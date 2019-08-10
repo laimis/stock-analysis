@@ -1,0 +1,26 @@
+<form>
+	<div class="form-group">
+		<label for="ticker">Symbol</label>
+		<input type="text" class="form-control" 
+			id="ticker"
+			aria-describedby="tickerHelp"
+			[(ngModel)]="ticker"
+			name="ticker" >
+		<small id="tickerHelp" class="form-text text-muted">Enter stock symbol</small>
+	</div>
+	<button type="submit" class="btn btn-primary" (click)="fetchStock()" style="display: none">Submit</button>
+</form>
+
+<div *ngIf="loaded" style="margin-top: 20px;">
+	
+	Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}} and largest loss of {{stock.largestLoss}}
+	
+	<img [src]="buildPriceChartUrl()">
+
+	<img [src]="buildVolumeChartUrl()">
+
+</div>
+
+<div *ngIf="!loaded">
+	Fetching stock information...
+</div>
