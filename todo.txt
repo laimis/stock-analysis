@@ -1,0 +1,17 @@
+- stock information caching, via actor perhaps
+
+- take out logic from controllers and put them into
+	queries and query handlers
+
+- any stock lower than their book value
+- stock that's P/E under 20 / 40 / 60
+- stock compare
+- ability to set baseline stock
+- industry trends recorded daily
+- stock caching information
+
+- portfolio
+	- define ticker, amount of stocks, avg price purchased
+- login with google oauth
+
+- chartjs integration

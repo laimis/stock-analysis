@@ -1,0 +1,25 @@
+<div *ngIf="loaded" style="margin-top: 20px;">
+	
+	<button style="float: right;" class="btn btn-primary" (click)="back()">Back to Dashboard</button>
+	
+	Total: {{stocks.list.length}}
+
+	<label>Price range breakdown</label>
+
+	<table>
+		<thead>
+			<th width="100">$ Range </th>
+			<th>Count</th>
+		</thead>
+		<tbody>
+			<tr *ngFor="let g of stocks.groups">
+				<td>{{g.bucket}}</td>
+				<td>{{g.count}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div *ngIf="!loaded">
+	Fetching stock list...
+</div>
