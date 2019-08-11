@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { StocksService } from '../services/stocks.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,8 +11,13 @@ export class DashboardComponent implements OnInit {
 
 	public tickers : string[];
 	public ticker : string;
+	public dashboard : object;
+	public loaded : boolean = false;
 
-	constructor(private router : Router) { }
+	constructor(
+		private stocks : StocksService,
+		private router : Router)
+	{ }
 
 	ngOnInit() {
 		this.tickers = [
@@ -25,6 +31,14 @@ export class DashboardComponent implements OnInit {
 			'TEUM',
 			'FTSV'
 		];
+
+		this.stocks.getDashboard().subscribe(result => {
+			this.dashboard = result;
+			this.loaded = true;
+		}, error => {
+			console.log(error);
+			this.loaded = true;
+		})
 	}
 
 	goToStock() {

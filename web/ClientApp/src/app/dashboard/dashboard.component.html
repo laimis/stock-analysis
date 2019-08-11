@@ -20,23 +20,64 @@
 	</ul>
 </div>
 
-<div>
-	<label>Gainers</label>
-	<ul>
-		
-	</ul>
-</div>
+<div *ngIf="loaded">
+	<div>
+		<label>Gainers</label>
+		<table>
+			<thead>
+				<th width="100">Ticker</th>
+				<th width="100">Price</th>
+				<th width="400">Company</th>
+				<th width="100">Change</th>
+			</thead>
+			<tbody>
+				<tr *ngFor="let a of dashboard.gainer">
+					<td><a [routerLink]="[ '/stocks', a.ticker ]">{{a.ticker}}</a></td>
+					<td>{{a.price}}</td>
+					<td>{{a.companyName}}</td>
+					<td>{{a.changesPercentage}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-<div>
-	<label>Losers</label>
-	<ul>
-		
-	</ul>
-</div>
+	<div>
+		<label>Losers</label>
+		<table>
+			<thead>
+				<th width="100">Ticker</th>
+				<th width="100">Price</th>
+				<th width="400">Company</th>
+				<th width="100">Change</th>
+			</thead>
+			<tbody>
+				<tr *ngFor="let a of dashboard.loser">
+					<td><a [routerLink]="[ '/stocks', a.ticker ]">{{a.ticker}}</a></td>
+					<td>{{a.price}}</td>
+					<td>{{a.companyName}}</td>
+					<td>{{a.changesPercentage}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-<div>
-	<label>Active</label>
-	<ul>
-		
-	</ul>
+	<div>
+		<label>Active</label>
+		<table>
+			<thead>
+				<th width="100">Ticker</th>
+				<th width="100">Price</th>
+				<th width="400">Company</th>
+				<th width="100">Change</th>
+			</thead>
+			<tbody>
+				<tr *ngFor="let a of dashboard.active">
+					<td><a [routerLink]="[ '/stocks', a.ticker ]">{{a.ticker}}</a></td>
+					<td>{{a.price}}</td>
+					<td>{{a.companyName}}</td>
+					<td>{{a.changesPercentage}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>

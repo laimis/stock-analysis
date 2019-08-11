@@ -9,17 +9,17 @@ namespace web.Controllers
 	[Route("api/[controller]")]
 	public class StocksController : Controller
 	{
-		private StockService _stockService;
+		private StocksService _stocksService;
 
-		public StocksController(StockService stockService)
+		public StocksController(StocksService stockService)
 		{
-			_stockService = stockService;
+			_stocksService = stockService;
 		}
 		
 		[HttpGet("{ticker}")]
 		public async Task<object> SummaryAsync(string ticker)
 		{
-			var data = await _stockService.GetHistoricalDataAsync(ticker);
+			var data = await _stocksService.GetHistoricalDataAsync(ticker);
 
 			var price = data.Historical.Last().Close;
 
@@ -37,14 +37,19 @@ namespace web.Controllers
 			var priceValues = byMonth.Select(a => Math.Round(a.Price,2));
 			var volumeValues = byMonth.Select(a => a.Volume);
 
-			var metrics = await _stockService.GetKeyMetrics(ticker);
+			var metrics = await _stocksService.GetKeyMetrics(ticker);
 
-			var mostRecent = metrics.Metrics[0];
+			var mostRecent = metrics.Metrics.FirstOrDefault();
 
-			var age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
+			int age = 0;
+			if (mostRecent != null)
+			{
+				age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
+			}
 
 			return new
 			{
+				ticker,
 				price,
 				largestGain,
 				largestLoss,
@@ -52,8 +57,8 @@ namespace web.Controllers
 				priceValues,
 				volumeValues,
 				age,
-				bookValue = mostRecent.BookValuePerShare,
-				peValue = mostRecent.PERatio,
+				bookValue = mostRecent?.BookValuePerShare,
+				peValue = mostRecent?.PERatio,
 				bookValues = metrics.Metrics.Select(m => m.BookValuePerShare),
 				peValues = metrics.Metrics.Select(m => m.PERatio)
 			};
