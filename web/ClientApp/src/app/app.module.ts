@@ -8,23 +8,30 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { StockListComponent } from './stock-list/stock-list.component';
+
+var routes = [
+	{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+	{ path: 'dashboard', component: DashboardComponent},
+
+	{ path: 'stocks/list', component: StockListComponent},
+	{ path: 'stocks/:ticker', component: StockDetailsComponent},
+	
+]
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
 	StockDetailsComponent,
-	DashboardComponent
+	DashboardComponent,
+	StockListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
-    RouterModule.forRoot([
-	  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-	  { path: 'dashboard', component: DashboardComponent},
-	  { path: 'stocks/:ticker', component: StockDetailsComponent}
-    ])
+    RouterModule.forRoot(routes)
   ],
   providers: [],
   bootstrap: [AppComponent]

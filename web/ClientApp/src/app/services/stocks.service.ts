@@ -13,6 +13,10 @@ export class StocksService {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
 	}
 
+	getStocks(): Observable<object> {
+		return this.http.get<object>('/api/stocks')
+	}
+
 	getDashboard(): Observable<object> {
 		return this.http.get<Object>('/api/dashboard')
 	}

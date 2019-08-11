@@ -6,6 +6,7 @@ import {Location} from '@angular/common';
 @Component({
   selector: 'app-home',
   templateUrl: './stock-details.component.html',
+  styleUrls: ['./stock-details.component.css']
 })
 export class StockDetailsComponent {
 

@@ -15,9 +15,27 @@ namespace web.Controllers
 		{
 			_stocksService = stockService;
 		}
+
+		[HttpGet]
+		public async Task<object> ListAsync()
+		{
+			var data = await _stocksService.GetAvailableStocks();
+
+			var groups = data.FilteredList.GroupBy(s => s.PriceBucket)
+				.Select(g => new {
+					bucket = g.Key,
+					count = g.Count()
+				})
+				.OrderBy(a => a.bucket);
+
+			return new {
+				list = data.FilteredList,
+				groups
+			};
+		}
 		
 		[HttpGet("{ticker}")]
-		public async Task<object> SummaryAsync(string ticker)
+		public async Task<object> DetailsAsync(string ticker)
 		{
 			var data = await _stocksService.GetHistoricalDataAsync(ticker);
 
@@ -47,6 +65,16 @@ namespace web.Controllers
 				age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
 			}
 
+			var ratings = await _stocksService.GetRatings(ticker);
+
+			var ratingInfo = new {
+				rating = ratings.Rating,
+				details = ratings.RatingDetails.Select(d => new {
+					name = d.Key,
+					rating = d.Value
+				})
+			};
+
 			return new
 			{
 				ticker,
@@ -60,7 +88,8 @@ namespace web.Controllers
 				bookValue = mostRecent?.BookValuePerShare,
 				peValue = mostRecent?.PERatio,
 				bookValues = metrics.Metrics.Select(m => m.BookValuePerShare),
-				peValues = metrics.Metrics.Select(m => m.PERatio)
+				peValues = metrics.Metrics.Select(m => m.PERatio),
+				ratings = ratingInfo
 			};
 		}
 	}

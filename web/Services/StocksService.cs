@@ -13,7 +13,7 @@ namespace web.Services
 
 		public async Task<HistoricalResponse> GetHistoricalDataAsync(string ticker)
 		{
-			var from = DateTime.UtcNow.AddMonths(-12).ToString("yyyy-MM-dd");
+			var from = DateTime.UtcNow.AddMonths(-16).ToString("yyyy-MM-dd");
 			var to = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd");
 
 			var url = $"{_endpoint}/historical-price-full/{ticker}?from={from}&to={to}";
@@ -25,6 +25,19 @@ namespace web.Services
 			var response = await r.Content.ReadAsStringAsync();
 
 			return JsonConvert.DeserializeObject<HistoricalResponse>(response);
+		}
+
+		internal async Task<StockListResponse> GetAvailableStocks()
+		{
+			var url = $"{_endpoint}/company/stock/list";
+
+			var r = await _client.GetAsync(url);
+
+			r.EnsureSuccessStatusCode();
+
+			var response = await r.Content.ReadAsStringAsync();
+
+			return JsonConvert.DeserializeObject<StockListResponse>(response);
 		}
 
 		internal async Task<List<StockActivity>> GetMostActive()
@@ -59,6 +72,19 @@ namespace web.Services
 			var response = await r.Content.ReadAsStringAsync();
 
 			return JsonConvert.DeserializeObject<T>(response);
+		}
+
+		internal async Task<StockRatings> GetRatings(string ticker)
+		{
+			var url = $"{_endpoint}/company/rating/{ticker}";
+
+			var r = await _client.GetAsync(url);
+
+			r.EnsureSuccessStatusCode();
+
+			var response = await r.Content.ReadAsStringAsync();
+
+			return JsonConvert.DeserializeObject<StockRatings>(response);
 		}
 
 		public async Task<MetricsResponse> GetKeyMetrics(string ticker)

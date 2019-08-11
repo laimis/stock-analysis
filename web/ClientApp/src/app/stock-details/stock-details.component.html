@@ -4,12 +4,29 @@
 	
 	<div>
 		<label>General</label>
-		Ticker {{stock.ticker}}, <a href="https://robinhood.com/stocks/{{stock.ticker}}" target="_blank">link on robinhood</a>
-	</div>
+		<div>
+			Ticker {{stock.ticker}}, <a href="https://robinhood.com/stocks/{{stock.ticker}}" target="_blank">link on robinhood</a>
+		</div>
 	<div>
 		<label>Price information</label>
 		<div>
 			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}} and largest loss of {{stock.largestLoss}}
+		</div>
+	</div>
+	<div>
+		<label>Ratings</label>
+		<div>
+			Overall {{stock.ratings.rating.recommendation}}
+			<table>
+				<thead>
+					<th align="middle" width="100" *ngFor="let r of stock.ratings.details">{{r.name}}</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td *ngFor="let r of stock.ratings.details">{{r.rating.recommendation}}</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 
