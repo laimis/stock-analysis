@@ -1,18 +1,22 @@
 import { Component } from '@angular/core';
 import { StocksService, StockSummary } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html',
+  templateUrl: './stock-details.component.html',
 })
-export class HomeComponent {
+export class StockDetailsComponent {
 
 	public ticker: string;
 	public loaded: boolean = false;
 	public stock: StockSummary;
 
-	constructor(private stocks : StocksService, private route: ActivatedRoute){}
+	constructor(
+		private stocks : StocksService,
+		private route: ActivatedRoute,
+		private location : Location){}
 
 	ngOnInit(): void {
 		var ticker = this.route.snapshot.paramMap.get('ticker');
@@ -30,6 +34,10 @@ export class HomeComponent {
 			console.error(error);
 			this.loaded = true;
 		});
+	}
+
+	back(){
+		this.location.back();
 	}
 
 	buildPriceChartUrl(){
@@ -53,18 +61,6 @@ export class HomeComponent {
 			   ]
 			},
 			options: {
-				scales: {
-					xAxes: [
-						{
-							display: false
-						}
-					],
-					yAxes: [
-						{
-							display: false
-						}
-					]
-				},
 				legend: {
 					labels: { 
 					  fontSize: 8

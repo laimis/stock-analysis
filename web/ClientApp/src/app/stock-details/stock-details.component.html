@@ -1,0 +1,45 @@
+<div *ngIf="loaded" style="margin-top: 20px;">
+	
+	<button style="float: right;" class="btn btn-primary" (click)="back()">Back to Dashboard</button>
+
+	<div>
+		<h3>Price information</h3>
+		<div>
+			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}} and largest loss of {{stock.largestLoss}}
+		</div>
+	</div>
+
+	<div>
+		<h3>Ratios</h3>
+		<div>
+			Book value of {{stock.bookValue}} with P/E ratio of {{stock.peValue}} (information is {{stock.age}} months old)
+		</div>
+	</div>
+	
+	<div>
+		<h3>Charts</h3>
+		<div>
+			<img [src]="buildPriceChartUrl()">
+			<!-- <img [src]="buildVolumeChartUrl()"> -->
+		</div>
+	</div>
+
+	<div>
+		<h3>Book Values</h3>
+		<ul>
+			<li *ngFor="let bv of stock.bookValues">{{bv}}</li>
+		</ul>
+	</div>
+
+	<div>
+		<h3>P/E Values</h3>
+		<ul>
+			<li *ngFor="let pe of stock.peValues">{{pe}}</li>
+		</ul>
+	</div>
+
+</div>
+
+<div *ngIf="!loaded">
+	Fetching stock information...
+</div>

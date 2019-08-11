@@ -6,22 +6,24 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { HomeComponent } from './home/home.component';
+import { StockDetailsComponent } from './stock-details/stock-details.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
-    HomeComponent
+	StockDetailsComponent,
+	DashboardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-	  { path: '', redirectTo: '/stocks', pathMatch: 'full' },
-	  { path: 'stocks', component: HomeComponent},
-	  { path: 'stocks/:ticker', component: HomeComponent}
+	  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+	  { path: 'dashboard', component: DashboardComponent},
+	  { path: 'stocks/:ticker', component: StockDetailsComponent}
     ])
   ],
   providers: [],

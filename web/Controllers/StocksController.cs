@@ -1,19 +1,25 @@
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using web.Services;
 
 namespace web.Controllers
 {
 	[Route("api/[controller]")]
 	public class StocksController : Controller
 	{
+		private StockService _stockService;
+
+		public StocksController(StockService stockService)
+		{
+			_stockService = stockService;
+		}
+		
 		[HttpGet("{ticker}")]
 		public async Task<object> SummaryAsync(string ticker)
 		{
-			var data = await GetHistoricalDataAsync(ticker);
+			var data = await _stockService.GetHistoricalDataAsync(ticker);
 
 			var price = data.Historical.Last().Close;
 
@@ -30,7 +36,13 @@ namespace web.Controllers
 			var priceLabels = byMonth.Select(a => a.Date.ToString("MMMM"));
 			var priceValues = byMonth.Select(a => Math.Round(a.Price,2));
 			var volumeValues = byMonth.Select(a => a.Volume);
-			
+
+			var metrics = await _stockService.GetKeyMetrics(ticker);
+
+			var mostRecent = metrics.Metrics[0];
+
+			var age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
+
 			return new
 			{
 				price,
@@ -38,45 +50,13 @@ namespace web.Controllers
 				largestLoss,
 				priceLabels,
 				priceValues,
-				volumeValues
+				volumeValues,
+				age,
+				bookValue = mostRecent.BookValuePerShare,
+				peValue = mostRecent.PERatio,
+				bookValues = metrics.Metrics.Select(m => m.BookValuePerShare),
+				peValues = metrics.Metrics.Select(m => m.PERatio)
 			};
 		}
-
-		private static HttpClient _client = new HttpClient();
-
-		private async Task<HistoricalResponse> GetHistoricalDataAsync(string ticker)
-		{
-			var from = DateTime.UtcNow.AddMonths(-12).ToString("yyyy-MM-dd");
-			var to = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd");
-
-			var url = $"https://financialmodelingprep.com/api/v3/historical-price-full/{ticker}?from={from}&to={to}";
-
-			var r = await _client.GetAsync(url);
-
-			r.EnsureSuccessStatusCode();
-
-			var response = await r.Content.ReadAsStringAsync();
-
-			return JsonConvert.DeserializeObject<HistoricalResponse>(response);
-		}
-
-		public class StockSummary
-		{
-			public float Price { get; set; }
-		}
-	}
-
-	internal class HistoricalResponse
-	{
-		public HistoricalPriceRecord[] Historical { get; set; }
-	}
-
-	public class HistoricalPriceRecord
-	{
-		public DateTime Date { get; set; }
-		public float Open { get; set; }
-		public float Close { get; set; }
-		public long Volume { get; set; }
-		public float ChangePercent { get; set; }
 	}
 }

@@ -1,0 +1,42 @@
+<h2>Stocks</h2>
+
+<form>
+	<div class="form-group">
+		<label for="ticker">Symbol</label>
+		<input type="text" class="form-control" 
+			id="ticker"
+			aria-describedby="tickerHelp"
+			[(ngModel)]="ticker"
+			name="ticker" >
+		<small id="tickerHelp" class="form-text text-muted">Enter stock symbol</small>
+	</div>
+	<button type="submit" class="btn btn-primary" (click)="goToStock()" style="display: none">Submit</button>
+</form>
+
+<div>
+	<label>Your portfolio</label>
+	<ul>
+		<li *ngFor="let ticker of tickers"><a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a></li>
+	</ul>
+</div>
+
+<div>
+	<label>Gainers</label>
+	<ul>
+		
+	</ul>
+</div>
+
+<div>
+	<label>Losers</label>
+	<ul>
+		
+	</ul>
+</div>
+
+<div>
+	<label>Active</label>
+	<ul>
+		
+	</ul>
+</div>
