@@ -36,7 +36,8 @@ namespace web
 
 			services.AddSingleton<IActorRef>(s => {
 				var stocks = s.GetService<StocksService>();
-				var props = Props.Create(() => new AnalysisCoordinator(stocks));
+				var storage = s.GetService<IAnalysisStorage>();
+				var props = Props.Create(() => new AnalysisCoordinator(stocks, storage));
 				return _system.ActorOf(props, "coordinator");
 			});
 		}

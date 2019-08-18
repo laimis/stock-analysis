@@ -10,10 +10,12 @@ namespace analysis
 		private Dictionary<string, IActorRef> _workers = new Dictionary<string, IActorRef>();
 		private Dictionary<string, JobStatus> _results = new Dictionary<string, JobStatus>();
 		private StocksService _stocks;
+		private IAnalysisStorage _storage;
 
-		public AnalysisCoordinator(StocksService stocks)
+		public AnalysisCoordinator(StocksService stocks, IAnalysisStorage storage)
 		{
 			this._stocks = stocks;
+			this._storage = storage;
 			
 			this.Receive<AnalyzeStocks>(m => StartAnalysis(m));
 			this.Receive<AnalysisFinished>(m => AnalysisFinished(m));
@@ -42,7 +44,7 @@ namespace analysis
 		{
 			var jobId = Guid.NewGuid().ToString("N");
 
-			var props = Props.Create(() => new AnalysisWorker(_stocks, jobId, m));
+			var props = Props.Create(() => new AnalysisWorker(_stocks, jobId, m, _storage));
 
 			var actor = Context.ActorOf(props, jobId);
 

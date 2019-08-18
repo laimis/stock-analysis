@@ -1,8 +1,5 @@
-- jobs section
-- job details with links
 - save job results in db somewhere
 - record how long it took to run it
-
 - book value per share trend, and how strong
 - P/E trend, and how strong
 

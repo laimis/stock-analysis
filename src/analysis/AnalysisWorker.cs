@@ -16,12 +16,18 @@ namespace analysis
 		private Queue<string> _toAnalyze = new Queue<string>();
 		private List<string> _candidates = new List<string>();
 		private AnalyzeStocks _cmd;
+		private IAnalysisStorage _storage;
 
-		public AnalysisWorker(StocksService stock, string jobId, AnalyzeStocks cmd)
+		public AnalysisWorker(
+			StocksService stock,
+			string jobId,
+			AnalyzeStocks cmd,
+			IAnalysisStorage storage)
 		{
 			this._service = stock;
 			this._jobId = jobId;
 			this._cmd = cmd;
+			this._storage = storage;
 
 			ReceiveAsync<StartAnalysis>(m => Start(m));
 			Receive<JobStatusQuery>(m => TellAboutStatus(m));
@@ -44,25 +50,10 @@ namespace analysis
 			var symbol = _toAnalyze.Dequeue();
 
 			var metrics = await this._service.GetKeyMetrics(symbol);
+			var prices = await this._service.GetHistoricalDataAsync(symbol);
+			var company = await this._service.GetCompanyProfile(symbol);
 
-			var mostRecent = metrics.Metrics.FirstOrDefault();
-
-			if (mostRecent != null && mostRecent.BookValuePerShare.HasValue)
-			{
-				var prices = await this._service.GetHistoricalDataAsync(symbol);
-
-				if (prices.Historical.Length > 0)
-				{
-					var price = prices.Historical.Last().Close;
-
-					if (price <= mostRecent.BookValuePerShare.Value * _cmd.BookValuePremium)
-					{
-						_candidates.Add(symbol);
-					}
-				}
-			}
-
-			_analyzed.Add(symbol);
+			await this._storage.SaveAnalysisAsync(symbol, metrics, prices, company);
 
 			Self.Tell(new AnalyzeStock());
 		}
