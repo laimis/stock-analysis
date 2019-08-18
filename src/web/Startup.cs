@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using storage;
 
 namespace web
 {
@@ -33,6 +34,7 @@ namespace web
 			});
 
 			services.AddSingleton<StocksService>();
+			services.AddSingleton<IAnalysisStorage, AnalysisStorage>();
 
 			services.AddSingleton<IActorRef>(s => {
 				var stocks = s.GetService<StocksService>();

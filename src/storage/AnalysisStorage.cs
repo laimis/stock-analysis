@@ -37,9 +37,13 @@ namespace storage
 		{
 			var query = "DELETE FROM companies WHERE ticker = :ticker";
 			db.Execute(query, new {ticker});
-			query = @"INSERT INTO companies (ticker, created, json) VALUES (:ticker, current_timestamp, :json)";
+			query = @"INSERT INTO companies (ticker, created, name, industry, sector, json) VALUES (:ticker, current_timestamp, :name, :industry, :sector, :json)";
 			var obj = new {
-				ticker = ticker, json = JsonConvert.SerializeObject(company)
+				ticker = ticker,
+				name = company.Profile.CompanyName,
+				industry = company.Profile.Industry,
+				sector = company.Profile.Sector,
+				json = JsonConvert.SerializeObject(company)
 			};
 			db.Execute(query, obj);
 		}
@@ -48,9 +52,11 @@ namespace storage
 		{
 			var query = "DELETE FROM prices WHERE ticker = :ticker";
 			db.Execute(query, new {ticker});
-			query = @"INSERT INTO prices (ticker, created, json) VALUES (:ticker, current_timestamp, :json)";
+			query = @"INSERT INTO prices (ticker, created, lastclose, json) VALUES (:ticker, current_timestamp, :lastclose, :json)";
 			var obj = new {
-				ticker = ticker, json = JsonConvert.SerializeObject(prices)
+				ticker = ticker,
+				lastclose = prices.Historical.LastOrDefault().Close,
+				json = JsonConvert.SerializeObject(prices)
 			};
 			db.Execute(query, obj);
 		}

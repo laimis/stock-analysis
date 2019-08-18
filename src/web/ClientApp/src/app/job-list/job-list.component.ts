@@ -13,17 +13,12 @@ export class JobListComponent implements OnInit {
 	public loading: boolean = false;
 	public jobs: object;
 	public job: JobResponse
-	intervalHolder: NodeJS.Timer;
 
 	constructor(
 		private service : StocksService,
 		private location : Location){}
 
 	ngOnInit() {
-		this.intervalHolder = setInterval(() => {
-			// Let's refresh the list.
-			this.refresh();
-		  }, 1000 * 5); // 1 minute
 		this.refresh()
 	}
 

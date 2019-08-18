@@ -12,11 +12,16 @@ namespace web.Controllers
 	{
 		private StocksService _stocksService;
 		private IActorRef _coordinator;
+		private IAnalysisStorage _storage;
 		private static readonly TimeSpan _timeout = TimeSpan.FromSeconds(15);
 
-		public AnalysisController(IActorRef coordinator)
+		public AnalysisController(
+			IActorRef coordinator,
+			IAnalysisStorage storage
+		)
 		{
 			_coordinator = coordinator;
+			_storage = storage;
 		}
 
 		[Route("start")]
@@ -30,20 +35,10 @@ namespace web.Controllers
 			};
 		}
 
-		[Route("jobs/{jobId}")]
-		public async Task<object> JobStatusAsync(string jobId)
+		[HttpGet()]
+		public object List()
 		{
-			var r = await this._coordinator.Ask<JobStatus>(new JobStatusQuery(jobId), _timeout);
-
-			return r;
-		}
-
-		[Route("jobs")]
-		public async Task<object> Jobs()
-		{
-			var r = await this._coordinator.Ask<JobsStatus>(new JobsStatusQuery(), _timeout);
-
-			return r;
+			return new { jobs = new object[0]};
 		}
 	}
 }
