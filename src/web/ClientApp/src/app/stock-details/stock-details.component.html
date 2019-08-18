@@ -1,0 +1,66 @@
+<div *ngIf="loaded" style="margin-top: 20px;">
+	
+	<button style="float: right;" class="btn btn-primary" (click)="goToDashboard()">Back to Dashboard</button>
+	
+	<div>
+		<label>General</label>
+		<div>
+			Ticker {{stock.ticker}}, <a href="https://robinhood.com/stocks/{{stock.ticker}}" target="_blank">link on robinhood</a>
+		</div>
+	<div>
+		<label>Price information</label>
+		<div>
+			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}} and largest loss of {{stock.largestLoss}}
+		</div>
+	</div>
+	<div>
+		<label>Ratings</label>
+		<div>
+			Overall {{stock.ratings.rating.recommendation}}
+			<table>
+				<thead>
+					<th align="middle" width="100" *ngFor="let r of stock.ratings.details">{{r.name}}</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td *ngFor="let r of stock.ratings.details">{{r.rating.recommendation}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div>
+		<label>Ratios</label>
+		<div>
+			Book value of {{stock.bookValue}} with P/E ratio of {{stock.peValue}} (information is {{stock.age}} months old)
+		</div>
+	</div>
+	
+	<div>
+		<label>Charts</label>
+		<div>
+			<img [src]="buildPriceChartUrl()">
+			<!-- <img [src]="buildVolumeChartUrl()"> -->
+		</div>
+	</div>
+
+	<div>
+		<label>Book Values</label>
+		<ul>
+			<li *ngFor="let bv of stock.bookValues">{{bv}}</li>
+		</ul>
+	</div>
+
+	<div>
+		<label>P/E Values</label>
+		<ul>
+			<li *ngFor="let pe of stock.peValues">{{pe}}</li>
+		</ul>
+	</div>
+
+</div>
+
+<div *ngIf="!loaded">
+	Fetching stock information...
+</div>
