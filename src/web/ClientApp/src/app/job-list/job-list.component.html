@@ -1,0 +1,39 @@
+<div *ngIf="loaded" style="margin-top: 20px;">
+	
+	<button style="float: right;" class="btn btn-primary" (click)="back()">Back to Dashboard</button>
+	
+	<div>
+		<button class="btn btn-primary" (click)="start()">Start analysis</button> &nbsp;&nbsp;
+		<button class="btn btn-primary" (click)="refresh()">Refresh</button>
+	</div>
+
+	Total: {{jobs.length}} <span *ngIf="loading">refreshing...</span>
+
+	<table>
+		<thead>
+			<th width="300">Job Id</th>
+			<th>Status</th>
+			<th>Details</th>
+		</thead>
+		<tbody>
+			<tr *ngFor="let j of jobs">
+				<td>{{j.key}}</td>
+				<td>{{j.value}}</td>
+				<td><button class="btn btn-link" (click)="details(j.key)">Details</button> </td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div *ngIf="job">
+		Analyzed {{job.analyzed}}, {{job.toAnalyze}} left to review. <br />
+		Candidates
+		<ul>
+			<li *ngFor="let item of job.candidates"> <a [routerLink]="[ '/stocks', item ]">{{item}}</a> </li>
+		</ul>
+	</div>
+
+</div>
+
+<div *ngIf="!loaded">
+	Fetching job list...
+</div>

@@ -3,9 +3,10 @@
 	<button style="float: right;" class="btn btn-primary" (click)="goToDashboard()">Back to Dashboard</button>
 	
 	<div>
-		<label>General</label>
+		<label>{{stock.profile.companyName}}</label> - {{stock.profile.industry}}/{{stock.profile.sector}}
 		<div>
-			Ticker {{stock.ticker}}, <a href="https://robinhood.com/stocks/{{stock.ticker}}" target="_blank">link on robinhood</a>
+			Ticker {{stock.ticker}}, <a href="https://robinhood.com/stocks/{{stock.ticker}}" target="_blank">link on robinhood</a> <br />
+			
 		</div>
 	<div>
 		<label>Price information</label>

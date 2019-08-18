@@ -37,6 +37,8 @@ namespace web.Controllers
 		[HttpGet("{ticker}")]
 		public async Task<object> DetailsAsync(string ticker)
 		{
+			var profile = await _stocksService.GetCompanyProfile(ticker);
+
 			var data = await _stocksService.GetHistoricalDataAsync(ticker);
 
 			var price = data.Historical.Last().Close;
@@ -82,6 +84,7 @@ namespace web.Controllers
 			{
 				ticker,
 				price,
+				profile = profile.Profile,
 				largestGain,
 				largestLoss,
 				priceLabels,

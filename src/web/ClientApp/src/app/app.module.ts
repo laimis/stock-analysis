@@ -9,6 +9,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { StockListComponent } from './stock-list/stock-list.component';
+import { JobListComponent } from './job-list/job-list.component';
 
 var routes = [
 	{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -16,6 +17,8 @@ var routes = [
 
 	{ path: 'stocks/list', component: StockListComponent},
 	{ path: 'stocks/:ticker', component: StockDetailsComponent},
+
+	{ path: 'jobs', component: JobListComponent}
 	
 ]
 
@@ -25,7 +28,8 @@ var routes = [
     NavMenuComponent,
 	StockDetailsComponent,
 	DashboardComponent,
-	StockListComponent
+	StockListComponent,
+	JobListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

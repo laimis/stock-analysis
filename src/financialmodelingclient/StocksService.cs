@@ -40,6 +40,19 @@ namespace financialmodelingclient
 			return JsonConvert.DeserializeObject<StockListResponse>(response);
 		}
 
+		public async Task<CompanyProfile> GetCompanyProfile(string ticker)
+		{
+			var url = $"{_endpoint}/company/profile/{ticker}";
+
+			var r = await _client.GetAsync(url);
+
+			r.EnsureSuccessStatusCode();
+
+			var response = await r.Content.ReadAsStringAsync();
+
+			return JsonConvert.DeserializeObject<CompanyProfile>(response);
+		}
+
 		public async Task<List<StockActivity>> GetMostActive()
 		{
 			var r = await GetStockActivity<MostActiveResponse>("actives");

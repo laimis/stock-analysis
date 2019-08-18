@@ -20,6 +20,30 @@ export class StocksService {
 	getDashboard(): Observable<object> {
 		return this.http.get<Object>('/api/dashboard')
 	}
+
+	getJobs(): Observable<JobsResponse> {
+		return this.http.get<JobsResponse>('/api/analysis/jobs')
+	}
+
+	getJob(jobId:string): Observable<JobResponse> {
+		return this.http.get<JobResponse>('/api/analysis/jobs/' + jobId)
+	}
+
+	startAnalysis(amount: Number) {
+		this.http.post('/api/analysis/start?maxCost=' + amount, null).subscribe(() => {
+			console.log('start finished')
+		})
+	}
+}
+
+export interface JobsResponse {
+	jobs: object[]
+}
+
+export interface JobResponse {
+	analyzed : Number
+	candidates : string[]
+	toAnalyze : Number
 }
 
 export interface StockSummary {
