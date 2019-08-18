@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,9 +30,15 @@ namespace analysis
 
 		private async Task RunAnalysisAsync(AnalyzeStock m)
 		{
+			Console.WriteLine("Run analysis");
+
 			if (_toAnalyze.Count == 0)
 			{
 				TellFinished();
+
+				Context.Self.Tell(PoisonPill.Instance);
+
+				return;
 			}
 
 			var symbol = _toAnalyze.Dequeue();
@@ -87,6 +94,8 @@ namespace analysis
 
 		private void TellFinished()
 		{
+			Console.WriteLine("Telling about finished signal");
+
 			Context.Parent.Tell(new AnalysisFinished(this._jobId, CreateStatus()));
 		}
 	}

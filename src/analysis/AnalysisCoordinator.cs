@@ -18,6 +18,24 @@ namespace analysis
 			this.Receive<AnalyzeStocks>(m => StartAnalysis(m));
 			this.Receive<AnalysisFinished>(m => AnalysisFinished(m));
 			this.ReceiveAsync<JobStatusQuery>(m => JobStatusAsync(m));
+			this.Receive<JobsStatusQuery>(m => JobsStatus(m));
+		}
+
+		private void JobsStatus(JobsStatusQuery m)
+		{
+			var jobs = new List<KeyValuePair<string, string>>();
+
+			foreach(var k in _workers)
+			{
+				jobs.Add(new KeyValuePair<string, string>(k.Key, "inprocess"));
+			}
+
+			foreach(var k in _results)
+			{
+				jobs.Add(new KeyValuePair<string, string>(k.Key, "completed"));
+			}
+
+			Sender.Tell(new JobsStatus(jobs));
 		}
 
 		private void StartAnalysis(AnalyzeStocks m)
@@ -37,6 +55,8 @@ namespace analysis
 
 		private void AnalysisFinished(AnalysisFinished m)
 		{
+			Console.WriteLine("Received finished signal for job " + m.JobId);
+
 			_workers.Remove(m.JobId);
 
 			_results[m.JobId] = m.Status;
@@ -46,12 +66,16 @@ namespace analysis
 		{
 			if (_workers.ContainsKey(q.JobId))
 			{
+				Console.WriteLine("Asking worker about status");
+
 				var r = await _workers[q.JobId].Ask<JobStatus>(q);
 
 				this.Sender.Tell(r);
 			}
 			else
 			{
+				Console.WriteLine("Using results for status");
+
 				this.Sender.Tell(_results[q.JobId]);
 			}
 		}
