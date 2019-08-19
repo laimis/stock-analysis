@@ -4,6 +4,7 @@ CREATE TABLE analysis (
 	lastprice DECIMAL,
 	lastbookvalue DECIMAL,
 	lastpevalue DECIMAL,
+	industry TEXT,
 	PRIMARY KEY(ticker)
 );
 ALTER TABLE analysis OWNER TO stocks;

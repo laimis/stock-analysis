@@ -25,3 +25,9 @@
 - login with google oauth
 
 - chartjs integration
+
+https://robinhood.com/stocks/GVA
+https://robinhood.com/stocks/PPL
+https://robinhood.com/stocks/FAST
+https://robinhood.com/stocks/CAG
+https://robinhood.com/stocks/TRS

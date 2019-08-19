@@ -1,4 +1,5 @@
-﻿using financialmodelingclient;
+﻿using System.Linq;
+using financialmodelingclient;
 using storage;
 using Xunit;
 
@@ -22,6 +23,16 @@ namespace storagetests
 			await storage.SaveAnalysisAsync(
 				ticker, metrics, prices, company
 			);
+
+			var list = await storage.GetAnalysisAsync();
+
+			Assert.NotEmpty(list);
+
+			Assert.Equal("Health Care Providers", list.First().Industry);
+
+			var a = await storage.GetAnalysisAsync("WHFBL");
+
+			Assert.NotNull(a);
 		}
 	}
 }

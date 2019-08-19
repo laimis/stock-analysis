@@ -3,34 +3,35 @@
 	<button style="float: right;" class="btn btn-primary" (click)="back()">Back to Dashboard</button>
 	
 	<div>
-		<button class="btn btn-primary" (click)="start()">Start analysis</button> &nbsp;&nbsp;
-		<button class="btn btn-primary" (click)="refresh()">Refresh</button>
+		<input type="number" name="minPrice" [(ngModel)]="minPrice" >&nbsp;
+		<input type="number" name="maxPrice" [(ngModel)]="maxPrice" >
+		&nbsp;&nbsp; <button class="btn btn-primary" (click)="start()">Start analysis</button> &nbsp;&nbsp;
 	</div>
 
-	Total: {{jobs.length}} <span *ngIf="loading">refreshing...</span>
+	<div>
+		<button class="btn btn-primary" (click)="refresh()">Load completed analysis</button>
+	</div>
+
+	<span *ngIf="loading">refreshing...</span>
 
 	<table>
 		<thead>
-			<th width="300">Job Id</th>
-			<th>Status</th>
-			<th>Details</th>
+			<th (click)="sortBy('ticker')" width="150">ticker</th>
+			<th (click)="sortBy('price')" width="150">price</th>
+			<th width="150">book value</th>
+			<th width="150">pe value</th>
+			<th>industry</th>
 		</thead>
 		<tbody>
-			<tr *ngFor="let j of jobs">
-				<td>{{j.key}}</td>
-				<td>{{j.value}}</td>
-				<td><button class="btn btn-link" (click)="details(j.key)">Details</button> </td>
+			<tr *ngFor="let a of analysis">
+				<td> <a [routerLink]="[ '/stocks', a.ticker ]">{{a.ticker}}</a></td>
+				<td>{{a.lastPrice}}</td>
+				<td>{{a.lastBookValue}}</td>
+				<td>{{a.lastPEValue}}</td>
+				<td>{{a.industry}}</td>
 			</tr>
 		</tbody>
 	</table>
-
-	<div *ngIf="job">
-		Analyzed {{job.analyzed}}, {{job.toAnalyze}} left to review. <br />
-		Candidates
-		<ul>
-			<li *ngFor="let item of job.candidates"> <a [routerLink]="[ '/stocks', item ]">{{item}}</a> </li>
-		</ul>
-	</div>
 
 </div>
 

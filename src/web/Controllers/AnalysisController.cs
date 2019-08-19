@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using analysis;
@@ -10,7 +11,6 @@ namespace web.Controllers
 	[Route("api/[controller]")]
 	public class AnalysisController : Controller
 	{
-		private StocksService _stocksService;
 		private IActorRef _coordinator;
 		private IAnalysisStorage _storage;
 		private static readonly TimeSpan _timeout = TimeSpan.FromSeconds(15);
@@ -24,21 +24,42 @@ namespace web.Controllers
 			_storage = storage;
 		}
 
-		[Route("start")]
-		public async Task<object> Start(int maxCost)
+		[HttpPost("start")]
+		public void Start(int min, int max)
 		{
-			var jobId = await _coordinator.Ask<string>(new AnalyzeStocks(maxCost, 1.1f), _timeout);
-
-			return new {
-				jobId,
-				href = "/api/analysis/jobs/" + jobId
-			};
+			_coordinator.Tell(new AnalyzeStocks(min, max));
 		}
 
 		[HttpGet()]
-		public object List()
+		public async Task<object> ListAsync(string sortBy, string sortDirection)
 		{
-			return new { jobs = new object[0]};
+			var list = await this._storage.GetAnalysisAsync();
+
+			list = list.Where(a => a.LastPEValue > 0);
+
+			if (sortBy != null)
+			{
+				if (sortDirection == "asc")
+				{
+					list = list.OrderBy(a => GetSortValue(a, sortBy));
+				}
+				else
+				{
+					list = list.OrderByDescending(a => GetSortValue(a, sortBy));
+				}
+			}
+
+			return list;
+		}
+
+		private object GetSortValue(AnalysisInfo a, string sortBy)
+		{
+			if (sortBy == "price")
+			{
+				return a.LastPrice;
+			}
+
+			return a.Ticker;
 		}
 	}
 }

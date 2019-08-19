@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using financialmodelingclient;
 
 namespace analysis
@@ -11,5 +12,9 @@ namespace analysis
 			HistoricalResponse prices,
 			CompanyProfile company
 		);
+
+		Task<IEnumerable<AnalysisInfo>> GetAnalysisAsync();
+
+		Task<AnalysisInfo> GetAnalysisAsync(string ticker);
 	}
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, JobResponse } from '../services/stocks.service';
+import { StocksService } from '../services/stocks.service';
 import {Location} from '@angular/common';
+import { mapToExpression } from '@angular/compiler/src/render3/view/util';
 
 @Component({
   selector: 'app-job-list',
@@ -11,8 +12,13 @@ export class JobListComponent implements OnInit {
 
 	public loaded: boolean = false;
 	public loading: boolean = false;
-	public jobs: object;
-	public job: JobResponse
+	public analysis: object[];
+
+	public minPrice : Number
+	public maxPrice : Number
+
+	sortByProperty:string = 'ticker';
+	sortDirection:string = 'asc';
 
 	constructor(
 		private service : StocksService,
@@ -23,14 +29,37 @@ export class JobListComponent implements OnInit {
 	}
 
 	start() {
-		console.log("starting analysis")
-		this.service.startAnalysis(5);
+		this.service.startAnalysis(this.minPrice, this.maxPrice);
+	}
+
+	sortBy(property:string){
+		
+		var changeInProperty = false;
+		if (this.sortByProperty != property)
+		{
+			changeInProperty = true;
+		}
+
+		this.sortByProperty = property;
+		if (!changeInProperty)
+		{
+			if (this.sortDirection == 'asc')
+			{
+				this.sortDirection = 'desc'
+			}
+			else
+			{
+				this.sortDirection = 'asc'
+			}
+		}
+
+		this.refresh();
 	}
 
 	refresh(){
 		this.loading = true;
-		this.service.getJobs().subscribe(result => {
-			this.jobs = result.jobs;
+		this.service.getAnalysis(this.sortByProperty, this.sortDirection).subscribe(result => {
+			this.analysis = result;
 			this.loaded = true;
 			this.loading = false;
 		}, error => {
@@ -38,12 +67,6 @@ export class JobListComponent implements OnInit {
 			this.loaded = true;
 			this.loading = false;
 		});
-	}
-
-	details(jobId:string){
-		this.service.getJob(jobId).subscribe(result => {
-			this.job = result;
-		})
 	}
 
 	back(){

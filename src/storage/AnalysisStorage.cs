@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,30 @@ namespace storage
 {
 	public class AnalysisStorage : IAnalysisStorage
 	{
+		public async Task<IEnumerable<AnalysisInfo>> GetAnalysisAsync()
+		{
+			using (var db = GetConnection())
+			{
+				db.Open();
+
+				var query = @"select * FROM analysis ORDER BY ticker";
+
+				return await db.QueryAsync<AnalysisInfo>(query);
+			}
+		}
+
+		public async Task<AnalysisInfo> GetAnalysisAsync(string ticker)
+		{
+			using (var db = GetConnection())
+			{
+				db.Open();
+
+				var query = @"select * FROM analysis WHERE ticker = :ticker";
+
+				return await db.QuerySingleOrDefaultAsync<AnalysisInfo>(query, new {ticker});
+			}
+		}
+
 		public Task SaveAnalysisAsync(
 			string ticker,
 			MetricsResponse metrics,
@@ -21,7 +46,7 @@ namespace storage
 			{
 				db.Open();
 
-				InsertAnalysis(ticker, metrics, prices, db);
+				InsertAnalysis(ticker, metrics, prices, company, db);
 
 				InsertMetrics(ticker, metrics, db);
 
@@ -72,18 +97,19 @@ namespace storage
 			db.Execute(query, obj);
 		}
 
-		private static void InsertAnalysis(string ticker, MetricsResponse metrics, HistoricalResponse prices, IDbConnection db)
+		private static void InsertAnalysis(string ticker, MetricsResponse metrics, HistoricalResponse prices, CompanyProfile profile, IDbConnection db)
 		{
 			var query = "DELETE FROM analysis WHERE ticker = :ticker";
 			db.Execute(query, new { ticker });
-			query = @"INSERT INTO analysis (ticker, created, lastprice, lastbookvalue, lastpevalue)
-				VALUES (:ticker, current_timestamp, :lastprice, :lastbookvalue, :lastpevalue)";
+			query = @"INSERT INTO analysis (ticker, created, lastprice, lastbookvalue, lastpevalue, industry)
+				VALUES (:ticker, current_timestamp, :lastprice, :lastbookvalue, :lastpevalue, :industry)";
 
 			var lastprice = prices.Historical.LastOrDefault();
 			var lastbookvalue = metrics.Metrics.FirstOrDefault()?.BookValuePerShare;
 			var lastpevalue = metrics.Metrics.FirstOrDefault()?.PERatio;
+			var industry = profile.Profile.Industry;
 
-			var obj = new { ticker, lastprice = lastprice?.Close, lastbookvalue, lastpevalue };
+			var obj = new { ticker, lastprice = lastprice?.Close, lastbookvalue, lastpevalue, industry };
 
 			db.Execute(query, obj);
 		}

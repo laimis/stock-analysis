@@ -2,15 +2,13 @@ namespace analysis
 {
 	public class AnalyzeStocks
 	{
-		public AnalyzeStocks(float priceLevel, float bookValuePremium, float? peRatio = null)
+		public AnalyzeStocks(float minPrice, float maxPrice)
 		{
-			this.PriceLevel = priceLevel;
-			this.BookValuePremium = bookValuePremium;
-			this.PERatio = peRatio;
+			this.MinPrice = minPrice;
+			this.MaxPrice = maxPrice;
 		}
 
-		public float PriceLevel { get; }
-		public float BookValuePremium { get; }
-		public float? PERatio { get; }
+		public float MinPrice { get; }
+		public float MaxPrice { get; }
 	}
 }

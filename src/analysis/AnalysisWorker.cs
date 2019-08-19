@@ -22,6 +22,13 @@ namespace analysis
 
 		private async Task RunAnalysisAsync(AnalyzeStock m)
 		{
+			var existing = await this._storage.GetAnalysisAsync(m.Ticker);
+			if (existing != null)
+			{
+				Console.WriteLine("Found existing analysis " + m.Ticker);
+				return;
+			}
+
 			Console.WriteLine("Run analysis " + m.Ticker);
 
 			var ticker = m.Ticker;

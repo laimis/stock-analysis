@@ -29,7 +29,7 @@ namespace analysis
 
 			foreach(var s in stocks.FilteredList)
 			{
-				if (s.Price < m.PriceLevel)
+				if (s.Price >= m.MinPrice && s.Price <= m.MaxPrice)
 				{
 					_worker.Tell(new AnalyzeStock(s.Symbol));
 				}
