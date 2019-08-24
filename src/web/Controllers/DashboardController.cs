@@ -14,17 +14,19 @@ namespace web.Controllers
 			_stocksService = stockService;
 		}
 
-		[HttpGet]
-		public async Task<object> Index()
+		[HttpGet("portfolio")]
+		public string[] Portfolio()
 		{
-			var active = await _stocksService.GetMostActive();
-			var gainer = await _stocksService.GetMostGainer();
-			var loser = await _stocksService.GetMostLosers();
-
-			return new {
-				active,
-				gainer,
-				loser
+			return new [] {
+				"F",
+				"CTST",
+				"EGBN",
+				"BAC",
+				"ACB",
+				"IRBT",
+				"TRQ",
+				"TEUM",
+				"FTSV"
 			};
 		}
 	}

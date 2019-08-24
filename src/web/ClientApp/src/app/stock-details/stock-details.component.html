@@ -11,12 +11,12 @@
 	<div>
 		<label>Price information</label>
 		<div>
-			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}} and largest loss of {{stock.largestLoss}}
+			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}}% and largest loss of {{stock.largestLoss}}%
 		</div>
 	</div>
 	<div>
 		<label>Ratings</label>
-		<div>
+		<div *ngIf="stock.ratings.details">
 			Overall {{stock.ratings.rating.recommendation}}
 			<table>
 				<thead>
@@ -29,6 +29,7 @@
 				</tbody>
 			</table>
 		</div>
+		<div *ngIf="!stock.ratings.details">No rating information available</div>
 	</div>
 
 	<div>

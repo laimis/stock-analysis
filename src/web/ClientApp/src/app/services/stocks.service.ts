@@ -17,8 +17,8 @@ export class StocksService {
 		return this.http.get<object>('/api/stocks')
 	}
 
-	getDashboard(): Observable<object> {
-		return this.http.get<Object>('/api/dashboard')
+	getPortfolio(): Observable<string[]> {
+		return this.http.get<string[]>('/api/dashboard/portfolio')
 	}
 
 	getAnalysis(sortby:string, sortdirection:string): Observable<object[]> {

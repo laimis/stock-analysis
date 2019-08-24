@@ -9,9 +9,8 @@ import { StocksService } from '../services/stocks.service';
 })
 export class DashboardComponent implements OnInit {
 
-	public tickers : string[];
+	public portfolioTickers : string[];
 	public ticker : string;
-	public dashboard : object;
 	public loaded : boolean = false;
 
 	constructor(
@@ -20,20 +19,9 @@ export class DashboardComponent implements OnInit {
 	{ }
 
 	ngOnInit() {
-		this.tickers = [
-			'F',
-			'CTST',
-			'EGBN',
-			'BAC',
-			'ACB',
-			'IRBT',
-			'TRQ',
-			'TEUM',
-			'FTSV'
-		];
 
-		this.stocks.getDashboard().subscribe(result => {
-			this.dashboard = result;
+		this.stocks.getPortfolio().subscribe(result => {
+			this.portfolioTickers = result;
 			this.loaded = true;
 		}, error => {
 			console.log(error);
