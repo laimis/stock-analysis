@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\storage\storage.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\storage\storage.csproj" />
     <ProjectReference Include="..\..\src\financialmodelingclient\financialmodelingclient.csproj" />
   </ItemGroup>
 
