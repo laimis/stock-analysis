@@ -34,7 +34,10 @@ namespace web
 			});
 
 			services.AddSingleton<StocksService>();
-			services.AddSingleton<IAnalysisStorage, AnalysisStorage>();
+			services.AddSingleton<IAnalysisStorage>(s => {
+				var cnn = this.Configuration.GetConnectionString("db");
+				return new AnalysisStorage(cnn);
+			});
 
 			services.AddSingleton<IActorRef>(s => {
 				var stocks = s.GetService<StocksService>();

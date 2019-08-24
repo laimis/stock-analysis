@@ -12,6 +12,13 @@ namespace storage
 {
 	public class AnalysisStorage : IAnalysisStorage
 	{
+		private string _cnn;
+
+		public AnalysisStorage(string cnn)
+		{
+			_cnn = cnn;
+		}
+		
 		public async Task<IEnumerable<AnalysisInfo>> GetAnalysisAsync()
 		{
 			using (var db = GetConnection())
@@ -116,7 +123,7 @@ namespace storage
 
 		private IDbConnection GetConnection()
 		{
-			return new NpgsqlConnection("Server=localhost;Database=stocks;User id=stocks;password=stocks");
+			return new NpgsqlConnection(_cnn);
 		}
 	}
 }
