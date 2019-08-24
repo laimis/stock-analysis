@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using analysis;
-using financialmodelingclient;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers

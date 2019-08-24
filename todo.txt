@@ -1,4 +1,3 @@
-- review stocks project, charts usage
 - deploy to aws as a container
 - get stock project out there somewhere
 
@@ -10,7 +9,6 @@
 
 - take out logic from controllers and put them into
 	queries and query handlers
-
 
 
 - portfolio

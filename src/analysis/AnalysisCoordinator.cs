@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Akka.Actor;
+﻿using Akka.Actor;
 using financialmodelingclient;
 
 namespace analysis

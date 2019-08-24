@@ -7,11 +7,8 @@ namespace web.Controllers
 	[Route("api/[controller]")]
 	public class DashboardController : Controller
 	{
-		private StocksService _stocksService;
-
-		public DashboardController(StocksService stockService)
+		public DashboardController()
 		{
-			_stocksService = stockService;
 		}
 
 		[HttpGet("portfolio")]
