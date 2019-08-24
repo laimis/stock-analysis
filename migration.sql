@@ -36,3 +36,14 @@ CREATE TABLE prices (
 	PRIMARY KEY(ticker)
 );
 ALTER TABLE prices OWNER TO stocks;
+
+
+CREATE TABLE ownedstocks (
+	ticker TEXT,
+	userid TEXT,
+	created TIMESTAMP,
+	version INT,
+	eventjson TEXT,
+	PRIMARY KEY(ticker, userid, version)
+);
+ALTER TABLE ownedstocks OWNER TO stocks;

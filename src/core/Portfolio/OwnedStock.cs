@@ -6,12 +6,25 @@ namespace core.Portfolio
 	public class OwnedStock
 	{
 		public OwnedStockState State { get; }
-		private List<AggregateEvent> Events { get; }
+		private List<AggregateEvent> _events { get; }
+		public int Version { get; }
+
+		public IReadOnlyList<AggregateEvent> Events => _events.AsReadOnly();
 
 		public OwnedStock()
 		{
 			this.State = new OwnedStockState();
-			this.Events = new List<AggregateEvent>();
+			this._events = new List<AggregateEvent>();
+		}
+
+		public OwnedStock(List<AggregateEvent> events) : this()
+		{
+			foreach(var e in events)
+			{
+				Apply(e);
+			}
+
+			this.Version = events.Count;
 		}
 
 		public OwnedStock(string ticker, string userId, int amount, double price) : this()
@@ -28,7 +41,7 @@ namespace core.Portfolio
 
 		private void Apply(AggregateEvent obj)
 		{
-			this.Events.Add(obj);
+			this._events.Add(obj);
 
 			ApplyInternal(obj);
 		}

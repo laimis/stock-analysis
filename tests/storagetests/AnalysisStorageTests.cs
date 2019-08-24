@@ -8,7 +8,7 @@ namespace storagetests
 	[Trait("Category", "Integration")]
 	public class StorageTests
 	{
-		private static string _cnn = "Server=localhost;Database=stocks;User id=stocks;password=stocks";
+		internal static string _cnn = "Server=localhost;Database=stocks;User id=stocks;password=stocks";
 		
 		[Fact]
 		public async System.Threading.Tasks.Task StoraAnalysisAsync()
