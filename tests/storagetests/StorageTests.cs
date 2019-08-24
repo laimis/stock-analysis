@@ -5,14 +5,17 @@ using Xunit;
 
 namespace storagetests
 {
+	[Trait("Category", "Integration")]
 	public class StorageTests
 	{
+		private static string _cnn = "Server=localhost;Database=stocks;User id=stocks;password=stocks";
+		
 		[Fact]
 		public async System.Threading.Tasks.Task StoraAnalysisAsync()
 		{
 			var service = new StocksService();
 
-			var storage = new AnalysisStorage();
+			var storage = new AnalysisStorage(_cnn);
 
 			var ticker = "CCL";
 
