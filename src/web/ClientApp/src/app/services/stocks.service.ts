@@ -33,9 +33,8 @@ export class StocksService {
 }
 
 export interface StockSummary {
-	priceLabels : string[]
-	priceValues : Number[]
-	lowValues : Number[]
-	highValues : Number[]
-	volumeValues : Number[]
+	priceChartData : object[]
+	volumeChartData : object[]
+	peChartData : object[]
+	bookChartData : object[]
 }

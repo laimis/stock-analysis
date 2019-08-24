@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
+import { GoogleChartsModule } from 'angular-google-charts';
+
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
@@ -35,7 +37,8 @@ var routes = [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
-    RouterModule.forRoot(routes)
+	RouterModule.forRoot(routes),
+	GoogleChartsModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

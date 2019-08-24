@@ -13,6 +13,43 @@ export class StockDetailsComponent {
 	public ticker: string;
 	public loaded: boolean = false;
 	public stock: StockSummary;
+	
+	public priceChartType = "ColumnChart";
+	public priceOptions = {
+		title: "price",
+		legend: { position: "none" },
+		bar: {
+			groupWidth: 15
+		}
+	};
+	public priceChartData: object;
+
+	public volumeChartData: object;
+	public volumeOptions = {
+		title: "volume",
+		legend: { position: "none" },
+		bar: {
+			groupWidth: 15
+		}
+	};
+
+	public peChartData: object;
+	public peOptions = {
+		title: "P/E",
+		legend: { position: "none" },
+		bar: {
+			groupWidth: 15
+		}
+	};
+
+	public bookChartData: object;
+	public bookOptions = {
+		title: "book value",
+		legend: { position: "none" },
+		bar: {
+			groupWidth: 15
+		}
+	};
 
 	constructor(
 		private stocks : StocksService,
@@ -31,6 +68,10 @@ export class StockDetailsComponent {
 	fetchStock() {
 		this.stocks.getStockSummary(this.ticker).subscribe(result => {
 			this.stock = result;
+			this.priceChartData = result.priceChartData;
+			this.volumeChartData = result.volumeChartData;
+			this.bookChartData = result.bookChartData;
+			this.peChartData = result.peChartData;
 			this.loaded = true;
 		}, error => {
 			console.error(error);
@@ -40,48 +81,5 @@ export class StockDetailsComponent {
 
 	goToDashboard(){
 		this.router.navigateByUrl('/dashboard')
-	}
-
-	buildPriceChartUrl(){
-		var chart:any = {
-			type: 'line',
-			data: {
-			   labels: this.stock.priceLabels,
-			   datasets: [
-				   {
-					   label: 'low',
-					   data: this.stock.lowValues
-				   },
-				   {
-					label: 'high',
-					data: this.stock.highValues
-				}
-			   ]
-			},
-			options: {
-				legend: {
-					labels: { 
-					  fontSize: 8
-					}
-				},
-				plugins: {
-					datalabels: {
-					  display: true,
-					  font: {
-						  size: 8
-					  }
-					},
-					axislabels :{
-						font: {
-							size: 8
-						}
-					}
-				}
-			}
-		 }
-
-		 var payload = JSON.stringify(chart);
-
-		return "https://quickchart.io/chart?w=500&h=200&c="+ payload;
 	}
 }

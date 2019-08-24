@@ -6,7 +6,6 @@
 		<label>{{stock.profile.companyName}}</label> - {{stock.profile.industry}}/{{stock.profile.sector}}
 		<div>
 			Ticker {{stock.ticker}}, <a href="https://robinhood.com/stocks/{{stock.ticker}}" target="_blank">link on robinhood</a> <br />
-			
 		</div>
 	<div>
 		<label>Price information</label>
@@ -42,25 +41,18 @@
 	<div>
 		<label>Charts</label>
 		<div>
-			<img [src]="buildPriceChartUrl()">
-			<!-- <img [src]="buildVolumeChartUrl()"> -->
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="priceChartData" [options]="priceOptions"></google-chart>
+		</div>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="volumeChartData" [options]="volumeOptions"></google-chart>
+		</div>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="bookChartData" [options]="bookOptions"></google-chart>
+		</div>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="peChartData" [options]="peOptions"></google-chart>
 		</div>
 	</div>
-
-	<div>
-		<label>Book Values</label>
-		<ul>
-			<li *ngFor="let bv of stock.bookValues">{{bv}}</li>
-		</ul>
-	</div>
-
-	<div>
-		<label>P/E Values</label>
-		<ul>
-			<li *ngFor="let pe of stock.peValues">{{pe}}</li>
-		</ul>
-	</div>
-
 </div>
 
 <div *ngIf="!loaded">

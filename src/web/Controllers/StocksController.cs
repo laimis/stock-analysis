@@ -55,12 +55,10 @@ namespace web.Controllers
 					High = g.Max(p => p.Close)
 				});
 
-			var priceLabels = byMonth.Select(a => a.Date.ToString("MMMM"));
-			var priceValues = byMonth.Select(a => Math.Round(a.Price,2));
+			var labels = byMonth.Select(a => a.Date.ToString("MMMM"));
 			var lowValues = byMonth.Select(a => Math.Round(a.Low, 2));
 			var highValues = byMonth.Select(a => Math.Round(a.High, 2));
-			var volumeValues = byMonth.Select(a => a.Volume);
-
+			
 			var metrics = await _stocksService.GetKeyMetrics(ticker);
 
 			var mostRecent = metrics.Metrics.FirstOrDefault();
@@ -80,24 +78,34 @@ namespace web.Controllers
 				})
 			};
 
+			var priceValues = byMonth.Select(a => Math.Round(a.Price,2));
+			var priceChartData = labels.Zip(priceValues, (l, p) => new object[] { l, p});
+
+			var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare);
+			var bookChartData = labels.Zip(bookValues, (l, p) => new object[] { l, p});
+
+			var peValues = metrics.Metrics.Select(m => m.PERatio);
+			var peChartData = labels.Zip(peValues, (l, p) => new object[] { l, p});
+
+			var volumeValues = byMonth.Select(a => a.Volume);
+			var volumeChartData = labels.Zip(volumeValues, (l, p) => new object[] { l, p});
+
 			return new
 			{
 				ticker,
 				price,
 				profile = profile.Profile,
-				largestGain,
-				largestLoss,
-				priceLabels,
-				priceValues,
-				volumeValues,
-				lowValues,
-				highValues,
 				age,
 				bookValue = mostRecent?.BookValuePerShare,
 				peValue = mostRecent?.PERatio,
-				bookValues = metrics.Metrics.Select(m => m.BookValuePerShare),
-				peValues = metrics.Metrics.Select(m => m.PERatio),
-				ratings = ratingInfo
+				ratings = ratingInfo,
+				largestGain,
+				largestLoss,
+				labels,
+				priceChartData,
+				volumeChartData,
+				bookChartData,
+				peChartData
 			};
 		}
 	}
