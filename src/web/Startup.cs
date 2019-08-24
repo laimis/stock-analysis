@@ -1,5 +1,6 @@
 using Akka.Actor;
 using core;
+using core.Stocks;
 using financialmodelingclient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,7 +34,7 @@ namespace web
 				configuration.RootPath = "ClientApp/dist";
 			});
 
-			services.AddSingleton<StocksService>();
+			services.AddSingleton<IStocksService, StocksService>();
 			services.AddSingleton<IAnalysisStorage>(s => {
 				var cnn = this.Configuration.GetConnectionString("db");
 				return new AnalysisStorage(cnn);
