@@ -1,15 +1,15 @@
 ﻿using Akka.Actor;
-using financialmodelingclient;
+using core.Stocks;
 
 namespace core
 {
 	public class AnalysisCoordinator : ReceiveActor
 	{
-		private StocksService _stocks;
+		private IStocksService _stocks;
 		private IAnalysisStorage _storage;
 		private IActorRef _worker;
 
-		public AnalysisCoordinator(StocksService stocks, IAnalysisStorage storage)
+		public AnalysisCoordinator(IStocksService stocks, IAnalysisStorage storage)
 		{
 			this._stocks = stocks;
 			this._storage = storage;

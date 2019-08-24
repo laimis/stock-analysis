@@ -1,6 +1,6 @@
 using System;
 
-namespace financialmodelingclient
+namespace core.Stocks
 {
 	public class HistoricalPriceRecord
 	{

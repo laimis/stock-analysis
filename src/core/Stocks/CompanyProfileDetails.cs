@@ -1,4 +1,4 @@
-namespace financialmodelingclient
+namespace core.Stocks
 {
 	public class CompanyProfileDetails
 	{

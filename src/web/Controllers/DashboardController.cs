@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using financialmodelingclient;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers

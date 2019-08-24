@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using financialmodelingclient;
+using core.Stocks;
 
 namespace core
 {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace financialmodelingclient
+namespace core.Stocks
 {
 	public class StockListResponse
 	{

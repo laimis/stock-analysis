@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using financialmodelingclient;
+using core.Stocks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers
@@ -9,9 +9,9 @@ namespace web.Controllers
 	[Route("api/[controller]")]
 	public class StocksController : Controller
 	{
-		private StocksService _stocksService;
+		private IStocksService _stocksService;
 
-		public StocksController(StocksService stockService)
+		public StocksController(IStocksService stockService)
 		{
 			_stocksService = stockService;
 		}

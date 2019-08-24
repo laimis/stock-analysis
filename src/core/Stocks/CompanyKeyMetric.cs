@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace financialmodelingclient
+namespace core.Stocks
 {
 	public class CompanyKeyMetric
 	{

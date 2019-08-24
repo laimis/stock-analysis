@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace financialmodelingclient
+namespace core.Stocks
 {
 	public class MostActiveResponse
 	{

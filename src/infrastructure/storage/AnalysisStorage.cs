@@ -3,8 +3,8 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Stocks;
 using Dapper;
-using financialmodelingclient;
 using Newtonsoft.Json;
 using Npgsql;
 

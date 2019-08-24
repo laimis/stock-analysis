@@ -1,18 +1,16 @@
 using System;
 using System.Threading.Tasks;
 using Akka.Actor;
-using financialmodelingclient;
+using core.Stocks;
 
 namespace core
 {
 	public class AnalysisWorker : ReceiveActor
 	{
-		private StocksService _service;
+		private IStocksService _service;
 		private IAnalysisStorage _storage;
 
-		public AnalysisWorker(
-			StocksService stock,
-			IAnalysisStorage storage)
+		public AnalysisWorker(IStocksService stock, IAnalysisStorage storage)
 		{
 			this._service = stock;
 			this._storage = storage;
