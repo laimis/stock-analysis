@@ -1,3 +1,8 @@
+- OwnedStock
+	ticker, userid, OwnershipEvent
+
+
+
 - deploy to aws as a container
 - get stock project out there somewhere
 - take out logic from controllers and put them into
