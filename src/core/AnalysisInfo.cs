@@ -1,4 +1,4 @@
-﻿namespace analysis
+﻿namespace core
 {
 	public class AnalysisInfo
 	{

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using financialmodelingclient;
 
-namespace analysis
+namespace core
 {
 	public interface IAnalysisStorage
 	{

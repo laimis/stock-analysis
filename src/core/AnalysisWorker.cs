@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using financialmodelingclient;
 
-namespace analysis
+namespace core
 {
 	public class AnalysisWorker : ReceiveActor
 	{

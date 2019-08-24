@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using analysis;
+using core;
 using Dapper;
 using financialmodelingclient;
 using Newtonsoft.Json;

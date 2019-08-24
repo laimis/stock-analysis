@@ -1,16 +1,7 @@
 - deploy to aws as a container
 - get stock project out there somewhere
-
-- book value per share trend, and how strong
-- P/E trend, and how strong
-- stock compare
-- ability to set baseline stock
-- industry trends recorded daily
-
 - take out logic from controllers and put them into
 	queries and query handlers
-
-
 - portfolio
 	- define ticker, amount of stocks, avg price purchased
 - login with google oauth

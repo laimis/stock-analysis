@@ -1,5 +1,5 @@
 using Akka.Actor;
-using analysis;
+using core;
 using financialmodelingclient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

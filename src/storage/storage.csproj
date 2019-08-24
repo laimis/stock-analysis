@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\analysis\analysis.csproj" />
+    <ProjectReference Include="..\core\core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

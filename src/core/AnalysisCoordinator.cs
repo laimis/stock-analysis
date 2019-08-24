@@ -1,7 +1,7 @@
 ﻿using Akka.Actor;
 using financialmodelingclient;
 
-namespace analysis
+namespace core
 {
 	public class AnalysisCoordinator : ReceiveActor
 	{
