@@ -59,16 +59,6 @@ namespace web.Controllers
 			var lowValues = byMonth.Select(a => Math.Round(a.Low, 2));
 			var highValues = byMonth.Select(a => Math.Round(a.High, 2));
 			
-			var metrics = await _stocksService.GetKeyMetrics(ticker);
-
-			var mostRecent = metrics.Metrics.FirstOrDefault();
-
-			int age = 0;
-			if (mostRecent != null)
-			{
-				age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
-			}
-
 			var ratings = await _stocksService.GetRatings(ticker);
 			var ratingInfo = new {
 				rating = ratings.Rating?.ToString() ?? "not available",
@@ -81,14 +71,30 @@ namespace web.Controllers
 			var priceValues = byMonth.Select(a => Math.Round(a.Price,2));
 			var priceChartData = labels.Zip(priceValues, (l, p) => new object[] { l, p});
 
-			var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare);
-			var bookChartData = labels.Zip(bookValues, (l, p) => new object[] { l, p});
-
-			var peValues = metrics.Metrics.Select(m => m.PERatio);
-			var peChartData = labels.Zip(peValues, (l, p) => new object[] { l, p});
-
 			var volumeValues = byMonth.Select(a => a.Volume);
 			var volumeChartData = labels.Zip(volumeValues, (l, p) => new object[] { l, p});
+
+			var metrics = await _stocksService.GetKeyMetrics(ticker);
+			var mostRecent = metrics.Metrics.FirstOrDefault();
+
+			int age = 0;
+			if (mostRecent != null)
+			{
+				age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
+			}
+
+			var metricDates = metrics.Metrics.Select(m => m.Date.ToString("MM/yy")).Reverse();
+
+			var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare).Reverse();
+			var bookChartData = metricDates.Zip(bookValues, (l, p) => new object[] { l, p});
+
+			var peValues = metrics.Metrics.Select(m => m.PERatio).Reverse();
+			var peChartData = metricDates.Zip(peValues, (l, p) => new object[] { l, p});
+
+			foreach(var m in metrics.Metrics)
+			{
+				Console.WriteLine($"{m.Date} - {m.BookValuePerShare} - {m.PERatio}");
+			}
 
 			return new
 			{
