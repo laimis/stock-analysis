@@ -1,3 +1,5 @@
+- ability to buy stock from stock details
+
 - buy/sell, validation
 - buy/sell, easier calendar integration
 

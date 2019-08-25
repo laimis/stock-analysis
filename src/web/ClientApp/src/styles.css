@@ -6,6 +6,7 @@
 
 .dashboard-button {
 	float: right;
+	margin-right: 5px;
 }
 
 .wide-chart {

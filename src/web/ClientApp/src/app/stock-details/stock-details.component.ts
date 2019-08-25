@@ -82,4 +82,8 @@ export class StockDetailsComponent {
 	goToDashboard(){
 		this.router.navigateByUrl('/dashboard')
 	}
+
+	buyStock(){
+		this.router.navigateByUrl('/stocks/purchase/' + this.ticker)
+	}
 }

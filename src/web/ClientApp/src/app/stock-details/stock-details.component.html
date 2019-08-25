@@ -1,6 +1,7 @@
 <div *ngIf="loaded" class="top-container">
 	
 	<button class="btn btn-primary dashboard-button" (click)="goToDashboard()">Back to Dashboard</button>
+	<button class="btn btn-secondary dashboard-button" (click)="buyStock()">Buy</button>
 	
 	<div>
 		<label>{{stock.profile.companyName}}</label> - {{stock.profile.industry}}/{{stock.profile.sector}}

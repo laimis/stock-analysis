@@ -20,6 +20,7 @@ var routes = [
 
 	{ path: 'stocks/list', component: StockListComponent},
 	{ path: 'stocks/purchase', component: StockPurchaseComponent},
+	{ path: 'stocks/purchase/:ticker', component: StockPurchaseComponent},
 	{ path: 'stocks/:ticker', component: StockDetailsComponent},
 
 	{ path: 'jobs', component: JobListComponent}
