@@ -27,16 +27,24 @@ namespace core.Portfolio
 			this.Version = events.Count;
 		}
 
-		public OwnedStock(string ticker, string userId, int amount, double price) : this()
+		public OwnedStock(string ticker, string userId) : this()
 		{
 			Apply(new TickerObtained(ticker, userId, DateTime.UtcNow));
-			
-			Purchase(amount, price);
 		}
 
-		public void Purchase(int amount, double price)
+		public void Purchase(int amount, double price, DateTime date)
 		{
-			Apply(new StockPurchased(this.State.Ticker, this.State.UserId, amount, price, DateTime.UtcNow));
+			Apply(new StockPurchased(this.State.Ticker, this.State.UserId, amount, price, date));
+		}
+
+		public void Sell(int amount, double price, DateTime date)
+		{
+			if (amount > this.State.Owned)
+			{
+				throw new InvalidOperationException("Amount owned is less than what is desired to sell");
+			}
+			
+			Apply(new StockSold(this.State.Ticker, this.State.UserId, amount, price, date));
 		}
 
 		private void Apply(AggregateEvent obj)
@@ -61,6 +69,12 @@ namespace core.Portfolio
 		{
 			this.State.Ticker = tickerObtained.Ticker;
 			this.State.UserId = tickerObtained.UserId;
+		}
+
+		private void ApplyInternal(StockSold sold)
+		{
+			this.State.Owned -= sold.Amount;
+			this.State.Earned += sold.Amount * sold.Price;
 		}
 	}
 }

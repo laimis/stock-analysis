@@ -6,5 +6,6 @@ namespace core.Portfolio
 		public string UserId { get; internal set; }
 		public int Owned { get; internal set; }
 		public double Spent { get; internal set; }
+		public double Earned { get; internal set; }
 	}
 }

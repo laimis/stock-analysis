@@ -7,5 +7,6 @@ namespace core.Portfolio
 	{
 		Task<OwnedStock> GetStock(string ticker, string userId);
 		Task<IEnumerable<OwnedStock>> GetStocks(string userId);
+		Task Save(OwnedStock stock);
 	}
 }

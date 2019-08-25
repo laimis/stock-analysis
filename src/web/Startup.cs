@@ -1,5 +1,6 @@
 using Akka.Actor;
 using core;
+using core.Portfolio;
 using core.Stocks;
 using financialmodelingclient;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,11 @@ namespace web
 			services.AddSingleton<IAnalysisStorage>(s => {
 				var cnn = this.Configuration.GetConnectionString("db");
 				return new AnalysisStorage(cnn);
+			});
+
+			services.AddSingleton<IPortfolioStorage>(s => {
+				var cnn = this.Configuration.GetConnectionString("db");
+				return new PortfolioStorage(cnn);
 			});
 
 			services.AddSingleton<IActorRef>(s => {

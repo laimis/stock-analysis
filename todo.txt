@@ -1,5 +1,6 @@
-- OwnedStock
-	ticker, userid, OwnershipEvent
+- load portfolio from database
+- allow to record purchase
+
 
 
 

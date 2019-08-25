@@ -9,7 +9,10 @@ import { StocksService } from '../services/stocks.service';
 })
 export class DashboardComponent implements OnInit {
 
-	public portfolioTickers : string[];
+	public owned : object[];
+	public cashedOut : object[];
+	public totalSpent : Number;
+	public totalEarned : Number;
 	public ticker : string;
 	public loaded : boolean = false;
 
@@ -21,7 +24,10 @@ export class DashboardComponent implements OnInit {
 	ngOnInit() {
 
 		this.stocks.getPortfolio().subscribe(result => {
-			this.portfolioTickers = result;
+			this.owned = result.owned;
+			this.cashedOut = result.cashedOut;
+			this.totalEarned = result.totalEarned;
+			this.totalSpent = result.totalSpent;
 			this.loaded = true;
 		}, error => {
 			console.log(error);
