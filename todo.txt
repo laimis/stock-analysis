@@ -1,4 +1,3 @@
-- default date to today
 - buy/sell, validation
 - buy/sell, easier calendar integration
 - deploy to aws as a container
