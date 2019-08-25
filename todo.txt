@@ -1,8 +1,5 @@
-- load portfolio from database
-- allow to record purchase
-
-
-
+- buy/sell, validation
+- buy/sell, easier calendar integration
 
 - deploy to aws as a container
 - get stock project out there somewhere
@@ -11,6 +8,7 @@
 - portfolio
 	- define ticker, amount of stocks, avg price purchased
 - login with google oauth
+
 
 - chartjs integration
 

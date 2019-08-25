@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D067D9A3-32F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "analysis", "src\core\core.csproj", "{3B806027-868A-4619-894A-82A32E9F9037}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financialmodelingclient", "src\financialmodelingclient\financialmodelingclient.csproj", "{28834F0A-7FBD-4DD5-9E18-97E99CF79371}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financialmodelingclient", "src\infrastructure\financialmodelingclient\financialmodelingclient.csproj", "{28834F0A-7FBD-4DD5-9E18-97E99CF79371}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "web", "src\web\web.csproj", "{93CEE505-9175-4866-9DE5-FF83D00B98F4}"
 EndProject

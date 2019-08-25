@@ -26,8 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\financialmodelingclient\financialmodelingclient.csproj" />
     <ProjectReference Include="..\core\core.csproj" />
+    <ProjectReference Include="..\infrastructure\financialmodelingclient\financialmodelingclient.csproj" />
     <ProjectReference Include="..\infrastructure\storage\storage.csproj" />
   </ItemGroup>
 
