@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
 import {Location} from '@angular/common';
-import { mapToExpression } from '@angular/compiler/src/render3/view/util';
 
 @Component({
   selector: 'app-job-list',
