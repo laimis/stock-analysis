@@ -1,2 +1,2 @@
 cd src\web
-start dotnet watch run
+dotnet watch run
