@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+
+.top-container {
+	margin-top: 20px;
+}
+
+.dashboard-button {
+	float: right;
+}
+
+.wide-chart {
+	width: 100%;
+}

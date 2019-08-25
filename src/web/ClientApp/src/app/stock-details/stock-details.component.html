@@ -1,6 +1,6 @@
-<div *ngIf="loaded" style="margin-top: 20px;">
+<div *ngIf="loaded" class="top-container">
 	
-	<button style="float: right;" class="btn btn-primary" (click)="goToDashboard()">Back to Dashboard</button>
+	<button class="btn btn-primary dashboard-button" (click)="goToDashboard()">Back to Dashboard</button>
 	
 	<div>
 		<label>{{stock.profile.companyName}}</label> - {{stock.profile.industry}}/{{stock.profile.sector}}
