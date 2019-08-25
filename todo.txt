@@ -1,5 +1,3 @@
-- ability to buy stock from stock details
-- optional route to stock buy
 - default date to today
 - buy/sell, validation
 - buy/sell, easier calendar integration
