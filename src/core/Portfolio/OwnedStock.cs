@@ -34,6 +34,16 @@ namespace core.Portfolio
 
 		public void Purchase(int amount, double price, DateTime date)
 		{
+			if (price <= 0)
+			{
+				throw new InvalidOperationException("Price cannot be empty or zero");
+			}
+
+			if (date == DateTime.MinValue)
+			{
+				throw new InvalidOperationException("Purchase date not specified");
+			}
+			
 			Apply(new StockPurchased(this.State.Ticker, this.State.UserId, amount, price, date));
 		}
 

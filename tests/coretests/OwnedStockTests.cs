@@ -38,5 +38,21 @@ namespace coretests
 
 			Assert.ThrowsAny<Exception>(() => stock.Sell(20, 100, DateTime.UtcNow));
 		}
+
+		[Fact]
+		public void BuyingForZeroThrows()
+		{
+			var stock = new OwnedStock("ticker", "user");
+
+			Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.UtcNow));
+		}
+
+		[Fact]
+		public void BuyingWithBadDateThrows()
+		{
+			var stock = new OwnedStock("ticker", "user");
+
+			Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.MinValue));
+		}
 	}
 }
