@@ -1,18 +1,11 @@
 - ability to buy stock from stock details
-
+- optional route to stock buy
+- default date to today
 - buy/sell, validation
 - buy/sell, easier calendar integration
-
 - deploy to aws as a container
 - get stock project out there somewhere
-- take out logic from controllers and put them into
-	queries and query handlers
-- portfolio
-	- define ticker, amount of stocks, avg price purchased
 - login with google oauth
-
-
-- chartjs integration
 
 https://robinhood.com/stocks/GVA
 https://robinhood.com/stocks/PPL
