@@ -29,6 +29,16 @@ namespace core.Portfolio
 
 		public OwnedStock(string ticker, string userId) : this()
 		{
+			if (string.IsNullOrWhiteSpace(ticker))
+			{
+				throw new InvalidOperationException("Missing ticker value");
+			}
+
+			if (string.IsNullOrWhiteSpace(userId))
+			{
+				throw new InvalidOperationException("Missing user id");
+			}
+
 			Apply(new TickerObtained(ticker, userId, DateTime.UtcNow));
 		}
 
