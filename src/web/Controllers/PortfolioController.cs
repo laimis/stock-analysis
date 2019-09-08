@@ -33,6 +33,8 @@ namespace web.Controllers
 			return new {
 				totalSpent,
 				totalEarned,
+				totalCashedOutSpend = cashedout.Sum(s => s.State.Spent),
+				totalCashedOutEarnings = cashedout.Sum(s => s.State.Earned),
 				owned = owned.Select(o => ToOwnedView(o)),
 				cashedOut = cashedout.Select(o => ToOwnedView(o))
 			};

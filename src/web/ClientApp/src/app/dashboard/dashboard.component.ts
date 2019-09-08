@@ -13,6 +13,8 @@ export class DashboardComponent implements OnInit {
 	public cashedOut : object[];
 	public totalSpent : Number;
 	public totalEarned : Number;
+	public totalCashedOutSpend : number;
+	public totalCashedOutEarnings : number;
 	public ticker : string;
 	public loaded : boolean = false;
 
@@ -28,6 +30,8 @@ export class DashboardComponent implements OnInit {
 			this.cashedOut = result.cashedOut;
 			this.totalEarned = result.totalEarned;
 			this.totalSpent = result.totalSpent;
+			this.totalCashedOutSpend = result.totalCashedOutSpend;
+			this.totalCashedOutEarnings = result.totalCashedOutEarnings;
 			this.loaded = true;
 		}, error => {
 			console.log(error);
@@ -37,6 +41,14 @@ export class DashboardComponent implements OnInit {
 
 	goToStock() {
 		this.router.navigateByUrl('/stocks/' + this.ticker)
+	}
+
+	cashedOutGains(){
+		return this.totalCashedOutEarnings - this.totalCashedOutSpend;
+	}
+
+	cashedOutGainsPct(){
+		return this.cashedOutGains() / this.totalCashedOutSpend * 100;
 	}
 
 }

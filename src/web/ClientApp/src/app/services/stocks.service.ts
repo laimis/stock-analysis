@@ -45,6 +45,8 @@ export interface Portfolio {
 	cashedOut: object[]
 	totalEarned: Number
 	totalSpent: Number
+	totalCashedOutSpend : number
+	totalCashedOutEarnings : number
 }
 
 export interface StockSummary {

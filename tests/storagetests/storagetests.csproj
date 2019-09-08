@@ -15,7 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\infrastructure\storage\storage.csproj" />
 	<ProjectReference Include="..\..\src\core\core.csproj" />
-    <ProjectReference Include="..\..\src\financialmodelingclient\financialmodelingclient.csproj" />
+	<ProjectReference Include="..\..\src\infrastructure\financialmodelingclient\financialmodelingclient.csproj" />
   </ItemGroup>
 
 </Project>

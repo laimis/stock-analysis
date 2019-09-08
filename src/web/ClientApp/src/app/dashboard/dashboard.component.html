@@ -35,6 +35,12 @@
 
 <h2>Cashed Out Stocks</h2>
 
+<ul>
+	<li>Spent: {{totalCashedOutSpend | currency}}</li>
+	<li>Earned: {{totalCashedOutEarnings | currency}}</li>
+	<li>Profit: {{cashedOutGains() | currency}}, {{cashedOutGainsPct() | number }}%</li>
+</ul>
+
 <table class="table">
 	<thead>
 		<tr>
@@ -49,7 +55,7 @@
 			<td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
 			<td>{{ticker.spent}}</td>
 			<td>{{ticker.earned}}</td>
-			<td>{{ticker.earned - ticker.spent}}</td>
+			<td>{{ticker.earned - ticker.spent | currency}}</td>
 		</tr>
 	</tbody>
 </table>

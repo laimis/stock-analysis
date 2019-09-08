@@ -1,11 +1,14 @@
+- options tracking
+	- option definition
+		type
+		strike price
+		target date
+		premium
+
+
+
 - buy/sell, validation
 - buy/sell, easier calendar integration
 - deploy to aws as a container
 - get stock project out there somewhere
 - login with google oauth
-
-https://robinhood.com/stocks/GVA
-https://robinhood.com/stocks/PPL
-https://robinhood.com/stocks/FAST
-https://robinhood.com/stocks/CAG
-https://robinhood.com/stocks/TRS
