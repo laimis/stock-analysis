@@ -1,10 +1,12 @@
-- options tracking
-	- option definition
-		type
-		strike price
-		target date
-		premium
++ implement options purchase screen
+- record in database
+- list of options
+- total money received
+- total money spent
 
+options list: https://cloud.iexapis.com/stable/ref-data/options/symbols?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
+stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
+historical volume info: https://cloud.iexapis.com/stable/stock/aapl/chart/5y?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
 
 
 - buy/sell, validation

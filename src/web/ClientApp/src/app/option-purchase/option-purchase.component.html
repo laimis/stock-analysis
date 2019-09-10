@@ -1,0 +1,54 @@
+<div class="top-container">
+
+	<div *ngIf="purchased">Purchased!</div>
+	
+	<button class="btn btn-primary dashboard-button" (click)="back()">Back to Dashboard</button>
+	
+	<div class="option-purchase-c-container">
+		<form>
+			<div class="form-group">
+				<label for="buyOrSell">Buy/Sell&nbsp;&nbsp;</label>
+				<select name="buyOrSell" [(ngModel)]="buyOrSell">
+					<option>Buy</option>
+					<option>Sell</option>
+				</select>
+			</div>
+			
+			<div class="form-group">
+				<label for="ticker">Ticker</label>
+				<input type="text" class="form-control" id="ticker" placeholder="TSLA" name="ticker" [(ngModel)]="ticker">
+			</div>
+
+			<div class="form-group">
+				<label for="strikePrice">Strike Price</label>
+				<input type="number" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="strikePrice">
+			</div>
+
+			<div class="form-group">
+				<label for="optionType">Type &nbsp;&nbsp; </label>
+				<select name="optionType" [(ngModel)]="optionType">
+					<option>CALL</option>
+					<option>PUT</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="amount">Amount</label>
+				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="amount">
+			</div>
+
+			<div class="form-group">
+				<label for="premium">Premium</label>
+				<input type="premium" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
+			</div>
+
+			<div class="form-group">
+				<label for="date">Filled</label>
+				<input type="date" class="form-control" id="date"name="date" [(ngModel)]="date">
+			</div>
+
+			<button type="submit" class="btn btn-primary mb-2" (click)="submitPurchase()">Open</button>&nbsp;&nbsp;
+			<button type="submit" class="btn btn-primary mb-2 btn-info" (click)="submitSell()">Close</button>
+		</form>
+	</div>
+</div>

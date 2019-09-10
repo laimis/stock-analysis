@@ -13,6 +13,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { StockListComponent } from './stock-list/stock-list.component';
 import { JobListComponent } from './job-list/job-list.component';
 import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
+import { OptionPurchaseComponent } from './option-purchase/option-purchase.component';
 
 var routes = [
 	{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -22,6 +23,8 @@ var routes = [
 	{ path: 'stocks/purchase', component: StockPurchaseComponent},
 	{ path: 'stocks/purchase/:ticker', component: StockPurchaseComponent},
 	{ path: 'stocks/:ticker', component: StockDetailsComponent},
+
+	{ path: 'options/purchase', component: OptionPurchaseComponent},
 
 	{ path: 'jobs', component: JobListComponent}
 	
@@ -35,7 +38,8 @@ var routes = [
 	DashboardComponent,
 	StockListComponent,
 	JobListComponent,
-	StockPurchaseComponent
+	StockPurchaseComponent,
+	OptionPurchaseComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

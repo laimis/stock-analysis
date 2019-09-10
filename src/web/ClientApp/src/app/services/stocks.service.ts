@@ -33,6 +33,10 @@ export class StocksService {
 		return this.http.post('/api/portfolio/sell', obj)
 	}
 
+	openOption(obj:object) {
+		console.log(obj);
+	}
+
 	startAnalysis(minPrice: Number, maxPrice: Number) {
 		this.http.post('/api/analysis/start?min=' + minPrice + '&max=' + maxPrice, null).subscribe(() => {
 			console.log('start finished')
