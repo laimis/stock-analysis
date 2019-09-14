@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using core.Shared;
 
 namespace core.Portfolio
 {
-    public class OwnedOption : Aggregate
+    public class SoldOption : Aggregate
     {
-        private OwnedOptionState _state = new OwnedOptionState();
-        public OwnedOptionState State => _state;
+        private SoldOptionState _state = new SoldOptionState();
+        public SoldOptionState State => _state;
 
-        public OwnedOption(string ticker, OptionType type, DateTimeOffset expiration, double strikePrice, string userId)
+        public SoldOption(string ticker, OptionType type, DateTimeOffset expiration, double strikePrice, string userId)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -40,7 +40,7 @@ namespace core.Portfolio
             Apply(new OptionObtained(ticker, type, strikePrice, expiration, userId, DateTime.UtcNow));
         }
 
-        public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
+        public SoldOption(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
 

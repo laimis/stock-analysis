@@ -7,7 +7,7 @@ namespace core.Portfolio
     {
 
         public OptionObtained(string tickerSymbol, OptionType type, double strikePrice, DateTimeOffset expiration, string userId, DateTime when)
-            : base(OwnedOption.GenerateKey(tickerSymbol, type, expiration, strikePrice), userId, when)
+            : base(SoldOption.GenerateKey(tickerSymbol, type, expiration, strikePrice), userId, when)
         {
             this.TickerSymbol = tickerSymbol;
             this.Type = type;

@@ -29,7 +29,7 @@ namespace web.Controllers
             var totalSpent = stocks.Sum(s => s.State.Spent);
             var totalEarned = stocks.Sum(s => s.State.Earned);
 
-            var options = await _storage.GetOptions(_user);
+            var options = await _storage.GetSoldOptions(_user);
             
             return new
             {
@@ -74,7 +74,7 @@ namespace web.Controllers
             };
         }
 
-        private object ToOptionView(OwnedOption o)
+        private object ToOptionView(SoldOption o)
         {
             return new
             {
@@ -109,10 +109,10 @@ namespace web.Controllers
         {
             var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType.ToString());
 
-            var option = await this._storage.GetOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
+            var option = await this._storage.GetSoldOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
             if (option == null)
             {
-                option = new OwnedOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
+                option = new SoldOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
             }
 
             option.Open(model.Amount, model.Premium, model.Filled);

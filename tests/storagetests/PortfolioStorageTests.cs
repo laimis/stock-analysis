@@ -47,7 +47,7 @@ namespace storagetests
         [Fact]
         public async Task OwnedOption_WorksAsync()
         {
-            var option = new OwnedOption(
+            var option = new SoldOption(
                 GenerateTestTicker(),
                 OptionType.CALL,
                 new DateTimeOffset(2019, 9, 20, 0, 0, 0, 0, TimeSpan.FromSeconds(0)),
@@ -61,7 +61,7 @@ namespace storagetests
 
             await storage.Save(option);
 
-            var loaded = await storage.GetOption(
+            var loaded = await storage.GetSoldOption(
                 option.State.Ticker,
                 option.State.Type,
                 option.State.Expiration,
@@ -72,7 +72,7 @@ namespace storagetests
 
             Assert.Equal(option.State.StrikePrice, loaded.State.StrikePrice);
 
-            var list = await storage.GetOptions(_userId);
+            var list = await storage.GetSoldOptions(_userId);
 
             var fromList = list.Single(o => o.State.Ticker == option.State.Ticker);
 

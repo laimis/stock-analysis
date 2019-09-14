@@ -4,12 +4,12 @@ import { Location, DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-option-purchase',
-  templateUrl: './option-purchase.component.html',
-  styleUrls: ['./option-purchase.component.css'],
+  selector: 'app-option-sell',
+  templateUrl: './option-sell.component.html',
+  styleUrls: ['./option-sell.component.css'],
   providers: [DatePipe]
 })
-export class OptionPurchaseComponent implements OnInit {
+export class OptionSellComponent implements OnInit {
 
   public option : OptionDefinition
   public ticker : string

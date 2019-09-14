@@ -10,8 +10,8 @@ namespace core.Portfolio
         Task<IEnumerable<OwnedStock>> GetStocks(string userId);
         Task Save(OwnedStock stock);
 
-        Task<IEnumerable<OwnedOption>> GetOptions(string user);
-        Task<OwnedOption> GetOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId);
-        Task Save(OwnedOption option);
+        Task<IEnumerable<SoldOption>> GetSoldOptions(string user);
+        Task<SoldOption> GetSoldOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId);
+        Task Save(SoldOption option);
     }
 }

@@ -1,16 +1,8 @@
-+ implement options purchase screen
-- record in database
-- list of options
-- total money received
-- total money spent
+- ability to navigate into option details
+- option purchase after ticker, show available dates, and volume information
+
+- start incorporating iexapis client
 
 options list: https://cloud.iexapis.com/stable/ref-data/options/symbols?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
 stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
 historical volume info: https://cloud.iexapis.com/stable/stock/aapl/chart/5y?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
-
-
-- buy/sell, validation
-- buy/sell, easier calendar integration
-- deploy to aws as a container
-- get stock project out there somewhere
-- login with google oauth
