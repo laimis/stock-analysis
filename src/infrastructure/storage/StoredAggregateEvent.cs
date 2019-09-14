@@ -1,5 +1,5 @@
 using System;
-using core.Portfolio;
+using core.Shared;
 using Newtonsoft.Json;
 
 namespace storage

@@ -1,25 +1,15 @@
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Portfolio;
 using Dapper;
-using Npgsql;
 
 namespace storage
 {
-    public class PortfolioStorage : IPortfolioStorage
+    public class PortfolioStorage : AggregateStorage, IPortfolioStorage
     {
-        private string _cnn;
-
-        public PortfolioStorage(string cnn)
+        public PortfolioStorage(string cnn) : base(cnn)
         {
-            _cnn = cnn;
-        }
-
-        private IDbConnection GetConnection()
-        {
-            return new NpgsqlConnection(_cnn);
         }
 
         public async Task<OwnedStock> GetStock(string ticker, string userId)
