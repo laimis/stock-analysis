@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	public class PortfolioController : Controller
 	{
 		private IPortfolioStorage _storage;

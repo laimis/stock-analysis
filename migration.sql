@@ -38,12 +38,13 @@ CREATE TABLE prices (
 ALTER TABLE prices OWNER TO stocks;
 
 
-CREATE TABLE ownedstocks (
-	ticker TEXT,
+CREATE TABLE events (
+	key TEXT,
+    entity TEXT,
 	userid TEXT,
 	created TIMESTAMP,
 	version INT,
 	eventjson TEXT,
-	PRIMARY KEY(ticker, userid, version)
+	PRIMARY KEY(entity, key, userid, version)
 );
-ALTER TABLE ownedstocks OWNER TO stocks;
+ALTER TABLE events OWNER TO stocks;
