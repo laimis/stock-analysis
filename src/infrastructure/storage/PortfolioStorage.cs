@@ -28,7 +28,7 @@ namespace storage
             {
                 db.Open();
 
-                var query = @"select * FROM events WHERE  key = :ticker AND userId = :userId ORDER BY version";
+                var query = @"select * FROM events WHERE entity = 'ownedstock' AND key = :ticker AND userId = :userId ORDER BY version";
 
                 var list = await db.QueryAsync<StoredAggregateEvent>(query, new { ticker, userId });
 
@@ -66,7 +66,7 @@ namespace storage
                         };
 
                         var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
-						(@Ticker, @UserId, @Created, @Version, @EventJson)";
+						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
 
                         await db.ExecuteAsync(query, se);
                     }
@@ -82,7 +82,7 @@ namespace storage
             {
                 db.Open();
 
-                var query = @"select * FROM events WHERE type = 'ownedstock' userId = :userId ORDER BY version";
+                var query = @"select * FROM events WHERE entity = 'ownedstock' AND userId = :userId ORDER BY version";
 
                 var list = await db.QueryAsync<StoredAggregateEvent>(query, new { userId });
 
