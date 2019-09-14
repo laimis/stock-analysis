@@ -28,9 +28,9 @@ namespace storage
             {
                 db.Open();
 
-                var query = @"select * FROM events WHERE entity = 'ownedstock' AND key = :key AND userId = :userId ORDER BY version";
+                var query = @"select * FROM events WHERE entity = :entity AND key = :key AND userId = :userId ORDER BY version";
 
-                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { key, userId });
+                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, key, userId });
 
                 return list.Select(e => e.Event);
             }

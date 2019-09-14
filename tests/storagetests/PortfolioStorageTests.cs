@@ -6,36 +6,70 @@ using Xunit;
 
 namespace storagetests
 {
-	public class PortfolioStorageTests
-	{
+    public class PortfolioStorageTests
+    {
         const string _userId = "testuser";
 
-		[Fact]
-		public async Task OwnedStockStorageAsync()
-		{
-			var stock = new OwnedStock(Guid.NewGuid().ToString("N").Substring(0, 4), _userId);
+        [Fact]
+        public async Task OwnedStockStorageAsync()
+        {
+            var stock = new OwnedStock(GenerateTestTicker(), _userId);
 
-			stock.Purchase(10, 2.1, DateTime.UtcNow);
-			
-			var storage = new PortfolioStorage(StorageTests._cnn);
+            stock.Purchase(10, 2.1, DateTime.UtcNow);
 
-			await storage.Save(stock);
+            var storage = new PortfolioStorage(StorageTests._cnn);
 
-			var loadedList = await storage.GetStocks(_userId);
+            await storage.Save(stock);
 
-			Assert.NotEmpty(loadedList);
+            var loadedList = await storage.GetStocks(_userId);
 
-			var loaded = await storage.GetStock(stock.State.Ticker, _userId);
+            Assert.NotEmpty(loadedList);
 
-			Assert.Equal(loaded.State.Owned, stock.State.Owned);
+            var loaded = await storage.GetStock(stock.State.Ticker, _userId);
 
-			loaded.Purchase(5, 5, DateTime.UtcNow);
+            Assert.Equal(loaded.State.Owned, stock.State.Owned);
 
-			await storage.Save(loaded);
+            loaded.Purchase(5, 5, DateTime.UtcNow);
 
-			loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
+            await storage.Save(loaded);
 
-			Assert.NotEqual(loaded.State.Owned, stock.State.Owned);
-		}
-	}
+            loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
+
+            Assert.NotEqual(loaded.State.Owned, stock.State.Owned);
+        }
+
+        private static string GenerateTestTicker()
+        {
+            return $"test-{Guid.NewGuid().ToString("N").Substring(0, 4)}";
+        }
+
+        [Fact]
+        public async Task OwnedOption_WorksAsync()
+        {
+            var option = new OwnedOption(
+                GenerateTestTicker(),
+                OptionType.CALL,
+                new DateTimeOffset(2019, 9, 20, 0, 0, 0, 0, TimeSpan.FromSeconds(0)),
+                2.5,
+                _userId
+            );
+
+            option.Open(1, 8, DateTimeOffset.UtcNow);
+
+            var storage = new PortfolioStorage(StorageTests._cnn);
+
+            await storage.Save(option);
+
+            var loaded = await storage.GetOption(
+                option.State.Ticker,
+                option.State.Type,
+                option.State.Expiration,
+                option.State.StrikePrice,
+                _userId);
+
+            Assert.NotNull(loaded);
+
+            Assert.Equal(option.State.StrikePrice, loaded.State.StrikePrice);
+        }
+    }
 }

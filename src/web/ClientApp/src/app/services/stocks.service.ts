@@ -33,8 +33,8 @@ export class StocksService {
 		return this.http.post('/api/portfolio/sell', obj)
 	}
 
-	openOption(obj:object) {
-		console.log(obj);
+	openOption(obj:object) : Observable<any> {
+		return this.http.post('/api/portfolio/open', obj)
 	}
 
 	startAnalysis(minPrice: Number, maxPrice: Number) {
@@ -58,4 +58,19 @@ export interface StockSummary {
 	volumeChartData : object[]
 	peChartData : object[]
 	bookChartData : object[]
+}
+
+export class OptionDefinition {
+  ticker: string
+  strikePrice: number
+  expiration: string
+  optionType: OptionType
+  amount: number
+  premium: number
+  filled: string
+}
+
+enum OptionType {
+  CALL,
+  PUT
 }
