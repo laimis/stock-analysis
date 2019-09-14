@@ -6,19 +6,14 @@ namespace core.Portfolio
 {
     public class OwnedStock : Aggregate
     {
-        public OwnedStockState State { get; }
-
-        public OwnedStock() : base()
-        {
-            this.State = new OwnedStockState();
-        }
+        private OwnedStockState _state = new OwnedStockState();
+        public OwnedStockState State => _state;
 
         public OwnedStock(List<AggregateEvent> events) : base(events)
         {
-            this.State = new OwnedStockState();
         }
 
-        public OwnedStock(string ticker, string userId) : this()
+        public OwnedStock(string ticker, string userId)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -31,6 +26,18 @@ namespace core.Portfolio
             }
 
             Apply(new TickerObtained(ticker, userId, DateTime.UtcNow));
+        }
+
+        protected override void Apply(AggregateEvent obj)
+        {
+            this._events.Add(obj);
+
+            ApplyInternal(obj);
+        }
+
+        protected void ApplyInternal(dynamic obj)
+        {
+            this.ApplyInternal(obj);
         }
 
         public void Purchase(int amount, double price, DateTime date)

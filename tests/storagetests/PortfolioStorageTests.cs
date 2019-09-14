@@ -8,10 +8,12 @@ namespace storagetests
 {
 	public class PortfolioStorageTests
 	{
+        const string _userId = "testuser";
+
 		[Fact]
 		public async Task OwnedStockStorageAsync()
 		{
-			var stock = new OwnedStock(Guid.NewGuid().ToString("N").Substring(0, 4), "laimonas");
+			var stock = new OwnedStock(Guid.NewGuid().ToString("N").Substring(0, 4), _userId);
 
 			stock.Purchase(10, 2.1, DateTime.UtcNow);
 			
@@ -19,11 +21,11 @@ namespace storagetests
 
 			await storage.Save(stock);
 
-			var loadedList = await storage.GetStocks("laimonas");
+			var loadedList = await storage.GetStocks(_userId);
 
 			Assert.NotEmpty(loadedList);
 
-			var loaded = await storage.GetStock(stock.State.Ticker, "laimonas");
+			var loaded = await storage.GetStock(stock.State.Ticker, _userId);
 
 			Assert.Equal(loaded.State.Owned, stock.State.Owned);
 
