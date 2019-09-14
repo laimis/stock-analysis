@@ -29,6 +29,8 @@ namespace web.Controllers
             var totalSpent = stocks.Sum(s => s.State.Spent);
             var totalEarned = stocks.Sum(s => s.State.Earned);
 
+            var options = await _storage.GetOptions(_user);
+            
             return new
             {
                 totalSpent,
@@ -36,7 +38,9 @@ namespace web.Controllers
                 totalCashedOutSpend = cashedout.Sum(s => s.State.Spent),
                 totalCashedOutEarnings = cashedout.Sum(s => s.State.Earned),
                 owned = owned.Select(o => ToOwnedView(o)),
-                cashedOut = cashedout.Select(o => ToOwnedView(o))
+                cashedOut = cashedout.Select(o => ToOwnedView(o)),
+                options = options.Select(o => ToOptionView(o)),
+                pendingPremium = options.Sum(o => o.State.Premium)
             };
         }
 
@@ -70,6 +74,19 @@ namespace web.Controllers
             };
         }
 
+        private object ToOptionView(OwnedOption o)
+        {
+            return new
+            {
+                ticker = o.State.Ticker,
+                type = o.State.Type.ToString(),
+                strikePrice = o.State.StrikePrice,
+                expiration = o.State.Expiration,
+                premium = o.State.Premium,
+                riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100
+            };
+        }
+
         [HttpPost("purchase")]
         public async Task<ActionResult> PurchaseAsync([FromBody]PurchaseModel model)
         {
@@ -93,7 +110,6 @@ namespace web.Controllers
             var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType.ToString());
 
             var option = await this._storage.GetOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
-
             if (option == null)
             {
                 option = new OwnedOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);

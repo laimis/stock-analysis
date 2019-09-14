@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using core.Portfolio;
 using storage;
@@ -70,6 +71,12 @@ namespace storagetests
             Assert.NotNull(loaded);
 
             Assert.Equal(option.State.StrikePrice, loaded.State.StrikePrice);
+
+            var list = await storage.GetOptions(_userId);
+
+            var fromList = list.Single(o => o.State.Ticker == option.State.Ticker);
+
+            Assert.Equal(option.State.StrikePrice, fromList.State.StrikePrice);
         }
     }
 }

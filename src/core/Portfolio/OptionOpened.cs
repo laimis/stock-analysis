@@ -6,8 +6,8 @@ namespace core.Portfolio
     public class OptionOpened : AggregateEvent
     {
         // TODO: remove .DateTime
-        public OptionOpened(string key, string userId, int amount, double premium, DateTimeOffset filled)
-             : base(key, userId, filled.DateTime)
+        public OptionOpened(string ticker, string userId, int amount, double premium, DateTimeOffset filled)
+             : base(ticker, userId, filled.DateTime)
         {
             this.Amount = amount;
             this.Premium = premium;

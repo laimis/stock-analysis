@@ -45,12 +45,14 @@ export class StocksService {
 }
 
 export interface Portfolio {
-	owned: object[]
+  owned: object[]
+  options: object[]
 	cashedOut: object[]
 	totalEarned: Number
 	totalSpent: Number
 	totalCashedOutSpend : number
-	totalCashedOutEarnings : number
+  totalCashedOutEarnings : number
+  pendingPremium : number
 }
 
 export interface StockSummary {

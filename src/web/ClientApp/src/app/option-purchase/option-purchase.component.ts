@@ -30,6 +30,8 @@ export class OptionPurchaseComponent implements OnInit {
 
     this.option.filled = Date()
     this.option.filled = this.datePipe.transform(this.option.filled, 'yyyy-MM-dd');
+    this.option.expiration = Date()
+    this.option.expiration = this.datePipe.transform(this.option.expiration, 'yyyy-MM-dd');
   }
 
   clearValues() {

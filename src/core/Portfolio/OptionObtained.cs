@@ -6,10 +6,10 @@ namespace core.Portfolio
     public class OptionObtained : AggregateEvent
     {
 
-        public OptionObtained(string ticker, OptionType type, double strikePrice, DateTimeOffset expiration, string userId, DateTime when)
-            : base(OwnedOption.GenerateKey(ticker, type, expiration, strikePrice), userId, when)
+        public OptionObtained(string tickerSymbol, OptionType type, double strikePrice, DateTimeOffset expiration, string userId, DateTime when)
+            : base(OwnedOption.GenerateKey(tickerSymbol, type, expiration, strikePrice), userId, when)
         {
-            this.TickerSymbol = ticker;
+            this.TickerSymbol = tickerSymbol;
             this.Type = type;
             this.StrikePrice = strikePrice;
             this.Expiration = expiration;

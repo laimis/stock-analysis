@@ -8,22 +8,22 @@
 		<form>
 			<div class="form-group">
 				<label for="ticker">Ticker</label>
-				<input type="text" class="form-control" id="ticker" placeholder="TSLA" name="ticker" [(ngModel)]="ticker">
+				<input type="text" class="form-control" id="ticker" placeholder="TSLA" name="ticker" [(ngModel)]="option.ticker">
 			</div>
 
 			<div class="form-group">
 				<label for="strikePrice">Strike Price</label>
-				<input type="number" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="strikePrice">
+				<input type="number" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="option.strikePrice">
       </div>
 
       <div class="form-group">
 				<label for="date">Expiration</label>
-				<input type="date" class="form-control" id="expiration"name="expiration" [(ngModel)]="expiration">
+				<input type="date" class="form-control" id="expiration"name="expiration" [(ngModel)]="option.expiration">
 			</div>
 
 			<div class="form-group">
 				<label for="optionType">Type &nbsp;&nbsp; </label>
-				<select name="optionType" [(ngModel)]="optionType">
+				<select name="optionType" [(ngModel)]="option.optionType">
 					<option>CALL</option>
 					<option>PUT</option>
 				</select>
@@ -31,17 +31,17 @@
 
 			<div class="form-group">
 				<label for="amount">Amount</label>
-				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="amount">
+				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="option.amount">
 			</div>
 
 			<div class="form-group">
 				<label for="premium">Premium</label>
-				<input type="premium" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
+				<input type="premium" class="form-control" id="premium" name="premium" [(ngModel)]="option.premium">
 			</div>
 
 			<div class="form-group">
 				<label for="filled">Filled</label>
-				<input type="date" class="form-control" id="filled"name="filled" [(ngModel)]="filled">
+				<input type="date" class="form-control" id="filled"name="filled" [(ngModel)]="option.filled">
 			</div>
 
 			<button type="submit" class="btn btn-primary mb-2" (click)="open()">Open</button>&nbsp;&nbsp;

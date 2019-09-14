@@ -10,11 +10,13 @@ import { StocksService } from '../services/stocks.service';
 export class DashboardComponent implements OnInit {
 
 	public owned : object[];
-	public cashedOut : object[];
+  public cashedOut : object[];
+  public options : object[];
 	public totalSpent : Number;
 	public totalEarned : Number;
 	public totalCashedOutSpend : number;
-	public totalCashedOutEarnings : number;
+  public totalCashedOutEarnings : number;
+  public pendingPremium : number;
 	public ticker : string;
 	public loaded : boolean = false;
 
@@ -26,12 +28,14 @@ export class DashboardComponent implements OnInit {
 	ngOnInit() {
 
 		this.stocks.getPortfolio().subscribe(result => {
-			this.owned = result.owned;
+      this.owned = result.owned;
+      this.options = result.options;
 			this.cashedOut = result.cashedOut;
 			this.totalEarned = result.totalEarned;
 			this.totalSpent = result.totalSpent;
 			this.totalCashedOutSpend = result.totalCashedOutSpend;
-			this.totalCashedOutEarnings = result.totalCashedOutEarnings;
+      this.totalCashedOutEarnings = result.totalCashedOutEarnings;
+      this.pendingPremium = result.pendingPremium;
 			this.loaded = true;
 		}, error => {
 			console.log(error);
@@ -49,6 +53,6 @@ export class DashboardComponent implements OnInit {
 
 	cashedOutGainsPct(){
 		return this.cashedOutGains() / this.totalCashedOutSpend * 100;
-	}
+  }
 
 }
