@@ -32,7 +32,7 @@ export class JobListComponent implements OnInit {
 	}
 
 	sortBy(property:string){
-		
+
 		var changeInProperty = false;
 		if (this.sortByProperty != property)
 		{
@@ -66,10 +66,6 @@ export class JobListComponent implements OnInit {
 			this.loaded = true;
 			this.loading = false;
 		});
-	}
-
-	back(){
-		this.location.back();
 	}
 
 }

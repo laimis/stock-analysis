@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
-import {Location, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -19,7 +19,6 @@ export class StockPurchaseComponent implements OnInit {
 
 	constructor(
 		private service : StocksService,
-		private location : Location,
 		private route: ActivatedRoute,
 		private datePipe: DatePipe){}
 
@@ -67,9 +66,5 @@ export class StockPurchaseComponent implements OnInit {
 		this.price = null
 		this.date = null
 		this.amount = null
-	}
-
-	back(){
-		this.location.back();
 	}
 }

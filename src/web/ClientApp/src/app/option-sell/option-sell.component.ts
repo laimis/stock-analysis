@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition } from '../services/stocks.service';
-import { Location, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -16,7 +16,6 @@ export class OptionSellComponent implements OnInit {
 
   constructor(
     private service: StocksService,
-    private location: Location,
     private route: ActivatedRoute,
     private datePipe: DatePipe) { }
 
@@ -43,9 +42,5 @@ export class OptionSellComponent implements OnInit {
     this.service.openOption(this.option).subscribe( () => {
       this.clearValues();
     })
-  }
-
-  back() {
-    this.location.back();
   }
 }

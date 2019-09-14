@@ -53,6 +53,8 @@ export interface Portfolio {
 	totalCashedOutSpend : number
   totalCashedOutEarnings : number
   pendingPremium : number
+  collateralCash : number
+  collateralShares : number
 }
 
 export interface StockSummary {

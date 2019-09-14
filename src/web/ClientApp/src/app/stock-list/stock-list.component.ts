@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
-import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-stock-list',
@@ -13,8 +12,7 @@ export class StockListComponent implements OnInit {
 	public stocks: object;
 
 	constructor(
-		private service : StocksService,
-		private location : Location){}
+		private service : StocksService){}
 
 	ngOnInit() {
 		this.service.getStocks().subscribe(result => {
@@ -24,9 +22,5 @@ export class StockListComponent implements OnInit {
 			console.error(error);
 			this.loaded = true;
 		});
-	}
-
-	back(){
-		this.location.back();
 	}
 }

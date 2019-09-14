@@ -14,5 +14,7 @@ namespace core.Portfolio
         public int Amount { get; internal set; }
         public DateTime Filled { get; internal set; }
         public double Premium { get; internal set; }
+        public double CollateralCash => this.Type == OptionType.PUT ? StrikePrice * 100 - Premium : 0;
+        public int CollateralShares => this.Type == OptionType.CALL ? 100 : 0;
     }
 }

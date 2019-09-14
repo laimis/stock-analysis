@@ -17,7 +17,9 @@ export class DashboardComponent implements OnInit {
 	public totalCashedOutSpend : number;
   public totalCashedOutEarnings : number;
   public pendingPremium : number;
-	public ticker : string;
+	public collateralShares : number;
+  public collateralCash : number;
+  public ticker : string;
 	public loaded : boolean = false;
 
 	constructor(
@@ -36,6 +38,8 @@ export class DashboardComponent implements OnInit {
 			this.totalCashedOutSpend = result.totalCashedOutSpend;
       this.totalCashedOutEarnings = result.totalCashedOutEarnings;
       this.pendingPremium = result.pendingPremium;
+      this.collateralCash = result.collateralCash;
+      this.collateralShares = result.collateralShares;
 			this.loaded = true;
 		}, error => {
 			console.log(error);

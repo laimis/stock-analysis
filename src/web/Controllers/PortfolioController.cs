@@ -40,7 +40,9 @@ namespace web.Controllers
                 owned = owned.Select(o => ToOwnedView(o)),
                 cashedOut = cashedout.Select(o => ToOwnedView(o)),
                 options = options.Select(o => ToOptionView(o)),
-                pendingPremium = options.Sum(o => o.State.Premium)
+                pendingPremium = options.Sum(o => o.State.Premium),
+                collateralCash = options.Sum(o => o.State.CollateralCash),
+                collateralShares = options.Sum(o => o.State.CollateralShares)
             };
         }
 
