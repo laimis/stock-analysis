@@ -10,16 +10,15 @@ namespace core.Shared
             this._events = new List<AggregateEvent>();
         }
 
-        public Aggregate(List<AggregateEvent> events)
+        public Aggregate(IEnumerable<AggregateEvent> events)
         {
             this._events = new List<AggregateEvent>();
-            
+            this.Version = 0;
             foreach (var e in events)
             {
                 Apply(e);
+                this.Version++;
             }
-
-            this.Version = events.Count;
         }
 
         protected abstract void Apply(AggregateEvent e);

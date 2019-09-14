@@ -8,77 +8,30 @@ namespace storage
 {
     public class PortfolioStorage : AggregateStorage, IPortfolioStorage
     {
+        const string _entity = "ownedstock";
+
         public PortfolioStorage(string cnn) : base(cnn)
         {
         }
 
         public async Task<OwnedStock> GetStock(string ticker, string userId)
         {
-            using (var db = GetConnection())
-            {
-                db.Open();
-
-                var query = @"select * FROM events WHERE entity = 'ownedstock' AND key = :ticker AND userId = :userId ORDER BY version";
-
-                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { ticker, userId });
-
-                var events = list.Select(e => e.Event).ToList();
-
-                if (events.Count == 0)
-                {
-                    return null;
-                }
-
-                return new OwnedStock(events);
-            }
+            var events = await GetEventsAsync(_entity, ticker, userId);
+            
+            return new OwnedStock(events);
         }
 
         public async Task Save(OwnedStock stock)
         {
-            using (var db = GetConnection())
-            {
-                db.Open();
-
-                int version = stock.Version;
-
-                using (var tx = db.BeginTransaction())
-                {
-                    foreach (var e in stock.Events.Skip(stock.Version))
-                    {
-                        var se = new StoredAggregateEvent
-                        {
-                            Entity = "ownedstock",
-                            Event = e,
-                            Key = e.Ticker,
-                            UserId = e.UserId,
-                            Created = e.When,
-                            Version = ++version
-                        };
-
-                        var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
-						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
-
-                        await db.ExecuteAsync(query, se);
-                    }
-
-                    tx.Commit();
-                }
-            }
+            await SaveEventsAsync(stock, _entity);
         }
 
         public async Task<IEnumerable<OwnedStock>> GetStocks(string userId)
         {
-            using (var db = GetConnection())
-            {
-                db.Open();
+            var list = await GetEventsAsync(_entity, userId);
 
-                var query = @"select * FROM events WHERE entity = 'ownedstock' AND userId = :userId ORDER BY version";
-
-                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { userId });
-
-                return list.GroupBy(e => e.Key)
-                    .Select(g => new OwnedStock(g.Select(ag => ag.Event).ToList()));
-            }
+            return list.GroupBy(e => e.Ticker)
+                .Select(g => new OwnedStock(g.ToList()));
         }
     }
 }

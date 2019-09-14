@@ -9,7 +9,7 @@ namespace core.Portfolio
         private OwnedStockState _state = new OwnedStockState();
         public OwnedStockState State => _state;
 
-        public OwnedStock(List<AggregateEvent> events) : base(events)
+        public OwnedStock(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
 

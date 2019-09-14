@@ -1,4 +1,9 @@
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using core.Shared;
+using Dapper;
 using Npgsql;
 
 namespace storage
@@ -16,5 +21,67 @@ namespace storage
         {
             return new NpgsqlConnection(_cnn);
         }
+
+        protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"select * FROM events WHERE entity = 'ownedstock' AND key = :key AND userId = :userId ORDER BY version";
+
+                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { key, userId });
+
+                return list.Select(e => e.Event);
+            }
+        }
+
+        protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version";
+
+                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, userId });
+
+                return list.Select(e => e.Event);
+            }
+        }
+
+        protected async Task SaveEventsAsync(Aggregate agg, string entity)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                int version = agg.Version;
+
+                using (var tx = db.BeginTransaction())
+                {
+                    foreach (var e in agg.Events.Skip(agg.Version))
+                    {
+                        var se = new StoredAggregateEvent
+                        {
+                            Entity = entity,
+                            Event = e,
+                            Key = e.Ticker,
+                            UserId = e.UserId,
+                            Created = e.When,
+                            Version = ++version
+                        };
+
+                        var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
+						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
+
+                        await db.ExecuteAsync(query, se);
+                    }
+
+                    tx.Commit();
+                }
+            }
+        }
+
     }
 }
