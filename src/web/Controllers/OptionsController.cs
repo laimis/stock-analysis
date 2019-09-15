@@ -31,7 +31,9 @@ namespace web.Controllers
                 options.AddRange(details);
             }
 
-            return options.GroupBy(o => o.ExpirationDate)
+            return options
+                .Where(o => o.Volume > 0 || o.OpenInterest > 0)
+                .GroupBy(o => o.ExpirationDate)
                 .Select(g => new {
                     expiration = g.Key,
                     options = g.ToList()

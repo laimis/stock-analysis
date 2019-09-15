@@ -10,7 +10,8 @@ import { ActivatedRoute } from '@angular/router';
 export class OptionDetailComponent implements OnInit {
   ticker: string;
 
-  public option : object
+  public options : object
+  public loading : boolean = true
 
   constructor(
     private service: StocksService,
@@ -22,33 +23,10 @@ export class OptionDetailComponent implements OnInit {
       this.ticker = ticker;
     }
 
-    this.option = {
-      ticker: ticker,
-      currentSharePrice: 2.17,
-      available: [
-        {
-          "expiration" : "2019-09-20",
-          strikes: [
-            {
-              strikePrice: 2.5,
-              openInterest: 10,
-              volume: 5,
-              bid: 10,
-              ask: 15,
-              spread: 5
-            },
-            {
-              strikePrice: 3.0,
-              openInterest: 10,
-              volume: 5,
-              bid: 10,
-              ask: 15,
-              spread: 5
-            }
-          ]
-        }
-      ]
-    }
+    this.service.getOptions(this.ticker).subscribe( result => {
+      this.options = result
+      this.loading = false
+    });
   }
 
 }

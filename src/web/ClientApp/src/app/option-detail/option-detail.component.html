@@ -1,25 +1,37 @@
-<div class="top-container">
+<div class="top-container" *ngIf="!loading">
     <div>
-      <label>{{option.ticker}}</label> <a href="https://robinhood.com/stocks/{{option.ticker}}" target="_blank">link on robinhood</a>
+      <label>{{ticker}}</label> <a href="https://robinhood.com/stocks/{{ticker}}" target="_blank">link on robinhood</a>
     </div>
     <div>
-      Current price: {{option.currentSharePrice}}
+      Current price: Not implemented
     </div>
 
     <h2>Available Options</h2>
 
     <table class="table">
-      <tr *ngFor="let a of option.available">
+      <tr *ngFor="let a of options">
         <td width="150">{{a.expiration}}</td>
         <td>
           <table class="table">
-            <tr *ngFor="let strike of a.strikes">
-              <td>{{strike.strikePrice}}</td>
-              <td>{{strike.openInterest}}</td>
-              <td>{{strike.volume}}</td>
-              <td>{{strike.bid}}</td>
-              <td>{{strike.ask}}</td>
-              <td>{{strike.spread}}</td>
+            <thead>
+              <tr>
+                <th>Strike price</th>
+                <th>Side</th>
+                <th>Open interest</th>
+                <th>Volume</th>
+                <th>Bid</th>
+                <th>Ask</th>
+                <th>Spread</th>
+              </tr>
+            </thead>
+            <tr *ngFor="let option of a.options">
+              <td>{{option.strikePrice | currency}}</td>
+              <td>{{option.side}}</td>
+              <td>{{option.openInterest}}</td>
+              <td>{{option.volume}}</td>
+              <td>{{option.bid | currency}}</td>
+              <td>{{option.ask | currency}}</td>
+              <td>{{option.spread | currency}}</td>
             </tr>
           </table>
         </td>

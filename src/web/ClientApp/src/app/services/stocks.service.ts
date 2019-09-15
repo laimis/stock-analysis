@@ -15,7 +15,11 @@ export class StocksService {
 
 	getStocks(): Observable<object> {
 		return this.http.get<object>('/api/stocks')
-	}
+  }
+
+  getOptions(ticker:string): Observable<object> {
+    return this.http.get<object>('/api/options/' + ticker)
+  }
 
 	getPortfolio(): Observable<Portfolio> {
 		return this.http.get<Portfolio>('/api/portfolio')
