@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using core.Options;
 using iexclient;
 
 namespace iexclienttests
@@ -5,7 +7,7 @@ namespace iexclienttests
     public class IEXClientFixture
     {
         public string[] Options;
-        public OptionDetail[] OptionDetails;
+        public IEnumerable<OptionDetail> OptionDetails;
 
         public IEXClientFixture()
         {

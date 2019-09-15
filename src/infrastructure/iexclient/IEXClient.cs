@@ -1,11 +1,14 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using core.Options;
 using Newtonsoft.Json;
 
 namespace iexclient
 {
-    public class IEXClient
+    public class IEXClient : IOptionsService
     {
         private static HttpClient _client = new HttpClient();
         private static string _endpoint = "https://cloud.iexapis.com/stable";
@@ -16,7 +19,6 @@ namespace iexclient
             this._token = accessToken;
         }
 
-
         public Task<string[]> GetOptions(string ticker)
         {
             var url = $"{_endpoint}/stock/{ticker}/options?token={_token}";
@@ -24,11 +26,15 @@ namespace iexclient
             return Get<string[]>(url);
         }
 
-        public Task<OptionDetail[]> GetOptionDetails(string ticker, string optionDate)
+        public async Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate)
         {
             var url = $"{_endpoint}/stock/{ticker}/options/{optionDate}?token={_token}";
 
-            return Get<OptionDetail[]>(url);
+            var details = await Get<OptionDetail[]>(url);
+
+            return details
+                .OrderByDescending(o => o.StrikePrice)
+                .ThenBy(o => o.IsPut);
         }
 
         private async Task<T> Get<T>(string url)

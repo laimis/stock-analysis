@@ -1,5 +1,5 @@
 using System.Linq;
-using iexclient;
+using core.Options;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,7 +14,7 @@ namespace iexclienttests
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {
             _options = fixture.Options;
-            _optionDetails = fixture.OptionDetails;
+            _optionDetails = fixture.OptionDetails.ToArray();
             _output = output;
         }
 

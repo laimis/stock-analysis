@@ -1,6 +1,6 @@
 using System;
 
-namespace iexclient
+namespace core.Options
 {
     public partial class OptionDetail
     {
