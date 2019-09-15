@@ -29,6 +29,7 @@
     <ProjectReference Include="..\core\core.csproj" />
     <ProjectReference Include="..\infrastructure\financialmodelingclient\financialmodelingclient.csproj" />
     <ProjectReference Include="..\infrastructure\storage\storage.csproj" />
+    <ProjectReference Include="..\infrastructure\iexclient\iexclient.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

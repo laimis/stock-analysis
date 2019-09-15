@@ -1,8 +1,10 @@
 using Akka.Actor;
 using core;
+using core.Options;
 using core.Portfolio;
 using core.Stocks;
 using financialmodelingclient;
+using iexclient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +54,10 @@ namespace web
 				var props = Props.Create(() => new AnalysisCoordinator(stocks, storage));
 				return _system.ActorOf(props, "coordinator");
 			});
+
+            services.AddSingleton<IOptionsService>(s => {
+                return new IEXClient(this.Configuration.GetValue<string>("IEXClientToken"));
+            });
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
