@@ -1,0 +1,28 @@
+<div class="top-container">
+    <div>
+      <label>{{option.ticker}}</label> <a href="https://robinhood.com/stocks/{{option.ticker}}" target="_blank">link on robinhood</a>
+    </div>
+    <div>
+      Current price: {{option.currentSharePrice}}
+    </div>
+
+    <h2>Available Options</h2>
+
+    <table class="table">
+      <tr *ngFor="let a of option.available">
+        <td width="150">{{a.expiration}}</td>
+        <td>
+          <table class="table">
+            <tr *ngFor="let strike of a.strikes">
+              <td>{{strike.strikePrice}}</td>
+              <td>{{strike.openInterest}}</td>
+              <td>{{strike.volume}}</td>
+              <td>{{strike.bid}}</td>
+              <td>{{strike.ask}}</td>
+              <td>{{strike.spread}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+</div>

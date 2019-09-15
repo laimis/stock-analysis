@@ -14,19 +14,21 @@ import { StockListComponent } from './stock-list/stock-list.component';
 import { JobListComponent } from './job-list/job-list.component';
 import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
 import { OptionSellComponent } from './option-sell/option-sell.component';
+import { OptionDetailComponent } from './option-detail/option-detail.component';
 
 var routes = [
-	{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-	{ path: 'dashboard', component: DashboardComponent},
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: DashboardComponent },
 
-	{ path: 'stocks/list', component: StockListComponent},
-	{ path: 'stocks/purchase', component: StockPurchaseComponent},
-	{ path: 'stocks/purchase/:ticker', component: StockPurchaseComponent},
-	{ path: 'stocks/:ticker', component: StockDetailsComponent},
+  { path: 'stocks/list', component: StockListComponent },
+  { path: 'stocks/purchase', component: StockPurchaseComponent },
+  { path: 'stocks/purchase/:ticker', component: StockPurchaseComponent },
+  { path: 'stocks/:ticker', component: StockDetailsComponent },
 
-	{ path: 'options/sell', component: OptionSellComponent},
+  { path: 'options/sell', component: OptionSellComponent },
+  { path: 'options/:ticker', component: OptionDetailComponent },
 
-	{ path: 'jobs', component: JobListComponent}
+  { path: 'jobs', component: JobListComponent }
 
 ]
 
@@ -34,19 +36,20 @@ var routes = [
   declarations: [
     AppComponent,
     NavMenuComponent,
-	StockDetailsComponent,
-	DashboardComponent,
-	StockListComponent,
-	JobListComponent,
-	StockPurchaseComponent,
-	OptionSellComponent
+    StockDetailsComponent,
+    DashboardComponent,
+    StockListComponent,
+    JobListComponent,
+    StockPurchaseComponent,
+    OptionSellComponent,
+    OptionDetailComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
-	RouterModule.forRoot(routes),
-	GoogleChartsModule.forRoot()
+    RouterModule.forRoot(routes),
+    GoogleChartsModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

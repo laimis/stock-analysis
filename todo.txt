@@ -1,7 +1,7 @@
-- ability to navigate into option details
-- option purchase after ticker, show available dates, and volume information
+- options screen
 
 - start incorporating iexapis client
+
 
 options list: https://cloud.iexapis.com/stable/ref-data/options/symbols?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
 stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
