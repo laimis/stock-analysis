@@ -50,7 +50,7 @@
 	</thead>
 	<tbody>
 		<tr *ngFor="let option of options">
-			<td><a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a></td>
+			<td><a [routerLink]="[ '/options', option.ticker ]">{{option.ticker}}</a></td>
 			<td>{{option.type}}</td>
 			<td>{{option.strikePrice | currency}}</td>
       <td>{{option.expiration | date : 'shortDate'}}</td>

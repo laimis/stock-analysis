@@ -6,10 +6,27 @@
       Current price: Not implemented
     </div>
 
+    <div class="form-group">
+      <label for="expirationSelect">Expiration</label>
+      <select [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
+        <option value=""></option>
+        <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="sideSelect">Side</label>
+      <select [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
+        <option value=""></option>
+        <option value="call">call</option>
+        <option value="put">put</option>
+      </select>
+    </div>
+
     <h2>Available Options</h2>
 
     <table class="table">
-      <tr *ngFor="let a of options">
+      <tr *ngFor="let a of filteredOptions">
         <td width="150">{{a.expiration}}</td>
         <td>
           <table class="table">

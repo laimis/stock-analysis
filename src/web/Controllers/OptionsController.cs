@@ -31,13 +31,25 @@ namespace web.Controllers
                 options.AddRange(details);
             }
 
-            return options
+            var optionList = options
                 .Where(o => o.Volume > 0 || o.OpenInterest > 0)
                 .GroupBy(o => o.ExpirationDate)
                 .Select(g => new {
                     expiration = g.Key,
                     options = g.ToList()
-                });
+                })
+                .OrderBy(a => a.expiration)
+                .ToArray();
+
+            var expirations = optionList.Select(o => o.expiration)
+                .Distinct()
+                .OrderBy(s => s)
+                .ToArray();
+
+            return new {
+                options = optionList,
+                expirations
+            };
         }
     }
 }

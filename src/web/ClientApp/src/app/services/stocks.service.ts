@@ -17,8 +17,8 @@ export class StocksService {
 		return this.http.get<object>('/api/stocks')
   }
 
-  getOptions(ticker:string): Observable<object> {
-    return this.http.get<object>('/api/options/' + ticker)
+  getOptions(ticker:string): Observable<OptionDetail> {
+    return this.http.get<OptionDetail>('/api/options/' + ticker)
   }
 
 	getPortfolio(): Observable<Portfolio> {
@@ -72,13 +72,18 @@ export class OptionDefinition {
   ticker: string
   strikePrice: number
   expiration: string
-  optionType: OptionType
+  optionType: string
   amount: number
   premium: number
   filled: string
 }
 
-enum OptionType {
-  CALL,
-  PUT
+export class OptionGroup {
+  expiration: string
+  options: OptionDefinition[]
+}
+
+export interface OptionDetail {
+  expirations: string[]
+  options: OptionGroup[]
 }

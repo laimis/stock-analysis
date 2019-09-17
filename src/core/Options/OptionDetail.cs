@@ -27,9 +27,9 @@ namespace core.Options
         public double Ask { get; set; }
 
         public DateTimeOffset LastUpdated { get; set; }
+        public string OptionType => this.Side;
         public bool IsCall => this.Side == "call";
         public bool IsPut => this.Side == "put";
-
         public double Spread => (this.Ask - this.Bid);
     }
 }

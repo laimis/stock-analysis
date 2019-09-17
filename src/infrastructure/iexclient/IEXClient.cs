@@ -34,7 +34,7 @@ namespace iexclient
 
             return details
                 .OrderByDescending(o => o.StrikePrice)
-                .ThenBy(o => o.IsPut);
+                .ThenBy(o => o.Side);
         }
 
         private async Task<T> Get<T>(string url)
