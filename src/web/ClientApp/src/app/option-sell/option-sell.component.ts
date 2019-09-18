@@ -29,8 +29,8 @@ export class OptionSellComponent implements OnInit {
 
     this.option.filled = Date()
     this.option.filled = this.datePipe.transform(this.option.filled, 'yyyy-MM-dd');
-    this.option.expiration = Date()
-    this.option.expiration = this.datePipe.transform(this.option.expiration, 'yyyy-MM-dd');
+    this.option.expirationDate = Date()
+    this.option.expirationDate = this.datePipe.transform(this.option.expirationDate, 'yyyy-MM-dd');
   }
 
   clearValues() {

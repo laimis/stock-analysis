@@ -8,6 +8,7 @@ namespace iexclienttests
     {
         public string[] Options;
         public IEnumerable<OptionDetail> OptionDetails;
+        public double Price;
 
         public IEXClientFixture()
         {
@@ -24,6 +25,12 @@ namespace iexclienttests
             dt.Wait();
 
             OptionDetails = dt.Result;
+
+            var price = client.GetPrice("TEUM");
+
+            price.Wait();
+
+            Price = price.Result;
         }
     }
 }

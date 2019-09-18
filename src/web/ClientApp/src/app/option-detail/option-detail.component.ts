@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDetail, OptionDefinition, OptionGroup } from '../services/stocks.service';
+import { StocksService, OptionDetail, OptionDefinition } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-option-detail',
@@ -10,14 +11,17 @@ import { ActivatedRoute } from '@angular/router';
 export class OptionDetailComponent implements OnInit {
   ticker: string;
 
-  public options : OptionGroup[]
-  public filteredOptions : OptionGroup[]
+  public options : OptionDefinition[]
+  public filteredOptions : OptionDefinition[]
 
   public expirations: string[]
   public loading : boolean = true
 
   public expirationSelection : string = ""
   public sideSelection : string = ""
+  public minBid : number = 0
+  public minStrikePrice : number = 0
+  public maxStrikePrice : number = 0
 
   constructor(
     private service: StocksService,
@@ -40,6 +44,10 @@ export class OptionDetailComponent implements OnInit {
     console.log("running filter")
     console.log("expiration: " + this.expirationSelection)
     console.log("side: " + this.sideSelection)
+    console.log("min bid: " + this.minBid)
+    console.log("min strike price: " + this.minStrikePrice)
+    console.log("max strike price: " + this.maxStrikePrice)
+
     this.filteredOptions = this.options.filter(this.includeOption, this);
     this.loading = false;
     console.log("filter running finished")
@@ -47,8 +55,8 @@ export class OptionDetailComponent implements OnInit {
 
   includeOption(element:OptionDefinition, index, array) {
     if (this.expirationSelection !== "") {
-      if (element.expiration != this.expirationSelection) {
-        console.log("filterig out expiration " + element.expiration)
+      if (element.expirationDate != this.expirationSelection) {
+        console.log("filterig out expiration " + element.expirationDate)
         return false
       }
     }
@@ -56,6 +64,23 @@ export class OptionDetailComponent implements OnInit {
     if (this.sideSelection !== "") {
       if (element.optionType != this.sideSelection) {
         console.log("filterig out side " + element.optionType)
+        return false
+      }
+    }
+
+    if (element.bid < this.minBid) {
+      console.log("filtering out min price " + element.bid)
+      return false
+    }
+
+    if (this.minStrikePrice > 0) {
+      if (element.strikePrice < this.minStrikePrice) {
+        return false
+      }
+    }
+
+    if (this.maxStrikePrice > 0) {
+      if (element.strikePrice > this.maxStrikePrice) {
         return false
       }
     }
@@ -75,4 +100,18 @@ export class OptionDetailComponent implements OnInit {
     this.runFilter()
   }
 
+  onMinBidChange() {
+    console.log(this.minBid)
+    this.runFilter()
+  }
+
+  onMinStrikePriceChange() {
+    console.log(this.minStrikePrice)
+    this.runFilter()
+  }
+
+  onMaxStrikePriceChange() {
+    console.log(this.maxStrikePrice)
+    this.runFilter()
+  }
 }

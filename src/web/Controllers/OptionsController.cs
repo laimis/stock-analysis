@@ -33,15 +33,10 @@ namespace web.Controllers
 
             var optionList = options
                 .Where(o => o.Volume > 0 || o.OpenInterest > 0)
-                .GroupBy(o => o.ExpirationDate)
-                .Select(g => new {
-                    expiration = g.Key,
-                    options = g.ToList()
-                })
-                .OrderBy(a => a.expiration)
+                .OrderBy(o => o.ExpirationDate)
                 .ToArray();
 
-            var expirations = optionList.Select(o => o.expiration)
+            var expirations = optionList.Select(o => o.ExpirationDate)
                 .Distinct()
                 .OrderBy(s => s)
                 .ToArray();

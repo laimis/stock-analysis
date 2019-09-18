@@ -31,5 +31,19 @@ namespace core.Options
         public bool IsCall => this.Side == "call";
         public bool IsPut => this.Side == "put";
         public double Spread => (this.Ask - this.Bid);
+
+        public double PerDayPrice
+        {
+            get
+            {
+                var date = DateTime.ParseExact(this.ExpirationDate, "yyyyMMdd", null).Date;
+
+                var today = DateTime.UtcNow.Date;
+
+                var diff = (int)date.Subtract(today).TotalDays;
+
+                return this.Bid * 100 / diff;
+            }
+        }
     }
 }

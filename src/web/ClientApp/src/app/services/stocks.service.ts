@@ -71,19 +71,14 @@ export interface StockSummary {
 export class OptionDefinition {
   ticker: string
   strikePrice: number
-  expiration: string
+  expirationDate: string
   optionType: string
   amount: number
-  premium: number
+  bid: number
   filled: string
-}
-
-export class OptionGroup {
-  expiration: string
-  options: OptionDefinition[]
 }
 
 export interface OptionDetail {
   expirations: string[]
-  options: OptionGroup[]
+  options: OptionDefinition[]
 }

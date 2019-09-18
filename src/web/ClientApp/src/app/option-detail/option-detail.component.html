@@ -1,57 +1,59 @@
 <div class="top-container" *ngIf="!loading">
-    <div>
-      <label>{{ticker}}</label> <a href="https://robinhood.com/stocks/{{ticker}}" target="_blank">link on robinhood</a>
-    </div>
-    <div>
-      Current price: Not implemented
-    </div>
 
     <div class="form-group">
-      <label for="expirationSelect">Expiration</label>
+      <label for="expirationSelect">Expiration</label>&nbsp;&nbsp;
       <select [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
         <option value=""></option>
         <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
       </select>
-    </div>
 
-    <div class="form-group">
-      <label for="sideSelect">Side</label>
+      &nbsp;&nbsp;<label for="sideSelect">Side</label>&nbsp;&nbsp;
       <select [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
         <option value=""></option>
         <option value="call">call</option>
         <option value="put">put</option>
       </select>
+
+      &nbsp;&nbsp;<label for="minBid">Min Bid Price</label>&nbsp;&nbsp;
+      <input type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
+    </div>
+
+    <div class="form-group">
+      <label for="minStrikePrice">Min Strike Price</label>&nbsp;&nbsp;
+      <input type="number" id="minStrikePrice" name="minStrikePrice" [(ngModel)]="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()" />
+
+      &nbsp;&nbsp;<label for="maxStrikePrice">Max Strike Price</label>&nbsp;&nbsp;
+      <input type="number" id="maxStrikePrice" name="maxStrikePrice" [(ngModel)]="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()" />
     </div>
 
     <h2>Available Options</h2>
 
-    <table class="table">
-      <tr *ngFor="let a of filteredOptions">
-        <td width="150">{{a.expiration}}</td>
-        <td>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Strike price</th>
-                <th>Side</th>
-                <th>Open interest</th>
-                <th>Volume</th>
-                <th>Bid</th>
-                <th>Ask</th>
-                <th>Spread</th>
-              </tr>
-            </thead>
-            <tr *ngFor="let option of a.options">
-              <td>{{option.strikePrice | currency}}</td>
-              <td>{{option.side}}</td>
-              <td>{{option.openInterest}}</td>
-              <td>{{option.volume}}</td>
-              <td>{{option.bid | currency}}</td>
-              <td>{{option.ask | currency}}</td>
-              <td>{{option.spread | currency}}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Expiration</th>
+          <th>Strike price</th>
+          <th>Side</th>
+          <th>Open interest</th>
+          <th>Volume</th>
+          <th>Bid</th>
+          <th>Ask</th>
+          <th>Spread</th>
+          <th>PDR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let option of filteredOptions">
+          <td>{{option.expirationDate}}</td>
+          <td>{{option.strikePrice | currency}} <small>{{option.strikePrice - option.bid}}</small></td>
+          <td>{{option.side}}</td>
+          <td>{{option.openInterest}}</td>
+          <td>{{option.volume}}</td>
+          <td>{{option.bid * 100 | currency}}</td>
+          <td>{{option.ask * 100 | currency}}</td>
+          <td>{{option.spread | currency}}</td>
+          <td>{{option.perDayPrice | currency}}</td>
+        </tr>
+      </tbody>
     </table>
 </div>

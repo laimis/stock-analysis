@@ -9,12 +9,14 @@ namespace iexclienttests
     {
         private string[] _options;
         private OptionDetail[] _optionDetails;
+        private double _price;
         private ITestOutputHelper _output;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {
             _options = fixture.Options;
             _optionDetails = fixture.OptionDetails.ToArray();
+            _price = fixture.Price;
             _output = output;
         }
 
@@ -62,6 +64,12 @@ namespace iexclienttests
 
             Assert.Equal(0.9, maxSpread, 1);
             Assert.Equal(7.5, strike.StrikePrice);
+        }
+        
+        [Fact]
+        public void Price_Set()
+        {
+            Assert.True(_price > 1);
         }
     }
 }
