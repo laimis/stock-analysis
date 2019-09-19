@@ -76,9 +76,12 @@ export class OptionDefinition {
   amount: number
   bid: number
   filled: string
+  breakEven: number
+  risk: number
 }
 
 export interface OptionDetail {
+  stockPrice: number
   expirations: string[]
   options: OptionDefinition[]
 }

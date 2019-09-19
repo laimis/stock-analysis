@@ -45,5 +45,17 @@ namespace core.Options
                 return this.Bid * 100 / diff;
             }
         }
+
+        public double BreakEven
+        {
+            get
+            {
+                return this.IsCall ? 
+                    this.StrikePrice + this.Bid
+                    : this.StrikePrice - this.Bid;
+            }
+        }
+
+        public double Risk => this.Bid / this.StrikePrice;
     }
 }

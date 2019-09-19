@@ -20,6 +20,7 @@ namespace web.Controllers
         public async Task<object> Details(string ticker)
         {
             var dates = await _options.GetOptions(ticker);
+            var price = await _options.GetPrice(ticker);
 
             var upToFour = dates.Take(4);
 
@@ -42,6 +43,7 @@ namespace web.Controllers
                 .ToArray();
 
             return new {
+                stockPrice = price,
                 options = optionList,
                 expirations
             };

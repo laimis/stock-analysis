@@ -13,7 +13,7 @@ export class OptionDetailComponent implements OnInit {
 
   public options : OptionDefinition[]
   public filteredOptions : OptionDefinition[]
-
+  public stockPrice : number
   public expirations: string[]
   public loading : boolean = true
 
@@ -36,6 +36,11 @@ export class OptionDetailComponent implements OnInit {
     this.service.getOptions(this.ticker).subscribe( result => {
       this.options = result.options
       this.expirations = result.expirations
+      this.stockPrice = result.stockPrice
+      this.sideSelection = "put"
+      this.minStrikePrice = Math.round(this.stockPrice - 2)
+      this.maxStrikePrice = Math.round(this.stockPrice)
+      this.minBid = 0.1
       this.runFilter()
     });
   }
