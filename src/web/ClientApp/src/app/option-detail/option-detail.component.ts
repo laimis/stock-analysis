@@ -13,6 +13,7 @@ export class OptionDetailComponent implements OnInit {
 
   public options : OptionDefinition[]
   public filteredOptions : OptionDefinition[]
+  public expirationMap : Array<OptionDefinition[]>
   public stockPrice : number
   public expirations: string[]
   public loading : boolean = true
@@ -38,8 +39,8 @@ export class OptionDetailComponent implements OnInit {
       this.expirations = result.expirations
       this.stockPrice = result.stockPrice
       this.sideSelection = "put"
-      this.minStrikePrice = Math.round(this.stockPrice - 2)
-      this.maxStrikePrice = Math.round(this.stockPrice)
+      // this.minStrikePrice = Math.round(this.stockPrice - 2)
+      // this.maxStrikePrice = Math.round(this.stockPrice)
       this.minBid = 0.1
       this.runFilter()
     });
@@ -55,6 +56,21 @@ export class OptionDetailComponent implements OnInit {
 
     this.filteredOptions = this.options.filter(this.includeOption, this);
     this.loading = false;
+
+    let expirationMap = new Map<string, OptionDefinition[]>();
+    this.filteredOptions.forEach(function(value, index, arr) {
+      if (!expirationMap.has(value.expirationDate))
+      {
+        expirationMap.set(value.expirationDate, [value])
+      }
+      else
+      {
+          var temp = expirationMap.get(value.expirationDate)
+          temp.push(value)
+      }
+    })
+    this.expirationMap = Array.from(expirationMap.values());
+
     console.log("filter running finished")
   }
 

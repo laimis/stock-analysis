@@ -29,36 +29,39 @@
       <input type="number" id="maxStrikePrice" name="maxStrikePrice" [(ngModel)]="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()" />
     </div>
 
-    <h2>Available Options</h2>
+    <div *ngFor="let expiration of expirationMap">
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Expiration</th>
-          <th>Strike price</th>
-          <th>Side</th>
-          <th>Open interest</th>
-          <th>Volume</th>
-          <th>Bid</th>
-          <th>Ask</th>
-          <th>Spread</th>
-          <th>PDP</th>
-          <th>Risk</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let option of filteredOptions">
-          <td>{{option.expirationDate}}</td>
-          <td>{{option.strikePrice | currency}} <small>{{option.breakEven}}</small></td>
-          <td>{{option.side}}</td>
-          <td>{{option.openInterest}}</td>
-          <td>{{option.volume}}</td>
-          <td>{{option.bid * 100 | currency}}</td>
-          <td>{{option.ask * 100 | currency}}</td>
-          <td>{{option.spread | currency}}</td>
-          <td>{{option.perDayPrice | currency}}</td>
-          <td>{{option.risk | percent}}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Expiration</th>
+            <th>Strike price</th>
+            <th>Side</th>
+            <th>Open interest</th>
+            <th>Volume</th>
+            <th>Bid</th>
+            <th>Ask</th>
+            <th>Spread</th>
+            <th>PDP</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let option of expiration">
+            <td>{{option.expirationDate}}</td>
+            <td>{{option.strikePrice | currency}} <small>{{option.breakEven | currency }}</small></td>
+            <td>{{option.side}}</td>
+            <td>{{option.openInterest}}</td>
+            <td>{{option.volume}}</td>
+            <td>{{option.bid * 100 | currency}}</td>
+            <td>{{option.ask * 100 | currency}}</td>
+            <td>{{option.spread | currency}}</td>
+            <td>{{option.perDayPrice | currency}}</td>
+            <td>{{option.risk | percent}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
 </div>

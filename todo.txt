@@ -1,4 +1,3 @@
-- group by expiration
 - render interest/volume in a chart
 - render bids in a chart
 
