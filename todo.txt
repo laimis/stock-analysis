@@ -1,5 +1,3 @@
-- launch config from environment variable
-- temp file backing storage for iex options
 - group by expiration
 - render interest/volume in a chart
 - render bids in a chart
