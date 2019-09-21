@@ -30,6 +30,9 @@ namespace web.Controllers
             var totalEarned = stocks.Sum(s => s.State.Earned);
 
             var options = await _storage.GetSoldOptions(_user);
+
+            var ownedOptions = options.Where(o => o.State.Amount > 0);
+            var closedOptions = options.Where(o => o.State.Amount == 0);
             
             return new
             {
@@ -39,10 +42,12 @@ namespace web.Controllers
                 totalCashedOutEarnings = cashedout.Sum(s => s.State.Earned),
                 owned = owned.Select(o => ToOwnedView(o)),
                 cashedOut = cashedout.Select(o => ToOwnedView(o)),
-                options = options.Select(o => ToOptionView(o)),
-                pendingPremium = options.Sum(o => o.State.Premium),
-                collateralCash = options.Sum(o => o.State.CollateralCash),
-                collateralShares = options.Sum(o => o.State.CollateralShares)
+                ownedOptions = ownedOptions.Select(o => ToOptionView(o)),
+                closedOptions = closedOptions.Select(o => ToOptionView(o)),
+                pendingPremium = ownedOptions.Sum(o => o.State.Premium),
+                collateralCash = ownedOptions.Sum(o => o.State.CollateralCash),
+                collateralShares = ownedOptions.Sum(o => o.State.CollateralShares),
+                optionEarnings = options.Sum(o => o.State.Profit)
             };
         }
 
@@ -85,7 +90,8 @@ namespace web.Controllers
                 strikePrice = o.State.StrikePrice,
                 expiration = o.State.Expiration,
                 premium = o.State.Premium,
-                riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100
+                riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100,
+                profit = o.State.Profit
             };
         }
 
@@ -137,6 +143,34 @@ namespace web.Controllers
             stock.Sell(model.Amount, model.Price, model.Date);
 
             await this._storage.Save(stock);
+
+            return Ok();
+        }
+
+        [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}")]
+        public async Task<ActionResult> SoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration)
+        {
+            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, _user);
+            if (sold == null)
+            {
+                return NotFound();
+            }
+
+            return Json(ToOptionView(sold));
+        }
+
+        [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}/close")]
+        public async Task<ActionResult> CloseSoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration, double closePrice, DateTimeOffset closeDate)
+        {
+            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, _user);
+            if (sold == null)
+            {
+                return NotFound();
+            }
+
+            sold.Close(1, closePrice, closeDate);
+
+            await _storage.Save(sold);
 
             return Ok();
         }

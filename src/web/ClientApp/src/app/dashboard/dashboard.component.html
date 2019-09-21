@@ -11,6 +11,66 @@
 	<button type="submit" class="btn btn-primary" (click)="goToStock()" class="invisible">Submit</button>
 </form>
 
+<h2>Options</h2>
+
+  <table>
+      <tr><td width="200">Collateral</td><td>{{ collateralCash | currency}}, {{ collateralShares }} shares</td></tr>
+      <tr><td>Pending premium</td><td>{{ pendingPremium | currency }}</td></tr>
+      <tr><td>Earnings</td><td>{{ optionEarnings | currency}}</td></tr>
+  </table>
+
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Ticker</th>
+			<th>Type</th>
+			<th>Strike</th>
+      <th>Expiration</th>
+      <th>Premium</th>
+      <th>Risk %</th>
+      <th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let option of ownedOptions">
+			<td><a [routerLink]="[ '/options', option.ticker ]">{{option.ticker}}</a></td>
+			<td>{{option.type}}</td>
+			<td>{{option.strikePrice | currency}}</td>
+      <td>{{option.expiration | date : 'shortDate'}}</td>
+      <td>{{option.premium | currency}}</td>
+      <td>{{option.riskPct | number }}</td>
+      <td><a [routerLink]="[ '/soldoptions', option.ticker, option.type, option.strikePrice, option.expiration ]">edit</a> </td>
+		</tr>
+	</tbody>
+</table>
+
+
+<h2>Closed Options</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Ticker</th>
+			<th>Type</th>
+			<th>Strike</th>
+      <th>Expiration</th>
+      <th>Premium</th>
+      <th>Profit</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let option of closedOptions">
+			<td><a [routerLink]="[ '/options', option.ticker ]">{{option.ticker}}</a></td>
+			<td>{{option.type}}</td>
+			<td>{{option.strikePrice | currency}}</td>
+      <td>{{option.expiration | date : 'shortDate'}}</td>
+      <td>{{option.premium | currency}}</td>
+      <td>{{option.profit | currency }}</td>
+		</tr>
+	</tbody>
+</table>
+
 <h2>Owned Stocks</h2>
 <table class="table">
 	<thead>
@@ -27,35 +87,6 @@
 			<td>{{ticker.owned}}</td>
 			<td>{{ticker.spent}}</td>
 			<td>{{ticker.earned}}</td>
-		</tr>
-	</tbody>
-</table>
-
-
-<h2>Options</h2>
-  <div>Collateral cash: {{ collateralCash | currency}}</div>
-  <div>Collateral shares: {{ collateralShares }}</div>
-  <div>Pending premium: {{ pendingPremium | currency }}</div>
-
-<table class="table">
-	<thead>
-		<tr>
-			<th>Ticker</th>
-			<th>Type</th>
-			<th>Strike</th>
-      <th>Expiration</th>
-      <th>Premium</th>
-      <th>Risk %</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr *ngFor="let option of options">
-			<td><a [routerLink]="[ '/options', option.ticker ]">{{option.ticker}}</a></td>
-			<td>{{option.type}}</td>
-			<td>{{option.strikePrice | currency}}</td>
-      <td>{{option.expiration | date : 'shortDate'}}</td>
-      <td>{{option.premium | currency}}</td>
-      <td>{{option.riskPct | number }}</td>
 		</tr>
 	</tbody>
 </table>

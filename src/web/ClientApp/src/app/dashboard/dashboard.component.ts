@@ -11,12 +11,14 @@ export class DashboardComponent implements OnInit {
 
 	public owned : object[];
   public cashedOut : object[];
-  public options : object[];
+  public ownedOptions : object[];
+  public closedOptions : object[];
 	public totalSpent : Number;
 	public totalEarned : Number;
 	public totalCashedOutSpend : number;
   public totalCashedOutEarnings : number;
   public pendingPremium : number;
+  public optionEarnings : number;
 	public collateralShares : number;
   public collateralCash : number;
   public ticker : string;
@@ -31,13 +33,15 @@ export class DashboardComponent implements OnInit {
 
 		this.stocks.getPortfolio().subscribe(result => {
       this.owned = result.owned;
-      this.options = result.options;
+      this.ownedOptions = result.ownedOptions;
+      this.closedOptions = result.closedOptions;
 			this.cashedOut = result.cashedOut;
 			this.totalEarned = result.totalEarned;
 			this.totalSpent = result.totalSpent;
 			this.totalCashedOutSpend = result.totalCashedOutSpend;
       this.totalCashedOutEarnings = result.totalCashedOutEarnings;
       this.pendingPremium = result.pendingPremium;
+      this.optionEarnings = result.optionEarnings;
       this.collateralCash = result.collateralCash;
       this.collateralShares = result.collateralShares;
 			this.loaded = true;

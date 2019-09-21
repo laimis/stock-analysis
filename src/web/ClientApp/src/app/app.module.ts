@@ -15,6 +15,7 @@ import { JobListComponent } from './job-list/job-list.component';
 import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
 import { OptionSellComponent } from './option-sell/option-sell.component';
 import { OptionDetailComponent } from './option-detail/option-detail.component';
+import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -27,6 +28,8 @@ var routes = [
 
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
+
+  { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
 
   { path: 'jobs', component: JobListComponent }
 
@@ -42,7 +45,8 @@ var routes = [
     JobListComponent,
     StockPurchaseComponent,
     OptionSellComponent,
-    OptionDetailComponent
+    OptionDetailComponent,
+    SoldOptionDetailComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

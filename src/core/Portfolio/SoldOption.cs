@@ -37,7 +37,7 @@ namespace core.Portfolio
                 throw new InvalidOperationException("Expiratoin date is too far in the future");
             }
 
-            Apply(new OptionObtained(ticker, type, strikePrice, expiration, userId, DateTime.UtcNow));
+            Apply(new OptionObtained(ticker, type, strikePrice, expiration.Date, userId, DateTime.UtcNow));
         }
 
         public SoldOption(IEnumerable<AggregateEvent> events) : base(events)
@@ -57,6 +57,21 @@ namespace core.Portfolio
             }
 
             Apply(new OptionOpened(this.State.Key, this.State.UserId, amount, premium, filled));
+        }
+
+        public void Close(int amount, double money, DateTimeOffset closed)
+        {
+            if (amount <= 0)
+            {
+                throw new InvalidOperationException("Amount cannot be zero or negative");
+            }
+
+            if (this.State.Amount < amount)
+            {
+                throw new InvalidOperationException("Don't have enough options to close");
+            }
+
+            Apply(new OptionClosed(this.State.Key, this.State.UserId, amount, money, closed));
         }
 
         protected override void Apply(AggregateEvent e)
@@ -83,13 +98,18 @@ namespace core.Portfolio
         protected void ApplyInternal(OptionOpened opened)
         {
             this.State.Amount++;
-            this.State.Filled = opened.When;
-            this.State.Premium = opened.Premium;
+            this.State.Premium += opened.Premium;
+        }
+
+        protected void ApplyInternal(OptionClosed closed)
+        {
+            this.State.Amount--;
+            this.State.Spent += closed.Money;
         }
 
         public static string GenerateKey(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice)
         {
-            return $"{ticker}:{optionType}:{strikePrice}:{expiration}";
+            return $"{ticker}:{optionType}:{strikePrice}:{expiration.Date.ToString("yyyy-MM-dd")}";
         }
     }
 }

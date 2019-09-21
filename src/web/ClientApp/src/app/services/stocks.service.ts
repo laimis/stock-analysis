@@ -39,7 +39,15 @@ export class StocksService {
 
 	openOption(obj:object) : Observable<any> {
 		return this.http.post('/api/portfolio/open', obj)
-	}
+  }
+
+  getSoldOption(ticker:string, type:string, strikePrice:number, expiration:string) : Observable<OptionDefinition> {
+    return this.http.get<OptionDefinition>('/api/portfolio/soldoptions/' + ticker + '/' + type + '/' + strikePrice + '/' + expiration)
+  }
+
+  closeSoldOption(ticker:string, type:string, strikePrice:number, expiration:string, closePrice:number, closeDate:string) : Observable<any> {
+    return this.http.get('/api/portfolio/soldoptions/' + ticker + '/' + type + '/' + strikePrice + '/' + expiration + '/close?closePrice=' + closePrice + '&closeDate=' + closeDate)
+  }
 
 	startAnalysis(minPrice: Number, maxPrice: Number) {
 		this.http.post('/api/analysis/start?min=' + minPrice + '&max=' + maxPrice, null).subscribe(() => {
@@ -50,13 +58,15 @@ export class StocksService {
 
 export interface Portfolio {
   owned: object[]
-  options: object[]
+  ownedOptions: object[]
+  closedOptions: object[]
 	cashedOut: object[]
 	totalEarned: Number
 	totalSpent: Number
 	totalCashedOutSpend : number
   totalCashedOutEarnings : number
   pendingPremium : number
+  optionEarnings : number
   collateralCash : number
   collateralShares : number
 }
