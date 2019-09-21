@@ -44,7 +44,7 @@ namespace web
 			});
 
 			services.AddSingleton<IPortfolioStorage>(s => {
-				var cnn = this.Configuration.GetConnectionString("db");
+				var cnn = this.Configuration.GetValue<string>("DB_CNN");
 				return new PortfolioStorage(cnn);
 			});
 

@@ -231,3 +231,6 @@ _Pvt_Extensions
 .fake/
 
 coverage.json
+
+# dev secrets
+dev_secret.bat
