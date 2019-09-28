@@ -88,6 +88,7 @@ export class OptionDefinition {
   filled: string
   breakEven: number
   risk: number
+  volume : number
 }
 
 export interface OptionDetail {
