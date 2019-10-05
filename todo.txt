@@ -1,5 +1,11 @@
-- render interest/volume in a chart
-- render bids in a chart
+- dockerfile for deployments
+
+[
+
+    Total put bids:
+    Total call bids:
+
+]
 
 stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
 historical volume info: https://cloud.iexapis.com/stable/stock/aapl/chart/5y?token=pk_4a4c89c98fc443a4bdc4289b3526cb4

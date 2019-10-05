@@ -117,10 +117,10 @@ namespace web.Controllers
         {
             var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType.ToString());
 
-            var option = await this._storage.GetSoldOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
+            var option = await this._storage.GetSoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, _user);
             if (option == null)
             {
-                option = new SoldOption(model.Ticker, type, model.Expiration, model.StrikePrice, _user);
+                option = new SoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, _user);
             }
 
             option.Open(model.Amount, model.Premium, model.Filled);

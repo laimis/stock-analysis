@@ -6,7 +6,7 @@ namespace web
     {
         public string Ticker { get; set; }
         public float StrikePrice { get; set; }
-        public DateTimeOffset Expiration { get; set; }
+        public DateTimeOffset ExpirationDate { get; set; }
         public OptionType OptionType { get; set; }
         public int Amount { get; set; }
         public float Premium { get; set; }

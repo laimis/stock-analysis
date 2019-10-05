@@ -1,7 +1,5 @@
 <div class="top-container">
 
-	<div *ngIf="purchased">Purchased!</div>
-
 	<div class="option-purchase-c-container">
 		<form>
 			<div class="form-group">
@@ -16,7 +14,7 @@
 
       <div class="form-group">
 				<label for="date">Expiration</label>
-				<input type="date" class="form-control" id="expiration"name="expiration" [(ngModel)]="option.expiration">
+				<input type="date" class="form-control" id="expiration" name="expiration" [(ngModel)]="option.expirationDate">
 			</div>
 
 			<div class="form-group">
@@ -33,8 +31,8 @@
 			</div>
 
 			<div class="form-group">
-				<label for="premium">Premium</label>
-				<input type="premium" class="form-control" id="premium" name="premium" [(ngModel)]="option.premium">
+				<label for="premium">Premium Bid</label>
+				<input type="premium" class="form-control" id="premium" name="premium" [(ngModel)]="option.bid">
 			</div>
 
 			<div class="form-group">

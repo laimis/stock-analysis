@@ -1,5 +1,5 @@
 {
-	"name": "my-dream-app",
+	"name": "stock-analysis",
 	"version": "0.0.0",
 	"scripts": {
 		"ng": "ng",
