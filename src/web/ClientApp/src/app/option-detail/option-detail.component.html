@@ -1,11 +1,17 @@
+<div class="top-container" *ngIf="failure">
+  {{failure}} <a [routerLink]="[ '/dashboard' ]">return to dashboad</a>
+</div>
+
+<div class="top-container" *ngIf="loading && !failure">
+  Loading option details...
+</div>
+
 <div class="top-container" *ngIf="!loading">
-
     <div>
-      Stock price: {{ stockPrice | currency }}
-
       <table class="table">
         <thead>
           <tr>
+            <th>Stock Price</th>
             <th>Call Vol</th>
             <th>Put Vol</th>
             <th>Call Spend</th>
@@ -15,6 +21,7 @@
           </tr>
         </thead>
         <tr>
+          <td>{{ stockPrice | currency }}</td>
           <td>{{breakdown.callVolume}}</td>
           <td>{{breakdown.putVolume}}</td>
           <td>{{breakdown.callSpend | currency }}</td>
@@ -86,5 +93,4 @@
       </table>
 
     </div>
-
 </div>

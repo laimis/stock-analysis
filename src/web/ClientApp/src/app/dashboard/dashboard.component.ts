@@ -47,12 +47,12 @@ export class DashboardComponent implements OnInit {
 			this.loaded = true;
 		}, error => {
 			console.log(error);
-			this.loaded = true;
+			this.loaded = false;
 		})
 	}
 
 	goToStock() {
-		this.router.navigateByUrl('/stocks/' + this.ticker)
+		this.router.navigateByUrl('/options/' + this.ticker)
 	}
 
 	cashedOutGains(){

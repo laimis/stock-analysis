@@ -25,6 +25,8 @@ export class OptionDetailComponent implements OnInit {
   public minStrikePrice : number = 0
   public maxStrikePrice : number = 0
 
+  public failure;
+
   constructor(
     private service: StocksService,
     private route: ActivatedRoute) { }
@@ -45,7 +47,10 @@ export class OptionDetailComponent implements OnInit {
       // this.maxStrikePrice = Math.round(this.stockPrice)
       this.minBid = 0.1
       this.runFilter()
-    });
+    }, error => {
+      this.failure = "Failed to load option details, either data  is not available or entered symbol is incorrect."
+			console.log("failed: " + error);
+		})
   }
 
   runFilter() {

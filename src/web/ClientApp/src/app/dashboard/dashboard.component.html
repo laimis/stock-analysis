@@ -5,12 +5,14 @@
 			id="ticker"
 			aria-describedby="tickerHelp"
 			[(ngModel)]="ticker"
-			name="ticker" >
+      name="ticker"
+      autofocus >
 		<small id="tickerHelp" class="form-text text-muted">Enter stock symbol</small>
 	</div>
 	<button type="submit" class="btn btn-primary" (click)="goToStock()" class="invisible">Submit</button>
 </form>
 
+<div *ngIf="loaded">
 <h2>Options</h2>
 
   <table>
@@ -118,5 +120,4 @@
 	</tbody>
 </table>
 
-<div *ngIf="loaded">
 </div>

@@ -1,12 +1,5 @@
-- dockerfile for deployments
+- delete the exposed token
+- end to end build script
 
-[
-
-    Total put bids:
-    Total call bids:
-    expiration put volume
-    expiration call volume
-]
-
-stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=pk_4a4c89c98fc443a4bdc4289b3526cb49
-historical volume info: https://cloud.iexapis.com/stable/stock/aapl/chart/5y?token=pk_4a4c89c98fc443a4bdc4289b3526cb4
+stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=xxxx
+historical volume info: https://cloud.iexapis.com/stable/stock/aapl/chart/5y?token=xxxx
