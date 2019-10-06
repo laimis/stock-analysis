@@ -7,10 +7,12 @@ Invoke-Expression "docker build -t $imageName ."
 
 Invoke-Expression "docker tag $($imageName):latest $($imageName):$revision"
 
-Invoke-Expression "docker tag $($imageName):$revision $registry/$($repository):$imageName-$revision"
+Invoke-Expression "docker tag $($imageName):$revision $registry/$($repository):latest"
+Invoke-Expression "docker tag $($imageName):$revision $registry/$($repository):$revision"
 
 $e = aws ecr get-login --profile personal --no-include-email
 
 Invoke-expression $e
 
-Invoke-Expression "docker push $registry/$($repository):$imageName-$revision"
+Invoke-Expression "docker push $registry/$($repository):latest"
+Invoke-Expression "docker push $registry/$($repository):$revision"
