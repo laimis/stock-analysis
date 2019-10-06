@@ -36,7 +36,7 @@ namespace core.Options
         {
             get
             {
-                var date = DateTime.ParseExact(this.ExpirationDate, "yyyyMMdd", null).Date;
+                var date = this.ParsedExpirationDate;
 
                 var today = DateTime.UtcNow.Date;
 
@@ -57,5 +57,7 @@ namespace core.Options
         }
 
         public double Risk => this.Bid / this.StrikePrice;
+
+        public DateTime ParsedExpirationDate => DateTime.ParseExact(this.ExpirationDate, "yyyyMMdd", null).Date;
     }
 }

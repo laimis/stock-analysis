@@ -91,8 +91,18 @@ export class OptionDefinition {
   volume : number
 }
 
+export class OptionBreakdown {
+  callVolume : number
+  putVolume : number
+  callSpend : number
+  putSpend : number
+  priceBasedOnCalls : number
+  priceBasedOnPuts : number
+}
+
 export interface OptionDetail {
   stockPrice: number
   expirations: string[]
   options: OptionDefinition[]
+  breakdown : OptionBreakdown
 }

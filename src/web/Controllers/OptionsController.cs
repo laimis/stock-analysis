@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Options;
 using Microsoft.AspNetCore.Mvc;
+using web.Models;
 
 namespace web.Controllers
 {
@@ -17,11 +18,10 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}")]
-        public async Task<object> Details(string ticker)
+        public async Task<OptionDetailsViewModel> Details(string ticker)
         {
             var dates = await _options.GetOptions(ticker);
-            var price = await _options.GetPrice(ticker);
-
+            
             var upToFour = dates.Take(4);
 
             var options = new List<OptionDetail>();
@@ -32,21 +32,9 @@ namespace web.Controllers
                 options.AddRange(details);
             }
 
-            var optionList = options
-                .Where(o => o.Volume > 0 || o.OpenInterest > 0)
-                .OrderBy(o => o.ExpirationDate)
-                .ToArray();
+            var price = await _options.GetPrice(ticker);
 
-            var expirations = optionList.Select(o => o.ExpirationDate)
-                .Distinct()
-                .OrderBy(s => s)
-                .ToArray();
-
-            return new {
-                stockPrice = price,
-                options = optionList,
-                expirations
-            };
+            return OptionDetailsViewModelMapper.Map(price, options);
         }
     }
 }

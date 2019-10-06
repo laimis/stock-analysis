@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDetail, OptionDefinition } from '../services/stocks.service';
+import { StocksService, OptionDetail, OptionDefinition, OptionBreakdown } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { ThrowStmt } from '@angular/compiler';
 
@@ -14,6 +14,7 @@ export class OptionDetailComponent implements OnInit {
   public options : OptionDefinition[]
   public filteredOptions : OptionDefinition[]
   public expirationMap : Array<OptionDefinition[]>
+  public breakdown : OptionBreakdown
   public stockPrice : number
   public expirations: string[]
   public loading : boolean = true
@@ -37,6 +38,7 @@ export class OptionDetailComponent implements OnInit {
     this.service.getOptions(this.ticker).subscribe( result => {
       this.options = result.options
       this.expirations = result.expirations
+      this.breakdown = result.breakdown
       this.stockPrice = result.stockPrice
       this.sideSelection = "put"
       // this.minStrikePrice = Math.round(this.stockPrice - 2)

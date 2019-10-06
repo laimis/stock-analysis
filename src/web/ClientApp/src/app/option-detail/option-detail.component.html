@@ -2,7 +2,30 @@
 
     <div>
       Stock price: {{ stockPrice | currency }}
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Call Vol</th>
+            <th>Put Vol</th>
+            <th>Call Spend</th>
+            <th>Put Spend</th>
+            <th>Call Price</th>
+            <th>Put Price</th>
+          </tr>
+        </thead>
+        <tr>
+          <td>{{breakdown.callVolume}}</td>
+          <td>{{breakdown.putVolume}}</td>
+          <td>{{breakdown.callSpend | currency }}</td>
+          <td>{{breakdown.putSpend | currency }}</td>
+          <td>{{breakdown.priceBasedOnCalls | currency }}</td>
+          <td>{{breakdown.priceBasedOnPuts | currency }}</td>
+        </tr>
+      </table>
     </div>
+
+
     <div class="form-group">
       <label for="expirationSelect">Expiration</label>&nbsp;&nbsp;
       <select [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">

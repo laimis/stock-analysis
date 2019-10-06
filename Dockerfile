@@ -9,7 +9,7 @@ COPY . /app
 WORKDIR /app
 
 RUN dotnet build -c Release
-RUN dotnet publish ./src/web -c Release -o ../out
+RUN dotnet publish ./src/web -c Release -o /app/out
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0-alpine3.9
 WORKDIR /app
