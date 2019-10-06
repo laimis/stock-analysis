@@ -83,5 +83,16 @@ namespace iexclient
 
             return JsonConvert.DeserializeObject<T>(response);
         }
+
+        public Task<object> ServiceInformation()
+        {
+            object obj = new {
+                endpoint = _endpoint,
+                token = _token,
+                tempDir = _tempDir
+            };
+
+            return Task.FromResult(obj);
+        }
     }
 }

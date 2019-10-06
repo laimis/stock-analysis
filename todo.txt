@@ -1,5 +1,9 @@
-- delete the exposed token
-- end to end build script
+- get db provisioned on ec2
+- rewrite stock details page
+- add stats analysis
+- add tracking for credits consumed
+- add tracking for what options are being investigated
+- confirm local caching works
 
 stats: https://cloud.iexapis.com/stable/stock/aapl/stats?token=xxxx
 historical volume info: https://cloud.iexapis.com/stable/stock/aapl/chart/5y?token=xxxx
