@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using core.Portfolio;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using web.Utils;
 
 namespace web.Controllers
 {
@@ -11,7 +13,6 @@ namespace web.Controllers
     public class PortfolioController : Controller
     {
         private IPortfolioStorage _storage;
-        const string _user = "laimonas";
 
         public PortfolioController(IPortfolioStorage storage)
         {
@@ -21,7 +22,7 @@ namespace web.Controllers
         [HttpGet]
         public async Task<object> Stocks()
         {
-            var stocks = await _storage.GetStocks(_user);
+            var stocks = await _storage.GetStocks(this.User.Identifier());
 
             var cashedout = stocks.Where(s => s.State.Owned == 0);
             var owned = stocks.Where(s => s.State.Owned > 0);
@@ -29,12 +30,12 @@ namespace web.Controllers
             var totalSpent = stocks.Sum(s => s.State.Spent);
             var totalEarned = stocks.Sum(s => s.State.Earned);
 
-            var options = await _storage.GetSoldOptions(_user);
+            var options = await _storage.GetSoldOptions(this.User.Identifier());
 
             var ownedOptions = options.Where(o => o.State.Amount > 0);
             var closedOptions = options.Where(o => o.State.Amount == 0);
             
-            return new
+            var obj = new
             {
                 totalSpent,
                 totalEarned,
@@ -49,12 +50,14 @@ namespace web.Controllers
                 collateralShares = ownedOptions.Sum(o => o.State.CollateralShares),
                 optionEarnings = options.Sum(o => o.State.Profit)
             };
+
+            return obj;
         }
 
         [HttpGet("csv")]
         public async Task<ActionResult> CSV()
         {
-            var stocks = await _storage.GetStocks(_user);
+            var stocks = await _storage.GetStocks(this.User.Identifier());
 
             var builder = new StringBuilder();
 
@@ -98,11 +101,11 @@ namespace web.Controllers
         [HttpPost("purchase")]
         public async Task<ActionResult> PurchaseAsync([FromBody]PurchaseModel model)
         {
-            var stock = await this._storage.GetStock(model.Ticker, _user);
+            var stock = await this._storage.GetStock(model.Ticker, this.User.Identifier());
 
             if (stock == null)
             {
-                stock = new OwnedStock(model.Ticker, _user);
+                stock = new OwnedStock(model.Ticker, this.User.Identifier());
             }
 
             stock.Purchase(model.Amount, model.Price, model.Date);
@@ -117,10 +120,10 @@ namespace web.Controllers
         {
             var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType.ToString());
 
-            var option = await this._storage.GetSoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, _user);
+            var option = await this._storage.GetSoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, this.User.Identifier());
             if (option == null)
             {
-                option = new SoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, _user);
+                option = new SoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, this.User.Identifier());
             }
 
             option.Open(model.Amount, model.Premium, model.Filled);
@@ -133,7 +136,7 @@ namespace web.Controllers
         [HttpPost("sell")]
         public async Task<ActionResult> SellAsync([FromBody]PurchaseModel model)
         {
-            var stock = await this._storage.GetStock(model.Ticker, _user);
+            var stock = await this._storage.GetStock(model.Ticker, this.User.Identifier());
 
             if (stock == null)
             {
@@ -150,7 +153,7 @@ namespace web.Controllers
         [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}")]
         public async Task<ActionResult> SoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration)
         {
-            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, _user);
+            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, this.User.Identifier());
             if (sold == null)
             {
                 return NotFound();
@@ -162,7 +165,7 @@ namespace web.Controllers
         [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}/close")]
         public async Task<ActionResult> CloseSoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration, double closePrice, DateTimeOffset closeDate)
         {
-            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, _user);
+            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, this.User.Identifier());
             if (sold == null)
             {
                 return NotFound();

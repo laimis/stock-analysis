@@ -1,6 +1,6 @@
-- get db provisioned on ec2
+- migrate data, make sure it loads
+- test with another fresh user
 - rewrite stock details page
-- add stats analysis
 - add tracking for credits consumed
 - add tracking for what options are being investigated
 - confirm local caching works

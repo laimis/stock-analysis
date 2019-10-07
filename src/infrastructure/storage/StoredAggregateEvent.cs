@@ -24,6 +24,8 @@ namespace storage
 
             set
             {
+                value = value.Replace("laimonas", "laimis@gmail.com");
+                
                 this.Event = JsonConvert.DeserializeObject<AggregateEvent>(value, _formatting);
             }
         }
