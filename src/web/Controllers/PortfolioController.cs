@@ -3,13 +3,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using core.Portfolio;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using web.Utils;
 
 namespace web.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class PortfolioController : Controller
     {
         private IPortfolioStorage _storage;
@@ -118,7 +119,14 @@ namespace web.Controllers
         [HttpPost("open")]
         public async Task<ActionResult> OpenAsync([FromBody]OpenModel model)
         {
-            var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType.ToString());
+            if (!this.ModelState.IsValid)
+            {
+                return BadRequest("Invalid input sent: " + 
+                    string.Join(",", this.ModelState.Values.SelectMany(e => e.Errors).Select(e => e.ErrorMessage))
+                );
+            }
+
+            var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType);
 
             var option = await this._storage.GetSoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, this.User.Identifier());
             if (option == null)
@@ -126,7 +134,7 @@ namespace web.Controllers
                 option = new SoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, this.User.Identifier());
             }
 
-            option.Open(model.Amount, model.Premium, model.Filled);
+            option.Open(model.Amount, model.Bid, model.Filled);
 
             await this._storage.Save(option);
 

@@ -1,5 +1,6 @@
-- migrate data, make sure it loads
 - test with another fresh user
+
+- user management
 - rewrite stock details page
 - add tracking for credits consumed
 - add tracking for what options are being investigated

@@ -234,3 +234,4 @@ coverage.json
 
 # dev secrets
 dev_secret.bat
+dev_secret.sh

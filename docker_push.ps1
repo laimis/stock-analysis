@@ -4,9 +4,7 @@ $registry = "184947213509.dkr.ecr.us-east-1.amazonaws.com"
 $repository = "stock-site"
 
 Invoke-Expression "docker build -t $imageName ."
-
 Invoke-Expression "docker tag $($imageName):latest $($imageName):$revision"
-
 Invoke-Expression "docker tag $($imageName):$revision $registry/$($repository):latest"
 Invoke-Expression "docker tag $($imageName):$revision $registry/$($repository):$revision"
 
