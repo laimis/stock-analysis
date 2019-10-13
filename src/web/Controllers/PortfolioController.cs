@@ -11,6 +11,7 @@ namespace web.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
+    [ApiController]
     public class PortfolioController : Controller
     {
         private IPortfolioStorage _storage;
@@ -119,22 +120,15 @@ namespace web.Controllers
         [HttpPost("open")]
         public async Task<ActionResult> OpenAsync([FromBody]OpenModel model)
         {
-            if (!this.ModelState.IsValid)
-            {
-                return BadRequest("Invalid input sent: " + 
-                    string.Join(",", this.ModelState.Values.SelectMany(e => e.Errors).Select(e => e.ErrorMessage))
-                );
-            }
-
             var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType);
 
-            var option = await this._storage.GetSoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, this.User.Identifier());
+            var option = await this._storage.GetSoldOption(model.Ticker, type, model.ExpirationDate.Value, model.StrikePrice, this.User.Identifier());
             if (option == null)
             {
-                option = new SoldOption(model.Ticker, type, model.ExpirationDate, model.StrikePrice, this.User.Identifier());
+                option = new SoldOption(model.Ticker, type, model.ExpirationDate.Value, model.StrikePrice, this.User.Identifier());
             }
 
-            option.Open(model.Amount, model.Bid, model.Filled);
+            option.Open(model.Amount, model.Bid, model.Filled.Value);
 
             await this._storage.Save(option);
 
