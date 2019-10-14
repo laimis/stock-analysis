@@ -16,10 +16,11 @@ import { StockPurchaseComponent } from './stock-purchase/stock-purchase.componen
 import { OptionSellComponent } from './option-sell/option-sell.component';
 import { OptionDetailComponent } from './option-detail/option-detail.component';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
+import { AuthGuard } from './auth/auth.guard';
 
 var routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
 
   { path: 'stocks/list', component: StockListComponent },
   { path: 'stocks/purchase', component: StockPurchaseComponent },
@@ -55,7 +56,9 @@ var routes = [
     RouterModule.forRoot(routes),
     GoogleChartsModule.forRoot()
   ],
-  providers: [],
+  providers: [
+	  { provide: "windowObject", useValue: window}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

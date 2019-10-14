@@ -53,7 +53,11 @@ export class StocksService {
 		this.http.post('/api/analysis/start?min=' + minPrice + '&max=' + maxPrice, null).subscribe(() => {
 			console.log('start finished')
 		})
-	}
+  }
+
+  getAccountStatus() : Observable<AccountStatus> {
+    return this.http.get<AccountStatus>('/api/account/status')
+  }
 }
 
 export interface Portfolio {
@@ -105,4 +109,9 @@ export interface OptionDetail {
   expirations: string[]
   options: OptionDefinition[]
   breakdown : OptionBreakdown
+}
+
+export interface AccountStatus {
+  username: String
+  loggedIn: boolean
 }

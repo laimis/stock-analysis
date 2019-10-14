@@ -1,3 +1,4 @@
+using core.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,13 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
+        private IAccountStorage _storage;
+
+        public AccountController(IAccountStorage storage)
+        {
+            _storage = storage;
+        }
+        
         [HttpGet("status")]
         public object Identity()
         {
@@ -24,6 +32,8 @@ namespace web.Controllers
         [Authorize]
         public ActionResult Login()
         {
+            this._storage.RecordLoginAsync(this.User.Identifier());
+            
             return this.Redirect("~/");
         }
 

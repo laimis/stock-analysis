@@ -48,3 +48,9 @@ CREATE TABLE events (
 	PRIMARY KEY(entity, key, userid, version)
 );
 ALTER TABLE events OWNER TO stocks;
+
+CREATE TABLE loginlog (
+    username TEXT,
+    date TIMESTAMP
+);
+ALTER TABLE loginlog OWNER TO stocks;

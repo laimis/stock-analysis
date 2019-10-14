@@ -1,4 +1,4 @@
-- /dashboard guard to require login
+- deploy latest
 - google analytics
 
 - rewrite stock details page

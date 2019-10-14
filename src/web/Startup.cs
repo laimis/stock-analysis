@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
+using core.Account;
 
 namespace web
 {
@@ -57,7 +58,7 @@ namespace web
             services.AddSingleton<IStocksService, StocksService>();
             services.AddSingleton<IAnalysisStorage>(s =>
             {
-                var cnn = this.Configuration.GetConnectionString("db");
+                var cnn = this.Configuration.GetValue<string>("DB_CNN");
                 return new AnalysisStorage(cnn);
             });
 
@@ -65,6 +66,12 @@ namespace web
             {
                 var cnn = this.Configuration.GetValue<string>("DB_CNN");
                 return new PortfolioStorage(cnn);
+            });
+
+            services.AddSingleton<IAccountStorage>(s =>
+            {
+                var cnn = this.Configuration.GetValue<string>("DB_CNN");
+                return new AccountStorage(cnn);
             });
 
             services.AddSingleton<IActorRef>(s =>

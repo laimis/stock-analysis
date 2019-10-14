@@ -1,0 +1,40 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using core.Account;
+using Dapper;
+
+namespace storage
+{
+    public class AccountStorage : AggregateStorage, IAccountStorage
+    {
+        public AccountStorage(string cnn) : base(cnn)
+        {
+        }
+
+        public Task RecordLoginAsync(string username)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"INSERT INTO loginlog (username, date)
+                VALUES (@username, @date)";
+
+                return db.ExecuteAsync(query, new {username, date = DateTime.UtcNow});
+            }
+        }
+
+        public Task<IEnumerable<LoginLogEntry>> List(int offset, int limit)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"SELECT username, date FROM loginlog ORDER BY date DESC";
+
+                return db.QueryAsync<LoginLogEntry>(query);
+            }
+        }
+    }
+}
