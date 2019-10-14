@@ -8,6 +8,5 @@ namespace core.Options
          Task<string[]> GetOptions(string ticker);
          Task<double> GetPrice(string ticker);
          Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate);
-         Task<object> ServiceInformation();
     }
 }

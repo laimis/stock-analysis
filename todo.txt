@@ -1,6 +1,6 @@
-- test with another fresh user
+- /dashboard guard to require login
+- google analytics
 
-- user management
 - rewrite stock details page
 - add tracking for credits consumed
 - add tracking for what options are being investigated
