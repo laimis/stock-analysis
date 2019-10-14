@@ -32,7 +32,7 @@ namespace web.Controllers
         [Authorize]
         public ActionResult Login()
         {
-            this._storage.RecordLoginAsync(this.User.Identifier());
+            this._storage.RecordLogin(this.User.Identifier());
             
             return this.Redirect("~/");
         }

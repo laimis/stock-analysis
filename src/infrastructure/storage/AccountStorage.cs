@@ -12,7 +12,7 @@ namespace storage
         {
         }
 
-        public Task RecordLoginAsync(string username)
+        public async void RecordLogin(string username)
         {
             using (var db = GetConnection())
             {
@@ -21,11 +21,11 @@ namespace storage
                 var query = @"INSERT INTO loginlog (username, date)
                 VALUES (@username, @date)";
 
-                return db.ExecuteAsync(query, new {username, date = DateTime.UtcNow});
+                await db.ExecuteAsync(query, new {username, date = DateTime.UtcNow});
             }
         }
 
-        public Task<IEnumerable<LoginLogEntry>> List(int offset, int limit)
+        public async Task<IEnumerable<LoginLogEntry>> List(int offset, int limit)
         {
             using (var db = GetConnection())
             {
@@ -33,7 +33,9 @@ namespace storage
 
                 var query = @"SELECT username, date FROM loginlog ORDER BY date DESC";
 
-                return db.QueryAsync<LoginLogEntry>(query);
+                var list = await db.QueryAsync<LoginLogEntry>(query);
+
+                return list;
             }
         }
     }

@@ -15,7 +15,7 @@ namespace storagetests
         {
             var storage = new AccountStorage(StorageTests._cnn);
 
-            await storage.RecordLoginAsync("laimonas");
+            storage.RecordLogin("laimonas");
 
             var loadedList = await storage.List(0, 50);
 
