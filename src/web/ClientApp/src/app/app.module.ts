@@ -17,6 +17,7 @@ import { OptionSellComponent } from './option-sell/option-sell.component';
 import { OptionDetailComponent } from './option-detail/option-detail.component';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 import { AuthGuard } from './auth/auth.guard';
+import { AdminComponent } from './admin/admin.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -32,7 +33,9 @@ var routes = [
 
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
 
-  { path: 'jobs', component: JobListComponent }
+  { path: 'jobs', component: JobListComponent },
+
+  { path: 'admin', component: AdminComponent}
 
 ]
 
@@ -47,7 +50,8 @@ var routes = [
     StockPurchaseComponent,
     OptionSellComponent,
     OptionDetailComponent,
-    SoldOptionDetailComponent
+    SoldOptionDetailComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

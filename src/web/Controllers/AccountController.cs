@@ -1,3 +1,4 @@
+using System.Linq;
 using core.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -19,10 +20,15 @@ namespace web.Controllers
         [HttpGet("status")]
         public object Identity()
         {
+            var claims = this.User.Claims.Select(
+                c => $"{c.Type}:{c.Value}"
+            );
+            
             var user = new
             {
                 username = this.User.Identifier(),
-                loggedIn = this.User.Identity.IsAuthenticated
+                loggedIn = this.User.Identity.IsAuthenticated,
+                claims
             };
 
             return user;

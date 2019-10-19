@@ -25,7 +25,7 @@ namespace storage
             }
         }
 
-        public async Task<IEnumerable<LoginLogEntry>> List(int offset, int limit)
+        public async Task<IEnumerable<LoginLogEntry>> GetLogins()
         {
             using (var db = GetConnection())
             {

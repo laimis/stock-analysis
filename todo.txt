@@ -1,4 +1,4 @@
-- deploy latest
+- easy button to sell options
 - google analytics
 
 - rewrite stock details page

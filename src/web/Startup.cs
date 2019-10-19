@@ -16,6 +16,11 @@ using storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using core.Account;
+using Microsoft.AspNetCore.Authentication;
+using System.Linq;
+using System.Security.Claims;
+using System;
+using System.Threading.Tasks;
 
 namespace web
 {
@@ -105,6 +110,10 @@ namespace web
                 options.ClientId = this.Configuration.GetValue<string>("GoogleClientId");
                 options.ClientSecret = this.Configuration.GetValue<string>("GoogleSecret");
             });
+
+            services.AddAuthorization(opt => 
+                opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Email, "laimis@gmail.com"))
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -17,7 +17,7 @@ namespace storagetests
 
             storage.RecordLogin("laimonas");
 
-            var loadedList = await storage.List(0, 50);
+            var loadedList = await storage.GetLogins();
 
             Assert.NotEmpty(loadedList);
         }
