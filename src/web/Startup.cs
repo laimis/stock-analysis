@@ -1,8 +1,3 @@
-using core.Options;
-using core.Portfolio;
-using core.Stocks;
-using financialmodelingclient;
-using iexclient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +5,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using storage;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
-using core.Account;
-using System.Security.Claims;
 
 namespace web
 {
@@ -30,14 +21,14 @@ namespace web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            ConfigureAuthentication(services);
+            AuthHelper.Configure(this.Configuration, services);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
-                options.ForwardedHeaders = 
-                    ForwardedHeaders.XForwardedFor | 
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor |
                     ForwardedHeaders.XForwardedProto;
 
                 options.KnownNetworks.Clear();
@@ -52,47 +43,7 @@ namespace web
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            services.AddSingleton<IStocksService, StocksService>();
-
-            services.AddSingleton<IPortfolioStorage>(s =>
-            {
-                var cnn = this.Configuration.GetValue<string>("DB_CNN");
-                return new PortfolioStorage(cnn);
-            });
-
-            services.AddSingleton<IAccountStorage>(s =>
-            {
-                var cnn = this.Configuration.GetValue<string>("DB_CNN");
-                return new AccountStorage(cnn);
-            });
-
-            services.AddSingleton<IOptionsService>(s =>
-            {
-                return new IEXClient(this.Configuration.GetValue<string>("IEXClientToken"));
-            });
-        }
-
-        private void ConfigureAuthentication(IServiceCollection services)
-        {
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Google";
-            })
-            .AddCookie(opt =>
-            {
-                opt.Cookie.Name = "tw";
-            })
-            .AddGoogle("Google", options =>
-            {
-                options.ClientId = this.Configuration.GetValue<string>("GoogleClientId");
-                options.ClientSecret = this.Configuration.GetValue<string>("GoogleSecret");
-            });
-
-            services.AddAuthorization(opt => 
-                opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Email, "laimis@gmail.com"))
-            );
+            DIHelper.RegisterServices(this.Configuration, services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
