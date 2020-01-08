@@ -2,6 +2,10 @@
 
   <div *ngIf="closed">Closed!</div>
 
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    {{error}}
+  </div>
+
 	<div *ngIf="loaded">
 		<form>
 			<div class="form-group">
@@ -22,7 +26,12 @@
 			<div class="form-group">
         <label for="optionType">Type &nbsp;&nbsp; </label>
         <input type="text" class="form-control" id="optionType" name="optionType" [(ngModel)]="option.type" readonly>
-			</div>
+      </div>
+
+      <div class="form-group">
+				<label for="premium">Number of contracts</label>
+				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="option.amount" readonly>
+      </div>
 
 			<div class="form-group">
 				<label for="premium">Premium</label>
