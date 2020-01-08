@@ -7,7 +7,7 @@ using Xunit;
 
 namespace storagetests
 {
-    public class PortfolioStorageTests
+    public class PortfolioStorageTests : StorageTests
     {
         const string _userId = "testuser";
 
