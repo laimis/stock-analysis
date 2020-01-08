@@ -13,16 +13,10 @@ Stock details contain charts powered by Google Charts.
 
 The project uses event sourcing for tracking owned stocks, this has been a great exercise to try out different event approaches.
 
-## Stock analysis
-
-Using Akka to create components that can inspect a large batch of stocks and find ones that meet a certain criteria. For instance,
-find all stocks under $5 that have book value greater than that and a P/E less than 20. That sort of analysis. Results are stored in database
-and can be reviewed.
-
 ## Storage
 
-Using postgresql for events and analysis results
+Using postgresql for event storage.
 
 ## Stock information
 
-Stock information is provided by https://financialmodelingprep.com.
+Stock information is provided by https://financialmodelingprep.com and https://www.iexcloud.io/

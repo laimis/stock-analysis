@@ -16,11 +16,7 @@ using storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using core.Account;
-using Microsoft.AspNetCore.Authentication;
-using System.Linq;
 using System.Security.Claims;
-using System;
-using System.Threading.Tasks;
 
 namespace web
 {
@@ -52,7 +48,7 @@ namespace web
                 options.KnownProxies.Clear();
             });
 
-            services.AddHttpsRedirection(opt => opt.HttpsPort = 443);
+            // services.AddHttpsRedirection(opt => opt.HttpsPort = 443);
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -131,7 +127,7 @@ namespace web
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
