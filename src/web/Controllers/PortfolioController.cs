@@ -12,7 +12,7 @@ namespace web.Controllers
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class PortfolioController : Controller
+    public class PortfolioController : ControllerBase
     {
         private IPortfolioStorage _storage;
 
@@ -101,7 +101,7 @@ namespace web.Controllers
         }
 
         [HttpPost("purchase")]
-        public async Task<ActionResult> PurchaseAsync([FromBody]PurchaseModel model)
+        public async Task<ActionResult> PurchaseAsync(PurchaseModel model)
         {
             var stock = await this._storage.GetStock(model.Ticker, this.User.Identifier());
 
@@ -118,7 +118,7 @@ namespace web.Controllers
         }
 
         [HttpPost("open")]
-        public async Task<ActionResult> OpenAsync([FromBody]OpenModel model)
+        public async Task<ActionResult> OpenAsync(OpenModel model)
         {
             var type = Enum.Parse<core.Portfolio.OptionType>(model.OptionType);
 
@@ -136,7 +136,7 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> SellAsync([FromBody]PurchaseModel model)
+        public async Task<ActionResult> SellAsync(PurchaseModel model)
         {
             var stock = await this._storage.GetStock(model.Ticker, this.User.Identifier());
 
@@ -153,7 +153,7 @@ namespace web.Controllers
         }
 
         [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}")]
-        public async Task<ActionResult> SoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration)
+        public async Task<object> SoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration)
         {
             var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, this.User.Identifier());
             if (sold == null)
@@ -161,7 +161,7 @@ namespace web.Controllers
                 return NotFound();
             }
 
-            return Json(ToOptionView(sold));
+            return ToOptionView(sold);
         }
 
         [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}/close")]

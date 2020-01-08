@@ -1,14 +1,12 @@
 using core.Account;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using web.Utils;
 
 namespace web.Controllers
 {
     [Route("api/[controller]")]
     [Authorize("admin")]
-    public class AdminController : Controller
+    public class AdminController : ControllerBase
     {
         private IAccountStorage _storage;
 

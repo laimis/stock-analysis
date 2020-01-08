@@ -8,7 +8,7 @@ using web.Utils;
 namespace web.Controllers
 {
     [Route("api/[controller]")]
-    public class AccountController : Controller
+    public class AccountController : ControllerBase
     {
         private IAccountStorage _storage;
 

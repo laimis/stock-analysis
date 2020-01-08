@@ -5,3 +5,5 @@
 - login page
 - convert to mediatr
 - test coverage
+- replace financial modeling with another class
+- practice use of polly

@@ -9,7 +9,7 @@ namespace web.Controllers
 {
 	[Route("api/[controller]")]
     [Authorize]
-	public class StocksController : Controller
+	public class StocksController : ControllerBase
 	{
 		private IStocksService _stocksService;
 

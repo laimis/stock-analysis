@@ -10,7 +10,7 @@ namespace web.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class OptionsController : Controller
+    public class OptionsController : ControllerBase
     {
         private IOptionsService _options;
 
