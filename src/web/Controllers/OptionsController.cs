@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Options;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Models;
 
 namespace web.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class OptionsController : Controller
     {
         private IOptionsService _options;

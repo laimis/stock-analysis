@@ -4,3 +4,5 @@
 - landing page
 - login page
 - remove akka/analysis stuff
+- convert to mediatr
+- test coverage

@@ -3,11 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers
 {
 	[Route("api/[controller]")]
+    [Authorize]
 	public class AnalysisController : Controller
 	{
 		private IActorRef _coordinator;

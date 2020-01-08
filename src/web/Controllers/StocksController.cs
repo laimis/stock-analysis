@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Stocks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers
 {
 	[Route("api/[controller]")]
+    [Authorize]
 	public class StocksController : Controller
 	{
 		private IStocksService _stocksService;
@@ -90,11 +92,6 @@ namespace web.Controllers
 
 			var peValues = metrics.Metrics.Select(m => m.PERatio).Reverse();
 			var peChartData = metricDates.Zip(peValues, (l, p) => new object[] { l, p});
-
-			foreach(var m in metrics.Metrics)
-			{
-				Console.WriteLine($"{m.Date} - {m.BookValuePerShare} - {m.PERatio}");
-			}
 
 			return new
 			{

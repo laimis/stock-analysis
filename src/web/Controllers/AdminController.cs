@@ -7,6 +7,7 @@ using web.Utils;
 namespace web.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize("admin")]
     public class AdminController : Controller
     {
         private IAccountStorage _storage;
@@ -17,7 +18,6 @@ namespace web.Controllers
         }
         
         [HttpGet("users")]
-        [Authorize("admin")]
         public async System.Threading.Tasks.Task<object> UsersAsync()
         {
             var list = await this._storage.GetLogins();
