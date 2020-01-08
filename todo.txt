@@ -1,3 +1,5 @@
+- update project name from stock-analysis to tradewatch
+- update npm call?
 - export of options
 - export of stocks
 - timeline of option events
