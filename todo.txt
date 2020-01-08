@@ -1,6 +1,6 @@
-- easy button to sell options
-- google analytics
-
-- rewrite stock details page
-- add tracking for credits consumed
-- add tracking for what options are being investigated
+- export of options
+- export of stocks
+- timeline of option events
+- landing page
+- login page
+- remove akka/analysis stuff

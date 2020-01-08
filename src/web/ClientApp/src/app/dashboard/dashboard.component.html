@@ -14,16 +14,17 @@
 
 <div *ngIf="loaded">
 
-  <div *ngIf="ownedOptions.length > 0">
-    <h2>Options</h2>
 
+    <h2>Options
+      <a [routerLink]="[ '/options/sell']" class="btn btn-primary">Sell</a>
+    </h2>
       <table>
-          <tr><td width="200">Collateral</td><td>{{ collateralCash | currency}}, {{ collateralShares }} shares</td></tr>
-          <tr><td>Pending premium</td><td>{{ pendingPremium | currency }}</td></tr>
-          <tr><td>Earnings</td><td>{{ optionEarnings | currency}}</td></tr>
+        <tr><td>Total premium</td><td>{{ optionEarnings | currency}}</td></tr>
+        <tr><td>Pending premium</td><td>{{ pendingPremium | currency }} (collateral: {{ collateralCash | currency}}, {{ collateralShares }} shares)</td></tr>
       </table>
 
-
+  <div *ngIf="ownedOptions.length > 0">
+    <h2>Open Option Contracts</h2>
     <table class="table">
       <thead>
         <tr>
@@ -52,7 +53,7 @@
 
 
   <div *ngIf="closedOptions.length > 0">
-    <h2>Closed Options</h2>
+    <h2>Closed Option Contracts</h2>
 
     <table class="table">
       <thead>
