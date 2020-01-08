@@ -1,5 +1,3 @@
-using Akka.Actor;
-using core;
 using core.Options;
 using core.Portfolio;
 using core.Stocks;
@@ -22,8 +20,6 @@ namespace web
 {
     public class Startup
     {
-        private ActorSystem _system;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -57,11 +53,6 @@ namespace web
             });
 
             services.AddSingleton<IStocksService, StocksService>();
-            services.AddSingleton<IAnalysisStorage>(s =>
-            {
-                var cnn = this.Configuration.GetValue<string>("DB_CNN");
-                return new AnalysisStorage(cnn);
-            });
 
             services.AddSingleton<IPortfolioStorage>(s =>
             {
@@ -73,14 +64,6 @@ namespace web
             {
                 var cnn = this.Configuration.GetValue<string>("DB_CNN");
                 return new AccountStorage(cnn);
-            });
-
-            services.AddSingleton<IActorRef>(s =>
-            {
-                var stocks = s.GetService<StocksService>();
-                var storage = s.GetService<IAnalysisStorage>();
-                var props = Props.Create(() => new AnalysisCoordinator(stocks, storage));
-                return _system.ActorOf(props, "coordinator");
             });
 
             services.AddSingleton<IOptionsService>(s =>
@@ -149,8 +132,6 @@ namespace web
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-
-            this._system = ActorSystem.Create("analysis");
         }
     }
 }
