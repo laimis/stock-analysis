@@ -1,8 +1,8 @@
-- export of stocks
 - timeline of option events
 - landing page
-- login page
+- account tracking?
 - convert to mediatr
 - test coverage
 - replace financial modeling with another class
 - practice use of polly
+- testing workflow on github
