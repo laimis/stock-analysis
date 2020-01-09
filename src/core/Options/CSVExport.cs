@@ -64,7 +64,7 @@ namespace core.Options
                 state.Spent,
                 state.Earned,
                 state.Purchased.ToString("yyyy-MM-dd"),
-                state.Sold.ToString("yyyy-MM-dd"),
+                state.Sold != null ? state.Sold.Value.ToString("yyyy-MM-dd") : null,
                 state.Profit
             };
         }
