@@ -6,3 +6,4 @@
 - replace financial modeling
 - practice use of polly
 - testing workflow on github
+- terraform or pulumi for infrastructure

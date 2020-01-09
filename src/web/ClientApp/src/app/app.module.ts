@@ -7,7 +7,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { FormsModule } from '@angular/forms';
 import { GoogleChartsModule } from 'angular-google-charts';
 import { HttpClientModule } from '@angular/common/http';
-import { JobListComponent } from './job-list/job-list.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { NgModule } from '@angular/core';
 import { OptionDetailComponent } from './option-detail/option-detail.component';
@@ -23,7 +22,6 @@ var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'admin', component: AdminComponent},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'jobs', component: JobListComponent },
   { path: 'profile', component: ProfileComponent},
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
@@ -39,7 +37,6 @@ var routes = [
     AdminComponent,
     AppComponent,
     DashboardComponent,
-    JobListComponent,
     NavMenuComponent,
     OptionDetailComponent,
     OptionSellComponent,
