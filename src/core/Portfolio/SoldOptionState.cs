@@ -17,25 +17,5 @@ namespace core.Portfolio
         public double Profit => this.Premium - this.Spent;
         public double CollateralCash => this.Type == OptionType.PUT ? StrikePrice * 100 - Premium : 0;
         public int CollateralShares => this.Type == OptionType.CALL ? 100 * Amount : 0;
-
-        public object[] GetExportParts()
-        {
-            return new object[]{
-                this.Ticker,
-                this.StrikePrice,
-                this.Type.ToString(),
-                this.Expiration,
-                this.Closed,
-                this.Amount,
-                this.Premium,
-                this.Spent,
-                this.Profit
-            };
-        }
-
-        public static string GetExportHeaders()
-        {
-            return "ticker,strike price,type,expiration,closed,amount,premium,spent,profit";
-        }
     }
 }

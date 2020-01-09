@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using core.Options;
 using core.Portfolio;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -80,20 +81,11 @@ namespace web.Controllers
         {
             var stocks = await _storage.GetSoldOptions(this.User.Identifier());
 
-            var builder = new StringBuilder();
-
-            builder.AppendLine(SoldOptionState.GetExportHeaders());
-            
-            foreach (var s in stocks)
-            {
-                builder.AppendLine(string.Join(",", s.State.GetExportParts()));
-            }
-
             this.HttpContext.Response.Headers.Add("content-disposition", "attachment; filename=export.csv");
 
             return new ContentResult
             {
-                Content = builder.ToString(),
+                Content = CSVExport.Generate(stocks),
                 ContentType = "text/csv"
             };
         }
