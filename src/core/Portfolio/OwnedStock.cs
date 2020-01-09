@@ -69,6 +69,7 @@ namespace core.Portfolio
         {
             this.State.Owned += purchased.Amount;
             this.State.Spent += purchased.Amount * purchased.Price;
+            this.State.Purchased = purchased.When;
         }
 
         private void ApplyInternal(TickerObtained tickerObtained)
@@ -81,6 +82,7 @@ namespace core.Portfolio
         {
             this.State.Owned -= sold.Amount;
             this.State.Earned += sold.Amount * sold.Price;
+            this.State.Sold = sold.When;
         }
     }
 }

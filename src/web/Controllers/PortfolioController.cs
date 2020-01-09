@@ -57,21 +57,20 @@ namespace web.Controllers
             return obj;
         }
 
-        [HttpGet("csv")]
-        public async Task<ActionResult> CSV()
+        [HttpGet("stocks/export")]
+        public async Task<ActionResult> StocksExport()
         {
             var stocks = await _storage.GetStocks(this.User.Identifier());
 
-            var builder = new StringBuilder();
+            var filename = CSVExport.GenerateFilename("stocks");
 
-            foreach (var s in stocks)
-            {
-                builder.AppendLine($"{s.State.Ticker},{s.State.Spent},{s.State.Earned}");
-            }
+            this.HttpContext.Response.Headers.Add(
+                "content-disposition", 
+                $"attachment; filename={filename}");
 
             return new ContentResult
             {
-                Content = builder.ToString(),
+                Content = CSVExport.Generate(stocks),
                 ContentType = "text/csv"
             };
         }
@@ -79,13 +78,17 @@ namespace web.Controllers
         [HttpGet("options/export")]
         public async Task<ActionResult> OptionsExport()
         {
-            var stocks = await _storage.GetSoldOptions(this.User.Identifier());
+            var options = await _storage.GetSoldOptions(this.User.Identifier());
 
-            this.HttpContext.Response.Headers.Add("content-disposition", "attachment; filename=export.csv");
+            var filename = CSVExport.GenerateFilename("options");
+
+            this.HttpContext.Response.Headers.Add(
+                "content-disposition", 
+                $"attachment; filename={filename}");
 
             return new ContentResult
             {
-                Content = CSVExport.Generate(stocks),
+                Content = CSVExport.Generate(options),
                 ContentType = "text/csv"
             };
         }
