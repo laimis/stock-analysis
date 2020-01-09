@@ -9,8 +9,8 @@ namespace web
         [Required]
         public string Ticker { get; set; }
         
-        [Range(1, float.MaxValue)]
-        public float StrikePrice { get; set; }
+        [Range(1, double.MaxValue)]
+        public double StrikePrice { get; set; }
         
         [Required]
         [NotInThePast]
@@ -19,11 +19,11 @@ namespace web
         [Required]
         public string OptionType { get; set; }
         
-        [Range(1, 1000)]
+        [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
         public int Amount { get; set; }
 
-        [Range(1, float.MaxValue)]
-        public float Bid { get; set; }
+        [Range(1, 1000)]
+        public double Premium { get; set; }
 
         [Required]
         public DateTimeOffset? Filled { get; set; }

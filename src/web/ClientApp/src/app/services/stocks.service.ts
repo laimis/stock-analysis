@@ -2,9 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+export function GetErrors(err:any): string[] {
+  return Object.keys(err.error.errors).map<string>(v => {
+    return Object.getOwnPropertyDescriptor(err.error.errors, v).value
+  })
+}
+
+@Injectable({providedIn: 'root'})
 export class StocksService {
 
 	constructor(private http: HttpClient) { }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition } from '../services/stocks.service';
+import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
@@ -49,7 +49,7 @@ export class SoldOptionDetailComponent implements OnInit {
     this.service.closeSoldOption(ticker, type, strikePrice, expiration, this.closePrice, this.closeDate).subscribe( () => {
       this.closed = true
     }, err => {
-      this.error = "Invalid value provided in " + Object.keys(err.error.errors)[0];
+      this.error = GetErrors(err)[0]
       console.log(err)
     })
   }

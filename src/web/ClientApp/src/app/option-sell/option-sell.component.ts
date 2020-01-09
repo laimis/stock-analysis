@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition } from '../services/stocks.service';
+import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,8 @@ export class OptionSellComponent implements OnInit {
 
   public option : OptionDefinition
   public ticker : string
+  public errors : string[]
+  public success: boolean
 
   constructor(
     private service: StocksService,
@@ -35,12 +37,16 @@ export class OptionSellComponent implements OnInit {
 
   clearValues() {
     this.ticker = null
+    this.errors = null
     this.option = new OptionDefinition()
   }
 
   open() {
     this.service.openOption(this.option).subscribe( () => {
+      this.success = true;
       this.clearValues();
+    }, err => {
+      this.errors = GetErrors(err)
     })
   }
 }
