@@ -75,6 +75,29 @@ namespace web.Controllers
             };
         }
 
+        [HttpGet("options/export")]
+        public async Task<ActionResult> OptionsExport()
+        {
+            var stocks = await _storage.GetSoldOptions(this.User.Identifier());
+
+            var builder = new StringBuilder();
+
+            builder.AppendLine(SoldOptionState.GetExportHeaders());
+            
+            foreach (var s in stocks)
+            {
+                builder.AppendLine(string.Join(",", s.State.GetExportParts()));
+            }
+
+            this.HttpContext.Response.Headers.Add("content-disposition", "attachment; filename=export.csv");
+
+            return new ContentResult
+            {
+                Content = builder.ToString(),
+                ContentType = "text/csv"
+            };
+        }
+
         private object ToOwnedView(OwnedStock o)
         {
             return new
