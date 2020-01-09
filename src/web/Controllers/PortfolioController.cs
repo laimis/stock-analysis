@@ -147,7 +147,7 @@ namespace web.Controllers
                 option = new SoldOption(model.Ticker, type, model.ExpirationDate.Value, model.StrikePrice, this.User.Identifier());
             }
 
-            option.Open(model.Amount, model.Bid, model.Filled.Value);
+            option.Open(model.Amount, model.Premium, model.Filled.Value);
 
             await this._storage.Save(option);
 

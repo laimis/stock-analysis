@@ -1,6 +1,8 @@
 <div class="top-container">
 
-  <div *ngIf="closed">Closed!</div>
+  <div *ngIf="closed" class="alert alert-success" role="alert">
+    Contract has been successfully closed
+  </div>
 
   <div *ngIf="error" class="alert alert-danger" role="alert">
     {{error}}
@@ -48,7 +50,7 @@
 				<input type="date" class="form-control" id="closeDate" name="closeDate" [(ngModel)]="closeDate">
 			</div>
 
-      <button type="submit" class="btn btn-primary mb-2" (click)="close()">Close</button>&nbsp;&nbsp;
+      <button type="submit" class="btn btn-primary mb-2" (click)="close()">Close Contract</button>&nbsp;&nbsp;
 		</form>
 	</div>
 </div>

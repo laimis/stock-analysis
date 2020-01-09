@@ -1,6 +1,16 @@
 <div class="top-container">
 
-	<div class="option-purchase-c-container">
+  <div *ngIf="errors" class="alert alert-danger" role="alert">
+    <ul>
+      <li *ngFor="let error of errors">{{error}}</li>
+    </ul>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success" role="alert">
+    Contract sale has been successfully recorded
+  </div>
+
+  <div class="option-purchase-c-container">
 		<form>
 			<div class="form-group">
 				<label for="ticker">Ticker</label>
@@ -26,21 +36,21 @@
 			</div>
 
 			<div class="form-group">
-				<label for="amount">Amount</label>
+				<label for="amount">Number of Contracts</label>
 				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="option.amount">
 			</div>
 
 			<div class="form-group">
-				<label for="premium">Premium Bid</label>
-				<input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="option.bid">
+				<label for="premium">Premium Received</label>
+				<input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="option.premium">
 			</div>
 
 			<div class="form-group">
-				<label for="filled">Filled</label>
+				<label for="filled">Filled Date</label>
 				<input type="date" class="form-control" id="filled"name="filled" [(ngModel)]="option.filled">
 			</div>
 
-			<button type="submit" class="btn btn-primary mb-2" (click)="open()">Open</button>&nbsp;&nbsp;
+			<button type="submit" class="btn btn-primary mb-2" (click)="open()">Record Sale</button>&nbsp;&nbsp;
 		</form>
 	</div>
 </div>
