@@ -1,5 +1,7 @@
 using System.Linq;
+using System.Threading.Tasks;
 using core.Options;
+using iexclient;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -10,6 +12,7 @@ namespace iexclienttests
         private string[] _options;
         private OptionDetail[] _optionDetails;
         private double _price;
+        private IEXClient _client;
         private ITestOutputHelper _output;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
@@ -17,6 +20,7 @@ namespace iexclienttests
             _options = fixture.Options;
             _optionDetails = fixture.OptionDetails.ToArray();
             _price = fixture.Price;
+            _client = fixture.Client;
             _output = output;
         }
 
@@ -69,7 +73,7 @@ namespace iexclienttests
         [Fact]
         public void Price_Set()
         {
-            Assert.True(_price > 1);
+            Assert.True(_price > 0);
         }
     }
 }

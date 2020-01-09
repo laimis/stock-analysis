@@ -105,6 +105,7 @@ namespace core.Portfolio
         {
             this.State.Amount--;
             this.State.Spent += closed.Money;
+            this.State.Closed = closed.When;
         }
 
         public static string GenerateKey(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice)

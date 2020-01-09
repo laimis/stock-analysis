@@ -9,24 +9,25 @@ namespace iexclienttests
         public string[] Options;
         public IEnumerable<OptionDetail> OptionDetails;
         public double Price;
+        public IEXClient Client;
 
         public IEXClientFixture()
         {
-            var client = new IEXClient("add-your-key");
+            Client = new IEXClient("pk_b7b51b4bf6194331962821da6ec36f75");
 
-            var t = client.GetOptions("TEUM");
+            var t = Client.GetOptions("TEUM");
 
             t.Wait();
             
             Options = t.Result;
 
-            var dt = client.GetOptionDetails("TEUM", "201909");
+            var dt = Client.GetOptionDetails("TEUM", "201909");
 
             dt.Wait();
 
             OptionDetails = dt.Result;
 
-            var price = client.GetPrice("TEUM");
+            var price = Client.GetPrice("TEUM");
 
             price.Wait();
 

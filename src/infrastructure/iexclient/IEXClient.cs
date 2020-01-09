@@ -66,11 +66,20 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        public async Task<double> GetPrice(string ticker)
+        public async Task<TickerPrice> GetPrice(string ticker)
         {
             var url = $"{_endpoint}/stock/{ticker}/price?token={_token}";
 
-            return await Get<double>(url);
+            var r = await _client.GetAsync(url);
+
+            if (r.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return new TickerPrice();
+            }
+
+            var response = await r.Content.ReadAsStringAsync();
+
+            return new TickerPrice(JsonConvert.DeserializeObject<double>(response));
         }
 
         private async Task<T> Get<T>(string url)
