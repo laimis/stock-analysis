@@ -11,7 +11,7 @@ namespace iexclienttests
     {
         private string[] _options;
         private OptionDetail[] _optionDetails;
-        private double _price;
+        private TickerPrice _price;
         private IEXClient _client;
         private ITestOutputHelper _output;
 
@@ -73,7 +73,7 @@ namespace iexclienttests
         [Fact]
         public void Price_Set()
         {
-            Assert.True(_price > 0);
+            Assert.True(_price.Amount > 0);
         }
     }
 }

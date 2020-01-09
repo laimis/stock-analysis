@@ -8,7 +8,7 @@ namespace iexclienttests
     {
         public string[] Options;
         public IEnumerable<OptionDetail> OptionDetails;
-        public double Price;
+        public TickerPrice Price;
         public IEXClient Client;
 
         public IEXClientFixture()
