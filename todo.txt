@@ -3,6 +3,6 @@
 - account tracking?
 - convert to mediatr
 - test coverage
-- replace financial modeling with another class
+- replace financial modeling
 - practice use of polly
 - testing workflow on github
