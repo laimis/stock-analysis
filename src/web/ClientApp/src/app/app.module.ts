@@ -25,13 +25,13 @@ var routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'jobs', component: JobListComponent },
   { path: 'profile', component: ProfileComponent},
-  { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'options/sell', component: OptionSellComponent },
+  { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
-  { path: 'stocks/:ticker', component: StockDetailsComponent },
   { path: 'stocks/list', component: StockListComponent },
   { path: 'stocks/purchase', component: StockPurchaseComponent },
   { path: 'stocks/purchase/:ticker', component: StockPurchaseComponent },
+  { path: 'stocks/:ticker', component: StockDetailsComponent },
 ]
 
 @NgModule({
