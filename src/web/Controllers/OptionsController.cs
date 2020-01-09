@@ -10,7 +10,7 @@ namespace web.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class OptionsController : ControllerBase
+    public class OptionsController : Controller
     {
         private IOptionsService _options;
 
@@ -20,8 +20,14 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}")]
-        public async Task<OptionDetailsViewModel> Details(string ticker)
+        public async Task<ActionResult<OptionDetailsViewModel>> DetailsAsync(string ticker)
         {
+            var price = await _options.GetPrice(ticker);
+            if (price.NotFound)
+            {
+                return NotFound();
+            }
+            
             var dates = await _options.GetOptions(ticker);
             
             var upToFour = dates.Take(4);
@@ -34,9 +40,7 @@ namespace web.Controllers
                 options.AddRange(details);
             }
 
-            var price = await _options.GetPrice(ticker);
-
-            return OptionDetailsViewModelMapper.Map(price, options);
+            return OptionDetailsViewModelMapper.Map(price.Amount, options);
         }
     }
 }

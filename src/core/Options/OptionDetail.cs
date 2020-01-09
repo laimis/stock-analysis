@@ -2,7 +2,7 @@ using System;
 
 namespace core.Options
 {
-    public partial class OptionDetail
+    public class OptionDetail
     {
         public string Symbol { get; set; }
 

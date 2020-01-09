@@ -75,6 +75,29 @@ namespace web.Controllers
             };
         }
 
+        [HttpGet("options/export")]
+        public async Task<ActionResult> OptionsExport()
+        {
+            var stocks = await _storage.GetSoldOptions(this.User.Identifier());
+
+            var builder = new StringBuilder();
+
+            builder.AppendLine(SoldOptionState.GetExportHeaders());
+            
+            foreach (var s in stocks)
+            {
+                builder.AppendLine(string.Join(",", s.State.GetExportParts()));
+            }
+
+            this.HttpContext.Response.Headers.Add("content-disposition", "attachment; filename=export.csv");
+
+            return new ContentResult
+            {
+                Content = builder.ToString(),
+                ContentType = "text/csv"
+            };
+        }
+
         private object ToOwnedView(OwnedStock o)
         {
             return new
@@ -95,6 +118,7 @@ namespace web.Controllers
                 strikePrice = o.State.StrikePrice,
                 expiration = o.State.Expiration,
                 premium = o.State.Premium,
+                amount = o.State.Amount,
                 riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100,
                 profit = o.State.Profit
             };
@@ -165,7 +189,7 @@ namespace web.Controllers
         }
 
         [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}/close")]
-        public async Task<ActionResult> CloseSoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration, double closePrice, DateTimeOffset closeDate)
+        public async Task<ActionResult> CloseSoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration, double closePrice, DateTimeOffset closeDate, int amount)
         {
             var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, this.User.Identifier());
             if (sold == null)
@@ -173,7 +197,7 @@ namespace web.Controllers
                 return NotFound();
             }
 
-            sold.Close(1, closePrice, closeDate);
+            sold.Close(amount, closePrice, closeDate);
 
             await _storage.Save(sold);
 
