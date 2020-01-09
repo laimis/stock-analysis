@@ -12,5 +12,5 @@ RUN dotnet publish ./src/web -c Release -o /app/out
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0-alpine3.9
 WORKDIR /app
-COPY ./publish /app
+COPY --from=build-env /app/out /app
 ENTRYPOINT ["dotnet", "web.dll"]
