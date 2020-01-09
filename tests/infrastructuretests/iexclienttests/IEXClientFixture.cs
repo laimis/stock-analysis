@@ -13,7 +13,7 @@ namespace iexclienttests
 
         public IEXClientFixture()
         {
-            Client = new IEXClient("pk_b7b51b4bf6194331962821da6ec36f75");
+            Client = new IEXClient("your-key");
 
             var t = Client.GetOptions("TEUM");
 
