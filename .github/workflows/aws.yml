@@ -3,7 +3,7 @@ on:
     branches:
       - production
 
-name: Deploy to Amazon ECS
+name: Deploy to Amazon ECR
 
 jobs:
   deploy:
@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+      with:
+        ref: production
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
