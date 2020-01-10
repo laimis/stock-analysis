@@ -68,5 +68,10 @@ namespace storage
             return list.GroupBy(e => e.Ticker)
                 .Select(g => new SoldOption(g));
         }
+
+        public async Task DoHealthCheck()
+        {
+            await GetEventsAsync("randomentity", "nonexisting");
+        }
     }
 }
