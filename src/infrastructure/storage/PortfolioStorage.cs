@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Portfolio;
+using Dapper;
 
 namespace storage
 {
@@ -67,6 +68,18 @@ namespace storage
 
             return list.GroupBy(e => e.Ticker)
                 .Select(g => new SoldOption(g));
+        }
+
+        public async Task DoHealthCheck()
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"select 1";
+
+                await db.QueryAsync<int>(query);
+            }
         }
     }
 }

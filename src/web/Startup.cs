@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
+using web.Utils;
 
 namespace web
 {
@@ -34,6 +35,9 @@ namespace web
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
+
+            services.AddHealthChecks()
+                .AddCheck<DBHealthCheck>("health check that uses db");
 
             // services.AddHttpsRedirection(opt => opt.HttpsPort = 443);
 
@@ -72,6 +76,7 @@ namespace web
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/health");
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
             });
 

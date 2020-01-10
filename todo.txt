@@ -8,3 +8,4 @@
 - testing workflow on github
 - terraform or pulumi for infrastructure
 - notification on new user logging in
+- healthcheck (what about built in?)
