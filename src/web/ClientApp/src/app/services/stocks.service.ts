@@ -97,6 +97,7 @@ export class OptionDefinition {
   optionType: string
   amount: number
   bid: number
+  premium: number
   filled: string
   breakEven: number
   risk: number
