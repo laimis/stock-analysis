@@ -7,3 +7,4 @@
 - practice use of polly
 - testing workflow on github
 - terraform or pulumi for infrastructure
+- notification on new user logging in
