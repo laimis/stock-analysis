@@ -1,6 +1,6 @@
 # Playground implementation of stock tracking site
 
-This repo contains a simple website one could use to track their stock portfolio.
+This repo contains a simple website one could use to track their stock/options portfolio. It's mostly geared towards analysing option prices and selling options.
 
 # Components
 
