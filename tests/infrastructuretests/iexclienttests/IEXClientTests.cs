@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading.Tasks;
 using core.Options;
 using iexclient;
 using Xunit;
@@ -7,6 +6,7 @@ using Xunit.Abstractions;
 
 namespace iexclienttests
 {
+    [Trait("Category", "Integration")]
     public class IEXClientTests : IClassFixture<IEXClientFixture>
     {
         private string[] _options;

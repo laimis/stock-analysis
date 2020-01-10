@@ -7,6 +7,7 @@ using Xunit;
 
 namespace storagetests
 {
+    [Trait("Category", "Database")]
     public class PortfolioStorageTests : StorageTests
     {
         const string _userId = "testuser";
@@ -47,10 +48,12 @@ namespace storagetests
         [Fact]
         public async Task OwnedOption_WorksAsync()
         {
+            var expiration = DateTimeOffset.UtcNow.AddDays(30).Date;
+
             var option = new SoldOption(
                 GenerateTestTicker(),
                 OptionType.CALL,
-                new DateTimeOffset(2019, 9, 20, 0, 0, 0, 0, TimeSpan.FromSeconds(0)),
+                expiration,
                 2.5,
                 _userId
             );

@@ -6,6 +6,7 @@ using Xunit;
 
 namespace storagetests
 {
+    [Trait("Category", "Database")]
     public class AccountStorageTests : StorageTests
     {
         const string _userId = "testuser";
