@@ -19,7 +19,7 @@ namespace storage.tests
 
             var entry = new LoginLogEntry("laimonas", DateTime.UtcNow);
 
-            storage.RecordLogin(entry);
+            await storage.RecordLoginAsync(entry);
 
             var loadedList = await storage.GetLogins();
 

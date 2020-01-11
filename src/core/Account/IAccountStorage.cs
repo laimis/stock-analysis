@@ -5,7 +5,7 @@ namespace core.Account
 {
     public interface IAccountStorage
     {
-         void RecordLogin(LoginLogEntry entry);
+         Task RecordLoginAsync(LoginLogEntry entry);
 
          Task<IEnumerable<LoginLogEntry>> GetLogins();
     }

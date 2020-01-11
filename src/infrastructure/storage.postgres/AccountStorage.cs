@@ -11,7 +11,7 @@ namespace storage.postgres
         {
         }
 
-        public async void RecordLogin(LoginLogEntry entry)
+        public async Task RecordLoginAsync(LoginLogEntry entry)
         {
             using (var db = GetConnection())
             {
