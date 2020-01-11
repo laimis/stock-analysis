@@ -13,6 +13,30 @@ namespace storagetests
         const string _userId = "testuser";
 
         [Fact]
+        public async Task NonExistingStockReturnsNullAsync()
+        {
+            var storage = new PortfolioStorage(StorageTests._cnn);
+
+            Assert.Null(await storage.GetStock("nonexisting", "nonexisting"));
+        }
+
+        [Fact]
+        public async Task NonExistingOptionReturnsNullAsync()
+        {
+            var storage = new PortfolioStorage(StorageTests._cnn);
+
+            Assert.Null(await storage.GetSoldOption("nonexisting", OptionType.CALL, DateTimeOffset.UtcNow, 2, "userid"));
+        }
+
+        [Fact]
+        public async Task HealthCheckWorks()
+        {
+            var storage = new PortfolioStorage(StorageTests._cnn);
+
+            await storage.DoHealthCheck();
+        }
+
+        [Fact]
         public async Task OwnedStockStorageAsync()
         {
             var stock = new OwnedStock(GenerateTestTicker(), _userId);

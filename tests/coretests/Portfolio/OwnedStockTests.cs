@@ -2,7 +2,7 @@ using System;
 using core.Portfolio;
 using Xunit;
 
-namespace coretests
+namespace coretests.Portfolio
 {
     public class OwnedStockTests
     {
@@ -22,11 +22,14 @@ namespace coretests
 
             Assert.Equal(15, stock.State.Owned);
             Assert.Equal(31, stock.State.Spent);
+            Assert.Equal(0, stock.State.Profit);
 
             stock.Sell(5, 20, DateTime.UtcNow);
 
             Assert.Equal(10, stock.State.Owned);
             Assert.Equal(100, stock.State.Earned);
+            Assert.NotNull(stock.State.Sold);
+            Assert.Equal(69, stock.State.Profit);
         }
 
         [Fact]
@@ -65,6 +68,29 @@ namespace coretests
         public void BuyingWithBadUserThrows()
         {
             Assert.Throws<InvalidOperationException>(() => new OwnedStock("ticker", ""));
+        }
+
+        [Fact]
+        public void PurchaseWithDateNotProvidedThrows()
+        {
+            var stock = new OwnedStock("ticker", "userid");
+
+            Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTime.MinValue));
+        }
+
+        [Fact]
+        public void EventCstrReplaysEvents()
+        {
+            var stock = new OwnedStock("ticker", "userid");
+
+            stock.Purchase(1, 10, DateTime.UtcNow);
+
+            var events = stock.Events;
+
+            var stock2 = new OwnedStock(events);
+
+            Assert.Equal(stock.State.Owned, stock2.State.Owned);
+            Assert.Equal(stock.State.Purchased, stock2.State.Purchased);
         }
     }
 }

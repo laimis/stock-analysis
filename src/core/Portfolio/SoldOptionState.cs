@@ -7,7 +7,8 @@ namespace core.Portfolio
         public string Ticker { get; internal set; }
         public double StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; internal set; }
-        public DateTimeOffset Closed { get; internal set; }
+        public DateTimeOffset? Closed { get; internal set; }
+        public DateTimeOffset? Filled { get; internal set; }
         public OptionType Type { get; internal set; }
         public string UserId { get; internal set; }
         public string Key => SoldOption.GenerateKey(this.Ticker, this.Type, this.Expiration, this.StrikePrice);

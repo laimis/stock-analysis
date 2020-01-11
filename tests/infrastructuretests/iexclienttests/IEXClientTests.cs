@@ -1,4 +1,5 @@
 using System.Linq;
+using core;
 using core.Options;
 using iexclient;
 using Xunit;

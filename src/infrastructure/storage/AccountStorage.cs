@@ -12,7 +12,7 @@ namespace storage
         {
         }
 
-        public async void RecordLogin(string username)
+        public async void RecordLogin(LoginLogEntry entry)
         {
             using (var db = GetConnection())
             {
@@ -21,7 +21,7 @@ namespace storage
                 var query = @"INSERT INTO loginlog (username, date)
                 VALUES (@username, @date)";
 
-                await db.ExecuteAsync(query, new {username, date = DateTime.UtcNow});
+                await db.ExecuteAsync(query, entry);
             }
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using core.Account;
 using storage;
 using Xunit;
 
@@ -16,7 +17,9 @@ namespace storagetests
         {
             var storage = new AccountStorage(StorageTests._cnn);
 
-            storage.RecordLogin("laimonas");
+            var entry = new LoginLogEntry("laimonas", DateTime.UtcNow);
+
+            storage.RecordLogin(entry);
 
             var loadedList = await storage.GetLogins();
 
