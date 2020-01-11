@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using core.Portfolio;
 using Dapper;
 
-namespace storage
+namespace storage.postgres
 {
     public class PortfolioStorage : AggregateStorage, IPortfolioStorage
     {

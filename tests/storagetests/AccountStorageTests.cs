@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
-using storage;
+using storage.postgres;
 using Xunit;
 
-namespace storagetests
+namespace storage.postgrestests
 {
     [Trait("Category", "Database")]
     public class AccountStorageTests : StorageTests

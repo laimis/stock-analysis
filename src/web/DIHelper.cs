@@ -6,7 +6,7 @@ using financialmodelingclient;
 using iexclient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using storage;
+using storage.postgres;
 
 namespace web
 {

@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
 using Dapper;
 
-namespace storage
+namespace storage.postgres
 {
     public class AccountStorage : AggregateStorage, IAccountStorage
     {

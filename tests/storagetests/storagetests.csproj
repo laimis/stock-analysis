@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\infrastructure\storage\storage.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\storage.postgres\storage.csproj" />
 	<ProjectReference Include="..\..\src\core\core.csproj" />
 	<ProjectReference Include="..\..\src\infrastructure\financialmodelingclient\financialmodelingclient.csproj" />
   </ItemGroup>

@@ -28,7 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\core\core.csproj" />
     <ProjectReference Include="..\infrastructure\financialmodelingclient\financialmodelingclient.csproj" />
-    <ProjectReference Include="..\infrastructure\storage\storage.csproj" />
+    <ProjectReference Include="..\infrastructure\storage.postgres\storage.csproj" />
     <ProjectReference Include="..\infrastructure\iexclient\iexclient.csproj" />
   </ItemGroup>
 

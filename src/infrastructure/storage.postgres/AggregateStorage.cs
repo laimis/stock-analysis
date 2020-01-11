@@ -6,7 +6,7 @@ using core.Shared;
 using Dapper;
 using Npgsql;
 
-namespace storage
+namespace storage.postgres
 {
     public class AggregateStorage
     {

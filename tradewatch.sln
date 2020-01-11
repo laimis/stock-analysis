@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financialmodelingclient", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "web", "src\web\web.csproj", "{93CEE505-9175-4866-9DE5-FF83D00B98F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "storage", "src\infrastructure\storage\storage.csproj", "{DCB83A00-07F6-4B06-81F3-2E4E51BC4C77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "storage", "src\infrastructure\storage.postgres\storage.csproj", "{DCB83A00-07F6-4B06-81F3-2E4E51BC4C77}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0B527AF4-E22E-4199-932A-F0ADA799EFE4}"
 EndProject

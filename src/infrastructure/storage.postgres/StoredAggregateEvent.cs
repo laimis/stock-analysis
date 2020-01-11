@@ -2,7 +2,7 @@ using System;
 using core.Shared;
 using Newtonsoft.Json;
 
-namespace storage
+namespace storage.postgres
 {
     internal class StoredAggregateEvent
     {
