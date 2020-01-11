@@ -17,24 +17,6 @@ namespace web.Controllers
 		{
 			_stocksService = stockService;
 		}
-
-		[HttpGet]
-		public async Task<object> ListAsync()
-		{
-			var data = await _stocksService.GetAvailableStocks();
-
-			var groups = data.FilteredList.GroupBy(s => s.PriceBucket)
-				.Select(g => new {
-					bucket = g.Key,
-					count = g.Count()
-				})
-				.OrderBy(a => a.bucket);
-
-			return new {
-				list = data.FilteredList,
-				groups
-			};
-		}
 		
 		[HttpGet("{ticker}")]
 		public async Task<object> DetailsAsync(string ticker)

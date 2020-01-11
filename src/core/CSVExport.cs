@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using core.Portfolio;
 
-namespace core.Options
+namespace core
 {
     public class CSVExport
     {
@@ -23,7 +23,10 @@ namespace core.Options
                 o => GetExportParts((o as SoldOption).State));
         }
 
-        private static string Generate(string header, IEnumerable<object> objs, Func<object, object[]> rowGenerator)
+        private static string Generate(
+            string header,
+            IEnumerable<object> objs,
+            Func<object, IEnumerable<object>> rowGenerator)
         {
             var builder = new StringBuilder();
 
@@ -44,7 +47,7 @@ namespace core.Options
                 state.StrikePrice,
                 state.Type.ToString(),
                 state.Expiration.ToString("yyyy-MM-dd"),
-                state.Closed.ToString("yyyy-MM-dd"),
+                state.Closed != null ? state.Closed.Value.ToString("yyyy-MM-dd") : null,
                 state.Amount,
                 state.Premium,
                 state.Spent,
@@ -52,7 +55,7 @@ namespace core.Options
             };
         }
 
-        private static string GetOptionsExportHeaders()
+        public static string GetOptionsExportHeaders()
         {
             return "ticker,strike price,type,expiration,closed,amount,premium,spent,profit";
         }
@@ -69,7 +72,7 @@ namespace core.Options
             };
         }
 
-        private static string GetStocksExportHeaders()
+        public static string GetStocksExportHeaders()
         {
             return "ticker,spent,earned,purchased,sold,profit";
         }

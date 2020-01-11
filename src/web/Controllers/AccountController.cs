@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using core.Account;
 using Microsoft.AspNetCore.Authentication;
@@ -38,7 +39,12 @@ namespace web.Controllers
         [Authorize]
         public ActionResult Login()
         {
-            this._storage.RecordLogin(this.User.Identifier());
+            var entry = new LoginLogEntry(
+                this.User.Identifier(),
+                DateTime.UtcNow
+            );
+
+            this._storage.RecordLogin(entry);
             
             return this.Redirect("~/");
         }

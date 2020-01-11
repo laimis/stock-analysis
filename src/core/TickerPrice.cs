@@ -1,4 +1,4 @@
-namespace core.Options
+namespace core
 {
     public struct TickerPrice
     {

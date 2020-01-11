@@ -1,8 +1,9 @@
+- test coverage
+
 - timeline of option events
 - landing page
 - account tracking?
 - convert to mediatr
-- test coverage
 - replace financial modeling
 - practice use of polly
 - testing workflow on github

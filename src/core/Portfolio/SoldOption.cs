@@ -71,6 +71,11 @@ namespace core.Portfolio
                 throw new InvalidOperationException("Don't have enough options to close");
             }
 
+            if (money < 0)
+            {
+                throw new InvalidOperationException("Close money cannot be negative");
+            }
+
             Apply(new OptionClosed(this.State.Key, this.State.UserId, amount, money, closed));
         }
 
@@ -97,15 +102,20 @@ namespace core.Portfolio
 
         protected void ApplyInternal(OptionOpened opened)
         {
-            this.State.Amount++;
+            this.State.Amount += opened.Amount;
+            this.State.Filled = opened.Filled;
             this.State.Premium += opened.Premium;
         }
 
         protected void ApplyInternal(OptionClosed closed)
         {
-            this.State.Amount--;
+            this.State.Amount -= closed.Amount;
             this.State.Spent += closed.Money;
-            this.State.Closed = closed.When;
+
+            if (this.State.Amount == 0)
+            {
+                this.State.Closed = closed.When;
+            }
         }
 
         public static string GenerateKey(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice)
