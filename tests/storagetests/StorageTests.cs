@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace storage.postgrestests
+using storage.tests
 {
     [Trait("Category", "Integration")]
     public class StorageTests

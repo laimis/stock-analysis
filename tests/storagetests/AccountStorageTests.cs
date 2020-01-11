@@ -5,7 +5,7 @@ using core.Account;
 using storage.postgres;
 using Xunit;
 
-namespace storage.postgrestests
+using storage.tests
 {
     [Trait("Category", "Database")]
     public class AccountStorageTests : StorageTests
