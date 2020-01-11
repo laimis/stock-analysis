@@ -5,7 +5,7 @@ using core.Portfolio;
 using storage.postgres;
 using Xunit;
 
-using storage.tests
+namespace storage.tests
 {
     [Trait("Category", "Database")]
     public class PortfolioStorageTests : StorageTests

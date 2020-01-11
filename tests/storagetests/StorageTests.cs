@@ -1,6 +1,6 @@
 using Xunit;
 
-using storage.tests
+namespace storage.tests
 {
     [Trait("Category", "Integration")]
     public class StorageTests
