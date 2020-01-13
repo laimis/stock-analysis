@@ -13,7 +13,5 @@ namespace core.Portfolio
         Task<IEnumerable<SoldOption>> GetSoldOptions(string user);
         Task<SoldOption> GetSoldOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId);
         Task Save(SoldOption option);
-
-        Task DoHealthCheck();
     }
 }

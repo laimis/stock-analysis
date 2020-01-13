@@ -120,5 +120,12 @@ namespace storage.redis
                 Version = int.Parse(result.Single(h => h.Name == "version").Value),
             };
         }
+
+        public Task DoHealthCheck()
+        {
+            _redis.GetStatus();
+
+            return Task.CompletedTask;
+        }
     }
 }

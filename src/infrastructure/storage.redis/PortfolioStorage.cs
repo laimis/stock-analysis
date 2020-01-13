@@ -68,12 +68,5 @@ namespace storage.redis
             return list.GroupBy(e => e.Ticker)
                 .Select(g => new SoldOption(g));
         }
-
-        public Task DoHealthCheck()
-        {
-            _redis.GetStatus();
-
-            return Task.CompletedTask;
-        }
     }
 }

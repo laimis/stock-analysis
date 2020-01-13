@@ -95,5 +95,16 @@ namespace storage.postgres
             }
         }
 
+        public async Task DoHealthCheck()
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"select 1";
+
+                await db.QueryAsync<int>(query);
+            }
+        }
     }
 }

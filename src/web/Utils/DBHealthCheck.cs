@@ -1,15 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using core.Portfolio;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace web.Utils
 {
     public class DBHealthCheck : IHealthCheck
     {
-        private IPortfolioStorage _storage;
+        private storage.postgres.AggregateStorage _storage;
 
-        public DBHealthCheck(IPortfolioStorage storage)
+        public DBHealthCheck(storage.postgres.AggregateStorage storage)
         {
             _storage = storage;
         }
