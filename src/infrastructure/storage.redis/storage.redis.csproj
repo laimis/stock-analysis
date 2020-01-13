@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\core\core.csproj" />
+    <ProjectReference Include="..\storage.postgres\storage.postgres.csproj" />
   </ItemGroup>
 
   <ItemGroup>

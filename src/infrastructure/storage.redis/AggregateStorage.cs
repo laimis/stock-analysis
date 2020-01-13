@@ -16,7 +16,7 @@ namespace storage.redis
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
-        public async Task StoreEventsMigration(IEnumerable<StoredAggregateEvent> events)
+        public async Task StoreEventsMigration(IEnumerable<storage.postgres.StoredAggregateEvent> events)
         {
             var db = _redis.GetDatabase();
 
@@ -32,7 +32,7 @@ namespace storage.redis
                 var fields = new HashEntry[] {
                     new HashEntry("created", e.Created.ToString("o")),
                     new HashEntry("entity", e.Entity),
-                    new HashEntry("event", StoredAggregateEvent.ToJson(e.Event)),
+                    new HashEntry("event", e.EventJson),
                     new HashEntry("key", e.Key),
                     new HashEntry("userId", e.UserId),
                     new HashEntry("version", e.Version),
@@ -79,7 +79,7 @@ namespace storage.redis
 
             foreach (var e in agg.Events.Skip(agg.Version))
             {
-                var se = new StoredAggregateEvent
+                var se = new storage.postgres.StoredAggregateEvent
                 {
                     Entity = entity,
                     Event = e,
@@ -99,7 +99,7 @@ namespace storage.redis
                 var fields = new HashEntry[] {
                     new HashEntry("created", e.When.ToString("o")),
                     new HashEntry("entity", entity),
-                    new HashEntry("event", StoredAggregateEvent.ToJson(e)),
+                    new HashEntry("event", se.EventJson),
                     new HashEntry("key", e.Ticker),
                     new HashEntry("userId", e.UserId),
                     new HashEntry("version", version),
@@ -109,12 +109,12 @@ namespace storage.redis
             }
         }
 
-        private StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)
+        private storage.postgres.StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)
         {
-            return new StoredAggregateEvent {
+            return new storage.postgres.StoredAggregateEvent {
                 Created = DateTime.Parse(result.Single(h => h.Name == "created").Value, null, System.Globalization.DateTimeStyles.AssumeUniversal),
                 Entity = result.Single(h => h.Name == "entity").Value,
-                Event = StoredAggregateEvent.GetEvent(result.Single(h => h.Name == "event").Value),
+                EventJson = result.Single(h => h.Name == "event").Value,
                 Key = result.Single(h => h.Name == "key").Value,
                 UserId = result.Single(h => h.Name == "userId").Value,
                 Version = int.Parse(result.Single(h => h.Name == "version").Value),
