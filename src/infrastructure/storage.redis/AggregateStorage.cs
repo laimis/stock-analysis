@@ -16,6 +16,32 @@ namespace storage.redis
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
+        public async Task StoreEventsMigration(IEnumerable<StoredAggregateEvent> events)
+        {
+            var db = _redis.GetDatabase();
+
+            foreach (var e in events)
+            {
+                var globalKey = $"{e.Entity}:{e.UserId}";
+                var entityKey = $"{e.Entity}:{e.UserId}:{e.Key}";
+                var keyToStore = $"{e.Entity}:{e.UserId}:{e.Key}:{e.Version}";
+
+                await db.SetAddAsync(globalKey, keyToStore);
+                await db.SetAddAsync(entityKey, keyToStore);
+
+                var fields = new HashEntry[] {
+                    new HashEntry("created", e.Created.ToString("o")),
+                    new HashEntry("entity", e.Entity),
+                    new HashEntry("event", StoredAggregateEvent.ToJson(e.Event)),
+                    new HashEntry("key", e.Key),
+                    new HashEntry("userId", e.UserId),
+                    new HashEntry("version", e.Version),
+                };
+
+                await db.HashSetAsync(keyToStore, fields);
+            }
+        }
+
         protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
         {
             var redisKey = entity + ":" + userId + ":" + key;
@@ -49,39 +75,37 @@ namespace storage.redis
         {
             var db = _redis.GetDatabase();
 
+            int version = agg.Version;
+
+            foreach (var e in agg.Events.Skip(agg.Version))
             {
-                int version = agg.Version;
-
-                foreach (var e in agg.Events.Skip(agg.Version))
+                var se = new StoredAggregateEvent
                 {
-                    var se = new StoredAggregateEvent
-                    {
-                        Entity = entity,
-                        Event = e,
-                        Key = e.Ticker,
-                        UserId = e.UserId,
-                        Created = e.When,
-                        Version = ++version
-                    };
+                    Entity = entity,
+                    Event = e,
+                    Key = e.Ticker,
+                    UserId = e.UserId,
+                    Created = e.When,
+                    Version = ++version
+                };
 
-                    var globalKey = $"{entity}:{e.UserId}";
-                    var entityKey = $"{entity}:{e.UserId}:{e.Ticker}";
-                    var keyToStore = $"{entity}:{e.UserId}:{e.Ticker}:{version}";
+                var globalKey = $"{entity}:{e.UserId}";
+                var entityKey = $"{entity}:{e.UserId}:{e.Ticker}";
+                var keyToStore = $"{entity}:{e.UserId}:{e.Ticker}:{version}";
 
-                    await db.SetAddAsync(globalKey, keyToStore);
-                    await db.SetAddAsync(entityKey, keyToStore);
+                await db.SetAddAsync(globalKey, keyToStore);
+                await db.SetAddAsync(entityKey, keyToStore);
 
-                    var fields = new HashEntry[] {
-                        new HashEntry("created", e.When.ToString("o")),
-                        new HashEntry("entity", entity),
-                        new HashEntry("event", StoredAggregateEvent.ToJson(e)),
-                        new HashEntry("key", e.Ticker),
-                        new HashEntry("userId", e.UserId),
-                        new HashEntry("version", version),
-                    };
+                var fields = new HashEntry[] {
+                    new HashEntry("created", e.When.ToString("o")),
+                    new HashEntry("entity", entity),
+                    new HashEntry("event", StoredAggregateEvent.ToJson(e)),
+                    new HashEntry("key", e.Ticker),
+                    new HashEntry("userId", e.UserId),
+                    new HashEntry("version", version),
+                };
 
-                    await db.HashSetAsync(keyToStore, fields);
-                }
+                await db.HashSetAsync(keyToStore, fields);
             }
         }
 

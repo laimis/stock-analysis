@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace storage.postgres
 {
-    internal class StoredAggregateEvent
+    public class StoredAggregateEvent
     {
         static JsonSerializerSettings _formatting = new JsonSerializerSettings
         {

@@ -29,6 +29,14 @@ namespace web
             {
                 return new IEXClient(configuration.GetValue<string>("IEXClientToken"));
             });
+            services.AddSingleton<AggregateStorage>(_ => {
+                var cnn = configuration.GetValue<string>("DB_CNN");
+                return new AggregateStorage(cnn);
+            });
+            services.AddSingleton<storage.redis.AggregateStorage>(_ => {
+                var cnn = configuration.GetValue<string>("REDIS_CNN");
+                return new storage.redis.AggregateStorage(cnn);
+            });
         }
     }
 }

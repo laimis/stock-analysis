@@ -1,11 +1,10 @@
 using System;
 using core.Shared;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace storage.redis
 {
-    internal class StoredAggregateEvent
+    public class StoredAggregateEvent
     {
         static JsonSerializerSettings _formatting = new JsonSerializerSettings
         {
