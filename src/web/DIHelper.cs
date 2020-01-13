@@ -1,3 +1,4 @@
+using System;
 using core.Account;
 using core.Options;
 using core.Portfolio;
@@ -21,12 +22,36 @@ namespace web
             });
             services.AddSingleton<IStocksService, StocksService>();
 
-            RegisterPostgresImplemenations(configuration, services);
-            RegisterRedisImplemenations(configuration, services);
+            var storage = configuration.GetValue<string>("storage");
+
+            if (storage == "postgres")
+            {
+                RegisterPostgresImplemenations(configuration, services);
+            } 
+            else if (storage == "redis")
+            {
+                RegisterRedisImplemenations(configuration, services);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"configuration 'storage' has value '{storage}', only 'redis' or 'postgres' is supported"
+                );
+            }
         }
 
         private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services)
         {
+            services.AddSingleton<IPortfolioStorage>(s =>
+            {
+                var cnn = configuration.GetValue<string>("DB_CNN");
+                return new storage.redis.PortfolioStorage(cnn);
+            });
+            services.AddSingleton<IAccountStorage>(s =>
+            {
+                var cnn = configuration.GetValue<string>("DB_CNN");
+                return new storage.redis.AccountStorage(cnn);
+            });
             services.AddSingleton<storage.redis.AggregateStorage>(_ =>
             {
                 var cnn = configuration.GetValue<string>("REDIS_CNN");
