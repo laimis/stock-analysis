@@ -50,6 +50,18 @@ namespace storage.postgres
             }
         }
 
+        public async Task<IEnumerable<StoredAggregateEvent>> GetEventsForMigration()
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"select * FROM events ORDER BY entity, userid, key, version";
+
+                return await db.QueryAsync<StoredAggregateEvent>(query);
+            }
+        }
+
         protected async Task SaveEventsAsync(Aggregate agg, string entity)
         {
             using (var db = GetConnection())

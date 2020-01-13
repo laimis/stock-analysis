@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using core.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -37,14 +38,14 @@ namespace web.Controllers
 
         [HttpGet("login")]
         [Authorize]
-        public ActionResult Login()
+        public async Task<ActionResult> LoginAsync()
         {
             var entry = new LoginLogEntry(
                 this.User.Identifier(),
                 DateTime.UtcNow
             );
 
-            this._storage.RecordLogin(entry);
+            await this._storage.RecordLoginAsync(entry);
             
             return this.Redirect("~/");
         }
