@@ -5,6 +5,7 @@ using Xunit;
 
 namespace storage.redis.tests
 {
+    [Trait("Category", "Database")]
     public class AccountStorageTests
     {
         [Fact]
