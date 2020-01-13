@@ -44,12 +44,12 @@ namespace web
         {
             services.AddSingleton<IPortfolioStorage>(s =>
             {
-                var cnn = configuration.GetValue<string>("DB_CNN");
+                var cnn = configuration.GetValue<string>("REDIS_CNN");
                 return new storage.redis.PortfolioStorage(cnn);
             });
             services.AddSingleton<IAccountStorage>(s =>
             {
-                var cnn = configuration.GetValue<string>("DB_CNN");
+                var cnn = configuration.GetValue<string>("REDIS_CNN");
                 return new storage.redis.AccountStorage(cnn);
             });
             services.AddSingleton<storage.redis.AggregateStorage>(_ =>
