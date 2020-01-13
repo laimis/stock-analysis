@@ -3,17 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace storage.redis
 {
-    public class AccountStorage : IAccountStorage
+    public class AccountStorage : AggregateStorage, IAccountStorage
     {
-        private ConnectionMultiplexer _redis;
-
-        public AccountStorage(string redisCnn)
+        public AccountStorage(string redisCnn) : base(redisCnn)
         {
-            _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
         public async Task<IEnumerable<LoginLogEntry>> GetLogins()
