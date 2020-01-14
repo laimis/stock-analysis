@@ -17,11 +17,7 @@ export class StocksService {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
 	}
 
-	getStocks(): Observable<object> {
-		return this.http.get<object>('/api/stocks')
-  }
-
-  getOptions(ticker:string): Observable<OptionDetail> {
+	getOptions(ticker:string): Observable<OptionDetail> {
     return this.http.get<OptionDetail>('/api/options/' + ticker)
   }
 

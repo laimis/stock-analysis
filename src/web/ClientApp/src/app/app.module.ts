@@ -15,7 +15,6 @@ import { ProfileComponent } from './profile/profile.component';
 import { RouterModule } from '@angular/router';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
-import { StockListComponent } from './stock-list/stock-list.component';
 import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
 
 var routes = [
@@ -26,7 +25,6 @@ var routes = [
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
-  { path: 'stocks/list', component: StockListComponent },
   { path: 'stocks/purchase', component: StockPurchaseComponent },
   { path: 'stocks/purchase/:ticker', component: StockPurchaseComponent },
   { path: 'stocks/:ticker', component: StockDetailsComponent },
@@ -43,7 +41,6 @@ var routes = [
     ProfileComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,
-    StockListComponent,
     StockPurchaseComponent,
   ],
   imports: [
