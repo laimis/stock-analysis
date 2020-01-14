@@ -1,6 +1,6 @@
+- account tracking?
 - timeline of option events
 - landing page
-- account tracking?
 - convert to mediatr
 - replace financial modeling
 - practice use of polly
