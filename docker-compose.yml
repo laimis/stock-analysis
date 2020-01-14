@@ -1,0 +1,13 @@
+version: '3'
+services:
+  web:
+    ports:
+      - "80:80"
+    image: "*******.dkr.ecr.us-east-1.amazonaws.com/<imagename>:latest"
+    environment:
+      IEXClientToken: iex token
+      GoogleClientId: google client id
+      GoogleSecret: google secret
+      storage: redis (use 'postgres' if running on postgres)
+      REDIS_CNN: redis connection string
+      DB_CNN: postgres connection string

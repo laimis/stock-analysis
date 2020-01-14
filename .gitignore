@@ -235,5 +235,4 @@ coverage.opencover.xml
 coverage/
 
 # dev secrets
-dev_secret.bat
-dev_secret.sh
+*_secret.*
