@@ -16,32 +16,6 @@ namespace storage.redis
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
-        public async Task StoreEventsMigration(IEnumerable<storage.postgres.StoredAggregateEvent> events)
-        {
-            var db = _redis.GetDatabase();
-
-            foreach (var e in events)
-            {
-                var globalKey = $"{e.Entity}:{e.UserId}";
-                var entityKey = $"{e.Entity}:{e.UserId}:{e.Key}";
-                var keyToStore = $"{e.Entity}:{e.UserId}:{e.Key}:{e.Version}";
-
-                await db.SetAddAsync(globalKey, keyToStore);
-                await db.SetAddAsync(entityKey, keyToStore);
-
-                var fields = new HashEntry[] {
-                    new HashEntry("created", e.Created.ToString("o")),
-                    new HashEntry("entity", e.Entity),
-                    new HashEntry("event", e.EventJson),
-                    new HashEntry("key", e.Key),
-                    new HashEntry("userId", e.UserId),
-                    new HashEntry("version", e.Version),
-                };
-
-                await db.HashSetAsync(keyToStore, fields);
-            }
-        }
-
         protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
         {
             var redisKey = entity + ":" + userId + ":" + key;
