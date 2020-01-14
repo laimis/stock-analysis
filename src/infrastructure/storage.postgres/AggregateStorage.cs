@@ -9,7 +9,7 @@ using storage.shared;
 
 namespace storage.postgres
 {
-    public class AggregateStorage
+    public class AggregateStorage : IAggregateStorage
     {
         protected string _cnn;
 
@@ -23,7 +23,7 @@ namespace storage.postgres
             return new NpgsqlConnection(_cnn);
         }
 
-        protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
         {
             using (var db = GetConnection())
             {
@@ -37,7 +37,7 @@ namespace storage.postgres
             }
         }
 
-        protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
         {
             using (var db = GetConnection())
             {
@@ -51,7 +51,7 @@ namespace storage.postgres
             }
         }
 
-        protected async Task SaveEventsAsync(Aggregate agg, string entity)
+        public async Task SaveEventsAsync(Aggregate agg, string entity)
         {
             using (var db = GetConnection())
             {

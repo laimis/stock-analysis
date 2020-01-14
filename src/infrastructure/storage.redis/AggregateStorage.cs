@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Shared;
 using StackExchange.Redis;
+using storage.shared;
 
 namespace storage.redis
 {
-    public class AggregateStorage
+    public class AggregateStorage : IAggregateStorage
     {
         protected ConnectionMultiplexer _redis;
 
@@ -16,7 +17,7 @@ namespace storage.redis
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
-        protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
         {
             var redisKey = entity + ":" + userId + ":" + key;
 
@@ -30,7 +31,7 @@ namespace storage.redis
                 .Select(e => e.Event);
         }
 
-        protected async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
         {
             var redisKey = entity + ":" + userId;
 
@@ -45,7 +46,7 @@ namespace storage.redis
                 .Select(e => e.Event);
         }
 
-        protected async Task SaveEventsAsync(core.Shared.Aggregate agg, string entity)
+        public async Task SaveEventsAsync(core.Shared.Aggregate agg, string entity)
         {
             var db = _redis.GetDatabase();
 

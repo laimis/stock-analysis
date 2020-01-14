@@ -2,38 +2,30 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Portfolio;
-using storage.postgres;
 using Xunit;
 
 namespace storage.tests
 {
-    [Trait("Category", "Database")]
-    public class PortfolioStorageTests : StorageTests
+    public abstract class PortfolioStorageTests
     {
         const string _userId = "testuser";
 
         [Fact]
         public async Task NonExistingStockReturnsNullAsync()
         {
-            var storage = new PortfolioStorage(StorageTests._cnn);
+            var storage = CreateStorage();
 
             Assert.Null(await storage.GetStock("nonexisting", "nonexisting"));
         }
 
+        protected abstract IPortfolioStorage CreateStorage();
+
         [Fact]
         public async Task NonExistingOptionReturnsNullAsync()
         {
-            var storage = new PortfolioStorage(StorageTests._cnn);
+            var storage = CreateStorage();
 
             Assert.Null(await storage.GetSoldOption("nonexisting", OptionType.CALL, DateTimeOffset.UtcNow, 2, "userid"));
-        }
-
-        [Fact]
-        public async Task HealthCheckWorks()
-        {
-            var storage = new PortfolioStorage(StorageTests._cnn);
-
-            await storage.DoHealthCheck();
         }
 
         [Fact]
@@ -43,7 +35,7 @@ namespace storage.tests
 
             stock.Purchase(10, 2.1, DateTime.UtcNow);
 
-            var storage = new PortfolioStorage(StorageTests._cnn);
+            var storage = CreateStorage();
 
             await storage.Save(stock);
 
@@ -84,7 +76,7 @@ namespace storage.tests
 
             option.Open(1, 8, DateTimeOffset.UtcNow);
 
-            var storage = new PortfolioStorage(StorageTests._cnn);
+            var storage = CreateStorage();
 
             await storage.Save(option);
 

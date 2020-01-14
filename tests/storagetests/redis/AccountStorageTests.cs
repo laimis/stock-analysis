@@ -1,9 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using core.Account;
+using storage.redis;
 using Xunit;
 
-namespace storage.redis.tests
+namespace storagetests.redis
 {
     [Trait("Category", "Database")]
     public class AccountStorageTests
