@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\core\core.csproj" />
-    <ProjectReference Include="..\storage.postgres\storage.postgres.csproj" />
+    <ProjectReference Include="..\storage.shared\storage.shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

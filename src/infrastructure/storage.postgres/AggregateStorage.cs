@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Shared;
 using Dapper;
 using Npgsql;
+using storage.shared;
 
 namespace storage.postgres
 {

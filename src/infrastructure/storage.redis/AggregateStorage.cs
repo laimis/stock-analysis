@@ -53,7 +53,7 @@ namespace storage.redis
 
             foreach (var e in agg.Events.Skip(agg.Version))
             {
-                var se = new storage.postgres.StoredAggregateEvent
+                var se = new storage.shared.StoredAggregateEvent
                 {
                     Entity = entity,
                     Event = e,
@@ -83,9 +83,9 @@ namespace storage.redis
             }
         }
 
-        private storage.postgres.StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)
+        private storage.shared.StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)
         {
-            return new storage.postgres.StoredAggregateEvent {
+            return new storage.shared.StoredAggregateEvent {
                 Created = DateTime.Parse(result.Single(h => h.Name == "created").Value, null, System.Globalization.DateTimeStyles.AssumeUniversal),
                 Entity = result.Single(h => h.Name == "entity").Value,
                 EventJson = result.Single(h => h.Name == "event").Value,
