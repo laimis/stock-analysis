@@ -42,28 +42,28 @@ namespace web
 
         private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services)
         {
+            var cnn = configuration.GetValue<string>("REDIS_CNN");
             services.AddSingleton<IAccountStorage>(s =>
             {
-                var cnn = configuration.GetValue<string>("REDIS_CNN");
                 return new storage.redis.AccountStorage(cnn);
             });
             services.AddSingleton<IAggregateStorage>(_ =>
             {
-                var cnn = configuration.GetValue<string>("REDIS_CNN");
                 return new storage.redis.AggregateStorage(cnn);
             });
+            services.AddSingleton<storage.redis.AggregateStorage>(c => 
+                (storage.redis.AggregateStorage)c.GetService<IAggregateStorage>());
         }
 
         private static void RegisterPostgresImplemenations(IConfiguration configuration, IServiceCollection services)
         {
+            var cnn = configuration.GetValue<string>("DB_CNN");
             services.AddSingleton<IAccountStorage>(s =>
             {
-                var cnn = configuration.GetValue<string>("DB_CNN");
                 return new storage.postgres.AccountStorage(cnn);
             });
             services.AddSingleton<IAggregateStorage>(_ =>
             {
-                var cnn = configuration.GetValue<string>("DB_CNN");
                 return new storage.postgres.AggregateStorage(cnn);
             });
         }
