@@ -4,6 +4,7 @@ using Xunit;
 
 namespace storagetests.redis
 {
+    [Trait("Category", "Database")]
     public class AggregateStorageTests
     {
         [Fact]
