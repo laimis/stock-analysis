@@ -6,7 +6,7 @@ using Xunit;
 
 namespace storagetests.postgres
 {
-    [Trait("Category", "Integration")]
+    [Trait("Category", "Database")]
     public class PostgresPortfolioStorageTests : PortfolioStorageTests
     {
         internal static string _cnn = "Server=localhost;Database=stocks;User id=stocks;password=stocks";
