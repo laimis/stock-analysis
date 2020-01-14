@@ -4,20 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Portfolio;
 
-namespace storage.redis
+namespace storage.shared
 {
-    public class PortfolioStorage : AggregateStorage, IPortfolioStorage
+    public class PortfolioStorage : IPortfolioStorage
     {
         const string _stock_entity = "ownedstock";
         const string _option_entity = "soldoption";
+        private IAggregateStorage _aggregateStorage;
 
-        public PortfolioStorage(string cnn) : base(cnn)
+        public PortfolioStorage(IAggregateStorage aggregateStorage)
         {
+            _aggregateStorage = aggregateStorage;
         }
 
         public async Task<OwnedStock> GetStock(string ticker, string userId)
         {
-            var events = await GetEventsAsync(_stock_entity, ticker, userId);
+            var events = await _aggregateStorage.GetEventsAsync(_stock_entity, ticker, userId);
 
             if (events.Count() == 0)
             {
@@ -29,17 +31,17 @@ namespace storage.redis
 
         public async Task Save(OwnedStock stock)
         {
-            await SaveEventsAsync(stock, _stock_entity);
+            await _aggregateStorage.SaveEventsAsync(stock, _stock_entity);
         }
 
         public async Task Save(SoldOption option)
         {
-            await SaveEventsAsync(option, _option_entity);
+            await _aggregateStorage.SaveEventsAsync(option, _option_entity);
         }
 
         public async Task<IEnumerable<OwnedStock>> GetStocks(string userId)
         {
-            var list = await GetEventsAsync(_stock_entity, userId);
+            var list = await _aggregateStorage.GetEventsAsync(_stock_entity, userId);
 
             return list.GroupBy(e => e.Ticker)
                 .Select(g => new OwnedStock(g));
@@ -49,7 +51,7 @@ namespace storage.redis
         {
             var key = SoldOption.GenerateKey(ticker, optionType, expiration, strikePrice);
 
-            var events = await GetEventsAsync(_option_entity, key, userId);
+            var events = await _aggregateStorage.GetEventsAsync(_option_entity, key, userId);
 
             if (events.Count() == 0)
             {
@@ -61,7 +63,7 @@ namespace storage.redis
 
         public async Task<IEnumerable<SoldOption>> GetSoldOptions(string userId)
         {
-            var list = await GetEventsAsync(_option_entity, userId);
+            var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId);
 
             var events = list.ToList();
 

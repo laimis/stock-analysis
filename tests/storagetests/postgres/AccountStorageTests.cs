@@ -1,21 +1,18 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using storage.postgres;
 using Xunit;
 
-namespace storage.tests
+namespace storagetests.postgres
 {
     [Trait("Category", "Database")]
-    public class AccountStorageTests : StorageTests
+    public class AccountStorageTests
     {
-        const string _userId = "testuser";
-
         [Fact]
         public async Task StoreLogWorks()
         {
-            var storage = new AccountStorage(StorageTests._cnn);
+            var storage = new AccountStorage(PostgresPortfolioStorageTests._cnn);
 
             var entry = new LoginLogEntry("laimonas", DateTime.UtcNow);
 

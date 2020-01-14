@@ -7,8 +7,7 @@ using financialmodelingclient;
 using iexclient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using storage.redis;
-// using storage.postgres;
+using storage.shared;
 
 namespace web
 {
@@ -21,6 +20,7 @@ namespace web
                 return new IEXClient(configuration.GetValue<string>("IEXClientToken"));
             });
             services.AddSingleton<IStocksService, StocksService>();
+            services.AddSingleton<IPortfolioStorage, PortfolioStorage>(); 
 
             var storage = configuration.GetValue<string>("storage");
 
@@ -42,17 +42,12 @@ namespace web
 
         private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services)
         {
-            services.AddSingleton<IPortfolioStorage>(s =>
-            {
-                var cnn = configuration.GetValue<string>("REDIS_CNN");
-                return new storage.redis.PortfolioStorage(cnn);
-            });
             services.AddSingleton<IAccountStorage>(s =>
             {
                 var cnn = configuration.GetValue<string>("REDIS_CNN");
                 return new storage.redis.AccountStorage(cnn);
             });
-            services.AddSingleton<storage.redis.AggregateStorage>(_ =>
+            services.AddSingleton<IAggregateStorage>(_ =>
             {
                 var cnn = configuration.GetValue<string>("REDIS_CNN");
                 return new storage.redis.AggregateStorage(cnn);
@@ -61,17 +56,12 @@ namespace web
 
         private static void RegisterPostgresImplemenations(IConfiguration configuration, IServiceCollection services)
         {
-            services.AddSingleton<IPortfolioStorage>(s =>
-            {
-                var cnn = configuration.GetValue<string>("DB_CNN");
-                return new storage.postgres.PortfolioStorage(cnn);
-            });
             services.AddSingleton<IAccountStorage>(s =>
             {
                 var cnn = configuration.GetValue<string>("DB_CNN");
                 return new storage.postgres.AccountStorage(cnn);
             });
-            services.AddSingleton<storage.postgres.AggregateStorage>(_ =>
+            services.AddSingleton<IAggregateStorage>(_ =>
             {
                 var cnn = configuration.GetValue<string>("DB_CNN");
                 return new storage.postgres.AggregateStorage(cnn);
