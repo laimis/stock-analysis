@@ -4,6 +4,7 @@ using Xunit;
 
 namespace storagetests.postgres
 {
+    [Trait("Category", "Database")]
     public class AggregateStorageTests
     {
         [Fact]
