@@ -17,17 +17,14 @@ namespace core.Options
             public OptionType OptionType => (OptionType)Enum.Parse(typeof(OptionType), this.Type);
         }
 
-        public class Handler : IRequestHandler<Query, object>
+        public class Handler : HandlerWithStorage<Query, object>
         {
 
-            private IPortfolioStorage _storage;
-            
-            public Handler(IPortfolioStorage storage)
+            public Handler(IPortfolioStorage storage) : base(storage)
             {
-                _storage = storage;
             }
 
-            public async Task<object> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
                 var sold = await _storage.GetSoldOption(
                     request.Ticker,

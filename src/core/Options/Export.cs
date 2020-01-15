@@ -16,16 +16,13 @@ namespace core.Options
             public string UserId { get; }
         }
 
-        public class Handler : IRequestHandler<Query, ExportResponse>
+        public class Handler : HandlerWithStorage<Query, ExportResponse>
         {
-            private IPortfolioStorage _storage;
-
-            public Handler(IPortfolioStorage storage)
+            public Handler(IPortfolioStorage storage) : base(storage)
             {
-                _storage = storage;
             }
 
-            public async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
             {
                 var options = await _storage.GetSoldOptions(request.UserId);
 
