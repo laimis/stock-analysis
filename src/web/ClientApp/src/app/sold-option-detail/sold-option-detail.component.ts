@@ -46,7 +46,17 @@ export class SoldOptionDetailComponent implements OnInit {
 
     this.error = null;
 
-    this.service.closeSoldOption(ticker, type, strikePrice, expiration, this.closePrice, this.closeDate).subscribe( () => {
+    var obj = {
+      ticker,
+      optionType: type,
+      strikePrice,
+      expiration,
+      closePrice: this.closePrice,
+      closeDate: this.closeDate,
+      amount: this.option.amount
+    }
+
+    this.service.closeSoldOption(obj).subscribe( () => {
       this.closed = true
     }, err => {
       this.error = GetErrors(err)[0]

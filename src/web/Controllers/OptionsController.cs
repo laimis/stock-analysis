@@ -13,8 +13,9 @@ using web.Utils;
 namespace web.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     [Authorize]
-    public class OptionsController : Controller
+    public class OptionsController : ControllerBase
     {
         private IOptionsService _options;
         private IPortfolioStorage _storage;
@@ -81,16 +82,22 @@ namespace web.Controllers
             return ToOptionView(sold);
         }
 
-        [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}/close")]
-        public async Task<ActionResult> CloseSoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration, double closePrice, DateTimeOffset closeDate, int amount)
+        [HttpPost("close")]
+        public async Task<ActionResult> CloseSoldOption(CloseOption cmd)
         {
-            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, this.User.Identifier());
+            var sold = await _storage.GetSoldOption(
+                cmd.Ticker,
+                Enum.Parse<core.Portfolio.OptionType>(cmd.OptionType),
+                cmd.Expiration.Value,
+                cmd.StrikePrice,
+                this.User.Identifier());
+
             if (sold == null)
             {
                 return NotFound();
             }
 
-            sold.Close(amount, closePrice, closeDate);
+            sold.Close(cmd.Amount, cmd.ClosePrice.Value, cmd.CloseDate.Value);
 
             await _storage.Save(sold);
 
@@ -122,7 +129,7 @@ namespace web.Controllers
                 ticker = o.State.Ticker,
                 type = o.State.Type.ToString(),
                 strikePrice = o.State.StrikePrice,
-                expiration = o.State.Expiration,
+                expiration = o.State.Expiration.ToString("yyyy-MM-dd"),
                 premium = o.State.Premium,
                 amount = o.State.Amount,
                 riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100,

@@ -45,8 +45,8 @@ export class StocksService {
     return this.http.get<OptionDefinition>('/api/options/soldoptions/' + ticker + '/' + type + '/' + strikePrice + '/' + expiration)
   }
 
-  closeSoldOption(ticker:string, type:string, strikePrice:number, expiration:string, closePrice:number, closeDate:string) : Observable<any> {
-    return this.http.get('/api/options/soldoptions/' + ticker + '/' + type + '/' + strikePrice + '/' + expiration + '/close?closePrice=' + closePrice + '&closeDate=' + closeDate)
+  closeSoldOption(obj:object) : Observable<any> {
+    return this.http.post('/api/options/close', obj)
   }
 
 	startAnalysis(minPrice: Number, maxPrice: Number) {

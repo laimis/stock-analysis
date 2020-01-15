@@ -1,7 +1,5 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using core;
 using core.Portfolio;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
