@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using web.Utils;
+using core.Utils;
 
-namespace web
+namespace core.Options
 {
-    public class OpenModel
+    public class SellOption
     {
         [Required]
         public string Ticker { get; set; }

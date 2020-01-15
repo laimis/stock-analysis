@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace web.Utils
+namespace core.Utils
 {
     public class NotInThePast : ValidationAttribute
     {
