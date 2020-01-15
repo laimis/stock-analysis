@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,11 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
-        private IAccountStorage _storage;
+        private IMediator _mediator;
 
-        public AccountController(IAccountStorage storage)
+        public AccountController(IMediator mediator)
         {
-            _storage = storage;
+            _mediator = mediator;
         }
         
         [HttpGet("status")]
@@ -41,12 +42,7 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> LoginAsync()
         {
-            var entry = new LoginLogEntry(
-                this.User.Identifier(),
-                DateTime.UtcNow
-            );
-
-            await this._storage.RecordLoginAsync(entry);
+            await _mediator.Send(new Login.Command(this.User.Identifier()));
             
             return this.Redirect("~/");
         }
