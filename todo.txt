@@ -1,4 +1,4 @@
-- convert to mediatr
+- bring up coverage after mediatr
 - replace financial modeling
 - practice use of polly
 - terraform or pulumi for infrastructure
