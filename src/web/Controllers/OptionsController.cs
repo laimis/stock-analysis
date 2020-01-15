@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
 using core.Options;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Models;
@@ -19,13 +20,16 @@ namespace web.Controllers
     {
         private IOptionsService _options;
         private IPortfolioStorage _storage;
+        private IMediator _mediator;
 
         public OptionsController(
             IOptionsService options,
-            IPortfolioStorage storage)
+            IPortfolioStorage storage,
+            IMediator mediator)
         {
             _options = options;
             _storage = storage;
+            _mediator = mediator;
         }
 
         [HttpGet("{ticker}")]
@@ -53,19 +57,11 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(SellOption cmd)
+        public async Task<ActionResult> Sell(SellOption.Command cmd)
         {
-            var type = Enum.Parse<OptionType>(cmd.OptionType);
-
-            var option = await this._storage.GetSoldOption(cmd.Ticker, type, cmd.ExpirationDate.Value, cmd.StrikePrice, this.User.Identifier());
-            if (option == null)
-            {
-                option = new SoldOption(cmd.Ticker, type, cmd.ExpirationDate.Value, cmd.StrikePrice, this.User.Identifier());
-            }
-
-            option.Open(cmd.Amount, cmd.Premium, cmd.Filled.Value);
-
-            await this._storage.Save(option);
+            cmd.WithUser(this.User.Identifier());
+            
+            await _mediator.Send(cmd);
 
             return Ok();
         }
