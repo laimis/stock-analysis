@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
@@ -43,8 +44,8 @@ namespace web.Controllers
                 totalCashedOutEarnings = cashedout.Sum(s => s.State.Earned),
                 owned = owned.Select(o => StocksController.ToOwnedView(o)),
                 cashedOut = cashedout.Select(o => StocksController.ToOwnedView(o)),
-                ownedOptions = ownedOptions.Select(o => OptionsController.ToOptionView(o)),
-                closedOptions = closedOptions.Select(o => OptionsController.ToOptionView(o)),
+                ownedOptions = ownedOptions.Select(o => GetSoldOption.Handler.ToOptionView(o)),
+                closedOptions = closedOptions.Select(o => GetSoldOption.Handler.ToOptionView(o)),
                 pendingPremium = ownedOptions.Sum(o => o.State.Premium),
                 collateralCash = ownedOptions.Sum(o => o.State.CollateralCash),
                 collateralShares = ownedOptions.Sum(o => o.State.CollateralShares),

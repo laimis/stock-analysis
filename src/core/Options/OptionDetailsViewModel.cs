@@ -1,6 +1,6 @@
 using core.Adapters.Options;
 
-namespace web.Models
+namespace core.Options
 {
     public class OptionDetailsViewModel
     {

@@ -1,4 +1,4 @@
-namespace web.Models
+namespace core.Options
 {
     public class OptionBreakdownViewModel
     {

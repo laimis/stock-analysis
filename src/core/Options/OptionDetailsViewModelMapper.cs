@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using core.Adapters.Options;
 
-namespace web.Models
+namespace core.Options
 {
     public class OptionDetailsViewModelMapper
     {
