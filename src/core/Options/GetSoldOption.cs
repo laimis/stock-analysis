@@ -33,22 +33,7 @@ namespace core.Options
                     request.StrikePrice,
                     request.UserId);
                 
-                return ToOptionView(sold);
-            }
-
-            public static object ToOptionView(SoldOption o)
-            {
-                return new
-                {
-                    ticker = o.State.Ticker,
-                    type = o.State.Type.ToString(),
-                    strikePrice = o.State.StrikePrice,
-                    expiration = o.State.Expiration.ToString("yyyy-MM-dd"),
-                    premium = o.State.Premium,
-                    amount = o.State.Amount,
-                    riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100,
-                    profit = o.State.Profit
-                };
+                return Mapper.ToOptionView(sold);
             }
         }
     }

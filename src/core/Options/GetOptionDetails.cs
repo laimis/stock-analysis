@@ -47,7 +47,7 @@ namespace core.Options
                     options.AddRange(details);
                 }
 
-                return OptionDetailsViewModelMapper.Map(price.Amount, options);
+                return Mapper.Map(price.Amount, options);
             }
         }
     }
