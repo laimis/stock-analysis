@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Portfolio;
 
-namespace core.Portfolio
+namespace core
 {
     public interface IPortfolioStorage
     {

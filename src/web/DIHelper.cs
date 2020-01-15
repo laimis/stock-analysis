@@ -1,8 +1,8 @@
 using System;
+using core;
 using core.Account;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
-using core.Portfolio;
 using financialmodelingclient;
 using iexclient;
 using Microsoft.Extensions.Configuration;

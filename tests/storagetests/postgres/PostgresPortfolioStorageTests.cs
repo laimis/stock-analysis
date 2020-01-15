@@ -1,4 +1,4 @@
-﻿using core.Portfolio;
+﻿using core;
 using storage.postgres;
 using storage.shared;
 using storage.tests;
