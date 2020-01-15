@@ -3,8 +3,10 @@ using core;
 using core.Account;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using core.Options;
 using financialmodelingclient;
 using iexclient;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using storage.shared;
@@ -38,6 +40,8 @@ namespace web
                     $"configuration 'storage' has value '{storage}', only 'redis' or 'postgres' is supported"
                 );
             }
+
+            services.AddMediatR(typeof(CloseOption).Assembly);
         }
 
         private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services)

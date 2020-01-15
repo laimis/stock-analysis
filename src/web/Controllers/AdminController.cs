@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,17 +12,18 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
-        private IAccountStorage _storage;
+        private IMediator _mediator;
 
-        public AdminController(IAccountStorage storage)
+        public AdminController(IMediator mediator)
         {
-            _storage = storage;
+            _mediator = mediator;
         }
         
         [HttpGet("users")]
         public async Task<object> UsersAsync()
         {
-            var list = await this._storage.GetLogins();
+            var list = await this._mediator.Send<IEnumerable<LoginLogEntry>>(
+                new GetLogins.Query());
 
             return list;
         }
