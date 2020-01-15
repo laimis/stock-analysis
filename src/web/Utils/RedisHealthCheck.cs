@@ -1,14 +1,15 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using storage.shared;
 
 namespace web.Utils
 {
-    public class RedisHealthCheck : IHealthCheck
+    public class HealthCheck : IHealthCheck
     {
-        private storage.redis.AggregateStorage _storage;
+        private IAggregateStorage _storage;
 
-        public RedisHealthCheck(storage.redis.AggregateStorage storage)
+        public HealthCheck(IAggregateStorage storage)
         {
             _storage = storage;
         }

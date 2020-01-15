@@ -37,7 +37,7 @@ namespace web
             });
 
             services.AddHealthChecks()
-                .AddCheck<RedisHealthCheck>("health check that uses redis");
+                .AddCheck<HealthCheck>("storage based health check");
 
             // services.AddHttpsRedirection(opt => opt.HttpsPort = 443);
 
