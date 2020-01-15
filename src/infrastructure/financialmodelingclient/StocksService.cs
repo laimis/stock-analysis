@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using core.Stocks;
+using core.Adapters.Stocks;
 using Newtonsoft.Json;
 
 namespace financialmodelingclient
 {
-	public class StocksService : IStocksService
+    public class StocksService : IStocksService
 	{
 		private static HttpClient _client = new HttpClient();
 		private static string _endpoint = "https://financialmodelingprep.com/api/v3";

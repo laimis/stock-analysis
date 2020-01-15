@@ -1,6 +1,6 @@
 using System;
 
-namespace core.Stocks
+namespace core.Adapters.Stocks
 {
 	public class HistoricalPriceRecord
 	{

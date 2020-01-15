@@ -16,3 +16,5 @@
     - monitor script
     - edit crontab
     - run monitor script
+
+- check into https://www.nuget.org/packages/Respawn/

@@ -1,4 +1,4 @@
-namespace core.Stocks
+namespace core.Adapters.Stocks
 {
 	public class HistoricalResponse
 	{

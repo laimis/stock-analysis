@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace core.Stocks
+namespace core.Adapters.Stocks
 {
 	public class CompanyKeyMetric
 	{

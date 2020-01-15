@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace core.Stocks
+namespace core.Adapters.Stocks
 {
 	public class StockRatings
 	{

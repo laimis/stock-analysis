@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace core.Stocks
+namespace core.Adapters.Stocks
 {
 	public interface IStocksService
 	{
