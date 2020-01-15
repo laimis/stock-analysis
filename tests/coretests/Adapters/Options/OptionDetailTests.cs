@@ -1,8 +1,8 @@
 using System;
-using core.Options;
+using core.Adapters.Options;
 using Xunit;
 
-namespace coretests.Options
+namespace coretests.Adapters.Options
 {
     public class OptionDetailTests
     {

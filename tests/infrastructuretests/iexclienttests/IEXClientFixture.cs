@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using core;
-using core.Options;
+using core.Adapters.Options;
 using iexclient;
 
 namespace iexclienttests

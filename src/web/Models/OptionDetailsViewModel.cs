@@ -1,4 +1,4 @@
-using core.Options;
+using core.Adapters.Options;
 
 namespace web.Models
 {

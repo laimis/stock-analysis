@@ -1,7 +1,7 @@
 using System;
 using core.Account;
+using core.Adapters.Options;
 using core.Adapters.Stocks;
-using core.Options;
 using core.Portfolio;
 using financialmodelingclient;
 using iexclient;

@@ -1,6 +1,6 @@
 using System;
 
-namespace core.Options
+namespace core.Adapters.Options
 {
     public class OptionDetail
     {
@@ -50,7 +50,7 @@ namespace core.Options
         {
             get
             {
-                return this.IsCall ? 
+                return this.IsCall ?
                     this.StrikePrice + this.Bid
                     : this.StrikePrice - this.Bid;
             }

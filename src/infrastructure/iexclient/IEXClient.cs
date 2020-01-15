@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using core;
-using core.Options;
+using core.Adapters.Options;
 using Newtonsoft.Json;
 
 namespace iexclient
