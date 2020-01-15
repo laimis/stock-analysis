@@ -16,6 +16,3 @@
     - monitor script
     - edit crontab
     - run monitor script
-
-
-- remove startAnalysis

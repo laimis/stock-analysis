@@ -25,10 +25,6 @@ export class StocksService {
 		return this.http.get<Portfolio>('/api/portfolio')
 	}
 
-	getAnalysis(sortby:string, sortdirection:string): Observable<object[]> {
-		return this.http.get<object[]>('/api/analysis?sortby=' + sortby + '&sortdirection=' + sortdirection)
-	}
-
 	purchase(obj:object) : Observable<any> {
 		return this.http.post('/api/stocks/purchase', obj)
 	}
@@ -47,12 +43,6 @@ export class StocksService {
 
   closeSoldOption(obj:object) : Observable<any> {
     return this.http.post('/api/options/close', obj)
-  }
-
-	startAnalysis(minPrice: Number, maxPrice: Number) {
-		this.http.post('/api/analysis/start?min=' + minPrice + '&max=' + maxPrice, null).subscribe(() => {
-			console.log('start finished')
-		})
   }
 
   getAccountStatus() : Observable<AccountStatus> {
