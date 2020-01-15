@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
-using core.Portfolio;
+using core.Options;
+using core.Stocks;
 
 namespace storage.shared
 {

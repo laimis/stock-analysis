@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace core.Portfolio
+namespace core.Options
 {
     public class SoldOptionState
     {

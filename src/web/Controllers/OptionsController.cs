@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
 using core.Options;
-using core.Portfolio;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Models;
@@ -56,7 +55,7 @@ namespace web.Controllers
         [HttpPost("sell")]
         public async Task<ActionResult> Sell(SellOption cmd)
         {
-            var type = Enum.Parse<core.Portfolio.OptionType>(cmd.OptionType);
+            var type = Enum.Parse<OptionType>(cmd.OptionType);
 
             var option = await this._storage.GetSoldOption(cmd.Ticker, type, cmd.ExpirationDate.Value, cmd.StrikePrice, this.User.Identifier());
             if (option == null)
@@ -74,7 +73,7 @@ namespace web.Controllers
         [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}")]
         public async Task<object> SoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration)
         {
-            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<core.Portfolio.OptionType>(type), expiration, strikePrice, this.User.Identifier());
+            var sold = await _storage.GetSoldOption(ticker, Enum.Parse<OptionType>(type), expiration, strikePrice, this.User.Identifier());
             if (sold == null)
             {
                 return NotFound();
@@ -88,7 +87,7 @@ namespace web.Controllers
         {
             var sold = await _storage.GetSoldOption(
                 cmd.Ticker,
-                Enum.Parse<core.Portfolio.OptionType>(cmd.OptionType),
+                Enum.Parse<OptionType>(cmd.OptionType),
                 cmd.Expiration.Value,
                 cmd.StrikePrice,
                 this.User.Identifier());

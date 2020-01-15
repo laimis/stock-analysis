@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using core;
 using core.Adapters.Stocks;
-using core.Portfolio;
 using core.Stocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

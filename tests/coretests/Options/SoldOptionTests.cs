@@ -1,5 +1,5 @@
 using System;
-using core.Portfolio;
+using core.Options;
 using Xunit;
 
 namespace coretests.Options

@@ -1,6 +1,6 @@
 using System;
 
-namespace core.Portfolio
+namespace core.Stocks
 {
 	public class OwnedStockState
 	{

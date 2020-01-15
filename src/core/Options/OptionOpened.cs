@@ -1,11 +1,10 @@
 using System;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Options
 {
     public class OptionOpened : AggregateEvent
     {
-        // TODO: remove .DateTime
         public OptionOpened(string ticker, string userId, int amount, double premium, DateTimeOffset filled)
              : base(ticker, userId, filled.DateTime)
         {

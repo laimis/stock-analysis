@@ -2,7 +2,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
-using core.Portfolio;
+using core.Options;
+using core.Stocks;
 using Xunit;
 
 namespace storage.tests

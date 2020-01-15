@@ -1,7 +1,7 @@
 using System;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Stocks
 {
     internal class TickerObtained : AggregateEvent
     {

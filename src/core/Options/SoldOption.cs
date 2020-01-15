@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Options
 {
     public class SoldOption : Aggregate
     {

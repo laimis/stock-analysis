@@ -1,8 +1,8 @@
 using System;
-using core.Portfolio;
+using core.Stocks;
 using Xunit;
 
-namespace coretests.Portfolio
+namespace coretests.Stocks
 {
     public class OwnedStockTests
     {

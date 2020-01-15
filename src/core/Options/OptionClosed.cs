@@ -1,7 +1,7 @@
 using System;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Options
 {
     public class OptionClosed : AggregateEvent
     {

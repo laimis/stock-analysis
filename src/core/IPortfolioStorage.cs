@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using core.Portfolio;
+using core.Options;
+using core.Stocks;
 
 namespace core
 {

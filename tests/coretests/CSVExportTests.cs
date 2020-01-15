@@ -1,6 +1,7 @@
 using System;
 using core;
-using core.Portfolio;
+using core.Options;
+using core.Stocks;
 using Xunit;
 
 namespace coretests
