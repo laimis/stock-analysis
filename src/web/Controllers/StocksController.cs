@@ -10,8 +10,9 @@ using web.Utils;
 
 namespace web.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiController]
     [Authorize]
+    [Route("api/[controller]")]
     public class StocksController : ControllerBase
     {
         private IStocksService _stocksService;

@@ -7,9 +7,9 @@ using web.Utils;
 
 namespace web.Controllers
 {
-    [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
+    [Authorize]
+    [Route("api/[controller]")]
     public class PortfolioController : ControllerBase
     {
         private IPortfolioStorage _storage;

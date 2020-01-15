@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace web.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiController]
     [Authorize("admin")]
+    [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
         private IAccountStorage _storage;

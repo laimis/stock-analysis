@@ -9,6 +9,7 @@ using web.Utils;
 
 namespace web.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {

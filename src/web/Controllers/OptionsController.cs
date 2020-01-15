@@ -12,9 +12,9 @@ using web.Utils;
 
 namespace web.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [Route("api/[controller]")]
     public class OptionsController : ControllerBase
     {
         private IOptionsService _options;
