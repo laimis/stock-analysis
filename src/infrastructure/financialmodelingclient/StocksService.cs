@@ -41,40 +41,6 @@ namespace financialmodelingclient
 			return JsonConvert.DeserializeObject<CompanyProfile>(response);
 		}
 
-		public async Task<List<StockActivity>> GetMostActive()
-		{
-			var r = await GetStockActivity<MostActiveResponse>("actives");
-
-			return r.MostActiveStock;
-		}
-
-		public async Task<List<StockActivity>> GetMostGainer()
-		{
-			var r = await GetStockActivity<MostGainerResponse>("gainers");
-			
-			return r.MostGainerStock;
-		}
-
-		public async Task<List<StockActivity>> GetMostLosers()
-		{
-			var r = await GetStockActivity<MostLoserResponse>("losers");
-			
-			return r.MostLoserStock;
-		}
-
-		private async Task<T> GetStockActivity<T>(string type)
-		{
-			var url = $"{_endpoint}/stock/{type}";
-
-			var r = await _client.GetAsync(url);
-
-			r.EnsureSuccessStatusCode();
-
-			var response = await r.Content.ReadAsStringAsync();
-
-			return JsonConvert.DeserializeObject<T>(response);
-		}
-
 		public async Task<StockRatings> GetRatings(string ticker)
 		{
 			var url = $"{_endpoint}/company/rating/{ticker}";
