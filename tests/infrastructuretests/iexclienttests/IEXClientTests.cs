@@ -34,7 +34,7 @@ namespace iexclienttests
         [Fact]
         public void OptionHasYear()
         {
-            Assert.Equal("201909", _options[0]);
+            Assert.Equal("202001", _options[0]);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace iexclienttests
 
             var strike = _optionDetails.Single(o => o.Spread == maxSpread);
 
-            Assert.Equal(0.9, maxSpread, 1);
+            Assert.Equal(0.7, maxSpread, 1);
             Assert.Equal(7.5, strike.StrikePrice);
         }
         

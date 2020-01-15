@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using core;
 using core.Options;
@@ -14,7 +15,7 @@ namespace iexclienttests
 
         public IEXClientFixture()
         {
-            Client = new IEXClient("your-key");
+            Client = new IEXClient(Environment.GetEnvironmentVariable("IEXClientToken"));
 
             var t = Client.GetOptions("TEUM");
 
