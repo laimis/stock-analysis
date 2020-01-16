@@ -3,7 +3,7 @@
 - practice use of polly
 - terraform or pulumi for infrastructure
 - notification on new user logging in
-- batches for builds/coverage
+- badges for builds/coverage
 
 - docker compose describing your application
 - shell file that will login into ecr, fetch image, run docker-compose up -d
