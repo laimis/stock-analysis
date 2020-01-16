@@ -33,6 +33,7 @@ namespace core
                 StockPrice = price,
                 Options = optionList,
                 Expirations = expirations,
+                LastUpdated = optionList.Max(o => o.LastUpdated),
                 Breakdown = new OptionBreakdownViewModel
                 {
                     CallVolume = calls.Sum(o => o.Volume),

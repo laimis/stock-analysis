@@ -16,6 +16,7 @@ export class OptionDetailComponent implements OnInit {
   public expirationMap : Array<OptionDefinition[]>
   public breakdown : OptionBreakdown
   public stockPrice : number
+  public lastUpdated : string
   public expirations: string[]
   public loading : boolean = true
 
@@ -42,6 +43,7 @@ export class OptionDetailComponent implements OnInit {
       this.expirations = result.expirations
       this.breakdown = result.breakdown
       this.stockPrice = result.stockPrice
+      this.lastUpdated = result.lastUpdated
       this.sideSelection = "put"
       // this.minStrikePrice = Math.round(this.stockPrice - 2)
       // this.maxStrikePrice = Math.round(this.stockPrice)

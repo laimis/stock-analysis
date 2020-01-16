@@ -10,25 +10,32 @@
     <div>
       <table class="table">
         <thead>
+
           <tr>
-            <th>Stock Price</th>
-            <th>Call Vol</th>
-            <th>Put Vol</th>
+            <th>Option Info Date</th>
+            <th>Stock Price (currently)</th>
+            <th>Put vs Call (ratio)</th>
             <th>Call Spend</th>
             <th>Put Spend</th>
             <th>Call Price</th>
             <th>Put Price</th>
           </tr>
         </thead>
-        <tr>
-          <td>{{ stockPrice | currency }}</td>
-          <td>{{breakdown.callVolume}}</td>
-          <td>{{breakdown.putVolume}}</td>
-          <td>{{breakdown.callSpend | currency }}</td>
-          <td>{{breakdown.putSpend | currency }}</td>
-          <td>{{breakdown.priceBasedOnCalls | currency }}</td>
-          <td>{{breakdown.priceBasedOnPuts | currency }}</td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>{{ lastUpdated | date:"MM/dd/yyyy" }}</td>
+            <td>{{ stockPrice | currency }}</td>
+            <td>{{breakdown.putVolume}} vs {{breakdown.callVolume}}
+              ({{(breakdown.putVolume / breakdown.callVolume) | number }})</td>
+            <td>{{breakdown.callSpend | currency }}</td>
+            <td>{{breakdown.putSpend | currency }}</td>
+            <td>{{breakdown.priceBasedOnCalls | currency }}</td>
+            <td>{{breakdown.priceBasedOnPuts | currency }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="8"></td></tr>
+        </tfoot>
       </table>
     </div>
 
@@ -90,6 +97,9 @@
             <td>{{option.risk | percent}}</td>
           </tr>
         </tbody>
+        <tfoot>
+          <tr><td colspan="10"></td></tr>
+        </tfoot>
       </table>
 
     </div>

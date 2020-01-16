@@ -27,6 +27,7 @@ namespace core.Options
             {
                 _options = options;
             }
+            
             public async Task<OptionDetailsViewModel> Handle(Query request, CancellationToken cancellationToken)
             {
                 var price = await _options.GetPrice(request.Ticker);

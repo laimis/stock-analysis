@@ -101,6 +101,7 @@ export class OptionBreakdown {
 
 export interface OptionDetail {
   stockPrice: number
+  lastUpdated: string
   expirations: string[]
   options: OptionDefinition[]
   breakdown : OptionBreakdown
