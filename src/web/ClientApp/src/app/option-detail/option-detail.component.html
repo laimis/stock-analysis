@@ -24,7 +24,7 @@
         <tbody>
           <tr>
             <td>{{ lastUpdated | date:"MM/dd/yyyy" }}</td>
-            <td>{{ stockPrice | currency }}</td>
+            <td><a [routerLink]="[ '/stocks', ticker ]">{{ stockPrice | currency }}</a></td>
             <td>{{breakdown.putVolume}} vs {{breakdown.callVolume}}
               ({{(breakdown.putVolume / breakdown.callVolume) | number }})</td>
             <td>{{breakdown.callSpend | currency }}</td>

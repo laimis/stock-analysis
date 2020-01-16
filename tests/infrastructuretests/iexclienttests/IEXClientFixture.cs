@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using core;
 using core.Adapters.Options;
+using core.Adapters.Stocks;
 using iexclient;
 
 namespace iexclienttests
@@ -12,10 +13,11 @@ namespace iexclienttests
         public IEnumerable<OptionDetail> OptionDetails;
         public TickerPrice Price;
         public IEXClient Client;
+        public List<MostActiveEntry> MostActive;
 
         public IEXClientFixture()
         {
-            Client = new IEXClient(Environment.GetEnvironmentVariable("IEXClientToken"));
+            Client = new IEXClient("<enter key>");
 
             var t = Client.GetOptions("TEUM");
 
@@ -34,6 +36,12 @@ namespace iexclienttests
             price.Wait();
 
             Price = price.Result;
+
+            var active = Client.GetMostActive();
+
+            active.Wait();
+
+            MostActive = active.Result;
         }
     }
 }

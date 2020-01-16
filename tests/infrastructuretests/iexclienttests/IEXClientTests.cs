@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using core;
 using core.Adapters.Options;
+using core.Adapters.Stocks;
 using core.Options;
 using iexclient;
 using Xunit;
@@ -16,6 +18,7 @@ namespace iexclienttests
         private TickerPrice _price;
         private IEXClient _client;
         private ITestOutputHelper _output;
+        private List<MostActiveEntry> _mostActive;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {
@@ -24,6 +27,7 @@ namespace iexclienttests
             _price = fixture.Price;
             _client = fixture.Client;
             _output = output;
+            _mostActive = fixture.MostActive;
         }
 
         [Fact]
@@ -76,6 +80,12 @@ namespace iexclienttests
         public void Price_Set()
         {
             Assert.True(_price.Amount > 0);
+        }
+
+        [Fact]
+        public void MostActive_Set()
+        {
+            Assert.Equal(11, _mostActive.Count);
         }
     }
 }

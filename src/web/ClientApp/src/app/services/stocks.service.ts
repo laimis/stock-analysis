@@ -13,6 +13,11 @@ export class StocksService {
 
 	constructor(private http: HttpClient) { }
 
+  getMostActive(): Observable<object[]> {
+    return this.http.get<object[]>('/api/stocks/mostactive')
+  }
+
+
 	getStockSummary(symbol:string): Observable<StockSummary> {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
 	}

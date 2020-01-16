@@ -17,11 +17,15 @@ namespace web
     {
         internal static void RegisterServices(IConfiguration configuration, IServiceCollection services)
         {
-            services.AddSingleton<IOptionsService>(s =>
+            services.AddSingleton<IEXClient>(s =>
             {
                 return new IEXClient(configuration.GetValue<string>("IEXClientToken"));
             });
+            services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
+            services.AddSingleton<IStocksLists>(s => s.GetService<IEXClient>());
+
             services.AddSingleton<IStocksService, StocksService>();
+            
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>(); 
 
             var storage = configuration.GetValue<string>("storage");

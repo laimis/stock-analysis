@@ -5,11 +5,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
+using core.Adapters.Stocks;
 using Newtonsoft.Json;
 
 namespace iexclient
 {
-    public class IEXClient : IOptionsService
+    public class IEXClient : IOptionsService, IStocksLists
     {
         private static HttpClient _client = new HttpClient();
         private static string _endpoint = "https://cloud.iexapis.com/stable";
@@ -37,30 +38,11 @@ namespace iexclient
 
         public async Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate)
         {
-            // option details are expensive to call, cache locally once per day per ticker per option date
+            var url = $"{_endpoint}/stock/{ticker}/options/{optionDate}?token={_token}";
+            
             var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + ticker + optionDate + ".json";
 
-            var file = Path.Combine(_tempDir, key);
-
-            string contents = null;
-            if (File.Exists(file))
-            {
-                contents = File.ReadAllText(file);
-            }
-            else
-            {
-                var url = $"{_endpoint}/stock/{ticker}/options/{optionDate}?token={_token}";
-
-                var r = await _client.GetAsync(url);
-
-                r.EnsureSuccessStatusCode();
-
-                contents = await r.Content.ReadAsStringAsync();
-
-                File.WriteAllText(file, contents);
-            }
-
-            var details = JsonConvert.DeserializeObject<OptionDetail[]>(contents);
+            var details = await GetCachedResponse<OptionDetail[]>(url, key);
 
             return details
                 .OrderByDescending(o => o.StrikePrice)
@@ -81,6 +63,37 @@ namespace iexclient
             var response = await r.Content.ReadAsStringAsync();
 
             return new TickerPrice(JsonConvert.DeserializeObject<double>(response));
+        }
+
+        public async Task<List<MostActiveEntry>> GetMostActive()
+        {
+            var url = $"{_endpoint}/stock/market/list/mostactive?token={_token}";
+            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + "mostactive.json";
+
+            return await GetCachedResponse<List<MostActiveEntry>>(url, key);
+        }
+
+        private async Task<T> GetCachedResponse<T>(string url, string key)
+        {
+            var file = Path.Combine(_tempDir, key);
+
+            string contents = null;
+            if (File.Exists(file))
+            {
+                contents = File.ReadAllText(file);
+            }
+            else
+            {
+                var r = await _client.GetAsync(url);
+
+                r.EnsureSuccessStatusCode();
+
+                contents = await r.Content.ReadAsStringAsync();
+
+                File.WriteAllText(file, contents);
+            }
+
+            return JsonConvert.DeserializeObject<T>(contents);
         }
 
         private async Task<T> Get<T>(string url)
