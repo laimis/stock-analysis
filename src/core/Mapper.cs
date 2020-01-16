@@ -10,7 +10,7 @@ namespace core
 {
     public class Mapper
     {
-        public static OptionDetailsViewModel Map(
+        public static OptionDetailsViewModel MapOptionDetails(
             double price,
             IEnumerable<OptionDetail> options)
         {
@@ -46,7 +46,7 @@ namespace core
             };
         }
 
-        public static object Map(string ticker, CompanyProfile profile, HistoricalResponse data, StockRatings ratings, MetricsResponse metrics)
+        public static object MapStockDetail(string ticker, CompanyProfile profile, HistoricalResponse data, MetricsResponse metrics)
         {
             var price = data.Historical.Last().Close;
 
@@ -66,16 +66,6 @@ namespace core
             var labels = byMonth.Select(a => a.Date.ToString("MMMM"));
             var lowValues = byMonth.Select(a => Math.Round(a.Low, 2));
             var highValues = byMonth.Select(a => Math.Round(a.High, 2));
-
-            var ratingInfo = new
-            {
-                rating = ratings.Rating?.ToString() ?? "not available",
-                details = ratings.RatingDetails?.Select(d => new
-                {
-                    name = d.Key,
-                    rating = d.Value
-                })
-            };
 
             var priceValues = byMonth.Select(a => Math.Round(a.Price, 2));
             var priceChartData = labels.Zip(priceValues, (l, p) => new object[] { l, p });
@@ -107,7 +97,6 @@ namespace core
                 age,
                 bookValue = mostRecent?.BookValuePerShare,
                 peValue = mostRecent?.PERatio,
-                ratings = ratingInfo,
                 largestGain,
                 largestLoss,
                 labels,

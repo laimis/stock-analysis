@@ -40,19 +40,6 @@ namespace financialmodelingclient
 			return JsonConvert.DeserializeObject<CompanyProfile>(response);
 		}
 
-		public async Task<StockRatings> GetRatings(string ticker)
-		{
-			var url = $"{_endpoint}/company/rating/{ticker}";
-
-			var r = await _client.GetAsync(url);
-
-			r.EnsureSuccessStatusCode();
-
-			var response = await r.Content.ReadAsStringAsync();
-
-			return JsonConvert.DeserializeObject<StockRatings>(response);
-		}
-
 		public async Task<MetricsResponse> GetKeyMetrics(string ticker)
 		{
 			var url = $"{_endpoint}/company-key-metrics/{ticker}?period=quarter";

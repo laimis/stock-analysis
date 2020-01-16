@@ -34,11 +34,9 @@ namespace core.Stocks
 
                 var data = await _stocksService.GetHistoricalDataAsync(request.Ticker);
 
-                var ratings = await _stocksService.GetRatings(request.Ticker);
-
                 var metrics = await _stocksService.GetKeyMetrics(request.Ticker);
                 
-                return Mapper.Map(request.Ticker, profile, data, ratings, metrics);
+                return Mapper.MapStockDetail(request.Ticker, profile, data, metrics);
             }
         }
     }

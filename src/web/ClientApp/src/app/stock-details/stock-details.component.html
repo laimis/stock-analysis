@@ -14,23 +14,6 @@
 			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}}% and largest loss of {{stock.largestLoss}}%
 		</div>
 	</div>
-	<div>
-		<label>Ratings</label>
-		<div *ngIf="stock.ratings.details">
-			Overall {{stock.ratings.rating.recommendation}}
-			<table>
-				<thead>
-					<th align="middle" width="100" *ngFor="let r of stock.ratings.details">{{r.name}}</th>
-				</thead>
-				<tbody>
-					<tr>
-						<td *ngFor="let r of stock.ratings.details">{{r.rating.recommendation}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div *ngIf="!stock.ratings.details">No rating information available</div>
-	</div>
 
 	<div>
 		<label>Ratios</label>

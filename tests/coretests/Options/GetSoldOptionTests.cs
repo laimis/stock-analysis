@@ -25,7 +25,7 @@ namespace coretests.Options
                 UserId = _fixture.CloseOptionCommand.UserIdentifier
             };
 
-            var handler = new GetSoldOption.Handler(_fixture.CreateStorage());
+            var handler = new GetSoldOption.Handler(_fixture.CreateStorageWithSoldOption());
 
             var result = await handler.Handle(query, CancellationToken.None);
 

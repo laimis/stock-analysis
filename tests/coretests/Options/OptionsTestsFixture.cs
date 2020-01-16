@@ -12,17 +12,33 @@ namespace coretests.Options
         private CloseOption.Command _closeOptionCommand;
         public CloseOption.Command CloseOptionCommand => _closeOptionCommand;
 
+        private SellOption.Command _sellOptionCommand;
+        public SellOption.Command SellOptionCommand => _sellOptionCommand;
+
         public OptionsTestsFixture()
         {
-            _closeOptionCommand = CreateCommand();
+            _closeOptionCommand = CreateCloseCommand();
+            _sellOptionCommand = CreateSellCommand();
         }
 
-        public FakePortfolioStorage CreateStorage()
+        public FakePortfolioStorage CreateStorageWithSoldOption()
         {
             return CreateStorage(_closeOptionCommand);
         }
 
-        public FakePortfolioStorage CreateStorage(CloseOption.Command cmd)
+        public FakePortfolioStorage CreateStorageWithNoSoldOptions()
+        {
+            return new FakePortfolioStorage();
+        }
+
+        public FakePortfolioStorage CreateStorageWithSoldOption(SoldOption opt)
+        {
+            var storage = new FakePortfolioStorage();
+            storage.Register(opt);
+            return storage;
+        }
+
+        private FakePortfolioStorage CreateStorage(CloseOption.Command cmd)
         {
             var storage = new FakePortfolioStorage();
 
@@ -35,7 +51,7 @@ namespace coretests.Options
             return storage;
         }
 
-        private static CloseOption.Command CreateCommand()
+        private static CloseOption.Command CreateCloseCommand()
         {
             var cmd = new CloseOption.Command
             {
@@ -43,6 +59,24 @@ namespace coretests.Options
                 CloseDate = DateTime.UtcNow,
                 Expiration = DateTime.UtcNow.AddDays(1),
                 ClosePrice = 0,
+                OptionType = OptionType.CALL.ToString(),
+                StrikePrice = 45,
+                Ticker = Ticker
+            };
+
+            cmd.WithUser(UserId);
+
+            return cmd;
+        }
+
+        private static SellOption.Command CreateSellCommand()
+        {
+            var cmd = new SellOption.Command
+            {
+                Amount = 1,
+                ExpirationDate = DateTime.UtcNow.AddDays(1),
+                Filled = DateTime.UtcNow,
+                Premium = 200,
                 OptionType = OptionType.CALL.ToString(),
                 StrikePrice = 45,
                 Ticker = Ticker

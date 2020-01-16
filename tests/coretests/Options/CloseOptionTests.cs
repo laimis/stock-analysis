@@ -31,7 +31,7 @@ namespace coretests.Options
         [Fact]
         public async Task ClosingSoldOption_Closes()
         {
-            var storage = _fixture.CreateStorage();
+            var storage = _fixture.CreateStorageWithSoldOption();
 
             var handler = new CloseOption.Handler(storage);
 
