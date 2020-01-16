@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
@@ -47,6 +48,14 @@ namespace web.Controllers
             await _mediator.Send(model);
 
             return Ok();
+        }
+
+        [HttpGet("mostactive")]
+        public async Task<List<MostActiveEntry>> MostActive()
+        {
+            var response = await _mediator.Send(new MostActive.Query());
+
+            return response;
         }
 
         [HttpGet("export")]

@@ -16,6 +16,7 @@ import { RouterModule } from '@angular/router';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
 import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
+import { StockMostactiveComponent } from './stock-mostactive/stock-mostactive.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -25,6 +26,7 @@ var routes = [
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
+  { path: 'stocks/mostactive', component: StockMostactiveComponent },
   { path: 'stocks/purchase', component: StockPurchaseComponent },
   { path: 'stocks/purchase/:ticker', component: StockPurchaseComponent },
   { path: 'stocks/:ticker', component: StockDetailsComponent },
@@ -41,6 +43,7 @@ var routes = [
     ProfileComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,
+    StockMostactiveComponent,
     StockPurchaseComponent,
   ],
   imports: [
