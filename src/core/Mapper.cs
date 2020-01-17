@@ -47,6 +47,15 @@ namespace core
             };
         }
 
+        public static object MapLists(List<StockQueryResult> active, List<StockQueryResult> gainers, List<StockQueryResult> losers)
+        {
+            return new {
+                active,
+                gainers,
+                losers
+            };
+        }
+
         public static object MapStockDetail(string ticker, CompanyProfile profile, HistoricalResponse data, MetricsResponse metrics)
         {
             var price = data.Historical.Last().Close;

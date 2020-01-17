@@ -50,12 +50,19 @@ namespace web.Controllers
             return Ok();
         }
 
-        [HttpGet("mostactive")]
-        public async Task<List<MostActiveEntry>> MostActive()
+        [HttpGet("lists")]
+        public async Task<object> MostActive()
         {
-            var response = await _mediator.Send(new MostActive.Query());
+            var active = _mediator.Send(new StockLists.QueryMostActive());
+            var gainers = _mediator.Send(new StockLists.QueryGainers());
+            var losers = _mediator.Send(new StockLists.QueryLosers());
 
-            return response;
+            await Task.WhenAll(active, gainers, losers);
+
+            return Mapper.MapLists(
+                active.Result,
+                gainers.Result,
+                losers.Result);
         }
 
         [HttpGet("export")]

@@ -1,6 +1,6 @@
-namespace core.Adapters.Stocks
+﻿namespace core.Adapters.Stocks
 {
-    public class MostActiveEntry
+    public class StockQueryResult
     {
         public string Symbol { get; set; }
         public string CompanyName { get; set; }

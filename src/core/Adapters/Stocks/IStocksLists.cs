@@ -5,6 +5,8 @@ namespace core.Adapters.Stocks
 {
     public interface IStocksLists
     {
-         Task<List<MostActiveEntry>> GetMostActive();
+         Task<List<StockQueryResult>> GetMostActive();
+         Task<List<StockQueryResult>> GetGainers();
+         Task<List<StockQueryResult>> GetLosers();
     }
 }
