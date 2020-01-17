@@ -1,0 +1,63 @@
+<div *ngIf="loaded" class="top-container">
+
+  <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn dashboard-button" target="_blank">
+    <img src="robinhood.png" height="30px" />
+  </a>
+	<button class="btn btn-secondary dashboard-button" (click)="buyStock()">Buy</button>
+
+	<div>
+    <img style="float: left" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />
+    <h3>{{profile.symbol}}: {{profile.companyName}}</h3>
+    <i>{{profile.industry}} / {{profile.sector}}</i>
+    <div>
+      <a href="{{profile.website}}" target="_blank">{{profile.website}}</a>
+    </div>
+    <div>
+      <i>{{profile.description}}</i>
+    </div>
+    <div>
+      Country: <b>{{profile.country}}</b>&nbsp;&nbsp;&nbsp;&nbsp;
+      Type: <b>{{profile.issueType}}</b>&nbsp;&nbsp;&nbsp;&nbsp;
+      Employees: <b>{{profile.employees}}</b>&nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+
+	<div style="clear: both">
+		<label>Fundamentals</label>
+		<div class="container">
+      <!-- <div class="row" *ngFor="let row of rows">
+        <div class="col" *ngFor="let col of row.cols">
+          {{col.label}}: {{col.value}}
+        </div>
+      </div> -->
+			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}}% and largest loss of {{stock.largestLoss}}%
+		</div>
+	</div>
+
+	<div>
+		<label>Ratios</label>
+		<div>
+			Book value of {{stock.bookValue}} with P/E ratio of {{stock.peValue}} (information is {{stock.age}} months old)
+		</div>
+	</div>
+
+	<div>
+		<label>Charts</label>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="priceChartData" [options]="priceOptions"></google-chart>
+		</div>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="volumeChartData" [options]="volumeOptions"></google-chart>
+		</div>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="bookChartData" [options]="bookOptions"></google-chart>
+		</div>
+		<div>
+			<google-chart style="width: 100%;" [type]="priceChartType" [data]="peChartData" [options]="peOptions"></google-chart>
+		</div>
+	</div>
+</div>
+
+<div *ngIf="!loaded">
+	Fetching stock information...
+</div>

@@ -4,18 +4,6 @@
 https://cloud.iexapis.com/stable/account/metadata?token=pk_71ba0d8d98ed4d2caac8089588d62973
 
 
-GET /stock/{symbol}/company
-    companyName
-    industry
-    sector
-    website
-    description
-    employees
-    country
-
-LOGO
-https://storage.googleapis.com/iex/api/logos/AAPL.png
-
 GET /stock/{symbol}/stats
     marketcap
     week52high

@@ -117,6 +117,72 @@ namespace core
             };
         }
 
+        public static object MapStockDetail(
+            string ticker,
+            double price,
+            CompanyProfile2 profile,
+            StockAdvancedStats stats,
+            HistoricalResponse data,
+            MetricsResponse metrics)
+        {
+            var largestGain = data.Historical.Max(p => p.ChangePercent);
+            var largestLoss = data.Historical.Min(p => p.ChangePercent);
+
+            var byMonth = data.Historical.GroupBy(r => r.Date.ToString("yyyy-MM-01"))
+                .Select(g => new
+                {
+                    Date = DateTime.Parse(g.Key),
+                    Price = g.Average(p => p.Close),
+                    Volume = g.Average(p => p.Volume),
+                    Low = g.Min(p => p.Close),
+                    High = g.Max(p => p.Close)
+                });
+
+            var labels = byMonth.Select(a => a.Date.ToString("MMMM"));
+            var lowValues = byMonth.Select(a => Math.Round(a.Low, 2));
+            var highValues = byMonth.Select(a => Math.Round(a.High, 2));
+
+            var priceValues = byMonth.Select(a => Math.Round(a.Price, 2));
+            var priceChartData = labels.Zip(priceValues, (l, p) => new object[] { l, p });
+
+            var volumeValues = byMonth.Select(a => a.Volume);
+            var volumeChartData = labels.Zip(volumeValues, (l, p) => new object[] { l, p });
+
+            var mostRecent = metrics.Metrics.FirstOrDefault();
+
+            int age = 0;
+            if (mostRecent != null)
+            {
+                age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
+            }
+
+            var metricDates = metrics.Metrics.Select(m => m.Date.ToString("MM/yy")).Reverse();
+
+            var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare).Reverse();
+            var bookChartData = metricDates.Zip(bookValues, (l, p) => new object[] { l, p });
+
+            var peValues = metrics.Metrics.Select(m => m.PERatio).Reverse();
+            var peChartData = metricDates.Zip(peValues, (l, p) => new object[] { l, p });
+
+            return new
+            {
+                ticker,
+                price,
+                stats,
+                profile,
+                age,
+                bookValue = mostRecent?.BookValuePerShare,
+                peValue = mostRecent?.PERatio,
+                largestGain,
+                largestLoss,
+                labels,
+                priceChartData,
+                volumeChartData,
+                bookChartData,
+                peChartData
+            };
+        }
+
         public static object ToOptionView(SoldOption o)
         {
             return new
