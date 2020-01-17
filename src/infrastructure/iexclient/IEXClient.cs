@@ -68,7 +68,7 @@ namespace iexclient
         public async Task<List<MostActiveEntry>> GetMostActive()
         {
             var url = $"{_endpoint}/stock/market/list/mostactive?token={_token}";
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + "mostactive.json";
+            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd-hh") + "mostactive.json";
 
             return await GetCachedResponse<List<MostActiveEntry>>(url, key);
         }
