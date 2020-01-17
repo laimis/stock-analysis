@@ -9,9 +9,9 @@ import { Component, Input, OnInit } from '@angular/core';
       <th>Name</th>
       <th>Latest Price</th>
       <th>Time</th>
-      <th>Market Cap</th>
-      <th>Volume</th>
-      <th>PE Ratio</th>
+      <th style="text-align: right">Market Cap</th>
+      <th style="text-align: right">Volume</th>
+      <th style="text-align: right">PE Ratio</th>
     </tr>
   </thead>
   <tbody>
@@ -20,9 +20,9 @@ import { Component, Input, OnInit } from '@angular/core';
       <td>{{ entry.companyName }}</td>
       <td>{{ entry.latestPrice | currency }}</td>
       <td>{{ entry.latestTime }}</td>
-      <td>{{ entry.marketCap | number }}</td>
-      <td>{{ entry.volume | number }}</td>
-      <td>{{ entry.peRatio | number }}</td>
+      <td align="right">{{ entry.marketCap / 1000000 | number }} M</td>
+      <td align="right">{{ entry.volume / 1000000 | number }} M</td>
+      <td align="right">{{ entry.peRatio | number }}</td>
     </tr>
   </tbody>
   <tfoot>
