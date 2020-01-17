@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -31,14 +32,12 @@ namespace iexclient
 
         public Task<string[]> GetOptions(string ticker)
         {
-            var url = $"{_endpoint}/stock/{ticker}/options?token={_token}";
-
-            return Get<string[]>(url);
+            return Get<string[]>(MakeUrl($"stock/{ticker}/options"));
         }
 
         public async Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate)
         {
-            var url = $"{_endpoint}/stock/{ticker}/options/{optionDate}?token={_token}";
+            var url = MakeUrl($"stock/{ticker}/options/{optionDate}");
             
             var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + ticker + optionDate + ".json";
 
@@ -49,9 +48,14 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
+        private string MakeUrl(string function)
+        {
+            return $"{_endpoint}/{function}?token={_token}";
+        }
+
         public async Task<TickerPrice> GetPrice(string ticker)
         {
-            var url = $"{_endpoint}/stock/{ticker}/price?token={_token}";
+            var url = MakeUrl($"stock/{ticker}/price");
 
             var r = await _client.GetAsync(url);
 
@@ -67,7 +71,8 @@ namespace iexclient
 
         public async Task<List<MostActiveEntry>> GetMostActive()
         {
-            var url = $"{_endpoint}/stock/market/list/mostactive?token={_token}";
+            var url = MakeUrl($"stock/market/list/mostactive");
+            
             var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd-hh") + "mostactive.json";
 
             return await GetCachedResponse<List<MostActiveEntry>>(url, key);
