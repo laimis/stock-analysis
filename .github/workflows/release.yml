@@ -29,17 +29,17 @@ jobs:
         env:
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
             ECR_REPOSITORY: stock-site
-            IMAGE_TAG: $(echo "${GITHUB_REF}" | cut -d "/" -f3)
         run: |
+            IMAGE_TAG=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
             # Build a docker container and
             # push it to ECR so that it can
             # be deployed to ECS.
-            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-            docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG} .
+            docker tag $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG} $ECR_REGISTRY/$ECR_REPOSITORY:latest
             
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}"
       
       - name: Create Release
         id: create_release
