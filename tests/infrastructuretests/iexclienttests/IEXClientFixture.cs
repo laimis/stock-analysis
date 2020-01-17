@@ -13,7 +13,7 @@ namespace iexclienttests
         public IEnumerable<OptionDetail> OptionDetails;
         public TickerPrice Price;
         public IEXClient Client;
-        public List<MostActiveEntry> MostActive;
+        public List<StockQueryResult> MostActive;
 
         public IEXClientFixture()
         {

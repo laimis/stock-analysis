@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -69,13 +68,28 @@ namespace iexclient
             return new TickerPrice(JsonConvert.DeserializeObject<double>(response));
         }
 
-        public async Task<List<MostActiveEntry>> GetMostActive()
+        public Task<List<StockQueryResult>> GetMostActive()
         {
-            var url = MakeUrl($"stock/market/list/mostactive");
-            
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd-hh") + "mostactive.json";
+            return GetList("mostactive");
+        }
 
-            return await GetCachedResponse<List<MostActiveEntry>>(url, key);
+        public Task<List<StockQueryResult>> GetLosers()
+        {
+            return GetList("losers");
+        }
+
+        public Task<List<StockQueryResult>> GetGainers()
+        {
+            return GetList("gainers");
+        }
+
+        private Task<List<StockQueryResult>> GetList(string listname)
+        {
+            var url = MakeUrl($"stock/market/list/{listname}");
+
+            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd-hh") + $"{listname}.json";
+
+            return GetCachedResponse<List<StockQueryResult>>(url, key);
         }
 
         private async Task<T> GetCachedResponse<T>(string url, string key)

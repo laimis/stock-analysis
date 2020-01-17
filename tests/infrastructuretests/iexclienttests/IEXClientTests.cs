@@ -18,7 +18,7 @@ namespace iexclienttests
         private TickerPrice _price;
         private IEXClient _client;
         private ITestOutputHelper _output;
-        private List<MostActiveEntry> _mostActive;
+        private List<StockQueryResult> _mostActive;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {

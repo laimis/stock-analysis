@@ -13,8 +13,8 @@ export class StocksService {
 
 	constructor(private http: HttpClient) { }
 
-  getMostActive(): Observable<object[]> {
-    return this.http.get<object[]>('/api/stocks/mostactive')
+  getStockLists(): Observable<StockLists> {
+    return this.http.get<StockLists>('/api/stocks/lists')
   }
 
 
@@ -57,6 +57,12 @@ export class StocksService {
   getAcounts() : Observable<any> {
     return this.http.get('/api/admin/users')
   }
+}
+
+export interface StockLists {
+  active : object[]
+  gainers: object[]
+  losers: object[]
 }
 
 export interface Portfolio {
