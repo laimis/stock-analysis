@@ -22,21 +22,11 @@ GET /stock/{symbol}/stats
     week52low
     week52change
 
-/stock/market/list/gainers
-/stock/market/list/mostactive
-/stock/market/list/losers
-- hit up lossers endpoint, list each -> price/volume/options pricing
-
 - practice use of polly
 - terraform or pulumi for infrastructure
 - notification on new user logging in
 - badges for builds/coverage
-
 - iexcloud test endpoint
-
-- docker compose describing your application
-- shell file that will login into ecr, fetch image, run docker-compose up -d
-- crontab running the above every couple minutes
 
 - now the cloudformation script that will install docker, docker-compose
     - install docker
