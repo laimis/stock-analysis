@@ -27,7 +27,7 @@ namespace web.Controllers
         [HttpGet("{ticker}")]
         public async Task<object> DetailsAsync(string ticker)
         {
-            return await _mediator.Send(new Get.Query(ticker));
+            return await _mediator.Send(new Details.Query(ticker));
         }
 
         [HttpPost("sell")]

@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace iexclient
 {
-    public class IEXClient : IOptionsService, IStocksLists
+    public class IEXClient : IOptionsService, IStocksLists, IStocksService2
     {
         private static HttpClient _client = new HttpClient();
         private static string _endpoint = "https://cloud.iexapis.com/stable";
@@ -47,9 +47,22 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        private string MakeUrl(string function)
+        public Task<CompanyProfile> GetCompanyProfile(string ticker)
         {
-            return $"{_endpoint}/{function}?token={_token}";
+            var url = MakeUrl($"stock/{ticker}/company");
+
+            var key = System.DateTime.UtcNow.ToString("yyyy-MM") + ticker + "company.json";
+
+            return GetCachedResponse<CompanyProfile>(url, key);
+        }
+
+        public Task<StockAdvancedStats> GetAdvancedStats(string ticker)
+        {
+            var url = MakeUrl($"stock/{ticker}/advanced-stats");
+
+            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + ticker + "advancedstats.json";
+
+            return GetCachedResponse<StockAdvancedStats>(url, key);
         }
 
         public async Task<TickerPrice> GetPrice(string ticker)
@@ -90,6 +103,11 @@ namespace iexclient
             var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd-hh") + $"{listname}.json";
 
             return GetCachedResponse<List<StockQueryResult>>(url, key);
+        }
+
+        private string MakeUrl(string function)
+        {
+            return $"{_endpoint}/{function}?token={_token}";
         }
 
         private async Task<T> GetCachedResponse<T>(string url, string key)

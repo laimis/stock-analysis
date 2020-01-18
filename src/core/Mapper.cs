@@ -56,19 +56,20 @@ namespace core
             };
         }
 
-        public static object MapStockDetail(string ticker, CompanyProfile profile, HistoricalResponse data, MetricsResponse metrics)
+        public static object MapStockDetail(
+            string ticker,
+            double price,
+            CompanyProfile profile,
+            StockAdvancedStats stats,
+            HistoricalResponse data,
+            MetricsResponse metrics)
         {
-            var price = data.Historical.Last().Close;
-
-            var largestGain = data.Historical.Max(p => p.ChangePercent);
-            var largestLoss = data.Historical.Min(p => p.ChangePercent);
-
             var byMonth = data.Historical.GroupBy(r => r.Date.ToString("yyyy-MM-01"))
                 .Select(g => new
                 {
                     Date = DateTime.Parse(g.Key),
                     Price = g.Average(p => p.Close),
-                    Volume = g.Average(p => p.Volume),
+                    Volume = Math.Round(g.Average(p => p.Volume) / 1000000.0, 2),
                     Low = g.Min(p => p.Close),
                     High = g.Max(p => p.Close)
                 });
@@ -83,14 +84,6 @@ namespace core
             var volumeValues = byMonth.Select(a => a.Volume);
             var volumeChartData = labels.Zip(volumeValues, (l, p) => new object[] { l, p });
 
-            var mostRecent = metrics.Metrics.FirstOrDefault();
-
-            int age = 0;
-            if (mostRecent != null)
-            {
-                age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
-            }
-
             var metricDates = metrics.Metrics.Select(m => m.Date.ToString("MM/yy")).Reverse();
 
             var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare).Reverse();
@@ -103,12 +96,8 @@ namespace core
             {
                 ticker,
                 price,
-                profile = profile.Profile,
-                age,
-                bookValue = mostRecent?.BookValuePerShare,
-                peValue = mostRecent?.PERatio,
-                largestGain,
-                largestLoss,
+                stats,
+                profile,
                 labels,
                 priceChartData,
                 volumeChartData,

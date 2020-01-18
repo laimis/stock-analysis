@@ -7,50 +7,36 @@ using Newtonsoft.Json;
 namespace financialmodelingclient
 {
     public class StocksService : IStocksService
-	{
-		private static HttpClient _client = new HttpClient();
-		private static string _endpoint = "https://financialmodelingprep.com/api/v3";
+    {
+        private static HttpClient _client = new HttpClient();
+        private static string _endpoint = "https://financialmodelingprep.com/api/v3";
 
-		public async Task<HistoricalResponse> GetHistoricalDataAsync(string ticker)
-		{
-			var from = DateTime.UtcNow.AddMonths(-16).ToString("yyyy-MM-dd");
-			var to = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd");
+        public Task<HistoricalResponse> GetHistoricalDataAsync(string ticker)
+        {
+            var from = DateTime.UtcNow.AddMonths(-16).ToString("yyyy-MM-dd");
+            var to = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd");
 
-			var url = $"{_endpoint}/historical-price-full/{ticker}?from={from}&to={to}";
+            var url = $"{_endpoint}/historical-price-full/{ticker}?from={from}&to={to}";
 
-			var r = await _client.GetAsync(url);
+            return GetResponse<HistoricalResponse>(url);
+        }
 
-			r.EnsureSuccessStatusCode();
+        public Task<MetricsResponse> GetKeyMetrics(string ticker)
+        {
+            var url = $"{_endpoint}/company-key-metrics/{ticker}?period=quarter";
 
-			var response = await r.Content.ReadAsStringAsync();
+            return GetResponse<MetricsResponse>(url);
+        }
 
-			return JsonConvert.DeserializeObject<HistoricalResponse>(response);
-		}
+        private async Task<T> GetResponse<T>(string url)
+        {
+            var r = await _client.GetAsync(url);
 
-		public async Task<CompanyProfile> GetCompanyProfile(string ticker)
-		{
-			var url = $"{_endpoint}/company/profile/{ticker}";
+            r.EnsureSuccessStatusCode();
 
-			var r = await _client.GetAsync(url);
+            var response = await r.Content.ReadAsStringAsync();
 
-			r.EnsureSuccessStatusCode();
-
-			var response = await r.Content.ReadAsStringAsync();
-
-			return JsonConvert.DeserializeObject<CompanyProfile>(response);
-		}
-
-		public async Task<MetricsResponse> GetKeyMetrics(string ticker)
-		{
-			var url = $"{_endpoint}/company-key-metrics/{ticker}?period=quarter";
-
-			var r = await _client.GetAsync(url);
-
-			r.EnsureSuccessStatusCode();
-
-			var response = await r.Content.ReadAsStringAsync();
-
-			return JsonConvert.DeserializeObject<MetricsResponse>(response);
-		}
-	}
+            return JsonConvert.DeserializeObject<T>(response);
+        }
+    }
 }

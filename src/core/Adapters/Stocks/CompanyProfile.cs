@@ -1,8 +1,16 @@
-namespace core.Adapters.Stocks
+﻿namespace core.Adapters.Stocks
 {
-	public class CompanyProfile
-	{
-		public string Ticker { get; set; }
-		public CompanyProfileDetails Profile { get; set; }
-	}
+    public class CompanyProfile
+    {
+        public string Symbol { get; set; }
+        public string CompanyName { get; set; }
+        public long Employees { get; set; }
+        public string Industry { get; set; }
+        public string Website { get; set; }
+        public string Description { get; set; }
+        public string SecurityName { get; set; }
+        public string IssueType { get; set; }
+        public string Sector { get; set; }
+        public string Country { get; set; }
+    }
 }

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { StocksService, StockSummary } from '../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -12,9 +11,11 @@ export class StockDetailsComponent {
 
 	public ticker: string;
 	public loaded: boolean = false;
-	public stock: StockSummary;
-	
-	public priceChartType = "ColumnChart";
+  public stock: StockSummary;
+  public profile: object;
+  public stats: object;
+
+	public priceChartType = "LineChart";
 	public priceOptions = {
 		title: "price",
 		legend: { position: "none" },
@@ -24,6 +25,7 @@ export class StockDetailsComponent {
 	};
 	public priceChartData: object;
 
+  public volumeChartType = "ColumnChart";
 	public volumeChartData: object;
 	public volumeOptions = {
 		title: "volume",
@@ -54,8 +56,7 @@ export class StockDetailsComponent {
 	constructor(
 		private stocks : StocksService,
 		private route: ActivatedRoute,
-		private router: Router,
-		private location : Location){}
+		private router: Router){}
 
 	ngOnInit(): void {
 		var ticker = this.route.snapshot.paramMap.get('ticker');
@@ -67,7 +68,9 @@ export class StockDetailsComponent {
 
 	fetchStock() {
 		this.stocks.getStockSummary(this.ticker).subscribe(result => {
-			this.stock = result;
+      this.stock = result;
+      this.profile = result.profile;
+      this.stats = result.stats;
 			this.priceChartData = result.priceChartData;
 			this.volumeChartData = result.volumeChartData;
 			this.bookChartData = result.bookChartData;

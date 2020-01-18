@@ -20,7 +20,7 @@ export class StocksService {
 
 	getStockSummary(symbol:string): Observable<StockSummary> {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
-	}
+  }
 
 	getOptions(ticker:string): Observable<OptionDetail> {
     return this.http.get<OptionDetail>('/api/options/' + ticker)
@@ -81,6 +81,9 @@ export interface Portfolio {
 }
 
 export interface StockSummary {
+  price: number,
+  stats: object,
+  profile : object
 	priceChartData : object[]
 	volumeChartData : object[]
 	peChartData : object[]

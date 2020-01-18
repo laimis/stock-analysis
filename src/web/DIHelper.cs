@@ -23,6 +23,7 @@ namespace web
             });
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksLists>(s => s.GetService<IEXClient>());
+            services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
 
             services.AddSingleton<IStocksService, StocksService>();
             
