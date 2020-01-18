@@ -1,6 +1,8 @@
 <div class="top-container">
 
-	<div *ngIf="purchased">Purchased!</div>
+  <div *ngIf="purchased">Purchased!</div>
+
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<form>
 		<br />

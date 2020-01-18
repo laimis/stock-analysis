@@ -14,7 +14,7 @@ namespace core.Options
             [Required]
             public string Ticker { get; set; }
 
-            [Range(1, double.MaxValue)]
+            [Range(1, 10000)]
             public double StrikePrice { get; set; }
 
             [Required]
@@ -22,7 +22,7 @@ namespace core.Options
             public DateTimeOffset? ExpirationDate { get; set; }
 
             [Required]
-            public string OptionType { get; set; }
+            public OptionType? OptionType { get; set; }
 
             [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
             public int Amount { get; set; }
@@ -38,8 +38,6 @@ namespace core.Options
             {
                 this.UserIdentifier = userId;
             }
-
-            public OptionType Type => (OptionType)Enum.Parse(typeof(OptionType), this.OptionType);
         }
 
         public class Handler : IRequestHandler<Command>
@@ -53,10 +51,10 @@ namespace core.Options
             
             public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var option = await this._storage.GetSoldOption(cmd.Ticker, cmd.Type, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
+                var option = await this._storage.GetSoldOption(cmd.Ticker, cmd.OptionType.Value, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
                 if (option == null)
                 {
-                    option = new SoldOption(cmd.Ticker, cmd.Type, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
+                    option = new SoldOption(cmd.Ticker, cmd.OptionType.Value, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
                 }
 
                 option.Open(cmd.Amount, cmd.Premium, cmd.Filled.Value);

@@ -1,4 +1,5 @@
-- diary e
+- note entry
+- search lookup
 - int for money amounts
 - option details page
 - generate most active email

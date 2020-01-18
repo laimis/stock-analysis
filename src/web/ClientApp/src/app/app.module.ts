@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { AuthGuard } from './auth/auth.guard';
 import { BrowserModule } from '@angular/platform-browser';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { ErrorDisplayComponent } from './shared/error-display/error-display.component';
 import { FormsModule } from '@angular/forms';
 import { GoogleChartsModule } from 'angular-google-charts';
 import { HttpClientModule } from '@angular/common/http';
@@ -47,6 +48,7 @@ var routes = [
     StockListsComponent,
     StockListComponent,
     StockTransactionComponent,
+    ErrorDisplayComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

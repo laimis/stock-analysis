@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
-import { StockListComponent } from './stock-list.component';
 
 @Component({
   selector: 'app-stock-lists',

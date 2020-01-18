@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
+import { StocksService, GetErrors } from '../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
@@ -15,7 +15,8 @@ export class StockTransactionComponent implements OnInit {
 	public amount: Number
 	public price: Number
 	public date: String
-	public purchased: Boolean
+  public purchased: Boolean
+  public errors: string[]
 
 	constructor(
 		private service : StocksService,
@@ -34,22 +35,28 @@ export class StockTransactionComponent implements OnInit {
 
 	submitPurchase() {
 
-		this.purchased = false;
+    this.purchased = false;
+    this.errors = null;
 
 		this.service.purchase(this.toObject()).subscribe(() => {
 			this.purchased = true;
 			this.clearValues()
-		})
+		}, err => {
+      this.errors = GetErrors(err)
+    })
 	}
 
 	submitSell() {
 
-		this.purchased = false;
+    this.purchased = false;
+    this.errors = null;
 
 		this.service.sell(this.toObject()).subscribe(() => {
 			this.purchased = true;
 			this.clearValues()
-		})
+		}, err => {
+      this.errors = GetErrors(err)
+    })
 	}
 
 	toObject() {
@@ -65,6 +72,7 @@ export class StockTransactionComponent implements OnInit {
 		this.ticker = null
 		this.price = null
 		this.date = null
-		this.amount = null
+    this.amount = null
+    this.errors = null
 	}
 }

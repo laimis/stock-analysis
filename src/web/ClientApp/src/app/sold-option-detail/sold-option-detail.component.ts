@@ -15,7 +15,7 @@ export class SoldOptionDetailComponent implements OnInit {
   public closed: boolean;
   public closePrice: number;
   public closeDate: string;
-  public error: string;
+  public errors: string[];
 
   constructor(
     private service: StocksService,
@@ -44,7 +44,7 @@ export class SoldOptionDetailComponent implements OnInit {
     var strikePrice = Number.parseFloat(this.route.snapshot.paramMap.get('strikePrice'));
     var expiration = this.route.snapshot.paramMap.get('expiration');
 
-    this.error = null;
+    this.errors = null;
 
     var obj = {
       ticker,
@@ -59,8 +59,7 @@ export class SoldOptionDetailComponent implements OnInit {
     this.service.closeSoldOption(obj).subscribe( () => {
       this.closed = true
     }, err => {
-      this.error = GetErrors(err)[0]
-      console.log(err)
+      this.errors = GetErrors(err)
     })
   }
 

@@ -1,10 +1,6 @@
 <div class="top-container">
 
-  <div *ngIf="errors" class="alert alert-danger" role="alert">
-    <ul>
-      <li *ngFor="let error of errors">{{error}}</li>
-    </ul>
-  </div>
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <div *ngIf="success" class="alert alert-success" role="alert">
     Contract sale has been successfully recorded

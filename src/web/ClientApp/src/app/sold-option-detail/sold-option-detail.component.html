@@ -4,9 +4,7 @@
     Contract has been successfully closed
   </div>
 
-  <div *ngIf="error" class="alert alert-danger" role="alert">
-    {{error}}
-  </div>
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<div *ngIf="loaded">
 		<form>

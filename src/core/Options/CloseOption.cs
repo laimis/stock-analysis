@@ -25,6 +25,7 @@ namespace core.Options
             [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
             public int Amount { get; set; }
 
+            [Required]
             [Range(0, 1000)]
             public double? ClosePrice { get; set; }
 
