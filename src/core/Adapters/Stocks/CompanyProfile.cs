@@ -1,4 +1,4 @@
-namespace core.Adapters.Stocks
+﻿namespace core.Adapters.Stocks
 {
     public class CompanyProfile
     {
