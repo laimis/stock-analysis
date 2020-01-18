@@ -38,14 +38,8 @@ namespace core.Portfolio
 
                 var obj = new
                 {
-                    totalSpent,
-                    totalEarned,
                     owned = owned.Select(o => Mapper.ToOwnedView(o)),
-                    openOptions = openOptions.Select(o => Mapper.ToOptionView(o)),
-                    pendingPremium = openOptions.Sum(o => o.State.Premium),
-                    collateralCash = openOptions.Sum(o => o.State.CollateralCash),
-                    collateralShares = openOptions.Sum(o => o.State.CollateralShares),
-                    optionEarnings = options.Sum(o => o.State.Profit)
+                    openOptions = openOptions.Select(o => Mapper.ToOptionView(o))
                 };
 
                 return obj;

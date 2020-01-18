@@ -68,10 +68,6 @@ export interface StockLists {
 export interface Portfolio {
   owned: object[]
   openOptions: object[]
-  pendingPremium : number
-  optionEarnings : number
-  collateralCash : number
-  collateralShares : number
 }
 
 export interface StockSummary {

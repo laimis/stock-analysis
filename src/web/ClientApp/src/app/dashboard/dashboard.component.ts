@@ -11,10 +11,6 @@ export class DashboardComponent implements OnInit {
 
 	public owned : object[];
   public openOptions : object[];
-  public pendingPremium : number;
-  public optionEarnings : number;
-	public collateralShares : number;
-  public collateralCash : number;
   public ticker : string;
 	public loaded : boolean = false;
 
@@ -28,10 +24,6 @@ export class DashboardComponent implements OnInit {
 		this.stocks.getPortfolio().subscribe(result => {
       this.owned = result.owned;
       this.openOptions = result.openOptions;
-      this.pendingPremium = result.pendingPremium;
-      this.optionEarnings = result.optionEarnings;
-      this.collateralCash = result.collateralCash;
-      this.collateralShares = result.collateralShares;
 			this.loaded = true;
 		}, error => {
 			console.log(error);
