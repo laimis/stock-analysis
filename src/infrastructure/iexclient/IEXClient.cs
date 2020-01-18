@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace iexclient
 {
-    public class IEXClient : IOptionsService, IStocksLists, IStocksService2
+    public class IEXClient : IOptionsService, IStocksService2
     {
         private static HttpClient _client = new HttpClient();
         private static string _endpoint = "https://cloud.iexapis.com/stable";

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using MediatR;

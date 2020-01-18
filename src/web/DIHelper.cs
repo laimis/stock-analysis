@@ -22,7 +22,6 @@ namespace web
                 return new IEXClient(configuration.GetValue<string>("IEXClientToken"));
             });
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
-            services.AddSingleton<IStocksLists>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
 
             services.AddSingleton<IStocksService, StocksService>();

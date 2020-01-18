@@ -1,16 +1,17 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using core;
 using core.Adapters.Stocks;
 
 namespace coretests.Fakes
 {
-    internal class FakeStocksLists : IStocksLists
+    internal class FakeStocksService : IStocksService2
     {
         private StockQueryResult _active;
         private StockQueryResult _gainer;
         private StockQueryResult _loser;
 
-        public FakeStocksLists()
+        public FakeStocksService()
         {
         }
 
@@ -47,6 +48,21 @@ namespace coretests.Fakes
         internal void RegisterLoser(StockQueryResult entry)
         {
             _loser = entry;
+        }
+
+        public Task<CompanyProfile> GetCompanyProfile(string ticker)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<StockAdvancedStats> GetAdvancedStats(string ticker)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<TickerPrice> GetPrice(string ticker)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -25,26 +25,26 @@ namespace core.Stocks
             IRequestHandler<QueryLosers, List<StockQueryResult>>,
             IRequestHandler<QueryGainers, List<StockQueryResult>>
         {
-            private IStocksLists _lists;
+            private IStocksService2 _service;
 
-            public Handler(IStocksLists lists)
+            public Handler(IStocksService2 service)
             {
-                _lists = lists;
+                _service = service;
             }
 
             public async Task<List<StockQueryResult>> Handle(QueryMostActive request, CancellationToken cancellationToken)
             {
-                return await _lists.GetMostActive();
+                return await _service.GetMostActive();
             }
 
             public async Task<List<StockQueryResult>> Handle(QueryLosers request, CancellationToken cancellationToken)
             {
-                return await _lists.GetLosers();
+                return await _service.GetLosers();
             }
 
             public async Task<List<StockQueryResult>> Handle(QueryGainers request, CancellationToken cancellationToken)
             {
-                return await _lists.GetGainers();
+                return await _service.GetGainers();
             }
         }
     }
