@@ -27,7 +27,6 @@ namespace core.Portfolio
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                var cashedout = stocks.Where(s => s.State.Owned == 0);
                 var owned = stocks.Where(s => s.State.Owned > 0);
 
                 var totalSpent = stocks.Sum(s => s.State.Spent);
@@ -35,22 +34,17 @@ namespace core.Portfolio
 
                 var options = await _storage.GetSoldOptions(request.UserId);
 
-                var ownedOptions = options.Where(o => o.State.Amount > 0);
-                var closedOptions = options.Where(o => o.State.Amount == 0);
+                var openOptions = options.Where(o => o.State.Closed == null);
 
                 var obj = new
                 {
                     totalSpent,
                     totalEarned,
-                    totalCashedOutSpend = cashedout.Sum(s => s.State.Spent),
-                    totalCashedOutEarnings = cashedout.Sum(s => s.State.Earned),
                     owned = owned.Select(o => Mapper.ToOwnedView(o)),
-                    cashedOut = cashedout.Select(o => Mapper.ToOwnedView(o)),
-                    ownedOptions = ownedOptions.Select(o => Mapper.ToOptionView(o)),
-                    closedOptions = closedOptions.Select(o => Mapper.ToOptionView(o)),
-                    pendingPremium = ownedOptions.Sum(o => o.State.Premium),
-                    collateralCash = ownedOptions.Sum(o => o.State.CollateralCash),
-                    collateralShares = ownedOptions.Sum(o => o.State.CollateralShares),
+                    openOptions = openOptions.Select(o => Mapper.ToOptionView(o)),
+                    pendingPremium = openOptions.Sum(o => o.State.Premium),
+                    collateralCash = openOptions.Sum(o => o.State.CollateralCash),
+                    collateralShares = openOptions.Sum(o => o.State.CollateralShares),
                     optionEarnings = options.Sum(o => o.State.Profit)
                 };
 

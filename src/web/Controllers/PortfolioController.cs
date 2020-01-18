@@ -1,7 +1,4 @@
-using System.Linq;
 using System.Threading.Tasks;
-using core;
-using core.Options;
 using core.Portfolio;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

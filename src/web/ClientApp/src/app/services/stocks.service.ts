@@ -67,13 +67,7 @@ export interface StockLists {
 
 export interface Portfolio {
   owned: object[]
-  ownedOptions: object[]
-  closedOptions: object[]
-	cashedOut: object[]
-	totalEarned: Number
-	totalSpent: Number
-	totalCashedOutSpend : number
-  totalCashedOutEarnings : number
+  openOptions: object[]
   pendingPremium : number
   optionEarnings : number
   collateralCash : number

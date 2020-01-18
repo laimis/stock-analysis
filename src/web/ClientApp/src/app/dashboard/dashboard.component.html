@@ -14,16 +14,8 @@
 
 <div *ngIf="loaded">
 
-
-    <h2>Options
-      <a [routerLink]="[ '/options/sell']" class="btn btn-primary btn-space">Sell</a>
-    </h2>
-      <table>
-        <tr><td>Total premium</td><td>{{ optionEarnings | currency}}</td></tr>
-        <tr><td>Pending premium</td><td>{{ pendingPremium | currency }} (collateral: {{ collateralCash | currency}}, {{ collateralShares }} shares)</td></tr>
-      </table>
-
-  <div *ngIf="ownedOptions.length > 0">
+  <div *ngIf="openOptions.length > 0">
+    <a style="float: right" [routerLink]="[ '/options/sell']" class="btn btn-primary btn-space">Record Options Sale</a>
     <h2>Open Option Contracts</h2>
     <table class="table">
       <thead>
@@ -38,8 +30,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let option of ownedOptions">
-          <td><a [routerLink]="[ '/options', option.ticker ]">{{option.ticker}}</a></td>
+        <tr *ngFor="let option of openOptions">
+          <td><a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a></td>
           <td>{{option.type}}</td>
           <td>{{option.strikePrice | currency}}</td>
           <td>{{option.expiration | date : 'shortDate'}}</td>
@@ -50,36 +42,9 @@
       </tbody>
     </table>
   </div>
-
-
-  <div *ngIf="closedOptions.length > 0">
-    <h2>Closed Option Contracts</h2>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Type</th>
-          <th>Strike</th>
-          <th>Expiration</th>
-          <th>Premium</th>
-          <th>Profit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let option of closedOptions">
-          <td><a [routerLink]="[ '/options', option.ticker ]">{{option.ticker}}</a></td>
-          <td>{{option.type}}</td>
-          <td>{{option.strikePrice | currency}}</td>
-          <td>{{option.expiration | date : 'shortDate'}}</td>
-          <td>{{option.premium | currency}}</td>
-          <td>{{option.profit | currency }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
+  <br />
   <div *ngIf="owned.length > 0">
+    <a style="float: right" [routerLink]="[ '/stocks/purchase']" class="btn btn-primary btn-space">Record Stock Sale</a>
     <h2>Owned Stocks</h2>
     <table class="table">
       <thead>
@@ -96,35 +61,6 @@
           <td>{{ticker.owned}}</td>
           <td>{{ticker.spent}}</td>
           <td>{{ticker.earned}}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="cashedOut.length > 0">
-    <h2>Cashed Out Stocks</h2>
-
-    <ul>
-      <li>Spent: {{totalCashedOutSpend | currency}}</li>
-      <li>Earned: {{totalCashedOutEarnings | currency}}</li>
-      <li>Profit: {{cashedOutGains() | currency}}, {{cashedOutGainsPct() | number }}%</li>
-    </ul>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Spent</th>
-          <th>Earned</th>
-          <th>Net</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let ticker of cashedOut">
-          <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
-          <td>{{ticker.spent}}</td>
-          <td>{{ticker.earned}}</td>
-          <td>{{ticker.earned - ticker.spent | currency}}</td>
         </tr>
       </tbody>
     </table>

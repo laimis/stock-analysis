@@ -10,13 +10,7 @@ import { StocksService } from '../services/stocks.service';
 export class DashboardComponent implements OnInit {
 
 	public owned : object[];
-  public cashedOut : object[];
-  public ownedOptions : object[];
-  public closedOptions : object[];
-	public totalSpent : Number;
-	public totalEarned : Number;
-	public totalCashedOutSpend : number;
-  public totalCashedOutEarnings : number;
+  public openOptions : object[];
   public pendingPremium : number;
   public optionEarnings : number;
 	public collateralShares : number;
@@ -33,13 +27,7 @@ export class DashboardComponent implements OnInit {
 
 		this.stocks.getPortfolio().subscribe(result => {
       this.owned = result.owned;
-      this.ownedOptions = result.ownedOptions;
-      this.closedOptions = result.closedOptions;
-			this.cashedOut = result.cashedOut;
-			this.totalEarned = result.totalEarned;
-			this.totalSpent = result.totalSpent;
-			this.totalCashedOutSpend = result.totalCashedOutSpend;
-      this.totalCashedOutEarnings = result.totalCashedOutEarnings;
+      this.openOptions = result.openOptions;
       this.pendingPremium = result.pendingPremium;
       this.optionEarnings = result.optionEarnings;
       this.collateralCash = result.collateralCash;
@@ -54,13 +42,5 @@ export class DashboardComponent implements OnInit {
 	goToStock() {
 		this.router.navigateByUrl('/options/' + this.ticker)
 	}
-
-	cashedOutGains(){
-		return this.totalCashedOutEarnings - this.totalCashedOutSpend;
-	}
-
-	cashedOutGainsPct(){
-		return this.cashedOutGains() / this.totalCashedOutSpend * 100;
-  }
 
 }
