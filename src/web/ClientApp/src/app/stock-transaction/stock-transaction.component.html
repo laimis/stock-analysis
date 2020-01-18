@@ -1,6 +1,6 @@
 <div class="top-container">
 
-  <div *ngIf="purchased">Purchased!</div>
+  <div class="alert alert-success" *ngIf="purchased">The transaction has been sucessfully recorded</div>
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
@@ -8,7 +8,7 @@
 		<br />
 		<div class="form-group">
 			<label for="ticker">Ticker</label>
-			<input type="text" class="form-control" id="ticker" aria-describedby="tickerHelp" placeholder="TSLA" name="ticker" [(ngModel)]="ticker">
+			<input type="text" class="form-control" id="ticker" aria-describedby="tickerHelp" name="ticker" [(ngModel)]="ticker">
 			<small id="tickerHelp" class="form-text text-muted">Stock ticker.</small>
 		</div>
 
