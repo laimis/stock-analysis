@@ -38,10 +38,10 @@ namespace coretests.Stocks
         }
 
         private async Task EnsureRightListIsCalledAsync(
-            Action<Fakes.FakeStocksLists, StockQueryResult> registerAction,
+            Action<Fakes.FakeStocksService, StockQueryResult> registerAction,
             Func<StockLists.Handler, Task<List<StockQueryResult>>> func)
         {
-            var lists = new Fakes.FakeStocksLists();
+            var lists = new Fakes.FakeStocksService();
 
             registerAction(lists, new StockQueryResult());
             
