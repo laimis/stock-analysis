@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ using MediatR;
 
 namespace core.Stocks
 {
-    public class Get
+    public class Details
     {
         public class Query : IRequest<object>
         {
@@ -34,14 +34,21 @@ namespace core.Stocks
 
             public async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                var profile = await _stocksService2.GetCompanyProfile(request.Ticker);
-                var advanced = await _stocksService2.GetAdvancedStats(request.Ticker);
-                var price = await _stocksService2.GetPrice(request.Ticker);
+                var profile = _stocksService2.GetCompanyProfile(request.Ticker);
+                var advanced = _stocksService2.GetAdvancedStats(request.Ticker);
+                var price = _stocksService2.GetPrice(request.Ticker);
+                var data = _stocksService.GetHistoricalDataAsync(request.Ticker);
+                var metrics = _stocksService.GetKeyMetrics(request.Ticker);
 
-                var data = await _stocksService.GetHistoricalDataAsync(request.Ticker);
-                var metrics = await _stocksService.GetKeyMetrics(request.Ticker);
+                await Task.WhenAll(profile, advanced, price, data, metrics);
                 
-                return Mapper.MapStockDetail(request.Ticker, price.Amount, profile, advanced, data, metrics);
+                return Mapper.MapStockDetail(
+                    request.Ticker,
+                    price.Result.Amount,
+                    profile.Result,
+                    advanced.Result,
+                    data.Result,
+                    metrics.Result);
             }
         }
     }
