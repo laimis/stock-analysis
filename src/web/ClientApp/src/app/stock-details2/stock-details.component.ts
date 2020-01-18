@@ -13,8 +13,9 @@ export class StockDetailsComponent2 {
 	public loaded: boolean = false;
   public stock: StockSummary;
   public profile: object;
+  public stats: object;
 
-	public priceChartType = "ColumnChart";
+	public priceChartType = "LineChart";
 	public priceOptions = {
 		title: "price",
 		legend: { position: "none" },
@@ -24,6 +25,7 @@ export class StockDetailsComponent2 {
 	};
 	public priceChartData: object;
 
+  public volumeChartType = "ColumnChart";
 	public volumeChartData: object;
 	public volumeOptions = {
 		title: "volume",
@@ -66,9 +68,9 @@ export class StockDetailsComponent2 {
 
 	fetchStock() {
 		this.stocks.getStockSummary2(this.ticker).subscribe(result => {
-
       this.stock = result;
       this.profile = result.profile;
+      this.stats = result.stats;
 			this.priceChartData = result.priceChartData;
 			this.volumeChartData = result.volumeChartData;
 			this.bookChartData = result.bookChartData;

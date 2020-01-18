@@ -86,7 +86,7 @@ export interface Portfolio {
 
 export interface StockSummary {
   price: number,
-  stats: any,
+  stats: object,
   profile : object
 	priceChartData : object[]
 	volumeChartData : object[]

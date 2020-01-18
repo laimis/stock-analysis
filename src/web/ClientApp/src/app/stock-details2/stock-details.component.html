@@ -15,30 +15,56 @@
     <div>
       <i>{{profile.description}}</i>
     </div>
-    <div>
-      Country: <b>{{profile.country}}</b>&nbsp;&nbsp;&nbsp;&nbsp;
-      Type: <b>{{profile.issueType}}</b>&nbsp;&nbsp;&nbsp;&nbsp;
-      Employees: <b>{{profile.employees}}</b>&nbsp;&nbsp;&nbsp;&nbsp;
-    </div>
   </div>
 
 	<div style="clear: both">
-		<label>Fundamentals</label>
 		<div class="container">
-      <!-- <div class="row" *ngFor="let row of rows">
-        <div class="col" *ngFor="let col of row.cols">
-          {{col.label}}: {{col.value}}
-        </div>
-      </div> -->
-			Priced at <b>${{stock.price}}</b> with largest gain of {{stock.largestGain}}% and largest loss of {{stock.largestLoss}}%
-		</div>
-	</div>
+      <div class="row">
+        <div class="col-12" style="text-align: center;"><h4>Fundamentals</h4></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">Price</div><div>{{stock.price | currency}}</div></div>
+        <div class="col"><div class="stat-label">PE</div><div>{{stats.peRatio}}</div></div>
+        <div class="col"><div class="stat-label">10d Volume</div><div>{{stats.avg10Volume / 1000000 | number}}M</div></div>
+        <div class="col"><div class="stat-label">30d Volumne</div><div>{{stats.avg30Volume / 1000000 | number}}M</div></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">1 Year High</div><div>{{stats.week52highDate | date}}</div></div>
+        <div class="col"><div class="stat-label">1 Year High</div><div>{{stats.week52High | currency}}</div></div>
+        <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52lowDate | date}}</div></div>
+        <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52Low | currency}}</div></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">Next Earnings</div><div>{{stats.nextEarningsDate | date}}</div></div>
+        <div class="col"><div class="stat-label">Ex Div Date</div><div>{{stats.exDividendDate | date}}</div></div>
+        <div class="col"><div class="stat-label">Next Div Date</div><div>{{stats.nextDividendDate | date}}</div></div>
+        <div class="col"><div class="stat-label">Dividend Yield</div><div>{{stats.dividendYield | number}}</div></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">Market Cap</div><div>{{stats.marketCap / 1000000 | number}}M</div></div>
+        <div class="col"><div class="stat-label">Beta</div><div>{{stats.beta | number}}</div></div>
+        <div class="col"><div class="stat-label">Put/Call Ratio</div><div>{{stats.putCallRatio | number}}</div></div>
+        <div class="col"><div class="stat-label">Price/Book</div><div>{{stats.priceToBook | number}}</div></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">Revenue</div><div>{{stats.revenue / 1000000 | number}}M</div></div>
+        <div class="col"><div class="stat-label">Gross Profit</div><div>{{stats.grossProfit / 1000000 | number}}M</div></div>
+        <div class="col"><div class="stat-label">Profit Margin</div><div>{{stats.profitMargin | percent}}</div></div>
+        <div class="col"><div class="stat-label">Total Cash</div><div>{{stats.totalCash / 1000000 | number}}M</div></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">5-year change</div><div>{{stats.year5ChangePercent | percent}}</div></div>
+        <div class="col"><div class="stat-label">1-year change</div><div>{{stats.year1ChangePercent | percent}}</div></div>
+        <div class="col"><div class="stat-label">3-month change</div><div>{{stats.month3ChangePercent | percent}}</div></div>
+        <div class="col"><div class="stat-label">1-month change</div><div>{{stats.month1ChangePercent | percent}}</div></div>
+      </div>
+      <div class="row">
+        <div class="col"><div class="stat-label">Country</div><div>{{profile.country}}</div></div>
+        <div class="col"><div class="stat-label">Type</div><div>{{profile.issueType}}</div></div>
+        <div class="col"><div class="stat-label">Employees</div><div>{{profile.employees}}</div></div>
+        <div class="col"></div>
+      </div>
 
-	<div>
-		<label>Ratios</label>
-		<div>
-			Book value of {{stock.bookValue}} with P/E ratio of {{stock.peValue}} (information is {{stock.age}} months old)
-		</div>
 	</div>
 
 	<div>
@@ -47,7 +73,7 @@
 			<google-chart style="width: 100%;" [type]="priceChartType" [data]="priceChartData" [options]="priceOptions"></google-chart>
 		</div>
 		<div>
-			<google-chart style="width: 100%;" [type]="priceChartType" [data]="volumeChartData" [options]="volumeOptions"></google-chart>
+			<google-chart style="width: 100%;" [type]="volumeChartType" [data]="volumeChartData" [options]="volumeOptions"></google-chart>
 		</div>
 		<div>
 			<google-chart style="width: 100%;" [type]="priceChartType" [data]="bookChartData" [options]="bookOptions"></google-chart>

@@ -125,15 +125,12 @@ namespace core
             HistoricalResponse data,
             MetricsResponse metrics)
         {
-            var largestGain = data.Historical.Max(p => p.ChangePercent);
-            var largestLoss = data.Historical.Min(p => p.ChangePercent);
-
             var byMonth = data.Historical.GroupBy(r => r.Date.ToString("yyyy-MM-01"))
                 .Select(g => new
                 {
                     Date = DateTime.Parse(g.Key),
                     Price = g.Average(p => p.Close),
-                    Volume = g.Average(p => p.Volume),
+                    Volume = Math.Round(g.Average(p => p.Volume) / 1000000.0, 2),
                     Low = g.Min(p => p.Close),
                     High = g.Max(p => p.Close)
                 });
@@ -150,12 +147,6 @@ namespace core
 
             var mostRecent = metrics.Metrics.FirstOrDefault();
 
-            int age = 0;
-            if (mostRecent != null)
-            {
-                age = (int)(DateTime.UtcNow.Subtract(mostRecent.Date).TotalDays / 30);
-            }
-
             var metricDates = metrics.Metrics.Select(m => m.Date.ToString("MM/yy")).Reverse();
 
             var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare).Reverse();
@@ -170,11 +161,8 @@ namespace core
                 price,
                 stats,
                 profile,
-                age,
                 bookValue = mostRecent?.BookValuePerShare,
                 peValue = mostRecent?.PERatio,
-                largestGain,
-                largestLoss,
                 labels,
                 priceChartData,
                 volumeChartData,
