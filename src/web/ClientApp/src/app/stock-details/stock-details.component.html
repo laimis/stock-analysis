@@ -3,8 +3,10 @@
   <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn dashboard-button" target="_blank">
     <img src="robinhood.png" height="30px" />
   </a>
-  <button class="btn btn-secondary dashboard-button" (click)="buyStock()">Record Buy/Sell</button>
+  <!-- <a [routerLink]="[ '/notes', 'add', ticker ]" class="btn btn-primary dashboard-button">Add Notes</a> -->
+  <button class="btn btn-primary dashboard-button" (click)="buyStock()">Record Buy/Sell</button>
   <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary dashboard-button">Options</a>
+
 
 	<div>
     <img style="float: left" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />

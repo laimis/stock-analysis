@@ -1,3 +1,5 @@
+- diary e
+- int for money amounts
 - option details page
 - generate most active email
 - practice use of polly

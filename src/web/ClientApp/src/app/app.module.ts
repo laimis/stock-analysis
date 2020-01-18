@@ -15,7 +15,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { RouterModule } from '@angular/router';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
-import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
+import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
 import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
 
@@ -28,8 +28,8 @@ var routes = [
   { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
   { path: 'stocks/lists', component: StockListsComponent },
-  { path: 'stocks/purchase', component: StockPurchaseComponent },
-  { path: 'stocks/purchase/:ticker', component: StockPurchaseComponent },
+  { path: 'stocks/transaction', component: StockTransactionComponent },
+  { path: 'stocks/transaction/:ticker', component: StockTransactionComponent },
   { path: 'stocks/:ticker', component: StockDetailsComponent },
 ]
 
@@ -46,7 +46,7 @@ var routes = [
     StockDetailsComponent,
     StockListsComponent,
     StockListComponent,
-    StockPurchaseComponent,
+    StockTransactionComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

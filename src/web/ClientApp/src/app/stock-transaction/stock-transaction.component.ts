@@ -4,12 +4,12 @@ import {DatePipe} from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-stock-purchase',
-  templateUrl: './stock-purchase.component.html',
-  styleUrls: ['./stock-purchase.component.css'],
+  selector: 'app-stock-transaction',
+  templateUrl: './stock-transaction.component.html',
+  styleUrls: ['./stock-transaction.component.css'],
   providers: [DatePipe]
 })
-export class StockPurchaseComponent implements OnInit {
+export class StockTransactionComponent implements OnInit {
 
 	public ticker: string
 	public amount: Number

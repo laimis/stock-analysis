@@ -87,6 +87,6 @@ export class StockDetailsComponent {
 	}
 
 	buyStock(){
-		this.router.navigateByUrl('/stocks/purchase/' + this.ticker)
+		this.router.navigateByUrl('/stocks/transaction/' + this.ticker)
 	}
 }
