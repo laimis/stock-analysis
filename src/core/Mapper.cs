@@ -84,13 +84,13 @@ namespace core
             var volumeValues = byMonth.Select(a => a.Volume);
             var volumeChartData = labels.Zip(volumeValues, (l, p) => new object[] { l, p });
 
-            var metricDates = metrics.Metrics.Select(m => m.Date.ToString("MM/yy")).Reverse();
+            var metricDates = metrics?.Metrics?.Select(m => m.Date.ToString("MM/yy")).Reverse();
 
-            var bookValues = metrics.Metrics.Select(m => m.BookValuePerShare).Reverse();
-            var bookChartData = metricDates.Zip(bookValues, (l, p) => new object[] { l, p });
+            var bookValues = metrics?.Metrics?.Select(m => m.BookValuePerShare).Reverse();
+            var bookChartData = metricDates?.Zip(bookValues, (l, p) => new object[] { l, p });
 
-            var peValues = metrics.Metrics.Select(m => m.PERatio).Reverse();
-            var peChartData = metricDates.Zip(peValues, (l, p) => new object[] { l, p });
+            var peValues = metrics?.Metrics?.Select(m => m.PERatio).Reverse();
+            var peChartData = metricDates?.Zip(peValues, (l, p) => new object[] { l, p });
 
             return new
             {
