@@ -5,6 +5,7 @@ https://cloud.iexapis.com/stable/account/metadata?token=pk_71ba0d8d98ed4d2caac80
 
 
 GET /stock/{symbol}/stats
+    /stock/{symbol}/advanced-stats
     marketcap
     week52high
     week52low

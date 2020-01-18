@@ -1,6 +1,6 @@
 namespace core.Adapters.Stocks
 {
-    public class CompanyProfile2
+    public class CompanyProfile
     {
         public string Symbol { get; set; }
         public string CompanyName { get; set; }

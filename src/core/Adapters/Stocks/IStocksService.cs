@@ -6,6 +6,5 @@ namespace core.Adapters.Stocks
 	{
 		Task<MetricsResponse> GetKeyMetrics(string ticker);
 		Task<HistoricalResponse> GetHistoricalDataAsync(string ticker);
-		Task<CompanyProfile> GetCompanyProfile(string ticker);
 	}
 }

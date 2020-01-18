@@ -47,13 +47,13 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        public Task<CompanyProfile2> GetCompanyProfile(string ticker)
+        public Task<CompanyProfile> GetCompanyProfile(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/company");
 
             var key = System.DateTime.UtcNow.ToString("yyyy-MM") + ticker + "company.json";
 
-            return GetCachedResponse<CompanyProfile2>(url, key);
+            return GetCachedResponse<CompanyProfile>(url, key);
         }
 
         public Task<StockAdvancedStats> GetAdvancedStats(string ticker)

@@ -15,7 +15,6 @@ import { ProfileComponent } from './profile/profile.component';
 import { RouterModule } from '@angular/router';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
-import { StockDetailsComponent2 } from './stock-details2/stock-details.component';
 import { StockPurchaseComponent } from './stock-purchase/stock-purchase.component';
 import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
@@ -32,7 +31,6 @@ var routes = [
   { path: 'stocks/purchase', component: StockPurchaseComponent },
   { path: 'stocks/purchase/:ticker', component: StockPurchaseComponent },
   { path: 'stocks/:ticker', component: StockDetailsComponent },
-  { path: 'stocks2/:ticker', component: StockDetailsComponent2 },
 ]
 
 @NgModule({
@@ -46,7 +44,6 @@ var routes = [
     ProfileComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,
-    StockDetailsComponent2,
     StockListsComponent,
     StockListComponent,
     StockPurchaseComponent,

@@ -19,19 +19,7 @@ namespace core.Stocks
             }
         }
 
-        public class Query2 : IRequest<object>
-        {
-            public string Ticker { get; private set; }
-
-            public Query2(string ticker)
-            {
-                this.Ticker = ticker;
-            }
-        }
-
-        public class Handler : 
-            IRequestHandler<Query, object>,
-            IRequestHandler<Query2, object>
+        public class Handler : IRequestHandler<Query, object>
         {
             private IStocksService _stocksService;
             private IStocksService2 _stocksService2;
@@ -46,23 +34,11 @@ namespace core.Stocks
 
             public async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                var profile = await _stocksService.GetCompanyProfile(request.Ticker);
-
-                var data = await _stocksService.GetHistoricalDataAsync(request.Ticker);
-
-                var metrics = await _stocksService.GetKeyMetrics(request.Ticker);
-                
-                return Mapper.MapStockDetail(request.Ticker, profile, data, metrics);
-            }
-
-            public async Task<object> Handle(Query2 request, CancellationToken cancellationToken)
-            {
                 var profile = await _stocksService2.GetCompanyProfile(request.Ticker);
                 var advanced = await _stocksService2.GetAdvancedStats(request.Ticker);
                 var price = await _stocksService2.GetPrice(request.Ticker);
 
                 var data = await _stocksService.GetHistoricalDataAsync(request.Ticker);
-
                 var metrics = await _stocksService.GetKeyMetrics(request.Ticker);
                 
                 return Mapper.MapStockDetail(request.Ticker, price.Amount, profile, advanced, data, metrics);
