@@ -29,7 +29,6 @@ namespace coretests.Notes
         [Fact]
         public void DateAssigned()
         {
-            Assert.NotNull(_state.Created);
             Assert.NotEqual(DateTime.MinValue, _state.Created);
         }
 

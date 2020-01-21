@@ -52,7 +52,7 @@ namespace core
         internal static object MapNotes(IEnumerable<Note> notes)
         {
             return new {
-                notes = notes.OrderByDescending(n => n.State.Created).Select(n => n.State)
+                notes = notes.Select(n => n.State)
             };
         }
 

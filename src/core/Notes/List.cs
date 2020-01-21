@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -27,7 +28,7 @@ namespace core.Notes
             {
                 var notes = await _storage.GetNotes(request.UserId);
 
-                return Mapper.MapNotes(notes);
+                return Mapper.MapNotes(notes.OrderByDescending(n => n.State.Created));
             }
         }
     }
