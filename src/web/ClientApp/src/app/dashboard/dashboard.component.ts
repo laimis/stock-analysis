@@ -32,7 +32,9 @@ export class DashboardComponent implements OnInit {
 	}
 
 	goToStock() {
-		this.router.navigateByUrl('/stocks/' + this.ticker)
+    if (this.ticker !== undefined) {
+      this.router.navigateByUrl('/stocks/' + this.ticker)
+    }
 	}
 
 }
