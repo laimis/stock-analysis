@@ -7,37 +7,10 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<div *ngIf="loaded">
-		<form>
-			<div class="form-group">
-				<label for="ticker">Ticker</label>
-				<input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="option.ticker" readonly>
-			</div>
+    <h3>{{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}} exp {{option.expiration | date}}</h3>
+    <h5>{{option.amount}} contract(s) for {{option.premium | currency }}</h5>
 
-			<div class="form-group">
-				<label for="strikePrice">Strike Price</label>
-				<input type="number" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="option.strikePrice"  readonly>
-      </div>
-
-      <div class="form-group">
-				<label for="date">Expiration</label>
-				<input type="date" class="form-control" id="expiration"name="expiration" [(ngModel)]="option.expiration" readonly>
-			</div>
-
-			<div class="form-group">
-        <label for="optionType">Type &nbsp;&nbsp; </label>
-        <input type="text" class="form-control" id="optionType" name="optionType" [(ngModel)]="option.type" readonly>
-      </div>
-
-      <div class="form-group">
-				<label for="premium">Number of contracts</label>
-				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="option.amount" readonly>
-      </div>
-
-			<div class="form-group">
-				<label for="premium">Premium</label>
-				<input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="option.premium" readonly>
-      </div>
-
+    <form>
       <div class="form-group">
 				<label for="closePrice">Close Price</label>
 				<input type="number" class="form-control" id="closePrice" name="closePrice" [(ngModel)]="closePrice">
