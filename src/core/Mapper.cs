@@ -73,7 +73,7 @@ namespace core
             HistoricalResponse data,
             MetricsResponse metrics)
         {
-            var byMonth = data.Historical.GroupBy(r => r.Date.ToString("yyyy-MM-01"))
+            var byMonth = data?.Historical?.GroupBy(r => r.Date.ToString("yyyy-MM-01"))
                 .Select(g => new
                 {
                     Date = DateTime.Parse(g.Key),
@@ -83,15 +83,15 @@ namespace core
                     High = g.Max(p => p.Close)
                 });
 
-            var labels = byMonth.Select(a => a.Date.ToString("MMMM"));
-            var lowValues = byMonth.Select(a => Math.Round(a.Low, 2));
-            var highValues = byMonth.Select(a => Math.Round(a.High, 2));
+            var labels = byMonth?.Select(a => a.Date.ToString("MMMM"));
+            var lowValues = byMonth?.Select(a => Math.Round(a.Low, 2));
+            var highValues = byMonth?.Select(a => Math.Round(a.High, 2));
 
-            var priceValues = byMonth.Select(a => Math.Round(a.Price, 2));
-            var priceChartData = labels.Zip(priceValues, (l, p) => new object[] { l, p });
+            var priceValues = byMonth?.Select(a => Math.Round(a.Price, 2));
+            var priceChartData = labels?.Zip(priceValues, (l, p) => new object[] { l, p });
 
-            var volumeValues = byMonth.Select(a => a.Volume);
-            var volumeChartData = labels.Zip(volumeValues, (l, p) => new object[] { l, p });
+            var volumeValues = byMonth?.Select(a => a.Volume);
+            var volumeChartData = labels?.Zip(volumeValues, (l, p) => new object[] { l, p });
 
             var metricDates = metrics?.Metrics?.Select(m => m.Date.ToString("MM/yy")).Reverse();
 
