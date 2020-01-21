@@ -1,5 +1,7 @@
-<a [routerLink]="[ '/notes', 'add' ]" class="btn btn-primary">Add Note</a>
+<a style="float: right" [routerLink]="[ '/notes', 'add' ]" class="btn btn-primary">Add Note</a>
+
 <div *ngIf="notes && notes.length > 0">
+  <h2>Your Notes</h2>
   <div class="row" *ngFor="let note of notes">
     <div style="white-space: pre-wrap;" class="col-11">
       <i>{{note.created | date}}</i> &nbsp;&nbsp;&nbsp;&nbsp;{{note.note}}

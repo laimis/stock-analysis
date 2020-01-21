@@ -1,5 +1,8 @@
 div.row {
   margin-top: 10px;
-  border-bottom: 1px solid gray;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
