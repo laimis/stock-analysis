@@ -5,7 +5,7 @@
       <i>{{note.created | date}}</i> &nbsp;&nbsp;&nbsp;&nbsp;{{note.note}}
     </div>
     <div class="col">
-      {{note.relatedToTicker}}
+      <a *ngIf="note.relatedToTicker" [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
     </div>
   </div>
 </div>
