@@ -1,5 +1,3 @@
-- note entry
-
 - search lookup
 - int for money amounts
 - option details page
