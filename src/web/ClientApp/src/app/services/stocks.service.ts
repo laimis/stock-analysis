@@ -10,10 +10,19 @@ export function GetErrors(err:any): string[] {
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
+  constructor(private http: HttpClient) { }
 
-	constructor(private http: HttpClient) { }
+  addNote(input: any): Observable<any> {
+    return this.http.post<any>('/api/notes', input)
+  }
 
-  getStockLists(): Observable<StockLists> {
+  getNotes(): Observable<NoteList> {
+    return this.http.get<NoteList>('/api/notes')
+  }
+
+
+
+	getStockLists(): Observable<StockLists> {
     return this.http.get<StockLists>('/api/stocks/lists')
   }
 
@@ -57,6 +66,10 @@ export class StocksService {
   getAcounts() : Observable<any> {
     return this.http.get('/api/admin/users')
   }
+}
+
+export interface NoteList {
+  notes: object[]
 }
 
 export interface StockLists {

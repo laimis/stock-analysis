@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Notes;
 using core.Options;
+using core.Shared;
 using core.Stocks;
 
 namespace storage.shared
@@ -12,6 +14,8 @@ namespace storage.shared
     {
         const string _stock_entity = "ownedstock";
         const string _option_entity = "soldoption";
+        const string _note_entity = "note";
+
         private IAggregateStorage _aggregateStorage;
 
         public PortfolioStorage(IAggregateStorage aggregateStorage)
@@ -31,14 +35,19 @@ namespace storage.shared
             return new OwnedStock(events);
         }
 
-        public async Task Save(OwnedStock stock)
+        public Task Save(OwnedStock stock)
         {
-            await _aggregateStorage.SaveEventsAsync(stock, _stock_entity);
+            return Save(stock, _stock_entity);
         }
 
-        public async Task Save(SoldOption option)
+        public Task Save(SoldOption option)
         {
-            await _aggregateStorage.SaveEventsAsync(option, _option_entity);
+            return Save(option, _option_entity);
+        }
+
+        private Task Save(Aggregate agg, string entityName)
+        {
+            return _aggregateStorage.SaveEventsAsync(agg, entityName);
         }
 
         public async Task<IEnumerable<OwnedStock>> GetStocks(string userId)
@@ -71,6 +80,19 @@ namespace storage.shared
 
             return list.GroupBy(e => e.Ticker)
                 .Select(g => new SoldOption(g));
+        }
+
+        public Task Save(Note note)
+        {
+            return Save(note, _note_entity);
+        }
+
+        public async Task<IEnumerable<Note>> GetNotes(string userId)
+        {
+            var list = await _aggregateStorage.GetEventsAsync(_note_entity, userId);
+
+            return list.GroupBy(e => e.Ticker)
+                .Select(g => new Note(g));
         }
     }
 }

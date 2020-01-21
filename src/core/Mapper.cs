@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using core.Notes;
 using core.Options;
 using core.Stocks;
 
@@ -44,6 +46,13 @@ namespace core
                     PutSpend = puts.Sum(o => o.Volume * o.Bid),
                     PriceBasedOnPuts = puts.Average(o => o.Volume * o.StrikePrice) / puts.Average(o => o.Volume),
                 }
+            };
+        }
+
+        internal static object MapNotes(IEnumerable<Note> notes)
+        {
+            return new {
+                notes = notes.Select(n => n.State)
             };
         }
 

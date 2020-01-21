@@ -3,7 +3,7 @@
   <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn dashboard-button" target="_blank">
     <img src="robinhood.png" height="30px" />
   </a>
-  <!-- <a [routerLink]="[ '/notes', 'add', ticker ]" class="btn btn-primary dashboard-button">Add Notes</a> -->
+  <a [routerLink]="[ '/notes', ticker ]" class="btn btn-primary dashboard-button">Add Notes</a>
   <button class="btn btn-primary dashboard-button" (click)="buyStock()">Record Buy/Sell</button>
   <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary dashboard-button">Options</a>
 
