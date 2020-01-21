@@ -6,7 +6,16 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-  <form *ngIf="note">
+  <div *ngIf="note && note.isArchived">
+    <div class="alert alert-warning">This note has been archived. Back to <a [routerLink]="[ '/notes' ]">notes</a></div>
+
+    <div style="white-space: pre-wrap;">
+      <span *ngIf="note.relatedToTicker"><a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a></span>
+      {{note.note}}</div>
+  </div>
+
+
+  <form *ngIf="note && !note.isArchived">
     <div class="form-group">
       <label for="description">Note</label>
       <textarea class="form-control" id="description" name="Note" [(ngModel)]="note.note" rows="10">

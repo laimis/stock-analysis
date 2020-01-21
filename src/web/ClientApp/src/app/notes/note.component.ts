@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class NoteComponent implements OnInit {
 
-  public note: object
+  public note: any
   public saved:boolean
   public errors: string[];
 
@@ -34,8 +34,16 @@ export class NoteComponent implements OnInit {
     this.saved = false;
     this.errors = null;
 
-    this.stockService.saveNote(this.note).subscribe(r => {
+    this.stockService.saveNote(this.note).subscribe(_ => {
       this.saved = true
+    }, err => this.errors = GetErrors(err))
+  }
+
+  archiveNote() {
+    this.errors = null;
+
+    this.stockService.archiveNote(this.note).subscribe(_ => {
+      this.loadNote(this.note.id)
     }, err => this.errors = GetErrors(err))
   }
 }

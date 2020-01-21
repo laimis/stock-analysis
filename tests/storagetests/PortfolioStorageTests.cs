@@ -113,7 +113,19 @@ namespace storage.tests
             var notes = await storage.GetNotes(_userId);
 
             Assert.NotEmpty(notes);
-            Assert.NotEqual(DateTime.MinValue, notes.First().State.Created);
+
+            note = notes.OrderByDescending(n => n.State.Created).First();
+
+            note.Update("new note", "new ticker", 100);
+
+            await storage.Save(note);
+
+            notes = await storage.GetNotes(_userId);
+            
+            var fromDb = notes.Single(n => n.State.Id == note.State.Id);
+
+            Assert.Equal("new note", fromDb.State.Note);
+            Assert.Equal("new ticker", fromDb.State.RelatedToTicker);
         }
     }
 }

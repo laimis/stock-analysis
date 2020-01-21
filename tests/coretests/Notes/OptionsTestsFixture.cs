@@ -26,6 +26,10 @@ namespace coretests.Notes
 
             storage.Save(note);
 
+            note = new Note(UserId, "another note", Ticker, 100);
+            note.Archive();
+            storage.Save(note);
+
             return storage;
         }
     }
