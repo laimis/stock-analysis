@@ -4,10 +4,12 @@
   <h2>Your Notes</h2>
   <div class="row" *ngFor="let note of notes">
     <div style="white-space: pre-wrap;" class="col-11">
-      <i>{{note.created | date}}</i> &nbsp;&nbsp;&nbsp;&nbsp;{{note.note}}
+      <i>{{note.created | date}}&nbsp;&nbsp;&nbsp;&nbsp;</i>
+      <span *ngIf="note.relatedToTicker"><a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a> - </span>
+      {{note.note}}
     </div>
     <div class="col">
-      <a *ngIf="note.relatedToTicker" [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
+      <a [routerLink]="[ '/notes', note.id ]" class="btn btn-primary">view</a>
     </div>
   </div>
 </div>

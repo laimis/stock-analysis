@@ -75,21 +75,9 @@ namespace web.Controllers
         }
 
         [HttpGet("export")]
-        public async Task<ActionResult> Export()
+        public Task<ActionResult> Export()
         {
-            var response = await _mediator.Send(
-                new Export.Query(this.User.Identifier())
-            );
-
-            this.HttpContext.Response.Headers.Add(
-                "content-disposition", 
-                $"attachment; filename={response.Filename}");
-
-            return new ContentResult
-            {
-                Content = response.Content,
-                ContentType = response.ContentType
-            };
+            return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
         }
     }
 }

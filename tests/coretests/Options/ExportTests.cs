@@ -14,7 +14,7 @@ namespace coretests.Options
         public OptionsTestsFixture Fixture { get; }
 
         [Fact]
-        public async Task ClosingSoldOption_Closes()
+        public async Task ExportContainsExpectedData()
         {
             var handler = new core.Options.Export.Handler(Fixture.CreateStorageWithSoldOption());
 

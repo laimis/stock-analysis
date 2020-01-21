@@ -8,6 +8,7 @@ namespace core.Notes
     {
         private NoteState _state = new NoteState();
         public NoteState State => _state;
+        
 
         public Note(IEnumerable<AggregateEvent> events) : base(events)
         {
@@ -41,6 +42,30 @@ namespace core.Notes
             );
         }
 
+        internal void Update(string note, string ticker, double? predictedPrice)
+        {
+            if (predictedPrice != null && predictedPrice.Value < 0)
+            {
+                throw new InvalidOperationException("Predicted price cannot be negative");
+            }
+
+            if (string.IsNullOrWhiteSpace(note))
+            {
+                throw new InvalidOperationException("Note cannot be empty");
+            }
+
+            Apply(
+                new NoteUpdated(
+                    this.State.Id,
+                    DateTimeOffset.UtcNow,
+                    this.State.UserId,
+                    note,
+                    ticker,
+                    predictedPrice
+                )
+            );
+        }
+
         protected override void Apply(AggregateEvent e)
         {
             this._events.Add(e);
@@ -56,10 +81,18 @@ namespace core.Notes
         protected void ApplyInternal(NoteCreated created)
         {
             this.State.Id = created.Ticker;
+            this.State.UserId = created.UserId;
             this.State.RelatedToTicker = created.RelatedToTicker;
             this.State.Created = created.When;
             this.State.Note = created.Note;
             this.State.PredictedPrice = created.PredictedPrice;
+        }
+
+        protected void ApplyInternal(NoteUpdated updated)
+        {
+            this.State.RelatedToTicker = updated.RelatedToTicker;
+            this.State.Note = updated.Note;
+            this.State.PredictedPrice = updated.PredictedPrice;
         }
     }
 }

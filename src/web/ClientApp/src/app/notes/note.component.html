@@ -1,0 +1,30 @@
+<div>
+
+  <div class="alert alert-success" *ngIf="saved">The note has been sucessfully recorded,
+    <a [routerLink]="[ '/notes' ]">view</a>
+  </div>
+
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+
+  <form *ngIf="note">
+    <div class="form-group">
+      <label for="description">Note</label>
+      <textarea class="form-control" id="description" name="Note" [(ngModel)]="note.note" rows="10">
+      </textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="title">Ticker</label>
+      <input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="note.relatedToTicker">
+    </div>
+    <div class="form-group">
+      <label>Created</label>
+      {{note.created | date}}
+    </div>
+
+    <div class="form-group">
+      <button class="btn btn-primary btn-space" (click)="saveNote()">Save</button>
+      <button class="btn btn-secondary btn-space" (click)="archiveNote()">Archive</button>
+    </div>
+  </form>
+</div>

@@ -16,11 +16,18 @@ export class StocksService {
     return this.http.post<any>('/api/notes', input)
   }
 
+  saveNote(note: object) {
+    return this.http.patch<any>('/api/notes', note)
+  }
+
+
   getNotes(): Observable<NoteList> {
     return this.http.get<NoteList>('/api/notes')
   }
 
-
+  getNote(id: string): Observable<object> {
+    return this.http.get<object>('/api/notes/' + id)
+  }
 
 	getStockLists(): Observable<StockLists> {
     return this.http.get<StockLists>('/api/stocks/lists')

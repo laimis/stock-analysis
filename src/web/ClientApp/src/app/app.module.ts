@@ -21,6 +21,7 @@ import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
 import { AddNoteComponent } from './notes/add-note.component';
 import { NotesComponent } from './notes/notes.component';
+import { NoteComponent } from './notes/note.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -30,6 +31,7 @@ var routes = [
   { path: 'notes', component: NotesComponent},
   { path: 'notes/add', component: AddNoteComponent},
   { path: 'notes/add/:ticker', component: AddNoteComponent},
+  { path: 'notes/:id', component: NoteComponent},
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
@@ -47,6 +49,7 @@ var routes = [
     DashboardComponent,
     ErrorDisplayComponent,
     NavMenuComponent,
+    NoteComponent,
     NotesComponent,
     OptionDetailComponent,
     OptionSellComponent,

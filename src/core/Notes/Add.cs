@@ -1,19 +1,19 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
 namespace core.Notes
 {
-    public class AddNote
+    public class Add
     {
         public class Command : IRequest
         {
             [Required]
             public string Note { get; set; }
-            public string Ticker { get; set; }
+            public string RelatedToTicker { get; set; }
             public string UserId { get; private set; }
-            public double PredictedPrice { get; set; }
+            public double? PredictedPrice { get; set; }
 
             public void WithUserId(string userId) => UserId = userId;
         }
@@ -32,7 +32,7 @@ namespace core.Notes
                 var note = new Note(
                     request.UserId,
                     request.Note,
-                    request.Ticker,
+                    request.RelatedToTicker,
                     request.PredictedPrice);
 
                 await _storage.Save(note);

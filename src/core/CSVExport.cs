@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using core.Notes;
 using core.Options;
 using core.Stocks;
 
@@ -14,6 +15,14 @@ namespace core
                 GetStocksExportHeaders(),
                 stocks,
                 o => GetExportParts((o as OwnedStock).State));
+        }
+
+        public static string Generate(IEnumerable<Note> notes)
+        {
+            return Generate(
+                GetNotesExportHeaders(),
+                notes,
+                o => GetExportParts((o as Note).State));
         }
 
         public static string Generate(IEnumerable<SoldOption> stocks)
@@ -76,6 +85,21 @@ namespace core
         public static string GetStocksExportHeaders()
         {
             return "ticker,spent,earned,purchased,sold,profit";
+        }
+
+        private static object[] GetExportParts(NoteState state)
+        {
+            return new object[]{
+                state.Created.ToString("yyyy-MM-dd"),
+                state.PredictedPrice,
+                state.RelatedToTicker,
+                "\"" + state.Note.Replace("\"", "\"\"") + "\""
+            };
+        }
+
+        public static string GetNotesExportHeaders()
+        {
+            return "created,predicted price,ticker,note";
         }
 
         public static string GenerateFilename(string exportType)

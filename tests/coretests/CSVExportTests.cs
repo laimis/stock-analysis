@@ -1,5 +1,6 @@
 using System;
 using core;
+using core.Notes;
 using core.Options;
 using core.Stocks;
 using Xunit;
@@ -33,6 +34,18 @@ namespace coretests
             Assert.Contains("ticker", report);
             Assert.Contains("CALL", report);
             Assert.Contains("2.5", report);
+        }
+
+        [Fact]
+        public void ExportNotes()
+        {
+            var note = new Note("user", "note", "ticker", 100);
+
+            var report = CSVExport.Generate(new[] {note});
+
+            Assert.Contains(CSVExport.GetNotesExportHeaders(), report);
+            Assert.Contains("ticker", report);
+            Assert.Contains("100", report);
         }
 
         [Fact]

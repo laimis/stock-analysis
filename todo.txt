@@ -1,5 +1,13 @@
-- show activity for given stock details
 - show stock details for note entry screen if stock is entered
+    - add ability to export notes
+    - add ability to archive note
+    - add ability to set a reminder
+    - run a job that will generate a reminder
+    - show notes with reminders today
+    - add ability to follow up on the note
+    - add ability to add prediction
+
+- show activity for given stock details
 - option details page
 - generate most active email
 - practice use of polly

@@ -1,9 +1,6 @@
-using System.Linq;
 using System.Threading.Tasks;
-using core.Account;
 using core.Notes;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
@@ -23,7 +20,17 @@ namespace web.Controllers
         }
         
         [HttpPost]
-        public async Task<object> Add(AddNote.Command input)
+        public async Task<object> Add(Add.Command input)
+        {
+            input.WithUserId(this.User.Identifier());
+
+            await _mediator.Send(input);
+            
+            return Ok();
+        }
+
+        [HttpPatch]
+        public async Task<object> Update(Save.Command input)
         {
             input.WithUserId(this.User.Identifier());
 
@@ -36,6 +43,22 @@ namespace web.Controllers
         public async Task<object> Get()
         {
             var query = new List.Query(this.User.Identifier());
+
+            var result = await _mediator.Send(query);
+            
+            return result;
+        }
+
+        [HttpGet("export")]
+        public Task<ActionResult> Export()
+        {
+            return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
+        }
+
+        [HttpGet("{noteId}")]
+        public async Task<object> Get(string noteId)
+        {
+            var query = new Get.Query(this.User.Identifier(), noteId);
 
             var result = await _mediator.Send(query);
             
