@@ -77,7 +77,7 @@ namespace coretests.Options
                 ExpirationDate = DateTime.UtcNow.AddDays(1),
                 Filled = DateTime.UtcNow,
                 Premium = 200,
-                OptionType = OptionType.CALL.ToString(),
+                OptionType = OptionType.CALL,
                 StrikePrice = 45,
                 Ticker = Ticker
             };

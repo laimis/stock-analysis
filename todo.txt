@@ -7,6 +7,7 @@
 - terraform or pulumi for infrastructure
 - badges for builds/coverage
 - consolidate stock lists
+- contact form
 
 - now the cloudformation script that will install docker, docker-compose
     - install docker

@@ -17,31 +17,20 @@
   <div *ngIf="openOptions.length > 0">
     <a style="float: right" [routerLink]="[ '/options/sell']" class="btn btn-primary btn-space">Record Options Sale</a>
     <h2>Open Option Contracts</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Type</th>
-          <th>Strike</th>
-          <th>Expiration</th>
-          <th>Premium</th>
-          <th>Risk %</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let option of openOptions">
-          <td><a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a></td>
-          <td>{{option.type}}</td>
-          <td>{{option.strikePrice | currency}}</td>
-          <td>{{option.expiration | date : 'shortDate'}}</td>
-          <td>{{option.premium | currency}}</td>
-          <td>{{option.riskPct | number }}</td>
-          <td><a [routerLink]="[ '/soldoptions', option.ticker, option.type, option.strikePrice, option.expiration ]">edit</a> </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="row" *ngFor="let option of openOptions">
+      <div class="col">
+        <b>{{option.ticker}}</b> @ <b>{{option.strikePrice | currency}}</b>
+        {{option.type}} expiring <b>{{option.expiration | date : 'shortDate'}}</b>
+      </div>
+      <div class="col">
+        {{option.amount}} for {{option.premium | currency}} ({{option.riskPct | number }})
+      </div>
+      <div class="col">
+        <a [routerLink]="[ '/soldoptions', option.ticker, option.type, option.strikePrice, option.expiration ]">edit</a>
+      </div>
+    </div>
   </div>
+
   <br />
   <div *ngIf="owned.length > 0">
     <a style="float: right" [routerLink]="[ '/stocks/transaction']" class="btn btn-primary btn-space">Record Stock Sale</a>
