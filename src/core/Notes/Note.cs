@@ -42,8 +42,27 @@ namespace core.Notes
             );
         }
 
-        internal void Update(string note, string ticker, double? predictedPrice)
+        public void Archive()
         {
+            if (!this.State.IsArchived)
+            {
+                Apply(
+                    new NoteArchived(
+                        this.State.Id,
+                        DateTimeOffset.UtcNow,
+                        this.State.UserId
+                    )
+                );
+            }
+        }
+
+        public void Update(string note, string ticker, double? predictedPrice)
+        {
+            if (this.State.IsArchived)
+            {
+                throw new InvalidOperationException("Archived note cannot be updated");
+            }
+            
             if (predictedPrice != null && predictedPrice.Value < 0)
             {
                 throw new InvalidOperationException("Predicted price cannot be negative");
@@ -93,6 +112,11 @@ namespace core.Notes
             this.State.RelatedToTicker = updated.RelatedToTicker;
             this.State.Note = updated.Note;
             this.State.PredictedPrice = updated.PredictedPrice;
+        }
+
+        protected void ApplyInternal(NoteArchived archived)
+        {
+            this.State.IsArchived = true;
         }
     }
 }

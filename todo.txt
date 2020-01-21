@@ -1,5 +1,4 @@
 - show stock details for note entry screen if stock is entered
-    - add ability to export notes
     - add ability to archive note
     - add ability to set a reminder
     - run a job that will generate a reminder

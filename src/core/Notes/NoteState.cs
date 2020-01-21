@@ -10,5 +10,6 @@ namespace core.Notes
         public string Note { get; internal set; }
         public double? PredictedPrice { get; internal set; }
         public string UserId { get; internal set; }
+        public bool IsArchived { get; internal set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Notes;
+using core.Notes.Output;
 using core.Options;
 using core.Stocks;
 
@@ -49,10 +50,10 @@ namespace core
             };
         }
 
-        internal static object MapNotes(IEnumerable<Note> notes)
+        internal static NotesList MapNotes(IEnumerable<Note> notes)
         {
-            return new {
-                notes = notes.Select(n => n.State)
+            return new NotesList {
+                Notes = notes.Select(n => n.State)
             };
         }
 

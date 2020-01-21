@@ -10,14 +10,21 @@ namespace coretests.Notes
 
         public NoteTests()
         {
-            var note = new Note(
-                "userid",
-                "description",
-                "ticker",
-                100
-            );
+            var note = CreateTestNote();
+
+            note.Archive();
 
             _state = note.State;
+        }
+
+        private static Note CreateTestNote()
+        {
+            return new Note(
+                            "userid",
+                            "description",
+                            "ticker",
+                            100
+                        );
         }
 
         [Fact]
@@ -66,6 +73,48 @@ namespace coretests.Notes
         public void FailWithNoNote()
         {
             Assert.Throws<InvalidOperationException>(() => new Note("user", "", null, 12));
+        }
+
+        [Fact]
+        public void Archived()
+        {
+            Assert.True(_state.IsArchived);
+        }
+
+        [Fact]
+        public void UpdateWorks()
+        {
+            var note = CreateTestNote();
+
+            note.Update("new note", null, null);
+
+            Assert.Equal("new note", note.State.Note);
+        }
+
+        [Fact]
+        public void UpdateArchivedFails()
+        {
+            var note = CreateTestNote();
+
+            note.Archive();
+
+            Assert.Throws<InvalidOperationException>(
+                () => note.Update("new note", null, null)
+            );
+        }
+
+        [Fact]
+        public void DoubleArchiveNoOp()
+        {
+            var note = CreateTestNote();
+
+            note.Archive();
+
+            var eventCount = note.Events.Count;
+
+            note.Archive();
+
+            Assert.Equal(eventCount, note.Events.Count);
         }
     }
 }
