@@ -1,12 +1,14 @@
-- search lookup
-- int for money amounts
+- show activity for given stock details
+- show stock details for note entry screen if stock is entered
 - option details page
 - generate most active email
 - practice use of polly
 - terraform or pulumi for infrastructure
 - badges for builds/coverage
-- consolidate stock lists
 - contact form
+- search lookup
+- int for money amounts
+
 
 - now the cloudformation script that will install docker, docker-compose
     - install docker
