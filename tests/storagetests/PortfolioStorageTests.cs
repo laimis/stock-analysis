@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Notes;
 using core.Options;
 using core.Stocks;
 using Xunit;
@@ -98,6 +99,21 @@ namespace storage.tests
             var fromList = list.Single(o => o.State.Ticker == option.State.Ticker);
 
             Assert.Equal(option.State.StrikePrice, fromList.State.StrikePrice);
+        }
+
+        [Fact]
+        public async Task NoteStorageWorksAsync()
+        {
+            var note = new Note(_userId, "note", "ticker", null);
+
+            var storage = CreateStorage();
+
+            await storage.Save(note);
+
+            var notes = await storage.GetNotes(_userId);
+
+            Assert.NotEmpty(notes);
+            Assert.NotEqual(DateTime.MinValue, notes.First().State.Created);
         }
     }
 }

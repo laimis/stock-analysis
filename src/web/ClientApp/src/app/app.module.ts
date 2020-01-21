@@ -19,12 +19,17 @@ import { StockDetailsComponent } from './stock-details/stock-details.component';
 import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
 import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
+import { AddNoteComponent } from './notes/add-note.component';
+import { NotesComponent } from './notes/notes.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'admin', component: AdminComponent},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'profile', component: ProfileComponent},
+  { path: 'notes', component: NotesComponent},
+  { path: 'notes/add', component: AddNoteComponent},
+  { path: 'notes/add/:ticker', component: AddNoteComponent},
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
@@ -36,19 +41,21 @@ var routes = [
 
 @NgModule({
   declarations: [
+    AddNoteComponent,
     AdminComponent,
     AppComponent,
     DashboardComponent,
+    ErrorDisplayComponent,
     NavMenuComponent,
+    NotesComponent,
     OptionDetailComponent,
     OptionSellComponent,
     ProfileComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,
-    StockListsComponent,
     StockListComponent,
+    StockListsComponent,
     StockTransactionComponent,
-    ErrorDisplayComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

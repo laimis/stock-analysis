@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Notes;
 using core.Options;
 using core.Stocks;
 
@@ -15,5 +16,8 @@ namespace core
         Task<IEnumerable<SoldOption>> GetSoldOptions(string user);
         Task<SoldOption> GetSoldOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId);
         Task Save(SoldOption option);
+        
+        Task Save(Note note);
+        Task<IEnumerable<Note>> GetNotes(string userId);
     }
 }

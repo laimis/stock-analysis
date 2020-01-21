@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Notes;
 using core.Options;
 using core.Stocks;
 
@@ -13,6 +13,7 @@ namespace coretests.Fakes
     {
         private SoldOption _soldOption;
         private List<SoldOption> _savedSoldOptions = new List<SoldOption>();
+        private List<Note> _notes = new List<Note>();
 
         public IEnumerable<SoldOption> SavedOptions => _savedSoldOptions.AsReadOnly();
 
@@ -53,6 +54,18 @@ namespace coretests.Fakes
             _savedSoldOptions.Add(option);
 
             return Task.CompletedTask;
+        }
+
+        public Task Save(Note note)
+        {
+            _notes.Add(note);
+
+            return Task.CompletedTask;
+        }
+
+        public Task<IEnumerable<Note>> GetNotes(string userId)
+        {
+            return Task.FromResult(_notes.Select(n => n));
         }
     }
 }
