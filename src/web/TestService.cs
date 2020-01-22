@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace web
 {
-    internal class TestService : IHostedService
+    internal class TestService : BackgroundService
     {
         private ILogger<TestService> _logger;
 
@@ -14,25 +14,19 @@ namespace web
         {
             _logger = logger;
         }
-        
-        public async Task StartAsync(CancellationToken cancellationToken)
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("start goodness");
+            _logger.LogDebug("exec enter");
+            
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogDebug("loop " + DateTime.UtcNow);
 
-            await Task.Run(async () => {
-                while(true)
-                {
-                    _logger.LogInformation("Running service " + DateTime.UtcNow);
-                    await Task.Delay(3000);
-                }
-            });
-        }
+                await Task.Delay(1000 * 3, stoppingToken);
+            }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("stop goodness");
-
-            return Task.CompletedTask;
+            _logger.LogDebug("exec exit");
         }
     }
 }

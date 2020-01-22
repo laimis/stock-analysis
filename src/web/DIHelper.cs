@@ -27,7 +27,7 @@ namespace web
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddMediatR(typeof(CloseOption).Assembly);
 
-            // services.AddHostedService<TestService>();
+            services.AddHostedService<TestService>();
             
             StorageRegistrations(configuration, services);
         }

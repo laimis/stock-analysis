@@ -1,8 +1,7 @@
-- run a job that will generate note reminders
 - enrich note with stock advanced stats so that you can see progression
+- run a job that will generate note reminders
 - trade log
 - show activity for given stock details
-- generate most active email
 - contact form
 - landing page
 - search lookup
@@ -13,3 +12,5 @@
 - terraform or pulumi for infrastructure
 - check into https://www.nuget.org/packages/Respawn/
 - export as excel sheet
+
+- angular material, what is that?

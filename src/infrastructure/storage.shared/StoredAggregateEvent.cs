@@ -15,18 +15,15 @@ namespace storage.shared
         public string UserId { get; set; }
         public string Key { get; set; }
         public DateTime Created { get; set; }
+
         public string EventJson
         {
-            get
-            {
-                return JsonConvert.SerializeObject(this.Event, _formatting);
-            }
+            get { return JsonConvert.SerializeObject(this.Event, _formatting); }
 
             set
             {
                 value = value.Replace("laimonas", "laimis@gmail.com");
                 value = value.Replace("core.Portfolio.Stock", "core.Stocks.Stock");
-                value = value.Replace("core.Portfolio.TickerObtained", "core.Stocks.TickerObtained");
                 value = value.Replace("core.Portfolio.TickerObtained", "core.Stocks.TickerObtained");
                 value = value.Replace("core.Portfolio.Option", "core.Options.Option");
                 
