@@ -1,10 +1,16 @@
-.tradewatch-link {
+.nav-menu {
   font-size: 36px;
-  color: darkcyan;
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.tradewatch-link a:hover {
-  text-decoration: none
+div.nav-menu a {
+  color: darkcyan;
+}
+
+a.floating-button {
+  font-size: small;
+  font-weight: bold;
+  margin-right: 10px;
+  margin-left: 10px;
 }

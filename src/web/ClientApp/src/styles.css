@@ -4,9 +4,13 @@
 	margin-top: 20px;
 }
 
-.dashboard-button {
+.floating-button {
 	float: right;
 	margin-right: 5px;
+}
+
+a {
+  color: darkcyan;
 }
 
 .wide-chart {

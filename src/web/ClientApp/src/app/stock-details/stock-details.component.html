@@ -1,11 +1,11 @@
 <div *ngIf="loaded" class="top-container">
 
-  <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn dashboard-button" target="_blank">
+  <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn floating-button" target="_blank">
     <img src="robinhood.png" height="30px" />
   </a>
-  <a [routerLink]="[ '/notes/add', ticker ]" class="btn btn-primary dashboard-button">Add Notes</a>
-  <button class="btn btn-primary dashboard-button" (click)="buyStock()">Record Buy/Sell</button>
-  <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary dashboard-button">Options</a>
+  <a [routerLink]="[ '/notes/add', ticker ]" class="btn btn-primary floating-button">Add Notes</a>
+  <button class="btn btn-primary floating-button" (click)="buyStock()">Record Buy/Sell</button>
+  <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary floating-button">Options</a>
 
 
 	<div>
