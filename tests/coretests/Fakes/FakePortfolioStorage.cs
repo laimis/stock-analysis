@@ -67,5 +67,12 @@ namespace coretests.Fakes
         {
             return Task.FromResult(_notes.Select(n => n));
         }
+
+        public async Task<Note> GetNote(string userId, string noteId)
+        {
+            var list = await GetNotes(userId);
+
+            return list.SingleOrDefault(n => n.State.Id == noteId);
+        }
     }
 }

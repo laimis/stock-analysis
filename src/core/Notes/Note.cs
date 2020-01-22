@@ -42,6 +42,34 @@ namespace core.Notes
             );
         }
 
+        public void ClearReminder()
+        {
+            if (!this.State.HasReminder)
+            {
+                return;
+            }
+
+            Apply(
+                new NoteReminderCleared(
+                    this.State.Id,
+                    DateTimeOffset.UtcNow,
+                    this.State.UserId
+                )
+            );
+        }
+
+        public void SetupReminder(DateTimeOffset reminderDate)
+        {
+            Apply(
+                new NoteReminderSet(
+                    this.State.Id,
+                    DateTimeOffset.UtcNow,
+                    this.State.UserId,
+                    reminderDate
+                )
+            );
+        }
+
         public void Archive()
         {
             if (!this.State.IsArchived)
@@ -117,6 +145,16 @@ namespace core.Notes
         protected void ApplyInternal(NoteArchived archived)
         {
             this.State.IsArchived = true;
+        }
+
+        protected void ApplyInternal(NoteReminderCleared cleared)
+        {
+            this.State.ReminderDate = null;
+        }
+
+        protected void ApplyInternal(NoteReminderSet set)
+        {
+            this.State.ReminderDate = set.ReminderDate;
         }
     }
 }

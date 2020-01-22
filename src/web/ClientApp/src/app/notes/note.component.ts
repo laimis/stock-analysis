@@ -46,4 +46,24 @@ export class NoteComponent implements OnInit {
       this.loadNote(this.note.id)
     }, err => this.errors = GetErrors(err))
   }
+
+  saveReminder() {
+    this.errors = null;
+
+    this.stockService.saveReminder(this.note).subscribe(_ => {
+      this.loadNote(this.note.id)
+    }, err => this.errors = GetErrors(err))
+  }
+
+  clearReminder() {
+    this.errors = null;
+
+    var obj = {
+      id : this.note.id
+    }
+
+    this.stockService.saveReminder(obj).subscribe(_ => {
+      this.loadNote(this.note.id)
+    }, err => this.errors = GetErrors(err))
+  }
 }
