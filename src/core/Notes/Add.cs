@@ -12,6 +12,7 @@ namespace core.Notes
         {
             [Required]
             public string Note { get; set; }
+            [Required]
             public string RelatedToTicker { get; set; }
             public double? PredictedPrice { get; set; }
         }

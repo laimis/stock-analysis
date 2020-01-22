@@ -16,6 +16,11 @@ namespace core.Notes
 
         public Note(string userId, string note, string ticker, double? predictedPrice)
         {
+            if (string.IsNullOrWhiteSpace(ticker))
+            {
+                throw new InvalidOperationException("Missing ticker");
+            }
+
             if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new InvalidOperationException("Missing user id");
@@ -84,7 +89,7 @@ namespace core.Notes
             }
         }
 
-        public void Update(string note, string ticker, double? predictedPrice)
+        public void Update(string note, double? predictedPrice)
         {
             if (this.State.IsArchived)
             {
@@ -107,7 +112,6 @@ namespace core.Notes
                     DateTimeOffset.UtcNow,
                     this.State.UserId,
                     note,
-                    ticker,
                     predictedPrice
                 )
             );
@@ -149,7 +153,6 @@ namespace core.Notes
 
         protected void ApplyInternal(NoteUpdated updated)
         {
-            this.State.RelatedToTicker = updated.RelatedToTicker;
             this.State.Note = updated.Note;
             this.State.PredictedPrice = updated.PredictedPrice;
         }

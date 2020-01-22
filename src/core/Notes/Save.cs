@@ -2,16 +2,20 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Notes
 {
     public class Save
     {
-        public class Command : Add.Command
+        public class Command : RequestWithUserId
         {
             [Required]
             public string Id { get; set; }
+            [Required]
+            public string Note { get; set; }
+            public double? PredictedPrice { get; set; }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -31,7 +35,7 @@ namespace core.Notes
                     return new Unit();
                 }
 
-                note.Update(request.Note, request.RelatedToTicker, request.PredictedPrice);
+                note.Update(request.Note, request.PredictedPrice);
 
                 await _storage.Save(note);
 

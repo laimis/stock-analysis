@@ -86,7 +86,7 @@ namespace coretests.Notes
         {
             var note = CreateTestNote();
 
-            note.Update("new note", null, null);
+            note.Update("new note", null);
 
             Assert.Equal("new note", note.State.Note);
         }
@@ -99,7 +99,7 @@ namespace coretests.Notes
             note.Archive();
 
             Assert.Throws<InvalidOperationException>(
-                () => note.Update("new note", null, null)
+                () => note.Update("new note", null)
             );
         }
 
