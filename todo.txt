@@ -1,13 +1,9 @@
-- show stock details for note entry screen if stock is entered
-    - add ability to follow up on the note
-    - add ability to add prediction
-    - run a job that will generate a reminder
-    - show notes with reminders today
-    
+- run a job that will generate note reminders
+- show notes with reminders today
 - userid with userid base class?
-- archive to the same model?
-
+- enrich note with stock advanced stats so that you can see progression
 - all notes for a particular stock
+- trade log
 - show activity for given stock details
 - option details page
 - generate most active email
@@ -17,14 +13,5 @@
 - contact form
 - search lookup
 - int for money amounts
-
-
-- now the cloudformation script that will install docker, docker-compose
-    - install docker
-    - install docker compose
-    - docker-compose script
-    - monitor script
-    - edit crontab
-    - run monitor script
-
 - check into https://www.nuget.org/packages/Respawn/
+- export as excel sheet

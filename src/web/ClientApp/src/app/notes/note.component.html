@@ -18,7 +18,7 @@
   <!-- follow up block -->
   <div *ngIf="note && !note.isArchived">
     <div class="form-group">
-      <label for="description">Follow up</label>
+      <label for="description">Add a follow up note</label>
       <textarea class="form-control" id="description" name="Note" [(ngModel)]="followup" rows="5">
       </textarea>
     </div>
@@ -66,6 +66,7 @@
 
       <div class="form-group">
         <label for="title">Ticker</label>
+         (<a *ngIf="note.relatedToTicker" [routerLink]="[ '/stocks', note.relatedToTicker ]" target="_blank">details</a>)
         <input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="note.relatedToTicker">
       </div>
       <div class="form-group">

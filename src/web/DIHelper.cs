@@ -23,17 +23,23 @@ namespace web
             });
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
-
             services.AddSingleton<IStocksService, StocksService>();
-            
-            services.AddSingleton<IPortfolioStorage, PortfolioStorage>(); 
+            services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
+            services.AddMediatR(typeof(CloseOption).Assembly);
 
+            services.AddHostedService<TestService>();
+            
+            StorageRegistrations(configuration, services);
+        }
+
+        private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services)
+        {
             var storage = configuration.GetValue<string>("storage");
 
             if (storage == "postgres")
             {
                 RegisterPostgresImplemenations(configuration, services);
-            } 
+            }
             else if (storage == "redis")
             {
                 RegisterRedisImplemenations(configuration, services);
@@ -44,8 +50,6 @@ namespace web
                     $"configuration 'storage' has value '{storage}', only 'redis' or 'postgres' is supported"
                 );
             }
-
-            services.AddMediatR(typeof(CloseOption).Assembly);
         }
 
         private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services)
