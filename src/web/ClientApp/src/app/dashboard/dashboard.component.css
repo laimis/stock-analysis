@@ -1,3 +1,7 @@
 .invisible {
 	display: none
 }
+
+div.row {
+  margin-top: 10px;
+}
