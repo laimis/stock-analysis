@@ -51,8 +51,9 @@ namespace web.Controllers
                 Ticker = ticker,
                 Type = type,
                 StrikePrice = strikePrice,
-                UserId = this.User.Identifier()
             };
+
+            query.WithUserId(this.User.Identifier());
             
             var sold =  await _mediator.Send(query);
 

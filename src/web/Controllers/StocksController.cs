@@ -33,7 +33,7 @@ namespace web.Controllers
         [HttpPost("sell")]
         public async Task<ActionResult> Sell(SellTransaction.Command model)
         {
-            model.WithUser(this.User.Identifier());
+            model.WithUserId(this.User.Identifier());
 
             await _mediator.Send(model);
 
@@ -43,7 +43,7 @@ namespace web.Controllers
         [HttpPost("purchase")]
         public async Task<ActionResult> Purchase(BuyTransaction.Command model)
         {
-            model.WithUser(this.User.Identifier());
+            model.WithUserId(this.User.Identifier());
 
             await _mediator.Send(model);
 

@@ -2,18 +2,17 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Notes
 {
     public class Archive
     {
-        public class Command : IRequest
+        public class Command : RequestWithUserId
         {
             [Required]
             public string Id { get; set; }
-            public string UserId { get; private set; }
-            public void WithUserId(string userId) => UserId = userId;
         }
 
         public class Handler : IRequestHandler<Command>

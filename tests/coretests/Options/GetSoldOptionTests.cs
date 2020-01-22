@@ -22,8 +22,9 @@ namespace coretests.Options
                 Type = _fixture.CloseOptionCommand.OptionType,
                 StrikePrice = _fixture.CloseOptionCommand.StrikePrice,
                 Ticker = _fixture.CloseOptionCommand.Ticker,
-                UserId = _fixture.CloseOptionCommand.UserIdentifier
             };
+
+            query.WithUserId(_fixture.CloseOptionCommand.UserIdentifier);
 
             var handler = new GetSoldOption.Handler(_fixture.CreateStorageWithSoldOption());
 

@@ -1,12 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using core.Shared;
 using MediatR;
 
 namespace core.Stocks
 {
     public class StockTransaction : IRequest
     {
-        public class Command : IRequest
+        public class Command : RequestWithUserId
         {
             [Required]
             public string Ticker { get; set; }
@@ -19,12 +20,6 @@ namespace core.Stocks
             
             [Required]
             public DateTime? Date { get; set; }
-
-            public string UserId { get; private set; }
-            public void WithUser(string userId)
-            {
-                this.UserId = userId;
-            }
         }
     }
 }

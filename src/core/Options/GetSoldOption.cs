@@ -1,19 +1,18 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using core.Shared;
 
 namespace core.Options
 {
     public class GetSoldOption
     {
-        public class Query : IRequest<object>
+        public class Query : RequestWithUserId<object>
         {
             public string Ticker { get; set; }
             public string Type { get; set; }
             public double StrikePrice { get; set; }
             public DateTimeOffset Expiration { get; set; }
-            public string UserId { get; set; }
             public OptionType OptionType => (OptionType)Enum.Parse(typeof(OptionType), this.Type);
         }
 

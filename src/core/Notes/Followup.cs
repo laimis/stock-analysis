@@ -1,20 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Notes
 {
     public class Followup
     {
-        public class Command : IRequest
+        public class Command : RequestWithUserId
         {
             [Required]
             public string Id { get; set; }
             [Required]
             public string Text { get; set; }
-            public string UserId { get; private set; }
-            public void WithUserId(string userId) => UserId = userId;
         }
 
         public class Handler : HandlerWithStorage<Command, Unit>
