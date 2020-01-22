@@ -25,9 +25,7 @@ namespace core.Notes
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var list = await _storage.GetNotes(request.UserId);
-
-                var note = list.SingleOrDefault(n => n.State.Id == request.Id);
+                var note = await _storage.GetNote(request.UserId, request.Id);
                 if (note == null)
                 {
                     return new Unit();
