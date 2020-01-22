@@ -12,7 +12,6 @@ namespace core.Portfolio
         {
             public Query(string userId) : base(userId)
             {
-                this.UserId = userId;
             }
         }
 
