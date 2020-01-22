@@ -132,5 +132,15 @@ namespace coretests.Notes
 
             Assert.False(note.State.HasReminder);
         }
+
+        [Fact]
+        public void Followup()
+        {
+            var note = CreateTestNote();
+
+            note.Followup("follow up 1");
+
+            Assert.Single(note.State.Followups);
+        }
     }
 }

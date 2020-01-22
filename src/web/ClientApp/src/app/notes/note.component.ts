@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-note',
@@ -11,7 +12,9 @@ export class NoteComponent implements OnInit {
 
   public note: any
   public saved:boolean
-  public errors: string[];
+  public errors: string[]
+
+  public followup: string
 
   constructor(
     private stockService:StocksService,
@@ -50,7 +53,7 @@ export class NoteComponent implements OnInit {
   saveReminder() {
     this.errors = null;
 
-    this.stockService.saveReminder(this.note).subscribe(_ => {
+    this.stockService.saveNoteReminder(this.note).subscribe(_ => {
       this.loadNote(this.note.id)
     }, err => this.errors = GetErrors(err))
   }
@@ -62,7 +65,20 @@ export class NoteComponent implements OnInit {
       id : this.note.id
     }
 
-    this.stockService.saveReminder(obj).subscribe(_ => {
+    this.stockService.saveNoteReminder(obj).subscribe(_ => {
+      this.loadNote(this.note.id)
+    }, err => this.errors = GetErrors(err))
+  }
+
+  saveFollowup() {
+    this.errors = null;
+
+    var obj = {
+      id: this.note.id,
+      text: this.followup
+    }
+
+    this.stockService.saveNoteFollowup(obj).subscribe(_ => {
       this.loadNote(this.note.id)
     }, err => this.errors = GetErrors(err))
   }

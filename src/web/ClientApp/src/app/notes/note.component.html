@@ -6,6 +6,7 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
+  <!-- ARCHIVE block -->
   <div *ngIf="note && note.isArchived">
     <div class="alert alert-warning">This note has been archived. Back to <a [routerLink]="[ '/notes' ]">notes </a></div>
 
@@ -14,7 +15,25 @@
       {{note.note}}</div>
   </div>
 
+  <!-- ARCHIVE block -->
+  <div *ngIf="note && !note.isArchived">
+    <div class="form-group">
+      <label for="description">Follow up</label>
+      <textarea class="form-control" id="description" name="Note" [(ngModel)]="followup" rows="5">
+      </textarea>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary btn-space" (click)="saveFollowup()">Save Followup</button>
+    </div>
 
+    <div class="row" *ngFor="let f of note.followups">
+      <div class="col" style="white-space: pre-wrap;"><i>{{f.date | date:'shortDate'}}</i>&nbsp;&nbsp;{{f.text}}</div>
+    </div>
+
+    <hr />
+  </div>
+
+  <!-- REMINDER -->
   <div *ngIf="note && !note.isArchived">
     <div *ngIf="!note.hasReminder">
       <div class="form-group">
@@ -35,8 +54,9 @@
         <button class="btn btn-primary btn-space" (click)="clearReminder()">Clear Reminder</button>
       </div>
     </div>
-
     <hr />
+
+    <!-- note edit -->
     <form>
       <div class="form-group">
         <label for="description">Note</label>

@@ -24,8 +24,12 @@ export class StocksService {
     return this.http.post('/api/notes/' + note.id + '/archive', {})
   }
 
-  saveReminder(note: any) {
+  saveNoteReminder(note: any) {
     return this.http.post('/api/notes/reminder', note)
+  }
+
+  saveNoteFollowup(followup: any) {
+    return this.http.post('/api/notes/followup', followup)
   }
 
   getNotes(): Observable<NoteList> {

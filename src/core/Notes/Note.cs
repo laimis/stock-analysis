@@ -113,6 +113,18 @@ namespace core.Notes
             );
         }
 
+        public void Followup(string text)
+        {
+            Apply(
+                new NoteFollowedUp(
+                    this.State.Id,
+                    DateTimeOffset.UtcNow,
+                    this.State.UserId,
+                    text
+                )
+            );
+        }
+
         protected override void Apply(AggregateEvent e)
         {
             this._events.Add(e);
@@ -155,6 +167,11 @@ namespace core.Notes
         protected void ApplyInternal(NoteReminderSet set)
         {
             this.State.ReminderDate = set.ReminderDate;
+        }
+
+        protected void ApplyInternal(NoteFollowedUp e)
+        {
+            this.State.AddFollowup(e.When, e.Text);
         }
     }
 }
