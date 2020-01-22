@@ -43,6 +43,16 @@ namespace web.Controllers
             return Ok();
         }
 
+        [HttpPost("reminder")]
+        public async Task<ActionResult> Reminder(Reminder.Command cmd)
+        {
+            cmd.WithUserId(this.User.Identifier());
+
+            await _mediator.Send(cmd);
+            
+            return Ok();
+        }
+
         [HttpPatch]
         public async Task<object> Update(Save.Command input)
         {

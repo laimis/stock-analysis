@@ -116,5 +116,21 @@ namespace coretests.Notes
 
             Assert.Equal(eventCount, note.Events.Count);
         }
+
+        [Fact]
+        public void ReminderSetting()
+        {
+            var note = CreateTestNote();
+
+            Assert.False(note.State.HasReminder);
+
+            note.SetupReminder(DateTimeOffset.UtcNow);
+
+            Assert.True(note.State.HasReminder);
+
+            note.ClearReminder();
+
+            Assert.False(note.State.HasReminder);
+        }
     }
 }

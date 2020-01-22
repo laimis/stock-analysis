@@ -19,5 +19,6 @@ namespace core
         
         Task Save(Note note);
         Task<IEnumerable<Note>> GetNotes(string userId);
+        Task<Note> GetNote(string userId, string noteId);
     }
 }

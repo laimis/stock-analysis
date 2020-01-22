@@ -94,5 +94,12 @@ namespace storage.shared
             return list.GroupBy(e => e.Ticker)
                 .Select(g => new Note(g));
         }
+
+        public async Task<Note> GetNote(string userId, string noteId)
+        {
+            var list = await GetNotes(userId);
+
+            return list.SingleOrDefault(n => n.State.Id == noteId);
+        }
     }
 }

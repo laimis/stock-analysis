@@ -7,7 +7,7 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <div *ngIf="note && note.isArchived">
-    <div class="alert alert-warning">This note has been archived. Back to <a [routerLink]="[ '/notes' ]">notes</a></div>
+    <div class="alert alert-warning">This note has been archived. Back to <a [routerLink]="[ '/notes' ]">notes </a></div>
 
     <div style="white-space: pre-wrap;">
       <span *ngIf="note.relatedToTicker"><a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a></span>
@@ -15,25 +15,50 @@
   </div>
 
 
-  <form *ngIf="note && !note.isArchived">
-    <div class="form-group">
-      <label for="description">Note</label>
-      <textarea class="form-control" id="description" name="Note" [(ngModel)]="note.note" rows="10">
-      </textarea>
+  <div *ngIf="note && !note.isArchived">
+    <div *ngIf="!note.hasReminder">
+      <div class="form-group">
+        <label for="title">Setup reminder to follow up on this note</label>
+        <input class="form-control" type="date" id="reminderDate" name="reminderDate" title="reminder date" [(ngModel)]="note.reminderDate" />
+        <span *ngIf="note.hasReminder">Reminder is set for {{note.reminderDate | date}}</span>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary btn-space" (click)="saveReminder()">Save Reminder</button>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="title">Ticker</label>
-      <input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="note.relatedToTicker">
-    </div>
-    <div class="form-group">
-      <label>Created</label>
-      {{note.created | date}}
+    <div *ngIf="note.hasReminder">
+      <div class="form-group">
+        <span *ngIf="note.hasReminder">Reminder is set for {{note.reminderDate | date}}</span>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary btn-space" (click)="clearReminder()">Clear Reminder</button>
+      </div>
     </div>
 
-    <div class="form-group">
-      <button class="btn btn-primary btn-space" (click)="saveNote()">Save</button>
-      <button class="btn btn-secondary btn-space" (click)="archiveNote()">Archive</button>
-    </div>
-  </form>
+    <hr />
+    <form>
+      <div class="form-group">
+        <label for="description">Note</label>
+        <textarea class="form-control" id="description" name="Note" [(ngModel)]="note.note" rows="10">
+        </textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="title">Ticker</label>
+        <input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="note.relatedToTicker">
+      </div>
+      <div class="form-group">
+        <label>Created</label>
+        {{note.created | date}}
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary btn-space" (click)="saveNote()">Save</button>
+        <button class="btn btn-secondary btn-space" (click)="archiveNote()">Archive</button>
+      </div>
+    </form>
+  </div>
+
+
 </div>
