@@ -10,3 +10,9 @@ label {
 div.row {
   margin-top: 10px;
 }
+
+#ticker-logo {
+  max-height: 100px;
+  float: left;
+  margin: 10px;
+}
