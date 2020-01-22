@@ -1,5 +1,4 @@
 - run a job that will generate note reminders
-- show notes with reminders today
 - userid with userid base class?
 - enrich note with stock advanced stats so that you can see progression
 - all notes for a particular stock

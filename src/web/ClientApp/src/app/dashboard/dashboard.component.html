@@ -15,7 +15,7 @@
 <div *ngIf="loaded">
 
   <div *ngIf="openOptions.length > 0">
-    <a style="float: right" [routerLink]="[ '/options/sell']" class="btn btn-primary btn-space">Record Options Sale</a>
+    <a style="float: right" [routerLink]="[ '/options/sell']">Record Options Sale</a>
     <h2>Open Option Contracts</h2>
     <div class="row" *ngFor="let option of openOptions">
       <div class="col">
@@ -33,7 +33,7 @@
 
   <br />
   <div *ngIf="owned.length > 0">
-    <a style="float: right" [routerLink]="[ '/stocks/transaction']" class="btn btn-primary btn-space">Record Stock Sale</a>
+    <a style="float: right" [routerLink]="[ '/stocks/transaction']">Record Stock Sale</a>
     <h2>Owned Stocks</h2>
     <table class="table">
       <thead>

@@ -1,21 +1,20 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Notes
 {
     public class Get
     {
-        public class Query : IRequest<object>
+        public class Query : RequestWithUserId<object>
         {
-            public Query(string userId, string noteId)
+            public Query(string userId, string noteId) : base(userId)
             {
-                this.UserId = userId;
                 this.NoteId = noteId;
             }
 
-            public string UserId { get; }
             public string NoteId { get; }
         }
 

@@ -1,19 +1,17 @@
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Notes
 {
     public class Export
     {
-        public class Query : IRequest<core.ExportResponse>
+        public class Query : RequestWithUserId<core.ExportResponse>
         {
-            public Query(string userId)
+            public Query(string userId) : base(userId)
             {
-                this.UserId = userId;
             }
-
-            public string UserId { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, ExportResponse>

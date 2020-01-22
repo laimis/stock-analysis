@@ -1,20 +1,19 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Portfolio
 {
     public class Get
     {
-        public class Query : IRequest<object>
+        public class Query : RequestWithUserId<object>
         {
-            public Query(string userId)
+            public Query(string userId) : base(userId)
             {
                 this.UserId = userId;
             }
-
-            public string UserId { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, object>

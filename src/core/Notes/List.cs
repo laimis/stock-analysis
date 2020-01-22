@@ -2,20 +2,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Notes.Output;
+using core.Shared;
 using MediatR;
 
 namespace core.Notes
 {
     public class List
     {
-        public class Query : IRequest<NotesList>
+        public class Query : RequestWithUserId<NotesList>
         {
-            public Query(string userId)
+            public Query(string userId) : base(userId)
             {
-                this.UserId = userId;
             }
-
-            public string UserId { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, NotesList>
