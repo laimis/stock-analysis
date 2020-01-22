@@ -10,6 +10,7 @@
 - terraform or pulumi for infrastructure
 - badges for builds/coverage
 - contact form
+- landing page
 - search lookup
 - int for money amounts
 - check into https://www.nuget.org/packages/Respawn/
