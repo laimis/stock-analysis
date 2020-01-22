@@ -1,13 +1,13 @@
 - show stock details for note entry screen if stock is entered
-    - run a job that will generate a reminder
-    - show notes with reminders today
     - add ability to follow up on the note
     - add ability to add prediction
-
-- getnote vs getnotes
+    - run a job that will generate a reminder
+    - show notes with reminders today
+    
 - userid with userid base class?
 - archive to the same model?
 
+- all notes for a particular stock
 - show activity for given stock details
 - option details page
 - generate most active email
