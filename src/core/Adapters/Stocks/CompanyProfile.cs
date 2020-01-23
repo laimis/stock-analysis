@@ -4,7 +4,7 @@
     {
         public string Symbol { get; set; }
         public string CompanyName { get; set; }
-        public long Employees { get; set; }
+        public int? Employees { get; set; }
         public string Industry { get; set; }
         public string Website { get; set; }
         public string Description { get; set; }

@@ -1,3 +1,4 @@
+- option dates seem to be off, it should not be a single date
 - enrich note with stock advanced stats so that you can see progression
 - run a job that will generate note reminders
 - trade log
