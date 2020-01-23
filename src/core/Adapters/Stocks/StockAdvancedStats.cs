@@ -6,7 +6,7 @@ namespace core.Adapters.Stocks
         public double Week52High { get; set; }
         public double Week52Low { get; set; }
         public double MarketCap { get; set; }
-        public double Employees { get; set; }
+        public double? Employees { get; set; }
         public double Day200MovingAvg { get; set; }
         public double Day50MovingAvg { get; set; }
         public double? Float { get; set; }
