@@ -13,6 +13,6 @@ namespace core.Options
         }
 
         public int Amount { get; }
-        public double Money { get; }
+        public double Money { get; set; }
     }
 }

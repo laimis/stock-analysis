@@ -9,6 +9,7 @@ using iexclient;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using storage.redis;
 using storage.shared;
 
 namespace web
@@ -65,6 +66,10 @@ namespace web
             });
             services.AddSingleton<storage.redis.AggregateStorage>(c => 
                 (storage.redis.AggregateStorage)c.GetService<IAggregateStorage>());
+            services.AddSingleton<Migration>(_ =>
+            {
+                return new storage.redis.Migration(cnn);
+            });
         }
 
         private static void RegisterPostgresImplemenations(IConfiguration configuration, IServiceCollection services)
