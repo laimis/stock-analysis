@@ -47,55 +47,8 @@ namespace core.Notes
             );
         }
 
-        public void ClearReminder()
-        {
-            if (!this.State.HasReminder)
-            {
-                return;
-            }
-
-            Apply(
-                new NoteReminderCleared(
-                    this.State.Id,
-                    DateTimeOffset.UtcNow,
-                    this.State.UserId
-                )
-            );
-        }
-
-        public void SetupReminder(DateTimeOffset reminderDate)
-        {
-            Apply(
-                new NoteReminderSet(
-                    this.State.Id,
-                    DateTimeOffset.UtcNow,
-                    this.State.UserId,
-                    reminderDate
-                )
-            );
-        }
-
-        public void Archive()
-        {
-            if (!this.State.IsArchived)
-            {
-                Apply(
-                    new NoteArchived(
-                        this.State.Id,
-                        DateTimeOffset.UtcNow,
-                        this.State.UserId
-                    )
-                );
-            }
-        }
-
         public void Update(string note, double? predictedPrice)
         {
-            if (this.State.IsArchived)
-            {
-                throw new InvalidOperationException("Archived note cannot be updated");
-            }
-            
             if (predictedPrice != null && predictedPrice.Value < 0)
             {
                 throw new InvalidOperationException("Predicted price cannot be negative");
@@ -145,24 +98,20 @@ namespace core.Notes
             this.State.PredictedPrice = updated.PredictedPrice;
         }
 
+        // these are no longer used
         protected void ApplyInternal(NoteArchived archived)
         {
-            this.State.IsArchived = true;
         }
-
+        
         protected void ApplyInternal(NoteReminderCleared cleared)
         {
-            this.State.ReminderDate = null;
         }
 
         protected void ApplyInternal(NoteReminderSet set)
         {
-            this.State.ReminderDate = set.ReminderDate;
         }
-
         protected void ApplyInternal(NoteFollowedUp e)
         {
-            // this is no longer used
         }
     }
 }

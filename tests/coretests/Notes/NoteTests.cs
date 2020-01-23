@@ -12,8 +12,6 @@ namespace coretests.Notes
         {
             var note = CreateTestNote();
 
-            note.Archive();
-
             _state = note.State;
         }
 
@@ -76,12 +74,6 @@ namespace coretests.Notes
         }
 
         [Fact]
-        public void Archived()
-        {
-            Assert.True(_state.IsArchived);
-        }
-
-        [Fact]
         public void UpdateWorks()
         {
             var note = CreateTestNote();
@@ -89,48 +81,6 @@ namespace coretests.Notes
             note.Update("new note", null);
 
             Assert.Equal("new note", note.State.Note);
-        }
-
-        [Fact]
-        public void UpdateArchivedFails()
-        {
-            var note = CreateTestNote();
-
-            note.Archive();
-
-            Assert.Throws<InvalidOperationException>(
-                () => note.Update("new note", null)
-            );
-        }
-
-        [Fact]
-        public void DoubleArchiveNoOp()
-        {
-            var note = CreateTestNote();
-
-            note.Archive();
-
-            var eventCount = note.Events.Count;
-
-            note.Archive();
-
-            Assert.Equal(eventCount, note.Events.Count);
-        }
-
-        [Fact]
-        public void ReminderSetting()
-        {
-            var note = CreateTestNote();
-
-            Assert.False(note.State.HasReminder);
-
-            note.SetupReminder(DateTimeOffset.UtcNow);
-
-            Assert.True(note.State.HasReminder);
-
-            note.ClearReminder();
-
-            Assert.False(note.State.HasReminder);
         }
     }
 }

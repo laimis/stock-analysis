@@ -1,4 +1,5 @@
-<a class="floating-button" [routerLink]="[ '/notes', 'add' ]">Add Note</a>
+<a class="floating-button" *ngIf="!tickerFilter" [routerLink]="[ '/notes', 'add' ]">Add Note</a>
+<a class="floating-button" *ngIf="tickerFilter" [routerLink]="[ '/notes', 'add', tickerFilter ]">Add Note</a>
 
 <div *ngIf="notes && notes.length > 0">
   <h2>Your Notes</h2>
@@ -10,8 +11,7 @@
       {{note.note}}
     </div>
     <div class="col">
-      <a [routerLink]="[ '/notes', note.id ]">view</a>
-      <div *ngIf="note.hasReminder"><i class="fas fa-bell"></i></div>
+      <a [routerLink]="[ '/notes', note.id ]">edit</a>
     </div>
   </div>
 </div>

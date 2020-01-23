@@ -20,14 +20,6 @@ export class StocksService {
     return this.http.patch<any>('/api/notes', note)
   }
 
-  archiveNote(note: any) {
-    return this.http.post('/api/notes/' + note.id + '/archive', {})
-  }
-
-  saveNoteReminder(note: any) {
-    return this.http.post('/api/notes/reminder', note)
-  }
-
   getNotes(ticker: string): Observable<NoteList> {
     if (ticker === null)
     {

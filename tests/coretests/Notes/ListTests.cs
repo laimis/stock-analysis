@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Notes;
 using Xunit;
 
 namespace coretests.Notes
@@ -16,7 +14,7 @@ namespace coretests.Notes
         public NotesTestsFixture Fixture { get; }
 
         [Fact]
-        public async Task ListSkipsArchived()
+        public async Task ListWorks()
         {
             var handler = new core.Notes.List.Handler(Fixture.CreateStorageWithNotes());
 
@@ -25,6 +23,18 @@ namespace coretests.Notes
             var response = await handler.Handle(query, CancellationToken.None);
 
             Assert.Single(response.Notes);
+        }
+
+        [Fact]
+        public async Task ListFilterWorks()
+        {
+            var handler = new core.Notes.List.Handler(Fixture.CreateStorageWithNotes());
+
+            var query = new core.Notes.List.Query(NotesTestsFixture.UserId, "filtered");
+
+            var response = await handler.Handle(query, CancellationToken.None);
+
+            Assert.Empty(response.Notes);
         }
     }
 }

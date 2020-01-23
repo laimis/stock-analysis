@@ -31,7 +31,6 @@ namespace core.Notes
 
                 return Mapper.MapNotes(
                     notes
-                        .Where(n => !n.State.IsArchived)
                         .Where(n => n.State.RelatedToTicker == (request.Ticker != null ? request.Ticker : n.State.RelatedToTicker))
                         .OrderByDescending(n => n.State.Created)
                 );

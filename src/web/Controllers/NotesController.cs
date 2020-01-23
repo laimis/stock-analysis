@@ -27,30 +27,6 @@ namespace web.Controllers
             return await _mediator.Send(input);
         }
 
-        [HttpPost("{id}/archive")]
-        public async Task<ActionResult> Archive(string id)
-        {
-            var cmd = new Archive.Command {
-                Id = id
-            };
-
-            cmd.WithUserId(this.User.Identifier());
-
-            await _mediator.Send(cmd);
-            
-            return Ok();
-        }
-
-        [HttpPost("reminder")]
-        public async Task<ActionResult> Reminder(Reminder.Command cmd)
-        {
-            cmd.WithUserId(this.User.Identifier());
-
-            await _mediator.Send(cmd);
-            
-            return Ok();
-        }
-
         [HttpPatch]
         public async Task<object> Update(Save.Command input)
         {
