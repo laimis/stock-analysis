@@ -1,9 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using core.Shared;
 
 namespace core.Options
 {
     public class SoldOptionState
     {
+        public SoldOptionState()
+        {
+            this.Transactions = new List<Transaction>();
+        }
+
         public string Ticker { get; internal set; }
         public double StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; internal set; }
@@ -18,5 +25,43 @@ namespace core.Options
         public double Profit => this.Premium - this.Spent;
         public double CollateralCash => this.Type == OptionType.PUT ? StrikePrice * 100 - Premium : 0;
         public int CollateralShares => this.Type == OptionType.CALL ? 100 * Amount : 0;
+
+        public List<Transaction> Transactions { get; private set; }
+
+        internal void Apply(OptionOpened opened)
+        {
+            this.Amount += opened.Amount;
+            this.Filled = opened.Filled;
+            this.Premium += opened.Premium;
+
+            this.Transactions.Add(
+                new Transaction(
+                    this.Ticker,
+                    "Sold Option",
+                    opened.Amount * opened.Premium,
+                    opened.When
+                )
+            );
+        }
+
+        internal void Apply(OptionClosed closed)
+        {
+            this.Amount -= closed.Amount;
+            this.Spent += closed.Money;
+
+            if (this.Amount == 0)
+            {
+                this.Closed = closed.When;
+            }
+
+            this.Transactions.Add(
+                new Transaction(
+                    this.Ticker,
+                    "Closed Sold Option",
+                    -1 * closed.Money * closed.Amount,
+                    closed.When
+                )
+            );
+        }
     }
 }

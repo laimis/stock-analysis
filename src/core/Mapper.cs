@@ -7,6 +7,7 @@ using core.Adapters.Stocks;
 using core.Notes;
 using core.Notes.Output;
 using core.Options;
+using core.Shared;
 using core.Stocks;
 
 namespace core
@@ -48,6 +49,17 @@ namespace core
                     PriceBasedOnPuts = puts.Average(o => o.Volume * o.StrikePrice) / puts.Average(o => o.Volume),
                 }
             };
+        }
+
+        internal static IEnumerable<Transaction> ToTransactionLog(IEnumerable<OwnedStock> stocks, IEnumerable<SoldOption> options)
+        {
+            var log = stocks
+            .SelectMany(s => s.State.Transactions)
+            .Union(options
+            .SelectMany(o => o.State.Transactions))
+            .OrderByDescending(t => t.Date);
+
+            return log;
         }
 
         internal static NotesList MapNotes(IEnumerable<Note> notes)

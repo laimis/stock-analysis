@@ -12,6 +12,10 @@ export function GetErrors(err:any): string[] {
 export class StocksService {
   constructor(private http: HttpClient) { }
 
+  getTransactions(): Observable<object[]> {
+    return this.http.get<object[]>('/api/portfolio/transactions')
+  }
+
   addNote(input: any): Observable<any> {
     return this.http.post<any>('/api/notes', input)
   }
@@ -36,7 +40,6 @@ export class StocksService {
 	getStockLists(): Observable<StockLists> {
     return this.http.get<StockLists>('/api/stocks/lists')
   }
-
 
 	getStockSummary(symbol:string): Observable<StockSummary> {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
