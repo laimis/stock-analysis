@@ -4,7 +4,7 @@
     <img src="robinhood.png" height="30px" />
   </a>
   <a [routerLink]="[ '/notes/add', ticker ]" class="btn btn-primary floating-button">Add Notes</a>
-  <button class="btn btn-primary floating-button" (click)="buyStock()">Record Buy/Sell</button>
+  <a [routerLink]="[ '/stocks/transaction', ticker ]" class="btn btn-primary floating-button">Record Buy/Sell</a>
   <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary floating-button">Options</a>
 
 

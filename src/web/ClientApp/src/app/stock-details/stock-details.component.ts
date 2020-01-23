@@ -81,12 +81,4 @@ export class StockDetailsComponent {
 			this.loaded = true;
 		});
 	}
-
-	goToDashboard(){
-		this.router.navigateByUrl('/dashboard')
-	}
-
-	buyStock(){
-		this.router.navigateByUrl('/stocks/transaction/' + this.ticker)
-	}
 }
