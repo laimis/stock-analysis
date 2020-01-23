@@ -20,13 +20,11 @@ namespace web.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult> Add(Add.Command input)
+        public async Task<object> Add(Add.Command input)
         {
             input.WithUserId(this.User.Identifier());
 
-            await _mediator.Send(input);
-            
-            return Ok();
+            return await _mediator.Send(input);
         }
 
         [HttpPost("{id}/archive")]

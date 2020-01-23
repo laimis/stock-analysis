@@ -8,16 +8,16 @@ namespace core.Notes
 {
     public class Add
     {
-        public class Command : RequestWithUserId
+        public class Command : RequestWithUserId<object>
         {
             [Required]
             public string Note { get; set; }
             [Required]
-            public string RelatedToTicker { get; set; }
+            public string Ticker { get; set; }
             public double? PredictedPrice { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, object>
         {
             private IPortfolioStorage _storage;
 
@@ -26,17 +26,19 @@ namespace core.Notes
                 _storage = storage;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<object> Handle(Command request, CancellationToken cancellationToken)
             {
                 var note = new Note(
                     request.UserId,
                     request.Note,
-                    request.RelatedToTicker,
+                    request.Ticker,
                     request.PredictedPrice);
 
                 await _storage.Save(note);
 
-                return new Unit();
+                return new {
+                    id = note.State.Id
+                };
             }
         }
     }

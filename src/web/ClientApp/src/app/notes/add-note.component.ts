@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-note',
@@ -16,7 +16,8 @@ export class AddNoteComponent implements OnInit {
 
   constructor(
     private stockService:StocksService,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute,
+    private router: Router) { }
 
   ngOnInit() {
     var ticker = this.route.snapshot.paramMap.get('ticker');
@@ -30,12 +31,14 @@ export class AddNoteComponent implements OnInit {
     this.saved = false;
     this.errors = null;
 
-    this.stockService.addNote({
+    var obj = {
       ticker: this.ticker,
       note: this.note
-    }).subscribe(() => {
-      this.saved = true
-      this.note = null
-    }, err => this.errors = GetErrors(err))
+    }
+
+    this.stockService.addNote(obj).subscribe(
+      r => this.router.navigate(['/notes', r.id]),
+      err => this.errors = GetErrors(err)
+    )
   }
 }
