@@ -22,7 +22,7 @@ namespace core.Options
             public DateTimeOffset? ExpirationDate { get; set; }
 
             [Required]
-            public OptionType? OptionType { get; set; }
+            public string OptionType { get; set; }
 
             [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
             public int Amount { get; set; }
@@ -51,10 +51,12 @@ namespace core.Options
             
             public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var option = await this._storage.GetSoldOption(cmd.Ticker, cmd.OptionType.Value, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
+                var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
+
+                var option = await this._storage.GetSoldOption(cmd.Ticker, optionType, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
                 if (option == null)
                 {
-                    option = new SoldOption(cmd.Ticker, cmd.OptionType.Value, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
+                    option = new SoldOption(cmd.Ticker, optionType, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
                 }
 
                 option.Open(cmd.Amount, cmd.Premium, cmd.Filled.Value);
