@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -93,6 +94,20 @@ namespace storage.postgres
                 var query = @"select 1";
 
                 await db.QueryAsync<int>(query);
+            }
+        }
+
+        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, string userId)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version";
+
+                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, userId });
+
+                return list;
             }
         }
     }

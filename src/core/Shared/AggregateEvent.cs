@@ -21,7 +21,7 @@ namespace core.Shared
             this.When = when;
         }
 
-        public DateTime When { get; }
+        public DateTime When { get; set; }
         public string Ticker { get; }
         public string UserId { get; }
     }

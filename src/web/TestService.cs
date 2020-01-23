@@ -21,7 +21,7 @@ namespace web
             
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogDebug("loop " + DateTime.UtcNow);
+                // _logger.LogDebug("loop " + DateTime.UtcNow);
 
                 await Task.Delay(1000 * 3, stoppingToken);
             }

@@ -1,0 +1,14 @@
+<div *ngIf="events">
+  <table class="table">
+    <tbody>
+      <tr *ngFor="let e of events">
+        <td>{{ e.entity}}</td>
+        <td>{{ e.key}}</td>
+        <td>{{ e.created }}</td>
+        <td>{{ e.version }}</td>
+        <td><pre>{{ e.eventJson }}</pre></td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
