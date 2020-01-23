@@ -16,7 +16,7 @@
 
       <div class="form-group">
         <label>Created</label>
-        {{note.created | date}}
+        {{note.created | date}} for <a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
       </div>
 
       <div class="form-group">
