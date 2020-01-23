@@ -102,20 +102,12 @@ namespace core.Options
 
         protected void ApplyInternal(OptionOpened opened)
         {
-            this.State.Amount += opened.Amount;
-            this.State.Filled = opened.Filled;
-            this.State.Premium += opened.Premium;
+            this.State.Apply(opened);
         }
 
         protected void ApplyInternal(OptionClosed closed)
         {
-            this.State.Amount -= closed.Amount;
-            this.State.Spent += closed.Money;
-
-            if (this.State.Amount == 0)
-            {
-                this.State.Closed = closed.When;
-            }
+            this.State.Apply(closed);
         }
 
         public static string GenerateKey(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice)

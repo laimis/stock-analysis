@@ -67,9 +67,7 @@ namespace core.Stocks
 
         private void ApplyInternal(StockPurchased purchased)
         {
-            this.State.Owned += purchased.Amount;
-            this.State.Spent += purchased.Amount * purchased.Price;
-            this.State.Purchased = purchased.When;
+            this.State.Apply(purchased);
         }
 
         private void ApplyInternal(TickerObtained tickerObtained)
@@ -80,9 +78,7 @@ namespace core.Stocks
 
         private void ApplyInternal(StockSold sold)
         {
-            this.State.Owned -= sold.Amount;
-            this.State.Earned += sold.Amount * sold.Price;
-            this.State.Sold = sold.When;
+            this.State.Apply(sold);
         }
     }
 }

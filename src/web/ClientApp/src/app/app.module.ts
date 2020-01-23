@@ -22,6 +22,7 @@ import { StockListComponent } from './stock-lists/stock-list.component';
 import { AddNoteComponent } from './notes/add-note.component';
 import { NotesComponent } from './notes/notes.component';
 import { NoteComponent } from './notes/note.component';
+import { TransactionsComponent } from './transactions/transactions.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -40,6 +41,7 @@ var routes = [
   { path: 'stocks/transaction', component: StockTransactionComponent },
   { path: 'stocks/transaction/:ticker', component: StockTransactionComponent },
   { path: 'stocks/:ticker', component: StockDetailsComponent },
+  { path: 'transactions', component: TransactionsComponent },
 ]
 
 @NgModule({
@@ -60,6 +62,7 @@ var routes = [
     StockListComponent,
     StockListsComponent,
     StockTransactionComponent,
+    TransactionsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

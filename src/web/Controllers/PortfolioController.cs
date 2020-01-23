@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
+using core.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,14 @@ namespace web.Controllers
         public async Task<object> Index()
         {
             var query = new Get.Query(this.User.Identifier());
+
+            return await _mediator.Send(query);
+        }
+
+        [HttpGet("transactions")]
+        public async Task<IEnumerable<Transaction>> TransactionsAsync()
+        {
+            var query = new Transactions.Query(this.User.Identifier());
 
             return await _mediator.Send(query);
         }
