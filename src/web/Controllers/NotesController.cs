@@ -62,9 +62,9 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Get()
+        public async Task<object> List(string ticker)
         {
-            var query = new List.Query(this.User.Identifier());
+            var query = new List.Query(this.User.Identifier(), ticker);
 
             var result = await _mediator.Send(query);
             

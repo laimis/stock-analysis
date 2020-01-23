@@ -31,6 +31,7 @@ var routes = [
   { path: 'notes', component: NotesComponent},
   { path: 'notes/add', component: AddNoteComponent},
   { path: 'notes/add/:ticker', component: AddNoteComponent},
+  { path: 'notes/filtered/:ticker', component: NotesComponent},
   { path: 'notes/:id', component: NoteComponent},
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },

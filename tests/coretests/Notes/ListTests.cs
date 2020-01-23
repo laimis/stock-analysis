@@ -20,7 +20,7 @@ namespace coretests.Notes
         {
             var handler = new core.Notes.List.Handler(Fixture.CreateStorageWithNotes());
 
-            var query = new core.Notes.List.Query(NotesTestsFixture.UserId);
+            var query = new core.Notes.List.Query(NotesTestsFixture.UserId, null);
 
             var response = await handler.Handle(query, CancellationToken.None);
 

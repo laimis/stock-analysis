@@ -28,8 +28,13 @@ export class StocksService {
     return this.http.post('/api/notes/reminder', note)
   }
 
-  getNotes(): Observable<NoteList> {
-    return this.http.get<NoteList>('/api/notes')
+  getNotes(ticker: string): Observable<NoteList> {
+    if (ticker === null)
+    {
+      ticker = ''
+    }
+
+    return this.http.get<NoteList>('/api/notes?ticker=' + ticker)
   }
 
   getNote(id: string): Observable<object> {
