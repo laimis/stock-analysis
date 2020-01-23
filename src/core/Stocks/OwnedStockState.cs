@@ -31,7 +31,8 @@ namespace core.Stocks
             this.Transactions.Add(new Transaction(
                 this.Ticker,
                 "Purchased shares",
-                -1 * purchased.Price * purchased.Amount,
+                purchased.Price * purchased.Amount,
+                0,
                 purchased.When
             ));
         }
@@ -46,6 +47,7 @@ namespace core.Stocks
                 this.Ticker,
                 "Sold shares",
                 sold.Price * sold.Amount,
+                this.Profit,
                 sold.When
             ));
         }

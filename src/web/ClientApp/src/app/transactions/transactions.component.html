@@ -12,6 +12,7 @@
         <th>Symbol</th>
         <th>Description</th>
         <th>Value</th>
+        <th>Profit</th>
       </tr>
     </thead>
     <tbody>
@@ -20,6 +21,7 @@
         <td><a [routerLink]="[ '/transactions', t.ticker ]">{{t.ticker}}</a></td>
         <td>{{ t.description }}</td>
         <td>{{ t.value | currency }}</td>
+        <td>{{ t.profit | currency }}</td>
       </tr>
     </tbody>
   </table>

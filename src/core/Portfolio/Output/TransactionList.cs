@@ -10,6 +10,6 @@ namespace core.Portfolio.Output
 
         public IEnumerable<Transaction> Transactions { get; }
 
-        public double Profit => Transactions.Sum(t => t.Value);
+        public double Profit => Transactions.Sum(t => t.Profit);
     }
 }
