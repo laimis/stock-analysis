@@ -5,24 +5,27 @@
     Total Earned: {{ response.profit | currency}}
   </div>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Symbol</th>
-        <th>Description</th>
-        <th>Value</th>
-        <th>Profit</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let t of response.transactions">
-        <td>{{ t.date | date:'shortDate'}}</td>
-        <td><a [routerLink]="[ '/transactions', t.ticker ]">{{t.ticker}}</a></td>
-        <td>{{ t.description }}</td>
-        <td>{{ t.value | currency }}</td>
-        <td>{{ t.profit | currency }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="top-container" *ngFor="let g of response.grouped">
+    <h4>{{g.name}}<span style="float: right">profit: {{g.transactions.profit | currency}}</span></h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Symbol</th>
+          <th>Description</th>
+          <th>Value</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of g.transactions.transactions">
+          <td>{{ t.date | date:'shortDate'}}</td>
+          <td><a [routerLink]="[ '/transactions', t.ticker ]">{{t.ticker}}</a></td>
+          <td>{{ t.description }}</td>
+          <td>{{ t.value | currency }}</td>
+          <td>{{ t.profit | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

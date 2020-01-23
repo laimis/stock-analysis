@@ -64,7 +64,7 @@ namespace core
             .OrderByDescending(t => t.Date)
             .ToList();
 
-            return new TransactionList(log);
+            return new TransactionList(log, true);
         }
 
         internal static NotesList MapNotes(IEnumerable<Note> notes)
