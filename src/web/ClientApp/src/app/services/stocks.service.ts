@@ -16,12 +16,12 @@ export class StocksService {
     return this.http.get<object[]>('/api/events')
   }
 
-  getTransactions(ticker:string): Observable<object[]> {
+  getTransactions(ticker:string): Observable<TransactionList> {
     if (ticker === null)
     {
       ticker = ''
     }
-    return this.http.get<object[]>('/api/portfolio/transactions?ticker=' + ticker)
+    return this.http.get<TransactionList>('/api/portfolio/transactions?ticker=' + ticker)
   }
 
   addNote(input: any): Observable<any> {
@@ -90,6 +90,9 @@ export class StocksService {
   }
 }
 
+export interface TransactionList {
+  transactions: object[]
+}
 export interface NoteList {
   notes: object[]
 }

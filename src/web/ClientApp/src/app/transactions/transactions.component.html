@@ -1,5 +1,10 @@
-<div *ngIf="transactions">
+<div *ngIf="response">
   <div *ngIf="ticker">Filtered by {{ticker}}, <a [routerLink]="[ '/transactions' ]">clear filter</a> </div>
+
+  <div class="top-container">
+    Total Earned: {{ response.profit | currency}}
+  </div>
+
   <table class="table">
     <thead>
       <tr>
@@ -10,7 +15,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let t of transactions">
+      <tr *ngFor="let t of response.transactions">
         <td>{{ t.date | date:'shortDate'}}</td>
         <td><a [routerLink]="[ '/transactions', t.ticker ]">{{t.ticker}}</a></td>
         <td>{{ t.description }}</td>

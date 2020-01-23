@@ -7,6 +7,7 @@ using core.Adapters.Stocks;
 using core.Notes;
 using core.Notes.Output;
 using core.Options;
+using core.Portfolio.Output;
 using core.Shared;
 using core.Stocks;
 
@@ -51,7 +52,7 @@ namespace core
             };
         }
 
-        internal static IEnumerable<Transaction> ToTransactionLog(
+        internal static TransactionList ToTransactionLog(
             IEnumerable<OwnedStock> stocks,
             IEnumerable<SoldOption> options,
             string ticker)
@@ -60,9 +61,10 @@ namespace core
             .SelectMany(s => s.State.Transactions)
             .Union(options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
             .SelectMany(o => o.State.Transactions))
-            .OrderByDescending(t => t.Date);
+            .OrderByDescending(t => t.Date)
+            .ToList();
 
-            return log;
+            return new TransactionList(log);
         }
 
         internal static NotesList MapNotes(IEnumerable<Note> notes)

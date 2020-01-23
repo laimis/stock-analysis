@@ -1,13 +1,13 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Portfolio.Output;
 using core.Shared;
 
 namespace core.Portfolio
 {
     public class Transactions
     {
-        public class Query : RequestWithUserId<IEnumerable<Transaction>>
+        public class Query : RequestWithUserId<TransactionList>
         {
             public Query(string userId, string ticker) : base(userId)
             {
@@ -17,13 +17,13 @@ namespace core.Portfolio
             public string Ticker { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, IEnumerable<Transaction>>
+        public class Handler : HandlerWithStorage<Query, TransactionList>
         {
             public Handler(IPortfolioStorage storage) : base(storage)
             {
             }
 
-            public override async Task<IEnumerable<Transaction>> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<TransactionList> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stocks = _storage.GetStocks(request.UserId);
                 var options = _storage.GetSoldOptions(request.UserId);

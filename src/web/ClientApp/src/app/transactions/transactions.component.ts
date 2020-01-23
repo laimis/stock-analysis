@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
+import { StocksService, TransactionList } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {
-  transactions: object[]
+  response: TransactionList
   ticker: string;
 
   constructor(
@@ -23,7 +23,7 @@ export class TransactionsComponent implements OnInit {
 
   loadTransactions(ticker:string) {
     this.stockService.getTransactions(ticker).subscribe(r => {
-      this.transactions = r
+      this.response = r
     })
   }
 

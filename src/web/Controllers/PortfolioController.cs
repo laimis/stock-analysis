@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
+using core.Portfolio.Output;
 using core.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,7 @@ namespace web.Controllers
         }
 
         [HttpGet("transactions")]
-        public async Task<IEnumerable<Transaction>> TransactionsAsync(string ticker)
+        public async Task<TransactionList> TransactionsAsync(string ticker)
         {
             var query = new Transactions.Query(this.User.Identifier(), ticker);
 
