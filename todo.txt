@@ -1,9 +1,8 @@
 FEATURES
-- transaction log
-- show activity for given stock details
-- contact form
 - landing page
 - search lookup
+- contact form
+- automated stock analysis/reviews -- need more details
 
 BUGS
 - option dates seem to be off, it should not be a single date
