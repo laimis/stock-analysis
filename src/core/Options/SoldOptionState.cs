@@ -37,7 +37,7 @@ namespace core.Options
             this.Transactions.Add(
                 new Transaction(
                     this.Ticker,
-                    "Sold Option",
+                    $"Sold ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} option",
                     opened.Amount * opened.Premium,
                     opened.When
                 )
@@ -57,7 +57,7 @@ namespace core.Options
             this.Transactions.Add(
                 new Transaction(
                     this.Ticker,
-                    "Closed Sold Option",
+                    $"Closed ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} option",
                     -1 * closed.Money * closed.Amount,
                     closed.When
                 )
