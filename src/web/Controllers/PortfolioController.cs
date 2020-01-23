@@ -30,9 +30,9 @@ namespace web.Controllers
         }
 
         [HttpGet("transactions")]
-        public async Task<IEnumerable<Transaction>> TransactionsAsync()
+        public async Task<IEnumerable<Transaction>> TransactionsAsync(string ticker)
         {
-            var query = new Transactions.Query(this.User.Identifier());
+            var query = new Transactions.Query(this.User.Identifier(), ticker);
 
             return await _mediator.Send(query);
         }

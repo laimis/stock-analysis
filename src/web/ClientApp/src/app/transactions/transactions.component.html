@@ -1,4 +1,5 @@
 <div *ngIf="transactions">
+  <div *ngIf="ticker">Filtered by {{ticker}}, <a [routerLink]="[ '/transactions' ]">clear filter</a> </div>
   <table class="table">
     <thead>
       <tr>
@@ -11,7 +12,7 @@
     <tbody>
       <tr *ngFor="let t of transactions">
         <td>{{ t.date | date:'shortDate'}}</td>
-        <td>{{ t.ticker }}</td>
+        <td><a [routerLink]="[ '/transactions', t.ticker ]">{{t.ticker}}</a></td>
         <td>{{ t.description }}</td>
         <td>{{ t.value | currency }}</td>
       </tr>

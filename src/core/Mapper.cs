@@ -51,11 +51,14 @@ namespace core
             };
         }
 
-        internal static IEnumerable<Transaction> ToTransactionLog(IEnumerable<OwnedStock> stocks, IEnumerable<SoldOption> options)
+        internal static IEnumerable<Transaction> ToTransactionLog(
+            IEnumerable<OwnedStock> stocks,
+            IEnumerable<SoldOption> options,
+            string ticker)
         {
-            var log = stocks
+            var log = stocks.Where(s => s.State.Ticker == (ticker != null ? ticker : s.State.Ticker))
             .SelectMany(s => s.State.Transactions)
-            .Union(options
+            .Union(options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
             .SelectMany(o => o.State.Transactions))
             .OrderByDescending(t => t.Date);
 

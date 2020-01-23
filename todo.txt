@@ -1,5 +1,5 @@
 FEATURES
-- trade log
+- transaction log
 - show activity for given stock details
 - contact form
 - landing page

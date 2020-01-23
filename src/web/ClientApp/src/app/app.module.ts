@@ -44,6 +44,7 @@ var routes = [
   { path: 'stocks/transaction/:ticker', component: StockTransactionComponent },
   { path: 'stocks/:ticker', component: StockDetailsComponent },
   { path: 'transactions', component: TransactionsComponent },
+  { path: 'transactions/:ticker', component: TransactionsComponent },
 ]
 
 @NgModule({

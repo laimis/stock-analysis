@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-transactions',
@@ -8,17 +9,20 @@ import { StocksService } from '../services/stocks.service';
 })
 export class TransactionsComponent implements OnInit {
   transactions: object[]
+  ticker: string;
 
   constructor(
-    private stockService:StocksService
+    private stockService:StocksService,
+    private route:ActivatedRoute,
   ) { }
 
   ngOnInit() {
-    this.loadTransactions()
+    this.ticker = this.route.snapshot.paramMap.get("ticker")
+    this.loadTransactions(this.ticker)
   }
 
-  loadTransactions() {
-    this.stockService.getTransactions().subscribe(r => {
+  loadTransactions(ticker:string) {
+    this.stockService.getTransactions(ticker).subscribe(r => {
       this.transactions = r
     })
   }

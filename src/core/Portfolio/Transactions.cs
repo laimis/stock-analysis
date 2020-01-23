@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
@@ -10,9 +9,12 @@ namespace core.Portfolio
     {
         public class Query : RequestWithUserId<IEnumerable<Transaction>>
         {
-            public Query(string userId) : base(userId)
+            public Query(string userId, string ticker) : base(userId)
             {
+                this.Ticker = ticker;
             }
+
+            public string Ticker { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, IEnumerable<Transaction>>
@@ -28,7 +30,7 @@ namespace core.Portfolio
 
                 await Task.WhenAll(stocks, options);
 
-                return Mapper.ToTransactionLog(stocks.Result, options.Result);
+                return Mapper.ToTransactionLog(stocks.Result, options.Result, request.Ticker);
             }
         }
     }
