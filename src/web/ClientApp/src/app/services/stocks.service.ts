@@ -28,10 +28,6 @@ export class StocksService {
     return this.http.post('/api/notes/reminder', note)
   }
 
-  saveNoteFollowup(followup: any) {
-    return this.http.post('/api/notes/followup', followup)
-  }
-
   getNotes(): Observable<NoteList> {
     return this.http.get<NoteList>('/api/notes')
   }

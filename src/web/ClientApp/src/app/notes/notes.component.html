@@ -7,13 +7,6 @@
       <i>{{note.created | date}}&nbsp;&nbsp;&nbsp;&nbsp;</i>
       <span *ngIf="note.relatedToTicker"><a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a> - </span>
       {{note.note}}
-      <div *ngIf="note.followups.length > 0">
-        <hr />
-        <i>Follow-Ups</i>
-        <ul>
-          <li *ngFor="let f of note.followups">{{f.text}}</li>
-        </ul>
-      </div>
     </div>
     <div class="col">
       <a [routerLink]="[ '/notes', note.id ]">view</a>

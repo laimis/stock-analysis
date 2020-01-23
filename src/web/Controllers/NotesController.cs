@@ -53,16 +53,6 @@ namespace web.Controllers
             return Ok();
         }
 
-        [HttpPost("followup")]
-        public async Task<ActionResult> Followup(Followup.Command cmd)
-        {
-            cmd.WithUserId(this.User.Identifier());
-
-            await _mediator.Send(cmd);
-            
-            return Ok();
-        }
-
         [HttpPatch]
         public async Task<object> Update(Save.Command input)
         {

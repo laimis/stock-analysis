@@ -14,8 +14,6 @@ export class NoteComponent implements OnInit {
   public saved:boolean
   public errors: string[]
 
-  public followup: string
-
   constructor(
     private stockService:StocksService,
     private route:ActivatedRoute) { }
@@ -66,19 +64,6 @@ export class NoteComponent implements OnInit {
     }
 
     this.stockService.saveNoteReminder(obj).subscribe(_ => {
-      this.loadNote(this.note.id)
-    }, err => this.errors = GetErrors(err))
-  }
-
-  saveFollowup() {
-    this.errors = null;
-
-    var obj = {
-      id: this.note.id,
-      text: this.followup
-    }
-
-    this.stockService.saveNoteFollowup(obj).subscribe(_ => {
       this.loadNote(this.note.id)
     }, err => this.errors = GetErrors(err))
   }
