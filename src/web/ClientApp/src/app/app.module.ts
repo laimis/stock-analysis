@@ -23,11 +23,13 @@ import { AddNoteComponent } from './notes/add-note.component';
 import { NotesComponent } from './notes/notes.component';
 import { NoteComponent } from './notes/note.component';
 import { TransactionsComponent } from './transactions/transactions.component';
+import { EventsComponent } from './events/events.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'admin', component: AdminComponent},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'events', component: EventsComponent},
   { path: 'profile', component: ProfileComponent},
   { path: 'notes', component: NotesComponent},
   { path: 'notes/add', component: AddNoteComponent},
@@ -51,6 +53,7 @@ var routes = [
     AppComponent,
     DashboardComponent,
     ErrorDisplayComponent,
+    EventsComponent,
     NavMenuComponent,
     NoteComponent,
     NotesComponent,

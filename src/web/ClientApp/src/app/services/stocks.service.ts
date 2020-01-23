@@ -12,6 +12,10 @@ export function GetErrors(err:any): string[] {
 export class StocksService {
   constructor(private http: HttpClient) { }
 
+  getEvents(): Observable<object[]> {
+    return this.http.get<object[]>('/api/events')
+  }
+
   getTransactions(): Observable<object[]> {
     return this.http.get<object[]>('/api/portfolio/transactions')
   }
