@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using core;
-using core.Adapters.Stocks;
 using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +27,7 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(SellTransaction.Command model)
+        public async Task<ActionResult> Sell(SellCommand model)
         {
             model.WithUserId(this.User.Identifier());
 
@@ -41,7 +37,7 @@ namespace web.Controllers
         }
 
         [HttpPost("purchase")]
-        public async Task<ActionResult> Purchase(BuyTransaction.Command model)
+        public async Task<ActionResult> Purchase(BuyCommand model)
         {
             model.WithUserId(this.User.Identifier());
 
