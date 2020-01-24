@@ -6,6 +6,15 @@ FEATURES
 - record option buys
 - import transactions
 
+MINOR IMPROVEMENTS
+
+DESIGN
+- consider cards for rendering owned options, owned stock... might get too much?
+- dropdown for option type selection
+- the whole Watch section is incomplete, what to do there
+- market cap/gross profit, should all be rounded
+- fundamentals section should be a card layout
+
 BUGS
 - share buy/sell is a disaster from UX/usability/flow standpoint
 - option dates seem to be off, it should not be a single date
@@ -19,6 +28,7 @@ INFRA
 - terraform or pulumi for infrastructure
 - check into https://www.nuget.org/packages/Respawn/
 - export as excel sheet
+- k8s for managing container switches
 
 EXPERIMENTAL
 - angular material

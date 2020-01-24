@@ -14,7 +14,7 @@
   <div class="mt-2" *ngFor="let g of response.grouped">
     <table class="table table-striped border">
       <caption>{{g.name}} breakdown <span class="float-right">profit: {{g.transactions.profit | currency}}</span></caption>
-      <thead>
+      <thead class="thead-light">
         <tr>
           <th>Date</th>
           <th>Symbol</th>

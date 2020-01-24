@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-stock-list',
-  template: `<table class="table">
-  <thead>
+  template: `<table class="table table-hover border">
+  <thead class="thead-light">
     <tr>
       <th>Ticker</th>
       <th>Name</th>
