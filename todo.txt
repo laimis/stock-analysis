@@ -8,6 +8,8 @@ FEATURES
 
 MINOR IMPROVEMENTS
 
+- notes badge on stock details that can be expanded and shows notes you have for the stock
+
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?
 - dropdown for option type selection
