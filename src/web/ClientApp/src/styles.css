@@ -1,22 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-
-.top-container {
-	margin-top: 20px;
-}
-
-.floating-button {
-	float: right;
-	margin-right: 5px;
-}
-
 a {
   color: darkcyan;
 }
 
 .wide-chart {
 	width: 100%;
-}
-
-.btn-space {
-  margin-right: 5px;
 }

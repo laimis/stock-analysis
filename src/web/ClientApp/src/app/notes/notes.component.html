@@ -1,5 +1,5 @@
-<a class="floating-button" *ngIf="!tickerFilter" [routerLink]="[ '/notes', 'add' ]">Add Note</a>
-<a class="floating-button" *ngIf="tickerFilter" [routerLink]="[ '/notes', 'add', tickerFilter ]">Add Note</a>
+<a class="float-right" *ngIf="!tickerFilter" [routerLink]="[ '/notes', 'add' ]">Add Note</a>
+<a class="float-right" *ngIf="tickerFilter" [routerLink]="[ '/notes', 'add', tickerFilter ]">Add Note</a>
 
 <div *ngIf="notes && notes.length > 0">
   <h2>Your Notes</h2>

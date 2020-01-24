@@ -1,15 +1,15 @@
-<div *ngIf="loaded" class="top-container">
+<div *ngIf="loaded" class="mt-2">
 
-  <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn floating-button" target="_blank">
+  <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn float-right mr-1" target="_blank">
     <img src="robinhood.png" height="30px" />
   </a>
-  <a [routerLink]="[ '/notes/filtered', ticker ]" class="btn btn-primary floating-button">Watch</a>
-  <a [routerLink]="[ '/stocks/transaction', ticker ]" class="btn btn-primary floating-button">Record Buy/Sell</a>
-  <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary floating-button">Options</a>
+  <a [routerLink]="[ '/notes/filtered', ticker ]" class="btn btn-primary float-right mr-1">Watch</a>
+  <a [routerLink]="[ '/stocks/transaction', ticker ]" class="btn btn-primary float-right mr-1">Record Buy/Sell</a>
+  <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary float-right mr-1">Options</a>
 
 
 	<div>
-    <img id="ticker-logo" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />
+    <img id="ticker-logo" class="float-left img-thumbnail" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />
     <h3>{{profile.symbol}}: {{profile.companyName}}</h3>
     <i>{{profile.industry}} / {{profile.sector}}</i>
     <div>

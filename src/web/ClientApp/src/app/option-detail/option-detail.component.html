@@ -1,12 +1,12 @@
-<div class="top-container" *ngIf="failure">
+<div class="mt-2" *ngIf="failure">
   {{failure}} <a [routerLink]="[ '/dashboard' ]">return to dashboad</a>
 </div>
 
-<div class="top-container" *ngIf="loading && !failure">
+<div class="mt-2" *ngIf="loading && !failure">
   Loading option details...
 </div>
 
-<div class="top-container" *ngIf="!loading">
+<div class="mt-2" *ngIf="!loading">
     <div>
       <table class="table">
         <thead>

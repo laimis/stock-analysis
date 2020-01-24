@@ -1,16 +1,16 @@
 <div *ngIf="response">
 
-  <div class="top-container">
+  <div class="mt-2">
     Total Earned: {{ response.profit | currency}}
 
-    <div *ngIf="ticker" style="float: right">
+    <div *ngIf="ticker" class="float-right">
       Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,
       <a [routerLink]="" (click)="!!clearFilter()">clear filter</a>
     </div>
   </div>
 
-  <div class="top-container" *ngFor="let g of response.grouped">
-    <h4>{{g.name}}<span style="float: right">profit: {{g.transactions.profit | currency}}</span></h4>
+  <div class="mt-2" *ngFor="let g of response.grouped">
+    <h4>{{g.name}}<span class="float-right">profit: {{g.transactions.profit | currency}}</span></h4>
     <table class="table">
       <thead>
         <tr>
