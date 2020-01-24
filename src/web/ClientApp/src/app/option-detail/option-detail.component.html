@@ -8,9 +8,8 @@
 
 <div class="mt-2" *ngIf="!loading">
     <div>
-      <table class="table">
-        <thead>
-
+      <table class="table border">
+        <thead class="thead-light">
           <tr>
             <th>Option Info Date</th>
             <th>Stock Price (currently)</th>
@@ -33,9 +32,6 @@
             <td>{{breakdown.priceBasedOnPuts | currency }}</td>
           </tr>
         </tbody>
-        <tfoot>
-          <tr><td colspan="8"></td></tr>
-        </tfoot>
       </table>
     </div>
 
@@ -68,8 +64,8 @@
 
     <div *ngFor="let expiration of expirationMap">
 
-      <table class="table table-striped">
-        <thead>
+      <table class="table table-hover border">
+        <thead class="thead-light">
           <tr>
             <th>Expiration</th>
             <th>Strike price</th>
@@ -97,9 +93,6 @@
             <td>{{option.risk | percent}}</td>
           </tr>
         </tbody>
-        <tfoot>
-          <tr><td colspan="10"></td></tr>
-        </tfoot>
       </table>
 
     </div>
