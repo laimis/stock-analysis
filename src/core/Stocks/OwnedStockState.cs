@@ -30,7 +30,7 @@ namespace core.Stocks
 
             this.Transactions.Add(new Transaction(
                 this.Ticker,
-                "Purchased shares",
+                $"Purchased {purchased.Amount} shares @ ${purchased.Price}/share",
                 purchased.Price * purchased.Amount,
                 0,
                 purchased.When
@@ -45,7 +45,7 @@ namespace core.Stocks
 
             this.Transactions.Add(new Transaction(
                 this.Ticker,
-                "Sold shares",
+                $"Sold {sold.Amount} shares @ ${sold.Price}/share",
                 sold.Price * sold.Amount,
                 this.Profit,
                 sold.When

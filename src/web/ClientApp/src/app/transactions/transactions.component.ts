@@ -17,14 +17,19 @@ export class TransactionsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.ticker = this.route.snapshot.paramMap.get("ticker")
-    this.loadTransactions(this.ticker)
+    var ticker = this.route.snapshot.queryParamMap.get("ticker")
+    this.loadTransactions(ticker)
   }
 
   loadTransactions(ticker:string) {
+    this.ticker = ticker
     this.stockService.getTransactions(ticker).subscribe(r => {
       this.response = r
     })
+  }
+
+  clearFilter() {
+    this.loadTransactions(null)
   }
 
 }

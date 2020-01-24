@@ -1,8 +1,12 @@
 <div *ngIf="response">
-  <div *ngIf="ticker">Filtered by {{ticker}}, <a [routerLink]="[ '/transactions' ]">clear filter</a> </div>
 
   <div class="top-container">
     Total Earned: {{ response.profit | currency}}
+
+    <div *ngIf="ticker" style="float: right">
+      Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,
+      <a [routerLink]="" (click)="!!clearFilter()">clear filter</a>
+    </div>
   </div>
 
   <div class="top-container" *ngFor="let g of response.grouped">
@@ -20,7 +24,7 @@
       <tbody>
         <tr *ngFor="let t of g.transactions.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
-          <td><a [routerLink]="[ '/transactions', t.ticker ]">{{t.ticker}}</a></td>
+          <td><a [routerLink]="" (click)="!!loadTransactions(t.ticker)">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>
           <td>{{ t.value | currency }}</td>
           <td>{{ t.profit | currency }}</td>
