@@ -7,19 +7,10 @@
 
   <div class="card mb-3" *ngFor="let note of notes">
     <div class="card-body">
-      <div style="white-space: pre-wrap;">
-
-        <div class="float-left border rounded p-2 mb-2 mt-1 mr-2 text-center badge">
-          <div *ngIf="note.relatedToTicker" class="mb-1">
-            <a [routerLink]="[ '/notes', 'filtered', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
-          </div>
-          <div>{{note.created | date}}</div>
-        </div>
-
-        {{note.note}}
-
-        <div><a [routerLink]="[ '/notes', note.id ]">edit</a></div>
-      </div>
+      <h5 class="card-title">{{note.relatedToTicker}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{note.created | date}}</h6>
+      <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
+      <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
     </div>
   </div>
 </div>
