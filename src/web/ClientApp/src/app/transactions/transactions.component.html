@@ -1,7 +1,9 @@
 <div *ngIf="response">
 
   <div class="mt-2">
-    Total Earned: {{ response.profit | currency}}
+    {{ response.transactions.length}} transactions with profit of {{ response.profit | currency}},
+    {{ response.winningPercentage | percent}} positive,
+
 
     <div *ngIf="ticker" class="float-right">
       Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,
@@ -22,7 +24,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let t of g.transactions.transactions" [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0}">
+        <tr
+          [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
+          *ngFor="let t of g.transactions.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
           <td><a [routerLink]="" (click)="!!loadTransactions(t.ticker)">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>

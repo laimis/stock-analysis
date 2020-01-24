@@ -23,9 +23,9 @@ namespace core.Portfolio.Output
         }
 
         public IEnumerable<Transaction> Transactions { get; }
-
         public IEnumerable<object> Grouped { get; } 
         
         public double Profit => Transactions.Sum(t => t.Profit);
+        public double WinningPercentage => Transactions.Count(t => t.Profit > 0) * 1.0 / Transactions.Count(t => t.Profit != 0);
     }
 }
