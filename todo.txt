@@ -7,10 +7,11 @@ FEATURES
 - import transactions
 
 BUGS
+- share buy/sell is a disaster from UX/usability/flow standpoint
 - option dates seem to be off, it should not be a single date
 - int for money amounts
 - review how we track partial share and option sales
-- how to correct this whole "key" vs "ticker" on events...
+- how to correct this whole "key" vs "ticker" on events..
 
 INFRA
 - badges for builds/coverage
