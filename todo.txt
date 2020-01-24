@@ -3,10 +3,12 @@ FEATURES
 - landing page
 - search lookup
 - contact form
+- record option buys
 
 BUGS
 - option dates seem to be off, it should not be a single date
 - int for money amounts
+- review how we track partial share and option sales
 
 INFRA
 - badges for builds/coverage
