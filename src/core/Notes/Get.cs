@@ -27,8 +27,7 @@ namespace core.Notes
             public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
                 var note = await _storage.GetNote(request.UserId, request.NoteId);
-
-                return note.State;
+                return note?.State;
             }
         }
     }
