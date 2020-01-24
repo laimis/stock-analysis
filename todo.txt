@@ -4,6 +4,7 @@ FEATURES
 - search lookup
 - contact form
 - record option buys
+- import transactions
 
 BUGS
 - option dates seem to be off, it should not be a single date

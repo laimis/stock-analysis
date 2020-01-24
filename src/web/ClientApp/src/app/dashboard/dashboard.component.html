@@ -16,7 +16,7 @@
 
   <div *ngIf="openOptions.length > 0">
     <a class="float-right" [routerLink]="[ '/options/sell']">Record Options Sale</a>
-    <h2>Open Option Contracts</h2>
+    <h2>Options</h2>
     <div class="row" *ngFor="let option of openOptions">
       <div class="col">
         <b>{{option.ticker}}</b> @ <b>{{option.strikePrice | currency}}</b>
@@ -34,9 +34,9 @@
   <br />
   <div *ngIf="owned.length > 0">
     <a class="float-right" [routerLink]="[ '/stocks/transaction']">Record Stock Transaction</a>
-    <h2>Owned Stocks</h2>
-    <table class="table">
-      <thead>
+    <h2>Stocks</h2>
+    <table class="table table-striped border rounded">
+      <thead class="thead-light">
         <tr>
           <th>Ticker</th>
           <th>Owned</th>
