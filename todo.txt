@@ -1,10 +1,17 @@
 FEATURES
+
 - automated stock analysis/reviews -- need more details
 - landing page
 - search lookup
 - contact form
 - record option buys
 - import transactions
+- notes section with each transaction area
+- create account
+- reset password
+- delete account
+- GDPR
+- terms of use
 
 MINOR IMPROVEMENTS
 
@@ -32,5 +39,11 @@ INFRA
 - export as excel sheet
 - k8s for managing container switches
 
-EXPERIMENTAL
-- angular material
+LAUNCH CHECKLIST
+
+- account management
+- landing page
+- dashboard with transactions
+- options details
+- stocks details
+- tracking details
