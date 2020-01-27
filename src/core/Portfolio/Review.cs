@@ -16,9 +16,9 @@ namespace core.Portfolio
     {
         public class Generate : RequestWithUserId<ReviewList>
         {
-            public Generate(DateTime utcNow)
+            public Generate(DateTime date)
             {
-                this.Date = utcNow;
+                this.Date = date;
             }
 
             public DateTime Date { get; }
@@ -65,7 +65,6 @@ namespace core.Portfolio
                 {
                     entries.Add(new ReviewEntry
                     {
-                        IsOption = true,
                         Ticker = o.State.Ticker,
                         Description = $"${o.State.StrikePrice} {o.State.Type}",
                         Expiration = o.State.Expiration
@@ -76,7 +75,6 @@ namespace core.Portfolio
                 {
                     entries.Add(new ReviewEntry
                     {
-                        IsShare = true,
                         Ticker = s.State.Ticker,
                         Description = $"{s.State.Owned} shares owned, cost of ${s.State.Cost}",
                     });

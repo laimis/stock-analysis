@@ -37,8 +37,14 @@
 <div *ngIf="entries && entries.length > 0">
   <div class="card mb-3" *ngFor="let e of entries">
     <div class="card-body">
-      <h5 class="card-title">{{e.ticker}}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">{{e.price.amount | currency}}</h6>
+      <h5 class="card-title">
+        {{e.ticker}}
+        <span class="float-right">{{e.price.amount | currency}}</span>
+      </h5>
+
+      <div *ngIf="e.expiresIn && e.expiresIn > 0" class="alert alert-success">
+        Expires in {{e.expiresIn}} days.
+      </div>
 
       <p style="white-space: pre-wrap;" class="card-text" *ngFor="let d of e.descriptions">
         {{d}}
