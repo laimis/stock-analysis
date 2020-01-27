@@ -55,3 +55,4 @@ LAUNCH CHECKLIST
 - stocks details
 - tracking details
 - weekly email detailing
+- event keys must be fixed
