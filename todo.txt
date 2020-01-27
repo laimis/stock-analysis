@@ -1,9 +1,6 @@
 FEATURES
 
 - automated stock analysis/reviews -- need more details
-    Transactions
-        - what happened last week
-    =====
     Delivery over the email
         Month
 - landing page
@@ -23,7 +20,7 @@ MINOR IMPROVEMENTS
 
 - notes badge on stock details that can be expanded and shows notes you have for the stock
 - review endpoint, fetch advanced information on shares -> volume, dates
-- review endpoint, dates on each note, price of share at the time of the note
+- review endpoint, dates on each note, price of share at the time of the note, separate each note
 - notes, fill with share information when note is made
 
 DESIGN

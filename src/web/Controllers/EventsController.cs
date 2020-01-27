@@ -8,7 +8,7 @@ using web.Utils;
 namespace web.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize("admin")]
     [Route("api/[controller]")]
     public class EventsController : ControllerBase
     {
@@ -22,15 +22,9 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Index()
+        public async Task<object> Index(string entity)
         {
-            return await this._storage.GetStoredEvents("ownedstock", this.User.Identifier());
-        }
-
-        [HttpGet("fix")]
-        public async Task<int> Fix()
-        {
-            return await _migration.FixMistakenEntry();
+            return await this._storage.GetStoredEvents(entity, this.User.Identifier());
         }
     }
 }
