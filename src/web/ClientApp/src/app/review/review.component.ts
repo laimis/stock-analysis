@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
+import { StocksService, TransactionList, ReviewList } from '../services/stocks.service';
 
 @Component({
   selector: 'app-review',
@@ -8,6 +8,7 @@ import { StocksService } from '../services/stocks.service';
 })
 export class ReviewComponent implements OnInit {
   public entries: object[]
+  public transactions: TransactionList
 
   constructor(private stockService:StocksService) { }
 
@@ -16,8 +17,9 @@ export class ReviewComponent implements OnInit {
   }
 
   private loadEntries() {
-    this.stockService.getReviewEntires().subscribe((r: object[]) => {
-      this.entries = r
+    this.stockService.getReviewEntires().subscribe((r: ReviewList) => {
+      this.entries = r.tickers
+      this.transactions = r.transactionList
     })
   }
 }

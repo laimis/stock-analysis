@@ -1,20 +1,6 @@
 FEATURES
 
 - automated stock analysis/reviews -- need more details
-    Get open options
-        - info about option
-            - get its price today - expiration date, <todo> too expensive
-            - is it in the money, at the money, out of the money
-            - time left, is it closing this week
-        - ticker information
-            - price, volume
-            - dividident or earnings date next week?
-    Get owned stocks
-        - ticker information
-            - price, volume
-            - dividident or earnings date next week?
-    Notes
-        - date, what you wrote, price at the time of writing
     Transactions
         - what happened last week
     =====
@@ -36,6 +22,9 @@ FEATURES
 MINOR IMPROVEMENTS
 
 - notes badge on stock details that can be expanded and shows notes you have for the stock
+- review endpoint, fetch advanced information on shares -> volume, dates
+- review endpoint, dates on each note, price of share at the time of the note
+- notes, fill with share information when note is made
 
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?

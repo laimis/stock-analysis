@@ -1,5 +1,40 @@
+<h2>Your Review</h2>
+
+<div *ngIf="transactions && transactions.transactions.length > 0">
+  <div class="mt-2">
+    {{ transactions.transactions.length}} transactions with profit of {{ transactions.profit | currency}},
+    {{ transactions.winningPercentage | percent}} positive
+  </div>
+
+  <div class="mt-2" *ngFor="let g of transactions.grouped">
+    <table class="table table-striped border">
+      <caption>{{g.name}} breakdown <span class="float-right">profit: {{g.transactions.profit | currency}}</span></caption>
+      <thead class="thead-light">
+        <tr>
+          <th>Date</th>
+          <th>Symbol</th>
+          <th>Description</th>
+          <th>Value</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
+          *ngFor="let t of g.transactions.transactions">
+          <td>{{ t.date | date:'shortDate'}}</td>
+          <td><a [routerLink]="" (click)="!!loadTransactions(t.ticker)">{{t.ticker}}</a></td>
+          <td>{{ t.description }}</td>
+          <td>{{ t.value | currency }}</td>
+          <td>{{ t.profit | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
 <div *ngIf="entries && entries.length > 0">
-  <h2>Your Review</h2>
   <div class="card mb-3" *ngFor="let e of entries">
     <div class="card-body">
       <h5 class="card-title">{{e.ticker}}</h5>

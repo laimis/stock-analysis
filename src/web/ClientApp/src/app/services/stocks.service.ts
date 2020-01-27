@@ -16,8 +16,8 @@ export class StocksService {
     return this.http.get<object[]>('/api/events')
   }
 
-  getReviewEntires(): Observable<object[]> {
-    return this.http.get<object[]>('/api/portfolio/review')
+  getReviewEntires(): Observable<ReviewList> {
+    return this.http.get<ReviewList>('/api/portfolio/review')
   }
 
   getTransactions(ticker:string): Observable<TransactionList> {
@@ -92,6 +92,11 @@ export class StocksService {
   getAcounts() : Observable<any> {
     return this.http.get('/api/admin/users')
   }
+}
+
+export interface ReviewList {
+  transactionList: TransactionList,
+  tickers: object[]
 }
 
 export interface TransactionList {

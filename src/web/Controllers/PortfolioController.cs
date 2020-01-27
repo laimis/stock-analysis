@@ -39,7 +39,7 @@ namespace web.Controllers
         }
 
         [HttpGet("review")]
-        public async Task<IEnumerable<ReviewEntryGroup>> Review()
+        public async Task<ReviewList> Review()
         {
             var cmd = new Review.Generate(DateTime.UtcNow);
 
