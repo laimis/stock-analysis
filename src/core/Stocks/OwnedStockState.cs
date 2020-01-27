@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
@@ -21,6 +22,7 @@ namespace core.Stocks
         public double Profit => this.Sold != null ? this.Earned - this.Spent : 0;
 
         public List<Transaction> Transactions { get; private set; }
+        public double Cost => Math.Round(Math.Abs(this.Spent - this.Earned), 2);
 
         internal void Apply(StockPurchased purchased)
         {

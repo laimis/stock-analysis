@@ -27,6 +27,7 @@ namespace core.Options
         public int CollateralShares => this.Type == OptionType.CALL ? 100 * Amount : 0;
 
         public List<Transaction> Transactions { get; private set; }
+        public bool IsOpen => this.Closed == null;
 
         internal void Apply(OptionOpened opened)
         {
