@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
-using core.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,19 +23,29 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Index()
+        public Task<object> Index()
         {
             var query = new Get.Query(this.User.Identifier());
 
-            return await _mediator.Send(query);
+            return _mediator.Send(query);
         }
 
         [HttpGet("transactions")]
-        public async Task<TransactionList> TransactionsAsync(string ticker)
+        public Task<TransactionList> TransactionsAsync(string ticker)
         {
             var query = new Transactions.Query(this.User.Identifier(), ticker);
 
-            return await _mediator.Send(query);
+            return _mediator.Send(query);
+        }
+
+        [HttpGet("review")]
+        public async Task<IEnumerable<ReviewEntryGroup>> Review()
+        {
+            var cmd = new Review.Generate(DateTime.UtcNow);
+
+            cmd.WithUserId(this.User.Identifier());
+
+            return await _mediator.Send(cmd);
         }
     }
 }

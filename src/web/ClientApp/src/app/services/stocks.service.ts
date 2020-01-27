@@ -16,6 +16,10 @@ export class StocksService {
     return this.http.get<object[]>('/api/events')
   }
 
+  getReviewEntires(): Observable<object[]> {
+    return this.http.get<object[]>('/api/portfolio/review')
+  }
+
   getTransactions(ticker:string): Observable<TransactionList> {
     if (ticker === null)
     {

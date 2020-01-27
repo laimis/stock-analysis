@@ -1,0 +1,18 @@
+<div *ngIf="entries && entries.length > 0">
+  <h2>Your Review</h2>
+  <div class="card mb-3" *ngFor="let e of entries">
+    <div class="card-body">
+      <h5 class="card-title">{{e.ticker}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{e.price.amount | currency}}</h6>
+
+      <p style="white-space: pre-wrap;" class="card-text" *ngFor="let d of e.descriptions">
+        {{d}}
+      </p>
+
+      <h6 *ngIf="e.notes.length > 0">Notes</h6>
+      <p style="white-space: pre-wrap;" class="card-text" *ngFor="let n of e.notes" >
+        {{n}}
+      </p>
+    </div>
+  </div>
+</div>

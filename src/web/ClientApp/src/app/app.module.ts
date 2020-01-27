@@ -24,6 +24,7 @@ import { NotesComponent } from './notes/notes.component';
 import { NoteComponent } from './notes/note.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { EventsComponent } from './events/events.component';
+import { ReviewComponent } from './review/review.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -38,6 +39,7 @@ var routes = [
   { path: 'notes/:id', component: NoteComponent},
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
+  { path: 'review', component: ReviewComponent },
   { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
   { path: 'stocks/lists', component: StockListsComponent },
   { path: 'stocks/transaction', component: StockTransactionComponent },
@@ -60,6 +62,7 @@ var routes = [
     OptionDetailComponent,
     OptionSellComponent,
     ProfileComponent,
+    ReviewComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,
     StockListComponent,
