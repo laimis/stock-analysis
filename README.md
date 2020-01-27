@@ -1,22 +1,18 @@
-# Playground implementation of stock tracking site
+# Project for journaling your observations around stocks
 
-This repo contains a simple website one could use to track their stock/options portfolio. It's mostly geared towards analysing option prices and selling options.
+Patience and information gathering leads to better trading moves. Use this site to keep track of your thoughts around stocks, record your transactions, and review them regularly so that you are ready to make the right decisions when the time comes to buy, sell, or keep a share.
 
-# Components
+# What's in the code?
 
 ## Frontend
 
-Angular + asp.net core for UI. Nothing fancy, just basic screens to list your portfolio, search for stocks and provide their analysis.
+Angular + ASP.NET Core. Nothing fancy, just basic screens to list your portfolio, search for stocks and provide their analysis.
 Stock details contain charts powered by Google Charts.
-
-## Domain
-
-The project uses event sourcing for tracking owned stocks, this has been a great exercise to try out different event approaches.
 
 ## Storage
 
-Using postgresql for event storage.
+Supports Postgres or Redis for storing information.
 
 ## Stock information
 
-Stock information is provided by https://financialmodelingprep.com and https://www.iexcloud.io/
+Stock information is provided by https://www.iexcloud.io/ and https://financialmodelingprep.com.
