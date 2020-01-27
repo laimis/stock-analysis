@@ -11,16 +11,21 @@ namespace core
 {
     public class CSVExport
     {
+        private const string DATE_FORMAT = "yyyy-MM-dd";
+        public const string STOCK_HEADER = "ticker,type,amount,price,date";
+        public const string NOTE_HEADER = "created,predicted price,ticker,note";
+        public const string OPTION_HEADER = "ticker,strike price,type,expiration,filled,amount,premium,closed,spent,profit";
+
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
             var rows = stocks.SelectMany(o => o.State.Buys).Cast<AggregateEvent>()
                 .Union(stocks.SelectMany(o => o.State.Sells))
-                .OrderBy(e => e.When);
+                .OrderBy(e => e.When)
+                .Select(e => {
+                    return StockEventToParts(e);
+                });
 
-            return Generate(
-                GetStocksExportHeaders(),
-                rows,
-                r => StockEventToParts(r));
+            return Generate(STOCK_HEADER, rows);
         }
 
         private static IEnumerable<object> StockEventToParts(object r)
@@ -33,7 +38,7 @@ namespace core
                         "buy",
                         sp.Amount,
                         sp.Price,
-                        sp.When.ToString("yyyy-MM-dd")
+                        sp.When.ToString(DATE_FORMAT)
                     };
                 
                 case StockSold ss:
@@ -43,7 +48,7 @@ namespace core
                         "sell",
                         ss.Amount,
                         ss.Price,
-                        ss.When.ToString("yyyy-MM-dd")
+                        ss.When.ToString(DATE_FORMAT)
                     };
 
                 default:
@@ -53,88 +58,50 @@ namespace core
 
         public static string Generate(IEnumerable<Note> notes)
         {
-            return Generate(
-                GetNotesExportHeaders(),
-                notes,
-                o => GetExportParts((o as Note).State));
+            var rows = notes.Select(n => {
+                var state = n.State;
+
+                return new object[]{
+                    state.Created.ToString(DATE_FORMAT),
+                    state.PredictedPrice,
+                    state.RelatedToTicker,
+                    "\"" + state.Note.Replace("\"", "\"\"") + "\""
+                };
+            });
+
+            return Generate(NOTE_HEADER, rows);
         }
 
         public static string Generate(IEnumerable<SoldOption> options)
         {
-            var rows = options.Select(s => new object[]{
+            var rows = options.OrderBy(s => s.State.Filled).Select(s => new object[]{
                 s.State.Ticker,
                 s.State.StrikePrice,
                 s.State.Type,
-                s.State.Expiration.ToString("yyyy-MM-dd"),
-                s.State.Filled?.ToString("yyyy-MM-dd"),
+                s.State.Expiration.ToString(DATE_FORMAT),
+                s.State.Filled?.ToString(DATE_FORMAT),
                 s.State.Amount,
                 s.State.Premium,
-                s.State.Closed?.ToString("yyyy-MM-dd"),
+                s.State.Closed?.ToString(DATE_FORMAT),
                 s.State.Spent,
                 s.State.Profit
             });
 
-            return Generate(
-                GetOptionsExportHeaders(),
-                rows,
-                o => (object[])o);
+            return Generate(OPTION_HEADER, rows);
         }
 
-        public static string GetOptionsExportHeaders()
-        {
-            return "ticker,strike price,type,expiration,filled,amount,premium,closed,spent,profit";
-        }
-
-        private static string Generate(
-            string header,
-            IEnumerable<object> objs,
-            Func<object, IEnumerable<object>> rowGenerator)
+        private static string Generate(string header, IEnumerable<IEnumerable<object>> rows)
         {
             var builder = new StringBuilder();
 
             builder.AppendLine(header);
             
-            foreach (var s in objs)
+            foreach (var r in rows)
             {
-                builder.AppendLine(string.Join(",", rowGenerator(s)));
+                builder.AppendLine(string.Join(",", r));
             }
 
             return builder.ToString();
-        }
-
-        private static object[] GetExportParts(SoldOptionState state)
-        {
-            return new object[]{
-                state.Ticker,
-                state.StrikePrice,
-                state.Type.ToString(),
-                state.Expiration.ToString("yyyy-MM-dd"),
-                state.Closed != null ? state.Closed.Value.ToString("yyyy-MM-dd") : null,
-                state.Amount,
-                state.Premium,
-                state.Spent,
-                state.Profit
-            };
-        }
-
-        public static string GetStocksExportHeaders()
-        {
-            return "ticker,type,amount,price,date";
-        }
-
-        private static object[] GetExportParts(NoteState state)
-        {
-            return new object[]{
-                state.Created.ToString("yyyy-MM-dd"),
-                state.PredictedPrice,
-                state.RelatedToTicker,
-                "\"" + state.Note.Replace("\"", "\"\"") + "\""
-            };
-        }
-
-        public static string GetNotesExportHeaders()
-        {
-            return "created,predicted price,ticker,note";
         }
 
         public static string GenerateFilename(string exportType)

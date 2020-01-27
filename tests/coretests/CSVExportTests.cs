@@ -17,7 +17,8 @@ namespace coretests
 
             var report = CSVExport.Generate(new[] {stock});
 
-            Assert.Contains(CSVExport.GetStocksExportHeaders(), report);
+            Assert.Contains(CSVExport.STOCK_HEADER, report);
+            Assert.Contains("ticker", report);
             Assert.Contains("ticker", report);
         }
 
@@ -30,7 +31,8 @@ namespace coretests
 
             var report = CSVExport.Generate(new[] {option});
 
-            Assert.Contains(CSVExport.GetOptionsExportHeaders(), report);
+            Assert.Contains(CSVExport.OPTION_HEADER, report);
+            
             Assert.Contains("ticker", report);
             Assert.Contains("CALL", report);
             Assert.Contains("2.5", report);
@@ -43,7 +45,7 @@ namespace coretests
 
             var report = CSVExport.Generate(new[] {note});
 
-            Assert.Contains(CSVExport.GetNotesExportHeaders(), report);
+            Assert.Contains(CSVExport.NOTE_HEADER, report);
             Assert.Contains("ticker", report);
             Assert.Contains("100", report);
         }

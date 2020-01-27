@@ -2,8 +2,6 @@ current:
 
 fix aggregate id thing
     - export data
-        - shares bought
-        - shares sold
         - options sold
         - options closed
 
