@@ -22,6 +22,7 @@ MINOR IMPROVEMENTS
 - review endpoint, fetch advanced information on shares -> volume, dates
 - review endpoint, dates on each note, price of share at the time of the note, separate each note
 - notes, fill with share information when note is made
+- organize code: separate events from handlers from core domain models?
 
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?
