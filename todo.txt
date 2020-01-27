@@ -1,3 +1,12 @@
+current:
+
+fix aggregate id thing
+    - export data
+        - shares bought
+        - shares sold
+        - options sold
+        - options closed
+
 FEATURES
 
 - automated stock analysis/reviews -- need more details
@@ -48,11 +57,13 @@ INFRA
 
 LAUNCH CHECKLIST
 
+- fix event/aggregate ids
+- buy options
+- partial option sells/closes
+- money as int
 - account management
 - landing page
 - dashboard with transactions
 - options details
 - stocks details
-- tracking details
-- weekly email detailing
-- event keys must be fixed
+- weekly review email 

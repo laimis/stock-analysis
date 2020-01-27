@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
-using MediatR;
 
 namespace core.Stocks
 {
@@ -22,11 +21,11 @@ namespace core.Stocks
 
             public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
             {
-                var options = await _storage.GetStocks(request.UserId);
+                var stocks = await _storage.GetStocks(request.UserId);
 
                 var filename = CSVExport.GenerateFilename("stocks");
 
-                return new ExportResponse(filename, CSVExport.Generate(options));
+                return new ExportResponse(filename, CSVExport.Generate(stocks));
             }
         }
     }

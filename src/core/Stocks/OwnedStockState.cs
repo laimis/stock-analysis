@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
 {
-	public class OwnedStockState
+    public class OwnedStockState
 	{
         public OwnedStockState()
         {
             this.Transactions = new List<Transaction>();
+            this.Buys = new List<StockPurchased>();
+            this.Sells = new List<StockSold>();
         }
 
 		public string Ticker { get; internal set; }
@@ -24,11 +25,16 @@ namespace core.Stocks
         public List<Transaction> Transactions { get; private set; }
         public double Cost => Math.Round(Math.Abs(this.Spent - this.Earned), 2);
 
+        internal List<StockPurchased> Buys { get; }
+        internal List<StockSold> Sells { get; }
+
         internal void Apply(StockPurchased purchased)
         {
             Owned += purchased.Amount;
             Spent += purchased.Amount * purchased.Price;
             Purchased = purchased.When;
+
+            this.Buys.Add(purchased);
 
             this.Transactions.Add(new Transaction(
                 this.Ticker,
@@ -45,6 +51,8 @@ namespace core.Stocks
             this.Earned += sold.Amount * sold.Price;
             this.Sold = sold.When;
 
+            this.Sells.Add(sold);
+            
             this.Transactions.Add(new Transaction(
                 this.Ticker,
                 $"Sold {sold.Amount} shares @ ${sold.Price}/share",

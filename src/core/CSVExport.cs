@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using core.Notes;
 using core.Options;
+using core.Shared;
 using core.Stocks;
 
 namespace core
@@ -11,10 +13,42 @@ namespace core
     {
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
+            var rows = stocks.SelectMany(o => o.State.Buys).Cast<AggregateEvent>()
+                .Union(stocks.SelectMany(o => o.State.Sells))
+                .OrderBy(e => e.When);
+
             return Generate(
                 GetStocksExportHeaders(),
-                stocks,
-                o => GetExportParts((o as OwnedStock).State));
+                rows,
+                r => StockEventToParts(r));
+        }
+
+        private static IEnumerable<object> StockEventToParts(object r)
+        {
+            switch(r)
+            {
+                case StockPurchased sp:
+                    return new object[] {
+                        sp.Ticker,
+                        "buy",
+                        sp.Amount,
+                        sp.Price,
+                        sp.When.ToString("yyyy-MM-dd")
+                    };
+                
+                case StockSold ss:
+
+                    return new object[] {
+                        ss.Ticker,
+                        "sell",
+                        ss.Amount,
+                        ss.Price,
+                        ss.When.ToString("yyyy-MM-dd")
+                    };
+
+                default:
+                    throw new InvalidOperationException("Invalid stock event for export: " + r.GetType());
+            }
         }
 
         public static string Generate(IEnumerable<Note> notes)
@@ -70,21 +104,9 @@ namespace core
             return "ticker,strike price,type,expiration,closed,amount,premium,spent,profit";
         }
 
-        private static object[] GetExportParts(OwnedStockState state)
-        {
-            return new object[]{
-                state.Ticker,
-                state.Spent,
-                state.Earned,
-                state.Purchased.ToString("yyyy-MM-dd"),
-                state.Sold != null ? state.Sold.Value.ToString("yyyy-MM-dd") : null,
-                state.Profit
-            };
-        }
-
         public static string GetStocksExportHeaders()
         {
-            return "ticker,spent,earned,purchased,sold,profit";
+            return "ticker,type,amount,price,date";
         }
 
         private static object[] GetExportParts(NoteState state)
