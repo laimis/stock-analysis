@@ -59,12 +59,30 @@ namespace core
                 o => GetExportParts((o as Note).State));
         }
 
-        public static string Generate(IEnumerable<SoldOption> stocks)
+        public static string Generate(IEnumerable<SoldOption> options)
         {
+            var rows = options.Select(s => new object[]{
+                s.State.Ticker,
+                s.State.StrikePrice,
+                s.State.Type,
+                s.State.Expiration.ToString("yyyy-MM-dd"),
+                s.State.Filled?.ToString("yyyy-MM-dd"),
+                s.State.Amount,
+                s.State.Premium,
+                s.State.Closed?.ToString("yyyy-MM-dd"),
+                s.State.Spent,
+                s.State.Profit
+            });
+
             return Generate(
                 GetOptionsExportHeaders(),
-                stocks,
-                o => GetExportParts((o as SoldOption).State));
+                rows,
+                o => (object[])o);
+        }
+
+        public static string GetOptionsExportHeaders()
+        {
+            return "ticker,strike price,type,expiration,filled,amount,premium,closed,spent,profit";
         }
 
         private static string Generate(
@@ -97,11 +115,6 @@ namespace core
                 state.Spent,
                 state.Profit
             };
-        }
-
-        public static string GetOptionsExportHeaders()
-        {
-            return "ticker,strike price,type,expiration,closed,amount,premium,spent,profit";
         }
 
         public static string GetStocksExportHeaders()
