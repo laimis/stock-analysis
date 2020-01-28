@@ -80,20 +80,6 @@ namespace coretests.Options
         }
 
         [Fact]
-        public void CreateWithPastExpirationFails()
-        {
-            Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(-1), 2, "user", 1, 20, DateTimeOffset.UtcNow));
-        }
-
-        [Fact]
-        public void CreateWithFarFutureExpirationFails()
-        {
-            Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", 1, 20, DateTimeOffset.UtcNow));
-        }
-
-        [Fact]
         public void EventCstrReplays()
         {
             var opt = GetTestOption(OptionType.CALL);
