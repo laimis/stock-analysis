@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Options;
@@ -18,13 +19,10 @@ namespace coretests.Options
         public async Task Get_WorksAsync()
         {
             var query = new GetSoldOption.Query {
-                Expiration = _fixture.CloseOptionCommand.Expiration.Value,
-                Type = _fixture.CloseOptionCommand.OptionType,
-                StrikePrice = _fixture.CloseOptionCommand.StrikePrice,
-                Ticker = _fixture.CloseOptionCommand.Ticker,
+                Id = Guid.NewGuid()
             };
 
-            query.WithUserId(_fixture.CloseOptionCommand.UserIdentifier);
+            query.WithUserId(_fixture.CloseOptionCommand.UserId);
 
             var handler = new GetSoldOption.Handler(_fixture.CreateStorageWithSoldOption());
 

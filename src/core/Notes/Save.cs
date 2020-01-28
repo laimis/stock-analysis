@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -12,7 +13,7 @@ namespace core.Notes
         public class Command : RequestWithUserId
         {
             [Required]
-            public string Id { get; set; }
+            public Guid Id { get; set; }
             [Required]
             public string Note { get; set; }
             public double? PredictedPrice { get; set; }
@@ -37,7 +38,7 @@ namespace core.Notes
 
                 note.Update(request.Note, request.PredictedPrice);
 
-                await _storage.Save(note);
+                await _storage.Save(note, request.UserId);
 
                 return new Unit();
             }

@@ -5,8 +5,7 @@ namespace core.Notes
 {
     public class NoteReminderCleared : AggregateEvent
     {
-        public NoteReminderCleared(string ticker, DateTimeOffset when, string userId)
-         : base(ticker, userId, when.DateTime)
+        public NoteReminderCleared(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
         {
         }
     }

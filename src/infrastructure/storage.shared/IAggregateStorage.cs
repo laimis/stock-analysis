@@ -6,9 +6,8 @@ namespace storage.shared
 {
     public interface IAggregateStorage
     {
-        Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId);
         Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId);
-        Task SaveEventsAsync(Aggregate agg, string entity);
+        Task SaveEventsAsync(Aggregate agg, string entity, string userId);
         Task DoHealthCheck();
         
         Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, string userId);

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
@@ -9,11 +10,8 @@ namespace core.Options
     {
         public class Query : RequestWithUserId<object>
         {
-            public string Ticker { get; set; }
-            public string Type { get; set; }
-            public double StrikePrice { get; set; }
-            public DateTimeOffset Expiration { get; set; }
-            public OptionType OptionType => (OptionType)Enum.Parse(typeof(OptionType), this.Type);
+            [Required]
+            public Guid Id { get; set; }
         }
 
         public class Handler : HandlerWithStorage<Query, object>
@@ -25,12 +23,7 @@ namespace core.Options
 
             public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                var sold = await _storage.GetSoldOption(
-                    request.Ticker,
-                    request.OptionType,
-                    request.Expiration,
-                    request.StrikePrice,
-                    request.UserId);
+                var sold = await _storage.GetSoldOption(request.Id, request.UserId);
                 
                 return Mapper.ToOptionView(sold);
             }

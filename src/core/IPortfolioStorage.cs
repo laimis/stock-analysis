@@ -11,14 +11,14 @@ namespace core
     {
         Task<OwnedStock> GetStock(string ticker, string userId);
         Task<IEnumerable<OwnedStock>> GetStocks(string userId);
-        Task Save(OwnedStock stock);
+        Task Save(OwnedStock stock, string userId);
 
         Task<IEnumerable<SoldOption>> GetSoldOptions(string user);
-        Task<SoldOption> GetSoldOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId);
-        Task Save(SoldOption option);
+        Task<SoldOption> GetSoldOption(Guid optionId, string userId);
+        Task Save(SoldOption option, string userId);
         
-        Task Save(Note note);
+        Task Save(Note note, string userId);
         Task<IEnumerable<Note>> GetNotes(string userId);
-        Task<Note> GetNote(string userId, string noteId);
+        Task<Note> GetNote(string userId, Guid noteId);
     }
 }

@@ -15,39 +15,6 @@ namespace storage.redis
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
-        public async Task FixMinValueDates(string entity, string userId)
-        {
-            var redisKey = entity + ":" + userId;
-
-            var db = _redis.GetDatabase();
-
-            var keys = await db.SetMembersAsync(redisKey);
-
-            var events = keys.Select(async k => await db.HashGetAllAsync(k.ToString()))
-                .Select(e => AggregateStorage.ToEvent(entity, userId, e.Result));
-
-            foreach(var e in events)
-            {
-                if (e.Event.When == DateTime.MinValue)
-                {
-                    e.Event.When = e.Created;
-
-                    var fields = new HashEntry[] {
-                        new HashEntry("created", e.Created.ToString("o")),
-                        new HashEntry("entity", entity),
-                        new HashEntry("event", e.EventJson),
-                        new HashEntry("key", e.Key),
-                        new HashEntry("userId", e.UserId),
-                        new HashEntry("version", e.Version),
-                    };
-
-                    var keyToStore = $"{entity}:{e.UserId}:{e.Key}:{e.Version}";
-
-                    await db.HashSetAsync(keyToStore, fields);
-                }
-            }
-        }
-
         public async Task<int> FixMistakenEntry()
         {
             const string entity = "soldoption";

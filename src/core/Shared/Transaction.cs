@@ -8,9 +8,9 @@ namespace core.Shared
         public string Description { get; }
         public double Value { get; }
         public double Profit { get; }
-        public DateTime Date { get; }
+        public DateTimeOffset Date { get; }
 
-        public Transaction(string ticker, string description, double value, double profit, DateTime when)
+        public Transaction(string ticker, string description, double value, double profit, DateTimeOffset when)
         {
             this.Ticker = ticker;
             this.Description = description;

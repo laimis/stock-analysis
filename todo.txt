@@ -1,9 +1,7 @@
 current:
 
-fix aggregate id thing
-    - export data
-        - options sold
-        - options closed
+fix aggregate id
+    
 
 FEATURES
 
@@ -44,6 +42,7 @@ BUGS
 - int for money amounts
 - review how we track partial share and option sales
 - how to correct this whole "key" vs "ticker" on events..
+- export of options, amount sometimes is zero
 
 INFRA
 - badges for builds/coverage

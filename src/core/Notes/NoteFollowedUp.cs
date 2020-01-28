@@ -8,12 +8,8 @@ namespace core.Notes
     // make sure aggregate can be rebuilt
     public class NoteFollowedUp : AggregateEvent
     {
-        public NoteFollowedUp(string ticker, DateTimeOffset when, string userId, string text)
-            : base(ticker, userId, when.DateTime)
+        public NoteFollowedUp(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
         {
-            this.Text = text;
         }
-
-        public string Text { get; }
     }
 }

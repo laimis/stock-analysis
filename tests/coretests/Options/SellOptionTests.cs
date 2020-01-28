@@ -20,36 +20,12 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithNoSoldOptions();
 
-            var handler = new SellOption.Handler(storage);
+            var handler = new Sell.Handler(storage);
 
             await handler.Handle(_fixture.SellOptionCommand, CancellationToken.None);
 
             Assert.Single(storage.SavedOptions);
-        }
-
-        [Fact]
-        public async Task Sell_AlreadySold_IncreasesAmount()
-        {
-            var storage = _fixture.CreateStorageWithNoSoldOptions();
-
-            var handler = new SellOption.Handler(storage);
-
-            await handler.Handle(_fixture.SellOptionCommand, CancellationToken.None);
-
-            Assert.Single(storage.SavedOptions);
-
-            var opt = storage.SavedOptions.Single();
-            
-            storage = _fixture.CreateStorageWithSoldOption(opt);
-
-            handler = new SellOption.Handler(storage);
-
-            await handler.Handle(_fixture.SellOptionCommand, CancellationToken.None);
-
-            opt = storage.SavedOptions.Single();
-
-            Assert.Equal(2, opt.State.Amount);
-            Assert.Null(opt.State.Closed);
+            Assert.True(storage.SavedOptions.Single().State.IsOpen);
         }
     }
 }

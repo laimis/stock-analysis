@@ -33,25 +33,19 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(SellOption.Command cmd)
+        public async Task<ActionResult> Sell(Sell.Command cmd)
         {
-            cmd.WithUser(this.User.Identifier());
+            cmd.WithUserId(this.User.Identifier());
 
             await _mediator.Send(cmd);
 
             return Ok();
         }
 
-        [HttpGet("soldoptions/{ticker}/{type}/{strikePrice}/{expiration}")]
-        public async Task<object> SoldOption(string ticker, string type, double strikePrice, DateTimeOffset expiration)
+        [HttpGet("soldoptions/{id}")]
+        public async Task<object> SoldOption(Guid id)
         {
-            // TODO: can this come from the route?
-            var query = new GetSoldOption.Query {
-                Expiration = expiration,
-                Ticker = ticker,
-                Type = type,
-                StrikePrice = strikePrice,
-            };
+            var query = new GetSoldOption.Query { Id = id };
 
             query.WithUserId(this.User.Identifier());
             
@@ -66,9 +60,9 @@ namespace web.Controllers
         }
 
         [HttpPost("close")]
-        public async Task<ActionResult> CloseSoldOption(CloseOption.Command cmd)
+        public async Task<ActionResult> CloseSoldOption(Close.Command cmd)
         {
-            cmd.WithUser(this.User.Identifier());
+            cmd.WithUserId(this.User.Identifier());
 
             await _mediator.Send(cmd);
 

@@ -18,13 +18,14 @@ namespace core.Stocks
 		public int Owned { get; internal set; }
 		public double Spent { get; internal set; }
 		public double Earned { get; internal set; }
-        public DateTime Purchased { get; internal set; }
-        public DateTime? Sold { get; internal set; }
+        public DateTimeOffset Purchased { get; internal set; }
+        public DateTimeOffset? Sold { get; internal set; }
         public double Profit => this.Sold != null ? this.Earned - this.Spent : 0;
 
         public List<Transaction> Transactions { get; private set; }
         public double Cost => Math.Round(Math.Abs(this.Spent - this.Earned), 2);
 
+        public Guid Id { get; set; }
         internal List<StockPurchased> Buys { get; }
         internal List<StockSold> Sells { get; }
 

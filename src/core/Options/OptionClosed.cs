@@ -5,8 +5,8 @@ namespace core.Options
 {
     public class OptionClosed : AggregateEvent
     {
-        public OptionClosed(string ticker, string userId, int amount, double money, DateTimeOffset when)
-             : base(ticker, userId, when.DateTime)
+        public OptionClosed(Guid guid, Guid aggregateId, DateTimeOffset when, int amount, double money)
+             : base(guid, aggregateId, when)
         {
             this.Amount = amount;
             this.Money = money;

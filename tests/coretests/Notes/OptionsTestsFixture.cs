@@ -24,7 +24,7 @@ namespace coretests.Notes
             var note = new Note(UserId, @"multi line
             note", Ticker, 100);
 
-            storage.Save(note);
+            storage.Save(note, UserId);
 
             return storage;
         }

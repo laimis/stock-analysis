@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using core.Notes;
 using MediatR;
@@ -54,7 +55,7 @@ namespace web.Controllers
         }
 
         [HttpGet("{noteId}")]
-        public async Task<object> Get(string noteId)
+        public async Task<object> Get(Guid noteId)
         {
             var query = new Get.Query(this.User.Identifier(), noteId);
 

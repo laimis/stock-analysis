@@ -26,7 +26,7 @@ namespace web
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService, StocksService>();
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
-            services.AddMediatR(typeof(CloseOption).Assembly);
+            services.AddMediatR(typeof(Close).Assembly);
 
             services.AddHostedService<TestService>();
             

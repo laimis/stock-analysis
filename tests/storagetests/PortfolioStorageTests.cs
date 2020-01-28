@@ -28,7 +28,7 @@ namespace storage.tests
         {
             var storage = CreateStorage();
 
-            Assert.Null(await storage.GetSoldOption("nonexisting", OptionType.CALL, DateTimeOffset.UtcNow, 2, "userid"));
+            Assert.Null(await storage.GetSoldOption(Guid.NewGuid(), _userId));
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace storage.tests
 
             var storage = CreateStorage();
 
-            await storage.Save(stock);
+            await storage.Save(stock, _userId);
 
             var loadedList = await storage.GetStocks(_userId);
 
@@ -52,7 +52,7 @@ namespace storage.tests
 
             loaded.Purchase(5, 5, DateTime.UtcNow);
 
-            await storage.Save(loaded);
+            await storage.Save(loaded, _userId);
 
             loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
 
@@ -74,20 +74,18 @@ namespace storage.tests
                 OptionType.CALL,
                 expiration,
                 2.5,
-                _userId
+                _userId,
+                1,
+                8,
+                DateTimeOffset.UtcNow
             );
-
-            option.Open(1, 8, DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
-            await storage.Save(option);
+            await storage.Save(option, _userId);
 
             var loaded = await storage.GetSoldOption(
-                option.State.Ticker,
-                option.State.Type,
-                option.State.Expiration,
-                option.State.StrikePrice,
+                option.State.Id,
                 _userId);
 
             Assert.NotNull(loaded);
@@ -108,17 +106,17 @@ namespace storage.tests
 
             var storage = CreateStorage();
 
-            await storage.Save(note);
+            await storage.Save(note, _userId);
 
             var notes = await storage.GetNotes(_userId);
 
             Assert.NotEmpty(notes);
 
-            note = notes.OrderByDescending(n => n.State.Created).First();
+            note = notes.Single(n => n.State.Id == note.State.Id);
 
             note.Update("new note", 100);
 
-            await storage.Save(note);
+            await storage.Save(note, _userId);
 
             var fromDb = await storage.GetNote(_userId, note.State.Id);
             

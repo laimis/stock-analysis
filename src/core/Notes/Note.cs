@@ -38,12 +38,14 @@ namespace core.Notes
 
             Apply(
                 new NoteCreated(
-                    Guid.NewGuid().ToString(),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
                     DateTimeOffset.UtcNow,
                     userId,
                     note,
                     ticker,
-                    predictedPrice)
+                    predictedPrice
+                )
             );
         }
 
@@ -61,9 +63,9 @@ namespace core.Notes
 
             Apply(
                 new NoteUpdated(
+                    Guid.NewGuid(),
                     this.State.Id,
                     DateTimeOffset.UtcNow,
-                    this.State.UserId,
                     note,
                     predictedPrice
                 )
@@ -84,9 +86,9 @@ namespace core.Notes
 
         protected void ApplyInternal(NoteCreated created)
         {
-            this.State.Id = created.Ticker;
+            this.State.Id = created.AggregateId;
             this.State.UserId = created.UserId;
-            this.State.RelatedToTicker = created.RelatedToTicker;
+            this.State.RelatedToTicker = created.Ticker;
             this.State.Created = created.When;
             this.State.Note = created.Note;
             this.State.PredictedPrice = created.PredictedPrice;

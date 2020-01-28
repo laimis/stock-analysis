@@ -34,7 +34,7 @@ namespace core.Notes
                     request.Ticker,
                     request.PredictedPrice);
 
-                await _storage.Save(note);
+                await _storage.Save(note, request.UserId);
 
                 return new {
                     id = note.State.Id

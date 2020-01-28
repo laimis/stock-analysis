@@ -21,7 +21,7 @@ namespace coretests.Options
         {
             var storage = new FakePortfolioStorage();
 
-            var handler = new CloseOption.Handler(storage);
+            var handler = new Close.Handler(storage);
 
             await handler.Handle(_fixture.CloseOptionCommand, CancellationToken.None);
 
@@ -33,7 +33,7 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithSoldOption();
 
-            var handler = new CloseOption.Handler(storage);
+            var handler = new Close.Handler(storage);
 
             await handler.Handle(_fixture.CloseOptionCommand, CancellationToken.None);
 

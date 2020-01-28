@@ -9,13 +9,13 @@ namespace coretests.Shared
         [Fact]
         public void CreateWithBadKeyFails()
         {
-            Assert.Throws<InvalidOperationException>(() => new AggregateEvent(null, "userid", DateTime.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new AggregateEvent(Guid.Empty, Guid.NewGuid(), DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void CreateWithBadUserIdFails()
         {
-            Assert.Throws<InvalidOperationException>(() => new AggregateEvent("key", null, DateTime.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new AggregateEvent(Guid.NewGuid(), Guid.Empty, DateTimeOffset.UtcNow));
         }
     }
 }
