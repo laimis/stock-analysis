@@ -1,9 +1,11 @@
 using System;
 using core;
 using core.Account;
+using core.Adapters.CSV;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Options;
+using csvparser;
 using financialmodelingclient;
 using iexclient;
 using MediatR;
@@ -26,6 +28,7 @@ namespace web
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService, StocksService>();
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
+            services.AddSingleton<ICSVParser, CSVParser>();
             services.AddMediatR(typeof(Close).Assembly);
 
             services.AddHostedService<TestService>();

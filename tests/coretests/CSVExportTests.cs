@@ -39,7 +39,7 @@ namespace coretests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note("user", "note", "ticker", 100);
+            var note = new Note("user", "note", "ticker", 100, DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {note});
 

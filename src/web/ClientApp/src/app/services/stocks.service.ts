@@ -37,6 +37,10 @@ export class StocksService {
     return this.http.patch<any>('/api/notes', note)
   }
 
+  importNotes(formData: FormData) {
+    return this.http.post('/api/notes/import', formData)
+  }
+
   getNotes(ticker: string): Observable<NoteList> {
     if (ticker === null)
     {

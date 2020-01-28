@@ -21,7 +21,8 @@ namespace coretests.Notes
                             "userid",
                             "description",
                             "ticker",
-                            100
+                            100,
+                            DateTimeOffset.UtcNow
                         );
         }
 
@@ -58,19 +59,25 @@ namespace coretests.Notes
         [Fact]
         public void FailWithEmptyUser()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(null, "some note", null, null));
+            Assert.Throws<InvalidOperationException>(() => new Note(null, "some note", "ticker", null, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithNegativePrediction()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note("user", "some note", null, -12));
+            Assert.Throws<InvalidOperationException>(() => new Note("user", "some note", "ticker", -12, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithNoNote()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note("user", "", null, 12));
+            Assert.Throws<InvalidOperationException>(() => new Note("user", "", "ticker", 12, DateTimeOffset.UtcNow));
+        }
+
+        [Fact]
+        public void FailWithFutureCreated()
+        {
+            Assert.Throws<InvalidOperationException>(() => new Note("user", "note", "ticker", 12, DateTimeOffset.UtcNow.AddDays(1)));
         }
 
         [Fact]

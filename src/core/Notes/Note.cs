@@ -14,7 +14,7 @@ namespace core.Notes
         {
         }
 
-        public Note(string userId, string note, string ticker, double? predictedPrice)
+        public Note(string userId, string note, string ticker, double? predictedPrice, DateTimeOffset created)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -36,11 +36,16 @@ namespace core.Notes
                 throw new InvalidOperationException("Note cannot be empty");
             }
 
+            if (created > DateTimeOffset.UtcNow)
+            {
+                throw new InvalidOperationException("Note creation date cannot be in the future");
+            }
+
             Apply(
                 new NoteCreated(
                     Guid.NewGuid(),
                     Guid.NewGuid(),
-                    DateTimeOffset.UtcNow,
+                    created,
                     userId,
                     note,
                     ticker,

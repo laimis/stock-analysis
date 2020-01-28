@@ -102,7 +102,7 @@ namespace storage.tests
         [Fact]
         public async Task NoteStorageWorksAsync()
         {
-            var note = new Note(_userId, "note", "ticker", null);
+            var note = new Note(_userId, "note", "ticker", null, DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
