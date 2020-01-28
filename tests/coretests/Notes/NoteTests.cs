@@ -29,7 +29,7 @@ namespace coretests.Notes
         [Fact]
         public void GuidAssigned()
         {
-            Assert.NotNull(_state.Id);
+            Assert.NotEqual(Guid.Empty, _state.Id);
         }
 
         [Fact]
