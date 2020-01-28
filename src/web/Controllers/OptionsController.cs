@@ -1,8 +1,10 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using core.Options;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 
@@ -73,6 +75,20 @@ namespace web.Controllers
         public Task<ActionResult> Export()
         {
             return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
+        }
+
+        [HttpPost("import")]
+        public async Task Import(IFormFile file)
+        {
+            using var streamReader = new StreamReader(file.OpenReadStream());
+
+            var content = await streamReader.ReadToEndAsync();
+
+            var cmd = new Import.Command(content);
+
+            cmd.WithUserId(this.User.Identifier());
+
+            await _mediator.Send(cmd);
         }
     }
 }

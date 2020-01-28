@@ -34,13 +34,12 @@ namespace core.Options
                 throw new InvalidOperationException("Strike price cannot be zero or negative");
             }
 
-            var daysToExpiration = expiration.Subtract(DateTimeOffset.UtcNow).TotalDays;
-            if (daysToExpiration <= 0)
+            if (expiration == DateTimeOffset.MinValue)
             {
                 throw new InvalidOperationException("Expiration date is in the past");
             }
 
-            if (daysToExpiration > 365)
+            if (expiration == DateTimeOffset.MaxValue)
             {
                 throw new InvalidOperationException("Expiratoin date is too far in the future");
             }

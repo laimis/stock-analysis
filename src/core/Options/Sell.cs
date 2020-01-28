@@ -10,7 +10,7 @@ namespace core.Options
 {
     public class Sell
     {
-        public class Command : RequestWithUserId
+        public class Command : RequestWithUserId<Guid>
         {
             [Required]
             public string Ticker { get; set; }
@@ -35,7 +35,7 @@ namespace core.Options
             public DateTimeOffset? Filled { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Guid>
         {
             private IPortfolioStorage _storage;
 
@@ -44,7 +44,7 @@ namespace core.Options
                 _storage = storage;
             }
             
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
 
@@ -60,7 +60,7 @@ namespace core.Options
 
                 await this._storage.Save(option, cmd.UserId);
 
-                return new Unit();
+                return option.State.Id;
             }
         }
     }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { format } from 'url';
 
 export function GetErrors(err:any): string[] {
   return Object.keys(err.error.errors).map<string>(v => {
@@ -57,8 +58,8 @@ export class StocksService {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
   }
 
-  importShares(file: any) : Observable<any> {
-    return this.http.post('/api/stocks/importshares', file)
+  importStocks(file: any) : Observable<any> {
+    return this.http.post('/api/stocks/import', file)
   }
 
 	purchase(obj:object) : Observable<any> {
@@ -71,6 +72,10 @@ export class StocksService {
 
 	getOptions(ticker:string): Observable<OptionDetail> {
     return this.http.get<OptionDetail>('/api/options/' + ticker)
+  }
+
+  importOptions(formData: FormData) {
+    return this.http.post('/api/options/import', formData)
   }
 
 	getPortfolio(): Observable<Portfolio> {

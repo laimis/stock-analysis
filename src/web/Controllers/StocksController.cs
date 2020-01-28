@@ -69,8 +69,8 @@ namespace web.Controllers
             return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
         }
 
-        [HttpPost("importshares")]
-        public async Task ImportShares(IFormFile file)
+        [HttpPost("import")]
+        public async Task Import(IFormFile file)
         {
             using var streamReader = new StreamReader(file.OpenReadStream());
 

@@ -13,12 +13,28 @@
     <h2>Import your shares</h2>
     <div class="mt-2">
       <label class="import-file">
-        <input hidden (change)="onFileSelected($event)"  #fileInput type="file" id="file">
-        <div *ngIf="importSharesEnabled">Import your shares
-          <button class="btn btn-primary" (click)="fileInput.click()">Choose file...</button>
+        <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
+        <div *ngIf="importShareStatus == 'ready'">Import your shares
+          <button class="btn btn-primary" (click)="shareInput.click()">Choose file...</button>
         </div>
-        <div *ngIf="importSharesInProgress">Importing shares...</div>
-        <div *ngIf="importSharesComplete" class="alert alert-success">Shares imported successfully</div>
+        <div *ngIf="importShareStatus == 'inprogress'">Importing shares...</div>
+        <div *ngIf="importShareStatus == 'success'" class="alert alert-success">Shares imported successfully</div>
+        <div *ngIf="importShareStatus == 'failed'" class="alert alert-error">Shares import failed</div>
+    </label>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h2>Import your options</h2>
+    <div class="mt-2">
+      <label class="import-file">
+        <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
+        <div *ngIf="importOptionStatus == 'ready'">Import your options
+          <button class="btn btn-primary" (click)="optionInput.click()">Choose file...</button>
+        </div>
+        <div *ngIf="importOptionStatus == 'inprogress'">Importing options...</div>
+        <div *ngIf="importOptionStatus == 'success'" class="alert alert-success">Options imported successfully</div>
+        <div *ngIf="importOptionStatus == 'failed'" class="alert alert-error">Options import failed</div>
     </label>
     </div>
   </div>

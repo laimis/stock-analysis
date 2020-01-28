@@ -72,14 +72,23 @@ namespace storage.redis
 
         internal static storage.shared.StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)
         {
-            return new storage.shared.StoredAggregateEvent {
-                Created = DateTime.Parse(result.Single(h => h.Name == "created").Value, null, System.Globalization.DateTimeStyles.AssumeUniversal),
-                Entity = result.Single(h => h.Name == "entity").Value,
-                EventJson = result.Single(h => h.Name == "event").Value,
-                Key = result.Single(h => h.Name == "key").Value,
-                UserId = result.Single(h => h.Name == "userId").Value,
-                Version = int.Parse(result.Single(h => h.Name == "version").Value),
-            };
+            var eventJson = result.Single(h => h.Name == "event").Value;
+
+            try
+            {
+                return new storage.shared.StoredAggregateEvent {
+                    Created = DateTime.Parse(result.Single(h => h.Name == "created").Value, null, System.Globalization.DateTimeStyles.AssumeUniversal),
+                    Entity = result.Single(h => h.Name == "entity").Value,
+                    EventJson = eventJson,
+                    Key = result.Single(h => h.Name == "key").Value,
+                    UserId = result.Single(h => h.Name == "userId").Value,
+                    Version = int.Parse(result.Single(h => h.Name == "version").Value),
+                };
+            }
+            catch(InvalidOperationException ex)
+            {
+                throw new Exception("Failed to build event from JSON: " + eventJson, ex);
+            }
         }
 
         public Task DoHealthCheck()

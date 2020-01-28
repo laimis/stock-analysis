@@ -8,30 +8,51 @@ import { StocksService } from '../services/stocks.service';
 })
 export class ProfileComponent implements OnInit {
 
-  importSharesEnabled: boolean = true
-  importSharesInProgress: boolean = false
-  importSharesComplete: boolean = false
+  importShareStatus: string = 'ready'
+  importOptionStatus: string = 'ready'
 
   constructor(private service:StocksService) { }
 
   ngOnInit() {}
 
-  onFileSelected($event) {
+  importShares($event) {
 
-    this.importSharesEnabled = false
-    this.importSharesInProgress = true
+    this.importShareStatus = 'inprogress'
 
-    var file = $event.target.files[0]
-    let formData: FormData = new FormData();
-    formData.append("file", file, file.name);
+    let formData: FormData = this.getFormData($event);
 
-    this.service.importShares(formData).subscribe(
+    this.service.importStocks(formData).subscribe(
       s => {
         console.log("success uploading " + s)
-        this.importSharesInProgress = false
-        this.importSharesComplete = true
+        this.importShareStatus = 'success'
       },
-      e => console.log("failed: " + e))
+      e => {
+        console.log("failed: " + e);
+        this.importShareStatus = 'failed'
+      })
   }
 
+  importOptions($event) {
+
+    this.importOptionStatus = 'inprogress'
+
+    let formData: FormData = this.getFormData($event);
+
+    this.service.importOptions(formData).subscribe(
+      s => {
+        console.log("success uploading " + s)
+        this.importOptionStatus = 'success'
+      },
+      e => {
+        console.log("failed: " + e);
+        this.importOptionStatus = 'failed'
+      })
+  }
+
+  private getFormData($event: any) {
+    var file = $event.target.files[0];
+    let formData: FormData = new FormData();
+    formData.append("file", file, file.name);
+    return formData;
+  }
 }
