@@ -27,7 +27,7 @@ namespace storage.redis
 
             return keys.Select(async k => await db.HashGetAllAsync(k.ToString()))
                 .Select(e => ToEvent(entity, userId, e.Result))
-                .OrderBy(e => e.Key)
+                .OrderBy(e => e.Event.AggregateId)
                 .ThenBy(e => e.Version)
                 .Select(e => e.Event);
         }
