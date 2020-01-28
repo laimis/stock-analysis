@@ -12,10 +12,6 @@ export function GetErrors(err:any): string[] {
 export class StocksService {
   constructor(private http: HttpClient) { }
 
-  importShares(file: any) : Observable<any> {
-    return this.http.post('/api/profile/importshares', file)
-  }
-
   getEvents(): Observable<object[]> {
     return this.http.get<object[]>('/api/events')
   }
@@ -61,13 +57,9 @@ export class StocksService {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
   }
 
-	getOptions(ticker:string): Observable<OptionDetail> {
-    return this.http.get<OptionDetail>('/api/options/' + ticker)
+  importShares(file: any) : Observable<any> {
+    return this.http.post('/api/stocks/importshares', file)
   }
-
-	getPortfolio(): Observable<Portfolio> {
-		return this.http.get<Portfolio>('/api/portfolio')
-	}
 
 	purchase(obj:object) : Observable<any> {
 		return this.http.post('/api/stocks/purchase', obj)
@@ -75,6 +67,14 @@ export class StocksService {
 
 	sell(obj:object) : Observable<any> {
 		return this.http.post('/api/stocks/sell', obj)
+	}
+
+	getOptions(ticker:string): Observable<OptionDetail> {
+    return this.http.get<OptionDetail>('/api/options/' + ticker)
+  }
+
+	getPortfolio(): Observable<Portfolio> {
+		return this.http.get<Portfolio>('/api/portfolio')
 	}
 
 	openOption(obj:object) : Observable<any> {
