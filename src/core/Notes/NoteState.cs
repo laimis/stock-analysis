@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace core.Notes
 {
     public class NoteState
     {
-        public string Id { get; internal set; }
+        public Guid Id { get; internal set; }
         public string RelatedToTicker { get; internal set; }
-        public DateTime Created { get; internal set; }
+        public DateTimeOffset Created { get; internal set; }
         public string Note { get; internal set; }
         public double? PredictedPrice { get; internal set; }
         public string UserId { get; internal set; }

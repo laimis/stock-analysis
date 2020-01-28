@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +11,12 @@ namespace core.Notes
     {
         public class Query : RequestWithUserId<object>
         {
-            public Query(string userId, string noteId) : base(userId)
+            public Query(string userId, Guid noteId) : base(userId)
             {
                 this.NoteId = noteId;
             }
 
-            public string NoteId { get; }
+            public Guid NoteId { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, object>

@@ -9,7 +9,15 @@ namespace core.Options
         private SoldOptionState _state = new SoldOptionState();
         public SoldOptionState State => _state;
 
-        public SoldOption(string ticker, OptionType type, DateTimeOffset expiration, double strikePrice, string userId)
+        public SoldOption(
+            string ticker,
+            OptionType type,
+            DateTimeOffset expiration,
+            double strikePrice,
+            string userId,
+            int amount,
+            double premium,
+            DateTimeOffset filled)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -26,26 +34,16 @@ namespace core.Options
                 throw new InvalidOperationException("Strike price cannot be zero or negative");
             }
 
-            var daysToExpiration = expiration.Subtract(DateTimeOffset.UtcNow).TotalDays;
-            if (daysToExpiration <= 0)
+            if (expiration == DateTimeOffset.MinValue)
             {
                 throw new InvalidOperationException("Expiration date is in the past");
             }
 
-            if (daysToExpiration > 365)
+            if (expiration == DateTimeOffset.MaxValue)
             {
                 throw new InvalidOperationException("Expiratoin date is too far in the future");
             }
 
-            Apply(new OptionObtained(ticker, type, strikePrice, expiration.Date, userId, DateTime.UtcNow));
-        }
-
-        public SoldOption(IEnumerable<AggregateEvent> events) : base(events)
-        {
-        }
-
-        public void Open(int amount, double premium, DateTimeOffset filled)
-        {
             if (amount <= 0)
             {
                 throw new InvalidOperationException("Amount cannot be zero or negative");
@@ -56,7 +54,11 @@ namespace core.Options
                 throw new InvalidOperationException("Premium cannot be zero or negative");
             }
 
-            Apply(new OptionOpened(this.State.Key, this.State.UserId, amount, premium, filled));
+            Apply(new OptionSold(Guid.NewGuid(), Guid.NewGuid(), filled, ticker, type, strikePrice, expiration.Date, userId, amount, premium));
+        }
+
+        public SoldOption(IEnumerable<AggregateEvent> events) : base(events)
+        {
         }
 
         public void Close(int amount, double money, DateTimeOffset closed)
@@ -76,7 +78,7 @@ namespace core.Options
                 throw new InvalidOperationException("Close money cannot be negative");
             }
 
-            Apply(new OptionClosed(this.State.Key, this.State.UserId, amount, money, closed));
+            Apply(new OptionClosed(Guid.NewGuid(), this.State.Id, closed, amount, money));
         }
 
         protected override void Apply(AggregateEvent e)
@@ -91,18 +93,9 @@ namespace core.Options
             this.ApplyInternal(obj);
         }
 
-        protected void ApplyInternal(OptionObtained obtained)
+        protected void ApplyInternal(OptionSold sold)
         {
-            this.State.Ticker = obtained.TickerSymbol;
-            this.State.StrikePrice = obtained.StrikePrice;
-            this.State.Expiration = obtained.Expiration;
-            this.State.Type = obtained.Type;
-            this.State.UserId = obtained.UserId;
-        }
-
-        protected void ApplyInternal(OptionOpened opened)
-        {
-            this.State.Apply(opened);
+            this.State.Apply(sold);
         }
 
         protected void ApplyInternal(OptionClosed closed)

@@ -25,7 +25,7 @@ namespace core.Stocks
                 throw new InvalidOperationException("Missing user id");
             }
 
-            Apply(new TickerObtained(ticker, userId, DateTime.UtcNow));
+            Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker, userId));
         }
 
         protected override void Apply(AggregateEvent obj)
@@ -40,7 +40,7 @@ namespace core.Stocks
             this.ApplyInternal(obj);
         }
 
-        public void Purchase(int amount, double price, DateTime date)
+        public void Purchase(int amount, double price, DateTimeOffset date)
         {
             if (price <= 0)
             {
@@ -52,17 +52,17 @@ namespace core.Stocks
                 throw new InvalidOperationException("Purchase date not specified");
             }
 
-            Apply(new StockPurchased(this.State.Ticker, this.State.UserId, amount, price, date));
+            Apply(new StockPurchased(Guid.NewGuid(), this.State.Id, date, this.State.Ticker, amount, price));
         }
 
-        public void Sell(int amount, double price, DateTime date)
+        public void Sell(int amount, double price, DateTimeOffset date)
         {
             if (amount > this.State.Owned)
             {
                 throw new InvalidOperationException("Amount owned is less than what is desired to sell");
             }
 
-            Apply(new StockSold(this.State.Ticker, this.State.UserId, amount, price, date));
+            Apply(new StockSold(Guid.NewGuid(), this.State.Id, date, this.State.Ticker, amount, price));
         }
 
         private void ApplyInternal(StockPurchased purchased)
@@ -72,6 +72,7 @@ namespace core.Stocks
 
         private void ApplyInternal(TickerObtained tickerObtained)
         {
+            this.State.Id = tickerObtained.AggregateId;
             this.State.Ticker = tickerObtained.Ticker;
             this.State.UserId = tickerObtained.UserId;
         }

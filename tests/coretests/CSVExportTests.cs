@@ -25,9 +25,7 @@ namespace coretests
         [Fact]
         public void ExportOptionsHeader()
         {
-            var option = new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(1), 2.5, "user");
-
-            option.Open(1, 100, DateTimeOffset.UtcNow);
+            var option = new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(1), 2.5, "user", 1, 100, DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {option});
 
@@ -41,7 +39,7 @@ namespace coretests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note("user", "note", "ticker", 100);
+            var note = new Note("user", "note", "ticker", 100, DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {note});
 

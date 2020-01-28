@@ -1,8 +1,10 @@
+using System.IO;
 using System.Threading.Tasks;
 using core;
 using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 
@@ -27,7 +29,7 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(SellCommand model)
+        public async Task<ActionResult> Sell(Sell.Command model)
         {
             model.WithUserId(this.User.Identifier());
 
@@ -37,7 +39,7 @@ namespace web.Controllers
         }
 
         [HttpPost("purchase")]
-        public async Task<ActionResult> Purchase(BuyCommand model)
+        public async Task<ActionResult> Purchase(Buy.Command model)
         {
             model.WithUserId(this.User.Identifier());
 
@@ -65,6 +67,20 @@ namespace web.Controllers
         public Task<ActionResult> Export()
         {
             return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
+        }
+
+        [HttpPost("import")]
+        public async Task Import(IFormFile file)
+        {
+            using var streamReader = new StreamReader(file.OpenReadStream());
+
+            var content = await streamReader.ReadToEndAsync();
+
+            var cmd = new Import.Command(content);
+
+            cmd.WithUserId(this.User.Identifier());
+
+            await _mediator.Send(cmd);
         }
     }
 }

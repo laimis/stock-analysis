@@ -11,6 +11,7 @@ namespace core.Options
             this.Transactions = new List<Transaction>();
         }
 
+        public Guid Id { get; private set; }
         public string Ticker { get; internal set; }
         public double StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; internal set; }
@@ -29,19 +30,28 @@ namespace core.Options
         public List<Transaction> Transactions { get; private set; }
         public bool IsOpen => this.Closed == null;
 
-        internal void Apply(OptionOpened opened)
+        internal void Apply(OptionSold sold)
         {
-            this.Amount += opened.Amount;
-            this.Filled = opened.Filled;
-            this.Premium += opened.Premium;
+            this.Id = sold.AggregateId;
+            this.Ticker = sold.Ticker;
+            this.StrikePrice = sold.StrikePrice;
+            this.Expiration = sold.Expiration;
+            this.Type = sold.Type;
+            this.UserId = sold.UserId;
+            this.Amount += sold.Amount;
+            this.Premium += sold.Premium;
+
+            // TODO: this does not make sense for multiple opens?
+            // should each open stay separate and no ++ on amount/premium
+            this.Filled = sold.When;
 
             this.Transactions.Add(
                 new Transaction(
                     this.Ticker,
                     $"Sold ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} option",
-                    opened.Amount * opened.Premium,
+                    sold.Amount * sold.Premium,
                     0,
-                    opened.When
+                    sold.When
                 )
             );
         }

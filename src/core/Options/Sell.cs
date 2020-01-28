@@ -2,14 +2,15 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using core.Utils;
 using MediatR;
 
 namespace core.Options
 {
-    public class SellOption
+    public class Sell
     {
-        public class Command : IRequest
+        public class Command : RequestWithUserId<Guid>
         {
             [Required]
             public string Ticker { get; set; }
@@ -32,15 +33,9 @@ namespace core.Options
 
             [Required]
             public DateTimeOffset? Filled { get; set; }
-            public string UserIdentifier { get; private set; }
-
-            public void WithUser(string userId)
-            {
-                this.UserIdentifier = userId;
-            }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Guid>
         {
             private IPortfolioStorage _storage;
 
@@ -49,21 +44,23 @@ namespace core.Options
                 _storage = storage;
             }
             
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
 
-                var option = await this._storage.GetSoldOption(cmd.Ticker, optionType, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
-                if (option == null)
-                {
-                    option = new SoldOption(cmd.Ticker, optionType, cmd.ExpirationDate.Value, cmd.StrikePrice, cmd.UserIdentifier);
-                }
+                var option = new SoldOption(
+                        cmd.Ticker,
+                        optionType,
+                        cmd.ExpirationDate.Value,
+                        cmd.StrikePrice,
+                        cmd.UserId,
+                        cmd.Amount,
+                        cmd.Premium,
+                        cmd.Filled.Value);
 
-                option.Open(cmd.Amount, cmd.Premium, cmd.Filled.Value);
+                await this._storage.Save(option, cmd.UserId);
 
-                await this._storage.Save(option);
-
-                return new Unit();
+                return option.State.Id;
             }
         }
     }

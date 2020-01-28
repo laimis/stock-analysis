@@ -12,9 +12,9 @@ namespace storage.shared
 {
     public class PortfolioStorage : IPortfolioStorage
     {
-        const string _stock_entity = "ownedstock";
-        const string _option_entity = "soldoption";
-        const string _note_entity = "note";
+        const string _stock_entity = "ownedstock2";
+        const string _option_entity = "soldoption2";
+        const string _note_entity = "note2";
 
         private IAggregateStorage _aggregateStorage;
 
@@ -25,51 +25,37 @@ namespace storage.shared
 
         public async Task<OwnedStock> GetStock(string ticker, string userId)
         {
-            var events = await _aggregateStorage.GetEventsAsync(_stock_entity, ticker, userId);
-
-            if (events.Count() == 0)
-            {
-                return null;
-            }
+            var stocks = await GetStocks(userId);
             
-            return new OwnedStock(events);
+            return stocks.SingleOrDefault(s => s.State.Ticker == ticker);
         }
 
-        public Task Save(OwnedStock stock)
+        public Task Save(OwnedStock stock, string userId)
         {
-            return Save(stock, _stock_entity);
+            return Save(stock, _stock_entity, userId);
         }
 
-        public Task Save(SoldOption option)
+        public Task Save(SoldOption option, string userId)
         {
-            return Save(option, _option_entity);
+            return Save(option, _option_entity, userId);
         }
 
-        private Task Save(Aggregate agg, string entityName)
+        private Task Save(Aggregate agg, string entityName, string userId)
         {
-            return _aggregateStorage.SaveEventsAsync(agg, entityName);
+            return _aggregateStorage.SaveEventsAsync(agg, entityName, userId);
         }
 
         public async Task<IEnumerable<OwnedStock>> GetStocks(string userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_stock_entity, userId);
 
-            return list.GroupBy(e => e.Ticker)
+            return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedStock(g));
         }
 
-        public async Task<SoldOption> GetSoldOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId)
+        public async Task<SoldOption> GetSoldOption(Guid optionId, string userId)
         {
-            var key = SoldOption.GenerateKey(ticker, optionType, expiration, strikePrice);
-
-            var events = await _aggregateStorage.GetEventsAsync(_option_entity, key, userId);
-
-            if (events.Count() == 0)
-            {
-                return null;
-            }
-
-            return new SoldOption(events);
+            return (await GetSoldOptions(userId)).SingleOrDefault(s => s.State.Id == optionId);
         }
 
         public async Task<IEnumerable<SoldOption>> GetSoldOptions(string userId)
@@ -78,24 +64,24 @@ namespace storage.shared
 
             var events = list.ToList();
 
-            return list.GroupBy(e => e.Ticker)
+            return list.GroupBy(e => e.AggregateId)
                 .Select(g => new SoldOption(g));
         }
 
-        public Task Save(Note note)
+        public Task Save(Note note, string userId)
         {
-            return Save(note, _note_entity);
+            return Save(note, _note_entity, userId);
         }
 
         public async Task<IEnumerable<Note>> GetNotes(string userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_note_entity, userId);
 
-            return list.GroupBy(e => e.Ticker)
+            return list.GroupBy(e => e.AggregateId)
                 .Select(g => new Note(g));
         }
 
-        public async Task<Note> GetNote(string userId, string noteId)
+        public async Task<Note> GetNote(string userId, Guid noteId)
         {
             var list = await GetNotes(userId);
 

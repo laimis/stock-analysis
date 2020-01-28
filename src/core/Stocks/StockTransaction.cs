@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using core.Shared;
-using MediatR;
 
 namespace core.Stocks
 {
@@ -17,6 +16,6 @@ namespace core.Stocks
         public double Price { get; set; }
         
         [Required]
-        public DateTime? Date { get; set; }
+        public DateTimeOffset? Date { get; set; }
     }
 }

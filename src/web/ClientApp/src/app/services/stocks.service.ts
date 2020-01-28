@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { format } from 'url';
 
 export function GetErrors(err:any): string[] {
   return Object.keys(err.error.errors).map<string>(v => {
@@ -36,6 +37,10 @@ export class StocksService {
     return this.http.patch<any>('/api/notes', note)
   }
 
+  importNotes(formData: FormData) {
+    return this.http.post('/api/notes/import', formData)
+  }
+
   getNotes(ticker: string): Observable<NoteList> {
     if (ticker === null)
     {
@@ -57,13 +62,9 @@ export class StocksService {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
   }
 
-	getOptions(ticker:string): Observable<OptionDetail> {
-    return this.http.get<OptionDetail>('/api/options/' + ticker)
+  importStocks(file: any) : Observable<any> {
+    return this.http.post('/api/stocks/import', file)
   }
-
-	getPortfolio(): Observable<Portfolio> {
-		return this.http.get<Portfolio>('/api/portfolio')
-	}
 
 	purchase(obj:object) : Observable<any> {
 		return this.http.post('/api/stocks/purchase', obj)
@@ -71,6 +72,18 @@ export class StocksService {
 
 	sell(obj:object) : Observable<any> {
 		return this.http.post('/api/stocks/sell', obj)
+	}
+
+	getOptions(ticker:string): Observable<OptionDetail> {
+    return this.http.get<OptionDetail>('/api/options/' + ticker)
+  }
+
+  importOptions(formData: FormData) {
+    return this.http.post('/api/options/import', formData)
+  }
+
+	getPortfolio(): Observable<Portfolio> {
+		return this.http.get<Portfolio>('/api/portfolio')
 	}
 
 	openOption(obj:object) : Observable<any> {

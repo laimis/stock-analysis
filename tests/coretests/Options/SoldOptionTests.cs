@@ -22,17 +22,6 @@ namespace coretests.Options
             Assert.Equal(0, option.State.CollateralShares);
             Assert.Equal(218, option.State.CollateralCash);
 
-            option.Open(1, 40, DateTimeOffset.UtcNow);
-
-            Assert.Equal(72, option.State.Premium);
-
-            Assert.Equal(2, option.State.Amount);
-
-            option.Close(1, 0, DateTimeOffset.UtcNow);
-
-            Assert.Equal(1, option.State.Amount);
-            Assert.Null(option.State.Closed);
-
             option.Close(1, 10, DateTimeOffset.UtcNow);
 
             Assert.Equal(0, option.State.Amount);
@@ -40,7 +29,7 @@ namespace coretests.Options
 
             Assert.Equal(10, option.State.Spent);
 
-            Assert.Equal(62, option.State.Profit);
+            Assert.Equal(22, option.State.Profit);
         }
 
         [Fact]
@@ -59,10 +48,10 @@ namespace coretests.Options
                 optionType,
                 DateTimeOffset.UtcNow.AddDays(10),
                 2.5,
-                "laimonas"
-            );
-
-            option.Open(1, 32, DateTimeOffset.UtcNow);
+                "laimonas",
+                1,
+                32,
+                DateTimeOffset.UtcNow);
 
             return option;
         }
@@ -71,37 +60,23 @@ namespace coretests.Options
         public void CreateWithBadTickerFails()
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption(null, OptionType.CALL, DateTimeOffset.UtcNow, 2, "user"));
+                new SoldOption(null, OptionType.CALL, DateTimeOffset.UtcNow, 2, "user", 1, 20, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void CreateWithBadUserFails()
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow, 2, ""));
+                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow, 2, "", 1, 20, DateTimeOffset.UtcNow));
         }
 
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]
-        public void CreateWithBadStrikeFails(double input)
+        public void CreateWithBadStrikeFails(double strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow, input, "user"));
-        }
-
-        [Fact]
-        public void CreateWithPastExpirationFails()
-        {
-            Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(-1), 2, "user"));
-        }
-
-        [Fact]
-        public void CreateWithFarFutureExpirationFails()
-        {
-            Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user"));
+                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow, strikePrice, "user", 1, 20, DateTimeOffset.UtcNow));
         }
 
         [Fact]
@@ -121,10 +96,8 @@ namespace coretests.Options
         [InlineData(0)]
         public void OpenWithInvalidAmountFails(int amount)
         {
-            var opt = GetTestOption(OptionType.CALL);
-
             Assert.Throws<InvalidOperationException>( () =>
-                opt.Open(amount, 2, DateTimeOffset.UtcNow));
+                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", amount, 20, DateTimeOffset.UtcNow));
         }
 
         [Theory]
@@ -135,7 +108,7 @@ namespace coretests.Options
             var opt = GetTestOption(OptionType.CALL);
 
             Assert.Throws<InvalidOperationException>( () =>
-                opt.Open(1, premium, DateTimeOffset.UtcNow));
+                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", 1, premium, DateTimeOffset.UtcNow));
         }
 
         [Theory]

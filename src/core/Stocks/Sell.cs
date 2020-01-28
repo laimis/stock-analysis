@@ -6,13 +6,15 @@ namespace core.Stocks
 {
     public class Sell
     {
-        public class Handler : HandlerWithStorage<SellCommand, Unit>
+        public class Command : StockTransaction {}
+
+        public class Handler : HandlerWithStorage<Command, Unit>
         {
             public Handler(IPortfolioStorage storage) : base(storage)
             {
             }
 
-            public override async Task<Unit> Handle(SellCommand cmd, CancellationToken cancellationToken)
+            public override async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
 
@@ -23,7 +25,7 @@ namespace core.Stocks
 
                 stock.Sell(cmd.Amount, cmd.Price, cmd.Date.Value);
 
-                await this._storage.Save(stock);
+                await this._storage.Save(stock, cmd.UserId);
 
                 return new Unit();
             }

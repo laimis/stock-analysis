@@ -14,7 +14,7 @@ namespace core.Notes
         {
         }
 
-        public Note(string userId, string note, string ticker, double? predictedPrice)
+        public Note(string userId, string note, string ticker, double? predictedPrice, DateTimeOffset created)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -36,14 +36,21 @@ namespace core.Notes
                 throw new InvalidOperationException("Note cannot be empty");
             }
 
+            if (created > DateTimeOffset.UtcNow)
+            {
+                throw new InvalidOperationException("Note creation date cannot be in the future");
+            }
+
             Apply(
                 new NoteCreated(
-                    Guid.NewGuid().ToString(),
-                    DateTimeOffset.UtcNow,
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    created,
                     userId,
                     note,
                     ticker,
-                    predictedPrice)
+                    predictedPrice
+                )
             );
         }
 
@@ -61,9 +68,9 @@ namespace core.Notes
 
             Apply(
                 new NoteUpdated(
+                    Guid.NewGuid(),
                     this.State.Id,
                     DateTimeOffset.UtcNow,
-                    this.State.UserId,
                     note,
                     predictedPrice
                 )
@@ -84,9 +91,9 @@ namespace core.Notes
 
         protected void ApplyInternal(NoteCreated created)
         {
-            this.State.Id = created.Ticker;
+            this.State.Id = created.AggregateId;
             this.State.UserId = created.UserId;
-            this.State.RelatedToTicker = created.RelatedToTicker;
+            this.State.RelatedToTicker = created.Ticker;
             this.State.Created = created.When;
             this.State.Note = created.Note;
             this.State.PredictedPrice = created.PredictedPrice;

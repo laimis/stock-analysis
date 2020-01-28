@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
@@ -15,6 +16,7 @@ namespace core.Notes
             [Required]
             public string Ticker { get; set; }
             public double? PredictedPrice { get; set; }
+            public DateTimeOffset? Created { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, object>
@@ -32,9 +34,10 @@ namespace core.Notes
                     request.UserId,
                     request.Note,
                     request.Ticker,
-                    request.PredictedPrice);
+                    request.PredictedPrice,
+                    request.Created ?? DateTimeOffset.UtcNow);
 
-                await _storage.Save(note);
+                await _storage.Save(note, request.UserId);
 
                 return new {
                     id = note.State.Id

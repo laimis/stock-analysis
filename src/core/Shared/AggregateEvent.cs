@@ -4,25 +4,25 @@ namespace core.Shared
 {
     public class AggregateEvent
     {
-        public AggregateEvent(string key, string userId, DateTime when)
+        public AggregateEvent(Guid id, Guid aggregateId, DateTimeOffset when)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            if (id == Guid.Empty)
             {
-                throw new InvalidOperationException("key cannot be empty");
+                throw new InvalidOperationException("id cannot be empty");
             }
 
-            if (string.IsNullOrWhiteSpace(userId))
+            if (aggregateId == Guid.Empty)
             {
-                throw new InvalidOperationException("userId cannot be empty");
+                throw new InvalidOperationException("aggregateId cannot be empty");
             }
 
-            this.Ticker = key;
-            this.UserId = userId;
+            this.Id = id;
+            this.AggregateId = aggregateId;
             this.When = when;
         }
 
-        public DateTime When { get; set; }
-        public string Ticker { get; }
-        public string UserId { get; }
+        public Guid Id { get; }
+        public Guid AggregateId { get; }
+        public DateTimeOffset When { get; }
     }
 }

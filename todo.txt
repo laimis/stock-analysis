@@ -1,9 +1,7 @@
 current:
 
-fix aggregate id thing
-    - export data
-        - options sold
-        - options closed
+- increment entity ids to cause full reload
+- userid to value object
 
 FEATURES
 
@@ -30,6 +28,7 @@ MINOR IMPROVEMENTS
 - review endpoint, dates on each note, price of share at the time of the note, separate each note
 - notes, fill with share information when note is made
 - organize code: separate events from handlers from core domain models?
+- import validation (size, contents, headers)
 
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?
@@ -44,6 +43,7 @@ BUGS
 - int for money amounts
 - review how we track partial share and option sales
 - how to correct this whole "key" vs "ticker" on events..
+- export of options, amount sometimes is zero
 
 INFRA
 - badges for builds/coverage

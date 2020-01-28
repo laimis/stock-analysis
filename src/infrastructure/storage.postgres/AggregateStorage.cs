@@ -24,27 +24,13 @@ namespace storage.postgres
             return new NpgsqlConnection(_cnn);
         }
 
-        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string key, string userId)
-        {
-            using (var db = GetConnection())
-            {
-                db.Open();
-
-                var query = @"select * FROM events WHERE entity = :entity AND key = :key AND userId = :userId ORDER BY version";
-
-                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, key, userId });
-
-                return list.Select(e => e.Event);
-            }
-        }
-
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
         {
             using (var db = GetConnection())
             {
                 db.Open();
 
-                var query = @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version";
+                var query = @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY version";
 
                 var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, userId });
 
@@ -52,7 +38,7 @@ namespace storage.postgres
             }
         }
 
-        public async Task SaveEventsAsync(Aggregate agg, string entity)
+        public async Task SaveEventsAsync(Aggregate agg, string entity, string userId)
         {
             using (var db = GetConnection())
             {
@@ -68,9 +54,9 @@ namespace storage.postgres
                         {
                             Entity = entity,
                             Event = e,
-                            Key = e.Ticker,
-                            UserId = e.UserId,
-                            Created = e.When,
+                            Key = e.Id.ToString(),
+                            UserId = userId,
+                            Created = DateTimeOffset.UtcNow,
                             Version = ++version
                         };
 

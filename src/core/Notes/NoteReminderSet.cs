@@ -5,12 +5,8 @@ namespace core.Notes
 {
     public class NoteReminderSet : AggregateEvent
     {
-        public NoteReminderSet(string ticker, DateTimeOffset when, string userId, DateTimeOffset reminderDate)
-         : base(ticker, userId, when.DateTime)
+        public NoteReminderSet(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
         {
-            this.ReminderDate = reminderDate;
         }
-
-        public DateTimeOffset ReminderDate { get; }
     }
 }

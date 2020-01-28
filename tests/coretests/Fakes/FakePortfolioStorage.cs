@@ -17,7 +17,7 @@ namespace coretests.Fakes
 
         public IEnumerable<SoldOption> SavedOptions => _savedSoldOptions.AsReadOnly();
 
-        public Task<SoldOption> GetSoldOption(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice, string userId)
+        public Task<SoldOption> GetSoldOption(Guid id, string userId)
         {
             return Task.FromResult<SoldOption>(_soldOption);
         }
@@ -44,19 +44,19 @@ namespace coretests.Fakes
             _soldOption = opt;
         }
 
-        public Task Save(OwnedStock stock)
+        public Task Save(OwnedStock stock, string userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task Save(SoldOption option)
+        public Task Save(SoldOption option, string userId)
         {
             _savedSoldOptions.Add(option);
 
             return Task.CompletedTask;
         }
 
-        public Task Save(Note note)
+        public Task Save(Note note, string userId)
         {
             _notes.Add(note);
 
@@ -68,7 +68,7 @@ namespace coretests.Fakes
             return Task.FromResult(_notes.Select(n => n));
         }
 
-        public async Task<Note> GetNote(string userId, string noteId)
+        public async Task<Note> GetNote(string userId, Guid noteId)
         {
             var list = await GetNotes(userId);
 
