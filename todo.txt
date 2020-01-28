@@ -1,6 +1,7 @@
 current:
 
-fix aggregate id
+- migrate remaining parsing to csvparser
+- increment entity ids to cause full reload
     
 
 FEATURES

@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.CSV;
 using core.Shared;
 using MediatR;
 
@@ -22,78 +24,48 @@ namespace core.Options
         public class Handler : IRequestHandler<Command, Unit>
         {
             private IMediator _mediator;
-
-            public Handler(IMediator mediator)
+            private ICSVParser _parser;
+            
+            public Handler(IMediator mediator, ICSVParser parser)
             {
                 _mediator = mediator;
+                _parser = parser;
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                using var stringReader = new StringReader(request.Content);
-                while(true)
+                var records = _parser.Parse<OptionRecord>(request.Content);
+
+                foreach(var r in records)
                 {
-                    var line = await stringReader.ReadLineAsync();
-                    if (line == null)
-                    {
-                        break;
-                    }
-
-                    if (line.StartsWith("ticker,"))
-                    {
-                        continue;
-                    }
-
-                    Console.WriteLine("processing " + line);
-                    
-                    var parts = line.Split(',');
-
-                    await ProcessLine(parts, request.UserId);
+                    await ProcessLine(r, request.UserId);
                 }
 
                 return new Unit();
             }
 
-            private async Task ProcessLine(string[] parts, string userId)
+            private async Task ProcessLine(OptionRecord record, string userId)
             {
-                var ticker = parts[0];
-                var strike = double.Parse(parts[1]);
-                var type = parts[2];
-                var expiration = DateTimeOffset.Parse(parts[3]);
-                var filled = DateTimeOffset.Parse(parts[4]);
-                var amount = Int32.Parse(parts[5]);
-                if (amount == 0)
-                {
-                    amount = 1;
-                }
-                var premium = double.Parse(parts[6]);
-                DateTimeOffset? closed = null;
-                var closedString = parts[7];
-                if (!string.IsNullOrEmpty(closedString))
-                {
-                    closed = DateTimeOffset.Parse(closedString);
-                }
-                var spent = double.Parse(parts[8]);
-
                 var cmd = new Options.Sell.Command {
-                    Amount = amount,
-                    ExpirationDate = expiration,
-                    Filled = filled,
-                    OptionType = type,
-                    Premium = premium,
-                    StrikePrice = strike,
-                    Ticker = ticker,
+                    Amount = record.amount,
+                    ExpirationDate = record.expiration,
+                    Filled = record.filled,
+                    OptionType = record.type,
+                    Premium = record.premium,
+                    StrikePrice = record.strike,
+                    Ticker = record.ticker,
                 };
+
                 cmd.WithUserId(userId);
 
                 var r = await _mediator.Send(cmd);
 
-                if (closed != null)
+                if (record.closed != null)
                 {
                     var c = new Options.Close.Command {
-                        Amount = amount,
-                        CloseDate = closed.Value,
-                        ClosePrice = spent,
+                        Amount = record.amount,
+                        CloseDate = record.closed.Value,
+                        ClosePrice = record.spent,
                         Id = r,
                     };
 
@@ -101,6 +73,19 @@ namespace core.Options
 
                     await _mediator.Send(c);
                 }
+            }
+
+            private class OptionRecord
+            {
+                public DateTimeOffset? closed { get; set; }
+                public DateTimeOffset? expiration { get; set; }
+                public DateTimeOffset? filled { get; set; }
+                public int amount { get; set; }
+                public string type { get; set; }
+                public double premium { get; internal set; }
+                public double strike { get; internal set; }
+                public string ticker { get; internal set; }
+                public double? spent { get; internal set; }
             }
         }
     }

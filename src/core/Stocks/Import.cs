@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.CSV;
 using core.Shared;
 using MediatR;
 
@@ -22,56 +23,35 @@ namespace core.Stocks
         public class Handler : IRequestHandler<Command, Unit>
         {
             private IMediator _mediator;
+            private ICSVParser _parser;
 
-            public Handler(IMediator mediator)
+            public Handler(IMediator mediator, ICSVParser parser)
             {
                 _mediator = mediator;
+                _parser = parser;
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                using var stringReader = new StringReader(request.Content);
-                while(true)
-                {
-                    var line = await stringReader.ReadLineAsync();
-                    if (line == null)
-                    {
-                        break;
-                    }
-
-                    if (line.StartsWith("ticker,"))
-                    {
-                        continue;
-                    }
-
-                    Console.WriteLine("processing " + line);
-                    
-                    var parts = line.Split(',');
-
-                    await ProcessLine(parts, request.UserId);
-                }
+                var records = _parser.Parse<StockRecord>(request.Content);
+                foreach(var r in records)
+                    await ProcessLine(r, request.UserId);
 
                 return new Unit();
             }
 
-            private async Task ProcessLine(string[] parts, string userId)
+            private async Task ProcessLine(StockRecord record, string userId)
             {
-                var ticker = parts[0];
-                var type = parts[1];
-                var amount = Int32.Parse(parts[2]);
-                var price = double.Parse(parts[3]);
-                var date = DateTimeOffset.Parse(parts[4]);
-
                 object cmd = null;
-                switch (type)
+                switch (record.type)
                 {
                     case "buy":
                         var b = new core.Stocks.Buy.Command
                         {
-                            Amount = amount,
-                            Date = date,
-                            Price = price,
-                            Ticker = ticker,
+                            Amount = record.amount,
+                            Date = record.date,
+                            Price = record.price,
+                            Ticker = record.ticker,
                         };
 
                         b.WithUserId(userId);
@@ -81,10 +61,10 @@ namespace core.Stocks
                     case "sell":
                         var s = new core.Stocks.Sell.Command
                         {
-                            Amount = amount,
-                            Date = date,
-                            Price = price,
-                            Ticker = ticker,
+                            Amount = record.amount,
+                            Date = record.date,
+                            Price = record.price,
+                            Ticker = record.ticker,
                         };
 
                         s.WithUserId(userId);
@@ -93,6 +73,15 @@ namespace core.Stocks
                 }
 
                 await _mediator.Send(cmd);
+            }
+
+            private class StockRecord
+            {
+                public int amount { get; set; }
+                public string type { get; set; }
+                public DateTimeOffset? date { get; internal set; }
+                public double price { get; internal set; }
+                public string ticker { get; internal set; }
             }
         }
     }
