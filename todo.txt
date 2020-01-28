@@ -1,8 +1,7 @@
 current:
 
-- migrate remaining parsing to csvparser
 - increment entity ids to cause full reload
-    
+- userid to value object
 
 FEATURES
 
