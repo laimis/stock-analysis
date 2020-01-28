@@ -27,7 +27,7 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(SellCommand model)
+        public async Task<ActionResult> Sell(Sell.Command model)
         {
             model.WithUserId(this.User.Identifier());
 
@@ -37,7 +37,7 @@ namespace web.Controllers
         }
 
         [HttpPost("purchase")]
-        public async Task<ActionResult> Purchase(BuyCommand model)
+        public async Task<ActionResult> Purchase(Buy.Command model)
         {
             model.WithUserId(this.User.Identifier());
 
