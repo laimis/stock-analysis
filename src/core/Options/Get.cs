@@ -6,7 +6,7 @@ using core.Shared;
 
 namespace core.Options
 {
-    public class GetSoldOption
+    public class Get
     {
         public class Query : RequestWithUserId<object>
         {

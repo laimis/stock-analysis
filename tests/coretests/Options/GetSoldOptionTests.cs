@@ -18,13 +18,13 @@ namespace coretests.Options
         [Fact]
         public async Task Get_WorksAsync()
         {
-            var query = new GetSoldOption.Query {
+            var query = new Get.Query {
                 Id = Guid.NewGuid()
             };
 
             query.WithUserId(_fixture.CloseOptionCommand.UserId);
 
-            var handler = new GetSoldOption.Handler(_fixture.CreateStorageWithSoldOption());
+            var handler = new Get.Handler(_fixture.CreateStorageWithSoldOption());
 
             var result = await handler.Handle(query, CancellationToken.None);
 

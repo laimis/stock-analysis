@@ -23,7 +23,7 @@ namespace web.Controllers
         [HttpGet("{ticker}")]
         public async Task<ActionResult<OptionDetailsViewModel>> DetailsAsync(string ticker)
         {
-            var details = await _mediator.Send(new GetOptionDetails.Query(ticker));
+            var details = await _mediator.Send(new Detail.Query(ticker));
             if (details == null)
             {
                 return NotFound();
@@ -45,7 +45,7 @@ namespace web.Controllers
         [HttpGet("soldoptions/{id}")]
         public async Task<object> SoldOption(Guid id)
         {
-            var query = new GetSoldOption.Query { Id = id };
+            var query = new Get.Query { Id = id };
 
             query.WithUserId(this.User.Identifier());
             
