@@ -47,7 +47,7 @@ namespace core.Options
             private async Task ProcessLine(OptionRecord record, string userId)
             {
                 var cmd = new Options.Sell.Command {
-                    Amount = record.amount,
+                    Amount = record.amount == 0 ? 1 : record.amount,
                     ExpirationDate = record.expiration,
                     Filled = record.filled,
                     OptionType = record.type,
@@ -63,7 +63,7 @@ namespace core.Options
                 if (record.closed != null)
                 {
                     var c = new Options.Close.Command {
-                        Amount = record.amount,
+                        Amount = record.amount == 0 ? 1 : record.amount,
                         CloseDate = record.closed.Value,
                         ClosePrice = record.spent,
                         Id = r,
@@ -82,10 +82,10 @@ namespace core.Options
                 public DateTimeOffset? filled { get; set; }
                 public int amount { get; set; }
                 public string type { get; set; }
-                public double premium { get; internal set; }
-                public double strike { get; internal set; }
-                public string ticker { get; internal set; }
-                public double? spent { get; internal set; }
+                public double premium { get; set; }
+                public double strike { get; set; }
+                public string ticker { get; set; }
+                public double? spent { get; set; }
             }
         }
     }

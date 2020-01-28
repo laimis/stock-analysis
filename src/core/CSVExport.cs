@@ -14,7 +14,7 @@ namespace core
         private const string DATE_FORMAT = "yyyy-MM-dd";
         public const string STOCK_HEADER = "ticker,type,amount,price,date";
         public const string NOTE_HEADER = "created,predicted price,ticker,note";
-        public const string OPTION_HEADER = "ticker,strike price,type,expiration,filled,amount,premium,closed,spent,profit";
+        public const string OPTION_HEADER = "ticker,strike,type,expiration,filled,amount,premium,closed,spent,profit";
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
