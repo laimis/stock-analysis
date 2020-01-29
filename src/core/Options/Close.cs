@@ -14,8 +14,9 @@ namespace core.Options
             [Required]
             public Guid? Id { get; set; }
 
+            [Required]
             [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
-            public int Amount { get; set; }
+            public int? NumberOfContracts { get; set; }
 
             [Required]
             [Range(0, 1000)]
@@ -46,7 +47,7 @@ namespace core.Options
                 {
                     Console.WriteLine("closing option");
 
-                    sold.Close(cmd.Amount, cmd.ClosePrice.Value, cmd.CloseDate.Value);
+                    sold.Close(cmd.NumberOfContracts.Value, cmd.ClosePrice.Value, cmd.CloseDate.Value);
                     await _storage.Save(sold, cmd.UserId);
                 }
 

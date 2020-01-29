@@ -63,7 +63,7 @@ namespace core.Options
                 if (record.closed != null)
                 {
                     var c = new Options.Close.Command {
-                        Amount = record.amount == 0 ? 1 : record.amount,
+                        NumberOfContracts = record.amount == 0 ? 1 : record.amount,
                         CloseDate = record.closed.Value,
                         ClosePrice = record.spent,
                         Id = r,

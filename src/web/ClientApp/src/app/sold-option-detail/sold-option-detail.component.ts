@@ -15,6 +15,7 @@ export class SoldOptionDetailComponent implements OnInit {
   public closed: boolean;
   public closePrice: number;
   public closeDate: string;
+  public numberOfContracts: number;
   public errors: string[];
 
   constructor(
@@ -31,6 +32,7 @@ export class SoldOptionDetailComponent implements OnInit {
 
     this.service.getSoldOption(id).subscribe( result => {
       this.option = result
+      this.numberOfContracts = result.amount
       this.loaded = true
     })
   }
@@ -43,7 +45,7 @@ export class SoldOptionDetailComponent implements OnInit {
       id: this.option.id,
       closePrice: this.closePrice,
       closeDate: this.closeDate,
-      amount: this.option.amount
+      numberOfContracts: this.numberOfContracts
     }
 
     this.service.closeSoldOption(obj).subscribe( () => {

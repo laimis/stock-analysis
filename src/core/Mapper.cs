@@ -142,8 +142,7 @@ namespace core
                 expiration = o.State.Expiration.ToString("yyyy-MM-dd"),
                 premium = o.State.Premium,
                 amount = o.State.Amount,
-                riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100,
-                profit = o.State.Profit
+                riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100
             };
         }
 

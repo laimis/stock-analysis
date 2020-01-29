@@ -23,7 +23,6 @@ namespace core.Options
         public int Amount { get; internal set; }
         public double Premium { get; internal set; }
         public double Spent { get; internal set; }
-        public double Profit => this.Premium - this.Spent;
         public double CollateralCash => this.Type == OptionType.PUT ? StrikePrice * 100 - Premium : 0;
         public int CollateralShares => this.Type == OptionType.CALL ? 100 * Amount : 0;
 
@@ -48,8 +47,8 @@ namespace core.Options
             this.Transactions.Add(
                 new Transaction(
                     this.Ticker,
-                    $"Sold ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} option",
-                    sold.Amount * sold.Premium,
+                    $"Sold {sold.Amount} x ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} contract(s) for ${this.Premium}",
+                    0,
                     0,
                     sold.When
                 )
@@ -59,7 +58,7 @@ namespace core.Options
         internal void Apply(OptionClosed closed)
         {
             this.Amount -= closed.Amount;
-            this.Spent += closed.Money;
+            this.Spent += closed.Money * closed.Amount;
 
             if (this.Amount == 0)
             {
@@ -69,9 +68,9 @@ namespace core.Options
             this.Transactions.Add(
                 new Transaction(
                     this.Ticker,
-                    $"Closed ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} option",
+                    $"Closed {closed.Amount} ${this.StrikePrice} {this.Type} {this.Expiration.ToString("MM/dd")} contracts",
                     closed.Money * closed.Amount,
-                    this.Profit,
+                    this.Premium * closed.Amount - closed.Money * closed.Amount,
                     closed.When
                 )
             );

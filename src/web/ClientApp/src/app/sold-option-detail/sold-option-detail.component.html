@@ -12,7 +12,12 @@
 
     <form>
       <div class="form-group">
-				<label for="closePrice">Close Price</label>
+				<label for="numberOfContracts">Number of Contracts</label>
+				<input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
+      </div>
+
+      <div class="form-group">
+				<label for="closePrice">Close Price Per Contract</label>
 				<input type="number" class="form-control" id="closePrice" name="closePrice" [(ngModel)]="closePrice">
       </div>
 
@@ -22,7 +27,8 @@
 			</div>
 
       <button type="submit" class="btn btn-primary mb-2" (click)="close()">Close Contract</button>&nbsp;&nbsp;
-		</form>
+    </form>
+
 	</div>
 </div>
 

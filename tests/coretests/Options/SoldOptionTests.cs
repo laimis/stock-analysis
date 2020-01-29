@@ -28,8 +28,6 @@ namespace coretests.Options
             Assert.NotNull(option.State.Closed);
 
             Assert.Equal(10, option.State.Spent);
-
-            Assert.Equal(22, option.State.Profit);
         }
 
         [Fact]

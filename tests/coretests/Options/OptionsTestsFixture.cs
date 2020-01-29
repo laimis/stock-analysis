@@ -61,7 +61,7 @@ namespace coretests.Options
         {
             var cmd = new Close.Command
             {
-                Amount = 1,
+                NumberOfContracts = 1,
                 CloseDate = DateTime.UtcNow,
                 ClosePrice = 0,
             };
