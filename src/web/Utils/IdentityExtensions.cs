@@ -7,14 +7,16 @@ namespace web.Utils
         public const string ID_CLAIM_NAME = "userid";
         
         public static string Identifier(this System.Security.Claims.ClaimsPrincipal p)
-        {
-            return GetClaimValue(p, ID_CLAIM_NAME);
-        }
+            => GetClaimValue(p, ID_CLAIM_NAME);
 
-        public static string Email(this System.Security.Claims.ClaimsPrincipal p)
-        {
-            return GetClaimValue(p, ClaimTypes.Email);
-        }
+        public static string Email(this System.Security.Claims.ClaimsPrincipal p) 
+            => GetClaimValue(p, ClaimTypes.Email);
+
+        public static string Firstname(this System.Security.Claims.ClaimsPrincipal p) 
+            => GetClaimValue(p, ClaimTypes.GivenName);
+
+        public static string Lastname(this System.Security.Claims.ClaimsPrincipal p) 
+            => GetClaimValue(p, ClaimTypes.Surname);
 
         private static string GetClaimValue(ClaimsPrincipal p, string name)
         {

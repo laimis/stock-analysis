@@ -14,7 +14,7 @@ namespace storagetests
         {
             var email = Guid.NewGuid().ToString();
 
-            var user = new User(email);
+            var user = new User(email, "firstname", "lastname");
 
             var storage = GetStorage();
 
@@ -29,6 +29,9 @@ namespace storagetests
             Assert.NotNull(fromDb);
 
             Assert.NotEqual(Guid.Empty, fromDb.State.Id);
+            Assert.Equal(email, fromDb.State.Email);
+            Assert.Equal("firstname", fromDb.State.Firstname);
+            Assert.Equal("lastname", fromDb.State.Lastname);
         }
     }
 }

@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
-using Newtonsoft.Json;
 
 namespace storage.redis
 {
     public class AccountStorage : AggregateStorage, IAccountStorage
     {
-        private const string _user_entity = "users";
+        private const string USER_ENTITY = "users";
+        private const string USER_RECORDS_KEY = "userrecords";
 
         public AccountStorage(string redisCnn) : base(redisCnn)
         {
@@ -16,16 +14,15 @@ namespace storage.redis
 
         public async Task<User> GetUser(string emailAddress)
         {
-            // first you need to check if email has user id
             var db = _redis.GetDatabase();
-
-            var id = await db.StringGetAsync(emailAddress);
+            
+            var id = await db.HashGetAsync(USER_RECORDS_KEY, emailAddress);
             if (id.IsNullOrEmpty)
             {
                 return null;
             }
 
-            var events = await GetEventsAsync(_user_entity, id);
+            var events = await GetEventsAsync(USER_ENTITY, id);
 
             return new User(events);
         }
@@ -36,9 +33,13 @@ namespace storage.redis
 
             var userId = u.State.Id.ToString();
 
-            await db.StringSetAsync(u.State.Email, userId);
+            await db.HashSetAsync(
+                USER_RECORDS_KEY,
+                u.State.Email,
+                userId,
+                StackExchange.Redis.When.NotExists);
 
-            await SaveEventsAsync(u, _user_entity, userId);
+            await SaveEventsAsync(u, USER_ENTITY, userId);
         }
     }
 }

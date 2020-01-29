@@ -1,8 +1,6 @@
 current:
 
-- user id as guid vs email
 - userid to value object
-- remove explicit login entry
 
 FEATURES
 
@@ -30,6 +28,7 @@ MINOR IMPROVEMENTS
 - notes, fill with share information when note is made
 - organize code: separate events from handlers from core domain models?
 - import validation (size, contents, headers)
+- login tracking
 
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?

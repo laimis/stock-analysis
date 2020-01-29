@@ -23,8 +23,10 @@ namespace web.Utils
         public override async Task SigningIn(CookieSigningInContext context)
         {
             var email = context.Principal.Email();
+            var firstname = context.Principal.Firstname();
+            var lastname = context.Principal.Lastname();
 
-            var id = await _mediator.Send(new CreateOrGet.Command(email));
+            var id = await _mediator.Send(new CreateOrGet.Command(email, firstname, lastname));
 
             (context.Principal.Identity as ClaimsIdentity).AddClaim(
                 new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())

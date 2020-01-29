@@ -9,15 +9,25 @@ namespace core.Account
         public UserState State => _state;
         private UserState _state = new UserState();
 
-        public User(string email)
+        public User(string email, string firstname, string lastname)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
                 throw new InvalidOperationException("Email is required");
             }
 
+            if (string.IsNullOrWhiteSpace(firstname))
+            {
+                throw new InvalidOperationException("Firstname is required");
+            }
+
+            if (string.IsNullOrWhiteSpace(lastname))
+            {
+                throw new InvalidOperationException("Lastname is required");
+            }
+
             Apply(
-                new UserCreated(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, email)
+                new UserCreated(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, email, firstname, lastname)
             );
         }
 
