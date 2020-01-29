@@ -8,62 +8,70 @@ import { StocksService } from '../services/stocks.service';
 })
 export class ProfileComponent implements OnInit {
 
-  importShareStatus: string = 'ready'
-  importOptionStatus: string = 'ready'
-  importNoteStatus: string = 'ready'
+  profile:object
+
+  importProgress: string = ''
 
   constructor(private service:StocksService) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.service.getProfile().subscribe(p => {
+      this.profile = p
+    })
+  }
+
+  markProgress(msg:string) {
+    this.importProgress = msg
+  }
 
   importShares($event) {
 
-    this.importShareStatus = 'inprogress'
+    this.markProgress('Importing shares')
 
     let formData: FormData = this.getFormData($event);
 
     this.service.importStocks(formData).subscribe(
       s => {
         console.log("success uploading " + s)
-        this.importShareStatus = 'success'
+        this.markProgress('Shares imported successfully')
       },
       e => {
         console.log("failed: " + e);
-        this.importShareStatus = 'failed'
+        this.markProgress('Failed to import shares')
       })
   }
 
   importOptions($event) {
 
-    this.importOptionStatus = 'inprogress'
+    this.markProgress('Importing options')
 
     let formData: FormData = this.getFormData($event);
 
     this.service.importOptions(formData).subscribe(
       s => {
         console.log("success uploading " + s)
-        this.importOptionStatus = 'success'
+        this.markProgress('Options imported')
       },
       e => {
         console.log("failed: " + e);
-        this.importOptionStatus = 'failed'
+        this.markProgress('Options import failed')
       })
   }
 
   importNotes($event) {
 
-    this.importNoteStatus = 'inprogress'
+    this.markProgress('Importing notes')
 
     let formData: FormData = this.getFormData($event);
 
     this.service.importNotes(formData).subscribe(
       s => {
         console.log("success uploading " + s)
-        this.importNoteStatus = 'success'
+        this.markProgress('Notes imported')
       },
       e => {
         console.log("failed: " + e);
-        this.importNoteStatus = 'failed'
+        this.markProgress('Note import failed')
       })
   }
 

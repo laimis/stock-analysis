@@ -12,19 +12,24 @@ namespace storage.redis
         {
         }
 
-        public async Task<User> GetUser(string emailAddress)
+        public async Task<User> GetUser(string userId)
+        {
+            var events = await GetEventsAsync(USER_ENTITY, userId);
+
+            return new User(events);
+        }
+
+        public async Task<User> GetUserByEmail(string emailAddress)
         {
             var db = _redis.GetDatabase();
-            
+
             var id = await db.HashGetAsync(USER_RECORDS_KEY, emailAddress);
             if (id.IsNullOrEmpty)
             {
                 return null;
             }
 
-            var events = await GetEventsAsync(USER_ENTITY, id);
-
-            return new User(events);
+            return await GetUser(id);
         }
 
         public async Task Save(User u)

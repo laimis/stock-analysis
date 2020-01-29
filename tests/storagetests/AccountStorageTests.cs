@@ -18,13 +18,13 @@ namespace storagetests
 
             var storage = GetStorage();
 
-            var fromDb = await storage.GetUser(email);
+            var fromDb = await storage.GetUserByEmail(email);
 
             Assert.Null(fromDb);
 
             await storage.Save(user);
 
-            fromDb = await storage.GetUser(email);
+            fromDb = await storage.GetUserByEmail(email);
 
             Assert.NotNull(fromDb);
 

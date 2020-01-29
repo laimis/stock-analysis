@@ -40,6 +40,14 @@ namespace web.Controllers
             return user;
         }
 
+        [HttpGet()]
+        public Task<object> Get()
+        {
+            var query = new Get.Query(this.User.Identifier());
+
+            return _mediator.Send(query);
+        }
+
         [HttpGet("login")]
         [Authorize]
         public async Task<ActionResult> LoginAsync()

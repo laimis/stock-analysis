@@ -1,6 +1,6 @@
 current:
 
-- userid to value object
+- render user profile information
 
 FEATURES
 

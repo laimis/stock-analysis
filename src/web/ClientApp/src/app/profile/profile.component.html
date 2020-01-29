@@ -1,56 +1,44 @@
 <div class="container">
-  <div>
-    <h2>Export your data</h2>
-    <div class="mt-2">
-      <a href="/api/options/export" class="btn btn-secondary mr-1">Export Options</a>
-      <a href="/api/stocks/export" class="btn btn-secondary mr-1">Export Stocks</a>
-      <a href="/api/notes/export" class="btn btn-secondary mr-1">Export Notes</a>
-      <a href="/api/account/logout" class="btn btn-primary mr-1">Logout</a>
+
+  <div class="card mb-3" *ngIf="profile">
+    <div class="card-body">
+      <h5 class="card-title">{{profile.firstname}} {{profile.lastname}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Member since {{profile.created | date}}</h6>
+      <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
     </div>
   </div>
 
-  <div class="mt-5">
-    <h2>Import your shares</h2>
-    <div class="mt-2">
-      <label class="import-file">
-        <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
-        <div *ngIf="importShareStatus == 'ready'">Import your shares
-          <button class="btn btn-primary" (click)="shareInput.click()">Choose file...</button>
-        </div>
-        <div *ngIf="importShareStatus == 'inprogress'">Importing shares...</div>
-        <div *ngIf="importShareStatus == 'success'" class="alert alert-success">Shares imported successfully</div>
-        <div *ngIf="importShareStatus == 'failed'" class="alert alert-danger">Shares import failed</div>
-    </label>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Exports</h5>
+      <a href="/api/options/export" class="btn btn-secondary mr-1 card-link">Export Options</a>
+      <a href="/api/stocks/export" class="btn btn-secondary mr-1 card-link">Export Stocks</a>
+      <a href="/api/notes/export" class="btn btn-secondary mr-1 card-link">Export Notes</a>
     </div>
   </div>
 
-  <div class="mt-5">
-    <h2>Import your options</h2>
-    <div class="mt-2">
-      <label class="import-file">
-        <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
-        <div *ngIf="importOptionStatus == 'ready'">Import your options
-          <button class="btn btn-primary" (click)="optionInput.click()">Choose file...</button>
-        </div>
-        <div *ngIf="importOptionStatus == 'inprogress'">Importing options...</div>
-        <div *ngIf="importOptionStatus == 'success'" class="alert alert-success">Options imported successfully</div>
-        <div *ngIf="importOptionStatus == 'failed'" class="alert alert-danger">Options import failed</div>
-    </label>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Imports</h5>
+      <h6 class="card-subtitle mb-2">{{ importProgress }}</h6>
+
+      <label class="card-link">
+          <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
+          <button class="btn btn-secondary mr-1" (click)="shareInput.click()">Load Shares</button>
+      </label>
+
+
+      <label class="card-link">
+          <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
+          <button class="btn btn-secondary mr-1 card-link" (click)="optionInput.click()">Load Options</button>
+      </label>
+
+      <label class="card-link">
+          <input hidden (change)="importNotes($event)"  #noteInput type="file" id="file">
+          <button class="btn btn-secondary mr-1 card-link" (click)="noteInput.click()">Load Notes</button>
+      </label>
+
     </div>
   </div>
 
-  <div class="mt-5">
-    <h2>Import your notes</h2>
-    <div class="mt-2">
-      <label class="import-file">
-        <input hidden (change)="importNotes($event)"  #noteInput type="file" id="file">
-        <div *ngIf="importNoteStatus == 'ready'">Import your notes
-          <button class="btn btn-primary" (click)="noteInput.click()">Choose file...</button>
-        </div>
-        <div *ngIf="importNoteStatus == 'inprogress'">Importing notes...</div>
-        <div *ngIf="importNoteStatus == 'success'" class="alert alert-success">Notes imported successfully</div>
-        <div *ngIf="importNoteStatus == 'failed'" class="alert alert-danger">Notes import failed</div>
-    </label>
-    </div>
-  </div>
 </div>

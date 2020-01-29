@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
 using Dapper;
@@ -13,7 +12,14 @@ namespace storage.postgres
         {
         }
 
-        public async Task<User> GetUser(string emailAddress)
+        public async Task<User> GetUser(string userId)
+        {
+            var events = await GetEventsAsync(_user_entity, userId);
+
+            return new User(events);
+        }
+
+        public async Task<User> GetUserByEmail(string emailAddress)
         {
             using var db = GetConnection();
             db.Open();
@@ -25,9 +31,7 @@ namespace storage.postgres
                 return null;
             }
 
-            var events = await GetEventsAsync(_user_entity, identifier);
-
-            return new User(events);
+            return await GetUser(identifier);
         }
 
         public async Task Save(User u)

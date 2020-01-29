@@ -31,7 +31,7 @@ namespace core.Account
 
             public async Task<Guid> Handle(Command request, CancellationToken cancellationToken)
             {
-                var user = await _storage.GetUser(request.Email);
+                var user = await _storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
                     user = new User(request.Email, request.Firstname, request.Lastname);

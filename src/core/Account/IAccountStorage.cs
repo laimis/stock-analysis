@@ -5,7 +5,8 @@ namespace core.Account
 {
     public interface IAccountStorage
     {
-        Task<User> GetUser(string emailAddress);
+        Task<User> GetUserByEmail(string emailAddress);
+        Task<User> GetUser(string userId);
         Task Save(User u);
     }
 }

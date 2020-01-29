@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { format } from 'url';
 
 export function GetErrors(err:any): string[] {
   return Object.keys(err.error.errors).map<string>(v => {
@@ -11,6 +10,7 @@ export function GetErrors(err:any): string[] {
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
+
   constructor(private http: HttpClient) { }
 
   getEvents(): Observable<object[]> {
@@ -101,6 +101,11 @@ export class StocksService {
   getAccountStatus() : Observable<AccountStatus> {
     return this.http.get<AccountStatus>('/api/account/status')
   }
+
+  getProfile() : Observable<object> {
+    return this.http.get<object>('/api/account')
+  }
+
 }
 
 export interface ReviewList {
