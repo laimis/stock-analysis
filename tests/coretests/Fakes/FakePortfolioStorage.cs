@@ -11,21 +11,21 @@ namespace coretests.Fakes
 {
     public class FakePortfolioStorage : IPortfolioStorage
     {
-        private SoldOption _soldOption;
-        private List<SoldOption> _savedSoldOptions = new List<SoldOption>();
+        private OwnedOption _soldOption;
+        private List<OwnedOption> _savedSoldOptions = new List<OwnedOption>();
         private List<Note> _notes = new List<Note>();
 
-        public IEnumerable<SoldOption> SavedOptions => _savedSoldOptions.AsReadOnly();
+        public IEnumerable<OwnedOption> SavedOptions => _savedSoldOptions.AsReadOnly();
 
-        public Task<SoldOption> GetSoldOption(Guid id, string userId)
+        public Task<OwnedOption> GetSoldOption(Guid id, string userId)
         {
-            return Task.FromResult<SoldOption>(_soldOption);
+            return Task.FromResult<OwnedOption>(_soldOption);
         }
 
-        public Task<IEnumerable<SoldOption>> GetSoldOptions(string user)
+        public Task<IEnumerable<OwnedOption>> GetSoldOptions(string user)
         {
             return Task.FromResult(
-                new List<SoldOption>{_soldOption}.Select(o => o)
+                new List<OwnedOption>{_soldOption}.Select(o => o)
             );
         }
 
@@ -39,7 +39,7 @@ namespace coretests.Fakes
             throw new NotImplementedException();
         }
 
-        internal void Register(SoldOption opt)
+        internal void Register(OwnedOption opt)
         {
             _soldOption = opt;
         }
@@ -49,7 +49,7 @@ namespace coretests.Fakes
             throw new NotImplementedException();
         }
 
-        public Task Save(SoldOption option, string userId)
+        public Task Save(OwnedOption option, string userId)
         {
             _savedSoldOptions.Add(option);
 

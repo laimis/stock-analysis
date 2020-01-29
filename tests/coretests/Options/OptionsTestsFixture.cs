@@ -12,8 +12,8 @@ namespace coretests.Options
         private Close.Command _closeOptionCommand;
         public Close.Command CloseOptionCommand => _closeOptionCommand;
 
-        private Sell.Command _sellOptionCommand;
-        public Sell.Command SellOptionCommand => _sellOptionCommand;
+        private Open.Command _sellOptionCommand;
+        public Open.Command SellOptionCommand => _sellOptionCommand;
 
         public OptionsTestsFixture()
         {
@@ -31,19 +31,20 @@ namespace coretests.Options
             return new FakePortfolioStorage();
         }
 
-        public FakePortfolioStorage CreateStorageWithSoldOption(SoldOption opt)
+        public FakePortfolioStorage CreateStorageWithSoldOption(OwnedOption opt)
         {
             var storage = new FakePortfolioStorage();
             storage.Register(opt);
             return storage;
         }
 
-        private FakePortfolioStorage CreateStorage(Sell.Command sell)
+        private FakePortfolioStorage CreateStorage(Open.Command sell)
         {
             var storage = new FakePortfolioStorage();
 
-            var opt = new SoldOption(
+            var opt = new OwnedOption(
                 sell.Ticker,
+                (PositionType)Enum.Parse(typeof(PositionType), sell.PositionType),
                 (OptionType)Enum.Parse(typeof(OptionType), sell.OptionType),
                 sell.ExpirationDate.Value,
                 sell.StrikePrice,
@@ -71,9 +72,9 @@ namespace coretests.Options
             return cmd;
         }
 
-        private static Sell.Command CreateSellCommand()
+        private static Open.Command CreateSellCommand()
         {
-            var cmd = new Sell.Command
+            var cmd = new Open.Command
             {
                 Amount = 1,
                 ExpirationDate = DateTime.UtcNow.AddDays(1),

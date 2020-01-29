@@ -46,7 +46,7 @@ namespace core.Options
 
             private async Task ProcessLine(OptionRecord record, string userId)
             {
-                var cmd = new Options.Sell.Command {
+                var cmd = new Options.Open.Command {
                     Amount = record.amount == 0 ? 1 : record.amount,
                     ExpirationDate = record.expiration,
                     Filled = record.filled,

@@ -15,7 +15,7 @@ namespace coretests.Options
             Assert.Equal("laimonas", option.State.UserId);
             Assert.Equal(2.5, option.State.StrikePrice);
             Assert.Equal(32, option.State.Premium);
-            Assert.Equal(1, option.State.Amount);
+            Assert.Equal(1, option.State.NumberOfContracts);
             Assert.True(option.State.Expiration.Hour == 0);
             Assert.NotNull(option.State.Filled);
             Assert.Null(option.State.Closed);
@@ -24,7 +24,7 @@ namespace coretests.Options
 
             option.Close(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(0, option.State.Amount);
+            Assert.Equal(0, option.State.NumberOfContracts);
             Assert.NotNull(option.State.Closed);
 
             Assert.Equal(10, option.State.Spent);
@@ -39,10 +39,11 @@ namespace coretests.Options
             Assert.Equal(0, option.State.CollateralCash);
         }
 
-        private static SoldOption GetTestOption(OptionType optionType)
+        private static OwnedOption GetTestOption(OptionType optionType)
         {
-            var option = new SoldOption(
+            var option = new OwnedOption(
                 "TEUM",
+                PositionType.Sell,
                 optionType,
                 DateTimeOffset.UtcNow.AddDays(10),
                 2.5,
@@ -58,14 +59,14 @@ namespace coretests.Options
         public void CreateWithBadTickerFails()
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption(null, OptionType.CALL, DateTimeOffset.UtcNow, 2, "user", 1, 20, DateTimeOffset.UtcNow));
+                new OwnedOption(null, PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow, 2, "user", 1, 20, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void CreateWithBadUserFails()
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow, 2, "", 1, 20, DateTimeOffset.UtcNow));
+                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow, 2, "", 1, 20, DateTimeOffset.UtcNow));
         }
 
         [Theory]
@@ -74,7 +75,7 @@ namespace coretests.Options
         public void CreateWithBadStrikeFails(double strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow, strikePrice, "user", 1, 20, DateTimeOffset.UtcNow));
+                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow, strikePrice, "user", 1, 20, DateTimeOffset.UtcNow));
         }
 
         [Fact]
@@ -82,10 +83,10 @@ namespace coretests.Options
         {
             var opt = GetTestOption(OptionType.CALL);
 
-            var opt2 = new SoldOption(opt.Events);
+            var opt2 = new OwnedOption(opt.Events);
 
             Assert.Equal(opt.State.Expiration, opt2.State.Expiration);
-            Assert.Equal(opt.State.Key, opt2.State.Key);
+            Assert.Equal(opt.State.Id, opt2.State.Id);
             Assert.Equal(opt.State.Ticker, opt2.State.Ticker);
         }
 
@@ -95,7 +96,7 @@ namespace coretests.Options
         public void OpenWithInvalidAmountFails(int amount)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", amount, 20, DateTimeOffset.UtcNow));
+                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", amount, 20, DateTimeOffset.UtcNow));
         }
 
         [Theory]
@@ -106,7 +107,7 @@ namespace coretests.Options
             var opt = GetTestOption(OptionType.CALL);
 
             Assert.Throws<InvalidOperationException>( () =>
-                new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", 1, premium, DateTimeOffset.UtcNow));
+                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", 1, premium, DateTimeOffset.UtcNow));
         }
 
         [Theory]

@@ -69,8 +69,9 @@ namespace storage.tests
         {
             var expiration = DateTimeOffset.UtcNow.AddDays(30).Date;
 
-            var option = new SoldOption(
+            var option = new OwnedOption(
                 GenerateTestTicker(),
+                PositionType.Sell,
                 OptionType.CALL,
                 expiration,
                 2.5,

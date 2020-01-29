@@ -72,15 +72,15 @@ namespace core
             return Generate(NOTE_HEADER, rows);
         }
 
-        public static string Generate(IEnumerable<SoldOption> options)
+        public static string Generate(IEnumerable<OwnedOption> options)
         {
             var rows = options.OrderBy(s => s.State.Filled).Select(s => new object[]{
                 s.State.Ticker,
                 s.State.StrikePrice,
-                s.State.Type,
+                s.State.OptionType,
                 s.State.Expiration.ToString(DATE_FORMAT),
                 s.State.Filled?.ToString(DATE_FORMAT),
-                s.State.Amount,
+                s.State.NumberOfContracts,
                 s.State.Premium,
                 s.State.Closed?.ToString(DATE_FORMAT),
                 s.State.Spent

@@ -52,7 +52,7 @@ namespace core
 
         internal static TransactionList ToTransactionLog(
             IEnumerable<OwnedStock> stocks,
-            IEnumerable<SoldOption> options,
+            IEnumerable<OwnedOption> options,
             string ticker)
         {
             var log = stocks.Where(s => s.State.Ticker == (ticker != null ? ticker : s.State.Ticker))
@@ -131,17 +131,17 @@ namespace core
             };
         }
 
-        public static object ToOptionView(SoldOption o)
+        public static object ToOptionView(OwnedOption o)
         {
             return new
             {
                 id = o.State.Id,
                 ticker = o.State.Ticker,
-                type = o.State.Type.ToString(),
+                type = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
                 expiration = o.State.Expiration.ToString("yyyy-MM-dd"),
                 premium = o.State.Premium,
-                amount = o.State.Amount,
+                amount = o.State.NumberOfContracts * (o.State.PositionType == PositionType.Sell ? -1 : 1),
                 riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100
             };
         }

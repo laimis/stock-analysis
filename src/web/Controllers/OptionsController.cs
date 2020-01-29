@@ -35,7 +35,7 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(Sell.Command cmd)
+        public async Task<ActionResult> Sell(Open.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
 

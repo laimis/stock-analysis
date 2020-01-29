@@ -20,7 +20,7 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithNoSoldOptions();
 
-            var handler = new Sell.Handler(storage);
+            var handler = new Open.Handler(storage);
 
             await handler.Handle(_fixture.SellOptionCommand, CancellationToken.None);
 

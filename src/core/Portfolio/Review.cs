@@ -57,7 +57,7 @@ namespace core.Portfolio
                 };
             }
 
-            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<SoldOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
+            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<OwnedOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
             {
                 var entries = new List<ReviewEntry>();
 
@@ -66,7 +66,7 @@ namespace core.Portfolio
                     entries.Add(new ReviewEntry
                     {
                         Ticker = o.State.Ticker,
-                        Description = $"${o.State.StrikePrice} {o.State.Type}",
+                        Description = $"${o.State.StrikePrice} {o.State.OptionType}",
                         Expiration = o.State.Expiration
                     });
                 }

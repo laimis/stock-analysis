@@ -8,45 +8,57 @@
 
   <div class="option-purchase-c-container">
 		<form>
-			<div class="form-group">
-				<label for="ticker">Ticker</label>
-				<input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="option.ticker">
-			</div>
-
-			<div class="form-group">
-				<label for="strikePrice">Strike Price</label>
-				<input type="number" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="option.strikePrice">
+      <div class="form-row">
+        <div class="col">
+          <label for="ticker">Ticker</label>
+          <input type="text" class="form-control" id="ticker" name="ticker" [(ngModel)]="option.ticker">
+        </div>
+        <div class="col">
+          <label for="strikePrice">Strike Price</label>
+          <input type="number" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="option.strikePrice">
+        </div>
+        <div class="col">
+          <label for="expirationDate">Expiration</label>
+          <input type="date" class="form-control" id="expirationDate" name="expirationDate" [(ngModel)]="option.expirationDate">
+        </div>
       </div>
 
-      <div class="form-group">
-				<label for="expirationDate">Expiration</label>
-				<input type="date" class="form-control" id="expirationDate" name="expirationDate" [(ngModel)]="option.expirationDate">
-			</div>
+      <div class="form-row mt-2">
+        <div class="col">
+          <label for="positionType">Buying or Selling? &nbsp;&nbsp; </label>
+          <select class="form-control" name="positionType" [(ngModel)]="option.positionType">
+            <option value="Buy">Buying</option>
+            <option value="Sell">Selling</option>
+          </select>
+        </div>
 
-			<div class="form-group">
-				<label for="optionType">Type &nbsp;&nbsp; </label>
-				<select name="optionType" [(ngModel)]="option.optionType">
-					<option>CALL</option>
-					<option>PUT</option>
-				</select>
-			</div>
+        <div class="col">
+          <label for="optionType">Option Type &nbsp;&nbsp; </label>
+          <select class="form-control" name="optionType" [(ngModel)]="option.optionType">
+            <option>CALL</option>
+            <option>PUT</option>
+          </select>
+        </div>
+      </div>
 
-			<div class="form-group">
-				<label for="amount">Number of Contracts</label>
-				<input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="option.amount">
-			</div>
+      <div class="form-row mt-2">
+        <div class="col">
+          <label for="amount">Number of Contracts</label>
+          <input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="option.amount">
+        </div>
 
-			<div class="form-group">
-				<label for="premium">Premium Received</label>
-				<input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="option.premium">
-			</div>
+        <div class="col">
+          <label for="premium">Premium per Contract</label>
+          <input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="option.premium">
+        </div>
+      </div>
 
 			<div class="form-group">
 				<label for="filled">Filled Date</label>
 				<input type="date" class="form-control" id="filled"name="filled" [(ngModel)]="option.filled">
 			</div>
 
-			<button type="submit" class="btn btn-primary mb-2" (click)="open()">Record Sale</button>&nbsp;&nbsp;
+			<button type="submit" class="btn btn-primary mb-2" (click)="open()">Record</button>&nbsp;&nbsp;
 		</form>
 	</div>
 </div>
