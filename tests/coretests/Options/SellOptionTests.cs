@@ -22,7 +22,7 @@ namespace coretests.Options
 
             var handler = new Open.Handler(storage);
 
-            await handler.Handle(_fixture.SellOptionCommand, CancellationToken.None);
+            await handler.Handle(_fixture.OpenOptionCommand, CancellationToken.None);
 
             Assert.Single(storage.SavedOptions);
             Assert.True(storage.SavedOptions.Single().State.IsOpen);

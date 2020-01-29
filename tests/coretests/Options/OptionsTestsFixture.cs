@@ -12,18 +12,18 @@ namespace coretests.Options
         private Close.Command _closeOptionCommand;
         public Close.Command CloseOptionCommand => _closeOptionCommand;
 
-        private Open.Command _sellOptionCommand;
-        public Open.Command SellOptionCommand => _sellOptionCommand;
+        private Open.Command _openOptionCommand;
+        public Open.Command OpenOptionCommand => _openOptionCommand;
 
         public OptionsTestsFixture()
         {
             _closeOptionCommand = CreateCloseCommand();
-            _sellOptionCommand = CreateSellCommand();
+            _openOptionCommand = CreateOpenCommand();
         }
 
         public FakePortfolioStorage CreateStorageWithSoldOption()
         {
-            return CreateStorage(_sellOptionCommand);
+            return CreateStorage(_openOptionCommand);
         }
 
         public FakePortfolioStorage CreateStorageWithNoSoldOptions()
@@ -38,19 +38,19 @@ namespace coretests.Options
             return storage;
         }
 
-        private FakePortfolioStorage CreateStorage(Open.Command sell)
+        private FakePortfolioStorage CreateStorage(Open.Command open)
         {
             var storage = new FakePortfolioStorage();
 
             var opt = new OwnedOption(
-                sell.Ticker,
-                (PositionType)Enum.Parse(typeof(PositionType), sell.PositionType),
-                (OptionType)Enum.Parse(typeof(OptionType), sell.OptionType),
-                sell.ExpirationDate.Value,
-                sell.StrikePrice,
-                sell.UserId,
-                sell.Amount,
-                sell.Premium,
+                open.Ticker,
+                (PositionType)Enum.Parse(typeof(PositionType), open.PositionType),
+                (OptionType)Enum.Parse(typeof(OptionType), open.OptionType),
+                open.ExpirationDate.Value,
+                open.StrikePrice,
+                open.UserId,
+                open.Amount,
+                open.Premium,
                 DateTimeOffset.UtcNow);
 
             storage.Register(opt);
@@ -62,6 +62,7 @@ namespace coretests.Options
         {
             var cmd = new Close.Command
             {
+                Id = Guid.NewGuid(),
                 NumberOfContracts = 1,
                 CloseDate = DateTime.UtcNow,
                 ClosePrice = 0,
@@ -72,7 +73,7 @@ namespace coretests.Options
             return cmd;
         }
 
-        private static Open.Command CreateSellCommand()
+        private static Open.Command CreateOpenCommand()
         {
             var cmd = new Open.Command
             {
@@ -80,6 +81,7 @@ namespace coretests.Options
                 ExpirationDate = DateTime.UtcNow.AddDays(1),
                 Filled = DateTime.UtcNow,
                 Premium = 200,
+                PositionType = PositionType.Sell.ToString(),
                 OptionType = OptionType.CALL.ToString(),
                 StrikePrice = 45,
                 Ticker = Ticker
