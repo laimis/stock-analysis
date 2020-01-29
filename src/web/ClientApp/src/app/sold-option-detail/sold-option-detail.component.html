@@ -1,12 +1,12 @@
 <div class="mt-2">
 
   <div *ngIf="closed" class="alert alert-success" role="alert">
-    Contract has been successfully closed
+    Successfully recorded the closing
   </div>
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-	<div *ngIf="loaded">
+	<div *ngIf="option">
     <h3>{{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}} exp {{option.expiration | date}}</h3>
     <h5>{{option.amount}} contract(s) for {{option.premium | currency }}</h5>
 

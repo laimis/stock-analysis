@@ -54,11 +54,9 @@ INFRA
 LAUNCH CHECKLIST
 
 - buy options
-- partial option sells/closes
 - money as int
 - account management
 - landing page
-- dashboard with transactions
 - options details
 - stocks details
 - weekly review email 

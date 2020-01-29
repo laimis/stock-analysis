@@ -11,7 +11,6 @@ import { DatePipe } from '@angular/common';
 })
 export class SoldOptionDetailComponent implements OnInit {
   public option: OptionDefinition;
-  public loaded: boolean;
   public closed: boolean;
   public closePrice: number;
   public closeDate: string;
@@ -30,10 +29,12 @@ export class SoldOptionDetailComponent implements OnInit {
 
     var id = this.route.snapshot.paramMap.get('id');
 
+    this.getOption(id)
+  }
+
+  getOption(id:string){
     this.service.getSoldOption(id).subscribe( result => {
       this.option = result
-      this.numberOfContracts = result.amount
-      this.loaded = true
     })
   }
 
@@ -50,6 +51,9 @@ export class SoldOptionDetailComponent implements OnInit {
 
     this.service.closeSoldOption(obj).subscribe( () => {
       this.closed = true
+      this.closePrice = null
+      this.numberOfContracts = null
+      this.getOption(this.option.id)
     }, err => {
       this.errors = GetErrors(err)
     })
