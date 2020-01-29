@@ -1,7 +1,7 @@
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Account;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Logging;
 
@@ -10,37 +10,25 @@ namespace web.Utils
     public class CookieEvents : CookieAuthenticationEvents
     {
         private ILogger<CookieEvents> _logger;
-        private IAccountStorage _accounts;
+        private IMediator _mediator;
 
         public CookieEvents(
             ILogger<CookieEvents> logger,
-            IAccountStorage accounts)
+            IMediator mediator )
         {
             _logger = logger;
-            _accounts = accounts;
+            _mediator = mediator;
         }
         
         public override async Task SigningIn(CookieSigningInContext context)
         {
-            var i = context.Principal.Identity as ClaimsIdentity;
+            var email = context.Principal.Email();
 
-            var claim = i.FindFirst(ClaimTypes.Email);
-            if (claim == null)
-            {
-                _logger.LogCritical("Failed to find email claim for " + i.Name);
-            }
+            var id = await _mediator.Send(new CreateOrGet.Command(email));
 
-            var email = claim.Value;
-
-            var u = await _accounts.GetUser(claim.Value);
-            if (u == null)
-            {
-                u = new User(email);
-
-                await _accounts.Save(u);
-            }
-
-            i.AddClaim(new Claim(IdentityExtensions.ID_CLAIM_NAME, u.State.Id.ToString()));
+            (context.Principal.Identity as ClaimsIdentity).AddClaim(
+                new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())
+            );
         }
     }
 }
