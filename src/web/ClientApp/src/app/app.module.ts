@@ -38,7 +38,7 @@ var routes = [
   { path: 'options/sell', component: OptionSellComponent },
   { path: 'options/:ticker', component: OptionDetailComponent },
   { path: 'review', component: ReviewComponent },
-  { path: 'soldoptions/:ticker/:type/:strikePrice/:expiration', component: SoldOptionDetailComponent},
+  { path: 'soldoptions/:id', component: SoldOptionDetailComponent},
   { path: 'stocks/lists', component: StockListsComponent },
   { path: 'stocks/transaction', component: StockTransactionComponent },
   { path: 'stocks/transaction/:ticker', component: StockTransactionComponent },

@@ -90,8 +90,8 @@ export class StocksService {
 		return this.http.post('/api/options/sell', obj)
   }
 
-  getSoldOption(ticker:string, type:string, strikePrice:number, expiration:string) : Observable<OptionDefinition> {
-    return this.http.get<OptionDefinition>('/api/options/soldoptions/' + ticker + '/' + type + '/' + strikePrice + '/' + expiration)
+  getSoldOption(id:string) : Observable<OptionDefinition> {
+    return this.http.get<OptionDefinition>('/api/options/soldoptions/' + id)
   }
 
   closeSoldOption(obj:object) : Observable<any> {
@@ -142,6 +142,7 @@ export interface StockSummary {
 }
 
 export class OptionDefinition {
+  id: string
   ticker: string
   strikePrice: number
   expirationDate: string

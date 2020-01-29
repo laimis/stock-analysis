@@ -1,12 +1,7 @@
-current:
-
-- render user profile information
+Current:
 
 FEATURES
 
-- automated stock analysis/reviews -- need more details
-    Delivery over the email
-        Month
 - landing page
 - search lookup
 - contact form
@@ -19,6 +14,8 @@ FEATURES
 - GDPR
 - terms of use
 - daily movement summary
+- automated stock analysis/reviews -- need more details
+
 
 MINOR IMPROVEMENTS
 

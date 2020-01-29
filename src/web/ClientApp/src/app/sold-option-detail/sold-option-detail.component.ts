@@ -27,30 +27,20 @@ export class SoldOptionDetailComponent implements OnInit {
     this.closeDate = Date()
     this.closeDate = this.datePipe.transform(this.closeDate, 'yyyy-MM-dd');
 
-    var ticker = this.route.snapshot.paramMap.get('ticker');
-    var type = this.route.snapshot.paramMap.get('type');
-    var strikePrice = Number.parseFloat(this.route.snapshot.paramMap.get('strikePrice'));
-    var expiration = this.route.snapshot.paramMap.get('expiration');
+    var id = this.route.snapshot.paramMap.get('id');
 
-    this.service.getSoldOption(ticker, type, strikePrice, expiration).subscribe( result => {
+    this.service.getSoldOption(id).subscribe( result => {
       this.option = result
       this.loaded = true
     })
   }
 
   close() {
-    var ticker = this.route.snapshot.paramMap.get('ticker');
-    var type = this.route.snapshot.paramMap.get('type');
-    var strikePrice = Number.parseFloat(this.route.snapshot.paramMap.get('strikePrice'));
-    var expiration = this.route.snapshot.paramMap.get('expiration');
 
     this.errors = null;
 
     var obj = {
-      ticker,
-      optionType: type,
-      strikePrice,
-      expiration,
+      id: this.option.id,
       closePrice: this.closePrice,
       closeDate: this.closeDate,
       amount: this.option.amount

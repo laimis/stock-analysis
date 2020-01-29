@@ -12,7 +12,7 @@ namespace core.Options
         public class Command : RequestWithUserId
         {
             [Required]
-            public Guid Id { get; set; }
+            public Guid? Id { get; set; }
 
             [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
             public int Amount { get; set; }
@@ -36,15 +36,21 @@ namespace core.Options
 
             public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
             {
+                Console.WriteLine("received command " + cmd.Id);
+                
                 var sold = await _storage.GetSoldOption(
-                    cmd.Id,
+                    cmd.Id.Value,
                     cmd.UserId);
 
                 if (sold != null)
                 {
+                    Console.WriteLine("closing option");
+
                     sold.Close(cmd.Amount, cmd.ClosePrice.Value, cmd.CloseDate.Value);
                     await _storage.Save(sold, cmd.UserId);
                 }
+
+                Console.WriteLine("end");
 
                 return new Unit();
             }

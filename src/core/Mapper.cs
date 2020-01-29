@@ -135,6 +135,7 @@ namespace core
         {
             return new
             {
+                id = o.State.Id,
                 ticker = o.State.Ticker,
                 type = o.State.Type.ToString(),
                 strikePrice = o.State.StrikePrice,
