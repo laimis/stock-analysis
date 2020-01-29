@@ -18,14 +18,5 @@ namespace web.Controllers
         {
             _mediator = mediator;
         }
-        
-        [HttpGet("users")]
-        public async Task<object> UsersAsync()
-        {
-            var list = await this._mediator.Send<IEnumerable<LoginLogEntry>>(
-                new GetLogins.Query());
-
-            return list;
-        }
     }
 }

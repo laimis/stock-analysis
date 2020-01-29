@@ -44,7 +44,11 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> LoginAsync()
         {
-            await _mediator.Send(new Login.Command(this.User.Identifier()));
+            var cmd = new Login.Command(
+                this.User.Identifier(),
+                this.Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
+            await _mediator.Send(cmd);
             
             return this.Redirect("~/");
         }

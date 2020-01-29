@@ -14,22 +14,6 @@ namespace storage.redis
         {
         }
 
-        public async Task<IEnumerable<LoginLogEntry>> GetLogins()
-        {
-            var db = _redis.GetDatabase();
-
-            var list = await db.ListRangeAsync("loggedinusers");
-
-            return list.Select(v => JsonConvert.DeserializeObject<LoginLogEntry>(v));
-        }
-
-        public async Task RecordLoginAsync(LoginLogEntry entry)
-        {
-            var db = _redis.GetDatabase();
-
-            await db.ListLeftPushAsync("loggedinusers", JsonConvert.SerializeObject(entry));
-        }
-
         public async Task<User> GetUser(string emailAddress)
         {
             // first you need to check if email has user id

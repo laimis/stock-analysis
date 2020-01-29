@@ -10,20 +10,6 @@ namespace storagetests
         protected abstract IAccountStorage GetStorage();
 
         [Fact]
-        public async Task StoreLogWorks()
-        {
-            var storage = GetStorage();
-
-            var entry = new LoginLogEntry("laimonas", DateTime.UtcNow);
-
-            await storage.RecordLoginAsync(entry);
-
-            var loadedList = await storage.GetLogins();
-
-            Assert.NotEmpty(loadedList);
-        }
-
-        [Fact]
         public async Task StoreUserWorks()
         {
             var email = Guid.NewGuid().ToString();

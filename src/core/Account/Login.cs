@@ -1,22 +1,23 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Account
 {
     public class Login
     {
-        public class Command : IRequest
+        public class Command : RequestWithUserId
         {
-            public Command(string username)
+            public Command(string userId, string ipAddress) : base(userId)
             {
-                this.Username = username;
-                this.Date = DateTime.UtcNow;
+                this.IPAddress = ipAddress;
+                this.Timestamp = DateTimeOffset.UtcNow;
             }
 
-            public string Username { get; }
-            public DateTime Date { get; }
+            public string IPAddress { get; }
+            public DateTimeOffset? Timestamp { get; }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -28,16 +29,11 @@ namespace core.Account
                 _storage = storage;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var entry = new LoginLogEntry(
-                    request.Username,
-                    request.Date
-                );
+                // var user = await this._storage.GetUser()
 
-                await this._storage.RecordLoginAsync(entry);
-
-                return new Unit();
+                return Task.FromResult(new Unit());
             }
         }
     }
