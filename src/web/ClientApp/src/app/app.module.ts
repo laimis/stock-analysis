@@ -1,5 +1,4 @@
 
-import { AdminComponent } from './admin/admin.component';
 import { AppComponent } from './app.component';
 import { AuthGuard } from './auth/auth.guard';
 import { BrowserModule } from '@angular/platform-browser';
@@ -28,7 +27,6 @@ import { ReviewComponent } from './review/review.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
-  { path: 'admin', component: AdminComponent},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent},
   { path: 'profile', component: ProfileComponent},
@@ -51,7 +49,6 @@ var routes = [
 @NgModule({
   declarations: [
     AddNoteComponent,
-    AdminComponent,
     AppComponent,
     DashboardComponent,
     ErrorDisplayComponent,

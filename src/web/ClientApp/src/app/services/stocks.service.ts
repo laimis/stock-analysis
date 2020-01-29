@@ -101,10 +101,6 @@ export class StocksService {
   getAccountStatus() : Observable<AccountStatus> {
     return this.http.get<AccountStatus>('/api/account/status')
   }
-
-  getAcounts() : Observable<any> {
-    return this.http.get('/api/admin/users')
-  }
 }
 
 export interface ReviewList {
