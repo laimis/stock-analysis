@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Options;
@@ -6,11 +6,11 @@ using Xunit;
 
 namespace coretests.Options
 {
-    public class GetSoldOptionTests : IClassFixture<OptionsTestsFixture>
+    public class GetTests : IClassFixture<OptionsTestsFixture>
     {
         private OptionsTestsFixture _fixture;
 
-        public GetSoldOptionTests(OptionsTestsFixture fixture)
+        public GetTests(OptionsTestsFixture fixture)
         {
             _fixture = fixture;
         }

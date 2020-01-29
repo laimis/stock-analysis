@@ -13,8 +13,8 @@ export class StocksService {
 
   constructor(private http: HttpClient) { }
 
-  getEvents(): Observable<object[]> {
-    return this.http.get<object[]>('/api/events')
+  getEvents(type:string): Observable<object[]> {
+    return this.http.get<object[]>('/api/events?entity=' + type)
   }
 
   getReviewEntires(): Observable<ReviewList> {
@@ -87,10 +87,10 @@ export class StocksService {
 	}
 
 	openOption(obj:object) : Observable<any> {
-		return this.http.post('/api/options/sell', obj)
+		return this.http.post('/api/options/open', obj)
   }
 
-  getSoldOption(id:string) : Observable<OptionDefinition> {
+  getOption(id:string) : Observable<OptionDefinition> {
     return this.http.get<OptionDefinition>('/api/options/soldoptions/' + id)
   }
 

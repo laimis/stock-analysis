@@ -13,8 +13,8 @@ namespace core.Portfolio.Output
             if (grouped)
             {
                 this.Grouped = this.Transactions
+                    .OrderByDescending(t => t.Date)
                     .GroupBy(t => t.Date.ToString("yyyy-MM-01"))
-                    .OrderByDescending(g => g.Key)
                     .Select(g => new {
                         name = g.Key,
                         transactions = new TransactionList(g, false)

@@ -53,12 +53,12 @@ namespace storage.shared
                 .Select(g => new OwnedStock(g));
         }
 
-        public async Task<OwnedOption> GetSoldOption(Guid optionId, string userId)
+        public async Task<OwnedOption> GetOwnedOption(Guid optionId, string userId)
         {
-            return (await GetSoldOptions(userId)).SingleOrDefault(s => s.State.Id == optionId);
+            return (await GetOwnedOptions(userId)).SingleOrDefault(s => s.State.Id == optionId);
         }
 
-        public async Task<IEnumerable<OwnedOption>> GetSoldOptions(string userId)
+        public async Task<IEnumerable<OwnedOption>> GetOwnedOptions(string userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId);
 

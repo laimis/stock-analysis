@@ -23,7 +23,7 @@ namespace core.Options
 
             public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                var sold = await _storage.GetSoldOption(request.Id, request.UserId);
+                var sold = await _storage.GetOwnedOption(request.Id, request.UserId);
                 
                 return Mapper.ToOptionView(sold);
             }

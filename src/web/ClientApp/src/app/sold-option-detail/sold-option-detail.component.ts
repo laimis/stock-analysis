@@ -33,7 +33,7 @@ export class SoldOptionDetailComponent implements OnInit {
   }
 
   getOption(id:string){
-    this.service.getSoldOption(id).subscribe( result => {
+    this.service.getOption(id).subscribe( result => {
       this.option = result
     })
   }

@@ -28,7 +28,7 @@ namespace storage.tests
         {
             var storage = CreateStorage();
 
-            Assert.Null(await storage.GetSoldOption(Guid.NewGuid(), _userId));
+            Assert.Null(await storage.GetOwnedOption(Guid.NewGuid(), _userId));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace storage.tests
 
             await storage.Save(option, _userId);
 
-            var loaded = await storage.GetSoldOption(
+            var loaded = await storage.GetOwnedOption(
                 option.State.Id,
                 _userId);
 
@@ -93,7 +93,7 @@ namespace storage.tests
 
             Assert.Equal(option.State.StrikePrice, loaded.State.StrikePrice);
 
-            var list = await storage.GetSoldOptions(_userId);
+            var list = await storage.GetOwnedOptions(_userId);
 
             var fromList = list.Single(o => o.State.Ticker == option.State.Ticker);
 

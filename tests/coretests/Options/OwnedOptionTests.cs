@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using core.Options;
 using Xunit;
 
 namespace coretests.Options
 {
-    public class SoldOptionTests
+    public class OwnedOptionTests
     {
         [Fact]
         public void PutOptionOperations()

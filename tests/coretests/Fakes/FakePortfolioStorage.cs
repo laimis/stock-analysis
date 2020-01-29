@@ -17,12 +17,12 @@ namespace coretests.Fakes
 
         public IEnumerable<OwnedOption> SavedOptions => _savedSoldOptions.AsReadOnly();
 
-        public Task<OwnedOption> GetSoldOption(Guid id, string userId)
+        public Task<OwnedOption> GetOwnedOption(Guid id, string userId)
         {
             return Task.FromResult<OwnedOption>(_soldOption);
         }
 
-        public Task<IEnumerable<OwnedOption>> GetSoldOptions(string user)
+        public Task<IEnumerable<OwnedOption>> GetOwnedOptions(string user)
         {
             return Task.FromResult(
                 new List<OwnedOption>{_soldOption}.Select(o => o)

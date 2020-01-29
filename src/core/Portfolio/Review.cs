@@ -37,7 +37,7 @@ namespace core.Portfolio
 
             public override async Task<ReviewList> Handle(Generate request, CancellationToken cancellationToken)
             {
-                var options = _storage.GetSoldOptions(request.UserId);
+                var options = _storage.GetOwnedOptions(request.UserId);
                 var stocks = _storage.GetStocks(request.UserId);
                 var notes = _storage.GetNotes(request.UserId);
 

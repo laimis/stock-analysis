@@ -26,7 +26,7 @@ namespace core.Portfolio
             public override async Task<TransactionList> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stocks = _storage.GetStocks(request.UserId);
-                var options = _storage.GetSoldOptions(request.UserId);
+                var options = _storage.GetOwnedOptions(request.UserId);
 
                 await Task.WhenAll(stocks, options);
 

@@ -39,7 +39,7 @@ namespace core.Options
             {
                 Console.WriteLine("received command " + cmd.Id);
                 
-                var sold = await _storage.GetSoldOption(
+                var sold = await _storage.GetOwnedOption(
                     cmd.Id.Value,
                     cmd.UserId);
 
