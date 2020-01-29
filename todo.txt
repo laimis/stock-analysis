@@ -1,7 +1,8 @@
 current:
 
-- increment entity ids to cause full reload
+- user id as guid vs email
 - userid to value object
+- remove explicit login entry
 
 FEATURES
 
@@ -52,10 +53,10 @@ INFRA
 - check into https://www.nuget.org/packages/Respawn/
 - export as excel sheet
 - k8s for managing container switches
+- nullability in the project
 
 LAUNCH CHECKLIST
 
-- fix event/aggregate ids
 - buy options
 - partial option sells/closes
 - money as int

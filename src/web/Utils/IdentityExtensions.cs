@@ -4,6 +4,8 @@ namespace web.Utils
 {
     public static class IdentityExtensions
     {
+        public const string ID_CLAIM_NAME = "userid";
+        
         public static string Identifier(this System.Security.Claims.ClaimsPrincipal p)
         {
             if (p == null)
@@ -11,7 +13,7 @@ namespace web.Utils
                 return null;
             }
 
-            var claim = p.FindFirst(ClaimTypes.Email);
+            var claim = p.FindFirst(ID_CLAIM_NAME);
             if (claim == null)
             {
                 return null;

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using storage.redis;
 using storage.shared;
+using web.Utils;
 
 namespace web
 {
@@ -30,6 +31,7 @@ namespace web
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddMediatR(typeof(Close).Assembly);
+            services.AddSingleton<CookieEvents>();
 
             services.AddHostedService<TestService>();
             
