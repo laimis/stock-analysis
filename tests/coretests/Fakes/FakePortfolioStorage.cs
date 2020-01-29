@@ -11,21 +11,21 @@ namespace coretests.Fakes
 {
     public class FakePortfolioStorage : IPortfolioStorage
     {
-        private OwnedOption _soldOption;
-        private List<OwnedOption> _savedSoldOptions = new List<OwnedOption>();
+        private OwnedOption _option;
+        private List<OwnedOption> _savedOptions = new List<OwnedOption>();
         private List<Note> _notes = new List<Note>();
 
-        public IEnumerable<OwnedOption> SavedOptions => _savedSoldOptions.AsReadOnly();
+        public IEnumerable<OwnedOption> SavedOptions => _savedOptions.AsReadOnly();
 
         public Task<OwnedOption> GetOwnedOption(Guid id, string userId)
         {
-            return Task.FromResult<OwnedOption>(_soldOption);
+            return Task.FromResult<OwnedOption>(_option);
         }
 
         public Task<IEnumerable<OwnedOption>> GetOwnedOptions(string user)
         {
             return Task.FromResult(
-                new List<OwnedOption>{_soldOption}.Select(o => o)
+                new List<OwnedOption>{_option}.Select(o => o)
             );
         }
 
@@ -41,7 +41,7 @@ namespace coretests.Fakes
 
         internal void Register(OwnedOption opt)
         {
-            _soldOption = opt;
+            _option = opt;
         }
 
         public Task Save(OwnedStock stock, string userId)
@@ -51,7 +51,7 @@ namespace coretests.Fakes
 
         public Task Save(OwnedOption option, string userId)
         {
-            _savedSoldOptions.Add(option);
+            _savedOptions.Add(option);
 
             return Task.CompletedTask;
         }

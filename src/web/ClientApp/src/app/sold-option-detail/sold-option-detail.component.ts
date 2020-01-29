@@ -49,7 +49,7 @@ export class SoldOptionDetailComponent implements OnInit {
       numberOfContracts: this.numberOfContracts
     }
 
-    this.service.closeSoldOption(obj).subscribe( () => {
+    this.service.closeOption(obj).subscribe( () => {
       this.closed = true
       this.closePrice = null
       this.numberOfContracts = null

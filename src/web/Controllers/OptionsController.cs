@@ -22,7 +22,7 @@ namespace web.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("{ticker}")]
+        [HttpGet("{ticker}/details")]
         public async Task<ActionResult<OptionDetailsViewModel>> DetailsAsync(string ticker)
         {
             var details = await _mediator.Send(new Detail.Query(ticker));
@@ -44,25 +44,24 @@ namespace web.Controllers
             return Ok();
         }
 
-        [HttpGet("soldoptions/{id}")]
-        public async Task<object> SoldOption(Guid id)
+        [HttpGet("{id}")]
+        public async Task<object> Get(Guid id)
         {
             var query = new Get.Query { Id = id };
 
             query.WithUserId(this.User.Identifier());
             
-            var sold =  await _mediator.Send(query);
-
-            if (sold == null)
+            var option =  await _mediator.Send(query);
+            if (option == null)
             {
                 return NotFound();
             }
 
-            return sold;
+            return option;
         }
 
         [HttpPost("close")]
-        public async Task<ActionResult> CloseSoldOption(Close.Command cmd)
+        public async Task<ActionResult> CloseOption(Close.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
 

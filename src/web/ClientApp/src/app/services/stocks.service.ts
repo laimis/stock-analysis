@@ -74,14 +74,6 @@ export class StocksService {
 		return this.http.post('/api/stocks/sell', obj)
 	}
 
-	getOptions(ticker:string): Observable<OptionDetail> {
-    return this.http.get<OptionDetail>('/api/options/' + ticker)
-  }
-
-  importOptions(formData: FormData) {
-    return this.http.post('/api/options/import', formData)
-  }
-
 	getPortfolio(): Observable<Portfolio> {
 		return this.http.get<Portfolio>('/api/portfolio')
 	}
@@ -91,11 +83,19 @@ export class StocksService {
   }
 
   getOption(id:string) : Observable<OptionDefinition> {
-    return this.http.get<OptionDefinition>('/api/options/soldoptions/' + id)
+    return this.http.get<OptionDefinition>('/api/options/' + id)
   }
 
-  closeSoldOption(obj:object) : Observable<any> {
+  closeOption(obj:object) : Observable<any> {
     return this.http.post('/api/options/close', obj)
+  }
+
+  getOptions(ticker:string): Observable<OptionDetail> {
+    return this.http.get<OptionDetail>('/api/options/' + ticker + '/details')
+  }
+
+  importOptions(formData: FormData) {
+    return this.http.post('/api/options/import', formData)
   }
 
   getAccountStatus() : Observable<AccountStatus> {

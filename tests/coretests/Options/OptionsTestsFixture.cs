@@ -26,16 +26,9 @@ namespace coretests.Options
             return CreateStorage(_openOptionCommand);
         }
 
-        public FakePortfolioStorage CreateStorageWithNoSoldOptions()
+        public FakePortfolioStorage CreateStorageWithNoOptions()
         {
             return new FakePortfolioStorage();
-        }
-
-        public FakePortfolioStorage CreateStorageWithSoldOption(OwnedOption opt)
-        {
-            var storage = new FakePortfolioStorage();
-            storage.Register(opt);
-            return storage;
         }
 
         private FakePortfolioStorage CreateStorage(Open.Command open)
