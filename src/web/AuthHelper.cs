@@ -1,7 +1,14 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using web.Utils;
 
 namespace web
 {
@@ -18,6 +25,7 @@ namespace web
             .AddCookie(opt =>
             {
                 opt.Cookie.Name = "tw";
+                opt.EventsType = typeof(CookieEvents);
             })
             .AddGoogle("Google", options =>
             {

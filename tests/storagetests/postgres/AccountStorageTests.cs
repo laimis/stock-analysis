@@ -7,20 +7,11 @@ using Xunit;
 namespace storagetests.postgres
 {
     [Trait("Category", "Database")]
-    public class AccountStorageTests
+    public class PostgresAccountStorageTests : AccountStorageTests
     {
-        [Fact]
-        public async Task StoreLogWorks()
+        protected override IAccountStorage GetStorage()
         {
-            var storage = new AccountStorage(PostgresPortfolioStorageTests._cnn);
-
-            var entry = new LoginLogEntry("laimonas", DateTime.UtcNow);
-
-            await storage.RecordLoginAsync(entry);
-
-            var loadedList = await storage.GetLogins();
-
-            Assert.NotEmpty(loadedList);
+            return new AccountStorage(PostgresPortfolioStorageTests._cnn);
         }
     }
 }

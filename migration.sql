@@ -54,3 +54,13 @@ CREATE TABLE loginlog (
     date TIMESTAMP
 );
 ALTER TABLE loginlog OWNER TO stocks;
+
+CREATE TABLE users (
+    id TEXT,
+    email TEXT,
+    PRIMARY KEY users_id (id) 
+);
+ALTER TABLE users OWNER TO stocks;
+
+ADD UNIQUE INDEX users_id ON users USING BTREE(id);
+ADD UNIQUE INDEX users_email ON users USING BTREE(email);
