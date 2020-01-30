@@ -29,9 +29,7 @@ MINOR IMPROVEMENTS
 - indicate expired option in option details, do not allow to buy/sell
 
 DESIGN
-- consider cards for rendering owned options, owned stock... might get too much?
-- dropdown for option type selection
-- the whole Watch section is incomplete, what to do there
+- custom bootstrap components for dropdowns, dates
 - market cap/gross profit, should all be rounded
 - fundamentals section should be a card layout
 
@@ -57,3 +55,4 @@ LAUNCH CHECKLIST
 - account management
 - stocks details
 - search of ticker ... ticker as value object that's validated?
+- domain
