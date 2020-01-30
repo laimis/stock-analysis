@@ -14,7 +14,7 @@ namespace core
         private const string DATE_FORMAT = "yyyy-MM-dd";
         public const string STOCK_HEADER = "ticker,type,amount,price,date";
         public const string NOTE_HEADER = "created,predicted price,ticker,note";
-        public const string OPTION_HEADER = "ticker,strike,type,expiration,amount,premium,closed,spent";
+        public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
@@ -35,8 +35,8 @@ namespace core
                 case OptionSold os:
                     var o1 = tuple.a as OwnedOption;
                     return new object[] {
-                        "sell",
                         o1.State.Ticker,
+                        "sell",
                         o1.State.StrikePrice,
                         o1.State.OptionType.ToString(),
                         o1.State.Expiration.ToString(DATE_FORMAT),
@@ -48,14 +48,27 @@ namespace core
                 case OptionPurchased op:
                     var o2 = tuple.a as OwnedOption;
                     return new object[] {
-                        "buy",
                         o2.State.Ticker,
+                        "buy",
                         o2.State.StrikePrice,
                         o2.State.OptionType.ToString(),
                         o2.State.Expiration.ToString(DATE_FORMAT),
                         op.NumberOfContracts,
                         op.Premium,
                         op.When.ToString(DATE_FORMAT)
+                    };
+
+                case OptionExpired expired:
+                    var o3 = tuple.a as OwnedOption;
+                    return new object[] {
+                        o3.State.Ticker,
+                        "expired",
+                        o3.State.StrikePrice,
+                        o3.State.OptionType.ToString(),
+                        o3.State.Expiration.ToString(DATE_FORMAT),
+                        0,
+                        0,
+                        expired.When.ToString(DATE_FORMAT)
                     };
 
                 case StockPurchased sp:
@@ -102,6 +115,7 @@ namespace core
         {
             var rows = options.SelectMany(o => o.State.Buys.Select(op => (o, (AggregateEvent)op)))
                 .Union(options.SelectMany(o => o.State.Sells.Select(os => (o, (AggregateEvent)os))))
+                .Union(options.SelectMany(o => o.State.Expirations.Select(os => (o, (AggregateEvent)os))))
                 .OrderBy(t => t.Item2.When)
                 .Select(e => {
                     return StockEventToParts(e);
