@@ -11,14 +11,10 @@ namespace core.Options
 
         public OwnedOption(
             string ticker,
-            PositionType positionType,
+            double strikePrice,
             OptionType type,
             DateTimeOffset expiration,
-            double strikePrice,
-            string userId,
-            int amount,
-            double premium,
-            DateTimeOffset filled)
+            string userId)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -45,57 +41,54 @@ namespace core.Options
                 throw new InvalidOperationException("Expiration date is too far in the future");
             }
 
-            if (expiration < filled)
-            {
-                throw new InvalidOperationException("Expiration date cannot be before filled date");
-            }
-
-            if (amount <= 0)
-            {
-                throw new InvalidOperationException("Amount cannot be zero or negative");
-            }
-
-            if (premium <= 0)
-            {
-                throw new InvalidOperationException("Premium cannot be zero or negative");
-            }
-
             Apply(new OptionOpened(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                filled,
+                DateTimeOffset.UtcNow,
                 ticker,
-                positionType,
-                type,
                 strikePrice,
+                type,
                 expiration.Date,
-                userId,
-                amount,
-                premium));
+                userId));
+        }
+
+        public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
+        {
+            return this.State.IsMatch(ticker, strike, type, expiration);
         }
 
         public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
 
-        public void Close(int amount, double money, DateTimeOffset closed)
+        public void Buy(int amount, double premium, DateTimeOffset filled)
         {
             if (amount <= 0)
             {
                 throw new InvalidOperationException("Amount cannot be zero or negative");
             }
 
-            if (this.State.NumberOfContracts < amount)
+            if (premium < 0)
             {
-                throw new InvalidOperationException("Don't have enough options to close");
+                throw new InvalidOperationException("Premium money cannot be negative");
             }
 
-            if (money < 0)
+            Apply(new OptionPurchased(Guid.NewGuid(), this.State.Id, filled, amount, premium));
+        }
+
+        public void Sell(int numberOfContracts, double premium, DateTimeOffset filled)
+        {
+            if (numberOfContracts <= 0)
             {
-                throw new InvalidOperationException("Close money cannot be negative");
+                throw new InvalidOperationException("Amount cannot be zero or negative");
             }
 
-            Apply(new OptionClosed(Guid.NewGuid(), this.State.Id, closed, amount, money));
+            if (premium < 0)
+            {
+                throw new InvalidOperationException("Premium money cannot be negative");
+            }
+
+            Apply(new OptionSold(Guid.NewGuid(), this.State.Id, filled, numberOfContracts, premium));
         }
 
         protected override void Apply(AggregateEvent e)
@@ -115,19 +108,14 @@ namespace core.Options
             this.State.Apply(sold);
         }
 
-        protected void ApplyInternal(OptionClosed closed)
+        protected void ApplyInternal(OptionPurchased purchased)
         {
-            this.State.Apply(closed);
+            this.State.Apply(purchased);
         }
 
-        protected void ApplyInternal(OptionOpened closed)
+        protected void ApplyInternal(OptionOpened opened)
         {
-            this.State.Apply(closed);
-        }
-
-        public static string GenerateKey(string ticker, OptionType optionType, DateTimeOffset expiration, double strikePrice)
-        {
-            return $"{ticker}:{optionType}:{strikePrice}:{expiration.Date.ToString("yyyy-MM-dd")}";
+            this.State.Apply(opened);
         }
     }
 }

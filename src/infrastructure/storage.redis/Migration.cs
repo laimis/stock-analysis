@@ -33,9 +33,9 @@ namespace storage.redis
 
             foreach(var e in events)
             {
-                if (e.Event is OptionClosed c && c.Money == 140 && e.Key.Contains("WORK"))
+                if (e.Event is OptionPurchased c && c.Premium == 140 && e.Key.Contains("WORK"))
                 {
-                    c.Money = 40;
+                    // c.Premium = 40;
 
                     var fields = new HashEntry[] {
                         new HashEntry("created", e.Created.ToString("o")),

@@ -71,14 +71,10 @@ namespace storage.tests
 
             var option = new OwnedOption(
                 GenerateTestTicker(),
-                PositionType.Sell,
+                2.5,
                 OptionType.CALL,
                 expiration,
-                2.5,
-                _userId,
-                1,
-                8,
-                DateTimeOffset.UtcNow
+                _userId
             );
 
             var storage = CreateStorage();

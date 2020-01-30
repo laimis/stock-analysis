@@ -9,21 +9,24 @@ namespace coretests.Options
         public const string Ticker = "ticker";
         public const string UserId = "userid";
 
-        private Close.Command _closeOptionCommand;
-        public Close.Command CloseOptionCommand => _closeOptionCommand;
-
-        private Open.Command _openOptionCommand;
-        public Open.Command OpenOptionCommand => _openOptionCommand;
-
-        public OptionsTestsFixture()
-        {
-            _closeOptionCommand = CreateCloseCommand();
-            _openOptionCommand = CreateOpenCommand();
-        }
-
         public FakePortfolioStorage CreateStorageWithSoldOption()
         {
-            return CreateStorage(_openOptionCommand);
+            var storage = new FakePortfolioStorage();
+
+            var cmd = CreateSellCommand();
+
+            var opt = new OwnedOption(
+                cmd.Ticker,
+                cmd.StrikePrice,
+                (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType),
+                cmd.ExpirationDate.Value,
+                cmd.UserId);
+
+            opt.Sell(1, 20, DateTimeOffset.UtcNow);
+
+            storage.Register(opt);
+
+            return storage;
         }
 
         public FakePortfolioStorage CreateStorageWithNoOptions()
@@ -31,53 +34,17 @@ namespace coretests.Options
             return new FakePortfolioStorage();
         }
 
-        private FakePortfolioStorage CreateStorage(Open.Command open)
+        public static Sell.Command CreateSellCommand()
         {
-            var storage = new FakePortfolioStorage();
-
-            var opt = new OwnedOption(
-                open.Ticker,
-                (PositionType)Enum.Parse(typeof(PositionType), open.PositionType),
-                (OptionType)Enum.Parse(typeof(OptionType), open.OptionType),
-                open.ExpirationDate.Value,
-                open.StrikePrice,
-                open.UserId,
-                open.Amount,
-                open.Premium,
-                DateTimeOffset.UtcNow);
-
-            storage.Register(opt);
-
-            return storage;
-        }
-
-        private static Close.Command CreateCloseCommand()
-        {
-            var cmd = new Close.Command
+            var cmd = new Sell.Command
             {
-                Id = Guid.NewGuid(),
+                Ticker = Ticker,
                 NumberOfContracts = 1,
-                CloseDate = DateTime.UtcNow,
-                ClosePrice = 0,
-            };
-
-            cmd.WithUserId(UserId);
-
-            return cmd;
-        }
-
-        private static Open.Command CreateOpenCommand()
-        {
-            var cmd = new Open.Command
-            {
-                Amount = 1,
-                ExpirationDate = DateTime.UtcNow.AddDays(1),
-                Filled = DateTime.UtcNow,
-                Premium = 200,
-                PositionType = PositionType.Sell.ToString(),
-                OptionType = OptionType.CALL.ToString(),
-                StrikePrice = 45,
-                Ticker = Ticker
+                Premium = 10,
+                StrikePrice = 20,
+                OptionType = OptionType.PUT.ToString(),
+                ExpirationDate = DateTimeOffset.UtcNow.AddDays(10),
+                Filled = DateTimeOffset.UtcNow
             };
 
             cmd.WithUserId(UserId);

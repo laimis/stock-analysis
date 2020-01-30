@@ -27,14 +27,10 @@ namespace coretests
         {
             var option = new OwnedOption(
                 "ticker",
-                PositionType.Sell,
+                2.5,
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
-                2.5,
-                "user",
-                1,
-                100,
-                DateTimeOffset.UtcNow);
+                "user");
 
             var report = CSVExport.Generate(new[] {option});
 

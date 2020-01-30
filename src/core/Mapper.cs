@@ -140,9 +140,8 @@ namespace core
                 type = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
                 expiration = o.State.Expiration.ToString("yyyy-MM-dd"),
-                premium = o.State.Premium,
-                amount = o.State.NumberOfContracts * (o.State.PositionType == PositionType.Sell ? -1 : 1),
-                riskPct = o.State.Premium / (o.State.StrikePrice * 100) * 100
+                numberOfContracts = o.State.NumberOfContracts,
+                transactions = new TransactionList(o.State.Transactions, false)
             };
         }
 

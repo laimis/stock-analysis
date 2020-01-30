@@ -61,7 +61,7 @@ namespace core.Portfolio
             {
                 var entries = new List<ReviewEntry>();
 
-                foreach (var o in options.Result.Where(s => s.State.IsOpen))
+                foreach (var o in options.Result.Where(s => s.State.NumberOfContracts != 0))
                 {
                     entries.Add(new ReviewEntry
                     {

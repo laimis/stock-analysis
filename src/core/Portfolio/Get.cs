@@ -31,7 +31,7 @@ namespace core.Portfolio
 
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
-                var openOptions = options.Where(o => o.State.Closed == null);
+                var openOptions = options.Where(o => o.State.NumberOfContracts != 0);
 
                 var obj = new
                 {

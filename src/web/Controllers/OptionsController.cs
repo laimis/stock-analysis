@@ -35,7 +35,7 @@ namespace web.Controllers
         }
 
         [HttpPost("open")]
-        public async Task<ActionResult> Open(Open.Command cmd)
+        public async Task<ActionResult> Open(Buy.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
 
@@ -60,8 +60,8 @@ namespace web.Controllers
             return option;
         }
 
-        [HttpPost("close")]
-        public async Task<ActionResult> CloseOption(Close.Command cmd)
+        [HttpPost("sell")]
+        public async Task<ActionResult> Sell(Sell.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
 

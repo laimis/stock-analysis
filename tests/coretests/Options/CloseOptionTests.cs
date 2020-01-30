@@ -17,29 +17,23 @@ namespace coretests.Options
         }
 
         [Fact]
-        public async Task NonExistingDoesNotFail()
+        public async Task SellingOption_Decreases()
         {
-            var storage = new FakePortfolioStorage();
+            var storage = _fixture.CreateStorageWithNoOptions();
 
-            var handler = new Close.Handler(storage);
+            var handler = new Sell.Handler(storage);
 
-            await handler.Handle(_fixture.CloseOptionCommand, CancellationToken.None);
+            await handler.Handle(
+                OptionsTestsFixture.CreateSellCommand(),
+                CancellationToken.None);
 
-            Assert.Empty(storage.SavedOptions);
-        }
-
-        [Fact]
-        public async Task ClosingOption_Closes()
-        {
-            var storage = _fixture.CreateStorageWithSoldOption();
-
-            var handler = new Close.Handler(storage);
-
-            await handler.Handle(_fixture.CloseOptionCommand, CancellationToken.None);
+            await handler.Handle(
+                OptionsTestsFixture.CreateSellCommand(),
+                CancellationToken.None);
 
             var opt = storage.SavedOptions.Single();
 
-            Assert.NotNull(opt.State.Closed);
+            Assert.Equal(-2, opt.State.NumberOfContracts);
         }
     }
 }

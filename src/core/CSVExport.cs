@@ -14,7 +14,7 @@ namespace core
         private const string DATE_FORMAT = "yyyy-MM-dd";
         public const string STOCK_HEADER = "ticker,type,amount,price,date";
         public const string NOTE_HEADER = "created,predicted price,ticker,note";
-        public const string OPTION_HEADER = "ticker,strike,type,expiration,filled,amount,premium,closed,spent";
+        public const string OPTION_HEADER = "ticker,strike,type,expiration,amount,premium,closed,spent";
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
@@ -74,16 +74,12 @@ namespace core
 
         public static string Generate(IEnumerable<OwnedOption> options)
         {
-            var rows = options.OrderBy(s => s.State.Filled).Select(s => new object[]{
+            var rows = options.OrderBy(s => s.State.Expiration).Select(s => new object[]{
                 s.State.Ticker,
                 s.State.StrikePrice,
                 s.State.OptionType,
                 s.State.Expiration.ToString(DATE_FORMAT),
-                s.State.Filled?.ToString(DATE_FORMAT),
-                s.State.NumberOfContracts,
-                s.State.Premium,
-                s.State.Closed?.ToString(DATE_FORMAT),
-                s.State.Spent
+                s.State.NumberOfContracts
             });
 
             return Generate(OPTION_HEADER, rows);

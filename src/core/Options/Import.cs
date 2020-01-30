@@ -44,35 +44,9 @@ namespace core.Options
                 return new Unit();
             }
 
-            private async Task ProcessLine(OptionRecord record, string userId)
+            private Task ProcessLine(OptionRecord record, string userId)
             {
-                var cmd = new Options.Open.Command {
-                    Amount = record.amount == 0 ? 1 : record.amount,
-                    ExpirationDate = record.expiration,
-                    Filled = record.filled,
-                    OptionType = record.type,
-                    Premium = record.premium,
-                    StrikePrice = record.strike,
-                    Ticker = record.ticker,
-                };
-
-                cmd.WithUserId(userId);
-
-                var r = await _mediator.Send(cmd);
-
-                if (record.closed != null)
-                {
-                    var c = new Options.Close.Command {
-                        NumberOfContracts = record.amount == 0 ? 1 : record.amount,
-                        CloseDate = record.closed.Value,
-                        ClosePrice = record.spent,
-                        Id = r,
-                    };
-
-                    c.WithUserId(userId);
-
-                    await _mediator.Send(c);
-                }
+                throw new InvalidOperationException("Needs to be implemented");
             }
 
             private class OptionRecord

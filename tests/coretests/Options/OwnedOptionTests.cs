@@ -6,67 +6,38 @@ namespace coretests.Options
 {
     public class OwnedOptionTests
     {
+        private static readonly DateTimeOffset _expiration = DateTimeOffset.UtcNow.AddDays(10);
+        
         [Fact]
         public void PutOptionOperations()
         {
-            var option = GetTestOption(OptionType.PUT);
+            var option = GetTestOption();
 
-            Assert.Equal("TEUM", option.State.Ticker);
-            Assert.Equal("laimonas", option.State.UserId);
-            Assert.Equal(2.5, option.State.StrikePrice);
-            Assert.Equal(32, option.State.Premium);
-            Assert.Equal(1, option.State.NumberOfContracts);
-            Assert.True(option.State.Expiration.Hour == 0);
-            Assert.NotNull(option.State.Filled);
-            Assert.Null(option.State.Closed);
-            Assert.Equal(0, option.State.CollateralShares);
-            Assert.Equal(218, option.State.CollateralCash);
-
-            option.Close(1, 10, DateTimeOffset.UtcNow);
-
-            Assert.Equal(0, option.State.NumberOfContracts);
-            Assert.NotNull(option.State.Closed);
-
-            Assert.Equal(10, option.State.Spent);
+            option.Sell(1, 10, DateTimeOffset.UtcNow);
+            
+            Assert.Equal(-1, option.State.NumberOfContracts);
         }
 
         [Fact]
-        public void CallOptionOperations()
+        public void IsMatchWorks()
         {
-            var option = GetTestOption(OptionType.CALL);
+            var option = GetTestOption();
 
-            Assert.Equal(100, option.State.CollateralShares);
-            Assert.Equal(0, option.State.CollateralCash);
-        }
-
-        private static OwnedOption GetTestOption(OptionType optionType)
-        {
-            var option = new OwnedOption(
-                "TEUM",
-                PositionType.Sell,
-                optionType,
-                DateTimeOffset.UtcNow.AddDays(10),
-                2.5,
-                "laimonas",
-                1,
-                32,
-                DateTimeOffset.UtcNow);
-
-            return option;
+            option.IsMatch("TEUM", 2.5, OptionType.PUT, _expiration);
         }
 
         [Fact]
         public void CreateWithBadTickerFails()
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption(null, PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow, 2, "user", 1, 20, DateTimeOffset.UtcNow));
+                new OwnedOption(null, 2, OptionType.CALL, DateTimeOffset.UtcNow, "user"));
         }
 
         [Fact]
         public void CreateWithBadUserFails()
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow, 2, "", 1, 20, DateTimeOffset.UtcNow));
+                new OwnedOption("ticker", 2, OptionType.CALL, DateTimeOffset.UtcNow, ""));
         }
 
         [Theory]
@@ -75,69 +46,48 @@ namespace coretests.Options
         public void CreateWithBadStrikeFails(double strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow, strikePrice, "user", 1, 20, DateTimeOffset.UtcNow));
+                new OwnedOption("ticker", strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, "user"));
         }
 
         [Fact]
         public void EventCstrReplays()
         {
-            var opt = GetTestOption(OptionType.CALL);
+            var opt = GetTestOption();
 
             var opt2 = new OwnedOption(opt.Events);
 
             Assert.Equal(opt.State.Expiration, opt2.State.Expiration);
             Assert.Equal(opt.State.Id, opt2.State.Id);
             Assert.Equal(opt.State.Ticker, opt2.State.Ticker);
+            Assert.Equal(opt.State.OptionType, opt.State.OptionType);
         }
 
         [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void OpenWithInvalidAmountFails(int amount)
+        [InlineData(-1, 0)] // negative contracts
+        [InlineData(0, 0)]    // zero contracts
+        [InlineData(1, -10)]    // negative money
+        public void CloseWithInvalidAmountFails(int amount, double money)
         {
+            var opt = GetTestOption();
+
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", amount, 20, DateTimeOffset.UtcNow));
+                opt.Sell(amount, money, DateTimeOffset.UtcNow));
         }
 
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void OpenWithInvalidPremiumFails(int premium)
+        private static OwnedOption GetTestOption(
+            string ticker = "TEUM",
+            OptionType optionType = OptionType.PUT,
+            double strikePrice = 2.5,
+            string userId = "testuser")
         {
-            var opt = GetTestOption(OptionType.CALL);
+            var option = new OwnedOption(
+                ticker,
+                strikePrice,
+                optionType,
+                _expiration,
+                userId);
 
-            Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption("ticker", PositionType.Sell, OptionType.CALL, DateTimeOffset.UtcNow.AddDays(700), 2, "user", 1, premium, DateTimeOffset.UtcNow));
-        }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void CloseWithInvalidAmountFails(int amount)
-        {
-            var opt = GetTestOption(OptionType.CALL);
-
-            Assert.Throws<InvalidOperationException>( () =>
-                opt.Close(amount, 0, DateTimeOffset.UtcNow));
-        }
-
-        [Theory]
-        [InlineData(-1)]
-        public void CloseWithInvalidMoneyFails(int money)
-        {
-            var opt = GetTestOption(OptionType.CALL);
-
-            Assert.Throws<InvalidOperationException>( () =>
-                opt.Close(1, money, DateTimeOffset.UtcNow));
-        }
-
-        [Fact]
-        public void CloseWithTooManyContractsFails()
-        {
-            var opt = GetTestOption(OptionType.CALL);
-
-            Assert.Throws<InvalidOperationException>( () =>
-                opt.Close(200, 0, DateTimeOffset.UtcNow));
+            return option;
         }
     }
 }

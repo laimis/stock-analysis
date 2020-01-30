@@ -30,7 +30,7 @@ namespace web
             services.AddSingleton<IStocksService, StocksService>();
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
-            services.AddMediatR(typeof(Close).Assembly);
+            services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
 
             services.AddHostedService<TestService>();
