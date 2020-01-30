@@ -1,9 +1,5 @@
 <div class="mt-2">
 
-  <div *ngIf="closed" class="alert alert-success" role="alert">
-    Successfully recorded the closing
-  </div>
-
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<div *ngIf="option">

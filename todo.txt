@@ -3,17 +3,19 @@ FEATURES
 - landing page
 - search lookup
 - contact form
-- record option buys
 - import transactions
 - notes section with each transaction area
 - create account
 - reset password
 - delete account
+
+LONG TERM
+
+- weekly review email 
 - GDPR
 - terms of use
 - daily movement summary
 - automated stock analysis/reviews -- need more details
-
 
 MINOR IMPROVEMENTS
 
@@ -53,10 +55,7 @@ INFRA
 
 LAUNCH CHECKLIST
 
-- buy options
-- money as int
 - account management
+- money as int
 - landing page
-- options details
 - stocks details
-- weekly review email 
