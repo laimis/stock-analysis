@@ -1,10 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Shared;
-using core.Utils;
 using MediatR;
 
 namespace core.Options
@@ -40,6 +37,8 @@ namespace core.Options
                         cmd.ExpirationDate.Value,
                         cmd.UserId);
                 }
+
+                option.Buy(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value);
 
                 await this._storage.Save(option, cmd.UserId);
 

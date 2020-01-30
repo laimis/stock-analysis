@@ -1,9 +1,7 @@
 <div *ngIf="response">
 
   <div class="mt-2">
-    {{ response.transactions.length}} transactions with profit of {{ response.profit | currency}},
-    {{ response.winningPercentage | percent}} positive,
-
+    {{ response.transactions.length}} transactions with profit of {{ response.profit | currency}}
 
     <div *ngIf="ticker" class="float-right">
       Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,

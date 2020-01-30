@@ -24,6 +24,11 @@ namespace core.Options
         
         public List<Transaction> Transactions { get; private set; }
 
+        internal void Apply(OptionExpired expired)
+        {
+            this.NumberOfContracts = 0;
+        }
+
         internal void Apply(OptionSold sold)
         {
             this.NumberOfContracts -= sold.Amount;
@@ -43,14 +48,14 @@ namespace core.Options
             );
         }
 
-        internal void Apply(OptionOpened sold)
+        internal void Apply(OptionOpened opened)
         {
-            this.Id = sold.AggregateId;
-            this.Ticker = sold.Ticker;
-            this.StrikePrice = sold.StrikePrice;
-            this.Expiration = sold.Expiration;
-            this.OptionType = sold.OptionType;
-            this.UserId = sold.UserId;
+            this.Id = opened.AggregateId;
+            this.Ticker = opened.Ticker;
+            this.StrikePrice = opened.StrikePrice;
+            this.Expiration = opened.Expiration;
+            this.OptionType = opened.OptionType;
+            this.UserId = opened.UserId;
         }
 
         internal bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)

@@ -35,18 +35,59 @@ namespace core.Options
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
                 var records = _parser.Parse<OptionRecord>(request.Content);
-
                 foreach(var r in records)
-                {
                     await ProcessLine(r, request.UserId);
-                }
 
                 return new Unit();
             }
 
-            private Task ProcessLine(OptionRecord record, string userId)
+            private async Task ProcessLine(OptionRecord record, string userId)
             {
-                throw new InvalidOperationException("Needs to be implemented");
+                var amount = record.amount;
+                if (amount == 0) amount = 1;
+
+                var sell = new Sell.Command {
+                    ExpirationDate = record.expiration,
+                    Filled = record.filled,
+                    NumberOfContracts = amount,
+                    OptionType = record.type,
+                    Premium = record.premium,
+                    StrikePrice = record.strike,
+                    Ticker = record.ticker,
+                };
+
+                sell.WithUserId(userId);
+
+                var r = await _mediator.Send(sell);
+
+                if (record.closed != null)
+                {
+                    if (record.spent == 0)
+                    {
+                        var expire = new Expire.Command{
+                            Id = r
+                        };
+                        expire.WithUserId(userId);
+
+                        await _mediator.Send(expire);
+                    }
+                    else
+                    {
+                        var buy = new Buy.Command{
+                            ExpirationDate = record.expiration,
+                            Filled = record.filled,
+                            NumberOfContracts = amount,
+                            OptionType = record.type,
+                            Premium = record.spent.Value,
+                            StrikePrice = record.strike,
+                            Ticker = record.ticker,
+                        };
+
+                        buy.WithUserId(userId);
+
+                        await _mediator.Send(buy);
+                    }
+                }
             }
 
             private class OptionRecord

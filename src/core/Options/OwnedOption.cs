@@ -9,6 +9,10 @@ namespace core.Options
         private OwnedOptionState _state = new OwnedOptionState();
         public OwnedOptionState State => _state;
 
+        public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
+        {
+        }
+
         public OwnedOption(
             string ticker,
             double strikePrice,
@@ -53,13 +57,7 @@ namespace core.Options
         }
 
         public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
-        {
-            return this.State.IsMatch(ticker, strike, type, expiration);
-        }
-
-        public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
-        {
-        }
+            => this.State.IsMatch(ticker, strike, type, expiration);
 
         public void Buy(int amount, double premium, DateTimeOffset filled)
         {
@@ -91,6 +89,11 @@ namespace core.Options
             Apply(new OptionSold(Guid.NewGuid(), this.State.Id, filled, numberOfContracts, premium));
         }
 
+        public void Expire()
+        {
+            Apply(new OptionExpired(Guid.NewGuid(), this.State.Id, this.State.Expiration));
+        }
+
         protected override void Apply(AggregateEvent e)
         {
             this._events.Add(e);
@@ -116,6 +119,11 @@ namespace core.Options
         protected void ApplyInternal(OptionOpened opened)
         {
             this.State.Apply(opened);
+        }
+
+        protected void ApplyInternal(OptionExpired expired)
+        {
+            this.State.Apply(expired);
         }
     }
 }
