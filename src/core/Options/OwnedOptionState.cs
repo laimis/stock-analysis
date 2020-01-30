@@ -9,6 +9,9 @@ namespace core.Options
         public OwnedOptionState()
         {
             this.Transactions = new List<Transaction>();
+            this.Buys = new List<OptionPurchased>();
+            this.Sells = new List<OptionSold>();
+            this.Expirations = new List<OptionExpired>();
         }
 
         public Guid Id { get; private set; }
@@ -23,15 +26,22 @@ namespace core.Options
         public double Debit { get; private set; }
         
         public List<Transaction> Transactions { get; private set; }
+        public List<OptionSold> Sells { get; private set; }
+        public List<OptionPurchased> Buys { get; private set; }
+        public List<OptionExpired> Expirations { get; private set; }
 
         internal void Apply(OptionExpired expired)
         {
             this.NumberOfContracts = 0;
+
+            this.Expirations.Add(expired);
         }
 
         internal void Apply(OptionSold sold)
         {
             this.NumberOfContracts -= sold.Amount;
+
+            this.Sells.Add(sold);
 
             var credit = (sold.Amount * sold.Premium);
 
@@ -72,6 +82,8 @@ namespace core.Options
             var debit = purchased.NumberOfContracts * purchased.Premium;
 
             this.Debit += debit;
+
+            this.Buys.Add(purchased);
 
             this.Transactions.Add(
                 Transaction.DebitTx(
