@@ -64,5 +64,10 @@ namespace coretests.Fakes
         {
             throw new System.NotImplementedException();
         }
+
+        public Task<List<SearchResult>> Search(string fragment)
+        {
+            return Task.FromResult(new List<SearchResult>());
+        }
     }
 }

@@ -3,7 +3,6 @@ using System.Linq;
 using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
-using core.Options;
 using iexclient;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,6 +18,7 @@ namespace iexclienttests
         private IEXClient _client;
         private ITestOutputHelper _output;
         private List<StockQueryResult> _mostActive;
+        private List<SearchResult> _search;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {
@@ -28,6 +28,7 @@ namespace iexclienttests
             _client = fixture.Client;
             _output = output;
             _mostActive = fixture.MostActive;
+            _search = fixture.SearchResults;
         }
 
         [Fact]
@@ -86,6 +87,13 @@ namespace iexclienttests
         public void MostActive_Set()
         {
             Assert.Equal(11, _mostActive.Count);
+        }
+
+        [Fact]
+        public void SearchWorks()
+        {
+            Assert.Equal(1, _search.Count);
+            Assert.NotNull(_search.SingleOrDefault(r => r.Symbol == "SFIX"));
         }
     }
 }

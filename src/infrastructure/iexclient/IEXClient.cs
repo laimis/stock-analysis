@@ -47,6 +47,15 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
+        public async Task<List<SearchResult>> Search(string fragment)
+        {
+            var url = MakeUrl($"search/{fragment}");
+            
+            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + fragment + ".json";
+
+            return await GetCachedResponse<List<SearchResult>>(url, key);
+        }
+
         public Task<CompanyProfile> GetCompanyProfile(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/company");

@@ -11,5 +11,7 @@ namespace core.Adapters.Stocks
         Task<List<StockQueryResult>> GetMostActive();
         Task<List<StockQueryResult>> GetGainers();
         Task<List<StockQueryResult>> GetLosers();
+
+        Task<List<SearchResult>> Search(string fragment);
     }
 }

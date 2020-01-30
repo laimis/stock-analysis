@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export function GetErrors(err:any): string[] {
   return Object.keys(err.error.errors).map<string>(v => {
@@ -108,6 +109,16 @@ export class StocksService {
 
   getProfile() : Observable<object> {
     return this.http.get<object>('/api/account')
+  }
+
+  search(term: string): Observable<object[]> {
+    if (!term.trim()) {
+      // if not search term, return empty hero array.
+      return of([]);
+    }
+    return this.http.get<object[]>(`/api/stocks/search/${term}`).pipe(
+      tap(_ => console.log(`found stoks matching "${term}"`))
+    );
   }
 
 }

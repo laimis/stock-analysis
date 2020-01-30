@@ -5,3 +5,8 @@
 div.row {
   margin-top: 10px;
 }
+
+.search-results div:hover {
+  font-weight: bold;
+  cursor: pointer;
+}

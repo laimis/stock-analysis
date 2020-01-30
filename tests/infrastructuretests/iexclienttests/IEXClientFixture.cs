@@ -14,10 +14,11 @@ namespace iexclienttests
         public TickerPrice Price;
         public IEXClient Client;
         public List<StockQueryResult> MostActive;
+        public List<SearchResult> SearchResults;
 
         public IEXClientFixture()
         {
-            Client = new IEXClient("<enter key>");
+            Client = new IEXClient("pk_71ba0d8d98ed4d2caac8089588d62973");
 
             var t = Client.GetOptions("TEUM");
 
@@ -42,6 +43,12 @@ namespace iexclienttests
             active.Wait();
 
             MostActive = active.Result;
+
+            var search = Client.Search("stitch");
+
+            search.Wait();
+
+            SearchResults = search.Result;
         }
     }
 }

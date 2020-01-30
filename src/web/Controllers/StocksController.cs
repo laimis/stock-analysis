@@ -28,6 +28,12 @@ namespace web.Controllers
             return await _mediator.Send(new Details.Query(ticker));
         }
 
+        [HttpGet("search/{term}")]
+        public async Task<object> Search(string term)
+        {
+            return await _mediator.Send(new Search.Query(term));
+        }
+
         [HttpPost("sell")]
         public async Task<ActionResult> Sell(Sell.Command model)
         {

@@ -2,11 +2,21 @@
 	<div class="form-group">
 		<label for="ticker">Symbol</label>
 		<input type="text" class="form-control"
-			id="ticker"
-			aria-describedby="tickerHelp"
-			[(ngModel)]="ticker"
+      id="ticker"
+      #tickerBox
       name="ticker"
-      autofocus >
+      (input)="search(tickerBox.value)"
+      (blur)="loseFocus()"
+      autofocus
+      autocomplete="off" />
+
+      <div [ngClass]="{'border': resultCount > 0, 'rounded': resultCount > 0}" class="search-results">
+        <div class="row" *ngFor="let r of searchResults$ | async" (click)="clicked(r.symbol)">
+          <div class="col ml-2 mb-2">{{r.symbol}}</div>
+          <div class="col-10">{{r.securityName}}</div>
+        </div>
+      </div>
+
 		<small id="tickerHelp" class="form-text text-muted">Enter stock symbol</small>
 	</div>
 	<button type="submit" class="btn btn-primary" (click)="goToStock()" class="invisible">Submit</button>
