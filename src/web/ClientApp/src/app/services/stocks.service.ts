@@ -78,8 +78,12 @@ export class StocksService {
 		return this.http.get<Portfolio>('/api/portfolio')
 	}
 
-	openOption(obj:object) : Observable<any> {
-		return this.http.post('/api/options/open', obj)
+	buyOption(obj:object) : Observable<any> {
+		return this.http.post<string>('/api/options/buy', obj)
+  }
+
+  sellOption(obj:object) : Observable<any> {
+		return this.http.post<string>('/api/options/sell', obj)
   }
 
   getOption(id:string) : Observable<OptionDefinition> {

@@ -12,11 +12,13 @@ import { Location } from '@angular/common';
 })
 export class SoldOptionDetailComponent implements OnInit {
   public option: OptionDefinition;
-  public closed: boolean;
-  public closePrice: number;
-  public closeDate: string;
-  public numberOfContracts: number;
-  public errors: string[];
+
+  public positionType: string
+  public premium: number
+  public filled: string
+  public numberOfContracts: number
+
+  public errors: string[]
 
   constructor(
     private service: StocksService,
@@ -26,8 +28,8 @@ export class SoldOptionDetailComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.closeDate = Date()
-    this.closeDate = this.datePipe.transform(this.closeDate, 'yyyy-MM-dd');
+    this.filled = Date()
+    this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
 
     var id = this.route.snapshot.paramMap.get('id');
 
@@ -40,29 +42,42 @@ export class SoldOptionDetailComponent implements OnInit {
     })
   }
 
-  close() {
+  record() {
 
     this.errors = null;
 
-    var obj = {
-      id: this.option.id,
-      closePrice: this.closePrice,
-      closeDate: this.closeDate,
-      numberOfContracts: this.numberOfContracts
+    var opt = {
+      ticker: this.option.ticker,
+      strikePrice: this.option.strikePrice,
+      optionType: this.option.optionType,
+      expirationDate: this.option.expirationDate,
+      numberOfContracts: this.numberOfContracts,
+      premium: this.premium,
+      filled: this.filled
     }
 
-    this.service.closeOption(obj).subscribe( () => {
-      this.closed = true
-      this.closePrice = null
-      this.numberOfContracts = null
-      this.getOption(this.option.id)
+    if (this.positionType == 'buy') this.recordBuy(opt)
+    if (this.positionType == 'sell') this.recordSell(opt)
+  }
+
+  back() {
+    this.location.back()
+  }
+
+  recordBuy(opt: object) {
+    this.service.buyOption(opt).subscribe( r => {
+      this.getOption(r)
     }, err => {
       this.errors = GetErrors(err)
     })
   }
 
-  back() {
-    this.location.back()
+  recordSell(opt: object) {
+    this.service.sellOption(opt).subscribe( r => {
+      this.getOption(r)
+    }, err => {
+      this.errors = GetErrors(err)
+    })
   }
 
 }

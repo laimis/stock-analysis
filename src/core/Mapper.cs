@@ -137,9 +137,9 @@ namespace core
             {
                 id = o.State.Id,
                 ticker = o.State.Ticker,
-                type = o.State.OptionType.ToString(),
+                optionType = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
-                expiration = o.State.Expiration.ToString("yyyy-MM-dd"),
+                expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
                 numberOfContracts = o.State.NumberOfContracts,
                 transactions = new TransactionList(o.State.Transactions, false)
             };

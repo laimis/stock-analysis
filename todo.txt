@@ -1,7 +1,3 @@
-Current:
-
-- SoldOptionTest can be one theory
-
 FEATURES
 
 - landing page
@@ -29,6 +25,7 @@ MINOR IMPROVEMENTS
 - import validation (size, contents, headers)
 - login tracking
 - reuse transaction component for rendering transaction list
+- indicate expired option in option details, do not allow to buy/sell
 
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?

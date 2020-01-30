@@ -27,5 +27,25 @@ namespace coretests.Options
             Assert.Single(storage.SavedOptions);
             Assert.Equal(-1, storage.SavedOptions.Single().State.NumberOfContracts);
         }
+
+        [Fact]
+        public async Task SellingOption_Decreases()
+        {
+            var storage = _fixture.CreateStorageWithNoOptions();
+
+            var handler = new Sell.Handler(storage);
+
+            await handler.Handle(
+                OptionsTestsFixture.CreateSellCommand(),
+                CancellationToken.None);
+
+            await handler.Handle(
+                OptionsTestsFixture.CreateSellCommand(),
+                CancellationToken.None);
+
+            var opt = storage.SavedOptions.Single();
+
+            Assert.Equal(-2, opt.State.NumberOfContracts);
+        }
     }
 }

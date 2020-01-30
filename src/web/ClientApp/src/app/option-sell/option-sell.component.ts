@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
+import { StocksService, GetErrors } from '../services/stocks.service';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-option-sell',
@@ -11,14 +11,23 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class OptionSellComponent implements OnInit {
 
-  public option : OptionDefinition
-  public ticker : string
   public errors : string[]
+
   public success: boolean
+
+  public ticker : string
+  public strikePrice: number
+  public optionType: string
+  public expirationDate: string
+  public positionType: string
+  public numberOfContracts: number
+  public premium: number
+  public filled: string;
 
   constructor(
     private service: StocksService,
     private route: ActivatedRoute,
+    private router: Router,
     private datePipe: DatePipe) { }
 
   ngOnInit() {
@@ -27,26 +36,42 @@ export class OptionSellComponent implements OnInit {
       this.ticker = ticker;
     }
 
-    this.option = new OptionDefinition();
-
-    this.option.filled = Date()
-    this.option.filled = this.datePipe.transform(this.option.filled, 'yyyy-MM-dd');
-    this.option.expirationDate = Date()
-    this.option.expirationDate = this.datePipe.transform(this.option.expirationDate, 'yyyy-MM-dd');
+    this.filled = Date()
+    this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
   }
 
-  clearValues() {
-    this.ticker = null
-    this.errors = null
-    this.option = new OptionDefinition()
+  record() {
+    var opt = {
+      ticker: this.ticker,
+      strikePrice: this.strikePrice,
+      optionType: this.optionType,
+      expirationDate: this.expirationDate,
+      numberOfContracts: this.numberOfContracts,
+      premium: this.premium,
+      filled: this.filled
+    }
+
+    if (this.positionType == 'buy') this.recordBuy(opt)
+    if (this.positionType == 'sell') this.recordSell(opt)
   }
 
-  open() {
-    this.service.openOption(this.option).subscribe( () => {
-      this.success = true;
-      this.clearValues();
+  recordBuy(opt: object) {
+    this.service.buyOption(opt).subscribe( r => {
+      this.navigateToOption(r)
     }, err => {
       this.errors = GetErrors(err)
     })
+  }
+
+  recordSell(opt: object) {
+    this.service.sellOption(opt).subscribe( r => {
+      this.navigateToOption(r)
+    }, err => {
+      this.errors = GetErrors(err)
+    })
+  }
+
+  navigateToOption(id:string) {
+    this.router.navigate(['/optiondetails', id])
   }
 }

@@ -34,16 +34,6 @@ namespace web.Controllers
             return details;
         }
 
-        [HttpPost("open")]
-        public async Task<ActionResult> Open(Buy.Command cmd)
-        {
-            cmd.WithUserId(this.User.Identifier());
-
-            await _mediator.Send(cmd);
-
-            return Ok();
-        }
-
         [HttpGet("{id}")]
         public async Task<object> Get(Guid id)
         {
@@ -61,14 +51,22 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(Sell.Command cmd)
+        public async Task<object> Sell(Sell.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
 
-            await _mediator.Send(cmd);
-
-            return Ok();
+            return await _mediator.Send(cmd);
         }
+
+        [HttpPost("buy")]
+        public async Task<object> Buy(Buy.Command cmd)
+        {
+            cmd.WithUserId(this.User.Identifier());
+
+            return await _mediator.Send(cmd);
+        }
+
+        
 
         [HttpGet("export")]
         public Task<ActionResult> Export()

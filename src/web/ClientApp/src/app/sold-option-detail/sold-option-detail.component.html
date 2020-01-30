@@ -16,7 +16,7 @@
           <span class="float-right">{{option.numberOfContracts}} contracts</span>
         </h3>
         <h5 class="card-subtitle text-muted">
-          Expiration: {{option.expiration | date:"MM/dd/yyyy"}}
+          Expiration: {{option.expirationDate | date:"MM/dd/yyyy"}}
         </h5>
       </div>
     </div>
@@ -24,27 +24,36 @@
     <div class="card mt-2">
       <div class="card-body">
         <div class="card-title">
-          Record closing of contracts
+          Record additional trades
         </div>
         <form>
           <div class="form-row">
+            <div class="form-group col">
+              <label for="positionType">Buying or Selling? &nbsp;&nbsp; </label>
+              <select class="form-control" name="positionType" [(ngModel)]="positionType">
+                <option value="buy">Buying</option>
+                <option value="sell">Selling</option>
+              </select>
+            </div>
+
             <div class="form-group col">
               <label for="numberOfContracts">Number of Contracts</label>
               <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
             </div>
 
             <div class="form-group col">
-              <label for="closePrice">Close Price Per Contract</label>
-              <input type="number" class="form-control" id="closePrice" name="closePrice" [(ngModel)]="closePrice">
+              <label for="premium">Premium Per Contract</label>
+              <input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
             </div>
 
             <div class="form-group col">
-              <label for="closeDate">Close Date</label>
-              <input type="date" class="form-control" id="closeDate" name="closeDate" [(ngModel)]="closeDate">
+              <label for="filled">Filled</label>
+              <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary mb-1" (click)="close()">Close</button>&nbsp;&nbsp;
+
+          <button type="submit" class="btn btn-primary mb-1" (click)="record()">Record</button>&nbsp;&nbsp;
           <button type="submit" class="btn btn-primary mb-1" (click)="back()">Back</button>&nbsp;&nbsp;
         </form>
       </div>
