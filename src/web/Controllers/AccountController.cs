@@ -66,10 +66,7 @@ namespace web.Controllers
         {
             await HttpContext.SignOutAsync();
 
-            return new ContentResult
-            {
-                Content = "You have been signed out."
-            };
+            return this.Redirect("~/");
         }
     }
 }

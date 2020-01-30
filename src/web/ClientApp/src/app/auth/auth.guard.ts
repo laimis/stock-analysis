@@ -1,4 +1,4 @@
-import { CanActivate } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 import { Injectable, Inject } from '@angular/core';
 import { StocksService, AccountStatus } from '../services/stocks.service';
 
@@ -7,7 +7,10 @@ export class AuthGuard implements CanActivate {
 
 	 window : Window;
 
-	constructor(private stocks : StocksService, @Inject("windowObject") $window: Window){
+	constructor(
+    private stocks : StocksService,
+    @Inject("windowObject") $window: Window,
+    private router : Router){
 		this.window = $window
 	}
 
@@ -15,7 +18,7 @@ export class AuthGuard implements CanActivate {
     //get user data
     const result = await this.stocks.getAccountStatus().toPromise<AccountStatus>();
     if (!result.loggedIn) {
-      this.window.location.href = "/api/account/login";
+      this.router.navigate(['/landing'])
       return false;
     }
     return true;

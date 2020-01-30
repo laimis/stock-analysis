@@ -24,26 +24,28 @@ import { NoteComponent } from './notes/note.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { EventsComponent } from './events/events.component';
 import { ReviewComponent } from './review/review.component';
+import { LandingComponent } from './landing/landing.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: 'landing', component: LandingComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'events', component: EventsComponent},
-  { path: 'profile', component: ProfileComponent},
-  { path: 'notes', component: NotesComponent},
-  { path: 'notes/add', component: AddNoteComponent},
-  { path: 'notes/add/:ticker', component: AddNoteComponent},
-  { path: 'notes/filtered/:ticker', component: NotesComponent},
-  { path: 'notes/:id', component: NoteComponent},
-  { path: 'options/sell', component: OptionSellComponent },
-  { path: 'options/:ticker', component: OptionDetailComponent },
-  { path: 'review', component: ReviewComponent },
-  { path: 'optiondetails/:id', component: SoldOptionDetailComponent},
-  { path: 'stocks/lists', component: StockListsComponent },
-  { path: 'stocks/transaction', component: StockTransactionComponent },
-  { path: 'stocks/transaction/:ticker', component: StockTransactionComponent },
-  { path: 'stocks/:ticker', component: StockDetailsComponent },
-  { path: 'transactions', component: TransactionsComponent },
+  { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
+  { path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
+  { path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
+  { path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
+  { path: 'notes/filtered/:ticker', component: NotesComponent, canActivate: [AuthGuard]},
+  { path: 'notes/:id', component: NoteComponent, canActivate: [AuthGuard]},
+  { path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard] },
+  { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
+  { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
+  { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
+  { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
+  { path: 'stocks/transaction', component: StockTransactionComponent, canActivate: [AuthGuard] },
+  { path: 'stocks/transaction/:ticker', component: StockTransactionComponent, canActivate: [AuthGuard] },
+  { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
+  { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
 ]
 
 @NgModule({
@@ -53,6 +55,7 @@ var routes = [
     DashboardComponent,
     ErrorDisplayComponent,
     EventsComponent,
+    LandingComponent,
     NavMenuComponent,
     NoteComponent,
     NotesComponent,
