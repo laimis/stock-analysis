@@ -1,7 +1,7 @@
 FEATURES
 
 - search lookup
-- contact form
+- help section
 - import transactions
 - notes section with each transaction area
 - create account
@@ -56,3 +56,4 @@ LAUNCH CHECKLIST
 
 - account management
 - stocks details
+- search of ticker ... ticker as value object that's validated?
