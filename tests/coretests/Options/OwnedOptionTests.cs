@@ -26,27 +26,15 @@ namespace coretests.Options
             option.IsMatch("TEUM", 2.5, OptionType.PUT, _expiration);
         }
 
-        [Fact]
-        public void CreateWithBadTickerFails()
-        {
-            Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption(null, 2, OptionType.CALL, DateTimeOffset.UtcNow, "user"));
-        }
-
-        [Fact]
-        public void CreateWithBadUserFails()
-        {
-            Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption("ticker", 2, OptionType.CALL, DateTimeOffset.UtcNow, ""));
-        }
-
         [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void CreateWithBadStrikeFails(double strikePrice)
+        [InlineData(null,       2,  "user")]
+        [InlineData("ticker",   2,  "")]
+        [InlineData("ticker",   -1,  "user")]
+        [InlineData("ticker",   0,  "user")]
+        public void CreateWithBadTickerFails(string ticker, double strikePrice, string userId)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption("ticker", strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, "user"));
+                new OwnedOption(ticker, strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, userId));
         }
 
         [Fact]

@@ -1,7 +1,5 @@
 Current:
 
-- option rewrite
-- export of options is a transaction log of opens and closes
 - SoldOptionTest can be one theory
 
 FEATURES
