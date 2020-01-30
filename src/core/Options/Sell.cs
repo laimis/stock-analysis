@@ -1,64 +1,43 @@
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Shared;
-using core.Utils;
-using MediatR;
 
 namespace core.Options
 {
     public class Sell
     {
-        public class Command : RequestWithUserId<Guid>
+        public class Command : OptionTransaction
         {
-            [Required]
-            public string Ticker { get; set; }
-
-            [Range(1, 10000)]
-            public double StrikePrice { get; set; }
-
-            [Required]
-            [NotInThePast]
-            public DateTimeOffset? ExpirationDate { get; set; }
-
-            [Required]
-            public string OptionType { get; set; }
-
-            [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
-            public int Amount { get; set; }
-
-            [Range(1, 1000)]
-            public double Premium { get; set; }
-
-            [Required]
-            public DateTimeOffset? Filled { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, Guid>
+        public class Handler : HandlerWithStorage<Command, Guid>
         {
-            private IPortfolioStorage _storage;
-
-            public Handler(IPortfolioStorage storage)
+            public Handler(IPortfolioStorage storage) : base(storage)
             {
-                _storage = storage;
             }
-            
-            public async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
+
+            public override async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
+                var options = await _storage.GetOwnedOptions(cmd.UserId);
 
-                var option = new SoldOption(
+                var type = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
+
+                var option = options.SingleOrDefault(o => o.IsMatch(cmd.Ticker, cmd.StrikePrice, type, cmd.ExpirationDate.Value));
+                if (option == null)
+                {
+                    option = new OwnedOption(
                         cmd.Ticker,
-                        optionType,
-                        cmd.ExpirationDate.Value,
                         cmd.StrikePrice,
-                        cmd.UserId,
-                        cmd.Amount,
-                        cmd.Premium,
-                        cmd.Filled.Value);
+                        type,
+                        cmd.ExpirationDate.Value,
+                        cmd.UserId
+                    );
+                }
 
-                await this._storage.Save(option, cmd.UserId);
+                option.Sell(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value);
+
+                await _storage.Save(option, cmd.UserId);
 
                 return option.State.Id;
             }

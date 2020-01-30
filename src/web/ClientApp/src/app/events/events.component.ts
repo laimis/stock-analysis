@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-events',
@@ -10,15 +11,17 @@ export class EventsComponent implements OnInit {
   events: object[]
 
   constructor(
-    private stockService:StocksService
+    private stockService:StocksService,
+    private route:ActivatedRoute
   ) { }
 
   ngOnInit() {
-    this.loadEvents()
+    var type = this.route.snapshot.queryParamMap.get("type")
+    this.loadEvents(type)
   }
 
-  loadEvents() {
-    this.stockService.getEvents().subscribe(r => {
+  loadEvents(type:string) {
+    this.stockService.getEvents(type).subscribe(r => {
       this.events = r
     })
   }

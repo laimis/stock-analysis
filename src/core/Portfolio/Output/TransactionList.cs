@@ -13,8 +13,8 @@ namespace core.Portfolio.Output
             if (grouped)
             {
                 this.Grouped = this.Transactions
+                    .OrderByDescending(t => t.Date)
                     .GroupBy(t => t.Date.ToString("yyyy-MM-01"))
-                    .OrderByDescending(g => g.Key)
                     .Select(g => new {
                         name = g.Key,
                         transactions = new TransactionList(g, false)
@@ -25,19 +25,8 @@ namespace core.Portfolio.Output
         public IEnumerable<Transaction> Transactions { get; }
         public IEnumerable<object> Grouped { get; } 
         
-        public double Profit => Transactions.Sum(t => t.Profit);
-        public double? WinningPercentage
-        {
-            get 
-            {
-                var applicableTxCount = Transactions.Count(t => t.Profit != 0);
-                if (applicableTxCount == 0)
-                {
-                    return null;
-                }
-
-                return Transactions.Count(t => t.Profit > 0) * 1.0 / applicableTxCount;
-            }
-        }
+        public double Credit => Transactions.Sum(t => t.Credit);
+        public double Debit => Transactions.Sum(t => t.Debit);
+        public double Profit => this.Credit - this.Debit;
     }
 }

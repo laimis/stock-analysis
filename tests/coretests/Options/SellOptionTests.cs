@@ -18,14 +18,14 @@ namespace coretests.Options
         [Fact]
         public async Task Sell_OpensNewOneAsync()
         {
-            var storage = _fixture.CreateStorageWithNoSoldOptions();
+            var storage = _fixture.CreateStorageWithNoOptions();
 
             var handler = new Sell.Handler(storage);
 
-            await handler.Handle(_fixture.SellOptionCommand, CancellationToken.None);
+            await handler.Handle(OptionsTestsFixture.CreateSellCommand(), CancellationToken.None);
 
             Assert.Single(storage.SavedOptions);
-            Assert.True(storage.SavedOptions.Single().State.IsOpen);
+            Assert.Equal(-1, storage.SavedOptions.Single().State.NumberOfContracts);
         }
     }
 }

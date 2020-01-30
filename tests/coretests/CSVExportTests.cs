@@ -25,7 +25,14 @@ namespace coretests
         [Fact]
         public void ExportOptionsHeader()
         {
-            var option = new SoldOption("ticker", OptionType.CALL, DateTimeOffset.UtcNow.AddDays(1), 2.5, "user", 1, 100, DateTimeOffset.UtcNow);
+            var option = new OwnedOption(
+                "ticker",
+                2.5,
+                OptionType.CALL,
+                DateTimeOffset.UtcNow.AddDays(1),
+                "user");
+            
+            option.Sell(1, 20, DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {option});
 

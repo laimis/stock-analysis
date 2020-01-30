@@ -21,7 +21,7 @@ namespace core.Options
 
             public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
             {
-                var options = await _storage.GetSoldOptions(request.UserId);
+                var options = await _storage.GetOwnedOptions(request.UserId);
 
                 var filename = CSVExport.GenerateFilename("options");
 

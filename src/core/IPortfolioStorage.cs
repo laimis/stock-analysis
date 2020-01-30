@@ -13,9 +13,9 @@ namespace core
         Task<IEnumerable<OwnedStock>> GetStocks(string userId);
         Task Save(OwnedStock stock, string userId);
 
-        Task<IEnumerable<SoldOption>> GetSoldOptions(string user);
-        Task<SoldOption> GetSoldOption(Guid optionId, string userId);
-        Task Save(SoldOption option, string userId);
+        Task<IEnumerable<OwnedOption>> GetOwnedOptions(string user);
+        Task<OwnedOption> GetOwnedOption(Guid optionId, string userId);
+        Task Save(OwnedOption option, string userId);
         
         Task Save(Note note, string userId);
         Task<IEnumerable<Note>> GetNotes(string userId);

@@ -35,43 +35,58 @@ namespace core.Options
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
                 var records = _parser.Parse<OptionRecord>(request.Content);
-
                 foreach(var r in records)
-                {
                     await ProcessLine(r, request.UserId);
-                }
 
                 return new Unit();
             }
 
             private async Task ProcessLine(OptionRecord record, string userId)
             {
-                var cmd = new Options.Sell.Command {
-                    Amount = record.amount == 0 ? 1 : record.amount,
+                var amount = record.amount;
+                if (amount == 0) amount = 1;
+
+                var sell = new Sell.Command {
                     ExpirationDate = record.expiration,
                     Filled = record.filled,
+                    NumberOfContracts = amount,
                     OptionType = record.type,
                     Premium = record.premium,
                     StrikePrice = record.strike,
                     Ticker = record.ticker,
                 };
 
-                cmd.WithUserId(userId);
+                sell.WithUserId(userId);
 
-                var r = await _mediator.Send(cmd);
+                var r = await _mediator.Send(sell);
 
                 if (record.closed != null)
                 {
-                    var c = new Options.Close.Command {
-                        NumberOfContracts = record.amount == 0 ? 1 : record.amount,
-                        CloseDate = record.closed.Value,
-                        ClosePrice = record.spent,
-                        Id = r,
-                    };
+                    if (record.spent == 0)
+                    {
+                        var expire = new Expire.Command{
+                            Id = r
+                        };
+                        expire.WithUserId(userId);
 
-                    c.WithUserId(userId);
+                        await _mediator.Send(expire);
+                    }
+                    else
+                    {
+                        var buy = new Buy.Command{
+                            ExpirationDate = record.expiration,
+                            Filled = record.closed,
+                            NumberOfContracts = amount,
+                            OptionType = record.type,
+                            Premium = record.spent.Value,
+                            StrikePrice = record.strike,
+                            Ticker = record.ticker,
+                        };
 
-                    await _mediator.Send(c);
+                        buy.WithUserId(userId);
+
+                        await _mediator.Send(buy);
+                    }
                 }
             }
 

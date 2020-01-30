@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-sold-option-detail',
@@ -20,6 +21,7 @@ export class SoldOptionDetailComponent implements OnInit {
   constructor(
     private service: StocksService,
     private route: ActivatedRoute,
+    private location: Location,
     private datePipe: DatePipe
   ) { }
 
@@ -33,7 +35,7 @@ export class SoldOptionDetailComponent implements OnInit {
   }
 
   getOption(id:string){
-    this.service.getSoldOption(id).subscribe( result => {
+    this.service.getOption(id).subscribe( result => {
       this.option = result
     })
   }
@@ -49,7 +51,7 @@ export class SoldOptionDetailComponent implements OnInit {
       numberOfContracts: this.numberOfContracts
     }
 
-    this.service.closeSoldOption(obj).subscribe( () => {
+    this.service.closeOption(obj).subscribe( () => {
       this.closed = true
       this.closePrice = null
       this.numberOfContracts = null
@@ -57,6 +59,10 @@ export class SoldOptionDetailComponent implements OnInit {
     }, err => {
       this.errors = GetErrors(err)
     })
+  }
+
+  back() {
+    this.location.back()
   }
 
 }

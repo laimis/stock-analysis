@@ -14,13 +14,13 @@ namespace core
         private const string DATE_FORMAT = "yyyy-MM-dd";
         public const string STOCK_HEADER = "ticker,type,amount,price,date";
         public const string NOTE_HEADER = "created,predicted price,ticker,note";
-        public const string OPTION_HEADER = "ticker,strike,type,expiration,filled,amount,premium,closed,spent";
+        public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
-            var rows = stocks.SelectMany(o => o.State.Buys).Cast<AggregateEvent>()
-                .Union(stocks.SelectMany(o => o.State.Sells))
-                .OrderBy(e => e.When)
+            var rows = stocks.SelectMany(o => o.State.Buys.Select(op => (o, (AggregateEvent)op)))
+                .Union(stocks.SelectMany(o => o.State.Sells.Select(os => (o, (AggregateEvent)os))))
+                .OrderBy(t => t.Item2.When)
                 .Select(e => {
                     return StockEventToParts(e);
                 });
@@ -28,10 +28,49 @@ namespace core
             return Generate(STOCK_HEADER, rows);
         }
 
-        private static IEnumerable<object> StockEventToParts(object r)
+        private static IEnumerable<object> StockEventToParts((Aggregate a, AggregateEvent ae) tuple)
         {
-            switch(r)
+            switch(tuple.ae)
             {
+                case OptionSold os:
+                    var o1 = tuple.a as OwnedOption;
+                    return new object[] {
+                        o1.State.Ticker,
+                        "sell",
+                        o1.State.StrikePrice,
+                        o1.State.OptionType.ToString(),
+                        o1.State.Expiration.ToString(DATE_FORMAT),
+                        os.Amount,
+                        os.Premium,
+                        os.When.ToString(DATE_FORMAT)
+                    };
+
+                case OptionPurchased op:
+                    var o2 = tuple.a as OwnedOption;
+                    return new object[] {
+                        o2.State.Ticker,
+                        "buy",
+                        o2.State.StrikePrice,
+                        o2.State.OptionType.ToString(),
+                        o2.State.Expiration.ToString(DATE_FORMAT),
+                        op.NumberOfContracts,
+                        op.Premium,
+                        op.When.ToString(DATE_FORMAT)
+                    };
+
+                case OptionExpired expired:
+                    var o3 = tuple.a as OwnedOption;
+                    return new object[] {
+                        o3.State.Ticker,
+                        "expired",
+                        o3.State.StrikePrice,
+                        o3.State.OptionType.ToString(),
+                        o3.State.Expiration.ToString(DATE_FORMAT),
+                        0,
+                        0,
+                        expired.When.ToString(DATE_FORMAT)
+                    };
+
                 case StockPurchased sp:
                     return new object[] {
                         sp.Ticker,
@@ -52,7 +91,7 @@ namespace core
                     };
 
                 default:
-                    throw new InvalidOperationException("Invalid stock event for export: " + r.GetType());
+                    throw new InvalidOperationException("Invalid stock event for export: " + tuple.ae.GetType());
             }
         }
 
@@ -72,19 +111,15 @@ namespace core
             return Generate(NOTE_HEADER, rows);
         }
 
-        public static string Generate(IEnumerable<SoldOption> options)
+        public static string Generate(IEnumerable<OwnedOption> options)
         {
-            var rows = options.OrderBy(s => s.State.Filled).Select(s => new object[]{
-                s.State.Ticker,
-                s.State.StrikePrice,
-                s.State.Type,
-                s.State.Expiration.ToString(DATE_FORMAT),
-                s.State.Filled?.ToString(DATE_FORMAT),
-                s.State.Amount,
-                s.State.Premium,
-                s.State.Closed?.ToString(DATE_FORMAT),
-                s.State.Spent
-            });
+            var rows = options.SelectMany(o => o.State.Buys.Select(op => (o, (AggregateEvent)op)))
+                .Union(options.SelectMany(o => o.State.Sells.Select(os => (o, (AggregateEvent)os))))
+                .Union(options.SelectMany(o => o.State.Expirations.Select(os => (o, (AggregateEvent)os))))
+                .OrderBy(t => t.Item2.When)
+                .Select(e => {
+                    return StockEventToParts(e);
+                });
 
             return Generate(OPTION_HEADER, rows);
         }

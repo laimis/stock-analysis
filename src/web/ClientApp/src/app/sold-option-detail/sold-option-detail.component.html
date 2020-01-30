@@ -7,27 +7,72 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<div *ngIf="option">
-    <h3>{{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}} exp {{option.expiration | date}}</h3>
-    <h5>{{option.amount}} contract(s) for {{option.premium | currency }}</h5>
 
-    <form>
-      <div class="form-group">
-				<label for="numberOfContracts">Number of Contracts</label>
-				<input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title">
+          {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
+
+          <span class="float-right">{{option.numberOfContracts}} contracts</span>
+        </h3>
+        <h5 class="card-subtitle text-muted">
+          Expiration: {{option.expiration | date:"MM/dd/yyyy"}}
+        </h5>
       </div>
+    </div>
 
-      <div class="form-group">
-				<label for="closePrice">Close Price Per Contract</label>
-				<input type="number" class="form-control" id="closePrice" name="closePrice" [(ngModel)]="closePrice">
+    <div class="card mt-2">
+      <div class="card-body">
+        <div class="card-title">
+          Record closing of contracts
+        </div>
+        <form>
+          <div class="form-row">
+            <div class="form-group col">
+              <label for="numberOfContracts">Number of Contracts</label>
+              <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
+            </div>
+
+            <div class="form-group col">
+              <label for="closePrice">Close Price Per Contract</label>
+              <input type="number" class="form-control" id="closePrice" name="closePrice" [(ngModel)]="closePrice">
+            </div>
+
+            <div class="form-group col">
+              <label for="closeDate">Close Date</label>
+              <input type="date" class="form-control" id="closeDate" name="closeDate" [(ngModel)]="closeDate">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary mb-1" (click)="close()">Close</button>&nbsp;&nbsp;
+          <button type="submit" class="btn btn-primary mb-1" (click)="back()">Back</button>&nbsp;&nbsp;
+        </form>
       </div>
+    </div>
 
-      <div class="form-group">
-				<label for="closeDate">Close Date</label>
-				<input type="date" class="form-control" id="closeDate" name="closeDate" [(ngModel)]="closeDate">
-			</div>
-
-      <button type="submit" class="btn btn-primary mb-2" (click)="close()">Close Contract</button>&nbsp;&nbsp;
-    </form>
+    <div>
+      <caption>Transactions</caption>
+      <table class="table table-striped border">
+        <thead class="thead-light">
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Debit</th>
+            <th>Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
+            *ngFor="let t of option.transactions.transactions">
+            <td>{{ t.date | date:'shortDate'}}</td>
+            <td>{{ t.description }}</td>
+            <td>{{ t.debit | currency }}</td>
+            <td>{{ t.credit | currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
 	</div>
 </div>

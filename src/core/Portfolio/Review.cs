@@ -37,7 +37,7 @@ namespace core.Portfolio
 
             public override async Task<ReviewList> Handle(Generate request, CancellationToken cancellationToken)
             {
-                var options = _storage.GetSoldOptions(request.UserId);
+                var options = _storage.GetOwnedOptions(request.UserId);
                 var stocks = _storage.GetStocks(request.UserId);
                 var notes = _storage.GetNotes(request.UserId);
 
@@ -57,16 +57,16 @@ namespace core.Portfolio
                 };
             }
 
-            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<SoldOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
+            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<OwnedOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
             {
                 var entries = new List<ReviewEntry>();
 
-                foreach (var o in options.Result.Where(s => s.State.IsOpen))
+                foreach (var o in options.Result.Where(s => s.State.NumberOfContracts != 0))
                 {
                     entries.Add(new ReviewEntry
                     {
                         Ticker = o.State.Ticker,
-                        Description = $"${o.State.StrikePrice} {o.State.Type}",
+                        Description = $"${o.State.StrikePrice} {o.State.OptionType}",
                         Expiration = o.State.Expiration
                     });
                 }
