@@ -1,6 +1,5 @@
 FEATURES
 
-- landing page
 - search lookup
 - contact form
 - import transactions
@@ -56,6 +55,4 @@ INFRA
 LAUNCH CHECKLIST
 
 - account management
-- money as int
-- landing page
 - stocks details

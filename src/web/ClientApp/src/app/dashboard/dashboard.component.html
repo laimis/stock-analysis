@@ -14,8 +14,11 @@
 
 <div *ngIf="loaded">
 
+  <div class="clearfix mb-2">
+    <a class="float-right ml-3" [routerLink]="[ '/options/sell']">Record Options Sale</a>
+    <a class="float-right" [routerLink]="[ '/stocks/transaction']">Record Stock Transaction</a>
+  </div>
   <div *ngIf="openOptions.length > 0">
-    <a class="float-right" [routerLink]="[ '/options/sell']">Record Options Sale</a>
     <h2>Options</h2>
     <div class="row" *ngFor="let option of openOptions">
       <div class="col">
@@ -31,7 +34,6 @@
 
   <br />
   <div *ngIf="owned.length > 0">
-    <a class="float-right" [routerLink]="[ '/stocks/transaction']">Record Stock Transaction</a>
     <h2>Stocks</h2>
     <table class="table border">
       <thead class="thead-light">
