@@ -12,9 +12,9 @@ namespace storage.shared
 {
     public class PortfolioStorage : IPortfolioStorage
     {
-        const string _stock_entity = "ownedstock2";
-        const string _option_entity = "soldoption2";
-        const string _note_entity = "note2";
+        const string _stock_entity = "ownedstock3";
+        const string _option_entity = "soldoption3";
+        const string _note_entity = "note3";
 
         private IAggregateStorage _aggregateStorage;
 
