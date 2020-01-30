@@ -19,7 +19,7 @@
     <h2>Options</h2>
     <div class="row" *ngFor="let option of openOptions">
       <div class="col">
-        {{option.amount}} x
+        {{option.numberOfContracts}} x
         <b>{{option.ticker}}</b> @ <b>{{option.strikePrice | currency}}</b>
         {{option.type}} expiring <b>{{option.expiration | date : 'shortDate'}}</b>
       </div>

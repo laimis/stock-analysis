@@ -75,7 +75,7 @@ namespace core.Options
                     {
                         var buy = new Buy.Command{
                             ExpirationDate = record.expiration,
-                            Filled = record.filled,
+                            Filled = record.closed,
                             NumberOfContracts = amount,
                             OptionType = record.type,
                             Premium = record.spent.Value,

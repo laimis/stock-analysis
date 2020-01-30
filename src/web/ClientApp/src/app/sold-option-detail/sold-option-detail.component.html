@@ -13,7 +13,7 @@
         <h3 class="card-title">
           {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
 
-          <span class="float-right">{{option.amount}} contracts</span>
+          <span class="float-right">{{option.numberOfContracts}} contracts</span>
         </h3>
         <h5 class="card-subtitle text-muted">
           Expiration: {{option.expiration | date:"MM/dd/yyyy"}}
@@ -57,6 +57,8 @@
           <tr>
             <th>Date</th>
             <th>Description</th>
+            <th>Debit</th>
+            <th>Credit</th>
           </tr>
         </thead>
         <tbody>
@@ -65,6 +67,8 @@
             *ngFor="let t of option.transactions.transactions">
             <td>{{ t.date | date:'shortDate'}}</td>
             <td>{{ t.description }}</td>
+            <td>{{ t.debit | currency }}</td>
+            <td>{{ t.credit | currency }}</td>
           </tr>
         </tbody>
       </table>

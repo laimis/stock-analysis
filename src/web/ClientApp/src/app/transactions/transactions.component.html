@@ -17,8 +17,8 @@
           <th>Date</th>
           <th>Symbol</th>
           <th>Description</th>
-          <th>Value</th>
-          <th>Profit</th>
+          <th>Debit</th>
+          <th>Credit</th>
         </tr>
       </thead>
       <tbody>
@@ -28,8 +28,8 @@
           <td>{{ t.date | date:'shortDate'}}</td>
           <td><a [routerLink]="" (click)="!!loadTransactions(t.ticker)">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>
-          <td>{{ t.value | currency }}</td>
-          <td>{{ t.profit | currency }}</td>
+          <td>{{ t.debit | currency }}</td>
+          <td>{{ t.credit | currency }}</td>
         </tr>
       </tbody>
     </table>

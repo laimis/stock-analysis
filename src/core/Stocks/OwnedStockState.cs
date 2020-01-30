@@ -37,11 +37,10 @@ namespace core.Stocks
 
             this.Buys.Add(purchased);
 
-            this.Transactions.Add(new Transaction(
+            this.Transactions.Add(Transaction.DebitTx(
                 this.Ticker,
                 $"Purchased {purchased.Amount} shares @ ${purchased.Price}/share",
                 purchased.Price * purchased.Amount,
-                0,
                 purchased.When
             ));
         }
@@ -54,11 +53,10 @@ namespace core.Stocks
 
             this.Sells.Add(sold);
             
-            this.Transactions.Add(new Transaction(
+            this.Transactions.Add(Transaction.CreditTx(
                 this.Ticker,
                 $"Sold {sold.Amount} shares @ ${sold.Price}/share",
                 sold.Price * sold.Amount,
-                this.Profit,
                 sold.When
             ));
         }

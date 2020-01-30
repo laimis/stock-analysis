@@ -1,7 +1,7 @@
 Current:
 
 - option rewrite
-    - eliminate option closed concept
+    - transaction summary
 - import of options is a transaction log of opens and closes
 - export of options is a transaction log of opens and closes
 - SoldOptionTest can be one theory
@@ -32,6 +32,7 @@ MINOR IMPROVEMENTS
 - organize code: separate events from handlers from core domain models?
 - import validation (size, contents, headers)
 - login tracking
+- reuse transaction component for rendering transaction list
 
 DESIGN
 - consider cards for rendering owned options, owned stock... might get too much?

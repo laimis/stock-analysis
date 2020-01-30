@@ -26,5 +26,7 @@ namespace core.Portfolio.Output
         public IEnumerable<object> Grouped { get; } 
         
         public double Credit => Transactions.Sum(t => t.Credit);
+        public double Debit => Transactions.Sum(t => t.Debit);
+        public double Profit => this.Credit - this.Debit;
     }
 }
