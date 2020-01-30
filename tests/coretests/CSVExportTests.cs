@@ -31,6 +31,8 @@ namespace coretests
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
                 "user");
+            
+            option.Sell(1, 20, DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {option});
 
