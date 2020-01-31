@@ -22,6 +22,8 @@ MINOR IMPROVEMENTS
 - reuse transaction component for rendering transaction list
 - indicate expired option in option details, do not allow to buy/sell
 - user ip address is not used anywhere
+- empty state: 
+    clicking from stock detail to notes, loads nothing
 
 DESIGN
 - custom bootstrap components for dropdowns, dates

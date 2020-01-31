@@ -7,6 +7,10 @@ label {
   font-weight: 500;
 }
 
+#company-description {
+  font-size: smaller;
+}
+
 #ticker-logo {
   max-height: 50px;
   margin-right: 5px;
