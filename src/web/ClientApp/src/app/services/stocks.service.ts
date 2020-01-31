@@ -4,8 +4,19 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 export function GetErrors(err:any): string[] {
-  return Object.keys(err.error.errors).map<string>(v => {
-    return Object.getOwnPropertyDescriptor(err.error.errors, v).value
+  var objToMap = err.error.errors
+  if (objToMap === undefined)
+  {
+    objToMap = err.error
+  }
+
+  if (typeof(objToMap) === 'string')
+  {
+    return [objToMap]
+  }
+
+  return Object.keys(objToMap).map<string>(v => {
+    return Object.getOwnPropertyDescriptor(objToMap, v).value
   })
 }
 
@@ -13,6 +24,8 @@ export function GetErrors(err:any): string[] {
 export class StocksService {
 
   constructor(private http: HttpClient) { }
+
+  // ----------------- misc ---------------------
 
   getEvents(type:string): Observable<object[]> {
     return this.http.get<object[]>('/api/events?entity=' + type)
@@ -29,6 +42,8 @@ export class StocksService {
     }
     return this.http.get<TransactionList>('/api/portfolio/transactions?ticker=' + ticker)
   }
+
+  // ----------------- notes ---------------------
 
   addNote(input: any): Observable<any> {
     return this.http.post<any>('/api/notes', input)
@@ -55,6 +70,8 @@ export class StocksService {
     return this.http.get<object>('/api/notes/' + id)
   }
 
+  // ------------------ stocks ------------------
+
 	getStockLists(): Observable<StockLists> {
     return this.http.get<StockLists>('/api/stocks/lists')
   }
@@ -73,11 +90,24 @@ export class StocksService {
 
 	sell(obj:object) : Observable<any> {
 		return this.http.post('/api/stocks/sell', obj)
-	}
+  }
+
+  search(term: string): Observable<object[]> {
+    if (!term.trim()) {
+      return of([]);
+    }
+    return this.http.get<object[]>(`/api/stocks/search/${term}`).pipe(
+      tap(_ => console.log(`found stoks matching "${term}"`))
+    );
+  }
+
+  // ------- portfolio ----------------
 
 	getPortfolio(): Observable<Portfolio> {
 		return this.http.get<Portfolio>('/api/portfolio')
-	}
+  }
+
+  // ------- options ----------------
 
 	buyOption(obj:object) : Observable<any> {
 		return this.http.post<string>('/api/options/buy', obj)
@@ -103,6 +133,8 @@ export class StocksService {
     return this.http.post('/api/options/import', formData)
   }
 
+  // ---------- accounts ---------
+
   getAccountStatus() : Observable<AccountStatus> {
     return this.http.get<AccountStatus>('/api/account/status')
   }
@@ -111,16 +143,17 @@ export class StocksService {
     return this.http.get<object>('/api/account')
   }
 
-  search(term: string): Observable<object[]> {
-    if (!term.trim()) {
-      // if not search term, return empty hero array.
-      return of([]);
-    }
-    return this.http.get<object[]>(`/api/stocks/search/${term}`).pipe(
-      tap(_ => console.log(`found stoks matching "${term}"`))
-    );
+  createAccount(obj:object) : Observable<object> {
+    return this.http.post<object>('/api/account', obj)
   }
 
+  loginAccount(obj:object) : Observable<object> {
+    return this.http.post<object>('/api/account/login', obj)
+  }
+
+  requestPasswordReset(obj:object) : Observable<object> {
+    return this.http.post<object>('/api/account/requestpasswordreset', obj)
+  }
 }
 
 export interface ReviewList {
