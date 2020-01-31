@@ -156,7 +156,7 @@ export class StocksService {
   }
 
   deleteAccount(obj:object) : Observable<object> {
-    return this.http.post('/api/account', obj)
+    return this.http.post('/api/account/delete', obj)
   }
 }
 

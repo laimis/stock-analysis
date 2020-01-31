@@ -24,6 +24,7 @@ MINOR IMPROVEMENTS
 - user ip address is not used anywhere
 - empty state: 
     clicking from stock detail to notes, loads nothing
+- user delete post processing to wipe out info
 
 DESIGN
 - custom bootstrap components for dropdowns, dates

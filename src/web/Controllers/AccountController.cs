@@ -145,11 +145,23 @@ namespace web.Controllers
         }
 
         [HttpGet("logout")]
-        public async System.Threading.Tasks.Task<ActionResult> LogoutAsync()
+        public async Task<ActionResult> LogoutAsync()
         {
             await HttpContext.SignOutAsync();
 
             return this.Redirect("~/");
+        }
+
+        [HttpPost("delete")]
+        public async Task<ActionResult> Delete(Delete.Command cmd)
+        {
+            cmd.WithUserId(this.User.Identifier());
+            
+            await _mediator.Send(cmd);
+
+            await HttpContext.SignOutAsync();
+
+            return Ok();
         }
     }
 }

@@ -35,6 +35,13 @@ namespace core.Account
             );
         }
 
+        internal void Delete(string feedback)
+        {
+            Apply(
+                new UserDeleted(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, feedback)
+            );
+        }
+
         public bool PasswordHashMatches(string hash)
         {
             return this.State.PasswordHashMatches(hash);
@@ -77,6 +84,10 @@ namespace core.Account
         }
 
         private void ApplyInternal(UserPasswordResetRequested r)
+        {
+        }
+
+        private void ApplyInternal(UserDeleted d)
         {
         }
     }
