@@ -7,11 +7,7 @@ label {
   font-weight: 500;
 }
 
-div.row {
-  margin-top: 10px;
-}
-
 #ticker-logo {
-  max-height: 100px;
-  margin: 10px;
+  max-height: 50px;
+  margin-right: 5px;
 }
