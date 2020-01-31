@@ -10,34 +10,34 @@
 
   <div class="card mb-3">
     <div class="card-body">
-      <h5 class="card-title">Exports</h5>
-      <a href="/api/options/export" class="btn btn-secondary mr-1 card-link">Export Options</a>
-      <a href="/api/stocks/export" class="btn btn-secondary mr-1 card-link">Export Stocks</a>
-      <a href="/api/notes/export" class="btn btn-secondary mr-1 card-link">Export Notes</a>
-    </div>
-  </div>
-
-  <div class="card mb-3">
-    <div class="card-body">
       <h5 class="card-title">Imports</h5>
       <h6 class="card-subtitle mb-2">{{ importProgress }}</h6>
 
       <label class="card-link">
           <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
-          <button class="btn btn-secondary mr-1" (click)="shareInput.click()">Load Shares</button>
+          <button class="btn btn-secondary mr-1" (click)="shareInput.click()">Shares</button>
       </label>
 
 
       <label class="card-link">
           <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
-          <button class="btn btn-secondary mr-1 card-link" (click)="optionInput.click()">Load Options</button>
+          <button class="btn btn-secondary mr-1 card-link" (click)="optionInput.click()">Options</button>
       </label>
 
       <label class="card-link">
           <input hidden (change)="importNotes($event)"  #noteInput type="file" id="file">
-          <button class="btn btn-secondary mr-1 card-link" (click)="noteInput.click()">Load Notes</button>
+          <button class="btn btn-secondary mr-1 card-link" (click)="noteInput.click()">Notes</button>
       </label>
 
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Exports</h5>
+      <a href="/api/options/export" class="btn btn-secondary mr-1 card-link">Options</a>
+      <a href="/api/stocks/export" class="btn btn-secondary mr-1 card-link">Stocks</a>
+      <a href="/api/notes/export" class="btn btn-secondary mr-1 card-link">Notes</a>
     </div>
   </div>
 
