@@ -1,23 +1,38 @@
 <div class="container">
 
   <div class="card mb-3" *ngIf="profile">
+    <div class="card-header">
+      Profile
+      <span class="text-muted float-right">Member since {{profile.created | date}}</span>
+    </div>
     <div class="card-body">
       <h5 class="card-title">{{profile.firstname}} {{profile.lastname}}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">Member since {{profile.created | date}}</h6>
       <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
+
+      <button class="btn btn-danger float-right" (click)="deleteInitial()">delete account</button>
+    </div>
+  </div>
+
+  <div class="card mb-3" *ngIf="showDelete">
+    <div class="card-body">
+      <form>
+        <label for="reason">Any feedback you would like to pass along?</label>
+        <textarea class="form-control mb-2" autofocus [(ngModel)]="deleteFeedback"></textarea>
+        <button class="btn btn-danger mr-2" (click)="deleteFinal()">confirm delete</button>
+        <button class="btn btn-primary" (click)="undoDelete()">nevermind</button>
+      </form>
     </div>
   </div>
 
   <div class="card mb-3">
+    <div class="card-header">Imports</div>
     <div class="card-body">
-      <h5 class="card-title">Imports</h5>
       <h6 class="card-subtitle mb-2">{{ importProgress }}</h6>
 
       <label class="card-link">
           <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
           <button class="btn btn-secondary mr-1" (click)="shareInput.click()">Shares</button>
       </label>
-
 
       <label class="card-link">
           <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
@@ -33,8 +48,8 @@
   </div>
 
   <div class="card mb-3">
+    <div class="card-header">Exports</div>
     <div class="card-body">
-      <h5 class="card-title">Exports</h5>
       <a href="/api/options/export" class="btn btn-secondary mr-1 card-link">Options</a>
       <a href="/api/stocks/export" class="btn btn-secondary mr-1 card-link">Stocks</a>
       <a href="/api/notes/export" class="btn btn-secondary mr-1 card-link">Notes</a>

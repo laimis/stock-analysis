@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -12,12 +13,29 @@ export class ProfileComponent implements OnInit {
 
   importProgress: string = ''
 
-  constructor(private service:StocksService) { }
+  showDelete: boolean = false
+
+  deleteFeedback: string = ''
+
+  constructor(private service:StocksService, private router:Router) { }
 
   ngOnInit() {
     this.service.getProfile().subscribe(p => {
       this.profile = p
     })
+  }
+
+  deleteInitial() {
+    this.showDelete = true
+  }
+
+  undoDelete() {
+    this.showDelete = false
+  }
+
+  deleteFinal() {
+    this.service.deleteAccount({feedback:this.deleteFeedback})
+      .subscribe(s => this.router.navigate(['/landing']))
   }
 
   markProgress(msg:string) {
