@@ -1,0 +1,22 @@
+<div>
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+  <form>
+    <div class="form-row">
+      <div class="col">
+        <label for="email">Email</label>
+        <input class="form-control" autofocus type="email" id="email" name="email" [(ngModel)]="email" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label for="lastname">Password</label>
+        <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
+      </div>
+    </div>
+    <div class="form-row mt-2">
+      <div class="col">
+        <button class="btn btn-primary" (click)="login()">Login</button>
+      </div>
+    </div>
+  </form>
+</div>

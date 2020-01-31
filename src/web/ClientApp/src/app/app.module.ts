@@ -1,30 +1,32 @@
 
+import { AddNoteComponent } from './notes/add-note.component';
 import { AppComponent } from './app.component';
 import { AuthGuard } from './auth/auth.guard';
 import { BrowserModule } from '@angular/platform-browser';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ErrorDisplayComponent } from './shared/error-display/error-display.component';
+import { EventsComponent } from './events/events.component';
 import { FormsModule } from '@angular/forms';
 import { GoogleChartsModule } from 'angular-google-charts';
 import { HttpClientModule } from '@angular/common/http';
+import { LandingComponent } from './landing/landing.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { NgModule } from '@angular/core';
+import { NoteComponent } from './notes/note.component';
+import { NotesComponent } from './notes/notes.component';
 import { OptionDetailComponent } from './option-detail/option-detail.component';
 import { OptionSellComponent } from './option-sell/option-sell.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ProfileCreateComponent } from './profile/profile-create.component';
+import { ProfileLoginComponent } from './profile/profile-login.component';
+import { ReviewComponent } from './review/review.component';
 import { RouterModule } from '@angular/router';
 import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
-import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
-import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
-import { AddNoteComponent } from './notes/add-note.component';
-import { NotesComponent } from './notes/notes.component';
-import { NoteComponent } from './notes/note.component';
+import { StockListsComponent } from './stock-lists/stock-lists.component';
+import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
 import { TransactionsComponent } from './transactions/transactions.component';
-import { EventsComponent } from './events/events.component';
-import { ReviewComponent } from './review/review.component';
-import { LandingComponent } from './landing/landing.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -32,6 +34,8 @@ var routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
+  { path: 'profile/create', component: ProfileCreateComponent },
+  { path: 'profile/login', component: ProfileLoginComponent },
   { path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
   { path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
   { path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
@@ -62,6 +66,8 @@ var routes = [
     OptionDetailComponent,
     OptionSellComponent,
     ProfileComponent,
+    ProfileCreateComponent,
+    ProfileLoginComponent,
     ReviewComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,

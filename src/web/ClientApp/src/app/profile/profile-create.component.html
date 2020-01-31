@@ -1,0 +1,34 @@
+<div>
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+  <form>
+    <div class="form-row">
+      <div class="col">
+        <label for="firstname">First name</label>
+        <input class="form-control" autofocus type="text" id="firstname" name="firstname" [(ngModel)]="firstname" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label for="lastname">Last name</label>
+        <input class="form-control" type="text" id="lastname" name="lastname" [(ngModel)]="lastname" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label for="email">Email</label>
+        <input class="form-control" type="email" id="email" name="email" [(ngModel)]="email" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label for="password">Password</label>
+        <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
+      </div>
+    </div>
+    <div class="form-row mt-2">
+      <div class="col">
+        <button class="btn btn-primary" (click)="create()">Create</button>
+      </div>
+    </div>
+  </form>
+</div>

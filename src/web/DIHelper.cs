@@ -32,6 +32,7 @@ namespace web
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
+            services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
 
             services.AddHostedService<TestService>();
             

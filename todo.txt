@@ -1,7 +1,8 @@
 FEATURES
 
 - create account
-- reset password
+- confirmation email
+- password reset
 - delete account
 
 LONG TERM

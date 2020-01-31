@@ -22,5 +22,15 @@ namespace coretests.Account
         {
             Assert.Throws<InvalidOperationException>(() => new User(email, first, last));
         }
+
+        [Fact]
+        public void SettingPasswordMatchEvalCorrect()
+        {
+            var u = new User("laimis@gmail.com", "firstname", "last");
+
+            u.SetPassword("hash", "salt");
+
+            Assert.True(u.PasswordHashMatches("hash"));
+        }
     }
 }
