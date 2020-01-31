@@ -39,18 +39,18 @@ namespace core.Options
 
         internal void Apply(OptionSold sold)
         {
-            this.NumberOfContracts -= sold.Amount;
+            this.NumberOfContracts -= sold.NumberOfContracts;
 
             this.Sells.Add(sold);
 
-            var credit = (sold.Amount * sold.Premium);
+            var credit = (sold.NumberOfContracts * sold.Premium);
 
             this.Credit += credit;
 
             this.Transactions.Add(
                 Transaction.CreditTx(
                     this.Ticker,
-                    $"Sold {sold.Amount} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
+                    $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
                     credit,
                     sold.When
                 )

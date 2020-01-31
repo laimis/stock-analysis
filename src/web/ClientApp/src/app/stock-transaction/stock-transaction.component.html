@@ -5,31 +5,34 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<form>
-		<br />
-		<div class="form-group">
-			<label for="ticker">Ticker</label>
-			<input type="text" class="form-control" id="ticker" aria-describedby="tickerHelp" name="ticker" [(ngModel)]="ticker">
-			<small id="tickerHelp" class="form-text text-muted">Stock ticker.</small>
-		</div>
 
-		<div class="form-group">
-			<label for="ticker">Amount</label>
-			<input type="number" class="form-control" id="amount" aria-describedby="amountHelp" name="amount" [(ngModel)]="amount">
-			<small id="amountHelp" class="form-text text-muted">Amount.</small>
-		</div>
+    <div class="form-row">
+      <div class="col">
+        <label for="ticker">Ticker</label>
+        <input type="text" class="form-control" id="ticker" aria-describedby="tickerHelp" name="ticker" [(ngModel)]="ticker">
+      </div>
+      <div class="col">
+        <label for="ticker">Number of Shares</label>
+        <input type="number" class="form-control" id="numberOfShares" aria-describedby="numberOfSharesHelp" name="numberOfShares" [(ngModel)]="numberOfShares">
+      </div>
+    </div>
 
-		<div class="form-group">
-			<label for="price">Price</label>
-			<input type="number" class="form-control" id="price" aria-describedby="priceHelp" name="price" [(ngModel)]="price">
-			<small id="priceHelp" class="form-text text-muted">Price.</small>
-		</div>
+    <div class="form-row mt-2">
+      <div class="col">
+        <label for="price">Price</label>
+        <input type="number" class="form-control" id="price" aria-describedby="priceHelp" name="price" [(ngModel)]="price">
+      </div>
 
-		<div class="form-group">
-			<label for="date">Date</label>
-			<input type="date" class="form-control" id="date" aria-describedby="dateHelp" name="date" [(ngModel)]="date">
-			<small id="dateHelp" class="form-text text-muted">Date.</small>
-		</div>
-		<button type="submit" class="btn btn-primary mb-2" (click)="submitPurchase()">Buy</button>&nbsp;&nbsp;
-		<button type="submit" class="btn btn-primary mb-2 btn-info" (click)="submitSell()">Sell</button>
-	</form>
+      <div class="col">
+        <label for="date">Date</label>
+        <input type="date" class="form-control" id="date" aria-describedby="dateHelp" name="date" [(ngModel)]="date">
+      </div>
+    </div>
+
+    <div class="form-row mt-3">
+      <button type="submit" class="btn btn-primary ml-2 mb-2 mr-2" (click)="submitPurchase()">Buy</button>
+      <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="submitSell()">Sell</button>
+      <button type="submit" class="btn btn-secondary mb-2 mr-2" (click)="back()">Back</button>
+    </div>
+  </form>
 </div>

@@ -1,8 +1,6 @@
 FEATURES
 
-- search lookup
 - help section
-- import transactions
 - notes section with each transaction area
 - create account
 - reset password

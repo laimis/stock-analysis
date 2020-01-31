@@ -9,15 +9,15 @@ namespace core.Options
             Guid id,
             Guid aggregateId,
             DateTimeOffset when,
-            int amount,
+            int numberOfContracts,
             double premium)
             : base(id, aggregateId, when)
         {
-            this.Amount = amount;
+            this.NumberOfContracts = numberOfContracts;
             this.Premium = premium;
         }
 
-        public int Amount { get; }
+        public int NumberOfContracts { get; }
         public double Premium { get; }
     }
 }

@@ -31,32 +31,32 @@ namespace core.Stocks
 
         internal void Apply(StockPurchased purchased)
         {
-            Owned += purchased.Amount;
-            Spent += purchased.Amount * purchased.Price;
+            Owned += purchased.NumberOfShares;
+            Spent += purchased.NumberOfShares * purchased.Price;
             Purchased = purchased.When;
 
             this.Buys.Add(purchased);
 
             this.Transactions.Add(Transaction.DebitTx(
                 this.Ticker,
-                $"Purchased {purchased.Amount} shares @ ${purchased.Price}/share",
-                purchased.Price * purchased.Amount,
+                $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
+                purchased.Price * purchased.NumberOfShares,
                 purchased.When
             ));
         }
 
         internal void Apply(StockSold sold)
         {
-            this.Owned -= sold.Amount;
-            this.Earned += sold.Amount * sold.Price;
+            this.Owned -= sold.NumberOfShares;
+            this.Earned += sold.NumberOfShares * sold.Price;
             this.Sold = sold.When;
 
             this.Sells.Add(sold);
             
             this.Transactions.Add(Transaction.CreditTx(
                 this.Ticker,
-                $"Sold {sold.Amount} shares @ ${sold.Price}/share",
-                sold.Price * sold.Amount,
+                $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
+                sold.Price * sold.NumberOfShares,
                 sold.When
             ));
         }

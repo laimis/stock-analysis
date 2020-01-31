@@ -47,7 +47,7 @@ namespace core.Stocks
                     case "buy":
                         var b = new core.Stocks.Buy.Command
                         {
-                            Amount = record.amount,
+                            NumberOfShares = record.amount,
                             Date = record.date,
                             Price = record.price,
                             Ticker = record.ticker,
@@ -60,7 +60,7 @@ namespace core.Stocks
                     case "sell":
                         var s = new core.Stocks.Sell.Command
                         {
-                            Amount = record.amount,
+                            NumberOfShares = record.amount,
                             Date = record.date,
                             Price = record.price,
                             Ticker = record.ticker,

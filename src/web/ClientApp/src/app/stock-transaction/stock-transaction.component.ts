@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
-import {DatePipe} from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-stock-transaction',
@@ -12,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 export class StockTransactionComponent implements OnInit {
 
 	public ticker: string
-	public amount: Number
+	public numberOfShares: Number
 	public price: Number
 	public date: String
   public purchased: Boolean
@@ -20,7 +21,8 @@ export class StockTransactionComponent implements OnInit {
 
 	constructor(
 		private service : StocksService,
-		private route: ActivatedRoute,
+    private route: ActivatedRoute,
+    private location: Location,
 		private datePipe: DatePipe){}
 
 	ngOnInit() {
@@ -31,7 +33,11 @@ export class StockTransactionComponent implements OnInit {
 
 		this.date = Date()
 		this.date = this.datePipe.transform(this.date, 'yyyy-MM-dd');
-	}
+  }
+
+  back() {
+    this.location.back()
+  }
 
 	submitPurchase() {
 
@@ -62,7 +68,7 @@ export class StockTransactionComponent implements OnInit {
 	toObject() {
 		return {
 			ticker:this.ticker,
-			amount:this.amount,
+			numberOfShares:this.numberOfShares,
 			price:this.price,
 			date:this.date
 		}
@@ -72,7 +78,7 @@ export class StockTransactionComponent implements OnInit {
 		this.ticker = null
 		this.price = null
 		this.date = null
-    this.amount = null
+    this.numberOfShares = null
     this.errors = null
 	}
 }

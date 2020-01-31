@@ -40,7 +40,7 @@ namespace core
                         o1.State.StrikePrice,
                         o1.State.OptionType.ToString(),
                         o1.State.Expiration.ToString(DATE_FORMAT),
-                        os.Amount,
+                        os.NumberOfContracts,
                         os.Premium,
                         os.When.ToString(DATE_FORMAT)
                     };
@@ -75,7 +75,7 @@ namespace core
                     return new object[] {
                         sp.Ticker,
                         "buy",
-                        sp.Amount,
+                        sp.NumberOfShares,
                         sp.Price,
                         sp.When.ToString(DATE_FORMAT)
                     };
@@ -85,7 +85,7 @@ namespace core
                     return new object[] {
                         ss.Ticker,
                         "sell",
-                        ss.Amount,
+                        ss.NumberOfShares,
                         ss.Price,
                         ss.When.ToString(DATE_FORMAT)
                     };

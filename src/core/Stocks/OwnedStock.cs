@@ -40,7 +40,7 @@ namespace core.Stocks
             this.ApplyInternal(obj);
         }
 
-        public void Purchase(int amount, double price, DateTimeOffset date)
+        public void Purchase(int numberOfShares, double price, DateTimeOffset date)
         {
             if (price <= 0)
             {
@@ -52,17 +52,17 @@ namespace core.Stocks
                 throw new InvalidOperationException("Purchase date not specified");
             }
 
-            Apply(new StockPurchased(Guid.NewGuid(), this.State.Id, date, this.State.Ticker, amount, price));
+            Apply(new StockPurchased(Guid.NewGuid(), this.State.Id, date, this.State.Ticker, numberOfShares, price));
         }
 
-        public void Sell(int amount, double price, DateTimeOffset date)
+        public void Sell(int numberOfShares, double price, DateTimeOffset date)
         {
-            if (amount > this.State.Owned)
+            if (numberOfShares > this.State.Owned)
             {
-                throw new InvalidOperationException("Amount owned is less than what is desired to sell");
+                throw new InvalidOperationException("Number of shares owned is less than what is desired to sell");
             }
 
-            Apply(new StockSold(Guid.NewGuid(), this.State.Id, date, this.State.Ticker, amount, price));
+            Apply(new StockSold(Guid.NewGuid(), this.State.Id, date, this.State.Ticker, numberOfShares, price));
         }
 
         private void ApplyInternal(StockPurchased purchased)

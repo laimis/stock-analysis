@@ -33,7 +33,7 @@
       <div class="col">
         {{option.numberOfContracts}} x
         <b>{{option.ticker}}</b> @ <b>{{option.strikePrice | currency}}</b>
-        {{option.type}} expiring <b>{{option.expiration | date : 'shortDate'}}</b>
+        {{option.type}} expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
       </div>
       <div class="col">
         <a [routerLink]="[ '/optiondetails', option.id ]">view</a>

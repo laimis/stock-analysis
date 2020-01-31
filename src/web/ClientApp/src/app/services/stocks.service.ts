@@ -162,7 +162,7 @@ export class OptionDefinition {
   strikePrice: number
   expirationDate: string
   optionType: string
-  amount: number
+  numberOfContracts: number
   bid: number
   premium: number
   filled: string

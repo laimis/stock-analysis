@@ -23,7 +23,7 @@ namespace core.Stocks
                     return new Unit();
                 }
 
-                stock.Sell(cmd.Amount, cmd.Price, cmd.Date.Value);
+                stock.Sell(cmd.NumberOfShares, cmd.Price, cmd.Date.Value);
 
                 await this._storage.Save(stock, cmd.UserId);
 

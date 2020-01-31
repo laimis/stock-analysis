@@ -2,36 +2,36 @@ namespace core.Adapters.Stocks
 {
     public class StockAdvancedStats
     {
-        public double Week52Change { get; set; }
-        public double Week52High { get; set; }
-        public double Week52Low { get; set; }
-        public double MarketCap { get; set; }
+        public double? Week52Change { get; set; }
+        public double? Week52High { get; set; }
+        public double? Week52Low { get; set; }
+        public double? MarketCap { get; set; }
         public int? Employees { get; set; }
-        public double Day200MovingAvg { get; set; }
-        public double Day50MovingAvg { get; set; }
+        public double? Day200MovingAvg { get; set; }
+        public double? Day50MovingAvg { get; set; }
         public double? Float { get; set; }
-        public double Avg10Volume { get; set; }
-        public double Avg30Volume { get; set; }
+        public double? Avg10Volume { get; set; }
+        public double? Avg30Volume { get; set; }
         public double? TTMEPS { get; set; }
         public double? TTMDividendRate { get; set; }
         public string CompanyName { get; set; }
-        public long SharesOutstanding { get; set; }
-        public double MaxChangePercent { get; set; }
-        public double Year5ChangePercent { get; set; }
-        public double Year2ChangePercent { get; set; }
-        public double Year1ChangePercent { get; set; }
-        public double YTDChangePercent { get; set; }
-        public double Month6ChangePercent { get; set; }
-        public double Month3ChangePercent { get; set; }
-        public double Month1ChangePercent { get; set; }
-        public double Day30ChangePercent { get; set; }
-        public double Day5ChangePercent { get; set; }
+        public long? SharesOutstanding { get; set; }
+        public double? MaxChangePercent { get; set; }
+        public double? Year5ChangePercent { get; set; }
+        public double? Year2ChangePercent { get; set; }
+        public double? Year1ChangePercent { get; set; }
+        public double? YTDChangePercent { get; set; }
+        public double? Month6ChangePercent { get; set; }
+        public double? Month3ChangePercent { get; set; }
+        public double? Month1ChangePercent { get; set; }
+        public double? Day30ChangePercent { get; set; }
+        public double? Day5ChangePercent { get; set; }
         public string nextDividendDate { get; set; }
         public double? DividendYield { get; set; }
         public string NextEarningsDate { get; set; }
         public string ExDividendDate { get; set; }
-        public double PERatio { get; set; }
-        public double Beta { get; set; }
+        public double? PERatio { get; set; }
+        public double? Beta { get; set; }
         public long? TotalCash { get; set; }
         public long? CurrentDebt { get; set; }
         public long? Revenue { get; set; }

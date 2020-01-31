@@ -10,7 +10,7 @@ namespace core.Stocks
         public string Ticker { get; set; }
         
         [Range(1, 10000)]
-        public int Amount { get; set; }
+        public int NumberOfShares { get; set; }
 
         [Range(1, 10000)]
         public double Price { get; set; }

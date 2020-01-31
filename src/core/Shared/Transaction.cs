@@ -20,14 +20,14 @@ namespace core.Shared
             this.Date = when;
         }
 
-        public static Transaction CreditTx(string ticker, string description, double amount, DateTimeOffset when)
+        public static Transaction CreditTx(string ticker, string description, double credit, DateTimeOffset when)
         {
-            return new Transaction(ticker, description, 0, amount, when);
+            return new Transaction(ticker, description, 0, credit, when);
         }
 
-        public static Transaction DebitTx(string ticker, string description, double amount, DateTimeOffset when)
+        public static Transaction DebitTx(string ticker, string description, double debit, DateTimeOffset when)
         {
-            return new Transaction(ticker, description, amount, 0, when);
+            return new Transaction(ticker, description, debit, 0, when);
         }
     }
 }

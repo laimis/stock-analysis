@@ -54,12 +54,12 @@ namespace coretests.Options
         [InlineData(-1, 0)] // negative contracts
         [InlineData(0, 0)]    // zero contracts
         [InlineData(1, -10)]    // negative money
-        public void CloseWithInvalidAmountFails(int amount, double money)
+        public void CloseWithInvalidInput(int numberOfContracts, double money)
         {
             var opt = GetTestOption();
 
             Assert.Throws<InvalidOperationException>( () =>
-                opt.Sell(amount, money, DateTimeOffset.UtcNow));
+                opt.Sell(numberOfContracts, money, DateTimeOffset.UtcNow));
         }
 
         private static OwnedOption GetTestOption(
