@@ -1,22 +1,26 @@
 <div *ngIf="loaded" class="mt-2">
 
-  <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="btn float-right mr-1" target="_blank">
-    <img src="robinhood.png" height="30px" />
-  </a>
-  <a [routerLink]="[ '/notes/filtered', ticker ]" class="btn btn-primary float-right mr-1">Journal</a>
-  <a [routerLink]="[ '/stocks/transaction', ticker ]" class="btn btn-primary float-right mr-1">Record Buy/Sell</a>
-  <a [routerLink]="[ '/options', ticker ]" class="btn btn-primary float-right mr-1">Options</a>
-
-
-	<div class="clearfix">
-    <img id="ticker-logo" class="float-left img-thumbnail" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />
-    <h3>{{profile.companyName}}</h3>
-    <i>{{profile.industry}} / {{profile.sector}}</i>
-    <div>
-      <a href="{{profile.website}}" target="_blank">{{profile.website}}</a>
+  <div class="card">
+    <div class="card-header">
+      <b>{{profile.symbol}} {{profile.companyName}}</b>
+      <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="float-right ml-3" target="_blank">
+        <img src="robinhood.png" height="25px" />
+      </a>
+      <a [routerLink]="[ '/notes/filtered', ticker ]" class="float-right ml-3">Journal</a>
+      <a [routerLink]="[ '/stocks/transaction', ticker ]" class="float-right ml-3">Record Buy/Sell</a>
+      <a [routerLink]="[ '/options', ticker ]" class="float-right ml-3">Options</a>
     </div>
-    <div>
-      <i>{{profile.description}}</i>
+    <div class="card-body">
+
+      <img id="ticker-logo" class="float-left img-thumbnail" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />
+      <div>
+        <i>{{profile.description}}</i>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span class="float-right">{{profile.industry}} / {{profile.sector}}</span>
+      <a href="{{profile.website}}" target="_blank">{{profile.website}}</a>
     </div>
   </div>
 
