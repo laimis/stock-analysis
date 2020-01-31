@@ -2,6 +2,7 @@ using System;
 using core;
 using core.Account;
 using core.Adapters.CSV;
+using core.Adapters.Emails;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Options;
@@ -22,9 +23,11 @@ namespace web
         internal static void RegisterServices(IConfiguration configuration, IServiceCollection services)
         {
             services.AddSingleton<IEXClient>(s =>
-            {
-                return new IEXClient(configuration.GetValue<string>("IEXClientToken"));
-            });
+                new IEXClient(
+                    configuration.GetValue<string>("IEXClientToken")
+                )
+            );
+            
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService, StocksService>();
@@ -33,6 +36,12 @@ namespace web
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
+
+            services.AddSingleton<IEmailService>(s => 
+                new sendgridclient.SendGridClientImpl(
+                    configuration.GetValue<string>("SENDGRID_API_KEY")
+                )
+            );
 
             services.AddHostedService<TestService>();
             

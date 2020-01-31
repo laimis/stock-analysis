@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.Emails;
 using MediatR;
 
 namespace core.Account
@@ -23,12 +24,12 @@ namespace core.Account
         public class Handler : IRequestHandler<Request, PasswordResetResult>
         {
             private IAccountStorage _storage;
-            private IPasswordHashProvider _hash;
+            private IEmailService _emailService;
 
-            public Handler(IAccountStorage storage, IPasswordHashProvider hashProvider)
+            public Handler(IAccountStorage storage, IEmailService emailService)
             {
                 _storage = storage;
-                _hash = hashProvider;
+                _emailService = emailService;
             }
 
             public async Task<PasswordResetResult> Handle(Request request, CancellationToken cancellationToken)
@@ -43,7 +44,20 @@ namespace core.Account
 
                 await this._storage.Save(user);
 
+                SendEmail(request, user);
+
                 return PasswordResetResult.Success();
+            }
+
+            private void SendEmail(Request request, User user)
+            {
+                var reseturl = "https://www.graphdrive.com/profile/passwordreset/" + Guid.NewGuid();
+
+                _emailService.Send(
+                    request.Email,
+                    "d-6f4ac095859a417d88e8243d8056838b",
+                    new {reseturl}
+                );
             }
         }
     }

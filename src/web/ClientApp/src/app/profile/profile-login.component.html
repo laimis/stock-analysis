@@ -25,7 +25,7 @@
     </div>
   </form>
 
-  <div class="alert alert-success" *ngIf="passwordRequestSuccess">If you have a valid account, you will receive a password reset email.</div>
+  <div class="alert alert-success" *ngIf="passwordRequestSuccess && resetPasswordRequest">If you have a valid account, you will receive a password reset email.</div>
   <form *ngIf="resetPasswordRequest">
     <div class="form-row">
       <div class="col">
