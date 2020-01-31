@@ -15,25 +15,24 @@ LONG TERM
 MINOR IMPROVEMENTS
 
 - notes badge on stock details that can be expanded and shows notes you have for the stock
-- review endpoint, fetch advanced information on shares -> volume, dates
 - review endpoint, dates on each note, price of share at the time of the note, separate each note
 - notes, fill with share information when note is made
-- organize code: separate events from handlers from core domain models?
 - import validation (size, contents, headers)
 - login tracking
 - reuse transaction component for rendering transaction list
 - indicate expired option in option details, do not allow to buy/sell
+- user ip address is not used anywhere
 
 DESIGN
 - custom bootstrap components for dropdowns, dates
 - market cap/gross profit, should all be rounded
 - fundamentals section should be a card layout
+- share buy/sell is a disaster from UX/usability/flow standpoint
 
 BUGS
-- share buy/sell is a disaster from UX/usability/flow standpoint
 - option dates seem to be off, it should not be a single date
 - int for money amounts
-- review how we track partial share and option sales
+- review how we track partial share sales
 - how to correct this whole "key" vs "ticker" on events..
 - export of options, amount sometimes is zero
 
