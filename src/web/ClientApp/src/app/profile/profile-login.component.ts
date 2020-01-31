@@ -14,6 +14,9 @@ export class ProfileLoginComponent implements OnInit {
 
   public errors     :string[]
 
+  public resetPasswordRequest : boolean
+  public passwordRequestSuccess : boolean
+
   constructor(
     private stockService : StocksService,
     private router: Router) { }
@@ -34,5 +37,30 @@ export class ProfileLoginComponent implements OnInit {
     }, err => {
       this.errors = GetErrors(err)
     })
+  }
+
+  requestReset() {
+
+    this.errors = null
+    this.passwordRequestSuccess = false
+
+    var obj = {
+      email: this.email
+    }
+
+    this.stockService.requestPasswordReset(obj).subscribe(r => {
+      this.email = null
+      this.passwordRequestSuccess = true
+    }, err => {
+      this.errors = GetErrors(err)
+    })
+  }
+
+  forgotPassword() {
+    this.resetPasswordRequest = true
+  }
+
+  cancelReset() {
+    this.resetPasswordRequest = false
   }
 }

@@ -9,6 +9,12 @@ export function GetErrors(err:any): string[] {
   {
     objToMap = err.error
   }
+
+  if (typeof(objToMap) === 'string')
+  {
+    return [objToMap]
+  }
+
   return Object.keys(objToMap).map<string>(v => {
     return Object.getOwnPropertyDescriptor(objToMap, v).value
   })
@@ -143,6 +149,10 @@ export class StocksService {
 
   loginAccount(obj:object) : Observable<object> {
     return this.http.post<object>('/api/account/login', obj)
+  }
+
+  requestPasswordReset(obj:object) : Observable<object> {
+    return this.http.post<object>('/api/account/requestpasswordreset', obj)
   }
 }
 

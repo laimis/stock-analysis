@@ -47,6 +47,13 @@ namespace core.Account
             );
         }
 
+        internal void RequestPasswordReset(DateTimeOffset when)
+        {
+            Apply(
+                new UserPasswordResetRequested(Guid.NewGuid(), this.State.Id, when)
+            );
+        }
+
         protected override void Apply(AggregateEvent e)
         {
             this._events.Add(e);
@@ -67,6 +74,10 @@ namespace core.Account
         private void ApplyInternal(UserPasswordSet p)
         {
             this.State.Apply(p);
+        }
+
+        private void ApplyInternal(UserPasswordResetRequested r)
+        {
         }
     }
 }

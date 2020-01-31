@@ -1,13 +1,13 @@
 <div>
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-  <form>
+  <form *ngIf="!resetPasswordRequest">
     <div class="form-row">
       <div class="col">
         <label for="email">Email</label>
         <input class="form-control" autofocus type="email" id="email" name="email" [(ngModel)]="email" />
       </div>
     </div>
-    <div class="form-row">
+    <div class="form-row mt-2">
       <div class="col">
         <label for="lastname">Password</label>
         <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
@@ -15,7 +15,28 @@
     </div>
     <div class="form-row mt-2">
       <div class="col">
+        <a [routerLink]="" (click)="!!forgotPassword()">Forgot Password?</a>
+      </div>
+    </div>
+    <div class="form-row mt-2">
+      <div class="col">
         <button class="btn btn-primary" (click)="login()">Login</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="alert alert-success" *ngIf="passwordRequestSuccess">If you have a valid account, you will receive a password reset email.</div>
+  <form *ngIf="resetPasswordRequest">
+    <div class="form-row">
+      <div class="col">
+        <label for="email">Email</label>
+        <input class="form-control" autofocus type="email" id="email" name="email" [(ngModel)]="email" />
+      </div>
+    </div>
+    <div class="form-row mt-2">
+      <div class="col">
+        <button class="btn btn-primary" (click)="requestReset()">Request Reset</button>
+        <button class="btn btn-secondary ml-3" (click)="cancelReset()">Cancel</button>
       </div>
     </div>
   </form>

@@ -107,6 +107,18 @@ namespace web.Controllers
             return this.Redirect("~/");
         }
 
+        [HttpPost("requestpasswordreset")]
+        public async Task<ActionResult> RequestPasswordReset(PasswordReset.Request cmd)
+        {
+            cmd.WithIPAddress(
+                this.Request.HttpContext.Connection.RemoteIpAddress.ToString()
+            );
+
+            var r = await _mediator.Send(cmd);
+
+            return Ok();
+        }
+
         [HttpPost("login")]
         public async Task<ActionResult> Authenticate(Authenticate.Command cmd)
         {
