@@ -1,10 +1,5 @@
 FEATURES
 
-- delete account event  
-    - inline handling
-        - case insensitive
-    - move delete account to async
-
 - confirmation email
 - password reset email
 
