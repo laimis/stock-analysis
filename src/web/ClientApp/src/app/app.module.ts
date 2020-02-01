@@ -27,6 +27,7 @@ import { StockListComponent } from './stock-lists/stock-list.component';
 import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
 import { TransactionsComponent } from './transactions/transactions.component';
+import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -36,6 +37,7 @@ var routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
   { path: 'profile/create', component: ProfileCreateComponent },
   { path: 'profile/login', component: ProfileLoginComponent },
+  { path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent },
   { path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
   { path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
   { path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
@@ -68,6 +70,7 @@ var routes = [
     ProfileComponent,
     ProfileCreateComponent,
     ProfileLoginComponent,
+    ProfilePasswordResetComponent,
     ReviewComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,

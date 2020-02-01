@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace core.Account
@@ -8,5 +9,7 @@ namespace core.Account
         Task<User> GetUser(string userId);
         Task Save(User u);
         Task Delete(User u);
+        Task SavePasswordResetRequest(PasswordResetRequest r);
+        Task<PasswordResetRequest> GetPasswordResetRequest(Guid guid);
     }
 }

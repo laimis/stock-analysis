@@ -73,11 +73,11 @@ namespace web
             var cnn = configuration.GetValue<string>("REDIS_CNN");
             services.AddSingleton<IAccountStorage>(s =>
             {
-                return new storage.redis.AccountStorage(cnn);
+                return new storage.redis.AccountStorage(s.GetRequiredService<IMediator>(), cnn);
             });
-            services.AddSingleton<IAggregateStorage>(_ =>
+            services.AddSingleton<IAggregateStorage>(s =>
             {
-                return new storage.redis.RedisAggregateStorage(cnn);
+                return new storage.redis.RedisAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
             });
             services.AddSingleton<storage.redis.RedisAggregateStorage>(c => 
                 (storage.redis.RedisAggregateStorage)c.GetService<IAggregateStorage>());
@@ -92,11 +92,11 @@ namespace web
             var cnn = configuration.GetValue<string>("DB_CNN");
             services.AddSingleton<IAccountStorage>(s =>
             {
-                return new storage.postgres.AccountStorage(cnn);
+                return new storage.postgres.AccountStorage(s.GetRequiredService<IMediator>(), cnn);
             });
-            services.AddSingleton<IAggregateStorage>(_ =>
+            services.AddSingleton<IAggregateStorage>(s =>
             {
-                return new storage.postgres.PostgresAggregateStorage(cnn);
+                return new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
             });
         }
     }

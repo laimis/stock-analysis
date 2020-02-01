@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using core.Account;
+using MediatR;
 
 namespace storage.redis
 {
@@ -8,7 +10,7 @@ namespace storage.redis
         private const string USER_ENTITY = "users";
         private const string USER_RECORDS_KEY = "userrecords";
 
-        public AccountStorage(string redisCnn) : base(redisCnn)
+        public AccountStorage(IMediator mediator, string redisCnn) : base(mediator, redisCnn)
         {
         }
 
@@ -61,6 +63,51 @@ namespace storage.redis
             await db.HashDeleteAsync(USER_RECORDS_KEY, user.State.Email);
 
             await DeleteEvents(USER_ENTITY, user.Id.ToString());
+        }
+
+        public async Task SavePasswordResetRequest(PasswordResetRequest r)
+        {
+            var db = _redis.GetDatabase();
+
+            await db.HashSetAsync(
+                "passwordreset:" + r.Id,
+                new StackExchange.Redis.HashEntry[] {
+                    new StackExchange.Redis.HashEntry("id", r.Id.ToString()),
+                    new StackExchange.Redis.HashEntry("userid", r.UserId.ToString()),
+                    new StackExchange.Redis.HashEntry("timestamp", r.Timestamp.ToString()),
+                }
+            );
+        }
+
+        public async Task<PasswordResetRequest> GetPasswordResetRequest(Guid id)
+        {
+            var db = _redis.GetDatabase();
+
+            var entries = await db.HashGetAllAsync("passwordreset:" + id);
+
+            Guid userId; string timestamp = null;
+
+            foreach(var e in entries)
+            {
+                switch (e.Name)
+                {
+                    case "userid":
+                        userId = Guid.Parse(e.Value);
+                        break;
+                    case "timestamp":
+                        timestamp = e.Value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (userId == Guid.Empty)
+            {
+                return null;
+            }
+
+            return new PasswordResetRequest(id, userId, timestamp);
         }
     }
 }

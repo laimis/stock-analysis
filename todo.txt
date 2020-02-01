@@ -1,7 +1,12 @@
 FEATURES
 
 - confirmation email
-- password reset email
+    - generate confirmation email when user is created
+        - template for the email
+        - button points back to the site
+        - clicking will mark user as valid and sign them in, redirect to dashboard
+        - no ability to sell/buy stocks/options until validated, no ability to look up stocks or trends
+- Guid for userid
 
 LONG TERM
 

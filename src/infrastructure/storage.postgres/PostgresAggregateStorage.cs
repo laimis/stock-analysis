@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Shared;
 using Dapper;
+using MediatR;
 using Npgsql;
 using storage.shared;
 
@@ -12,10 +13,14 @@ namespace storage.postgres
 {
     public class PostgresAggregateStorage : IAggregateStorage
     {
+        private IMediator _mediator;
         protected string _cnn;
 
-        public PostgresAggregateStorage(string cnn)
+        public PostgresAggregateStorage(
+            IMediator mediator,
+            string cnn)
         {
+            _mediator = mediator;
             _cnn = cnn;
         }
 
@@ -58,6 +63,8 @@ namespace storage.postgres
 
                 int version = agg.Version;
 
+                var eventsToBlast = new List<AggregateEvent>();
+
                 using (var tx = db.BeginTransaction())
                 {
                     foreach (var e in agg.Events.Skip(agg.Version))
@@ -76,9 +83,15 @@ namespace storage.postgres
 						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
 
                         await db.ExecuteAsync(query, se);
+
+                        eventsToBlast.Add(e);
                     }
 
                     tx.Commit();
+
+                    foreach(var e in eventsToBlast)
+                        if (e is INotification n)
+                            await _mediator.Publish(n);
                 }
             }
         }

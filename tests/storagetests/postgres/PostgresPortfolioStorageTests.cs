@@ -13,7 +13,8 @@ namespace storagetests.postgres
 
         protected override IPortfolioStorage CreateStorage()
         {
-            return new PortfolioStorage(new PostgresAggregateStorage(_cnn));
+            return new PortfolioStorage(
+                new PostgresAggregateStorage(new Fakes.FakeMediator(), _cnn));
         }
     }
 }

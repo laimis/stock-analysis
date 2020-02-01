@@ -38,6 +38,10 @@ namespace core.Account
                     return new Unit();
                 }
 
+                user.Delete(cmd.Feedback);
+
+                await _storage.Save(user);
+
                 await _emails.Send(
                     EmailSettings.Admin,
                     EmailSettings.TemplateUserDeleted,

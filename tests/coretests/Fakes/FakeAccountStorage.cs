@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,11 @@ namespace coretests.Fakes
             return Task.CompletedTask;
         }
 
+        public Task<PasswordResetRequest> GetPasswordResetRequest(Guid guid)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<User> GetUser(string userId)
         {
             return Task.FromResult(_users.Values.SingleOrDefault(v => v.State.Id.ToString() == userId));
@@ -33,6 +39,11 @@ namespace coretests.Fakes
             _users[u.State.Email] = u;
 
             return Task.CompletedTask;
+        }
+
+        public Task SavePasswordResetRequest(PasswordResetRequest r)
+        {
+            throw new NotImplementedException();
         }
     }
 }

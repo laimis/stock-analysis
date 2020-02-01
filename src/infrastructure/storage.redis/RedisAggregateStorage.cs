@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Shared;
+using MediatR;
 using StackExchange.Redis;
 using storage.shared;
 
@@ -10,10 +11,12 @@ namespace storage.redis
 {
     public class RedisAggregateStorage : IAggregateStorage
     {
+        private IMediator _mediator;
         protected ConnectionMultiplexer _redis;
 
-        public RedisAggregateStorage(string redisCnn)
+        public RedisAggregateStorage(IMediator mediator, string redisCnn)
         {
+            _mediator = mediator;
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
@@ -37,6 +40,8 @@ namespace storage.redis
             var db = _redis.GetDatabase();
 
             int version = agg.Version;
+
+            var eventsToBlast = new List<AggregateEvent>();
 
             foreach (var e in agg.Events.Skip(agg.Version))
             {
@@ -66,7 +71,13 @@ namespace storage.redis
                 await db.SetAddAsync(globalKey, keyToStore);
                 await db.SetAddAsync(entityKey, keyToStore);
                 await db.HashSetAsync(keyToStore, fields);
+
+                eventsToBlast.Add(e);
             }
+
+            foreach(var e in eventsToBlast)
+                if (e is INotification n)
+                    await _mediator.Publish(n);
         }
 
         internal static storage.shared.StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)

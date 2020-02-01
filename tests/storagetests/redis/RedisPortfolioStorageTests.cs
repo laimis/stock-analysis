@@ -11,7 +11,10 @@ namespace storagetests.redis
     {
         protected override IPortfolioStorage CreateStorage()
         {
-            return new PortfolioStorage(new RedisAggregateStorage("localhost"));
+            return new PortfolioStorage(
+                new RedisAggregateStorage(
+                    new Fakes.FakeMediator(),
+                    "localhost"));
         }
     }
 }

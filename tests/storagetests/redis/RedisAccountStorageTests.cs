@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using core.Account;
+﻿using core.Account;
 using storage.redis;
 using Xunit;
 
@@ -11,7 +9,9 @@ namespace storagetests.redis
     {
         protected override IAccountStorage GetStorage()
         {
-            return new AccountStorage("localhost");
+            return new AccountStorage(
+                new Fakes.FakeMediator(),
+                "localhost");
         }
     }
 }
