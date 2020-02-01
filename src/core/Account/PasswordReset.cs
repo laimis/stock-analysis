@@ -37,7 +37,9 @@ namespace core.Account
                 var user = await this._storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
-                    return PasswordResetResult.Failed("User does not exist");
+                    // not really success, but we are not going to disclose
+                    // if user account exists for a given email
+                    return PasswordResetResult.Success();
                 }
 
                 user.RequestPasswordReset(DateTimeOffset.UtcNow);

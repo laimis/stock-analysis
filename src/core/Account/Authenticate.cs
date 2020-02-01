@@ -38,7 +38,7 @@ namespace core.Account
                 var user = await this._storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
-                    return AuthenticateResult.Failed("User does not exist");
+                    return AuthenticateResult.Failed("Invalid email/password combination");
                 }
 
                 var computed = _hash.Generate(request.Password, user.State.GetSalt());
@@ -50,7 +50,7 @@ namespace core.Account
                     return AuthenticateResult.Success(user);
                 }
 
-                return AuthenticateResult.Failed("Invalid password provided");
+                return AuthenticateResult.Failed("Invalid email/password combination");
             }
         }
     }
