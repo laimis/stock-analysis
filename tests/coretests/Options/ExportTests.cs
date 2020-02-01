@@ -18,7 +18,7 @@ namespace coretests.Options
         {
             var handler = new core.Options.Export.Handler(Fixture.CreateStorageWithSoldOption());
 
-            var query = new core.Options.Export.Query(OptionsTestsFixture.UserId);
+            var query = new core.Options.Export.Query(OptionsTestsFixture.User.Id);
 
             var response = await handler.Handle(query, CancellationToken.None);
 

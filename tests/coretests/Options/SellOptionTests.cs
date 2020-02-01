@@ -19,10 +19,13 @@ namespace coretests.Options
         public async Task Sell_OpensNewOneAsync()
         {
             var storage = _fixture.CreateStorageWithNoOptions();
+            var account = await _fixture.CreateAccountStorageWithUserAsync();
 
-            var handler = new Sell.Handler(storage, new Fakes.FakeAccountStorage());
+            var handler = new Sell.Handler(storage, account);
 
-            await handler.Handle(OptionsTestsFixture.CreateSellCommand(), CancellationToken.None);
+            await handler.Handle(
+                OptionsTestsFixture.CreateSellCommand(),
+                CancellationToken.None);
 
             Assert.Single(storage.SavedOptions);
             Assert.Equal(-1, storage.SavedOptions.Single().State.NumberOfContracts);
@@ -33,7 +36,9 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithNoOptions();
 
-            var handler = new Sell.Handler(storage, new Fakes.FakeAccountStorage());
+            var handler = new Sell.Handler(
+                storage,
+                await _fixture.CreateAccountStorageWithUserAsync());
 
             await handler.Handle(
                 OptionsTestsFixture.CreateSellCommand(),

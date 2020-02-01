@@ -92,7 +92,7 @@ namespace iexclienttests
         [Fact]
         public void SearchWorks()
         {
-            Assert.Equal(1, _search.Count);
+            Assert.Single(_search);
             Assert.NotNull(_search.SingleOrDefault(r => r.Symbol == "SFIX"));
         }
     }

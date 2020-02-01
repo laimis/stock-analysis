@@ -27,14 +27,13 @@ namespace coretests.Options
         }
 
         [Theory]
-        [InlineData(null,       2,  "user")]
-        [InlineData("ticker",   2,  "")]
-        [InlineData("ticker",   -1,  "user")]
-        [InlineData("ticker",   0,  "user")]
-        public void CreateWithBadTickerFails(string ticker, double strikePrice, Guid userId)
+        [InlineData(null,       2)]
+        [InlineData("ticker",   -1)]
+        [InlineData("ticker",   0)]
+        public void CreateWithBadTickerFails(string ticker, double strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption(ticker, strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, userId));
+                new OwnedOption(ticker, strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, Guid.NewGuid()));
         }
 
         [Fact]

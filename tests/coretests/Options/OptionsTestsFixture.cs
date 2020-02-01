@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using core.Account;
 using core.Options;
 using coretests.Fakes;
 
@@ -7,7 +9,14 @@ namespace coretests.Options
     public class OptionsTestsFixture
     {
         public const string Ticker = "ticker";
-        public static Guid UserId = Guid.NewGuid();
+        public static User User;
+
+        static OptionsTestsFixture()
+        {
+            var u = new User("email", "f", "l");
+            u.Confirm();
+            User = u;
+        }
 
         public FakePortfolioStorage CreateStorageWithSoldOption()
         {
@@ -47,9 +56,18 @@ namespace coretests.Options
                 Filled = DateTimeOffset.UtcNow
             };
 
-            cmd.WithUserId(UserId);
+            cmd.WithUserId(User.Id);
 
             return cmd;
+        }
+
+        internal async Task<IAccountStorage> CreateAccountStorageWithUserAsync()
+        {
+            var storage = new FakeAccountStorage();
+
+            await storage.Save(User);
+
+            return storage;
         }
     }
 }

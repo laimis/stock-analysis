@@ -41,7 +41,7 @@ ALTER TABLE prices OWNER TO stocks;
 CREATE TABLE events (
 	key TEXT,
     entity TEXT,
-	userid TEXT,
+	userid uuid,
 	created TIMESTAMP,
 	version INT,
 	eventjson TEXT,
