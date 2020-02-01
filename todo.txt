@@ -2,10 +2,6 @@ FEATURES
 
 - delete account event  
     - inline handling
-        - create user deleted template
-            - feedback
-            - email
-        - delete tests
         - case insensitive
     - move delete account to async
 
@@ -41,6 +37,7 @@ DESIGN
 - share buy/sell is a disaster from UX/usability/flow standpoint
 
 BUGS
+- redis keys are nonsensical
 - option dates seem to be off, it should not be a single date
 - int for money amounts
 - review how we track partial share sales

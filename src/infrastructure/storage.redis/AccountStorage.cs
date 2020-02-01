@@ -26,6 +26,8 @@ namespace storage.redis
 
         public async Task<User> GetUserByEmail(string emailAddress)
         {
+            emailAddress = emailAddress.ToLowerInvariant();
+
             var db = _redis.GetDatabase();
 
             var id = await db.HashGetAsync(USER_RECORDS_KEY, emailAddress);
@@ -52,13 +54,13 @@ namespace storage.redis
             await SaveEventsAsync(u, USER_ENTITY, userId);
         }
 
-        public async Task Delete(string userId, string email)
+        public async Task Delete(User user)
         {
             var db = _redis.GetDatabase();
 
-            await db.HashDeleteAsync(USER_RECORDS_KEY, email);
+            await db.HashDeleteAsync(USER_RECORDS_KEY, user.State.Email);
 
-            await DeleteEvents(USER_ENTITY, userId);
+            await DeleteEvents(USER_ENTITY, user.Id.ToString());
         }
     }
 }

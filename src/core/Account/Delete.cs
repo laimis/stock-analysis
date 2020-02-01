@@ -43,7 +43,7 @@ namespace core.Account
                     EmailSettings.TemplateUserDeleted,
                     new {feedback = cmd.Feedback, email = user.State.Email});
 
-                await _storage.Delete(user.Id.ToString(), user.State.Email);
+                await _storage.Delete(user);
 
                 await _portfolio.Delete(user.Id.ToString());
                 

@@ -27,6 +27,8 @@ namespace storage.postgres
 
         public async Task<User> GetUserByEmail(string emailAddress)
         {
+            emailAddress = emailAddress.ToLowerInvariant();
+
             using var db = GetConnection();
             db.Open();
             var query = @"SELECT id FROM users WHERE email = :emailAddress";
@@ -51,15 +53,15 @@ namespace storage.postgres
             await SaveEventsAsync(u, _user_entity, u.State.Id.ToString());
         }
 
-        public async Task Delete(string userId, string email)
+        public async Task Delete(User user)
         {
             using var db = GetConnection();
             db.Open();
             var query = @"DELETE FROM users WHERE id = :id";
 
-            await db.ExecuteAsync(query, new {id = userId});
+            await db.ExecuteAsync(query, new {id = user.Id.ToString()});
 
-            await DeleteEvents("users", userId);
+            await DeleteEvents("users", user.Id.ToString());
         }
     }
 }

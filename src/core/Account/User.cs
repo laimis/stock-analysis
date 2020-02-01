@@ -35,7 +35,13 @@ namespace core.Account
             }
 
             Apply(
-                new UserCreated(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, email, firstname, lastname)
+                new UserCreated(
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    DateTimeOffset.UtcNow,
+                    email.ToLowerInvariant(),
+                    firstname,
+                    lastname)
             );
         }
 

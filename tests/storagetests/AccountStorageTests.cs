@@ -33,7 +33,7 @@ namespace storagetests
             Assert.Equal("firstname", fromDb.State.Firstname);
             Assert.Equal("lastname", fromDb.State.Lastname);
 
-            await storage.Delete(user.Id.ToString(), email);
+            await storage.Delete(user);
 
             fromDb = await storage.GetUserByEmail(email);
 
