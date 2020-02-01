@@ -1,8 +1,16 @@
 FEATURES
 
+- delete account event  
+    - inline handling
+        - create user deleted template
+            - feedback
+            - email
+        - delete tests
+        - case insensitive
+    - move delete account to async
+
 - confirmation email
 - password reset email
-- delete account event  
 
 LONG TERM
 

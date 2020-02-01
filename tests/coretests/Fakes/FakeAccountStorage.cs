@@ -11,6 +11,11 @@ namespace coretests.Fakes
 
         public IReadOnlyList<User> SavedEntries => _users.Values.ToList();
 
+        public Task Delete(string userId, string email)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task<User> GetUser(string userId)
         {
             return Task.FromResult(_users.Values.SingleOrDefault(v => v.State.Id.ToString() == userId));

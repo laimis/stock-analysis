@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,11 +8,11 @@ using storage.shared;
 
 namespace storage.redis
 {
-    public class AggregateStorage : IAggregateStorage
+    public class RedisAggregateStorage : IAggregateStorage
     {
         protected ConnectionMultiplexer _redis;
 
-        public AggregateStorage(string redisCnn)
+        public RedisAggregateStorage(string redisCnn)
         {
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
@@ -37,8 +37,6 @@ namespace storage.redis
             var db = _redis.GetDatabase();
 
             int version = agg.Version;
-
-            var tx = db.CreateTransaction();
 
             foreach (var e in agg.Events.Skip(agg.Version))
             {
@@ -65,18 +63,9 @@ namespace storage.redis
                     new HashEntry("version", version),
                 };
 
-                await tx.SetAddAsync(globalKey, keyToStore);
-                await tx.SetAddAsync(entityKey, keyToStore);
-                await tx.HashSetAsync(keyToStore, fields);
-            }
-
-            var success = await tx.ExecuteAsync();
-
-            if (!success)
-            {
-                throw new InvalidOperationException(
-                    $"Redis transaction failed saving aggregate {entity}, {agg.Id}"
-                );
+                await db.SetAddAsync(globalKey, keyToStore);
+                await db.SetAddAsync(entityKey, keyToStore);
+                await db.HashSetAsync(keyToStore, fields);
             }
         }
 
@@ -120,6 +109,33 @@ namespace storage.redis
                 .Select(e => ToEvent(entity, userId, e.Result))
                 .OrderBy(e => e.Key)
                 .ThenBy(e => e.Version);
+        }
+
+        public async Task DeleteEvents(string entity, string userId)
+        {
+            var db = _redis.GetDatabase();
+
+            var globalKey = $"{entity}:{userId}";
+
+            // var globalKey = $"{entity}:{userId}";
+            // var entityKey = $"{entity}:{userId}:{e.Id}";
+            // var keyToStore = $"{entity}:{userId}:{e.Id}:{version}";
+
+            var keys = await db.SetMembersAsync(globalKey);
+
+            foreach(var k in keys)
+            {
+                var key = k.ToString();
+
+                await db.KeyDeleteAsync(key);
+
+                // get subset of a key, pointing to aggregate
+                var aggInstanceKey = string.Join(":", key.Split(':').Take(3));
+
+                await db.KeyDeleteAsync(aggInstanceKey);
+            }
+
+            await db.KeyDeleteAsync(globalKey);
         }
     }
 }

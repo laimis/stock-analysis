@@ -77,10 +77,10 @@ namespace web
             });
             services.AddSingleton<IAggregateStorage>(_ =>
             {
-                return new storage.redis.AggregateStorage(cnn);
+                return new storage.redis.RedisAggregateStorage(cnn);
             });
-            services.AddSingleton<storage.redis.AggregateStorage>(c => 
-                (storage.redis.AggregateStorage)c.GetService<IAggregateStorage>());
+            services.AddSingleton<storage.redis.RedisAggregateStorage>(c => 
+                (storage.redis.RedisAggregateStorage)c.GetService<IAggregateStorage>());
             services.AddSingleton<Migration>(_ =>
             {
                 return new storage.redis.Migration(cnn);
@@ -96,7 +96,7 @@ namespace web
             });
             services.AddSingleton<IAggregateStorage>(_ =>
             {
-                return new storage.postgres.AggregateStorage(cnn);
+                return new storage.postgres.PostgresAggregateStorage(cnn);
             });
         }
     }

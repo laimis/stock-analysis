@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,11 +10,11 @@ using storage.shared;
 
 namespace storage.postgres
 {
-    public class AggregateStorage : IAggregateStorage
+    public class PostgresAggregateStorage : IAggregateStorage
     {
         protected string _cnn;
 
-        public AggregateStorage(string cnn)
+        public PostgresAggregateStorage(string cnn)
         {
             _cnn = cnn;
         }
@@ -22,6 +22,18 @@ namespace storage.postgres
         protected IDbConnection GetConnection()
         {
             return new NpgsqlConnection(_cnn);
+        }
+
+        public async Task DeleteEvents(string entity, string userId)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId";
+
+                await db.ExecuteAsync(query, new { userId, entity });
+            }
         }
 
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)

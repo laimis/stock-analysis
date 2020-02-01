@@ -12,9 +12,9 @@ namespace storage.shared
 {
     public class PortfolioStorage : IPortfolioStorage
     {
-        const string _stock_entity = "ownedstock3";
-        const string _option_entity = "soldoption3";
-        const string _note_entity = "note3";
+        private const string _stock_entity = "ownedstock3";
+        private const string _option_entity = "soldoption3";
+        private const string _note_entity = "note3";
 
         private IAggregateStorage _aggregateStorage;
 
@@ -86,6 +86,13 @@ namespace storage.shared
             var list = await GetNotes(userId);
 
             return list.SingleOrDefault(n => n.State.Id == noteId);
+        }
+
+        public async Task Delete(string userId)
+        {
+            await this._aggregateStorage.DeleteEvents(_note_entity, userId);
+            await this._aggregateStorage.DeleteEvents(_option_entity, userId);
+            await this._aggregateStorage.DeleteEvents(_stock_entity, userId);
         }
     }
 }

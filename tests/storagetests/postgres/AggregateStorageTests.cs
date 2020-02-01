@@ -10,7 +10,7 @@ namespace storagetests.postgres
         [Fact]
         public async Task HealthCheckWorks()
         {
-            var storage = new AggregateStorage(PostgresPortfolioStorageTests._cnn);
+            var storage = new PostgresAggregateStorage(PostgresPortfolioStorageTests._cnn);
 
             await storage.DoHealthCheck();
         }
