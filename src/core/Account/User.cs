@@ -57,6 +57,13 @@ namespace core.Account
             return this.State.PasswordHashMatches(hash);
         }
 
+        public void Confirm()
+        {
+            Apply(
+                new UserConfirmed(Guid.NewGuid(), this.State.Id, DateTimeOffset.UtcNow)
+            );
+        }
+
         public void SetPassword(string hash, string salt)
         {
             Apply(
@@ -100,6 +107,11 @@ namespace core.Account
         private void ApplyInternal(UserDeleted d)
         {
             this.State.Apply(d);
+        }
+
+        private void ApplyInternal(UserConfirmed c)
+        {
+            this.State.Apply(c);
         }
     }
 }

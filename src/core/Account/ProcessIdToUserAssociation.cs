@@ -1,22 +1,22 @@
-using System;
+﻿using System;
 
 namespace core.Account
 {
-    public class PasswordResetRequest
+    public class ProcessIdToUserAssociation
     {
-        private PasswordResetRequest(Guid id, Guid userId, DateTimeOffset timestamp)
+        private ProcessIdToUserAssociation(Guid id, Guid userId, DateTimeOffset timestamp)
         {
             this.Id = id;
             this.UserId = userId;
             this.Timestamp = timestamp;
         }
 
-        public PasswordResetRequest(Guid userId, DateTimeOffset timestamp) 
+        public ProcessIdToUserAssociation(Guid userId, DateTimeOffset timestamp) 
             : this(Guid.NewGuid(), userId, timestamp)
         {
         }
 
-        public PasswordResetRequest(Guid id, Guid userId, string timestamp)
+        public ProcessIdToUserAssociation(Guid id, Guid userId, string timestamp)
             : this(id, userId, DateTimeOffset.Parse(timestamp))
         {
         }
@@ -24,6 +24,6 @@ namespace core.Account
         public Guid Id { get; }
         public Guid UserId { get; }
         public DateTimeOffset Timestamp { get; }
-        public bool IsExpired => DateTimeOffset.UtcNow.Subtract(this.Timestamp).TotalMinutes > 15;
+        public bool IsOlderThan(long minutes) => DateTimeOffset.UtcNow.Subtract(this.Timestamp).TotalMinutes > minutes;
     }
 }

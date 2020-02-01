@@ -30,11 +30,11 @@ namespace core.Account
                 return;
             }
 
-            var request = new PasswordResetRequest(e.AggregateId, e.When);
+            var association = new ProcessIdToUserAssociation(e.AggregateId, e.When);
 
-            await _storage.SavePasswordResetRequest(request);
+            await _storage.SaveUserAssociation(association);
 
-            var reseturl = $"{EmailSettings.PasswordResetUrl}/{request.Id}";
+            var reseturl = $"{EmailSettings.PasswordResetUrl}/{association.Id}";
 
             await _email.Send(
                 u.State.Email,
