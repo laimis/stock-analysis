@@ -43,7 +43,7 @@ namespace core.Account
                 }
 
                 // oauth path where password was not set....
-                if (user.State.GetSalt() == null)
+                if (!user.IsPasswordAvailable)
                 {
                     return AuthenticateResult.Failed(GENERIC_MSG);
                 }
