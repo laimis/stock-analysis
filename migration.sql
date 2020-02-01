@@ -66,12 +66,12 @@ CREATE UNIQUE INDEX users_id ON users USING BTREE(id);
 CREATE UNIQUE INDEX users_email ON users USING BTREE(email);
 
 
-CREATE TABLE passwordresetrequests (
+CREATE TABLE processidtouserassociations (
     id uuid,
     userid uuid,
     timestamp text,
     PRIMARY KEY (id) 
 );
-ALTER TABLE passwordresetrequests OWNER TO stocks;
+ALTER TABLE processidtouserassociations OWNER TO stocks;
 
-CREATE UNIQUE INDEX passwordresetrequests_id ON passwordresetrequests USING BTREE(id);
+CREATE UNIQUE INDEX processidtouserassociations_id ON processidtouserassociations USING BTREE(id);

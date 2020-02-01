@@ -1,9 +1,10 @@
 using System;
 using core.Shared;
+using MediatR;
 
 namespace core.Account
 {
-    internal class UserCreated : AggregateEvent
+    public class UserCreated : AggregateEvent, INotification
     {
         public UserCreated(Guid id, Guid aggregateId, DateTimeOffset when, string email, string firstname, string lastname)
             : base(id, aggregateId, when)

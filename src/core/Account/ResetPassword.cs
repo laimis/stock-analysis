@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Emails;
 using MediatR;
 
 namespace core.Account
@@ -32,13 +31,13 @@ namespace core.Account
 
             public async Task<ResetPasswordResult> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var r = await _storage.GetPasswordResetRequest(cmd.Id.Value);
+                var r = await _storage.GetUserAssociation(cmd.Id.Value);
                 if (r == null)
                 {
                     return ResetPasswordResult.Failed("Invalid password reset token. Check the link in the email or request a new password reset");
                 }
 
-                if (r.IsExpired)
+                if (r.IsOlderThan(15))
                 {
                     return ResetPasswordResult.Failed("Password reset link has expired. Please request a new password reset");
                 }

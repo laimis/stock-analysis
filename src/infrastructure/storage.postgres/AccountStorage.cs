@@ -65,22 +65,22 @@ namespace storage.postgres
             await DeleteEvents("users", user.Id.ToString());
         }
 
-        public async Task SavePasswordResetRequest(PasswordResetRequest r)
+        public async Task SaveUserAssociation(ProcessIdToUserAssociation r)
         {
             using var db = GetConnection();
             db.Open();
-            var query = @"INSERT INTO passwordresetrequests (id, userId, timestamp) VALUES (:id, :userId, :timestamp)";
+            var query = @"INSERT INTO processidtouserassociations (id, userId, timestamp) VALUES (:id, :userId, :timestamp)";
 
             await db.ExecuteAsync(query, new {r.Id, userId = r.UserId, timestamp = r.Timestamp});
         }
 
-        public async Task<PasswordResetRequest> GetPasswordResetRequest(Guid id)
+        public async Task<ProcessIdToUserAssociation> GetUserAssociation(Guid id)
         {
             using var db = GetConnection();
             db.Open();
-            var query = @"SELECT * FROM passwordresetrequests WHERE id = :id";
+            var query = @"SELECT * FROM processidtouserassociations WHERE id = :id";
 
-            return await db.QuerySingleOrDefaultAsync<PasswordResetRequest>(query, new { id });
+            return await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
         }
     }
 }

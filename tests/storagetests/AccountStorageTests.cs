@@ -45,15 +45,15 @@ namespace storagetests
         }
 
         [Fact]
-        public async Task PasswordResetRequestsAreRecordedWorks()
+        public async Task ProcessIdToUserAssociationsWork()
         {
             var storage = GetStorage();
 
-            var r = new PasswordResetRequest(Guid.NewGuid(), DateTimeOffset.UtcNow);
+            var r = new ProcessIdToUserAssociation(Guid.NewGuid(), DateTimeOffset.UtcNow);
 
-            await storage.SavePasswordResetRequest(r);
+            await storage.SaveUserAssociation(r);
 
-            var fromDb = await storage.GetPasswordResetRequest(r.Id);
+            var fromDb = await storage.GetUserAssociation(r.Id);
 
             Assert.Equal(r.UserId, fromDb.UserId);
         }

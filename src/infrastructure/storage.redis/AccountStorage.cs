@@ -65,7 +65,7 @@ namespace storage.redis
             await DeleteEvents(USER_ENTITY, user.Id.ToString());
         }
 
-        public async Task SavePasswordResetRequest(PasswordResetRequest r)
+        public async Task SaveUserAssociation(ProcessIdToUserAssociation r)
         {
             var db = _redis.GetDatabase();
 
@@ -79,7 +79,7 @@ namespace storage.redis
             );
         }
 
-        public async Task<PasswordResetRequest> GetPasswordResetRequest(Guid id)
+        public async Task<ProcessIdToUserAssociation> GetUserAssociation(Guid id)
         {
             var db = _redis.GetDatabase();
 
@@ -107,7 +107,7 @@ namespace storage.redis
                 return null;
             }
 
-            return new PasswordResetRequest(id, userId, timestamp);
+            return new ProcessIdToUserAssociation(id, userId, timestamp);
         }
     }
 }

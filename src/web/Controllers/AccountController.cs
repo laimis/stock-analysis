@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -178,6 +179,24 @@ namespace web.Controllers
             await EstablishSignedInIdentity(r.User);
 
             return Ok();
+        }
+
+        [HttpGet("confirm/{id}")]
+        public async Task<ActionResult> Confirm(Guid id)
+        {
+            var cmd = new Confirm.Command(id);
+
+            var r = await _mediator.Send(cmd);
+
+            var error = r.Error;
+            if (error != null)
+            {
+                return new ContentResult { Content = error};
+            }
+
+            await EstablishSignedInIdentity(r.User);
+
+            return Redirect("~/");
         }
     }
 }

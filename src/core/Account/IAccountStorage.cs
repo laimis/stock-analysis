@@ -9,7 +9,7 @@ namespace core.Account
         Task<User> GetUser(string userId);
         Task Save(User u);
         Task Delete(User u);
-        Task SavePasswordResetRequest(PasswordResetRequest r);
-        Task<PasswordResetRequest> GetPasswordResetRequest(Guid guid);
+        Task SaveUserAssociation(ProcessIdToUserAssociation r);
+        Task<ProcessIdToUserAssociation> GetUserAssociation(Guid guid);
     }
 }

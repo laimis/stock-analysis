@@ -19,14 +19,14 @@ namespace coretests.Fakes
             return Task.CompletedTask;
         }
 
-        public Task<PasswordResetRequest> GetPasswordResetRequest(Guid guid)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<User> GetUser(string userId)
         {
             return Task.FromResult(_users.Values.SingleOrDefault(v => v.State.Id.ToString() == userId));
+        }
+
+        public Task<ProcessIdToUserAssociation> GetUserAssociation(Guid guid)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<User> GetUserByEmail(string emailAddress)
@@ -41,7 +41,7 @@ namespace coretests.Fakes
             return Task.CompletedTask;
         }
 
-        public Task SavePasswordResetRequest(PasswordResetRequest r)
+        public Task SaveUserAssociation(ProcessIdToUserAssociation r)
         {
             throw new NotImplementedException();
         }
