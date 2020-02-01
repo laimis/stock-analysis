@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using core.Account;
 using Xunit;
 
@@ -31,6 +32,27 @@ namespace coretests.Account
             u.SetPassword("hash", "salt");
 
             Assert.True(u.PasswordHashMatches("hash"));
+        }
+
+        [Fact]
+        public void Deleting_MarksAsDeleted()
+        {
+            var u = new User("laimis@gmail.com", "firstname", "last");
+
+            u.Delete("delete feedback");
+
+            Assert.NotNull(u.State.Deleted);
+            Assert.Equal("delete feedback", u.State.DeleteFeedback);
+        }
+
+        [Fact]
+        public void RequestPasswordReset()
+        {
+            var u = new User("laimis@gmail.com", "firstname", "last");
+
+            u.RequestPasswordReset(DateTimeOffset.UtcNow);
+
+            Assert.NotNull(u.Events.Single(e => e is core.Account.UserPasswordResetRequested));
         }
     }
 }

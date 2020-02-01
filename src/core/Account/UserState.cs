@@ -11,6 +11,8 @@ namespace core.Account
         public string Lastname { get; private set; }
         private string PasswordHash { get; set; }
         private string Salt { get; set; }
+        public DateTimeOffset? Deleted { get; private set; }
+        public string DeleteFeedback { get; private set; }
 
         internal void Apply(UserCreated c)
         {
@@ -25,6 +27,12 @@ namespace core.Account
         {
             this.PasswordHash = p.Hash;
             this.Salt = p.Salt;
+        }
+
+        internal void Apply(UserDeleted d)
+        {
+            this.Deleted = d.When;
+            this.DeleteFeedback = d.Feedback;
         }
 
         internal bool PasswordHashMatches(string hash)

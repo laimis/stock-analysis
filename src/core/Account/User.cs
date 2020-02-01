@@ -35,7 +35,7 @@ namespace core.Account
             );
         }
 
-        internal void Delete(string feedback)
+        public void Delete(string feedback)
         {
             Apply(
                 new UserDeleted(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, feedback)
@@ -54,7 +54,7 @@ namespace core.Account
             );
         }
 
-        internal void RequestPasswordReset(DateTimeOffset when)
+        public void RequestPasswordReset(DateTimeOffset when)
         {
             Apply(
                 new UserPasswordResetRequested(Guid.NewGuid(), this.State.Id, when)
@@ -89,6 +89,7 @@ namespace core.Account
 
         private void ApplyInternal(UserDeleted d)
         {
+            this.State.Apply(d);
         }
     }
 }
