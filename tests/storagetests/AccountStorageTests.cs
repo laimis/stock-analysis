@@ -43,5 +43,19 @@ namespace storagetests
 
             Assert.Null(fromDb);
         }
+
+        [Fact]
+        public async Task PasswordResetRequestsAreRecordedWorks()
+        {
+            var storage = GetStorage();
+
+            var r = new PasswordResetRequest(Guid.NewGuid(), DateTimeOffset.UtcNow);
+
+            await storage.SavePasswordResetRequest(r);
+
+            var fromDb = await storage.GetPasswordResetRequest(r.Id);
+
+            Assert.Equal(r.UserId, fromDb.UserId);
+        }
     }
 }

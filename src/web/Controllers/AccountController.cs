@@ -163,5 +163,21 @@ namespace web.Controllers
 
             return Ok();
         }
+
+        [HttpPost("resetpassword")]
+        public async Task<ActionResult> ResetPassword(ResetPassword.Command cmd)
+        {
+            var r = await _mediator.Send(cmd);
+
+            var error = r.Error;
+            if (error != null)
+            {
+                return GenerateBadRequestWithError(error);
+            }
+
+            await EstablishSignedInIdentity(r.User);
+
+            return Ok();
+        }
     }
 }

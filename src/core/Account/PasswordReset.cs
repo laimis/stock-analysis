@@ -46,20 +46,7 @@ namespace core.Account
 
                 await this._storage.Save(user);
 
-                SendEmail(request, user);
-
                 return PasswordResetResult.Success();
-            }
-
-            private void SendEmail(Request request, User user)
-            {
-                var reseturl = "https://www.graphdrive.com/profile/passwordreset/" + Guid.NewGuid();
-
-                _emailService.Send(
-                    request.Email,
-                    EmailSettings.TemplatePasswordReset,
-                    new {reseturl}
-                );
             }
         }
     }

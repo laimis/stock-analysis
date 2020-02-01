@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using core.Account;
 using Dapper;
+using MediatR;
 
 namespace storage.postgres
 {
@@ -9,7 +10,7 @@ namespace storage.postgres
     {
         private const string _user_entity = "users";
 
-        public AccountStorage(string cnn) : base(cnn)
+        public AccountStorage(IMediator mediator, string cnn) : base(mediator, cnn)
         {
         }
 
@@ -62,6 +63,24 @@ namespace storage.postgres
             await db.ExecuteAsync(query, new {id = user.Id.ToString()});
 
             await DeleteEvents("users", user.Id.ToString());
+        }
+
+        public async Task SavePasswordResetRequest(PasswordResetRequest r)
+        {
+            using var db = GetConnection();
+            db.Open();
+            var query = @"INSERT INTO passwordresetrequests (id, userId, timestamp) VALUES (:id, :userId, :timestamp)";
+
+            await db.ExecuteAsync(query, new {r.Id, userId = r.UserId, timestamp = r.Timestamp});
+        }
+
+        public async Task<PasswordResetRequest> GetPasswordResetRequest(Guid id)
+        {
+            using var db = GetConnection();
+            db.Open();
+            var query = @"SELECT * FROM passwordresetrequests WHERE id = :id";
+
+            return await db.QuerySingleOrDefaultAsync<PasswordResetRequest>(query, new { id });
         }
     }
 }

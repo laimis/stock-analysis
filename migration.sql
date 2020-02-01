@@ -58,9 +58,20 @@ ALTER TABLE loginlog OWNER TO stocks;
 CREATE TABLE users (
     id TEXT,
     email TEXT,
-    PRIMARY KEY users_id (id) 
+    PRIMARY KEY (id) 
 );
 ALTER TABLE users OWNER TO stocks;
 
-ADD UNIQUE INDEX users_id ON users USING BTREE(id);
-ADD UNIQUE INDEX users_email ON users USING BTREE(email);
+CREATE UNIQUE INDEX users_id ON users USING BTREE(id);
+CREATE UNIQUE INDEX users_email ON users USING BTREE(email);
+
+
+CREATE TABLE passwordresetrequests (
+    id uuid,
+    userid uuid,
+    timestamp text,
+    PRIMARY KEY (id) 
+);
+ALTER TABLE passwordresetrequests OWNER TO stocks;
+
+CREATE UNIQUE INDEX passwordresetrequests_id ON passwordresetrequests USING BTREE(id);

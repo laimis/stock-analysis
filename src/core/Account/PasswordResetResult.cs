@@ -1,5 +1,3 @@
-using System;
-
 namespace core.Account
 {
     public class PasswordResetResult

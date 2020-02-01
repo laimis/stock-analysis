@@ -9,7 +9,9 @@ namespace storagetests.postgres
     {
         protected override IAccountStorage GetStorage()
         {
-            return new AccountStorage(PostgresPortfolioStorageTests._cnn);
+            return new AccountStorage(
+                new Fakes.FakeMediator(),
+                PostgresPortfolioStorageTests._cnn);
         }
     }
 }

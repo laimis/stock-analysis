@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using storage.postgres;
+using storagetests.Fakes;
 using Xunit;
 
 namespace storagetests.postgres
@@ -10,7 +11,9 @@ namespace storagetests.postgres
         [Fact]
         public async Task HealthCheckWorks()
         {
-            var storage = new PostgresAggregateStorage(PostgresPortfolioStorageTests._cnn);
+            var storage = new PostgresAggregateStorage(
+                new FakeMediator(),
+                PostgresPortfolioStorageTests._cnn);
 
             await storage.DoHealthCheck();
         }
