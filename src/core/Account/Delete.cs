@@ -22,15 +22,15 @@ namespace core.Account
                 _storage = storage;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var user = await _storage.GetUser(request.UserId);
+                var user = await _storage.GetUser(cmd.UserId);
                 if (user == null)
                 {
                     return new Unit();
                 }
 
-                user.Delete();
+                user.Delete(cmd.Feedback);
 
                 await _storage.Save(user);
                 
