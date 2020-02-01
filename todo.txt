@@ -2,7 +2,7 @@ FEATURES
 
 - confirmation email
 - password reset email
-- delete account event
+- delete account event  
 
 LONG TERM
 

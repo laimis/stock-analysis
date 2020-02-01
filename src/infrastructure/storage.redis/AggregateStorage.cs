@@ -54,9 +54,6 @@ namespace storage.redis
                 var entityKey = $"{entity}:{userId}:{e.Id}";
                 var keyToStore = $"{entity}:{userId}:{e.Id}:{version}";
 
-                await db.SetAddAsync(globalKey, keyToStore);
-                await db.SetAddAsync(entityKey, keyToStore);
-
                 var fields = new HashEntry[] {
                     new HashEntry("created", e.When.ToString("o")),
                     new HashEntry("entity", entity),
@@ -66,7 +63,13 @@ namespace storage.redis
                     new HashEntry("version", version),
                 };
 
-                await db.HashSetAsync(keyToStore, fields);
+                var tx = db.CreateTransaction();
+                
+                await tx.SetAddAsync(globalKey, keyToStore);
+                await tx.SetAddAsync(entityKey, keyToStore);
+                await tx.HashSetAsync(keyToStore, fields);
+
+                await tx.ExecuteAsync();
             }
         }
 
