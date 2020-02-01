@@ -14,7 +14,7 @@ namespace core.Stocks
         }
 
 		public string Ticker { get; internal set; }
-		public string UserId { get; internal set; }
+		public Guid UserId { get; internal set; }
 		public int Owned { get; internal set; }
 		public double Spent { get; internal set; }
 		public double Earned { get; internal set; }

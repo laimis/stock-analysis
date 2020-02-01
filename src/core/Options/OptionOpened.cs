@@ -13,7 +13,7 @@ namespace core.Options
             double strikePrice,
             OptionType optionType,
             DateTimeOffset expiration,
-            string userId)
+            Guid userId)
             : base(id, aggregateId, when)
         {
             this.Ticker = ticker;
@@ -27,6 +27,6 @@ namespace core.Options
         public OptionType OptionType { get; }
         public double StrikePrice { get; }
         public DateTimeOffset Expiration { get; }
-        public string UserId { get; }
+        public Guid UserId { get; }
     }
 }

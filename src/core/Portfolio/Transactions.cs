@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Portfolio.Output;
@@ -9,7 +10,7 @@ namespace core.Portfolio
     {
         public class Query : RequestWithUserId<TransactionList>
         {
-            public Query(string userId, string ticker) : base(userId)
+            public Query(Guid userId, string ticker) : base(userId)
             {
                 this.Ticker = ticker;
             }

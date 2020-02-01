@@ -42,7 +42,7 @@ namespace core.Account
                     return ResetPasswordResult.Failed("Password reset link has expired. Please request a new password reset");
                 }
 
-                var u = await _storage.GetUser(r.UserId.ToString());
+                var u = await _storage.GetUser(r.UserId);
                 if (u == null)
                 {
                     return ResetPasswordResult.Failed("User account is no longer valid");

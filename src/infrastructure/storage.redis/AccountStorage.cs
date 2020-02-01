@@ -14,7 +14,7 @@ namespace storage.redis
         {
         }
 
-        public async Task<User> GetUser(string userId)
+        public async Task<User> GetUser(Guid userId)
         {
             var events = await GetEventsAsync(USER_ENTITY, userId);
 
@@ -38,19 +38,19 @@ namespace storage.redis
                 return null;
             }
 
-            return await GetUser(id);
+            return await GetUser(new Guid(id.ToString()));
         }
 
         public async Task Save(User u)
         {
             var db = _redis.GetDatabase();
 
-            var userId = u.State.Id.ToString();
+            var userId = u.State.Id;
 
             await db.HashSetAsync(
                 USER_RECORDS_KEY,
                 u.State.Email,
-                userId,
+                userId.ToString(),
                 StackExchange.Redis.When.NotExists);
 
             await SaveEventsAsync(u, USER_ENTITY, userId);
@@ -62,7 +62,7 @@ namespace storage.redis
 
             await db.HashDeleteAsync(USER_RECORDS_KEY, user.State.Email);
 
-            await DeleteEvents(USER_ENTITY, user.Id.ToString());
+            await DeleteEvents(USER_ENTITY, user.Id);
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
@@ -8,7 +9,7 @@ namespace core.Stocks
     {
         public class Query : RequestWithUserId<ExportResponse>
         {
-            public Query(string userId) : base(userId)
+            public Query(Guid userId) : base(userId)
             {
             }
         }

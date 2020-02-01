@@ -18,7 +18,7 @@ namespace coretests.Notes
         private static Note CreateTestNote()
         {
             return new Note(
-                            "userid",
+                            Guid.NewGuid(),
                             "description",
                             "ticker",
                             100,
@@ -59,25 +59,25 @@ namespace coretests.Notes
         [Fact]
         public void FailWithEmptyUser()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(null, "some note", "ticker", null, DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.Empty, "some note", "ticker", null, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithNegativePrediction()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note("user", "some note", "ticker", -12, DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "some note", "ticker", -12, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithNoNote()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note("user", "", "ticker", 12, DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "", "ticker", 12, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithFutureCreated()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note("user", "note", "ticker", 12, DateTimeOffset.UtcNow.AddDays(1)));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "note", "ticker", 12, DateTimeOffset.UtcNow.AddDays(1)));
         }
 
         [Fact]

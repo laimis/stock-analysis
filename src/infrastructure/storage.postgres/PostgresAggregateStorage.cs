@@ -29,7 +29,7 @@ namespace storage.postgres
             return new NpgsqlConnection(_cnn);
         }
 
-        public async Task DeleteEvents(string entity, string userId)
+        public async Task DeleteEvents(string entity, Guid userId)
         {
             using (var db = GetConnection())
             {
@@ -41,7 +41,7 @@ namespace storage.postgres
             }
         }
 
-        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
         {
             using (var db = GetConnection())
             {
@@ -55,7 +55,7 @@ namespace storage.postgres
             }
         }
 
-        public async Task SaveEventsAsync(Aggregate agg, string entity, string userId)
+        public async Task SaveEventsAsync(Aggregate agg, string entity, Guid userId)
         {
             using (var db = GetConnection())
             {
@@ -108,7 +108,7 @@ namespace storage.postgres
             }
         }
 
-        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, string userId)
+        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, Guid userId)
         {
             using (var db = GetConnection())
             {

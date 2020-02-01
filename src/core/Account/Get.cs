@@ -9,7 +9,7 @@ namespace core.Account
     {
         public class Query : RequestWithUserId<object>
         {
-            public Query(string userId) : base(userId)
+            public Query(Guid userId) : base(userId)
             {
             }
         }

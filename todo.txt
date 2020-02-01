@@ -1,6 +1,7 @@
 FEATURES
 
-- Guid for userid
+- return errors when user is not confirmed
+- allow to confirm from user profile page
 
 LONG TERM
 

@@ -1,3 +1,4 @@
+using System;
 using MediatR;
 
 namespace core.Shared
@@ -5,7 +6,7 @@ namespace core.Shared
     public class RequestWithUserId<T> : RequestWithUserIdBase, IRequest<T>
     {
         public RequestWithUserId() {}
-        public RequestWithUserId(string userId) : base(userId)
+        public RequestWithUserId(Guid userId) : base(userId)
         {
         }
     }
@@ -14,7 +15,7 @@ namespace core.Shared
     {
         public RequestWithUserId() {}
 
-        public RequestWithUserId(string userId) : base(userId)
+        public RequestWithUserId(Guid userId) : base(userId)
         {
         }
     }
@@ -23,12 +24,12 @@ namespace core.Shared
     {
         public RequestWithUserIdBase(){}
 
-        public RequestWithUserIdBase(string userId)
+        public RequestWithUserIdBase(Guid userId)
         {
             UserId = userId;
         }
 
-        public string UserId { get; private set; }
-        public void WithUserId(string userId) => UserId = userId;
+        public Guid UserId { get; private set; }
+        public void WithUserId(Guid userId) => UserId = userId;
     }
 }

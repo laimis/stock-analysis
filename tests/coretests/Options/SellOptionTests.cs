@@ -20,7 +20,7 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithNoOptions();
 
-            var handler = new Sell.Handler(storage);
+            var handler = new Sell.Handler(storage, new Fakes.FakeAccountStorage());
 
             await handler.Handle(OptionsTestsFixture.CreateSellCommand(), CancellationToken.None);
 
@@ -33,7 +33,7 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithNoOptions();
 
-            var handler = new Sell.Handler(storage);
+            var handler = new Sell.Handler(storage, new Fakes.FakeAccountStorage());
 
             await handler.Handle(
                 OptionsTestsFixture.CreateSellCommand(),

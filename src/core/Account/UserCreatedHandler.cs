@@ -18,7 +18,7 @@ namespace core.Account
 
         public async Task Handle(UserCreated e, CancellationToken cancellationToken)
         {
-            var u = await _storage.GetUser(e.AggregateId.ToString());
+            var u = await _storage.GetUser(e.AggregateId);
             if (u == null)
             {
                 return;

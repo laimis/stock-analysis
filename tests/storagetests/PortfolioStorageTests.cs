@@ -11,14 +11,14 @@ namespace storage.tests
 {
     public abstract class PortfolioStorageTests
     {
-        const string _userId = "testuser";
+        private static Guid _userId = Guid.NewGuid();
 
         [Fact]
         public async Task NonExistingStockReturnsNullAsync()
         {
             var storage = CreateStorage();
 
-            Assert.Null(await storage.GetStock("nonexisting", "nonexisting"));
+            Assert.Null(await storage.GetStock("nonexisting", _userId));
         }
 
         protected abstract IPortfolioStorage CreateStorage();

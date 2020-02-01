@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace core.Portfolio
     {
         public class Query : RequestWithUserId<object>
         {
-            public Query(string userId) : base(userId)
+            public Query(Guid userId) : base(userId)
             {
             }
         }

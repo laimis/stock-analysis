@@ -20,7 +20,7 @@ namespace storage.redis
             _redis = ConnectionMultiplexer.Connect(redisCnn);
         }
 
-        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
         {
             var redisKey = entity + ":" + userId;
 
@@ -35,7 +35,7 @@ namespace storage.redis
                 .Select(e => e.Event);
         }
 
-        public async Task SaveEventsAsync(core.Shared.Aggregate agg, string entity, string userId)
+        public async Task SaveEventsAsync(core.Shared.Aggregate agg, string entity, Guid userId)
         {
             var db = _redis.GetDatabase();
 
@@ -64,7 +64,7 @@ namespace storage.redis
                     new HashEntry("entity", entity),
                     new HashEntry("event", se.EventJson),
                     new HashEntry("key", e.Id.ToString()),
-                    new HashEntry("userId", userId),
+                    new HashEntry("userId", userId.ToString()),
                     new HashEntry("version", version),
                 };
 
@@ -80,7 +80,7 @@ namespace storage.redis
                     await _mediator.Publish(n);
         }
 
-        internal static storage.shared.StoredAggregateEvent ToEvent(string entity, string userId, HashEntry[] result)
+        internal static storage.shared.StoredAggregateEvent ToEvent(string entity, Guid userId, HashEntry[] result)
         {
             var eventJson = result.Single(h => h.Name == "event").Value;
 
@@ -91,7 +91,7 @@ namespace storage.redis
                     Entity = result.Single(h => h.Name == "entity").Value,
                     EventJson = eventJson,
                     Key = result.Single(h => h.Name == "key").Value,
-                    UserId = result.Single(h => h.Name == "userId").Value,
+                    UserId = new Guid(result.Single(h => h.Name == "userId").Value.ToString()),
                     Version = int.Parse(result.Single(h => h.Name == "version").Value),
                 };
             }
@@ -108,7 +108,7 @@ namespace storage.redis
             return Task.CompletedTask;
         }
 
-        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, string userId)
+        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, Guid userId)
         {
             var redisKey = entity + ":" + userId;
 
@@ -122,7 +122,7 @@ namespace storage.redis
                 .ThenBy(e => e.Version);
         }
 
-        public async Task DeleteEvents(string entity, string userId)
+        public async Task DeleteEvents(string entity, Guid userId)
         {
             var db = _redis.GetDatabase();
 

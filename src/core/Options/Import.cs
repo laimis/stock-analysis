@@ -41,7 +41,7 @@ namespace core.Options
                 return new Unit();
             }
 
-            private async Task ProcessLine(OptionRecord record, string userId)
+            private async Task ProcessLine(OptionRecord record, Guid userId)
             {
                 var amount = record.amount;
                 if (amount == 0) amount = 1;

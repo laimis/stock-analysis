@@ -19,9 +19,9 @@ namespace coretests.Fakes
             return Task.CompletedTask;
         }
 
-        public Task<User> GetUser(string userId)
+        public Task<User> GetUser(Guid userId)
         {
-            return Task.FromResult(_users.Values.SingleOrDefault(v => v.State.Id.ToString() == userId));
+            return Task.FromResult(_users.Values.SingleOrDefault(v => v.State.Id == userId));
         }
 
         public Task<ProcessIdToUserAssociation> GetUserAssociation(Guid guid)

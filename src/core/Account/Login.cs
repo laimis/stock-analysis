@@ -10,7 +10,7 @@ namespace core.Account
     {
         public class Command : RequestWithUserId
         {
-            public Command(string userId, string ipAddress) : base(userId)
+            public Command(Guid userId, string ipAddress) : base(userId)
             {
                 this.IPAddress = ipAddress;
                 this.Timestamp = DateTimeOffset.UtcNow;

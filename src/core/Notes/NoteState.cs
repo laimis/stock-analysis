@@ -9,6 +9,6 @@ namespace core.Notes
         public DateTimeOffset Created { get; internal set; }
         public string Note { get; internal set; }
         public double? PredictedPrice { get; internal set; }
-        public string UserId { get; internal set; }
+        public Guid UserId { get; internal set; }
     }
 }

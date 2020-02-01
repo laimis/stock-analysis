@@ -23,29 +23,29 @@ namespace storage.shared
             _aggregateStorage = aggregateStorage;
         }
 
-        public async Task<OwnedStock> GetStock(string ticker, string userId)
+        public async Task<OwnedStock> GetStock(string ticker, Guid userId)
         {
             var stocks = await GetStocks(userId);
             
             return stocks.SingleOrDefault(s => s.State.Ticker == ticker);
         }
 
-        public Task Save(OwnedStock stock, string userId)
+        public Task Save(OwnedStock stock, Guid userId)
         {
             return Save(stock, _stock_entity, userId);
         }
 
-        public Task Save(OwnedOption option, string userId)
+        public Task Save(OwnedOption option, Guid userId)
         {
             return Save(option, _option_entity, userId);
         }
 
-        private Task Save(Aggregate agg, string entityName, string userId)
+        private Task Save(Aggregate agg, string entityName, Guid userId)
         {
             return _aggregateStorage.SaveEventsAsync(agg, entityName, userId);
         }
 
-        public async Task<IEnumerable<OwnedStock>> GetStocks(string userId)
+        public async Task<IEnumerable<OwnedStock>> GetStocks(Guid userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_stock_entity, userId);
 
@@ -53,12 +53,12 @@ namespace storage.shared
                 .Select(g => new OwnedStock(g));
         }
 
-        public async Task<OwnedOption> GetOwnedOption(Guid optionId, string userId)
+        public async Task<OwnedOption> GetOwnedOption(Guid optionId, Guid userId)
         {
             return (await GetOwnedOptions(userId)).SingleOrDefault(s => s.State.Id == optionId);
         }
 
-        public async Task<IEnumerable<OwnedOption>> GetOwnedOptions(string userId)
+        public async Task<IEnumerable<OwnedOption>> GetOwnedOptions(Guid userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId);
 
@@ -68,12 +68,12 @@ namespace storage.shared
                 .Select(g => new OwnedOption(g));
         }
 
-        public Task Save(Note note, string userId)
+        public Task Save(Note note, Guid userId)
         {
             return Save(note, _note_entity, userId);
         }
 
-        public async Task<IEnumerable<Note>> GetNotes(string userId)
+        public async Task<IEnumerable<Note>> GetNotes(Guid userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_note_entity, userId);
 
@@ -81,14 +81,14 @@ namespace storage.shared
                 .Select(g => new Note(g));
         }
 
-        public async Task<Note> GetNote(string userId, Guid noteId)
+        public async Task<Note> GetNote(Guid userId, Guid noteId)
         {
             var list = await GetNotes(userId);
 
             return list.SingleOrDefault(n => n.State.Id == noteId);
         }
 
-        public async Task Delete(string userId)
+        public async Task Delete(Guid userId)
         {
             await this._aggregateStorage.DeleteEvents(_note_entity, userId);
             await this._aggregateStorage.DeleteEvents(_option_entity, userId);

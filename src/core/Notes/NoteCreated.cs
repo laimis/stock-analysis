@@ -5,7 +5,7 @@ namespace core.Notes
 {
     public class NoteCreated : AggregateEvent
     {
-        public NoteCreated(Guid id, Guid aggregateId, DateTimeOffset when, string userId, string note, string ticker, double? predictedPrice)
+        public NoteCreated(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string note, string ticker, double? predictedPrice)
             : base(id, aggregateId, when)
         {
             this.UserId = userId;
@@ -14,7 +14,7 @@ namespace core.Notes
             this.PredictedPrice = predictedPrice;
         }
 
-        public string UserId { get; }
+        public Guid UserId { get; }
         public string Note { get; }
         public string Ticker { get; }
         public double? PredictedPrice { get; }

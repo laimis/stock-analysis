@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
@@ -9,7 +10,7 @@ namespace core.Notes
     {
         public class Query : RequestWithUserId<core.ExportResponse>
         {
-            public Query(string userId) : base(userId)
+            public Query(Guid userId) : base(userId)
             {
             }
         }

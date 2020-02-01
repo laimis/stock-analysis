@@ -20,7 +20,7 @@ namespace core.Options
         public DateTimeOffset Expiration { get; private set; }
         public bool IsExpired => DateTimeOffset.UtcNow > this.Expiration;
         public OptionType OptionType { get; internal set; }
-        public string UserId { get; internal set; }
+        public Guid UserId { get; internal set; }
         public int NumberOfContracts { get; internal set; }
         public double Credit { get; private set; }
         public double Debit { get; private set; }

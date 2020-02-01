@@ -41,7 +41,7 @@ namespace core.Account
                     return ConfirmResult.Failed("Account confirmation link is expired. Please request a new one.");
                 }
 
-                var u = await _storage.GetUser(r.UserId.ToString());
+                var u = await _storage.GetUser(r.UserId);
                 if (u == null)
                 {
                     return ConfirmResult.Failed("User account is no longer valid");

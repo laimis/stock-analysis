@@ -39,7 +39,7 @@ namespace core.Stocks
                 return new Unit();
             }
 
-            private async Task ProcessLine(StockRecord record, string userId)
+            private async Task ProcessLine(StockRecord record, Guid userId)
             {
                 object cmd = null;
                 switch (record.type)

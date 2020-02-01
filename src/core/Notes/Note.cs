@@ -14,14 +14,14 @@ namespace core.Notes
         {
         }
 
-        public Note(string userId, string note, string ticker, double? predictedPrice, DateTimeOffset created)
+        public Note(Guid userId, string note, string ticker, double? predictedPrice, DateTimeOffset created)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
                 throw new InvalidOperationException("Missing ticker");
             }
 
-            if (string.IsNullOrWhiteSpace(userId))
+            if (userId == Guid.Empty)
             {
                 throw new InvalidOperationException("Missing user id");
             }

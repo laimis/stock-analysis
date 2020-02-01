@@ -39,7 +39,7 @@ namespace storagetests
 
             Assert.Null(fromDb);
 
-            fromDb = await storage.GetUser(user.Id.ToString());
+            fromDb = await storage.GetUser(user.Id);
 
             Assert.Null(fromDb);
         }

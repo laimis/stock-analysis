@@ -14,7 +14,7 @@ namespace storage.postgres
         {
         }
 
-        public async Task<User> GetUser(string userId)
+        public async Task<User> GetUser(Guid userId)
         {
             var events = await GetEventsAsync(_user_entity, userId);
 
@@ -40,7 +40,7 @@ namespace storage.postgres
                 return null;
             }
 
-            return await GetUser(identifier);
+            return await GetUser(new Guid(identifier));
         }
 
         public async Task Save(User u)
@@ -51,7 +51,7 @@ namespace storage.postgres
 
             await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
 
-            await SaveEventsAsync(u, _user_entity, u.State.Id.ToString());
+            await SaveEventsAsync(u, _user_entity, u.State.Id);
         }
 
         public async Task Delete(User user)
@@ -62,7 +62,7 @@ namespace storage.postgres
 
             await db.ExecuteAsync(query, new {id = user.Id.ToString()});
 
-            await DeleteEvents("users", user.Id.ToString());
+            await DeleteEvents("users", user.Id);
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)

@@ -12,7 +12,7 @@ namespace coretests
         [Fact]
         public void ExportStocksHeader()
         {
-            var stock = new OwnedStock("ticker", "userid");
+            var stock = new OwnedStock("ticker", Guid.NewGuid());
             stock.Purchase(1, 100, DateTime.UtcNow);
 
             var report = CSVExport.Generate(new[] {stock});
@@ -30,7 +30,7 @@ namespace coretests
                 2.5,
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
-                "user");
+                Guid.NewGuid());
             
             option.Sell(1, 20, DateTimeOffset.UtcNow);
 
@@ -46,7 +46,7 @@ namespace coretests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note("user", "note", "ticker", 100, DateTimeOffset.UtcNow);
+            var note = new Note(Guid.NewGuid(), "note", "ticker", 100, DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {note});
 

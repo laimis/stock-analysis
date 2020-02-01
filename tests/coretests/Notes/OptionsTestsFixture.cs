@@ -7,7 +7,7 @@ namespace coretests.Notes
     public class NotesTestsFixture
     {
         public const string Ticker = "ticker";
-        public const string UserId = "userid";
+        public static Guid UserId = Guid.NewGuid();
 
         public NotesTestsFixture()
         {

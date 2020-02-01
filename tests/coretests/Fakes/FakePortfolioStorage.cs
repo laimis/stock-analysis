@@ -16,24 +16,24 @@ namespace coretests.Fakes
 
         public IEnumerable<OwnedOption> SavedOptions => _options.Values.ToList();
 
-        public Task<OwnedOption> GetOwnedOption(Guid id, string userId)
+        public Task<OwnedOption> GetOwnedOption(Guid id, Guid userId)
         {
             return Task.FromResult<OwnedOption>(_options.GetValueOrDefault(id.ToString()));
         }
 
-        public Task<IEnumerable<OwnedOption>> GetOwnedOptions(string user)
+        public Task<IEnumerable<OwnedOption>> GetOwnedOptions(Guid userId)
         {
             return Task.FromResult<IEnumerable<OwnedOption>>(
                 SavedOptions
             );
         }
 
-        public Task<OwnedStock> GetStock(string ticker, string userId)
+        public Task<OwnedStock> GetStock(string ticker, Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<OwnedStock>> GetStocks(string userId)
+        public Task<IEnumerable<OwnedStock>> GetStocks(Guid userId)
         {
             throw new NotImplementedException();
         }
@@ -43,38 +43,38 @@ namespace coretests.Fakes
             _options.Add(opt.State.Id.ToString(), opt);
         }
 
-        public Task Save(OwnedStock stock, string userId)
+        public Task Save(OwnedStock stock, Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task Save(OwnedOption option, string userId)
+        public Task Save(OwnedOption option, Guid userId)
         {
             _options[option.State.Id.ToString()] = option;
 
             return Task.CompletedTask;
         }
 
-        public Task Save(Note note, string userId)
+        public Task Save(Note note, Guid userId)
         {
             _notes.Add(note);
 
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<Note>> GetNotes(string userId)
+        public Task<IEnumerable<Note>> GetNotes(Guid userId)
         {
             return Task.FromResult(_notes.Select(n => n));
         }
 
-        public async Task<Note> GetNote(string userId, Guid noteId)
+        public async Task<Note> GetNote(Guid userId, Guid noteId)
         {
             var list = await GetNotes(userId);
 
             return list.SingleOrDefault(n => n.State.Id == noteId);
         }
 
-        public Task Delete(string userId)
+        public Task Delete(Guid userId)
         {
             return Task.CompletedTask;
         }

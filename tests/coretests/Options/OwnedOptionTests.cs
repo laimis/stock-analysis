@@ -31,7 +31,7 @@ namespace coretests.Options
         [InlineData("ticker",   2,  "")]
         [InlineData("ticker",   -1,  "user")]
         [InlineData("ticker",   0,  "user")]
-        public void CreateWithBadTickerFails(string ticker, double strikePrice, string userId)
+        public void CreateWithBadTickerFails(string ticker, double strikePrice, Guid userId)
         {
             Assert.Throws<InvalidOperationException>( () =>
                 new OwnedOption(ticker, strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, userId));
@@ -65,15 +65,14 @@ namespace coretests.Options
         private static OwnedOption GetTestOption(
             string ticker = "TEUM",
             OptionType optionType = OptionType.PUT,
-            double strikePrice = 2.5,
-            string userId = "testuser")
+            double strikePrice = 2.5)
         {
             var option = new OwnedOption(
                 ticker,
                 strikePrice,
                 optionType,
                 _expiration,
-                userId);
+                Guid.NewGuid());
 
             return option;
         }

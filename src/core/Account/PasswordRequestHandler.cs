@@ -24,7 +24,7 @@ namespace core.Account
 
             Console.WriteLine("Issuing password reset");
 
-            var u = await _storage.GetUser(e.AggregateId.ToString());
+            var u = await _storage.GetUser(e.AggregateId);
             if (u == null)
             {
                 return;

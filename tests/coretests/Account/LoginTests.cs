@@ -32,7 +32,7 @@ namespace coretests.Account
 
         private static Login.Command CreateCommand()
         {
-            return new Login.Command("id", "ip");
+            return new Login.Command(Guid.NewGuid(), "ip");
         }
     }
 }

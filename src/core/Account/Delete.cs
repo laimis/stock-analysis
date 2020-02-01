@@ -49,7 +49,7 @@ namespace core.Account
 
                 await _storage.Delete(user);
 
-                await _portfolio.Delete(user.Id.ToString());
+                await _portfolio.Delete(user.Id);
                 
                 return new Unit();
             }

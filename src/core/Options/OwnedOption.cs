@@ -19,14 +19,14 @@ namespace core.Options
             double strikePrice,
             OptionType type,
             DateTimeOffset expiration,
-            string userId)
+            Guid userId)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
                 throw new InvalidOperationException("Missing ticker value");
             }
 
-            if (string.IsNullOrWhiteSpace(userId))
+            if (userId == Guid.Empty)
             {
                 throw new InvalidOperationException("Missing user id");
             }

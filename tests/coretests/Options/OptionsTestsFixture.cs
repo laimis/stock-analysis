@@ -7,7 +7,7 @@ namespace coretests.Options
     public class OptionsTestsFixture
     {
         public const string Ticker = "ticker";
-        public const string UserId = "userid";
+        public static Guid UserId = Guid.NewGuid();
 
         public FakePortfolioStorage CreateStorageWithSoldOption()
         {

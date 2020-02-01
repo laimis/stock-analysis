@@ -1,9 +1,7 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
-using MediatR;
 
 namespace core.Notes
 {
@@ -11,7 +9,7 @@ namespace core.Notes
     {
         public class Query : RequestWithUserId<object>
         {
-            public Query(string userId, Guid noteId) : base(userId)
+            public Query(Guid userId, Guid noteId) : base(userId)
             {
                 this.NoteId = noteId;
             }

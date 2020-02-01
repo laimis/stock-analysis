@@ -1,9 +1,9 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Notes.Output;
 using core.Shared;
-using MediatR;
 
 namespace core.Notes
 {
@@ -11,7 +11,7 @@ namespace core.Notes
     {
         public class Query : RequestWithUserId<NotesList>
         {
-            public Query(string userId, string ticker) : base(userId)
+            public Query(Guid userId, string ticker) : base(userId)
             {
                 this.Ticker = ticker;
             }
