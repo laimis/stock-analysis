@@ -59,6 +59,11 @@ namespace core.Account
 
         public void Confirm()
         {
+            if (this.State.Confirmed != null)
+            {
+                return;
+            }
+            
             Apply(
                 new UserConfirmed(Guid.NewGuid(), this.State.Id, DateTimeOffset.UtcNow)
             );

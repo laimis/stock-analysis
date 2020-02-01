@@ -181,7 +181,7 @@ namespace web.Controllers
             return Ok();
         }
 
-        [HttpPost("confirm/{id}")]
+        [HttpGet("confirm/{id}")]
         public async Task<ActionResult> Confirm(Guid id)
         {
             var cmd = new Confirm.Command(id);
@@ -196,7 +196,7 @@ namespace web.Controllers
 
             await EstablishSignedInIdentity(r.User);
 
-            return Ok();
+            return Redirect("~/");
         }
     }
 }
