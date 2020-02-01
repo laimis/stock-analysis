@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using MediatR;
 
 namespace core.Stocks
@@ -10,12 +11,27 @@ namespace core.Stocks
 
         public class Handler : HandlerWithStorage<Command, Unit>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private IAccountStorage _accounts;
+
+            public Handler(IPortfolioStorage storage, IAccountStorage accounts) : base(storage)
             {
+                _accounts = accounts;
             }
 
             public override async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(cmd.UserId);
+                if (user == null)
+                {
+                    return new Unit();
+                }
+
+                // TODO: return error
+                if (!user.IsConfirmed)
+                {
+                    return new Unit();
+                }
+
                 var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
 
                 if (stock == null)

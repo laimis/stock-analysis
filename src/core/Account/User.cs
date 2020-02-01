@@ -13,6 +13,8 @@ namespace core.Account
 
         public bool IsPasswordAvailable => State.GetSalt() != null;
 
+        public bool IsConfirmed => State.Confirmed != null;
+
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

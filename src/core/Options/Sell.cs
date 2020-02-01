@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 
 namespace core.Options
 {
@@ -13,12 +14,27 @@ namespace core.Options
 
         public class Handler : HandlerWithStorage<Command, Guid>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private IAccountStorage _accounts;
+
+            public Handler(IPortfolioStorage storage, IAccountStorage accounts) : base(storage)
             {
+                _accounts = accounts;
             }
 
             public override async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(cmd.UserId);
+                if (user == null)
+                {
+                    return Guid.Empty;
+                }
+
+                // TODO: return error
+                if (!user.IsConfirmed)
+                {
+                    return Guid.Empty;
+                }
+
                 var options = await _storage.GetOwnedOptions(cmd.UserId);
 
                 var type = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);

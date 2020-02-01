@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using MediatR;
 
 namespace core.Options
@@ -15,14 +16,28 @@ namespace core.Options
         public class Handler : IRequestHandler<Command, Guid>
         {
             private IPortfolioStorage _storage;
+            private IAccountStorage _accountStorage;
 
-            public Handler(IPortfolioStorage storage)
+            public Handler(IAccountStorage accountStorage, IPortfolioStorage storage)
             {
                 _storage = storage;
+                _accountStorage = accountStorage;
             }
             
             public async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
             {
+                var user = await _accountStorage.GetUser(cmd.UserId);
+                if (user == null)
+                {
+                    return Guid.Empty;
+                }
+
+                // TODO: return error
+                if (!user.IsConfirmed)
+                {
+                    return Guid.Empty;
+                }
+
                 var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
                 
                 var options = await _storage.GetOwnedOptions(cmd.UserId);
