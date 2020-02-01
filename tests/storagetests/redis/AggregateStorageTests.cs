@@ -10,7 +10,7 @@ namespace storagetests.redis
         [Fact]
         public async Task HealthCheckWorks()
         {
-            var storage = new AggregateStorage("localhost");
+            var storage = new RedisAggregateStorage("localhost");
 
             await storage.DoHealthCheck();
         }

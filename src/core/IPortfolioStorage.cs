@@ -20,5 +20,6 @@ namespace core
         Task Save(Note note, string userId);
         Task<IEnumerable<Note>> GetNotes(string userId);
         Task<Note> GetNote(string userId, Guid noteId);
+        Task Delete(string userId);
     }
 }

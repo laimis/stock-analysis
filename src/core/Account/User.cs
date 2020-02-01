@@ -11,6 +11,8 @@ namespace core.Account
 
         public override Guid Id => State.Id;
 
+        public bool IsPasswordAvailable => State.GetSalt() != null;
+
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

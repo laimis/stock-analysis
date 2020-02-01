@@ -1,6 +1,4 @@
-using System;
-using System.Threading.Tasks;
-using core.Account;
+﻿using core.Account;
 using storage.postgres;
 using Xunit;
 

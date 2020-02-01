@@ -27,7 +27,7 @@ namespace storage.redis
             var keys = await db.SetMembersAsync(redisKey);
 
             var events = keys.Select(async k => await db.HashGetAllAsync(k.ToString()))
-                .Select(e => AggregateStorage.ToEvent(entity, userId, e.Result));
+                .Select(e => RedisAggregateStorage.ToEvent(entity, userId, e.Result));
             
             var fixedRecords = 0;
 

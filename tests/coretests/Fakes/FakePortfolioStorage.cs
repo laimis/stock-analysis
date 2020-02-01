@@ -73,5 +73,10 @@ namespace coretests.Fakes
 
             return list.SingleOrDefault(n => n.State.Id == noteId);
         }
+
+        public Task Delete(string userId)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

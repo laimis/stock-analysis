@@ -57,7 +57,7 @@ namespace core.Account
 
                 _emailService.Send(
                     request.Email,
-                    "d-6f4ac095859a417d88e8243d8056838b",
+                    EmailSettings.TemplatePasswordReset,
                     new {reseturl}
                 );
             }

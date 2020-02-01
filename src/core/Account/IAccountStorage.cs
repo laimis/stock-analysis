@@ -7,5 +7,6 @@ namespace core.Account
         Task<User> GetUserByEmail(string emailAddress);
         Task<User> GetUser(string userId);
         Task Save(User u);
+        Task Delete(string userId, string email);
     }
 }

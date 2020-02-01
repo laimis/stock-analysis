@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.Emails;
 using core.Shared;
 using MediatR;
 
@@ -16,10 +17,17 @@ namespace core.Account
         public class Handler : MediatR.IRequestHandler<Command>
         {
             private IAccountStorage _storage;
+            private IPortfolioStorage _portfolio;
+            private IEmailService _emails;
 
-            public Handler(IAccountStorage storage)
+            public Handler(
+                IAccountStorage storage,
+                IPortfolioStorage portfolioStorage,
+                IEmailService emailService)
             {
                 _storage = storage;
+                _portfolio = portfolioStorage;
+                _emails = emailService;
             }
 
             public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
@@ -30,9 +38,14 @@ namespace core.Account
                     return new Unit();
                 }
 
-                user.Delete(cmd.Feedback);
+                await _emails.Send(
+                    EmailSettings.Admin,
+                    EmailSettings.TemplateUserDeleted,
+                    new {feedback = cmd.Feedback, email = user.State.Email});
 
-                await _storage.Save(user);
+                await _storage.Delete(user.Id.ToString(), user.State.Email);
+
+                await _portfolio.Delete(user.Id.ToString());
                 
                 return new Unit();
             }

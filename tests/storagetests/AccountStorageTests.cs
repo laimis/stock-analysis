@@ -32,6 +32,16 @@ namespace storagetests
             Assert.Equal(email, fromDb.State.Email);
             Assert.Equal("firstname", fromDb.State.Firstname);
             Assert.Equal("lastname", fromDb.State.Lastname);
+
+            await storage.Delete(user.Id.ToString(), email);
+
+            fromDb = await storage.GetUserByEmail(email);
+
+            Assert.Null(fromDb);
+
+            fromDb = await storage.GetUser(user.Id.ToString());
+
+            Assert.Null(fromDb);
         }
     }
 }

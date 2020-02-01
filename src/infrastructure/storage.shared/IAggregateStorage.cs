@@ -9,6 +9,7 @@ namespace storage.shared
         Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, string userId);
         Task SaveEventsAsync(Aggregate agg, string entity, string userId);
         Task DoHealthCheck();
+        Task DeleteEvents(string entity, string userId);
         
         Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, string userId);
     }

@@ -3,7 +3,7 @@ using core.Account;
 
 namespace storage.redis
 {
-    public class AccountStorage : AggregateStorage, IAccountStorage
+    public class AccountStorage : RedisAggregateStorage, IAccountStorage
     {
         private const string USER_ENTITY = "users";
         private const string USER_RECORDS_KEY = "userrecords";
@@ -16,7 +16,12 @@ namespace storage.redis
         {
             var events = await GetEventsAsync(USER_ENTITY, userId);
 
-            return new User(events);
+            var u = new User(events);
+            if (u.Id == System.Guid.Empty)
+            {
+                return null;
+            }
+            return u;
         }
 
         public async Task<User> GetUserByEmail(string emailAddress)
@@ -45,6 +50,15 @@ namespace storage.redis
                 StackExchange.Redis.When.NotExists);
 
             await SaveEventsAsync(u, USER_ENTITY, userId);
+        }
+
+        public async Task Delete(string userId, string email)
+        {
+            var db = _redis.GetDatabase();
+
+            await db.HashDeleteAsync(USER_RECORDS_KEY, email);
+
+            await DeleteEvents(USER_ENTITY, userId);
         }
     }
 }

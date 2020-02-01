@@ -24,6 +24,7 @@ namespace core.Account
 
         public class Handler : IRequestHandler<Command, AuthenticateResult>
         {
+            private const string GENERIC_MSG = "Invalid email/password combination";
             private IAccountStorage _storage;
             private IPasswordHashProvider _hash;
 
@@ -38,7 +39,13 @@ namespace core.Account
                 var user = await this._storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
-                    return AuthenticateResult.Failed("Invalid email/password combination");
+                    return AuthenticateResult.Failed(GENERIC_MSG);
+                }
+
+                // oauth path where password was not set....
+                if (!user.IsPasswordAvailable)
+                {
+                    return AuthenticateResult.Failed(GENERIC_MSG);
                 }
 
                 var computed = _hash.Generate(request.Password, user.State.GetSalt());
@@ -50,7 +57,7 @@ namespace core.Account
                     return AuthenticateResult.Success(user);
                 }
 
-                return AuthenticateResult.Failed("Invalid email/password combination");
+                return AuthenticateResult.Failed(GENERIC_MSG);
             }
         }
     }

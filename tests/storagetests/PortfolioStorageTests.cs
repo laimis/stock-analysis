@@ -57,6 +57,12 @@ namespace storage.tests
             loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
 
             Assert.NotEqual(loaded.State.Owned, stock.State.Owned);
+
+            await storage.Delete(_userId);
+
+            var afterDelete = await storage.GetStocks(_userId);
+
+            Assert.Empty(afterDelete);
         }
 
         private static string GenerateTestTicker()
@@ -94,6 +100,12 @@ namespace storage.tests
             var fromList = list.Single(o => o.State.Ticker == option.State.Ticker);
 
             Assert.Equal(option.State.StrikePrice, fromList.State.StrikePrice);
+
+            await storage.Delete(_userId);
+
+            var afterDelete = await storage.GetOwnedOptions(_userId);
+
+            Assert.Empty(afterDelete);
         }
 
         [Fact]
@@ -118,6 +130,12 @@ namespace storage.tests
             var fromDb = await storage.GetNote(_userId, note.State.Id);
             
             Assert.Equal("new note", fromDb.State.Note);
+
+            await storage.Delete(_userId);
+
+            var afterDelete = await storage.GetNotes(_userId);
+
+            Assert.Empty(afterDelete);
         }
     }
 }
