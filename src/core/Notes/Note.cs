@@ -8,7 +8,7 @@ namespace core.Notes
     {
         private NoteState _state = new NoteState();
         public NoteState State => _state;
-        
+        public override Guid Id => State.Id;
 
         public Note(IEnumerable<AggregateEvent> events) : base(events)
         {

@@ -8,6 +8,7 @@ namespace core.Stocks
     {
         private OwnedStockState _state = new OwnedStockState();
         public OwnedStockState State => _state;
+        public override Guid Id => State.Id;
 
         public OwnedStock(IEnumerable<AggregateEvent> events) : base(events)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace core.Shared
@@ -26,5 +27,7 @@ namespace core.Shared
         public IReadOnlyList<AggregateEvent> Events => _events.AsReadOnly();
 
         public int Version { get; }
+
+        public abstract Guid Id { get; }
     }
 }

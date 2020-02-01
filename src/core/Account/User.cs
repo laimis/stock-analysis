@@ -9,6 +9,8 @@ namespace core.Account
         public UserState State => _state;
         private UserState _state = new UserState();
 
+        public override Guid Id => State.Id;
+
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

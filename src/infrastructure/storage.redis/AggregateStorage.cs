@@ -38,6 +38,8 @@ namespace storage.redis
 
             int version = agg.Version;
 
+            var tx = db.CreateTransaction();
+
             foreach (var e in agg.Events.Skip(agg.Version))
             {
                 var se = new storage.shared.StoredAggregateEvent
@@ -63,13 +65,18 @@ namespace storage.redis
                     new HashEntry("version", version),
                 };
 
-                var tx = db.CreateTransaction();
-                
                 await tx.SetAddAsync(globalKey, keyToStore);
                 await tx.SetAddAsync(entityKey, keyToStore);
                 await tx.HashSetAsync(keyToStore, fields);
+            }
 
-                await tx.ExecuteAsync();
+            var success = await tx.ExecuteAsync();
+
+            if (!success)
+            {
+                throw new InvalidOperationException(
+                    $"Redis transaction failed saving aggregate {entity}, {agg.Id}"
+                );
             }
         }
 

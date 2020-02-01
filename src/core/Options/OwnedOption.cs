@@ -8,6 +8,7 @@ namespace core.Options
     {
         private OwnedOptionState _state = new OwnedOptionState();
         public OwnedOptionState State => _state;
+        public override Guid Id => State.Id;
 
         public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
         {
