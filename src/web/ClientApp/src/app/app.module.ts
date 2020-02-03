@@ -1,7 +1,7 @@
 
 import { AddNoteComponent } from './notes/add-note.component';
 import { AppComponent } from './app.component';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthGuard, AuthGuardUnverifiedAllowed } from './auth/auth.guard';
 import { BrowserModule } from '@angular/platform-browser';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ErrorDisplayComponent } from './shared/error-display/error-display.component';
@@ -28,15 +28,17 @@ import { StockListsComponent } from './stock-lists/stock-lists.component';
 import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
+import { ProfileVerifyComponent } from './profile/profile-verify.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'landing', component: LandingComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
   { path: 'profile/create', component: ProfileCreateComponent },
   { path: 'profile/login', component: ProfileLoginComponent },
+  { path: 'profile/verify', component: ProfileVerifyComponent },
   { path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent },
   { path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
   { path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
@@ -71,6 +73,7 @@ var routes = [
     ProfileCreateComponent,
     ProfileLoginComponent,
     ProfilePasswordResetComponent,
+    ProfileVerifyComponent,
     ReviewComponent,
     SoldOptionDetailComponent,
     StockDetailsComponent,

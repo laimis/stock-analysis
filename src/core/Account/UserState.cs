@@ -13,7 +13,7 @@ namespace core.Account
         private string Salt { get; set; }
         public DateTimeOffset? Deleted { get; private set; }
         public string DeleteFeedback { get; private set; }
-        public DateTimeOffset? Confirmed { get; private set; }
+        public DateTimeOffset? Verified { get; private set; }
 
         internal void Apply(UserCreated c)
         {
@@ -38,7 +38,7 @@ namespace core.Account
 
         internal void Apply(UserConfirmed d)
         {
-            this.Confirmed = d.When;
+            this.Verified = d.When;
         }
 
         internal bool PasswordHashMatches(string hash)

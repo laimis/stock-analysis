@@ -25,13 +25,25 @@ namespace core.Account
 
             public async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                Console.WriteLine("getting user " + request.UserId);
-
                 var user = await _storage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    return new
+                    {
+                        loggedIn = false,
+                    };
+                }
                 
-                Console.WriteLine("returning " + user.State.Id);
-                
-                return user.State;
+                return new
+                {
+                    username = user.Id,
+                    loggedIn = true,
+                    verified = user.Verified,
+                    created = user.Created,
+                    email = user.Email,
+                    firstname = user.Firstname,
+                    lastname = user.Lastname
+                };
             }
         }
     }

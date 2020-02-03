@@ -42,7 +42,11 @@
 
       <app-error-display *ngIf="importErrors" [errors]="importErrors"></app-error-display>
       <div *ngIf="importSuccess" class="alert alert-success" role="alert">
-        Data has been successfully imported!
+        {{importSuccess}}
+      </div>
+
+      <div *ngIf="importProgress" class="alert alert-info" role="alert">
+        {{importProgress}}
       </div>
 
       <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">

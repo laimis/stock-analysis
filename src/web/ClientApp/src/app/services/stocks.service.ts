@@ -135,12 +135,8 @@ export class StocksService {
 
   // ---------- accounts ---------
 
-  getAccountStatus() : Observable<AccountStatus> {
+  getProfile() : Observable<AccountStatus> {
     return this.http.get<AccountStatus>('/api/account/status')
-  }
-
-  getProfile() : Observable<object> {
-    return this.http.get<object>('/api/account')
   }
 
   createAccount(obj:object) : Observable<object> {
@@ -233,5 +229,10 @@ export interface OptionDetail {
 
 export interface AccountStatus {
   username: String
+  email: string
+  firstname: string
+  lastname: string
+  created: string
+  verified: boolean
   loggedIn: boolean
 }

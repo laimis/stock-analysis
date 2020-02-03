@@ -10,10 +10,12 @@ namespace core.Account
         private UserState _state = new UserState();
 
         public override Guid Id => State.Id;
-
         public bool IsPasswordAvailable => State.GetSalt() != null;
-
-        public bool IsConfirmed => State.Confirmed != null;
+        public bool Verified => State.Verified != null;
+        public DateTimeOffset Created => State.Created;
+        public string Email => State.Email;
+        public string Firstname => State.Firstname;
+        public string Lastname => State.Lastname;
 
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
@@ -61,7 +63,7 @@ namespace core.Account
 
         public void Confirm()
         {
-            if (this.State.Confirmed != null)
+            if (this.State.Verified != null)
             {
                 return;
             }

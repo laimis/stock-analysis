@@ -42,7 +42,7 @@ namespace core.Notes
                         "Unable to find user account for notes operation");
                 }
 
-                if (!user.IsConfirmed)
+                if (!user.Verified)
                 {
                     return CommandResponse<Note>.Failed(
                         "Please verify your email first before you can start creating notes");
