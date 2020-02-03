@@ -75,7 +75,7 @@ namespace web.Controllers
         }
 
         [HttpPost("import")]
-        public async Task Import(IFormFile file)
+        public async Task<ActionResult> Import(IFormFile file)
         {
             using var streamReader = new StreamReader(file.OpenReadStream());
 
@@ -85,11 +85,11 @@ namespace web.Controllers
 
             var userId = this.User.Identifier();
 
-            Console.WriteLine("userid: " + userId);
-            
             cmd.WithUserId(userId);
 
-            await _mediator.Send(cmd);
+            var r = await _mediator.Send(cmd);
+
+            return this.OkOrError(r);
         }
     }
 }

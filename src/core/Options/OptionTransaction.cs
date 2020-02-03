@@ -5,7 +5,7 @@ using core.Utils;
 
 namespace core.Options
 {
-    public class OptionTransaction : RequestWithUserId<Guid>
+    public class OptionTransaction : RequestWithUserId<CommandResponse<OwnedOption>>
     {
         [Required]
         public string Ticker { get; set; }

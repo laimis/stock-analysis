@@ -2,13 +2,14 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Account
 {
     public class Authenticate
     {
-        public class Command : IRequest<AuthenticateResult>
+        public class Command : IRequest<CommandResponse<User>>
         {
             [Required]
             public string Email { get; set; }
@@ -22,7 +23,7 @@ namespace core.Account
             }
         }
 
-        public class Handler : IRequestHandler<Command, AuthenticateResult>
+        public class Handler : IRequestHandler<Command, CommandResponse<User>>
         {
             private const string GENERIC_MSG = "Invalid email/password combination";
             private IAccountStorage _storage;
@@ -34,18 +35,18 @@ namespace core.Account
                 _hash = hashProvider;
             }
 
-            public async Task<AuthenticateResult> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<CommandResponse<User>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var user = await this._storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
-                    return AuthenticateResult.Failed(GENERIC_MSG);
+                    return CommandResponse<User>.Failed(GENERIC_MSG);
                 }
 
                 // oauth path where password was not set....
                 if (!user.IsPasswordAvailable)
                 {
-                    return AuthenticateResult.Failed(GENERIC_MSG);
+                    return CommandResponse<User>.Failed(GENERIC_MSG);
                 }
 
                 var computed = _hash.Generate(request.Password, user.State.GetSalt());
@@ -54,10 +55,10 @@ namespace core.Account
 
                 if (matches)
                 {
-                    return AuthenticateResult.Success(user);
+                    return CommandResponse<User>.Success(user);
                 }
 
-                return AuthenticateResult.Failed(GENERIC_MSG);
+                return CommandResponse<User>.Failed(GENERIC_MSG);
             }
         }
     }

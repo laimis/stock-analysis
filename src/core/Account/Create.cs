@@ -2,13 +2,14 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Account
 {
     public class Create
     {
-        public class Command : IRequest<CreateResult>
+        public class Command : IRequest<CommandResponse<User>>
         {
             [Required]
             public string Email { get; set; }
@@ -25,7 +26,7 @@ namespace core.Account
             public string Password { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, CreateResult>
+        public class Handler : IRequestHandler<Command, CommandResponse<User>>
         {
             private IAccountStorage _storage;
             private IPasswordHashProvider _hash;
@@ -36,12 +37,12 @@ namespace core.Account
                 _hash = hash;
             }
 
-            public async Task<CreateResult> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<CommandResponse<User>> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var exists = await this._storage.GetUserByEmail(cmd.Email);
                 if (exists != null)
                 {
-                    return CreateResult.Failed($"Account with {cmd.Email} already exists");
+                    return CommandResponse<User>.Failed($"Account with {cmd.Email} already exists");
                 }
 
                 var u = new User(cmd.Email, cmd.Firstname, cmd.Lastname);
@@ -52,7 +53,7 @@ namespace core.Account
 
                 await _storage.Save(u);
 
-                return CreateResult.Success(u);
+                return CommandResponse<User>.Success(u);
             }
         }
     }

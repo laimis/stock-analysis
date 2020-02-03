@@ -60,14 +60,12 @@ namespace web.Controllers
             var r = await _mediator.Send(cmd);
 
             var error = r.Error;
-            if (error != null)
+            if (error == null)
             {
-                return GenerateBadRequestWithError(error);
+                await EstablishSignedInIdentity(r.Aggregate);
             }
 
-            await EstablishSignedInIdentity(r.User);
-
-            return Ok();
+            return this.OkOrError(r);
         }
 
         private async Task EstablishSignedInIdentity(User user)
@@ -86,13 +84,6 @@ namespace web.Controllers
             var principal = new ClaimsPrincipal(claimsIdentity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        }
-
-        private ActionResult GenerateBadRequestWithError(string error)
-        {
-            var dict = new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary();
-            dict.AddModelError("email", error);
-            return BadRequest(dict);
         }
 
         [HttpGet("login")]
@@ -135,14 +126,12 @@ namespace web.Controllers
             var r = await _mediator.Send(cmd);
 
             var error = r.Error;
-            if (error != null)
+            if (error == null)
             {
-                return GenerateBadRequestWithError(error);
+                await EstablishSignedInIdentity(r.Aggregate);
             }
-
-            await EstablishSignedInIdentity(r.User);
             
-            return Ok();
+            return this.OkOrError(r);
         }
 
         [HttpGet("logout")]
@@ -171,14 +160,12 @@ namespace web.Controllers
             var r = await _mediator.Send(cmd);
 
             var error = r.Error;
-            if (error != null)
+            if (error == null)
             {
-                return GenerateBadRequestWithError(error);
+                await EstablishSignedInIdentity(r.Aggregate);
             }
 
-            await EstablishSignedInIdentity(r.User);
-
-            return Ok();
+            return this.OkOrError(r);
         }
 
         [HttpGet("confirm/{id}")]
@@ -191,10 +178,10 @@ namespace web.Controllers
             var error = r.Error;
             if (error != null)
             {
-                return new ContentResult { Content = error};
+                return this.Error(error);
             }
 
-            await EstablishSignedInIdentity(r.User);
+            await EstablishSignedInIdentity(r.Aggregate);
 
             return Redirect("~/");
         }

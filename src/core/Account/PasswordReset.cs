@@ -3,13 +3,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Emails;
+using core.Shared;
 using MediatR;
 
 namespace core.Account
 {
     public class PasswordReset
     {
-        public class Request : IRequest<PasswordResetResult>
+        public class Request : IRequest<CommandResponse>
         {
             [Required]
             public string Email { get; set; }
@@ -21,7 +22,7 @@ namespace core.Account
             }
         }
 
-        public class Handler : IRequestHandler<Request, PasswordResetResult>
+        public class Handler : IRequestHandler<Request, CommandResponse>
         {
             private IAccountStorage _storage;
             private IEmailService _emailService;
@@ -32,21 +33,21 @@ namespace core.Account
                 _emailService = emailService;
             }
 
-            public async Task<PasswordResetResult> Handle(Request request, CancellationToken cancellationToken)
+            public async Task<CommandResponse> Handle(Request request, CancellationToken cancellationToken)
             {
                 var user = await this._storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
                     // not really success, but we are not going to disclose
                     // if user account exists for a given email
-                    return PasswordResetResult.Success();
+                    return CommandResponse.Success();
                 }
 
                 user.RequestPasswordReset(DateTimeOffset.UtcNow);
 
                 await this._storage.Save(user);
 
-                return PasswordResetResult.Success();
+                return CommandResponse.Success();
             }
         }
     }

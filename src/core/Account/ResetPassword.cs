@@ -2,13 +2,14 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared;
 using MediatR;
 
 namespace core.Account
 {
     public class ResetPassword
     {
-        public class Command : IRequest<ResetPasswordResult>
+        public class Command : IRequest<CommandResponse<User>>
         {
             [Required]
             public Guid? Id { get; set; }
@@ -18,7 +19,7 @@ namespace core.Account
             public string Password { get; set; }
         }
 
-        public class Handler : MediatR.IRequestHandler<Command, ResetPasswordResult>
+        public class Handler : MediatR.IRequestHandler<Command, CommandResponse<User>>
         {
             private IAccountStorage _storage;
             private IPasswordHashProvider _hash;
@@ -29,23 +30,26 @@ namespace core.Account
                 _hash = hash;
             }
 
-            public async Task<ResetPasswordResult> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<CommandResponse<User>> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var r = await _storage.GetUserAssociation(cmd.Id.Value);
                 if (r == null)
                 {
-                    return ResetPasswordResult.Failed("Invalid password reset token. Check the link in the email or request a new password reset");
+                    return CommandResponse<User>.Failed(
+                        "Invalid password reset token. Check the link in the email or request a new password reset");
                 }
 
                 if (r.IsOlderThan(15))
                 {
-                    return ResetPasswordResult.Failed("Password reset link has expired. Please request a new password reset");
+                    return CommandResponse<User>.Failed(
+                        "Password reset link has expired. Please request a new password reset");
                 }
 
                 var u = await _storage.GetUser(r.UserId);
                 if (u == null)
                 {
-                    return ResetPasswordResult.Failed("User account is no longer valid");
+                    return CommandResponse<User>.Failed(
+                        "User account is no longer valid");
                 }
 
                 var hash = _hash.Generate(cmd.Password, 32);
@@ -54,7 +58,7 @@ namespace core.Account
 
                 await _storage.Save(u);
 
-                return ResetPasswordResult.Success(u);
+                return CommandResponse<User>.Success(u);
             }
         }
     }

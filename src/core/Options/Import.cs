@@ -11,7 +11,7 @@ namespace core.Options
 {
     public class Import
     {
-        public class Command : RequestWithUserId
+        public class Command : RequestWithUserId<CommandResponse>
         {
             public Command(string content)
             {
@@ -21,7 +21,7 @@ namespace core.Options
             public string Content { get; }
         }
 
-        public class Handler : IRequestHandler<Command, Unit>
+        public class Handler : IRequestHandler<Command, CommandResponse>
         {
             private IMediator _mediator;
             private ICSVParser _parser;
@@ -32,16 +32,22 @@ namespace core.Options
                 _parser = parser;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
                 var records = _parser.Parse<OptionRecord>(request.Content);
                 foreach(var r in records)
-                    await ProcessLine(r, request.UserId);
+                {
+                    var response = await ProcessLine(r, request.UserId);
+                    if (response.Error != null)
+                    {
+                        return response;
+                    }
+                }
 
-                return new Unit();
+                return CommandResponse.Success();
             }
 
-            private async Task ProcessLine(OptionRecord record, Guid userId)
+            private async Task<CommandResponse> ProcessLine(OptionRecord record, Guid userId)
             {
                 var amount = record.amount;
                 if (amount == 0) amount = 1;
@@ -60,16 +66,21 @@ namespace core.Options
 
                 var r = await _mediator.Send(sell);
 
+                if (r.Error != null)
+                {
+                    return r;
+                }
+
                 if (record.closed != null)
                 {
                     if (record.spent == 0)
                     {
                         var expire = new Expire.Command{
-                            Id = r
+                            Id = r.Aggregate.Id
                         };
                         expire.WithUserId(userId);
 
-                        await _mediator.Send(expire);
+                        return await _mediator.Send(expire);
                     }
                     else
                     {
@@ -85,9 +96,11 @@ namespace core.Options
 
                         buy.WithUserId(userId);
 
-                        await _mediator.Send(buy);
+                        return await _mediator.Send(buy);
                     }
                 }
+
+                return CommandResponse.Success();
             }
 
             private class OptionRecord

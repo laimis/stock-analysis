@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared;
 using MediatR;
 
 namespace core.Options
@@ -13,7 +14,7 @@ namespace core.Options
         {
         }
 
-        public class Handler : IRequestHandler<Command, Guid>
+        public class Handler : IRequestHandler<Command, CommandResponse<OwnedOption>>
         {
             private IPortfolioStorage _storage;
             private IAccountStorage _accountStorage;
@@ -24,18 +25,19 @@ namespace core.Options
                 _accountStorage = accountStorage;
             }
             
-            public async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<CommandResponse<OwnedOption>> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(cmd.UserId);
                 if (user == null)
                 {
-                    return Guid.Empty;
+                    return CommandResponse<OwnedOption>.Failed(
+                        "Unable to find user account for options operation");
                 }
 
-                // TODO: return error
                 if (!user.IsConfirmed)
                 {
-                    return Guid.Empty;
+                    return CommandResponse<OwnedOption>.Failed(
+                        "Please verify your email first before you can start importing");
                 }
 
                 var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
@@ -57,7 +59,7 @@ namespace core.Options
 
                 await this._storage.Save(option, cmd.UserId);
 
-                return option.State.Id;
+                return CommandResponse<OwnedOption>.Success(option);
             }
         }
     }

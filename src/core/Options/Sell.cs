@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared;
 
 namespace core.Options
 {
@@ -12,7 +13,7 @@ namespace core.Options
         {
         }
 
-        public class Handler : HandlerWithStorage<Command, Guid>
+        public class Handler : HandlerWithStorage<Command, CommandResponse<OwnedOption>>
         {
             private IAccountStorage _accounts;
 
@@ -21,18 +22,19 @@ namespace core.Options
                 _accounts = accounts;
             }
 
-            public override async Task<Guid> Handle(Command cmd, CancellationToken cancellationToken)
+            public override async Task<CommandResponse<OwnedOption>> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(cmd.UserId);
                 if (user == null)
                 {
-                    return Guid.Empty;
+                    return CommandResponse<OwnedOption>.Failed(
+                        "Unable to find user account for options operation");
                 }
 
-                // TODO: return error
                 if (!user.IsConfirmed)
                 {
-                    return Guid.Empty;
+                    return CommandResponse<OwnedOption>.Failed(
+                        "Please verify your email first before you can start importing");
                 }
 
                 var options = await _storage.GetOwnedOptions(cmd.UserId);
@@ -55,7 +57,7 @@ namespace core.Options
 
                 await _storage.Save(option, cmd.UserId);
 
-                return option.State.Id;
+                return CommandResponse<OwnedOption>.Success(option);
             }
         }
     }
