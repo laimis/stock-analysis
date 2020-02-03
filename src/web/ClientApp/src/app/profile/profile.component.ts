@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
+import { StocksService, GetErrors } from '../services/stocks.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,7 +11,9 @@ export class ProfileComponent implements OnInit {
 
   profile:object
 
-  importProgress: string = ''
+  importErrors: string[]
+  importSuccess: string
+  importProgress: string
 
   showDelete: boolean = false
 
@@ -38,8 +40,22 @@ export class ProfileComponent implements OnInit {
       .subscribe(s => this.router.navigate(['/landing']))
   }
 
-  markProgress(msg:string) {
+  markError(msg) {
+    this.importErrors = GetErrors(msg)
+    this.importProgress = null
+    this.importSuccess = null
+  }
+
+  markSuccess(msg) {
+    this.importErrors = null
+    this.importProgress = null
+    this.importSuccess = msg
+  }
+
+  markProgress(msg) {
     this.importProgress = msg
+    this.importErrors = null
+    this.importSuccess = null
   }
 
   importShares($event) {
@@ -49,14 +65,9 @@ export class ProfileComponent implements OnInit {
     let formData: FormData = this.getFormData($event);
 
     this.service.importStocks(formData).subscribe(
-      s => {
-        console.log("success uploading " + s)
-        this.markProgress('Shares imported successfully')
-      },
-      e => {
-        console.log("failed: " + e);
-        this.markProgress('Failed to import shares')
-      })
+      _ => this.markSuccess('Shares imported successfully'),
+      e => this.markError(e)
+    )
   }
 
   importOptions($event) {
@@ -66,14 +77,9 @@ export class ProfileComponent implements OnInit {
     let formData: FormData = this.getFormData($event);
 
     this.service.importOptions(formData).subscribe(
-      s => {
-        console.log("success uploading " + s)
-        this.markProgress('Options imported')
-      },
-      e => {
-        console.log("failed: " + e);
-        this.markProgress('Options import failed')
-      })
+      _ => this.markSuccess('Options imported'),
+      e => this.markError(e)
+    )
   }
 
   importNotes($event) {
@@ -83,14 +89,9 @@ export class ProfileComponent implements OnInit {
     let formData: FormData = this.getFormData($event);
 
     this.service.importNotes(formData).subscribe(
-      s => {
-        console.log("success uploading " + s)
-        this.markProgress('Notes imported')
-      },
-      e => {
-        console.log("failed: " + e);
-        this.markProgress('Note import failed')
-      })
+      _ => {this.markSuccess('Notes imported') },
+      e => this.markError(e)
+    )
   }
 
   private getFormData($event: any) {

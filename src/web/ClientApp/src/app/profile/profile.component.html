@@ -39,7 +39,11 @@
   <div class="card mb-3">
     <div class="card-header">Imports</div>
     <div class="card-body">
-      <h6 class="card-subtitle mb-2">{{ importProgress }}</h6>
+
+      <app-error-display *ngIf="importErrors" [errors]="importErrors"></app-error-display>
+      <div *ngIf="importSuccess" class="alert alert-success" role="alert">
+        Data has been successfully imported!
+      </div>
 
       <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
       <button class="btn btn-secondary mr-2 mb-1" (click)="shareInput.click()">Shares</button>

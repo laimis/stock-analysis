@@ -2,6 +2,8 @@ FEATURES
 
 - return errors when user is not confirmed
 - allow to confirm from user profile page
+- special landing page for verify email
+- mark state as private inside aggregates
 
 LONG TERM
 
@@ -24,6 +26,7 @@ MINOR IMPROVEMENTS
 - empty state: 
     clicking from stock detail to notes, loads nothing
 - user delete post processing to wipe out info
+- what happens when you try to record a sell before you had a buy
 
 DESIGN
 - custom bootstrap components for dropdowns, dates

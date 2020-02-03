@@ -9,7 +9,7 @@ namespace core.Notes
 {
     public class Import
     {
-        public class Command : RequestWithUserId
+        public class Command : RequestWithUserId<CommandResponse>
         {
             public Command(string content)
             {
@@ -19,7 +19,7 @@ namespace core.Notes
             public string Content { get; }
         }
 
-        public class Handler : MediatR.IRequestHandler<Command>
+        public class Handler : MediatR.IRequestHandler<Command, CommandResponse>
         {
             private IMediator _mediator;
             private ICSVParser _parser;
@@ -30,7 +30,7 @@ namespace core.Notes
                 _parser = parser;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
                 var records = _parser.Parse<NoteRecord>(request.Content);
 
@@ -44,10 +44,15 @@ namespace core.Notes
 
                     c.WithUserId(request.UserId);
 
-                    await _mediator.Send(c);
+                    var ar = await _mediator.Send(c);
+
+                    if (ar.Error != null)
+                    {
+                        return ar;
+                    }
                 }
 
-                return new Unit();
+                return CommandResponse.Success();
             }
 
             private class NoteRecord

@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared;
 using MediatR;
 
 namespace core.Stocks
@@ -9,7 +10,7 @@ namespace core.Stocks
     {
         public class Command : StockTransaction {}
 
-        public class Handler : HandlerWithStorage<Command, Unit>
+        public class Handler : HandlerWithStorage<Command, CommandResponse>
         {
             private IAccountStorage _accounts;
 
@@ -18,32 +19,33 @@ namespace core.Stocks
                 _accounts = accounts;
             }
 
-            public override async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public override async Task<CommandResponse> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(cmd.UserId);
                 if (user == null)
                 {
-                    return new Unit();
+                    return CommandResponse.Failed(
+                        "Unable to find user account for stock operation");
                 }
 
-                // TODO: return error
                 if (!user.IsConfirmed)
                 {
-                    return new Unit();
+                    return CommandResponse.Failed(
+                        "Please verify your email first before you can start importing");
                 }
 
                 var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
-
                 if (stock == null)
                 {
-                    return new Unit();
+                    return CommandResponse.Failed(
+                        "Failed to find owned option for sell operation");
                 }
 
                 stock.Sell(cmd.NumberOfShares, cmd.Price, cmd.Date.Value);
 
                 await this._storage.Save(stock, cmd.UserId);
 
-                return new Unit();
+                return CommandResponse.Success();
             }
         }
     }

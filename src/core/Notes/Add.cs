@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Shared;
 using MediatR;
 
@@ -9,7 +10,7 @@ namespace core.Notes
 {
     public class Add
     {
-        public class Command : RequestWithUserId<object>
+        public class Command : RequestWithUserId<CommandResponse<Note>>
         {
             [Required]
             public string Note { get; set; }
@@ -19,29 +20,44 @@ namespace core.Notes
             public DateTimeOffset? Created { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, object>
+        public class Handler : IRequestHandler<Command, CommandResponse<Note>>
         {
             private IPortfolioStorage _storage;
+            private IAccountStorage _accounts;
 
-            public Handler(IPortfolioStorage storage)
+            public Handler(
+                IAccountStorage accountStorage,
+                IPortfolioStorage storage)
             {
                 _storage = storage;
+                _accounts = accountStorage;
             }
 
-            public async Task<object> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<CommandResponse<Note>> Handle(Command cmd, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(cmd.UserId);
+                if (user == null)
+                {
+                    return CommandResponse<Note>.Failed(
+                        "Unable to find user account for notes operation");
+                }
+
+                if (!user.IsConfirmed)
+                {
+                    return CommandResponse<Note>.Failed(
+                        "Please verify your email first before you can start creating notes");
+                }
+
                 var note = new Note(
-                    request.UserId,
-                    request.Note,
-                    request.Ticker,
-                    request.PredictedPrice,
-                    request.Created ?? DateTimeOffset.UtcNow);
+                    cmd.UserId,
+                    cmd.Note,
+                    cmd.Ticker,
+                    cmd.PredictedPrice,
+                    cmd.Created ?? DateTimeOffset.UtcNow);
 
-                await _storage.Save(note, request.UserId);
+                await _storage.Save(note, cmd.UserId);
 
-                return new {
-                    id = note.State.Id
-                };
+                return CommandResponse<Note>.Success(note);
             }
         }
     }

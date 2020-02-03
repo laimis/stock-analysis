@@ -9,7 +9,7 @@ namespace core.Stocks
 {
     public class Import
     {
-        public class Command : RequestWithUserId
+        public class Command : RequestWithUserId<CommandResponse>
         {
             public Command(string content)
             {
@@ -19,7 +19,7 @@ namespace core.Stocks
             public string Content { get; }
         }
 
-        public class Handler : IRequestHandler<Command, Unit>
+        public class Handler : IRequestHandler<Command, CommandResponse>
         {
             private IMediator _mediator;
             private ICSVParser _parser;
@@ -30,18 +30,24 @@ namespace core.Stocks
                 _parser = parser;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
                 var records = _parser.Parse<StockRecord>(request.Content);
                 foreach(var r in records)
-                    await ProcessLine(r, request.UserId);
+                {
+                    var res = await ProcessLine(r, request.UserId);
+                    if (res.Error != null)
+                    {
+                        return res;
+                    }
+                }
 
-                return new Unit();
+                return CommandResponse.Success();
             }
 
-            private async Task ProcessLine(StockRecord record, Guid userId)
+            private async Task<CommandResponse> ProcessLine(StockRecord record, Guid userId)
             {
-                object cmd = null;
+                RequestWithUserId<CommandResponse> cmd = null;
                 switch (record.type)
                 {
                     case "buy":
@@ -71,7 +77,7 @@ namespace core.Stocks
                         break;
                 }
 
-                await _mediator.Send(cmd);
+                return await _mediator.Send(cmd);
             }
 
             private class StockRecord

@@ -4,7 +4,7 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public class StockTransaction : RequestWithUserId
+    public class StockTransaction : RequestWithUserId<CommandResponse>
     {
         [Required]
         public string Ticker { get; set; }
