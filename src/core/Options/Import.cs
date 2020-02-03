@@ -34,7 +34,12 @@ namespace core.Options
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var records = _parser.Parse<OptionRecord>(request.Content);
+                var (records, err) = _parser.Parse<OptionRecord>(request.Content);
+                if (err != null)
+                {
+                    return CommandResponse.Failed(err);
+                }
+                
                 foreach(var r in records)
                 {
                     var response = await ProcessLine(r, request.UserId);

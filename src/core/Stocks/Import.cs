@@ -32,7 +32,12 @@ namespace core.Stocks
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var records = _parser.Parse<StockRecord>(request.Content);
+                var (records, err) = _parser.Parse<StockRecord>(request.Content);
+                if (err != null)
+                {
+                    return CommandResponse.Failed(err);
+                }
+                
                 foreach(var r in records)
                 {
                     var res = await ProcessLine(r, request.UserId);

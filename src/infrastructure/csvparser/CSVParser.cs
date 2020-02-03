@@ -9,12 +9,19 @@ namespace csvparser
 {
     public class CSVParser : ICSVParser
     {
-        public IEnumerable<T> Parse<T>(string content)
+        public (IEnumerable<T>, string error) Parse<T>(string content)
         {
-            using (var reader = new StringReader(content))
+            try
             {
-                var csvReader = new CsvReader(reader, CultureInfo.CurrentCulture);
-                return csvReader.GetRecords<T>().ToList();
+                using (var reader = new StringReader(content))
+                {
+                    var csvReader = new CsvReader(reader, CultureInfo.CurrentCulture);
+                    return (csvReader.GetRecords<T>().ToList(), null);
+                }
+            }
+            catch(HeaderValidationException ex)
+            {
+                return (null, "Missing header fields: " + string.Join(",", ex.HeaderNames));
             }
         }
     }

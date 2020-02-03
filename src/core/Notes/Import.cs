@@ -32,7 +32,11 @@ namespace core.Notes
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var records = _parser.Parse<NoteRecord>(request.Content);
+                var (records, err) = _parser.Parse<NoteRecord>(request.Content);
+                if (err != null)
+                {
+                    return CommandResponse.Failed(err);
+                }
 
                 foreach(var r in records)
                 {

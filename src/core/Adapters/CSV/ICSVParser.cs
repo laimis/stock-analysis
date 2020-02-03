@@ -4,6 +4,6 @@ namespace core.Adapters.CSV
 {
     public interface ICSVParser
     {
-         IEnumerable<T> Parse<T>(string content);
+         (IEnumerable<T>, string error) Parse<T>(string content);
     }
 }

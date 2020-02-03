@@ -51,22 +51,33 @@ namespace web.Controllers
         }
 
         [HttpPost("sell")]
-        public async Task<object> Sell(Sell.Command cmd)
+        public Task<object> Sell(Sell.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
 
-            return await _mediator.Send(cmd);
+            return ExecTransaction(cmd);
         }
 
         [HttpPost("buy")]
-        public async Task<object> Buy(Buy.Command cmd)
+        public Task<object> Buy(Buy.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());
-
-            return await _mediator.Send(cmd);
+            
+            return ExecTransaction(cmd);
         }
 
-        
+        private async Task<object> ExecTransaction(OptionTransaction cmd)
+        {
+            var r = await _mediator.Send(cmd);
+
+            if (r.Error != null)
+            {
+                return this.Error(r.Error);
+            }
+
+            return r.Aggregate;
+        }
+
 
         [HttpGet("export")]
         public Task<ActionResult> Export()

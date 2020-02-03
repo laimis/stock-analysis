@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -28,7 +28,8 @@ export class OptionSellComponent implements OnInit {
     private service: StocksService,
     private route: ActivatedRoute,
     private router: Router,
-    private datePipe: DatePipe) { }
+    private datePipe: DatePipe,
+    private location: Location) { }
 
   ngOnInit() {
     var ticker = this.route.snapshot.paramMap.get('ticker');
@@ -73,5 +74,9 @@ export class OptionSellComponent implements OnInit {
 
   navigateToOption(id:string) {
     this.router.navigate(['/optiondetails', id])
+  }
+
+  back() {
+    this.location.back()
   }
 }
