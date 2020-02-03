@@ -1,16 +1,23 @@
 <div class="clearfix mb-2">
+  <span *ngIf="tickerFilter">Showing notes for {{tickerFilter}}, <a [routerLink]="[ '/notes' ]">view all</a></span>
+
   <a class="float-right" *ngIf="!tickerFilter" [routerLink]="[ '/notes', 'add' ]">Add Note</a>
   <a class="float-right" *ngIf="tickerFilter" [routerLink]="[ '/notes', 'add', tickerFilter ]">Add Note</a>
 </div>
 <div *ngIf="notes && notes.length > 0">
-  <div *ngIf="tickerFilter">Showing notes for {{tickerFilter}}, <a [routerLink]="[ '/notes' ]">view all</a></div>
 
   <div class="card mb-3" *ngFor="let note of notes">
     <div class="card-body">
-      <h5 class="card-title">{{note.relatedToTicker}}</h5>
+      <h5 class="card-title">
+        <a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
+      </h5>
       <h6 class="card-subtitle mb-2 text-muted">{{note.created | date}}</h6>
       <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
-      <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
+
+      <div>
+        <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
+        <a class="float-right" [routerLink]="[ '/notes/filtered', note.relatedToTicker ]">view all {{note.relatedToTicker}} notes</a>
+      </div>
     </div>
   </div>
 </div>

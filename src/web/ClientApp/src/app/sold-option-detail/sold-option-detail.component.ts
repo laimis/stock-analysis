@@ -65,7 +65,7 @@ export class SoldOptionDetailComponent implements OnInit {
 
   recordBuy(opt: object) {
     this.service.buyOption(opt).subscribe( r => {
-      this.getOption(r)
+      this.getOption(r.id)
     }, err => {
       this.errors = GetErrors(err)
     })
@@ -73,7 +73,7 @@ export class SoldOptionDetailComponent implements OnInit {
 
   recordSell(opt: object) {
     this.service.sellOption(opt).subscribe( r => {
-      this.getOption(r)
+      this.getOption(r.id)
     }, err => {
       this.errors = GetErrors(err)
     })

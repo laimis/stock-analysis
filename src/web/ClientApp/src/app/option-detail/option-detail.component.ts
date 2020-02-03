@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDetail, OptionDefinition, OptionBreakdown } from '../services/stocks.service';
+import { StocksService, OptionDefinition, OptionBreakdown } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
-import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-option-detail',
@@ -45,8 +44,6 @@ export class OptionDetailComponent implements OnInit {
       this.stockPrice = result.stockPrice
       this.lastUpdated = result.lastUpdated
       this.sideSelection = "put"
-      // this.minStrikePrice = Math.round(this.stockPrice - 2)
-      // this.maxStrikePrice = Math.round(this.stockPrice)
       this.minBid = 0.1
       this.runFilter()
     }, error => {
