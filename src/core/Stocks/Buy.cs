@@ -1,9 +1,7 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
-using MediatR;
 
 namespace core.Stocks
 {
@@ -35,11 +33,11 @@ namespace core.Stocks
                         "Please verify your email first before you can record buy transaction");
                 }
 
-                var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
+                var stock = await this._storage.GetStock(cmd.TickerSymbol, cmd.UserId);
 
                 if (stock == null)
                 {
-                    stock = new OwnedStock(cmd.Ticker, cmd.UserId);
+                    stock = new OwnedStock(cmd.TickerSymbol, cmd.UserId);
                 }
 
                 stock.Purchase(cmd.NumberOfShares, cmd.Price, cmd.Date.Value);

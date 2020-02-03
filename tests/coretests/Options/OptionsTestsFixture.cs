@@ -25,7 +25,7 @@ namespace coretests.Options
             var cmd = CreateSellCommand();
 
             var opt = new OwnedOption(
-                cmd.Ticker,
+                cmd.TickerSymbol,
                 cmd.StrikePrice,
                 (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType),
                 cmd.ExpirationDate.Value,

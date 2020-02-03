@@ -1,14 +1,11 @@
 FEATURES
 
 - all the places ticker is entered, how do we track it
-
 - record note on AMD $49 escape and sell of $47 without getting assigned
 
 LONG TERM
 
 - weekly review email 
-- GDPR
-- terms of use
 - daily movement summary
 - automated stock analysis/reviews -- need more details
 
@@ -57,6 +54,7 @@ LAUNCH CHECKLIST
 - landing page more help
 - welome page more help
 - free/trial/limited
+- GDPR?
 - terms of use (agree checkbox), terms of use itself, privacy policy
 - stocks details
 - search of ticker ... ticker as value object that's validated?

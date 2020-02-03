@@ -34,7 +34,7 @@ namespace core.Stocks
                         "Please verify your email first before you can record sell transaction");
                 }
 
-                var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
+                var stock = await this._storage.GetStock(cmd.TickerSymbol, cmd.UserId);
                 if (stock == null)
                 {
                     return CommandResponse.Failed(

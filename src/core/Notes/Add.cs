@@ -15,7 +15,13 @@ namespace core.Notes
             [Required]
             public string Note { get; set; }
             [Required]
-            public string Ticker { get; set; }
+            public string Ticker {
+                set {
+                    _ticker = new Ticker(value);
+                }
+            }
+            private Ticker _ticker;
+            public Ticker TickerSymbol => _ticker;
             public double? PredictedPrice { get; set; }
             public DateTimeOffset? Created { get; set; }
         }
@@ -51,7 +57,7 @@ namespace core.Notes
                 var note = new Note(
                     cmd.UserId,
                     cmd.Note,
-                    cmd.Ticker,
+                    cmd.TickerSymbol,
                     cmd.PredictedPrice,
                     cmd.Created ?? DateTimeOffset.UtcNow);
 
