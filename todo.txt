@@ -3,6 +3,8 @@ FEATURES
 - allow to confirm from user profile page
 - special landing page for verify email
 - mark state as private inside aggregates
+- admin notices on
+    user created
 
 LONG TERM
 

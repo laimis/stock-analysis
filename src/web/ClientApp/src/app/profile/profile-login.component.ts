@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-profile-login',
@@ -18,8 +19,9 @@ export class ProfileLoginComponent implements OnInit {
   public passwordRequestSuccess : boolean
 
   constructor(
-    private stockService : StocksService,
-    private router: Router) { }
+    private stockService  : StocksService,
+    private router        : Router,
+    private location      : Location) { }
 
   ngOnInit() {}
 
@@ -62,5 +64,9 @@ export class ProfileLoginComponent implements OnInit {
 
   cancelReset() {
     this.resetPasswordRequest = false
+  }
+
+  back() {
+    this.location.back()
   }
 }

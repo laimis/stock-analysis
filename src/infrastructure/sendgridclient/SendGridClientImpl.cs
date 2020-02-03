@@ -9,7 +9,7 @@ namespace sendgridclient
     public class SendGridClientImpl : IEmailService
     {
         private string _key;
-        private const string NO_REPLY = "noreply@graphdrive.com";
+        private const string NO_REPLY = "noreply@nightingaletrading.com";
 
         public SendGridClientImpl(string apiKey)
         {

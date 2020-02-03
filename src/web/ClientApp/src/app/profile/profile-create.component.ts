@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-profile-create',
@@ -17,8 +18,9 @@ export class ProfileCreateComponent implements OnInit {
   public errors     :string[]
 
   constructor(
-    private stockService : StocksService,
-    private router: Router) { }
+    private stockService  : StocksService,
+    private router        : Router,
+    private location      : Location) { }
 
   ngOnInit() {}
 
@@ -38,5 +40,9 @@ export class ProfileCreateComponent implements OnInit {
     }, err => {
       this.errors = GetErrors(err)
     })
+  }
+
+  back() {
+    this.location.back()
   }
 }
