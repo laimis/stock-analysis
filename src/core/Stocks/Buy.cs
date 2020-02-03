@@ -32,7 +32,7 @@ namespace core.Stocks
                 if (!user.IsConfirmed)
                 {
                     return CommandResponse.Failed(
-                        "Please verify your email first before you can start importing");
+                        "Please verify your email first before you can record buy transaction");
                 }
 
                 var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);

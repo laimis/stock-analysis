@@ -39,9 +39,9 @@ namespace web.Controllers
         {
             model.WithUserId(this.User.Identifier());
 
-            await _mediator.Send(model);
+            var r = await _mediator.Send(model);
 
-            return Ok();
+            return this.OkOrError(r);
         }
 
         [HttpPost("purchase")]
@@ -49,9 +49,9 @@ namespace web.Controllers
         {
             model.WithUserId(this.User.Identifier());
 
-            await _mediator.Send(model);
+            var r = await _mediator.Send(model);
 
-            return Ok();
+            return this.OkOrError(r);
         }
 
         [HttpGet("lists")]

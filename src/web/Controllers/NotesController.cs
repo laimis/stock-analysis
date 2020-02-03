@@ -27,7 +27,14 @@ namespace web.Controllers
         {
             input.WithUserId(this.User.Identifier());
 
-            return await _mediator.Send(input);
+            var r = await _mediator.Send(input);
+
+            if (r.Error != null)
+            {
+                return this.Error(r.Error);
+            }
+
+            return r.Aggregate;
         }
 
         [HttpPatch]

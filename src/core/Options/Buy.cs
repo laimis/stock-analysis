@@ -37,7 +37,7 @@ namespace core.Options
                 if (!user.IsConfirmed)
                 {
                     return CommandResponse<OwnedOption>.Failed(
-                        "Please verify your email first before you can start importing");
+                        "Please verify your email first before you can record option transaction");
                 }
 
                 var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);

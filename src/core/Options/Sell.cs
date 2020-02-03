@@ -34,7 +34,7 @@ namespace core.Options
                 if (!user.IsConfirmed)
                 {
                     return CommandResponse<OwnedOption>.Failed(
-                        "Please verify your email first before you can start importing");
+                        "Please verify your email first before you can record option transaction");
                 }
 
                 var options = await _storage.GetOwnedOptions(cmd.UserId);

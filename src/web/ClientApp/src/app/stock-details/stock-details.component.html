@@ -8,9 +8,6 @@
       <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="float-right ml-3" target="_blank">
         <img src="robinhood.png" height="25px" />
       </a>
-      <a [routerLink]="[ '/notes/filtered', ticker ]" class="float-right ml-3">Journal</a>
-      <a [routerLink]="[ '/stocks/transaction', ticker ]" class="float-right ml-3">Record Buy/Sell</a>
-      <a [routerLink]="[ '/options', ticker ]" class="float-right ml-3">Options</a>
     </div>
     <div class="card-body">
 
@@ -20,10 +17,10 @@
         <i>{{profile.description}}</i>
       </div>
 
-      <div class="row mt-3">
-        <div class="col"><div class="stat-label">Country</div><div>{{profile.country}}</div></div>
-        <div class="col"><div class="stat-label">Industry</div><div>{{profile.industry}} / {{profile.sector}}</div></div>
-        <div class="col"><div class="stat-label">Employees</div><div>{{profile.employees}}</div></div>
+      <div class="mt-2">
+        <a [routerLink]="[ '/notes/filtered', ticker ]" class="card-link">Journal</a>
+        <a [routerLink]="[ '/stocks/transaction', ticker ]" class="card-link">Record Buy/Sell</a>
+        <a [routerLink]="[ '/options', ticker ]" class="card-link">Options</a>
       </div>
 
     </div>
@@ -67,6 +64,12 @@
         <div class="col"><div class="stat-label">1-year change</div><div>{{stats.year1ChangePercent | percent}}</div></div>
         <div class="col"><div class="stat-label">3-month change</div><div>{{stats.month3ChangePercent | percent}}</div></div>
         <div class="col"><div class="stat-label">1-month change</div><div>{{stats.month1ChangePercent | percent}}</div></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col"><div class="stat-label">Country</div><div>{{profile.country}}</div></div>
+        <div class="col"><div class="stat-label">Industry</div><div>{{profile.industry}} / {{profile.sector}}</div></div>
+        <div class="col"><div class="stat-label">Employees</div><div>{{profile.employees}}</div></div>
+        <div class="col"></div>
       </div>
     </div>
   </div>
