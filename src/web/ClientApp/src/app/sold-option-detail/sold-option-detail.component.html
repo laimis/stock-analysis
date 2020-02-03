@@ -7,12 +7,15 @@
     <div class="card">
       <div class="card-body">
         <h3 class="card-title">
-          {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
+          <a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a>
+           @ {{option.strikePrice | currency}} {{option.type}}
 
-          <span class="float-right">{{option.numberOfContracts}} contracts</span>
+          <span class="float-right">
+            {{option.numberOfContracts}} contracts
+          </span>
         </h3>
         <h5 class="card-subtitle text-muted">
-          Expiration: {{option.expirationDate | date:"MM/dd/yyyy"}}
+          Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
         </h5>
       </div>
     </div>
@@ -20,7 +23,7 @@
     <div class="card mt-2">
       <div class="card-body">
         <div class="card-title">
-          Record additional trades
+          Record additional trades for {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
         </div>
         <form>
           <div class="form-row">
@@ -50,7 +53,7 @@
 
 
           <button type="submit" class="btn btn-primary mb-1" (click)="record()">Record</button>&nbsp;&nbsp;
-          <button type="submit" class="btn btn-primary mb-1" (click)="back()">Back</button>&nbsp;&nbsp;
+          <button type="submit" class="btn btn-secondary mb-1" (click)="back()">Back</button>&nbsp;&nbsp;
         </form>
       </div>
     </div>

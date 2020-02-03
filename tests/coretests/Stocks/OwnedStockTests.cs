@@ -24,14 +24,11 @@ namespace coretests.Stocks
 
             Assert.Equal(15, stock.State.Owned);
             Assert.Equal(31, stock.State.Spent);
-            Assert.Equal(0, stock.State.Profit);
 
             stock.Sell(5, 20, DateTime.UtcNow);
 
             Assert.Equal(10, stock.State.Owned);
-            Assert.Equal(100, stock.State.Earned);
             Assert.NotNull(stock.State.Sold);
-            Assert.Equal(69, stock.State.Profit);
         }
 
         [Fact]

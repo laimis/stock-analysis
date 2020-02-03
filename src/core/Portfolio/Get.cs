@@ -27,9 +27,6 @@ namespace core.Portfolio
 
                 var owned = stocks.Where(s => s.State.Owned > 0);
 
-                var totalSpent = stocks.Sum(s => s.State.Spent);
-                var totalEarned = stocks.Sum(s => s.State.Earned);
-
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
                 var openOptions = options.Where(o => o.State.NumberOfContracts != 0);

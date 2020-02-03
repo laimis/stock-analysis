@@ -66,7 +66,7 @@ export class OptionSellComponent implements OnInit {
 
   recordSell(opt: object) {
     this.service.sellOption(opt).subscribe( r => {
-      this.navigateToOption(r)
+      this.navigateToOption(r.id)
     }, err => {
       this.errors = GetErrors(err)
     })

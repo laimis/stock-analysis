@@ -1,8 +1,8 @@
 FEATURES
 
-- admin notices on
-    user created
-- verify email click should drop you on "Welcome" with some goodies
+- all the places ticker is entered, how do we track it
+
+- record note on AMD $49 escape and sell of $47 without getting assigned
 
 LONG TERM
 
@@ -26,6 +26,7 @@ MINOR IMPROVEMENTS
     clicking from stock detail to notes, loads nothing
 - user delete post processing to wipe out info
 - what happens when you try to record a sell before you had a buy
+- loading indicator when stock is looked up on the front page, it can take a while
 
 DESIGN
 - custom bootstrap components for dropdowns, dates
@@ -52,7 +53,11 @@ INFRA
 
 LAUNCH CHECKLIST
 
-- account management
+- template review
+- landing page more help
+- welome page more help
+- free/trial/limited
+- terms of use (agree checkbox), terms of use itself, privacy policy
 - stocks details
 - search of ticker ... ticker as value object that's validated?
 - domain

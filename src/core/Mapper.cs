@@ -151,8 +151,6 @@ namespace core
             {
                 ticker = o.State.Ticker,
                 owned = o.State.Owned,
-                spent = Math.Round(o.State.Spent, 2),
-                earned = Math.Round(o.State.Earned, 2)
             };
         }
     }

@@ -76,7 +76,7 @@ namespace core.Portfolio
                     entries.Add(new ReviewEntry
                     {
                         Ticker = s.State.Ticker,
-                        Description = $"{s.State.Owned} shares owned, cost of ${s.State.Cost}",
+                        Description = $"{s.State.Owned} shares owned",
                     });
                 }
 

@@ -27,11 +27,11 @@
     <a class="float-right ml-3" [routerLink]="[ '/options/sell']">Record Options Sale</a>
     <a class="float-right" [routerLink]="[ '/stocks/transaction']">Record Stock Transaction</a>
   </div>
-  <div *ngIf="openOptions.length > 0">
-    <h2>Options</h2>
+  <div *ngIf="openOptions.length > 0 || owned.length > 0">
+    <h2>Ownership</h2>
     <div class="row" *ngFor="let option of openOptions">
       <div class="col">
-        {{option.numberOfContracts}} x
+        {{option.numberOfContracts}} <i>option contracts</i> for
         <b>{{option.ticker}}</b> @ <b>{{option.strikePrice | currency}}</b>
         {{option.type}} expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
       </div>
@@ -39,29 +39,10 @@
         <a [routerLink]="[ '/optiondetails', option.id ]">view</a>
       </div>
     </div>
-  </div>
-
-  <br />
-  <div *ngIf="owned.length > 0">
-    <h2>Stocks</h2>
-    <table class="table border">
-      <thead class="thead-light">
-        <tr>
-          <th>Ticker</th>
-          <th>Owned</th>
-          <th>Spent</th>
-          <th>Earned</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let ticker of owned">
-          <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
-          <td>{{ticker.owned}}</td>
-          <td>{{ticker.spent}}</td>
-          <td>{{ticker.earned}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="row" *ngFor="let ticker of owned">
+      <div class="col">{{ticker.owned}} <i>shares</i> of <a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></div>
+      <div class="col"></div>
+    </div>
   </div>
 
 </div>
