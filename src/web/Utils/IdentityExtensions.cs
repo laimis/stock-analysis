@@ -8,7 +8,7 @@ namespace web.Utils
         public const string ID_CLAIM_NAME = "userid";
         
         public static Guid Identifier(this System.Security.Claims.ClaimsPrincipal p)
-            => new Guid(GetClaimValue(p, ID_CLAIM_NAME));
+            => new Guid(GetClaimValue(p, ID_CLAIM_NAME) ?? Guid.Empty.ToString());
 
         public static string Email(this System.Security.Claims.ClaimsPrincipal p) 
             => GetClaimValue(p, ClaimTypes.Email);

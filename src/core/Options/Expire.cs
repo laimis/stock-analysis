@@ -30,7 +30,8 @@ namespace core.Options
                 var option = await _storage.GetOwnedOption(cmd.Id.Value, cmd.UserId);
                 if (option == null)
                 {
-                    throw new InvalidOperationException("Trying to expore not owned option");
+                    Console.WriteLine("Option id: " + cmd.Id.Value + ", user: " + cmd.UserId);
+                    throw new InvalidOperationException("Trying to expire not owned option");
                 }
 
                 option.Expire();

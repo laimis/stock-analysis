@@ -83,7 +83,11 @@ namespace web.Controllers
 
             var cmd = new Import.Command(content);
 
-            cmd.WithUserId(this.User.Identifier());
+            var userId = this.User.Identifier();
+
+            Console.WriteLine("userid: " + userId);
+            
+            cmd.WithUserId(userId);
 
             await _mediator.Send(cmd);
         }

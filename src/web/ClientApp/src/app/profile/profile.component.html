@@ -1,4 +1,4 @@
-<div class="container">
+<div>
 
   <div class="card mb-3" *ngIf="profile">
     <div class="card-header">
@@ -6,10 +6,22 @@
       <span class="text-muted float-right">Member since {{profile.created | date}}</span>
     </div>
     <div class="card-body">
-      <h5 class="card-title">{{profile.firstname}} {{profile.lastname}}</h5>
-      <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
-
-      <button class="btn btn-danger float-right" (click)="deleteInitial()">delete account</button>
+      <div class="row">
+        <div class="col">
+          <div class="card-title">{{profile.firstname}} {{profile.lastname}}</div>
+        </div>
+        <div class="col text-right">
+          <span class="text-muted">{{profile.email}}</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col mb-1">
+          <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
+        </div>
+        <div class="col text-right">
+          <button class="btn btn-danger" (click)="deleteInitial()">delete account</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -29,20 +41,14 @@
     <div class="card-body">
       <h6 class="card-subtitle mb-2">{{ importProgress }}</h6>
 
-      <label class="card-link">
-          <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
-          <button class="btn btn-secondary mr-1" (click)="shareInput.click()">Shares</button>
-      </label>
+      <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
+      <button class="btn btn-secondary mr-2 mb-1" (click)="shareInput.click()">Shares</button>
 
-      <label class="card-link">
-          <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
-          <button class="btn btn-secondary mr-1 card-link" (click)="optionInput.click()">Options</button>
-      </label>
+      <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
+      <button class="btn btn-secondary mr-2 mb-1" (click)="optionInput.click()">Options</button>
 
-      <label class="card-link">
-          <input hidden (change)="importNotes($event)"  #noteInput type="file" id="file">
-          <button class="btn btn-secondary mr-1 card-link" (click)="noteInput.click()">Notes</button>
-      </label>
+      <input hidden (change)="importNotes($event)"  #noteInput type="file" id="file">
+      <button class="btn btn-secondary mr-2 mb-1" (click)="noteInput.click()">Notes</button>
 
     </div>
   </div>
@@ -50,9 +56,9 @@
   <div class="card mb-3">
     <div class="card-header">Exports</div>
     <div class="card-body">
-      <a href="/api/options/export" class="btn btn-secondary mr-1 card-link">Options</a>
-      <a href="/api/stocks/export" class="btn btn-secondary mr-1 card-link">Stocks</a>
-      <a href="/api/notes/export" class="btn btn-secondary mr-1 card-link">Notes</a>
+      <a href="/api/options/export" class="btn btn-secondary mr-2 mb-1">Options</a>
+      <a href="/api/stocks/export" class="btn btn-secondary mr-2 mb-1">Stocks</a>
+      <a href="/api/notes/export" class="btn btn-secondary mr-2 mb-1">Notes</a>
     </div>
   </div>
 
