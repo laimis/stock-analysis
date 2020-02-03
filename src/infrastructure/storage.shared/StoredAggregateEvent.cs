@@ -22,11 +22,6 @@ namespace storage.shared
 
             set
             {
-                value = value.Replace("laimonas", "laimis@gmail.com");
-                value = value.Replace("core.Portfolio.Stock", "core.Stocks.Stock");
-                value = value.Replace("core.Portfolio.TickerObtained", "core.Stocks.TickerObtained");
-                value = value.Replace("core.Portfolio.Option", "core.Options.Option");
-                
                 this.Event = JsonConvert.DeserializeObject<AggregateEvent>(value, _formatting);
             }
         }

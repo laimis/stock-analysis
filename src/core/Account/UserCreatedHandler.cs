@@ -24,6 +24,22 @@ namespace core.Account
                 return;
             }
 
+            await SendConfirmAccountEmail(e, u);
+
+            await SendNewUserSignedUpEmail(u);
+        }
+
+        private async Task SendNewUserSignedUpEmail(User u)
+        {
+            await _email.Send(
+                EmailSettings.Admin,
+                EmailSettings.TemplateAdminNewUser,
+                new { email = u.Email }
+            );
+        }
+
+        private async Task SendConfirmAccountEmail(UserCreated e, User u)
+        {
             var request = new ProcessIdToUserAssociation(e.AggregateId, e.When);
 
             await _storage.SaveUserAssociation(request);
@@ -33,7 +49,7 @@ namespace core.Account
             await _email.Send(
                 u.State.Email,
                 EmailSettings.TemplateConfirmAccount,
-                new {confirmurl}
+                new { confirmurl }
             );
         }
     }

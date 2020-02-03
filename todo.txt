@@ -1,10 +1,8 @@
 FEATURES
 
-- allow to confirm from user profile page
-- special landing page for verify email
-- mark state as private inside aggregates
 - admin notices on
     user created
+- verify email click should drop you on "Welcome" with some goodies
 
 LONG TERM
 
