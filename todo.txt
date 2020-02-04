@@ -36,8 +36,6 @@ INFRA
 
 LAUNCH CHECKLIST
 
-- landing page more help
-- welome page more help
 - contact us section
 - working email
 - free/trial/limited
