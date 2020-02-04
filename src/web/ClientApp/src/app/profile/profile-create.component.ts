@@ -14,6 +14,7 @@ export class ProfileCreateComponent implements OnInit {
   public lastname   :string
   public email      :string
   public password   :string
+  public terms      :boolean
 
   public errors     :string[]
 
@@ -32,7 +33,8 @@ export class ProfileCreateComponent implements OnInit {
       firstname: this.firstname,
       lastname: this.lastname,
       email: this.email,
-      password: this.password
+      password: this.password,
+      terms: this.terms
     }
 
     this.stockService.createAccount(obj).subscribe(r => {

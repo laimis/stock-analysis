@@ -36,14 +36,7 @@ INFRA
 
 LAUNCH CHECKLIST
 
-- contact us section
 - working email
 - free/trial/limited
-- GDPR?
 - terms of use (agree checkbox), terms of use itself, privacy policy
-- stocks details
-- search of ticker ... ticker as value object that's validated?
-- domain
-- footer with address, name, contacts
-
 - template review

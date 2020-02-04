@@ -24,6 +24,10 @@ namespace core.Account
             [MinLength(12)]
             [MaxLength(1000)]
             public string Password { get; set; }
+
+            [Required]
+            [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree to Terms & Conditions")]
+            public bool Terms { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, CommandResponse<User>>

@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Emails;
@@ -44,7 +43,7 @@ namespace core.Account
 
                 await _emails.Send(
                     EmailSettings.Admin,
-                    EmailSettings.TemplateUserDeleted,
+                    EmailSettings.TemplateAdminUserDeleted,
                     new {feedback = cmd.Feedback, email = user.State.Email});
 
                 await _storage.Delete(user);

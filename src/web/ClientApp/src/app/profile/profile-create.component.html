@@ -25,6 +25,12 @@
         <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
       </div>
     </div>
+    <div class="form-row">
+      <div class="col">
+        <input type="checkbox" class="mt-2" id="terms" name="terms" [(ngModel)]="terms" />
+        <label for="terms">&nbsp; Agree to Terms & Conditions</label>
+      </div>
+    </div>
     <div class="form-row mt-2">
       <div class="col">
         <button class="btn btn-primary mr-2" (click)="create()">Create</button>

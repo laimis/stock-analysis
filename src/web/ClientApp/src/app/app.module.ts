@@ -29,12 +29,14 @@ import { StockTransactionComponent } from './stock-transaction/stock-transaction
 import { TransactionsComponent } from './transactions/transactions.component';
 import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
 import { ProfileVerifyComponent } from './profile/profile-verify.component';
+import { ContactComponent } from './contact/contact.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
-  { path: 'landing', component: LandingComponent },
+  { path: 'contact', component: ContactComponent, canActivate: [AuthGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
+  { path: 'landing', component: LandingComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
   { path: 'profile/create', component: ProfileCreateComponent },
   { path: 'profile/login', component: ProfileLoginComponent },
@@ -60,6 +62,7 @@ var routes = [
   declarations: [
     AddNoteComponent,
     AppComponent,
+    ContactComponent,
     DashboardComponent,
     ErrorDisplayComponent,
     EventsComponent,

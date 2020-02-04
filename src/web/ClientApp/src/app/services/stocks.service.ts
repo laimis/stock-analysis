@@ -159,6 +159,9 @@ export class StocksService {
     return this.http.post<object>('/api/account/resetpassword', obj)
   }
 
+  sendMessage(obj: { email: string; message: string; }) {
+    return this.http.post<object>('/api/account/contact', obj)
+  }
 
 }
 

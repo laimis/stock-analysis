@@ -115,6 +115,14 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
+        [HttpPost("contact")]
+        public async Task<ActionResult> Contact(Contact.Command cmd)
+        {
+            var r = await _mediator.Send(cmd);
+
+            return Ok();
+        }
+
         [HttpGet("logout")]
         public async Task<ActionResult> LogoutAsync()
         {
