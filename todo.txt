@@ -36,7 +36,6 @@ INFRA
 
 LAUNCH CHECKLIST
 
-- working email
+- terms of use, privacy policy
 - free/trial/limited
-- terms of use (agree checkbox), terms of use itself, privacy policy
 - template review

@@ -33,7 +33,7 @@ import { ContactComponent } from './contact/contact.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
-  { path: 'contact', component: ContactComponent, canActivate: [AuthGuard] },
+  { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
   { path: 'landing', component: LandingComponent },
