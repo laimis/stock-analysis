@@ -5,17 +5,14 @@
   }
 }
 
-body {
-  margin:0; /*gets rid of white space around body*/
-  position:relative; /*REQUIRED Sets up positioning for your footer*/
+
+#bodyContainer {
+  min-height: 600px;
 }
 
 #sticky {
   width:100%;
-  height:64px;
+  height: 100px;
   color:white;
   text-align:center;
-  position:fixed;    /*Here's what sticks it*/
-  bottom:0;          /*to the bottom of the window*/
-  left:0;            /*and to the left of the window.*/
 }
