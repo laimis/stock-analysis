@@ -38,8 +38,9 @@
     </a>
   </div>
 
+  <h3 class="mt-4">Ownership</h3>
+
   <div *ngIf="openOptions.length > 0 || owned.length > 0">
-    <h2>Ownership</h2>
     <div *ngFor="let option of openOptions" class="mb-1">
       <a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a> @ <b>{{option.strikePrice | currency}}</b>
       {{option.type}} expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
