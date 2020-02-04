@@ -37,7 +37,7 @@ export class AddNoteComponent implements OnInit {
     }
 
     this.stockService.addNote(obj).subscribe(
-      r => this.router.navigate(['/notes', r.id]),
+      _ => this.router.navigate(['/notes/filtered', this.ticker]),
       err => this.errors = GetErrors(err)
     )
   }

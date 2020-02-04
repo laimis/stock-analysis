@@ -1,6 +1,10 @@
-FEATURES
+- sendgrid unsubscribe empty
+- searching indicator for stock look up
+- selected indicator for stock look up after search pick up
+- custom bootstrap components for dropdowns, dates
+- review option details and the flow of stock -> option detail and how to go back to stock or enter notes
 
-- 
+FEATURES
 
 MINOR IMPROVEMENTS
 
@@ -11,9 +15,6 @@ MINOR IMPROVEMENTS
 - loading indicator when stock is looked up on the front page, it can take a while
 
 DESIGN
-- custom bootstrap components for dropdowns, dates
-- market cap/gross profit, should all be rounded
-- fundamentals section should be a card layout
 - share buy/sell is a disaster from UX/usability/flow standpoint
 
 BUGS

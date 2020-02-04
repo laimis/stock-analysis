@@ -18,9 +18,15 @@
       </div>
 
       <div class="mt-2">
-        <a [routerLink]="[ '/notes/filtered', ticker ]" class="card-link">Journal</a>
-        <a [routerLink]="[ '/stocks/transaction', ticker ]" class="card-link">Record Buy/Sell</a>
-        <a [routerLink]="[ '/options', ticker ]" class="card-link">Options</a>
+        <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/stocks/transaction', ticker]">
+          <i class="fas fa-dollar-sign"></i> Shares
+        </a>
+        <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/options', ticker]">
+          <i class="fas fa-credit-card"></i> Option Details
+        </a>
+        <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/notes' ]" aria-label="notes">
+          <i class="fas fa-feather"></i> Journal
+        </a>
       </div>
 
     </div>
