@@ -17,21 +17,8 @@
         <div class="col mb-1">
           <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
         </div>
-        <div class="col text-right">
-          <button class="btn btn-danger" (click)="deleteInitial()">delete account</button>
-        </div>
+        <div class="col text-right"></div>
       </div>
-    </div>
-  </div>
-
-  <div class="card mb-3" *ngIf="showDelete">
-    <div class="card-body">
-      <form>
-        <label for="reason">Any feedback you would like to pass along?</label>
-        <textarea class="form-control mb-2" autofocus [(ngModel)]="deleteFeedback"></textarea>
-        <button class="btn btn-danger mr-2" (click)="deleteFinal()">confirm delete</button>
-        <button class="btn btn-primary" (click)="undoDelete()">nevermind</button>
-      </form>
     </div>
   </div>
 
@@ -68,5 +55,23 @@
       <a href="/api/notes/export" class="btn btn-secondary mr-2 mb-1">Notes</a>
     </div>
   </div>
+
+  <div class="card mb-5">
+    <div class="card-header">Close Account</div>
+    <div class="card-body">
+      <button class="btn btn-danger" (click)="deleteInitial()">delete account</button>
+
+      <div *ngIf="showDelete" class="mt-1">
+        <form>
+          <label for="reason">Any feedback you would like to pass along?</label>
+          <textarea class="form-control mb-2" name="deleteFeedback" id="deleteFeedback" autofocus [(ngModel)]="deleteFeedback"></textarea>
+          <button class="btn btn-danger mr-2" (click)="deleteFinal()">confirm delete</button>
+          <button class="btn btn-primary" (click)="undoDelete()">nevermind</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="w50"></div>
 
 </div>
