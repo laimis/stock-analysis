@@ -23,10 +23,21 @@
 
 <div *ngIf="loaded">
 
-  <div class="clearfix mb-2">
-    <a class="float-right ml-3" [routerLink]="[ '/options/sell']">Record Options Sale</a>
-    <a class="float-right" [routerLink]="[ '/stocks/transaction']">Record Stock Transaction</a>
+  <div>
+    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/stocks/transaction']">
+      <i class="fas fa-dollar-sign"></i> Shares
+    </a>
+    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/options/sell']">
+      <i class="fas fa-credit-card"></i> Options
+    </a>
+    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/transactions' ]" aria-label="stock lists">
+      <i class="fas fa-sync"></i> Transactions
+    </a>
+    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/notes' ]" aria-label="notes">
+      <i class="fas fa-feather"></i> Journal
+    </a>
   </div>
+
   <div *ngIf="openOptions.length > 0 || owned.length > 0">
     <h2>Ownership</h2>
     <div *ngFor="let option of openOptions" class="mb-1">

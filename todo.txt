@@ -1,6 +1,6 @@
 FEATURES
 
-- record note on AMD $49 escape and sell of $47 without getting assigned
+- 
 
 MINOR IMPROVEMENTS
 

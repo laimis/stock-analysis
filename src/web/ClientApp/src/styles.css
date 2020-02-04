@@ -6,3 +6,8 @@ a {
 .wide-chart {
 	width: 100%;
 }
+
+.btn-primary {
+  background-color: darkcyan;
+  border-color: darkcyan;
+}

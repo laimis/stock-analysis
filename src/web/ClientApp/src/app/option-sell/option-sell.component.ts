@@ -39,6 +39,7 @@ export class OptionSellComponent implements OnInit {
 
     this.filled = Date()
     this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
+    this.positionType = 'buy'
   }
 
   record() {
