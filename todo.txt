@@ -39,6 +39,8 @@ LAUNCH CHECKLIST
 - template review
 - landing page more help
 - welome page more help
+- contact us section
+- working email
 - free/trial/limited
 - GDPR?
 - terms of use (agree checkbox), terms of use itself, privacy policy
