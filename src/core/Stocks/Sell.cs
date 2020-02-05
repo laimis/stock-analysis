@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
-using MediatR;
 
 namespace core.Stocks
 {
@@ -34,11 +33,11 @@ namespace core.Stocks
                         "Please verify your email first before you can record sell transaction");
                 }
 
-                var stock = await this._storage.GetStock(cmd.TickerSymbol, cmd.UserId);
+                var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
                 if (stock == null)
                 {
                     return CommandResponse.Failed(
-                        "Failed to find owned option for sell operation");
+                        $"You don't have shares of {cmd.Ticker.ToString()} to sell, record buy transaction first");
                 }
 
                 stock.Sell(cmd.NumberOfShares, cmd.Price, cmd.Date.Value);

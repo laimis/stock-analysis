@@ -7,15 +7,12 @@ namespace core.Stocks
     public class StockTransaction : RequestWithUserId<CommandResponse>
     {
         private Ticker _ticker;
-
         [Required]
-        public string Ticker {
-            set {
-                _ticker = new Ticker(value);
-            }
+        public string Ticker 
+        {
+            get { return _ticker;}
+            set { _ticker = new Ticker(value); }
         }
-
-        public Ticker TickerSymbol => _ticker;
         
         [Range(1, 10000)]
         public int NumberOfShares { get; set; }
