@@ -43,12 +43,12 @@ namespace core.Options
                 var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
                 
                 var options = await _storage.GetOwnedOptions(cmd.UserId);
-                var option = options.SingleOrDefault(o => o.IsMatch(cmd.TickerSymbol, cmd.StrikePrice, optionType, cmd.ExpirationDate.Value));
+                var option = options.SingleOrDefault(o => o.IsMatch(cmd.Ticker, cmd.StrikePrice, optionType, cmd.ExpirationDate.Value));
 
                 if (option == null)
                 {
                     option = new OwnedOption(
-                        cmd.TickerSymbol,
+                        cmd.Ticker,
                         cmd.StrikePrice,
                         optionType,
                         cmd.ExpirationDate.Value,

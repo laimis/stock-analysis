@@ -41,11 +41,11 @@ namespace core.Options
 
                 var type = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
 
-                var option = options.SingleOrDefault(o => o.IsMatch(cmd.TickerSymbol, cmd.StrikePrice, type, cmd.ExpirationDate.Value));
+                var option = options.SingleOrDefault(o => o.IsMatch(cmd.Ticker, cmd.StrikePrice, type, cmd.ExpirationDate.Value));
                 if (option == null)
                 {
                     option = new OwnedOption(
-                        cmd.TickerSymbol,
+                        cmd.Ticker,
                         cmd.StrikePrice,
                         type,
                         cmd.ExpirationDate.Value,

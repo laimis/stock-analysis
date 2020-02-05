@@ -1,3 +1,11 @@
+LAUNCH CHECKLIST
+
+- free/trial/limited
+- template review
+- contact@nightingaletrading.com
+- privacy@nightingaletrading.com
+
+
 https://github.com/mailgun/transactional-email-templates
 - sendgrid unsubscribe empty
 - custom bootstrap components for dropdowns, dates
@@ -28,9 +36,3 @@ INFRA
 - export as excel sheet
 - k8s for managing container switches
 - nullability in the project
-
-LAUNCH CHECKLIST
-
-- terms of use, privacy policy
-- free/trial/limited
-- template review

@@ -30,6 +30,8 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
 import { ProfileVerifyComponent } from './profile/profile-verify.component';
 import { ContactComponent } from './contact/contact.component';
+import { TermsComponent } from './terms/terms.component';
+import { PrivacyComponent } from './privacy/privacy.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -52,11 +54,13 @@ var routes = [
   { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
   { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
   { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
+  { path: 'privacy', component: PrivacyComponent},
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/transaction', component: StockTransactionComponent, canActivate: [AuthGuard] },
   { path: 'stocks/transaction/:ticker', component: StockTransactionComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
+  { path: 'terms', component: TermsComponent},
 ]
 
 @NgModule({
@@ -73,6 +77,7 @@ var routes = [
     NotesComponent,
     OptionDetailComponent,
     OptionSellComponent,
+    PrivacyComponent,
     ProfileComponent,
     ProfileCreateComponent,
     ProfileLoginComponent,
@@ -84,7 +89,8 @@ var routes = [
     StockListComponent,
     StockListsComponent,
     StockTransactionComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    TermsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

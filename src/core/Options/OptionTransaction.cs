@@ -7,15 +7,13 @@ namespace core.Options
 {
     public class OptionTransaction : RequestWithUserId<CommandResponse<OwnedOption>>
     {
-        [Required]
-        public string Ticker {
-            set {
-                _ticker = new Ticker(value);
-            }
-        }
-
         private Ticker _ticker;
-        public Ticker TickerSymbol => _ticker;
+        [Required]
+        public string Ticker 
+        {
+            get { return _ticker;}
+            set { _ticker = new Ticker(value); }
+        }
 
         [Range(1, 10000)]
         public double StrikePrice { get; set; }
