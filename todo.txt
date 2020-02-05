@@ -1,32 +1,20 @@
 LAUNCH CHECKLIST
 
 - free/trial/limited
-- template review
-- contact@nightingaletrading.com
-- privacy@nightingaletrading.com
-
-
-https://github.com/mailgun/transactional-email-templates
-- sendgrid unsubscribe empty
-- custom bootstrap components for dropdowns, dates
 
 FEATURES
 
-MINOR IMPROVEMENTS
-
-- what happens when you try to record a sell before you had a buy
-- loading indicator when stock is looked up on the front page, it can take a while
+Enrich note with stock information after it is recorded
+Admin panel for password reset failures, password reset requests, new accounts, deleted acounts
+User association tracking
+Logging interface
+New Export format
 
 DESIGN
-- share buy/sell is a disaster from UX/usability/flow standpoint
+- custom bootstrap components for dropdowns, dates
 
 BUGS
-- redis keys are nonsensical
 - option dates seem to be off, it should not be a single date
-- int for money amounts
-- review how we track partial share sales
-- how to correct this whole "key" vs "ticker" on events..
-- export of options, amount sometimes is zero
 
 INFRA
 - badges for builds/coverage
@@ -36,3 +24,5 @@ INFRA
 - export as excel sheet
 - k8s for managing container switches
 - nullability in the project
+
+https://github.com/mailgun/transactional-email-templates
