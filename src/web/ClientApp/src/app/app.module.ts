@@ -48,6 +48,7 @@ var routes = [
   { path: 'notes/filtered/:ticker', component: NotesComponent, canActivate: [AuthGuard]},
   { path: 'notes/:id', component: NoteComponent, canActivate: [AuthGuard]},
   { path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard] },
+  { path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
   { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
   { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
