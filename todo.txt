@@ -1,18 +1,15 @@
 - take note right inside the stocks page so that I don't have to wonder around?
 
 FEATURES
-- twitter account, in the footer as well
-- export as excel sheet
-- import as excel sheet
+review reminders or daily/weekly report
 
-DESIGN
-- custom bootstrap components for dropdowns, dates
+MINOR
+migrate email settings to appsettings
+export excel
+import excel
 
 INFRA
 - practice use of polly
-- terraform or pulumi for infrastructure
-- check into https://www.nuget.org/packages/Respawn/
-- k8s for managing container switches
 - nullability in the project
 
 "v=spf1 include:amazonses.com ~all"
