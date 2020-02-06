@@ -1,14 +1,11 @@
-LAUNCH CHECKLIST
+New Export format
 
-- free/trial/limited
 
 FEATURES
 
 Enrich note with stock information after it is recorded
 Admin panel for password reset failures, password reset requests, new accounts, deleted acounts
 User association tracking
-Logging interface
-New Export format
 
 DESIGN
 - custom bootstrap components for dropdowns, dates
@@ -26,3 +23,12 @@ INFRA
 - nullability in the project
 
 https://github.com/mailgun/transactional-email-templates
+
+List down 
+
+top 10 important people in your life 
+top ten things you want to do
+top 10 people you hate
+top 10 things you hate doing
+
+The following emerged as my priorities

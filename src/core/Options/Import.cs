@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.CSV;
@@ -25,11 +26,13 @@ namespace core.Options
         {
             private IMediator _mediator;
             private ICSVParser _parser;
-            
-            public Handler(IMediator mediator, ICSVParser parser)
+            private IPortfolioStorage _storage;
+
+            public Handler(IMediator mediator, ICSVParser parser, IPortfolioStorage storage)
             {
                 _mediator = mediator;
                 _parser = parser;
+                _storage = storage;
             }
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
@@ -54,54 +57,64 @@ namespace core.Options
 
             private async Task<CommandResponse> ProcessLine(OptionRecord record, Guid userId)
             {
-                var amount = record.amount;
-                if (amount == 0) amount = 1;
+                RequestWithUserIdBase cmd = null;
 
-                var sell = new Sell.Command {
-                    ExpirationDate = record.expiration,
-                    Filled = record.filled,
-                    NumberOfContracts = amount,
-                    OptionType = record.type,
-                    Premium = record.premium,
-                    StrikePrice = record.strike,
-                    Ticker = record.ticker,
-                };
-
-                sell.WithUserId(userId);
-
-                var r = await _mediator.Send(sell);
-
-                if (r.Error != null)
+                if (record.type == "sell")
                 {
-                    return r;
+                    cmd = new Sell.Command();
+                }
+                else if (record.type == "buy")
+                {
+                    cmd = new Buy.Command();
+                }
+                else if (record.type == "expired")
+                {
+                    cmd = new Expire.Command();
                 }
 
-                if (record.closed != null)
+                if (cmd is OptionTransaction ot)
                 {
-                    if (record.spent == 0)
-                    {
-                        var expire = new Expire.Command{
-                            Id = r.Aggregate.Id
-                        };
-                        expire.WithUserId(userId);
+                    ot.ExpirationDate = record.expiration;
+                    ot.Filled = record.filled;
+                    ot.NumberOfContracts = record.amount;
+                    ot.OptionType = record.optiontype;
+                    ot.Premium = record.premium;
+                    ot.StrikePrice = record.strike;
+                    ot.Ticker = record.ticker;
+                    ot.WithUserId(userId);
 
-                        return await _mediator.Send(expire);
+                    var r = await _mediator.Send(ot);
+                    if (r.Error != null)
+                    {
+                        return r;
                     }
-                    else
+                }
+
+                if (cmd is Expire.Command ec)
+                {
+                    var opts = await _storage.GetOwnedOptions(userId);
+
+                    var optType = (OptionType)Enum.Parse(typeof(OptionType), record.optiontype);
+
+                    var opt = opts.SingleOrDefault(o => 
+                        o.IsMatch(record.ticker, record.strike, optType, record.expiration.Value)
+                    );
+
+                    if (opt == null)
                     {
-                        var buy = new Buy.Command{
-                            ExpirationDate = record.expiration,
-                            Filled = record.closed,
-                            NumberOfContracts = amount,
-                            OptionType = record.type,
-                            Premium = record.spent.Value,
-                            StrikePrice = record.strike,
-                            Ticker = record.ticker,
-                        };
+                        return CommandResponse.Failed(
+                            $"Unable to find option to expire for {record.ticker} {record.strike} {record.optiontype} {record.expiration}"
+                        );
+                    }
 
-                        buy.WithUserId(userId);
+                    ec.Id = opt.Id;
+                    ec.WithUserId(userId);
 
-                        return await _mediator.Send(buy);
+                    var er = await _mediator.Send(ec);
+
+                    if (er.Error != null)
+                    {
+                        return er;
                     }
                 }
 
@@ -110,15 +123,14 @@ namespace core.Options
 
             private class OptionRecord
             {
-                public DateTimeOffset? closed { get; set; }
-                public DateTimeOffset? expiration { get; set; }
-                public DateTimeOffset? filled { get; set; }
-                public int amount { get; set; }
-                public string type { get; set; }
-                public double premium { get; set; }
-                public double strike { get; set; }
                 public string ticker { get; set; }
-                public double? spent { get; set; }
+                public string type { get; set; }
+                public double strike { get; set; }
+                public string optiontype { get; set; }
+                public DateTimeOffset? expiration { get; set; }
+                public int amount { get; set; }
+                public double premium { get; set; }
+                public DateTimeOffset? filled { get; set; }
             }
         }
     }
