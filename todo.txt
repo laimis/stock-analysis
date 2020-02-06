@@ -1,6 +1,3 @@
-New Export format
-
-
 FEATURES
 
 Enrich note with stock information after it is recorded

@@ -111,7 +111,7 @@ namespace storage.tests
         [Fact]
         public async Task NoteStorageWorksAsync()
         {
-            var note = new Note(_userId, "note", "ticker", null, DateTimeOffset.UtcNow);
+            var note = new Note(_userId, "note", "ticker", DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
@@ -123,7 +123,7 @@ namespace storage.tests
 
             note = notes.Single(n => n.State.Id == note.State.Id);
 
-            note.Update("new note", 100);
+            note.Update("new note");
 
             await storage.Save(note, _userId);
 

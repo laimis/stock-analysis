@@ -46,7 +46,7 @@ namespace coretests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note(Guid.NewGuid(), "note", "ticker", 100, DateTimeOffset.UtcNow);
+            var note = new Note(Guid.NewGuid(), "note", "ticker", DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {note});
 

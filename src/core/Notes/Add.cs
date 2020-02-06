@@ -21,7 +21,6 @@ namespace core.Notes
                 get { return _ticker;}
                 set { _ticker = new Ticker(value); }
             }
-            public double? PredictedPrice { get; set; }
             public DateTimeOffset? Created { get; set; }
         }
 
@@ -57,7 +56,6 @@ namespace core.Notes
                     cmd.UserId,
                     cmd.Note,
                     cmd.Ticker,
-                    cmd.PredictedPrice,
                     cmd.Created ?? DateTimeOffset.UtcNow);
 
                 await _storage.Save(note, cmd.UserId);

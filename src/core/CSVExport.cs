@@ -13,7 +13,7 @@ namespace core
     {
         private const string DATE_FORMAT = "yyyy-MM-dd";
         public const string STOCK_HEADER = "ticker,type,amount,price,date";
-        public const string NOTE_HEADER = "created,predicted price,ticker,note";
+        public const string NOTE_HEADER = "created,ticker,note";
         public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
@@ -102,7 +102,6 @@ namespace core
 
                 return new object[]{
                     state.Created.ToString(DATE_FORMAT),
-                    state.PredictedPrice,
                     state.RelatedToTicker,
                     "\"" + state.Note.Replace("\"", "\"\"") + "\""
                 };

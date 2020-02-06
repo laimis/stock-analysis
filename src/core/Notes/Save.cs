@@ -16,7 +16,6 @@ namespace core.Notes
             public Guid Id { get; set; }
             [Required]
             public string Note { get; set; }
-            public double? PredictedPrice { get; set; }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -36,7 +35,7 @@ namespace core.Notes
                     return new Unit();
                 }
 
-                note.Update(request.Note, request.PredictedPrice);
+                note.Update(request.Note);
 
                 await _storage.Save(note, request.UserId);
 

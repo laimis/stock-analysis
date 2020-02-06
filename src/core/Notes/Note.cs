@@ -14,7 +14,7 @@ namespace core.Notes
         {
         }
 
-        public Note(Guid userId, string note, string ticker, double? predictedPrice, DateTimeOffset created)
+        public Note(Guid userId, string note, string ticker, DateTimeOffset created)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -24,11 +24,6 @@ namespace core.Notes
             if (userId == Guid.Empty)
             {
                 throw new InvalidOperationException("Missing user id");
-            }
-
-            if (predictedPrice != null && predictedPrice.Value < 0)
-            {
-                throw new InvalidOperationException("Predicted price cannot be negative");
             }
 
             if (string.IsNullOrWhiteSpace(note))
@@ -48,19 +43,13 @@ namespace core.Notes
                     created,
                     userId,
                     note,
-                    ticker,
-                    predictedPrice
+                    ticker
                 )
             );
         }
 
-        public void Update(string note, double? predictedPrice)
+        public void Update(string note)
         {
-            if (predictedPrice != null && predictedPrice.Value < 0)
-            {
-                throw new InvalidOperationException("Predicted price cannot be negative");
-            }
-
             if (string.IsNullOrWhiteSpace(note))
             {
                 throw new InvalidOperationException("Note cannot be empty");
@@ -71,8 +60,7 @@ namespace core.Notes
                     Guid.NewGuid(),
                     this.State.Id,
                     DateTimeOffset.UtcNow,
-                    note,
-                    predictedPrice
+                    note
                 )
             );
         }
@@ -96,13 +84,11 @@ namespace core.Notes
             this.State.RelatedToTicker = created.Ticker;
             this.State.Created = created.When;
             this.State.Note = created.Note;
-            this.State.PredictedPrice = created.PredictedPrice;
         }
 
         protected void ApplyInternal(NoteUpdated updated)
         {
             this.State.Note = updated.Note;
-            this.State.PredictedPrice = updated.PredictedPrice;
         }
 
         // these are no longer used

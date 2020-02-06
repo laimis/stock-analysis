@@ -23,7 +23,7 @@ namespace coretests.Notes
             var storage = new FakePortfolioStorage();
 
             var note = new Note(UserId, @"multi line
-            note", Ticker, 100, DateTimeOffset.UtcNow);
+            note", Ticker, DateTimeOffset.UtcNow);
 
             storage.Save(note, UserId);
 
