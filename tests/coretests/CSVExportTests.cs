@@ -46,13 +46,13 @@ namespace coretests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note(Guid.NewGuid(), "note", "ticker", DateTimeOffset.UtcNow);
+            var note = new Note(Guid.NewGuid(), "my note", "stockticker", DateTimeOffset.UtcNow);
 
             var report = CSVExport.Generate(new[] {note});
 
             Assert.Contains(CSVExport.NOTE_HEADER, report);
-            Assert.Contains("ticker", report);
-            Assert.Contains("100", report);
+            Assert.Contains("stockticker", report);
+            Assert.Contains("my note", report);
         }
 
         [Fact]
