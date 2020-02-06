@@ -1,6 +1,7 @@
 FEATURES
 
 Enrich note with stock information after it is recorded
+CSVExportTests fix
 Admin panel for password reset failures, password reset requests, new accounts, deleted acounts
 User association tracking
 
@@ -29,3 +30,5 @@ top 10 people you hate
 top 10 things you hate doing
 
 The following emerged as my priorities
+
+"v=spf1 include:amazonses.com ~all"

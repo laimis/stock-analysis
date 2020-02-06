@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using core.Adapters.Stocks;
 using core.Shared;
 
 namespace core.Notes
@@ -48,6 +49,19 @@ namespace core.Notes
             );
         }
 
+        internal void Enrich(TickerPrice p, StockAdvancedStats d)
+        {
+            Apply(
+                new NoteEnrichedWithPrice(
+                    Guid.NewGuid(),
+                    this.Id,
+                    DateTimeOffset.UtcNow,
+                    p,
+                    d
+                )
+            );
+        }
+
         public void Update(string note)
         {
             if (string.IsNullOrWhiteSpace(note))
@@ -79,27 +93,31 @@ namespace core.Notes
 
         protected void ApplyInternal(NoteCreated created)
         {
-            this.State.Id = created.AggregateId;
-            this.State.UserId = created.UserId;
-            this.State.RelatedToTicker = created.Ticker;
-            this.State.Created = created.When;
-            this.State.Note = created.Note;
+            this.State.Apply(created);
         }
 
         protected void ApplyInternal(NoteUpdated updated)
         {
-            this.State.Note = updated.Note;
+            this.State.Apply(updated);
+        }
+
+        protected void ApplyInternal(NoteEnriched enriched)
+        {
+            this.State.Apply(enriched);
+        }
+
+        protected void ApplyInternal(NoteEnrichedWithPrice enriched)
+        {
+            this.State.Apply(enriched);
         }
 
         // these are no longer used
         protected void ApplyInternal(NoteArchived archived)
         {
         }
-        
         protected void ApplyInternal(NoteReminderCleared cleared)
         {
         }
-
         protected void ApplyInternal(NoteReminderSet set)
         {
         }
