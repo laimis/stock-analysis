@@ -1,34 +1,18 @@
-FEATURES
+- take note right inside the stocks page so that I don't have to wonder around?
 
-Enrich note with stock information after it is recorded
-CSVExportTests fix
-Admin panel for password reset failures, password reset requests, new accounts, deleted acounts
-User association tracking
+FEATURES
+- twitter account, in the footer as well
+- export as excel sheet
+- import as excel sheet
 
 DESIGN
 - custom bootstrap components for dropdowns, dates
 
-BUGS
-- option dates seem to be off, it should not be a single date
-
 INFRA
-- badges for builds/coverage
 - practice use of polly
 - terraform or pulumi for infrastructure
 - check into https://www.nuget.org/packages/Respawn/
-- export as excel sheet
 - k8s for managing container switches
 - nullability in the project
-
-https://github.com/mailgun/transactional-email-templates
-
-List down 
-
-top 10 important people in your life 
-top ten things you want to do
-top 10 people you hate
-top 10 things you hate doing
-
-The following emerged as my priorities
 
 "v=spf1 include:amazonses.com ~all"
