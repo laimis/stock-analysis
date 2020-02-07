@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: 2010-09-09
+    
+Parameters:
+    EC2InstanceType:
+        Type: String
+    EC2AMI:
+        Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+        Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+    DockerImage:
+        Type: String
+
+Resources:
+    SecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: !Sub 'Internal Security group for ${AWS::StackName}'
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 80
+                  ToPort: 80
+                  CidrIp: 0.0.0.0/0
+                - IpProtocol: tcp
+                  FromPort: 22
+                  ToPort: 22
+                  CidrIp: 0.0.0.0/0
+            Tags:
+                - Key: Name
+                  Value: !Ref AWS::StackName
+
+    InstanceRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    Effect: Allow
+                    Principal:
+                        Service:
+                            - "ec2.amazonaws.com"
+                    Action: sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/CloudWatchFullAccess
+                - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+            Tags:
+                - Key: Name
+                  Value: !Ref AWS::StackName
+    
+    InstanceProfile:
+        Type: "AWS::IAM::InstanceProfile"
+        Properties:
+            Roles:
+                - Ref: InstanceRole
+
+    Instance:
+        Type: AWS::EC2::Instance
+        CreationPolicy:
+            ResourceSignal:
+                Timeout: PT15M
+                Count: 1
+        Metadata:
+            AWS::CloudFormation::Init:
+                config:
+                    packages:
+                        yum:
+                            docker: []
+        Properties:
+            ImageId: !Ref EC2AMI
+            InstanceType: !Ref EC2InstanceType
+            IamInstanceProfile: !Ref InstanceProfile
+            Monitoring: true
+            SecurityGroupIds:
+                - !GetAtt SecurityGroup.GroupId
+            UserData:
+                Fn::Base64:
+                    Fn::Sub:
+                        - |
+                            #!/bin/bash -xe
+                            # send script output to /tmp so we can debug boot failures
+                            exec > /tmp/userdata.log 2>&1
+
+                            # Update all packages
+                            yum -y update
+                            
+                            # Have CloudFormation install any files and packages from the metadata
+                            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --region ${AWS::Region} --resource Instance
+
+                            sudo systemctl enable docker
+
+                            sudo systemctl start docker
+                            
+                            # set up docker compose
+                            cat > /tmp/install_dockercompose.sh << EOF
+                                sudo usermod -a -G docker ec2-user
+                                sudo curl -L https://github.com/docker/compose/releases/download/1.25.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+                                sudo chmod +x /usr/local/bin/docker-compose
+                            EOF
+                            chown ec2-user:ec2-user /tmp/install_dockercompose.sh && chmod a+x /tmp/install_dockercompose.sh
+                            sleep 1; su - ec2-user -c "/tmp/install_dockercompose.sh"
+
+                            # setup script that should be run regularly to pull latest image
+                            cat > /tmp/update_compose.sh << EOF
+                                \$(aws ecr get-login --no-include-email --region us-east-1)
+                                docker pull ${DockerImage}
+                                /usr/local/bin/docker-compose -f /tmp/docker-compose.yml up -d
+                            EOF
+                            chown ec2-user:ec2-user /tmp/update_compose.sh
+                            chmod a+x /tmp/update_compose.sh
+
+                            # make sure script is part of crontab
+                            cat >/tmp/crontabinstall.sh << EOF
+                                crontab -l > /tmp/mycron
+                                echo "*/2 * * * * /tmp/update_compose.sh >> /tmp/crontab.txt 2>&1" >> /tmp/mycron
+                                crontab /tmp/mycron
+                                rm /tmp/mycron
+                            EOF
+
+                            chown ec2-user:ec2-user /tmp/crontabinstall.sh && chmod a+x /tmp/crontabinstall.sh
+                            sleep 1; su - ec2-user -c "/tmp/crontabinstall.sh"
+
+                            # all set
+                            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --region ${AWS::Region} --resource Instance
+                        - {DockerImage: !Ref DockerImage}
+            Tags:
+                - Key: Name
+                  Value: !Ref AWS::StackName
+
+Outputs:
+    InstanceId:
+        Description: The DNS name for the created instance
+        Value: !Ref Instance
+        Export:
+            Name: InstanceId

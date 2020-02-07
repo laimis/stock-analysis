@@ -11,3 +11,4 @@ services:
       storage: redis (use 'postgres' if running on postgres)
       REDIS_CNN: redis connection string
       DB_CNN: postgres connection string
+      SENDGRID_API_KEY: api key from send grid
