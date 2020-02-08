@@ -9,9 +9,10 @@
 
   <div class="card mb-3" *ngFor="let note of notes">
     <div class="card-body">
-      <h5 class="card-title">
-        <a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
-      </h5>
+      <div class="card-title">
+        <a class="font-weight-bold" [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
+        <span *ngIf="note.stats" class="text-muted"> - {{note.stats.companyName}}</span>
+      </div>
       <h6 class="card-subtitle mb-2 text-muted">
         {{note.created | date}}
         <span class="ml-3" *ngIf="note.price.amount">price: {{note.price.amount | currency}}</span>
