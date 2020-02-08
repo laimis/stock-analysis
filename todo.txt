@@ -1,11 +1,3 @@
-
-- blog domain, static gen
-    writing posts how to use it
-    help section perhaps with all the documentation?
-
-https://github.com/wenboyu2/yahoo-earnings-calendar
-
-
 FEATURES
 
 - review reminders or daily/weekly report
@@ -18,12 +10,17 @@ FEATURES
 - import excel
 - track someone visiting the page
 - how to list the upcoming earnings companies, but 2-3 weeks out
+- blog domain, static gen
+    writing posts how to use it
+    help section perhaps with all the documentation?
+
+https://github.com/wenboyu2/yahoo-earnings-calendar
+
 
 
 IMPROVEMENTS/FIXES
 
 - separate credit/debit in stocks and options in transaction view
-- note summary, show company name
 - price chart should start at zero
 - migrate email settings to appsettings
 - search in the header

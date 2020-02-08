@@ -21,7 +21,11 @@ export class StockDetailsComponent {
 		legend: { position: "none" },
 		bar: {
 			groupWidth: 15
-		}
+    },
+    vAxis: {
+      format: "currency",
+      baseline: 0
+    }
 	};
 	public priceChartData: object;
 
