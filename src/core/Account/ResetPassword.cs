@@ -14,7 +14,7 @@ namespace core.Account
             [Required]
             public Guid? Id { get; set; }
             [Required]
-            [MinLength(12)]
+            [MinLength(10)]
             [MaxLength(1000)]
             public string Password { get; set; }
         }
