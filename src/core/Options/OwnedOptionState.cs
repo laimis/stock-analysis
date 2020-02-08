@@ -52,7 +52,8 @@ namespace core.Options
                     this.Ticker,
                     $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
                     credit,
-                    sold.When
+                    sold.When,
+                    true
                 )
             );
         }
@@ -90,7 +91,8 @@ namespace core.Options
                     this.Ticker,
                     $"Bought {purchased.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract",
                     debit,
-                    purchased.When
+                    purchased.When,
+                    true
                 )
             );
         }

@@ -38,7 +38,8 @@ namespace core.Stocks
                 this.Ticker,
                 $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
                 purchased.Price * purchased.NumberOfShares,
-                purchased.When
+                purchased.When,
+                false
             ));
         }
 
@@ -53,7 +54,8 @@ namespace core.Stocks
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
                 sold.Price * sold.NumberOfShares,
-                sold.When
+                sold.When,
+                false
             ));
         }
     }

@@ -1,18 +1,44 @@
 <div *ngIf="response">
 
-  <div class="mt-2">
-    {{ response.transactions.length}} transactions, {{response.debit | currency}} debit and {{response.credit | currency}} credit
+  <div class="card mt-2">
+    <div class="card-header">
+      <span class="font-weight-bold">Transaction Summary</span>
+      <span *ngIf="ticker">
+         - Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,
+        <a [routerLink]="" (click)="!!clearFilter()">clear filter</a>
+      </span>
 
+      <span class="float-right">({{ response.transactions.length}})</span>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          {{response.debit | currency}} debit
+        </div>
+        <div class="col">
+          {{response.credit | currency}} credit
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          {{response.optionDebit | currency}} option debit
+        </div>
+        <div class="col">
+          {{response.optionCredit | currency}} option credit
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-2">
 
     <div class="alert alert-secondary mt-2" *ngIf="!ticker && response.transactions.length == 0">
       You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
     </div>
 
-    <div *ngIf="ticker" class="float-right">
-      Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,
-      <a [routerLink]="" (click)="!!clearFilter()">clear filter</a>
-    </div>
   </div>
+
+  <h3 *ngIf="response.transactions.length > 0">Breakdown by month</h3>
 
   <div class="mt-2" *ngFor="let g of response.grouped">
     <table class="table table-striped border">

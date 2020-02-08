@@ -27,6 +27,8 @@ namespace core.Portfolio.Output
         
         public double Credit => Transactions.Sum(t => t.Credit);
         public double Debit => Transactions.Sum(t => t.Debit);
+        public double OptionDebit => Transactions.Where(t => t.IsOption).Sum(t => t.Debit);
+        public double OptionCredit => Transactions.Where(t => t.IsOption).Sum(t => t.Credit);
         public double Profit => this.Credit - this.Debit;
     }
 }
