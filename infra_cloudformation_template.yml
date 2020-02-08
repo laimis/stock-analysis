@@ -8,6 +8,10 @@ Parameters:
         Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
     DockerImage:
         Type: String
+    DockerComposeSource:
+        Type: String
+    S3BucketPolicyArn:
+        Type: String
 
 Resources:
     SecurityGroup:
@@ -27,6 +31,15 @@ Resources:
                 - Key: Name
                   Value: !Ref AWS::StackName
 
+    SecurityGroupRedisIngress:
+        Type: "AWS::EC2::SecurityGroupIngress"
+        Properties:
+            GroupId: "sg-091f6ab93e91f4a6a"
+            IpProtocol: "tcp"
+            FromPort: 6379
+            ToPort: 6379
+            SourceSecurityGroupId: !GetAtt SecurityGroup.GroupId
+
     InstanceRole:
         Type: "AWS::IAM::Role"
         Properties:
@@ -41,6 +54,7 @@ Resources:
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/CloudWatchFullAccess
                 - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+                - !Ref S3BucketPolicyArn
             Tags:
                 - Key: Name
                   Value: !Ref AWS::StackName
@@ -50,6 +64,12 @@ Resources:
         Properties:
             Roles:
                 - Ref: InstanceRole
+
+    ElasticIp:
+        Type: AWS::EC2::EIP
+        Properties:
+            InstanceId: !Ref Instance
+            Domain: vpc
 
     Instance:
         Type: AWS::EC2::Instance
@@ -117,16 +137,18 @@ Resources:
                             chown ec2-user:ec2-user /tmp/crontabinstall.sh && chmod a+x /tmp/crontabinstall.sh
                             sleep 1; su - ec2-user -c "/tmp/crontabinstall.sh"
 
+                            aws s3 cp ${DockerComposeSource} /tmp/docker-compose.yml
+
                             # all set
                             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --region ${AWS::Region} --resource Instance
-                        - {DockerImage: !Ref DockerImage}
+                        - {DockerImage: !Ref DockerImage, DockerComposeSource: !Ref DockerComposeSource}
             Tags:
                 - Key: Name
                   Value: !Ref AWS::StackName
 
 Outputs:
     InstanceId:
-        Description: The DNS name for the created instance
+        Description: Instance Id
         Value: !Ref Instance
         Export:
             Name: InstanceId

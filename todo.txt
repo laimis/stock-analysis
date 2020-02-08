@@ -1,10 +1,16 @@
 - take note right inside the stocks page so that I don't have to wonder around?
+- add to watchlist, see how alpha does it
 - put date events on a timeline so that it's easier to see when is what
 - separate credit/debit in stocks and options in transaction view
 - "show me the goods" walk through
 - track someone visiting the page
 - how to list the upcoming earnings companies, but 2-3 weeks out
-
+- fix dates on the transactions so that it's not midnight
+- search in the header
+- price chart should start at zero
+- better welcome page
+- nightingaletrading twitter page
+    - push announcements to twitter on new releases
 
 FEATURES
 review reminders or daily/weekly report
