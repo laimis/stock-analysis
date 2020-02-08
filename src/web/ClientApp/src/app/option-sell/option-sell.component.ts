@@ -59,7 +59,7 @@ export class OptionSellComponent implements OnInit {
 
   recordBuy(opt: object) {
     this.service.buyOption(opt).subscribe( r => {
-      this.navigateToOption(r)
+      this.navigateToOption(r.id)
     }, err => {
       this.errors = GetErrors(err)
     })

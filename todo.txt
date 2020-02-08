@@ -21,7 +21,6 @@ https://github.com/wenboyu2/yahoo-earnings-calendar
 IMPROVEMENTS/FIXES
 
 - separate credit/debit in stocks and options in transaction view
-- price chart should start at zero
 - migrate email settings to appsettings
 - search in the header
 - fix dates on the transactions so that it's not midnight
