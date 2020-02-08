@@ -9,8 +9,12 @@
 - search in the header
 - price chart should start at zero
 - better welcome page
-- nightingaletrading twitter page
-    - push announcements to twitter on new releases
+
+- blog domain, static gen
+    writing posts how to use it
+    help section perhaps with all the documentation?
+
+https://github.com/wenboyu2/yahoo-earnings-calendar
 
 FEATURES
 review reminders or daily/weekly report
