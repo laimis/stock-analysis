@@ -10,6 +10,3 @@ jobs:
     steps:
     - name: Twitter Action
       uses: xorilog/twitter-action@0.1
-      args:
-        -message
-        "test message"
