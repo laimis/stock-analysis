@@ -1,0 +1,12 @@
+name: Twitter test
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Twitter Action
+    - uses: xorilog/twitter-action@0.1
