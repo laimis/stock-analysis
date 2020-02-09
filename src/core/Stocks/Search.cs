@@ -31,7 +31,9 @@ namespace core.Stocks
             {
                 var list = await _stocksService.Search(request.Term);
 
-                return list.Where(s => s.IsCommonShare).Take(5);
+                return list
+                    .Where(s => s.IsCommonShare && s.Region == "US")
+                    .Take(5);
             }
         }
     }

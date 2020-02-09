@@ -25,7 +25,6 @@ IMPROVEMENTS/FIXES
 - show dollar amount at the time of entering the note
 - note case sensitivity after entering the note with lower case ticker
 - import of shares/options in transaction screens
-- purchase price label on the stock transaction
 - transactions gain/profit
 - filter out -mm hits, what are those?
 - comments from the buy/sell/options screens
