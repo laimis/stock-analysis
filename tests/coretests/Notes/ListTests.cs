@@ -35,6 +35,12 @@ namespace coretests.Notes
             var response = await handler.Handle(query, CancellationToken.None);
 
             Assert.Empty(response.Notes);
+
+            query = new core.Notes.List.Query(NotesTestsFixture.UserId, NotesTestsFixture.Ticker);
+
+            response = await handler.Handle(query, CancellationToken.None);
+
+            Assert.Single(response.Notes);
         }
     }
 }

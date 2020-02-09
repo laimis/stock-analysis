@@ -44,7 +44,7 @@ namespace coretests.Stocks
         [Fact]
         public void BuyingForZeroThrows()
         {
-            var stock = new OwnedStock("ticker", _guid);
+            var stock = new OwnedStock("tlsa", _guid);
 
             Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.UtcNow));
         }
@@ -52,27 +52,21 @@ namespace coretests.Stocks
         [Fact]
         public void BuyingWithBadDateThrows()
         {
-            var stock = new OwnedStock("ticker", _guid);
+            var stock = new OwnedStock("tlsa", _guid);
 
             Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.MinValue));
         }
 
         [Fact]
-        public void BuyingWithBadTickerThrows()
-        {
-            Assert.Throws<InvalidOperationException>(() => new OwnedStock("", _guid));
-        }
-
-        [Fact]
         public void BuyingWithBadUserThrows()
         {
-            Assert.Throws<InvalidOperationException>(() => new OwnedStock("ticker", Guid.Empty));
+            Assert.Throws<InvalidOperationException>(() => new OwnedStock("tlsa", Guid.Empty));
         }
 
         [Fact]
         public void PurchaseWithDateNotProvidedThrows()
         {
-            var stock = new OwnedStock("ticker", _guid);
+            var stock = new OwnedStock("tlsa", _guid);
 
             Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTime.MinValue));
         }
@@ -80,7 +74,7 @@ namespace coretests.Stocks
         [Fact]
         public void EventCstrReplaysEvents()
         {
-            var stock = new OwnedStock("ticker", _guid);
+            var stock = new OwnedStock("tlsa", _guid);
 
             stock.Purchase(1, 10, DateTime.UtcNow);
 

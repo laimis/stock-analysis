@@ -15,13 +15,8 @@ namespace core.Notes
         {
         }
 
-        public Note(Guid userId, string note, string ticker, DateTimeOffset created)
+        public Note(Guid userId, string note, Ticker ticker, DateTimeOffset created)
         {
-            if (string.IsNullOrWhiteSpace(ticker))
-            {
-                throw new InvalidOperationException("Missing ticker");
-            }
-
             if (userId == Guid.Empty)
             {
                 throw new InvalidOperationException("Missing user id");
@@ -47,6 +42,16 @@ namespace core.Notes
                     ticker
                 )
             );
+        }
+
+        public bool MatchesTickerFilter(Ticker? filter)
+        {
+            if (filter == null)
+            {
+                return true;
+            }
+
+            return this.State.RelatedToTicker == filter.Value;
         }
 
         internal void Enrich(TickerPrice p, StockAdvancedStats d)

@@ -27,9 +27,8 @@ namespace coretests.Options
         }
 
         [Theory]
-        [InlineData(null,       2)]
-        [InlineData("ticker",   -1)]
-        [InlineData("ticker",   0)]
+        [InlineData("tlsa",   -1)]
+        [InlineData("tlsa",   0)]
         public void CreateWithBadTickerFails(string ticker, double strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>

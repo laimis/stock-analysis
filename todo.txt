@@ -26,14 +26,10 @@ IMPROVEMENTS/FIXES
 - note case sensitivity after entering the note with lower case ticker
 - import of shares/options in transaction screens
 - transactions gain/profit
-- filter out -mm hits, what are those?
 - comments from the buy/sell/options screens
 - ticker look up on all entry screens
 - separate credit/debit in stocks and options in transaction view
-- migrate email settings to appsettings
 - search in the header
-- fix dates on the transactions so that it's not midnight
-
 
 DEV
 - practice use of polly

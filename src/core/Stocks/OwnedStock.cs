@@ -14,13 +14,8 @@ namespace core.Stocks
         {
         }
 
-        public OwnedStock(string ticker, Guid userId)
+        public OwnedStock(Ticker ticker, Guid userId)
         {
-            if (string.IsNullOrWhiteSpace(ticker))
-            {
-                throw new InvalidOperationException("Missing ticker value");
-            }
-
             if (userId == Guid.Empty)
             {
                 throw new InvalidOperationException("Missing user id");

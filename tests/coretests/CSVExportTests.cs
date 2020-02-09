@@ -12,21 +12,20 @@ namespace coretests
         [Fact]
         public void ExportStocksHeader()
         {
-            var stock = new OwnedStock("ticker", Guid.NewGuid());
+            var stock = new OwnedStock("tsla", Guid.NewGuid());
             stock.Purchase(1, 100, DateTime.UtcNow);
 
             var report = CSVExport.Generate(new[] {stock});
 
             Assert.Contains(CSVExport.STOCK_HEADER, report);
-            Assert.Contains("ticker", report);
-            Assert.Contains("ticker", report);
+            Assert.Contains("TSLA", report);
         }
 
         [Fact]
         public void ExportOptionsHeader()
         {
             var option = new OwnedOption(
-                "ticker",
+                "tlsa",
                 2.5,
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
@@ -38,7 +37,7 @@ namespace coretests
 
             Assert.Contains(CSVExport.OPTION_HEADER, report);
             
-            Assert.Contains("ticker", report);
+            Assert.Contains("TLSA", report);
             Assert.Contains("CALL", report);
             Assert.Contains("2.5", report);
         }
@@ -51,7 +50,7 @@ namespace coretests
             var report = CSVExport.Generate(new[] {note});
 
             Assert.Contains(CSVExport.NOTE_HEADER, report);
-            Assert.Contains("stockticker", report);
+            Assert.Contains(note.State.RelatedToTicker, report);
             Assert.Contains("my note", report);
         }
 

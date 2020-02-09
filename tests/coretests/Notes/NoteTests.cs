@@ -1,5 +1,6 @@
 using System;
 using core.Notes;
+using core.Shared;
 using Xunit;
 
 namespace coretests.Notes
@@ -20,7 +21,7 @@ namespace coretests.Notes
             return new Note(
                 Guid.NewGuid(),
                 "description",
-                "ticker",
+                "tsla",
                 DateTimeOffset.UtcNow
             );
         }
@@ -46,7 +47,7 @@ namespace coretests.Notes
         [Fact]
         public void Ticker()
         {
-            Assert.Equal("ticker", _state.RelatedToTicker);
+            Assert.Equal("TSLA", _state.RelatedToTicker);
         }
 
         [Fact]
@@ -75,6 +76,24 @@ namespace coretests.Notes
             note.Update("new note");
 
             Assert.Equal("new note", note.State.Note);
+        }
+
+        [Fact]
+        public void MatchesFilterWithNullWorks()
+        {
+            var note = CreateTestNote();
+
+            Assert.True(note.MatchesTickerFilter(null));
+        }
+
+        [Fact]
+        public void MatchesFilterWithMatchingText()
+        {
+            var note = CreateTestNote();
+
+            Ticker t = new Ticker(note.State.RelatedToTicker);
+
+            Assert.True(note.MatchesTickerFilter(t));
         }
     }
 }

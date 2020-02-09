@@ -8,7 +8,7 @@ namespace core.Shared
 
         public Ticker(string ticker)
         {
-            if (string.IsNullOrEmpty(ticker))
+            if (string.IsNullOrWhiteSpace(ticker))
             {
                 throw new ArgumentException(nameof(ticker), "Ticker cannot be blank");
             }

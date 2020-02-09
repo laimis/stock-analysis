@@ -1,12 +1,13 @@
 using System;
 using core.Notes;
+using core.Shared;
 using coretests.Fakes;
 
 namespace coretests.Notes
 {
     public class NotesTestsFixture
     {
-        public const string Ticker = "ticker";
+        public static readonly Ticker Ticker = "tsla";
         public static Guid UserId = Guid.NewGuid();
 
         public NotesTestsFixture()

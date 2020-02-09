@@ -13,10 +13,13 @@ namespace core.Notes
         {
             public Query(Guid userId, string ticker) : base(userId)
             {
-                this.Ticker = ticker;
+                if (ticker != null)
+                {
+                    this.Ticker = ticker;
+                }
             }
 
-            public string Ticker { get; }
+            public Ticker? Ticker { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, NotesList>
@@ -31,7 +34,7 @@ namespace core.Notes
 
                 return Mapper.MapNotes(
                     notes
-                        .Where(n => n.State.RelatedToTicker == (request.Ticker != null ? request.Ticker : n.State.RelatedToTicker))
+                        .Where(n => n.MatchesTickerFilter(request.Ticker))
                         .OrderByDescending(n => n.State.Created)
                 );
             }

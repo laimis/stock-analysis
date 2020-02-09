@@ -2,13 +2,14 @@ using System;
 using System.Threading.Tasks;
 using core.Account;
 using core.Options;
+using core.Shared;
 using coretests.Fakes;
 
 namespace coretests.Options
 {
     public class OptionsTestsFixture
     {
-        public const string Ticker = "ticker";
+        public static readonly Ticker Ticker = new Ticker("tlsa");
         public static User User;
 
         static OptionsTestsFixture()

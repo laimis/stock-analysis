@@ -15,17 +15,12 @@ namespace core.Options
         }
 
         public OwnedOption(
-            string ticker,
+            Ticker ticker,
             double strikePrice,
             OptionType type,
             DateTimeOffset expiration,
             Guid userId)
         {
-            if (string.IsNullOrWhiteSpace(ticker))
-            {
-                throw new InvalidOperationException("Missing ticker value");
-            }
-
             if (userId == Guid.Empty)
             {
                 throw new InvalidOperationException("Missing user id");
