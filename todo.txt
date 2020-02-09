@@ -1,15 +1,14 @@
 FEATURES
 
-- review reminders or daily/weekly report
-- better welcome page
 - add to watchlist, see how alpha does it
-- put date events on a timeline so that it's easier to see when is what
 - take note right inside the stocks page so that I don't have to wonder around?
-- "show me the goods" walk through
+- review reminders or daily/weekly report
+- better welcome page, "show me the goods" walk through
+- put date events on a timeline so that it's easier to see when is what
 - export excel
 - import excel
-- track someone visiting the page
 - how to list the upcoming earnings companies, but 2-3 weeks out
+- track someone visiting the page
 - ownership dashboard that is like trends but for stuff you ownership
 - add search to notes
 - blog domain, static gen
