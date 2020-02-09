@@ -10,16 +10,26 @@ FEATURES
 - import excel
 - track someone visiting the page
 - how to list the upcoming earnings companies, but 2-3 weeks out
+- ownership dashboard that is like trends but for stuff you ownership
+- add search to notes
 - blog domain, static gen
     writing posts how to use it
     help section perhaps with all the documentation?
+- recent changes
 
 https://github.com/wenboyu2/yahoo-earnings-calendar
 
-
-
 IMPROVEMENTS/FIXES
 
+- better filtering of transactions (list of stocks)
+- show dollar amount at the time of entering the note
+- note case sensitivity after entering the note with lower case ticker
+- import of shares/options in transaction screens
+- purchase price label on the stock transaction
+- transactions gain/profit
+- filter out -mm hits, what are those?
+- comments from the buy/sell/options screens
+- ticker look up on all entry screens
 - separate credit/debit in stocks and options in transaction view
 - migrate email settings to appsettings
 - search in the header

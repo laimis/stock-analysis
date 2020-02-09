@@ -19,20 +19,20 @@
 
     <div class="form-row mt-2">
       <div class="col">
-        <label for="price">Price</label>
+        <label for="price">Per Share Price</label>
         <input type="number" class="form-control" id="price" aria-describedby="priceHelp" name="price" [(ngModel)]="price">
       </div>
 
       <div class="col">
-        <label for="date">Date</label>
+        <label for="date">Date of Transaction</label>
         <input type="date" class="form-control" id="date" aria-describedby="dateHelp" name="date" [(ngModel)]="date">
       </div>
     </div>
 
     <div class="form-row mt-3">
       <div class="col">
-        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="submitPurchase()">Buy</button>
-        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="submitSell()">Sell</button>
+        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="submitPurchase()">Record Buy</button>
+        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="submitSell()">Record Sell</button>
         <button type="submit" class="btn btn-secondary mb-2 mr-2" (click)="back()">Back</button>
       </div>
     </div>
