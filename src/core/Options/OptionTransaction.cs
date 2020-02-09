@@ -5,16 +5,8 @@ using core.Utils;
 
 namespace core.Options
 {
-    public class OptionTransaction : RequestWithUserId<CommandResponse<OwnedOption>>
+    public class OptionTransaction : RequestWithTicker<CommandResponse<OwnedOption>>
     {
-        private Ticker _ticker;
-        [Required]
-        public string Ticker 
-        {
-            get { return _ticker;}
-            set { _ticker = new Ticker(value); }
-        }
-
         [Range(1, 10000)]
         public double StrikePrice { get; set; }
 

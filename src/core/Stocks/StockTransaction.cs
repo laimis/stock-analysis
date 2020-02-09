@@ -4,16 +4,8 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public class StockTransaction : RequestWithUserId<CommandResponse>
+    public class StockTransaction : RequestWithTicker<CommandResponse>
     {
-        private Ticker _ticker;
-        [Required]
-        public string Ticker 
-        {
-            get { return _ticker;}
-            set { _ticker = new Ticker(value); }
-        }
-        
         [Range(1, 10000)]
         public int NumberOfShares { get; set; }
 

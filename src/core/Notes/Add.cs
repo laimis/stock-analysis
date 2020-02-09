@@ -10,17 +10,10 @@ namespace core.Notes
 {
     public class Add
     {
-        public class Command : RequestWithUserId<CommandResponse<Note>>
+        public class Command : RequestWithTicker<CommandResponse<Note>>
         {
             [Required]
             public string Note { get; set; }
-            private Ticker _ticker;
-            [Required]
-            public string Ticker 
-            {
-                get { return _ticker;}
-                set { _ticker = new Ticker(value); }
-            }
             public DateTimeOffset? Created { get; set; }
         }
 

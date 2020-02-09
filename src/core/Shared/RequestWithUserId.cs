@@ -1,8 +1,33 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using MediatR;
 
 namespace core.Shared
 {
+    public class RequestWithTicker<T> : RequestWithUserId<T>
+    {
+        private Ticker? _ticker;
+        [Required]
+        public string Ticker 
+        {
+            get 
+            { 
+                if (_ticker == null) return null;
+                return _ticker;
+            }
+            
+            set 
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    _ticker = null;
+                    return;
+                }
+                _ticker = new Ticker(value);
+            }
+        }
+    }
+
     public class RequestWithUserId<T> : RequestWithUserIdBase, IRequest<T>
     {
         public RequestWithUserId() {}
