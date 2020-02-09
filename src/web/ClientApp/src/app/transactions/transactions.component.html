@@ -13,20 +13,25 @@
     <div class="card-body">
       <div class="row">
         <div class="col">
-          {{response.debit | currency}} debit
+          <span class="font-weight-bold">{{response.debit | currency}}</span> debit
         </div>
         <div class="col">
-          {{response.credit | currency}} credit
+          <span class="font-weight-bold">{{response.credit | currency}}</span> credit
         </div>
       </div>
       <div class="row">
         <div class="col">
-          {{response.optionDebit | currency}} option debit
+          <span class="font-weight-bold">{{response.optionDebit | currency}}</span> option debit
         </div>
         <div class="col">
-          {{response.optionCredit | currency}} option credit
+          <span class="font-weight-bold">{{response.optionCredit | currency}}</span> option credit
         </div>
       </div>
+    </div>
+
+    <div class="card-footer">
+      Balance: <span class="font-weight-bold">{{ response.credit - response.debit | currency }}</span>,
+      balance from options <span class="font-weight-bold">{{ response.optionCredit - response.optionDebit | currency }}</span>
     </div>
   </div>
 
