@@ -50,8 +50,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+            See releases tags for full set of changes
           draft: false
           prerelease: false
