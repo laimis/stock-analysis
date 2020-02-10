@@ -1,3 +1,5 @@
+ticker filter in transactions, ticker link is new window to stocks page
+
 FEATURES
 
 - ticker look up on all entry screens
@@ -19,12 +21,12 @@ FEATURES
 - recent changes
 - import of shares/options in transaction screens
 - delete transactions?
+- support indexes?
 
 https://github.com/wenboyu2/yahoo-earnings-calendar
 
 IMPROVEMENTS/FIXES
 
-- better filtering of transactions (list of stocks)
 
 DESIGN/UX
 

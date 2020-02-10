@@ -3,11 +3,6 @@
   <div class="card mt-2">
     <div class="card-header">
       <span class="font-weight-bold">Transaction Summary</span>
-      <span *ngIf="ticker">
-         - Filtered by <a [routerLink]="[ '/stocks', ticker ]">{{ticker}}</a>,
-        <a [routerLink]="" (click)="!!clearFilter()">clear filter</a>
-      </span>
-
       <span class="float-right">({{ response.transactions.length}})</span>
     </div>
     <div class="card-body">
@@ -43,10 +38,16 @@
     </select>
 
     <label for="showFilter">Show </label>&nbsp;&nbsp;
-    <select #showFilter id="showFilter" name="showFilter" (click)="setFilter(showFilter.value)">
+    <select class="mr-3" #showFilter id="showFilter" name="showFilter" (click)="setFilter(showFilter.value)">
       <option value="">Shares and options</option>
       <option value="shares">Just shares</option>
       <option value="options">Just options</option>
+    </select>
+
+    <label for="symbolFilter">Symbol filter </label>&nbsp;&nbsp;
+    <select #symbolFilter id="symbolFilter" name="symbolFilter" (click)="setTicker(symbolFilter.value)">
+      <option value="">Show all</option>
+      <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
     </select>
 
   </div>
@@ -72,7 +73,7 @@
         <tr
           *ngFor="let t of g.transactions.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
-          <td><a [routerLink]="" (click)="!!setTicker(t.ticker)">{{t.ticker}}</a></td>
+          <td><a [routerLink]="[ '/stocks', t.ticker ]" target="_blank">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>
           <td>{{ t.debit | currency }}</td>
           <td>{{ t.credit | currency }}</td>

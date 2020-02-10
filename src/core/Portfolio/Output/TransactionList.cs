@@ -9,6 +9,7 @@ namespace core.Portfolio.Output
         public TransactionList(IEnumerable<Transaction> transactions, string groupBy)
         {
             this.Transactions = Ordered(transactions, groupBy);
+            this.Tickers = transactions.Select(t => t.Ticker).Distinct().OrderBy(s => s);
             
             if (groupBy != null)
             {
@@ -41,6 +42,7 @@ namespace core.Portfolio.Output
         }
 
         public IEnumerable<Transaction> Transactions { get; }
+        public IEnumerable<string> Tickers { get; }
         public IEnumerable<object> Grouped { get; } 
         
         public double Credit => Transactions.Sum(t => t.Credit);
