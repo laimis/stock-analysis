@@ -1,3 +1,5 @@
+- no way to add new news besides from transactions
+
 FEATURES
 
 - add to watchlist, see how alpha does it
