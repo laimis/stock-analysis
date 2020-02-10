@@ -80,9 +80,7 @@ namespace core
 
         internal static NotesList MapNotes(IEnumerable<Note> notes)
         {
-            return new NotesList {
-                Notes = notes.Select(n => n.State)
-            };
+            return new NotesList (notes.Select(n => n.State));
         }
 
         public static object MapLists(List<StockQueryResult> active, List<StockQueryResult> gainers, List<StockQueryResult> losers)

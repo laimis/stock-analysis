@@ -9,21 +9,33 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class NotesComponent implements OnInit {
 
-  public notes: object[]
-  public tickerFilter: string
+  notes: object[]
+  tickers: string[]
+  symbolFilter: string
+  loading: boolean = false
 
   constructor(
     private stockService:StocksService,
     private route:ActivatedRoute) { }
 
   ngOnInit() {
-    this.tickerFilter = this.route.snapshot.paramMap.get('ticker')
-    this.loadNotes(this.tickerFilter)
+    this.symbolFilter = this.route.snapshot.paramMap.get('ticker')
+    this.loadData()
   }
 
-  private loadNotes(ticker:string) {
-    this.stockService.getNotes(ticker).subscribe((r: NoteList) => {
+  private loadData() {
+    this.loading = true
+
+    console.log("loading")
+
+    this.stockService.getNotes(this.symbolFilter).subscribe((r: NoteList) => {
+      this.loading = false;
+      this.tickers = r.tickers
       this.notes = r.notes
+      console.log("loaded")
+    }, _ => {
+      console.log("failed to load")
+      this.loading = false;
     })
   }
 }

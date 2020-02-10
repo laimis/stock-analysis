@@ -1,11 +1,18 @@
-<div class="clearfix mb-2">
-  <span *ngIf="tickerFilter">Showing notes for {{tickerFilter}}, <a [routerLink]="[ '/notes' ]">view all</a></span>
-
-  <a class="float-right" *ngIf="!tickerFilter" [routerLink]="[ '/notes', 'add' ]">Add Note</a>
-  <a class="float-right" *ngIf="tickerFilter" [routerLink]="[ '/notes', 'add', tickerFilter ]">Add Note</a>
-</div>
-
 <div *ngIf="notes && notes.length > 0">
+
+  <div>
+
+    <label for="symbolFilter">Filter your notes by symbol </label>&nbsp;&nbsp;
+    <select class="mr-3" [(ngModel)]="symbolFilter" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+      <option value="">Show all</option>
+      <option *ngFor="let t of tickers" value="{{t}}">{{t}}</option>
+    </select>
+
+    <div *ngIf="loading" class="spinner-border spinner-border-sm text-info" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+
+  </div>
 
   <div class="card mb-3" *ngFor="let note of notes">
     <div class="card-body">

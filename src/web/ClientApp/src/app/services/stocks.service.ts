@@ -173,6 +173,7 @@ export interface TransactionList {
   transactions: object[]
 }
 export interface NoteList {
+  tickers: string[]
   notes: object[]
 }
 
