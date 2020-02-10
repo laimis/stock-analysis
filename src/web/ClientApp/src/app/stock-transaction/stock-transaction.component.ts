@@ -80,5 +80,9 @@ export class StockTransactionComponent implements OnInit {
 		this.date = null
     this.numberOfShares = null
     this.errors = null
-	}
+  }
+
+  onTickerSelected(ticker:string) {
+    this.ticker = ticker
+  }
 }

@@ -80,4 +80,8 @@ export class OptionSellComponent implements OnInit {
   back() {
     this.location.back()
   }
+
+  onTickerSelected(ticker:string) {
+    this.ticker = ticker;
+  }
 }

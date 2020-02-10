@@ -41,4 +41,8 @@ export class AddNoteComponent implements OnInit {
       err => this.errors = GetErrors(err)
     )
   }
+
+  onTickerSelected(ticker:string) {
+    this.ticker = ticker;
+  }
 }

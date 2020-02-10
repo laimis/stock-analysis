@@ -8,8 +8,11 @@
 	<form>
     <div class="form-row">
       <div class="col">
-        <label for="ticker">Ticker</label>
-        <input type="text" class="form-control" id="ticker" aria-describedby="tickerHelp" name="ticker" [(ngModel)]="ticker">
+        <app-symbol-search
+          label="Ticker"
+          (tickerSelected)="onTickerSelected($event)"
+          cssClass="form-control">
+        </app-symbol-search>
       </div>
       <div class="col">
         <label for="ticker">Number of Shares</label>
