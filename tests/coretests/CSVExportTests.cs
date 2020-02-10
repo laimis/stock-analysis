@@ -13,7 +13,7 @@ namespace coretests
         public void ExportStocksHeader()
         {
             var stock = new OwnedStock("tsla", Guid.NewGuid());
-            stock.Purchase(1, 100, DateTime.UtcNow);
+            stock.Purchase(1, 100, DateTime.UtcNow, "some note");
 
             var report = CSVExport.Generate(new[] {stock});
 
@@ -31,7 +31,7 @@ namespace coretests
                 DateTimeOffset.UtcNow.AddDays(1),
                 Guid.NewGuid());
             
-            option.Sell(1, 20, DateTimeOffset.UtcNow);
+            option.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
             var report = CSVExport.Generate(new[] {option});
 

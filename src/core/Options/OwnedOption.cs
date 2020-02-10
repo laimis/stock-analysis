@@ -55,7 +55,7 @@ namespace core.Options
         public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
             => this.State.IsMatch(ticker, strike, type, expiration);
 
-        public void Buy(int numberOfContracts, double premium, DateTimeOffset filled)
+        public void Buy(int numberOfContracts, double premium, DateTimeOffset filled, string notes)
         {
             if (numberOfContracts <= 0)
             {
@@ -67,10 +67,20 @@ namespace core.Options
                 throw new InvalidOperationException("Premium amount cannot be negative");
             }
 
-            Apply(new OptionPurchased(Guid.NewGuid(), this.State.Id, filled, numberOfContracts, premium));
+            Apply(
+                new OptionPurchased(
+                    Guid.NewGuid(),
+                    this.State.Id,
+                    filled,
+                    this.State.UserId,
+                    numberOfContracts,
+                    premium,
+                    notes
+                )
+            );
         }
 
-        public void Sell(int numberOfContracts, double premium, DateTimeOffset filled)
+        public void Sell(int numberOfContracts, double premium, DateTimeOffset filled, string notes)
         {
             if (numberOfContracts <= 0)
             {
@@ -82,7 +92,17 @@ namespace core.Options
                 throw new InvalidOperationException("Premium money cannot be negative");
             }
 
-            Apply(new OptionSold(Guid.NewGuid(), this.State.Id, filled, numberOfContracts, premium));
+            Apply(
+                new OptionSold(
+                    Guid.NewGuid(),
+                    this.State.Id,
+                    filled,
+                    this.State.UserId,
+                    numberOfContracts,
+                    premium,
+                    notes
+                )
+            );
         }
 
         public void Expire()

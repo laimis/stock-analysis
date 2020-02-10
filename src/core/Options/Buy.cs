@@ -55,7 +55,7 @@ namespace core.Options
                         cmd.UserId);
                 }
 
-                option.Buy(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value);
+                option.Buy(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value, cmd.Notes);
 
                 await this._storage.Save(option, cmd.UserId);
 

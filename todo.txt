@@ -1,20 +1,17 @@
-- filter on comments by ticker similar to transactions
-
+- comments from the buy/sell/options screens
+    if fill date is old, don't enrich
 
 FEATURES
 
-- comments from the buy/sell/options screens
 - add to watchlist, see how alpha does it
-- take note right inside the stocks page so that I don't have to wonder around?
 - review reminders or daily/weekly report
 - better welcome page, "show me the goods" walk through
-- put date events on a timeline so that it's easier to see when is what
 - export excel
 - import excel
-- how to list the upcoming earnings companies, but 2-3 weeks out
 - track someone visiting the page
-- ownership dashboard that is like trends but for stuff you ownership
-- add search to notes
+
+LONG TERM 
+
 - blog domain, static gen
     writing posts how to use it
     help section perhaps with all the documentation?
@@ -22,6 +19,8 @@ FEATURES
 - import of shares/options in transaction screens
 - delete transactions?
 - support indexes?
+- how to list the upcoming earnings companies, but 2-3 weeks out
+- ownership dashboard that is like trends but for stuff you ownership
 
 https://github.com/wenboyu2/yahoo-earnings-calendar
 
@@ -36,6 +35,7 @@ DESIGN/UX
 - angular material
 
 DEV
+- aggregate keys in redis is still a shitshow
 - practice use of polly
 - nullability in the project
 

@@ -11,18 +11,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class OptionSellComponent implements OnInit {
 
-  public errors : string[]
+  errors : string[]
 
-  public success: boolean
+  success: boolean
 
-  public ticker : string
-  public strikePrice: number
-  public optionType: string
-  public expirationDate: string
-  public positionType: string
-  public numberOfContracts: number
-  public premium: number
-  public filled: string;
+  ticker            : string
+  strikePrice       : number
+  optionType        : string
+  expirationDate    : string
+  positionType      : string
+  numberOfContracts : number
+  premium           : number
+  filled            : string
+  notes             : string
 
   constructor(
     private service: StocksService,
@@ -50,7 +51,8 @@ export class OptionSellComponent implements OnInit {
       expirationDate: this.expirationDate,
       numberOfContracts: this.numberOfContracts,
       premium: this.premium,
-      filled: this.filled
+      filled: this.filled,
+      notes: this.notes
     }
 
     if (this.positionType == 'buy') this.recordBuy(opt)

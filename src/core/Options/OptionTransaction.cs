@@ -25,5 +25,7 @@ namespace core.Options
 
         [Required]
         public DateTimeOffset? Filled { get; set; }
+
+        public string Notes { get; set; }
     }
 }

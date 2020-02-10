@@ -14,5 +14,7 @@ namespace core.Stocks
         
         [Required]
         public DateTimeOffset? Date { get; set; }
+
+        public string Notes { get; set; }
     }
 }

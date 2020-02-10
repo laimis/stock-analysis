@@ -25,7 +25,7 @@ namespace coretests.Stocks
             Assert.Equal(15, stock.State.Owned);
             Assert.Equal(31, stock.State.Spent);
 
-            stock.Sell(5, 20, DateTime.UtcNow);
+            stock.Sell(5, 20, DateTime.UtcNow, "sample note");
 
             Assert.Equal(10, stock.State.Owned);
             Assert.NotNull(stock.State.Sold);
@@ -38,7 +38,7 @@ namespace coretests.Stocks
 
             stock.Purchase(10, 2.1, DateTime.UtcNow);
 
-            Assert.ThrowsAny<Exception>(() => stock.Sell(20, 100, DateTime.UtcNow));
+            Assert.ThrowsAny<Exception>(() => stock.Sell(20, 100, DateTime.UtcNow, "sample note"));
         }
 
         [Fact]

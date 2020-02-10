@@ -32,7 +32,7 @@ namespace coretests.Options
                 cmd.ExpirationDate.Value,
                 cmd.UserId);
 
-            opt.Sell(1, 20, DateTimeOffset.UtcNow);
+            opt.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
             storage.Register(opt);
 

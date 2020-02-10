@@ -13,7 +13,7 @@ namespace coretests.Options
         {
             var option = GetTestOption();
 
-            option.Sell(1, 10, DateTimeOffset.UtcNow);
+            option.Sell(1, 10, DateTimeOffset.UtcNow, "some notes");
             
             Assert.Equal(-1, option.State.NumberOfContracts);
         }
@@ -57,7 +57,7 @@ namespace coretests.Options
             var opt = GetTestOption();
 
             Assert.Throws<InvalidOperationException>( () =>
-                opt.Sell(numberOfContracts, money, DateTimeOffset.UtcNow));
+                opt.Sell(numberOfContracts, money, DateTimeOffset.UtcNow, "some notes"));
         }
 
         private static OwnedOption GetTestOption(

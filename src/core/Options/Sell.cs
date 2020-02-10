@@ -53,7 +53,7 @@ namespace core.Options
                     );
                 }
 
-                option.Sell(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value);
+                option.Sell(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value, cmd.Notes);
 
                 await _storage.Save(option, cmd.UserId);
 

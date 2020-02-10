@@ -32,6 +32,11 @@
       </div>
     </div>
 
+    <div class="form-row mt-2">
+      <label for="notes">Notes and your thoughts around this transaction</label>
+      <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="5"></textarea>
+    </div>
+
     <div class="form-row mt-3">
       <div class="col">
         <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="submitPurchase()">Record Buy</button>

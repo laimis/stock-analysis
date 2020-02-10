@@ -40,7 +40,7 @@ namespace core.Stocks
                         $"You don't have shares of {cmd.Ticker.ToString()} to sell, record buy transaction first");
                 }
 
-                stock.Sell(cmd.NumberOfShares, cmd.Price, cmd.Date.Value);
+                stock.Sell(cmd.NumberOfShares, cmd.Price, cmd.Date.Value, cmd.Notes);
 
                 await this._storage.Save(stock, cmd.UserId);
 

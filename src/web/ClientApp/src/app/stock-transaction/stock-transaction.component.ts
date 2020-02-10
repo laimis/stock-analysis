@@ -12,12 +12,13 @@ import { Location } from '@angular/common';
 })
 export class StockTransactionComponent implements OnInit {
 
-	public ticker: string
-	public numberOfShares: Number
-	public price: Number
-	public date: String
-  public purchased: Boolean
-  public errors: string[]
+	ticker:         string
+	numberOfShares: Number
+	price:          Number
+	date:           string
+  purchased:      boolean
+  errors:         string[]
+  notes:          string
 
 	constructor(
 		private service : StocksService,
@@ -70,7 +71,8 @@ export class StockTransactionComponent implements OnInit {
 			ticker:this.ticker,
 			numberOfShares:this.numberOfShares,
 			price:this.price,
-			date:this.date
+      date:this.date,
+      notes:this.notes
 		}
 	}
 
@@ -80,6 +82,7 @@ export class StockTransactionComponent implements OnInit {
 		this.date = null
     this.numberOfShares = null
     this.errors = null
+    this.notes = null
   }
 
   onTickerSelected(ticker:string) {
