@@ -32,6 +32,8 @@ import { ProfileVerifyComponent } from './profile/profile-verify.component';
 import { ContactComponent } from './contact/contact.component';
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
+import { SymbolSearchComponent } from './symbol-search/symbol-search.component';
+import { PlaygroundComponent } from './playground/playground.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -54,6 +56,7 @@ var routes = [
   { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
   { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
   { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
+  { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/transaction', component: StockTransactionComponent, canActivate: [AuthGuard] },
@@ -61,6 +64,7 @@ var routes = [
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
   { path: 'terms', component: TermsComponent},
+  { path: 'test', component: SymbolSearchComponent}
 ]
 
 @NgModule({
@@ -77,6 +81,7 @@ var routes = [
     NotesComponent,
     OptionDetailComponent,
     OptionSellComponent,
+    PlaygroundComponent,
     PrivacyComponent,
     ProfileComponent,
     ProfileCreateComponent,
@@ -89,6 +94,7 @@ var routes = [
     StockListComponent,
     StockListsComponent,
     StockTransactionComponent,
+    SymbolSearchComponent,
     TransactionsComponent,
     TermsComponent
   ],

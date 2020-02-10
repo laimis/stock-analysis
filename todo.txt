@@ -1,8 +1,13 @@
-ticker filter in transactions, ticker link is new window to stocks page
+- ticker look up on all entry screens
+
+how? 
+    look up component
+    wire up the ecosystem or returning values
+    positioning, overlay, how to get the value, right?
 
 FEATURES
 
-- ticker look up on all entry screens
+- filter on comments by ticker similar to transactions
 - comments from the buy/sell/options screens
 - add to watchlist, see how alpha does it
 - take note right inside the stocks page so that I don't have to wonder around?
@@ -27,6 +32,7 @@ https://github.com/wenboyu2/yahoo-earnings-calendar
 
 IMPROVEMENTS/FIXES
 
+option info date is off
 
 DESIGN/UX
 

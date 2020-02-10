@@ -1,0 +1,19 @@
+<div>
+
+  <div class="row">
+    <div class="col">
+      <app-symbol-search
+        label="Search"
+        (tickerSelected)="onTickerSelected($event)"
+        cssClass="form-control">
+      </app-symbol-search>
+    </div>
+    <div class="col">
+      Another col
+    </div>
+  </div>
+
+  <div>
+    Playground will use this value: {{ticker}}
+  </div>
+</div>

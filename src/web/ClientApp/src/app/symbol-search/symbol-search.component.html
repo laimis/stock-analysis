@@ -1,0 +1,24 @@
+<div class="form-group">
+  <label for="ticker">{{label}}</label>
+  <input type="text"
+    class="{{cssClass}}"
+    id="ticker"
+    #tickerBox
+    name="ticker"
+    [(ngModel)]="selectedValue"
+    (input)="search(tickerBox.value)"
+    (blur)="loseFocus()"
+    autofocus
+    autocomplete="off" />
+
+    <div
+      [ngClass]="{'border': resultCount > 0, 'rounded': resultCount > 0}"
+      class="search-results">
+
+      <div class="row" *ngFor="let r of searchResults$ | async" (click)="clicked(r.symbol)">
+        <div class="col ml-2 mb-2">{{r.symbol}}</div>
+        <div class="col-10">{{r.securityName}}</div>
+      </div>
+    </div>
+
+</div>

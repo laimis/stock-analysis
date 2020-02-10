@@ -1,0 +1,4 @@
+.search-results div:hover {
+  font-weight: bold;
+  cursor: pointer;
+}
