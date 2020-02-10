@@ -14,6 +14,7 @@ namespace core.Account
         public DateTimeOffset? Deleted { get; private set; }
         public string DeleteFeedback { get; private set; }
         public DateTimeOffset? Verified { get; private set; }
+        public DateTimeOffset? LastLogin { get; private set; }
 
         internal void Apply(UserCreated c)
         {
@@ -28,6 +29,11 @@ namespace core.Account
         {
             this.PasswordHash = p.Hash;
             this.Salt = p.Salt;
+        }
+
+        internal void Apply(UserLoggedIn l)
+        {
+            this.LastLogin = l.When;
         }
 
         internal void Apply(UserDeleted d)

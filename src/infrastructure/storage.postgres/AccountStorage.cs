@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using Dapper;
@@ -81,6 +83,16 @@ namespace storage.postgres
             var query = @"SELECT * FROM processidtouserassociations WHERE id = :id";
 
             return await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
+        }
+
+        public async Task<IEnumerable<(string, string)>> GetUsers()
+        {
+            using var db = GetConnection();
+            
+            db.Open();
+            var query = @"SELECT email,id FROM users";
+
+            return await db.QueryAsync<(string, string)>(query);
         }
     }
 }

@@ -29,11 +29,15 @@ namespace core.Account
                 _storage = storage;
             }
 
-            public Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                // var user = await this._storage.GetUser()
+                var user = await this._storage.GetUser(request.UserId);
 
-                return Task.FromResult(new Unit());
+                user.LoggedIn(request.IPAddress, request.Timestamp.Value);
+
+                await this._storage.Save(user);
+
+                return new Unit();
             }
         }
     }

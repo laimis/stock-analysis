@@ -1,6 +1,3 @@
-- comments from the buy/sell/options screens
-    if fill date is old, don't enrich
-
 FEATURES
 
 - add to watchlist, see how alpha does it

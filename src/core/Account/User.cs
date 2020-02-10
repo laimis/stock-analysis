@@ -16,6 +16,7 @@ namespace core.Account
         public string Email => State.Email;
         public string Firstname => State.Firstname;
         public string Lastname => State.Lastname;
+        public DateTimeOffset? LastLogin => State.LastLogin;
 
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
@@ -49,10 +50,17 @@ namespace core.Account
             );
         }
 
+        public void LoggedIn(string ipAddress, DateTimeOffset when)
+        {
+            Apply(
+                new UserLoggedIn(Guid.NewGuid(), this.Id, when)
+            );
+        }
+
         public void Delete(string feedback)
         {
             Apply(
-                new UserDeleted(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, feedback)
+                new UserDeleted(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, feedback)
             );
         }
 
@@ -107,6 +115,11 @@ namespace core.Account
         private void ApplyInternal(UserPasswordSet p)
         {
             this.State.Apply(p);
+        }
+
+        private void ApplyInternal(UserLoggedIn l)
+        {
+            this.State.Apply(l);
         }
 
         private void ApplyInternal(UserPasswordResetRequested r)

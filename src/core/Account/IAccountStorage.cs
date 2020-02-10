@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace core.Account
@@ -11,5 +12,6 @@ namespace core.Account
         Task Delete(User u);
         Task SaveUserAssociation(ProcessIdToUserAssociation r);
         Task<ProcessIdToUserAssociation> GetUserAssociation(Guid guid);
+        Task<IEnumerable<(string, string)>> GetUsers();
     }
 }

@@ -54,5 +54,15 @@ namespace coretests.Account
 
             Assert.NotNull(u.Events.Single(e => e is core.Account.UserPasswordResetRequested));
         }
+
+        [Fact]
+        public void LastLoginTracked()
+        {
+            var u = new User("laimis@gmail.com", "firstname", "last");
+
+            u.LoggedIn("blablabla", DateTimeOffset.UtcNow);
+
+            Assert.Equal(u.LastLogin.Value.DateTime, DateTimeOffset.UtcNow.DateTime, TimeSpan.FromMinutes(1));
+        }
     }
 }

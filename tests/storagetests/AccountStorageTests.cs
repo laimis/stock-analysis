@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using Xunit;
@@ -33,6 +34,9 @@ namespace storagetests
             Assert.Equal("firstname", fromDb.State.Firstname);
             Assert.Equal("lastname", fromDb.State.Lastname);
 
+            var users = await storage.GetUsers();
+            Assert.True(users.Any(u => u.Item1.Contains(email)));
+
             await storage.Delete(user);
 
             fromDb = await storage.GetUserByEmail(email);
@@ -42,6 +46,9 @@ namespace storagetests
             fromDb = await storage.GetUser(user.Id);
 
             Assert.Null(fromDb);
+
+            users = await storage.GetUsers();
+            Assert.False(users.Any(u => u.Item1.Contains(email)));
         }
 
         [Fact]

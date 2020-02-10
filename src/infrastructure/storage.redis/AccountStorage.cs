@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using MediatR;
@@ -108,6 +110,15 @@ namespace storage.redis
             }
 
             return new ProcessIdToUserAssociation(id, userId, timestamp);
+        }
+
+        public async Task<IEnumerable<(string, string)>> GetUsers()
+        {
+            var db = _redis.GetDatabase();
+
+            var id = await db.HashGetAllAsync(USER_RECORDS_KEY);
+
+            return id.Select(i => (i.Name.ToString(), i.Value.ToString()));
         }
     }
 }
