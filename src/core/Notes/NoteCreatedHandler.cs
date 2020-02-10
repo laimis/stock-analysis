@@ -23,6 +23,12 @@ namespace core.Notes
                 return;
             }
 
+            var age = System.DateTimeOffset.UtcNow.Subtract(e.When).TotalDays;
+            if (age > 2)
+            {
+                return;
+            }
+
             var d = await _stocks.GetAdvancedStats(n.State.RelatedToTicker);
             var p = await _stocks.GetPrice(n.State.RelatedToTicker);
 
