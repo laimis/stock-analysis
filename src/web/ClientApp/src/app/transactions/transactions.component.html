@@ -1,6 +1,33 @@
 <div *ngIf="response">
 
-  <div class="card mt-2">
+  <div>
+
+    <label for="breakdownFilter">Breakdown by</label>&nbsp;&nbsp;
+    <select class="mr-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
+      <option value="month">Month</option>
+      <option value="ticker">Symbol</option>
+    </select>
+
+    <label for="showFilter">Type filter </label>&nbsp;&nbsp;
+    <select class="mr-3" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
+      <option value="">Shares and options</option>
+      <option value="shares">Just shares</option>
+      <option value="options">Just options</option>
+    </select>
+
+    <label for="symbolFilter">Symbol filter </label>&nbsp;&nbsp;
+    <select class="mr-3" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+      <option value="">Show all</option>
+      <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
+    </select>
+
+    <div *ngIf="loading" class="spinner-border spinner-border-sm text-info" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+
+  </div>
+
+  <div class="card mt-2 mb-3">
     <div class="card-header">
       <span class="font-weight-bold">Transaction Summary</span>
       <span class="float-right">({{ response.transactions.length}})</span>
@@ -29,44 +56,21 @@
 
   </div>
 
-  <div *ngIf="response.transactions.length > 0">
-
-    <label for="breakdownFilter">Breakdown by</label>&nbsp;&nbsp;
-    <select class="mr-3" #breakdownFilter id="breakdownFilter" name="breakdownFilter" (click)="setGroupBy(breakdownFilter.value)">
-      <option value="month">Month</option>
-      <option value="ticker">Symbol</option>
-    </select>
-
-    <label for="showFilter">Show </label>&nbsp;&nbsp;
-    <select class="mr-3" #showFilter id="showFilter" name="showFilter" (click)="setFilter(showFilter.value)">
-      <option value="">Shares and options</option>
-      <option value="shares">Just shares</option>
-      <option value="options">Just options</option>
-    </select>
-
-    <label for="symbolFilter">Symbol filter </label>&nbsp;&nbsp;
-    <select #symbolFilter id="symbolFilter" name="symbolFilter" (click)="setTicker(symbolFilter.value)">
-      <option value="">Show all</option>
-      <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
-    </select>
-
-  </div>
-
-  <div class="mt-2" *ngFor="let g of response.grouped">
-    <div class="text-muted font-size-small row">
+  <div *ngFor="let g of response.grouped">
+    <div class="text-muted font-size-small row mb-2 mt-3">
       <div class="col-2">{{g.name}}</div>
       <div class="col-10 text-right">
         balance: <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>
       </div>
     </div>
-    <table class="table table-hover border">
+    <table class="table table-hover border rounded">
       <thead class="thead-light">
         <tr>
-          <th>Date</th>
-          <th>Symbol</th>
+          <th width="100">Date</th>
+          <th width="100">Symbol</th>
           <th>Description</th>
-          <th>Debit</th>
-          <th>Credit</th>
+          <th width="125" class="text-right">Debit</th>
+          <th width="125" class="text-right">Credit</th>
         </tr>
       </thead>
       <tbody>
@@ -75,17 +79,17 @@
           <td>{{ t.date | date:'shortDate'}}</td>
           <td><a [routerLink]="[ '/stocks', t.ticker ]" target="_blank">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>
-          <td>{{ t.debit | currency }}</td>
-          <td>{{ t.credit | currency }}</td>
+          <td class="text-right">{{ t.debit | currency }}</td>
+          <td class="text-right">{{ t.credit | currency }}</td>
         </tr>
       </tbody>
       <tfoot>
-        <tr class="table-info">
+        <tr class="table-secondary">
           <td>Totals</td>
           <td></td>
           <td></td>
-          <td>{{g.transactions.debit | currency}}</td>
-          <td>{{g.transactions.credit | currency}}</td>
+          <td class="text-right">{{g.transactions.debit | currency}}</td>
+          <td class="text-right">{{g.transactions.credit | currency}}</td>
         </tr>
       </tfoot>
     </table>

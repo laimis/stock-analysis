@@ -38,7 +38,7 @@ namespace core.Portfolio.Output
             {
                 return t.Ticker;
             }
-            return t.Date.ToString("yyyy-MM-01");
+            return t.Date.ToString("MMMM, yyyy");
         }
 
         public IEnumerable<Transaction> Transactions { get; }
