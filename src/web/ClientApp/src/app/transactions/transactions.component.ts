@@ -9,7 +9,8 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class TransactionsComponent implements OnInit {
   response: TransactionList
-  ticker: string;
+  ticker: string
+  groupBy: string
 
   constructor(
     private stockService:StocksService,
@@ -18,18 +19,35 @@ export class TransactionsComponent implements OnInit {
 
   ngOnInit() {
     var ticker = this.route.snapshot.queryParamMap.get("ticker")
-    this.loadTransactions(ticker)
+
+    this.groupBy = "month"
+    this.ticker = ticker;
+
+    this.loadData()
   }
 
-  loadTransactions(ticker:string) {
-    this.ticker = ticker
-    this.stockService.getTransactions(ticker).subscribe(r => {
+  loadData() {
+    this.stockService.getTransactions(this.ticker, this.groupBy).subscribe(r => {
       this.response = r
     })
   }
 
+  setTicker(ticker:string) {
+    this.ticker = ticker
+    this.loadData()
+  }
+
   clearFilter() {
-    this.loadTransactions(null)
+    this.ticker = null
+    this.loadData()
+  }
+
+  setGroupBy(type:string) {
+    if (type != this.groupBy)
+    {
+      this.groupBy = type
+      this.loadData()
+    }
   }
 
 }

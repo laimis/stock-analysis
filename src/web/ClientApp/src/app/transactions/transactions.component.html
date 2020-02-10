@@ -15,7 +15,7 @@
         <div class="col">
           <span class="font-weight-bold">{{response.debit | currency}}</span> debit
         </div>
-        <div class="col">
+        <div class="col text-right">
           <span class="font-weight-bold">{{response.credit | currency}}</span> credit
         </div>
       </div>
@@ -23,7 +23,7 @@
         <div class="col">
           <span class="font-weight-bold">{{response.optionDebit | currency}}</span> option debit
         </div>
-        <div class="col">
+        <div class="col text-right">
           <span class="font-weight-bold">{{response.optionCredit | currency}}</span> option credit
         </div>
       </div>
@@ -43,14 +43,32 @@
 
   </div>
 
-  <h3 *ngIf="response.transactions.length > 0">Breakdown by month</h3>
+  <div *ngIf="response.transactions.length > 0">
+
+    <label for="breakdownFilter">Breakdown by</label>&nbsp;&nbsp;
+    <select class="mr-3" #breakdownFilter id="breakdownFilter" name="breakdownFilter" (click)="setGroupBy(breakdownFilter.value)">
+      <option value="month">Month</option>
+      <option value="ticker">Symbol</option>
+    </select>
+
+    <!-- <label for="tickerFilter">Filter by ticker</label>&nbsp;&nbsp;
+    <select #tickerFilter id="tickerFilter" name="tickerFilter" (ngModelChange)="onTickerFilterChange(tickerFilter.value)">
+      <option value=""></option>
+      <option value="call">call</option>
+      <option value="put">put</option>
+    </select> -->
+
+  </div>
 
   <div class="mt-2" *ngFor="let g of response.grouped">
+    <div class="text-muted font-size-small row">
+      <div class="col-2">{{g.name}}</div>
+      <div class="col-10 text-right">
+        balance: <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>,
+        balance from options <span class="font-weight-bold">{{ g.transactions.optionCredit - g.transactions.optionDebit | currency }}</span>
+      </div>
+    </div>
     <table class="table table-striped border">
-      <caption>{{g.name}} breakdown <span class="float-right">
-        debit: {{g.transactions.debit | currency}} |
-        credit: {{g.transactions.credit | currency}}</span>
-      </caption>
       <thead class="thead-light">
         <tr>
           <th>Date</th>
@@ -65,12 +83,21 @@
           [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
           *ngFor="let t of g.transactions.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
-          <td><a [routerLink]="" (click)="!!loadTransactions(t.ticker)">{{t.ticker}}</a></td>
+          <td><a [routerLink]="" (click)="!!setTicker(t.ticker)">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>
           <td>{{ t.debit | currency }}</td>
           <td>{{ t.credit | currency }}</td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr>
+          <td>Totals</td>
+          <td></td>
+          <td></td>
+          <td>{{g.transactions.debit | currency}}</td>
+          <td>{{g.transactions.credit | currency}}</td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

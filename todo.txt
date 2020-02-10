@@ -18,19 +18,18 @@ FEATURES
     help section perhaps with all the documentation?
 - recent changes
 - import of shares/options in transaction screens
-
+- delete transactions?
 
 https://github.com/wenboyu2/yahoo-earnings-calendar
 
 IMPROVEMENTS/FIXES
 
-- transactions gain/profit
 - better filtering of transactions (list of stocks)
-
 
 DESIGN/UX
 
 - search in the header
+- angular material
 
 DEV
 - practice use of polly

@@ -53,16 +53,16 @@ namespace core
         internal static TransactionList ToTransactionLog(
             IEnumerable<OwnedStock> stocks,
             IEnumerable<OwnedOption> options,
-            string ticker)
+            string ticker,
+            string groupBy)
         {
             var log = stocks.Where(s => s.State.Ticker == (ticker != null ? ticker : s.State.Ticker))
             .SelectMany(s => s.State.Transactions)
             .Union(options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
             .SelectMany(o => o.State.Transactions))
-            .OrderByDescending(t => t.Date)
             .ToList();
 
-            return new TransactionList(log, true);
+            return new TransactionList(log, groupBy);
         }
 
         internal static NotesList MapNotes(IEnumerable<Note> notes)
@@ -141,7 +141,7 @@ namespace core
                 strikePrice = o.State.StrikePrice,
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
                 numberOfContracts = o.State.NumberOfContracts,
-                transactions = new TransactionList(o.State.Transactions, false)
+                transactions = new TransactionList(o.State.Transactions, null)
             };
         }
 

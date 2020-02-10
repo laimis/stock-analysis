@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using core.Shared;
@@ -6,20 +7,38 @@ namespace core.Portfolio.Output
 {
     public class TransactionList
     {
-        public TransactionList(IEnumerable<Transaction> transactions, bool grouped)
+        public TransactionList(IEnumerable<Transaction> transactions, string groupBy)
         {
-            this.Transactions = transactions;
+            this.Transactions = Ordered(transactions, groupBy);
             
-            if (grouped)
+            if (groupBy != null)
             {
-                this.Grouped = this.Transactions
-                    .OrderByDescending(t => t.Date)
-                    .GroupBy(t => t.Date.ToString("yyyy-MM-01"))
+                this.Grouped = Ordered(transactions, groupBy)
+                    .GroupBy(t => GroupByValue(groupBy, t))
                     .Select(g => new {
                         name = g.Key,
-                        transactions = new TransactionList(g, false)
+                        transactions = new TransactionList(g, null)
                     });
             }
+        }
+
+        private IEnumerable<Transaction> Ordered(IEnumerable<Transaction> transactions, string groupBy)
+        {
+            if (groupBy == "ticker")
+            {
+                return transactions.OrderBy(t => t.Ticker);
+            }
+
+            return transactions.OrderByDescending(t => t.Date);
+        }
+
+        private static string GroupByValue(string groupBy, Transaction t)
+        {
+            if (groupBy == "ticker")
+            {
+                return t.Ticker;
+            }
+            return t.Date.ToString("yyyy-MM-01");
         }
 
         public IEnumerable<Transaction> Transactions { get; }

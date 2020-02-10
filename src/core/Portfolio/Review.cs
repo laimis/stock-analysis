@@ -53,7 +53,7 @@ namespace core.Portfolio
 
                 return new ReviewList {
                     Tickers = groups,
-                    TransactionList = new TransactionList(transactions, true)
+                    TransactionList = new TransactionList(transactions, null)
                 };
             }
 

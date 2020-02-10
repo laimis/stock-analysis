@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
@@ -31,9 +30,9 @@ namespace web.Controllers
         }
 
         [HttpGet("transactions")]
-        public Task<TransactionList> TransactionsAsync(string ticker)
+        public Task<TransactionList> TransactionsAsync(string ticker, string groupBy)
         {
-            var query = new Transactions.Query(this.User.Identifier(), ticker);
+            var query = new Transactions.Query(this.User.Identifier(), ticker, groupBy);
 
             return _mediator.Send(query);
         }
