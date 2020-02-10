@@ -11,6 +11,7 @@ export class TransactionsComponent implements OnInit {
   response: TransactionList
   ticker: string
   groupBy: string
+  filterType: string = ""
 
   constructor(
     private stockService:StocksService,
@@ -27,7 +28,7 @@ export class TransactionsComponent implements OnInit {
   }
 
   loadData() {
-    this.stockService.getTransactions(this.ticker, this.groupBy).subscribe(r => {
+    this.stockService.getTransactions(this.ticker, this.groupBy, this.filterType).subscribe(r => {
       this.response = r
     })
   }
@@ -46,6 +47,14 @@ export class TransactionsComponent implements OnInit {
     if (type != this.groupBy)
     {
       this.groupBy = type
+      this.loadData()
+    }
+  }
+
+  setFilter(type:string) {
+    if (type != this.filterType)
+    {
+      this.filterType = type
       this.loadData()
     }
   }

@@ -30,9 +30,9 @@ namespace web.Controllers
         }
 
         [HttpGet("transactions")]
-        public Task<TransactionList> TransactionsAsync(string ticker, string groupBy)
+        public Task<TransactionList> TransactionsAsync(string ticker, string groupBy, string show)
         {
-            var query = new Transactions.Query(this.User.Identifier(), ticker, groupBy);
+            var query = new Transactions.Query(this.User.Identifier(), ticker, groupBy, show);
 
             return _mediator.Send(query);
         }

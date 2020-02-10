@@ -54,13 +54,26 @@ namespace core
             IEnumerable<OwnedStock> stocks,
             IEnumerable<OwnedOption> options,
             string ticker,
-            string groupBy)
+            string groupBy,
+            string show)
         {
-            var log = stocks.Where(s => s.State.Ticker == (ticker != null ? ticker : s.State.Ticker))
-            .SelectMany(s => s.State.Transactions)
-            .Union(options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
-            .SelectMany(o => o.State.Transactions))
-            .ToList();
+            var log = new List<Shared.Transaction>();
+
+            if (string.IsNullOrEmpty(show) || show == "shares")
+            {
+                log.AddRange(
+                    stocks.Where(s => s.State.Ticker == (ticker != null ? ticker : s.State.Ticker))
+                        .SelectMany(s => s.State.Transactions)
+                );
+            }
+
+            if (string.IsNullOrEmpty(show) || show == "options")
+            {
+                log.AddRange(
+                    options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
+                        .SelectMany(o => o.State.Transactions)
+                );
+            }
 
             return new TransactionList(log, groupBy);
         }

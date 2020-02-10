@@ -19,19 +19,10 @@
           <span class="font-weight-bold">{{response.credit | currency}}</span> credit
         </div>
       </div>
-      <div class="row">
-        <div class="col">
-          <span class="font-weight-bold">{{response.optionDebit | currency}}</span> option debit
-        </div>
-        <div class="col text-right">
-          <span class="font-weight-bold">{{response.optionCredit | currency}}</span> option credit
-        </div>
-      </div>
     </div>
 
     <div class="card-footer">
-      Balance: <span class="font-weight-bold">{{ response.credit - response.debit | currency }}</span>,
-      balance from options <span class="font-weight-bold">{{ response.optionCredit - response.optionDebit | currency }}</span>
+      Balance: <span class="font-weight-bold">{{ response.credit - response.debit | currency }}</span>
     </div>
   </div>
 
@@ -51,12 +42,12 @@
       <option value="ticker">Symbol</option>
     </select>
 
-    <!-- <label for="tickerFilter">Filter by ticker</label>&nbsp;&nbsp;
-    <select #tickerFilter id="tickerFilter" name="tickerFilter" (ngModelChange)="onTickerFilterChange(tickerFilter.value)">
-      <option value=""></option>
-      <option value="call">call</option>
-      <option value="put">put</option>
-    </select> -->
+    <label for="showFilter">Show </label>&nbsp;&nbsp;
+    <select #showFilter id="showFilter" name="showFilter" (click)="setFilter(showFilter.value)">
+      <option value="">Shares and options</option>
+      <option value="shares">Just shares</option>
+      <option value="options">Just options</option>
+    </select>
 
   </div>
 
@@ -64,11 +55,10 @@
     <div class="text-muted font-size-small row">
       <div class="col-2">{{g.name}}</div>
       <div class="col-10 text-right">
-        balance: <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>,
-        balance from options <span class="font-weight-bold">{{ g.transactions.optionCredit - g.transactions.optionDebit | currency }}</span>
+        balance: <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>
       </div>
     </div>
-    <table class="table table-striped border">
+    <table class="table table-hover border">
       <thead class="thead-light">
         <tr>
           <th>Date</th>
@@ -80,7 +70,6 @@
       </thead>
       <tbody>
         <tr
-          [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
           *ngFor="let t of g.transactions.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
           <td><a [routerLink]="" (click)="!!setTicker(t.ticker)">{{t.ticker}}</a></td>
@@ -90,7 +79,7 @@
         </tr>
       </tbody>
       <tfoot>
-        <tr>
+        <tr class="table-info">
           <td>Totals</td>
           <td></td>
           <td></td>

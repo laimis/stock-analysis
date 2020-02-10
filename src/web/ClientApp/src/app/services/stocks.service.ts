@@ -35,11 +35,11 @@ export class StocksService {
     return this.http.get<ReviewList>('/api/portfolio/review')
   }
 
-  getTransactions(ticker:string, groupBy:string): Observable<TransactionList> {
+  getTransactions(ticker:string, groupBy:string, filter:string): Observable<TransactionList> {
     if (ticker === null) {
       ticker = ''
     }
-    return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}`)
+    return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}`)
   }
 
   // ----------------- notes ---------------------

@@ -10,14 +10,16 @@ namespace core.Portfolio
     {
         public class Query : RequestWithUserId<TransactionList>
         {
-            public Query(Guid userId, string ticker, string groupBy) : base(userId)
+            public Query(Guid userId, string ticker, string groupBy, string show) : base(userId)
             {
                 this.Ticker = ticker;
                 this.GroupBy = groupBy;
+                this.Show = show;
             }
 
             public string Ticker { get; }
             public string GroupBy { get; }
+            public string Show { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, TransactionList>
@@ -33,7 +35,12 @@ namespace core.Portfolio
 
                 await Task.WhenAll(stocks, options);
 
-                return Mapper.ToTransactionLog(stocks.Result, options.Result, request.Ticker, request.GroupBy);
+                return Mapper.ToTransactionLog(
+                    stocks.Result,
+                    options.Result,
+                    request.Ticker,
+                    request.GroupBy,
+                    request.Show);
             }
         }
     }
