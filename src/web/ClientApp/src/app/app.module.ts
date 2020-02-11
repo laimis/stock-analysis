@@ -34,6 +34,7 @@ import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { SymbolSearchComponent } from './symbol-search/symbol-search.component';
 import { PlaygroundComponent } from './playground/playground.component';
+import { OwnedStockDetailComponent } from './owned-stock-detail/owned-stock-detail.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -58,6 +59,7 @@ var routes = [
   { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
+  { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/transaction', component: StockTransactionComponent, canActivate: [AuthGuard] },
   { path: 'stocks/transaction/:ticker', component: StockTransactionComponent, canActivate: [AuthGuard] },
@@ -81,6 +83,7 @@ var routes = [
     NotesComponent,
     OptionDetailComponent,
     OptionSellComponent,
+    OwnedStockDetailComponent,
     PlaygroundComponent,
     PrivacyComponent,
     ProfileComponent,

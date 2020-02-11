@@ -78,5 +78,10 @@ namespace coretests.Fakes
         {
             return Task.CompletedTask;
         }
+
+        public Task<OwnedStock> GetStock(Guid id, Guid userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

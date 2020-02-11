@@ -58,7 +58,9 @@
           <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
           <td class="text-right">{{ticker.owned}}</td>
           <td>shares owned</td>
-          <td></td>
+          <td>
+            <a [routerLink]="[ '/stockdetails', ticker.id ]">details</a>
+          </td>
         </tr>
       </tbody>
     </table>

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using core;
@@ -26,6 +27,15 @@ namespace web.Controllers
         public async Task<object> DetailsAsync(string ticker)
         {
             return await _mediator.Send(new Details.Query(ticker));
+        }
+
+        [HttpGet("details/{id}")]
+        public async Task<object> OwnedStockDetails(Guid id)
+        {
+            var query = new Get.Query(id);
+            query.WithUserId(User.Identifier());
+
+            return await _mediator.Send(query);
         }
 
         [HttpGet("search/{term}")]

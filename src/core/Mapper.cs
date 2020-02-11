@@ -165,8 +165,10 @@ namespace core
         {
             return new
             {
+                id = o.Id,
                 ticker = o.State.Ticker,
                 owned = o.State.Owned,
+                transactions = new TransactionList(o.State.Transactions, null)
             };
         }
     }

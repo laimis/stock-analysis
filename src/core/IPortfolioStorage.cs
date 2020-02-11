@@ -10,6 +10,7 @@ namespace core
     public interface IPortfolioStorage
     {
         Task<OwnedStock> GetStock(string ticker, Guid userId);
+        Task<OwnedStock> GetStock(Guid id, Guid userId);
         Task<IEnumerable<OwnedStock>> GetStocks(Guid userId);
         Task Save(OwnedStock stock, Guid userId);
 

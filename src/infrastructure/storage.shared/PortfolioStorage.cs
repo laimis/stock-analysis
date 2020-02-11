@@ -30,6 +30,13 @@ namespace storage.shared
             return stocks.SingleOrDefault(s => s.State.Ticker == ticker);
         }
 
+        public async Task<OwnedStock> GetStock(Guid stockId, Guid userId)
+        {
+            var stocks = await GetStocks(userId);
+            
+            return stocks.SingleOrDefault(s => s.Id == stockId);
+        }
+
         public Task Save(OwnedStock stock, Guid userId)
         {
             return Save(stock, _stock_entity, userId);

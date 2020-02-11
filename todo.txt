@@ -1,6 +1,7 @@
+- stock transaction details
+
 - draft reach out letter, see what they can be helped with
 
-- stock transaction details
 - automated emails:
     load options
         - expiration this week? highglight! how many days left
@@ -13,9 +14,12 @@
     admin console button to generate it
     
 - delete transactions
-
 - losses/active/gainers combined with the ones you own or took notes
+- notes on the additional transactions in options/shares details screens
+- on detail pages disable buy/sell buttons to eliminate duplicate transactions
 
+
+git 
 FEATURES
 
 - how to list the upcoming earnings companies, but 2-3 weeks out

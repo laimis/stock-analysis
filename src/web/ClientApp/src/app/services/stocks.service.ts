@@ -79,6 +79,10 @@ export class StocksService {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
   }
 
+  getStock(id:string): Observable<object> {
+		return this.http.get<object>(`/api/stocks/details/${id}`)
+  }
+
   importStocks(file: any) : Observable<any> {
     return this.http.post('/api/stocks/import', file)
   }
@@ -96,13 +100,13 @@ export class StocksService {
       return of([]);
     }
     return this.http.get<object[]>(`/api/stocks/search/${term}`).pipe(
-      tap(_ => console.log(`found stoks matching "${term}"`))
+      tap(_ => console.log(`found stocks matching "${term}"`))
     );
   }
 
   // ------- portfolio ----------------
 
-	getPortfolio(): Observable<Portfolio> {
+  getPortfolio(): Observable<Portfolio> {
 		return this.http.get<Portfolio>('/api/portfolio')
   }
 
