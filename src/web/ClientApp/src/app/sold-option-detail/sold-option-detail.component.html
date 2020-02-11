@@ -16,6 +16,8 @@
         </h3>
         <h5 class="card-subtitle text-muted">
           Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
+          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
+          <span *ngIf="option.expired" class="ml-1 badge badge-danger">expired</span>
         </h5>
       </div>
     </div>
@@ -51,9 +53,10 @@
             </div>
           </div>
 
-
-          <button type="submit" class="btn btn-primary mb-1" (click)="record()">Record</button>&nbsp;&nbsp;
-          <button type="submit" class="btn btn-secondary mb-1" (click)="back()">Back</button>&nbsp;&nbsp;
+          <div>
+            <button type="button" class="btn btn-primary mb-1 mr-2" (click)="record()">Record</button>
+            <button type="button" class="btn btn-secondary mb-1 mr-2" (click)="back()">Back</button>
+          </div>
         </form>
       </div>
     </div>

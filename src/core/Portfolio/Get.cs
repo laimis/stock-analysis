@@ -29,7 +29,9 @@ namespace core.Portfolio
 
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
-                var openOptions = options.Where(o => o.State.NumberOfContracts != 0);
+                var openOptions = options
+                    .Where(o => o.State.NumberOfContracts != 0 && o.State.ExpiredDays > -5)
+                    .OrderBy(o => o.State.Expiration);
 
                 var obj = new
                 {

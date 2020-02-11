@@ -29,6 +29,7 @@ namespace core.Options
         public List<OptionSold> Sells { get; private set; }
         public List<OptionPurchased> Buys { get; private set; }
         public List<OptionExpired> Expirations { get; private set; }
+        public long ExpiredDays => (long)this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays;
 
         internal void Apply(OptionExpired expired)
         {

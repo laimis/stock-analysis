@@ -144,6 +144,8 @@ namespace core
 
         public static object ToOptionView(OwnedOption o)
         {
+            var daysLeft = o.State.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays;
+
             return new
             {
                 id = o.State.Id,
@@ -151,8 +153,11 @@ namespace core
                 optionType = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
-                numberOfContracts = o.State.NumberOfContracts,
-                transactions = new TransactionList(o.State.Transactions, null)
+                numberOfContracts = Math.Abs(o.State.NumberOfContracts),
+                boughtOrSold = o.State.NumberOfContracts > 0 ? "Bought" : "Sold",
+                transactions = new TransactionList(o.State.Transactions, null),
+                expiresSoon = daysLeft >= 0 && daysLeft < 7,
+                expired = daysLeft < 0
             };
         }
 

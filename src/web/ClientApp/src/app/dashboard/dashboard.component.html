@@ -28,14 +28,41 @@
   <h3 class="mt-4">Ownership</h3>
 
   <div *ngIf="openOptions.length > 0 || owned.length > 0">
-    <div *ngFor="let option of openOptions" class="mb-1">
-      <a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a> @ <b>{{option.strikePrice | currency}}</b>
-      {{option.type}} expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
-        (<a [routerLink]="[ '/optiondetails', option.id ]">details</a>)
-    </div>
-    <div *ngFor="let ticker of owned" class="mb-1">
-      {{ticker.owned}} <i>shares</i> of <a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a>
-    </div>
+    <table class="table table-hover border">
+      <thead class="thead-light">
+        <tr>
+          <th width="50">Symbol</th>
+          <th width="50">Amount</th>
+          <th>Details</th>
+          <th width="100">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let option of openOptions">
+          <td><a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a></td>
+          <td class="text-right">{{option.numberOfContracts}}</td>
+          <td>
+            {{option.boughtOrSold}}
+            <b>{{option.strikePrice | currency}}</b>
+            {{option.optionType}}
+            expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
+
+            <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
+            <span *ngIf="option.expired" class="ml-1 badge badge-danger">expired</span>
+          </td>
+          <td>
+            <a [routerLink]="[ '/optiondetails', option.id ]">details</a>
+          </td>
+        </tr>
+        <tr *ngFor="let ticker of owned">
+          <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
+          <td class="text-right">{{ticker.owned}}</td>
+          <td>shares owned</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
   </div>
 
   <div *ngIf="openOptions.length == 0 && owned.length == 0">
