@@ -1,0 +1,21 @@
+<form>
+  <div class="form-group">
+    <label for="to">To</label>
+    <input type="email" class="form-control" id="to" name="to" [(ngModel)]="to">
+  </div>
+  <div class="form-group">
+    <label for="from">From</label>
+    <input type="email" class="form-control" id="from" name="from" [(ngModel)]="from">
+  </div>
+  <div class="form-group">
+    <label for="subject">Subject</label>
+    <input type="email" class="form-control" id="subject" name="subject" [(ngModel)]="subject">
+  </div>
+  <div class="form-group">
+    <label for="to">Body</label>
+    <textarea class="form-control" id="body" name="body" rows="5" [(ngModel)]="body"></textarea>
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-primary" (click)="send()">Send</button>
+  </div>
+</form>

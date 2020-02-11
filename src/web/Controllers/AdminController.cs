@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using core;
 using core.Account;
+using core.Adapters.Emails;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,18 @@ namespace web.Controllers
         private IMediator _mediator;
         private IAccountStorage _storage;
         private IPortfolioStorage _portfolio;
+        private IEmailService _email;
 
         public AdminController(
             IMediator mediator,
             IAccountStorage storage,
-            IPortfolioStorage portfolio)
+            IPortfolioStorage portfolio,
+            IEmailService email)
         {
             _mediator = mediator;
             _storage = storage;
             _portfolio = portfolio;
+            _email = email;
         }
 
         [HttpGet("loginas/{userId}")]
@@ -38,6 +42,19 @@ namespace web.Controllers
             await AccountController.EstablishSignedInIdentity(HttpContext, u);
 
             return this.Redirect("~/");
+        }
+
+        [HttpPost("email")]
+        public async Task<ActionResult> Email(EmailInput obj)
+        {
+            await this._email.Send(
+                obj.To,
+                obj.From,
+                obj.Subject,
+                obj.Body
+            );
+
+            return this.Ok();
         }
 
         [HttpGet("users")]

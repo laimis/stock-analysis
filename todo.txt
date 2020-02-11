@@ -1,4 +1,6 @@
-- draft reach out letter, see what they can be helped with
+- email interface
+- test email interface
+- send email out
 
 - automated emails:
     load options
@@ -12,13 +14,11 @@
     admin console button to generate it
     - losses/active/gainers combined with the ones you own or took notes
 
-- delete transactions
 - notes on the additional transactions in options/shares details screens
 
-
-git 
 FEATURES
 
+- robinhood targetted import of monthly summary
 - how to list the upcoming earnings companies, but 2-3 weeks out
 - ownership dashboard that is like trends but for stuff you ownership
     show how many shares

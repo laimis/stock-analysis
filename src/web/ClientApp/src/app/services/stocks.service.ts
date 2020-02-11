@@ -22,7 +22,6 @@ export function GetErrors(err:any): string[] {
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
-
   constructor(private http: HttpClient) { }
 
   // ----------------- misc ---------------------
@@ -166,6 +165,10 @@ export class StocksService {
     return this.http.post<object>('/api/account/contact', obj)
   }
 
+  sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
+    return this.http.post<object>('/api/admin/email', obj)
+  }
+
 }
 
 export interface ReviewList {
@@ -242,4 +245,5 @@ export interface AccountStatus {
   created: string
   verified: boolean
   loggedIn: boolean
+  isAdmin: boolean
 }

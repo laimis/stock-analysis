@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.Emails;
 using core.Shared;
 
 namespace core.Account
@@ -42,7 +43,8 @@ namespace core.Account
                     created = user.Created,
                     email = user.Email,
                     firstname = user.Firstname,
-                    lastname = user.Lastname
+                    lastname = user.Lastname,
+                    isAdmin = user.Email == EmailSettings.Admin
                 };
             }
         }

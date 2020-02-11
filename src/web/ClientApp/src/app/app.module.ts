@@ -1,7 +1,7 @@
 
 import { AddNoteComponent } from './notes/add-note.component';
 import { AppComponent } from './app.component';
-import { AuthGuard, AuthGuardUnverifiedAllowed } from './auth/auth.guard';
+import { AuthGuard, AuthGuardUnverifiedAllowed, AuthGuardAdminOnly } from './auth/auth.guard';
 import { BrowserModule } from '@angular/platform-browser';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ErrorDisplayComponent } from './shared/error-display/error-display.component';
@@ -35,9 +35,11 @@ import { PrivacyComponent } from './privacy/privacy.component';
 import { SymbolSearchComponent } from './symbol-search/symbol-search.component';
 import { PlaygroundComponent } from './playground/playground.component';
 import { OwnedStockDetailComponent } from './owned-stock-detail/owned-stock-detail.component';
+import { AdminEmailComponent } from './admin-email/admin-email.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
@@ -72,6 +74,7 @@ var routes = [
 @NgModule({
   declarations: [
     AddNoteComponent,
+    AdminEmailComponent,
     AppComponent,
     ContactComponent,
     DashboardComponent,

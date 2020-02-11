@@ -42,3 +42,21 @@ export class AuthGuardUnverifiedAllowed implements CanActivate {
    return true;
  }
 }
+
+@Injectable({providedIn: 'root'})
+export class AuthGuardAdminOnly implements CanActivate {
+
+  constructor(
+    private stocks : StocksService,
+    private router : Router){}
+
+ async canActivate(): Promise<boolean> {
+   //get user data
+   const result = await this.stocks.getProfile().toPromise<AccountStatus>();
+   if (!result.isAdmin) {
+     this.router.navigate(['/unauthorized'])
+     return false;
+   }
+   return true;
+ }
+}
