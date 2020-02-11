@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 
@@ -43,13 +44,13 @@ namespace web.Controllers
             var error = r.Error;
             if (error == null)
             {
-                await EstablishSignedInIdentity(r.Aggregate);
+                await EstablishSignedInIdentity(HttpContext, r.Aggregate);
             }
 
             return this.OkOrError(r);
         }
 
-        private async Task EstablishSignedInIdentity(User user)
+        internal static async Task EstablishSignedInIdentity(HttpContext context, User user)
         {
             var claims = new List<Claim>
             {
@@ -64,7 +65,7 @@ namespace web.Controllers
 
             var principal = new ClaimsPrincipal(claimsIdentity);
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
         }
 
         [HttpGet("login")]
@@ -109,7 +110,7 @@ namespace web.Controllers
             var error = r.Error;
             if (error == null)
             {
-                await EstablishSignedInIdentity(r.Aggregate);
+                await EstablishSignedInIdentity(HttpContext, r.Aggregate);
             }
             
             return this.OkOrError(r);
@@ -151,7 +152,7 @@ namespace web.Controllers
             var error = r.Error;
             if (error == null)
             {
-                await EstablishSignedInIdentity(r.Aggregate);
+                await EstablishSignedInIdentity(HttpContext, r.Aggregate);
             }
 
             return this.OkOrError(r);
@@ -170,7 +171,7 @@ namespace web.Controllers
                 return this.Error(error);
             }
 
-            await EstablishSignedInIdentity(r.Aggregate);
+            await EstablishSignedInIdentity(HttpContext, r.Aggregate);
 
             return Redirect("~/");
         }

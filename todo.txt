@@ -1,5 +1,12 @@
+- draft reach out letter, see what they can be helped with
+
 FEATURES
 
+- how to list the upcoming earnings companies, but 2-3 weeks out
+- ownership dashboard that is like trends but for stuff you ownership
+    show how many shares
+    average price, one bigger table that adjusts with number of stocks/otions?
+    options expiring this week tag
 - add to watchlist, see how alpha does it
 - review reminders or daily/weekly report
 - better welcome page, "show me the goods" walk through
@@ -15,8 +22,6 @@ LONG TERM
 - import of shares/options in transaction screens
 - delete transactions?
 - support indexes?
-- how to list the upcoming earnings companies, but 2-3 weeks out
-- ownership dashboard that is like trends but for stuff you ownership
 
 https://github.com/wenboyu2/yahoo-earnings-calendar
 

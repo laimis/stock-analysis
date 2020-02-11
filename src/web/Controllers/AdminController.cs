@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using core;
 using core.Account;
 using MediatR;
@@ -28,19 +30,37 @@ namespace web.Controllers
             _portfolio = portfolio;
         }
 
+        [HttpGet("loginas/{userId}")]
+        public async Task<ActionResult> LoginAs(Guid userId)
+        {
+            var u = await _storage.GetUser(userId);
+
+            await AccountController.EstablishSignedInIdentity(HttpContext, u);
+
+            return this.Redirect("~/");
+        }
+
         [HttpGet("users")]
-        public async System.Threading.Tasks.Task<ActionResult> ActiveAccountsAsync()
+        public async Task<ActionResult> ActiveAccountsAsync()
         {
             var users = await _storage.GetUsers();
 
             var sb = new StringBuilder();
 
-            sb.Append("<html><body><table><tr><th>Email</th><th>Last Login</th><th>Stocks</th><th>Options</th><th>Notes</th></tr>");
+            sb.Append(@"<html><body><table><tr>
+                <th>Email</th>
+                <th>User Id</th>
+                <th>Last Login</th>
+                <th>Stocks</th>
+                <th>Options</th>
+                <th>Notes</th>
+            </tr>");
 
             foreach(var (email,userId) in users)
             {
                 sb.Append($"<tr>");
                 sb.Append($"<td>{email}</td>");
+                sb.Append($"<td>{userId}</td>");
 
                 var guid = new System.Guid(userId);
 
