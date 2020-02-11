@@ -1,8 +1,5 @@
-- wire up expire button to options
-- show status of option in option details
-
 - draft reach out letter, see what they can be helped with
-- show on the dashboard is the contract PUT or CALL, how many contracts, order by expiration
+
 - stock transaction details
 - automated emails:
     load options
@@ -16,6 +13,8 @@
     admin console button to generate it
     
 - delete transactions
+
+- losses/active/gainers combined with the ones you own or took notes
 
 FEATURES
 
