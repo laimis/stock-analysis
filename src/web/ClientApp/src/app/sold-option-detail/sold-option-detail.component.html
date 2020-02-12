@@ -17,7 +17,7 @@
         <h5 class="card-subtitle text-muted">
           Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
           <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-          <span *ngIf="option.expired" class="ml-1 badge badge-danger">expired</span>
+          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
         </h5>
       </div>
     </div>

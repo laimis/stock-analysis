@@ -1,5 +1,3 @@
-<h2>Your Review</h2>
-
 <div *ngIf="!loaded">
   Generating your report, this might take a while, please wait
   <div class="spinner-border text-info spinner-border-sm" role="status">
@@ -7,86 +5,71 @@
   </div>
 </div>
 
-<div *ngIf="result && result.transactions.transactions.length > 0">
-
+<div *ngIf="loaded">
   <div class="card mt-2 mb-3">
     <div class="card-header">
-      <span class="font-weight-bold">Transaction Summary</span>
-      from <b>{{ result.start | date }}</b> to <b>{{ result.end | date}}</b>
-      <span class="float-right">({{ result.transactions.transactions.length}} transactions)</span>
+      <span class="font-weight-bold">Week of {{ result.start | date }} review</span>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col">
-          <span class="font-weight-bold">{{result.transactions.debit | currency}}</span> debit
+          Transactions
         </div>
-        <div class="col text-right">
-          <span class="font-weight-bold">{{result.transactions.credit | currency}}</span> credit
+        <div class="col">
+          {{ result.transactions.transactions.length}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          Debits
+        </div>
+        <div class="col">
+          {{result.transactions.debit | currency}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          Credits
+        </div>
+        <div class="col">
+          {{result.transactions.credit | currency}}
         </div>
       </div>
     </div>
-
-    <div class="card-footer">
-      Balance: <span class="font-weight-bold">{{ result.transactions.credit - result.transactions.debit | currency }}</span>
-    </div>
   </div>
-
-  <div class="mt-2">
-    <table class="table table-hover border rounded">
-      <thead class="thead-light">
-        <tr>
-          <th width="100">Date</th>
-          <th width="100">Symbol</th>
-          <th>Description</th>
-          <th width="125" class="text-right">Debit</th>
-          <th width="125" class="text-right">Credit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let t of result.transactions.transactions">
-          <td>{{ t.date | date:'shortDate'}}</td>
-          <td><a [routerLink]="[ '/stocks', t.ticker ]" target="_blank">{{t.ticker}}</a></td>
-          <td>{{ t.description }}</td>
-          <td class="text-right">{{ t.debit | currency }}</td>
-          <td class="text-right">{{ t.credit | currency }}</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr class="table-secondary">
-          <td>Totals</td>
-          <td></td>
-          <td></td>
-          <td class="text-right">{{result.transactions.debit | currency}}</td>
-          <td class="text-right">{{result.transactions.credit | currency}}</td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-
 </div>
 
 <div *ngIf="result && result.entries.length > 0">
-  <div class="card mb-3" *ngFor="let e of result.entries">
-    <div class="card-body">
-      <h5 class="card-title">
-        {{e.ticker}}
+  <div class="card mb-5" *ngFor="let e of result.entries">
+    <div class="card-header">
+      <h5>
+        {{e.stats.companyName}} - {{e.ticker}}
         <span class="float-right">{{e.price.amount | currency}}</span>
       </h5>
+    </div>
+    <div class="card-body">
 
-      <div *ngIf="e.expiresIn && e.expiresIn > 0" class="alert alert-success">
-        Expires in {{e.expiresIn}} days.
+      <div class="card-text mb-3">
+        <b>Earnings</b>: <span>{{ e.stats.nextEarningsDate | date }}</span>
+        <span *ngIf="!e.earningsWarning">, {{e.earningsDaysLeft}} days away</span>
       </div>
 
-      <p style="white-space: pre-wrap;" class="card-text" *ngFor="let d of e.descriptions">
-        {{d}}
-      </p>
+      <div class="card-text mb-3" *ngFor="let o of e.ownership">
+        <span *ngIf="o.isExpired" class="ml-1 badge badge-danger">expired</span>
+        <span
+          *ngIf="o.expiration && !o.isExpired && o.daysLeft >= 0"
+          class="badge"
+          [ngClass]="{'badge-success': !o.expiresSoon, 'badge-warning': o.expiresSoon}">
+          Expires in {{o.daysLeft}} days
+        </span>
+        {{o.description}}
+      </div>
 
       <p style="white-space: pre-wrap;" class="card-text" *ngFor="let n of e.notes" >
-        <span class="bg-info rounded text-white p-1 m-1">{{n.date | date }}</span>
-        <span class="bg-secondary rounded text-white p-1 m-1" *ngIf="n.price && n.price.amount > 0">{{n.price.amount | currency }}</span>
-
-        {{n.text}}
+        <span class="p-1 m-1">{{n.created | date }}</span>
+        <span class="bg-light rounded p-1 m-1" *ngIf="n.price && n.price.amount > 0">
+          {{n.price.amount | currency }} </span>
+        {{n.description}}
       </p>
     </div>
   </div>

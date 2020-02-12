@@ -1,7 +1,6 @@
 - review
-    - expires, list on the transactions
     - list if earnings are 1 month away, 2 weeks away, 1 week away
-    
+
 - automated emails:
     load options
         - expiration this week? highglight! how many days left
@@ -16,6 +15,10 @@
 
 - notes on the additional transactions in options/shares details screens
 - write documentation
+- allow to expire the options from UI
+- reject attempt to expire the options that have not reached expiration date
+- upcoming expiration scraping???
+- when was it generated
 
 FEATURES
 

@@ -48,7 +48,7 @@
             expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
 
             <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-            <span *ngIf="option.expired" class="ml-1 badge badge-danger">expired</span>
+            <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
           </td>
           <td>
             <a [routerLink]="[ '/optiondetails', option.id ]">details</a>

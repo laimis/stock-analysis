@@ -55,6 +55,14 @@ namespace core.Options
         public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
             => this.State.IsMatch(ticker, strike, type, expiration);
 
+        public bool IsActive => !this.State.IsExpired && this.State.NumberOfContracts != 0;
+        public string Ticker => this.State.Ticker;
+        public string Description => $"{(State.NumberOfContracts > 0 ? "BOUGHT" : "SOLD")} {Math.Abs(State.NumberOfContracts)} ${State.StrikePrice} {State.OptionType} contracts";
+        public DateTimeOffset Expiration => this.State.Expiration;
+        public bool IsExpired => this.State.IsExpired;
+        public bool ExpiresSoon => this.State.DaysUntilExpiration >= 0 && this.State.DaysUntilExpiration < 7;
+        public long? DaysLeft => this.State.DaysUntilExpiration;
+
         public void Buy(int numberOfContracts, double premium, DateTimeOffset filled, string notes)
         {
             if (numberOfContracts <= 0)

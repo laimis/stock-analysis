@@ -59,16 +59,16 @@ namespace core.Portfolio
             {
                 var entries = new List<ReviewEntry>();
 
-                foreach (var o in options.Result.Where(s => s.State.NumberOfContracts != 0))
+                foreach (var o in options.Result.Where(s => s.IsActive))
                 {
-                    var soldOrBought = o.State.NumberOfContracts > 0 ? "BOUGHT" : "SOLD";
-                    var numberOfContracts = Math.Abs(o.State.NumberOfContracts);
-
                     entries.Add(new ReviewEntry
                     {
-                        Ticker = o.State.Ticker,
-                        Description = $"{soldOrBought} {numberOfContracts} ${o.State.StrikePrice} {o.State.OptionType} contracts",
-                        Expiration = o.State.Expiration
+                        Ticker = o.Ticker,
+                        Description = o.Description,
+                        Expiration = o.Expiration,
+                        IsExpired = o.IsExpired,
+                        ExpiresSoon = o.ExpiresSoon,
+                        DaysLeft = o.DaysLeft
                     });
                 }
 
@@ -76,8 +76,8 @@ namespace core.Portfolio
                 {
                     entries.Add(new ReviewEntry
                     {
-                        Ticker = s.State.Ticker,
-                        Description = $"{s.State.Owned} shares owned",
+                        Ticker = s.Ticker,
+                        Description = s.Description,
                     });
                 }
 
@@ -100,8 +100,9 @@ namespace core.Portfolio
                 foreach (var group in grouped)
                 {
                     var price = await _stocks.GetPrice(group.Key);
+                    var advanced = await _stocks.GetAdvancedStats(group.Key);
 
-                    groups.Add(new ReviewEntryGroup(group, price));
+                    groups.Add(new ReviewEntryGroup(group, price, advanced));
                 }
 
                 return groups;

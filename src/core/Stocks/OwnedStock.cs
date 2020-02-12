@@ -36,6 +36,9 @@ namespace core.Stocks
             this.ApplyInternal(obj);
         }
 
+        public string Ticker => this.State.Ticker;
+        public string Description => $"{this.State.Owned} shares owned";
+
         public void Purchase(int numberOfShares, double price, DateTimeOffset date, string notes = null)
         {
             if (price <= 0)
