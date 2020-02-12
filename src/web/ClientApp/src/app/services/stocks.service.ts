@@ -172,8 +172,10 @@ export class StocksService {
 }
 
 export interface ReviewList {
-  transactionList: TransactionList,
-  tickers: object[]
+  start: string
+  end: string
+  transactions: TransactionList,
+  entries: object[]
 }
 
 export interface TransactionList {

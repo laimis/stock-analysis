@@ -7,8 +7,8 @@ import { StocksService, TransactionList, ReviewList } from '../services/stocks.s
   styleUrls: ['./review.component.css']
 })
 export class ReviewComponent implements OnInit {
-  public entries: object[]
-  public transactions: TransactionList
+  result: ReviewList
+  loaded: boolean = false
 
   constructor(private stockService:StocksService) { }
 
@@ -18,9 +18,9 @@ export class ReviewComponent implements OnInit {
 
   private loadEntries() {
     this.stockService.getReviewEntires().subscribe((r: ReviewList) => {
-      this.entries = r.tickers
-      this.transactions = r.transactionList
-    })
+      this.loaded = true
+      this.result = r
+    }, _ => { this.loaded = true})
   }
 }
 

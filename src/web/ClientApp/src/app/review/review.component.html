@@ -1,41 +1,73 @@
 <h2>Your Review</h2>
 
-<div *ngIf="transactions && transactions.transactions.length > 0">
-  <div class="mt-2">
-    {{ transactions.transactions.length}} transactions with profit of {{ transactions.profit | currency}},
-    {{ transactions.winningPercentage | percent}} positive
+<div *ngIf="!loaded">
+  Generating your report, this might take a while, please wait
+  <div class="spinner-border text-info spinner-border-sm" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="result && result.transactions.transactions.length > 0">
+
+  <div class="card mt-2 mb-3">
+    <div class="card-header">
+      <span class="font-weight-bold">Transaction Summary</span>
+      from <b>{{ result.start | date }}</b> to <b>{{ result.end | date}}</b>
+      <span class="float-right">({{ result.transactions.transactions.length}} transactions)</span>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <span class="font-weight-bold">{{result.transactions.debit | currency}}</span> debit
+        </div>
+        <div class="col text-right">
+          <span class="font-weight-bold">{{result.transactions.credit | currency}}</span> credit
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      Balance: <span class="font-weight-bold">{{ result.transactions.credit - result.transactions.debit | currency }}</span>
+    </div>
   </div>
 
-  <div class="mt-2" *ngFor="let g of transactions.grouped">
-    <table class="table table-striped border">
-      <caption>{{g.name}} breakdown <span class="float-right">profit: {{g.transactions.profit | currency}}</span></caption>
+  <div class="mt-2">
+    <table class="table table-hover border rounded">
       <thead class="thead-light">
         <tr>
-          <th>Date</th>
-          <th>Symbol</th>
+          <th width="100">Date</th>
+          <th width="100">Symbol</th>
           <th>Description</th>
-          <th>Value</th>
-          <th>Profit</th>
+          <th width="125" class="text-right">Debit</th>
+          <th width="125" class="text-right">Credit</th>
         </tr>
       </thead>
       <tbody>
         <tr
-          [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
-          *ngFor="let t of g.transactions.transactions">
+          *ngFor="let t of result.transactions.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
-          <td><a [routerLink]="" (click)="!!loadTransactions(t.ticker)">{{t.ticker}}</a></td>
+          <td><a [routerLink]="[ '/stocks', t.ticker ]" target="_blank">{{t.ticker}}</a></td>
           <td>{{ t.description }}</td>
-          <td>{{ t.value | currency }}</td>
-          <td>{{ t.profit | currency }}</td>
+          <td class="text-right">{{ t.debit | currency }}</td>
+          <td class="text-right">{{ t.credit | currency }}</td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr class="table-secondary">
+          <td>Totals</td>
+          <td></td>
+          <td></td>
+          <td class="text-right">{{result.transactions.debit | currency}}</td>
+          <td class="text-right">{{result.transactions.credit | currency}}</td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 
 </div>
 
-<div *ngIf="entries && entries.length > 0">
-  <div class="card mb-3" *ngFor="let e of entries">
+<div *ngIf="result && result.entries.length > 0">
+  <div class="card mb-3" *ngFor="let e of result.entries">
     <div class="card-body">
       <h5 class="card-title">
         {{e.ticker}}
@@ -52,7 +84,10 @@
 
       <h6 *ngIf="e.notes.length > 0">Notes</h6>
       <p style="white-space: pre-wrap;" class="card-text" *ngFor="let n of e.notes" >
-        {{n}}
+        <span class="bg-info rounded text-white p-1 m-1">{{n.date | date }}</span>
+        <span class="bg-secondary rounded text-white p-1 m-1" *ngIf="n.price && n.price.amount > 0">{{n.price.amount | currency }}</span>
+
+        {{n.text}}
       </p>
     </div>
   </div>

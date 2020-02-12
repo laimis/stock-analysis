@@ -45,16 +45,14 @@ namespace core.Portfolio
 
                 var groups = await CreateReviewGroups(options, stocks, notes);
 
-                var filterDate = request.Date.Date.AddDays(-7);
+                var start = request.Date.Date.AddDays(-7);
+                var end = request.Date.Date;
 
                 var transactions = options.Result.SelectMany(o => o.State.Transactions)
                     .Union(stocks.Result.SelectMany(s => s.State.Transactions))
-                    .Where(t => t.Date > filterDate);
+                    .Where(t => t.Date >= start);
 
-                return new ReviewList {
-                    Tickers = groups,
-                    TransactionList = new TransactionList(transactions, null)
-                };
+                return new ReviewList(start, end, groups, new TransactionList(transactions, null));
             }
 
             private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<OwnedOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
@@ -63,10 +61,13 @@ namespace core.Portfolio
 
                 foreach (var o in options.Result.Where(s => s.State.NumberOfContracts != 0))
                 {
+                    var soldOrBought = o.State.NumberOfContracts > 0 ? "BOUGHT" : "SOLD";
+                    var numberOfContracts = Math.Abs(o.State.NumberOfContracts);
+
                     entries.Add(new ReviewEntry
                     {
                         Ticker = o.State.Ticker,
-                        Description = $"${o.State.StrikePrice} {o.State.OptionType}",
+                        Description = $"{soldOrBought} {numberOfContracts} ${o.State.StrikePrice} {o.State.OptionType} contracts",
                         Expiration = o.State.Expiration
                     });
                 }
@@ -87,6 +88,9 @@ namespace core.Portfolio
                         Ticker = n.State.RelatedToTicker,
                         IsNote = true,
                         Description = n.State.Note,
+                        Created = n.State.Created,
+                        Stats = n.State.Stats,
+                        Price = n.State.Price
                     });
                 }
 
