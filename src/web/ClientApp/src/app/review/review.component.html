@@ -50,8 +50,8 @@
     <div class="card-body">
 
       <div class="card-text mb-3">
-        <b>Earnings</b>: <span>{{ e.stats.nextEarningsDate | date }}</span>
-        <span *ngIf="!e.earningsWarning">, {{e.earningsDaysLeft}} days away</span>
+        <b>Earnings</b> &nbsp;&nbsp; <i>{{ e.stats.nextEarningsDate | date }}</i>&nbsp;&nbsp;
+        <span [ngClass]="{'badge': e.earningsWarning, 'badge-warning': e.earningsWarning}"> {{e.earningsDaysLeft}} days away</span>
       </div>
 
       <div class="card-text mb-3" *ngFor="let o of e.ownership">
@@ -65,12 +65,11 @@
         {{o.description}}
       </div>
 
-      <p style="white-space: pre-wrap;" class="card-text" *ngFor="let n of e.notes" >
-        <span class="p-1 m-1">{{n.created | date }}</span>
-        <span class="bg-light rounded p-1 m-1" *ngIf="n.price && n.price.amount > 0">
-          {{n.price.amount | currency }} </span>
-        {{n.description}}
-      </p>
+      <ul *ngFor="let n of e.notes">
+        <li style="white-space: pre-wrap;">
+        {{n.created | date }} :: {{n.price.amount | currency }} :: {{n.description}}
+        </li>
+      </ul>
     </div>
   </div>
 </div>
