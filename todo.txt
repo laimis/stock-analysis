@@ -1,6 +1,3 @@
-- review
-    - list if earnings are 1 month away, 2 weeks away, 1 week away
-
 - automated emails:
     load options
         - expiration this week? highglight! how many days left
@@ -18,7 +15,7 @@
 - allow to expire the options from UI
 - reject attempt to expire the options that have not reached expiration date
 - upcoming expiration scraping???
-- when was it generated
+- show when the review was generated
 
 FEATURES
 
