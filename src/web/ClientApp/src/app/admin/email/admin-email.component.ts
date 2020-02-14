@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
+import { StocksService } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-admin-email',

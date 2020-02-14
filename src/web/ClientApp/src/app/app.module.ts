@@ -35,11 +35,13 @@ import { PrivacyComponent } from './privacy/privacy.component';
 import { SymbolSearchComponent } from './symbol-search/symbol-search.component';
 import { PlaygroundComponent } from './playground/playground.component';
 import { OwnedStockDetailComponent } from './owned-stock-detail/owned-stock-detail.component';
-import { AdminEmailComponent } from './admin-email/admin-email.component';
+import { AdminEmailComponent } from './admin/email/admin-email.component';
+import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
+  { path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
@@ -75,6 +77,7 @@ var routes = [
   declarations: [
     AddNoteComponent,
     AdminEmailComponent,
+    AdminWeeklyComponent,
     AppComponent,
     ContactComponent,
     DashboardComponent,

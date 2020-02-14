@@ -85,7 +85,7 @@ namespace storage.postgres
             return await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
         }
 
-        public async Task<IEnumerable<(string, string)>> GetUsers()
+        public async Task<IEnumerable<(string, string)>> GetUserEmailIdPairs()
         {
             using var db = GetConnection();
             

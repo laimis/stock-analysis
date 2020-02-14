@@ -8,14 +8,15 @@
     - admin console button to generate it
     - losers/active/gainers combined with the ones you own or took notes
     - show when the review was generated
+    - stock news
 
 - upcoming earnings scraping, important announcements
 
 FEATURES
 
+- robinhood targetted import of monthly summary
 - paid plans
 - write documentation
-- robinhood targetted import of monthly summary
 - how to list the upcoming earnings companies, but 2-3 weeks out
 - ownership dashboard that is like trends but for stuff you ownership
     show how many shares

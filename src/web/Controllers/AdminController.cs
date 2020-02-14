@@ -34,6 +34,16 @@ namespace web.Controllers
             _email = email;
         }
 
+        [HttpPost("weekly")]
+        public async Task<ActionResult> Weekly()
+        {
+            var cmd = new Weekly.Command();
+
+            await _mediator.Send(cmd);
+
+            return Ok();
+        }
+
         [HttpGet("loginas/{userId}")]
         public async Task<ActionResult> LoginAs(Guid userId)
         {
@@ -60,7 +70,7 @@ namespace web.Controllers
         [HttpGet("users")]
         public async Task<ActionResult> ActiveAccountsAsync()
         {
-            var users = await _storage.GetUsers();
+            var users = await _storage.GetUserEmailIdPairs();
 
             var sb = new StringBuilder();
 

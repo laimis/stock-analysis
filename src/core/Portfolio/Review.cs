@@ -16,12 +16,12 @@ namespace core.Portfolio
     {
         public class Generate : RequestWithUserId<ReviewList>
         {
-            public Generate(DateTime date)
+            public Generate(DateTimeOffset date)
             {
                 this.Date = date;
             }
 
-            public DateTime Date { get; }
+            public DateTimeOffset Date { get; }
         }
 
         public class Handler : HandlerWithStorage<Generate, ReviewList>

@@ -12,6 +12,6 @@ namespace core.Account
         Task Delete(User u);
         Task SaveUserAssociation(ProcessIdToUserAssociation r);
         Task<ProcessIdToUserAssociation> GetUserAssociation(Guid guid);
-        Task<IEnumerable<(string, string)>> GetUsers();
+        Task<IEnumerable<(string, string)>> GetUserEmailIdPairs();
     }
 }
