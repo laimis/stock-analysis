@@ -60,7 +60,7 @@ namespace core.Options
         public string Description => $"{(State.NumberOfContracts > 0 ? "BOUGHT" : "SOLD")} {Math.Abs(State.NumberOfContracts)} ${State.StrikePrice} {State.OptionType} contracts";
         public DateTimeOffset Expiration => this.State.Expiration;
         public bool IsExpired => this.State.IsExpired;
-        public bool ExpiresSoon => this.State.DaysUntilExpiration >= 0 && this.State.DaysUntilExpiration < 7;
+        public bool ExpiresSoon => !IsExpired && this.State.DaysUntilExpiration >= 0 && this.State.DaysUntilExpiration < 7;
         public long? DaysLeft => this.State.DaysUntilExpiration;
 
         public void Buy(int numberOfContracts, double premium, DateTimeOffset filled, string notes)

@@ -11,7 +11,7 @@ namespace coretests.Options
         [Fact]
         public void PutOptionOperations()
         {
-            var option = GetTestOption();
+            var option = GetTestOption(_expiration);
 
             option.Sell(1, 10, DateTimeOffset.UtcNow, "some notes");
             
@@ -19,9 +19,32 @@ namespace coretests.Options
         }
 
         [Fact]
+        public void ExpiresSoonWithin7Days()
+        {
+            var option = GetTestOption(DateTimeOffset.UtcNow.AddDays(2));
+
+            Assert.True(option.ExpiresSoon);
+            Assert.False(option.IsExpired);
+        }
+
+        [Fact]
+        public void Expired()
+        {
+            var option = GetTestOption(DateTimeOffset.UtcNow);
+
+            Assert.True(option.ExpiresSoon);
+            Assert.False(option.IsExpired);
+
+            option = GetTestOption(DateTimeOffset.UtcNow.AddDays(-1));
+
+            Assert.False(option.ExpiresSoon);
+            Assert.True(option.IsExpired);
+        }
+
+        [Fact]
         public void IsMatchWorks()
         {
-            var option = GetTestOption();
+            var option = GetTestOption(_expiration);
 
             option.IsMatch("TEUM", 2.5, OptionType.PUT, _expiration);
         }
@@ -38,7 +61,7 @@ namespace coretests.Options
         [Fact]
         public void EventCstrReplays()
         {
-            var opt = GetTestOption();
+            var opt = GetTestOption(_expiration);
 
             var opt2 = new OwnedOption(opt.Events);
 
@@ -54,13 +77,14 @@ namespace coretests.Options
         [InlineData(1, -10)]    // negative money
         public void CloseWithInvalidInput(int numberOfContracts, double money)
         {
-            var opt = GetTestOption();
+            var opt = GetTestOption(_expiration);
 
             Assert.Throws<InvalidOperationException>( () =>
                 opt.Sell(numberOfContracts, money, DateTimeOffset.UtcNow, "some notes"));
         }
 
         private static OwnedOption GetTestOption(
+            DateTimeOffset expiration,
             string ticker = "TEUM",
             OptionType optionType = OptionType.PUT,
             double strikePrice = 2.5)
@@ -69,7 +93,7 @@ namespace coretests.Options
                 ticker,
                 strikePrice,
                 optionType,
-                _expiration,
+                expiration,
                 Guid.NewGuid());
 
             return option;
