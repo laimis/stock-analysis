@@ -1,14 +1,12 @@
-- option last updated side 
-
 - automated emails:
     - create a page that has a button, accessible by admin, that generates an email
     - load basic data
-    load stocks
+    - load stocks
         - purchased price, current price
-    offer to take down notes
-    if no options or stocks, suggest?
-    admin console button to generate it
-    - losses/active/gainers combined with the ones you own or took notes
+    - offer to take down notes
+    - if no options or stocks, suggest?
+    - admin console button to generate it
+    - losers/active/gainers combined with the ones you own or took notes
     - show when the review was generated
 
 - upcoming earnings scraping, important announcements

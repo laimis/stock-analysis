@@ -11,8 +11,7 @@
       <table class="table border">
         <thead class="thead-light">
           <tr>
-            <th>Option Info Date</th>
-            <th>Stock Price (currently)</th>
+            <th>Stock Price</th>
             <th>Put vs Call (ratio)</th>
             <th>Call Spend</th>
             <th>Put Spend</th>
@@ -22,7 +21,6 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ lastUpdated | date:"MM/dd/yyyy" }}</td>
             <td><a [routerLink]="[ '/stocks', ticker ]">{{ stockPrice | currency }}</a></td>
             <td>{{breakdown.putVolume}} vs {{breakdown.callVolume}}
               ({{(breakdown.putVolume / breakdown.callVolume) | number }})</td>
@@ -72,11 +70,11 @@
             <th>Side</th>
             <th>Open interest</th>
             <th>Volume</th>
-            <th>Bid</th>
-            <th>Ask</th>
+            <th>Bid vs Ask</th>
             <th>Spread</th>
             <th>PDP</th>
             <th>Risk</th>
+            <th>Last Update</th>
           </tr>
         </thead>
         <tbody>
@@ -86,11 +84,11 @@
             <td>{{option.side}}</td>
             <td>{{option.openInterest}}</td>
             <td>{{option.volume}}</td>
-            <td>{{option.bid | currency}}</td>
-            <td>{{option.ask | currency}}</td>
+            <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
             <td>{{option.spread | currency}}</td>
             <td>{{option.perDayPrice | currency}}</td>
             <td>{{option.risk | percent}}</td>
+            <td>{{option.lastUpdated | date}}</td>
           </tr>
         </tbody>
       </table>
