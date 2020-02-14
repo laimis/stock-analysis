@@ -135,6 +135,10 @@ export class StocksService {
     return this.http.post('/api/options/import', formData)
   }
 
+  expireOption(obj:object) : Observable<any> {
+    return this.http.post('/api/options/expire', obj)
+  }
+
   // ---------- accounts ---------
 
   getProfile() : Observable<AccountStatus> {

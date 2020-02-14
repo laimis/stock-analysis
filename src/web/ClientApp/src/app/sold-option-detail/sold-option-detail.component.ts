@@ -79,4 +79,17 @@ export class SoldOptionDetailComponent implements OnInit {
     })
   }
 
+  expire(assigned:boolean) {
+    var opt = {
+      id: this.option.id,
+      assigned: assigned,
+    }
+
+    this.service.expireOption(opt).subscribe( r => {
+      this.getOption(r.id)
+    }, err => {
+      this.errors = GetErrors(err)
+    })
+  }
+
 }

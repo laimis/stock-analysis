@@ -113,9 +113,15 @@ namespace core.Options
             );
         }
 
-        public void Expire()
+        public void Expire(bool assigned)
         {
-            Apply(new OptionExpired(Guid.NewGuid(), this.State.Id, this.State.Expiration));
+            if (!this.IsExpired)
+            {
+                throw new InvalidOperationException(
+                    "You can't mark option as expired before its expiration date has passed");
+            }
+
+            Apply(new OptionExpired(Guid.NewGuid(), this.State.Id, this.State.Expiration, assigned));
         }
 
         protected override void Apply(AggregateEvent e)

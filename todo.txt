@@ -17,6 +17,7 @@
 
 FEATURES
 
+- paid plans
 - write documentation
 - robinhood targetted import of monthly summary
 - how to list the upcoming earnings companies, but 2-3 weeks out

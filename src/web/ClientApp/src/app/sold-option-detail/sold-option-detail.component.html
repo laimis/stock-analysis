@@ -25,7 +25,7 @@
     <div class="card mt-2">
       <div class="card-body">
         <div class="card-title">
-          Record additional trades for {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
+          Additional trades for {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
         </div>
         <form>
           <div class="form-row">
@@ -55,7 +55,9 @@
 
           <div>
             <button type="button" class="btn btn-primary mb-1 mr-2" (click)="record()">Record</button>
-            <button type="button" class="btn btn-secondary mb-1 mr-2" (click)="back()">Back</button>
+            <button type="button" class="btn btn-secondary mb-1 mr-4" (click)="back()">Back</button>
+            <button *ngIf="option.isExpired" type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(false)">Expired - Out of Money</button>
+            <button *ngIf="option.isExpired" type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(true)">Expired - Assigned</button>
           </div>
         </form>
       </div>

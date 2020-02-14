@@ -8,9 +8,13 @@ namespace core.Options
         public OptionExpired(
             Guid id,
             Guid aggregateId,
-            DateTimeOffset when)
+            DateTimeOffset when,
+            bool assigned)
             : base(id, aggregateId, when)
         {
+            this.Assigned = assigned;
         }
+
+        public bool Assigned { get; }
     }
 }

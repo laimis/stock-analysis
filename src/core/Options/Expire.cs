@@ -9,13 +9,16 @@ namespace core.Options
 {
     public class Expire
     {
-        public class Command : RequestWithUserId<CommandResponse>
+        public class Command : RequestWithUserId<CommandResponse<OwnedOption>>
         {
             [Required]
             public Guid? Id { get; set; }
+
+            [Required]
+            public bool? Assigned { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, CommandResponse>
+        public class Handler : IRequestHandler<Command, CommandResponse<OwnedOption>>
         {
             private IPortfolioStorage _storage;
 
@@ -24,19 +27,19 @@ namespace core.Options
                 _storage = storage;
             }
             
-            public async Task<CommandResponse> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<CommandResponse<OwnedOption>> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var option = await _storage.GetOwnedOption(cmd.Id.Value, cmd.UserId);
                 if (option == null)
                 {
-                    return CommandResponse.Failed("Trying to expire not owned option");
+                    return CommandResponse<OwnedOption>.Failed("Trying to expire not owned option");
                 }
 
-                option.Expire();
+                option.Expire(cmd.Assigned.Value);
 
                 await this._storage.Save(option, cmd.UserId);
 
-                return CommandResponse.Success();
+                return CommandResponse<OwnedOption>.Success(option);
             }
         }
     }

@@ -66,6 +66,16 @@ namespace web.Controllers
             return ExecTransaction(cmd);
         }
 
+        [HttpPost("expire")]
+        public async Task<object> Expire(Expire.Command cmd)
+        {
+            cmd.WithUserId(this.User.Identifier());
+
+            var r = await _mediator.Send(cmd);
+            
+            return this.OkOrError(r);
+        }
+
         private async Task<object> ExecTransaction(OptionTransaction cmd)
         {
             var r = await _mediator.Send(cmd);
