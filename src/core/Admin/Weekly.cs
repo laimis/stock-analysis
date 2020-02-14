@@ -46,7 +46,7 @@ namespace core.Admin
 
                     var r = await _mediator.Send(review);
 
-                    _emails.Send(u.Item1, EmailSettings.TemplateReviewEmail, new {
+                    await _emails.Send(u.Item1, EmailSettings.TemplateReviewEmail, new {
                         content = JsonConvert.SerializeObject(r)
                     });
                 }
