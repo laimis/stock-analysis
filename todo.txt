@@ -1,24 +1,23 @@
+- allow to expire the options from UI
+- reject attempt to expire the options that have not reached expiration date
+- option last updated side 
+
 - automated emails:
-    load options
-        - expiration this week? highglight! how many days left
-        - stock price, is it in the money, out of the money
+    - create a page that has a button, accessible by admin, that generates an email
+    - load basic data
     load stocks
-        - purchased price, current price, earnings date coming up
+        - purchased price, current price
     offer to take down notes
-        - active stocks list
     if no options or stocks, suggest?
     admin console button to generate it
     - losses/active/gainers combined with the ones you own or took notes
+    - show when the review was generated
 
-- notes on the additional transactions in options/shares details screens
-- write documentation
-- allow to expire the options from UI
-- reject attempt to expire the options that have not reached expiration date
-- upcoming expiration scraping???
-- show when the review was generated
+- upcoming earnings scraping, important announcements
 
 FEATURES
 
+- write documentation
 - robinhood targetted import of monthly summary
 - how to list the upcoming earnings companies, but 2-3 weeks out
 - ownership dashboard that is like trends but for stuff you ownership
@@ -30,14 +29,11 @@ FEATURES
 - better welcome page, "show me the goods" walk through
 - export excel
 - import excel
+- notes on the additional transactions in options/shares details screens
+- import of shares/options in transaction screens
 
 LONG TERM 
 
-- blog domain, static gen
-    writing posts how to use it
-    help section perhaps with all the documentation?
-- recent changes
-- import of shares/options in transaction screens
 - support crypto?
 
 https://github.com/wenboyu2/yahoo-earnings-calendar

@@ -18,7 +18,7 @@ namespace core.Options
         public string Ticker { get; internal set; }
         public double StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; private set; }
-        public bool IsExpired => DateTimeOffset.UtcNow > this.Expiration;
+        public bool IsExpired => DateTimeOffset.UtcNow.Date > this.Expiration;
         public OptionType OptionType { get; internal set; }
         public Guid UserId { get; internal set; }
         public int NumberOfContracts { get; internal set; }
