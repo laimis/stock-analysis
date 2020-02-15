@@ -1,30 +1,6 @@
-- replace weekly template id with real id
-- generate template data
-    {
-        optionExpirations: [
-            {
-                ticker,
-                date
-            }
-        ],
-        earnings: [
-            {
-                ticker,
-                date
-            }
-        ],
-        portfolio: [
-            {
-                ticker,
-                value,
-                description
-            }
-        ]
-    }
-- automated emails:
-    - if no options or stocks, suggest?
-
 - upcoming earnings scraping, important announcements
+- if portfolio is empty, candidate for getting started
+- name on the send
 
 FEATURES
 

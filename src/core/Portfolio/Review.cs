@@ -66,24 +66,12 @@ namespace core.Portfolio
 
                 foreach (var s in stocks.Result.Where(s => s.State.Owned > 0))
                 {
-                    entries.Add(new ReviewEntry
-                    {
-                        Ticker = s.Ticker,
-                        Description = s.Description,
-                    });
+                    entries.Add(new ReviewEntry(s));
                 }
 
                 foreach (var n in notes.Result.Where(n => !string.IsNullOrWhiteSpace(n.State.RelatedToTicker)))
                 {
-                    entries.Add(new ReviewEntry
-                    {
-                        Ticker = n.State.RelatedToTicker,
-                        IsNote = true,
-                        Description = n.State.Note,
-                        Created = n.State.Created,
-                        Stats = n.State.Stats,
-                        Price = n.State.Price
-                    });
+                    entries.Add(new ReviewEntry(n));
                 }
 
                 var grouped = entries.GroupBy(r => r.Ticker);
