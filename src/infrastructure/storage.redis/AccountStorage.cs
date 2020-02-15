@@ -112,7 +112,7 @@ namespace storage.redis
             return new ProcessIdToUserAssociation(id, userId, timestamp);
         }
 
-        public async Task<IEnumerable<(string, string)>> GetUsers()
+        public async Task<IEnumerable<(string, string)>> GetUserEmailIdPairs()
         {
             var db = _redis.GetDatabase();
 

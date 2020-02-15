@@ -34,7 +34,7 @@ namespace coretests.Fakes
             return Task.FromResult(_users.GetValueOrDefault(emailAddress));
         }
 
-        public Task<IEnumerable<(string, string)>> GetUsers()
+        public Task<IEnumerable<(string, string)>> GetUserEmailIdPairs()
         {
             throw new NotImplementedException();
         }

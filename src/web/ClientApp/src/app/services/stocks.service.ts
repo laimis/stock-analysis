@@ -22,6 +22,7 @@ export function GetErrors(err:any): string[] {
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
+
   constructor(private http: HttpClient) { }
 
   // ----------------- misc ---------------------
@@ -39,6 +40,14 @@ export class StocksService {
       ticker = ''
     }
     return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}`)
+  }
+
+  sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
+    return this.http.post<object>('/api/admin/email', obj)
+  }
+
+  weeklyReview() {
+    return this.http.post('/api/admin/weekly', {})
   }
 
   // ----------------- notes ---------------------
@@ -167,10 +176,6 @@ export class StocksService {
 
   sendMessage(obj: { email: string; message: string; }) {
     return this.http.post<object>('/api/account/contact', obj)
-  }
-
-  sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
-    return this.http.post<object>('/api/admin/email', obj)
   }
 
 }

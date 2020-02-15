@@ -1,21 +1,12 @@
-- automated emails:
-    - create a page that has a button, accessible by admin, that generates an email
-    - load basic data
-    - load stocks
-        - purchased price, current price
-    - offer to take down notes
-    - if no options or stocks, suggest?
-    - admin console button to generate it
-    - losers/active/gainers combined with the ones you own or took notes
-    - show when the review was generated
-
 - upcoming earnings scraping, important announcements
+- if portfolio is empty, candidate for getting started
+- name on the send
 
 FEATURES
 
+- robinhood targetted import of monthly summary
 - paid plans
 - write documentation
-- robinhood targetted import of monthly summary
 - how to list the upcoming earnings companies, but 2-3 weeks out
 - ownership dashboard that is like trends but for stuff you ownership
     show how many shares
