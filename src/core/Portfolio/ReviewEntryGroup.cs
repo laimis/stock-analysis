@@ -35,20 +35,8 @@ namespace core.Portfolio
         public List<ReviewEntry> Notes { get; }
         public List<ReviewEntry> Ownership { get; }
         public TickerPrice Price { get; }
-        public bool EarningsWarning
-        {
-            get
-            {
-                if (!DateTimeOffset.TryParse(this.Stats.NextEarningsDate, out var result))
-                {
-                    return false;
-                }
-                
-                return result.Subtract(DateTimeOffset.UtcNow).TotalDays <= 30;
-            }
-        }
 
-        public double? EarningsDaysLeft
+        public DateTimeOffset? EarningsDate
         {
             get
             {
@@ -56,9 +44,18 @@ namespace core.Portfolio
                 {
                     return null;
                 }
-                
-                return Math.Ceiling(result.Subtract(DateTimeOffset.UtcNow).TotalDays);
+                return result;
             }
-        } 
+        }
+
+        public bool EarningsWarning 
+            => 
+                EarningsDate == null ? false 
+                : EarningsDate.Value.Subtract(DateTimeOffset.UtcNow).TotalDays <= 30;
+
+        public double? EarningsDaysLeft
+            => 
+                EarningsDate == null ? (double?)null
+                : Math.Ceiling(EarningsDate.Value.Subtract(DateTimeOffset.UtcNow).TotalDays);
     }
 }

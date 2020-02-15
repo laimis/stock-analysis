@@ -61,15 +61,7 @@ namespace core.Portfolio
 
                 foreach (var o in options.Result.Where(s => s.IsActive))
                 {
-                    entries.Add(new ReviewEntry
-                    {
-                        Ticker = o.Ticker,
-                        Description = o.Description,
-                        Expiration = o.Expiration,
-                        IsExpired = o.IsExpired,
-                        ExpiresSoon = o.ExpiresSoon,
-                        DaysLeft = o.DaysLeft
-                    });
+                    entries.Add(new ReviewEntry(o));
                 }
 
                 foreach (var s in stocks.Result.Where(s => s.State.Owned > 0))
