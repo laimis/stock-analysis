@@ -51,7 +51,13 @@ namespace core.Admin
 
                     var r = await _mediator.Send(review);
 
-                    var portfolio = r.Entries.Where(e => e.Ownership.Count > 0);
+                    var portfolio = r.Entries.Where(e => e.Ownership.Count > 0).ToList();
+
+                    if (portfolio.Count == 0)
+                    {
+                        Console.WriteLine("No portfolio items for " + u.Item1);
+                        continue;
+                    }
 
                     var data = new {
                         portfolio = portfolio.SelectMany(p => p.Ownership.Select(re => (p, re)))
