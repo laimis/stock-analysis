@@ -30,7 +30,7 @@ namespace core.Account
             {
                 await _emails.Send(
                     EmailSettings.Admin,
-                    EmailSender.NoReply,
+                    Sender.NoReply,
                     EmailTemplate.AdminContact,
                     new {message = cmd.Message, email = cmd.Email});
 

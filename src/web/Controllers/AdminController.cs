@@ -60,7 +60,7 @@ namespace web.Controllers
         {
             await this._email.Send(
                 obj.To,
-                new EmailSender(obj.From, obj.FromName),
+                new Sender(obj.From, obj.FromName),
                 obj.Subject,
                 obj.Body
             );

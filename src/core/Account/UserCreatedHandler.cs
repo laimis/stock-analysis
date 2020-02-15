@@ -33,7 +33,7 @@ namespace core.Account
         {
             await _email.Send(
                 EmailSettings.Admin,
-                EmailSender.NoReply,
+                Sender.NoReply,
                 EmailTemplate.AdminNewUser,
                 new { email = u.Email }
             );
@@ -49,7 +49,7 @@ namespace core.Account
 
             await _email.Send(
                 u.State.Email,
-                EmailSender.NoReply,
+                Sender.NoReply,
                 EmailTemplate.ConfirmAccount,
                 new { confirmurl }
             );

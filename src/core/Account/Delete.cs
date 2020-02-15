@@ -43,7 +43,7 @@ namespace core.Account
 
                 await _emails.Send(
                     EmailSettings.Admin,
-                    EmailSender.NoReply,
+                    Sender.NoReply,
                     EmailTemplate.AdminUserDeleted,
                     new {feedback = cmd.Feedback, email = user.State.Email});
 

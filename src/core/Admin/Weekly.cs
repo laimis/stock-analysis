@@ -73,7 +73,7 @@ namespace core.Admin
                     
                     Console.WriteLine(JsonConvert.SerializeObject(data));
 
-                    await _emails.Send(u.Item1, EmailSender.Support, EmailTemplate.ReviewEmail, data);
+                    await _emails.Send(u.Item1, Sender.Support, EmailTemplate.ReviewEmail, data);
                 }
 
                 return new Unit();

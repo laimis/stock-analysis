@@ -16,7 +16,7 @@ namespace sendgridclient
             _key = apiKey;
         }
 
-        public async Task Send(string to, EmailSender sender, string subject, string body)
+        public async Task Send(string to, Sender sender, string subject, string body)
         {
             var client = new SendGridClient(_key);
             var fromAddr = new EmailAddress(sender.Email, sender.Name);
@@ -34,7 +34,7 @@ namespace sendgridclient
 
         public async Task Send(
             string recipient,
-            EmailSender sender,
+            Sender sender,
             EmailTemplate template,
             object properties)
         {

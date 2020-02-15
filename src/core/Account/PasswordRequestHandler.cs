@@ -38,7 +38,7 @@ namespace core.Account
 
             await _email.Send(
                 u.State.Email,
-                EmailSender.NoReply,
+                Sender.NoReply,
                 EmailTemplate.PasswordReset,
                 new {reseturl}
             );

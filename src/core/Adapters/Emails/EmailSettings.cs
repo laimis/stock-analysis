@@ -8,12 +8,12 @@ namespace core.Adapters.Emails
         public const string ConfirmAccountUrl = "https://www.nightingaletrading.com/api/account/confirm";
     }
 
-    public struct EmailSender
+    public struct Sender
     {
-        public static EmailSender NoReply = new EmailSender("noreply@nightingaletrading.com", "Nightingale Trading");
-        public static EmailSender Support = new EmailSender("support@nightingaletrading.com", "Nightingale Trading");
-        
-        public EmailSender(string email, string name)
+        public static Sender NoReply = new Sender("noreply@nightingaletrading.com", "Nightingale Trading");
+        public static Sender Support = new Sender("support@nightingaletrading.com", "Nightingale Trading");
+
+        public Sender(string email, string name)
         {
             this.Email = email;
             this.Name = name;
