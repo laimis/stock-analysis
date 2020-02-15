@@ -1,9 +1,8 @@
-- upcoming earnings scraping, important announcements
-- if portfolio is empty, candidate for getting started
-- name on the send
-
 FEATURES
 
+- other companies you watch on weekly review that have earnings coming upcoming
+- upcoming earnings scraping, important announcements
+- if portfolio is empty, candidate for getting started
 - robinhood targetted import of monthly summary
 - paid plans
 - write documentation
@@ -29,7 +28,6 @@ https://github.com/wenboyu2/yahoo-earnings-calendar
 IMPROVEMENTS/FIXES
 
 - temp file cleanup based on created date
-- option info date is off
 - on detail pages disable buy/sell buttons to eliminate duplicate transactions
 
 

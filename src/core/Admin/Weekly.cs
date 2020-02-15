@@ -37,12 +37,6 @@ namespace core.Admin
 
                 foreach(var u in users)
                 {
-                    if (u.Item1 != "laimis@gmail.com")
-                    {
-                        Console.WriteLine("Skipping user " + u.Item1);
-                        continue;
-                    }
-
                     Console.WriteLine("Processing weekly review for " + u.Item1);
 
                     var review = new Review.Generate(DateTimeOffset.UtcNow);
