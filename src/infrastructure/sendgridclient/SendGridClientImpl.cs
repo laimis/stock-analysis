@@ -16,10 +16,10 @@ namespace sendgridclient
             _key = apiKey;
         }
 
-        public async Task Send(string to, string from, string subject, string body)
+        public async Task Send(string to, EmailSender sender, string subject, string body)
         {
             var client = new SendGridClient(_key);
-            var fromAddr = new EmailAddress(from);
+            var fromAddr = new EmailAddress(sender.Email, sender.Name);
             var toAddr = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromAddr, toAddr, subject, body, null);
             
@@ -32,14 +32,18 @@ namespace sendgridclient
             Console.WriteLine("Sendgrid response: " + err);
         }
 
-        public async Task Send(string email, string templateId, object properties)
+        public async Task Send(
+            string recipient,
+            EmailSender sender,
+            EmailTemplate template,
+            object properties)
         {
             var client = new SendGridClient(_key);
-            var from = new EmailAddress(NO_REPLY);
-            var to = new EmailAddress(email);
+            var from = new EmailAddress(sender.Email, sender.Name);
+            var to = new EmailAddress(recipient);
             
             var msg = MailHelper.CreateSingleTemplateEmail(
-                from, to, templateId, properties
+                from, to, template.Id, properties
             );
             
             var response = await client.SendEmailAsync(msg);

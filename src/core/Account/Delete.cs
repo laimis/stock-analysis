@@ -43,7 +43,8 @@ namespace core.Account
 
                 await _emails.Send(
                     EmailSettings.Admin,
-                    EmailSettings.TemplateAdminUserDeleted,
+                    EmailSender.NoReply,
+                    EmailTemplate.AdminUserDeleted,
                     new {feedback = cmd.Feedback, email = user.State.Email});
 
                 await _storage.Delete(user);

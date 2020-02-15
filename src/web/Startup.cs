@@ -87,6 +87,18 @@ namespace web
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
+
+                spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+                {
+                    OnPrepareResponse = context =>
+                    {
+                        if (context.File.Name == "index.html")
+                        {
+                            context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+                            context.Context.Response.Headers.Add("Expires", "-1");
+                        }
+                    }
+                };
             });
         }
     }

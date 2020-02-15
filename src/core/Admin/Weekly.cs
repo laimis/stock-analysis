@@ -65,15 +65,15 @@ namespace core.Admin
                                 ticker = pair.p.Ticker,
                                 value = pair.p.Price.Amount,
                                 description = pair.re.Description,
-                                expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("yyyy-MM-dd") : null,
-                                earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("yyyy-MM-dd") : null
+                                expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null,
+                                earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null
                             }),
-                        timestamp = review.Date.ToString("o")
+                        timestamp = review.Date.ToString("yyyy-MM-dd HH:mm:ss") + " UTC"
                     };
                     
                     Console.WriteLine(JsonConvert.SerializeObject(data));
 
-                    await _emails.Send(u.Item1, EmailSettings.TemplateReviewEmail, data);
+                    await _emails.Send(u.Item1, EmailSender.Support, EmailTemplate.ReviewEmail, data);
                 }
 
                 return new Unit();
