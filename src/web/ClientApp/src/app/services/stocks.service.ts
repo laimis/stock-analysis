@@ -46,8 +46,8 @@ export class StocksService {
     return this.http.post<object>('/api/admin/email', obj)
   }
 
-  weeklyReview() {
-    return this.http.post('/api/admin/weekly', {})
+  weeklyReview(obj:object) {
+    return this.http.post('/api/admin/weekly', obj)
   }
 
   // ----------------- notes ---------------------

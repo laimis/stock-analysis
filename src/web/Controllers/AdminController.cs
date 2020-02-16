@@ -36,10 +36,8 @@ namespace web.Controllers
         }
 
         [HttpPost("weekly")]
-        public async Task<ActionResult> Weekly()
+        public async Task<ActionResult> Weekly(Weekly.Command cmd)
         {
-            var cmd = new Weekly.Command();
-
             await _mediator.Send(cmd);
 
             return Ok();

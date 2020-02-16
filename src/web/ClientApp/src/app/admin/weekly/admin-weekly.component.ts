@@ -13,8 +13,8 @@ export class AdminWeeklyComponent implements OnInit {
   ngOnInit() {
   }
 
-  kickOff() {
-    this.stockService.weeklyReview().subscribe(
+  kickOff(everyone:boolean) {
+    this.stockService.weeklyReview({everyone:everyone}).subscribe(
       _ => console.log("success"),
       _ => console.log("failure")
     )
