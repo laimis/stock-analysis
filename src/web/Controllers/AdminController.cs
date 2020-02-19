@@ -77,6 +77,7 @@ namespace web.Controllers
                 <th>Email</th>
                 <th>User Id</th>
                 <th>Last Login</th>
+                <th>Verified</th>
                 <th>Stocks</th>
                 <th>Options</th>
                 <th>Notes</th>
@@ -93,6 +94,7 @@ namespace web.Controllers
                 var user = await _storage.GetUser(guid);
 
                 sb.Append($"<td>{user?.LastLogin?.ToString()}</td>");
+                sb.Append($"<td>{user?.Verified}</td>");
                 
                 var options = await _portfolio.GetOwnedOptions(guid);
                 var notes = await _portfolio.GetNotes(guid);
