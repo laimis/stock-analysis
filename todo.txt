@@ -1,18 +1,41 @@
-- add other notable section
+BUSINESS
+
+- transactions as top level item
+
+- where to get users, ad campaign
+
+- omg, look at this interest sign up:
+https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_trading_journal_for/
+https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps_you_identify_when_a/
+
+- robinhood landing page and a page that attacks it
+
+- realized and unrealized separtion
+
+- ability to tag entry trades?
+
+- P&L report, what's that all about
+
+"How do I know how much I have made or lost 
+if the graph doesn’t include realised gain/loss? 
+Is there a way to calculate that quickly 
+or I have to go through the statement each month 
+and manually input in excel sheet lol?"
 
 FEATURES
 
-- other companies you watch on weekly review that have earnings coming upcoming
-- upcoming earnings scraping, important announcements
-- if portfolio is empty, candidate for getting started
-- robinhood targetted import of monthly summary
-- paid plans
-- write documentation
-- how to list the upcoming earnings companies, but 2-3 weeks out
 - ownership dashboard that is like trends but for stuff you ownership
     show how many shares
     average price, one bigger table that adjusts with number of stocks/otions?
     options expiring this week tag
+- paid plans
+- robinhood targetted import of monthly summary
+- temp file cleanup based on created date
+- on detail pages disable buy/sell buttons to eliminate duplicate transactions
+- upcoming earnings scraping, important announcements
+- if portfolio is empty, candidate for getting started
+- write documentation
+- how to list the upcoming earnings companies, but 2-3 weeks out
 - add to watchlist, see how alpha does it
 - review reminders or daily/weekly report
 - better welcome page, "show me the goods" walk through
@@ -29,8 +52,6 @@ https://github.com/wenboyu2/yahoo-earnings-calendar
 
 IMPROVEMENTS/FIXES
 
-- temp file cleanup based on created date
-- on detail pages disable buy/sell buttons to eliminate duplicate transactions
 
 
 DESIGN/UX
