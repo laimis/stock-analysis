@@ -71,46 +71,65 @@ namespace web.Controllers
         {
             var users = await _storage.GetUserEmailIdPairs();
 
-            var sb = new StringBuilder();
+            var total = 0;
+            var loggedIn = 0;
 
-            sb.Append(@"<html><body><table><tr>
-                <th>Email</th>
-                <th>User Id</th>
-                <th>Last Login</th>
-                <th>Verified</th>
-                <th>Stocks</th>
-                <th>Options</th>
-                <th>Notes</th>
-            </tr>");
+            var tableHtml = new StringBuilder();
+
+            tableHtml.Append(@"
+            <table>
+                <tr>
+                    <th>Email</th>
+                    <th>User Id</th>
+                    <th>Last Login</th>
+                    <th>Verified</th>
+                    <th>Stocks</th>
+                    <th>Options</th>
+                    <th>Notes</th>
+                </tr>");
 
             foreach(var (email,userId) in users)
             {
-                sb.Append($"<tr>");
-                sb.Append($"<td>{email}</td>");
-                sb.Append($"<td>{userId}</td>");
+                tableHtml.AppendLine($"<tr>");
+                tableHtml.Append($"<td>{email}</td>");
+                tableHtml.Append($"<td>{userId}</td>");
 
                 var guid = new System.Guid(userId);
 
                 var user = await _storage.GetUser(guid);
 
-                sb.Append($"<td>{user?.LastLogin?.ToString()}</td>");
-                sb.Append($"<td>{user?.Verified}</td>");
+                tableHtml.Append($"<td>{user?.LastLogin?.ToString()}</td>");
+                tableHtml.Append($"<td>{user?.Verified}</td>");
                 
                 var options = await _portfolio.GetOwnedOptions(guid);
                 var notes = await _portfolio.GetNotes(guid);
                 var stocks = await _portfolio.GetStocks(guid);
 
-                sb.Append($"<td>{stocks.Count()}</td>");
-                sb.Append($"<td>{options.Count()}</td>");
-                sb.Append($"<td>{notes.Count()}</td>");
+                tableHtml.Append($"<td>{stocks.Count()}</td>");
+                tableHtml.Append($"<td>{options.Count()}</td>");
+                tableHtml.Append($"<td>{notes.Count()}</td>");
 
-                sb.Append("</tr>");
+                tableHtml.AppendLine("</tr>");
+
+                total++;
+                if (user != null && user.LastLogin.HasValue)
+                {
+                    loggedIn++;
+                }
             }
 
-            sb.Append("<table></body></html>");
+            tableHtml.AppendLine("</table>");
+
+            var body = $@"<html>
+                <body>
+                    <h3>Users: {total}</h3>
+                    <h4>Logged In: {loggedIn}</h4>
+                    ${tableHtml.ToString()}
+                </body>
+            </html>";
 
             return new ContentResult {
-                Content = sb.ToString(),
+                Content = body,
                 ContentType = "text/html"
             };
         }
