@@ -24,7 +24,7 @@ namespace web
         {
             AuthHelper.Configure(this.Configuration, services);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -38,8 +38,6 @@ namespace web
 
             services.AddHealthChecks()
                 .AddCheck<HealthCheck>("storage based health check");
-
-            // services.AddHttpsRedirection(opt => opt.HttpsPort = 443);
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

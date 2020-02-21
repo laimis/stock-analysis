@@ -1,7 +1,5 @@
 BUSINESS
 
-- transactions as top level item
-
 - where to get users, ad campaign
 
 - omg, look at this interest sign up:
@@ -24,11 +22,14 @@ and manually input in excel sheet lol?"
 
 FEATURES
 
+- paid plans
+- compare grid of stocks
+- transactions as top level item
+- expired out of money does not work well
 - ownership dashboard that is like trends but for stuff you ownership
     show how many shares
     average price, one bigger table that adjusts with number of stocks/otions?
     options expiring this week tag
-- paid plans
 - robinhood targetted import of monthly summary
 - temp file cleanup based on created date
 - on detail pages disable buy/sell buttons to eliminate duplicate transactions
