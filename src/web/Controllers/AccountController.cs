@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Account;
+using core.Adapters.Subscriptions;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,6 +30,16 @@ namespace web.Controllers
         public Task<object> IdentityAsync()
         {
             return _mediator.Send(new Get.Query(this.User.Identifier()));
+        }
+
+        [HttpPost("subscribe")]
+        public async Task<bool> Subscribe(Subscribe.Command cmd)
+        {
+            cmd.WithUserId(this.User.Identifier());
+            
+            var r = await _mediator.Send(cmd);
+
+            return true;
         }
 
         [HttpPost]
@@ -125,6 +136,7 @@ namespace web.Controllers
         }
 
         [HttpGet("logout")]
+        [Authorize]
         public async Task<ActionResult> LogoutAsync()
         {
             await HttpContext.SignOutAsync();
@@ -133,6 +145,7 @@ namespace web.Controllers
         }
 
         [HttpPost("delete")]
+        [Authorize]
         public async Task<ActionResult> Delete(Delete.Command cmd)
         {
             cmd.WithUserId(this.User.Identifier());

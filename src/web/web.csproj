@@ -33,6 +33,7 @@
     <ProjectReference Include="..\infrastructure\iexclient\iexclient.csproj" />
     <ProjectReference Include="..\infrastructure\csvparser\csvparser.csproj" />
     <ProjectReference Include="..\infrastructure\sendgridclient\sendgridclient.csproj" />
+    <ProjectReference Include="..\infrastructure\stripe\stripe.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

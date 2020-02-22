@@ -178,6 +178,11 @@ export class StocksService {
     return this.http.post<object>('/api/account/contact', obj)
   }
 
+  // ------------------- payments ------------------------
+  createSubsription(obj: any) : Observable<object> {
+    return this.http.post('/api/account/subscribe', obj)
+  }
+
 }
 
 export interface ReviewList {

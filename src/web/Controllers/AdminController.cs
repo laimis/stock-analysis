@@ -83,6 +83,7 @@ namespace web.Controllers
                     <th>User Id</th>
                     <th>Last Login</th>
                     <th>Verified</th>
+                    <th>Level</th>
                     <th>Stocks</th>
                     <th>Options</th>
                     <th>Notes</th>
@@ -100,7 +101,8 @@ namespace web.Controllers
 
                 tableHtml.Append($"<td>{user?.LastLogin?.ToString()}</td>");
                 tableHtml.Append($"<td>{user?.Verified}</td>");
-                
+                tableHtml.Append($"<td>{user?.SubscriptionLevel}</td>");
+
                 var options = await _portfolio.GetOwnedOptions(guid);
                 var notes = await _portfolio.GetNotes(guid);
                 var stocks = await _portfolio.GetStocks(guid);

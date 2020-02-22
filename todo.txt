@@ -1,28 +1,48 @@
-BUSINESS
+- paid plans
+    - integrate with the sign up, how will that work
 
-- where to get users, ad campaign
+Plans:
+    
+    >> FREE <<
+    Unlimited Stock tracking
+    Unlimited Options tracking
+    Unlimited Notes
+    Market Data - price/volume
+    Portfolio Reports
+    Transaction Reports
+    Export/Import
 
-- omg, look at this interest sign up:
-https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_trading_journal_for/
-https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps_you_identify_when_a/
+    >> STARTER <<
+    Advanced Stock Research
+        Advanced Metrics
+        Earnings/Dividend dates
+        Breakdown of Fundamentals
+    Earnings Reports
 
+    >> FULL <<
+    Options Analysis
+    Advanced Access to upcoming features
+
+
+- ad campaign
+- stock journal [<- did much better] vs trade journal
+- better landing page
 - robinhood landing page and a page that attacks it
-
-- realized and unrealized separtion
-
-- ability to tag entry trades?
-
-- P&L report, what's that all about
-
-"How do I know how much I have made or lost 
-if the graph doesn’t include realised gain/loss? 
-Is there a way to calculate that quickly 
-or I have to go through the statement each month 
-and manually input in excel sheet lol?"
 
 FEATURES
 
-- paid plans
+- add my IP to filter out my visits
+- ability to tag entry trades?
+- details of stocks owned
+- P&L report, what's that all about
+- realized and unrealized separtion
+- transations:
+    - stocks in the filter available at all times
+    - details collapsed that can be expanded
+    - chart
+- redo top menu
+- charts with highchart
+- % change from the time you watched?
 - compare grid of stocks
 - transactions as top level item
 - expired out of money does not work well
@@ -44,16 +64,11 @@ FEATURES
 - import excel
 - notes on the additional transactions in options/shares details screens
 - import of shares/options in transaction screens
-
-LONG TERM 
-
 - support crypto?
 
 https://github.com/wenboyu2/yahoo-earnings-calendar
 
 IMPROVEMENTS/FIXES
-
-
 
 DESIGN/UX
 
@@ -66,3 +81,18 @@ DEV
 - nullability in the project
 
 BACKEND ENGINEER GUIDE TO FRONTEND
+
+
+MARKETING
+
+"How do I know how much I have made or lost 
+if the graph doesn’t include realised gain/loss? 
+Is there a way to calculate that quickly 
+or I have to go through the statement each month 
+and manually input in excel sheet lol?"
+
+
+- omg, look at this interest sign up:
+https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_trading_journal_for/
+https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps_you_identify_when_a/
+

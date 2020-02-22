@@ -37,6 +37,7 @@ import { PlaygroundComponent } from './playground/playground.component';
 import { OwnedStockDetailComponent } from './owned-stock-detail/owned-stock-detail.component';
 import { AdminEmailComponent } from './admin/email/admin-email.component';
 import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
+import { PaymentsComponent } from './payments/payments.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -61,6 +62,7 @@ var routes = [
   { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
   { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
   { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
+  { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
@@ -90,6 +92,7 @@ var routes = [
     OptionDetailComponent,
     OptionSellComponent,
     OwnedStockDetailComponent,
+    PaymentsComponent,
     PlaygroundComponent,
     PrivacyComponent,
     ProfileComponent,
