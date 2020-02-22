@@ -1,30 +1,8 @@
 - paid plans
     - integrate with the sign up, how will that work
+    
     - make sure to allow trial
     - pick plan UI flow
-
-Plans:
-    
-    >> FREE <<
-    Unlimited Stock tracking
-    Unlimited Options tracking
-    Unlimited Notes
-    Market Data - price/volume
-    Portfolio Reports
-    Transaction Reports
-    Export/Import
-
-    >> STARTER <<
-    Advanced Stock Research
-        Advanced Metrics
-        Earnings/Dividend dates
-        Breakdown of Fundamentals
-    Earnings Reports
-
-    >> FULL <<
-    Options Analysis
-    Advanced Access to upcoming features
-
 
 - ad campaign
 - stock journal [<- did much better] vs trade journal
@@ -33,6 +11,7 @@ Plans:
 
 FEATURES
 
+- show plan level, allow to upgrade
 - add my IP to filter out my visits
 - ability to tag entry trades?
 - details of stocks owned
