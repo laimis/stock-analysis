@@ -1,5 +1,7 @@
 - paid plans
     - integrate with the sign up, how will that work
+    - make sure to allow trial
+    - pick plan UI flow
 
 Plans:
     

@@ -1,24 +1,99 @@
-<div class="jumbotron text-center">
+<div class="jumbotron text-center rounded-100">
   <h1 class="display-4">Welcome to Nightingale Trading!</h1>
-  <p class="lead">Your investment journal and trade log, all in one place.</p>
+  <p class="lead">Your investment journal and research tool, all in one place.</p>
   <hr class="my-4">
 
-  <h4 class="mt-2">Watch stocks, record your thoughts, and learn from your past.</h4>
-
-  <div class="mt-4">
-    <a class="btn btn-primary mt-1 mr-2 mb-1" [routerLink]="[ '/profile', 'create' ]" role="button">
-      Create Account to get started
-    </a>
-    <a class="btn btn-secondary mt-1 mr-2 mb-1" [routerLink]="[ '/profile', 'login' ]" role="button">
-      Login using existing account
-    </a>
-
-  </div>
-
+  <h4 class="mt-2">
+    Make better decisions through insights and research
+  </h4>
 </div>
 
 
-<!-- Icons Grid -->
+
+<!-- Plan Grid -->
+
+<section class="pricing py-5">
+  <div class="container">
+    <div class="row">
+      <!-- Free Tier -->
+      <div class="col-lg-4">
+        <div class="card mb-5 mb-lg-0">
+          <div class="card-body">
+            <h5 class="card-title text-muted text-uppercase text-center">Free</h5>
+            <h6 class="card-price text-center">$0<span class="period">/month</span></h6>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Stock Metrics</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings/Dividend dates</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Automated Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
+            </ul>
+            <a href="#" class="btn btn-block btn-secondary text-uppercase btn-sm">Start Free</a>
+          </div>
+        </div>
+      </div>
+      <!-- Plus Tier -->
+      <div class="col-lg-4">
+        <div class="card mb-5 mb-lg-0">
+          <div class="card-body">
+            <h5 class="card-title text-muted text-uppercase text-center">Plus</h5>
+            <h6 class="card-price text-center">$12.99<span class="period">/month</span></h6>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Automated Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
+            </ul>
+            <a href="#" class="btn btn-block btn-primary text-uppercase">Succeed with Plus</a>
+          </div>
+        </div>
+      </div>
+      <!-- Pro Tier -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title text-muted text-uppercase text-center">Full</h5>
+            <h6 class="card-price text-center">$24.99<span class="period">/month</span></h6>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Automated Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Options Data</li>
+            </ul>
+            <a href="#" class="btn btn-block btn-primary text-uppercase">Start in Full</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="text-center">
   <div class="container">
     <div class="row pt-2">
