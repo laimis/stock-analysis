@@ -8,9 +8,9 @@ namespace stripe
 {
     public class Subscriptions : ISubscriptions
     {
-        public Subscriptions()
+        public Subscriptions(string stripeKey)
         {
-            StripeConfiguration.ApiKey = "sk_test_DQVHEn00kbAMyeQN2QKeBCzB00H1nGOyEq";
+            StripeConfiguration.ApiKey = stripeKey;
         }
 
         public SubscriptionResult Create(User user, string email, string paymentToken, string planId)

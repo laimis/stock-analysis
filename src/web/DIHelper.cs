@@ -38,7 +38,12 @@ namespace web
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
-            services.AddSingleton<ISubscriptions, Subscriptions>();
+            
+            services.AddSingleton<ISubscriptions>(s => 
+                new stripe.Subscriptions(
+                    configuration.GetValue<string>("STRIPE_API_KEY")
+                )
+            );
 
             services.AddSingleton<IEmailService>(s => 
                 new sendgridclient.SendGridClientImpl(
