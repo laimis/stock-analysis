@@ -49,6 +49,7 @@ var routes = [
   { path: 'landing', component: LandingComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
   { path: 'profile/create', component: ProfileCreateComponent },
+  { path: 'profile/create/:plan', component: ProfileCreateComponent },
   { path: 'profile/login', component: ProfileLoginComponent },
   { path: 'profile/verify', component: ProfileVerifyComponent },
   { path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent },

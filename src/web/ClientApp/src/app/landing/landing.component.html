@@ -27,7 +27,6 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Stock Metrics</li>
@@ -36,7 +35,10 @@
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
             </ul>
-            <a href="#" class="btn btn-block btn-secondary text-uppercase btn-sm">Start Free</a>
+            <a
+              [routerLink]="[ '/profile', 'create' ]"
+              class="btn btn-block btn-secondary text-uppercase btn-sm">Start Free
+            </a>
           </div>
         </div>
       </div>
@@ -52,16 +54,19 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Automated Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Data</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
             </ul>
-            <a href="#" class="btn btn-block btn-primary text-uppercase">Succeed with Plus</a>
+            <a
+              [routerLink]="[ '/profile', 'create', 'starter' ]"
+              class="btn btn-block btn-primary text-uppercase">
+              Start with Plus
+            </a>
           </div>
         </div>
       </div>
@@ -77,16 +82,19 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Automated Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Options Data</li>
             </ul>
-            <a href="#" class="btn btn-block btn-primary text-uppercase">Start in Full</a>
+            <a
+              [routerLink]="[ '/profile', 'create', 'full' ]"
+              class="btn btn-block btn-primary text-uppercase">
+              Succeed in Full
+            </a>
           </div>
         </div>
       </div>
@@ -131,10 +139,10 @@
   <div class="container">
     <div class="row">
       <div class="col-xl-9 mx-auto">
-        <h2 class="mb-4">Ready to get started? Sign up now!</h2>
+        <h3 class="mb-4">Already have an account?</h3>
       </div>
       <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-        <app-profile-create></app-profile-create>
+        <a [routerLink]="[ '/profile', login ]" class="btn btn-primary">Login</a>
       </div>
     </div>
   </div>
