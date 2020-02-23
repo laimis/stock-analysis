@@ -30,6 +30,16 @@ namespace core.Account
                 throw new InvalidOperationException("Email is required");
             }
 
+            if (string.IsNullOrWhiteSpace(firstname))
+            {
+                throw new InvalidOperationException("First name is required");
+            }
+
+            if (string.IsNullOrWhiteSpace(lastname))
+            {
+                throw new InvalidOperationException("Last name is required");
+            }
+
             Apply(
                 new UserCreated(
                     Guid.NewGuid(),

@@ -100,7 +100,7 @@ export class ProfileCreateComponent implements OnInit {
     var capture = this;
 
     var handler = (<any>window).StripeCheckout.configure({
-      key: 'pk_test_XKCVJk24i9R0N8He0YkHC7uA00trzQsSKK',
+      key: 'pk_live_dls5NvmF6iwb4W19DlqsYvYR0006lBNU20',
       locale: 'auto',
       token: function (token: any) {
         console.log(token)
