@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { StocksService, GetErrors } from '../services/stocks.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
@@ -7,9 +9,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LandingComponent implements OnInit {
 
+  success: Boolean = false
+  errors: string[]
+
   constructor() { }
 
   ngOnInit() {
   }
-
 }

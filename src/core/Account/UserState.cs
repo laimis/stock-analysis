@@ -1,4 +1,5 @@
 using System;
+using core.Adapters.Subscriptions;
 
 namespace core.Account
 {
@@ -15,6 +16,7 @@ namespace core.Account
         public string DeleteFeedback { get; private set; }
         public DateTimeOffset? Verified { get; private set; }
         public DateTimeOffset? LastLogin { get; private set; }
+        public string SubscriptionLevel { get; private set; }
 
         internal void Apply(UserCreated c)
         {
@@ -45,6 +47,11 @@ namespace core.Account
         internal void Apply(UserConfirmed d)
         {
             this.Verified = d.When;
+        }
+
+        internal void Apply(UserSubscribedToPlan p)
+        {
+            this.SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
         }
 
         internal bool PasswordHashMatches(string hash)

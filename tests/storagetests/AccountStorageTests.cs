@@ -35,7 +35,7 @@ namespace storagetests
             Assert.Equal("lastname", fromDb.State.Lastname);
 
             var users = await storage.GetUserEmailIdPairs();
-            Assert.True(users.Any(u => u.Item1.Contains(email)));
+            Assert.NotEmpty(users.Where(u => u.Item1.Contains(email)));
 
             await storage.Delete(user);
 
@@ -48,7 +48,7 @@ namespace storagetests
             Assert.Null(fromDb);
 
             users = await storage.GetUserEmailIdPairs();
-            Assert.False(users.Any(u => u.Item1.Contains(email)));
+            Assert.Empty(users.Where(u => u.Item1.Contains(email)));
         }
 
         [Fact]

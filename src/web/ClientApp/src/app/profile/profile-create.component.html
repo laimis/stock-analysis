@@ -1,13 +1,18 @@
 <div class="text-left">
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
   <form>
+    <div class="h5 mb-3">
+      <span
+        class="badge badge-pill p-2"
+        [ngClass]="{'badge-warning': isPremium, 'badge-secondary': !isPremium}">
+        {{planName}} plan
+      </span>
+    </div>
     <div class="form-row">
       <div class="col">
         <label for="firstname">First name</label>
         <input class="form-control" type="text" id="firstname" name="firstname" [(ngModel)]="firstname" />
       </div>
-    </div>
-    <div class="form-row">
       <div class="col">
         <label for="lastname">Last name</label>
         <input class="form-control" type="text" id="lastname" name="lastname" [(ngModel)]="lastname" />
@@ -18,8 +23,6 @@
         <label for="email">Email</label>
         <input class="form-control" type="email" id="email" name="email" [(ngModel)]="email" />
       </div>
-    </div>
-    <div class="form-row">
       <div class="col">
         <label for="password">Password</label>
         <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
@@ -27,13 +30,13 @@
     </div>
     <div class="form-row">
       <div class="col">
-        <input type="checkbox" class="mt-2" id="terms" name="terms" [(ngModel)]="terms" />
+        <input type="checkbox" class="form-control" class="mt-2" id="terms" name="terms" [(ngModel)]="terms" />
         <label for="terms">&nbsp; Agree to Terms & Conditions</label>
       </div>
     </div>
     <div class="form-row mt-2">
       <div class="col">
-        <button class="btn btn-primary mr-2" (click)="create()">Create</button>
+        <button class="btn btn-primary mr-2" (click)="validate()">Create {{payLabel}}</button>
         <button class="btn btn-secondary" (click)="back()">Back</button>
       </div>
     </div>

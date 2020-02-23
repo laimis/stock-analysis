@@ -1,41 +1,121 @@
-<div class="jumbotron text-center">
+<div class="jumbotron text-center rounded-100">
   <h1 class="display-4">Welcome to Nightingale Trading!</h1>
-  <p class="lead">Your investment journal and trade log, all in one place.</p>
+  <p class="lead">Your investment journal and research tool, all in one place.</p>
   <hr class="my-4">
 
-  <h4 class="mt-2">Watch stocks, record your thoughts, and learn from your past.</h4>
-
-  <div class="mt-4">
-    <a class="btn btn-primary mt-1 mr-2 mb-1" [routerLink]="[ '/profile', 'create' ]" role="button">
-      Create Account to get started
-    </a>
-    <a class="btn btn-secondary mt-1 mr-2 mb-1" [routerLink]="[ '/profile', 'login' ]" role="button">
-      Login using existing account
-    </a>
-
-  </div>
-
+  <h4 class="mt-2">
+    Make better decisions through insights and research
+  </h4>
 </div>
 
 
-<!-- Icons Grid -->
+
+<!-- Plan Grid -->
+
+<section class="pricing py-5">
+  <div class="container">
+    <div class="row">
+      <!-- Free Tier -->
+      <div class="col-lg-4">
+        <div class="card mb-5 mb-lg-0">
+          <div class="card-body">
+            <h5 class="card-title text-muted text-uppercase text-center">Free</h5>
+            <h6 class="card-price text-center">$0<span class="period">/month</span></h6>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Stock Metrics</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings/Dividend dates</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Automated Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
+            </ul>
+            <a
+              [routerLink]="[ '/profile', 'create' ]"
+              class="btn btn-block btn-secondary text-uppercase btn-sm">Start Free
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Plus Tier -->
+      <div class="col-lg-4">
+        <div class="card mb-5 mb-lg-0">
+          <div class="card-body">
+            <h5 class="card-title text-muted text-uppercase text-center">Plus</h5>
+            <h6 class="card-price text-center">$12.99<span class="period">/month</span></h6>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
+              <!-- <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li> -->
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
+            </ul>
+            <button
+              [routerLink]="[ '/profile', 'create', 'plus' ]"
+              class="btn btn-block btn-primary text-uppercase">
+              Start with Plus
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Pro Tier -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title text-muted text-uppercase text-center">Full</h5>
+            <h6 class="card-price text-center">$24.99<span class="period">/month</span></h6>
+            <hr>
+            <ul class="fa-ul">
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
+              <!-- <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li> -->
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings Reports</li>
+              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Options Data</li>
+            </ul>
+            <button
+              [routerLink]="[ '/profile', 'create', 'full' ]"
+              class="btn btn-block btn-primary text-uppercase">
+              Succeed in Full
+          </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="text-center">
   <div class="container">
     <div class="row pt-2">
       <div class="col-lg-4">
         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
-          <h3>Trade Journal</h3>
-          <p class="lead mb-0">Write down your investment thoughts, follow up
-            and re-evalute your predictions and assumptions.
+          <h3>Advanced information</h3>
+          <p class="lead mb-0">Stock prices, fundamentals, earning dates and earning results, not to mention option pricing data will keep you
+            informed how the market is performing.
           </p>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
-          <h3>Transactions</h3>
-          <p class="lead mb-0">Record your share and option purchases, and see clearly how many
-            transactions you perform per month, total of credits and debits incurred.
-          </p>
+          <h3>Full Reporting</h3>
+          <p class="lead mb-0">Weely reports that give you all the overview you need. And transcation logs that you can slide and dice for full understanding what works and what doesn't.</p>
         </div>
       </div>
       <div class="col-lg-4">
@@ -43,8 +123,10 @@
           <div class="features-icons-icon d-flex">
             <i class="icon-check m-auto text-primary"></i>
           </div>
-          <h3>Ease of Use</h3>
-          <p class="lead mb-0">We remove the noise of daily stock movements and keep the interface simple!</p>
+          <h3>Trade Journal</h3>
+          <p class="lead mb-0">Write down your investment thoughts, follow up
+            and re-evalute your predictions and assumptions.
+          </p>
         </div>
       </div>
     </div>
@@ -56,10 +138,10 @@
   <div class="container">
     <div class="row">
       <div class="col-xl-9 mx-auto">
-        <h2 class="mb-4">Ready to get started? Sign up now!</h2>
+        <h3 class="mb-4">Already have an account?</h3>
       </div>
       <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-        <app-profile-create></app-profile-create>
+        <a [routerLink]="[ '/profile', 'login' ]" class="btn btn-primary">Login</a>
       </div>
     </div>
   </div>

@@ -12,6 +12,7 @@ namespace core.Account
         public override Guid Id => State.Id;
         public bool IsPasswordAvailable => State.GetSalt() != null;
         public bool Verified => State.Verified != null;
+        public string SubscriptionLevel => State.SubscriptionLevel;
         public DateTimeOffset Created => State.Created;
         public string Email => State.Email;
         public string Firstname => State.Firstname;
@@ -31,12 +32,12 @@ namespace core.Account
 
             if (string.IsNullOrWhiteSpace(firstname))
             {
-                throw new InvalidOperationException("Firstname is required");
+                throw new InvalidOperationException("First name is required");
             }
 
             if (string.IsNullOrWhiteSpace(lastname))
             {
-                throw new InvalidOperationException("Lastname is required");
+                throw new InvalidOperationException("Last name is required");
             }
 
             Apply(
@@ -47,6 +48,13 @@ namespace core.Account
                     email.ToLowerInvariant(),
                     firstname,
                     lastname)
+            );
+        }
+
+        public void SubscribeToPlan(string planId, string customerId, string subscriptionId)
+        {
+            Apply(
+                new UserSubscribedToPlan(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, planId, customerId, subscriptionId)
             );
         }
 
@@ -134,6 +142,11 @@ namespace core.Account
         private void ApplyInternal(UserConfirmed c)
         {
             this.State.Apply(c);
+        }
+
+        private void ApplyInternal(UserSubscribedToPlan s)
+        {
+            this.State.Apply(s);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using core.Account;
+using core.Adapters.Subscriptions;
 using Xunit;
 
 namespace coretests.Account
@@ -63,6 +64,16 @@ namespace coretests.Account
             u.LoggedIn("blablabla", DateTimeOffset.UtcNow);
 
             Assert.Equal(u.LastLogin.Value.DateTime, DateTimeOffset.UtcNow.DateTime, TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
+        public void Subscribe()
+        {
+            var u = new User("laimis@gmail.com", "firstname", "last");
+
+            u.SubscribeToPlan(Plans.Full, "customer", "subscription");
+
+            Assert.Equal(nameof(Plans.Full), u.SubscriptionLevel);
         }
     }
 }

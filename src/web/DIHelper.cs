@@ -5,6 +5,7 @@ using core.Adapters.CSV;
 using core.Adapters.Emails;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using core.Adapters.Subscriptions;
 using core.Options;
 using csvparser;
 using financialmodelingclient;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using storage.redis;
 using storage.shared;
+using stripe;
 using web.Utils;
 
 namespace web
@@ -36,6 +38,12 @@ namespace web
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
+            
+            services.AddSingleton<ISubscriptions>(s => 
+                new stripe.Subscriptions(
+                    configuration.GetValue<string>("STRIPE_API_KEY")
+                )
+            );
 
             services.AddSingleton<IEmailService>(s => 
                 new sendgridclient.SendGridClientImpl(
