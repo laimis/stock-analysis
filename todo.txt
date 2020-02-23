@@ -1,6 +1,10 @@
 - paid plans
     - integrate with the sign up, how will that work
-    
+        - collect information to validate
+        - if not valid, show error
+        - if valid, collect payment information
+        - send payment information together with user information
+        - verify everything at one time
     - make sure to allow trial
     - pick plan UI flow
 

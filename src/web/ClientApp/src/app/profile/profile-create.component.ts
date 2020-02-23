@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 @Component({
@@ -10,41 +10,113 @@ import { Location } from '@angular/common';
 })
 export class ProfileCreateComponent implements OnInit {
 
-  public firstname  :string
-  public lastname   :string
-  public email      :string
-  public password   :string
-  public terms      :boolean
+  firstname  : string
+  lastname   : string
+  email      : string
+  password   : string
+  terms      : boolean
 
-  public errors     :string[]
+  errors     : string[]
+
+  private FREE_PLAN  : string = 'FREE'
+  private PLUS_PLAN  : string = 'PLUS'
+  private FULL_PLAN  : string = 'FULL'
+
+  planName   : string = this.FREE_PLAN
+  isPremium  : boolean = false
 
   constructor(
     private stockService  : StocksService,
     private router        : Router,
-    private location      : Location) { }
+    private location      : Location,
+    private route   : ActivatedRoute) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    var plan = this.route.snapshot.paramMap.get("plan")
+    if (plan)
+    {
+      if (plan == 'plus') this.planName = this.PLUS_PLAN
+      if (plan == 'full') this.planName = this.FULL_PLAN
 
-  create() {
+      this.isPremium = true;
+    }
+  }
+
+  validate() {
 
     this.errors = null
 
-    var obj = {
-      firstname: this.firstname,
-      lastname: this.lastname,
-      email: this.email,
-      password: this.password,
-      terms: this.terms
-    }
+    var obj = this.createUserData()
 
-    this.stockService.createAccount(obj).subscribe(r => {
-      this.router.navigate(['/dashboard'])
+    this.stockService.validateAccount(obj).subscribe(r => {
+      if (this.planName == this.PLUS_PLAN) {
+        this.payPlus()
+      } else if (this.planName == this.FULL_PLAN) {
+        this.payFull()
+      } else {
+        this.createAccount(obj, null)
+      }
     }, err => {
       this.errors = GetErrors(err)
     })
   }
 
+  createAccount(userData, paymentToken){
+    var obj = {
+      userInfo: userData,
+      paymentInfo: paymentToken
+    }
+    this.stockService.createAccount(obj).subscribe(r =>{
+      this.router.navigate(['/dashboard'])
+    }, err => this.errors = GetErrors(err))
+  }
+
+  private createUserData() {
+    return {
+      firstname: this.firstname,
+      lastname: this.lastname,
+      email: this.email,
+      password: this.password,
+      terms: this.terms
+    };
+  }
+
   back() {
     this.location.back()
+  }
+
+  payFull() {
+    this.pay("plan_GmXCy9dpWKIB4E", "Plan level: Full")
+  }
+
+  payPlus() {
+    this.pay("plan_GmXCWQvmEWwhtr", "Plan level: Plus")
+  }
+
+  pay(planId:string, planName:string) {
+
+    var capture = this;
+
+    var handler = (<any>window).StripeCheckout.configure({
+      key: 'pk_test_XKCVJk24i9R0N8He0YkHC7uA00trzQsSKK',
+      locale: 'auto',
+      token: function (token: any) {
+        console.log(token)
+
+        var paymentData = {
+          token : token,
+          planId : planId
+        }
+
+        capture.createAccount(
+          capture.createUserData(),
+          paymentData)
+      }
+    });
+
+    handler.open({
+      name: 'Nightingale Trading',
+      description: planName
+    });
   }
 }

@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.Subscriptions;
 using core.Shared;
 using MediatR;
 
@@ -10,6 +11,14 @@ namespace core.Account
     public class Create
     {
         public class Command : IRequest<CommandResponse<User>>
+        {
+            [Required]
+            public UserInfo UserInfo { get; set; }
+
+            public PaymentInfo PaymentInfo { get; set; }
+        }
+
+        public class UserInfo : IRequest<CommandResponse<User>>
         {
             [Required]
             public string Email { get; set; }
@@ -30,30 +39,69 @@ namespace core.Account
             public bool Terms { get; set; }
         }
 
+        public class PaymentInfo
+        {
+            [Required]
+            public PaymentToken Token { get; set; }
+            [Required]
+            public string PlanId { get; set; }
+        }
+
+        public class PaymentToken
+        {
+            [Required]
+            public string Id { get; set; }
+
+            [Required]
+            public string Email { get; set; }
+        }
+
         public class Handler : IRequestHandler<Command, CommandResponse<User>>
         {
             private IAccountStorage _storage;
             private IPasswordHashProvider _hash;
+            private ISubscriptions _subscriptions;
 
-            public Handler(IAccountStorage storage, IPasswordHashProvider hash)
+            public Handler(IAccountStorage storage, IPasswordHashProvider hash, ISubscriptions subscriptions)
             {
                 _storage = storage;
                 _hash = hash;
+                _subscriptions = subscriptions;
             }
 
             public async Task<CommandResponse<User>> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var exists = await this._storage.GetUserByEmail(cmd.Email);
+                var exists = await this._storage.GetUserByEmail(cmd.UserInfo.Email);
                 if (exists != null)
                 {
-                    return CommandResponse<User>.Failed($"Account with {cmd.Email} already exists");
+                    return CommandResponse<User>.Failed($"Account with {cmd.UserInfo} already exists");
                 }
 
-                var u = new User(cmd.Email, cmd.Firstname, cmd.Lastname);
+                var u = new User(cmd.UserInfo.Email, cmd.UserInfo.Firstname, cmd.UserInfo.Lastname);
 
-                var (hash, salt) = _hash.Generate(cmd.Password, 32);
+                var (hash, salt) = _hash.Generate(cmd.UserInfo.Password, 32);
 
                 u.SetPassword(hash, salt);
+
+                if (cmd.PaymentInfo != null)
+                {
+                    var result = _subscriptions.Create(
+                        u,
+                        planId: cmd.PaymentInfo.PlanId,
+                        paymentToken: cmd.PaymentInfo.Token.Id,
+                        email: cmd.PaymentInfo.Token.Email);
+
+                    if (result.CustomerId != null)
+                    {
+                        u.SubscribeToPlan(cmd.PaymentInfo.PlanId, result.CustomerId, result.SubscriptionId);
+                    }
+                    else
+                    {
+                        return CommandResponse<User>.Failed(
+                            $"Failed to process the payment, please try again or use a different payment form"
+                        );
+                    }
+                }
 
                 await _storage.Save(u);
 

@@ -62,7 +62,7 @@
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
             </ul>
             <button
-              (click)="payStarter()"
+              [routerLink]="[ '/profile', 'create', 'plus' ]"
               class="btn btn-block btn-primary text-uppercase">
               Start with Plus
             </button>
@@ -90,7 +90,7 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Options Data</li>
             </ul>
             <button
-              (click)="payFull()"
+              [routerLink]="[ '/profile', 'create', 'full' ]"
               class="btn btn-block btn-primary text-uppercase">
               Succeed in Full
           </button>

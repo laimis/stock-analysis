@@ -158,6 +158,10 @@ export class StocksService {
     return this.http.post<object>('/api/account', obj)
   }
 
+  validateAccount(obj:object) : Observable<object> {
+    return this.http.post<object>('/api/account/validate', obj)
+  }
+
   loginAccount(obj:object) : Observable<object> {
     return this.http.post<object>('/api/account/login', obj)
   }

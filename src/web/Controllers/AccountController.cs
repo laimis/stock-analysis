@@ -33,8 +33,24 @@ namespace web.Controllers
         }
 
         [HttpPost("subscribe")]
+        [Authorize]
         public async Task<ActionResult> Subscribe(Subscribe.Command cmd)
         {
+            cmd.WithUserId(this.User.Identifier());
+
+            var r = await _mediator.Send(cmd);
+
+            return this.OkOrError(r);
+        }
+
+        [HttpPost("validate")]
+        public async Task<ActionResult> Validate(Validate.Command cmd)
+        {
+            if (this.User.Identity.IsAuthenticated)
+            {
+                return BadRequest("User already has an account");
+            }
+
             var r = await _mediator.Send(cmd);
 
             return this.OkOrError(r);
