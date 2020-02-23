@@ -21,7 +21,7 @@ export class PaymentsComponent implements OnInit {
   }
 
   payStarter() {
-    this.pay("plan_GmXCWQvmEWwhtr", "Plan level: Starter")
+    this.pay("plan_GmXCWQvmEWwhtr", "Plan level: Plus")
   }
 
   pay(planId:string, planName:string) {
@@ -53,6 +53,6 @@ export class PaymentsComponent implements OnInit {
       name: 'Nightingale Trading',
       description: planName
     });
-}
+  }
 
 }

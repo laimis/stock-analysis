@@ -10,7 +10,7 @@ namespace core.Account
 {
     public class Subscribe
     {
-        public class Command : RequestWithUserId<CommandResponse<User>>
+        public class Command : IRequest<CommandResponse<User>>
         {
             [Required]
             public PaymentToken Token { get; set; }
@@ -33,11 +33,13 @@ namespace core.Account
 
             public async Task<CommandResponse<User>> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var user = await this._storage.GetUser(cmd.UserId);
-                if (user == null)
+                var user = await this._storage.GetUserByEmail(cmd.Token.Email);
+                if (user != null)
                 {
-                    return CommandResponse<User>.Failed($"Account does not exist");
+                    return CommandResponse<User>.Failed($"Account already exist");
                 }
+
+                user = new User(cmd.Token.Email, null, null);
 
                 var result = _subscriptions.Create(
                     user,

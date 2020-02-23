@@ -28,7 +28,6 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Stock Metrics</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings/Dividend dates</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Automated Reports</li>
@@ -55,18 +54,18 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
+              <!-- <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li> -->
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Data</li>
+              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
               <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
             </ul>
-            <a
-              [routerLink]="[ '/profile', 'create', 'starter' ]"
+            <button
+              (click)="payStarter()"
               class="btn btn-block btn-primary text-uppercase">
               Start with Plus
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -83,18 +82,18 @@
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li>
+              <!-- <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li> -->
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings Reports</li>
               <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Options Data</li>
             </ul>
-            <a
-              [routerLink]="[ '/profile', 'create', 'full' ]"
+            <button
+              (click)="payFull()"
               class="btn btn-block btn-primary text-uppercase">
               Succeed in Full
-            </a>
+          </button>
           </div>
         </div>
       </div>

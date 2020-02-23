@@ -33,13 +33,11 @@ namespace web.Controllers
         }
 
         [HttpPost("subscribe")]
-        public async Task<bool> Subscribe(Subscribe.Command cmd)
+        public async Task<ActionResult> Subscribe(Subscribe.Command cmd)
         {
-            cmd.WithUserId(this.User.Identifier());
-            
             var r = await _mediator.Send(cmd);
 
-            return true;
+            return this.OkOrError(r);
         }
 
         [HttpPost]
