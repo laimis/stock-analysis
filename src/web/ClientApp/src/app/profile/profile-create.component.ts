@@ -24,6 +24,7 @@ export class ProfileCreateComponent implements OnInit {
 
   planName   : string = this.FREE_PLAN
   isPremium  : boolean = false
+  payLabel   : string = ''
 
   constructor(
     private stockService  : StocksService,
@@ -39,6 +40,7 @@ export class ProfileCreateComponent implements OnInit {
       if (plan == 'full') this.planName = this.FULL_PLAN
 
       this.isPremium = true;
+      this.payLabel = " & Pay"
     }
   }
 

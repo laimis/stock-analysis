@@ -32,17 +32,6 @@ namespace web.Controllers
             return _mediator.Send(new Get.Query(this.User.Identifier()));
         }
 
-        [HttpPost("subscribe")]
-        [Authorize]
-        public async Task<ActionResult> Subscribe(Subscribe.Command cmd)
-        {
-            cmd.WithUserId(this.User.Identifier());
-
-            var r = await _mediator.Send(cmd);
-
-            return this.OkOrError(r);
-        }
-
         [HttpPost("validate")]
         public async Task<ActionResult> Validate(Validate.Command cmd)
         {
