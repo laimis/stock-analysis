@@ -52,6 +52,17 @@ namespace core.Options
                 userId));
         }
 
+        internal void Delete()
+        {
+            Apply(
+                new OptionDeleted(
+                    Guid.NewGuid(),
+                    this.Id,
+                    DateTimeOffset.UtcNow
+                )
+            );
+        }
+
         public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
             => this.State.IsMatch(ticker, strike, type, expiration);
 
@@ -154,6 +165,11 @@ namespace core.Options
         protected void ApplyInternal(OptionExpired expired)
         {
             this.State.Apply(expired);
+        }
+
+        protected void ApplyInternal(OptionDeleted deleted)
+        {
+            this.State.Apply(deleted);
         }
     }
 }

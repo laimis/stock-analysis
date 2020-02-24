@@ -1,20 +1,17 @@
 - paid plans
-    - integrate with the sign up, how will that work
-        - collect information to validate
-        - if not valid, show error
-        - if valid, collect payment information
-        - send payment information together with user information
-        - verify everything at one time
     - make sure to allow trial
-    - pick plan UI flow
+    - disable create button when creating an account
 
 - ad campaign
-- stock journal [<- did much better] vs trade journal
-- better landing page
-- robinhood landing page and a page that attacks it
+    - stock journal [<- did much better] vs trade journal
 
 FEATURES
 
+- Vestas VWDRY is what he owns, only VWSYF shows up
+- nekheel logged in but it was not marked as logging in
+- delete transaction option
+- better landing page
+- robinhood landing page and a page that attacks it
 - show plan level, allow to upgrade
 - add my IP to filter out my visits
 - ability to tag entry trades?

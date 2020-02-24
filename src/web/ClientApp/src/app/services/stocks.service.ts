@@ -120,6 +120,11 @@ export class StocksService {
 
   // ------- options ----------------
 
+  deleteOption(id: string) {
+    return this.http.delete('/api/options/' + id)
+  }
+
+
 	buyOption(obj:object) : Observable<any> {
 		return this.http.post<string>('/api/options/buy', obj)
   }

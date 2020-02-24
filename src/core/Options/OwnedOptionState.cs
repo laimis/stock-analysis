@@ -39,6 +39,12 @@ namespace core.Options
             this.Expirations.Add(expired);
         }
 
+        internal void Apply(OptionDeleted deleted)
+        {
+            this.NumberOfContracts = 0;
+            this.Transactions.Clear();
+        }
+
         internal void Apply(OptionSold sold)
         {
             this.NumberOfContracts -= sold.NumberOfContracts;

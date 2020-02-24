@@ -66,6 +66,16 @@ namespace web.Controllers
             return ExecTransaction(cmd);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<object> Delete(Guid id)
+        {
+            var cmd = new Delete.Command(id, this.User.Identifier());
+            
+            await _mediator.Send(cmd);
+
+            return Ok();
+        }
+
         [HttpPost("expire")]
         public async Task<object> Expire(Expire.Command cmd)
         {
