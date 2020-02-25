@@ -38,6 +38,14 @@ namespace web.Controllers
             return await _mediator.Send(query);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<object> Delete(Guid id)
+        {
+            var cmd = new Delete.Command(id, User.Identifier());
+
+            return await _mediator.Send(cmd);
+        }
+
         [HttpGet("search/{term}")]
         public async Task<object> Search(string term)
         {

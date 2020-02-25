@@ -34,7 +34,7 @@ namespace core.Options
                 var option = await _storage.GetOwnedOption(cmd.Id, cmd.UserId);
                 if (option == null)
                 {
-                    return CommandResponse<OwnedOption>.Failed("Trying to expire not owned option");
+                    return CommandResponse<OwnedOption>.Failed("Trying to delete not owned option");
                 }
 
                 option.Delete();

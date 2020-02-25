@@ -62,16 +62,14 @@ export class SoldOptionDetailComponent implements OnInit {
 
   delete() {
 
-    this.errors = null;
+    if (confirm("are you sure you want to delete this option?"))
+    {
+      this.errors = null;
 
-    var opt = {
-      id: this.option.id,
-
+      this.service.deleteOption(this.option.id).subscribe(r => {
+        this.router.navigateByUrl('/dashboard')
+      })
     }
-
-    this.service.deleteOption(this.option.id).subscribe(r => {
-      this.router.navigateByUrl('/dashboard')
-    })
   }
 
   back() {

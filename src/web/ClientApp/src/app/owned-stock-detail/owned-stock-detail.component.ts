@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, Location } from '@angular/common';
 
 @Component({
@@ -23,6 +23,7 @@ export class OwnedStockDetailComponent implements OnInit {
   constructor(
     private service: StocksService,
     private route: ActivatedRoute,
+    private router: Router,
     private location: Location,
     private datePipe: DatePipe
   ) { }
@@ -40,6 +41,18 @@ export class OwnedStockDetailComponent implements OnInit {
     this.service.getStock(id).subscribe( result => {
       this.stock = result
     })
+  }
+
+  delete() {
+
+    if (confirm("are you sure you want to delete this stock?"))
+    {
+      this.errors = null
+
+      this.service.deleteStocks(this.stock.id).subscribe(r => {
+        this.router.navigateByUrl('/dashboard')
+      })
+    }
   }
 
   record() {

@@ -43,6 +43,11 @@ namespace core.Stocks
             ));
         }
 
+        internal void Apply(StockDeleted deleted)
+        {
+            this.Owned = 0;
+        }
+
         internal void Apply(StockSold sold)
         {
             this.Owned -= sold.NumberOfShares;

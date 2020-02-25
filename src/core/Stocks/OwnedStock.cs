@@ -65,6 +65,17 @@ namespace core.Stocks
             );
         }
 
+        internal void Delete()
+        {
+            Apply(
+                new StockDeleted(
+                    Guid.NewGuid(),
+                    this.State.Id,
+                    DateTimeOffset.UtcNow
+                )
+            );
+        }
+
         public void Sell(int numberOfShares, double price, DateTimeOffset date, string notes)
         {
             if (numberOfShares > this.State.Owned)
@@ -100,6 +111,11 @@ namespace core.Stocks
         private void ApplyInternal(StockSold sold)
         {
             this.State.Apply(sold);
+        }
+
+        private void ApplyInternal(StockDeleted deleted)
+        {
+            this.State.Apply(deleted);
         }
     }
 }
