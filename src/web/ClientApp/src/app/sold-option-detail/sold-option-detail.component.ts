@@ -98,8 +98,8 @@ export class SoldOptionDetailComponent implements OnInit {
       assigned: assigned,
     }
 
-    this.service.expireOption(opt).subscribe( r => {
-      this.getOption(r.id)
+    this.service.expireOption(opt).subscribe( _ => {
+      this.router.navigateByUrl('/dashboard')
     }, err => {
       this.errors = GetErrors(err)
     })
