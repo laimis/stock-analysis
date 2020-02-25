@@ -68,9 +68,12 @@ export class ProfileCreateComponent implements OnInit {
       userInfo: userData,
       paymentInfo: paymentToken
     }
-    this.stockService.createAccount(obj).subscribe(r =>{
+
+    this.stockService.createAccount(obj).subscribe(_ => {
       this.router.navigate(['/dashboard'])
-    }, err => this.errors = GetErrors(err))
+    }, err => {
+      this.errors = GetErrors(err)
+    })
   }
 
   private createUserData() {

@@ -2,15 +2,18 @@
     - make sure to allow trial
     - disable create button when creating an account
 
-- ad campaign
-    - stock journal [<- did much better] vs trade journal
-
 FEATURES
 
+- review endpoint, collapse or exclude notes
+- concept of a watch -- easy to understand, forget the notes ... unless some one adds a note, you add the stock to watch
+- fundamentals, bold text, lighten the label
+- nicer looking filters
+- search in the header
+- ad campaign
+    - stock journal [<- did much better] vs trade journal
 - Vestas VWDRY is what he owns, only VWSYF shows up
 - nekheel logged in but it was not marked as logging in
-- delete transaction option
-- better landing page
+- landing page: why should you use it
 - robinhood landing page and a page that attacks it
 - show plan level, allow to upgrade
 - add my IP to filter out my visits
@@ -47,22 +50,8 @@ FEATURES
 - notes on the additional transactions in options/shares details screens
 - import of shares/options in transaction screens
 - support crypto?
-
-https://github.com/wenboyu2/yahoo-earnings-calendar
-
-IMPROVEMENTS/FIXES
-
-DESIGN/UX
-
-- search in the header
+- https://github.com/wenboyu2/yahoo-earnings-calendar
 - angular material
-
-DEV
-- aggregate keys in redis is still a shitshow
-- practice use of polly
-- nullability in the project
-
-BACKEND ENGINEER GUIDE TO FRONTEND
 
 
 MARKETING
