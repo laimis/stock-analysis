@@ -45,14 +45,16 @@ namespace stripe
 
             var items = new List<SubscriptionItemOptions> {
                 new SubscriptionItemOptions {
-                    Plan = planId
+                    Plan = planId,
                 }
             };
             
             var subscriptionOptions = new SubscriptionCreateOptions {
                 Customer = customer.Id,
-                Items = items
+                Items = items,
+                TrialPeriodDays = 7
             };
+            
             subscriptionOptions.AddExpand("latest_invoice.payment_intent");
 
             var subService = new SubscriptionService();
