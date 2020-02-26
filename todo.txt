@@ -9,7 +9,6 @@ FEATURES
 - ad campaign
     - stock journal [<- did much better] vs trade journal
 - Vestas VWDRY is what he owns, only VWSYF shows up
-- nekheel logged in but it was not marked as logging in
 - landing page: why should you use it
 - robinhood landing page and a page that attacks it
 - show plan level, allow to upgrade

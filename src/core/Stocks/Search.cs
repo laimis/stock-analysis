@@ -32,7 +32,7 @@ namespace core.Stocks
                 var list = await _stocksService.Search(request.Term);
 
                 return list
-                    .Where(s => s.IsCommonShare && s.Region == "US")
+                    .Where(s => s.IsSupportedType)
                     .Take(5);
             }
         }
