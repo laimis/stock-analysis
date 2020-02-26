@@ -37,7 +37,9 @@ namespace core.Stocks
         }
 
         public string Ticker => this.State.Ticker;
-        public string Description => $"{this.State.Owned} shares owned";
+        public string Description => this.State.Description;
+
+        public double AverageCost => this.State.AverageCost;
 
         public void Purchase(int numberOfShares, double price, DateTimeOffset date, string notes = null)
         {

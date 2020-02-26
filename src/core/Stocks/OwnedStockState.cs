@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
@@ -23,11 +24,17 @@ namespace core.Stocks
         public List<Transaction> Transactions { get; private set; }
         
         public Guid Id { get; set; }
+        public double AverageCost { get; private set; }
+        public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
         internal List<StockPurchased> Buys { get; }
         internal List<StockSold> Sells { get; }
 
         internal void Apply(StockPurchased purchased)
         {
+            this.AverageCost = 
+                (this.AverageCost * this.Owned + purchased.Price * purchased.NumberOfShares) 
+                / (this.Owned + purchased.NumberOfShares);
+
             Owned += purchased.NumberOfShares;
             Spent += purchased.NumberOfShares * purchased.Price;
             Purchased = purchased.When;
