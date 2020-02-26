@@ -55,6 +55,10 @@ namespace core.Account
 
                 if (matches)
                 {
+                    user.LoggedIn(request.IPAddress, DateTimeOffset.UtcNow);
+
+                    await this._storage.Save(user);
+
                     return CommandResponse<User>.Success(user);
                 }
 
