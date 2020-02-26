@@ -1,5 +1,4 @@
 - paid plans
-    - make sure to allow trial
     - disable create button when creating an account
 
 FEATURES

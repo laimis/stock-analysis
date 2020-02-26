@@ -18,6 +18,8 @@ export class ProfileCreateComponent implements OnInit {
 
   errors     : string[]
 
+  disableButton : boolean = false
+
   private FREE_PLAN  : string = 'FREE'
   private PLUS_PLAN  : string = 'PLUS'
   private FULL_PLAN  : string = 'FULL'
@@ -47,6 +49,7 @@ export class ProfileCreateComponent implements OnInit {
   validate() {
 
     this.errors = null
+    this.disableButton = true
 
     var obj = this.createUserData()
 
@@ -59,6 +62,7 @@ export class ProfileCreateComponent implements OnInit {
         this.createAccount(obj, null)
       }
     }, err => {
+      this.disableButton = false
       this.errors = GetErrors(err)
     })
   }
@@ -71,8 +75,10 @@ export class ProfileCreateComponent implements OnInit {
 
     this.stockService.createAccount(obj).subscribe(_ => {
       this.router.navigate(['/dashboard'])
+      this.disableButton = false
     }, err => {
       this.errors = GetErrors(err)
+      this.disableButton = false
     })
   }
 
@@ -123,5 +129,7 @@ export class ProfileCreateComponent implements OnInit {
       name: 'Nightingale Trading',
       description: planName
     });
+
+    this.disableButton = false
   }
 }
