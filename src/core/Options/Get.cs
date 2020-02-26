@@ -25,7 +25,7 @@ namespace core.Options
             {
                 var option = await _storage.GetOwnedOption(request.Id, request.UserId);
                 
-                return Mapper.ToOptionView(option);
+                return Mapper.ToOptionView(option, new TickerPrice(0));
             }
         }
     }

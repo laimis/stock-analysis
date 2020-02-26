@@ -32,6 +32,7 @@
       <thead class="thead-light">
         <tr>
           <th width="50">Symbol</th>
+          <th width="120">Latest Price</th>
           <th width="50">Amount</th>
           <th>Details</th>
           <th width="100">Action</th>
@@ -40,6 +41,7 @@
       <tbody>
         <tr *ngFor="let option of openOptions">
           <td><a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a></td>
+          <td>{{option.currentPrice | currency}}</td>
           <td class="text-right">{{option.numberOfContracts}}</td>
           <td>
             {{option.boughtOrSold}}
@@ -56,8 +58,9 @@
         </tr>
         <tr *ngFor="let ticker of owned">
           <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
+          <td>{{ticker.currentPrice | currency}}</td>
           <td class="text-right">{{ticker.owned}}</td>
-          <td>shares owned</td>
+          <td>Average cost of <b>{{ticker.averageCost | currency }}</b></td>
           <td>
             <a [routerLink]="[ '/stockdetails', ticker.id ]">details</a>
           </td>

@@ -145,12 +145,13 @@ namespace core
             };
         }
 
-        public static object ToOptionView(OwnedOption o)
+        public static object ToOptionView(OwnedOption o, TickerPrice currentPrice)
         {
             return new
             {
                 id = o.State.Id,
                 ticker = o.State.Ticker,
+                currentPrice = currentPrice.Amount,
                 optionType = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
@@ -162,13 +163,16 @@ namespace core
             };
         }
 
-        internal static object ToOwnedView(OwnedStock o)
+        internal static object ToOwnedView(OwnedStock o, TickerPrice price)
         {
             return new
             {
                 id = o.Id,
+                currentPrice = price.Amount,
                 ticker = o.State.Ticker,
                 owned = o.State.Owned,
+                description = o.State.Description,
+                averageCost = o.State.AverageCost,
                 transactions = new TransactionList(o.State.Transactions, null, null)
             };
         }
