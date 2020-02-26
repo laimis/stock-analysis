@@ -58,6 +58,9 @@ namespace core
             string show)
         {
             var log = new List<Shared.Transaction>();
+            var tickers = stocks.Select(s => s.Ticker).Union(options.Select(o => o.Ticker))
+                .Distinct()
+                .OrderBy(s => s);
 
             if (string.IsNullOrEmpty(show) || show == "shares")
             {
@@ -75,7 +78,7 @@ namespace core
                 );
             }
 
-            return new TransactionList(log, groupBy);
+            return new TransactionList(log, groupBy, tickers);
         }
 
         internal static NotesList MapNotes(IEnumerable<Note> notes)
@@ -153,7 +156,7 @@ namespace core
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
                 numberOfContracts = Math.Abs(o.State.NumberOfContracts),
                 boughtOrSold = o.State.NumberOfContracts > 0 ? "Bought" : "Sold",
-                transactions = new TransactionList(o.State.Transactions, null),
+                transactions = new TransactionList(o.State.Transactions, null, null),
                 expiresSoon = o.ExpiresSoon,
                 isExpired = o.IsExpired
             };
@@ -166,7 +169,7 @@ namespace core
                 id = o.Id,
                 ticker = o.State.Ticker,
                 owned = o.State.Owned,
-                transactions = new TransactionList(o.State.Transactions, null)
+                transactions = new TransactionList(o.State.Transactions, null, null)
             };
         }
     }

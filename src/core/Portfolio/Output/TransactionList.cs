@@ -6,10 +6,13 @@ namespace core.Portfolio.Output
 {
     public class TransactionList
     {
-        public TransactionList(IEnumerable<Transaction> transactions, string groupBy)
+        public TransactionList(
+            IEnumerable<Transaction> transactions,
+            string groupBy,
+            IEnumerable<string> tickers)
         {
             this.Transactions = Ordered(transactions, groupBy);
-            this.Tickers = transactions.Select(t => t.Ticker).Distinct().OrderBy(s => s);
+            this.Tickers = tickers;
             
             if (groupBy != null)
             {
@@ -17,7 +20,7 @@ namespace core.Portfolio.Output
                     .GroupBy(t => GroupByValue(groupBy, t))
                     .Select(g => new {
                         name = g.Key,
-                        transactions = new TransactionList(g, null)
+                        transactions = new TransactionList(g, null, null)
                     });
             }
         }

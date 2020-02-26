@@ -44,7 +44,8 @@ namespace core.Account
                     email = user.Email,
                     firstname = user.Firstname,
                     lastname = user.Lastname,
-                    isAdmin = user.Email == EmailSettings.Admin
+                    isAdmin = user.Email == EmailSettings.Admin,
+                    subscriptionLevel = user.SubscriptionLevel
                 };
             }
         }

@@ -1,20 +1,16 @@
 
 FEATURES
 
+- details of stocks owned
+
+
 - review endpoint, collapse or exclude notes
 - concept of a watch -- easy to understand, forget the notes ... unless some one adds a note, you add the stock to watch
-- fundamentals, bold text, lighten the label
 - nicer looking filters
 - search in the header
-- ad campaign
-    - stock journal [<- did much better] vs trade journal
-- Vestas VWDRY is what he owns, only VWSYF shows up
 - landing page: why should you use it
 - robinhood landing page and a page that attacks it
-- show plan level, allow to upgrade
 - add my IP to filter out my visits
-- ability to tag entry trades?
-- details of stocks owned
 - P&L report, what's that all about
 - realized and unrealized separtion
 - transations:

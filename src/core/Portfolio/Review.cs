@@ -52,7 +52,7 @@ namespace core.Portfolio
                     .Union(stocks.Result.SelectMany(s => s.State.Transactions))
                     .Where(t => t.Date >= start);
 
-                return new ReviewList(start, end, groups, new TransactionList(transactions, null));
+                return new ReviewList(start, end, groups, new TransactionList(transactions, null, null));
             }
 
             private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<OwnedOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
