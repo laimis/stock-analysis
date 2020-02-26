@@ -2,11 +2,12 @@
 FEATURES
 
 - details of stocks owned
+    average cost
 
+- on front page, show the ticker price
 
 - review endpoint, collapse or exclude notes
 - concept of a watch -- easy to understand, forget the notes ... unless some one adds a note, you add the stock to watch
-- nicer looking filters
 - search in the header
 - landing page: why should you use it
 - robinhood landing page and a page that attacks it

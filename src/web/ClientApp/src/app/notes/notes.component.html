@@ -6,7 +6,7 @@
 
   <div>
     <label for="symbolFilter">Filter your notes by symbol </label>&nbsp;&nbsp;
-    <select class="mr-3" [(ngModel)]="symbolFilter" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+    <select class="btn border rounded mr-3" [(ngModel)]="symbolFilter" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
       <option value="">Show all</option>
       <option *ngFor="let t of tickers" value="{{t}}">{{t}}</option>
     </select>

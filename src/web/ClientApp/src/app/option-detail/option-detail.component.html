@@ -36,13 +36,13 @@
 
     <div class="form-group">
       <label for="expirationSelect">Expiration</label>&nbsp;&nbsp;
-      <select [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
+      <select class="btn border rounded" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
         <option value=""></option>
         <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
       </select>
 
       &nbsp;&nbsp;<label for="sideSelect">Side</label>&nbsp;&nbsp;
-      <select [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
+      <select class="btn border rounded" [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
         <option value=""></option>
         <option value="call">call</option>
         <option value="put">put</option>
