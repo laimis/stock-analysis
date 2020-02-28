@@ -27,7 +27,7 @@ export class NotesComponent implements OnInit {
     this.loadData()
   }
 
-  private loadData() {
+  loadData() {
     this.loading = true
 
     console.log("loading")

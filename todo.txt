@@ -6,7 +6,6 @@ FEATURES
 - search in the header
 - landing page: why should you use it
 - robinhood landing page and a page that attacks it
-- add my IP to filter out my visits
 - P&L report, what's that all about
 - realized and unrealized separtion
 - transations:
