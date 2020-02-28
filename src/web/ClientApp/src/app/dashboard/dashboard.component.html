@@ -1,12 +1,11 @@
-<form>
-	<div class="form-group">
-    <app-symbol-search
-        label="Search for securities using ticker or name"
-        (tickerSelected)="onTickerSelected($event)"
-        cssClass="form-control">
-      </app-symbol-search>
-	</div>
-</form>
+<div>
+  <app-symbol-search
+      label="{{null}}"
+      placeholder="Search for securities using ticker or name"
+      (tickerSelected)="onTickerSelected($event)"
+      cssClass="form-control">
+  </app-symbol-search>
+</div>
 
 <div *ngIf="loaded">
 
