@@ -2,18 +2,18 @@
 
   <div>
 
-    <select class="btn border rounded mr-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
+    <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
       <option value="month">Breakdown by Month</option>
       <option value="ticker">Breakdown by Symbol</option>
     </select>
 
-    <select class="btn border rounded mr-3" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
+    <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
       <option value="">Shares and options</option>
       <option value="shares">Just shares</option>
       <option value="options">Just options</option>
     </select>
 
-    <select class="btn border rounded mr-3" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+    <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
       <option value="">All Symbols</option>
       <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
     </select>

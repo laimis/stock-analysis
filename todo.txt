@@ -9,7 +9,6 @@ FEATURES
 - P&L report, what's that all about
 - realized and unrealized separtion
 - transations:
-    - stocks in the filter available at all times
     - details collapsed that can be expanded
     - chart
 - % historical performance
@@ -22,11 +21,7 @@ FEATURES
 - add to watchlist, see how alpha does it
 - review reminders or daily/weekly report
 - better welcome page, "show me the goods" walk through
-- export/import excel
 - import of shares/options in transaction screens
-- https://github.com/wenboyu2/yahoo-earnings-calendar
-- angular material
-
 
 MARKETING
 
