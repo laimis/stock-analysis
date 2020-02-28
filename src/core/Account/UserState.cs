@@ -18,6 +18,11 @@ namespace core.Account
         public DateTimeOffset? LastLogin { get; private set; }
         public string SubscriptionLevel { get; private set; }
 
+        public UserState()
+        {
+            this.SubscriptionLevel = "Free";
+        }
+
         internal void Apply(UserCreated c)
         {
             this.Id = c.AggregateId;

@@ -5,38 +5,25 @@ FEATURES
 - concept of a watch -- easy to understand, forget the notes ... unless some one adds a note, you add the stock to watch
 - search in the header
 - landing page: why should you use it
-- robinhood landing page and a page that attacks it
+- robinhood landing page and a page that attacks it, import/export
 - P&L report, what's that all about
 - realized and unrealized separtion
 - transations:
     - stocks in the filter available at all times
     - details collapsed that can be expanded
     - chart
-- redo top menu
-- charts with highchart
-- % change from the time you watched?
+- % historical performance
 - compare grid of stocks
 - transactions as top level item
-- expired out of money does not work well
-- ownership dashboard that is like trends but for stuff you ownership
-    show how many shares
-    average price, one bigger table that adjusts with number of stocks/otions?
-    options expiring this week tag
-- robinhood targetted import of monthly summary
-- temp file cleanup based on created date
 - on detail pages disable buy/sell buttons to eliminate duplicate transactions
 - upcoming earnings scraping, important announcements
 - if portfolio is empty, candidate for getting started
-- write documentation
 - how to list the upcoming earnings companies, but 2-3 weeks out
 - add to watchlist, see how alpha does it
 - review reminders or daily/weekly report
 - better welcome page, "show me the goods" walk through
-- export excel
-- import excel
-- notes on the additional transactions in options/shares details screens
+- export/import excel
 - import of shares/options in transaction screens
-- support crypto?
 - https://github.com/wenboyu2/yahoo-earnings-calendar
 - angular material
 
