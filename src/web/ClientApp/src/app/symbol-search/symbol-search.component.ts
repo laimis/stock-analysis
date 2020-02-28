@@ -12,6 +12,7 @@ export class SymbolSearchComponent implements OnInit {
 
   @Input() label: string = "Search for securities using ticker or name"
   @Input() cssClass: string = "form-control"
+  @Input() initialValue: string
   @Output() tickerSelected = new EventEmitter<string>();
 
   selectedValue: string = null
@@ -25,6 +26,10 @@ export class SymbolSearchComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (this.initialValue) {
+      this.selectedValue = this.initialValue
+    }
+
     this.searchResults$ = this.searchTerms.pipe(
       // wait 300ms after each keystroke before considering the term
       debounceTime(300),

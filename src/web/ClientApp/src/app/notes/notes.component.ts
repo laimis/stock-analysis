@@ -11,7 +11,7 @@ export class NotesComponent implements OnInit {
 
   notes: object[]
   tickers: string[]
-  symbolFilter: string
+  symbolFilter: string = ''
   loading: boolean = false
 
   constructor(
@@ -19,7 +19,11 @@ export class NotesComponent implements OnInit {
     private route:ActivatedRoute) { }
 
   ngOnInit() {
-    this.symbolFilter = this.route.snapshot.paramMap.get('ticker')
+    var filter = this.route.snapshot.paramMap.get('ticker')
+    if (filter)
+    {
+      this.symbolFilter = filter
+    }
     this.loadData()
   }
 
