@@ -12,11 +12,10 @@ FEATURES
     - details collapsed that can be expanded
     - chart
 - % historical performance
-- compare grid of stocks
 - transactions as top level item
 - on detail pages disable buy/sell buttons to eliminate duplicate transactions
 - upcoming earnings scraping, important announcements
-- if portfolio is empty, candidate for getting started
+
 - how to list the upcoming earnings companies, but 2-3 weeks out
 - add to watchlist, see how alpha does it
 - review reminders or daily/weekly report
