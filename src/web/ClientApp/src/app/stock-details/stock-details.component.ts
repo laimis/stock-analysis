@@ -14,6 +14,7 @@ export class StockDetailsComponent {
 	loaded: boolean = false
   stock: StockSummary
   notes: NoteList
+  ownership: object
   activeTab: string = 'fundamentals'
 
 	constructor(
@@ -42,6 +43,10 @@ export class StockDetailsComponent {
       this.notes = result
     }, error => {
       console.error(error)
+    })
+
+    this.stocks.getStock(this.ticker).subscribe(result => {
+      this.ownership = result
     })
   }
 

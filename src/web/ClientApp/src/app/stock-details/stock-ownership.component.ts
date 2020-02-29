@@ -1,15 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, Input } from '@angular/core';
+import { StocksService, GetErrors } from '../services/stocks.service';
+import { Router } from '@angular/router';
 import { DatePipe, Location } from '@angular/common';
 
 @Component({
-  selector: 'app-owned-stock-detail',
-  templateUrl: './owned-stock-detail.component.html',
+  selector: 'stock-ownership',
+  templateUrl: './stock-ownership.component.html',
   providers: [DatePipe]
 })
-export class OwnedStockDetailComponent implements OnInit {
+export class StockOwnershipComponent implements OnInit {
+
+  @Input()
   public stock: any;
+
+  @Input()
+  public ticker: any;
 
   public errors: string[]
 
@@ -21,7 +26,6 @@ export class OwnedStockDetailComponent implements OnInit {
 
   constructor(
     private service: StocksService,
-    private route: ActivatedRoute,
     private router: Router,
     private location: Location,
     private datePipe: DatePipe
@@ -30,10 +34,6 @@ export class OwnedStockDetailComponent implements OnInit {
   ngOnInit() {
     this.filled = Date()
     this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
-
-    var id = this.route.snapshot.paramMap.get('id');
-
-    this.getStock(id)
   }
 
   getStock(id:string){

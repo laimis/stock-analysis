@@ -38,7 +38,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let option of openOptions">
-          <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
+          <td><a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a></td>
           <td>{{option.currentPrice | currency}}</td>
           <td>
             <b>{{option.numberOfContracts}}</b> x
@@ -52,7 +52,7 @@
           </td>
         </tr>
         <tr *ngFor="let ticker of owned">
-          <td><a [routerLink]="[ '/stockdetails', ticker.id ]">{{ticker.ticker}}</a></td>
+          <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
           <td>{{ticker.currentPrice | currency}}</td>
           <td><b>{{ticker.owned}}</b> shares x <b>{{ticker.averageCost | currency }}</b>/share</td>
         </tr>
