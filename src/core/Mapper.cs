@@ -154,6 +154,7 @@ namespace core
                 currentPrice = currentPrice.Amount,
                 optionType = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
+                premium = o.State.Credit - o.State.Debit,
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
                 numberOfContracts = Math.Abs(o.State.NumberOfContracts),
                 boughtOrSold = o.State.NumberOfContracts > 0 ? "Bought" : "Sold",
@@ -171,8 +172,10 @@ namespace core
                 currentPrice = price.Amount,
                 ticker = o.State.Ticker,
                 owned = o.State.Owned,
+                equity = o.State.Owned * price.Amount,
                 description = o.State.Description,
                 averageCost = o.State.AverageCost,
+                spent = o.State.Spent,
                 transactions = new TransactionList(o.State.Transactions, null, null)
             };
         }

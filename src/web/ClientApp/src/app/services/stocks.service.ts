@@ -220,8 +220,32 @@ export interface StockLists {
 }
 
 export interface Portfolio {
-  owned: object[]
-  openOptions: object[]
+  owned: OwnedStock[]
+  openOptions: OwnedOption[]
+}
+
+export class OwnedStock {
+  id:string
+  currentPrice: Number
+  ticker: string
+  owned: number
+  spent: number
+  equity: number
+  description: string
+  averageCost: number
+  transactions: TransactionList
+}
+
+export class OwnedOption {
+  id:string
+  currentPrice: Number
+  ticker: string
+  optionType: string
+  strikePrice: number
+  numberOfContracts: number
+  boughtOrSold: string
+  premium: number
+  transactions: TransactionList
 }
 
 export interface StockSummary {

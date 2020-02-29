@@ -95,6 +95,7 @@ namespace coretests.Stocks
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
             Assert.Equal(7.5, stock.AverageCost);
+            Assert.Equal(15, stock.State.Spent);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 

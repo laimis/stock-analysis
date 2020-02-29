@@ -37,6 +37,7 @@ namespace core.Stocks
 
             Owned += purchased.NumberOfShares;
             Spent += purchased.NumberOfShares * purchased.Price;
+            
             LastPurchase = purchased.When;
 
             this.Buys.Add(purchased);

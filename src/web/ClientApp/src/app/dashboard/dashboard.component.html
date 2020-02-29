@@ -9,6 +9,22 @@
 
 <div *ngIf="loaded">
 
+  <div class="container">
+    <div class="row">
+      <div class="col text-center">
+        <div class="font-weight-bold text-muted">STOCKS</div>
+        <div>{{owned.length}} symbols, {{numberOfSharesOwned}} shares</div>
+        <div>{{moneySpentOnShares | currency}} invested</div>
+        <div>{{currentEquity | currency}} equity</div>
+        <div>{{profits | percent }}</div>
+      </div>
+      <div class="col text-center">
+        <div class="font-weight-bold text-muted">OPTIONS</div>
+        <div>{{putContracts}} PUTs and {{callContracts}} CALLs</div>
+        <div>{{optionPremium | currency}} premium </div>
+    </div>
+  </div>
+
   <h3 class="mt-4">Ownership</h3>
 
   <div *ngIf="openOptions.length > 0 || owned.length > 0">
