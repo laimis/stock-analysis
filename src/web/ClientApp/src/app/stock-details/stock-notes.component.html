@@ -1,0 +1,24 @@
+<div class="card mb-3" *ngFor="let note of notes.notes">
+  <div class="card-body">
+    <div class="card-title">
+      <a class="font-weight-bold" [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
+      <span *ngIf="note.stats" class="text-muted"> - {{note.stats.companyName}}</span>
+    </div>
+    <h6 class="card-subtitle mb-2 text-muted">
+      {{note.created | date}}
+      <span class="ml-3" *ngIf="note.price.amount">price: {{note.price.amount | currency}}</span>
+    </h6>
+
+    <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
+
+    <div>
+      <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="notes && notes.notes.length == 0">
+  <div class="alert alert-secondary">
+    You haven't recorded any notes for {{ticker}} yet
+  </div>
+</div>

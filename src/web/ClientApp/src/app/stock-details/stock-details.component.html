@@ -19,7 +19,10 @@
 
   <div class="tab-container mt-2">
     <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">Fundamentals</a>
-    <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">Notes</a>
+
+    <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
+      Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
+    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">Stocks</a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">Options</a>
     <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]="" (click)="activateTab('charts')">Charts</a>
@@ -28,6 +31,8 @@
   <stock-fundamentals *ngIf="isActive('fundamentals')" [stock]=stock></stock-fundamentals>
 
   <stock-charts *ngIf="isActive('charts')" [stock]=stock></stock-charts>
+
+  <stock-notes *ngIf="isActive('notes')" [notes]=notes></stock-notes>
 
 </div>
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockSummary } from '../services/stocks.service';
+import { StocksService, StockSummary, NoteList } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -13,6 +13,7 @@ export class StockDetailsComponent {
   ticker: string
 	loaded: boolean = false
   stock: StockSummary
+  notes: NoteList
   activeTab: string = 'fundamentals'
 
 	constructor(
@@ -35,7 +36,13 @@ export class StockDetailsComponent {
 		}, error => {
 			console.error(error);
 			this.loaded = true;
-		});
+    });
+
+    this.stocks.getNotes(this.ticker).subscribe(result => {
+      this.notes = result
+    }, error => {
+      console.error(error)
+    })
   }
 
   isActive(tabName:string) {
