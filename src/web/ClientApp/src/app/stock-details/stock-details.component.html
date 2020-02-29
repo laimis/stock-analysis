@@ -1,101 +1,47 @@
-<div *ngIf="loaded" class="mt-2">
+<div *ngIf="loaded" class="mt-2 mb-4">
 
-  <div class="card">
-    <div class="card-header">
-      <b>{{profile.symbol}} {{profile.companyName}}</b>
-      <a class="ml-2" href="{{profile.website}}" target="_blank"><i class="fas fa-external-link-alt"></i></a>
-
+  <div>
+    <div>
+      <h3>{{profile.symbol}}: {{profile.companyName}}</h3>
+      <a class="ml-2" href="{{profile.website}}" target="_blank">{{profile.website}} <i class="fas fa-external-link-alt"></i></a>
       <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="float-right ml-3" target="_blank">
         <img src="robinhood.png" height="25px" />
       </a>
     </div>
-    <div class="card-body">
-
-      <img id="ticker-logo" class="float-right img-thumbnail" src="https://storage.googleapis.com/iex/api/logos/{{profile.symbol}}.png" />
-
+    <div>
       <div id="company-description">
         <i>{{profile.description}}</i>
       </div>
-
-      <div class="mt-2">
-        <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/stocks/transaction', ticker]">
-          <i class="fas fa-dollar-sign"></i> Shares
-        </a>
-        <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/options/sell', ticker]">
-          <i class="fas fa-credit-card"></i> Options
-        </a>
-        <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/notes/filtered', ticker ]" aria-label="notes">
-          <i class="fas fa-feather"></i> Journal
-        </a>
-      </div>
-
     </div>
   </div>
 
-  <div class="card mt-3">
-    <div class="card-header"><b>Fundamentals</b></div>
-    <div class="card-body">
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">Price</div><div>{{stock.price | currency}}</div></div>
-        <div class="col"><div class="stat-label">PE</div><div>{{stats.peRatio}}</div></div>
-        <div class="col"><div class="stat-label">10d Volume</div><div>{{stats.avg10Volume / 1000000 | number:'1.0-2'}}M</div></div>
-        <div class="col"><div class="stat-label">30d Volumne</div><div>{{stats.avg30Volume / 1000000 | number:'1.0-2'}}M</div></div>
-      </div>
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">1 Year High</div><div>{{stats.week52highDate | date}}</div></div>
-        <div class="col"><div class="stat-label">1 Year High</div><div>{{stats.week52High | currency}}</div></div>
-        <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52lowDate | date}}</div></div>
-        <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52Low | currency}}</div></div>
-      </div>
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">Next Earnings</div><div>{{stats.nextEarningsDate | date}}</div></div>
-        <div class="col"><div class="stat-label">Ex Div Date</div><div>{{stats.exDividendDate | date}}</div></div>
-        <div class="col"><div class="stat-label">Next Div Date</div><div>{{stats.nextDividendDate | date}}</div></div>
-        <div class="col"><div class="stat-label">Dividend Yield</div><div>{{stats.dividendYield | percent}}</div></div>
-      </div>
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">Market Cap</div><div>{{stats.marketCap / 1000000 | number:'1.0-0'}}M</div></div>
-        <div class="col"><div class="stat-label">Debt-to-Equity</div><div>{{stats.debtToEquity}}</div></div>
-        <div class="col"><div class="stat-label">Put/Call Ratio</div><div>{{stats.putCallRatio | number}}</div></div>
-        <div class="col"><div class="stat-label">Price/Book</div><div>{{stats.priceToBook | number}}</div></div>
-      </div>
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">Revenue</div><div>{{stats.revenue / 1000000 | number:'1.0-0'}}M</div></div>
-        <div class="col"><div class="stat-label">Gross Profit</div><div>{{stats.grossProfit / 1000000 | number:'1.0-0'}}M</div></div>
-        <div class="col"><div class="stat-label">Profit Margin</div><div>{{stats.profitMargin | percent}}</div></div>
-        <div class="col"><div class="stat-label">Total Cash</div><div>{{stats.totalCash / 1000000 | number:'1.0-0'}}M</div></div>
-      </div>
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">5-year change</div><div>{{stats.year5ChangePercent | percent}}</div></div>
-        <div class="col"><div class="stat-label">1-year change</div><div>{{stats.year1ChangePercent | percent}}</div></div>
-        <div class="col"><div class="stat-label">3-month change</div><div>{{stats.month3ChangePercent | percent}}</div></div>
-        <div class="col"><div class="stat-label">1-month change</div><div>{{stats.month1ChangePercent | percent}}</div></div>
-      </div>
-      <div class="row mb-2">
-        <div class="col"><div class="stat-label">Country</div><div>{{profile.country}}</div></div>
-        <div class="col"><div class="stat-label">Industry</div><div>{{profile.industry}} / {{profile.sector}}</div></div>
-        <div class="col"><div class="stat-label">Employees</div><div>{{profile.employees}}</div></div>
-        <div class="col"></div>
-      </div>
-    </div>
+  <div class="tab-container mt-2">
+    <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
+      Fundamentals
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
+      Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
+      Stocks <span *ngIf="ownership && ownership.owned > 0" class="badge badge-pill badge-info">{{ownership.owned}}</span>
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
+      Options
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]="" (click)="activateTab('charts')">
+      Charts
+    </a>
   </div>
 
-	<div class="card mt-3 mb-3">
-    <div class="card-header"><b>Charts</b></div>
+  <stock-fundamentals *ngIf="isActive('fundamentals')" [stock]=stock></stock-fundamentals>
 
-    <div>
-			<google-chart *ngIf="priceChartData" style="width: 100%;" [type]="priceChartType" [data]="priceChartData" [options]="priceOptions"></google-chart>
-		</div>
-		<div>
-			<google-chart *ngIf="volumeChartType" style="width: 100%;" [type]="volumeChartType" [data]="volumeChartData" [options]="volumeOptions"></google-chart>
-		</div>
-		<div>
-			<google-chart *ngIf="bookChartData" style="width: 100%;" [type]="priceChartType" [data]="bookChartData" [options]="bookOptions"></google-chart>
-		</div>
-		<div>
-			<google-chart *ngIf="peChartData" style="width: 100%;" [type]="priceChartType" [data]="peChartData" [options]="peOptions"></google-chart>
-		</div>
-  </div>
+  <stock-charts *ngIf="isActive('charts')" [stock]=stock></stock-charts>
+
+  <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
+
+  <stock-ownership *ngIf="isActive('stocks')" [ticker]=stock.ticker [stock]=ownership></stock-ownership>
+
+  <stock-option *ngIf="isActive('options')" [ticker]=stock.ticker></stock-option>
 
 </div>
 

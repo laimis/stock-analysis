@@ -25,9 +25,6 @@ import { Component, Input, OnInit } from '@angular/core';
       <td align="right">{{ entry.peRatio | number }}</td>
     </tr>
   </tbody>
-  <tfoot>
-    <tr><td colspan="7"></td></tr>
-  </tfoot>
 </table>
   `
 })

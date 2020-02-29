@@ -29,10 +29,10 @@ namespace web.Controllers
             return await _mediator.Send(new Details.Query(ticker));
         }
 
-        [HttpGet("details/{id}")]
-        public async Task<object> OwnedStockDetails(Guid id)
+        [HttpGet("details/{ticker}")]
+        public async Task<object> OwnedStockDetails(string ticker)
         {
-            var query = new Get.Query(id);
+            var query = new Get.Query(ticker);
             query.WithUserId(User.Identifier());
 
             return await _mediator.Send(query);

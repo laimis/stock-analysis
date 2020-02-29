@@ -18,8 +18,8 @@ namespace core.Stocks
 		public Guid UserId { get; internal set; }
 		public int Owned { get; internal set; }
 		public double Spent { get; internal set; }
-		public DateTimeOffset Purchased { get; internal set; }
-        public DateTimeOffset? Sold { get; internal set; }
+		public DateTimeOffset LastPurchase { get; internal set; }
+        public DateTimeOffset? LastSale { get; internal set; }
 
         public List<Transaction> Transactions { get; private set; }
         
@@ -37,7 +37,7 @@ namespace core.Stocks
 
             Owned += purchased.NumberOfShares;
             Spent += purchased.NumberOfShares * purchased.Price;
-            Purchased = purchased.When;
+            LastPurchase = purchased.When;
 
             this.Buys.Add(purchased);
 
@@ -53,12 +53,19 @@ namespace core.Stocks
         internal void Apply(StockDeleted deleted)
         {
             this.Owned = 0;
+            this.Transactions.Clear();
+            this.AverageCost = 0;
         }
 
         internal void Apply(StockSold sold)
         {
             this.Owned -= sold.NumberOfShares;
-            this.Sold = sold.When;
+            this.LastSale = sold.When;
+
+            if (this.Owned == 0)
+            {
+                this.AverageCost = 0;
+            }
 
             this.Sells.Add(sold);
             

@@ -38,6 +38,11 @@ import { OwnedStockDetailComponent } from './owned-stock-detail/owned-stock-deta
 import { AdminEmailComponent } from './admin/email/admin-email.component';
 import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
 import { PaymentsComponent } from './payments/payments.component';
+import { StockFundamentalsComponent } from './stock-details/stock-fundamentals.component';
+import { StockChartsComponent } from './stock-details/stock-charts.component';
+import { StockNotesComponent } from './stock-details/stock-notes.component';
+import { StockOwnershipComponent } from './stock-details/stock-ownership.component';
+import { StockOptionComponent } from './stock-details/stock-option.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -103,9 +108,14 @@ var routes = [
     ProfileVerifyComponent,
     ReviewComponent,
     SoldOptionDetailComponent,
+    StockChartsComponent,
     StockDetailsComponent,
+    StockFundamentalsComponent,
     StockListComponent,
     StockListsComponent,
+    StockNotesComponent,
+    StockOptionComponent,
+    StockOwnershipComponent,
     StockTransactionComponent,
     SymbolSearchComponent,
     TransactionsComponent,

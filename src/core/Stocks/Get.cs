@@ -10,12 +10,12 @@ namespace core.Stocks
     {
         public class Query : RequestWithUserId<object>
         {
-            public Query(Guid id)
+            public Query(string ticker)
             {
-                this.Id = id;
+                this.Ticker = ticker;
             }
 
-            public Guid Id { get; }
+            public string Ticker { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, object>
@@ -29,7 +29,7 @@ namespace core.Stocks
 
             public override async Task<object> Handle(Query query, CancellationToken cancellationToken)
             {
-                var stock = await this._storage.GetStock(query.Id, query.UserId);
+                var stock = await this._storage.GetStock(query.Ticker, query.UserId);
                 if (stock == null)
                 {
                     return null;
