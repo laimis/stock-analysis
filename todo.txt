@@ -1,13 +1,11 @@
-
 FEATURES
 
-- review endpoint, collapse or exclude notes
-- concept of a watch -- easy to understand, forget the notes ... unless some one adds a note, you add the stock to watch
-- search in the header
-- landing page: why should you use it
-- robinhood landing page and a page that attacks it, import/export
-- P&L report, what's that all about
-- realized and unrealized separtion
+- tabs for stocks, show notes there and allow to take notes down
+- loading indicator for dashboard
+- concept of a watchlist 
+    -- easy to understand, forget the notes
+    ... unless some one adds a note, you add the stock to watch
+- P&L report, what's that all about, realized and unrealized separtion
 - transations:
     - details collapsed that can be expanded
     - chart
@@ -15,11 +13,9 @@ FEATURES
 - transactions as top level item
 - on detail pages disable buy/sell buttons to eliminate duplicate transactions
 - upcoming earnings scraping, important announcements
-
-- how to list the upcoming earnings companies, but 2-3 weeks out
-- add to watchlist, see how alpha does it
+- review endpoint, collapse or exclude notes
 - review reminders or daily/weekly report
-- better welcome page, "show me the goods" walk through
+- better landing page, "show me the goods" walk through
 - import of shares/options in transaction screens
 
 MARKETING

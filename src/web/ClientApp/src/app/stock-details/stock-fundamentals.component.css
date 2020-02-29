@@ -1,0 +1,8 @@
+label {
+	font-weight: bold;
+	margin-top: 10px;
+}
+
+.stat-label {
+  font-weight: lighter;
+}

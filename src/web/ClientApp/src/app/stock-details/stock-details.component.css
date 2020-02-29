@@ -15,3 +15,31 @@ label {
   max-height: 50px;
   margin-right: 5px;
 }
+
+.tab-container {
+  border-bottom: 1px solid #767676;
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.tab {
+  border-bottom: 3px solid transparent;
+  color: #767676;
+  cursor: pointer;
+  display: inline-block;
+  list-style-type: none;
+  margin-right: 2px;
+  padding: 10px 15px;
+  text-decoration: none;
+  transition: all .25s;
+}
+
+.tab:hover {
+	border-color: #ccc;
+}
+
+.tab.is-active {
+  border-bottom-color: #535353;
+  color: #353535;
+}
