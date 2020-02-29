@@ -1,7 +1,5 @@
 FEATURES
 
-- tabs for stocks, show notes there and allow to take notes down
-- loading indicator for dashboard
 - concept of a watchlist 
     -- easy to understand, forget the notes
     ... unless some one adds a note, you add the stock to watch
