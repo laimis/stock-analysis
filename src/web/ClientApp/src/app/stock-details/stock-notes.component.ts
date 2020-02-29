@@ -8,6 +8,8 @@ import { Component, Input } from '@angular/core';
 
 export class StockNotesComponent {
 
+  @Input() ticker: string
+
   private _notes : object[]
   @Input()
   set notes(notes: object[]) {

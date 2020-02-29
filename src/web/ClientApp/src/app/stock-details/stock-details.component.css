@@ -23,6 +23,10 @@ label {
   width: 100%;
 }
 
+.badge-info {
+  background-color: darkcyan
+}
+
 .tab {
   border-bottom: 3px solid transparent;
   color: #767676;

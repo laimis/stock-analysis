@@ -37,7 +37,7 @@
 
   <stock-charts *ngIf="isActive('charts')" [stock]=stock></stock-charts>
 
-  <stock-notes *ngIf="isActive('notes')" [notes]=notes></stock-notes>
+  <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
 
   <stock-ownership *ngIf="isActive('stocks')" [ticker]=stock.ticker [stock]=ownership></stock-ownership>
 

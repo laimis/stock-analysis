@@ -9,22 +9,6 @@
 
 <div *ngIf="loaded">
 
-  <div>
-    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/stocks/transaction']">
-      <i class="fas fa-dollar-sign"></i> Shares
-    </a>
-    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/options/sell']">
-      <i class="fas fa-credit-card"></i> Options
-    </a>
-    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/notes' ]" aria-label="notes">
-      <i class="fas fa-feather"></i> Journal
-    </a>
-    <a class="btn btn-primary mr-1 mt-2" [routerLink]="[ '/transactions' ]" aria-label="stock lists">
-      <i class="fas fa-university"></i> Reports
-    </a>
-
-  </div>
-
   <h3 class="mt-4">Ownership</h3>
 
   <div *ngIf="openOptions.length > 0 || owned.length > 0">
