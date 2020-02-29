@@ -1,20 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { Component, OnInit, Input } from '@angular/core';
+import { StocksService, GetErrors, OptionDefinition } from '../services/stocks.service';
 import { DatePipe, Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-option-sell',
-  templateUrl: './option-sell.component.html',
+  selector: 'stock-option',
+  templateUrl: './stock-option.component.html',
   providers: [DatePipe]
 })
-export class OptionSellComponent implements OnInit {
+export class StockOptionComponent implements OnInit {
+
+  @Input()
+  ownedOptions      : OptionDefinition[]
+  @Input()
+  ticker            : string
 
   errors : string[]
-
   success: boolean
 
-  ticker            : string
   strikePrice       : number
   optionType        : string
   expirationDate    : string
@@ -26,17 +29,11 @@ export class OptionSellComponent implements OnInit {
 
   constructor(
     private service: StocksService,
-    private route: ActivatedRoute,
     private router: Router,
     private datePipe: DatePipe,
     private location: Location) { }
 
   ngOnInit() {
-    var ticker = this.route.snapshot.paramMap.get('ticker');
-    if (ticker) {
-      this.ticker = ticker;
-    }
-
     this.filled = Date()
     this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
     this.positionType = 'buy'
@@ -76,10 +73,6 @@ export class OptionSellComponent implements OnInit {
 
   navigateToOption(id:string) {
     this.router.navigate(['/optiondetails', id])
-  }
-
-  back() {
-    this.location.back()
   }
 
   onTickerSelected(ticker:string) {

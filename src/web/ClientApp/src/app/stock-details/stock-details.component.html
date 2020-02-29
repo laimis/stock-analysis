@@ -41,6 +41,8 @@
 
   <stock-ownership *ngIf="isActive('stocks')" [ticker]=stock.ticker [stock]=ownership></stock-ownership>
 
+  <stock-option *ngIf="isActive('options')" [ticker]=stock.ticker></stock-option>
+
 </div>
 
 <div *ngIf="!loaded">
