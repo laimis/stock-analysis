@@ -2,11 +2,12 @@
 
   <div>
     <div>
-      <h3>{{profile.symbol}}: {{profile.companyName}}</h3>
-      <a class="ml-2" href="{{profile.website}}" target="_blank">{{profile.website}} <i class="fas fa-external-link-alt"></i></a>
+      <h3>{{profile.symbol}}: {{profile.companyName}}
       <a href="https://robinhood.com/stocks/{{stock.ticker}}" class="float-right ml-3" target="_blank">
         <img src="robinhood.png" height="25px" />
       </a>
+      </h3>
+
     </div>
     <div>
       <div id="company-description">
@@ -23,7 +24,7 @@
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
-      Stocks <span *ngIf="ownership && ownership.owned > 0" class="badge badge-pill badge-info">{{ownership.owned}}</span>
+      Shares <span *ngIf="ownership && ownership.owned > 0" class="badge badge-pill badge-info">{{ownership.owned}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
       Options
