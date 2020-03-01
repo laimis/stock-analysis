@@ -37,24 +37,33 @@
     </div> -->
 
     <table class="table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Share Price</th>
+          <th></th>
+          <th class="text-right">Gain/Loss</th>
+          <th class="text-right">%</th>
+        </tr>
+      </thead>
       <tr *ngFor="let option of openOptions">
         <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
-        <td>{{option.currentPrice | currency}}</td>
+        <td class="text-right">{{option.currentPrice | currency}}</td>
         <td><b>{{option.numberOfContracts}}</b> x {{option.boughtOrSold}}
           <b>{{option.strikePrice | currency}}</b>
           {{option.optionType}} expiring
           <b>{{option.expirationDate | date : 'shortDate'}}</b>
           <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span></td>
-        <td></td>
-        <td></td>
+          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
+        </td>
+        <td colspan="2"></td>
       </tr>
       <tr *ngFor="let ticker of owned">
         <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
-        <td>{{ticker.currentPrice | currency}}</td>
+        <td class="text-right">{{ticker.currentPrice | currency}}</td>
         <td>{{ticker.owned}}</td>
-        <td><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
-        <td><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent }}</span></td>
+        <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
+        <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent }}</span></td>
       </tr>
     </table>
 
