@@ -1,7 +1,7 @@
 - You own 100 shares at $39.69 per share, add up or down %
 - ownership pie per share
 - ownership pie per industry
-
+- when exporting, deleted options and stocks appear in the export
 
 FEATURES
 

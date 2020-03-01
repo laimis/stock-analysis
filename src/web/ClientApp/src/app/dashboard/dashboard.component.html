@@ -9,57 +9,54 @@
 
 <div *ngIf="loaded">
 
-  <div class="container">
-    <div class="row">
+  <div>
+    <div class="row" *ngIf="openOptions.length > 0 || owned.length > 0">
       <div class="col text-center">
         <div class="font-weight-bold text-muted">STOCKS</div>
-        <div>{{owned.length}} symbols, {{numberOfSharesOwned}} shares</div>
-        <div>{{moneySpentOnShares | currency}} invested</div>
-        <div>{{currentEquity | currency}} equity</div>
-        <div>{{profits | percent }}</div>
+        <div><b>{{moneySpentOnShares | currency}}</b> invested</div>
+        <div><b>{{currentEquity | currency}}</b> current equity</div>
+        <div [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">{{profits | percent }}</div>
       </div>
       <div class="col text-center">
         <div class="font-weight-bold text-muted">OPTIONS</div>
         <div>{{putContracts}} PUTs and {{callContracts}} CALLs</div>
-        <div>{{optionPremium | currency}} premium </div>
+        <div><b>{{optionPremium | currency}}</b> premium </div>
     </div>
   </div>
 
-  <h3 class="mt-4">Ownership</h3>
+  <div class="mt-4" *ngIf="openOptions.length > 0 || owned.length > 0">
 
-  <div *ngIf="openOptions.length > 0 || owned.length > 0">
-    <table class="table table-hover border">
-      <thead class="thead-light">
-        <tr>
-          <th width="50">Symbol</th>
-          <th width="120">Latest Price</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let option of openOptions">
-          <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
-          <td>{{option.currentPrice | currency}}</td>
-          <td>
-            <b>{{option.numberOfContracts}}</b> x
-            {{option.boughtOrSold}}
-            <b>{{option.strikePrice | currency}}</b>
-            {{option.optionType}}
-            expiring <b>{{option.expirationDate | date : 'shortDate'}}</b>
+    <!-- <div class="row border rounded" *ngFor="let option of openOptions">
+      <div class="col-2 text-center">
+        <div><a class="font-weight-bold" [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></div>
+        <div>{{option.currentPrice | currency}}</div>
+      </div>
+      <div class="col-10">
 
-            <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-            <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
-          </td>
-        </tr>
-        <tr *ngFor="let ticker of owned">
-          <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
-          <td>{{ticker.currentPrice | currency}}</td>
-          <td><b>{{ticker.owned}}</b> shares x <b>{{ticker.averageCost | currency }}</b>/share</td>
-        </tr>
-      </tbody>
+      </div>
+    </div> -->
+
+    <table class="table">
+      <tr *ngFor="let option of openOptions">
+        <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
+        <td>{{option.currentPrice | currency}}</td>
+        <td><b>{{option.numberOfContracts}}</b> x {{option.boughtOrSold}}
+          <b>{{option.strikePrice | currency}}</b>
+          {{option.optionType}} expiring
+          <b>{{option.expirationDate | date : 'shortDate'}}</b>
+          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
+          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let ticker of owned">
+        <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
+        <td>{{ticker.currentPrice | currency}}</td>
+        <td>{{ticker.owned}}</td>
+        <td><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
+        <td><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent }}</span></td>
+      </tr>
     </table>
-
-  </div>
 
   <div *ngIf="openOptions.length == 0 && owned.length == 0">
     <div class="alert alert-secondary">

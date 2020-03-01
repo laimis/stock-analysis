@@ -231,6 +231,8 @@ export class OwnedStock {
   owned: number
   spent: number
   equity: number
+  profits: number
+  profitsPct: number
   description: string
   averageCost: number
   transactions: TransactionList

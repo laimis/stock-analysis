@@ -10,3 +10,13 @@ div.row {
   font-weight: bold;
   cursor: pointer;
 }
+
+.profits-positive {
+  /* font-weight: bold; */
+  color: lightseagreen;
+}
+
+.profits-negative {
+  /* font-weight: bold; */
+  color: #f45531;
+}
