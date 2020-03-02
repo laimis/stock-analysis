@@ -21,7 +21,8 @@ export class DashboardComponent implements OnInit {
   optionPremium: number;
   putContracts: number;
   callContracts: number;
-
+  putCollateral: number;
+  putPremiumvsCollateralPct: number;
 
 	constructor(
 		private stocks : StocksService,
@@ -66,10 +67,26 @@ export class DashboardComponent implements OnInit {
     this.optionPremium = 0.0
     this.putContracts = 0
     this.callContracts = 0
+    this.putCollateral = 0
+    var putPremium = 0
     for (var o of this.openOptions) {
       this.optionPremium += o.premium
-      if (o.optionType == "PUT") this.putContracts++
-      if (o.optionType == "CALL") this.callContracts++
+      if (o.optionType == "PUT")
+      {
+        this.putContracts++
+        putPremium += o.premium
+        this.putCollateral += (o.strikePrice * 100)
+      }
+
+      if (o.optionType == "CALL")
+      {
+        this.callContracts++
+      }
+    }
+    this.putPremiumvsCollateralPct = 0
+    if (putPremium > 0)
+    {
+      this.putPremiumvsCollateralPct = putPremium / (1.0 * this.putCollateral)
     }
   }
 }
