@@ -68,6 +68,8 @@ namespace core.Stocks
                 this.AverageCost = 0;
             }
 
+            this.Spent -= sold.NumberOfShares * sold.Price;
+
             this.Sells.Add(sold);
             
             this.Transactions.Add(Transaction.CreditTx(
