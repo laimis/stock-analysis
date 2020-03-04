@@ -45,6 +45,10 @@ export class StockDetailsComponent {
       console.error(error)
     })
 
+    this.loadStockOwnership()
+  }
+
+  loadStockOwnership() {
     this.stocks.getStock(this.ticker).subscribe(result => {
       this.ownership = result
     })
@@ -56,5 +60,9 @@ export class StockDetailsComponent {
 
   activateTab(tabName:string) {
     this.activeTab = tabName
+  }
+
+  stockOwnershipChanged(e) {
+    this.loadStockOwnership()
   }
 }

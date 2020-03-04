@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
 import { Router } from '@angular/router';
 import { DatePipe, Location } from '@angular/common';
@@ -16,7 +16,10 @@ export class StockOwnershipComponent implements OnInit {
   @Input()
   public ticker: any;
 
+  @Output() ownershipChanged = new EventEmitter();
+
   public errors: string[]
+  success : boolean
 
   numberOfShares: Number
 	pricePerShare:  Number
@@ -27,7 +30,6 @@ export class StockOwnershipComponent implements OnInit {
   constructor(
     private service: StocksService,
     private router: Router,
-    private location: Location,
     private datePipe: DatePipe
   ) { }
 
@@ -36,10 +38,11 @@ export class StockOwnershipComponent implements OnInit {
     this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
   }
 
-  getStock(id:string){
-    this.service.getStock(id).subscribe( result => {
-      this.stock = result
-    })
+  clearFields() {
+    this.numberOfShares = null
+	  this.pricePerShare = null
+	  this.positionType = null
+    this.notes = null
   }
 
   delete() {
@@ -57,6 +60,7 @@ export class StockOwnershipComponent implements OnInit {
   record() {
 
     this.errors = null;
+    this.success = false;
 
     var op = {
       ticker: this.ticker,
@@ -69,21 +73,21 @@ export class StockOwnershipComponent implements OnInit {
     if (this.positionType == 'sell') this.recordSell(op)
   }
 
-  back() {
-    this.location.back()
-  }
-
   recordBuy(stock: object) {
-    this.service.purchase(stock).subscribe( r => {
-      this.getStock(this.stock.id)
+    this.service.purchase(stock).subscribe( _ => {
+      this.ownershipChanged.emit("buy")
+      this.clearFields()
+      this.success = true
     }, err => {
       this.errors = GetErrors(err)
     })
   }
 
   recordSell(stock: object) {
-    this.service.sell(stock).subscribe( r => {
-      this.getStock(this.stock.id)
+    this.service.sell(stock).subscribe( _ => {
+      this.ownershipChanged.emit("sell")
+      this.clearFields()
+      this.success = true
     }, err => {
       this.errors = GetErrors(err)
     })

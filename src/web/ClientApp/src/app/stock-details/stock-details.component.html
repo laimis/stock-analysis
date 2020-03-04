@@ -41,7 +41,9 @@
 
   <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
 
-  <stock-ownership *ngIf="isActive('stocks')" [ticker]=stock.ticker [stock]=ownership></stock-ownership>
+  <stock-ownership *ngIf="isActive('stocks')"
+    [ticker]=stock.ticker [stock]=ownership
+    (ownershipChanged)="stockOwnershipChanged($event)"></stock-ownership>
 
   <stock-option *ngIf="isActive('options')" [ticker]=stock.ticker></stock-option>
 

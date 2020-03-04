@@ -9,6 +9,9 @@
   <div class="card mt-4">
     <div class="card-header">Record trades for {{ticker}}</div>
     <div class="card-body">
+      <div *ngIf="success" class="alert alert-success" role="alert">
+        Successfully recorded the transaction
+      </div>
       <form>
         <div class="form-row">
           <div class="form-group col">
@@ -37,12 +40,12 @@
 
         <div>
           <button type="button" class="btn btn-primary mb-1 mr-2" (click)="record()">Record</button>
-          </div>
+        </div>
       </form>
     </div>
   </div>
 
-	<div *ngIf="stock">
+	<div *ngIf="stock && stock.transactions.length > 0">
     <div class="mt-4">
       <div class="text-muted">Past Transactions</div>
       <table class="table table-striped border">
