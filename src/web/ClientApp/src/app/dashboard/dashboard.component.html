@@ -8,23 +8,35 @@
 </div>
 
 <div *ngIf="loaded">
+  <div *ngIf="openOptions.length == 0 && owned.length == 0">
+    <div class="alert alert-secondary">
+      <h3>Welcome!</h3>
+      <p>You haven't recorded any option/share transactions. It's easy to get started!</p>
+      <p>Find the stock you own via symbol search above ☝ and enter the share number and price.</p>
+      <p>You can do the same with options.</p>
 
-  <div>
-    <div class="row" *ngIf="openOptions.length > 0 || owned.length > 0">
-      <div class="col text-center">
-        <div class="font-weight-bold text-muted">STOCKS</div>
-        <div><b>{{moneySpentOnShares | currency}}</b> invested</div>
-        <div><b>{{currentEquity | currency}}</b> current equity</div>
-        <div [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">{{profits | percent }}</div>
+      <h4>If you are just here to take notes</h4>
+      <p>Find the company you are interested in tracking and then starting taking notes.</p>
+      <p>Nightingale Trading platform will help you along with weekly notices on earnings and other important events</p>
+      <h4>We are happy to have you here and good luck with your trading!</h4>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="openOptions.length > 0 || owned.length > 0">
+    <div class="col text-center">
+      <div class="font-weight-bold text-muted">STOCKS</div>
+      <div><b>{{moneySpentOnShares | currency}}</b> invested</div>
+      <div><b>{{currentEquity | currency}}</b> current equity</div>
+      <div [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">{{profits | percent }}</div>
+    </div>
+    <div class="col text-center">
+      <div class="font-weight-bold text-muted">OPTIONS</div>
+      <div>{{putContracts}} PUTs and {{callContracts}} CALLs</div>
+      <div>
+        <b>{{putCollateral | currency}}</b>
+        collateral held
       </div>
-      <div class="col text-center">
-        <div class="font-weight-bold text-muted">OPTIONS</div>
-        <div>{{putContracts}} PUTs and {{callContracts}} CALLs</div>
-        <div>
-          <b>{{putCollateral | currency}}</b>
-          collateral held
-        </div>
-        <div><b>{{optionPremium | currency}}</b> premium ({{putPremiumvsCollateralPct | percent }} collateral coverage)</div>
+      <div><b>{{optionPremium | currency}}</b> premium ({{putPremiumvsCollateralPct | percent }} collateral coverage)</div>
     </div>
   </div>
 
@@ -59,7 +71,6 @@
 
 
   <div class="mt-4" *ngIf="owned.length > 0">
-
     <table class="table table-hover">
       <thead>
         <tr>
@@ -82,11 +93,5 @@
         <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent }}</span></td>
       </tr>
     </table>
-
-  <div *ngIf="openOptions.length == 0 && owned.length == 0">
-    <div class="alert alert-secondary">
-      You haven't recorded any option/share transactions.
-    </div>
   </div>
-
 </div>

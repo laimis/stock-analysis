@@ -59,7 +59,7 @@ export class StockOwnershipComponent implements OnInit {
     this.errors = null;
 
     var op = {
-      ticker: this.stock.ticker,
+      ticker: this.ticker,
       numberOfShares: this.numberOfShares,
       price: this.pricePerShare,
       date: this.filled

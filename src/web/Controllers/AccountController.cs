@@ -108,11 +108,6 @@ namespace web.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Authenticate(Authenticate.Command cmd)
         {
-            if (this.User.Identity.IsAuthenticated)
-            {
-                return BadRequest("User is already authenticated");
-            }
-
             cmd.WithIPAddress(
                 this.Request.HttpContext.Connection.RemoteIpAddress.ToString()
             );
