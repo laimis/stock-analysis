@@ -34,6 +34,16 @@ namespace web.Controllers
             return details;
         }
 
+        [HttpGet("{ticker}/list")]
+        public async Task<ActionResult<object>> List(string ticker)
+        {
+            var query = new List.Query { Ticker = ticker };
+            query.WithUserId(this.User.Identifier());
+            
+            return await _mediator.Send(query);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<object> Get(Guid id)
         {

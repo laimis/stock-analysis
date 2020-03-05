@@ -27,7 +27,7 @@
       Shares <span *ngIf="ownership && ownership.owned > 0" class="badge badge-pill badge-info">{{ownership.owned}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
-      Options
+      Options <span *ngIf="options && options.length > 0" class="badge badge-pill badge-info">{{options.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
@@ -45,7 +45,7 @@
     [ticker]=stock.ticker [stock]=ownership
     (ownershipChanged)="stockOwnershipChanged($event)"></stock-ownership>
 
-  <stock-option *ngIf="isActive('options')" [ticker]=stock.ticker></stock-option>
+  <stock-option *ngIf="isActive('options')" [ticker]=stock.ticker [options]=options></stock-option>
 
 </div>
 

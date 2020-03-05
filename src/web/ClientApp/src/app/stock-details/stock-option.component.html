@@ -1,13 +1,19 @@
 <div class="mt-3">
 
+  <div>
+    <div *ngFor="let option of options">
+      {{option.optionType}} @ {{option.strikePrice | currency}} expires {{option.expirationDate | date }}
+      (<a [routerLink]="[ '/optiondetails', option.id ]">more info</a>)
+    </div>
+  </div>
+
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
+  <h4 class="mt-4">Record option transactions</h4>
   <div *ngIf="success" class="alert alert-success" role="alert">
     Contract sale has been successfully recorded
   </div>
-
-  <h4>Record your option transaction</h4>
-  <div class="option-purchase-c-container">
+  <div>
 		<form>
       <div class="form-row">
         <div class="col">

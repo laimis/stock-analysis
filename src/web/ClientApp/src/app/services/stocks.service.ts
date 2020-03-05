@@ -145,7 +145,11 @@ export class StocksService {
     return this.http.post('/api/options/close', obj)
   }
 
-  getOptions(ticker:string): Observable<OptionDetail> {
+  getOptions(ticker:string): Observable<OwnedOption[]> {
+    return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/list')
+  }
+
+  getOptionDetails(ticker:string): Observable<OptionDetail> {
     return this.http.get<OptionDetail>('/api/options/' + ticker + '/details')
   }
 

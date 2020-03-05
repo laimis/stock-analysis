@@ -37,7 +37,7 @@ export class OptionDetailComponent implements OnInit {
       this.ticker = ticker;
     }
 
-    this.service.getOptions(this.ticker).subscribe( result => {
+    this.service.getOptionDetails(this.ticker).subscribe( result => {
       this.options = result.options
       this.expirations = result.expirations
       this.breakdown = result.breakdown

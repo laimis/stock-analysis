@@ -50,6 +50,12 @@ namespace core
             };
         }
 
+        internal static object ToOptions(IEnumerable<OwnedOption> filtered)
+        {
+            return filtered
+                .Select(o => ToOptionView(o, new TickerPrice()));
+        }
+
         internal static TransactionList ToTransactionLog(
             IEnumerable<OwnedStock> stocks,
             IEnumerable<OwnedOption> options,

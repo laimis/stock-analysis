@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { StocksService, GetErrors, OptionDefinition } from '../services/stocks.service';
+import { StocksService, GetErrors, OwnedOption } from '../services/stocks.service';
 import { DatePipe, Location } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 export class StockOptionComponent implements OnInit {
 
   @Input()
-  ownedOptions      : OptionDefinition[]
+  options      : OwnedOption[]
   @Input()
   ticker            : string
 
@@ -30,8 +30,7 @@ export class StockOptionComponent implements OnInit {
   constructor(
     private service: StocksService,
     private router: Router,
-    private datePipe: DatePipe,
-    private location: Location) { }
+    private datePipe: DatePipe) { }
 
   ngOnInit() {
     this.filled = Date()
