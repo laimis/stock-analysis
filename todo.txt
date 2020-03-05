@@ -1,5 +1,4 @@
 - buying options should refresh
-- show full option ownership
 - SEO head tags missing on the page
 - notes missing in the transactions for the stock
 
