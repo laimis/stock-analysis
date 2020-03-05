@@ -10,6 +10,7 @@ export class AdminEmailComponent implements OnInit {
 
   to: string
   from: string
+  fromName: string
   subject: string
   body: string
 
@@ -22,6 +23,7 @@ export class AdminEmailComponent implements OnInit {
     var obj = {
       to: this.to,
       from: this.from,
+      fromName: this.fromName,
       subject: this.subject,
       body: this.body
     }
