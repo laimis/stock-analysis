@@ -17,7 +17,7 @@ namespace core.Stocks
 		public string Ticker { get; internal set; }
 		public Guid UserId { get; internal set; }
 		public int Owned { get; internal set; }
-		public double Spent { get; internal set; }
+		public double Cost { get; internal set; }
 		public DateTimeOffset? LastPurchase { get; internal set; }
         public DateTimeOffset? LastSale { get; internal set; }
 
@@ -36,7 +36,7 @@ namespace core.Stocks
                 / (this.Owned + purchased.NumberOfShares);
 
             Owned += purchased.NumberOfShares;
-            Spent += purchased.NumberOfShares * purchased.Price;
+            Cost = AverageCost * Owned;
             
             LastPurchase = purchased.When;
 
@@ -54,7 +54,7 @@ namespace core.Stocks
         internal void Apply(StockDeleted deleted)
         {
             this.Owned = 0;
-            this.Spent = 0;
+            this.Cost = 0;
             this.LastPurchase = null;
             this.LastSale = null;
             this.Transactions.Clear();
@@ -65,18 +65,9 @@ namespace core.Stocks
 
         internal void Apply(StockSold sold)
         {
-            this.Owned -= sold.NumberOfShares;
+            this.Sells.Add(sold);
             this.LastSale = sold.When;
 
-            if (this.Owned == 0)
-            {
-                this.AverageCost = 0;
-            }
-
-            this.Spent -= sold.NumberOfShares * sold.Price;
-
-            this.Sells.Add(sold);
-            
             this.Transactions.Add(Transaction.CreditTx(
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
@@ -84,6 +75,14 @@ namespace core.Stocks
                 sold.When,
                 false
             ));
+
+            this.Owned -= sold.NumberOfShares;
+            if (this.Owned == 0)
+            {
+                this.AverageCost = 0;
+            }
+
+            this.Cost = AverageCost * Owned;
         }
     }
 }

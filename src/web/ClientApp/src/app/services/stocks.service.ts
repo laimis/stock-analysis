@@ -229,7 +229,7 @@ export class OwnedStock {
   currentPrice: Number
   ticker: string
   owned: number
-  spent: number
+  cost: number
   equity: number
   profits: number
   profitsPct: number

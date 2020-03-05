@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
 
     for (var i of this.owned) {
       this.numberOfSharesOwned += i.owned
-      this.moneySpentOnShares += i.spent
+      this.moneySpentOnShares += i.cost
       this.currentEquity += i.equity
     }
 

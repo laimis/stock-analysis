@@ -18,12 +18,12 @@ namespace coretests.Stocks
             Assert.Equal("TEUM", stock.State.Ticker);
             Assert.Equal(_userId, stock.State.UserId);
             Assert.Equal(10, stock.State.Owned);
-            Assert.Equal(21, stock.State.Spent);
+            Assert.Equal(21, stock.State.Cost);
 
             stock.Purchase(5, 2, DateTime.UtcNow);
 
             Assert.Equal(15, stock.State.Owned);
-            Assert.Equal(31, stock.State.Spent);
+            Assert.Equal(31, stock.State.Cost);
 
             stock.Sell(5, 20, DateTime.UtcNow, "sample note");
 
@@ -95,23 +95,23 @@ namespace coretests.Stocks
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
             Assert.Equal(7.5, stock.AverageCost);
-            Assert.Equal(15, stock.State.Spent);
+            Assert.Equal(15, stock.State.Cost);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             Assert.Equal(7.5, stock.AverageCost);
-            Assert.Equal(9, stock.State.Spent);
+            Assert.Equal(9, stock.State.Cost);
 
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
             Assert.Equal(8.75, stock.AverageCost);
-            Assert.Equal(19, stock.State.Spent);
+            Assert.Equal(19, stock.State.Cost);
 
             stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
 
             Assert.Equal(0, stock.State.Owned);
             Assert.Equal(0, stock.AverageCost);
-            Assert.Equal(-1, stock.State.Spent);
+            Assert.Equal(0, stock.State.Cost);
         }
     }
 }

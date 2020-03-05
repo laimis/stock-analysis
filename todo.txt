@@ -1,7 +1,7 @@
-- buying shares should refresh
 - buying options should refresh
 - show full option ownership
-
+- SEO head tags missing on the page
+- notes missing in the transactions for the stock
 
 - You own 100 shares at $39.69 per share, add up or down %
 - ownership pie per share

@@ -25,7 +25,6 @@ import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-deta
 import { StockDetailsComponent } from './stock-details/stock-details.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
 import { StockListsComponent } from './stock-lists/stock-lists.component';
-import { StockTransactionComponent } from './stock-transaction/stock-transaction.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
 import { ProfileVerifyComponent } from './profile/profile-verify.component';
@@ -73,8 +72,6 @@ var routes = [
   { path: 'privacy', component: PrivacyComponent},
   { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
-  { path: 'stocks/transaction', component: StockTransactionComponent, canActivate: [AuthGuard] },
-  { path: 'stocks/transaction/:ticker', component: StockTransactionComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
   { path: 'terms', component: TermsComponent},
@@ -116,7 +113,6 @@ var routes = [
     StockNotesComponent,
     StockOptionComponent,
     StockOwnershipComponent,
-    StockTransactionComponent,
     SymbolSearchComponent,
     TransactionsComponent,
     TermsComponent

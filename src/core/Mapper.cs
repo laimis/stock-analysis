@@ -167,9 +167,9 @@ namespace core
         internal static object ToOwnedView(OwnedStock o, TickerPrice price)
         {
             var equity = o.State.Owned * price.Amount;
-            var spent = o.State.Spent;
-            var profits = equity - spent;
-            var profitsPct = profits / (1.0 * spent);
+            var cost = o.State.Cost;
+            var profits = equity - cost;
+            var profitsPct = profits / (1.0 * cost);
 
             return new
             {
@@ -180,7 +180,7 @@ namespace core
                 equity = equity,
                 description = o.State.Description,
                 averageCost = o.State.AverageCost,
-                spent = spent,
+                cost = cost,
                 profits = profits,
                 profitsPct = profitsPct,
                 transactions = new TransactionList(o.State.Transactions, null, null)
