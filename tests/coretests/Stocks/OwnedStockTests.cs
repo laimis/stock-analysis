@@ -23,7 +23,7 @@ namespace coretests.Stocks
             stock.Purchase(5, 2, DateTime.UtcNow);
 
             Assert.Equal(15, stock.State.Owned);
-            Assert.Equal(31, stock.State.Cost);
+            Assert.Equal(31, stock.State.Cost, 0);
 
             stock.Sell(5, 20, DateTime.UtcNow, "sample note");
 

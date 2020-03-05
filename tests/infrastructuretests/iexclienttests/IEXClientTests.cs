@@ -86,7 +86,7 @@ namespace iexclienttests
         [Fact]
         public void MostActive_Set()
         {
-            Assert.Equal(11, _mostActive.Count);
+            Assert.Equal(10, _mostActive.Count);
         }
 
         [Fact]
