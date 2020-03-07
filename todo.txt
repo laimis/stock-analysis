@@ -1,6 +1,7 @@
 - buying options should refresh
 - SEO head tags missing on the page
 - notes missing in the transactions for the stock
+- ability to add notes from the front page
 
 - You own 100 shares at $39.69 per share, add up or down %
 - ownership pie per share
