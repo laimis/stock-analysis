@@ -10,10 +10,10 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <h4 class="mt-4">Record option transactions</h4>
-  <div *ngIf="success" class="alert alert-success" role="alert">
-    Contract sale has been successfully recorded
-  </div>
   <div>
+    <div *ngIf="success" class="alert alert-success" role="alert">
+      Successfully recorded the transaction
+    </div>
 		<form>
       <div class="form-row">
         <div class="col">

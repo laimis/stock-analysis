@@ -16,7 +16,8 @@ export class StockOwnershipComponent implements OnInit {
   @Input()
   public ticker: any;
 
-  @Output() ownershipChanged = new EventEmitter();
+  @Output()
+  ownershipChanged = new EventEmitter();
 
   public errors: string[]
   success : boolean

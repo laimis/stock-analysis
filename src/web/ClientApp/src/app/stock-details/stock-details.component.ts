@@ -74,4 +74,8 @@ export class StockDetailsComponent {
   stockOwnershipChanged(e) {
     this.loadStockOwnership()
   }
+
+  optionOwnershipChanged(e) {
+    this.loadOptionOwnership()
+  }
 }

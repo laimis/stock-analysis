@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { StocksService, GetErrors, OwnedOption } from '../services/stocks.service';
 import { DatePipe, Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -12,8 +12,12 @@ export class StockOptionComponent implements OnInit {
 
   @Input()
   options      : OwnedOption[]
+
   @Input()
   ticker            : string
+
+  @Output()
+  ownershipChanged = new EventEmitter();
 
   errors : string[]
   success: boolean
@@ -29,13 +33,23 @@ export class StockOptionComponent implements OnInit {
 
   constructor(
     private service: StocksService,
-    private router: Router,
     private datePipe: DatePipe) { }
 
   ngOnInit() {
     this.filled = Date()
     this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
     this.positionType = 'buy'
+  }
+
+  clearFields() {
+    this.strikePrice = null
+	  this.optionType = null
+	  this.positionType = null
+    this.numberOfContracts = null
+    this.expirationDate = null
+    this.premium = null
+    this.filled = null
+    this.notes = null
   }
 
   record() {
@@ -56,7 +70,9 @@ export class StockOptionComponent implements OnInit {
 
   recordBuy(opt: object) {
     this.service.buyOption(opt).subscribe( r => {
-      this.navigateToOption(r.id)
+      this.ownershipChanged.emit("buy")
+      this.clearFields()
+      this.success = true
     }, err => {
       this.errors = GetErrors(err)
     })
@@ -64,14 +80,12 @@ export class StockOptionComponent implements OnInit {
 
   recordSell(opt: object) {
     this.service.sellOption(opt).subscribe( r => {
-      this.navigateToOption(r.id)
+      this.ownershipChanged.emit("sell")
+      this.clearFields()
+      this.success = true
     }, err => {
       this.errors = GetErrors(err)
     })
-  }
-
-  navigateToOption(id:string) {
-    this.router.navigate(['/optiondetails', id])
   }
 
   onTickerSelected(ticker:string) {
