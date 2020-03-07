@@ -1,4 +1,3 @@
-- buying options should refresh
 - SEO head tags missing on the page
 - notes missing in the transactions for the stock
 - ability to add notes from the front page
