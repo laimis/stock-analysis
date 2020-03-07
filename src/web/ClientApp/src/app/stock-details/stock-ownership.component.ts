@@ -67,7 +67,8 @@ export class StockOwnershipComponent implements OnInit {
       ticker: this.ticker,
       numberOfShares: this.numberOfShares,
       price: this.pricePerShare,
-      date: this.filled
+      date: this.filled,
+      notes: this.notes
     }
 
     if (this.positionType == 'buy') this.recordBuy(op)

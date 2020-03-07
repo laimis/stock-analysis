@@ -37,6 +37,12 @@
             <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
           </div>
         </div>
+        <div class="form-row mt-2">
+          <div class="form-group col">
+            <label for="notes">Notes and your thoughts around this transaction</label>
+            <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="3"></textarea>
+          </div>
+        </div>
 
         <div>
           <button type="button" class="btn btn-primary mb-1 mr-2" (click)="record()">Record</button>
