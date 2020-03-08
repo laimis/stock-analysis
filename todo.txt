@@ -1,3 +1,13 @@
+Profit/Loss spreadsheet
+
+- transactions: row type with pl and tx options
+    - selling option to close position is a PL event test
+    - expiring option is a PL event test
+    - buying option to close positin is a PL event test
+    - selling shares is a PL event test
+
+- review collapse notes with counts instead of listing them all
+
 - ability to add notes from the front page
 
 - You own 100 shares at $39.69 per share, add up or down %

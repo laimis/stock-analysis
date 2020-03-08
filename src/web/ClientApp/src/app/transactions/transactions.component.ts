@@ -12,6 +12,7 @@ export class TransactionsComponent implements OnInit {
   ticker: string = ""
   groupBy: string = "month"
   filterType: string = ""
+  txType: string = "tx"
   loading: boolean = false
 
   constructor(
@@ -30,7 +31,7 @@ export class TransactionsComponent implements OnInit {
 
   loadData() {
     this.loading = true
-    this.stockService.getTransactions(this.ticker, this.groupBy, this.filterType).subscribe(r => {
+    this.stockService.getTransactions(this.ticker, this.groupBy, this.filterType, this.txType).subscribe(r => {
       this.response = r
       this.loading = false
     }, _ => {

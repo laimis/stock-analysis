@@ -1,27 +1,36 @@
 <div *ngIf="response">
 
-  <div>
-
-    <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
-      <option value="month">Breakdown by Month</option>
-      <option value="ticker">Breakdown by Symbol</option>
-    </select>
-
-    <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
-      <option value="">Shares and options</option>
-      <option value="shares">Just shares</option>
-      <option value="options">Just options</option>
-    </select>
-
-    <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
-      <option value="">All Symbols</option>
-      <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
-    </select>
-
-    <div *ngIf="loading" class="spinner-border spinner-border-sm text-info" role="status">
-      <span class="sr-only">Loading...</span>
+  <div class="row">
+    <div class="col">
+      <select class="filterDropdown btn border rounded mr-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
+        <option value="month">Breakdown by Month</option>
+        <option value="ticker">Breakdown by Symbol</option>
+      </select>
     </div>
-
+    <div class="col">
+      <select class="filterDropdown btn border rounded" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
+        <option value="">Shares and options</option>
+        <option value="shares">Just shares</option>
+        <option value="options">Just options</option>
+      </select>
+    </div>
+    <div class="col">
+      <select class="filterDropdown btn border rounded" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+        <option value="">All Symbols</option>
+        <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
+      </select>
+    </div>
+    <div class="col">
+      <select class="filterDropdown btn border rounded" [(ngModel)]="txType" id="txType" name="txType" (ngModelChange)="loadData()">
+        <option value="pl">Profit/Loss Only</option>
+        <option value="tx">All Transactions</option>
+      </select>
+    </div>
+    <div class="col">
+      <div *ngIf="loading" class="spinner-border spinner-border-sm text-info" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
   </div>
 
   <div class="card mt-2 mb-3">

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using core.Stocks;
 using Xunit;
 
@@ -112,6 +113,36 @@ namespace coretests.Stocks
             Assert.Equal(0, stock.State.Owned);
             Assert.Equal(0, stock.AverageCost);
             Assert.Equal(0, stock.State.Cost);
+        }
+
+        [Fact]
+        public void SellCreatesPLTransaction()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow);
+            stock.Purchase(1, 10, DateTimeOffset.UtcNow);
+
+            Assert.Equal(7.5, stock.AverageCost);
+            Assert.Equal(15, stock.State.Cost);
+
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            var tx = stock.State.Transactions.Last();
+
+            Assert.True(tx.IsPL);
+            Assert.Equal(1.5, tx.Debit); // average cost is 7.5, selling for 6 is 1.5 loss
+
+            stock.Purchase(1, 10, DateTimeOffset.UtcNow);
+
+            Assert.Equal(8.75, stock.AverageCost);
+            
+            stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
+
+            tx = stock.State.Transactions.Last();
+
+            Assert.True(tx.IsPL);
+            Assert.Equal(2.5, tx.Credit); // average cost is 8.75, selling 2 x 10 is 2.5 gain
         }
     }
 }

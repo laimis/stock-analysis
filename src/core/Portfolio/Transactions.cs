@@ -10,16 +10,18 @@ namespace core.Portfolio
     {
         public class Query : RequestWithUserId<TransactionList>
         {
-            public Query(Guid userId, string ticker, string groupBy, string show) : base(userId)
+            public Query(Guid userId, string ticker, string groupBy, string show, string txType) : base(userId)
             {
                 this.Ticker = ticker;
                 this.GroupBy = groupBy;
                 this.Show = show;
+                this.TxType = txType;
             }
 
             public string Ticker { get; }
             public string GroupBy { get; }
             public string Show { get; }
+            public string TxType { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, TransactionList>
@@ -40,7 +42,8 @@ namespace core.Portfolio
                     options.Result,
                     request.Ticker,
                     request.GroupBy,
-                    request.Show);
+                    request.Show,
+                    request.TxType);
             }
         }
     }

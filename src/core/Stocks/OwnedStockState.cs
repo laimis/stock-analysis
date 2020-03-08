@@ -76,6 +76,14 @@ namespace core.Stocks
                 false
             ));
 
+            this.Transactions.Add(Transaction.PLTx(
+                this.Ticker,
+                $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
+                (sold.Price * sold.NumberOfShares - this.AverageCost * sold.NumberOfShares),
+                sold.When,
+                false
+            ));
+
             this.Owned -= sold.NumberOfShares;
             if (this.Owned == 0)
             {

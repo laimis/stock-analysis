@@ -37,6 +37,16 @@ namespace core.Options
             this.NumberOfContracts = 0;
 
             this.Expirations.Add(expired);
+
+            this.Transactions.Add(
+                Transaction.PLTx(
+                    this.Ticker,
+                    "Expiration reached" + (expired.Assigned ? ", ASSIGNED" : ""),
+                    this.Credit - this.Debit,
+                    expired.When,
+                    true
+                )
+            );
         }
 
         internal void Apply(OptionDeleted deleted)
@@ -103,6 +113,19 @@ namespace core.Options
                     true
                 )
             );
+
+            if (this.NumberOfContracts == 0)
+            {
+                this.Transactions.Add(
+                    Transaction.PLTx(
+                        this.Ticker,
+                        $"Closed out option contract",
+                        this.Credit - this.Debit,
+                        purchased.When,
+                        true
+                    )
+                );
+            }
         }
     }
 }

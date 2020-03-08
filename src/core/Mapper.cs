@@ -61,7 +61,8 @@ namespace core
             IEnumerable<OwnedOption> options,
             string ticker,
             string groupBy,
-            string show)
+            string show,
+            string txType)
         {
             var log = new List<Shared.Transaction>();
             var tickers = stocks.Select(s => s.Ticker).Union(options.Select(o => o.Ticker))
@@ -73,6 +74,7 @@ namespace core
                 log.AddRange(
                     stocks.Where(s => s.State.Ticker == (ticker != null ? ticker : s.State.Ticker))
                         .SelectMany(s => s.State.Transactions)
+                        .Where(t => txType == "pl" ? t.IsPL : !t.IsPL)
                 );
             }
 
@@ -81,6 +83,7 @@ namespace core
                 log.AddRange(
                     options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
                         .SelectMany(o => o.State.Transactions)
+                        .Where(t => txType == "pl" ? t.IsPL : !t.IsPL)
                 );
             }
 

@@ -111,6 +111,11 @@ namespace core.Options
                 throw new InvalidOperationException("Premium money cannot be negative");
             }
 
+            if (filled > this.Expiration)
+            {
+                throw new InvalidOperationException("Filled date cannot be past expiration");
+            }
+
             Apply(
                 new OptionSold(
                     Guid.NewGuid(),

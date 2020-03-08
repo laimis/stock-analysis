@@ -16,6 +16,31 @@ namespace coretests.Options
             option.Sell(1, 10, DateTimeOffset.UtcNow, "some notes");
             
             Assert.Equal(-1, option.State.NumberOfContracts);
+            Assert.Single(option.State.Transactions);
+
+            Assert.False(option.State.Transactions[0].IsPL);
+
+            option.Buy(1, 1, DateTimeOffset.UtcNow, "some notes");
+
+            Assert.Equal(0, option.State.NumberOfContracts);
+            Assert.Equal(3, option.State.Transactions.Count);
+
+            Assert.True(option.State.Transactions[2].IsPL);
+            Assert.Equal(9, option.State.Transactions[2].Credit);
+        }
+
+        [Fact]
+        public void Expire_CountsAsPLTransaction()
+        {
+            var option = GetTestOption(DateTimeOffset.UtcNow.AddDays(-1));
+
+            option.Sell(1, 10, DateTimeOffset.UtcNow.AddDays(-2), "some notes");
+
+            option.Expire(false);
+
+            Assert.Equal(2, option.State.Transactions.Count);
+            Assert.True(option.State.Transactions[1].IsPL);
+            Assert.Equal(10, option.State.Transactions[1].Credit);
         }
 
         [Fact]
