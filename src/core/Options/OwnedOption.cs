@@ -131,10 +131,9 @@ namespace core.Options
 
         public void Expire(bool assigned)
         {
-            if (!this.IsExpired)
+            if (this.State.Expirations.Count > 0)
             {
-                throw new InvalidOperationException(
-                    "You can't mark option as expired before its expiration date has passed");
+                throw new InvalidOperationException("You already marked this option as expired");
             }
 
             Apply(new OptionExpired(Guid.NewGuid(), this.State.Id, this.State.Expiration, assigned));
