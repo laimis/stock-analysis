@@ -1,4 +1,17 @@
+- stock comparison grid
+    american airlines looks like it was gutted the most  $14 PUT for $115
+    delta is pretty good 6% option cover, $42 PUT for $210
+
+
 Profit/Loss spreadsheet
+
+- FSLR bug, sold CALL for 53 for 100, bought it for 10 to close out, only counting 10 debit
+- show total options transactions
+- assignment rate
+- expired worthless
+- closed at profit rate
+- % return of premium
+
 
 - transactions: row type with pl and tx options
     - selling option to close position is a PL event test
