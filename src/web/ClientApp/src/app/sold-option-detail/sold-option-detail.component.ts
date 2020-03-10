@@ -93,6 +93,21 @@ export class SoldOptionDetailComponent implements OnInit {
   }
 
   expire(assigned:boolean) {
+    if (assigned)
+    {
+      if (!confirm("Are you sure you want to mark this as assigned?"))
+      {
+        return;
+      }
+    }
+    else
+    {
+      if (!confirm("Are you sure you want to mark this as expired?"))
+      {
+        return;
+      }
+    }
+
     var opt = {
       id: this.option.id,
       assigned: assigned,
