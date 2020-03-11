@@ -9,7 +9,7 @@ namespace core.Stocks
         [Range(1, 10000)]
         public int NumberOfShares { get; set; }
 
-        [Range(1, 10000)]
+        [Range(0.01, 10000)]
         public double Price { get; set; }
         
         [Required]
