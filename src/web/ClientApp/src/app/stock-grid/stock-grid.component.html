@@ -3,32 +3,32 @@
   <table class="table striped">
     <thead>
       <tr>
-        <th>Stock</th>
-        <th align="right">Price</th>
-        <th align="right">PE</th>
-        <th align="right">30d Volume</th>
-        <th align="right">Market Cap</th>
-        <th align="right">Debt to Equity</th>
-        <th align="right">Price to Book</th>
-        <th align="right">Revenue</th>
-        <th align="right">Gross Profit</th>
-        <th align="right">Profit Margin</th>
-        <th align="right">Total Cash</th>
+        <th class="sort-header"            (click)="sort('stock')">Stock</th>
+        <th class="text-right sort-header" (click)="sort('price')">Price</th>
+        <th class="text-right sort-header" (click)="sort('pe')">PE</th>
+        <th class="text-right sort-header" (click)="sort('volume')">30d Volume</th>
+        <th class="text-right sort-header" (click)="sort('marketCap')">Market Cap</th>
+        <th class="text-right sort-header" (click)="sort('debtToEquity')">Debt to Equity</th>
+        <th class="text-right sort-header" (click)="sort('priceToBook')">Price to Book</th>
+        <th class="text-right sort-header" (click)="sort('revenue')">Revenue</th>
+        <th class="text-right sort-header" (click)="sort('grossProfit')">Gross Profit</th>
+        <th class="text-right sort-header" (click)="sort('profitMargin')">Profit Margin</th>
+        <th class="text-right sort-header" (click)="sort('totalCash')">Total Cash</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let s of ownership">
         <td>{{s.ticker}}</td>
-        <td align="right">{{s.price}}</td>
-        <td align="right">{{s.stats.peRatio}}</td>
-        <td align="right">{{s.stats.avg30Volume / 1000000 | number:'1.0-2'}}M</td>
-        <td align="right">{{s.stats.marketCap / 1000000 | number:'1.0-0'}}M</td>
-        <td align="right">{{s.stats.debtToEquity}}</td>
-        <td align="right">{{s.stats.priceToBook | number}}</td>
-        <td align="right">{{s.stats.revenue / 1000000 | number:'1.0-0'}}M</td>
-        <td align="right">{{s.stats.grossProfit / 1000000 | number:'1.0-0'}}M</td>
-        <td align="right">{{s.stats.profitMargin | percent}}</td>
-        <td align="right">{{s.stats.totalCash / 1000000 | number:'1.0-0'}}M</td>
+        <td class="text-right">{{s.price}}</td>
+        <td class="text-right">{{s.stats.peRatio}}</td>
+        <td class="text-right">{{s.stats.avg30Volume / 1000000 | number:'1.0-2'}}M</td>
+        <td class="text-right">{{s.stats.marketCap / 1000000 | number:'1.0-0'}}M</td>
+        <td class="text-right">{{s.stats.debtToEquity}}</td>
+        <td class="text-right">{{s.stats.priceToBook | number}}</td>
+        <td class="text-right">{{s.stats.revenue / 1000000 | number:'1.0-0'}}M</td>
+        <td class="text-right">{{s.stats.grossProfit / 1000000 | number:'1.0-0'}}M</td>
+        <td class="text-right">{{s.stats.profitMargin | percent}}</td>
+        <td class="text-right">{{s.stats.totalCash / 1000000 | number:'1.0-0'}}M</td>
       </tr>
     </tbody>
   </table>

@@ -33,14 +33,17 @@ namespace core.Portfolio
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                return stocks.Select(async s => {
-                    {
-                        var adv = await _stocks.GetAdvancedStats(s.Ticker);
-                        var price = await _stocks.GetPrice(s.Ticker);
+                return stocks
+                    .Where(s => s.State.Owned > 0)
+                    .Select(async s => {
+                        {
+                            var adv = await _stocks.GetAdvancedStats(s.Ticker);
+                            var price = await _stocks.GetPrice(s.Ticker);
 
-                        return new GridEntry(s.Ticker, price, adv);
-                    }
-                }).Select(t => t.Result);
+                            return new GridEntry(s.Ticker, price, adv);
+                        }
+                    })
+                    .Select(t => t.Result);
             }
         }
     }
