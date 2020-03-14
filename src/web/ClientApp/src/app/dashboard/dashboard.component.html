@@ -74,13 +74,13 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Symbol</th>
-          <th class="text-right">Share Price</th>
-          <th class="text-right">Your Average Cost</th>
-          <th>Ownership</th>
-          <th>Equity</th>
-          <th class="text-right">Gain/Loss</th>
-          <th class="text-right">%</th>
+          <th class="sort-header" (click)="sort('ticker')">Symbol</th>
+          <th class="text-right sort-header" (click)="sort('currentPrice')">Share Price</th>
+          <th class="text-right sort-header" (click)="sort('averageCost')">Your Average Cost</th>
+          <th class="sort-header" (click)="sort('owned')">Ownership</th>
+          <th class="text-right sort-header" (click)="sort('equity')">Equity</th>
+          <th class="text-right sort-header" (click)="sort('profits')">Gain/Loss</th>
+          <th class="text-right sort-header" (click)="sort('profitsPct')">%</th>
         </tr>
       </thead>
       <tr *ngFor="let ticker of owned">

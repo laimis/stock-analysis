@@ -1,13 +1,4 @@
-- stock comparison grid
-    american airlines looks like it was gutted the most  $14 PUT for $115
-    delta is pretty good 6% option cover, $42 PUT for $210
-
-Comparison grid:
-
-Looks like this:
-
-
-
+- sortable dashboard stock screen
 
 Profit/Loss spreadsheet
 

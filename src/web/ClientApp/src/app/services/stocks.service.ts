@@ -234,7 +234,7 @@ export interface Portfolio {
 
 export class OwnedStock {
   id:string
-  currentPrice: Number
+  currentPrice: number
   ticker: string
   owned: number
   cost: number

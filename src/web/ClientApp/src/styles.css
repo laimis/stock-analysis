@@ -11,3 +11,7 @@ a {
   background-color: darkcyan;
   border-color: darkcyan;
 }
+
+.sort-header {
+  cursor: pointer;
+}

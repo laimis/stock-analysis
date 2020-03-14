@@ -40,8 +40,6 @@ export class StockGridComponent {
     }
     this.sortColumn = column
 
-    console.log(column + ", " + this.sortDirection)
-
     var finalFunc = (a, b) => {
       var result = func(a, b)
       return result * this.sortDirection
