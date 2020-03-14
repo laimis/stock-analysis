@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
@@ -42,6 +43,15 @@ namespace web.Controllers
         {
             var cmd = new Review.Generate(DateTime.UtcNow);
 
+            cmd.WithUserId(this.User.Identifier());
+
+            return await _mediator.Send(cmd);
+        }
+
+        [HttpGet("grid")]
+        public async Task<IEnumerable<GridEntry>> Grid()
+        {
+            var cmd = new Grid.Generate();
             cmd.WithUserId(this.User.Identifier());
 
             return await _mediator.Send(cmd);

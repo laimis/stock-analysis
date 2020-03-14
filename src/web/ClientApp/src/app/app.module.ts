@@ -42,6 +42,7 @@ import { StockChartsComponent } from './stock-details/stock-charts.component';
 import { StockNotesComponent } from './stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stock-details/stock-option.component';
+import { StockGridComponent } from './stock-grid/stock-grid.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -50,6 +51,7 @@ var routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
+  { path: 'grid', component: StockGridComponent, canActivate: [AuthGuard]},
   { path: 'landing', component: LandingComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
   { path: 'profile/create', component: ProfileCreateComponent },
@@ -71,6 +73,7 @@ var routes = [
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
+  { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
@@ -108,6 +111,7 @@ var routes = [
     StockChartsComponent,
     StockDetailsComponent,
     StockFundamentalsComponent,
+    StockGridComponent,
     StockListComponent,
     StockListsComponent,
     StockNotesComponent,
