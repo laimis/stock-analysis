@@ -36,6 +36,7 @@ export class DashboardComponent implements OnInit {
       this.openOptions = result.openOptions;
       this.loaded = true;
       this.calculateProperties();
+      this.sort("profits")
 		}, error => {
 			console.log(error);
 			this.loaded = false;
