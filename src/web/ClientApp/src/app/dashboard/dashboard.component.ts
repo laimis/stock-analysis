@@ -75,7 +75,11 @@ export class DashboardComponent implements OnInit {
       {
         this.putContracts++
         putPremium += o.premium
-        this.putCollateral += (o.strikePrice * 100)
+
+        if (o.boughtOrSold == 'Sold')
+        {
+          this.putCollateral += (o.strikePrice * 100)
+        }
       }
 
       if (o.optionType == "CALL")

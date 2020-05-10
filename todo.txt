@@ -1,13 +1,27 @@
-- sortable dashboard stock screen
+- selling to close does not turn into profit event
+- buying puts still counts as collateral held
 
-Profit/Loss spreadsheet
+Feedback:
+not sure if it makes sense or not, but if I want to track how I'm doing, I trade with an initial bankroll, and then the trades can be measured on a percentage
+like, this position is 50% of your total bankroll
+when you exit a position, you gained xx% in your total bankroll
+or something like that
 
+Profit/Loss
 - FSLR bug, sold CALL for 53 for 100, bought it for 10 to close out, only counting 10 debit
 - show total options transactions
 - assignment rate
 - expired worthless
 - closed at profit rate
 - % return of premium
+
+- collateral held bug
+- premium bug
+
+Watch concept
+- create watch, alert when close is at -%10 +%10,
+
+- breakdown by industry, by microcap
 
 
 - transactions: row type with pl and tx options
