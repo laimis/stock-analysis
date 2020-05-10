@@ -62,7 +62,7 @@ namespace core
                     var o3 = tuple.a as OwnedOption;
                     return new object[] {
                         o3.State.Ticker,
-                        "expired",
+                        expired.Assigned ? "assigned" : "expired",
                         o3.State.StrikePrice,
                         o3.State.OptionType.ToString(),
                         o3.State.Expiration.ToString(DATE_FORMAT),
