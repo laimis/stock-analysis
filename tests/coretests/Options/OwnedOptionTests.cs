@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using core.Options;
+using core.Shared;
 using Xunit;
 
 namespace coretests.Options
@@ -8,6 +10,21 @@ namespace coretests.Options
     {
         private static readonly DateTimeOffset _expiration = DateTimeOffset.UtcNow.AddDays(10);
         
+        [Fact]
+        public void FslrBug()
+        {
+            var date = new DateTimeOffset(2020, 3, 13, 0, 0, 0, 0, TimeSpan.FromHours(0));
+            var user = Guid.NewGuid();
+
+            var option = new OwnedOption(new Ticker("FSLR"), 53, OptionType.CALL, date, user);
+
+            option.Sell(1, 100, date.AddDays(-20), null);
+            option.Buy(1, 10, date.AddDays(-10), null);
+
+            Assert.Single(option.State.Transactions.Where(t => t.IsPL));
+            Assert.Equal(90, option.State.Transactions.Where(t => t.IsPL).Select(t => t.Profit).Single());
+        }
+
         [Fact]
         public void PutOptionOperations()
         {

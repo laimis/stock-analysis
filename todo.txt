@@ -1,5 +1,4 @@
 - selling to close does not turn into profit event
-- buying puts still counts as collateral held
 
 Feedback:
 not sure if it makes sense or not, but if I want to track how I'm doing, I trade with an initial bankroll, and then the trades can be measured on a percentage
