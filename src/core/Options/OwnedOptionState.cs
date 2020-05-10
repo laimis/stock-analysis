@@ -34,19 +34,35 @@ namespace core.Options
 
         internal void Apply(OptionExpired expired)
         {
+            var purchased = this.NumberOfContracts > 0;
+
             this.NumberOfContracts = 0;
 
             this.Expirations.Add(expired);
 
-            this.Transactions.Add(
-                Transaction.PLTx(
-                    this.Ticker,
-                    "Expiration reached" + (expired.Assigned ? ", ASSIGNED" : ""),
-                    this.Credit - this.Debit,
-                    expired.When,
-                    true
-                )
-            );
+            if (!purchased)
+            {
+                this.Transactions.Add(
+                    Transaction.PLTx(
+                        this.Ticker,
+                        "Expiration reached" + (expired.Assigned ? ", ASSIGNED" : ""),
+                        this.Credit - this.Debit,
+                        expired.When,
+                        true
+                    )
+                );
+            }
+            else
+            {
+                this.Transactions.Add(
+                    Transaction.PLTx(
+                        this.Ticker, "Expiration reached, worthless",
+                        this.Credit - this.Debit,
+                        expired.When,
+                        true
+                    )
+                );
+            }
         }
 
         internal void Apply(OptionDeleted deleted)
