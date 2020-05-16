@@ -1,62 +1,16 @@
-- selling to close does not turn into profit event
-
-Feedback:
-not sure if it makes sense or not, but if I want to track how I'm doing, I trade with an initial bankroll, and then the trades can be measured on a percentage
-like, this position is 50% of your total bankroll
-when you exit a position, you gained xx% in your total bankroll
-or something like that
-
-Profit/Loss
-- FSLR bug, sold CALL for 53 for 100, bought it for 10 to close out, only counting 10 debit
-- show total options transactions
-- assignment rate
-- expired worthless
-- closed at profit rate
-- % return of premium
-
-- collateral held bug
-- premium bug
-
 Watch concept
 - create watch, alert when close is at -%10 +%10,
 
 - breakdown by industry, by microcap
 
-
 - transactions: row type with pl and tx options
-    - selling option to close position is a PL event test
-    - expiring option is a PL event test
-    - buying option to close positin is a PL event test
-    - selling shares is a PL event test
 
 - review collapse notes with counts instead of listing them all
 
-- ability to add notes from the front page
-
-- You own 100 shares at $39.69 per share, add up or down %
-- ownership pie per share
-- ownership pie per industry
-
 FEATURES
-
-
-- concept of a watchlist 
-    -- easy to understand, forget the notes
-    ... unless some one adds a note, you add the stock to watch
-- P&L report, what's that all about, realized and unrealized separtion
-- transations:
-    - details collapsed that can be expanded
-    - chart
-- % historical performance
-- transactions as top level item
+- watchlist
 
 LONG TERM
-
-- upcoming earnings scraping, important announcements
-- review endpoint, collapse or exclude notes
-- review reminders or daily/weekly report
-- better landing page, "show me the goods" walk through
-- import of shares/options in transaction screens
 
 MARKETING
 
@@ -66,8 +20,7 @@ Is there a way to calculate that quickly
 or I have to go through the statement each month 
 and manually input in excel sheet lol?"
 
-
-- omg, look at this interest sign up:
+- look at this interest sign up:
 https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_trading_journal_for/
 https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps_you_identify_when_a/
 
