@@ -90,7 +90,7 @@
         <td>{{ticker.owned}}</td>
         <td>{{ticker.equity | currency}}</td>
         <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
-        <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent }}</span></td>
+        <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
       </tr>
     </table>
   </div>
