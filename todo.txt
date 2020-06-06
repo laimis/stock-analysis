@@ -1,3 +1,7 @@
+- buy/sell separation
+
+
+
 Watch concept
 - create watch, alert when close is at -%10 +%10,
 

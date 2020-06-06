@@ -153,6 +153,19 @@ namespace web.Controllers
             return Ok();
         }
 
+        [HttpPost("clear")]
+        [Authorize]
+        public async Task<ActionResult> Clear(Clear.Command cmd)
+        {
+            cmd.WithUserId(this.User.Identifier());
+            
+            await _mediator.Send(cmd);
+
+            await HttpContext.SignOutAsync();
+
+            return Ok();
+        }
+
         [HttpPost("resetpassword")]
         public async Task<ActionResult> ResetPassword(ResetPassword.Command cmd)
         {

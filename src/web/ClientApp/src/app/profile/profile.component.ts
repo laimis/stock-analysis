@@ -31,6 +31,11 @@ export class ProfileComponent implements OnInit {
     this.showDelete = true
   }
 
+  clearData() {
+    this.service.clearAccount()
+      .subscribe(s => this.router.navigate(['/']))
+  }
+
   undoDelete() {
     this.showDelete = false
   }

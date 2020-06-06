@@ -191,6 +191,10 @@ export class StocksService {
     return this.http.post('/api/account/delete', obj)
   }
 
+  clearAccount() : Observable<object> {
+    return this.http.post('/api/account/clear', {})
+  }
+
   resetPassword(obj: { id: string; password: string; }) {
     return this.http.post<object>('/api/account/resetpassword', obj)
   }
