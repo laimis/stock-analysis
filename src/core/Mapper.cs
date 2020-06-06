@@ -163,11 +163,11 @@ namespace core
                 currentPrice = currentPrice.Amount,
                 optionType = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
-                premium = o.State.Credit - o.State.Debit,
+                premium = o.State.Transactions.Where(t => t.IsPL).Sum(t => t.Profit),
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
                 numberOfContracts = Math.Abs(o.State.NumberOfContracts),
                 boughtOrSold = o.State.NumberOfContracts > 0 ? "Bought" : "Sold",
-                transactions = new TransactionList(o.State.Transactions, null, null),
+                transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null),
                 expiresSoon = o.ExpiresSoon,
                 isExpired = o.IsExpired
             };

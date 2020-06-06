@@ -22,8 +22,6 @@ namespace core.Options
         public OptionType OptionType { get; internal set; }
         public Guid UserId { get; internal set; }
         public int NumberOfContracts { get; internal set; }
-        public double Credit { get; private set; }
-        public double Debit { get; private set; }
         
         public List<Transaction> Transactions { get; private set; }
         public List<OptionSold> Sells { get; private set; }
@@ -31,39 +29,6 @@ namespace core.Options
         public List<OptionExpired> Expirations { get; private set; }
         public long DaysUntilExpiration => 
             (long)Math.Ceiling(Math.Abs(this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
-
-        internal void Apply(OptionExpired expired)
-        {
-            var purchased = this.NumberOfContracts > 0;
-
-            this.NumberOfContracts = 0;
-
-            this.Expirations.Add(expired);
-
-            if (!purchased)
-            {
-                this.Transactions.Add(
-                    Transaction.PLTx(
-                        this.Ticker,
-                        "Expiration reached" + (expired.Assigned ? ", ASSIGNED" : ""),
-                        this.Credit - this.Debit,
-                        expired.When,
-                        true
-                    )
-                );
-            }
-            else
-            {
-                this.Transactions.Add(
-                    Transaction.PLTx(
-                        this.Ticker, "Expiration reached, worthless",
-                        this.Credit - this.Debit,
-                        expired.When,
-                        true
-                    )
-                );
-            }
-        }
 
         internal void Apply(OptionDeleted deleted)
         {
@@ -79,16 +44,20 @@ namespace core.Options
 
             var credit = (sold.NumberOfContracts * sold.Premium);
 
-            this.Credit += credit;
+            var description = $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract";
 
             this.Transactions.Add(
                 Transaction.CreditTx(
                     this.Ticker,
-                    $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
+                    description,
                     credit,
                     sold.When,
                     true
                 )
+            );
+
+            this.Transactions.Add(
+                Transaction.PLTx(this.Ticker, description, credit, sold.When, true)
             );
         }
 
@@ -116,32 +85,38 @@ namespace core.Options
 
             var debit = purchased.NumberOfContracts * purchased.Premium;
 
-            this.Debit += debit;
-
             this.Buys.Add(purchased);
+
+            var description = $"Bought {purchased.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract";
 
             this.Transactions.Add(
                 Transaction.DebitTx(
                     this.Ticker,
-                    $"Bought {purchased.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract",
+                    description,
                     debit,
                     purchased.When,
                     true
                 )
             );
 
-            if (this.NumberOfContracts == 0)
-            {
-                this.Transactions.Add(
-                    Transaction.PLTx(
-                        this.Ticker,
-                        $"Closed out option contract",
-                        this.Credit - this.Debit,
-                        purchased.When,
-                        true
-                    )
-                );
-            }
+            this.Transactions.Add(
+                Transaction.PLTx(
+                    this.Ticker,
+                    description,
+                    - debit,
+                    purchased.When,
+                    true
+                )
+            );
+        }
+
+        internal void Apply(OptionExpired expired)
+        {
+            var purchased = this.NumberOfContracts > 0;
+
+            this.NumberOfContracts = 0;
+
+            this.Expirations.Add(expired);
         }
     }
 }

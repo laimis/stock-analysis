@@ -9,20 +9,26 @@ namespace coretests.Options
     public class OwnedOptionTests
     {
         private static readonly DateTimeOffset _expiration = DateTimeOffset.UtcNow.AddDays(10);
-        
+
         [Fact]
-        public void FslrBug()
+        public void AssignedCallBug()
         {
             var date = new DateTimeOffset(2020, 3, 13, 0, 0, 0, 0, TimeSpan.FromHours(0));
             var user = Guid.NewGuid();
 
-            var option = new OwnedOption(new Ticker("FSLR"), 53, OptionType.CALL, date, user);
+            var option = new OwnedOption(new Ticker("SFIX"), 17.5, OptionType.CALL, date, user);
 
-            option.Sell(1, 100, date.AddDays(-20), null);
-            option.Buy(1, 10, date.AddDays(-10), null);
+            option.Sell(3, 100, date.AddDays(-20), null);
+            option.Buy(2, 10, date.AddDays(-10), null);
 
-            Assert.Single(option.State.Transactions.Where(t => t.IsPL));
-            Assert.Equal(90, option.State.Transactions.Where(t => t.IsPL).Select(t => t.Profit).Single());
+            option.Expire(true);
+
+            Assert.True(option.IsExpired);
+            Assert.False(option.IsActive);
+            
+            var pl = option.State.Transactions.Where(t => t.IsPL);
+
+            Assert.Equal(2, pl.Count());
         }
 
         [Fact]
@@ -33,17 +39,13 @@ namespace coretests.Options
             option.Sell(1, 10, DateTimeOffset.UtcNow, "some notes");
             
             Assert.Equal(-1, option.State.NumberOfContracts);
-            Assert.Single(option.State.Transactions);
-
-            Assert.False(option.State.Transactions[0].IsPL);
+            Assert.Single(option.State.Transactions.Where(t => !t.IsPL));
+            Assert.Single(option.State.Transactions.Where(t => t.IsPL));
 
             option.Buy(1, 1, DateTimeOffset.UtcNow, "some notes");
 
             Assert.Equal(0, option.State.NumberOfContracts);
-            Assert.Equal(3, option.State.Transactions.Count);
-
-            Assert.True(option.State.Transactions[2].IsPL);
-            Assert.Equal(9, option.State.Transactions[2].Credit);
+            Assert.Equal(4, option.State.Transactions.Count);
         }
 
         [Fact]
