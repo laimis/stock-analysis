@@ -54,7 +54,7 @@ namespace core
                         o2.State.OptionType.ToString(),
                         o2.State.Expiration.ToString(DATE_FORMAT),
                         op.NumberOfContracts,
-                        op.Premium,
+                        op.Premium * -1,
                         op.When.ToString(DATE_FORMAT)
                     };
 
