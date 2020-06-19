@@ -18,10 +18,15 @@ namespace core.Portfolio.Output
             {
                 this.Grouped = Ordered(transactions, groupBy)
                     .GroupBy(t => GroupByValue(groupBy, t))
-                    .Select(g => new {
-                        name = g.Key,
-                        transactions = new TransactionList(g, null, null)
-                    });
+                    .Select(g => new TransactionGroup(
+                        g.Key,
+                        new TransactionList(g, null, null)
+                    ));
+
+                if (groupBy == "ticker")
+                {
+                    this.Grouped = this.Grouped.OrderByDescending(a => a.Transactions.Credit - a.Transactions.Debit);
+                }
             }
         }
 
@@ -46,9 +51,21 @@ namespace core.Portfolio.Output
 
         public IEnumerable<Transaction> Transactions { get; }
         public IEnumerable<string> Tickers { get; }
-        public IEnumerable<object> Grouped { get; } 
+        public IEnumerable<TransactionGroup> Grouped { get; } 
         
         public double Credit => Transactions.Sum(t => t.Credit);
         public double Debit => Transactions.Sum(t => t.Debit);
+    }
+
+    public class TransactionGroup
+    {
+        public TransactionGroup(string name, TransactionList transactions)
+        {
+            this.Name = name;
+            this.Transactions = transactions;
+        }
+
+        public string Name { get; }
+        public TransactionList Transactions { get; }
     }
 }

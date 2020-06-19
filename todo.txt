@@ -1,18 +1,8 @@
-- buy/sell separation
-
-
-
 Watch concept
 - create watch, alert when close is at -%10 +%10,
-
 - breakdown by industry, by microcap
-
 - transactions: row type with pl and tx options
-
 - review collapse notes with counts instead of listing them all
-
-FEATURES
-- watchlist
 
 LONG TERM
 
