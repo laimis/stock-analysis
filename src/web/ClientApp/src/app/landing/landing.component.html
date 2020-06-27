@@ -43,106 +43,19 @@
 
 
 <!-- Plan Grid -->
-
 <section class="pricing py-5">
-  <h3 class="text-center mb-4">Start with one of these plans now!</h3>
-  <div class="container">
-    <div class="row">
-      <!-- Free Tier -->
-      <div class="col-lg-4">
-        <div class="card mb-5 mb-lg-0">
-          <div class="card-body">
-            <h5 class="card-title text-muted text-uppercase text-center">Free</h5>
-            <h6 class="card-price text-center">$0<span class="period">/month</span></h6>
-            <hr>
-            <ul class="fa-ul">
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Stock Metrics</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings/Dividend dates</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Automated Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
-            </ul>
-            <a
-              [routerLink]="[ '/profile', 'create' ]"
-              class="btn btn-block btn-secondary text-uppercase btn-sm">Start Free
-            </a>
-          </div>
-        </div>
-      </div>
-      <!-- Plus Tier -->
-      <div class="col-lg-4">
-        <div class="card mb-5 mb-lg-0">
-          <div class="card-body">
-            <h5 class="card-title text-muted text-uppercase text-center">Plus</h5>
-            <h6 class="card-price text-center">$12.99<span class="period">/month</span></h6>
-            <hr>
-            <ul class="fa-ul">
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
-              <!-- <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li> -->
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Earnings Reports</li>
-              <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Advanced Options Data</li>
-            </ul>
-            <button
-              [routerLink]="[ '/profile', 'create', 'plus' ]"
-              class="btn btn-block btn-primary text-uppercase">
-              Start with Plus - 7 day trial
-            </button>
-          </div>
-        </div>
-      </div>
-      <!-- Pro Tier -->
-      <div class="col-lg-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title text-muted text-uppercase text-center">Full</h5>
-            <h6 class="card-price text-center">$24.99<span class="period">/month</span></h6>
-            <hr>
-            <ul class="fa-ul">
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Stock tracking</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Options tracking</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Notes</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Market Data - price/volume</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Transaction Reports</li>
-              <!-- <li><span class="fa-li"><i class="fas fa-check"></i></span>Export/Import</li> -->
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Stock Metrics</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings/Dividend dates</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Portfolio Reports</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Earnings Reports</li>
-              <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Options Data</li>
-            </ul>
-            <button
-              [routerLink]="[ '/profile', 'create', 'full' ]"
-              class="btn btn-block btn-primary text-uppercase">
-              Start with Full - 7 day trial
-          </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  <div class="mb-4">
+    <div class="container">
+      <div class="row">
+        <div class="col text-center">
+          <a [routerLink]="[ '/profile', 'create' ]"
+              class="btn btn-primary text-uppercase">Sign up
+          </a>
 
-<!-- Call to Action -->
-<section class="text-center jumbotron mt-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-xl-9 mx-auto">
-        <h3 class="mb-4">Already have an account?</h3>
-      </div>
-      <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-        <a [routerLink]="[ '/profile', 'login' ]" class="btn btn-primary">Login</a>
+          <a [routerLink]="[ '/profile', 'create' ]"
+              class="btn btn-secondary text-uppercase ml-3">Login
+          </a>
+        </div>
       </div>
     </div>
   </div>

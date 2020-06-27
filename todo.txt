@@ -4,6 +4,11 @@ Watch concept
 - transactions: row type with pl and tx options
 - review collapse notes with counts instead of listing them all
 
+RobinHood statement parser
+
+Options stats
+
+
 LONG TERM
 
 MARKETING
