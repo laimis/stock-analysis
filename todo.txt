@@ -1,7 +1,9 @@
 Watch concept
-- create watch, alert when close is at -%10 +%10,
+    - once per 24 hours
+    - beginning of day
+    - end of day
+
 - breakdown by industry, by microcap
-- transactions: row type with pl and tx options
 - review collapse notes with counts instead of listing them all
 
 RobinHood statement parser

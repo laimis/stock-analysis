@@ -63,13 +63,13 @@ namespace core.Admin
                 return new Unit();
             }
 
-            private async Task ProcessUser((string, string) u)
+            private async Task ProcessUser((string email, string id) u)
             {
                 Console.WriteLine("Processing weekly review for " + u.Item1);
 
                 var review = new Review.Generate(DateTimeOffset.UtcNow);
 
-                review.WithUserId(new Guid(u.Item2));
+                review.WithUserId(new Guid(u.id));
 
                 var r = await _mediator.Send(review);
 
@@ -78,7 +78,7 @@ namespace core.Admin
 
                 if (portfolioEntries.Count == 0 && notesEntries.Count == 0)
                 {
-                    Console.WriteLine("No portfolio or other items for " + u.Item1);
+                    Console.WriteLine("No portfolio or other items for " + u.email);
                     return;
                 }
 
@@ -103,7 +103,7 @@ namespace core.Admin
 
                 // Console.WriteLine(JsonConvert.SerializeObject(data));
 
-                await _emails.Send(u.Item1, Sender.Support, EmailTemplate.ReviewEmail, data);
+                await _emails.Send(u.email, Sender.Support, EmailTemplate.ReviewEmail, data);
             }
 
             private static object Map((ReviewEntryGroup p, ReviewEntry re) pair)
