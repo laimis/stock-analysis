@@ -6,6 +6,7 @@ using core.Adapters.Emails;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Adapters.Subscriptions;
+using core.Alerts;
 using core.Options;
 using csvparser;
 using financialmodelingclient;
@@ -34,6 +35,7 @@ namespace web
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService, StocksService>();
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
+            services.AddSingleton<IAlertsStorage, AlertsStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
