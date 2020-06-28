@@ -20,19 +20,22 @@ namespace web
         private IAlertsStorage _alerts;
         private IEmailService _emails;
         private IStocksService2 _stocks;
+        private MarketHours _marketHours;
 
         public StockMonitorService(
             ILogger<StockMonitorService> logger,
             IAccountStorage accounts,
             IAlertsStorage alerts,
             IStocksService2 stocks,
-            IEmailService emails)
+            IEmailService emails,
+            MarketHours marketHours)
         {
             _accounts = accounts;
             _alerts = alerts;
             _emails = emails;
             _logger = logger;
             _stocks = stocks;
+            _marketHours = marketHours;
         }
 
         private HashSet<string> _tickers = new HashSet<string>();
@@ -48,7 +51,7 @@ namespace web
             {
                 _logger.LogDebug("loop " + DateTime.UtcNow);
 
-                if (MarketHours.IsOn(DateTimeOffset.UtcNow))
+                if (_marketHours.IsOn(DateTimeOffset.UtcNow))
                 {
                     _logger.LogDebug("market hours");
 
@@ -123,7 +126,7 @@ namespace web
             return new {
                 ticker = (string)trigger.Alert.State.Ticker,
                 value = trigger.Price.Amount,
-                time = MarketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
+                time = _marketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
             };
         }
     }

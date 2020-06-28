@@ -2,11 +2,24 @@ using System;
 
 namespace core.Utils
 {
-    public static class MarketHours
+    public class MarketHours
     {
-        private static TimeZoneInfo _easternZoneId = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
-        public static bool IsOn(DateTimeOffset offset)
+        private TimeZoneInfo _easternZoneId;
+
+        public MarketHours()
+        {
+            try
+            {
+                _easternZoneId = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+            }
+            catch(TimeZoneNotFoundException)
+            {
+                _easternZoneId = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+            }
+        }
+
+        public bool IsOn(DateTimeOffset offset)
         {
             // 930-1600
             var eastern = TimeZoneInfo.ConvertTimeFromUtc(
@@ -17,7 +30,7 @@ namespace core.Utils
             return (eastern.Hour > 9 && eastern.Minute >= 30) && (eastern.Hour < 17 && eastern.Minute <= 0);
         }
 
-        public static DateTime ToMarketTime(DateTimeOffset when)
+        public DateTime ToMarketTime(DateTimeOffset when)
         {
             return TimeZoneInfo.ConvertTimeFromUtc(
                 when.DateTime,
