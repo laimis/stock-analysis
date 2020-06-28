@@ -8,6 +8,7 @@ using core.Adapters.Stocks;
 using core.Adapters.Subscriptions;
 using core.Alerts;
 using core.Options;
+using core.Utils;
 using csvparser;
 using financialmodelingclient;
 using iexclient;
@@ -37,6 +38,7 @@ namespace web
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<IAlertsStorage, AlertsStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
+            services.AddSingleton<MarketHours>();
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
