@@ -1,7 +1,10 @@
 Watch concept
-    - once per 24 hours
-    - beginning of day
-    - end of day
+- show alerts concept in the stock details
+- allow to add alert
+- allow to delete alert
+- allow to change alert
+- end of day summary
+- beginning of the day summary
 
 - breakdown by industry, by microcap
 - review collapse notes with counts instead of listing them all

@@ -96,7 +96,7 @@ namespace web
 
                 _logger.LogDebug($"price {t} {price.Amount}");
 
-                foreach (var m in _monitors.Values.ToList())
+                foreach (var m in _monitors.Values.OrderByDescending(m => m.Value.Value).ToList())
                 {
                     if (m.UpdateValue(t, price.Amount))
                     {
