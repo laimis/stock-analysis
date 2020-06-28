@@ -8,7 +8,7 @@ namespace storage.shared
 {
     public class AlertsStorage : IAlertsStorage
     {
-        private const string _alert_entity = "alerts";
+        public const string _alert_entity = "alerts";
         
         private IAggregateStorage _aggregateStorage;
 

@@ -21,7 +21,7 @@ namespace core.Alerts
             if (this.Value == null)
             {
                 this.Value = newValue;
-                return false;
+                return true;
             }
 
             var prev = this.Value < this.Alert.State.Threshold;

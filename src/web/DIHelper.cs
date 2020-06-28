@@ -53,7 +53,7 @@ namespace web
                 )
             );
 
-            services.AddHostedService<TestService>();
+            services.AddHostedService<StockMonitorService>();
             
             StorageRegistrations(configuration, services);
         }

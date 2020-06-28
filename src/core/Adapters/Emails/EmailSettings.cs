@@ -33,6 +33,8 @@ namespace core.Adapters.Emails
         public static EmailTemplate AdminUserDeleted = new EmailTemplate("d-3bdfe7613d1048e5b1a469a155f945b0");
         public static EmailTemplate AdminContact = new EmailTemplate("d-ab673f8ba0be40018dcc20aca9880d63");
 
+        public static EmailTemplate Alerts = new EmailTemplate("d-8022af23c4624a9ab54a0bb6ac5ce840");
+
         public EmailTemplate(string id)
         {
             Id = id;

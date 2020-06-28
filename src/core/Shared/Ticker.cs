@@ -17,5 +17,7 @@ namespace core.Shared
 
         public static implicit operator string(Ticker t) => t._ticker;
         public static implicit operator Ticker(string t) => new Ticker(t);
+
+        public string Value => _ticker;
     }
 }

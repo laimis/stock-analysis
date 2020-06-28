@@ -100,6 +100,7 @@ namespace storage.shared
             await this._aggregateStorage.DeleteEvents(_note_entity, userId);
             await this._aggregateStorage.DeleteEvents(_option_entity, userId);
             await this._aggregateStorage.DeleteEvents(_stock_entity, userId);
+            await this._aggregateStorage.DeleteEvents(AlertsStorage._alert_entity, userId);
         }
     }
 }
