@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine3.10 AS build-env
 RUN apk add --no-cache -U \
     nodejs \
     npm
+    
 
 RUN mkdir -p /app
 COPY . /app
@@ -16,7 +17,8 @@ WORKDIR /app
 COPY --from=build-env /app/out /app
 
 RUN apk add --no-cache -U \
-    curl
+    curl \
+    tzdata
 
 HEALTHCHECK CMD curl -f http://localhost/health || exit 1
 
