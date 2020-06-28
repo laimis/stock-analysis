@@ -18,7 +18,7 @@ namespace coretests.AlertsTests
             var triggered = m.UpdateValue("AMD", 50);
 
             Assert.Equal(50, m.Value);
-            Assert.False(triggered);
+            Assert.True(triggered);
 
             triggered = m.UpdateValue("AMD", 51);
             Assert.False(triggered);
