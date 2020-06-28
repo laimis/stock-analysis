@@ -1,22 +1,15 @@
 using System;
+using TimeZoneConverter;
 
 namespace core.Utils
 {
     public class MarketHours
     {
-
         private TimeZoneInfo _easternZoneId;
 
         public MarketHours()
         {
-            try
-            {
-                _easternZoneId = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            }
-            catch(TimeZoneNotFoundException)
-            {
-                _easternZoneId = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
-            }
+            _easternZoneId = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
         }
 
         public bool IsOn(DateTimeOffset offset)
