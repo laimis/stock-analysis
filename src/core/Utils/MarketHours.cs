@@ -20,7 +20,7 @@ namespace core.Utils
                 _easternZoneId
             );
 
-            return (eastern.Hour > 9 && eastern.Minute >= 30) && (eastern.Hour < 17 && eastern.Minute <= 0);
+            return (eastern.Hour > 9 && eastern.Minute >= 40) && (eastern.Hour < 17 && eastern.Minute <= 0);
         }
 
         public DateTime ToMarketTime(DateTimeOffset when)
