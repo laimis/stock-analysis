@@ -50,9 +50,11 @@ namespace web
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (_marketHours.IsOn(DateTimeOffset.UtcNow))
+                var time = DateTimeOffset.UtcNow;
+
+                if (_marketHours.IsOn(time))
                 {
-                    _logger.LogInformation("market hours");
+                    _logger.LogInformation($"market hours {time.TimeOfDay}");
 
                     await ScanAlerts();
 
@@ -60,7 +62,7 @@ namespace web
                 }
                 else
                 {
-                    _logger.LogInformation("non market hours");
+                    _logger.LogInformation($"non market hours {time.TimeOfDay}");
 
                     await Task.Delay(SHORT_INTERVAL, stoppingToken);
                 }
@@ -97,6 +99,7 @@ namespace web
                 if (price.NotFound)
                 {
                     _logger.LogError($"price not found for {t}");
+                    continue;
                 }
 
                 _logger.LogInformation($"price {t} {price.Amount}");
