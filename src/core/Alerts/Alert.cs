@@ -62,5 +62,10 @@ namespace core.Alerts
         {
             this.State.Apply(c);
         }
+
+        private void ApplyInternal(AlertPricePointAdded a)
+        {
+            this.State.Apply(a);
+        }
     }
 }

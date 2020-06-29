@@ -17,5 +17,10 @@ namespace core.Alerts
             this.Ticker = c.Ticker;
             this.UserId = c.UserId;
         }
+
+        internal void Apply(AlertPricePointAdded a)
+        {
+            this.PricePoints.Add(new AlertPricePoint(a.Id, a.Value));
+        }
     }
 }

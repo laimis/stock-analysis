@@ -32,7 +32,10 @@ namespace web.Controllers
         public object Diagnostics()
         {
             return StockMonitorService._monitors.Select(
-                kp => kp.Value
+                kp => new {
+                    kp.Value.Alert.Ticker,
+                    kp.Value.Alert.PricePoints
+                }
             );
         }
 

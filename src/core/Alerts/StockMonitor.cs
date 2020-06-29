@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace core.Alerts
 {
-    public struct StockMonitor
+    public class StockMonitor
     {
         public StockMonitor(Alert alert)
         {
@@ -14,8 +14,6 @@ namespace core.Alerts
                 k => k.Id,
                 k => (double?)null
             );
-
-            
         }
 
         public Alert Alert { get; }
@@ -33,17 +31,22 @@ namespace core.Alerts
             foreach(var pp in this.Alert.State.PricePoints)
             {
                 var local = this.PointValues[pp.Id];
-
                 if (local == null)
                 {
+                    this.PointValues[pp.Id] = newValue;
                     continue;
                 }
                 
                 var prev = local.Value < pp.Value;
                 var curr = newValue < pp.Value;
+
+                if (prev != curr)
+                {
+                    triggered = true;
+                }
             }
 
-            return prev != curr;
+            return triggered;
         }
     }
 }

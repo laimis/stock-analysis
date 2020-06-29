@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using core.Alerts;
 using core.Shared;
 using Xunit;
@@ -24,7 +25,7 @@ namespace coretests.Alerts
         [InlineData(55)]
         public void PricePointsMatch(double point)
         {
-            Assert.Contains(point, _uat.PricePoints);
+            Assert.Contains(point, _uat.PricePoints.Select(pp => pp.Value));
         }
 
         [Fact]
