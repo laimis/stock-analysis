@@ -56,7 +56,14 @@ namespace web
                 {
                     _logger.LogInformation($"market hours {time.TimeOfDay}");
 
-                    await ScanAlerts();
+                    try
+                    {
+                        await ScanAlerts();
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError("Failed:" + ex);
+                    }
 
                     await Task.Delay(LONG_INTERVAL, stoppingToken);
                 }
@@ -102,9 +109,7 @@ namespace web
                     continue;
                 }
 
-                _logger.LogInformation($"price {t} {price.Amount}");
-
-                foreach (var m in _monitors.Values.OrderByDescending(m => m.Value.Value).ToList())
+                foreach (var m in _monitors.Values.ToList())
                 {
                     if (m.UpdateValue(t, price.Amount))
                     {
@@ -121,7 +126,7 @@ namespace web
             {
                 var u = await _accounts.GetUser(e.Key);
 
-                var alerts = e.ToList();
+                var alerts = e.OrderByDescending(m => m.Price.Amount).ToList();
 
                 var data = new { alerts = alerts.Select(Map) };
 
