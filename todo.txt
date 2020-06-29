@@ -9,6 +9,11 @@ Watch concept
 - breakdown by industry, by microcap
 - review collapse notes with counts instead of listing them all
 
+
+- earnings listings/highlight yours
+
+- add news link
+
 RobinHood statement parser
 
 Options stats
