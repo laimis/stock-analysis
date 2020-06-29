@@ -43,6 +43,7 @@ import { StockNotesComponent } from './stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stock-details/stock-option.component';
 import { StockGridComponent } from './stock-grid/stock-grid.component';
+import { StockAlertsComponent } from './stock-details/stock-alerts.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -108,6 +109,7 @@ var routes = [
     ProfileVerifyComponent,
     ReviewComponent,
     SoldOptionDetailComponent,
+    StockAlertsComponent,
     StockChartsComponent,
     StockDetailsComponent,
     StockFundamentalsComponent,

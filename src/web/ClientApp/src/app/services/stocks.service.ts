@@ -77,8 +77,18 @@ export class StocksService {
     return this.http.get<object>('/api/notes/' + id)
   }
 
-  // ------------------ stocks ------------------
+  // ------------------ alerts ------------------
+  getAlerts(ticker: string): Observable<object> {
+    if (ticker === null)
+    {
+      ticker = ''
+    }
 
+    return this.http.get<object>('/api/alerts/' + ticker)
+  }
+  //
+
+  // ------------------ stocks ------------------
 	getStockLists(): Observable<StockLists> {
     return this.http.get<StockLists>('/api/stocks/lists')
   }
@@ -263,13 +273,14 @@ export class OwnedOption {
 }
 
 export interface StockSummary {
-  price: number,
-  stats: object,
+  price: number
+  stats: object
   profile : object
 	priceChartData : object[]
 	volumeChartData : object[]
 	peChartData : object[]
-	bookChartData : object[]
+  bookChartData : object[]
+  alert: object
 }
 
 export interface StockGridEntry {

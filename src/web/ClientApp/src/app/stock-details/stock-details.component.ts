@@ -16,6 +16,7 @@ export class StockDetailsComponent {
   notes: NoteList
   ownership: object
   options: OwnedOption[]
+  alerts: object
   activeTab: string = 'fundamentals'
 
 	constructor(
@@ -49,6 +50,14 @@ export class StockDetailsComponent {
     this.loadStockOwnership()
 
     this.loadOptionOwnership()
+
+    this.loadAlerts()
+  }
+
+  loadAlerts() {
+    this.stocks.getAlerts(this.ticker).subscribe(result => {
+      this.alerts = result
+    })
   }
 
   loadOptionOwnership() {

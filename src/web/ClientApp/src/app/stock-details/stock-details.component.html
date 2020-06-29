@@ -20,14 +20,15 @@
     <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
       Fundamentals
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]="" (click)="activateTab('charts')">
-      Charts
-    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
       Shares <span *ngIf="ownership && ownership.owned > 0" class="badge badge-pill badge-info">{{ownership.owned}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
       Options <span *ngIf="options && options.length > 0" class="badge badge-pill badge-info">{{options.length}}</span>
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('alerts')}" [routerLink]="" (click)="activateTab('alerts')">
+      Alerts
+      <span *ngIf="alerts" class="badge badge-pill badge-info">ON</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
@@ -37,10 +38,6 @@
 
   <stock-fundamentals *ngIf="isActive('fundamentals')" [stock]=stock></stock-fundamentals>
 
-  <stock-charts *ngIf="isActive('charts')" [stock]=stock></stock-charts>
-
-  <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
-
   <stock-ownership *ngIf="isActive('stocks')"
     [ticker]=stock.ticker [stock]=ownership
     (ownershipChanged)="stockOwnershipChanged($event)"></stock-ownership>
@@ -48,6 +45,11 @@
   <stock-option *ngIf="isActive('options')"
     [ticker]=stock.ticker [options]=options
     (ownershipChanged)="optionOwnershipChanged($event)"></stock-option>
+
+  <stock-alerts *ngIf="isActive('alerts')"
+    [stock]=alerts></stock-alerts>
+
+  <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
 
 </div>
 
