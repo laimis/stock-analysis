@@ -42,7 +42,9 @@ namespace core.Alerts
                     var exists = alerts.Any(a => a.State.Ticker == o.Ticker);
                     if (!exists)
                     {
-                        var a = new Alert(o.Ticker, cmd.UserId, o.AverageCost, true);
+                        var a = new Alert(o.Ticker, cmd.UserId);
+
+                        a.AddPricePoint(o.AverageCost);
 
                         await _alertsStorage.Save(a);
                     }

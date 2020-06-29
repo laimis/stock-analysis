@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using core.Shared;
 
 namespace core.Alerts
@@ -7,14 +8,13 @@ namespace core.Alerts
     {
         public Guid Id { get; private set; }
         public Ticker Ticker { get; private set; }
-        public double Threshold { get; private set; }
         public Guid UserId { get; private set; }
+        public List<AlertPricePoint> PricePoints { get; private set; } = new List<AlertPricePoint>();
 
         internal void Apply(AlertCreated c)
         {
             this.Id = c.AggregateId;
             this.Ticker = c.Ticker;
-            this.Threshold = c.Threshold;
             this.UserId = c.UserId;
         }
     }

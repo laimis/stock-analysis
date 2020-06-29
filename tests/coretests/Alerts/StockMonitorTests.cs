@@ -2,7 +2,7 @@ using core.Alerts;
 using core.Shared;
 using Xunit;
 
-namespace coretests.AlertsTests
+namespace coretests.Alerts
 {
     public class StockMonitorTests
     {

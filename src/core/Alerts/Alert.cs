@@ -10,12 +10,14 @@ namespace core.Alerts
         private AlertState _state = new AlertState();
 
         public override Guid Id => State.Id;
+        public string Ticker => State.Ticker;
+        public List<AlertPricePoint> PricePoints => State.PricePoints;
         
         public Alert(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
 
-        public Alert(Ticker ticker, Guid userId, double threshold, bool daily)
+        public Alert(Ticker ticker, Guid userId)
         {
             if (userId == Guid.Empty)
             {
@@ -28,9 +30,19 @@ namespace core.Alerts
                     Guid.NewGuid(),
                     DateTimeOffset.UtcNow,
                     ticker,
-                    userId,
-                    threshold,
-                    daily)
+                    userId)
+            );
+        }
+
+        public void AddPricePoint(double value)
+        {
+            Apply(
+                new AlertPricePointAdded(
+                    Guid.NewGuid(),
+                    this.Id,
+                    DateTimeOffset.UtcNow,
+                    value
+                )
             );
         }
 

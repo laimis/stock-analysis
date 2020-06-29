@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace core.Alerts
 {
     public struct StockMonitor
@@ -5,11 +9,17 @@ namespace core.Alerts
         public StockMonitor(Alert alert)
         {
             this.Alert = alert;
-            this.Value = null;
+
+            this.PointValues = alert.PricePoints.ToDictionary(
+                k => k.Id,
+                k => (double?)null
+            );
+
+            
         }
 
         public Alert Alert { get; }
-        public double? Value { get; private set; }
+        public Dictionary<Guid, double?> PointValues { get; }
 
         public bool UpdateValue(string ticker, double newValue)
         {
@@ -18,16 +28,20 @@ namespace core.Alerts
                 return false;
             }
 
-            if (this.Value == null)
+            var triggered = false;
+
+            foreach(var pp in this.Alert.State.PricePoints)
             {
-                this.Value = newValue;
-                return true;
+                var local = this.PointValues[pp.Id];
+
+                if (local == null)
+                {
+                    continue;
+                }
+                
+                var prev = local.Value < pp.Value;
+                var curr = newValue < pp.Value;
             }
-
-            var prev = this.Value < this.Alert.State.Threshold;
-            var curr = newValue < this.Alert.State.Threshold;
-
-            this.Value = newValue;
 
             return prev != curr;
         }
