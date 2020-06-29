@@ -6,6 +6,8 @@ namespace core.Utils
     public class MarketHours
     {
         private TimeZoneInfo _easternZoneId;
+        private TimeSpan _start = new TimeSpan(9, 40, 0);
+        private TimeSpan _end = new TimeSpan(16, 0, 0);
 
         public MarketHours()
         {
@@ -22,10 +24,7 @@ namespace core.Utils
 
             var timeOfDay = eastern.TimeOfDay;
 
-            var start = new TimeSpan(9, 40, 0);
-            var end = new TimeSpan(16, 0, 0);
-
-            return timeOfDay >= start && timeOfDay <= end;
+            return timeOfDay >= _start && timeOfDay <= _end;
         }
 
         public DateTime ToMarketTime(DateTimeOffset when)
