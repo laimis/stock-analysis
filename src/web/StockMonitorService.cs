@@ -41,7 +41,8 @@ namespace web
         private HashSet<string> _tickers = new HashSet<string>();
         public static Dictionary<Guid, StockMonitor> _monitors = new Dictionary<Guid, StockMonitor>();
 
-        private const int INTERVAL = 60_000 * 15;
+        private const int LONG_INTERVAL = 60_000 * 15;
+        private const int SHORT_INTERVAL = 10_000;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -49,16 +50,18 @@ namespace web
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogDebug("loop " + DateTime.UtcNow);
-
                 if (_marketHours.IsOn(DateTimeOffset.UtcNow))
                 {
                     _logger.LogDebug("market hours");
 
                     await ScanAlerts();
-                }
 
-                await Task.Delay(INTERVAL, stoppingToken);
+                    await Task.Delay(LONG_INTERVAL, stoppingToken);
+                }
+                else
+                {
+                    await Task.Delay(SHORT_INTERVAL, stoppingToken);
+                }
             }
 
             _logger.LogDebug("exec exit");
