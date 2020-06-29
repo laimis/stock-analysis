@@ -60,6 +60,8 @@ namespace web
                 }
                 else
                 {
+                    _logger.LogInformation("non market hours");
+
                     await Task.Delay(SHORT_INTERVAL, stoppingToken);
                 }
             }
