@@ -32,7 +32,7 @@ namespace core.Alerts
 
                 return alerts.Select(a => new {
                     ticker = a.State.Ticker.Value,
-                    a.State.Threshold
+                    points = a.State.PricePoints
                 });
             }
         }

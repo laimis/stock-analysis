@@ -16,7 +16,7 @@ namespace storagetests
         {
             var user = Guid.NewGuid();
 
-            var alert = new Alert(new Ticker("AMD"), user, 50, true);
+            var alert = new Alert(new Ticker("AMD"), user);
 
             var storage = GetStorage();
 

@@ -1,6 +1,10 @@
 <div>
   <div *ngIf="!alert">No alert setup</div>
   <div *ngIf="alert">
-    You will be pinged if price moves above or below <b>{{alert.threshold | currency}}</b>
+    You will be pinged if price crosses the following price points:
+
+    <ul class="mt-3">
+      <li *ngFor="let pp of alert.points">{{pp.value | currency}}</li>
+    </ul>
   </div>
 </div>

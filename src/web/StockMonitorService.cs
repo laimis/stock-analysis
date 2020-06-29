@@ -115,8 +115,6 @@ namespace web
                     {
                         triggered.Add(new StockMonitorTrigger(m.Alert, price, DateTimeOffset.UtcNow));
                     }
-
-                    _monitors[m.Alert.Id] = m;
                 }
             }
 

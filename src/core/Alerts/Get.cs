@@ -40,7 +40,7 @@ namespace core.Alerts
 
                 return new {
                     ticker = alert.State.Ticker.Value,
-                    alert.State.Threshold
+                    points = alert.State.PricePoints
                 };
             }
         }
