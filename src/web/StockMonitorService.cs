@@ -46,25 +46,36 @@ namespace web
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogDebug("exec enter");
+            _logger.LogInformation("exec enter");
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (_marketHours.IsOn(DateTimeOffset.UtcNow))
-                {
-                    _logger.LogDebug("market hours");
+                var time = DateTimeOffset.UtcNow;
 
-                    await ScanAlerts();
+                if (_marketHours.IsOn(time))
+                {
+                    _logger.LogInformation($"market hours {time.TimeOfDay}");
+
+                    try
+                    {
+                        await ScanAlerts();
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError("Failed:" + ex);
+                    }
 
                     await Task.Delay(LONG_INTERVAL, stoppingToken);
                 }
                 else
                 {
+                    _logger.LogInformation($"non market hours {time.TimeOfDay}");
+
                     await Task.Delay(SHORT_INTERVAL, stoppingToken);
                 }
             }
 
-            _logger.LogDebug("exec exit");
+            _logger.LogInformation("exec exit");
         }
 
         private async Task ScanAlerts()
@@ -95,9 +106,8 @@ namespace web
                 if (price.NotFound)
                 {
                     _logger.LogError($"price not found for {t}");
+                    continue;
                 }
-
-                _logger.LogDebug($"price {t} {price.Amount}");
 
                 foreach (var m in _monitors.Values.ToList())
                 {
@@ -116,7 +126,7 @@ namespace web
             {
                 var u = await _accounts.GetUser(e.Key);
 
-                var alerts = e.ToList();
+                var alerts = e.OrderByDescending(m => m.Price.Amount).ToList();
 
                 var data = new { alerts = alerts.Select(Map) };
 

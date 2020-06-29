@@ -20,7 +20,12 @@ namespace core.Utils
                 _easternZoneId
             );
 
-            return (eastern.Hour > 9 && eastern.Minute >= 30) && (eastern.Hour < 17 && eastern.Minute <= 0);
+            var timeOfDay = eastern.TimeOfDay;
+
+            var start = new TimeSpan(9, 40, 0);
+            var end = new TimeSpan(16, 0, 0);
+
+            return timeOfDay >= start && timeOfDay <= end;
         }
 
         public DateTime ToMarketTime(DateTimeOffset when)
