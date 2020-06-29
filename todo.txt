@@ -1,9 +1,6 @@
 Alert concept
-- ability to add alert
-- ability to delete alert
 
-- email links to NG
-- portfolio link
+- review email to include alerts
 
 review collapse notes with counts instead of listing them all
 

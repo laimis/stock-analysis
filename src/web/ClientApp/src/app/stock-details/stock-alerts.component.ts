@@ -9,18 +9,21 @@ import { StockSummary, StocksService, GetErrors } from '../services/stocks.servi
 
 export class StockAlertsComponent {
 
-  public alert: any
+  alert               : any
 
-  errors : string[]
-  success: boolean
+  errors              : string[]
+  success             : boolean
 
   newPricePoint       : number
 
   @Input()
-  set stock(alert: object) {
+  set alerts(alert: object) {
     this.alert = alert
   }
-  get stock(): object { return this.alert }
+  get alerts(): object { return this.alert }
+
+  @Input()
+  public ticker: string;
 
   @Output()
   alertsChanged = new EventEmitter();
@@ -34,7 +37,7 @@ export class StockAlertsComponent {
   }
 
   addPricePoint() {
-    this.service.addAlert(this.alert.ticker, this.newPricePoint).subscribe( r => {
+    this.service.addAlert(this.ticker, this.newPricePoint).subscribe( r => {
       this.alertsChanged.emit("added")
       this.clearFields()
       this.success = true
@@ -44,7 +47,7 @@ export class StockAlertsComponent {
   }
 
   removeAlert(id:string) {
-    this.service.removeAlert(this.alert.ticker, id).subscribe( r => {
+    this.service.removeAlert(this.ticker, id).subscribe( r => {
       this.alertsChanged.emit("removed")
       this.clearFields()
       this.success = true
