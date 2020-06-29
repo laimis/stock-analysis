@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Alerts
@@ -21,6 +22,13 @@ namespace core.Alerts
         internal void Apply(AlertPricePointAdded a)
         {
             this.PricePoints.Add(new AlertPricePoint(a.Id, a.Value));
+        }
+
+        internal void Apply(AlertPricePointRemoved a)
+        {
+            var pp = this.PricePoints.Single(p => p.Id == a.PricePointId);
+
+            this.PricePoints.Remove(pp);
         }
     }
 }

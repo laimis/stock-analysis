@@ -40,7 +40,7 @@ namespace core.Alerts
 
                 return new {
                     ticker = alert.State.Ticker.Value,
-                    points = alert.State.PricePoints
+                    points = alert.State.PricePoints.OrderBy(a => a.Value)
                 };
             }
         }

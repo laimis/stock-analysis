@@ -17,6 +17,12 @@ namespace coretests.Alerts
             _uat.AddPricePoint(50);
             _uat.AddPricePoint(50 + 0.1*50);
             _uat.AddPricePoint(50 - 0.1*50);
+
+            _uat.AddPricePoint(60);
+
+            var last = _uat.PricePoints.Last().Id;
+
+            _uat.RemovePricePoint(last);
         }
 
         [Theory]
@@ -26,6 +32,13 @@ namespace coretests.Alerts
         public void PricePointsMatch(double point)
         {
             Assert.Contains(point, _uat.PricePoints.Select(pp => pp.Value));
+        }
+
+        [Theory]
+        [InlineData(60)]
+        public void PricePointsRemoved(double point)
+        {
+            Assert.DoesNotContain(point, _uat.PricePoints.Select(pp => pp.Value));
         }
 
         [Fact]

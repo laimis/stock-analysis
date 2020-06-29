@@ -90,9 +90,12 @@ namespace web
                 {
                     _tickers.Add(a.State.Ticker);
 
-                    if (!_monitors.ContainsKey(a.Id))
+                    foreach(var pp in a.PricePoints)
                     {
-                        _monitors[a.Id] = new StockMonitor(a);
+                        if (!_monitors.ContainsKey(pp.Id))
+                        {
+                            _monitors[pp.Id] = new StockMonitor(a, pp);
+                        }
                     }
                 }
             }

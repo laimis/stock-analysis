@@ -1,5 +1,7 @@
 Alert concept
-- multiple alert levels
+- ability to add alert
+- ability to delete alert
+
 - email links to NG
 - portfolio link
 

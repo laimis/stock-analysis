@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { StockSummary } from '../services/stocks.service';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { StockSummary, StocksService, GetErrors } from '../services/stocks.service';
 
 @Component({
   selector: 'stock-alerts',
@@ -9,7 +9,12 @@ import { StockSummary } from '../services/stocks.service';
 
 export class StockAlertsComponent {
 
-  public alert: object
+  public alert: any
+
+  errors : string[]
+  success: boolean
+
+  newPricePoint       : number
 
   @Input()
   set stock(alert: object) {
@@ -17,7 +22,34 @@ export class StockAlertsComponent {
   }
   get stock(): object { return this.alert }
 
-	constructor(){}
+  @Output()
+  alertsChanged = new EventEmitter();
 
-	ngOnInit(): void {}
+	constructor(private service: StocksService){}
+
+  ngOnInit(): void {}
+
+  clearFields() {
+    this.newPricePoint = null
+  }
+
+  addPricePoint() {
+    this.service.addAlert(this.alert.ticker, this.newPricePoint).subscribe( r => {
+      this.alertsChanged.emit("added")
+      this.clearFields()
+      this.success = true
+    }, err => {
+      this.errors = GetErrors(err)
+    })
+  }
+
+  removeAlert(id:string) {
+    this.service.removeAlert(this.alert.ticker, id).subscribe( r => {
+      this.alertsChanged.emit("removed")
+      this.clearFields()
+      this.success = true
+    }, err => {
+      this.errors = GetErrors(err)
+    })
+  }
 }

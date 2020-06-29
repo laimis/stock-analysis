@@ -6,18 +6,16 @@ namespace core.Alerts
 {
     public class StockMonitor
     {
-        public StockMonitor(Alert alert)
+        public StockMonitor(Alert alert, AlertPricePoint pricePoint)
         {
             this.Alert = alert;
-
-            this.PointValues = alert.PricePoints.ToDictionary(
-                k => k.Id,
-                k => (double?)null
-            );
+            this.PricePoint = pricePoint;
+            this.Value = null;
         }
 
         public Alert Alert { get; }
-        public Dictionary<Guid, double?> PointValues { get; }
+        public AlertPricePoint PricePoint { get; }
+        public double? Value { get; private set; }
 
         public bool UpdateValue(string ticker, double newValue)
         {
@@ -26,27 +24,16 @@ namespace core.Alerts
                 return false;
             }
 
-            var triggered = false;
-
-            foreach(var pp in this.Alert.State.PricePoints)
+            if (Value == null)
             {
-                var local = this.PointValues[pp.Id];
-                if (local == null)
-                {
-                    this.PointValues[pp.Id] = newValue;
-                    continue;
-                }
-                
-                var prev = local.Value < pp.Value;
-                var curr = newValue < pp.Value;
-
-                if (prev != curr)
-                {
-                    triggered = true;
-                }
+                Value = newValue;
+                return false;
             }
+                
+            var prev = Value < this.PricePoint.Value;
+            var curr = newValue < this.PricePoint.Value;
 
-            return triggered;
+            return prev != curr;
         }
     }
 }

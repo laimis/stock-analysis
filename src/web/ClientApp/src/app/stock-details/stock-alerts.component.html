@@ -1,10 +1,38 @@
 <div>
   <div *ngIf="!alert">No alert setup</div>
+
+  <div *ngIf="success" class="alert alert-success" role="alert">Alerts updated</div>
+
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+
   <div *ngIf="alert">
     You will be pinged if price crosses the following price points:
 
-    <ul class="mt-3">
-      <li *ngFor="let pp of alert.points">{{pp.value | currency}}</li>
-    </ul>
+    <div class="row">
+      <div class="col">
+        <ul class="mt-3 list-group">
+          <li *ngFor="let pp of alert.points" class="mt-2 list-group-item">
+            {{pp.value | currency}}
+            <button type="button" class="btn btn-secondary btn-sm float-right" (click)="removeAlert(pp.id)">remove</button>
+          </li>
+        </ul>
+      </div>
+      <div class="col"></div>
+    </div>
   </div>
+
+  <div>
+		<form>
+      <div class="form-row mt-2">
+        <div class="col">
+          <label for="newPricePoint"><b>Add price point</b></label>
+          <input type="number" class="form-control" id="newPricePoint" name="newPricePoint" [(ngModel)]="newPricePoint">
+        </div>
+        <div class="col"></div>
+      </div>
+      <div class="mt-2">
+        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="addPricePoint()">Add</button>
+      </div>
+		</form>
+	</div>
 </div>

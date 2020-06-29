@@ -14,16 +14,13 @@ namespace coretests.Alerts
             
             a.AddPricePoint(50);
 
-            var m = new StockMonitor(a);
+            var m = new StockMonitor(a, a.PricePoints[0]);
 
-            foreach(var p in m.PointValues.Values)
-            {
-                Assert.Null(p);
-            }
+            Assert.Null(m.Value);
 
             var triggered = m.UpdateValue("AMD", 50);
 
-            Assert.True(m.PointValues.All(p => p.Value == 50));
+            Assert.Equal(50, m.Value);
             Assert.False(triggered);
 
             triggered = m.UpdateValue("AMD", 51);

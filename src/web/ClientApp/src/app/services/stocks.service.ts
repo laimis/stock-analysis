@@ -86,6 +86,14 @@ export class StocksService {
 
     return this.http.get<object>('/api/alerts/' + ticker)
   }
+
+  addAlert(ticker: string, value: number): Observable<object> {
+    return this.http.post<object>('/api/alerts', {ticker, value})
+  }
+
+  removeAlert(ticker: string, id: string): Observable<object> {
+    return this.http.post<object>('/api/alerts/delete', {ticker, id})
+  }
   //
 
   // ------------------ stocks ------------------

@@ -46,6 +46,18 @@ namespace core.Alerts
             );
         }
 
+        public void RemovePricePoint(Guid pricePointId)
+        {
+            Apply(
+                new AlertPricePointRemoved(
+                    Guid.NewGuid(),
+                    this.Id,
+                    DateTimeOffset.UtcNow,
+                    pricePointId
+                )
+            );
+        }
+
         protected override void Apply(AggregateEvent e)
         {
             this._events.Add(e);
@@ -64,6 +76,11 @@ namespace core.Alerts
         }
 
         private void ApplyInternal(AlertPricePointAdded a)
+        {
+            this.State.Apply(a);
+        }
+
+        private void ApplyInternal(AlertPricePointRemoved a)
         {
             this.State.Apply(a);
         }

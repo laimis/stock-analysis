@@ -55,12 +55,30 @@ namespace web.Controllers
             return await _mediator.Send(query);
         }
 
+        
+
+        [HttpPost("delete")]
+        public async Task<object> Delete(Delete.Command cmd)
+        {
+            cmd.WithUserId(User.Identifier());
+
+            return await _mediator.Send(cmd);
+        }
+
         [HttpGet("{ticker}")]
         public async Task<object> Get(string ticker)
         {
             var query = new Get.Query(User.Identifier(), ticker);
 
             return await _mediator.Send(query);
+        }
+
+        [HttpPost]
+        public async Task<object> AddPricePoint(Create.Command cmd)
+        {
+            cmd.WithUserId(User.Identifier());
+
+            return await _mediator.Send(cmd);
         }
     }
 }
