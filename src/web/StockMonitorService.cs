@@ -46,13 +46,13 @@ namespace web
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogDebug("exec enter");
+            _logger.LogInformation("exec enter");
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 if (_marketHours.IsOn(DateTimeOffset.UtcNow))
                 {
-                    _logger.LogDebug("market hours");
+                    _logger.LogInformation("market hours");
 
                     await ScanAlerts();
 
@@ -64,7 +64,7 @@ namespace web
                 }
             }
 
-            _logger.LogDebug("exec exit");
+            _logger.LogInformation("exec exit");
         }
 
         private async Task ScanAlerts()
@@ -97,7 +97,7 @@ namespace web
                     _logger.LogError($"price not found for {t}");
                 }
 
-                _logger.LogDebug($"price {t} {price.Amount}");
+                _logger.LogInformation($"price {t} {price.Amount}");
 
                 foreach (var m in _monitors.Values.OrderByDescending(m => m.Value.Value).ToList())
                 {
