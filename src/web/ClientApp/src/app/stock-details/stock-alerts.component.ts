@@ -76,12 +76,11 @@ export class StockAlertsComponent {
     this.newPricePoint = null
   }
 
-  addPricePoint(value:number) {
-    if (!value)
-    {
-      value=this.newPricePoint
-    }
+  addCustomPricePoint() {
+    this.addPricePoint(this.newPricePoint)
+  }
 
+  addPricePoint(value:number) {
     this.service.addAlert(this.ticker, value).subscribe( r => {
       this.alertsChanged.emit("added")
       this.clearFields()
