@@ -66,6 +66,7 @@ export class StockAlertsComponent {
   }
 
   updateCostBasedPoints() {
+    if (!this.owned) { return }
     this.costMinus20 = this.owned.averageCost - this.owned.averageCost * 0.2
     this.costMinus10 = this.owned.averageCost - this.owned.averageCost * 0.1
     this.costPlus10 = this.owned.averageCost + this.owned.averageCost * 0.1
