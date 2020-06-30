@@ -65,8 +65,6 @@ namespace core.Admin
 
             private async Task ProcessUser((string email, string id) u)
             {
-                Console.WriteLine("Processing weekly review for " + u.Item1);
-
                 var review = new Review.Generate(DateTimeOffset.UtcNow);
 
                 review.WithUserId(new Guid(u.id));
@@ -78,15 +76,17 @@ namespace core.Admin
 
                 if (portfolioEntries.Count == 0 && alertEntries.Count == 0)
                 {
-                    Console.WriteLine("No portfolio or other items for " + u.email);
                     return;
                 }
 
-                Console.WriteLine("Owned: " + string.Join(",", portfolioEntries.Select(pe => pe.Ticker)));
-                Console.WriteLine("Alerts: " + string.Join(",", alertEntries.Select(pe => pe.Ticker)));
-
                 var portfolio = portfolioEntries
-                    .SelectMany(p => p.Ownership.Select(re => (p, re)))
+                    .SelectMany(p => p.Ownership.Where(re => !re.IsOption)
+                    .Select(re => (p, re)))
+                    .Select(Map);
+
+                var options = portfolioEntries
+                    .SelectMany(p => p.Ownership.Where(re => re.IsOption)
+                    .Select(re => (p, re)))
                     .Select(Map);
 
                 var other = alertEntries
@@ -96,6 +96,7 @@ namespace core.Admin
                 var data = new
                 {
                     portfolio,
+                    options,
                     other,
                     timestamp = review.Date.ToString("yyyy-MM-dd HH:mm:ss") + " UTC"
                 };

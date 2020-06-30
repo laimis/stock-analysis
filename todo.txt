@@ -1,16 +1,9 @@
 Alert concept
-- alert buttons
 
 - better diagnostics view of what the stock service is doing
     - last 100 messages in nice UI
-    
-- email to all users
-
-- admin users panel
-- admin alerts panel
 
 handling exceptions in background services
-
 earnings listings/highlight yours
 add news link
 RobinHood statement parser
