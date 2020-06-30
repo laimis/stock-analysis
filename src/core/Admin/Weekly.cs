@@ -74,24 +74,24 @@ namespace core.Admin
                 var r = await _mediator.Send(review);
 
                 var portfolioEntries = r.Entries.Where(e => e.Ownership.Count > 0).ToList();
-                var notesEntries = r.Entries.Where(e => e.Ownership.Count == 0 && e.Notes.Count > 0).ToList();
+                var alertEntries = r.Entries.Where(e => e.Ownership.Count == 0 && e.Alerts.Count > 0).ToList();
 
-                if (portfolioEntries.Count == 0 && notesEntries.Count == 0)
+                if (portfolioEntries.Count == 0 && alertEntries.Count == 0)
                 {
                     Console.WriteLine("No portfolio or other items for " + u.email);
                     return;
                 }
 
                 Console.WriteLine("Owned: " + string.Join(",", portfolioEntries.Select(pe => pe.Ticker)));
-                Console.WriteLine("Notes: " + string.Join(",", notesEntries.Select(pe => pe.Ticker)));
+                Console.WriteLine("Alerts: " + string.Join(",", alertEntries.Select(pe => pe.Ticker)));
 
                 var portfolio = portfolioEntries
                     .SelectMany(p => p.Ownership.Select(re => (p, re)))
                     .Select(Map);
 
-                var other = notesEntries
+                var other = alertEntries
                     .Where(p => p.EarningsWarning)
-                    .Select(p => (p, p.Notes.First()))
+                    .Select(p => (p, p.Alerts.First()))
                     .Select(Map);
 
                 var data = new
@@ -100,8 +100,6 @@ namespace core.Admin
                     other,
                     timestamp = review.Date.ToString("yyyy-MM-dd HH:mm:ss") + " UTC"
                 };
-
-                // Console.WriteLine(JsonConvert.SerializeObject(data));
 
                 await _emails.Send(u.email, Sender.Support, EmailTemplate.ReviewEmail, data);
             }

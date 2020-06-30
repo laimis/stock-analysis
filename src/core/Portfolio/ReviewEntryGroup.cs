@@ -9,7 +9,7 @@ namespace core.Portfolio
     {
         public ReviewEntryGroup(IEnumerable<ReviewEntry> entries, TickerPrice price, StockAdvancedStats stats)
         {
-            this.Notes = new List<ReviewEntry>();
+            this.Alerts = new List<ReviewEntry>();
             this.Ownership = new List<ReviewEntry>();
             this.Price = price;
             this.Ticker = null;
@@ -19,9 +19,9 @@ namespace core.Portfolio
             {
                 this.Ticker = e.Ticker;
 
-                if (e.IsNote)
+                if (e.IsAlert)
                 {
-                    this.Notes.Add(e);
+                    this.Alerts.Add(e);
                 }
                 else
                 {
@@ -32,7 +32,7 @@ namespace core.Portfolio
 
         public string Ticker { get; }
         public StockAdvancedStats Stats { get; }
-        public List<ReviewEntry> Notes { get; }
+        public List<ReviewEntry> Alerts { get; }
         public List<ReviewEntry> Ownership { get; }
         public TickerPrice Price { get; }
 

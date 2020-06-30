@@ -1,6 +1,6 @@
 using System;
 using core.Adapters.Stocks;
-using core.Notes;
+using core.Alerts;
 using core.Options;
 using core.Stocks;
 
@@ -20,7 +20,7 @@ namespace core.Portfolio
             Stats = null;
             Price = new TickerPrice();
             IsOption = true;
-            IsNote = false;
+            IsAlert = false;
         }
 
         public ReviewEntry(OwnedStock s)
@@ -35,29 +35,29 @@ namespace core.Portfolio
             Stats = null;
             Price = new TickerPrice();
             IsOption = false;
-            IsNote = false;
+            IsAlert = false;
         }
 
-        public ReviewEntry(Note n)
+        public ReviewEntry(Alert a)
         {
-            Ticker = n.State.RelatedToTicker;
-            IsNote = true;
-            Description = n.State.Note;
-            Created = n.State.Created;
-            Stats = n.State.Stats;
-            Price = n.State.Price;
+            Ticker = a.Ticker;
+            IsAlert = true;
+            Created = a.State.Created;
+            Description = "Alert";
+            Price = new TickerPrice();
             Expiration = null;
             DaysLeft = null;
             IsExpired = false;
             ExpiresSoon = false;
             IsOption = false;
+            Stats = null;
         }
         
         public string Ticker { get; }
         public string Description { get; }
         public DateTimeOffset? Expiration { get; }
         public long? DaysLeft { get; }
-        public bool IsNote { get; }
+        public bool IsAlert { get; }
         public DateTimeOffset? Created { get; }
         public StockAdvancedStats Stats { get; }
         public TickerPrice Price { get; }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
+using core.Alerts;
 using core.Notes;
 using core.Options;
 using core.Portfolio.Output;
@@ -28,22 +29,25 @@ namespace core.Portfolio
         {
             public Handler(
                 IPortfolioStorage storage,
+                IAlertsStorage alerts,
                 IStocksService2 stocks) : base(storage)
             {
+                _alerts = alerts;
                 _stocks = stocks;
             }
 
-            private IStocksService2 _stocks { get; }
+            private IAlertsStorage _alerts;
+            private IStocksService2 _stocks;
 
             public override async Task<ReviewList> Handle(Generate request, CancellationToken cancellationToken)
             {
                 var options = _storage.GetOwnedOptions(request.UserId);
                 var stocks = _storage.GetStocks(request.UserId);
-                var notes = _storage.GetNotes(request.UserId);
+                var alerts = _alerts.GetAlerts(request.UserId);
 
-                await Task.WhenAll(options, stocks, notes);
+                await Task.WhenAll(options, stocks, alerts);
 
-                var groups = await CreateReviewGroups(options, stocks, notes);
+                var groups = await CreateReviewGroups(options, stocks, alerts);
 
                 var start = request.Date.Date.AddDays(-7);
                 var end = request.Date.Date;
@@ -55,7 +59,10 @@ namespace core.Portfolio
                 return new ReviewList(start, end, groups, new TransactionList(transactions, null, null));
             }
 
-            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(Task<IEnumerable<OwnedOption>> options, Task<IEnumerable<OwnedStock>> stocks, Task<IEnumerable<Note>> notes)
+            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(
+                Task<IEnumerable<OwnedOption>> options,
+                Task<IEnumerable<OwnedStock>> stocks,
+                Task<IEnumerable<Alert>> alerts)
             {
                 var entries = new List<ReviewEntry>();
 
@@ -69,9 +76,9 @@ namespace core.Portfolio
                     entries.Add(new ReviewEntry(s));
                 }
 
-                foreach (var n in notes.Result.Where(n => !string.IsNullOrWhiteSpace(n.State.RelatedToTicker)))
+                foreach (var a in alerts.Result)
                 {
-                    entries.Add(new ReviewEntry(n));
+                    entries.Add(new ReviewEntry(a));
                 }
 
                 var grouped = entries.GroupBy(r => r.Ticker);

@@ -1,8 +1,11 @@
 Alert concept
 
 - review email to include alerts
-
-review collapse notes with counts instead of listing them all
+- review site to include alerts
+- email to all users
+- review collapse notes with counts instead of listing them all
+- include duration held in review
+- better diagnostics view or what the stock service is doing
 
 handling exceptions in background services
 
