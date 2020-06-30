@@ -47,6 +47,8 @@
 
   <stock-alerts *ngIf="isActive('alerts')"
     [alerts]=alerts [ticker]=stock.ticker
+    [stock]=stock
+    [ownership]=ownership
     (alertsChanged)="alertsChanged($event)"></stock-alerts>
 
   <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>

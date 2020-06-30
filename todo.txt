@@ -1,9 +1,13 @@
 Alert concept
+- alert buttons
 
-- include duration held in review
 - better diagnostics view of what the stock service is doing
+    - last 100 messages in nice UI
+    
 - email to all users
 
+- admin users panel
+- admin alerts panel
 
 handling exceptions in background services
 

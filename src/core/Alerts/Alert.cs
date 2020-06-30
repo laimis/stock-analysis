@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Alerts
@@ -36,6 +37,12 @@ namespace core.Alerts
 
         public void AddPricePoint(double value)
         {
+            var exists = this.PricePoints.Any(p => p.Value == value);
+            if (exists)
+            {
+                return;
+            }
+
             Apply(
                 new AlertPricePointAdded(
                     Guid.NewGuid(),
@@ -48,6 +55,12 @@ namespace core.Alerts
 
         public void RemovePricePoint(Guid pricePointId)
         {
+            var exists = this.PricePoints.Any(p => p.Id == pricePointId);
+            if (!exists)
+            {
+                return;
+            }
+
             Apply(
                 new AlertPricePointRemoved(
                     Guid.NewGuid(),
