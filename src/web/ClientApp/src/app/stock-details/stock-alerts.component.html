@@ -24,7 +24,7 @@
   <div class="mt-3">
     <h5>Add new alert</h5>
 		<form>
-      <div class="form-row mt-4">
+      <div class="form-row mt-4" *ngIf="this.owned && this.owned.averageCost > 0">
         <div class="col">
           <label>Your cost ({{this.owned.averageCost | currency}}) based alerts</label>
           <div>
