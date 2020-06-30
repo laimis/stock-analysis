@@ -22,6 +22,8 @@ namespace web
         private IStocksService2 _stocks;
         private MarketHours _marketHours;
 
+        private StockMonitorContainer _container = new StockMonitorContainer();
+
         public StockMonitorService(
             ILogger<StockMonitorService> logger,
             IAccountStorage accounts,
@@ -38,8 +40,7 @@ namespace web
             _marketHours = marketHours;
         }
 
-        private HashSet<string> _tickers = new HashSet<string>();
-        public static Dictionary<Guid, StockMonitor> _monitors = new Dictionary<Guid, StockMonitor>();
+        
 
         private const int LONG_INTERVAL = 60_000 * 15;
         private const int SHORT_INTERVAL = 10_000;
@@ -105,15 +106,7 @@ namespace web
 
                 foreach (var a in alerts)
                 {
-                    _tickers.Add(a.State.Ticker);
-
-                    foreach(var pp in a.PricePoints)
-                    {
-                        if (!_monitors.ContainsKey(pp.Id))
-                        {
-                            _monitors[pp.Id] = new StockMonitor(a, pp);
-                        }
-                    }
+                    _container.Monitor(a);
                 }
             }
         }
@@ -122,7 +115,7 @@ namespace web
         {
             var triggered = new List<StockMonitorTrigger>();
 
-            foreach (var t in _tickers)
+            foreach (var t in _container.GetTickers())
             {
                 var price = await _stocks.GetPrice(t);
 
@@ -132,12 +125,9 @@ namespace web
                     continue;
                 }
 
-                foreach (var m in _monitors.Values.ToList())
+                foreach(var trigger in _container.UpdateValue(t, price.Amount))
                 {
-                    if (m.UpdateValue(t, price.Amount))
-                    {
-                        triggered.Add(new StockMonitorTrigger(m.Alert, price, DateTimeOffset.UtcNow));
-                    }
+                    triggered.Add(trigger);
                 }
             }
 
@@ -147,7 +137,7 @@ namespace web
             {
                 var u = await _accounts.GetUser(e.Key);
 
-                var alerts = e.OrderByDescending(m => m.Price.Amount).ToList();
+                var alerts = e.OrderByDescending(m => m.Price).ToList();
 
                 var data = new { alerts = alerts.Select(Map) };
 
@@ -159,7 +149,7 @@ namespace web
         {
             return new {
                 ticker = (string)trigger.Alert.State.Ticker,
-                value = trigger.Price.Amount,
+                value = trigger.Price,
                 time = _marketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
             };
         }

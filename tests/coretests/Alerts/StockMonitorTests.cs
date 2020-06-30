@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Collections.Concurrent;
 using core.Alerts;
 using core.Shared;
 using Xunit;
@@ -31,6 +31,21 @@ namespace coretests.Alerts
 
             triggered = m.UpdateValue("BING", 52);
             Assert.False(triggered);
+        }
+
+        [Fact]
+        public void QueueTests()
+        {
+            var msg = new ConcurrentQueue<string>();
+
+            msg.Enqueue("message1");
+            msg.Enqueue("message2");
+            msg.Enqueue("message3");
+
+            msg.TryDequeue(out var r);
+
+            Assert.Equal("message1", r);
+            
         }
     }
 }
