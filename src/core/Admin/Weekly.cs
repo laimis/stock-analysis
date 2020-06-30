@@ -90,7 +90,6 @@ namespace core.Admin
                     .Select(Map);
 
                 var other = alertEntries
-                    .Where(p => p.EarningsWarning)
                     .Select(p => (p, p.Alerts.First()))
                     .Select(Map);
 
