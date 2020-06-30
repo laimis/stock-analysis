@@ -48,37 +48,54 @@ namespace web
         {
             _logger.LogInformation("exec enter");
 
+            var firstRun = true;
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var time = DateTimeOffset.UtcNow;
-
-                if (_marketHours.IsOn(time))
+                try
                 {
-                    _logger.LogInformation($"market hours {time.TimeOfDay}");
+                    await BuildUpAlerts();
 
-                    try
+                    if (firstRun)
                     {
+                        _logger.LogInformation("First run scan");
+                        
                         await ScanAlerts();
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.LogError("Failed:" + ex);
+
+                        firstRun = false;
                     }
 
-                    await Task.Delay(LONG_INTERVAL, stoppingToken);
+                    await Loop(stoppingToken);
                 }
-                else
+                catch(Exception ex)
                 {
-                    _logger.LogInformation($"non market hours {time.TimeOfDay}");
-
-                    await Task.Delay(SHORT_INTERVAL, stoppingToken);
+                    _logger.LogError("Failed:" + ex);
                 }
             }
 
             _logger.LogInformation("exec exit");
         }
 
-        private async Task ScanAlerts()
+        private async Task Loop(CancellationToken stoppingToken)
+        {
+            var time = DateTimeOffset.UtcNow;
+            if (_marketHours.IsOn(time))
+            {
+                _logger.LogInformation($"market hours {time.TimeOfDay}");
+
+                await ScanAlerts();
+
+                await Task.Delay(LONG_INTERVAL, stoppingToken);
+            }
+            else
+            {
+                _logger.LogInformation($"non market hours {time.TimeOfDay}");
+
+                await Task.Delay(SHORT_INTERVAL, stoppingToken);
+            }
+        }
+
+        private async Task BuildUpAlerts()
         {
             var users = await _accounts.GetUserEmailIdPairs();
 
@@ -99,7 +116,10 @@ namespace web
                     }
                 }
             }
+        }
 
+        private async Task ScanAlerts()
+        {
             var triggered = new List<StockMonitorTrigger>();
 
             foreach (var t in _tickers)
