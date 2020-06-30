@@ -43,33 +43,44 @@
   <div class="card mb-5" *ngFor="let e of result.entries">
     <div class="card-header">
       <h5>
-        {{e.stats.companyName}} - {{e.ticker}}
+        {{e.stats.companyName}} - <a [routerLink]="[ '/stocks', e.ticker ]">{{e.ticker}}</a>
         <span class="float-right">{{e.price.amount | currency}}</span>
       </h5>
     </div>
     <div class="card-body">
 
-      <div class="card-text mb-3">
-        <b>Earnings</b> &nbsp;&nbsp; <i>{{ e.stats.nextEarningsDate | date }}</i>&nbsp;&nbsp;
+      <div *ngIf="e.ownership.length > 0">
+        <h5>Ownership</h5>
+        <div class="card-text mb-3" *ngFor="let o of e.ownership">
+          <span *ngIf="o.isExpired" class="ml-1 badge badge-danger">expired</span>
+          <span
+            *ngIf="o.expiration && !o.isExpired && o.daysLeft >= 0"
+            class="badge"
+            [ngClass]="{'badge-success': !o.expiresSoon, 'badge-warning': o.expiresSoon}">
+            Expires in {{o.daysLeft}} days
+          </span>
+          {{o.description}}
+        </div>
+      </div>
+
+      <div class="card-text mb-3" *ngIf="e.earningsDate">
+        <h5>Earnings</h5>
+        <i>{{ e.stats.nextEarningsDate | date }}</i>&nbsp;&nbsp;
         <span [ngClass]="{'badge': e.earningsWarning, 'badge-warning': e.earningsWarning}"> {{e.earningsDaysLeft}} days away</span>
       </div>
-
-      <div class="card-text mb-3" *ngFor="let o of e.ownership">
-        <span *ngIf="o.isExpired" class="ml-1 badge badge-danger">expired</span>
-        <span
-          *ngIf="o.expiration && !o.isExpired && o.daysLeft >= 0"
-          class="badge"
-          [ngClass]="{'badge-success': !o.expiresSoon, 'badge-warning': o.expiresSoon}">
-          Expires in {{o.daysLeft}} days
-        </span>
-        {{o.description}}
+      <div class="card-text mb-3" *ngIf="!e.earningsDate">
+        <h5>Earnings</h5>
+        <i>Earnings date not specified</i>
       </div>
 
-      <ul *ngFor="let n of e.notes">
-        <li style="white-space: pre-wrap;">
-        {{n.created | date }} :: {{n.price.amount | currency }} :: {{n.description}}
-        </li>
-      </ul>
+      <div *ngIf="e.alerts.length > 0">
+        <h5>Alerts</h5>
+        <ul *ngFor="let a of e.alerts">
+          <li style="white-space: pre-wrap;" *ngFor="let pp of a.pricePoints">
+          {{pp.value | currency }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
