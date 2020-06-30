@@ -28,10 +28,10 @@
         <div class="col">
           <label>Your cost ({{this.owned.averageCost | currency}}) based alerts</label>
           <div>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(costMinus20)">-20%: {{costMinus20 | currency}}</button>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(costMinus10)">-10%: {{costMinus10 | currency}}</button>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(costPlus10)">+10%: {{costPlus10 | currency}}</button>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(costPlus20)">+20%: {{costPlus20 | currency}}</button>
+            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(costMinus20)">-20%: {{costMinus20 | currency}}</button>
+            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(costMinus10)">-10%: {{costMinus10 | currency}}</button>
+            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(costPlus10)">+10%: {{costPlus10 | currency}}</button>
+            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(costPlus20)">+20%: {{costPlus20 | currency}}</button>
           </div>
         </div>
         <div class="col"></div>
@@ -40,10 +40,10 @@
         <div class="col">
           <label>Current price ({{stock.price | currency}}) based alerts</label>
           <div>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(priceMinus20)">-20%: {{priceMinus20 | currency}}</button>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(priceMinus10)">-10%: {{priceMinus10 | currency}}</button>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(pricePlus10)">+10%: {{pricePlus10 | currency}}</button>
-            <button type="button" class="btn btn-secondary ml-2" (click)="addPricePoint(pricePlus20)">+20%: {{pricePlus20 | currency}}</button>
+            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(priceMinus20)">-20%: {{priceMinus20 | currency}}</button>
+            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(priceMinus10)">-10%: {{priceMinus10 | currency}}</button>
+            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(pricePlus10)">+10%: {{pricePlus10 | currency}}</button>
+            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(pricePlus20)">+20%: {{pricePlus20 | currency}}</button>
           </div>
         </div>
         <div class="col"></div>

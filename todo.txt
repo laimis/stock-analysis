@@ -1,7 +1,11 @@
 Alert concept
+- description for the alert
+- sold option exposure
+    - including call collateral coverage
 
 - better diagnostics view of what the stock service is doing
     - last 100 messages in nice UI
+
 
 handling exceptions in background services
 earnings listings/highlight yours
