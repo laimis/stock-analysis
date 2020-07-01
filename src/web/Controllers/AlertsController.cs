@@ -14,10 +14,14 @@ namespace web.Controllers
     public class AlertsController : ControllerBase
     {
         private IMediator _mediator;
+        private StockMonitorContainer _container;
 
-        public AlertsController(IMediator mediator)
+        public AlertsController(
+            IMediator mediator,
+            StockMonitorContainer container)
         {
             _mediator = mediator;
+            _container = container;
         }
 
         [HttpGet]
@@ -31,10 +35,10 @@ namespace web.Controllers
         [HttpGet("diagnostics")]
         public object Diagnostics()
         {
-            return StockMonitorService._monitors.Select(
-                kp => new {
-                    kp.Value.Alert.Ticker,
-                    kp.Value.Alert.PricePoints
+            return _container.Monitors.Select(
+                m => new {
+                    m.Alert.Ticker,
+                    m.Alert.PricePoints
                 }
             );
         }

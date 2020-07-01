@@ -1,5 +1,6 @@
 Alert concept
 
+- alerts page for user
 - alerts page on admin
 - when alerting, indicate what hit
 - pause alert, link to unpause

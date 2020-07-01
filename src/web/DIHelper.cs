@@ -39,6 +39,7 @@ namespace web
             services.AddSingleton<IAlertsStorage, AlertsStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddSingleton<MarketHours>();
+            services.AddSingleton<StockMonitorContainer>();
             services.AddMediatR(typeof(Sell).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();

@@ -1,14 +1,17 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace core.Alerts
 {
     public class StockMonitorContainer
     {
-        private Dictionary<Guid, StockMonitor> _monitors = new Dictionary<Guid, StockMonitor>();
+        private ConcurrentDictionary<Guid, StockMonitor> _monitors = new ConcurrentDictionary<Guid, StockMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
 
-        public void Monitor(Alert a)
+        public IEnumerable<StockMonitor> Monitors => _monitors.Values;
+
+        public void Register(Alert a)
         {
             _tickers.Add(a.State.Ticker);
 

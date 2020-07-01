@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace web
 {
-    internal class StockMonitorService : BackgroundService
+    public class StockMonitorService : BackgroundService
     {
         private IAccountStorage _accounts;
         private ILogger<StockMonitorService> _logger;
@@ -21,8 +21,9 @@ namespace web
         private IEmailService _emails;
         private IStocksService2 _stocks;
         private MarketHours _marketHours;
+        public StockMonitorContainer _container;
 
-        private StockMonitorContainer _container = new StockMonitorContainer();
+        public IEnumerable<StockMonitor> Monitors => _container.Monitors;
 
         public StockMonitorService(
             ILogger<StockMonitorService> logger,
@@ -30,7 +31,8 @@ namespace web
             IAlertsStorage alerts,
             IStocksService2 stocks,
             IEmailService emails,
-            MarketHours marketHours)
+            MarketHours marketHours,
+            StockMonitorContainer container)
         {
             _accounts = accounts;
             _alerts = alerts;
@@ -38,6 +40,7 @@ namespace web
             _logger = logger;
             _stocks = stocks;
             _marketHours = marketHours;
+            _container = container;
         }
 
         
@@ -106,7 +109,7 @@ namespace web
 
                 foreach (var a in alerts)
                 {
-                    _container.Monitor(a);
+                    _container.Register(a);
                 }
             }
         }
