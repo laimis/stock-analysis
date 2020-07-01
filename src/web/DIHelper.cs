@@ -10,7 +10,6 @@ using core.Alerts;
 using core.Options;
 using core.Utils;
 using csvparser;
-using financialmodelingclient;
 using iexclient;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +33,6 @@ namespace web
             
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
-            services.AddSingleton<IStocksService, StocksService>();
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<IAlertsStorage, AlertsStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();

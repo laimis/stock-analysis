@@ -38,7 +38,6 @@ import { AdminEmailComponent } from './admin/email/admin-email.component';
 import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
 import { PaymentsComponent } from './payments/payments.component';
 import { StockFundamentalsComponent } from './stock-details/stock-fundamentals.component';
-import { StockChartsComponent } from './stock-details/stock-charts.component';
 import { StockNotesComponent } from './stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stock-details/stock-option.component';
@@ -110,7 +109,6 @@ var routes = [
     ReviewComponent,
     SoldOptionDetailComponent,
     StockAlertsComponent,
-    StockChartsComponent,
     StockDetailsComponent,
     StockFundamentalsComponent,
     StockGridComponent,

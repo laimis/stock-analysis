@@ -15,4 +15,4 @@ Supports Postgres or Redis for storing information.
 
 ## Stock information
 
-Stock information is provided by https://www.iexcloud.io/ and https://financialmodelingprep.com.
+Stock information is provided by https://www.iexcloud.io/.

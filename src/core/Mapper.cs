@@ -108,49 +108,14 @@ namespace core
             string ticker,
             double price,
             CompanyProfile profile,
-            StockAdvancedStats stats,
-            HistoricalResponse data,
-            MetricsResponse metrics)
+            StockAdvancedStats stats)
         {
-            var byMonth = data?.Historical?.GroupBy(r => r.Date.ToString("yyyy-MM-01"))
-                .Select(g => new
-                {
-                    Date = DateTime.Parse(g.Key),
-                    Price = g.Average(p => p.Close),
-                    Volume = Math.Round(g.Average(p => p.Volume) / 1000000.0, 2),
-                    Low = g.Min(p => p.Close),
-                    High = g.Max(p => p.Close)
-                });
-
-            var labels = byMonth?.Select(a => a.Date.ToString("MMMM"));
-            var lowValues = byMonth?.Select(a => Math.Round(a.Low, 2));
-            var highValues = byMonth?.Select(a => Math.Round(a.High, 2));
-
-            var priceValues = byMonth?.Select(a => Math.Round(a.Price, 2));
-            var priceChartData = labels?.Zip(priceValues, (l, p) => new object[] { l, p });
-
-            var volumeValues = byMonth?.Select(a => a.Volume);
-            var volumeChartData = labels?.Zip(volumeValues, (l, p) => new object[] { l, p });
-
-            var metricDates = metrics?.Metrics?.Select(m => m.Date.ToString("MM/yy")).Reverse();
-
-            var bookValues = metrics?.Metrics?.Select(m => m.BookValuePerShare).Reverse();
-            var bookChartData = metricDates?.Zip(bookValues, (l, p) => new object[] { l, p });
-
-            var peValues = metrics?.Metrics?.Select(m => m.PERatio).Reverse();
-            var peChartData = metricDates?.Zip(peValues, (l, p) => new object[] { l, p });
-
             return new
             {
                 ticker,
                 price,
                 stats,
                 profile,
-                labels,
-                priceChartData,
-                volumeChartData,
-                bookChartData,
-                peChartData
             };
         }
 

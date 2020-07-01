@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D067D9A3-32F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core", "src\core\core.csproj", "{3B806027-868A-4619-894A-82A32E9F9037}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "financialmodelingclient", "src\infrastructure\financialmodelingclient\financialmodelingclient.csproj", "{28834F0A-7FBD-4DD5-9E18-97E99CF79371}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "web", "src\web\web.csproj", "{93CEE505-9175-4866-9DE5-FF83D00B98F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "storage", "src\infrastructure\storage.postgres\storage.postgres.csproj", "{DCB83A00-07F6-4B06-81F3-2E4E51BC4C77}"
@@ -64,18 +62,6 @@ Global
 		{3B806027-868A-4619-894A-82A32E9F9037}.Release|x64.Build.0 = Release|Any CPU
 		{3B806027-868A-4619-894A-82A32E9F9037}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B806027-868A-4619-894A-82A32E9F9037}.Release|x86.Build.0 = Release|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Debug|x64.Build.0 = Debug|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Debug|x86.Build.0 = Debug|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Release|Any CPU.Build.0 = Release|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Release|x64.ActiveCfg = Release|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Release|x64.Build.0 = Release|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Release|x86.ActiveCfg = Release|Any CPU
-		{28834F0A-7FBD-4DD5-9E18-97E99CF79371}.Release|x86.Build.0 = Release|Any CPU
 		{93CEE505-9175-4866-9DE5-FF83D00B98F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{93CEE505-9175-4866-9DE5-FF83D00B98F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93CEE505-9175-4866-9DE5-FF83D00B98F4}.Debug|x64.ActiveCfg = Debug|Any CPU

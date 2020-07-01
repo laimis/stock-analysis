@@ -20,7 +20,6 @@
     <ProjectReference Include="..\..\src\infrastructure\storage.postgres\storage.postgres.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\storage.redis\storage.redis.csproj" />
 	<ProjectReference Include="..\..\src\core\core.csproj" />
-	<ProjectReference Include="..\..\src\infrastructure\financialmodelingclient\financialmodelingclient.csproj" />
   </ItemGroup>
 
 </Project>
