@@ -128,7 +128,7 @@ namespace web
                     continue;
                 }
 
-                foreach(var trigger in _container.UpdateValue(t, price.Amount))
+                foreach(var trigger in _container.UpdateValue(t, price.Amount, DateTimeOffset.UtcNow))
                 {
                     triggered.Add(trigger);
                 }

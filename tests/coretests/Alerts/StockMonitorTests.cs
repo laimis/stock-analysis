@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using core.Alerts;
 using core.Shared;
@@ -18,18 +19,18 @@ namespace coretests.Alerts
 
             Assert.Null(m.Value);
 
-            var triggered = m.UpdateValue("AMD", 50);
+            var triggered = m.UpdateValue("AMD", 50, DateTimeOffset.UtcNow);
 
             Assert.Equal(50, m.Value);
             Assert.False(triggered);
 
-            triggered = m.UpdateValue("AMD", 51);
+            triggered = m.UpdateValue("AMD", 51, DateTimeOffset.UtcNow);
             Assert.False(triggered);
 
-            triggered = m.UpdateValue("AMD", 48);
+            triggered = m.UpdateValue("AMD", 48, DateTimeOffset.UtcNow);
             Assert.True(triggered);
 
-            triggered = m.UpdateValue("BING", 52);
+            triggered = m.UpdateValue("BING", 52, DateTimeOffset.UtcNow);
             Assert.False(triggered);
         }
     }

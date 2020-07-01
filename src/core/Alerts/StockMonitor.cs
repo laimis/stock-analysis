@@ -1,3 +1,5 @@
+using System;
+
 namespace core.Alerts
 {
     public class StockMonitor
@@ -12,8 +14,9 @@ namespace core.Alerts
         public Alert Alert { get; }
         public AlertPricePoint PricePoint { get; }
         public double? Value { get; private set; }
+        public DateTimeOffset LastTrigger { get; private set; }
 
-        public bool UpdateValue(string ticker, double newValue)
+        public bool UpdateValue(string ticker, double newValue, DateTimeOffset time)
         {
             if (this.Alert.State.Ticker != ticker)
             {
@@ -29,7 +32,16 @@ namespace core.Alerts
             var prev = Value < this.PricePoint.Value;
             var curr = newValue < this.PricePoint.Value;
 
-            return prev != curr;
+            if (prev != curr)
+            {
+                if (time.Date != LastTrigger.Date)
+                {
+                    LastTrigger = time;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

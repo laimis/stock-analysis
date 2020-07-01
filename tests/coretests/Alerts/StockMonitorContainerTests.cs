@@ -27,8 +27,8 @@ namespace coretests.Alerts
             _uat.Register(a2);
             _uat.Register(a2);
 
-            _initialTriggers = _uat.UpdateValue("AMD", 50).ToList();
-            _subsequentTriggers = _uat.UpdateValue("AMD", 49).ToList();
+            _initialTriggers = _uat.UpdateValue("AMD", 50, DateTimeOffset.UtcNow).ToList();
+            _subsequentTriggers = _uat.UpdateValue("AMD", 49, DateTimeOffset.UtcNow).ToList();
         }
 
         [Fact]

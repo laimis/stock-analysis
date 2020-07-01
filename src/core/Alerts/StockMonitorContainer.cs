@@ -29,11 +29,14 @@ namespace core.Alerts
             return _tickers;
         }
 
-        public IEnumerable<StockMonitorTrigger> UpdateValue(string ticker, double newPrice)
+        public IEnumerable<StockMonitorTrigger> UpdateValue(
+            string ticker,
+            double newPrice,
+            DateTimeOffset time)
         {
             foreach (var m in _monitors.Values)
             {
-                if (m.UpdateValue(ticker, newPrice))
+                if (m.UpdateValue(ticker, newPrice, time))
                 {
                     yield return new StockMonitorTrigger(m.Alert, newPrice, DateTimeOffset.UtcNow);
                 }
