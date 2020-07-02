@@ -42,5 +42,12 @@ namespace core.Alerts
                 }
             }
         }
+
+        public bool HasTriggered(AlertPricePoint pp)
+        {
+            _monitors.TryGetValue(pp.Id, out var m);
+
+            return m != null && m.LastTrigger.Date == DateTimeOffset.UtcNow.Date;
+        }
     }
 }

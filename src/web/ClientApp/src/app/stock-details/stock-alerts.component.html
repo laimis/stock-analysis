@@ -51,12 +51,12 @@
       <div class="form-row mt-4">
         <div class="col">
           <label for="newPricePoint">Custom Price Point</label>
-          <input type="number" class="form-control" id="newPricePoint" name="newPricePoint" [(ngModel)]="newPricePoint">
+          <input type="number" class="form-control" id="newPricePoint" name="newPricePoint" #customPricePoint>
         </div>
         <div class="col"></div>
       </div>
       <div class="mt-2">
-        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="addCustomPricePoint()">Add Custom</button>
+        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="addPricePoint(customPricePoint.value)">Add Custom</button>
       </div>
 		</form>
 	</div>

@@ -12,6 +12,8 @@ namespace coretests.Alerts
         private StockMonitorContainer _uat;
         private List<StockMonitorTrigger> _initialTriggers;
         private List<StockMonitorTrigger> _subsequentTriggers;
+        private AlertPricePoint _amdPricePoint;
+        private AlertPricePoint _bacPricePoint;
 
         public StockMonitorContainerTests()
         {
@@ -26,6 +28,9 @@ namespace coretests.Alerts
             _uat.Register(a1);
             _uat.Register(a2);
             _uat.Register(a2);
+
+            _amdPricePoint = a1.PricePoints[0];
+            _bacPricePoint = a2.PricePoints[0];
 
             _initialTriggers = _uat.UpdateValue("AMD", 50, DateTimeOffset.UtcNow).ToList();
             _subsequentTriggers = _uat.UpdateValue("AMD", 49, DateTimeOffset.UtcNow).ToList();
@@ -55,6 +60,13 @@ namespace coretests.Alerts
             var t = _subsequentTriggers[0];
 
             Assert.Equal(49, t.Price);
+        }
+
+        [Fact]
+        public void TriggeredCheck()
+        {
+            Assert.True(_uat.HasTriggered(_amdPricePoint));
+            Assert.False(_uat.HasTriggered(_bacPricePoint));
         }
 
     }

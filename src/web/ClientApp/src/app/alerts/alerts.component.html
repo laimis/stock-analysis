@@ -1,0 +1,39 @@
+<h3>Alerts</h3>
+
+<div *ngIf="loaded" class="mb-3">
+  <div *ngIf="alerts.length == 0">
+    <div class="alert alert-secondary">
+      <p>You haven't created any ticker alerts. Alerts can help you keep informed about the price movements.</p>
+      <p></p>
+      <div>Some of the most popular setups include:
+        <ul>
+          <li>alert price levels for when you want to pick up the stock</li>
+          <li>alert price levels for when you want to start averaging down your positions</li>
+          <li>alert price levels for when you want to start trimming your positions</li>
+          <li>or use alerts to create general awareness where the price has moved</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mt-4" *ngIf="alerts.length > 0">
+    <div class="card mt-3" *ngFor="let a of alerts">
+      <div class="card-header">
+        <h5>
+          <a [routerLink]="[ '/stocks', a.ticker ]">{{a.ticker}}</a>
+          <span class="float-right">{{a.currentPrice | currency}}</span>
+        </h5>
+      </div>
+
+      <div class="card-body">
+        <div *ngFor="let pp of a.points">
+          {{pp.value | currency}}
+          <span class="badge badge-warning" *ngIf="pp.triggered">triggered</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

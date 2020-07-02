@@ -14,8 +14,6 @@ export class StockAlertsComponent {
   errors              : string[]
   success             : boolean
 
-  newPricePoint       : number
-
   summary               : StockSummary
   priceMinus20: number;
   priceMinus10: number;
@@ -73,18 +71,9 @@ export class StockAlertsComponent {
     this.costPlus20 = this.owned.averageCost + this.owned.averageCost * 0.2
   }
 
-  clearFields() {
-    this.newPricePoint = null
-  }
-
-  addCustomPricePoint() {
-    this.addPricePoint(this.newPricePoint)
-  }
-
   addPricePoint(value:number) {
     this.service.addAlert(this.ticker, value).subscribe( r => {
       this.alertsChanged.emit("added")
-      this.clearFields()
       this.success = true
     }, err => {
       this.errors = GetErrors(err)
@@ -94,7 +83,6 @@ export class StockAlertsComponent {
   removeAlert(id:string) {
     this.service.removeAlert(this.ticker, id).subscribe( r => {
       this.alertsChanged.emit("removed")
-      this.clearFields()
       this.success = true
     }, err => {
       this.errors = GetErrors(err)
