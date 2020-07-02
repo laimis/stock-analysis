@@ -174,8 +174,6 @@ namespace storage.redis
                     await db.KeyDeleteAsync(aggInstanceKey);
                 }
             }
-
-            await db.KeyDeleteAsync(globalKey);
         }
     }
 }
