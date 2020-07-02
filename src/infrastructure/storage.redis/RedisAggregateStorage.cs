@@ -122,7 +122,7 @@ namespace storage.redis
                 .ThenBy(e => e.Version);
         }
 
-        public async Task DeleteEvents(string entity, Guid userId)
+        public async Task DeleteAggregates(string entity, Guid userId)
         {
             var db = _redis.GetDatabase();
 
@@ -144,6 +144,35 @@ namespace storage.redis
                 var aggInstanceKey = string.Join(":", key.Split(':').Take(3));
 
                 await db.KeyDeleteAsync(aggInstanceKey);
+            }
+
+            await db.KeyDeleteAsync(globalKey);
+        }
+
+        public async Task DeleteAggregate(string entity, Guid userId, Guid aggregateId)
+        {
+            var db = _redis.GetDatabase();
+
+            var globalKey = $"{entity}:{userId}";
+
+            // var globalKey = $"{entity}:{userId}";
+            // var entityKey = $"{entity}:{userId}:{e.Id}";
+            // var keyToStore = $"{entity}:{userId}:{e.Id}:{version}";
+
+            var keys = await db.SetMembersAsync(globalKey);
+
+            foreach(var k in keys)
+            {
+                var key = k.ToString();
+
+                if (key.Contains(aggregateId.ToString()))
+                {
+                    await db.SetRemoveAsync(globalKey, key);
+
+                    var aggInstanceKey = string.Join(":", key.Split(':').Take(3));
+
+                    await db.KeyDeleteAsync(aggInstanceKey);
+                }
             }
 
             await db.KeyDeleteAsync(globalKey);

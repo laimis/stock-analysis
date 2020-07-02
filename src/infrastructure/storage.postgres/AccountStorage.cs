@@ -64,7 +64,7 @@ namespace storage.postgres
 
             await db.ExecuteAsync(query, new {id = user.Id.ToString()});
 
-            await DeleteEvents("users", user.Id);
+            await DeleteAggregates(_user_entity, user.Id);
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)

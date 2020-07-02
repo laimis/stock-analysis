@@ -46,7 +46,7 @@ namespace storage.shared
 
         public async Task Delete(Alert alert)
         {
-            await this._aggregateStorage.DeleteEvents(_alert_entity, alert.State.UserId);
+            await this._aggregateStorage.DeleteAggregate(_alert_entity, alert.State.UserId, alert.Id);
         }
     }
 }

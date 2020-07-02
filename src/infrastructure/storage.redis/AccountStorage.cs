@@ -64,7 +64,7 @@ namespace storage.redis
 
             await db.HashDeleteAsync(USER_RECORDS_KEY, user.State.Email);
 
-            await DeleteEvents(USER_ENTITY, user.Id);
+            await DeleteAggregates(USER_ENTITY, user.Id);
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)

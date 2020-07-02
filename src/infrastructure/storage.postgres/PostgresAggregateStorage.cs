@@ -29,13 +29,25 @@ namespace storage.postgres
             return new NpgsqlConnection(_cnn);
         }
 
-        public async Task DeleteEvents(string entity, Guid userId)
+        public async Task DeleteAggregates(string entity, Guid userId)
         {
             using (var db = GetConnection())
             {
                 db.Open();
 
                 var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId";
+
+                await db.ExecuteAsync(query, new { userId, entity });
+            }
+        }
+
+        public async Task DeleteAggregate(string entity, Guid userId, Guid aggregateId)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND key = :aggregateId";
 
                 await db.ExecuteAsync(query, new { userId, entity });
             }
