@@ -25,5 +25,17 @@ export class AlertsComponent implements OnInit {
 			console.log(error);
 			this.loaded = false;
     })
-	}
+  }
+
+  below(price:number, pricePoints:any[]){
+    return pricePoints.filter( (v,i,a) => {
+      return (v.value < price)
+    })
+  }
+
+  above(price:number, pricePoints:any[]){
+    return pricePoints.filter( (v,i,a) => {
+      return (v.value > price)
+    })
+  }
 }

@@ -1,5 +1,10 @@
 <h3>Alerts</h3>
-
+<div *ngIf="!loaded" class="mb-3">
+  Loading your alerts and prices
+  <div class="spinner-border text-info spinner-border-sm" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
 <div *ngIf="loaded" class="mb-3">
   <div *ngIf="alerts.length == 0">
     <div class="alert alert-secondary">
@@ -27,9 +32,21 @@
       </div>
 
       <div class="card-body">
-        <div *ngFor="let pp of a.points">
-          {{pp.value | currency}}
-          <span class="badge badge-warning" *ngIf="pp.triggered">triggered</span>
+        <div class="row">
+          <div class="col text-left">
+            <div class="mb-2">Below current price</div>
+            <div *ngFor="let pp of below(a.currentPrice, a.points)">
+              {{pp.value | currency}}
+              <span class="badge badge-warning" *ngIf="pp.triggered">triggered</span>
+            </div>
+          </div>
+          <div class="col text-right">
+            <div class="mb-2">Above current price</div>
+            <div *ngFor="let pp of above(a.currentPrice, a.points)">
+              {{pp.value | currency}}
+              <span class="badge badge-warning" *ngIf="pp.triggered">triggered</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
