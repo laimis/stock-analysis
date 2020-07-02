@@ -32,6 +32,13 @@ namespace storage.shared
             return alerts.SingleOrDefault(s => s.State.Ticker == ticker);
         }
 
+        public async Task<Alert> GetAlert(Guid alertId, Guid userId)
+        {
+            var alerts = await GetAlerts(userId);
+            
+            return alerts.SingleOrDefault(s => s.Id == alertId);
+        }
+
         public Task Save(Alert stock)
         {
             return _aggregateStorage.SaveEventsAsync(stock, _alert_entity, stock.State.UserId);
