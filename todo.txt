@@ -3,6 +3,7 @@ Alert concept
 - instead of saying ON, show how many alerts
 - when alerting, indicate what hit, and in which direction
 - description for the price point
+- when deleting last price point, delete alert
 
 - sold option exposure
 - including call collateral coverage

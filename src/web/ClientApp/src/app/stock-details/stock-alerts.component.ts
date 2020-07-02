@@ -72,6 +72,9 @@ export class StockAlertsComponent {
   }
 
   addPricePoint(value:number) {
+
+    value = Number(value)
+
     this.service.addAlert(this.ticker, value).subscribe( r => {
       this.alertsChanged.emit("added")
       this.success = true
