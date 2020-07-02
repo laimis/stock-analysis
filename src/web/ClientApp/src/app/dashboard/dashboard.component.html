@@ -25,20 +25,84 @@
   <div class="row" *ngIf="openOptions.length > 0 || owned.length > 0">
     <div class="col text-center">
       <div class="font-weight-bold text-muted">STOCKS</div>
-      <div><b>{{moneySpentOnShares | currency}}</b> invested</div>
-      <div><b>{{currentEquity | currency}}</b> current equity</div>
-      <div [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">{{profits | percent }}</div>
+      <div class="container">
+        <div class="row">
+          <div class="col text-right">
+            Invested
+          </div>
+          <div class="col text-left">
+            <b>{{moneySpentOnShares | currency}}</b>
+          </div>
+        </div>
+        <div class="row mt-0">
+          <div class="col text-right">
+            Current Equity
+          </div>
+          <div class="col text-left">
+            <b>{{currentEquity | currency}}</b>
+          </div>
+        </div>
+        <div class="row mt-0">
+          <div class="col text-right">
+            Gains
+          </div>
+          <div class="col text-left">
+            <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">{{profits | percent }}</span>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="col text-center">
       <div class="font-weight-bold text-muted">OPTIONS</div>
-      <div>{{putContracts}} PUTs and {{callContracts}} CALLs</div>
-      <div>
-        <b>{{putCollateral | currency}}</b>
-        collateral held
+      <div class="row">
+        <div class="col text-right">
+          Collateral held
+        </div>
+        <div class="col text-left">
+          <b>{{putCollateral | currency}}</b>
+        </div>
       </div>
-      <div><b>{{optionPremium | currency}}</b> premium ({{putPremiumvsCollateralPct | percent }} collateral coverage)</div>
+      <div class="row mt-0">
+        <div class="col text-right">
+          Premium
+        </div>
+        <div class="col text-left">
+          <b>{{optionPremium | currency}}</b>
+        </div>
+      </div>
+      <div class="row mt-0">
+        <div class="col text-right">
+          Premium Coverage
+        </div>
+        <div class="col text-left">
+          {{putPremiumvsCollateralPct | percent }}
+        </div>
+      </div>
     </div>
+
+    <div class="col text-center">
+      <div class="font-weight-bold text-muted">LINKS</div>
+      <div class="row">
+        <div class="col text-right">
+          <a [routerLink]="[ '/alerts' ]">Alerts</a>
+        </div>
+        <div class="col text-left">
+          <a [routerLink]="[ '/grid' ]">Stock Grid</a>
+        </div>
+      </div>
+      <div class="row mt-0">
+        <div class="col text-right">
+          <a [routerLink]="[ '/review' ]">Review</a>
+        </div>
+        <div class="col text-left">
+          <a [routerLink]="[ '/transactions' ]">Transactions</a>
+        </div>
+      </div>
+    </div>
+
   </div>
+
 
   <div class="mt-4" *ngIf="openOptions.length > 0">
     <table class="table table-hover">
