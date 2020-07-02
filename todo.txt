@@ -1,15 +1,11 @@
 Alert concept
 
-- alerts page for user
 - instead of saying ON, show how many alerts
-- alerts page on admin
 - when alerting, indicate what hit, and in which direction
-- pause alert, link to unpause
-
-
 - description for the price point
+
 - sold option exposure
-    - including call collateral coverage
+- including call collateral coverage
 
 
 - better diagnostics view of what the stock service is doing
