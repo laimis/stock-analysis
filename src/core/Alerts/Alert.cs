@@ -12,6 +12,8 @@ namespace core.Alerts
 
         public override Guid Id => State.Id;
         public string Ticker => State.Ticker;
+        private Guid UserId => State.UserId;
+        
         public List<AlertPricePoint> PricePoints => State.PricePoints;
         
         public Alert(IEnumerable<AggregateEvent> events) : base(events)
@@ -69,6 +71,18 @@ namespace core.Alerts
                     pricePointId
                 )
             );
+
+            if (this.PricePoints.Count == 0)
+            {
+                Apply(
+                    new AlertCleared(
+                        Guid.NewGuid(),
+                        this.Id,
+                        DateTimeOffset.UtcNow,
+                        this.UserId
+                    )
+                );
+            }
         }
 
         protected override void Apply(AggregateEvent e)
@@ -96,6 +110,10 @@ namespace core.Alerts
         private void ApplyInternal(AlertPricePointRemoved a)
         {
             this.State.Apply(a);
+        }
+
+        private void ApplyInternal(AlertCleared c)
+        {
         }
     }
 }

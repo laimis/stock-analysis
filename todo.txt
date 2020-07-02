@@ -1,13 +1,17 @@
 Alert concept
 
-- instead of saying ON, show how many alerts
 - when alerting, indicate what hit, and in which direction
 - description for the price point
 - when deleting last price point, delete alert
+- when buying/selling option add alert of option strike price
 
+- email to people about alerts
+
+- time left progress bar concept
 - sold option exposure
 - including call collateral coverage
 
+- options details show 50%, 80%, 90% profit levels
 
 - better diagnostics view of what the stock service is doing
     - last 100 messages in nice UI

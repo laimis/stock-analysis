@@ -27,7 +27,7 @@
       Options <span *ngIf="options && options.length > 0" class="badge badge-pill badge-info">{{options.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('alerts')}" [routerLink]="" (click)="activateTab('alerts')">
-      Alerts <span *ngIf="alerts" class="badge badge-pill badge-info">ON</span>
+      Alerts <span *ngIf="alerts && alerts.points.length > 0" class="badge badge-pill badge-info">{{alerts.points.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
