@@ -41,9 +41,9 @@ namespace core.Alerts
         {
             foreach (var m in _monitors.Values)
             {
-                if (m.UpdateValue(ticker, newPrice, time))
+                if (m.CheckTrigger(ticker, newPrice, time, out var trigger))
                 {
-                    yield return new StockMonitorTrigger(m.Alert, newPrice, DateTimeOffset.UtcNow);
+                    yield return trigger;
                 }
             }
         }

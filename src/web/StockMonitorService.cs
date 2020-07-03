@@ -134,13 +134,13 @@ namespace web
                 }
             }
 
-            var grouped = triggered.GroupBy(t => t.Alert.State.UserId);
+            var grouped = triggered.GroupBy(t => t.UserId);
 
             foreach (var e in grouped)
             {
                 var u = await _accounts.GetUser(e.Key);
 
-                var alerts = e.OrderByDescending(m => m.Price).ToList();
+                var alerts = e.OrderByDescending(m => m.NewValue).ToList();
 
                 var data = new { alerts = alerts.Select(Map) };
 
@@ -151,8 +151,9 @@ namespace web
         private object Map(StockMonitorTrigger trigger)
         {
             return new {
-                ticker = (string)trigger.Alert.State.Ticker,
-                value = trigger.Price,
+                ticker = (string)trigger.Ticker,
+                value = trigger.NewValue,
+                direction = $"crossed <b>{trigger.Direction}</b> through {trigger.Monitor.PricePoint.Value}",
                 time = _marketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
             };
         }

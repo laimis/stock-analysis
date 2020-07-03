@@ -16,16 +16,18 @@ namespace core.Alerts
         public double? Value { get; private set; }
         public DateTimeOffset LastTrigger { get; private set; }
 
-        public bool UpdateValue(string ticker, double newValue, DateTimeOffset time)
+        public bool CheckTrigger(string ticker, double newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
         {
             if (this.Alert.State.Ticker != ticker)
             {
+                trigger = new StockMonitorTrigger();
                 return false;
             }
 
             if (Value == null)
             {
                 Value = newValue;
+                trigger = new StockMonitorTrigger();
                 return false;
             }
                 
@@ -36,11 +38,14 @@ namespace core.Alerts
             {
                 if (time.Date != LastTrigger.Date)
                 {
+                    trigger = new StockMonitorTrigger(this, time, Value.Value, newValue);
                     LastTrigger = time;
+                    Value = newValue;
                     return true;
                 }
             }
 
+            trigger = new StockMonitorTrigger();
             return false;
         }
     }

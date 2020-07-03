@@ -19,18 +19,21 @@ namespace coretests.Alerts
 
             Assert.Null(m.Value);
 
-            var triggered = m.UpdateValue("AMD", 50, DateTimeOffset.UtcNow);
+            var triggered = m.CheckTrigger("AMD", 50, DateTimeOffset.UtcNow, out var trigger);
 
             Assert.Equal(50, m.Value);
             Assert.False(triggered);
 
-            triggered = m.UpdateValue("AMD", 51, DateTimeOffset.UtcNow);
+            triggered = m.CheckTrigger("AMD", 51, DateTimeOffset.UtcNow, out trigger);
             Assert.False(triggered);
 
-            triggered = m.UpdateValue("AMD", 48, DateTimeOffset.UtcNow);
+            triggered = m.CheckTrigger("AMD", 48, DateTimeOffset.UtcNow, out trigger);
             Assert.True(triggered);
+            Assert.Equal("AMD", trigger.Ticker);
+            Assert.Equal(48, trigger.NewValue);
+            Assert.Equal("down", trigger.Direction);
 
-            triggered = m.UpdateValue("BING", 52, DateTimeOffset.UtcNow);
+            triggered = m.CheckTrigger("BING", 52, DateTimeOffset.UtcNow, out trigger);
             Assert.False(triggered);
         }
     }

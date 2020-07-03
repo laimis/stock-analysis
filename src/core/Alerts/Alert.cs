@@ -12,7 +12,7 @@ namespace core.Alerts
 
         public override Guid Id => State.Id;
         public string Ticker => State.Ticker;
-        private Guid UserId => State.UserId;
+        public Guid UserId => State.UserId;
         
         public List<AlertPricePoint> PricePoints => State.PricePoints;
         

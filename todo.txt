@@ -2,8 +2,10 @@ Alert concept
 
 - when alerting, indicate what hit, and in which direction
 - description for the price point
-- when deleting last price point, delete alert
 - when buying/selling option add alert of option strike price
+    (check box if to create an alert)
+
+- redo dashboard options display
 
 - email to people about alerts
 

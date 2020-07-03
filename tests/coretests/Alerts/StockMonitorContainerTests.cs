@@ -59,7 +59,7 @@ namespace coretests.Alerts
         {
             var t = _subsequentTriggers[0];
 
-            Assert.Equal(49, t.Price);
+            Assert.Equal(49, t.NewValue);
         }
 
         [Fact]
