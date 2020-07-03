@@ -2,9 +2,13 @@
 
 Patience and information gathering leads to better trading moves. Use this site to keep track of your thoughts around stocks, record your transactions, and review them regularly so that you are ready to make the right decisions when the time comes to buy, sell, or keep a share.
 
-# Implementation
+# Current Build and Release status
 
 ![Build and test](https://github.com/laimis/stock-analysis/workflows/Build%20and%20test/badge.svg)
+
+![Create Release](https://github.com/laimis/stock-analysis/workflows/Create%20Release/badge.svg)
+
+# Implementation
 
 ## Frontend
 
