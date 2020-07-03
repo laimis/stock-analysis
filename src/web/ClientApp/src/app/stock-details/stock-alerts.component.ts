@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { StockSummary, StocksService, GetErrors } from '../services/stocks.service';
+import { StockSummary, StocksService, GetErrors, AlertLabelValue } from '../services/stocks.service';
+import { timeStamp } from 'console';
 
 @Component({
   selector: 'stock-alerts',
@@ -9,22 +10,16 @@ import { StockSummary, StocksService, GetErrors } from '../services/stocks.servi
 
 export class StockAlertsComponent {
 
-  alert               : any
+  alert             : any
 
-  errors              : string[]
-  success             : boolean
+  errors            : string[]
+  success           : boolean
 
-  summary               : StockSummary
-  priceMinus20: number;
-  priceMinus10: number;
-  pricePlus10: number;
-  pricePlus20: number;
-
+  summary           : StockSummary
   owned : any
-  costMinus20: number;
-  costMinus10: number;
-  costPlus10: any;
-  costPlus20: any;
+
+  priceBasedAlerts  : AlertLabelValue[]
+  costBasedAlerts   : AlertLabelValue[]
 
   @Input()
   set alerts(alert: object) {
@@ -57,18 +52,43 @@ export class StockAlertsComponent {
   ngOnInit(): void {}
 
   updatePriceBasedPoints() {
-    this.priceMinus20 = this.stock.price - this.stock.price * 0.2
-    this.priceMinus10 = this.stock.price - this.stock.price * 0.1
-    this.pricePlus10 = this.stock.price + this.stock.price * 0.1
-    this.pricePlus20 = this.stock.price + this.stock.price * 0.2
+    this.priceBasedAlerts = this.generateAlertBands(this.stock.price)
   }
 
   updateCostBasedPoints() {
     if (!this.owned) { return }
-    this.costMinus20 = this.owned.averageCost - this.owned.averageCost * 0.2
-    this.costMinus10 = this.owned.averageCost - this.owned.averageCost * 0.1
-    this.costPlus10 = this.owned.averageCost + this.owned.averageCost * 0.1
-    this.costPlus20 = this.owned.averageCost + this.owned.averageCost * 0.2
+
+    this.costBasedAlerts = this.generateAlertBands(Number(this.owned.averageCost.toFixed(2)))
+
+  }
+
+  generateAlertBands(base : number) : Array<AlertLabelValue> {
+    var arr = Array<AlertLabelValue>(0)
+
+    for (let index = 100; index >= 1; index -= 2) {
+
+      var val = (base + base * index / 100.0).toFixed(2)
+      var label = "+" + index + "% " + val
+
+      arr.push( new AlertLabelValue(label, val) )
+    }
+
+    arr.push(
+      new AlertLabelValue(
+        base.toString(),
+        base.toString()
+      )
+    )
+
+    for (let index = 1; index <= 100; index += 2) {
+
+      var val = (base - base * index / 100.0).toFixed(2)
+      var label = "-" + index + "% " + val
+
+      arr.push( new AlertLabelValue(label, val) )
+    }
+
+    return arr;
   }
 
   addPricePoint(value:number) {

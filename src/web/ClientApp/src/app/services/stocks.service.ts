@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { type } from 'os';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -278,6 +279,16 @@ export class OwnedOption {
   boughtOrSold: string
   premium: number
   transactions: TransactionList
+}
+
+export class AlertLabelValue {
+  label: string
+  value: string
+
+  constructor(label: string, value: string) {
+    this.label = label;
+    this.value = value;
+  }
 }
 
 export interface StockSummary {

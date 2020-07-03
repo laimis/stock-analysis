@@ -26,37 +26,41 @@
 		<form>
       <div class="form-row mt-4" *ngIf="this.owned && this.owned.averageCost > 0">
         <div class="col">
-          <label>Your cost ({{this.owned.averageCost | currency}}) based alerts</label>
+          <label>Add alert based on your current cost of <b>{{this.owned.averageCost | currency}}</b></label>
           <div>
-            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(costMinus20)">-20%: {{costMinus20 | currency}}</button>
-            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(costMinus10)">-10%: {{costMinus10 | currency}}</button>
-            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(costPlus10)">+10%: {{costPlus10 | currency}}</button>
-            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(costPlus20)">+20%: {{costPlus20 | currency}}</button>
+            <select class="form-control" #costBasedSelect>
+              <option *ngFor="let pp of costBasedAlerts"
+                value="{{pp.value}}"
+                [attr.selected]="pp.value == this.owned.averageCost.toFixed(2) ? true : null">{{pp.label}}</option>
+            </select>
+            <button type="button" class="btn btn-primary mt-2" (click)="addPricePoint(costBasedSelect.value)">Add cost based alert</button>
           </div>
         </div>
         <div class="col"></div>
       </div>
       <div class="form-row mt-4">
         <div class="col">
-          <label>Current price ({{stock.price | currency}}) based alerts</label>
+          <label>Add alert based on the current stock price of <b>{{stock.price | currency}}</b></label>
           <div>
-            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(priceMinus20)">-20%: {{priceMinus20 | currency}}</button>
-            <button type="button" class="btn btn-warning ml-2" (click)="addPricePoint(priceMinus10)">-10%: {{priceMinus10 | currency}}</button>
-            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(pricePlus10)">+10%: {{pricePlus10 | currency}}</button>
-            <button type="button" class="btn btn-info ml-2" (click)="addPricePoint(pricePlus20)">+20%: {{pricePlus20 | currency}}</button>
+            <select class="form-control" #priceBasedSelect>
+              <option *ngFor="let pp of priceBasedAlerts"
+                value="{{pp.value}}"
+                [attr.selected]="pp.value == stock.price ? true : null">{{pp.label}}</option>
+            </select>
+            <button type="button" class="btn btn-primary mt-2" (click)="addPricePoint(priceBasedSelect.value)">Add price based alert</button>
           </div>
         </div>
         <div class="col"></div>
       </div>
       <div class="form-row mt-4">
         <div class="col">
-          <label for="newPricePoint">Custom Price Point</label>
+          <label for="newPricePoint">Or add an alert based on custom value</label>
           <input type="number" class="form-control" id="newPricePoint" name="newPricePoint" #customPricePoint>
         </div>
         <div class="col"></div>
       </div>
       <div class="mt-2">
-        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="addPricePoint(customPricePoint.value)">Add Custom</button>
+        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="addPricePoint(customPricePoint.value)">Add custom alert</button>
       </div>
 		</form>
 	</div>
