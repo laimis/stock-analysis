@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { type } from 'os';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
