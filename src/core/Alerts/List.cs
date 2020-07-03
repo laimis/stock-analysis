@@ -42,6 +42,11 @@ namespace core.Alerts
 
                 foreach(var a in alerts.OrderBy(a => a.Ticker))
                 {
+                    if (a.PricePoints.Count == 0)
+                    {
+                        continue;
+                    }
+                    
                     var price = await _stock.GetPrice(a.Ticker);
 
                     list.Add(new {
