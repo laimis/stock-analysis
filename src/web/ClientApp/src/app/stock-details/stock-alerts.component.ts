@@ -17,6 +17,8 @@ export class StockAlertsComponent {
   summary           : StockSummary
   owned : any
 
+  alertBands : number[]
+
   priceBasedAlerts  : AlertLabelValue[]
   costBasedAlerts   : AlertLabelValue[]
 
@@ -46,7 +48,10 @@ export class StockAlertsComponent {
   @Output()
   alertsChanged = new EventEmitter();
 
-	constructor(private service: StocksService){}
+	constructor(private service: StocksService){
+    this.alertBands = new Array<number>()
+    this.alertBands.push(1,2,3,4,5,6,7,8,9,10,15,20,25,30,50,75,90,100)
+  }
 
   ngOnInit(): void {}
 
@@ -64,10 +69,12 @@ export class StockAlertsComponent {
   generateAlertBands(base : number) : Array<AlertLabelValue> {
     var arr = Array<AlertLabelValue>(0)
 
-    for (let index = 100; index >= 1; index -= 2) {
+    for (let index = this.alertBands.length - 1; index >= 0; index--) {
 
-      var val = (base + base * index / 100.0).toFixed(2)
-      var label = "+" + index + "% " + val
+      var bandVal = this.alertBands[index]
+
+      var val = (base + base * bandVal / 100.0).toFixed(2)
+      var label = "+" + bandVal + "% " + val
 
       arr.push( new AlertLabelValue(label, val) )
     }
@@ -79,10 +86,12 @@ export class StockAlertsComponent {
       )
     )
 
-    for (let index = 1; index <= 100; index += 2) {
+    for (let index = 0; index < this.alertBands.length; index++) {
 
-      var val = (base - base * index / 100.0).toFixed(2)
-      var label = "-" + index + "% " + val
+      var bandVal = this.alertBands[index]
+
+      var val = (base - base * bandVal / 100.0).toFixed(2)
+      var label = "-" + bandVal + "% " + val
 
       arr.push( new AlertLabelValue(label, val) )
     }
