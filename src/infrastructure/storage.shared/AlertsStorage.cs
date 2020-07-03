@@ -39,14 +39,14 @@ namespace storage.shared
             return alerts.SingleOrDefault(s => s.Id == alertId);
         }
 
-        public Task Save(Alert stock)
+        public Task Save(Alert alert)
         {
-            return _aggregateStorage.SaveEventsAsync(stock, _alert_entity, stock.State.UserId);
+            return _aggregateStorage.SaveEventsAsync(alert, _alert_entity, alert.State.UserId);
         }
 
-        public async Task Delete(Alert alert)
+        public Task Delete(Guid userId)
         {
-            await this._aggregateStorage.DeleteAggregate(_alert_entity, alert.State.UserId, alert.Id);
+            return _aggregateStorage.DeleteAggregates(_alert_entity, userId);
         }
     }
 }

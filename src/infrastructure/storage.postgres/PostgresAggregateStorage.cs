@@ -41,18 +41,6 @@ namespace storage.postgres
             }
         }
 
-        public async Task DeleteAggregate(string entity, Guid userId, Guid aggregateId)
-        {
-            using (var db = GetConnection())
-            {
-                db.Open();
-
-                var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND key = :aggregateId";
-
-                await db.ExecuteAsync(query, new { userId, entity });
-            }
-        }
-
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
         {
             using (var db = GetConnection())

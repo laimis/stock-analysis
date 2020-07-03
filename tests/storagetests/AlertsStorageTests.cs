@@ -35,7 +35,7 @@ namespace storagetests
             Assert.NotEqual(Guid.Empty, alert.State.Id);
             Assert.Equal("AMD", alert.State.Ticker);
             
-            await storage.Delete(alert);
+            await storage.Delete(user);
 
             alerts = await storage.GetAlerts(user);
 

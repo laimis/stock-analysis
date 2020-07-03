@@ -10,6 +10,6 @@ namespace core.Alerts
         Task<Alert> GetAlert(Guid alertId, Guid userId);
         Task<IEnumerable<Alert>> GetAlerts(Guid userId);
         Task Save(Alert alert);
-        Task Delete(Alert alert);
+        Task Delete(Guid userId);
     }
 }

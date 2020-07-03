@@ -1,9 +1,10 @@
 using System;
 using core.Shared;
+using MediatR;
 
 namespace core.Alerts
 {
-    internal class AlertPricePointRemoved : AggregateEvent
+    public class AlertPricePointRemoved : AggregateEvent, INotification
     {
         public AlertPricePointRemoved(Guid id, Guid aggregateId, DateTimeOffset when, Guid pricePointId)
             : base(id, aggregateId, when)

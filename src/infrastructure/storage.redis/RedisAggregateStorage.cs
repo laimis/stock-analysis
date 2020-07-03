@@ -148,32 +148,5 @@ namespace storage.redis
 
             await db.KeyDeleteAsync(globalKey);
         }
-
-        public async Task DeleteAggregate(string entity, Guid userId, Guid aggregateId)
-        {
-            var db = _redis.GetDatabase();
-
-            var globalKey = $"{entity}:{userId}";
-
-            // var globalKey = $"{entity}:{userId}";
-            // var entityKey = $"{entity}:{userId}:{e.Id}";
-            // var keyToStore = $"{entity}:{userId}:{e.Id}:{version}";
-
-            var keys = await db.SetMembersAsync(globalKey);
-
-            foreach(var k in keys)
-            {
-                var key = k.ToString();
-
-                if (key.Contains(aggregateId.ToString()))
-                {
-                    await db.SetRemoveAsync(globalKey, key);
-
-                    var aggInstanceKey = string.Join(":", key.Split(':').Take(3));
-
-                    await db.KeyDeleteAsync(aggInstanceKey);
-                }
-            }
-        }
     }
 }

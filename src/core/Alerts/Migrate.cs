@@ -31,7 +31,7 @@ namespace core.Alerts
                 var owned = await _storage.GetStocks(cmd.UserId);
 
                 var alerts = await _alertsStorage.GetAlerts(cmd.UserId);
-
+                
                 foreach(var o in owned)
                 {
                     if (o.State.Owned == 0)

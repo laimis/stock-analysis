@@ -11,8 +11,7 @@ namespace storage.shared
         Task SaveEventsAsync(Aggregate agg, string entity, Guid userId);
         Task DoHealthCheck();
         Task DeleteAggregates(string entity, Guid userId);
-        Task DeleteAggregate(string entity, Guid userId, Guid aggregateId);
-
+        
         Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, Guid userId);
     }
 }

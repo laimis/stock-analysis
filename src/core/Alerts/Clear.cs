@@ -28,13 +28,8 @@ namespace core.Alerts
 
             public override async Task<object> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var alerts = await _alertsStorage.GetAlerts(cmd.UserId);
-
-                foreach(var a in alerts)
-                {
-                    await _alertsStorage.Delete(a);
-                }
-
+                await _alertsStorage.Delete(cmd.UserId);
+                
                 return new object();
             }
         }

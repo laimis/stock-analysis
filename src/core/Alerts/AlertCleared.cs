@@ -4,7 +4,8 @@ using MediatR;
 
 namespace core.Alerts
 {
-    public class AlertCleared : AggregateEvent, INotification
+    // DO NOT USE
+    public class AlertCleared : AggregateEvent
     {
         public AlertCleared(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId)
             : base(id, aggregateId, when)

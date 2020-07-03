@@ -24,6 +24,11 @@ namespace core.Alerts
             }
         }
 
+        internal void Deregister(Guid pricePointId)
+        {
+            _monitors.TryRemove(pricePointId, out var val);
+        }
+
         public IEnumerable<string> GetTickers()
         {
             return _tickers;
