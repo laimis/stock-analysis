@@ -14,11 +14,16 @@ namespace core.Utils
             _easternZoneId = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
         }
 
-        public bool IsOn(DateTimeOffset offset)
+        public bool IsOn(DateTimeOffset now)
         {
+            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return false;
+            }
+            
             // 930-1600
             var eastern = TimeZoneInfo.ConvertTimeFromUtc(
-                offset.DateTime,
+                now.DateTime,
                 _easternZoneId
             );
 
