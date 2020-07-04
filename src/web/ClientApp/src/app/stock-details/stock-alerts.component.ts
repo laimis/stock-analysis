@@ -24,6 +24,8 @@ export class StockAlertsComponent {
   priceBasedAlerts  : AlertLabelValue[]
   costBasedAlerts   : AlertLabelValue[]
 
+  showShortcuts : boolean = false
+
   @Input()
   set alerts(alert: object) {
     this.alert = alert
@@ -104,6 +106,10 @@ export class StockAlertsComponent {
   addPricePoint(value:number) {
 
     value = Number(value)
+    if (!value)
+    {
+      value = 0
+    }
 
     this.service.addAlert(this.ticker, value).subscribe( r => {
       this.alertsChanged.emit("added")
