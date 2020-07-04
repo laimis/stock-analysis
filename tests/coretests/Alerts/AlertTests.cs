@@ -14,12 +14,12 @@ namespace coretests.Alerts
         {
             _uat = new Alert(new Ticker("AMD"), Guid.NewGuid());
 
-            _uat.AddPricePoint(50);
-            _uat.AddPricePoint(50); // the same price point twice
-            _uat.AddPricePoint(50 + 0.1*50);
-            _uat.AddPricePoint(50 - 0.1*50);
+            _uat.AddPricePoint("initial", 50);
+            _uat.AddPricePoint("updated", 50); // the same price point twice
+            _uat.AddPricePoint("10% up", 50 + 0.1*50);
+            _uat.AddPricePoint("10% down", 50 - 0.1*50);
 
-            _uat.AddPricePoint(60);
+            _uat.AddPricePoint("real high", 60);
 
             var last = _uat.PricePoints.Last().Id;
 

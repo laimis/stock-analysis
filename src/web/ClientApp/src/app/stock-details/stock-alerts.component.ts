@@ -111,9 +111,12 @@ export class StockAlertsComponent {
       value = 0
     }
 
-    this.service.addAlert(this.ticker, value).subscribe( r => {
+    console.log("desc: " + this.description)
+
+    this.service.addAlert(this.ticker, this.description, value).subscribe( r => {
       this.alertsChanged.emit("added")
       this.success = true
+      this.errors = null
     }, err => {
       this.errors = GetErrors(err)
     })
@@ -123,6 +126,7 @@ export class StockAlertsComponent {
     this.service.removeAlert(this.ticker, id).subscribe( r => {
       this.alertsChanged.emit("removed")
       this.success = true
+      this.errors = null
     }, err => {
       this.errors = GetErrors(err)
     })

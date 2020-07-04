@@ -10,6 +10,8 @@ namespace core.Alerts
     {
         public class Command : RequestWithUserId<object>
         {
+            public string Description { get; set; }
+
             [Required]
             public string Ticker { get; set; }
 
@@ -38,7 +40,11 @@ namespace core.Alerts
                     alert = new Alert(cmd.Ticker, cmd.UserId);
                 }
 
-                alert.AddPricePoint(cmd.Value);
+                var added = alert.AddPricePoint(cmd.Description, cmd.Value);
+                if (!added)
+                {
+                    throw new InvalidOperationException("Alert for the price point already exists");
+                }
 
                 await _alertsStorage.Save(alert);
 

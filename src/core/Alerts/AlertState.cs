@@ -23,7 +23,12 @@ namespace core.Alerts
 
         internal void Apply(AlertPricePointAdded a)
         {
-            this.PricePoints.Add(new AlertPricePoint(a.Id, a.Value));
+            this.PricePoints.Add(new AlertPricePoint(a.Id, null, a.Value));
+        }
+
+        internal void Apply(AlertPricePointWithDescripitionAdded a)
+        {
+            this.PricePoints.Add(new AlertPricePoint(a.Id, a.Description, a.Value));
         }
 
         internal void Apply(AlertPricePointRemoved a)

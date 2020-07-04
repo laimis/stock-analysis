@@ -44,7 +44,7 @@ namespace core.Alerts
                     {
                         var a = new Alert(o.Ticker, cmd.UserId);
 
-                        a.AddPricePoint(o.AverageCost);
+                        a.AddPricePoint("Migrated average cost", o.AverageCost);
 
                         await _alertsStorage.Save(a);
                     }

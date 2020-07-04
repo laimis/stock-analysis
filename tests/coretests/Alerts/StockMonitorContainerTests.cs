@@ -20,10 +20,10 @@ namespace coretests.Alerts
             _uat = new StockMonitorContainer();
 
             var a1 = new Alert(new Ticker("AMD"), Guid.NewGuid());
-            a1.AddPricePoint(50);
+            a1.AddPricePoint("initial", 50);
 
             var a2 = new Alert(new Ticker("BAC"), Guid.NewGuid());
-            a2.AddPricePoint(20);
+            a2.AddPricePoint("another one" , 20);
 
             _uat.Register(a1);
             _uat.Register(a2);

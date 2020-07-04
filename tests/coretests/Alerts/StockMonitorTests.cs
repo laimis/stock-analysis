@@ -13,7 +13,7 @@ namespace coretests.Alerts
         {
             var a = new Alert(new Ticker("AMD"), System.Guid.NewGuid());
             
-            a.AddPricePoint(50);
+            a.AddPricePoint("initial", 50);
 
             var m = new StockMonitor(a, a.PricePoints[0]);
 

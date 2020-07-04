@@ -37,22 +37,25 @@ namespace core.Alerts
             );
         }
 
-        public void AddPricePoint(double value)
+        public bool AddPricePoint(string description, double value)
         {
             var exists = this.PricePoints.Any(p => p.Value == value);
             if (exists)
             {
-                return;
+                return false;
             }
 
             Apply(
-                new AlertPricePointAdded(
+                new AlertPricePointWithDescripitionAdded(
                     Guid.NewGuid(),
                     this.Id,
                     DateTimeOffset.UtcNow,
+                    description,
                     value
                 )
             );
+
+            return true;
         }
 
         public void RemovePricePoint(Guid pricePointId)
@@ -114,6 +117,11 @@ namespace core.Alerts
 
         private void ApplyInternal(AlertCleared c)
         {
+        }
+
+        private void ApplyInternal(AlertPricePointWithDescripitionAdded c)
+        {
+            this.State.Apply(c);
         }
     }
 }
