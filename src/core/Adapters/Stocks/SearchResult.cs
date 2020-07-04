@@ -9,7 +9,7 @@ namespace core.Adapters.Stocks
             "re",
             "cs",
             "et",
-            "ps"
+            //"ps"
         };
 
         public string Symbol { get; set; }
@@ -17,6 +17,6 @@ namespace core.Adapters.Stocks
         public string SecurityType { get; set; }
         public string Region { get; set; }
         public string Exchange { get; set; }
-        public bool IsSupportedType => _supportedTypes.Contains(SecurityType);
+        public bool IsSupportedType => _supportedTypes.Contains(SecurityType) && Region == "US";
     }
 }

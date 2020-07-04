@@ -26,13 +26,6 @@
 		<form>
       <div class="form-row mt-2">
         <div class="col">
-          <label for="alertDescription">Description <span class="text-muted">(optional)</span></label>
-          <input type="text" class="form-control" id="alertDescription" name="alertDescription" [(ngModel)]="description" />
-        </div>
-        <div class="col"></div>
-      </div>
-      <div class="form-row mt-2">
-        <div class="col">
           <label for="newPricePoint">Price point that will trigger the alert</label>
           <input type="number" class="form-control" id="newPricePoint" name="newPricePoint" [(ngModel)]="newPricePoint">
         </div>
@@ -63,6 +56,14 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="col"></div>
+      </div>
+
+      <div class="form-row mt-2">
+        <div class="col">
+          <label for="alertDescription">Description <span class="text-muted">(optional)</span></label>
+          <input type="text" class="form-control" id="alertDescription" name="alertDescription" [(ngModel)]="description" />
         </div>
         <div class="col"></div>
       </div>

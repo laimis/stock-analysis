@@ -1,28 +1,14 @@
 Alert concept
 
-- redo dashboard options display
-
 - email to people about alerts
 
-- time left progress bar concept
-- sold option exposure
-- including call collateral coverage
+- redo dashboard options display
+    - time left progress bar concept
+    - sold option exposure
+    - including call collateral coverage
+    - options details show 50%, 80%, 90% profit levels
 
-- options details show 50%, 80%, 90% profit levels
-
-- better diagnostics view of what the stock service is doing
-    - last 100 messages in nice UI
-
-
-handling exceptions in background services
-earnings listings/highlight yours
-add news link
 RobinHood statement parser
-Options stats
-
-LONG TERM
-
-MARKETING
 
 "How do I know how much I have made or lost 
 if the graph doesn’t include realised gain/loss? 
