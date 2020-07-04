@@ -17,7 +17,7 @@ export class StockAlertsComponent {
   summary           : StockSummary
   owned : any
 
-  newPricepoint :number
+  newPricePoint :number
   description: string
 
   alertBands : number[]

@@ -40,7 +40,7 @@
       </div>
       <div class="form-row mt-2">
         <div class="col">
-          <button type="button" class="btn btn-link" (click)="showShortcuts = !showShortcut">price shortcuts</button>
+          <button type="button" class="btn btn-link" (click)="showShortcuts = !showShortcuts">price shortcuts</button>
           <div class="row" *ngIf="showShortcuts">
             <div class="col" *ngIf="this.owned && this.owned.averageCost > 0">
               <label>Cost based shortcuts</label>
