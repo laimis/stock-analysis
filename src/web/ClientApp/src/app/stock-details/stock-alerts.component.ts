@@ -17,8 +17,10 @@ export class StockAlertsComponent {
   summary           : StockSummary
   owned : any
 
-  alertBands : number[]
+  newPricepoint :number
+  description: string
 
+  alertBands : number[]
   priceBasedAlerts  : AlertLabelValue[]
   costBasedAlerts   : AlertLabelValue[]
 
