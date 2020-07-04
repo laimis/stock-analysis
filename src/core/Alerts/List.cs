@@ -55,6 +55,7 @@ namespace core.Alerts
                         points = a.State.PricePoints.Select(pp => new {
                             pp.Id,
                             pp.Value,
+                            pp.Description,
                             triggered = _container.HasTriggered(pp)
                         }),
                     });

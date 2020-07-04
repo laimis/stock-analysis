@@ -1,12 +1,5 @@
 Alert concept
 
-- show alert description in email notification
-
-- alerts dashboard
-    - show description
-    - three column layout
-    - allow to add price point
-
 - redo dashboard options display
 
 - email to people about alerts
