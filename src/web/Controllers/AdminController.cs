@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using core;
 using core.Account;
@@ -9,6 +7,7 @@ using core.Admin;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using web.Utils;
 
 namespace web.Controllers
 {
@@ -66,73 +65,15 @@ namespace web.Controllers
         }
 
         [HttpGet("users")]
-        public async Task<ActionResult> ActiveAccountsAsync()
+        public Task<object> ActiveAccountsAsync()
         {
-            var users = await _storage.GetUserEmailIdPairs();
+            return _mediator.Send(new Users.Query());
+        }
 
-            var total = 0;
-            var loggedIn = 0;
-
-            var tableHtml = new StringBuilder();
-
-            tableHtml.Append(@"
-            <table>
-                <tr>
-                    <th>Email</th>
-                    <th>User Id</th>
-                    <th>Last Login</th>
-                    <th>Verified</th>
-                    <th>Level</th>
-                    <th>Stocks</th>
-                    <th>Options</th>
-                    <th>Notes</th>
-                </tr>");
-
-            foreach(var (email,userId) in users)
-            {
-                tableHtml.AppendLine($"<tr>");
-                tableHtml.Append($"<td>{email}</td>");
-                tableHtml.Append($"<td>{userId}</td>");
-
-                var guid = new System.Guid(userId);
-
-                var user = await _storage.GetUser(guid);
-
-                tableHtml.Append($"<td>{user?.LastLogin?.ToString()}</td>");
-                tableHtml.Append($"<td>{user?.Verified}</td>");
-                tableHtml.Append($"<td>{user?.SubscriptionLevel}</td>");
-
-                var options = await _portfolio.GetOwnedOptions(guid);
-                var notes = await _portfolio.GetNotes(guid);
-                var stocks = await _portfolio.GetStocks(guid);
-
-                tableHtml.Append($"<td>{stocks.Count()}</td>");
-                tableHtml.Append($"<td>{options.Count()}</td>");
-                tableHtml.Append($"<td>{notes.Count()}</td>");
-
-                tableHtml.AppendLine("</tr>");
-
-                total++;
-                if (user != null && user.LastLogin.HasValue)
-                {
-                    loggedIn++;
-                }
-            }
-
-            tableHtml.AppendLine("</table>");
-
-            var body = $@"<html>
-                <body>
-                    <h3>Users: {total}</h3>
-                    <h4>Logged In: {loggedIn}</h4>
-                    ${tableHtml.ToString()}
-                </body>
-            </html>";
-
-            return new ContentResult {
-                Content = body,
-                ContentType = "text/html"
-            };
+        [HttpGet("users/export")]
+        public Task<ActionResult> Export()
+        {
+            return this.GenerateExport(_mediator, new Users.Export());
         }
     }
 }

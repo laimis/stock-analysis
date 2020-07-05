@@ -50,6 +50,10 @@ export class StocksService {
     return this.http.post('/api/admin/weekly', obj)
   }
 
+  getUsers(): Observable<object[]> {
+    return this.http.get<object[]>('/api/admin/users')
+  }
+
   // ----------------- notes ---------------------
 
   addNote(input: any): Observable<any> {

@@ -26,14 +26,14 @@
 		<form>
       <div class="form-row mt-2">
         <div class="col">
-          <label for="newPricePoint">Price point that will trigger the alert</label>
+          <label for="newPricePoint">Price point</label>
+          <button type="button" class="btn btn-link mb-1" (click)="showShortcuts = !showShortcuts">price shortcuts</button>
           <input type="number" class="form-control" id="newPricePoint" name="newPricePoint" [(ngModel)]="newPricePoint">
         </div>
         <div class="col"></div>
       </div>
       <div class="form-row mt-2">
         <div class="col">
-          <button type="button" class="btn btn-link" (click)="showShortcuts = !showShortcuts">price shortcuts</button>
           <div class="row" *ngIf="showShortcuts">
             <div class="col" *ngIf="this.owned && this.owned.averageCost > 0">
               <label>Cost based shortcuts</label>

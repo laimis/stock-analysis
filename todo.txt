@@ -1,6 +1,22 @@
-Alert concept
-
+Copy:
 - email to people about alerts
+
+
+Position entry wizard:
+    step by step:
+
+    buy/sell
+    how many
+    what price
+    execute
+
+Option detail:
+    how many days left
+    ITM/OTM
+    %5 off
+    
+
+
 
 - redo dashboard options display
     - time left progress bar concept

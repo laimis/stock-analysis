@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using core.Account;
 using core.Notes;
 using core.Options;
 using core.Shared;
@@ -15,6 +16,20 @@ namespace core
         public const string STOCK_HEADER = "ticker,type,amount,price,date";
         public const string NOTE_HEADER = "created,ticker,note";
         public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
+        public const string USER_HEADER = "email,first_name,last_name";
+
+        public static string Generate(IEnumerable<User> users)
+        {
+            var rows = users.Select(u =>
+                new object[] {
+                    u.Email,
+                    u.Firstname,
+                    u.Lastname
+                }
+            );
+
+            return Generate(USER_HEADER, rows);
+        }
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {

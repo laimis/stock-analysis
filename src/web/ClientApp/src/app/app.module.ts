@@ -44,11 +44,13 @@ import { StockOptionComponent } from './stock-details/stock-option.component';
 import { StockGridComponent } from './stock-grid/stock-grid.component';
 import { StockAlertsComponent } from './stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
+import { AdminUsersComponent } from './admin/users/admin-users.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'alerts', component: AlertsComponent, canActivate: [AuthGuard] },
   { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
+  { path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
@@ -89,6 +91,7 @@ var routes = [
     AddNoteComponent,
     AdminEmailComponent,
     AdminWeeklyComponent,
+    AdminUsersComponent,
     AppComponent,
     ContactComponent,
     DashboardComponent,

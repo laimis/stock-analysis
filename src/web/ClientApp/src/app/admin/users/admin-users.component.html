@@ -1,0 +1,46 @@
+
+<div *ngIf="!users" class="mb-3">
+  Loading users
+  <div class="spinner-border text-info spinner-border-sm" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+<div class="mt-4 container" *ngIf="users">
+  <h5>Users {{users.length}}</h5>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>First</th>
+        <th>Last</th>
+        <th>Last Seen</th>
+        <th>Stocks</th>
+        <th>Options</th>
+        <th>Alerts</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of users">
+        <td>
+          <div (click)="showId=true">{{u.email}}</div>
+          <div><span *ngIf="showId">{{u.userId}}</span></div>
+        </td>
+        <td>{{u.firstname}}</td>
+        <td>{{u.lastname}}</td>
+        <td>{{u.lastLogin | date }}</td>
+        <td>{{u.stocks}}</td>
+        <td>{{u.options}}</td>
+        <td>{{u.alerts}}</td>
+        <td>{{u.notes}}</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="8"><a href="/api/admin/users/export" target="_blank">export</a></td>
+      </tr>
+    </tfoot>
+  </table>
+
+</div>
