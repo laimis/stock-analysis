@@ -1,10 +1,15 @@
 Copy:
-- email to people about alerts
 
+- email to people about alerts
+- send it out on Monday morning
+- space on NG for copy...
+- reddit post on alerts
+- wheel strategy landing page
+
+- help articles as S3 generated doc site?
 
 Position entry wizard:
     step by step:
-
     buy/sell
     how many
     what price
@@ -14,7 +19,7 @@ Option detail:
     how many days left
     ITM/OTM
     %5 off
-    
+
 
 
 
