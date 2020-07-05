@@ -1,4 +1,5 @@
-Copy:
+
+- dashboard redo
 
 - email to people about alerts
 - send it out on Monday morning
@@ -7,6 +8,12 @@ Copy:
 - wheel strategy landing page
 
 - help articles as S3 generated doc site?
+
+- premium capture, here is what you sold it, here is what you bought it out --- premium capture
+- P/L per day
+
+- free trial the only way to get account
+
 
 Position entry wizard:
     step by step:
