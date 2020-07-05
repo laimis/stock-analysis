@@ -9,8 +9,11 @@
 
 - help articles as S3 generated doc site?
 
-- premium capture, here is what you sold it, here is what you bought it out --- premium capture
-- P/L per day
+- Option detail:
+    how many days left
+    ITM/OTM
+    premium capture, here is what you sold it, here is what you bought it out --- premium capture
+    P/L per day
 
 - free trial the only way to get account
 
@@ -21,13 +24,6 @@ Position entry wizard:
     how many
     what price
     execute
-
-Option detail:
-    how many days left
-    ITM/OTM
-    %5 off
-
-
 
 
 - redo dashboard options display
@@ -43,6 +39,9 @@ if the graph doesn’t include realised gain/loss?
 Is there a way to calculate that quickly 
 or I have to go through the statement each month 
 and manually input in excel sheet lol?"
+
+Man in his 30s, having a full-time job, looking to add additional income stream and learn about the market with hopes of
+going full-time just trading stocks and being fully in charge of your time.
 
 - look at this interest sign up:
 https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_trading_journal_for/
