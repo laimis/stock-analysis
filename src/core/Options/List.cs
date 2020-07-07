@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Portfolio.Output;
 using core.Shared;
 
 namespace core.Options
@@ -46,8 +48,80 @@ namespace core.Options
 
                 options = options.OrderByDescending(o => o.State.FirstFill);
 
-                return Mapper.ToOptions(options);
+                return Map(options);
+            }
+
+            private object Map(IEnumerable<OwnedOption> options)
+            {
+                var summaries = options.Select(o => Map(o));
+
+                var overall = new OwnedOptionStats(summaries);
+                var buy = new OwnedOptionStats(summaries.Where(s => s.BoughtOrSold == "Bought"));
+                var sell = new OwnedOptionStats(summaries.Where(s => s.BoughtOrSold == "Sold"));
+
+                return new {
+                    overall,
+                    buy,
+                    sell,
+                    options = summaries
+                };
+            }
+
+            private OwnedOptionSummary Map(OwnedOption o)
+            {
+                return new OwnedOptionSummary
+                {
+                    Id = o.State.Id,
+                    Ticker = o.State.Ticker,
+                    OptionType = o.State.OptionType.ToString(),
+                    StrikePrice = o.State.StrikePrice,
+                    PremiumReceived = o.State.PremiumReceived,
+                    PremiumPaid = o.State.PremiumPaid,
+                    ExpirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
+                    NumberOfContracts = Math.Abs(o.State.NumberOfContracts),
+                    BoughtOrSold = o.State.SoldToOpen.Value ? "Sold" : "Bought",
+                    Filled = o.State.FirstFill,
+                    Days = o.State.Days,
+                    DaysHeld = o.State.DaysHeld,
+                    Transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null),
+                    ExpiresSoon = o.ExpiresSoon,
+                    IsExpired = o.IsExpired,
+                    Assigned = o.State.Assigned,
+                };
             }
         }
+    }
+
+    public class OwnedOptionSummary
+    {
+        public Guid Id { get; set; }
+        public string Ticker { get; set; }
+        public string OptionType { get; set; }
+        public double StrikePrice { get; set; }
+        public double PremiumReceived { get; set; }
+        public double PremiumPaid { get; set; }
+        public double PremiumCapture
+        {
+            get
+            {
+                if (this.BoughtOrSold == "Bought")
+                {
+                    return (PremiumReceived - PremiumPaid) / PremiumPaid;
+                }
+
+                return (PremiumReceived - PremiumPaid) / PremiumReceived;
+            }
+        }
+        public double Profit => this.PremiumReceived - this.PremiumPaid;
+        public string ExpirationDate { get; set; }
+        public int NumberOfContracts { get; set; }
+        public string BoughtOrSold { get; set; }
+        public DateTimeOffset Filled { get; set; }
+        public double Days { get; set; }
+        public int DaysHeld { get; set; }
+        public TransactionList Transactions { get; set; }
+        public bool ExpiresSoon { get; set; }
+        public bool IsExpired { get; set; }
+        public bool Assigned { get; set; }
     }
 }

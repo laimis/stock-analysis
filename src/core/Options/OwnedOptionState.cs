@@ -88,6 +88,10 @@ namespace core.Options
             }
 
             this.DaysHeld = (int)Math.Floor(when.Subtract(this.FirstFill).TotalDays);
+            if (this.DaysHeld == 0)
+            {
+                this.DaysHeld = 1;
+            }
         }
 
         private void ApplyFirstTransactionLogic(bool soldToOpen, DateTimeOffset filled)
