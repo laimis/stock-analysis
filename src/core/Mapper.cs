@@ -129,12 +129,19 @@ namespace core
                 optionType = o.State.OptionType.ToString(),
                 strikePrice = o.State.StrikePrice,
                 premium = o.State.Transactions.Where(t => t.IsPL).Sum(t => t.Profit),
+                premiumReceived = o.State.PremiumReceived,
+                premiumPaid = o.State.PremiumPaid,
+                premiumCapture = o.State.PremiumReceived > 0 ? (o.State.PremiumReceived - o.State.PremiumPaid) / o.State.PremiumReceived : 0,
                 expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
                 numberOfContracts = Math.Abs(o.State.NumberOfContracts),
-                boughtOrSold = o.State.NumberOfContracts > 0 ? "Bought" : "Sold",
+                boughtOrSold = o.State.SoldToOpen.Value ? "Sold" : "Bought",
+                filled = o.State.FirstFill,
+                days = o.State.Days,
+                daysHeld = o.State.DaysHeld,
                 transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null),
                 expiresSoon = o.ExpiresSoon,
-                isExpired = o.IsExpired
+                isExpired = o.IsExpired,
+                assigned = o.State.Assigned,
             };
         }
 

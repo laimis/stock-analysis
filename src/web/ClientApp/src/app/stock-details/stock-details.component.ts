@@ -61,7 +61,7 @@ export class StockDetailsComponent {
   }
 
   loadOptionOwnership() {
-    this.stocks.getOptions(this.ticker).subscribe(result => {
+    this.stocks.getOwnedOptions(this.ticker).subscribe(result => {
       this.options = result
     })
   }

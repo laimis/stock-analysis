@@ -24,7 +24,9 @@ namespace coretests.Options
             option.Expire(true);
 
             Assert.True(option.IsExpired);
+            Assert.True(option.State.Assigned);
             Assert.False(option.IsActive);
+            Assert.True(option.State.SoldToOpen);
             
             var pl = option.State.Transactions.Where(t => t.IsPL);
 

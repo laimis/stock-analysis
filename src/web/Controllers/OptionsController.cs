@@ -35,14 +35,10 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/list")]
-        public async Task<ActionResult<object>> List(string ticker)
+        public Task<object> List(string ticker)
         {
-            var query = new List.Query { Ticker = ticker };
-            query.WithUserId(this.User.Identifier());
-            
-            return await _mediator.Send(query);
+            return _mediator.Send(new List.Query(ticker, true, this.User.Identifier()));
         }
-
 
         [HttpGet("{id}")]
         public async Task<object> Get(Guid id)
@@ -131,6 +127,14 @@ namespace web.Controllers
             var r = await _mediator.Send(cmd);
 
             return this.OkOrError(r);
+        }
+
+        [HttpGet]
+        public Task<object> All()
+        {
+            return _mediator.Send(
+                new List.Query(null, false, this.User.Identifier())
+            );
         }
     }
 }

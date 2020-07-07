@@ -150,10 +150,13 @@ export class StocksService {
 
   // ------- options ----------------
 
+  getOptions() : Observable<any> {
+    return this.http.get('/api/options')
+  }
+
   deleteOption(id: string) {
     return this.http.delete('/api/options/' + id)
   }
-
 
 	buyOption(obj:object) : Observable<any> {
 		return this.http.post<string>('/api/options/buy', obj)
@@ -171,7 +174,7 @@ export class StocksService {
     return this.http.post('/api/options/close', obj)
   }
 
-  getOptions(ticker:string): Observable<OwnedOption[]> {
+  getOwnedOptions(ticker:string): Observable<OwnedOption[]> {
     return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/list')
   }
 

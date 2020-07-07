@@ -45,6 +45,7 @@ import { StockGridComponent } from './stock-grid/stock-grid.component';
 import { StockAlertsComponent } from './stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
+import { OptionsComponent } from './options/options.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -68,6 +69,7 @@ var routes = [
   { path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
   { path: 'notes/filtered/:ticker', component: NotesComponent, canActivate: [AuthGuard]},
   { path: 'notes/:id', component: NoteComponent, canActivate: [AuthGuard]},
+  { path: 'options', component: OptionsComponent, canActivate: [AuthGuard] },
   { path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
@@ -77,9 +79,11 @@ var routes = [
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
+
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
+
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
   { path: 'terms', component: TermsComponent},
   { path: 'test', component: SymbolSearchComponent}
@@ -101,6 +105,7 @@ var routes = [
     NavMenuComponent,
     NoteComponent,
     NotesComponent,
+    OptionsComponent,
     OptionDetailComponent,
     OptionSellComponent,
     OwnedStockDetailComponent,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Options
@@ -27,17 +28,33 @@ namespace core.Options
         public List<OptionSold> Sells { get; private set; }
         public List<OptionPurchased> Buys { get; private set; }
         public List<OptionExpired> Expirations { get; private set; }
+        public double Days { get; private set; }
+        public bool? SoldToOpen { get; private set; }
+        public DateTimeOffset FirstFill { get; private set; }
+
         public long DaysUntilExpiration => 
             (long)Math.Ceiling(Math.Abs(this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
+
+        public int DaysHeld { get; private set; }
+        public bool Assigned => this.Expirations.Count > 0 && this.Expirations[0].Assigned;
+        public bool Deleted { get; private set; }
+        public double PremiumReceived => Transactions.Where(t => t.IsPL).Sum(t => t.Credit);
+        public double PremiumPaid => Transactions.Where(t => t.IsPL).Sum(t => t.Debit);
 
         internal void Apply(OptionDeleted deleted)
         {
             this.NumberOfContracts = 0;
             this.Transactions.Clear();
+            this.Deleted = true;
         }
 
         internal void Apply(OptionSold sold)
         {
+            if (this.SoldToOpen == null)
+            {
+                ApplyFirstTransactionLogic(true, sold.When);
+            }
+
             this.NumberOfContracts -= sold.NumberOfContracts;
 
             this.Sells.Add(sold);
@@ -59,6 +76,25 @@ namespace core.Options
             this.Transactions.Add(
                 Transaction.PLTx(this.Ticker, description, credit, sold.When, true)
             );
+
+            ApplyClosedLogicIfApplicable(sold.When);
+        }
+
+        private void ApplyClosedLogicIfApplicable(DateTimeOffset when)
+        {
+            if (this.NumberOfContracts != 0)
+            {
+                return;
+            }
+
+            this.DaysHeld = (int)Math.Floor(when.Subtract(this.FirstFill).TotalDays);
+        }
+
+        private void ApplyFirstTransactionLogic(bool soldToOpen, DateTimeOffset filled)
+        {
+            this.Days = Math.Floor(this.Expiration.Subtract(filled).TotalDays);
+            this.SoldToOpen = soldToOpen;
+            this.FirstFill = filled;
         }
 
         internal void Apply(OptionOpened opened)
@@ -81,6 +117,11 @@ namespace core.Options
 
         internal void Apply(OptionPurchased purchased)
         {
+            if (this.SoldToOpen == null)
+            {
+                ApplyFirstTransactionLogic(false, purchased.When);
+            }
+
             this.NumberOfContracts += purchased.NumberOfContracts;
 
             var debit = purchased.NumberOfContracts * purchased.Premium;
@@ -108,15 +149,17 @@ namespace core.Options
                     true
                 )
             );
+
+            ApplyClosedLogicIfApplicable(purchased.When);
         }
 
         internal void Apply(OptionExpired expired)
         {
-            var purchased = this.NumberOfContracts > 0;
-
             this.NumberOfContracts = 0;
 
             this.Expirations.Add(expired);
+
+            ApplyClosedLogicIfApplicable(expired.When);
         }
     }
 }

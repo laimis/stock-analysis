@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
 import { Router } from '@angular/router';
-import { DatePipe, Location } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'stock-ownership',

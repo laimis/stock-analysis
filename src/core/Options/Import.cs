@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,7 +67,15 @@ namespace core.Options
                 }
                 else if (record.type == "expired")
                 {
-                    cmd = new Expire.Command();
+                    var exp = new Expire.Command();
+                    exp.Assigned = false;
+                    cmd = exp;
+                }
+                else if (record.type == "assigned")
+                {
+                    var exp = new Expire.Command();
+                    exp.Assigned = true;
+                    cmd = exp;
                 }
 
                 if (cmd is OptionTransaction ot)
@@ -82,6 +88,11 @@ namespace core.Options
                     ot.StrikePrice = record.strike;
                     ot.Ticker = record.ticker;
                     ot.WithUserId(userId);
+
+                    if (record.type == "buy")
+                    {
+                        ot.Premium = -1 * ot.Premium;
+                    }
 
                     var r = await _mediator.Send(ot);
                     if (r.Error != null)

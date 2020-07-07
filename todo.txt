@@ -1,3 +1,8 @@
+- Option detail:
+    how many days left
+    ITM/OTM
+    premium capture, here is what you sold it, here is what you bought it out --- premium capture
+    P/L per day
 
 - dashboard redo
 
@@ -8,12 +13,6 @@
 - wheel strategy landing page
 
 - help articles as S3 generated doc site?
-
-- Option detail:
-    how many days left
-    ITM/OTM
-    premium capture, here is what you sold it, here is what you bought it out --- premium capture
-    P/L per day
 
 - free trial the only way to get account
 
