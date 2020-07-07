@@ -1,3 +1,10 @@
+- options screen
+    previous
+    stats
+        total
+        % win [ total premium > 0]
+    active
+
 - Option detail:
     how many days left
     ITM/OTM

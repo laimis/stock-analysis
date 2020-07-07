@@ -46,6 +46,7 @@ import { StockAlertsComponent } from './stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
 import { OptionsComponent } from './options/options.component';
+import { OptionStatsComponent } from './options/option-stats.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -106,6 +107,7 @@ var routes = [
     NoteComponent,
     NotesComponent,
     OptionsComponent,
+    OptionStatsComponent,
     OptionDetailComponent,
     OptionSellComponent,
     OwnedStockDetailComponent,
