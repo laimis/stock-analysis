@@ -19,14 +19,13 @@
 		"@angular/platform-browser": "~8.0.0",
 		"@angular/platform-browser-dynamic": "~8.0.0",
 		"@angular/router": "~8.0.0",
-		"angular-google-charts": "^0.1.6",
 		"bootstrap": "^4.3.1",
 		"c": "^0.1.0",
+		"kind-of": ">=6.0.3",
+		"minimist": ">=1.2.3",
 		"rxjs": "~6.4.0",
 		"tslib": "^1.9.0",
-		"zone.js": "~0.9.1",
-		"minimist": ">=1.2.3",
-		"kind-of": ">=6.0.3"
+		"zone.js": "~0.9.1"
 	},
 	"devDependencies": {
 		"@angular-devkit/build-angular": "^0.1000.1",
