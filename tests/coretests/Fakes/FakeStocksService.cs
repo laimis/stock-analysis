@@ -62,7 +62,7 @@ namespace coretests.Fakes
 
         public Task<TickerPrice> GetPrice(string ticker)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(new TickerPrice());
         }
 
         public Task<List<SearchResult>> Search(string fragment)
