@@ -40,7 +40,7 @@ namespace core.Alerts
 
                 var list = new List<object>();
 
-                foreach(var a in alerts.OrderBy(a => a.Ticker))
+                foreach(var a in alerts.OrderByDescending(a => a.PricePoints.Any(p => _container.HasTriggered(p))).ThenBy(a => a.Ticker))
                 {
                     if (a.PricePoints.Count == 0)
                     {
