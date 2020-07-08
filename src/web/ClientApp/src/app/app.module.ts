@@ -7,7 +7,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ErrorDisplayComponent } from './shared/error-display/error-display.component';
 import { EventsComponent } from './events/events.component';
 import { FormsModule } from '@angular/forms';
-import { GoogleChartsModule } from 'angular-google-charts';
 import { HttpClientModule } from '@angular/common/http';
 import { LandingComponent } from './landing/landing.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -138,8 +137,7 @@ var routes = [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
-    RouterModule.forRoot(routes),
-    GoogleChartsModule.forRoot()
+    RouterModule.forRoot(routes)
   ],
   providers: [
 	  { provide: "windowObject", useValue: window}
