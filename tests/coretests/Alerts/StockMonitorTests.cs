@@ -31,7 +31,7 @@ namespace coretests.Alerts
             Assert.True(triggered);
             Assert.Equal("AMD", trigger.Ticker);
             Assert.Equal(48, trigger.NewValue);
-            Assert.Equal("down", trigger.Direction);
+            Assert.Equal("DOWN", trigger.Direction);
 
             triggered = m.CheckTrigger("BING", 52, DateTimeOffset.UtcNow, out trigger);
             Assert.False(triggered);
