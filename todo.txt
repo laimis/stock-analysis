@@ -1,11 +1,6 @@
 bugs:
 option stats does not load if you have no options of certain type
 
-- Option detail:
-    how many days left
-    ITM/OTM
-    premium capture, here is what you sold it, here is what you bought it out --- premium capture
-    P/L per day
 
 WRITING
 
@@ -55,3 +50,4 @@ https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps
 
 Alerts - 3 days
 Options stats - 7/5, 7/6, 7/7
+option details screen - 1 evening + 1 morning 1 day...

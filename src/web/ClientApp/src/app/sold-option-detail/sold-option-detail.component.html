@@ -23,6 +23,7 @@
           <div class="col">
             <div class="stat-label">current price</div>
             <div>
+              {{option.strikePriceDiff | percent}}
               <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
               {{option.currentPrice | currency}}
             </div>

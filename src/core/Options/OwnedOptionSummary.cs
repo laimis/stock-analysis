@@ -31,11 +31,8 @@ namespace core.Options
             if (!currentPrice.NotFound)
             {
                 ItmOtmLabel = GetItmOtmLabel(o, currentPrice.Amount);
-            }
-
-            if (ItmOtmLabel != null)
-            {
                 IsFavorable = GetIsFavorable();
+                StrikePriceDiff = (o.State.StrikePrice - currentPrice.Amount)/currentPrice.Amount;
             }
         }
 
@@ -98,5 +95,6 @@ namespace core.Options
         public bool Assigned { get; set; }
         public string ItmOtmLabel { get; }
         public bool IsFavorable { get; }
+        public double StrikePriceDiff { get; }
     }
 }
