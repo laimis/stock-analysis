@@ -1,3 +1,6 @@
+bugs:
+option stats does not load if you have no options of certain type
+
 - Option detail:
     how many days left
     ITM/OTM

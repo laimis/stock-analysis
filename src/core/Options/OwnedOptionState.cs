@@ -35,7 +35,26 @@ namespace core.Options
         public long DaysUntilExpiration => 
             (long)Math.Ceiling(Math.Abs(this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
 
-        public int DaysHeld { get; private set; }
+        public DateTimeOffset? Closed { get; private set; }
+        public int DaysHeld
+        {
+            get
+            {
+                DateTimeOffset date = DateTimeOffset.UtcNow;
+                if (this.Closed != null)
+                {
+                    date = this.Closed.Value;
+                }
+
+                var val = (int)Math.Floor(date.Subtract(this.FirstFill).TotalDays);
+                if (val == 0)
+                {
+                    val = 1;
+                }
+                return val;
+            }
+        }
+        
         public bool Assigned => this.Expirations.Count > 0 && this.Expirations[0].Assigned;
         public bool Deleted { get; private set; }
         public double PremiumReceived => Transactions.Where(t => t.IsPL).Sum(t => t.Credit);
@@ -87,11 +106,7 @@ namespace core.Options
                 return;
             }
 
-            this.DaysHeld = (int)Math.Floor(when.Subtract(this.FirstFill).TotalDays);
-            if (this.DaysHeld == 0)
-            {
-                this.DaysHeld = 1;
-            }
+            this.Closed = when;
         }
 
         private void ApplyFirstTransactionLogic(bool soldToOpen, DateTimeOffset filled)

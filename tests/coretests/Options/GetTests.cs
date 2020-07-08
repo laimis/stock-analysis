@@ -27,7 +27,7 @@ namespace coretests.Options
 
             query.WithUserId(opt.State.UserId);
 
-            var handler = new Get.Handler(storage);
+            var handler = new Get.Handler(storage, new Fakes.FakeStocksService());
 
             var result = await handler.Handle(query, CancellationToken.None);
 
