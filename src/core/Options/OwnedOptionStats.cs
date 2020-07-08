@@ -9,6 +9,11 @@ namespace core.Options
         {
             var list = summaries.ToList();
 
+            if (list.Count == 0)
+            {
+                return;
+            }
+
             this.Count = list.Count;
             this.WinningTrades = list.Count(s => s.Profit > 0);
             this.Assigned = list.Count(s => s.Assigned);
