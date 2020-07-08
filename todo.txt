@@ -1,9 +1,7 @@
-- options screen
-    previous
-    stats
-        total
-        % win [ total premium > 0]
-    active
+NEAR TERM
+- alerts bug <crossed up/down has mark up
+- alerts bug <crossed up/down has mark up
+- active alerts first
 
 - Option detail:
     how many days left
@@ -11,16 +9,18 @@
     premium capture, here is what you sold it, here is what you bought it out --- premium capture
     P/L per day
 
-- dashboard redo
+WRITING
 
-- email to people about alerts
-- send it out on Monday morning
-- space on NG for copy...
 - reddit post on alerts
+- reddit post on option stats
+
+FUTURE
+
+- dashboard redo
+- space on NG for copy
 - wheel strategy landing page
-
+- twitter follow campaign
 - help articles as S3 generated doc site?
-
 - free trial the only way to get account
 
 
@@ -53,3 +53,7 @@ going full-time just trading stocks and being fully in charge of your time.
 https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_trading_journal_for/
 https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps_you_identify_when_a/
 
+
+
+Alerts - 3 days
+Options stats - 7/5, 7/6, 7/7

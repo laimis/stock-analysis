@@ -19,6 +19,6 @@ namespace core.Alerts
 
         public Guid UserId => this.Monitor.Alert.UserId;
         public string Ticker => this.Monitor.Alert.Ticker;
-        public object Direction => this.OldValue < this.NewValue ? "up" : "down";
+        public object Direction => this.OldValue < this.NewValue ? "UP" : "DOWN";
     }
 }

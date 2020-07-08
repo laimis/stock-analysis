@@ -154,7 +154,7 @@ namespace web
                 ticker = (string)trigger.Ticker,
                 value = trigger.NewValue,
                 description = trigger.Monitor.PricePoint.Description,
-                direction = $"crossed <b>{trigger.Direction}</b> through {trigger.Monitor.PricePoint.Value}",
+                direction = $"crossed {trigger.Direction} through {trigger.Monitor.PricePoint.Value}",
                 time = _marketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
             };
         }
