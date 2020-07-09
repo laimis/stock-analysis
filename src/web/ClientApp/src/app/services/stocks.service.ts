@@ -283,7 +283,8 @@ export class OwnedOption {
   strikePrice: number
   numberOfContracts: number
   boughtOrSold: string
-  premium: number
+  premiumReceived: number
+  profit: number
   transactions: TransactionList
 }
 

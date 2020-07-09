@@ -32,7 +32,7 @@ namespace core.Options
             {
                 ItmOtmLabel = GetItmOtmLabel(o, currentPrice.Amount);
                 IsFavorable = GetIsFavorable();
-                StrikePriceDiff = (o.State.StrikePrice - currentPrice.Amount)/currentPrice.Amount;
+                StrikePriceDiff = Math.Abs(o.State.StrikePrice - currentPrice.Amount)/currentPrice.Amount;
             }
         }
 

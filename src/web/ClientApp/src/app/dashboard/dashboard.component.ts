@@ -71,11 +71,11 @@ export class DashboardComponent implements OnInit {
     this.putCollateral = 0
     var putPremium = 0
     for (var o of this.openOptions) {
-      this.optionPremium += o.premium
+      this.optionPremium += o.profit
       if (o.optionType == "PUT")
       {
         this.putContracts++
-        putPremium += o.premium
+        putPremium += o.profit
 
         if (o.boughtOrSold == 'Sold')
         {

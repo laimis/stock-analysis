@@ -1,10 +1,6 @@
 bugs:
 option stats does not load if you have no options of certain type
 
-near:
-
-redo listing of active options
-    - show option def, % itmotm price, premium, p/day, days, days left, % held
 
 WRITING
 
@@ -13,6 +9,8 @@ WRITING
 
 FUTURE
 
+- closed option detail shows final stats
+- put spreads
 - dashboard redo
 - space on NG for copy
 - wheel strategy landing page
