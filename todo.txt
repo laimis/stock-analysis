@@ -1,6 +1,10 @@
 bugs:
 option stats does not load if you have no options of certain type
 
+near:
+
+redo listing of active options
+    - show option def, % itmotm price, premium, p/day, days, days left, % held
 
 WRITING
 

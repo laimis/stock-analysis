@@ -108,24 +108,35 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Symbol</th>
-          <th class="text-right">Share Price</th>
-          <th class="text-right">Your Strike</th>
-          <th class="text-right">Type</th>
-          <th class="text-right">Premium</th>
-          <th></th>
+          <th>Option</th>
+          <th>OTM/ITM</th>
+          <th>Profit</th>
+          <th>Profit/Day</th>
+          <th>Days Held %</th>
+          <th>Days Left</th>
         </tr>
       </thead>
       <tr *ngFor="let option of openOptions">
-        <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
-        <td class="text-right">{{option.currentPrice | currency}}</td>
-        <td class="text-right">{{option.strikePrice | currency}}</td>
-        <td class="text-right">{{option.optionType}}</td>
-        <td class="text-right">{{option.premium | currency}}</td>
-        <td><b>{{option.numberOfContracts}}</b> x {{option.boughtOrSold}}
-          <b>{{option.strikePrice | currency}}</b>
-          {{option.optionType}} expiring
-          <b>{{option.expirationDate | date : 'shortDate'}}</b>
+        <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a>
+          {{option.strikePrice | currency}}
+          {{option.optionType}}
+        </td>
+        <td class="text-left">
+          {{option.strikePriceDiff | percent}}
+          <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+          {{option.currentPrice | currency}}
+        </td>
+        <td>
+          {{option.profit | currency}}
+        </td>
+        <td>
+          {{(option.profit / option.days) | currency}}
+        </td>
+        <td>
+          {{option.daysHeld / option.days | percent}}
+        </td>
+        <td>
+          {{(option.days - option.daysHeld) | number}}
           <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
           <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
         </td>

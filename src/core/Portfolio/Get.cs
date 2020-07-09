@@ -46,7 +46,7 @@ namespace core.Portfolio
                 var obj = new
                 {
                     owned = owned.Select(o => Mapper.ToOwnedView(o, prices[o.Ticker].Result)),
-                    openOptions = openOptions.Select(o => Mapper.ToOptionView(o, prices[o.Ticker].Result))
+                    openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.Ticker].Result))
                 };
 
                 return obj;
