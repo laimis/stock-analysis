@@ -1,7 +1,6 @@
 bugs:
 option stats does not load if you have no options of certain type
 
-
 WRITING
 
 - reddit post on alerts

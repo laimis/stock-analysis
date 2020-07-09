@@ -10,7 +10,7 @@ namespace core.Options
 {
     public class List
     {
-        public class Query : RequestWithUserId<object>
+        public class Query : RequestWithUserId<OwnedOptionStatsContainer>
         {
             public Query(string ticker, bool? activeFilter, Guid userId) :base(userId)
             {
@@ -23,13 +23,13 @@ namespace core.Options
             public bool? ActiveFilter { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, object>
+        public class Handler : HandlerWithStorage<Query, OwnedOptionStatsContainer>
         {
             public Handler(IPortfolioStorage storage) : base(storage)
             {
             }
 
-            public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<OwnedOptionStatsContainer> Handle(Query request, CancellationToken cancellationToken)
             {
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
@@ -50,7 +50,7 @@ namespace core.Options
                 return Map(options);
             }
 
-            private object Map(IEnumerable<OwnedOption> options)
+            private OwnedOptionStatsContainer Map(IEnumerable<OwnedOption> options)
             {
                 var summaries = options.Select(o => Map(o));
 
@@ -58,12 +58,7 @@ namespace core.Options
                 var buy = new OwnedOptionStats(summaries.Where(s => s.BoughtOrSold == "Bought"));
                 var sell = new OwnedOptionStats(summaries.Where(s => s.BoughtOrSold == "Sold"));
 
-                return new {
-                    overall,
-                    buy,
-                    sell,
-                    options = summaries
-                };
+                return new OwnedOptionStatsContainer(summaries);
             }
 
             private OwnedOptionSummary Map(OwnedOption o)
