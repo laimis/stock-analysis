@@ -35,7 +35,7 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/list")]
-        public Task<object> List(string ticker)
+        public Task<OwnedOptionStatsContainer> List(string ticker)
         {
             return _mediator.Send(new List.Query(ticker, true, this.User.Identifier()));
         }
@@ -130,7 +130,7 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<object> All()
+        public Task<OwnedOptionStatsContainer> All()
         {
             return _mediator.Send(
                 new List.Query(null, false, this.User.Identifier())
