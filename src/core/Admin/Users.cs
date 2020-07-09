@@ -46,7 +46,7 @@ namespace core.Admin
             {
                 var users = await _storage.GetUserEmailIdPairs();
 
-                var result = new List<object>();
+                var result = new List<UserView>();
 
                 foreach(var (email,userId) in users)
                 {
@@ -58,23 +58,12 @@ namespace core.Admin
                     var stocks = await _portfolio.GetStocks(guid);
                     var alerts = await _alerts.GetAlerts(guid);
                     
-                    var u = new {
-                        email,
-                        userId,
-                        user.Firstname,
-                        user.Lastname,
-                        user.LastLogin,
-                        user.Verified,
-                        stock = stocks.Count(),
-                        options = options.Count(),
-                        notes = notes.Count(),
-                        alerts = alerts.Count()
-                    };
+                    var u = new UserView(user, stocks, options, notes, alerts);
 
                     result.Add(u);
                 }
 
-                return result;
+                return result.OrderByDescending(u => u.LastLogin);
             }
 
             public async Task<ExportResponse> Handle(Users.Export request, CancellationToken cancellationToken)
