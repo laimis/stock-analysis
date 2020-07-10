@@ -125,7 +125,7 @@
           <span class="badge" [ngClass]="{'badge-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
         </td>
         <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
-        <td>{{option.optionType}}</td>
+        <td>{{option.expirationDate | date:'MM/dd'}} {{option.optionType}}</td>
         <td>
           {{option.strikePrice | currency}}
         </td>
