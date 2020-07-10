@@ -26,6 +26,7 @@ namespace core.Options
             Transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null);
             ExpiresSoon = o.ExpiresSoon;
             IsExpired = o.IsExpired;
+            Closed = o.Closed;
             Assigned = o.State.Assigned;
 
             if (!currentPrice.NotFound)
@@ -92,6 +93,7 @@ namespace core.Options
         public TransactionList Transactions { get; set; }
         public bool ExpiresSoon { get; set; }
         public bool IsExpired { get; set; }
+        public DateTimeOffset? Closed { get; }
         public bool Assigned { get; set; }
         public string ItmOtmLabel { get; }
         public bool IsFavorable { get; }

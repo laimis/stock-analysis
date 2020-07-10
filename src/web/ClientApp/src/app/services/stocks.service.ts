@@ -328,6 +328,7 @@ export class OptionDefinition {
   breakEven: number
   risk: number
   volume : number
+  boughtOrSold : string
 }
 
 export class OptionBreakdown {

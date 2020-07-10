@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DatePipe, Location } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-sold-option-detail',
@@ -23,7 +23,6 @@ export class SoldOptionDetailComponent implements OnInit {
     private service: StocksService,
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
     private datePipe: DatePipe
   ) { }
 
@@ -39,6 +38,8 @@ export class SoldOptionDetailComponent implements OnInit {
   getOption(id:string){
     this.service.getOption(id).subscribe( result => {
       this.option = result
+      this.positionType = this.option.boughtOrSold == 'Bought' ? 'sell' : 'buy'
+      this.numberOfContracts = this.option.numberOfContracts
     })
   }
 
@@ -70,10 +71,6 @@ export class SoldOptionDetailComponent implements OnInit {
         this.router.navigateByUrl('/dashboard')
       })
     }
-  }
-
-  back() {
-    this.location.back()
   }
 
   recordBuy(opt: object) {

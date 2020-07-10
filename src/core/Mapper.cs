@@ -50,12 +50,6 @@ namespace core
             };
         }
 
-        internal static object ToOptions(IEnumerable<OwnedOption> filtered)
-        {
-            return filtered
-                .Select(o => ToOptionView(o, new TickerPrice()));
-        }
-
         internal static TransactionList ToTransactionLog(
             IEnumerable<OwnedStock> stocks,
             IEnumerable<OwnedOption> options,
@@ -116,26 +110,6 @@ namespace core
                 price,
                 stats,
                 profile,
-            };
-        }
-
-        public static object ToOptionView(OwnedOption o, TickerPrice currentPrice)
-        {
-            return new
-            {
-                id = o.State.Id,
-                ticker = o.State.Ticker,
-                currentPrice = currentPrice.Amount,
-                optionType = o.State.OptionType.ToString(),
-                strikePrice = o.State.StrikePrice,
-                premium = o.State.Transactions.Where(t => t.IsPL).Sum(t => t.Profit),
-                expirationDate = o.State.Expiration.ToString("yyyy-MM-dd"),
-                numberOfContracts = Math.Abs(o.State.NumberOfContracts),
-                boughtOrSold = o.State.SoldToOpen.Value ? "Sold" : "Bought",
-                transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null),
-                expiresSoon = o.ExpiresSoon,
-                isExpired = o.IsExpired,
-                assigned = o.State.Assigned,
             };
         }
 

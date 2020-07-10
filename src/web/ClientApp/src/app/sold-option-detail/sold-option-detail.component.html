@@ -10,8 +10,11 @@
           <a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a>
            @ {{option.strikePrice | currency}} {{option.type}}
 
-          <span class="float-right">
+          <span class="float-right" *ngIf="!option.closed">
             {{option.numberOfContracts}} contracts {{option.boughtOrSold}}
+          </span>
+          <span class="float-right" *ngIf="option.closed">
+            position closed
           </span>
         </h3>
         <h5 class="card-subtitle text-muted">
@@ -19,30 +22,56 @@
           <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
           <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
         </h5>
-        <div class="mt-2 row">
-          <div class="col">
-            <div class="stat-label">current price</div>
-            <div>
-              {{option.strikePriceDiff | percent}}
-              <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
-              {{option.currentPrice | currency}}
+
+        <div *ngIf="!option.closed">
+          <div class="mt-2 row">
+            <div class="col">
+              <div class="stat-label">current price</div>
+              <div>
+                {{option.strikePriceDiff | percent}}
+                <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+                {{option.currentPrice | currency}}
+              </div>
             </div>
+            <div class="col"><div class="stat-label">Days Held</div><div>{{option.daysHeld | number}}</div></div>
+            <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
+            <div class="col"><div class="stat-label">Days Left</div><div>{{(option.days - option.daysHeld) | number}}</div></div>
           </div>
-          <div class="col"><div class="stat-label">Days Held</div><div>{{option.daysHeld | number}}</div></div>
-          <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
-          <div class="col"><div class="stat-label">Days Left</div><div>{{(option.days - option.daysHeld) | number}}</div></div>
+
+          <div class="mt-2 row">
+            <div class="col"><div class="stat-label">Premium Received</div><div>{{option.premiumReceived | currency}}</div></div>
+            <div class="col"><div class="stat-label">Premium Paid</div><div>{{option.premiumPaid | currency}}</div></div>
+            <div class="col"><div class="stat-label">Premium / Day</div><div>{{(option.premiumReceived / option.days) | currency}}</div></div>
+            <div class="col"><div class="stat-label"></div><div></div></div>
+          </div>
         </div>
 
-        <div class="mt-2 row">
-          <div class="col"><div class="stat-label">Premium Received</div><div>{{option.premiumReceived | currency}}</div></div>
-          <div class="col"><div class="stat-label">Premium Paid</div><div>{{option.premiumPaid | currency}}</div></div>
-          <div class="col"><div class="stat-label">Premium / Day</div><div>{{(option.premiumReceived / option.days) | currency}}</div></div>
-          <div class="col"><div class="stat-label"></div><div></div></div>
+        <div *ngIf="option.closed">
+          <div class="mt-2 row">
+            <div class="col"><div class="stat-label">Profit</div><div>{{option.profit | currency}}</div></div>
+            <div class="col"><div class="stat-label">Days Held</div><div>{{option.daysHeld | number}}</div></div>
+            <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
+            <div class="col">
+              <div class="stat-label">Win/Loss</div>
+              <div>
+                <span class="badge badge-success" *ngIf="option.profit >= 0">win</span>
+                <span class="badge badge-warning" *ngIf="option.profit < 0">loss</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2 row">
+            <div class="col"><div class="stat-label">Premium Received</div><div>{{option.premiumReceived | currency}}</div></div>
+            <div class="col"><div class="stat-label">Premium Paid</div><div>{{option.premiumPaid | currency}}</div></div>
+            <div class="col"><div class="stat-label">Premium / Day</div><div>{{(option.profit / option.days) | currency}}</div></div>
+            <div class="col"><div class="stat-label"></div><div></div></div>
+          </div>
         </div>
+
       </div>
     </div>
 
-    <div class="card mt-2">
+    <div class="card mt-2" *ngIf="!option.closed">
       <div class="card-body">
         <div class="card-title">
           Close Option Position
@@ -56,7 +85,7 @@
       </div>
     </div>
 
-    <div class="card mt-2">
+    <div class="card mt-2" *ngIf="!option.closed">
       <div class="card-body">
         <div class="card-title">
           If you closed via a trade, record it below:
@@ -64,11 +93,8 @@
         <form>
           <div class="form-row">
             <div class="form-group col">
-              <label for="positionType">Buying or Selling? &nbsp;&nbsp; </label>
-              <select class="form-control btn border rounded" name="positionType" [(ngModel)]="positionType">
-                <option value="buy">Buying</option>
-                <option value="sell">Selling</option>
-              </select>
+              <label for="positionType">Trade type</label>
+              <input class="form-control" type="text" readonly value="{{positionType}}" />
             </div>
 
             <div class="form-group col">
