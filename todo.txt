@@ -1,5 +1,15 @@
 bugs:
+
 option stats does not load if you have no options of certain type
+
+- remove "sold" label
+
+- stock in its own column
+- price next to strike
+- itm +% in its own colum
+- itmotm first, then +%
+
+RH vision
 
 WRITING
 
