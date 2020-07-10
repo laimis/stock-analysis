@@ -1,4 +1,4 @@
-- abilty to edit each entry
+
 
 WRITING
 
@@ -10,6 +10,7 @@ WRITING
 
 FUTURE
 
+- abilty to edit each entry
 - RH vision
 - closed option detail shows final stats
 - put spreads

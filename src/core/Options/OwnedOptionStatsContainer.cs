@@ -5,8 +5,6 @@ namespace core.Options
 {
     public class OwnedOptionStatsContainer
     {
-        private IEnumerable<OwnedOptionSummary> summaries;
-
         public OwnedOptionStatsContainer(IEnumerable<OwnedOptionSummary> summaries)
         {
             Options = summaries;

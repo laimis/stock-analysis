@@ -4,6 +4,7 @@ namespace core.Shared
 {
     public struct Transaction
     {
+        public Guid AggregateId { get; }
         public string Ticker { get; }
         public string Description { get; }
         public double Debit { get; }
@@ -14,6 +15,7 @@ namespace core.Shared
         public bool IsPL { get; }
 
         private Transaction(
+            Guid aggregateId,
             string ticker,
             string description,
             double debit,
@@ -22,6 +24,7 @@ namespace core.Shared
             bool isOption,
             bool isPL)
         {
+            this.AggregateId = aggregateId;
             this.Ticker = ticker;
             this.Description = description;
             this.Debit = debit;
@@ -31,19 +34,19 @@ namespace core.Shared
             this.IsPL = isPL;
         }
 
-        public static Transaction CreditTx(string ticker, string description, double credit, DateTimeOffset when, bool isOption)
+        public static Transaction CreditTx(Guid aggregateId, string ticker, string description, double credit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(ticker, description, 0, credit, when, isOption, false);
+            return new Transaction(aggregateId, ticker, description, 0, credit, when, isOption, false);
         }
 
-        public static Transaction DebitTx(string ticker, string description, double debit, DateTimeOffset when, bool isOption)
+        public static Transaction DebitTx(Guid aggregateId, string ticker, string description, double debit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(ticker, description, debit, 0, when, isOption, false);
+            return new Transaction(aggregateId, ticker, description, debit, 0, when, isOption, false);
         }
 
-        public static Transaction PLTx(string ticker, string description, double amount, DateTimeOffset when, bool isOption)
+        public static Transaction PLTx(Guid aggregateId, string ticker, string description, double amount, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(ticker, description, amount < 0 ? Math.Abs(amount) : 0, amount > 0 ? amount : 0, when, isOption, true);
+            return new Transaction(aggregateId, ticker, description, amount < 0 ? Math.Abs(amount) : 0, amount > 0 ? amount : 0, when, isOption, true);
         }
     }
 }

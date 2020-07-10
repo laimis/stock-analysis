@@ -84,6 +84,7 @@ namespace core.Options
 
             this.Transactions.Add(
                 Transaction.CreditTx(
+                    this.Id,
                     this.Ticker,
                     description,
                     credit,
@@ -93,7 +94,7 @@ namespace core.Options
             );
 
             this.Transactions.Add(
-                Transaction.PLTx(this.Ticker, description, credit, sold.When, true)
+                Transaction.PLTx(this.Id, this.Ticker, description, credit, sold.When, true)
             );
 
             ApplyClosedLogicIfApplicable(sold.When);
@@ -151,6 +152,7 @@ namespace core.Options
 
             this.Transactions.Add(
                 Transaction.DebitTx(
+                    this.Id,
                     this.Ticker,
                     description,
                     debit,
@@ -161,6 +163,7 @@ namespace core.Options
 
             this.Transactions.Add(
                 Transaction.PLTx(
+                    this.Id,
                     this.Ticker,
                     description,
                     - debit,

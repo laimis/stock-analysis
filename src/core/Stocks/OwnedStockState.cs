@@ -43,6 +43,7 @@ namespace core.Stocks
             this.Buys.Add(purchased);
 
             this.Transactions.Add(Transaction.DebitTx(
+                this.Id,
                 this.Ticker,
                 $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
                 purchased.Price * purchased.NumberOfShares,
@@ -69,6 +70,7 @@ namespace core.Stocks
             this.LastSale = sold.When;
 
             this.Transactions.Add(Transaction.CreditTx(
+                this.Id,
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
                 sold.Price * sold.NumberOfShares,
@@ -77,6 +79,7 @@ namespace core.Stocks
             ));
 
             this.Transactions.Add(Transaction.PLTx(
+                this.Id,
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
                 (sold.Price * sold.NumberOfShares - this.AverageCost * sold.NumberOfShares),
