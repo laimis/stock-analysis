@@ -11,7 +11,7 @@
            @ {{option.strikePrice | currency}} {{option.type}}
 
           <span class="float-right">
-            {{option.numberOfContracts}} contracts
+            {{option.numberOfContracts}} contracts {{option.boughtOrSold}}
           </span>
         </h3>
         <h5 class="card-subtitle text-muted">
@@ -45,7 +45,7 @@
     <div class="card mt-2">
       <div class="card-body">
         <div class="card-title">
-          Quick Close position options
+          Close Option Position
         </div>
         <form>
           <div>
@@ -59,7 +59,7 @@
     <div class="card mt-2">
       <div class="card-body">
         <div class="card-title">
-          Additional trades for {{option.ticker}} @ {{option.strikePrice | currency}} {{option.type}}
+          If you closed via a trade, record it below:
         </div>
         <form>
           <div class="form-row">
