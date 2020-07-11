@@ -22,10 +22,10 @@ namespace web.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("{ticker}/details")]
+        [HttpGet("{ticker}/chain")]
         public async Task<ActionResult<OptionDetailsViewModel>> DetailsAsync(string ticker)
         {
-            var details = await _mediator.Send(new Detail.Query(ticker));
+            var details = await _mediator.Send(new Chain.Query(ticker));
             if (details == null)
             {
                 return NotFound();
@@ -34,16 +34,16 @@ namespace web.Controllers
             return details;
         }
 
-        [HttpGet("{ticker}/list")]
+        [HttpGet("{ticker}/active")]
         public Task<OwnedOptionStatsContainer> List(string ticker)
         {
-            return _mediator.Send(new List.Query(ticker, true, this.User.Identifier()));
+            return _mediator.Send(new Active.Query(ticker, this.User.Identifier()));
         }
 
         [HttpGet("{id}")]
         public async Task<object> Get(Guid id)
         {
-            var query = new Get.Query { Id = id };
+            var query = new Details.Query { Id = id };
 
             query.WithUserId(this.User.Identifier());
             
@@ -130,10 +130,10 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<OwnedOptionStatsContainer> All()
+        public Task<OwnedOptionStatsContainer> Dashboard()
         {
             return _mediator.Send(
-                new List.Query(null, false, this.User.Identifier())
+                new Dashboard.Query(this.User.Identifier())
             );
         }
     }

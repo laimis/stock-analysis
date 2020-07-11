@@ -1,15 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
-using core.Portfolio.Output;
 using core.Shared;
 
 namespace core.Options
 {
-    public class Get
+    public class Details
     {
         public class Query : RequestWithUserId<object>
         {

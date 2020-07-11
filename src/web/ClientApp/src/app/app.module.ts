@@ -46,6 +46,9 @@ import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
 import { OptionsComponent } from './options/option-dashboard/option-dashboard.component';
 import { OptionStatsComponent } from './options/option-dashboard/option-stats.component';
+import { OptionOpenComponent } from './options/option-dashboard/option-open.component';
+import { OptionPerformanceComponent } from './options/option-dashboard/option-performance.component';
+import { OptionClosedComponent } from './options/option-dashboard/option-closed.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -107,10 +110,15 @@ var routes = [
     NavMenuComponent,
     NoteComponent,
     NotesComponent,
+
     OptionsComponent,
     OptionStatsComponent,
     OptionChainComponent,
     OptionSellComponent,
+    OptionOpenComponent,
+    OptionPerformanceComponent,
+    OptionClosedComponent,
+
     OwnedStockDetailComponent,
     PaymentsComponent,
     PlaygroundComponent,

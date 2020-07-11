@@ -6,6 +6,7 @@ Options page:
     Past position review
     Performance grid
 
+- new sign up experience
 
 WRITING
 

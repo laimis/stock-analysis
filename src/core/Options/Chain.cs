@@ -7,7 +7,7 @@ using MediatR;
 
 namespace core.Options
 {
-    public class Detail
+    public class Chain
     {
         public class Query : IRequest<OptionDetailsViewModel>
         {

@@ -7,31 +7,27 @@ using Xunit;
 
 namespace coretests.Options
 {
-    public class GetTests : IClassFixture<OptionsTestsFixture>
+    public class ListTests : IClassFixture<OptionsTestsFixture>
     {
         private OptionsTestsFixture _fixture;
 
-        public GetTests(OptionsTestsFixture fixture)
+        public ListTests(OptionsTestsFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
-        public async Task Get_WorksAsync()
+        public async Task List_WorksAsync()
         {
             var storage = _fixture.CreateStorageWithSoldOption();
             var opt = storage.SavedOptions.First();
-            var query = new Get.Query {
-                Id = opt.State.Id
-            };
+            var query = new Dashboard.Query(Guid.NewGuid());
 
-            query.WithUserId(opt.State.UserId);
-
-            var handler = new Get.Handler(storage, new Fakes.FakeStocksService());
+            var handler = new Dashboard.Handler(storage, new Fakes.FakeStocksService());
 
             var result = await handler.Handle(query, CancellationToken.None);
 
-            Assert.NotNull(result);
+            Assert.Equal(0, result.Buy.Count);
         }
     }
 }

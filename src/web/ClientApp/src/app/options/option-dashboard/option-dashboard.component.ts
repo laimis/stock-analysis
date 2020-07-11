@@ -8,11 +8,11 @@ import { StocksService } from '../../services/stocks.service';
 })
 export class OptionsComponent implements OnInit {
 
-  errors: string[]
-  options: any
-  overall: any
-  buy: any
-  sell: any
+  statsContainer: any
+
+  loaded: boolean = false;
+
+  activeTab: string = 'open'
 
   constructor(
     private service: StocksService
@@ -24,10 +24,16 @@ export class OptionsComponent implements OnInit {
 
   getOptions(){
     this.service.getOptions().subscribe( result => {
-      this.options = result.options
-      this.overall = result.overall
-      this.buy = result.buy
-      this.sell = result.sell
+      this.statsContainer = result
+      this.loaded = true
     })
+  }
+
+  isActive(tabName:string) {
+    return tabName == this.activeTab
+  }
+
+  activateTab(tabName:string) {
+    this.activeTab = tabName
   }
 }
