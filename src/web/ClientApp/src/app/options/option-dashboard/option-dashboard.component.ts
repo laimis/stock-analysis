@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
+import { StocksService } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-options',
-  templateUrl: './options.component.html',
-  styleUrls: ['./options.component.css']
+  templateUrl: './option-dashboard.component.html',
+  styleUrls: ['./option-dashboard.component.css']
 })
 export class OptionsComponent implements OnInit {
 

@@ -13,14 +13,14 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { NgModule } from '@angular/core';
 import { NoteComponent } from './notes/note.component';
 import { NotesComponent } from './notes/notes.component';
-import { OptionChainComponent } from './option-chain/option-chain.component';
-import { OptionSellComponent } from './option-sell/option-sell.component';
+import { OptionChainComponent } from './options/option-chain/option-chain.component';
+import { OptionSellComponent } from './options/option-sell/option-sell.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ProfileCreateComponent } from './profile/profile-create.component';
 import { ProfileLoginComponent } from './profile/profile-login.component';
 import { ReviewComponent } from './review/review.component';
 import { RouterModule } from '@angular/router';
-import { SoldOptionDetailComponent } from './sold-option-detail/sold-option-detail.component';
+import { SoldOptionDetailComponent } from './options/sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stock-details/stock-details.component';
 import { StockListComponent } from './stock-lists/stock-list.component';
 import { StockListsComponent } from './stock-lists/stock-lists.component';
@@ -44,8 +44,8 @@ import { StockGridComponent } from './stock-grid/stock-grid.component';
 import { StockAlertsComponent } from './stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
-import { OptionsComponent } from './options/options.component';
-import { OptionStatsComponent } from './options/option-stats.component';
+import { OptionsComponent } from './options/option-dashboard/option-dashboard.component';
+import { OptionStatsComponent } from './options/option-dashboard/option-stats.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },

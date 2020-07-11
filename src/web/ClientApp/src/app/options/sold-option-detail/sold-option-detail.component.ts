@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition, GetErrors } from '../services/stocks.service';
+import { StocksService, OptionDefinition, GetErrors } from '../../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
