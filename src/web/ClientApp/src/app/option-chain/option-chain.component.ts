@@ -3,11 +3,11 @@ import { StocksService, OptionDefinition, OptionBreakdown } from '../services/st
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-option-detail',
-  templateUrl: './option-detail.component.html',
-  styleUrls: ['./option-detail.component.css']
+  selector: 'app-option-chain',
+  templateUrl: './option-chain.component.html',
+  styleUrls: ['./option-chain.component.css']
 })
-export class OptionDetailComponent implements OnInit {
+export class OptionChainComponent implements OnInit {
   ticker: string;
 
   public options : OptionDefinition[]

@@ -13,7 +13,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { NgModule } from '@angular/core';
 import { NoteComponent } from './notes/note.component';
 import { NotesComponent } from './notes/notes.component';
-import { OptionDetailComponent } from './option-detail/option-detail.component';
+import { OptionChainComponent } from './option-chain/option-chain.component';
 import { OptionSellComponent } from './option-sell/option-sell.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ProfileCreateComponent } from './profile/profile-create.component';
@@ -73,7 +73,7 @@ var routes = [
   { path: 'options', component: OptionsComponent, canActivate: [AuthGuard] },
   { path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard] },
-  { path: 'options/:ticker', component: OptionDetailComponent, canActivate: [AuthGuard] },
+  { path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard] },
   { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
 
   { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
@@ -109,7 +109,7 @@ var routes = [
     NotesComponent,
     OptionsComponent,
     OptionStatsComponent,
-    OptionDetailComponent,
+    OptionChainComponent,
     OptionSellComponent,
     OwnedStockDetailComponent,
     PaymentsComponent,
