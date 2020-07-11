@@ -1,0 +1,49 @@
+<div class="mt-4" *ngIf="openOptions.length > 0">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Ticker</th>
+        <th>Type</th>
+        <th>Strike</th>
+        <th>Price</th>
+        <th>OTM/ITM</th>
+        <th>Profit</th>
+        <th>Profit/Day</th>
+        <th>Days Held %</th>
+        <th>Days Left</th>
+      </tr>
+    </thead>
+    <tr *ngFor="let option of openOptions">
+      <td>
+        <span class="badge" [ngClass]="{'badge-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
+      </td>
+      <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
+      <td>{{option.expirationDate | date:'MM/dd'}} {{option.optionType}}</td>
+      <td>
+        {{option.strikePrice | currency}}
+      </td>
+      <td>
+        {{option.currentPrice | currency}}
+      </td>
+      <td class="text-left">
+        <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+        {{option.strikePriceDiff | percent}}
+      </td>
+      <td>
+        {{option.profit | currency}}
+      </td>
+      <td>
+        {{(option.profit / option.days) | currency}}
+      </td>
+      <td>
+        {{option.daysHeld / option.days | percent}}
+      </td>
+      <td>
+        {{(option.days - option.daysHeld) | number}}
+        <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
+        <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
+      </td>
+    </tr>
+  </table>
+</div>

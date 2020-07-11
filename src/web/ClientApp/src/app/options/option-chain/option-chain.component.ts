@@ -37,7 +37,7 @@ export class OptionChainComponent implements OnInit {
       this.ticker = ticker;
     }
 
-    this.service.getOptionDetails(this.ticker).subscribe( result => {
+    this.service.getOptionChain(this.ticker).subscribe( result => {
       this.options = result.options
       this.expirations = result.expirations
       this.breakdown = result.breakdown
@@ -47,7 +47,7 @@ export class OptionChainComponent implements OnInit {
       this.minBid = 0.1
       this.runFilter()
     }, error => {
-      this.failure = "Failed to load option details, either data  is not available or entered symbol is incorrect."
+      this.failure = "Failed to load option chain, either data  is not available or entered symbol is incorrect."
 			console.log("failed: " + error);
 		})
   }

@@ -8,7 +8,7 @@ using core.Shared;
 
 namespace core.Options
 {
-    public class List
+    public class Stats
     {
         public class Query : RequestWithUserId<OwnedOptionStatsContainer>
         {

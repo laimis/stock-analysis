@@ -1,56 +1,18 @@
-<div>
-
-  <div *ngIf="overall" class="mb-5 container">
-    <div class="row mb-2"><h5>Overall stats</h5></div>
-    <option-stats [stats]=overall></option-stats>
-  </div>
-
-  <div *ngIf="sell" class="mb-5 container">
-    <div class="row mb-2"><h5>Sell stats</h5></div>
-    <option-stats [stats]=sell></option-stats>
-  </div>
-
-  <div *ngIf="buy" class="mb-5 container">
-    <div class="row mb-2"><h5>Buy stats</h5></div>
-    <option-stats [stats]=buy></option-stats>
-  </div>
-
-  <h4>Detail break down</h4>
-  <table class="table" *ngIf="options">
-    <thead>
-      <tr>
-        <th>Option</th>
-        <th>Expiration</th>
-        <th>Days Held</th>
-        <th>Days Held %</th>
-        <th>P/L</th>
-        <th>Capture %</th>
-        <th>Premium/Day Held</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let o of options">
-        <td width="100">
-          <div>{{o.ticker}} {{o.strikePrice |currency}}</div>
-          <div>
-            <span *ngIf="o.boughtOrSold=='Sold'" class="badge badge-info mr-1">sell</span>
-            <span *ngIf="o.boughtOrSold=='Bought'" class="badge badge-secondary mr-1">buy</span>
-
-            <span *ngIf="o.optionType=='CALL'" class="badge badge-success mr-1">call</span>
-            <span *ngIf="o.optionType=='PUT'" class="badge badge-warning mr-1">put</span>
-          </div>
-          <div *ngIf="o.assigned">
-            <span class="badge badge-warning mr-1">assigned</span>
-          </div>
-        </td>
-        <td>{{o.expirationDate | date:'MM/dd'}}</td>
-        <td>{{o.daysHeld}} / {{o.days}}</td>
-        <td>{{o.daysHeld/o.days| percent}}</td>
-        <td>{{o.premiumReceived - o.premiumPaid | currency}}</td>
-        <td>{{o.premiumCapture | percent}}</td>
-        <td>{{(o.premiumReceived - o.premiumPaid)/o.daysHeld | currency}}</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="tab-container mt-2">
+  <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
+    Open Positions
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('closed')}" [routerLink]="" (click)="activateTab('closed')">
+    Closed Positions
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
+    Performance
+  </a>
 </div>
 
+
+<option-open *ngIf="isActive('open')" [openPositions]=openPositions></option-open>
+
+<option-closed *ngIf="isActive('closed')" [closedPositions]=closedPositions></option-closed>
+
+<option-performance *ngIf="isActive('performance')" [statsContainer]=statsContainer></option-performance>
