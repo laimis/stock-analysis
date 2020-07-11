@@ -1,3 +1,11 @@
+- dashboard redo
+
+Options page:
+    
+    Current Positions tab
+    Past position review
+    Performance grid
+
 
 WRITING
 
@@ -16,7 +24,6 @@ FUTURE
 - abilty to edit each entry
 - RH vision
 - put spreads
-- dashboard redo
 - space on NG for copy
 - wheel strategy landing page
 - twitter follow campaign
