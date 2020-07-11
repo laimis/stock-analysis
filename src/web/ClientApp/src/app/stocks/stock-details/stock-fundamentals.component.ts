@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StockSummary } from '../services/stocks.service';
+import { StockSummary } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-fundamentals',

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { NoteList } from '../services/stocks.service';
+import { NoteList } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-notes',

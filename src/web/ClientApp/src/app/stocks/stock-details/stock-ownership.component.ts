@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { StocksService, GetErrors } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 

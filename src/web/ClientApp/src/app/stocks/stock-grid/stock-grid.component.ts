@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockGridEntry } from '../services/stocks.service';
+import { StocksService, StockGridEntry } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-grid',

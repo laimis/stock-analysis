@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { StockSummary, StocksService, GetErrors, AlertLabelValue } from '../services/stocks.service';
+import { StockSummary, StocksService, GetErrors, AlertLabelValue } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-alerts',
