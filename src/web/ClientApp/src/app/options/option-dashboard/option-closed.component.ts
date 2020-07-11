@@ -8,8 +8,12 @@ import { Component, Input } from '@angular/core';
 
 export class OptionClosedComponent {
 
+  options:any
+
   @Input()
-  closedPositions: any;
+  set statsContainer(container:any) {
+    this.options = container.closedOptions
+  }
 
 	constructor(){}
 

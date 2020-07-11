@@ -8,8 +8,12 @@ import { Component, Input } from '@angular/core';
 
 export class OptionOpenComponent {
 
+  openOptions : any
+
   @Input()
-  openPositions: any;
+  set statsContainer(container:any) {
+    this.openOptions = container.openOptions
+  }
 
 	constructor(){}
 

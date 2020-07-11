@@ -10,12 +10,9 @@ export class OptionsComponent implements OnInit {
 
   statsContainer: any
 
-  errors: string[]
-  options: any
+  loaded: boolean = false;
 
-  openPositions: any
-
-  activeTab: string = 'performance'
+  activeTab: string = 'open'
 
   constructor(
     private service: StocksService
@@ -28,8 +25,7 @@ export class OptionsComponent implements OnInit {
   getOptions(){
     this.service.getOptions().subscribe( result => {
       this.statsContainer = result
-      this.options = result.options
-      this.openPositions = result.openPositions
+      this.loaded = true
     })
   }
 

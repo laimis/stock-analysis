@@ -34,10 +34,10 @@ namespace web.Controllers
             return details;
         }
 
-        [HttpGet("{ticker}/list")]
+        [HttpGet("{ticker}/active")]
         public Task<OwnedOptionStatsContainer> List(string ticker)
         {
-            return _mediator.Send(new Stats.Query(ticker, true, this.User.Identifier()));
+            return _mediator.Send(new Active.Query(ticker, this.User.Identifier()));
         }
 
         [HttpGet("{id}")]
@@ -130,10 +130,10 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<OwnedOptionStatsContainer> All()
+        public Task<OwnedOptionStatsContainer> Dashboard()
         {
             return _mediator.Send(
-                new Stats.Query(null, false, this.User.Identifier())
+                new Dashboard.Query(this.User.Identifier())
             );
         }
     }

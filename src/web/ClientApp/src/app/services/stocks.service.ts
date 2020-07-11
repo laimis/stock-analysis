@@ -175,7 +175,7 @@ export class StocksService {
   }
 
   getOwnedOptions(ticker:string): Observable<OwnedOption[]> {
-    return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/list')
+    return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/active')
   }
 
   getOptionChain(ticker:string): Observable<OptionDetail> {

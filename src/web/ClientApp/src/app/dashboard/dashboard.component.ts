@@ -22,7 +22,6 @@ export class DashboardComponent implements OnInit {
   putContracts: number;
   callContracts: number;
   putCollateral: number;
-  putPremiumvsCollateralPct: number;
 
 	constructor(
 		private stocks : StocksService,
@@ -87,11 +86,6 @@ export class DashboardComponent implements OnInit {
       {
         this.callContracts++
       }
-    }
-    this.putPremiumvsCollateralPct = 0
-    if (putPremium > 0)
-    {
-      this.putPremiumvsCollateralPct = putPremium / (1.0 * this.putCollateral)
     }
   }
 

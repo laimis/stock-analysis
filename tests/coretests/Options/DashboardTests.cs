@@ -21,9 +21,9 @@ namespace coretests.Options
         {
             var storage = _fixture.CreateStorageWithSoldOption();
             var opt = storage.SavedOptions.First();
-            var query = new Stats.Query(null, false, Guid.NewGuid());
+            var query = new Dashboard.Query(Guid.NewGuid());
 
-            var handler = new Stats.Handler(storage);
+            var handler = new Dashboard.Handler(storage, new Fakes.FakeStocksService());
 
             var result = await handler.Handle(query, CancellationToken.None);
 

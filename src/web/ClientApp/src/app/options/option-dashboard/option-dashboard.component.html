@@ -1,4 +1,8 @@
-<div class="tab-container mt-2">
+<div *ngIf="!loaded">
+  Loading...
+</div>
+
+<div class="tab-container mt-2" *ngIf="loaded">
   <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
     Open Positions
   </a>
@@ -11,8 +15,8 @@
 </div>
 
 
-<option-open *ngIf="isActive('open')" [openPositions]=openPositions></option-open>
+<option-open *ngIf="loaded && isActive('open')" [statsContainer]=statsContainer></option-open>
 
-<option-closed *ngIf="isActive('closed')" [closedPositions]=closedPositions></option-closed>
+<option-closed *ngIf="loaded && isActive('closed')" [statsContainer]=statsContainer></option-closed>
 
-<option-performance *ngIf="isActive('performance')" [statsContainer]=statsContainer></option-performance>
+<option-performance *ngIf="loaded && isActive('performance')" [statsContainer]=statsContainer></option-performance>
