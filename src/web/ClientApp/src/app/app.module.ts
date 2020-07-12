@@ -49,6 +49,9 @@ import { OptionStatsComponent } from './options/option-dashboard/option-stats.co
 import { OptionOpenComponent } from './options/option-dashboard/option-open.component';
 import { OptionPerformanceComponent } from './options/option-dashboard/option-performance.component';
 import { OptionClosedComponent } from './options/option-dashboard/option-closed.component';
+import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboard.component';
+import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
+import { StockOwnershipMetricsComponent } from './stocks/stock-dashboard/stock-ownership-metrics.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -83,8 +86,9 @@ var routes = [
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
-  { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
 
+  { path: 'stocks', component: StockDashboardComponent},
+  { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
@@ -130,7 +134,9 @@ var routes = [
     ProfileVerifyComponent,
     ReviewComponent,
     SoldOptionDetailComponent,
+
     StockAlertsComponent,
+    StockDashboardComponent,
     StockDetailsComponent,
     StockFundamentalsComponent,
     StockGridComponent,
@@ -139,6 +145,9 @@ var routes = [
     StockNotesComponent,
     StockOptionComponent,
     StockOwnershipComponent,
+    StockOwnershipGridComponent,
+    StockOwnershipMetricsComponent,
+
     SymbolSearchComponent,
     TransactionsComponent,
     TermsComponent
