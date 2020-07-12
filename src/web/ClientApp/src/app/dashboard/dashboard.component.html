@@ -65,7 +65,7 @@
       </div>
       <div class="row mt-0">
         <div class="col text-right">
-          Premium Received
+          Premium
         </div>
         <div class="col text-left">
           <b>{{optionPremium | currency}}</b>
@@ -106,8 +106,7 @@
           <th>Strike</th>
           <th>Price</th>
           <th>OTM/ITM</th>
-          <th>Profit</th>
-          <th>Profit/Day</th>
+          <th>Premium</th>
           <th>Days Held %</th>
           <th>Days Left</th>
         </tr>
@@ -130,9 +129,6 @@
         </td>
         <td>
           {{option.profit | currency}}
-        </td>
-        <td>
-          {{(option.profit / option.days) | currency}}
         </td>
         <td>
           {{option.daysHeld / option.days | percent}}
