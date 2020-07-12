@@ -1,168 +1,77 @@
-<div>
-  <app-symbol-search
-      label="{{null}}"
-      placeholder="Search for securities using ticker or name"
-      (tickerSelected)="onTickerSelected($event)"
-      cssClass="form-control">
-  </app-symbol-search>
-</div>
-
 <div *ngIf="loaded">
-  <div *ngIf="openOptions.length == 0 && owned.length == 0">
-    <div class="alert alert-secondary">
-      <h3>Welcome!</h3>
-      <p>You haven't recorded any option/share transactions. It's easy to get started!</p>
-      <p>Find the stock you own via symbol search above ☝ and enter the share number and price.</p>
-      <p>You can do the same with options.</p>
+  <div class="container-fluid">
 
-      <h4>If you are just here to take notes</h4>
-      <p>Find the company you are interested in tracking and then starting taking notes.</p>
-      <p>Nightingale Trading platform will help you along with weekly notices on earnings and other important events</p>
-      <h4>We are happy to have you here and good luck with your trading!</h4>
+    <div class="row">
+      <div class="col">
+        <app-symbol-search
+            label="{{null}}"
+            placeholder="Search for securities using ticker or name"
+            (tickerSelected)="onTickerSelected($event)"
+            cssClass="form-control">
+        </app-symbol-search>
+      </div>
     </div>
-  </div>
 
-  <div class="row" *ngIf="openOptions.length > 0 || owned.length > 0">
-    <div class="col text-center">
-      <div class="font-weight-bold text-muted">STOCKS</div>
-      <div class="container">
-        <div class="row">
-          <div class="col text-right">
-            Invested
-          </div>
-          <div class="col text-left">
-            <b>{{moneySpentOnShares | currency}}</b>
-          </div>
-        </div>
-        <div class="row mt-0">
-          <div class="col text-right">
-            Current Equity
-          </div>
-          <div class="col text-left">
-            <b>{{currentEquity | currency}}</b>
-          </div>
-        </div>
-        <div class="row mt-0">
-          <div class="col text-right">
-            Gains
-          </div>
-          <div class="col text-left">
-            <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">{{profits | percent }}</span>
-          </div>
+    <div class="row" *ngIf="openOptions.length == 0 && owned.length == 0">
+      <div class="col">
+        <div class="alert alert-secondary">
+          <h3>Welcome!</h3>
+          <p>You haven't recorded any option/share transactions. It's easy to get started!</p>
+          <p>Find the stock you own via symbol search above ☝ and enter the share number and price.</p>
+          <p>You can do the same with options.</p>
+
+          <h4>If you are just here to take notes</h4>
+          <p>Find the company you are interested in tracking and then starting taking notes.</p>
+          <p>Nightingale Trading platform will help you along with weekly notices on earnings and other important events</p>
+          <h4>We are happy to have you here and good luck with your trading!</h4>
         </div>
       </div>
     </div>
 
-    <div class="col text-center">
-      <div class="font-weight-bold text-muted">OPTIONS</div>
-      <div class="row">
-        <div class="col text-right">
-          Open contracts
+    <div class="row">
+      <div class="col-8">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Shares</h5>
+            <p class="card-text">You have <b>{{owned.length}}</b> tickers on file</p>
+            <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
+          </div>
         </div>
-        <div class="col text-left">
-          <b>{{putContracts + callContracts}}</b>
+
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">Options</h5>
+            <p class="card-text">You have <b>{{openOptions.length}}</b> open contracts</p>
+            <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">Tools</h5>
+            <a class="card-link" [routerLink]="[ '/notes' ]">Journal</a>
+            <a class="card-link" [routerLink]="[ '/transactions' ]">Reports</a>
+            <a class="card-link" [routerLink]="[ '/review' ]">Review</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Alerts</h5>
+            <p class="card-text">Active: <b>{{alerts.length}}</b></p>
+            <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
+          </div>
         </div>
       </div>
-      <div class="row mt-0">
-        <div class="col text-right">
-          Premium
-        </div>
-        <div class="col text-left">
-          <b>{{optionPremium | currency}}</b>
-        </div>
-      </div>
+
     </div>
 
-    <div class="col text-center">
-      <div class="font-weight-bold text-muted">LINKS</div>
-      <div class="row">
-        <div class="col text-right">
-          <a [routerLink]="[ '/stocks' ]">Stocks</a>
-        </div>
-        <div class="col text-left">
-          <a [routerLink]="[ '/options' ]">Options</a>
-        </div>
-      </div>
-      <div class="row mt-0">
-        <div class="col text-right">
-          <a [routerLink]="[ '/alerts' ]">Alerts</a>
-        </div>
-        <div class="col text-left">
-          <a [routerLink]="[ '/review' ]">Review</a>
-        </div>
-      </div>
-    </div>
-
   </div>
 
+  <div class="mt-5">&nbsp;</div>
 
-  <div class="mt-4" *ngIf="openOptions.length > 0">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Option</th>
-          <th>Expiration</th>
-          <th>Price</th>
-          <th>OTM/ITM</th>
-          <th>Premium</th>
-          <th>Days Left</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tr *ngFor="let option of openOptions">
-        <td>
-          <span class="badge" [ngClass]="{'badge-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
-        </td>
-        <td>
-          <span class="font-weight-bold">
-            {{option.ticker}} {{option.strikePrice | currency}} {{option.optionType}}
-          </span>
-        </td>
-        <td>{{option.expirationDate | date:'MM/dd'}}</td>
-        <td>{{option.currentPrice | currency}}</td>
-        <td class="text-left">
-          <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
-          {{option.strikePriceDiff | percent}}
-        </td>
-        <td>
-          {{option.profit | currency}}
-        </td>
-        <td>
-          {{(option.days - option.daysHeld) | number}}
-          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning"> ! </span>
-          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
-        </td>
-        <td>
-          <a class="btn btn-primary btn-sm" [routerLink]="[ '/optiondetails', option.id ]">Edit</a>
-        </td>
-      </tr>
-    </table>
-  </div>
-
-
-  <div class="mt-4" *ngIf="owned.length > 0">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th class="sort-header" (click)="sort('ticker')">Symbol</th>
-          <th class="text-right sort-header" (click)="sort('currentPrice')">Share Price</th>
-          <th class="text-right sort-header" (click)="sort('averageCost')">Your Average Cost</th>
-          <th class="sort-header" (click)="sort('owned')">Ownership</th>
-          <th class="text-right sort-header" (click)="sort('equity')">Equity</th>
-          <th class="text-right sort-header" (click)="sort('profits')">Gain/Loss</th>
-          <th class="text-right sort-header" (click)="sort('profitsPct')">%</th>
-        </tr>
-      </thead>
-      <tr *ngFor="let ticker of owned">
-        <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
-        <td class="text-right">{{ticker.currentPrice | currency}}</td>
-        <td class="text-right">{{ticker.averageCost | currency}}</td>
-        <td>{{ticker.owned}}</td>
-        <td>{{ticker.equity | currency}}</td>
-        <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
-        <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
-      </tr>
-    </table>
-  </div>
 </div>

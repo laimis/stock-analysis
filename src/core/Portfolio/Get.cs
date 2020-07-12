@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
+using core.Alerts;
 using core.Shared;
 
 namespace core.Portfolio
@@ -19,12 +20,15 @@ namespace core.Portfolio
         public class Handler : HandlerWithStorage<Query, object>
         {
             private IStocksService2 _stocksService;
+            private StockMonitorContainer _alerts;
 
             public Handler(
                 IPortfolioStorage storage,
-                IStocksService2 stockService) : base(storage)
+                IStocksService2 stockService,
+                StockMonitorContainer alerts) : base(storage)
             {
                 _stocksService = stockService;
+                _alerts = alerts;
             }
 
             public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
@@ -46,7 +50,8 @@ namespace core.Portfolio
                 var obj = new
                 {
                     owned = owned.Select(o => Mapper.ToOwnedView(o, prices[o.Ticker].Result)),
-                    openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.Ticker].Result))
+                    openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.Ticker].Result)),
+                    alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered)
                 };
 
                 return obj;

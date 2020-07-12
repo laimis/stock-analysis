@@ -1,6 +1,5 @@
 - dashboard redo
 
-- expired options not clear how to close it
 
 - new sign up experience
 
@@ -62,7 +61,10 @@ https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps
 
 DONE:
 
+======================== July ========================
+
 Alerts - 3 days
 Options stats - 7/5, 7/6, 7/7
 Option details screen - 1 evening + 1 morning 1 day...
-Reddit post on option stats 7/10 --- the fucking thing blew up! almost 200 upvotes, the highest in that forum by far
+7/10 Reddit post on option stats --- the fucking thing blew up! almost 200 upvotes, the highest in that forum by far
+7/12 Stocks dashboard created
