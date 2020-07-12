@@ -1,6 +1,11 @@
 name: Build and test
 
-on: [push]
+on:
+    push:
+        tags-ignore:
+        - 'v*'
+        paths-ignore:
+        - 'todo.txt'
 
 jobs:
   build:
