@@ -46,6 +46,11 @@ namespace core.Options
                     date = this.Closed.Value;
                 }
 
+                if (this.IsExpired)
+                {
+                    date = this.Expiration;
+                }
+
                 var val = (int)Math.Floor(date.Subtract(this.FirstFill).TotalDays);
                 if (val == 0)
                 {
