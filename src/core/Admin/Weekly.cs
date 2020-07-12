@@ -109,11 +109,30 @@ namespace core.Admin
                 return new
                 {
                     ticker = pair.p.Ticker,
-                    value = pair.p.Price.Amount,
-                    description = pair.re.Description,
+                    price = pair.p.Price.Amount,
+                    cost = String.Format("{0:0.00}", pair.re.AverageCost),
+                    gainsPct = CalcGainPct(pair.p.Price.Amount, pair.re),
                     expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null,
                     earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null
                 };
+            }
+
+            private static object CalcGainPct(double current, ReviewEntry re)
+            {
+                if (re.AverageCost == 0)
+                {
+                    return "";
+                }
+
+                var gains = Math.Round((current - re.AverageCost)/re.AverageCost * 100, 2);
+
+                var plusOrMinus = gains >= 0 ? "+" : "-";
+                
+                gains = Math.Abs(gains);
+
+                var formatted = String.Format("{0:0.00} %", gains);
+
+                return $"{plusOrMinus} {formatted}";
             }
         }
     }

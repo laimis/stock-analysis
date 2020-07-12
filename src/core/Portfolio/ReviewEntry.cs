@@ -21,6 +21,7 @@ namespace core.Portfolio
             Stats = null;
             IsOption = true;
             IsAlert = false;
+            AverageCost = 0;
             PricePoints = new List<AlertPricePoint>();
         }
 
@@ -36,6 +37,7 @@ namespace core.Portfolio
             Stats = null;
             IsOption = false;
             IsAlert = false;
+            AverageCost = s.AverageCost;
             PricePoints = new List<AlertPricePoint>();
         }
 
@@ -51,6 +53,7 @@ namespace core.Portfolio
             ExpiresSoon = false;
             IsOption = false;
             Stats = null;
+            AverageCost = 0;
             PricePoints = a.PricePoints;
         }
         
@@ -59,6 +62,7 @@ namespace core.Portfolio
         public DateTimeOffset? Expiration { get; }
         public long? DaysLeft { get; }
         public bool IsAlert { get; }
+        public double AverageCost { get; }
         public DateTimeOffset? Created { get; }
         public StockAdvancedStats Stats { get; }
         public List<AlertPricePoint> PricePoints { get; }

@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Alerts;
-using core.Notes;
 using core.Options;
 using core.Portfolio.Output;
 using core.Shared;

@@ -18,6 +18,7 @@ options
 - find ticker in navigation
 - add ability to record new option in options dashboard
 - new sign up experience
+- show note entered with option purchases
 
 WRITING
 
