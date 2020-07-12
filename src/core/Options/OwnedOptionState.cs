@@ -30,7 +30,7 @@ namespace core.Options
         public List<OptionExpired> Expirations { get; private set; }
         public double Days { get; private set; }
         public bool? SoldToOpen { get; private set; }
-        public DateTimeOffset FirstFill { get; private set; }
+        public DateTimeOffset? FirstFill { get; private set; }
 
         public long DaysUntilExpiration => 
             (long)Math.Ceiling(Math.Abs(this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
@@ -51,7 +51,7 @@ namespace core.Options
                     date = this.Expiration;
                 }
 
-                var val = (int)Math.Floor(date.Subtract(this.FirstFill).TotalDays);
+                var val = (int)Math.Floor(date.Subtract(this.FirstFill.Value).TotalDays);
                 if (val == 0)
                 {
                     val = 1;
@@ -69,6 +69,12 @@ namespace core.Options
         {
             this.NumberOfContracts = 0;
             this.Transactions.Clear();
+            this.Buys.Clear();
+            this.Sells.Clear();
+            this.FirstFill = null;
+            this.SoldToOpen = null;
+            this.Closed = null;
+
             this.Deleted = true;
         }
 
@@ -147,7 +153,7 @@ namespace core.Options
 
         internal void Apply(OptionPurchased purchased)
         {
-            if (this.SoldToOpen == null)
+            if (this.FirstFill == null)
             {
                 ApplyFirstTransactionLogic(false, purchased.When);
             }
