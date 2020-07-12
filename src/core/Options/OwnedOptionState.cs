@@ -79,6 +79,11 @@ namespace core.Options
                 ApplyFirstTransactionLogic(true, sold.When);
             }
 
+            if (this.Deleted == true)
+            {
+                this.Deleted = false;
+            }
+
             this.NumberOfContracts -= sold.NumberOfContracts;
 
             this.Sells.Add(sold);
@@ -145,6 +150,11 @@ namespace core.Options
             if (this.SoldToOpen == null)
             {
                 ApplyFirstTransactionLogic(false, purchased.When);
+            }
+
+            if (this.Deleted == true)
+            {
+                this.Deleted = false;
             }
 
             this.NumberOfContracts += purchased.NumberOfContracts;
