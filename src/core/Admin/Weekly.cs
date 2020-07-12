@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Emails;
+using core.Options;
 using core.Portfolio;
 using MediatR;
 using Newtonsoft.Json;
@@ -112,9 +113,22 @@ namespace core.Admin
                     price = pair.p.Price.Amount,
                     cost = String.Format("{0:0.00}", pair.re.AverageCost),
                     gainsPct = CalcGainPct(pair.p.Price.Amount, pair.re),
+                    itmOtmLabel = CalcItmOtm(pair.p, pair.re),
+                    optionType = pair.re.OptionType,
+                    strikePrice = pair.re.StrikePrice,
                     expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null,
                     earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null
                 };
+            }
+
+            private static object CalcItmOtm(ReviewEntryGroup p, ReviewEntry re)
+            {
+                if (re.OptionType != null)
+                {
+                    return OwnedOptionSummary.GetItmOtmLabel(p.Price.Amount, re.OptionType.Value, re.StrikePrice);
+                }
+
+                return null;
             }
 
             private static object CalcGainPct(double current, ReviewEntry re)

@@ -68,7 +68,6 @@ namespace core.Options
 
         public bool IsActive => !this.State.IsExpired && this.State.NumberOfContracts != 0;
         public string Ticker => this.State.Ticker;
-        public string Description => $"{(State.NumberOfContracts > 0 ? "BOUGHT" : "SOLD")} {Math.Abs(State.NumberOfContracts)} ${State.StrikePrice} {State.OptionType} contracts";
         public DateTimeOffset Expiration => this.State.Expiration;
         public bool IsExpired => this.State.IsExpired;
         public DateTimeOffset? Closed => this.State.Closed;

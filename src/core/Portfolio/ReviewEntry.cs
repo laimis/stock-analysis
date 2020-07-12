@@ -13,7 +13,8 @@ namespace core.Portfolio
         {
             Created = null;
             Ticker = o.Ticker;
-            Description = o.Description;
+            Description = $"{Math.Abs(o.State.NumberOfContracts)} ${o.State.StrikePrice} {o.State.OptionType} contracts";
+            OptionType = o.State.OptionType;
             Expiration = o.Expiration;
             IsExpired = o.IsExpired;
             ExpiresSoon = o.ExpiresSoon;
@@ -22,6 +23,8 @@ namespace core.Portfolio
             IsOption = true;
             IsAlert = false;
             AverageCost = 0;
+            OptionType = o.State.OptionType;
+            StrikePrice = o.State.StrikePrice;
             PricePoints = new List<AlertPricePoint>();
         }
 
@@ -38,6 +41,9 @@ namespace core.Portfolio
             IsOption = false;
             IsAlert = false;
             AverageCost = s.AverageCost;
+            OptionType = null;
+            StrikePrice = 0;
+            OptionType = null;
             PricePoints = new List<AlertPricePoint>();
         }
 
@@ -54,6 +60,9 @@ namespace core.Portfolio
             IsOption = false;
             Stats = null;
             AverageCost = 0;
+            OptionType = null;
+            StrikePrice = 0;
+            OptionType = null;
             PricePoints = a.PricePoints;
         }
         
@@ -69,5 +78,7 @@ namespace core.Portfolio
         public bool IsExpired { get; }
         public bool ExpiresSoon { get; }
         public bool IsOption { get; }
+        public OptionType? OptionType { get; internal set; }
+        public double StrikePrice { get; internal set; }
     }
 }

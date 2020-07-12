@@ -1,14 +1,6 @@
 Weekly review redo:
-    symbol
-    price
-    your equity
-    gains/loss
-    gains/loss %
-    Earnings
 
 options
-    symbol
-    price
     % otm/itm
     on your side
     Earnings

@@ -31,7 +31,7 @@ namespace core.Options
 
             if (!currentPrice.NotFound)
             {
-                ItmOtmLabel = GetItmOtmLabel(o, currentPrice.Amount);
+                ItmOtmLabel = GetItmOtmLabel(currentPrice.Amount, o.State.OptionType, o.State.StrikePrice);
                 IsFavorable = GetIsFavorable();
                 StrikePriceDiff = Math.Abs(o.State.StrikePrice - currentPrice.Amount)/currentPrice.Amount;
             }
@@ -59,9 +59,10 @@ namespace core.Options
                 else return "ITM";
             }},
         };
-        private string GetItmOtmLabel(OwnedOption o, double amount)
+        
+        public static string GetItmOtmLabel(double currentPrice, OptionType optionType, double strikePrice)
         {
-            return _otmLogic[OptionType](amount, o.State.StrikePrice);
+            return _otmLogic[optionType.ToString()](currentPrice, strikePrice);
         }
 
         public Guid Id { get; set; }
