@@ -101,28 +101,26 @@
       <thead>
         <tr>
           <th></th>
-          <th>Ticker</th>
-          <th>Type</th>
-          <th>Strike</th>
-          <th>Price</th>
+          <th>Option</th>
+          <th>Expiration</th>
           <th>OTM/ITM</th>
           <th>Premium</th>
           <th>Days Held %</th>
           <th>Days Left</th>
+          <th></th>
         </tr>
       </thead>
       <tr *ngFor="let option of openOptions">
         <td>
           <span class="badge" [ngClass]="{'badge-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
         </td>
-        <td><a [routerLink]="[ '/optiondetails', option.id ]">{{option.ticker}}</a></td>
-        <td>{{option.expirationDate | date:'MM/dd'}} {{option.optionType}}</td>
         <td>
-          {{option.strikePrice | currency}}
+          <span class="font-weight-bold">
+            {{option.ticker}} {{option.strikePrice | currency}} {{option.optionType}}
+          </span>
         </td>
-        <td>
-          {{option.currentPrice | currency}}
-        </td>
+        <td>{{option.expirationDate | date:'MM/dd'}}</td>
+        <td>{{option.currentPrice | currency}}</td>
         <td class="text-left">
           <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
           {{option.strikePriceDiff | percent}}
@@ -131,12 +129,12 @@
           {{option.profit | currency}}
         </td>
         <td>
-          {{option.daysHeld / option.days | percent}}
+          {{(option.days - option.daysHeld) | number}}
+          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning"> ! </span>
+          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
         </td>
         <td>
-          {{(option.days - option.daysHeld) | number}}
-          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
+          <a class="btn btn-primary btn-sm" [routerLink]="[ '/optiondetails', option.id ]">Edit</a>
         </td>
       </tr>
     </table>
