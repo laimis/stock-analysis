@@ -33,7 +33,10 @@
 
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Shares</h5>
+            <h5 class="card-title">
+              <i class="fas fa-certificate"></i>
+              Shares
+            </h5>
             <p class="card-text">You have <b>{{owned.length}}</b> tickers on file</p>
             <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
           </div>
@@ -41,7 +44,10 @@
 
         <div class="card mt-4">
           <div class="card-body">
-            <h5 class="card-title">Options</h5>
+            <h5 class="card-title">
+              <i class="fas fa-dice-five"></i>
+              Options
+            </h5>
             <p class="card-text">You have <b>{{openOptions.length}}</b> open contracts</p>
             <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
           </div>
@@ -49,7 +55,9 @@
 
         <div class="card mt-4">
           <div class="card-body">
-            <h5 class="card-title">Tools</h5>
+            <h5 class="card-title">
+              <i class="fas fa-toolbox"></i>
+              Tools</h5>
             <a class="card-link" [routerLink]="[ '/notes' ]">Journal</a>
             <a class="card-link" [routerLink]="[ '/transactions' ]">Reports</a>
             <a class="card-link" [routerLink]="[ '/review' ]">Review</a>
@@ -61,7 +69,10 @@
       <div class="col-4">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Alerts</h5>
+            <h5 class="card-title">
+              <i class="fas fa-bell"></i>
+              Alerts
+            </h5>
             <p class="card-text">Active: <b>{{alerts.length}}</b></p>
             <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
           </div>
