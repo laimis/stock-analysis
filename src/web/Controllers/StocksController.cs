@@ -23,6 +23,12 @@ namespace web.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet()]
+        public async Task<object> Owned()
+        {
+            return await _mediator.Send(new List.Query(User.Identifier()));
+        }
+
         [HttpGet("{ticker}")]
         public async Task<object> DetailsAsync(string ticker)
         {

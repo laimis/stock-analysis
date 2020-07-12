@@ -1,0 +1,72 @@
+<div>
+  <app-symbol-search
+      label="{{null}}"
+      placeholder="Search for securities using ticker or name"
+      (tickerSelected)="onTickerSelected($event)"
+      cssClass="form-control">
+  </app-symbol-search>
+</div>
+
+<div *ngIf="loaded">
+  <div class="row">
+    <div class="col text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col text-right">Tickers</div>
+          <div class="col text-left"><b>{{owned.length}}</b></div>
+        </div>
+        <div class="row mt-0">
+          <div class="col text-right">Shares</div>
+          <div class="col text-left"><b>{{numberOfSharesOwned}}</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col text-right">Invested</div>
+          <div class="col text-left"><b>{{moneySpentOnShares | currency}}</b></div>
+        </div>
+        <div class="row mt-0">
+          <div class="col text-right">Equity</div>
+          <div class="col text-left"><b>{{currentEquity | currency}}</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col text-right">Gains</div>
+          <div class="col text-left">
+            <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">
+              {{currentEquity - moneySpentOnShares | currency}}
+            </span>
+          </div>
+        </div>
+        <div class="row mt-0">
+          <div class="col text-right">Gains %</div>
+          <div class="col text-left">
+            <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">
+              {{(currentEquity - moneySpentOnShares)/moneySpentOnShares | percent}}
+            </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="tab-container mt-2" *ngIf="loaded">
+  <a class="tab" [ngClass]="{'is-active': isActive('owned')}" [routerLink]="" (click)="activateTab('owned')">
+    Owned Shares
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('metrics')}" [routerLink]="" (click)="activateTab('metrics')">
+    Metrics Grid
+  </a>
+</div>
+
+<stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned></stock-ownership-grid>
+<stock-ownership-metrics *ngIf="loaded && isActive('metrics')"></stock-ownership-metrics>

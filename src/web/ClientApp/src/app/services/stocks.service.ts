@@ -105,6 +105,10 @@ export class StocksService {
     return this.http.get<StockLists>('/api/stocks/lists')
   }
 
+  getStocks(): Observable<Portfolio> {
+		return this.http.get<Portfolio>('/api/stocks')
+  }
+
 	getStockSummary(symbol:string): Observable<StockSummary> {
 		return this.http.get<StockSummary>('/api/stocks/' + symbol)
   }

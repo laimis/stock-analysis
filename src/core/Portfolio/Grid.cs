@@ -1,14 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
-using core.Notes;
-using core.Options;
-using core.Portfolio.Output;
 using core.Shared;
-using core.Stocks;
 
 namespace core.Portfolio
 {

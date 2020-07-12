@@ -1,10 +1,8 @@
 - dashboard redo
-
-Options page:
-    
-    Current Positions tab
-    Past position review
-    Performance grid
+    stocks tabs
+        - implement grid tab
+        - implement performance tab
+    show summary in stocks: 8 tickers, 521 shares, invested, gains [percentage]
 
 - new sign up experience
 
