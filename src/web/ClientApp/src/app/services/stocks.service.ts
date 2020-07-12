@@ -263,6 +263,7 @@ export interface StockLists {
 export interface Portfolio {
   owned: OwnedStock[]
   openOptions: OwnedOption[]
+  alerts: Alert[]
 }
 
 export class OwnedStock {
@@ -278,6 +279,8 @@ export class OwnedStock {
   averageCost: number
   transactions: TransactionList
 }
+
+export class Alert {}
 
 export class OwnedOption {
   id:string

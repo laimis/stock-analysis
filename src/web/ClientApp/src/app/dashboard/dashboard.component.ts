@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { StocksService, OwnedStock, OwnedOption } from '../services/stocks.service';
+import { StocksService, OwnedStock, OwnedOption, Alert } from '../services/stocks.service';
 
 
 @Component({
@@ -10,9 +10,10 @@ import { StocksService, OwnedStock, OwnedOption } from '../services/stocks.servi
 })
 export class DashboardComponent implements OnInit {
 
-	public owned : OwnedStock[];
-  public openOptions : OwnedOption[];
-  public loaded : boolean = false;
+	owned : OwnedStock[]
+  openOptions : OwnedOption[]
+  alerts: Alert[]
+  public loaded : boolean = false
 
   numberOfSharesOwned: number;
   moneySpentOnShares: number;
@@ -33,6 +34,7 @@ export class DashboardComponent implements OnInit {
 		this.stocks.getPortfolio().subscribe(result => {
       this.owned = result.owned;
       this.openOptions = result.openOptions;
+      this.alerts = result.alerts;
       this.loaded = true;
       this.calculateProperties();
       this.sort("profits")

@@ -1,19 +1,6 @@
 <div *ngIf="loaded">
-  <div *ngIf="openOptions.length == 0 && owned.length == 0">
-    <div class="alert alert-secondary">
-      <h3>Welcome!</h3>
-      <p>You haven't recorded any option/share transactions. It's easy to get started!</p>
-      <p>Find the stock you own via symbol search above ☝ and enter the share number and price.</p>
-      <p>You can do the same with options.</p>
-
-      <h4>If you are just here to take notes</h4>
-      <p>Find the company you are interested in tracking and then starting taking notes.</p>
-      <p>Nightingale Trading platform will help you along with weekly notices on earnings and other important events</p>
-      <h4>We are happy to have you here and good luck with your trading!</h4>
-    </div>
-  </div>
-
   <div class="container-fluid">
+
     <div class="row">
       <div class="col">
         <app-symbol-search
@@ -24,13 +11,30 @@
         </app-symbol-search>
       </div>
     </div>
+
+    <div class="row" *ngIf="openOptions.length == 0 && owned.length == 0">
+      <div class="col">
+        <div class="alert alert-secondary">
+          <h3>Welcome!</h3>
+          <p>You haven't recorded any option/share transactions. It's easy to get started!</p>
+          <p>Find the stock you own via symbol search above ☝ and enter the share number and price.</p>
+          <p>You can do the same with options.</p>
+
+          <h4>If you are just here to take notes</h4>
+          <p>Find the company you are interested in tracking and then starting taking notes.</p>
+          <p>Nightingale Trading platform will help you along with weekly notices on earnings and other important events</p>
+          <h4>We are happy to have you here and good luck with your trading!</h4>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-8">
 
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Shares</h5>
-            <p class="card-text">You have <b>{{owned.length}}</b> tickers on file.</p>
+            <p class="card-text">You have <b>{{owned.length}}</b> tickers on file</p>
             <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
           </div>
         </div>
@@ -38,7 +42,7 @@
         <div class="card mt-4">
           <div class="card-body">
             <h5 class="card-title">Options</h5>
-            <p class="card-text">You have <b>{{openOptions.length}}</b> open contracts.</p>
+            <p class="card-text">You have <b>{{openOptions.length}}</b> open contracts</p>
             <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
           </div>
         </div>
@@ -58,13 +62,16 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Alerts</h5>
-            <p class="card-text">Active: <b>2</b></p>
+            <p class="card-text">Active: <b>{{alerts.length}}</b></p>
             <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
           </div>
         </div>
       </div>
 
     </div>
+
   </div>
+
+  <div class="mt-5">&nbsp;</div>
 
 </div>

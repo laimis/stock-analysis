@@ -52,7 +52,7 @@ namespace core.Alerts
         {
             _monitors.TryGetValue(pp.Id, out var m);
 
-            return m != null && m.LastTrigger.Date == DateTimeOffset.UtcNow.Date;
+            return m != null && m.IsTriggered;
         }
     }
 }

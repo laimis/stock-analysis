@@ -15,6 +15,7 @@ namespace core.Alerts
         public AlertPricePoint PricePoint { get; }
         public double? Value { get; private set; }
         public DateTimeOffset LastTrigger { get; private set; }
+        public bool IsTriggered => LastTrigger.Date == DateTimeOffset.UtcNow.Date;
 
         public bool CheckTrigger(string ticker, double newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
         {
