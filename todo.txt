@@ -1,5 +1,19 @@
-- dashboard redo
+Weekly review redo:
+    symbol
+    price
+    your equity
+    gains/loss
+    gains/loss %
+    Earnings
 
+options
+    symbol
+    price
+    % otm/itm
+    on your side
+    Earnings
+    Days left
+    link to option
 
 - new sign up experience
 
@@ -17,6 +31,7 @@ https://www.reddit.com/r/options/comments/hl8i2n/option_greeks_101/
 
 FUTURE
 
+- unauth landing page preserve redirect url
 - abilty to edit each entry
 - RH vision
 - put spreads
@@ -68,3 +83,4 @@ Options stats - 7/5, 7/6, 7/7
 Option details screen - 1 evening + 1 morning 1 day...
 7/10 Reddit post on option stats --- the fucking thing blew up! almost 200 upvotes, the highest in that forum by far
 7/12 Stocks dashboard created
+7/12 Dashboard redone!
