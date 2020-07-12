@@ -25,7 +25,6 @@ namespace web
             .AddCookie(opt =>
             {
                 opt.Cookie.Name = "tw";
-                opt.Cookie.Domain = "nightingaletrading.com";
                 opt.EventsType = typeof(CookieEvents);
             })
             .AddGoogle("Google", options =>
