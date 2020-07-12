@@ -19,8 +19,18 @@ namespace core.Options
             this.Assigned = list.Count(s => s.Assigned);
             this.AveragePremiumCapture = list.Average(s => s.PremiumCapture);
 
-            this.AverageWinAmount = list.Where(s => s.Profit >= 0).Average(s => s.Profit);
-            this.AverageLossAmount = list.Where(s => s.Profit < 0).Average(s => s.Profit);
+            var positiveProfit = list.Where(s => s.Profit >= 0);
+            if (positiveProfit.Any())
+            {
+                this.AverageWinAmount = positiveProfit.Average(s => s.Profit);
+            }
+
+            var negativeProfit = list.Where(s => s.Profit < 0);
+            if (negativeProfit.Any())
+            {
+                this.AverageLossAmount = negativeProfit.Average(s => s.Profit);
+            }
+            
             this.MaxWin = list.Max(s => s.Profit);
             this.MaxLoss = list.Min(s => s.Profit);
 

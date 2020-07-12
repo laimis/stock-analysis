@@ -4,6 +4,8 @@
         - implement performance tab
     show summary in stocks: 8 tickers, 521 shares, invested, gains [percentage]
 
+- expired options not clear how to close it
+- expired options have incorrect days held stats
 - new sign up experience
 
 WRITING

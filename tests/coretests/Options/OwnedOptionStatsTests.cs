@@ -6,6 +6,8 @@ namespace coretests.Options
 {
     public class OwnedOptionStatsTests
     {
+        private OwnedOptionStats _stats;
+
         public OwnedOptionStatsTests()
         {
             var o1 = new OwnedOptionSummary {
@@ -21,7 +23,7 @@ namespace coretests.Options
                 NumberOfContracts = 1,
                 OptionType = OptionType.CALL.ToString(),
                 PremiumPaid = 10,
-                PremiumReceived = 40,
+                PremiumReceived = 10,
                 StrikePrice = 45,
                 Ticker = "AMD",
                 Transactions = null
@@ -39,18 +41,32 @@ namespace coretests.Options
                 IsExpired = true,
                 NumberOfContracts = 1,
                 OptionType = OptionType.CALL.ToString(),
-                PremiumPaid = 150,
-                PremiumReceived = 100,
+                PremiumPaid = 100,
+                PremiumReceived = 150,
                 StrikePrice = 45,
                 Ticker = "AMD",
                 Transactions = null
             };
 
-            var stats = new OwnedOptionStats(new [] {o1, o2});
+            _stats = new OwnedOptionStats(new [] {o1, o2});
+        }
 
-            Assert.Equal(2, stats.Count);
-            Assert.Equal(1, stats.WinningTrades);
-            Assert.Equal(1, stats.Assigned);
+        [Fact]
+        public void CountMatches()
+        {
+            Assert.Equal(2, _stats.Count);
+        }
+
+        [Fact]
+        public void WinningMatches()
+        {
+            Assert.Equal(1, _stats.WinningTrades);
+        }
+
+        [Fact]
+        public void AssignmentsMatch()
+        {
+            Assert.Equal(1, _stats.Assigned);
         }
     }
 }
