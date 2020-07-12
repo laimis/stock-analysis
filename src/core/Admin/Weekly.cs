@@ -114,7 +114,7 @@ namespace core.Admin
                     cost = String.Format("{0:0.00}", pair.re.AverageCost),
                     gainsPct = CalcGainPct(pair.p.Price.Amount, pair.re),
                     itmOtmLabel = CalcItmOtm(pair.p, pair.re),
-                    optionType = pair.re.OptionType,
+                    optionType = pair.re.OptionType.ToString(),
                     strikePrice = pair.re.StrikePrice,
                     expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null,
                     earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null
