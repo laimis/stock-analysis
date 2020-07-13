@@ -1,12 +1,9 @@
-Weekly review redo:
 
-- send out weekly review
-- find ticker in navigation
-- add ability to record new option in options dashboard
-- new sign up experience
 - show note entered with option purchases
 - review order
 - max loss bug
+
+- new sign up experience
 
 WRITING
 
@@ -76,4 +73,3 @@ Option details screen - 1 evening + 1 morning 1 day...
 7/12 Stocks dashboard created
 7/12 Dashboard redone!
 7/12 Weekly review redone!
-
