@@ -83,16 +83,19 @@ namespace core.Admin
                 var portfolio = portfolioEntries
                     .SelectMany(p => p.Ownership.Where(re => !re.IsOption)
                     .Select(re => (p, re)))
-                    .Select(Map);
+                    .Select(Map)
+                    .OrderBy(e => e.Ticker);
 
                 var options = portfolioEntries
                     .SelectMany(p => p.Ownership.Where(re => re.IsOption)
                     .Select(re => (p, re)))
-                    .Select(Map);
+                    .Select(Map)
+                    .OrderBy(e => e.Ticker);
 
                 var other = alertEntries
                     .Select(p => (p, p.Alerts.First()))
-                    .Select(Map);
+                    .Select(Map)
+                    .OrderBy(e => e.Ticker);
 
                 var data = new
                 {
@@ -105,48 +108,9 @@ namespace core.Admin
                 await _emails.Send(u.email, Sender.Support, EmailTemplate.ReviewEmail, data);
             }
 
-            private static object Map((ReviewEntryGroup p, ReviewEntry re) pair)
+            private static WeeklyReviewEntryView Map((ReviewEntryGroup p, ReviewEntry re) pair)
             {
-                return new
-                {
-                    ticker = pair.p.Ticker,
-                    price = pair.p.Price.Amount,
-                    cost = String.Format("{0:0.00}", pair.re.AverageCost),
-                    gainsPct = CalcGainPct(pair.p.Price.Amount, pair.re),
-                    itmOtmLabel = CalcItmOtm(pair.p, pair.re),
-                    optionType = pair.re.OptionType.ToString(),
-                    strikePrice = pair.re.StrikePrice,
-                    expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null,
-                    earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null
-                };
-            }
-
-            private static object CalcItmOtm(ReviewEntryGroup p, ReviewEntry re)
-            {
-                if (re.OptionType != null)
-                {
-                    return OwnedOptionSummary.GetItmOtmLabel(p.Price.Amount, re.OptionType.Value, re.StrikePrice);
-                }
-
-                return null;
-            }
-
-            private static object CalcGainPct(double current, ReviewEntry re)
-            {
-                if (re.AverageCost == 0)
-                {
-                    return "";
-                }
-
-                var gains = Math.Round((current - re.AverageCost)/re.AverageCost * 100, 2);
-
-                var plusOrMinus = gains >= 0 ? "+" : "-";
-                
-                gains = Math.Abs(gains);
-
-                var formatted = String.Format("{0:0.00} %", gains);
-
-                return $"{plusOrMinus} {formatted}";
+                return new WeeklyReviewEntryView(pair);
             }
         }
     }
