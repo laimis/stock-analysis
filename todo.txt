@@ -1,5 +1,3 @@
-
-- show note entered with option purchases
 - review order
 
 - new sign up experience
