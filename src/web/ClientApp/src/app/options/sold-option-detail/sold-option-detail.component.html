@@ -8,7 +8,7 @@
       <div class="card-body">
         <h3 class="card-title">
           <a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a>
-           @ {{option.strikePrice | currency}} {{option.type}}
+           @ {{option.strikePrice | currency}} {{option.optionType}}
 
           <span class="float-right" *ngIf="!option.closed">
             {{option.numberOfContracts}} contracts {{option.boughtOrSold}}
@@ -26,7 +26,7 @@
         <div *ngIf="!option.closed">
           <div class="mt-2 row">
             <div class="col">
-              <div class="stat-label">current price</div>
+              <div class="stat-label">Current price</div>
               <div>
                 {{option.strikePriceDiff | percent}}
                 <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>

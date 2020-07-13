@@ -1,7 +1,6 @@
 
 - show note entered with option purchases
 - review order
-- max loss bug
 
 - new sign up experience
 
