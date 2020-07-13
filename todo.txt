@@ -1,10 +1,12 @@
 Weekly review redo:
 
+- send out weekly review
 - find ticker in navigation
 - add ability to record new option in options dashboard
 - new sign up experience
 - show note entered with option purchases
 - review order
+- max loss bug
 
 WRITING
 

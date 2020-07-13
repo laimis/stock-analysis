@@ -77,7 +77,10 @@ namespace core.Portfolio
 
                 foreach (var a in alerts.Result)
                 {
-                    entries.Add(new ReviewEntry(a));
+                    if (a.PricePoints.Count > 0)
+                    {
+                        entries.Add(new ReviewEntry(a));
+                    }
                 }
 
                 var grouped = entries.GroupBy(r => r.Ticker);
