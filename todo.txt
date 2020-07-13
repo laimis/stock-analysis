@@ -1,12 +1,5 @@
 Weekly review redo:
 
-options
-    % otm/itm
-    on your side
-    Earnings
-    Days left
-    link to option
-
 - find ticker in navigation
 - add ability to record new option in options dashboard
 - new sign up experience
