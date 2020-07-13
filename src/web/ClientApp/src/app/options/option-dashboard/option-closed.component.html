@@ -10,6 +10,7 @@
       <th>P/L</th>
       <th>Capture %</th>
       <th>Premium/Day Held</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -33,6 +34,7 @@
       <td>{{o.premiumReceived - o.premiumPaid | currency}}</td>
       <td>{{o.premiumCapture | percent}}</td>
       <td>{{(o.premiumReceived - o.premiumPaid)/o.daysHeld | currency}}</td>
+      <td><a [routerLink]="[ '/optiondetails', o.id ]">details</a></td>
     </tr>
   </tbody>
 </table>

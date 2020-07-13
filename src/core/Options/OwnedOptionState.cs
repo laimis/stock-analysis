@@ -13,6 +13,7 @@ namespace core.Options
             this.Buys = new List<OptionPurchased>();
             this.Sells = new List<OptionSold>();
             this.Expirations = new List<OptionExpired>();
+            this.Notes = new List<string>();
         }
 
         public Guid Id { get; private set; }
@@ -65,6 +66,8 @@ namespace core.Options
         public double PremiumReceived => Transactions.Where(t => t.IsPL).Sum(t => t.Credit);
         public double PremiumPaid => Transactions.Where(t => t.IsPL).Sum(t => t.Debit);
 
+        public List<string> Notes { get; }
+
         internal void Apply(OptionDeleted deleted)
         {
             this.NumberOfContracts = 0;
@@ -74,6 +77,7 @@ namespace core.Options
             this.FirstFill = null;
             this.SoldToOpen = null;
             this.Closed = null;
+            this.Notes.Clear();
 
             this.Deleted = true;
         }
@@ -98,6 +102,8 @@ namespace core.Options
 
             var description = $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract";
 
+            AddNoteIfNotEmpty(sold.Notes);
+
             this.Transactions.Add(
                 Transaction.CreditTx(
                     this.Id,
@@ -114,6 +120,11 @@ namespace core.Options
             );
 
             ApplyClosedLogicIfApplicable(sold.When);
+        }
+
+        private void AddNoteIfNotEmpty(string notes)
+        {
+            if (!string.IsNullOrEmpty(notes)) this.Notes.Add(notes);
         }
 
         private void ApplyClosedLogicIfApplicable(DateTimeOffset when)
@@ -168,6 +179,8 @@ namespace core.Options
             var debit = purchased.NumberOfContracts * purchased.Premium;
 
             this.Buys.Add(purchased);
+
+            AddNoteIfNotEmpty(purchased.Notes);
 
             var description = $"Bought {purchased.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract";
 

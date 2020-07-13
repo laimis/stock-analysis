@@ -28,6 +28,7 @@ namespace core.Options
             IsExpired = o.IsExpired;
             Closed = o.Closed;
             Assigned = o.State.Assigned;
+            Notes = o.State.Notes;
 
             if (!currentPrice.NotFound)
             {
@@ -96,6 +97,7 @@ namespace core.Options
         public bool IsExpired { get; set; }
         public DateTimeOffset? Closed { get; }
         public bool Assigned { get; set; }
+        public List<string> Notes { get; }
         public string ItmOtmLabel { get; }
         public bool IsFavorable { get; }
         public double StrikePriceDiff { get; }
