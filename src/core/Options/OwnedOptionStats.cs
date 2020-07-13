@@ -23,14 +23,14 @@ namespace core.Options
             if (positiveProfit.Any())
             {
                 this.AverageWinAmount = positiveProfit.Average(s => s.Profit);
-                this.MaxWin = list.Max(s => s.Profit);
+                this.MaxWin = positiveProfit.Max(s => s.Profit);
             }
 
             var negativeProfit = list.Where(s => s.Profit < 0);
             if (negativeProfit.Any())
             {
                 this.AverageLossAmount = negativeProfit.Average(s => s.Profit);
-                this.MaxLoss = list.Min(s => s.Profit);
+                this.MaxLoss = negativeProfit.Min(s => s.Profit);
             }
 
             this.EV = (AverageWinAmount * WinningTrades / Count) + (AverageLossAmount * (Count - WinningTrades) / Count);
