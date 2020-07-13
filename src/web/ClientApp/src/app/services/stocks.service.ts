@@ -264,6 +264,7 @@ export interface Portfolio {
   owned: OwnedStock[]
   openOptions: OwnedOption[]
   alerts: Alert[]
+  triggered: Alert[]
 }
 
 export class OwnedStock {

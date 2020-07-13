@@ -13,7 +13,8 @@ export class DashboardComponent implements OnInit {
 	owned : OwnedStock[]
   openOptions : OwnedOption[]
   alerts: Alert[]
-  public loaded : boolean = false
+  triggered: Alert[]
+  loaded : boolean = false
 
   numberOfSharesOwned: number;
   moneySpentOnShares: number;
@@ -33,8 +34,9 @@ export class DashboardComponent implements OnInit {
 
 		this.stocks.getPortfolio().subscribe(result => {
       this.owned = result.owned;
-      this.openOptions = result.openOptions;
-      this.alerts = result.alerts;
+      this.openOptions = result.openOptions
+      this.alerts = result.alerts
+      this.triggered = result.triggered
       this.loaded = true;
       this.calculateProperties();
       this.sort("profits")

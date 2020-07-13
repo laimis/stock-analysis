@@ -51,7 +51,8 @@ namespace core.Portfolio
                 {
                     owned = owned.Select(o => Mapper.ToOwnedView(o, prices[o.Ticker].Result)),
                     openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.Ticker].Result)),
-                    alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered)
+                    triggered = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered),
+                    alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId)
                 };
 
                 return obj;
