@@ -1,4 +1,5 @@
 
+- flip shares display with equity and gains first, then shares
 - show note entered with option purchases
 - review order
 
