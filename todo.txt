@@ -1,6 +1,8 @@
-- review order
+- closed position premium/day should be profit per day
 
 - new sign up experience
+
+- TM parser for "Today" entries that then link to price look up
 
 WRITING
 
