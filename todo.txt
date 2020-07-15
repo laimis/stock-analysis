@@ -1,8 +1,7 @@
-- closed position premium/day should be profit per day
+Documentation site:
+    - setup deployment
+    - setup domain
 
-- new sign up experience
-
-- TM parser for "Today" entries that then link to price look up
 
 WRITING
 
@@ -18,6 +17,7 @@ https://www.reddit.com/r/options/comments/hl8i2n/option_greeks_101/
 
 FUTURE
 
+- new sign up experience
 - unauth landing page preserve redirect url
 - abilty to edit each entry
 - RH vision

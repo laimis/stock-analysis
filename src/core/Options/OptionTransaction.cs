@@ -17,10 +17,10 @@ namespace core.Options
         [ValidValues(nameof(core.Options.OptionType.CALL), nameof(core.Options.OptionType.PUT))]
         public string OptionType { get; set; }
 
-        [Range(1, 1000, ErrorMessage = "Invalid number of contracts specified")]
+        [Range(1, 10000, ErrorMessage = "Invalid number of contracts specified")]
         public int NumberOfContracts { get; set; }
 
-        [Range(1, 1000)]
+        [Range(1, 100000)]
         public double Premium { get; set; }
 
         [Required]
