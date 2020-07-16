@@ -30,7 +30,7 @@ namespace coretests.Options
             
             var pl = option.State.Transactions.Where(t => t.IsPL);
 
-            Assert.Equal(2, pl.Count());
+            Assert.Equal(1, pl.Count());
         }
 
         [Fact]
@@ -42,12 +42,12 @@ namespace coretests.Options
             
             Assert.Equal(-1, option.State.NumberOfContracts);
             Assert.Single(option.State.Transactions.Where(t => !t.IsPL));
-            Assert.Single(option.State.Transactions.Where(t => t.IsPL));
+            Assert.Empty(option.State.Transactions.Where(t => t.IsPL));
 
             option.Buy(1, 1, DateTimeOffset.UtcNow, "some notes");
 
             Assert.Equal(0, option.State.NumberOfContracts);
-            Assert.Equal(4, option.State.Transactions.Count);
+            Assert.Equal(3, option.State.Transactions.Count);
         }
 
         [Fact]

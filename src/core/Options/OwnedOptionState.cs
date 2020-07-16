@@ -63,8 +63,8 @@ namespace core.Options
         
         public bool Assigned => this.Expirations.Count > 0 && this.Expirations[0].Assigned;
         public bool Deleted { get; private set; }
-        public double PremiumReceived => Transactions.Where(t => t.IsPL).Sum(t => t.Credit);
-        public double PremiumPaid => Transactions.Where(t => t.IsPL).Sum(t => t.Debit);
+        public double PremiumReceived => Transactions.Where(t => !t.IsPL).Sum(t => t.Credit);
+        public double PremiumPaid => Transactions.Where(t => !t.IsPL).Sum(t => t.Debit);
 
         public List<string> Notes { get; }
 
@@ -115,10 +115,6 @@ namespace core.Options
                 )
             );
 
-            this.Transactions.Add(
-                Transaction.PLTx(this.Id, this.Ticker, description, credit, sold.When, true)
-            );
-
             ApplyClosedLogicIfApplicable(sold.When);
         }
 
@@ -135,6 +131,14 @@ namespace core.Options
             }
 
             this.Closed = when;
+
+            var profit = PremiumReceived - PremiumPaid;
+
+            var description = $"${this.StrikePrice.ToString("0.00")} {OptionType.ToString()}";
+
+            this.Transactions.Add(
+                Transaction.PLTx(this.Id, this.Ticker, description, profit, when, true)
+            );
         }
 
         private void ApplyFirstTransactionLogic(bool soldToOpen, DateTimeOffset filled)
@@ -190,17 +194,6 @@ namespace core.Options
                     this.Ticker,
                     description,
                     debit,
-                    purchased.When,
-                    true
-                )
-            );
-
-            this.Transactions.Add(
-                Transaction.PLTx(
-                    this.Id,
-                    this.Ticker,
-                    description,
-                    - debit,
                     purchased.When,
                     true
                 )

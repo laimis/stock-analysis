@@ -1,5 +1,4 @@
-Store options history sorted by close date
-Clear win/loss
+Options transactions PL one is at the close
 Stocks performance
 
 WRITING
