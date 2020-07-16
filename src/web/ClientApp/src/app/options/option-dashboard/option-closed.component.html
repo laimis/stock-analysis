@@ -1,15 +1,13 @@
-<h3>Your recently closed positions</h3>
-
 <table class="table mt-2" *ngIf="options">
   <thead>
     <tr>
       <th>Option</th>
-      <th>Expiration</th>
-      <th>Days Held</th>
-      <th>Days Held %</th>
+      <th>Closed</th>
       <th>P/L</th>
       <th>Capture %</th>
       <th>Premium/Day Held</th>
+      <th>Days Held</th>
+      <th>Days Held %</th>
       <th></th>
     </tr>
   </thead>
@@ -28,12 +26,18 @@
           <span class="badge badge-warning mr-1">assigned</span>
         </div>
       </td>
-      <td>{{o.expirationDate | date:'MM/dd'}}</td>
-      <td>{{o.daysHeld}} / {{o.days}}</td>
-      <td>{{o.daysHeld/o.days| percent}}</td>
-      <td>{{o.premiumReceived - o.premiumPaid | currency}}</td>
+      <td>{{o.closed | date:'MM/dd'}}</td>
+      <td>
+        <div>{{o.premiumReceived - o.premiumPaid | currency}}</div>
+        <div>
+          <span *ngIf="o.premiumReceived - o.premiumPaid >= 0" class="badge badge-success mr-1">win</span>
+          <span *ngIf="o.premiumReceived - o.premiumPaid < 0" class="badge badge-warning mr-1">loss</span>
+        </div>
+      </td>
       <td>{{o.premiumCapture | percent}}</td>
       <td>{{(o.premiumReceived - o.premiumPaid)/o.daysHeld | currency}}</td>
+      <td>{{o.daysHeld}} / {{o.days}}</td>
+      <td>{{o.daysHeld/o.days| percent}}</td>
       <td><a [routerLink]="[ '/optiondetails', o.id ]">details</a></td>
     </tr>
   </tbody>
