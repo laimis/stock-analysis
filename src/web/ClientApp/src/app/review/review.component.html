@@ -21,18 +21,18 @@
       </div>
       <div class="row">
         <div class="col">
-          Debits
+          Gains
         </div>
         <div class="col">
-          {{result.transactions.debit | currency}}
+          {{result.transactions.credit | currency}}
         </div>
       </div>
       <div class="row">
         <div class="col">
-          Credits
+          Losses
         </div>
         <div class="col">
-          {{result.transactions.credit | currency}}
+          {{result.transactions.debit | currency}}
         </div>
       </div>
     </div>

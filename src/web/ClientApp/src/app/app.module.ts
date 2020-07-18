@@ -52,6 +52,7 @@ import { OptionClosedComponent } from './options/option-dashboard/option-closed.
 import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboard.component';
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
 import { StockOwnershipMetricsComponent } from './stocks/stock-dashboard/stock-ownership-metrics.component';
+import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-ownership-performance.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -147,6 +148,7 @@ var routes = [
     StockOwnershipComponent,
     StockOwnershipGridComponent,
     StockOwnershipMetricsComponent,
+    StockOwnershipPerformanceComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,

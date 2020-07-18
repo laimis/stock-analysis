@@ -63,12 +63,16 @@
 
 <div class="tab-container mt-2" *ngIf="loaded">
   <a class="tab" [ngClass]="{'is-active': isActive('owned')}" [routerLink]="" (click)="activateTab('owned')">
-    Owned Shares
+    Ownership
   </a>
   <a class="tab" [ngClass]="{'is-active': isActive('metrics')}" [routerLink]="" (click)="activateTab('metrics')">
-    Metrics Grid
+    Ownership Metrics
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
+    Performance
   </a>
 </div>
 
 <stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned></stock-ownership-grid>
 <stock-ownership-metrics *ngIf="loaded && isActive('metrics')"></stock-ownership-metrics>
+<stock-ownership-performance *ngIf="loaded && isActive('performance')"></stock-ownership-performance>
