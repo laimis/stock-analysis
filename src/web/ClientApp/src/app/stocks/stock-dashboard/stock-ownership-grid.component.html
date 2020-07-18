@@ -8,7 +8,7 @@
           <th class="text-right sort-header" (click)="sort('currentPrice')">Share Price</th>
           <th class="text-right sort-header" (click)="sort('averageCost')">Your Average Cost</th>
           <th class="sort-header" (click)="sort('owned')">Ownership</th>
-          <th class="text-right sort-header" (click)="sort('equity')">Equity</th>
+          <th class="text-right sort-header" (click)="sort('invested')">Invested</th>
           <th class="text-right sort-header" (click)="sort('profits')">Gain/Loss</th>
           <th class="text-right sort-header" (click)="sort('profitsPct')">%</th>
         </tr>
@@ -18,7 +18,7 @@
         <td class="text-right">{{ticker.currentPrice | currency}}</td>
         <td class="text-right">{{ticker.averageCost | currency}}</td>
         <td>{{ticker.owned}}</td>
-        <td>{{ticker.equity | currency}}</td>
+        <td class="text-right">{{ticker.cost | currency}}</td>
         <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
         <td class="text-right"><span class="col text-right" [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
       </tr>

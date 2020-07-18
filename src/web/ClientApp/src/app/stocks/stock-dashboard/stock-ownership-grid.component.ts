@@ -47,8 +47,8 @@ export class StockOwnershipGridComponent implements OnInit {
         return (a:OwnedStock, b:OwnedStock) => a.averageCost - b.averageCost
       case "owned":
         return (a:OwnedStock, b:OwnedStock) => a.owned - b.owned
-      case "equity":
-        return (a:OwnedStock, b:OwnedStock) => a.equity - b.equity
+      case "invested":
+        return (a:OwnedStock, b:OwnedStock) => a.cost - b.cost
       case "profits":
         return (a:OwnedStock, b:OwnedStock) => a.profits - b.profits
       case "profitsPct":
