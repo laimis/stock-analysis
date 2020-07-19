@@ -131,7 +131,9 @@ namespace coretests.Stocks
             var tx = stock.State.Transactions.Last();
 
             Assert.True(tx.IsPL);
-            Assert.Equal(1.5, tx.Debit); // average cost is 7.5, selling for 6 is 1.5 loss
+            Assert.Equal(-1.5, tx.Profit);
+            Assert.Equal(7.5, tx.Debit);
+            Assert.Equal(6, tx.Credit); // average cost is 7.5, selling for 6 is 1.5 loss
 
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
@@ -142,7 +144,9 @@ namespace coretests.Stocks
             tx = stock.State.Transactions.Last();
 
             Assert.True(tx.IsPL);
-            Assert.Equal(2.5, tx.Credit); // average cost is 8.75, selling 2 x 10 is 2.5 gain
+            Assert.Equal(2.5, tx.Profit);
+            Assert.Equal(20, tx.Credit);
+            Assert.Equal(17.5, tx.Debit);
         }
     }
 }
