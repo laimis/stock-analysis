@@ -82,7 +82,8 @@ namespace core.Stocks
                 this.Id,
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
-                (sold.Price * sold.NumberOfShares - this.AverageCost * sold.NumberOfShares),
+                this.AverageCost * sold.NumberOfShares,
+                sold.Price * sold.NumberOfShares,
                 sold.When,
                 false
             ));

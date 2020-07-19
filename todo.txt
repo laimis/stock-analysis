@@ -1,4 +1,6 @@
 Stocks performance: that's for others
+    - 
+
 Option price/volume
 
 WRITING
@@ -15,6 +17,7 @@ https://www.reddit.com/r/options/comments/hl8i2n/option_greeks_101/
 
 FUTURE
 
+- closed positions stocks ---
 - new sign up experience
 - unauth landing page preserve redirect url
 - abilty to edit each entry

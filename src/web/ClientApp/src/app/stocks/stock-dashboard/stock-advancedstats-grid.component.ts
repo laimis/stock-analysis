@@ -3,11 +3,11 @@ import { StockGridEntry, StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
-  selector: 'stock-ownership-metrics',
-  templateUrl: './stock-ownership-metrics.component.html',
-  styleUrls: ['./stock-ownership-metrics.component.css']
+  selector: 'stock-advancedstats-grid',
+  templateUrl: './stock-advancedstats-grid.component.html',
+  styleUrls: ['./stock-advancedstats-grid.component.css']
 })
-export class StockOwnershipMetricsComponent implements OnInit {
+export class StockAdvancedStatsGridComponent implements OnInit {
 
 	ownership: StockGridEntry[]
   loaded: boolean = false

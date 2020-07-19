@@ -11,6 +11,19 @@ namespace core.Shared
         public double Credit { get; }
         public DateTimeOffset Date { get; }
         public double Profit => this.Credit - this.Debit;
+        public double ReturnPct
+        {
+            get
+            {
+                if (this.Debit > 0)
+                {
+                    return (this.Credit - this.Debit) * 1.0 / this.Debit;
+                }
+
+                return 0;
+            }
+        }
+
         public bool IsOption { get; }
         public bool IsPL { get; }
 
@@ -44,9 +57,9 @@ namespace core.Shared
             return new Transaction(aggregateId, ticker, description, debit, 0, when, isOption, false);
         }
 
-        public static Transaction PLTx(Guid aggregateId, string ticker, string description, double amount, DateTimeOffset when, bool isOption)
+        public static Transaction PLTx(Guid aggregateId, string ticker, string description, double debit, double credit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(aggregateId, ticker, description, amount < 0 ? Math.Abs(amount) : 0, amount > 0 ? amount : 0, when, isOption, true);
+            return new Transaction(aggregateId, ticker, description, debit, credit, when, isOption, true);
         }
     }
 }

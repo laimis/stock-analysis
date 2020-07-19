@@ -137,7 +137,7 @@ namespace core.Options
             var description = $"${this.StrikePrice.ToString("0.00")} {OptionType.ToString()}";
 
             this.Transactions.Add(
-                Transaction.PLTx(this.Id, this.Ticker, description, profit, when, true)
+                Transaction.PLTx(this.Id, this.Ticker, description, PremiumPaid, PremiumReceived, when, true)
             );
         }
 

@@ -24,9 +24,9 @@ namespace web.Controllers
         }
 
         [HttpGet()]
-        public async Task<object> Owned()
+        public async Task<object> Dashboard()
         {
-            return await _mediator.Send(new List.Query(User.Identifier()));
+            return await _mediator.Send(new Dashboard.Query(User.Identifier()));
         }
 
         [HttpGet("{ticker}")]

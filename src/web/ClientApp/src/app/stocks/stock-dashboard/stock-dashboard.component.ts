@@ -10,7 +10,8 @@ import { StocksService, OwnedStock } from '../../services/stocks.service';
 })
 export class StockDashboardComponent implements OnInit {
 
-	owned : OwnedStock[]
+  owned : OwnedStock[]
+  performance : any
   loaded : boolean = false
 
   numberOfSharesOwned: number;
@@ -29,6 +30,7 @@ export class StockDashboardComponent implements OnInit {
 
 		this.stocks.getStocks().subscribe(result => {
       this.owned = result.owned;
+      this.performance = result.performance;
       this.loaded = true;
       this.calculateProperties();
       this.sort("profits")

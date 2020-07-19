@@ -51,8 +51,8 @@ import { OptionPerformanceComponent } from './options/option-dashboard/option-pe
 import { OptionClosedComponent } from './options/option-dashboard/option-closed.component';
 import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboard.component';
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
-import { StockOwnershipMetricsComponent } from './stocks/stock-dashboard/stock-ownership-metrics.component';
-import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-ownership-performance.component';
+import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
+import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -147,7 +147,7 @@ var routes = [
     StockOptionComponent,
     StockOwnershipComponent,
     StockOwnershipGridComponent,
-    StockOwnershipMetricsComponent,
+    StockAdvancedStatsGridComponent,
     StockOwnershipPerformanceComponent,
 
     SymbolSearchComponent,
