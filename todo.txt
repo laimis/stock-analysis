@@ -1,10 +1,10 @@
-Option price/volume
+- new sign up experience
 
 WRITING
 
 - announcement on options insight
-- how to get the most out of nightingaletrading
-- reach out single send at the ready
+- blog post about reddit post
+- new user welcome that points to documentation
 
 REVIEW
 
@@ -14,8 +14,8 @@ https://www.reddit.com/r/options/comments/hl8i2n/option_greeks_101/
 
 FUTURE
 
-- closed positions stocks ---
-- new sign up experience
+- easier to record transaction
+- closed positions stocks
 - unauth landing page preserve redirect url
 - abilty to edit each entry
 - RH vision
@@ -73,3 +73,4 @@ Option details screen - 1 evening + 1 morning 1 day...
 7/15 Docs site is up and ready for articles!!! [2 days]
 7/16 minor bug fixes, changes to transactions screen
 7/19 stocks performance grid [1 day]
+7/20 launched documentation link with help
