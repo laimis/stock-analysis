@@ -1,6 +1,3 @@
-Stocks performance: that's for others
-    - 
-
 Option price/volume
 
 WRITING
@@ -75,3 +72,4 @@ Option details screen - 1 evening + 1 morning 1 day...
 7/12 Weekly review redone!
 7/15 Docs site is up and ready for articles!!! [2 days]
 7/16 minor bug fixes, changes to transactions screen
+7/19 stocks performance grid [1 day]
