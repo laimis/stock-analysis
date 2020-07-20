@@ -89,16 +89,19 @@ namespace core.Admin
                 var portfolio = portfolioEntries
                     .SelectMany(p => p.Ownership.Where(re => !re.IsOption)
                     .Select(re => (p, re)))
-                    .Select(Map);
+                    .Select(Map)
+                    .OrderBy(e => e.ticker);
 
                 var options = portfolioEntries
                     .SelectMany(p => p.Ownership.Where(re => re.IsOption)
                     .Select(re => (p, re)))
-                    .Select(Map);
+                    .Select(Map)
+                    .OrderBy(e => e.ticker);
 
                 var other = alertEntries
                     .Select(p => (p, p.Alerts.First()))
-                    .Select(Map);
+                    .Select(Map)
+                    .OrderBy(e => e.ticker);
 
                 var data = new
                 {
