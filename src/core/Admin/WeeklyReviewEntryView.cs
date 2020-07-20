@@ -8,26 +8,26 @@ namespace core.Admin
     {
         public WeeklyReviewEntryView((ReviewEntryGroup p, ReviewEntry re) pair)
         {
-            Ticker = pair.p.Ticker;
-            Price = pair.p.Price.Amount;
-            Cost = String.Format("{0:0.00}", pair.re.AverageCost);
-            GainsPct = CalcGainPct(pair.p.Price.Amount, pair.re);
-            ItmOtmLabel = CalcItmOtm(pair.p, pair.re);
-            PptionType = pair.re.OptionType.ToString();
-            StrikePrice = pair.re.StrikePrice;
-            Expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null;
-            Earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null;
+            ticker = pair.p.Ticker;
+            price = pair.p.Price.Amount;
+            cost = String.Format("{0:0.00}", pair.re.AverageCost);
+            gainsPct = CalcGainPct(pair.p.Price.Amount, pair.re);
+            itmOtmLabel = CalcItmOtm(pair.p, pair.re);
+            optionType = pair.re.OptionType.ToString();
+            strikePrice = pair.re.StrikePrice;
+            expiration = pair.re.Expiration.HasValue ? pair.re.Expiration.Value.ToString("MMM, dd") : null;
+            earnings = pair.p.EarningsWarning ? pair.p.EarningsDate.Value.ToString("MMM, dd") : null;
         }
 
-        public string Ticker { get; }
-        public double Price { get; }
-        public string Cost { get; }
-        public object GainsPct { get; }
-        public object ItmOtmLabel { get; }
-        public string PptionType { get; }
-        public double StrikePrice { get; }
-        public string Expiration { get; }
-        public string Earnings { get; }
+        public string ticker { get; }
+        public double price { get; }
+        public string cost { get; }
+        public object gainsPct { get; }
+        public object itmOtmLabel { get; }
+        public string optionType { get; }
+        public double strikePrice { get; }
+        public string expiration { get; }
+        public string earnings { get; }
 
         private static object CalcItmOtm(ReviewEntryGroup p, ReviewEntry re)
         {

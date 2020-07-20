@@ -34,11 +34,11 @@ namespace web.Controllers
         }
 
         [HttpPost("weekly")]
-        public async Task<ActionResult> Weekly(Weekly.Command cmd)
+        public async Task<object> Weekly(Weekly.Command cmd)
         {
-            await _mediator.Send(cmd);
+            var r = await _mediator.Send(cmd);
 
-            return Ok();
+            return r;
         }
 
         [HttpGet("loginas/{userId}")]

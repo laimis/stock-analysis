@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Emails;
-using core.Options;
 using core.Portfolio;
 using MediatR;
 using Newtonsoft.Json;
@@ -15,13 +14,13 @@ namespace core.Admin
 {
     public class Weekly
     {
-        public class Command : IRequest
+        public class Command : IRequest<List<object>>
         {
             [Required]
             public bool? Everyone { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, List<object>>
         {
             private IAccountStorage _storage;
             private IEmailService _emails;
@@ -37,10 +36,12 @@ namespace core.Admin
                 _mediator = mediator;
             }
 
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<List<object>> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var users = await _storage.GetUserEmailIdPairs();
 
+                var emailed = new List<object>();
+                
                 foreach(var u in users)
                 {
                     if (!cmd.Everyone.Value && u.Item1 != "laimis@gmail.com")
@@ -51,7 +52,12 @@ namespace core.Admin
 
                     try
                     {
-                        await ProcessUser(u);
+                        var result = await ProcessUser(u);
+
+                        emailed.Add(new {
+                            u.email,
+                            result
+                        });
                     }
                     catch(Exception error)
                     {
@@ -61,10 +67,10 @@ namespace core.Admin
                     }
                 }
 
-                return new Unit();
+                return emailed;
             }
 
-            private async Task ProcessUser((string email, string id) u)
+            private async Task<object> ProcessUser((string email, string id) u)
             {
                 var review = new Review.Generate(DateTimeOffset.UtcNow);
 
@@ -77,25 +83,22 @@ namespace core.Admin
 
                 if (portfolioEntries.Count == 0 && alertEntries.Count == 0)
                 {
-                    return;
+                    return null;
                 }
 
                 var portfolio = portfolioEntries
                     .SelectMany(p => p.Ownership.Where(re => !re.IsOption)
                     .Select(re => (p, re)))
-                    .Select(Map)
-                    .OrderBy(e => e.Ticker);
+                    .Select(Map);
 
                 var options = portfolioEntries
                     .SelectMany(p => p.Ownership.Where(re => re.IsOption)
                     .Select(re => (p, re)))
-                    .Select(Map)
-                    .OrderBy(e => e.Ticker);
+                    .Select(Map);
 
                 var other = alertEntries
                     .Select(p => (p, p.Alerts.First()))
-                    .Select(Map)
-                    .OrderBy(e => e.Ticker);
+                    .Select(Map);
 
                 var data = new
                 {
@@ -106,6 +109,8 @@ namespace core.Admin
                 };
 
                 await _emails.Send(u.email, Sender.Support, EmailTemplate.ReviewEmail, data);
+
+                return data;
             }
 
             private static WeeklyReviewEntryView Map((ReviewEntryGroup p, ReviewEntry re) pair)

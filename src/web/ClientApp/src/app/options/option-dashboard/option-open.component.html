@@ -1,3 +1,18 @@
+<div class="mt-4" *ngIf="openOptions && openOptions.length == 0">
+  You have no option options contracts on record. To record a position, select the ticker below to get started:
+
+  <div class="row">
+    <div class="col">
+      <app-symbol-search
+          label="{{null}}"
+          placeholder="Search for securities using ticker or name"
+          (tickerSelected)="onTickerSelected($event)"
+          cssClass="form-control">
+      </app-symbol-search>
+    </div>
+  </div>
+</div>
+
 <div class="mt-4" *ngIf="openOptions.length > 0">
   <table class="table table-hover">
     <thead>

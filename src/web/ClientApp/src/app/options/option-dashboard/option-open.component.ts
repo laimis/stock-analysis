@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'option-open',
@@ -15,7 +16,11 @@ export class OptionOpenComponent {
     this.openOptions = container.openOptions
   }
 
-	constructor(){}
+	constructor(private router: Router){}
 
-	ngOnInit(): void {}
+  ngOnInit(): void {}
+
+  onTickerSelected(ticker:string) {
+    this.router.navigateByUrl('/stocks/' + ticker)
+  }
 }
