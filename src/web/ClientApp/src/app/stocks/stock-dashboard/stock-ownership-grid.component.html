@@ -1,5 +1,8 @@
 <div *ngIf="owned">
 
+  <span *ngIf="owned.length==0">
+    You have no share purchases recorded.
+  </span>
   <div class="mt-4" *ngIf="owned.length > 0">
     <table class="table table-hover">
       <thead>
