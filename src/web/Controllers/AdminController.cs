@@ -64,6 +64,21 @@ namespace web.Controllers
             return this.Ok();
         }
 
+        [HttpPost("welcome")]
+        public async Task<ActionResult> Welcome(Guid userId)
+        {
+            var user = await _storage.GetUser(userId);
+
+            await this._email.Send(
+                user.Email,
+                new Sender("support@nightingaletrading.com", "Nightingale Trading"),
+                EmailTemplate.NewUserWelcome,
+                new object()
+            );
+
+            return this.Ok();
+        }
+
         [HttpGet("users")]
         public Task<object> ActiveAccountsAsync()
         {
