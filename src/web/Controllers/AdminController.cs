@@ -64,7 +64,7 @@ namespace web.Controllers
             return this.Ok();
         }
 
-        [HttpPost("welcome")]
+        [HttpGet("welcome")]
         public async Task<ActionResult> Welcome(Guid userId)
         {
             var user = await _storage.GetUser(userId);
