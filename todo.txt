@@ -74,3 +74,4 @@ Option details screen - 1 evening + 1 morning 1 day...
 7/16 minor bug fixes, changes to transactions screen
 7/19 stocks performance grid [1 day]
 7/20 launched documentation link with help
+7/22 docs now have FAQ, Starter Guide, and Options details!!! [2 days]
