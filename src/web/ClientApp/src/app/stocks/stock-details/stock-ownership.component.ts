@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'stock-ownership',
   templateUrl: './stock-ownership.component.html',
+  styleUrls: ['./stock-ownership.component.css'],
   providers: [DatePipe]
 })
 export class StockOwnershipComponent implements OnInit {
@@ -54,6 +55,18 @@ export class StockOwnershipComponent implements OnInit {
 
       this.service.deleteStocks(this.stock.id).subscribe(r => {
         this.router.navigateByUrl('/dashboard')
+      })
+    }
+  }
+
+  deleteTransaction(transactionId:string) {
+    if (confirm("are you sure you want to delete the transaction?"))
+    {
+      this.errors = null
+
+      this.service.deleteStockTransaction(this.stock.id, transactionId).subscribe(_ => {
+        this.ownershipChanged.emit("deletetransaction")
+        this.success = true
       })
     }
   }

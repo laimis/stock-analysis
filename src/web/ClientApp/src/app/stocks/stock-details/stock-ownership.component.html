@@ -61,6 +61,7 @@
             <th>Description</th>
             <th>Debit</th>
             <th>Credit</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -71,6 +72,7 @@
             <td>{{ t.description }}</td>
             <td>{{ t.debit | currency }}</td>
             <td>{{ t.credit | currency }}</td>
+            <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.id)"></i></td>
           </tr>
         </tbody>
       </table>
