@@ -66,11 +66,11 @@
   <div *ngFor="let g of response.grouped">
     <div class="text-muted font-size-small row mb-2 mt-3">
       <div class="col-4">
-        {{g.name}}
-        <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails != g.name">show details</button>
-        <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails == g.name">hide details</button>
+        <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails != g.name">[ + ]</button>
+        <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails == g.name">[ - ]</button>
+        {{g.name}} ({{g.transactions.transactions.length}})
       </div>
-      <div class="col-8 text-right">
+      <div class="col-8">
         <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>
       </div>
     </div>
