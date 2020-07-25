@@ -46,6 +46,13 @@ namespace core.Portfolio.Output
             {
                 return t.Ticker;
             }
+
+            if (groupBy == "week")
+            {
+                var mon = t.Date.AddDays(-(int)t.Date.DayOfWeek+1);
+                return mon.ToString("MMMM dd, yyyy");
+            }
+
             return t.Date.ToString("MMMM, yyyy");
         }
 
