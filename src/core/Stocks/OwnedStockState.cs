@@ -16,11 +16,9 @@ namespace core.Stocks
 
 		public string Ticker { get; internal set; }
 		public Guid UserId { get; internal set; }
-		public int Owned { get; internal set; }
-		public double Cost { get; internal set; }
-		public DateTimeOffset? LastPurchase { get; internal set; }
-        public DateTimeOffset? LastSale { get; internal set; }
-
+		public int Owned => this.Buys.Sum(b => b.NumberOfShares) - this.Sells.Sum(s => s.NumberOfShares);
+		public double Cost => this.Owned * this.AverageCost;
+		
         public List<Transaction> Transactions { get; private set; }
         
         public Guid Id { get; set; }
@@ -35,15 +33,11 @@ namespace core.Stocks
                 (this.AverageCost * this.Owned + purchased.Price * purchased.NumberOfShares) 
                 / (this.Owned + purchased.NumberOfShares);
 
-            Owned += purchased.NumberOfShares;
-            Cost = AverageCost * Owned;
-            
-            LastPurchase = purchased.When;
-
             this.Buys.Add(purchased);
 
             this.Transactions.Add(Transaction.DebitTx(
                 this.Id,
+                purchased.Id,
                 this.Ticker,
                 $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
                 purchased.Price * purchased.NumberOfShares,
@@ -54,10 +48,6 @@ namespace core.Stocks
 
         internal void Apply(StockDeleted deleted)
         {
-            this.Owned = 0;
-            this.Cost = 0;
-            this.LastPurchase = null;
-            this.LastSale = null;
             this.Transactions.Clear();
             this.Buys.Clear();
             this.Sells.Clear();
@@ -67,10 +57,10 @@ namespace core.Stocks
         internal void Apply(StockSold sold)
         {
             this.Sells.Add(sold);
-            this.LastSale = sold.When;
-
+            
             this.Transactions.Add(Transaction.CreditTx(
                 this.Id,
+                sold.Id,
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
                 sold.Price * sold.NumberOfShares,
@@ -80,6 +70,7 @@ namespace core.Stocks
 
             this.Transactions.Add(Transaction.PLTx(
                 this.Id,
+                sold.Id,
                 this.Ticker,
                 $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
                 this.AverageCost * sold.NumberOfShares,
@@ -88,13 +79,10 @@ namespace core.Stocks
                 false
             ));
 
-            this.Owned -= sold.NumberOfShares;
             if (this.Owned == 0)
             {
                 this.AverageCost = 0;
             }
-
-            this.Cost = AverageCost * Owned;
         }
     }
 }

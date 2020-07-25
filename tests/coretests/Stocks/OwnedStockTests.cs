@@ -29,7 +29,6 @@ namespace coretests.Stocks
             stock.Sell(5, 20, DateTime.UtcNow, "sample note");
 
             Assert.Equal(10, stock.State.Owned);
-            Assert.NotNull(stock.State.LastSale);
         }
 
         [Fact]
@@ -84,7 +83,6 @@ namespace coretests.Stocks
             var stock2 = new OwnedStock(events);
 
             Assert.Equal(stock.State.Owned, stock2.State.Owned);
-            Assert.Equal(stock.State.LastPurchase, stock2.State.LastPurchase);
         }
 
         [Fact]

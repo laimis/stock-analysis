@@ -5,6 +5,7 @@ namespace core.Shared
     public struct Transaction
     {
         public Guid AggregateId { get; }
+        public Guid EventId { get; }
         public string Ticker { get; }
         public string Description { get; }
         public double Debit { get; }
@@ -29,6 +30,7 @@ namespace core.Shared
 
         private Transaction(
             Guid aggregateId,
+            Guid eventId,
             string ticker,
             string description,
             double debit,
@@ -38,6 +40,7 @@ namespace core.Shared
             bool isPL)
         {
             this.AggregateId = aggregateId;
+            this.EventId = eventId;
             this.Ticker = ticker;
             this.Description = description;
             this.Debit = debit;
@@ -47,19 +50,19 @@ namespace core.Shared
             this.IsPL = isPL;
         }
 
-        public static Transaction CreditTx(Guid aggregateId, string ticker, string description, double credit, DateTimeOffset when, bool isOption)
+        public static Transaction CreditTx(Guid aggregateId, Guid eventId, string ticker, string description, double credit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(aggregateId, ticker, description, 0, credit, when, isOption, false);
+            return new Transaction(aggregateId, eventId, ticker, description, 0, credit, when, isOption, false);
         }
 
-        public static Transaction DebitTx(Guid aggregateId, string ticker, string description, double debit, DateTimeOffset when, bool isOption)
+        public static Transaction DebitTx(Guid aggregateId, Guid eventId, string ticker, string description, double debit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(aggregateId, ticker, description, debit, 0, when, isOption, false);
+            return new Transaction(aggregateId, eventId, ticker, description, debit, 0, when, isOption, false);
         }
 
-        public static Transaction PLTx(Guid aggregateId, string ticker, string description, double debit, double credit, DateTimeOffset when, bool isOption)
+        public static Transaction PLTx(Guid aggregateId, Guid eventId, string ticker, string description, double debit, double credit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(aggregateId, ticker, description, debit, credit, when, isOption, true);
+            return new Transaction(aggregateId, eventId, ticker, description, debit, credit, when, isOption, true);
         }
     }
 }
