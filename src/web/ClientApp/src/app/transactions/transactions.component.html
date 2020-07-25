@@ -70,9 +70,10 @@
         <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails == g.name">[ - ]</button>
         {{g.name}} ({{g.transactions.transactions.length}})
       </div>
-      <div class="col-8">
-        <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>
+      <div class="col-2 font-weight-bold text-right">
+        {{ g.transactions.credit - g.transactions.debit | currency }}
       </div>
+      <div class="col-4"></div>
     </div>
     <table class="table table-hover border rounded" *ngIf="showDetails == g.name">
       <thead class="thead-light">

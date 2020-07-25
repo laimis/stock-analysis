@@ -1,6 +1,6 @@
 CANDIDATES
 
-- abilty to edit each entry
+- ability to edit each entry
 - put spreads
 - easier to record transaction
 
@@ -36,5 +36,6 @@ Alerts - 3 days
 7/20 launched documentation link with help
 7/22 docs now have FAQ, Starter Guide, and Options details!!! [2 days]
 7/23 docs launched, new user welcome is much better [1 day]
+7/25 weekly option for transactions, less noise
 
 Users: 43. 3 active.
