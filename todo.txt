@@ -1,47 +1,9 @@
-- new sign up experience
+CANDIDATES
 
-WRITING
-
-- announcement on options insight
-- blog post about reddit post
-- new user welcome that points to documentation
-
-REVIEW
-
-https://www.reddit.com/r/options/comments/he16pq/testing_new_option_finder_on_options_profit/
-https://www.reddit.com/r/options/comments/hl8i2n/option_greeks_101/
-
-
-FUTURE
-
-- easier to record transaction
-- closed positions stocks
-- unauth landing page preserve redirect url
 - abilty to edit each entry
-- RH vision
 - put spreads
-- space on NG for copy
-- wheel strategy landing page
-- twitter follow campaign
-- help articles as S3 generated doc site?
-- free trial the only way to get account
+- easier to record transaction
 
-
-Position entry wizard:
-    step by step:
-    buy/sell
-    how many
-    what price
-    execute
-
-
-- redo dashboard options display
-    - time left progress bar concept
-    - sold option exposure
-    - including call collateral coverage
-    - options details show 50%, 80%, 90% profit levels
-
-RobinHood statement parser
 
 "How do I know how much I have made or lost 
 if the graph doesn’t include realised gain/loss? 
@@ -57,16 +19,14 @@ https://www.reddit.com/r/options/comments/8nb37e/im_making_an_interactive_tradin
 https://www.reddit.com/r/RobinHood/comments/7yzkpy/i_made_a_free_tool_that_helps_you_identify_when_a/
 
 
-
-
 DONE:
 
 ======================== July ========================
 
 Alerts - 3 days
-Options stats - 7/5, 7/6, 7/7
-Option details screen - 1 evening + 1 morning 1 day...
-7/10 Reddit post on option stats --- the fucking thing blew up! almost 200 upvotes, the highest in that forum by far
+7/7 Options stats
+7/9 Option details screen
+7/10 Reddit post on option stats --- the fucking thing blew up! almost 200 upvotes
 7/12 Stocks dashboard created
 7/12 Dashboard redone!
 7/12 Weekly review redone!
@@ -75,3 +35,6 @@ Option details screen - 1 evening + 1 morning 1 day...
 7/19 stocks performance grid [1 day]
 7/20 launched documentation link with help
 7/22 docs now have FAQ, Starter Guide, and Options details!!! [2 days]
+7/23 docs launched, new user welcome is much better [1 day]
+
+Users: 43. 3 active.
