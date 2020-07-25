@@ -65,12 +65,14 @@
 
   <div *ngFor="let g of response.grouped">
     <div class="text-muted font-size-small row mb-2 mt-3">
-      <div class="col-2">{{g.name}}</div>
-      <div class="col-10 text-right">
-        balance: <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>
+      <div class="col-4">
+        {{g.name}} <button class="btn btn-link" (click)="showDetails = !showDetails">details</button>
+      </div>
+      <div class="col-8 text-right">
+        <span class="font-weight-bold">{{ g.transactions.credit - g.transactions.debit | currency }}</span>
       </div>
     </div>
-    <table class="table table-hover border rounded">
+    <table class="table table-hover border rounded" *ngIf="showDetails">
       <thead class="thead-light">
         <tr>
           <th width="100">Date</th>

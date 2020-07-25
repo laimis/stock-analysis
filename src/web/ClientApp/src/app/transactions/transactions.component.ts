@@ -14,6 +14,7 @@ export class TransactionsComponent implements OnInit {
   filterType: string = ""
   txType: string = "tx"
   loading: boolean = false
+  showDetails: boolean = false
 
   constructor(
     private stockService:StocksService,
