@@ -49,10 +49,7 @@ namespace core.Stocks
                     }
                 }
 
-                return owned > 0 ? avgCost : 0;
-                // this.AverageCost = 
-                // (this.AverageCost * this.Owned + purchased.Price * purchased.NumberOfShares) 
-                // / (this.Owned + purchased.NumberOfShares);
+                return avgCost;
             }
         }
         public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
@@ -101,6 +98,11 @@ namespace core.Stocks
                 sold.When,
                 false
             ));
+
+            if (this.Owned == 0)
+            {
+                this.BuyOrSell.Clear();
+            }
         }
     }
 }
