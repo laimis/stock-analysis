@@ -6,7 +6,7 @@ namespace core.Stocks
 {
     public class OwnedStock : Aggregate
     {
-        private OwnedStockState _state = new OwnedStockState();
+        private OwnedStockState _state;
         public OwnedStockState State => _state;
         public override Guid Id => State.Id;
 
@@ -103,11 +103,13 @@ namespace core.Stocks
             this.State.Apply(purchased);
         }
 
-        private void ApplyInternal(TickerObtained tickerObtained)
+        private void ApplyInternal(TickerObtained o)
         {
-            this.State.Id = tickerObtained.AggregateId;
-            this.State.Ticker = tickerObtained.Ticker;
-            this.State.UserId = tickerObtained.UserId;
+            _state = new OwnedStockState(
+                o.AggregateId,
+                o.Ticker,
+                o.UserId
+            );
         }
 
         private void ApplyInternal(StockSold sold)

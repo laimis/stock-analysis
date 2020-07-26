@@ -60,9 +60,9 @@ namespace core.Shared
             return new Transaction(aggregateId, eventId, ticker, description, debit, 0, when, isOption, false);
         }
 
-        public static Transaction PLTx(Guid aggregateId, Guid eventId, string ticker, string description, double debit, double credit, DateTimeOffset when, bool isOption)
+        public static Transaction PLTx(Guid aggregateId, string ticker, string description, double debit, double credit, DateTimeOffset when, bool isOption)
         {
-            return new Transaction(aggregateId, eventId, ticker, description, debit, credit, when, isOption, true);
+            return new Transaction(aggregateId, Guid.Empty, ticker, description, debit, credit, when, isOption, true);
         }
     }
 }
