@@ -72,13 +72,7 @@ namespace core.Stocks
         {
             if (!this.State.BuyOrSell.Any(t => t.Id == transactionId))
             {
-                Console.WriteLine("could not find " + transactionId + " in ");
-                foreach(var t in this.State.BuyOrSell)
-                {
-                    Console.WriteLine(t.Id);
-                }
-                
-                return;
+                throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);
             }
 
             Apply(

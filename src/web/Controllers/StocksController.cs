@@ -32,8 +32,6 @@ namespace web.Controllers
         [HttpGet("{ticker}")]
         public async Task<object> DetailsAsync(string ticker)
         {
-            Console.WriteLine("ticker details invoked");
-
             return await _mediator.Send(new Details.Query(ticker));
         }
 
@@ -57,8 +55,6 @@ namespace web.Controllers
         [HttpDelete("{id}/transactions/{eventId}")]
         public async Task<object> DeleteTransaction(Guid id, Guid eventId)
         {
-            Console.WriteLine("delete transactions invoked");
-
             var cmd = new DeleteTransaction.Command(id, eventId, User.Identifier());
 
             return await _mediator.Send(cmd);
