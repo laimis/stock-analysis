@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Portfolio.Output;
 using core.Shared;
 
 namespace core.Stocks
@@ -35,7 +37,16 @@ namespace core.Stocks
                     return null;
                 }
 
-                return stock.State;
+                return new {
+                    id = stock.State.Id,
+                    averageCost = stock.State.AverageCost,
+                    cost = stock.State.Cost,
+                    owned = stock.State.Owned,
+                    ticker = stock.State.Ticker,
+                    transactions = new TransactionList(
+                        stock.State.Transactions.Where(t => !t.IsPL), null, null
+                    )
+                };
             }
         }
     }

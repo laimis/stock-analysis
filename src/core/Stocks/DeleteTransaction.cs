@@ -16,7 +16,7 @@ namespace core.Stocks
                 this.TransactionId = transactionId;
             }
 
-            public Guid Id { get; set; }
+            public Guid Id { get; }
             public Guid TransactionId { get; }
         }
 

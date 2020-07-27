@@ -72,6 +72,12 @@ namespace core.Stocks
         {
             if (!this.State.BuyOrSell.Any(t => t.Id == transactionId))
             {
+                Console.WriteLine("could not find " + transactionId + " in ");
+                foreach(var t in this.State.BuyOrSell)
+                {
+                    Console.WriteLine(t.Id);
+                }
+                
                 return;
             }
 
@@ -86,7 +92,7 @@ namespace core.Stocks
             );
         }
 
-        internal void Delete()
+        public void Delete()
         {
             Apply(
                 new StockDeleted(

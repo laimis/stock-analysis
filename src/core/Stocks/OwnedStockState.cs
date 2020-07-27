@@ -62,6 +62,7 @@ namespace core.Stocks
             double avgCost = 0;
             int owned = 0;
             double cost = 0;
+            var txs = new List<Transaction>();
 
             void PurchaseProcessing(IStockTransaction st)
             {
@@ -70,38 +71,44 @@ namespace core.Stocks
                 owned += st.NumberOfShares;
                 cost += st.Price * st.NumberOfShares;
 
-                this.Transactions.Add(Transaction.DebitTx(
-                    this.Id,
-                    st.Id,
-                    this.Ticker,
-                    $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
-                    st.Price * st.NumberOfShares,
-                    st.When,
-                    false
-                ));
+                txs.Add(
+                    Transaction.DebitTx(
+                        this.Id,
+                        st.Id,
+                        this.Ticker,
+                        $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price * st.NumberOfShares,
+                        st.When,
+                        false
+                    )
+                );
             }
 
             void SellProcessing(IStockTransaction st)
             {
-                this.Transactions.Add(Transaction.CreditTx(
-                    this.Id,
-                    st.Id,
-                    this.Ticker,
-                    $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
-                    st.Price * st.NumberOfShares,
-                    st.When,
-                    false
-                ));
+                txs.Add(
+                    Transaction.CreditTx(
+                        this.Id,
+                        st.Id,
+                        this.Ticker,
+                        $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price * st.NumberOfShares,
+                        st.When,
+                        false
+                    )
+                );
 
-                this.Transactions.Add(Transaction.PLTx(
-                    this.Id,
-                    this.Ticker,
-                    $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
-                    avgCost * st.NumberOfShares,
-                    st.Price * st.NumberOfShares,
-                    st.When,
-                    false
-                ));
+                txs.Add(
+                    Transaction.PLTx(
+                        this.Id,
+                        this.Ticker,
+                        $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
+                        avgCost * st.NumberOfShares,
+                        st.Price * st.NumberOfShares,
+                        st.When,
+                        false
+                    )
+                );
                 
                 owned -= st.NumberOfShares;
                 cost -= avgCost * st.NumberOfShares;
@@ -133,6 +140,8 @@ namespace core.Stocks
             this.AverageCost = avgCost;
             this.Owned = owned;
             this.Cost = cost;
+            this.Transactions.Clear();
+            this.Transactions.AddRange(txs);
         }
     }
 }

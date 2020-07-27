@@ -181,6 +181,13 @@ namespace coretests.Stocks
             Assert.Equal(2, stock.State.Owned);
             Assert.Equal(8.75, stock.AverageCost);
             Assert.Equal(17.5, stock.State.Cost);
+
+            stock.Delete();
+
+            Assert.Equal(0, stock.State.Owned);
+            Assert.Equal(0, stock.AverageCost);
+            Assert.Equal(0, stock.State.AverageCost);
+            Assert.Empty(stock.State.Transactions);
         }
     }
 }
