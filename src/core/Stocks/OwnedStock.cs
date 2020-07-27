@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
@@ -67,6 +68,24 @@ namespace core.Stocks
             );
         }
 
+        public void DeleteTransaction(Guid transactionId)
+        {
+            if (!this.State.BuyOrSell.Any(t => t.Id == transactionId))
+            {
+                return;
+            }
+
+            Apply(
+                new StockTransactionDeleted(
+                    Guid.NewGuid(),
+                    this.State.Id,
+                    transactionId,
+                    DateTimeOffset.UtcNow
+                    
+                )
+            );
+        }
+
         internal void Delete()
         {
             Apply(
@@ -118,6 +137,11 @@ namespace core.Stocks
         }
 
         private void ApplyInternal(StockDeleted deleted)
+        {
+            this.State.Apply(deleted);
+        }
+
+        private void ApplyInternal(StockTransactionDeleted deleted)
         {
             this.State.Apply(deleted);
         }

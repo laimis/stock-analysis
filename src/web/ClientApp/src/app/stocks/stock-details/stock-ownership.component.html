@@ -72,7 +72,7 @@
             <td>{{ t.description }}</td>
             <td>{{ t.debit | currency }}</td>
             <td>{{ t.credit | currency }}</td>
-            <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.id)"></i></td>
+            <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.eventId)"></i></td>
           </tr>
         </tbody>
       </table>

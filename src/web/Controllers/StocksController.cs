@@ -52,6 +52,14 @@ namespace web.Controllers
             return await _mediator.Send(cmd);
         }
 
+        [HttpDelete("{id}/transactions/{eventId}")]
+        public async Task<object> DeleteTransaction(Guid id, Guid transactionId)
+        {
+            var cmd = new DeleteTransaction.Command(id, transactionId, User.Identifier());
+
+            return await _mediator.Send(cmd);
+        }
+
         [HttpGet("search/{term}")]
         public async Task<object> Search(string term)
         {
