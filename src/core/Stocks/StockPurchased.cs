@@ -4,7 +4,10 @@ using MediatR;
 
 namespace core.Stocks
 {
-    public class StockPurchased : AggregateEvent, INotification
+    public class StockPurchased : 
+        AggregateEvent,
+        INotification,
+        IStockTransaction
     {
         public StockPurchased(
             Guid id,

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
 {
     public class OwnedStock : Aggregate
     {
-        private OwnedStockState _state = new OwnedStockState();
+        private OwnedStockState _state;
         public OwnedStockState State => _state;
         public override Guid Id => State.Id;
 
@@ -67,7 +68,25 @@ namespace core.Stocks
             );
         }
 
-        internal void Delete()
+        public void DeleteTransaction(Guid transactionId)
+        {
+            if (!this.State.BuyOrSell.Any(t => t.Id == transactionId))
+            {
+                throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);
+            }
+
+            Apply(
+                new StockTransactionDeleted(
+                    Guid.NewGuid(),
+                    this.State.Id,
+                    transactionId,
+                    DateTimeOffset.UtcNow
+                    
+                )
+            );
+        }
+
+        public void Delete()
         {
             Apply(
                 new StockDeleted(
@@ -103,11 +122,13 @@ namespace core.Stocks
             this.State.Apply(purchased);
         }
 
-        private void ApplyInternal(TickerObtained tickerObtained)
+        private void ApplyInternal(TickerObtained o)
         {
-            this.State.Id = tickerObtained.AggregateId;
-            this.State.Ticker = tickerObtained.Ticker;
-            this.State.UserId = tickerObtained.UserId;
+            _state = new OwnedStockState(
+                o.AggregateId,
+                o.Ticker,
+                o.UserId
+            );
         }
 
         private void ApplyInternal(StockSold sold)
@@ -116,6 +137,11 @@ namespace core.Stocks
         }
 
         private void ApplyInternal(StockDeleted deleted)
+        {
+            this.State.Apply(deleted);
+        }
+
+        private void ApplyInternal(StockTransactionDeleted deleted)
         {
             this.State.Apply(deleted);
         }

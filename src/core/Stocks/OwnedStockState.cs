@@ -1,100 +1,147 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
 {
     public class OwnedStockState
 	{
-        public OwnedStockState()
+        public OwnedStockState(Guid id, string ticker, Guid userId)
         {
-            this.Transactions = new List<Transaction>();
-            this.Buys = new List<StockPurchased>();
-            this.Sells = new List<StockSold>();
+            this.Id = id;
+            this.Ticker = ticker;
+            this.UserId = userId;
         }
 
-		public string Ticker { get; internal set; }
-		public Guid UserId { get; internal set; }
-		public int Owned { get; internal set; }
-		public double Cost { get; internal set; }
-		public DateTimeOffset? LastPurchase { get; internal set; }
-        public DateTimeOffset? LastSale { get; internal set; }
+        public Guid Id { get; }
+        public string Ticker { get; }
+        public Guid UserId { get; }
 
-        public List<Transaction> Transactions { get; private set; }
-        
-        public Guid Id { get; set; }
+        public int Owned { get; private set; }
+        public double Cost { get; private set; }
         public double AverageCost { get; private set; }
+        public List<Transaction> Transactions { get; } = new List<Transaction>();
+        internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
+        internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
+
         public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
-        internal List<StockPurchased> Buys { get; }
-        internal List<StockSold> Sells { get; }
 
         internal void Apply(StockPurchased purchased)
         {
-            this.AverageCost = 
-                (this.AverageCost * this.Owned + purchased.Price * purchased.NumberOfShares) 
-                / (this.Owned + purchased.NumberOfShares);
+            this.BuyOrSell.Add(purchased);
 
-            Owned += purchased.NumberOfShares;
-            Cost = AverageCost * Owned;
-            
-            LastPurchase = purchased.When;
-
-            this.Buys.Add(purchased);
-
-            this.Transactions.Add(Transaction.DebitTx(
-                this.Id,
-                this.Ticker,
-                $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
-                purchased.Price * purchased.NumberOfShares,
-                purchased.When,
-                false
-            ));
+            StateUpdateLoop();
         }
 
         internal void Apply(StockDeleted deleted)
         {
-            this.Owned = 0;
-            this.Cost = 0;
-            this.LastPurchase = null;
-            this.LastSale = null;
-            this.Transactions.Clear();
-            this.Buys.Clear();
-            this.Sells.Clear();
-            this.AverageCost = 0;
+            foreach(var t in this.BuyOrSell)
+            {
+                this.Deletes.Add(t.Id);
+            }
+
+            StateUpdateLoop();
+        }
+
+        internal void Apply(StockTransactionDeleted deleted)
+        {
+            this.Deletes.Add(deleted.TransactionId);
+
+            StateUpdateLoop();
         }
 
         internal void Apply(StockSold sold)
         {
-            this.Sells.Add(sold);
-            this.LastSale = sold.When;
+            this.BuyOrSell.Add(sold);
 
-            this.Transactions.Add(Transaction.CreditTx(
-                this.Id,
-                this.Ticker,
-                $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
-                sold.Price * sold.NumberOfShares,
-                sold.When,
-                false
-            ));
+            StateUpdateLoop();
+        }
 
-            this.Transactions.Add(Transaction.PLTx(
-                this.Id,
-                this.Ticker,
-                $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
-                this.AverageCost * sold.NumberOfShares,
-                sold.Price * sold.NumberOfShares,
-                sold.When,
-                false
-            ));
+        private void StateUpdateLoop()
+        {
+            double avgCost = 0;
+            int owned = 0;
+            double cost = 0;
+            var txs = new List<Transaction>();
 
-            this.Owned -= sold.NumberOfShares;
-            if (this.Owned == 0)
+            void PurchaseProcessing(IStockTransaction st)
             {
-                this.AverageCost = 0;
+                avgCost = (avgCost * owned + st.Price * st.NumberOfShares)
+                        / (owned + st.NumberOfShares);
+                owned += st.NumberOfShares;
+                cost += st.Price * st.NumberOfShares;
+
+                txs.Add(
+                    Transaction.DebitTx(
+                        this.Id,
+                        st.Id,
+                        this.Ticker,
+                        $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price * st.NumberOfShares,
+                        st.When,
+                        false
+                    )
+                );
             }
 
-            this.Cost = AverageCost * Owned;
+            void SellProcessing(IStockTransaction st)
+            {
+                txs.Add(
+                    Transaction.CreditTx(
+                        this.Id,
+                        st.Id,
+                        this.Ticker,
+                        $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price * st.NumberOfShares,
+                        st.When,
+                        false
+                    )
+                );
+
+                txs.Add(
+                    Transaction.PLTx(
+                        this.Id,
+                        this.Ticker,
+                        $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
+                        avgCost * st.NumberOfShares,
+                        st.Price * st.NumberOfShares,
+                        st.When,
+                        false
+                    )
+                );
+                
+                owned -= st.NumberOfShares;
+                cost -= avgCost * st.NumberOfShares;
+            }
+
+            foreach(var st in this.BuyOrSell)
+            {
+                if (this.Deletes.Contains(st.Id))
+                {
+                    continue;
+                }
+
+                if (st is StockPurchased)
+                {
+                    PurchaseProcessing(st);
+                }
+                else
+                {
+                    SellProcessing(st);
+                }
+
+                if (owned == 0)
+                {
+                    avgCost = 0;
+                    cost = 0;
+                }
+            }
+
+            this.AverageCost = avgCost;
+            this.Owned = owned;
+            this.Cost = cost;
+            this.Transactions.Clear();
+            this.Transactions.AddRange(txs);
         }
     }
 }

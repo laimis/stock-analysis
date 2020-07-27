@@ -125,6 +125,10 @@ export class StocksService {
     return this.http.delete(`/api/stocks/${id}`)
   }
 
+  deleteStockTransaction(id: string, transactionId:string): Observable<object>{
+    return this.http.delete(`/api/stocks/${id}/transactions/${transactionId}`)
+  }
+
   importStocks(file: any) : Observable<any> {
     return this.http.post('/api/stocks/import', file)
   }

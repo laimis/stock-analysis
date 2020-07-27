@@ -29,7 +29,6 @@ namespace coretests.Stocks
             stock.Sell(5, 20, DateTime.UtcNow, "sample note");
 
             Assert.Equal(10, stock.State.Owned);
-            Assert.NotNull(stock.State.LastSale);
         }
 
         [Fact]
@@ -84,7 +83,6 @@ namespace coretests.Stocks
             var stock2 = new OwnedStock(events);
 
             Assert.Equal(stock.State.Owned, stock2.State.Owned);
-            Assert.Equal(stock.State.LastPurchase, stock2.State.LastPurchase);
         }
 
         [Fact]
@@ -147,6 +145,49 @@ namespace coretests.Stocks
             Assert.Equal(2.5, tx.Profit);
             Assert.Equal(20, tx.Credit);
             Assert.Equal(17.5, tx.Debit);
+        }
+
+        [Fact]
+        public void MultipleBuysDeletingTransactions()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow);
+            stock.Purchase(1, 10, DateTimeOffset.UtcNow);
+
+            Assert.Equal(7.5, stock.AverageCost);
+            Assert.Equal(15, stock.State.Cost);
+
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Equal(7.5, stock.AverageCost);
+            Assert.Equal(7.5, stock.State.Cost);
+
+            stock.Purchase(1, 10, DateTimeOffset.UtcNow);
+
+            Assert.Equal(8.75, stock.AverageCost);
+            Assert.Equal(17.5, stock.State.Cost);
+
+            stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
+
+            Assert.Equal(0, stock.State.Owned);
+            Assert.Equal(0, stock.AverageCost);
+            Assert.Equal(0, stock.State.Cost);
+
+            var last = stock.State.Transactions.Where(t => !t.IsPL).Last();
+
+            stock.DeleteTransaction(last.EventId);
+
+            Assert.Equal(2, stock.State.Owned);
+            Assert.Equal(8.75, stock.AverageCost);
+            Assert.Equal(17.5, stock.State.Cost);
+
+            stock.Delete();
+
+            Assert.Equal(0, stock.State.Owned);
+            Assert.Equal(0, stock.AverageCost);
+            Assert.Equal(0, stock.State.AverageCost);
+            Assert.Empty(stock.State.Transactions);
         }
     }
 }

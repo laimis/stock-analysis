@@ -107,6 +107,7 @@ namespace core.Options
             this.Transactions.Add(
                 Transaction.CreditTx(
                     this.Id,
+                    sold.Id,
                     this.Ticker,
                     description,
                     credit,
@@ -115,7 +116,7 @@ namespace core.Options
                 )
             );
 
-            ApplyClosedLogicIfApplicable(sold.When);
+            ApplyClosedLogicIfApplicable(sold.When, sold.Id);
         }
 
         private void AddNoteIfNotEmpty(string notes)
@@ -123,7 +124,7 @@ namespace core.Options
             if (!string.IsNullOrEmpty(notes)) this.Notes.Add(notes);
         }
 
-        private void ApplyClosedLogicIfApplicable(DateTimeOffset when)
+        private void ApplyClosedLogicIfApplicable(DateTimeOffset when, Guid eventId)
         {
             if (this.NumberOfContracts != 0)
             {
@@ -191,6 +192,7 @@ namespace core.Options
             this.Transactions.Add(
                 Transaction.DebitTx(
                     this.Id,
+                    purchased.Id,
                     this.Ticker,
                     description,
                     debit,
@@ -199,7 +201,7 @@ namespace core.Options
                 )
             );
 
-            ApplyClosedLogicIfApplicable(purchased.When);
+            ApplyClosedLogicIfApplicable(purchased.When, purchased.Id);
         }
 
         internal void Apply(OptionExpired expired)
@@ -208,7 +210,7 @@ namespace core.Options
 
             this.Expirations.Add(expired);
 
-            ApplyClosedLogicIfApplicable(expired.When);
+            ApplyClosedLogicIfApplicable(expired.When, expired.Id);
         }
     }
 }
