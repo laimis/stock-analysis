@@ -5,11 +5,6 @@ Ideas checklist:
 
 CANDIDATES
 
-- ability to edit each entry
-- put spreads
-- easier to record transaction
-
-
 "How do I know how much I have made or lost 
 if the graph doesn’t include realised gain/loss? 
 Is there a way to calculate that quickly 
