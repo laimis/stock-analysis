@@ -10,7 +10,8 @@ namespace core.Shared
         public string Description { get; }
         public double Debit { get; }
         public double Credit { get; }
-        public DateTimeOffset Date { get; }
+        public DateTimeOffset DateAsDate { get; }
+        public string Date => this.DateAsDate.ToString("yyyy-MM-dd");
         public double Profit => this.Credit - this.Debit;
         public double ReturnPct
         {
@@ -45,7 +46,7 @@ namespace core.Shared
             this.Description = description;
             this.Debit = debit;
             this.Credit = credit;
-            this.Date = when;
+            this.DateAsDate = when;
             this.IsOption = isOption;
             this.IsPL = isPL;
         }

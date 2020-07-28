@@ -37,7 +37,7 @@ namespace core.Portfolio.Output
                 return transactions.OrderBy(t => t.Ticker);
             }
 
-            return transactions.OrderByDescending(t => t.Date);
+            return transactions.OrderByDescending(t => t.DateAsDate);
         }
 
         private static string GroupByValue(string groupBy, Transaction t)
@@ -49,11 +49,11 @@ namespace core.Portfolio.Output
 
             if (groupBy == "week")
             {
-                var mon = t.Date.AddDays(-(int)t.Date.DayOfWeek+1);
+                var mon = t.DateAsDate.AddDays(-(int)t.DateAsDate.DayOfWeek+1);
                 return mon.ToString("MMMM dd, yyyy");
             }
 
-            return t.Date.ToString("MMMM, yyyy");
+            return t.DateAsDate.ToString("MMMM, yyyy");
         }
 
         public IEnumerable<Transaction> Transactions { get; }

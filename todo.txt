@@ -3,8 +3,7 @@ Ideas checklist:
 - tm: check the daily list of ideas
 - sfix: missed the boat potentially
 - mu: too expensive to be worthwhile
-
-Keep on doing the simulation
+- keep on re-thinking how to evaluate different options better
 
 CANDIDATES
 
