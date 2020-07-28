@@ -1,9 +1,10 @@
-Excel import support
-
 Ideas checklist:
-- uber sell call for 32.5/33 if per option can be got at >$70
-- sfix buy $23.5 call expiring August, if the price moves up?
-- MU put spread, 49-47
+- uber: continue to be patient
+- tm: check the daily list of ideas
+- sfix: missed the boat potentially
+- mu: too expensive to be worthwhile
+
+Keep on doing the simulation
 
 CANDIDATES
 

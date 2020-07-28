@@ -52,37 +52,53 @@ namespace core.Stocks
 
             private async Task<CommandResponse> ProcessLine(StockRecord record, Guid userId)
             {
+                RequestWithUserId<CommandResponse> CreateBuy(StockRecord r)
+                {
+                    var b = new core.Stocks.Buy.Command {
+                        NumberOfShares = record.amount,
+                        Date = record.date,
+                        Price = record.price,
+                        Ticker = record.ticker,
+                    };
+                    b.WithUserId(userId);
+                    return b;
+                }
+
+                RequestWithUserId<CommandResponse> CreateSell(StockRecord r)
+                {
+                    var s = new core.Stocks.Sell.Command
+                    {
+                        NumberOfShares = record.amount,
+                        Date = record.date,
+                        Price = record.price,
+                        Ticker = record.ticker,
+                    };
+                    s.WithUserId(userId);
+                    return s;
+                }
+
                 RequestWithUserId<CommandResponse> cmd = null;
                 switch (record.type)
                 {
                     case "buy":
-                        var b = new core.Stocks.Buy.Command
-                        {
-                            NumberOfShares = record.amount,
-                            Date = record.date,
-                            Price = record.price,
-                            Ticker = record.ticker,
-                        };
-
-                        b.WithUserId(userId);
-                        cmd = b;
+                        cmd = CreateBuy(record);
                         break;
 
                     case "sell":
-                        var s = new core.Stocks.Sell.Command
-                        {
-                            NumberOfShares = record.amount,
-                            Date = record.date,
-                            Price = record.price,
-                            Ticker = record.ticker,
-                        };
-
-                        s.WithUserId(userId);
-                        cmd = s;
+                        cmd = CreateSell(record);
                         break;
                 }
 
-                return await _mediator.Send(cmd);
+                try
+                {
+                    return await _mediator.Send(cmd);
+                }
+                catch(Exception ex)
+                {
+                    return CommandResponse.Failed(
+                        $"Entry for {record.ticker}/{record.type}/{record.date.Value.ToString("yyyy-MM-dd")} failed: {ex.Message}"
+                    );
+                }
             }
 
             private class StockRecord
