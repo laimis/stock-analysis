@@ -1,9 +1,19 @@
+Excel import support
+
 Ideas checklist:
 - uber sell call for 32.5/33 if per option can be got at >$70
 - sfix buy $23.5 call expiring August, if the price moves up?
 - MU put spread, 49-47
 
 CANDIDATES
+
+Options strategy field
+    - dropdown
+    - value
+Simplified position entry
+Improved navigation around
+Charts for performance
+Goals for the week or upcoming trade positions
 
 "How do I know how much I have made or lost 
 if the graph doesn’t include realised gain/loss? 
