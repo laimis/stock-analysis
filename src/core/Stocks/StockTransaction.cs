@@ -6,10 +6,10 @@ namespace core.Stocks
 {
     public class StockTransaction : RequestWithTicker<CommandResponse>
     {
-        [Range(1, 10000)]
+        [Range(1, 1000000)]
         public int NumberOfShares { get; set; }
 
-        [Range(0.01, 10000)]
+        [Range(0, 100000)]
         public double Price { get; set; }
         
         [Required]
