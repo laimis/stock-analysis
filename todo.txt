@@ -1,9 +1,10 @@
 Ideas checklist:
 - uber: continue to be patient
 - tm: check the daily list of ideas
-- sfix: missed the boat potentially
-- mu: too expensive to be worthwhile
-- keep on re-thinking how to evaluate different options better
+- sfix: missed the boat potentially <-- got burned, need to setup alert when it rises again
+
+
+- import nonexisting symbol, does it work?
 
 CANDIDATES
 
