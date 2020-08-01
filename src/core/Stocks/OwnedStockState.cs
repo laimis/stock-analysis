@@ -154,4 +154,12 @@ namespace core.Stocks
             this.ApplyInternal(obj);
         }
     }
+
+    internal interface IStockTransaction
+    {
+        int NumberOfShares { get; }
+        double Price { get; }
+        Guid Id { get; }
+        DateTimeOffset When { get; }
+    }
 }
