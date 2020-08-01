@@ -15,8 +15,6 @@ namespace core.Options
             CurrentPrice = currentPrice.Amount;
             OptionType = o.State.OptionType.ToString();
             StrikePrice = o.State.StrikePrice;
-            PremiumReceived = o.State.PremiumReceived;
-            PremiumPaid = o.State.PremiumPaid;
             ExpirationDate = o.State.Expiration.ToString("yyyy-MM-dd");
             NumberOfContracts = Math.Abs(o.State.NumberOfContracts);
             BoughtOrSold = o.State.SoldToOpen.Value ? "Sold" : "Bought";
@@ -29,6 +27,12 @@ namespace core.Options
             Closed = o.Closed;
             Assigned = o.State.Assigned;
             Notes = o.State.Notes;
+
+            var credits = o.State.Transactions.Where(t => !t.IsPL && t.Profit >= 0);
+            var debits = o.State.Transactions.Where(t => !t.IsPL && t.Profit < 0);
+
+            if (credits.Any()) PremiumReceived = credits.Sum(t => t.Credit);
+            if (debits.Any()) PremiumPaid = debits.Sum(t => t.Debit);
 
             if (!currentPrice.NotFound)
             {

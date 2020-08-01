@@ -170,7 +170,7 @@ namespace coretests.Options
 
             var profit = pl.Sum(t => t.Profit);
 
-            // Assert.Equal(-100, profit);
+            Assert.Equal(-100, profit);
         }
 
         private static OwnedOption GetTestOption(

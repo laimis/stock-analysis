@@ -63,8 +63,8 @@ namespace core.Options
         
         public bool Assigned => this.Expirations.Count > 0 && this.Expirations[0].Assigned;
         public bool Deleted { get; private set; }
-        public double PremiumReceived => Transactions.Where(t => !t.IsPL).Sum(t => t.Credit);
-        public double PremiumPaid => Transactions.Where(t => !t.IsPL).Sum(t => t.Debit);
+        private double PremiumReceived { get; set; }
+        private double PremiumPaid { get; set; }
 
         public List<string> Notes { get; }
 
@@ -94,22 +94,28 @@ namespace core.Options
                 this.Deleted = false;
             }
 
+            AddNoteIfNotEmpty(sold.Notes);
+
+            if (this.NumberOfContracts == 0)
+            {
+                this.PremiumReceived = 0;
+                this.PremiumPaid = 0;
+            }
+
             this.NumberOfContracts -= sold.NumberOfContracts;
 
             this.Sells.Add(sold);
 
             var credit = (sold.NumberOfContracts * sold.Premium);
 
-            var description = $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract";
-
-            AddNoteIfNotEmpty(sold.Notes);
+            PremiumReceived += credit;
 
             this.Transactions.Add(
                 Transaction.CreditTx(
                     this.Id,
                     sold.Id,
                     this.Ticker,
-                    description,
+                    $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
                     credit,
                     sold.When,
                     true
@@ -179,13 +185,21 @@ namespace core.Options
                 this.Deleted = false;
             }
 
+            if (this.NumberOfContracts == 0)
+            {
+                this.PremiumReceived = 0;
+                this.PremiumPaid = 0;
+            }
+
+            AddNoteIfNotEmpty(purchased.Notes);
+
             this.NumberOfContracts += purchased.NumberOfContracts;
 
             var debit = purchased.NumberOfContracts * purchased.Premium;
 
-            this.Buys.Add(purchased);
+            this.PremiumPaid += debit;
 
-            AddNoteIfNotEmpty(purchased.Notes);
+            this.Buys.Add(purchased);
 
             var description = $"Bought {purchased.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract";
 
