@@ -70,7 +70,7 @@ namespace web.Controllers
             var user = await _storage.GetUser(userId);
 
             await this._email.Send(
-                user.Email,
+                user.State.Email,
                 new Sender("support@nightingaletrading.com", "Nightingale Trading"),
                 EmailTemplate.NewUserWelcome,
                 new object()

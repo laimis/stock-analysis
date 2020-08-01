@@ -144,7 +144,7 @@ namespace web
 
                 var data = new { alerts = alerts.Select(Map) };
 
-                await _emails.Send(u.Email, Sender.NoReply, EmailTemplate.Alerts, data);
+                await _emails.Send(u.State.Email, Sender.NoReply, EmailTemplate.Alerts, data);
             }
         }
 

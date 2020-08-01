@@ -44,7 +44,7 @@ namespace core.Account
                 }
 
                 // oauth path where password was not set....
-                if (!user.IsPasswordAvailable)
+                if (!user.State.IsPasswordAvailable)
                 {
                     return CommandResponse<User>.Failed(GENERIC_MSG);
                 }
