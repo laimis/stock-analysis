@@ -53,10 +53,10 @@ namespace core.Stocks
             private IEnumerable<object> MapOwnedStocks(IEnumerable<OwnedStock> stocks)
             {
                 var prices = stocks
-                    .Select(o => o.Ticker).Distinct()
+                    .Select(o => o.State.Ticker).Distinct()
                     .ToDictionary(s => s, async s => await _stocksService.GetPrice(s));
 
-                return stocks.Select(o => Mapper.ToOwnedView(o, prices[o.Ticker].Result));
+                return stocks.Select(o => Mapper.ToOwnedView(o, prices[o.State.Ticker].Result));
             }
         }
     }

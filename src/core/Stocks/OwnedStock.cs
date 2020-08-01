@@ -24,11 +24,6 @@ namespace core.Stocks
             Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker, userId));
         }
 
-        public string Ticker => this.State.Ticker;
-        public string Description => this.State.Description;
-
-        public double AverageCost => this.State.AverageCost;
-
         public void Purchase(int numberOfShares, double price, DateTimeOffset date, string notes = null)
         {
             if (price <= 0)

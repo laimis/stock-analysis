@@ -31,8 +31,8 @@ namespace core.Portfolio
         public ReviewEntry(OwnedStock s)
         {
             Created = null;
-            Ticker = s.Ticker;
-            Description = s.Description;
+            Ticker = s.State.Ticker;
+            Description = s.State.Description;
             Expiration = null;
             IsExpired = false;
             ExpiresSoon = false;
@@ -40,7 +40,7 @@ namespace core.Portfolio
             Stats = null;
             IsOption = false;
             IsAlert = false;
-            AverageCost = s.AverageCost;
+            AverageCost = s.State.AverageCost;
             OptionType = null;
             StrikePrice = 0;
             OptionType = null;

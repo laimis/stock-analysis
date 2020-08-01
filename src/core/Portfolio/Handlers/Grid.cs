@@ -32,10 +32,10 @@ namespace core.Portfolio
                     .Where(s => s.State.Owned > 0)
                     .Select(async s => {
                         {
-                            var adv = await _stocks.GetAdvancedStats(s.Ticker);
-                            var price = await _stocks.GetPrice(s.Ticker);
+                            var adv = await _stocks.GetAdvancedStats(s.State.Ticker);
+                            var price = await _stocks.GetPrice(s.State.Ticker);
 
-                            return new GridEntry(s.Ticker, price, adv);
+                            return new GridEntry(s.State.Ticker, price, adv);
                         }
                     })
                     .Select(t => t.Result);

@@ -39,12 +39,12 @@ namespace core.Alerts
                         continue;
                     }
 
-                    var exists = alerts.Any(a => a.State.Ticker == o.Ticker);
+                    var exists = alerts.Any(a => a.State.Ticker == o.State.Ticker);
                     if (!exists)
                     {
-                        var a = new Alert(o.Ticker, cmd.UserId);
+                        var a = new Alert(o.State.Ticker, cmd.UserId);
 
-                        a.AddPricePoint("Migrated average cost", o.AverageCost);
+                        a.AddPricePoint("Migrated average cost", o.State.AverageCost);
 
                         await _alertsStorage.Save(a);
                     }

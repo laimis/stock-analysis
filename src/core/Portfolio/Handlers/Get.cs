@@ -43,13 +43,13 @@ namespace core.Portfolio
                     .Where(o => o.State.NumberOfContracts != 0 && o.State.DaysUntilExpiration > -5)
                     .OrderBy(o => o.State.Expiration);
 
-                var prices = owned.Select(o => o.Ticker).Union(openOptions.Select(o => o.State.Ticker))
+                var prices = owned.Select(o => o.State.Ticker).Union(openOptions.Select(o => o.State.Ticker))
                     .Distinct()
                     .ToDictionary(s => s, async s => await _stocksService.GetPrice(s));
 
                 var obj = new
                 {
-                    owned = owned.Select(o => Mapper.ToOwnedView(o, prices[o.Ticker].Result)),
+                    owned = owned.Select(o => Mapper.ToOwnedView(o, prices[o.State.Ticker].Result)),
                     openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.State.Ticker].Result)),
                     triggered = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered),
                     alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId)
