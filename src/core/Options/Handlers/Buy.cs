@@ -34,7 +34,7 @@ namespace core.Options
                         "Unable to find user account for options operation");
                 }
 
-                if (!user.Verified)
+                if (user.State.Verified == null)
                 {
                     return CommandResponse<OwnedOption>.Failed(
                         "Please verify your email first before you can record option transaction");

@@ -18,6 +18,7 @@ namespace core.Account
         public DateTimeOffset? Verified { get; private set; }
         public DateTimeOffset? LastLogin { get; private set; }
         public string SubscriptionLevel { get; private set; }
+        public bool IsPasswordAvailable => GetSalt() != null;
 
         public UserState()
         {

@@ -35,7 +35,7 @@ namespace core.Account
                 EmailSettings.Admin,
                 Sender.NoReply,
                 EmailTemplate.AdminNewUser,
-                new { email = u.Email }
+                new { email = u.State.Email }
             );
         }
 

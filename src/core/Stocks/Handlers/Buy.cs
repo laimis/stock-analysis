@@ -27,7 +27,7 @@ namespace core.Stocks
                         "Unable to find user account for stock operation");
                 }
 
-                if (!user.Verified)
+                if (user.State.Verified == null)
                 {
                     return CommandResponse.Failed(
                         "Please verify your email first before you can record buy transaction");

@@ -39,13 +39,13 @@ namespace core.Account
                 {
                     username = user.Id,
                     loggedIn = true,
-                    verified = user.Verified,
-                    created = user.Created,
-                    email = user.Email,
-                    firstname = user.Firstname,
-                    lastname = user.Lastname,
-                    isAdmin = user.Email == EmailSettings.Admin,
-                    subscriptionLevel = user.SubscriptionLevel
+                    verified = user.State.Verified != null,
+                    created = user.State.Created,
+                    email = user.State.Email,
+                    firstname = user.State.Firstname,
+                    lastname = user.State.Lastname,
+                    isAdmin = user.State.Email == EmailSettings.Admin,
+                    subscriptionLevel = user.State.SubscriptionLevel
                 };
             }
         }

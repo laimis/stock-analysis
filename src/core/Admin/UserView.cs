@@ -13,12 +13,12 @@ namespace core.Admin
     {
         public UserView(User user, IEnumerable<OwnedStock> stocks, IEnumerable<OwnedOption> options, IEnumerable<Note> notes, IEnumerable<Alert> alerts)
         {
-            Email = user.Email;
+            Email = user.State.Email;
             UserId = user.Id;
-            Firstname = user.Firstname;
-            Lastname = user.Lastname;
-            LastLogin = user.LastLogin;
-            Verified = user.Verified;
+            Firstname = user.State.Firstname;
+            Lastname = user.State.Lastname;
+            LastLogin = user.State.LastLogin;
+            Verified = user.State.Verified != null;
             Stock = stocks.Count();
             Options = options.Count();
             Notes = notes.Count();

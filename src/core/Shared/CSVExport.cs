@@ -21,11 +21,7 @@ namespace core
         public static string Generate(IEnumerable<User> users)
         {
             var rows = users.Select(u =>
-                new object[] {
-                    u.Email,
-                    u.Firstname,
-                    u.Lastname
-                }
+                new object[] { u.State.Email, u.State.Firstname, u.State.Lastname}
             );
 
             return Generate(USER_HEADER, rows);
