@@ -9,15 +9,6 @@ namespace core.Account
         public UserState State { get; } = new UserState();
         public override IAggregateState AggregateState => State;
 
-        public bool IsPasswordAvailable => State.GetSalt() != null;
-        public bool Verified => State.Verified != null;
-        public string SubscriptionLevel => State.SubscriptionLevel;
-        public DateTimeOffset Created => State.Created;
-        public string Email => State.Email;
-        public string Firstname => State.Firstname;
-        public string Lastname => State.Lastname;
-        public DateTimeOffset? LastLogin => State.LastLogin;
-
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
