@@ -168,4 +168,10 @@ namespace core.Options
             this.State.Apply(deleted);
         }
     }
+
+    public enum OptionType
+    {
+        CALL,
+        PUT
+    }
 }

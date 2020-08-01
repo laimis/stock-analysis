@@ -37,7 +37,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/active")]
         public Task<OwnedOptionStatsContainer> List(string ticker)
         {
-            return _mediator.Send(new Active.Query(ticker, this.User.Identifier()));
+            return _mediator.Send(new List.Query(ticker, this.User.Identifier()));
         }
 
         [HttpGet("{id}")]
