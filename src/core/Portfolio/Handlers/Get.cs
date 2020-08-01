@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Alerts;
 using core.Shared;
+using core.Stocks.View;
 
 namespace core.Portfolio
 {
@@ -49,7 +50,7 @@ namespace core.Portfolio
 
                 var obj = new
                 {
-                    owned = owned.Select(o => Mapper.ToOwnedView(o, prices[o.State.Ticker].Result)),
+                    owned = owned.Select(o => new OwnedStockView(o, prices[o.State.Ticker].Result)),
                     openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.State.Ticker].Result)),
                     triggered = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered),
                     alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId)

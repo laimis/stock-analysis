@@ -32,11 +32,11 @@ namespace core.Notes
             {
                 var notes = await _storage.GetNotes(request.UserId);
 
-                return Mapper.MapNotes(
+                return new NotesList (
                     notes
                         .Where(n => n.MatchesTickerFilter(request.Ticker))
                         .OrderByDescending(n => n.State.Created)
-                );
+                        .Select(n => n.State));
             }
         }
     }

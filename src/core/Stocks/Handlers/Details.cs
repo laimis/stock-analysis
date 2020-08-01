@@ -34,11 +34,13 @@ namespace core.Stocks
                 
                 await Task.WhenAll(profile, advanced, price);
                 
-                return Mapper.MapStockDetail(
-                    request.Ticker,
-                    price.Result.Amount,
-                    profile.Result,
-                    advanced.Result);
+                return new
+                {
+                    ticker = request.Ticker,
+                    price = price.Result.Amount,
+                    stats = profile.Result,
+                    profile = advanced.Result,
+                };
             }
         }
     }

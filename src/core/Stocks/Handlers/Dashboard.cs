@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Account;
 using core.Adapters.Stocks;
 using core.Shared;
+using core.Stocks.View;
 
 namespace core.Stocks
 {
@@ -56,7 +56,7 @@ namespace core.Stocks
                     .Select(o => o.State.Ticker).Distinct()
                     .ToDictionary(s => s, async s => await _stocksService.GetPrice(s));
 
-                return stocks.Select(o => Mapper.ToOwnedView(o, prices[o.State.Ticker].Result));
+                return stocks.Select(o => new OwnedStockView(o, prices[o.State.Ticker].Result));
             }
         }
     }

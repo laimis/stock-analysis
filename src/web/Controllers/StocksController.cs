@@ -95,10 +95,11 @@ namespace web.Controllers
 
             await Task.WhenAll(active, gainers, losers);
 
-            return Mapper.MapLists(
-                active.Result,
-                gainers.Result,
-                losers.Result);
+            return new {
+                active,
+                gainers,
+                losers
+            };
         }
 
         [HttpGet("export")]
