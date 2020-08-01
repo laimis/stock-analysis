@@ -66,7 +66,7 @@ namespace core.Portfolio
             {
                 var entries = new List<ReviewEntry>();
 
-                foreach (var o in options.Result.Where(s => s.IsActive))
+                foreach (var o in options.Result.Where(s => s.State.Active))
                 {
                     entries.Add(new ReviewEntry(o));
                 }

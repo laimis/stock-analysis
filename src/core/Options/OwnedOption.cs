@@ -66,14 +66,6 @@ namespace core.Options
         public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
             => this.State.IsMatch(ticker, strike, type, expiration);
 
-        public bool IsActive => !this.State.IsExpired && this.State.NumberOfContracts != 0;
-        public string Ticker => this.State.Ticker;
-        public DateTimeOffset Expiration => this.State.Expiration;
-        public bool IsExpired => this.State.IsExpired;
-        public DateTimeOffset? Closed => this.State.Closed;
-        public bool ExpiresSoon => !IsExpired && this.State.DaysUntilExpiration >= 0 && this.State.DaysUntilExpiration < 7;
-        public long? DaysLeft => this.State.DaysUntilExpiration;
-
         public void Buy(int numberOfContracts, double premium, DateTimeOffset filled, string notes)
         {
             if (numberOfContracts <= 0)
@@ -111,7 +103,7 @@ namespace core.Options
                 throw new InvalidOperationException("Premium money cannot be negative");
             }
 
-            if (filled > this.Expiration)
+            if (filled > this.State.Expiration)
             {
                 throw new InvalidOperationException("Filled date cannot be past expiration");
             }

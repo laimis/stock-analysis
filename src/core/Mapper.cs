@@ -59,7 +59,7 @@ namespace core
             string txType)
         {
             var log = new List<Shared.Transaction>();
-            var tickers = stocks.Select(s => s.Ticker).Union(options.Select(o => o.Ticker))
+            var tickers = stocks.Select(s => s.Ticker).Union(options.Select(o => o.State.Ticker))
                 .Distinct()
                 .OrderBy(s => s);
 

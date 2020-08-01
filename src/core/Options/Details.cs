@@ -30,7 +30,7 @@ namespace core.Options
             {
                 var option = await _storage.GetOwnedOption(request.Id, request.UserId);
 
-                var price = await _stockService.GetPrice(option.Ticker);
+                var price = await _stockService.GetPrice(option.State.Ticker);
                 
                 return Map(option, price);
             }

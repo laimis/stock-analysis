@@ -12,13 +12,13 @@ namespace core.Portfolio
         public ReviewEntry(OwnedOption o)
         {
             Created = null;
-            Ticker = o.Ticker;
+            Ticker = o.State.Ticker;
             Description = $"{Math.Abs(o.State.NumberOfContracts)} ${o.State.StrikePrice} {o.State.OptionType} contracts";
             OptionType = o.State.OptionType;
-            Expiration = o.Expiration;
-            IsExpired = o.IsExpired;
-            ExpiresSoon = o.ExpiresSoon;
-            DaysLeft = o.DaysLeft;
+            Expiration = o.State.Expiration;
+            IsExpired = o.State.IsExpired;
+            ExpiresSoon = o.State.ExpiresSoon;
+            DaysLeft = o.State.DaysLeft;
             Stats = null;
             IsOption = true;
             IsAlert = false;

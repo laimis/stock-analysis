@@ -31,7 +31,7 @@ namespace core.Options
             {
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
-                options = options.Where(o => !o.State.Deleted && o.IsActive && o.Ticker == request.Ticker);
+                options = options.Where(o => o.State.Active && o.State.Ticker == request.Ticker);
                 options = options.OrderByDescending(o => o.State.FirstFill);
 
                 return Map(options);

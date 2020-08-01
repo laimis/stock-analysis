@@ -23,9 +23,9 @@ namespace coretests.Options
 
             option.Expire(true);
 
-            Assert.True(option.IsExpired);
+            Assert.True(option.State.IsExpired);
             Assert.True(option.State.Assigned);
-            Assert.False(option.IsActive);
+            Assert.False(option.State.Active);
             Assert.True(option.State.SoldToOpen);
             
             var pl = option.State.Transactions.Where(t => t.IsPL);
@@ -90,8 +90,8 @@ namespace coretests.Options
         {
             var option = GetTestOption(DateTimeOffset.UtcNow.AddDays(2));
 
-            Assert.True(option.ExpiresSoon);
-            Assert.False(option.IsExpired);
+            Assert.True(option.State.ExpiresSoon);
+            Assert.False(option.State.IsExpired);
         }
 
         [Fact]
@@ -99,13 +99,13 @@ namespace coretests.Options
         {
             var option = GetTestOption(DateTimeOffset.UtcNow);
 
-            Assert.True(option.ExpiresSoon);
-            Assert.False(option.IsExpired);
+            Assert.True(option.State.ExpiresSoon);
+            Assert.False(option.State.IsExpired);
 
             option = GetTestOption(DateTimeOffset.UtcNow.AddDays(-1));
 
-            Assert.False(option.ExpiresSoon);
-            Assert.True(option.IsExpired);
+            Assert.False(option.State.ExpiresSoon);
+            Assert.True(option.State.IsExpired);
         }
 
         [Fact]

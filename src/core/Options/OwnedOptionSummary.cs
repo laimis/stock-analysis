@@ -22,9 +22,9 @@ namespace core.Options
             Days = o.State.Days;
             DaysHeld = o.State.DaysHeld;
             Transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null);
-            ExpiresSoon = o.ExpiresSoon;
-            IsExpired = o.IsExpired;
-            Closed = o.Closed;
+            ExpiresSoon = o.State.ExpiresSoon;
+            IsExpired = o.State.IsExpired;
+            Closed = o.State.Closed;
             Assigned = o.State.Assigned;
             Notes = o.State.Notes;
 

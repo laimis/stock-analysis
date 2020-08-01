@@ -62,10 +62,12 @@ namespace core.Options
         }
         
         public bool Assigned => this.Expirations.Count > 0 && this.Expirations[0].Assigned;
+        public bool Active => !this.Deleted && !this.IsExpired && this.NumberOfContracts != 0;
+        public bool ExpiresSoon => !IsExpired && DaysUntilExpiration >= 0 && DaysUntilExpiration < 7;
+        public long? DaysLeft => this.DaysUntilExpiration;
         public bool Deleted { get; private set; }
         private double PremiumReceived { get; set; }
         private double PremiumPaid { get; set; }
-
         public List<string> Notes { get; }
 
         internal void Apply(OptionDeleted deleted)

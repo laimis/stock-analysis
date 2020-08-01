@@ -38,12 +38,12 @@ namespace core.Options
                     .OrderBy(o => o.State.Expiration)
                     .ToList();
                 
-                var prices = openOptions.Select(o => o.Ticker)
+                var prices = openOptions.Select(o => o.State.Ticker)
                     .Distinct()
                     .ToDictionary(s => s, async s => await _stockService.GetPrice(s));
 
                 var closedOptions = options
-                    .Where(o => o.Closed != null)
+                    .Where(o => o.State.Closed != null)
                     .OrderByDescending(o => o.State.FirstFill);
 
                 return Map(closedOptions, openOptions, prices);
@@ -56,7 +56,7 @@ namespace core.Options
             {
                 return new OwnedOptionStatsContainer(
                     closed.Select(o => Map(o)),
-                    open.Select(o => new Options.OwnedOptionSummary(o, prices[o.Ticker].Result))
+                    open.Select(o => new Options.OwnedOptionSummary(o, prices[o.State.Ticker].Result))
                 );
             }
 
