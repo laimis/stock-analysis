@@ -38,8 +38,8 @@ namespace core.Stocks
                 {
                     ticker = request.Ticker,
                     price = price.Result.Amount,
-                    stats = profile.Result,
-                    profile = advanced.Result,
+                    profile = profile.Result,
+                    stats = advanced.Result,
                 };
             }
         }
