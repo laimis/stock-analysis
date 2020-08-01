@@ -7,9 +7,9 @@ using core.Account;
 using core.Adapters.Emails;
 using core.Adapters.Stocks;
 using core.Alerts;
-using core.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using web.Utils;
 
 namespace web
 {

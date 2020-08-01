@@ -8,7 +8,6 @@ using core.Adapters.Stocks;
 using core.Adapters.Subscriptions;
 using core.Alerts;
 using core.Options;
-using core.Utils;
 using csvparser;
 using iexclient;
 using MediatR;
@@ -16,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using storage.redis;
 using storage.shared;
-using stripe;
 using web.Utils;
 
 namespace web

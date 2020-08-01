@@ -1,7 +1,7 @@
 using System;
 using TimeZoneConverter;
 
-namespace core.Utils
+namespace web.Utils
 {
     public class MarketHours
     {

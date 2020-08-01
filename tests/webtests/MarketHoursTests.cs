@@ -1,8 +1,8 @@
 using System;
-using core.Utils;
+using web.Utils;
 using Xunit;
 
-namespace coretests.Utils
+namespace webtests
 {
     public class MarketHoursTests
     {
