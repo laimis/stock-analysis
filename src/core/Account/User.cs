@@ -6,10 +6,9 @@ namespace core.Account
 {
     public class User : Aggregate
     {
-        public UserState State => _state;
-        private UserState _state = new UserState();
+        public UserState State { get; } = new UserState();
+        public override IAggregateState AggregateState => State;
 
-        public override Guid Id => State.Id;
         public bool IsPasswordAvailable => State.GetSalt() != null;
         public bool Verified => State.Verified != null;
         public string SubscriptionLevel => State.SubscriptionLevel;
@@ -101,52 +100,6 @@ namespace core.Account
             Apply(
                 new UserPasswordResetRequested(Guid.NewGuid(), this.State.Id, when)
             );
-        }
-
-        protected override void Apply(AggregateEvent e)
-        {
-            this._events.Add(e);
-
-            ApplyInternal(e);
-        }
-
-        private void ApplyInternal(dynamic obj)
-        {
-            this.ApplyInternal(obj);
-        }
-
-        private void ApplyInternal(UserCreated c)
-        {
-            this.State.Apply(c);
-        }
-
-        private void ApplyInternal(UserPasswordSet p)
-        {
-            this.State.Apply(p);
-        }
-
-        private void ApplyInternal(UserLoggedIn l)
-        {
-            this.State.Apply(l);
-        }
-
-        private void ApplyInternal(UserPasswordResetRequested r)
-        {
-        }
-
-        private void ApplyInternal(UserDeleted d)
-        {
-            this.State.Apply(d);
-        }
-
-        private void ApplyInternal(UserConfirmed c)
-        {
-            this.State.Apply(c);
-        }
-
-        private void ApplyInternal(UserSubscribedToPlan s)
-        {
-            this.State.Apply(s);
         }
     }
 }

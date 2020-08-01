@@ -7,9 +7,8 @@ namespace core.Notes
 {
     public class Note : Aggregate
     {
-        private NoteState _state = new NoteState();
-        public NoteState State => _state;
-        public override Guid Id => State.Id;
+        public NoteState State { get; } = new NoteState();
+        public override IAggregateState AggregateState => State;
 
         public Note(IEnumerable<AggregateEvent> events) : base(events)
         {
@@ -82,52 +81,6 @@ namespace core.Notes
                     note
                 )
             );
-        }
-
-        protected override void Apply(AggregateEvent e)
-        {
-            this._events.Add(e);
-
-            ApplyInternal(e);
-        }
-
-        protected void ApplyInternal(dynamic obj)
-        {
-            this.ApplyInternal(obj);
-        }
-
-        protected void ApplyInternal(NoteCreated created)
-        {
-            this.State.Apply(created);
-        }
-
-        protected void ApplyInternal(NoteUpdated updated)
-        {
-            this.State.Apply(updated);
-        }
-
-        protected void ApplyInternal(NoteEnriched enriched)
-        {
-            this.State.Apply(enriched);
-        }
-
-        protected void ApplyInternal(NoteEnrichedWithPrice enriched)
-        {
-            this.State.Apply(enriched);
-        }
-
-        // these are no longer used
-        protected void ApplyInternal(NoteArchived archived)
-        {
-        }
-        protected void ApplyInternal(NoteReminderCleared cleared)
-        {
-        }
-        protected void ApplyInternal(NoteReminderSet set)
-        {
-        }
-        protected void ApplyInternal(NoteFollowedUp e)
-        {
         }
     }
 }
