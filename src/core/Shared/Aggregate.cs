@@ -21,13 +21,20 @@ namespace core.Shared
             }
         }
 
-        protected abstract void Apply(AggregateEvent e);
+        public abstract IAggregateState AggregateState { get; }
+
+        protected void Apply(AggregateEvent e)
+        {
+            this._events.Add(e);
+
+            AggregateState.Apply(e);
+        }
 
         protected List<AggregateEvent> _events { get; }
         public IReadOnlyList<AggregateEvent> Events => _events.AsReadOnly();
 
         public int Version { get; }
 
-        public abstract Guid Id { get; }
+        public Guid Id => AggregateState.Id;
     }
 }

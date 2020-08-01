@@ -7,10 +7,9 @@ namespace core.Stocks
 {
     public class OwnedStock : Aggregate
     {
-        private OwnedStockState _state;
-        public OwnedStockState State => _state;
-        public override Guid Id => State.Id;
-
+        public OwnedStockState State { get; } = new OwnedStockState();
+        public override IAggregateState AggregateState => State;
+        
         public OwnedStock(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
@@ -23,18 +22,6 @@ namespace core.Stocks
             }
 
             Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker, userId));
-        }
-
-        protected override void Apply(AggregateEvent obj)
-        {
-            this._events.Add(obj);
-
-            ApplyInternal(obj);
-        }
-
-        protected void ApplyInternal(dynamic obj)
-        {
-            this.ApplyInternal(obj);
         }
 
         public string Ticker => this.State.Ticker;
@@ -115,35 +102,6 @@ namespace core.Stocks
                     price,
                     notes)
             );
-        }
-
-        private void ApplyInternal(StockPurchased purchased)
-        {
-            this.State.Apply(purchased);
-        }
-
-        private void ApplyInternal(TickerObtained o)
-        {
-            _state = new OwnedStockState(
-                o.AggregateId,
-                o.Ticker,
-                o.UserId
-            );
-        }
-
-        private void ApplyInternal(StockSold sold)
-        {
-            this.State.Apply(sold);
-        }
-
-        private void ApplyInternal(StockDeleted deleted)
-        {
-            this.State.Apply(deleted);
-        }
-
-        private void ApplyInternal(StockTransactionDeleted deleted)
-        {
-            this.State.Apply(deleted);
         }
     }
 }

@@ -4,18 +4,11 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public class OwnedStockState
+    public class OwnedStockState : IAggregateState
 	{
-        public OwnedStockState(Guid id, string ticker, Guid userId)
-        {
-            this.Id = id;
-            this.Ticker = ticker;
-            this.UserId = userId;
-        }
-
-        public Guid Id { get; }
-        public string Ticker { get; }
-        public Guid UserId { get; }
+        public Guid Id { get; private set; }
+        public string Ticker { get; private set; }
+        public Guid UserId { get; private set; }
 
         public int Owned { get; private set; }
         public double Cost { get; private set; }
@@ -26,14 +19,21 @@ namespace core.Stocks
 
         public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
 
-        internal void Apply(StockPurchased purchased)
+        internal void ApplyInternal(TickerObtained o)
+        {
+            this.Id = o.AggregateId;
+            this.Ticker = o.Ticker;
+            this.UserId = o.UserId;
+        }
+
+        internal void ApplyInternal(StockPurchased purchased)
         {
             this.BuyOrSell.Add(purchased);
 
             StateUpdateLoop();
         }
 
-        internal void Apply(StockDeleted deleted)
+        internal void ApplyInternal(StockDeleted deleted)
         {
             foreach(var t in this.BuyOrSell)
             {
@@ -43,14 +43,14 @@ namespace core.Stocks
             StateUpdateLoop();
         }
 
-        internal void Apply(StockTransactionDeleted deleted)
+        internal void ApplyInternal(StockTransactionDeleted deleted)
         {
             this.Deletes.Add(deleted.TransactionId);
 
             StateUpdateLoop();
         }
 
-        internal void Apply(StockSold sold)
+        internal void ApplyInternal(StockSold sold)
         {
             this.BuyOrSell.Add(sold);
 
@@ -143,5 +143,23 @@ namespace core.Stocks
             this.Transactions.Clear();
             this.Transactions.AddRange(txs);
         }
+
+        public void Apply(AggregateEvent e)
+        {
+            ApplyInternal(e);
+        }
+
+        protected void ApplyInternal(dynamic obj)
+        {
+            this.ApplyInternal(obj);
+        }
+    }
+
+    internal interface IStockTransaction
+    {
+        int NumberOfShares { get; }
+        double Price { get; }
+        Guid Id { get; }
+        DateTimeOffset When { get; }
     }
 }

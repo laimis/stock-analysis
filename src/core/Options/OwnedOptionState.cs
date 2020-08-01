@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using core.Shared;
 
 namespace core.Options
 {
-    public class OwnedOptionState
+    public class OwnedOptionState : IAggregateState
     {
         public OwnedOptionState()
         {
@@ -70,7 +69,7 @@ namespace core.Options
         private double PremiumPaid { get; set; }
         public List<string> Notes { get; }
 
-        internal void Apply(OptionDeleted deleted)
+        internal void ApplyInternal(OptionDeleted deleted)
         {
             this.NumberOfContracts = 0;
             this.Transactions.Clear();
@@ -84,7 +83,7 @@ namespace core.Options
             this.Deleted = true;
         }
 
-        internal void Apply(OptionSold sold)
+        internal void ApplyInternal(OptionSold sold)
         {
             if (this.SoldToOpen == null)
             {
@@ -157,7 +156,7 @@ namespace core.Options
             this.FirstFill = filled;
         }
 
-        internal void Apply(OptionOpened opened)
+        internal void ApplyInternal(OptionOpened opened)
         {
             this.Id = opened.AggregateId;
             this.Ticker = opened.Ticker;
@@ -175,7 +174,7 @@ namespace core.Options
                 && this.Expiration.Date == expiration.Date;
         }
 
-        internal void Apply(OptionPurchased purchased)
+        internal void ApplyInternal(OptionPurchased purchased)
         {
             if (this.FirstFill == null)
             {
@@ -220,13 +219,23 @@ namespace core.Options
             ApplyClosedLogicIfApplicable(purchased.When, purchased.Id);
         }
 
-        internal void Apply(OptionExpired expired)
+        internal void ApplyInternal(OptionExpired expired)
         {
             this.NumberOfContracts = 0;
 
             this.Expirations.Add(expired);
 
             ApplyClosedLogicIfApplicable(expired.When, expired.Id);
+        }
+
+        public void Apply(AggregateEvent e)
+        {
+            ApplyInternal(e);
+        }
+
+        protected void ApplyInternal(dynamic obj)
+        {
+            this.ApplyInternal(obj);
         }
     }
 }

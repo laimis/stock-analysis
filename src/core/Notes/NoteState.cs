@@ -1,9 +1,10 @@
 using System;
 using core.Adapters.Stocks;
+using core.Shared;
 
 namespace core.Notes
 {
-    public class NoteState
+    public class NoteState : IAggregateState
     {
         public Guid Id { get; internal set; }
         public string RelatedToTicker { get; internal set; }
@@ -14,25 +15,48 @@ namespace core.Notes
         public StockAdvancedStats Stats { get; private set; }
         public TickerPrice Price { get; private set; }
 
-        internal void Apply(NoteEnriched enriched)
+        public void Apply(AggregateEvent e)
+        {
+            this.ApplyInternal(e);
+        }
+
+        protected void ApplyInternal(dynamic obj)
+        {
+            this.ApplyInternal(obj);
+        }
+        
+        protected void ApplyInternal(NoteArchived archived)
+        {
+        }
+        protected void ApplyInternal(NoteReminderCleared cleared)
+        {
+        }
+        protected void ApplyInternal(NoteReminderSet set)
+        {
+        }
+        protected void ApplyInternal(NoteFollowedUp e)
+        {
+        }
+
+        internal void ApplyInternal(NoteEnriched enriched)
         {
             this.StatsApplied = enriched.When;
             this.Stats = enriched.Stats;
         }
 
-        internal void Apply(NoteEnrichedWithPrice enriched)
+        internal void ApplyInternal(NoteEnrichedWithPrice enriched)
         {
             this.StatsApplied = enriched.When;
             this.Stats = enriched.Stats;
             this.Price = enriched.Price;
         }
 
-        internal void Apply(NoteUpdated updated)
+        internal void ApplyInternal(NoteUpdated updated)
         {
             this.Note = updated.Note;
         }
 
-        internal void Apply(NoteCreated c)
+        internal void ApplyInternal(NoteCreated c)
         {
             this.Id = c.AggregateId;
             this.UserId = c.UserId;

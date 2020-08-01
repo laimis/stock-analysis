@@ -6,9 +6,9 @@ namespace core.Options
 {
     public class OwnedOption : Aggregate
     {
-        private OwnedOptionState _state = new OwnedOptionState();
-        public OwnedOptionState State => _state;
-        public override Guid Id => State.Id;
+        public OwnedOptionState State { get; } = new OwnedOptionState();
+
+        public override IAggregateState AggregateState => State;
 
         public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
         {
@@ -129,43 +129,6 @@ namespace core.Options
             }
 
             Apply(new OptionExpired(Guid.NewGuid(), this.State.Id, this.State.Expiration, assigned));
-        }
-
-        protected override void Apply(AggregateEvent e)
-        {
-            this._events.Add(e);
-
-            ApplyInternal(e);
-        }
-
-        protected void ApplyInternal(dynamic obj)
-        {
-            this.ApplyInternal(obj);
-        }
-
-        protected void ApplyInternal(OptionSold sold)
-        {
-            this.State.Apply(sold);
-        }
-
-        protected void ApplyInternal(OptionPurchased purchased)
-        {
-            this.State.Apply(purchased);
-        }
-
-        protected void ApplyInternal(OptionOpened opened)
-        {
-            this.State.Apply(opened);
-        }
-
-        protected void ApplyInternal(OptionExpired expired)
-        {
-            this.State.Apply(expired);
-        }
-
-        protected void ApplyInternal(OptionDeleted deleted)
-        {
-            this.State.Apply(deleted);
         }
     }
 

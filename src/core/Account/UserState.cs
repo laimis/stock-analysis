@@ -1,9 +1,10 @@
 using System;
 using core.Adapters.Subscriptions;
+using core.Shared;
 
 namespace core.Account
 {
-    public class UserState
+    public class UserState : IAggregateState
     {
         public Guid Id { get; private set; }
         public DateTimeOffset Created { get; private set; }
@@ -23,7 +24,7 @@ namespace core.Account
             this.SubscriptionLevel = "Free";
         }
 
-        internal void Apply(UserCreated c)
+        internal void ApplyInternal(UserCreated c)
         {
             this.Id = c.AggregateId;
             this.Created = c.When;
@@ -32,31 +33,35 @@ namespace core.Account
             this.Lastname = c.Lastname;
         }
 
-        internal void Apply(UserPasswordSet p)
+        internal void ApplyInternal(UserPasswordSet p)
         {
             this.PasswordHash = p.Hash;
             this.Salt = p.Salt;
         }
 
-        internal void Apply(UserLoggedIn l)
+        internal void ApplyInternal(UserLoggedIn l)
         {
             this.LastLogin = l.When;
         }
 
-        internal void Apply(UserDeleted d)
+        internal void ApplyInternal(UserDeleted d)
         {
             this.Deleted = d.When;
             this.DeleteFeedback = d.Feedback;
         }
 
-        internal void Apply(UserConfirmed d)
+        internal void ApplyInternal(UserConfirmed d)
         {
             this.Verified = d.When;
         }
 
-        internal void Apply(UserSubscribedToPlan p)
+        internal void ApplyInternal(UserSubscribedToPlan p)
         {
             this.SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
+        }
+
+        internal void ApplyInternal(UserPasswordResetRequested r)
+        {
         }
 
         internal bool PasswordHashMatches(string hash)
@@ -67,6 +72,16 @@ namespace core.Account
         internal string GetSalt()
         {
             return this.Salt;
+        }
+
+        public void Apply(AggregateEvent e)
+        {
+            ApplyInternal(e);
+        }
+
+        protected void ApplyInternal(dynamic obj)
+        {
+            this.ApplyInternal(obj);
         }
     }
 }

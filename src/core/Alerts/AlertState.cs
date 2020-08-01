@@ -5,7 +5,7 @@ using core.Shared;
 
 namespace core.Alerts
 {
-    public class AlertState
+    public class AlertState : IAggregateState
     {
         public Guid Id { get; private set; }
         public Ticker Ticker { get; private set; }
@@ -13,7 +13,21 @@ namespace core.Alerts
         public DateTimeOffset Created { get; private set; }
         public List<AlertPricePoint> PricePoints { get; private set; } = new List<AlertPricePoint>();
 
-        internal void Apply(AlertCreated c)
+        public void Apply(AggregateEvent e)
+        {
+            ApplyInternal(e);
+        }
+
+        private void ApplyInternal(dynamic obj)
+        {
+            this.ApplyInternal(obj);
+        }
+
+        internal void ApplyInternal(AlertCleared c)
+        {
+        }
+
+        internal void ApplyInternal(AlertCreated c)
         {
             this.Id = c.AggregateId;
             this.Ticker = c.Ticker;
@@ -21,17 +35,17 @@ namespace core.Alerts
             this.Created = c.When;
         }
 
-        internal void Apply(AlertPricePointAdded a)
+        internal void ApplyInternal(AlertPricePointAdded a)
         {
             this.PricePoints.Add(new AlertPricePoint(a.Id, null, a.Value));
         }
 
-        internal void Apply(AlertPricePointWithDescripitionAdded a)
+        internal void ApplyInternal(AlertPricePointWithDescripitionAdded a)
         {
             this.PricePoints.Add(new AlertPricePoint(a.Id, a.Description, a.Value));
         }
 
-        internal void Apply(AlertPricePointRemoved a)
+        internal void ApplyInternal(AlertPricePointRemoved a)
         {
             var pp = this.PricePoints.Single(p => p.Id == a.PricePointId);
 
