@@ -1,20 +1,12 @@
+- on aggregate, just methods, and a state
+
+
 Ideas checklist:
 - uber: continue to be patient
 - tm: check the daily list of ideas
-- sfix: missed the boat potentially <-- got burned, need to setup alert when it rises again
-
-
-- import nonexisting symbol, does it work?
+- sfix: missed the boat potentially
 
 CANDIDATES
-
-Options strategy field
-    - dropdown
-    - value
-Simplified position entry
-Improved navigation around
-Charts for performance
-Goals for the week or upcoming trade positions
 
 "How do I know how much I have made or lost 
 if the graph doesn’t include realised gain/loss? 

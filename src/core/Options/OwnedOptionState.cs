@@ -33,7 +33,7 @@ namespace core.Options
         public bool? SoldToOpen { get; private set; }
         public DateTimeOffset? FirstFill { get; private set; }
 
-        public long DaysUntilExpiration => 
+        public long DaysUntilExpiration => this.IsExpired ? 0 :
             (long)Math.Ceiling(Math.Abs(this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
 
         public DateTimeOffset? Closed { get; private set; }
