@@ -52,7 +52,7 @@ namespace core.Options
                 userId));
         }
 
-        internal void Delete()
+        public void Delete()
         {
             Apply(
                 new OptionDeleted(

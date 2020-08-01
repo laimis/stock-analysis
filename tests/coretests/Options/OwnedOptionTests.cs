@@ -54,6 +54,18 @@ namespace coretests.Options
             Assert.Equal(3, option.State.DaysHeld);
             Assert.Equal(12, option.State.Days);
             Assert.Equal(10, option.State.DaysUntilExpiration);
+
+            option.Delete();
+
+            Assert.Equal(0, option.State.NumberOfContracts);
+            Assert.Empty(option.State.Transactions);
+            Assert.Empty(option.State.Buys);
+            Assert.Empty(option.State.Sells);
+            Assert.Null(option.State.FirstFill);
+            Assert.Null(option.State.SoldToOpen);
+            Assert.Null(option.State.Closed);
+            Assert.Empty(option.State.Notes);
+            Assert.True(option.State.Deleted);
         }
 
         [Fact]
