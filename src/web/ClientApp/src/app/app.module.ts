@@ -53,6 +53,7 @@ import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboar
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
 import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
 import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
+import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -149,6 +150,7 @@ var routes = [
     StockOwnershipGridComponent,
     StockAdvancedStatsGridComponent,
     StockOwnershipPerformanceComponent,
+    StockPastComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,

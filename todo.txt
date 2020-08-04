@@ -1,10 +1,8 @@
-- on aggregate, just methods, and a state
+Working on:
+Past trades, days held, show wins/losses
+    - past transactions returned via API
+    - wins label
 
-
-Ideas checklist:
-- uber: continue to be patient
-- tm: check the daily list of ideas
-- sfix: missed the boat potentially
 
 CANDIDATES
 

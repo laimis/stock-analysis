@@ -33,18 +33,21 @@ namespace core.Stocks
 
                 var ownedStocks = stocks.Where(s => s.State.Owned > 0).ToList();
                 
-                var closedTransactions = stocks.Where(s => s.State.Owned == 0)
+                var closedTransactions = stocks
                     .SelectMany(s => s.State.Transactions.Where(t => t.IsPL))
                     .ToList();
 
                 var owned = MapOwnedStocks(ownedStocks);
-
                 var performance = new StockOwnershipPerformance(closedTransactions);
+                var past = closedTransactions
+                    .Select(t => new StockTransactionView(t))
+                    .OrderByDescending(p => p.Date);
 
                 var obj = new
                 {
                     owned,
-                    performance
+                    performance,
+                    past
                 };
 
                 return obj;

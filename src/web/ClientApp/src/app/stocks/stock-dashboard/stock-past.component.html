@@ -1,0 +1,14 @@
+<table *ngIf="past" class="table">
+  <tr>
+    <th>Stock</th>
+    <th>Date</th>
+    <th>Profit/Loss</th>
+    <th>Profit/Loss %</th>
+  </tr>
+  <tr *ngFor="let p of past">
+    <td>{{p.ticker}}</td>
+    <td>{{p.date | date}}</td>
+    <td>{{p.profit | currency}}</td>
+    <td>{{p.returnPct | percent}}</td>
+  </tr>
+</table>
