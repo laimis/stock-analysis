@@ -18,6 +18,11 @@ namespace core
         public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
         public const string USER_HEADER = "email,first_name,last_name";
 
+        public static string GenerateRaw(string header, IEnumerable<IEnumerable<object>> rows)
+        {
+            return Generate(header, rows);
+        }
+
         public static string Generate(IEnumerable<User> users)
         {
             var rows = users.Select(u =>
