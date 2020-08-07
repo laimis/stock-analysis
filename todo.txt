@@ -1,6 +1,8 @@
+Deletes
+    - is missing cleanup
+
 Working on:
 Past trades, days held, show wins/losses
-    - past transactions returned via API
     - wins label
 
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,17 @@ namespace web.Controllers
         [HttpGet]
         public async Task<object> Index(string entity)
         {
-            return await this._storage.GetStoredEvents(entity, this.User.Identifier());
+            var list = await this._storage.GetStoredEvents(entity, this.User.Identifier());
+
+            var filtered = new List<StoredAggregateEvent>();
+            foreach(var s in list)
+            {
+                if (s.EventJson.Contains("IRBT"))
+                {
+                    filtered.Add(s);
+                }
+            }
+            return filtered;
         }
     }
 }
