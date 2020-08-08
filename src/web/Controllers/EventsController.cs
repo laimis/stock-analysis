@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using core;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ using web.Utils;
 namespace web.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize("admin")]
     [Route("api/[controller]")]
     public class EventsController : ControllerBase
     {
@@ -25,41 +26,18 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Index(string entity)
+        public async Task<object> Index(string entity, Guid? userId, Guid? key)
         {
             var list = await this._storage.GetStoredEvents(
                 entity,
-                this.User.Identifier());
+                userId ?? this.User.Identifier());
 
-            // return list;
-
-            var filtered = new List<IEnumerable<object>>();
-            foreach(var s in list)
+            if (entity != null)
             {
-                if (s.EventJson.Contains("IRBT"))
-                {
-                    Console.WriteLine("irbt");
-                    filtered.Add(new object[] {s.Created, s.Key, s.Version, s.EventJson });
-                }
+                list = list.Where(e => e.Key == key.Value.ToString());
             }
 
-            var body = CSVExport.GenerateRaw(
-                "created,key,version,json",
-                filtered);
-
-            var response = new ExportResponse("events.csv", body);
-
-            HttpContext.Response.Headers.Add(
-                "content-disposition", 
-                $"attachment; filename={response.Filename}");
-
-            Console.WriteLine(response.Content);
-
-            return new ContentResult
-            {
-                Content = response.Content,
-                ContentType = response.ContentType
-            };
+            return list;
         }
     }
 }
