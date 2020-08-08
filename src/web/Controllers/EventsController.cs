@@ -26,15 +26,17 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Index(string entity, Guid? userId, Guid? key)
+        public async Task<object> Index(string entity, Guid? userId, Guid? aggregateId)
         {
             var list = await this._storage.GetStoredEvents(
                 entity,
                 userId ?? this.User.Identifier());
 
-            if (key != null)
+            if (aggregateId != null)
             {
-                list = list.Where(e => e.Key == key.Value.ToString());
+                list = list
+                    .Where(e => e.Event.AggregateId == aggregateId.Value)
+                    .OrderBy(e => e.Version);
             }
 
             return list;
