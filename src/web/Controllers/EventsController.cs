@@ -32,7 +32,7 @@ namespace web.Controllers
                 entity,
                 userId ?? this.User.Identifier());
 
-            if (entity != null)
+            if (key != null)
             {
                 list = list.Where(e => e.Key == key.Value.ToString());
             }
