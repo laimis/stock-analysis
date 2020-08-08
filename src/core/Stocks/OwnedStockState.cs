@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 
 namespace core.Stocks
@@ -114,7 +115,7 @@ namespace core.Stocks
                 cost -= avgCost * st.NumberOfShares;
             }
 
-            foreach(var st in this.BuyOrSell)
+            foreach(var st in this.BuyOrSell.OrderBy(e => e.When))
             {
                 if (this.Deletes.Contains(st.Id))
                 {
