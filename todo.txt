@@ -1,6 +1,5 @@
 bug:
 - review says gains/losses. Should be realized P/L and that's it.
-- luv transactions are wrong
 
 CANDIDATES
 
