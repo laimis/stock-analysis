@@ -1,12 +1,12 @@
-Deletes
-    - is missing cleanup
+
 
 Working on:
 Past trades, days held, show wins/losses
     - wins label
 
 bug:
-review says gains/losses. Should be realized P/L and that's it.
+- review says gains/losses. Should be realized P/L and that's it.
+- luv transactions are wrong
 
 CANDIDATES
 

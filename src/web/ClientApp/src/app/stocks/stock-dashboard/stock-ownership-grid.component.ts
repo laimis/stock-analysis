@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { OwnedStock } from '../../services/stocks.service';
+import { InvokeFunctionExpr } from '@angular/compiler';
 
 
 @Component({
@@ -57,5 +58,13 @@ export class StockOwnershipGridComponent implements OnInit {
 
     console.log("unrecognized sort column " + column)
     return null;
+  }
+
+  ownershipPct(ticker:OwnedStock) {
+    let total = this.owned
+      .map(s => s.cost)
+      .reduce((acc, curr) => acc + curr)
+
+    return ticker.cost / total
   }
 }
