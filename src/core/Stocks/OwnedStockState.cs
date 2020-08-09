@@ -115,7 +115,7 @@ namespace core.Stocks
                 cost -= avgCost * st.NumberOfShares;
             }
 
-            foreach(var st in this.BuyOrSell.OrderBy(e => e.When))
+            foreach(var st in this.BuyOrSell.OrderBy(e => e.When).ThenBy(i => this.BuyOrSell.IndexOf(i)))
             {
                 if (this.Deletes.Contains(st.Id))
                 {
