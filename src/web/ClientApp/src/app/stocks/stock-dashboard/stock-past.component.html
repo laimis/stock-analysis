@@ -9,6 +9,10 @@
     <td>{{p.ticker}}</td>
     <td>{{p.date | date}}</td>
     <td>{{p.profit | currency}}</td>
-    <td>{{p.returnPct | percent}}</td>
+    <td>
+      <span *ngIf="p.profit >= 0" class="badge badge-success mr-1">win</span>
+      <span *ngIf="p.profit < 0" class="badge badge-warning mr-1">loss</span>
+      {{p.returnPct | percent}}
+    </td>
   </tr>
 </table>
