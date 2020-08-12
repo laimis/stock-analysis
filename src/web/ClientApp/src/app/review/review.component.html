@@ -6,73 +6,64 @@
 </div>
 
 <div *ngIf="loaded">
-  <div class="card mt-2 mb-3">
-    <div class="card-header">
-      <span class="font-weight-bold">Week of {{ result.start | date }} review</span>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          Transactions
-        </div>
-        <div class="col">
-          {{ result.transactions.transactions.length}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          P/L
-        </div>
-        <div class="col">
-          {{result.transactions.credit - result.transactions.debit | currency}}
-        </div>
-      </div>
-    </div>
+  <div class="card-header">
+    <span class="font-weight-bold">Week of {{ result.start | date }} review</span>
   </div>
-</div>
+  <table class="table table-hover">
+    <tr>
+      <th colspan="3">Stock transactions</th>
+      <th class="text-right">P/L</th>
+    </tr>
+    <tr *ngIf="result.stocks.transactions.length == 0">
+      <td colspan="4">None</td>
+    </tr>
+    <tr *ngFor="let t of result.stocks.transactions">
+      <td>{{t.ticker}}</td>
+      <td>{{t.date | date}}</td>
+      <td>{{t.description}}</td>
+      <td align="right">{{t.profit | currency}}</td>
+    </tr>
+  </table>
 
-<div *ngIf="result && result.entries.length > 0">
-  <div class="card mb-5" *ngFor="let e of result.entries">
-    <div class="card-header">
-      <h5>
-        {{e.stats.companyName}} - <a [routerLink]="[ '/stocks', e.ticker ]">{{e.ticker}}</a>
-        <span class="float-right">{{e.price.amount | currency}}</span>
-      </h5>
-    </div>
-    <div class="card-body">
+  <table class="table table-hover">
+    <tr>
+      <th colspan="3">Option transactions</th>
+      <th class="text-right">P/L</th>
+    </tr>
+    <tr *ngIf="result.options.transactions.length == 0">
+      <td colspan="4">None</td>
+    </tr>
+    <tr *ngFor="let t of result.options.transactions">
+      <td>{{t.ticker}}</td>
+      <td>{{t.date | date}}</td>
+      <td>{{t.description}}</td>
+      <td align="right">{{t.profit | currency}}</td>
+    </tr>
+  </table>
 
-      <div *ngIf="e.ownership.length > 0">
-        <h5>Ownership</h5>
-        <div class="card-text mb-3" *ngFor="let o of e.ownership">
-          <span *ngIf="o.isExpired" class="ml-1 badge badge-danger">expired</span>
-          <span
-            *ngIf="o.expiration && !o.isExpired && o.daysLeft >= 0"
-            class="badge"
-            [ngClass]="{'badge-success': !o.expiresSoon, 'badge-warning': o.expiresSoon}">
-            Expires in {{o.daysLeft}} days
-          </span>
-          {{o.description}}
-        </div>
-      </div>
+  <table class="table table-hover">
+    <tr>
+      <th colspan="2">Earnings in the next 7 days</th>
+    </tr>
+    <tr *ngIf="result.shortEarnings.length == 0">
+      <td colspan="2">None</td>
+    </tr>
+    <tr *ngFor="let t of result.shortEarnings">
+      <td>{{t.ticker}}</td>
+      <td>{{t.earningsDate | date}}</td>
+    </tr>
+  </table>
 
-      <div class="card-text mb-3" *ngIf="e.earningsDate">
-        <h5>Earnings</h5>
-        <i>{{ e.stats.nextEarningsDate | date }}</i>&nbsp;&nbsp;
-        <span [ngClass]="{'badge': e.earningsWarning, 'badge-warning': e.earningsWarning}"> {{e.earningsDaysLeft}} days away</span>
-      </div>
-      <div class="card-text mb-3" *ngIf="!e.earningsDate">
-        <h5>Earnings</h5>
-        <i>Earnings date not specified</i>
-      </div>
-
-      <div *ngIf="e.alerts.length > 0">
-        <h5>Alerts</h5>
-        <ul *ngFor="let a of e.alerts">
-          <li style="white-space: pre-wrap;" *ngFor="let pp of a.pricePoints">
-          {{pp.value | currency }}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+  <table class="table table-hover">
+    <tr>
+      <th colspan="2">Earnings in the next 30 days</th>
+    </tr>
+    <tr *ngIf="result.longEarnings.length == 0">
+      <td colspan="2">None</td>
+    </tr>
+    <tr *ngFor="let t of result.longEarnings">
+      <td>{{t.ticker}}</td>
+      <td>{{t.earningsDate | date}}</td>
+    </tr>
+  </table>
 </div>
