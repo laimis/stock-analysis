@@ -54,7 +54,7 @@ namespace core.Portfolio
                 var transactions = options.Result.SelectMany(o => o.State.Transactions)
                     .Union(stocks.Result.SelectMany(s => s.State.Transactions))
                     .Where(t => t.DateAsDate >= start)
-                    .Where(t => t.IsPL);
+                    .Where(t => !t.IsPL);
 
                 return new ReviewList(
                     start,
