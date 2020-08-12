@@ -54,9 +54,15 @@ namespace core.Portfolio
                 var transactions = options.Result.SelectMany(o => o.State.Transactions)
                     .Union(stocks.Result.SelectMany(s => s.State.Transactions))
                     .Where(t => t.DateAsDate >= start)
-                    .Where(t => t.IsPL);
+                    .Where(t => !t.IsPL);
 
-                return new ReviewList(start, end, groups, new TransactionList(transactions, null, null));
+                return new ReviewList(
+                    start,
+                    end,
+                    groups,
+                    new TransactionList(transactions.Where(t => !t.IsOption), null, null),
+                    new TransactionList(transactions.Where(t => t.IsOption), null, null)
+                );
             }
 
             private async Task<List<ReviewEntryGroup>> CreateReviewGroups(

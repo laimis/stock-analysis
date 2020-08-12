@@ -1,5 +1,15 @@
-bug:
-- review says gains/losses. Should be realized P/L and that's it.
+New Feature:
+    Review walk through
+    Date, weekly - monthly selectin 
+
+- each tab a separate link
+- position open screen
+- performance grid show 3/6/12 month for all the important stats
+- entry calculations
+
+Future:
+- No need for alerts to be event source based
+
 
 CANDIDATES
 

@@ -53,9 +53,9 @@ namespace core.Portfolio
                 EarningsDate == null ? false 
                 : EarningsDate.Value.Subtract(DateTimeOffset.UtcNow).TotalDays <= 30;
 
-        public double? EarningsDaysLeft
+        public int EarningsDaysLeft
             => 
-                EarningsDate == null ? (double?)null
-                : Math.Ceiling(EarningsDate.Value.Subtract(DateTimeOffset.UtcNow).TotalDays);
+                EarningsDate == null ? -1
+                : (int)Math.Ceiling(EarningsDate.Value.Subtract(DateTimeOffset.UtcNow).TotalDays);
     }
 }
