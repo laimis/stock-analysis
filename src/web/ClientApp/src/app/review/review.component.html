@@ -6,6 +6,11 @@
 </div>
 
 <div *ngIf="loaded">
+  <select class="form-control" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
+    <option value="thisweek" selected>This week</option>
+    <option value="last7days">Last 7 days</option>
+  </select>
+
   <div class="card-header">
     <span class="font-weight-bold">Week of {{ result.start | date }} review</span>
   </div>

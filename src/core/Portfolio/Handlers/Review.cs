@@ -16,12 +16,37 @@ namespace core.Portfolio
     {
         public class Generate : RequestWithUserId<ReviewList>
         {
-            public Generate(DateTimeOffset date)
+            public Generate(string period)
             {
-                this.Date = date;
+                var dt = GetDateForPeriod(period);
+
+                this.Start = dt.start;
+                this.End = dt.end;
             }
 
-            public DateTimeOffset Date { get; }
+            public DateTimeOffset Start { get; }
+            public DateTimeOffset End { get; }
+
+            public static (DateTimeOffset start, DateTimeOffset end) GetDateForPeriod(string period)
+            {
+                var start = DateTimeOffset.UtcNow.Date.AddDays(-7);
+                var end = DateTimeOffset.UtcNow.Date.AddDays(1);
+
+                if (period != "last7days")
+                {
+                    var date = DateTimeOffset.UtcNow.Date;
+                    var toSubtract = (int)date.DayOfWeek - 1;
+                    if (toSubtract < 0)
+                    {
+                        toSubtract = 6;
+                    }
+
+                    start = date.AddDays(-1 * toSubtract);
+                    end = start.AddDays(7);
+                }
+
+                return (start, end);
+            }
         }
 
         public class Handler : HandlerWithStorage<Generate, ReviewList>
@@ -43,19 +68,16 @@ namespace core.Portfolio
                 var options = await _storage.GetOwnedOptions(request.UserId);
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                var start = request.Date.Date.AddDays(-7);
-                var end = request.Date.Date;
-
                 var groups = await CreateReviewGroups(options, stocks);
 
                 var transactions = options.SelectMany(o => o.State.Transactions)
                     .Union(stocks.SelectMany(s => s.State.Transactions))
-                    .Where(t => t.DateAsDate >= start)
+                    .Where(t => t.DateAsDate >= request.Start)
                     .Where(t => !t.IsPL);
 
                 return new ReviewList(
-                    start,
-                    end,
+                    request.Start,
+                    request.End,
                     groups,
                     new TransactionList(transactions.Where(t => !t.IsOption), "ticker", null),
                     new TransactionList(transactions.Where(t => t.IsOption), "ticker", null)

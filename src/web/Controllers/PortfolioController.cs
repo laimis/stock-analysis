@@ -39,9 +39,9 @@ namespace web.Controllers
         }
 
         [HttpGet("review")]
-        public async Task<ReviewList> Review()
+        public async Task<ReviewList> Review(string period)
         {
-            var cmd = new Review.Generate(DateTime.UtcNow);
+            var cmd = new Review.Generate(period);
 
             cmd.WithUserId(this.User.Identifier());
 

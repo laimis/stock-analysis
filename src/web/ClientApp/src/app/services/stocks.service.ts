@@ -31,8 +31,8 @@ export class StocksService {
     return this.http.get<object[]>('/api/events?entity=' + type)
   }
 
-  getReviewEntires(): Observable<ReviewList> {
-    return this.http.get<ReviewList>('/api/portfolio/review')
+  getReviewEntires(period:string): Observable<ReviewList> {
+    return this.http.get<ReviewList>('/api/portfolio/review?period=' + period)
   }
 
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionList> {

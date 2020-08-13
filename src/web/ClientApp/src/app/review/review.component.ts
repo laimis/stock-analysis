@@ -9,6 +9,7 @@ import { StocksService, TransactionList, ReviewList } from '../services/stocks.s
 export class ReviewComponent implements OnInit {
   result: ReviewList
   loaded: boolean = false
+  timePeriod: string = 'thisweek'
 
   constructor(private stockService:StocksService) { }
 
@@ -17,10 +18,14 @@ export class ReviewComponent implements OnInit {
   }
 
   private loadEntries() {
-    this.stockService.getReviewEntires().subscribe((r: ReviewList) => {
+    this.stockService.getReviewEntires(this.timePeriod).subscribe((r: ReviewList) => {
       this.loaded = true
       this.result = r
     }, _ => { this.loaded = true})
+  }
+
+  periodChanged() {
+    this.loadEntries()
   }
 }
 
