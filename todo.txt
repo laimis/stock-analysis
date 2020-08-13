@@ -1,6 +1,5 @@
-New Feature:
-    Review walk through
-    Date, weekly - monthly selectin 
+- add ability to pick between last 7 days or Mon-Fri <-- default
+- consolidate different stocks under one roof
 
 - each tab a separate link
 - position open screen

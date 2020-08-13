@@ -40,19 +40,16 @@ namespace core.Portfolio
 
             public override async Task<ReviewList> Handle(Generate request, CancellationToken cancellationToken)
             {
-                var options = _storage.GetOwnedOptions(request.UserId);
-                var stocks = _storage.GetStocks(request.UserId);
-                var alerts = _alerts.GetAlerts(request.UserId);
-
-                await Task.WhenAll(options, stocks, alerts);
-
-                var groups = await CreateReviewGroups(options, stocks, alerts);
+                var options = await _storage.GetOwnedOptions(request.UserId);
+                var stocks = await _storage.GetStocks(request.UserId);
 
                 var start = request.Date.Date.AddDays(-7);
                 var end = request.Date.Date;
 
-                var transactions = options.Result.SelectMany(o => o.State.Transactions)
-                    .Union(stocks.Result.SelectMany(s => s.State.Transactions))
+                var groups = await CreateReviewGroups(options, stocks);
+
+                var transactions = options.SelectMany(o => o.State.Transactions)
+                    .Union(stocks.SelectMany(s => s.State.Transactions))
                     .Where(t => t.DateAsDate >= start)
                     .Where(t => !t.IsPL);
 
@@ -60,34 +57,25 @@ namespace core.Portfolio
                     start,
                     end,
                     groups,
-                    new TransactionList(transactions.Where(t => !t.IsOption), null, null),
-                    new TransactionList(transactions.Where(t => t.IsOption), null, null)
+                    new TransactionList(transactions.Where(t => !t.IsOption), "ticker", null),
+                    new TransactionList(transactions.Where(t => t.IsOption), "ticker", null)
                 );
             }
 
             private async Task<List<ReviewEntryGroup>> CreateReviewGroups(
-                Task<IEnumerable<OwnedOption>> options,
-                Task<IEnumerable<OwnedStock>> stocks,
-                Task<IEnumerable<Alert>> alerts)
+                IEnumerable<OwnedOption> options,
+                IEnumerable<OwnedStock> stocks)
             {
                 var entries = new List<ReviewEntry>();
 
-                foreach (var o in options.Result.Where(s => s.State.Active))
+                foreach (var o in options.Where(s => s.State.Active))
                 {
                     entries.Add(new ReviewEntry(o));
                 }
 
-                foreach (var s in stocks.Result.Where(s => s.State.Owned > 0))
+                foreach (var s in stocks.Where(s => s.State.Owned > 0))
                 {
                     entries.Add(new ReviewEntry(s));
-                }
-
-                foreach (var a in alerts.Result)
-                {
-                    if (a.PricePoints.Count > 0)
-                    {
-                        entries.Add(new ReviewEntry(a));
-                    }
                 }
 
                 var grouped = entries.GroupBy(r => r.Ticker);

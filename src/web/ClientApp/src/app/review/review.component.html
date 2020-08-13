@@ -17,11 +17,18 @@
     <tr *ngIf="result.stocks.transactions.length == 0">
       <td colspan="4">None</td>
     </tr>
-    <tr *ngFor="let t of result.stocks.transactions">
-      <td>{{t.ticker}}</td>
-      <td>{{t.date | date}}</td>
-      <td>{{t.description}}</td>
-      <td align="right">{{t.profit | currency}}</td>
+    <tr *ngFor="let g of result.stocks.grouped">
+      <td colspan="4">
+        <div>{{g.name}}</div>
+
+        <table class="table">
+          <tr *ngFor="let t of g.transactions.transactions">
+            <td>{{t.date | date}}</td>
+            <td>{{t.description}}</td>
+            <td align="right">{{t.profit | currency}}</td>
+          </tr>
+        </table>
+      </td>
     </tr>
   </table>
 
