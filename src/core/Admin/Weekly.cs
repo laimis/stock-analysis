@@ -35,17 +35,20 @@ namespace core.Admin
             private IMediator _mediator;
 
             public Handler(
-                IAccountStorage storage,
-                IPortfolioStorage portfolio,
                 IAlertsStorage alerts,
                 IEmailService emails,
-                IMediator mediator)
+                IMediator mediator,
+                IPortfolioStorage portfolio,
+                IStocksService2 stocks,
+                IAccountStorage storage
+                )
             {
                 _alerts = alerts;
-                _portfolio = portfolio;
-                _storage = storage;
                 _emails = emails;
                 _mediator = mediator;
+                _portfolio = portfolio;
+                _stocks = stocks;
+                _storage = storage;
             }
 
             public async Task<List<object>> Handle(Command cmd, CancellationToken cancellationToken)
