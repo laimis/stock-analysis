@@ -22,6 +22,8 @@ export class StockDashboardComponent implements OnInit {
 
   activeTab: string = 'owned'
 
+  selectedCategory: string = 'all'
+
 	constructor(
 		private stocks : StocksService,
 		private router : Router)
@@ -54,6 +56,10 @@ export class StockDashboardComponent implements OnInit {
     this.activeTab = tabName
   }
 
+  categoryChanged() {
+    this.calculateProperties()
+  }
+
   calculateProperties() {
 
     this.numberOfSharesOwned = 0.0
@@ -61,6 +67,14 @@ export class StockDashboardComponent implements OnInit {
     this.currentEquity = 0.0
 
     for (var i of this.owned) {
+
+      if (this.selectedCategory == "longterm" || this.selectedCategory == "shortterm") {
+        console.log('doing comparison of ' + i.category + ' vs ' + this.selectedCategory)
+        if (i.category != this.selectedCategory) {
+          continue
+        }
+      }
+
       this.numberOfSharesOwned += i.owned
       this.moneySpentOnShares += i.cost
       this.currentEquity += i.equity

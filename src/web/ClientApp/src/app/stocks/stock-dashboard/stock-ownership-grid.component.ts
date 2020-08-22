@@ -13,6 +13,7 @@ export class StockOwnershipGridComponent implements OnInit {
 	public loaded : boolean = false;
 
   @Input() owned: OwnedStock[];
+  @Input() selectedCategory: string
 
 	ngOnInit() {}
 

@@ -47,12 +47,16 @@
     <div class="col text-center">
       <div class="container">
         <div class="row">
-          <div class="col text-right">Tickers</div>
-          <div class="col text-left"><b>{{owned.length}}</b></div>
+          <div class="col"></div>
+          <div class="col">
+            <select class="form-control btn border rounded" name="category" [(ngModel)]="selectedCategory" (ngModelChange)="categoryChanged()">
+              <option value="all">All</option>
+              <option value="longterm">Long-Term</option>
+              <option value="shortterm">Short-Term</option>
+            </select>
+          </div>
         </div>
         <div class="row mt-0">
-          <div class="col text-right">Shares</div>
-          <div class="col text-left"><b>{{numberOfSharesOwned}}</b></div>
         </div>
       </div>
     </div>
@@ -73,6 +77,6 @@
   </a>
 </div>
 
-<stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned></stock-ownership-grid>
+<stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
 <stock-performance *ngIf="loaded && isActive('performance')" [performance]=performance></stock-performance>
 <stock-past *ngIf="loaded && isActive('past')" [past]=past></stock-past>

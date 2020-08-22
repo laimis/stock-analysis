@@ -13,6 +13,7 @@ namespace core.Stocks.View
 
             Id = o.Id;
             CurrentPrice = price.Amount;
+            Category = o.State.Category;
             Ticker = o.State.Ticker;
             Owned = o.State.Owned;
             Equity = equity;
@@ -26,6 +27,7 @@ namespace core.Stocks.View
 
         public System.Guid Id { get; }
         public double CurrentPrice { get; }
+        public string Category { get; }
         public string Ticker { get; }
         public int Owned { get; }
         public double Equity { get; }

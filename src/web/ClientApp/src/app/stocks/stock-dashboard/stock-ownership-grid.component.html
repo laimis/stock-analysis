@@ -16,7 +16,7 @@
           <th class="text-right sort-header" (click)="sort('profitsPct')">%</th>
         </tr>
       </thead>
-      <tr *ngFor="let ticker of owned">
+      <tr *ngFor="let ticker of owned" [ngClass]="{'bg-warning': selectedCategory == ticker.category}">
         <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
         <td class="text-right">{{ticker.currentPrice | currency}}</td>
         <td class="text-right">{{ticker.averageCost | currency}}</td>
