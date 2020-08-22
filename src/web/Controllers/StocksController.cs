@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using core;
 using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -64,6 +63,16 @@ namespace web.Controllers
         public async Task<object> Search(string term)
         {
             return await _mediator.Send(new Search.Query(term));
+        }
+
+        [HttpPost("settings")]
+        public async Task<ActionResult> Settings(Settings.Command model)
+        {
+            model.WithUserId(this.User.Identifier());
+
+            var r = await _mediator.Send(model);
+
+            return this.OkOrError(r);
         }
 
         [HttpPost("sell")]

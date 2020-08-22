@@ -1,0 +1,8 @@
+<div>
+  <label for="category">Category</label>
+  <select class="form-control btn border rounded" name="category" [(ngModel)]="category" (ngModelChange)="saveSettings()">
+    <option value="longterm">Long-Term</option>
+    <option value="shortterm">Short-Term</option>
+  </select>
+  <div *ngIf="success">Saved</div>
+</div>

@@ -141,6 +141,11 @@ export class StocksService {
 		return this.http.post('/api/stocks/sell', obj)
   }
 
+  settings(ticker:string,category:string) : Observable<any> {
+    var obj = {ticker, category}
+		return this.http.post('/api/stocks/settings', obj)
+  }
+
   search(term: string): Observable<object[]> {
     if (!term.trim()) {
       return of([]);
@@ -284,6 +289,7 @@ export class OwnedStock {
   description: string
   averageCost: number
   transactions: TransactionList
+  category: string;
 }
 
 export class Alert {}

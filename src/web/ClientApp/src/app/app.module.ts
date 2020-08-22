@@ -54,6 +54,7 @@ import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-owne
 import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
 import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
 import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
+import { StockSettingsComponent } from './stocks/stock-details/stock-settings.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -145,6 +146,7 @@ var routes = [
     StockListComponent,
     StockListsComponent,
     StockNotesComponent,
+    StockSettingsComponent,
     StockOptionComponent,
     StockOwnershipComponent,
     StockOwnershipGridComponent,

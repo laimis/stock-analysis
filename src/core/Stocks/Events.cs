@@ -85,6 +85,16 @@ namespace core.Stocks
         public Guid TransactionId { get; }
     }
 
+    internal class StockCategoryChanged : AggregateEvent
+    {
+        public StockCategoryChanged(Guid id, Guid aggregateId, string category, DateTimeOffset when) : base(id, aggregateId, when)
+        {
+            this.Category =category;
+        }
+
+        public string Category { get; }
+    }
+
     internal class TickerObtained : AggregateEvent
     {
         public TickerObtained(Guid id, Guid aggregateId, DateTimeOffset when, string ticker, Guid userId) : base(id, aggregateId, when)

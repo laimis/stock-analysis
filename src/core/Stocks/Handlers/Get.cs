@@ -43,6 +43,7 @@ namespace core.Stocks
                     cost = stock.State.Cost,
                     owned = stock.State.Owned,
                     ticker = stock.State.Ticker,
+                    category = stock.State.Category,
                     transactions = new TransactionList(
                         stock.State.Transactions.Where(t => !t.IsPL), null, null
                     )

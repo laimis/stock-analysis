@@ -50,6 +50,28 @@ namespace core.Stocks
             );
         }
 
+        public void UpdateSettings(string category)
+        {
+            if (string.IsNullOrEmpty(category))
+            {
+                return;
+            }
+            
+            if (State.Category == category)
+            {
+                return;
+            }
+
+            Apply(
+                new StockCategoryChanged(
+                    Guid.NewGuid(),
+                    this.State.Id,
+                    category,
+                    DateTimeOffset.UtcNow
+                )
+            );
+        }
+
         public void DeleteTransaction(Guid transactionId)
         {
             if (!this.State.BuyOrSell.Any(t => t.Id == transactionId))

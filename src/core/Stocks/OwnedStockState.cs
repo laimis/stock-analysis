@@ -20,11 +20,18 @@ namespace core.Stocks
 
         public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
 
+        public string Category { get; private set; }
+
         internal void ApplyInternal(TickerObtained o)
         {
             this.Id = o.AggregateId;
             this.Ticker = o.Ticker;
             this.UserId = o.UserId;
+        }
+
+        internal void ApplyInternal(StockCategoryChanged c)
+        {
+            this.Category = c.Category;
         }
 
         internal void ApplyInternal(StockPurchased purchased)
