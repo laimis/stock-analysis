@@ -60,7 +60,7 @@ namespace coretests.Options
         [Fact]
         public void WinningMatches()
         {
-            Assert.Equal(1, _stats.WinningTrades);
+            Assert.Equal(1, _stats.Wins);
         }
 
         [Fact]

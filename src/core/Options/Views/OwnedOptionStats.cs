@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,48 +8,49 @@ namespace core.Options
     {
         public OwnedOptionStats(IEnumerable<OwnedOptionSummary> summaries)
         {
-            var list = summaries.ToList();
-
-            if (list.Count == 0)
+            var transactions = summaries.ToList();
+            if (transactions.Count == 0)
             {
                 return;
             }
 
-            this.Count = list.Count;
-            this.WinningTrades = list.Count(s => s.Profit > 0);
-            this.Assigned = list.Count(s => s.Assigned);
-            this.AveragePremiumCapture = list.Average(s => s.PremiumCapture);
+            this.Count = transactions.Count;
+            this.Assigned = transactions.Count(s => s.Assigned);
+            this.AveragePremiumCapture = transactions.Average(s => s.PremiumCapture);
 
-            var positiveProfit = list.Where(s => s.Profit >= 0);
-            if (positiveProfit.Any())
+            var wins = transactions.Where(s => s.Profit >= 0);
+            if (wins.Any())
             {
-                this.AverageWinAmount = positiveProfit.Average(s => s.Profit);
-                this.MaxWin = positiveProfit.Max(s => s.Profit);
+                this.Wins = transactions.Count(s => s.Profit > 0);
+                this.AvgWinAmount = wins.Average(s => s.Profit);
+                this.MaxWinAmount = wins.Max(s => s.Profit);
             }
 
-            var negativeProfit = list.Where(s => s.Profit < 0);
-            if (negativeProfit.Any())
+            var losses = transactions.Where(s => s.Profit < 0).ToList();
+            if (losses.Count > 0)
             {
-                this.AverageLossAmount = negativeProfit.Average(s => s.Profit);
-                this.MaxLoss = negativeProfit.Min(s => s.Profit);
+                this.Losses = losses.Count;
+                this.AverageLossAmount = Math.Abs(losses.Average(s => s.Profit));
+                this.MaxLossAmount = Math.Abs(losses.Min(s => s.Profit));
             }
 
-            this.EV = (AverageWinAmount * WinningTrades / Count) + (AverageLossAmount * (Count - WinningTrades) / Count);
-            this.AverageProfitPerDay = list.Average(s => s.Profit / s.DaysHeld);
-            this.AverageDays = list.Average(s => s.Days);
-            this.AverageDaysHeld = list.Average(s => s.DaysHeld);
+            this.EV = (AvgWinAmount * Wins / Count) - (AverageLossAmount * Losses / Count);
+            this.AverageProfitPerDay = transactions.Average(s => s.Profit / s.DaysHeld);
+            this.AverageDays = transactions.Average(s => s.Days);
+            this.AverageDaysHeld = transactions.Average(s => s.DaysHeld);
             this.AverageDaysHeldPercentage = AverageDaysHeld / AverageDays;
         }
 
         public int Count { get; }
-        public int WinningTrades { get; }
+        public int Wins { get; }
         public int Assigned { get; }
         public double AveragePremiumCapture { get; }
 
-        public double AverageWinAmount { get; }
+        public double AvgWinAmount { get; }
+        public int Losses { get; }
         public double AverageLossAmount { get; }
-        public double MaxWin { get; }
-        public double MaxLoss { get; }
+        public double MaxWinAmount { get; }
+        public double MaxLossAmount { get; }
 
         public double EV { get; }
         public double AverageProfitPerDay { get; }
