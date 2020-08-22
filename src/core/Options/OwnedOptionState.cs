@@ -79,6 +79,7 @@ namespace core.Options
             this.SoldToOpen = null;
             this.Closed = null;
             this.Notes.Clear();
+            this.Expirations.Clear();
 
             this.Deleted = true;
         }

@@ -1,4 +1,23 @@
+- Fix a bug with creating an option, marking it as expired, and then creating it again and marking as expired again?
 
+- Add R:R ratio to performance...
+% winning * % gain / % lossing * % loss
+
+- add ability to filter the performance by time period
+    - all time
+    - 6 months
+    - 12 months
+
+--- need the curve of the gains!!!
+----
+
+
+
+Ticker soup page:
+    - paste a bunch of tickers, looks them up as valid or not valid and returns entries for each with links to RH
+    - pattern of $ followed by letters 2-5
+    - turn them into grid response?
+Page that accepts tickers, returns grid
 
 
 Personalization tab:
