@@ -1,5 +1,3 @@
-- Fix a bug with creating an option, marking it as expired, and then creating it again and marking as expired again?
-
 - Add R:R ratio to performance...
 % winning * % gain / % lossing * % loss
 
@@ -8,9 +6,7 @@
     - 6 months
     - 12 months
 
---- need the curve of the gains!!!
-----
-
+- need the curve of the gains
 
 
 Ticker soup page:

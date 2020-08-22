@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using core.Shared;
 
@@ -28,9 +29,9 @@ namespace core.Stocks
             if (losses.Count > 0)
             {
                 this.Losses = losses.Count;
-                this.AvgLossAmount = losses.Average(t => t.Profit);
-                this.MaxLossAmount = losses.Min(t => t.Profit);
-                this.LossAvgReturnPct = losses.Average(t => t.ReturnPct);
+                this.AvgLossAmount = Math.Abs(losses.Average(t => t.Profit));
+                this.MaxLossAmount = Math.Abs(losses.Min(t => t.Profit));
+                this.LossAvgReturnPct = Math.Abs(losses.Average(t => t.ReturnPct));
             }
             
             this.WinPct = (1.0 * this.Wins) / this.Total;
