@@ -23,11 +23,13 @@ namespace core.Stocks.View
             Profits = profits;
             ProfitsPct = profitsPct;
             Transactions = new TransactionList(o.State.Transactions, null, null);
+            DaysHeld = o.State.DaysHeld;
         }
 
         public System.Guid Id { get; }
         public double CurrentPrice { get; }
         public string Category { get; }
+        public int DaysHeld { get; }
         public string Ticker { get; }
         public int Owned { get; }
         public double Equity { get; }

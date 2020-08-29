@@ -21,6 +21,7 @@ namespace core.Stocks
         public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
 
         public string Category { get; private set; }
+        public int DaysHeld { get; private set; }
 
         internal void ApplyInternal(TickerObtained o)
         {
@@ -71,6 +72,7 @@ namespace core.Stocks
             int owned = 0;
             double cost = 0;
             var txs = new List<Transaction>();
+            DateTimeOffset? mostRecentOpen = null;
 
             void PurchaseProcessing(IStockTransaction st)
             {
@@ -131,6 +133,11 @@ namespace core.Stocks
 
                 if (st is StockPurchased)
                 {
+                    if (owned == 0)
+                    {
+                        mostRecentOpen = st.When;
+                    }
+
                     PurchaseProcessing(st);
                 }
                 else
@@ -142,6 +149,7 @@ namespace core.Stocks
                 {
                     avgCost = 0;
                     cost = 0;
+                    mostRecentOpen = null;
                 }
             }
 
@@ -150,6 +158,8 @@ namespace core.Stocks
             this.Cost = cost;
             this.Transactions.Clear();
             this.Transactions.AddRange(txs);
+            this.DaysHeld = mostRecentOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(mostRecentOpen.Value).TotalDays)
+                : 0;
         }
 
         public void Apply(AggregateEvent e)

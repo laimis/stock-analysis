@@ -189,5 +189,24 @@ namespace coretests.Stocks
             Assert.Equal(0, stock.State.AverageCost);
             Assert.Empty(stock.State.Transactions);
         }
+
+        [Fact]
+        public void DaysHeldCorrect()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Purchase(1, 10, DateTimeOffset.UtcNow.AddDays(-2));
+
+            Assert.Equal(5, stock.State.DaysHeld);
+
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Equal(5, stock.State.DaysHeld);
+
+            stock.Sell(1, 10, DateTimeOffset.UtcNow, null);
+
+            Assert.Equal(0, stock.State.DaysHeld);
+        }
     }
 }
