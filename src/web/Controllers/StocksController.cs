@@ -117,6 +117,12 @@ namespace web.Controllers
             return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
         }
 
+        [HttpGet("export/closed")]
+        public Task<ActionResult> ExportClosed()
+        {
+            return this.GenerateExport(_mediator, new ExportClosed.Query(this.User.Identifier()));
+        }
+
         [HttpPost("import")]
         public async Task<ActionResult> Import(IFormFile file)
         {

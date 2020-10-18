@@ -7,6 +7,7 @@ using core.Notes;
 using core.Options;
 using core.Shared;
 using core.Stocks;
+using core.Stocks.View;
 
 namespace core
 {
@@ -17,6 +18,7 @@ namespace core
         public const string NOTE_HEADER = "created,ticker,note";
         public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
         public const string USER_HEADER = "email,first_name,last_name";
+        public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
 
         public static string GenerateRaw(string header, IEnumerable<IEnumerable<object>> rows)
         {
@@ -30,6 +32,15 @@ namespace core
             );
 
             return Generate(USER_HEADER, rows);
+        }
+
+        public static string Generate(IEnumerable<StockTransactionView> pastTrades)
+        {
+            var rows = pastTrades.Select(t =>
+                new object[] { t.Ticker, t.Date, t.Profit, t.ReturnPct }
+            );
+
+            return Generate(PAST_TRADES_HEADER, rows);
         }
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
