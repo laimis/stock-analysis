@@ -41,20 +41,22 @@ export class StockOwnershipGridComponent implements OnInit {
 
   private getSortFunc(column:string) {
     switch(column) {
-      case "ticker":
-        return (a:OwnedStock, b:OwnedStock) => a.ticker.localeCompare(b.ticker)
-      case "currentPrice":
-        return (a:OwnedStock, b:OwnedStock) => a.currentPrice - b.currentPrice
       case "averageCost":
         return (a:OwnedStock, b:OwnedStock) => a.averageCost - b.averageCost
-      case "owned":
-        return (a:OwnedStock, b:OwnedStock) => a.owned - b.owned
+      case "currentPrice":
+        return (a:OwnedStock, b:OwnedStock) => a.currentPrice - b.currentPrice
+      case "daysheld":
+        return (a:OwnedStock, b:OwnedStock) => a.daysHeld - b.daysHeld
       case "invested":
         return (a:OwnedStock, b:OwnedStock) => a.cost - b.cost
       case "profits":
         return (a:OwnedStock, b:OwnedStock) => a.profits - b.profits
       case "profitsPct":
         return (a:OwnedStock, b:OwnedStock) => a.profitsPct - b.profitsPct
+      case "owned":
+        return (a:OwnedStock, b:OwnedStock) => a.owned - b.owned
+      case "ticker":
+        return (a:OwnedStock, b:OwnedStock) => a.ticker.localeCompare(b.ticker)
     }
 
     console.log("unrecognized sort column " + column)
