@@ -19,9 +19,9 @@
       </thead>
       <tr *ngFor="let ticker of owned" [ngClass]="{'bg-warning': selectedCategory == ticker.category}">
         <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
+        <td>{{ticker.owned}}</td>
         <td class="text-right">{{ticker.currentPrice | currency}}</td>
         <td class="text-right">{{ticker.averageCost | currency}}</td>
-        <td>{{ticker.owned}}</td>
         <td class="text-right">
           {{ticker.cost | currency}}
           <small>{{ownershipPct(ticker) | percent}}</small>
