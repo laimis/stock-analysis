@@ -34,7 +34,7 @@ namespace core.Alerts
 
                 var filename = CSVExport.GenerateFilename("alerts");
 
-                return new ExportResponse(filename, CSVExport.Generate(alerts));
+                return new ExportResponse(filename, CSVExport.Generate(alerts.Where(a => a.PricePoints.Count > 0)));
             }
         }
     }
