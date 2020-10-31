@@ -59,7 +59,11 @@ namespace web.Controllers
             return await _mediator.Send(query);
         }
 
-        
+        [HttpGet("export")]
+        public Task<ActionResult> Export()
+        {
+            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
+        }
 
         [HttpPost("delete")]
         public async Task<object> Delete(Delete.Command cmd)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using core.Account;
+using core.Alerts;
 using core.Notes;
 using core.Options;
 using core.Shared;
@@ -18,12 +19,8 @@ namespace core
         public const string NOTE_HEADER = "created,ticker,note";
         public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
         public const string USER_HEADER = "email,first_name,last_name";
+        public const string ALERTS_HEADER = "ticker,pricepoints";
         public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
-
-        public static string GenerateRaw(string header, IEnumerable<IEnumerable<object>> rows)
-        {
-            return Generate(header, rows);
-        }
 
         public static string Generate(IEnumerable<User> users)
         {
@@ -32,6 +29,15 @@ namespace core
             );
 
             return Generate(USER_HEADER, rows);
+        }
+
+        public static string Generate(IEnumerable<Alert> alerts)
+        {
+            var rows = alerts.Select(u =>
+                new object[] { u.State.Ticker.Value, string.Join(";", u.State.PricePoints.Select(p => p.Value))}
+            );
+
+            return Generate(ALERTS_HEADER, rows);
         }
 
         public static string Generate(IEnumerable<StockTransactionView> pastTrades)
