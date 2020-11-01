@@ -28,7 +28,8 @@ namespace core.Stocks
 
                 var open = stocks
                     .Where(s => s.State.Owned > 0)
-                    .Select(s => new OwnedStockView(s, new TickerPrice(0)));
+                    .Select(s => new OwnedStockView(s, new TickerPrice(0)))
+                    .OrderByDescending(s => s.Cost);
 
                 var filename = CSVExport.GenerateFilename("openstocks");
 
