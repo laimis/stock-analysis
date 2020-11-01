@@ -21,6 +21,7 @@ namespace core
         public const string USER_HEADER = "email,first_name,last_name";
         public const string ALERTS_HEADER = "ticker,pricepoints";
         public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
+        public const string OWNED_STOCKS_HEADER = "ticker,shares,averagecost,invested,daysheld,category";
 
         public static string Generate(IEnumerable<User> users)
         {
@@ -29,6 +30,15 @@ namespace core
             );
 
             return Generate(USER_HEADER, rows);
+        }
+
+        public static string Generate(IEnumerable<OwnedStockView> stocks)
+        {
+            var rows = stocks.Select(s =>
+                new object[] { s.Ticker, s.Owned, s.AverageCost, s.Cost, s.DaysHeld, s.Category}
+            );
+
+            return Generate(OWNED_STOCKS_HEADER, rows);
         }
 
         public static string Generate(IEnumerable<Alert> alerts)
