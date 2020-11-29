@@ -1,0 +1,28 @@
+
+<div *ngIf="chain && chain.links.length > 0">
+
+  <div class="row">
+    <div class="col"><button class="btn btn-primary" (click)="toggle('v1')">V1</button></div>
+    <div class="col"><button class="btn btn-primary" (click)="toggle('v2')">V2</button></div>
+  </div>
+
+  <div class="mt-5" *ngIf="render == 'v1'">
+    <ul>
+      <span *ngFor="let link of chain.links">
+        {{link.success ? '✔️' : '❌'}}
+      </span>
+    </ul>
+  </div>
+
+  <div class="mt-5" *ngIf="render == 'v2'">
+    <ng-template ngFor let-link [ngForOf]="chain.links" let-i="index">
+      <br *ngIf="i%20 == 0" />
+      <span>{{link.success ? '✔️' : '❌'}}</span>
+    </ng-template>
+  </div>
+
+</div>
+
+<div *ngIf="chain && chain.links.length == 0">
+  Generate some trades to see links
+</div>

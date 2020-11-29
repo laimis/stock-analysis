@@ -246,6 +246,18 @@ export class StocksService {
     return this.http.post('/api/account/subscribe', obj)
   }
 
+  // -------------------- reports -------------------------
+  chainReport() : Observable<Chain> {
+    return this.http.get<Chain>('/api/reports/chain')
+  }
+}
+
+export interface Chain {
+  links: Link[]
+}
+
+export interface Link {
+  success: boolean
 }
 
 export interface ReviewList {

@@ -24,7 +24,7 @@
               "src/assets"
             ],
             "styles": [
-			        "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css"
             ],
@@ -146,5 +146,8 @@
       }
     }
   },
-  "defaultProject": "web"
+  "defaultProject": "web",
+  "cli": {
+    "analytics": "ec657688-6427-4c16-8006-9f8a60d63f74"
+  }
 }

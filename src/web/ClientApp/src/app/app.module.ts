@@ -55,6 +55,7 @@ import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-
 import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
 import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
 import { StockSettingsComponent } from './stocks/stock-details/stock-settings.component';
+import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
@@ -98,7 +99,9 @@ var routes = [
 
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
   { path: 'terms', component: TermsComponent},
-  { path: 'test', component: SymbolSearchComponent}
+  { path: 'test', component: SymbolSearchComponent},
+
+  { path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]}
 ]
 
 @NgModule({
@@ -156,7 +159,9 @@ var routes = [
 
     SymbolSearchComponent,
     TransactionsComponent,
-    TermsComponent
+    TermsComponent,
+
+    FailuresuccesschainComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
