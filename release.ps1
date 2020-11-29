@@ -19,3 +19,5 @@ $cmd = "git tag -a v$($newVersion) -m '$message'"
 write-host $cmd 
 
 iex $cmd
+
+iex "git push --tags"
