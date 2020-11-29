@@ -23,9 +23,9 @@ namespace core.Reports
             {
             }
 
-            public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
+            public override Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await RealThing(request);
+                return RealThing(request);
             }
 
             // public Task<object> Random()

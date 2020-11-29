@@ -24,7 +24,7 @@ namespace web.Controllers
         }
 
         [HttpGet("chain")]
-        public object Chain()
+        public Task<object> Chain()
         {
             var query = new Chain.Query(this.User.Identifier());
 
