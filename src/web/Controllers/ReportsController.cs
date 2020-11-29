@@ -26,20 +26,9 @@ namespace web.Controllers
         [HttpGet("chain")]
         public object Chain()
         {
-            // var query = new Chain.Query(this.User.Identifier());
+            var query = new Chain.Query(this.User.Identifier());
 
-            // return _mediator.Send(query);
-
-            var links = new List<object>();
-
-            var rand = new Random();
-
-            while(links.Count < 241)
-            {
-                links.Add(new {success = rand.NextDouble() >= 0.5});
-            }
-
-            return new {links};
+            return _mediator.Send(query);
         }
     }
 }
