@@ -51,6 +51,8 @@ export class StockOwnershipGridComponent implements OnInit {
         return (a:OwnedStock, b:OwnedStock) => a.cost - b.cost
       case "profits":
         return (a:OwnedStock, b:OwnedStock) => a.profits - b.profits
+      case "equity":
+        return (a:OwnedStock, b:OwnedStock) => a.equity - b.equity
       case "profitsPct":
         return (a:OwnedStock, b:OwnedStock) => a.profitsPct - b.profitsPct
       case "owned":
@@ -69,5 +71,13 @@ export class StockOwnershipGridComponent implements OnInit {
       .reduce((acc, curr) => acc + curr)
 
     return ticker.cost / total
+  }
+
+  equityPct(ticker:OwnedStock) {
+    let total = this.owned
+      .map(s => s.equity)
+      .reduce((acc, curr) => acc + curr)
+
+    return ticker.equity / total
   }
 }
