@@ -6,6 +6,8 @@ if ([System.String]::IsNullOrEmpty($message))
     exit
 }
 
+iex 'git push'
+
 $v = iex 'git describe --tags --abbrev=0'
 
 write-host $v
