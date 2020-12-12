@@ -57,9 +57,9 @@ namespace core.Stocks
             {
                 var prices = stocks
                     .Select(o => o.State.Ticker).Distinct()
-                    .ToDictionary(s => s, async s => await _stocksService.GetPrice(s));
+                    .ToDictionary(s => s, s => new TickerPrice(0));
 
-                return stocks.Select(o => new OwnedStockView(o, prices[o.State.Ticker].Result));
+                return stocks.Select(o => new OwnedStockView(o, prices[o.State.Ticker]));
             }
         }
     }
