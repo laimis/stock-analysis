@@ -33,7 +33,7 @@
         <td class="text-right"><span [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
         <td class="text-right">
           {{ticker.equity | currency}}
-          <small>{{equityPct(ticker) | percent:'1.2'}}</small>
+          <small>{{equityPct(ticker) | percent}}</small>
         </td>
       </tr>
     </table>
