@@ -5,11 +5,7 @@ namespace core.Adapters.Stocks
     public class SearchResult
     {
         private static readonly HashSet<string> _supportedTypes = new HashSet<string>{
-            "ad",
-            "re",
-            "cs",
-            "et",
-            //"ps"
+            "SHARE"
         };
 
         public string Symbol { get; set; }
