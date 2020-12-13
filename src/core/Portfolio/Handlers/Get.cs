@@ -46,12 +46,12 @@ namespace core.Portfolio
 
                 var prices = owned.Select(o => o.State.Ticker).Union(openOptions.Select(o => o.State.Ticker))
                     .Distinct()
-                    .ToDictionary(s => s, async s => await _stocksService.GetPrice(s));
+                    .ToDictionary(s => s, s => new TickerPrice(0));
 
                 var obj = new
                 {
-                    owned = owned.Select(o => new OwnedStockView(o, prices[o.State.Ticker].Result)),
-                    openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.State.Ticker].Result)),
+                    owned = owned.Select(o => new OwnedStockView(o, prices[o.State.Ticker])),
+                    openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.State.Ticker])),
                     triggered = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered),
                     alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId)
                 };
