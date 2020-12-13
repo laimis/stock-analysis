@@ -19,14 +19,14 @@
     <tbody>
       <tr *ngFor="let s of ownership">
         <td>{{s.ticker}}</td>
-        <td class="text-right">{{s.price}}</td>
-        <td class="text-right">{{s.stats.peRatio}}</td>
+        <td class="text-right">{{s.price | currency}}</td>
+        <td class="text-right">{{s.stats.peRatio | number:'1.0-2' }}</td>
         <td class="text-right">{{s.stats.avg30Volume / 1000000 | number:'1.0-2'}}M</td>
-        <td class="text-right">{{s.stats.marketCap / 1000000 | number:'1.0-0'}}M</td>
-        <td class="text-right">{{s.stats.debtToEquity}}</td>
+        <td class="text-right">{{s.stats.marketCap / 1000000000 | number:'1.0-2'}}B</td>
+        <td class="text-right">{{s.stats.debtToEquity | number:'1.0-2' }}</td>
         <td class="text-right">{{s.stats.priceToBook | number}}</td>
-        <td class="text-right">{{s.stats.revenue / 1000000 | number:'1.0-0'}}M</td>
-        <td class="text-right">{{s.stats.grossProfit / 1000000 | number:'1.0-0'}}M</td>
+        <td class="text-right">{{s.stats.revenue / 1000000 | currency:'1.0-0'}}M</td>
+        <td class="text-right">{{s.stats.grossProfit / 1000000 | currency:'1.0-0'}}M</td>
         <td class="text-right">{{s.stats.profitMargin | percent}}</td>
         <td class="text-right">{{s.stats.totalCash / 1000000 | number:'1.0-0'}}M</td>
       </tr>
