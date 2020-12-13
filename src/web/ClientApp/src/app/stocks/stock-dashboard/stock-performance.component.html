@@ -21,6 +21,6 @@
   <div class="col"><div class="stat-label">Expected Value</div>{{performance.ev | currency}}</div>
   <div class="col"><div class="stat-label">Avg Return %</div><div>{{performance.avgReturnPct | percent}}</div></div>
   <div class="col"><div class="stat-label">R:R</div>
-    <div>{{performance.avgWinAmount * performance.winAvgReturnPct / (performance.avgLossAmount * performance.lossAvgReturnPct)}}</div>
+    <div>{{performance.avgWinAmount * performance.winAvgReturnPct / (performance.avgLossAmount * performance.lossAvgReturnPct) | number:'1.2'}}</div>
   </div>
 </div>
