@@ -6,29 +6,12 @@
     - 6 months
     - 12 months
 
-- need the curve of the gains
-
 
 Ticker soup page:
     - paste a bunch of tickers, looks them up as valid or not valid and returns entries for each with links to RH
     - pattern of $ followed by letters 2-5
     - turn them into grid response?
 Page that accepts tickers, returns grid
-
-
-Personalization tab:
-    - Consider a tab that pulls last 4 annual fillings and show the revenue growth
-    - high-risk holding
-    - holding type: long term/short term
-    - exit strategy:
-    - entry strategy: 
-
-- position open screen
-- performance grid show 3/6/12 month for all the important stats
-- entry calculations
-
-Future:
-- No need for alerts to be event source based
 
 
 CANDIDATES

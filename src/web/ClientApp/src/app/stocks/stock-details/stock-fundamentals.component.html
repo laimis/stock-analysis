@@ -2,7 +2,7 @@
 <div *ngIf="summary">
   <div class="row mb-2">
     <div class="col"><div class="stat-label">Price</div><div>{{summary.price | currency}}</div></div>
-    <div class="col"><div class="stat-label">PE</div><div>{{stats.peRatio}}</div></div>
+    <div class="col"><div class="stat-label">PE</div><div>{{stats.peRatio | number:'1.0-2'}}</div></div>
     <div class="col"><div class="stat-label">10d Volume</div><div>{{stats.avg10Volume / 1000000 | number:'1.0-2'}}M</div></div>
     <div class="col"><div class="stat-label">30d Volumne</div><div>{{stats.avg30Volume / 1000000 | number:'1.0-2'}}M</div></div>
   </div>
@@ -19,10 +19,10 @@
     <div class="col"><div class="stat-label">Dividend Yield</div><div>{{stats.dividendYield | percent}}</div></div>
   </div>
   <div class="row mb-2">
-    <div class="col"><div class="stat-label">Market Cap</div><div>{{stats.marketCap / 1000000 | number:'1.0-0'}}M</div></div>
-    <div class="col"><div class="stat-label">Debt-to-Equity</div><div>{{stats.debtToEquity}}</div></div>
-    <div class="col"><div class="stat-label">Put/Call Ratio</div><div>{{stats.putCallRatio | number}}</div></div>
-    <div class="col"><div class="stat-label">Price/Book</div><div>{{stats.priceToBook | number}}</div></div>
+    <div class="col"><div class="stat-label">Market Cap</div><div>{{stats.marketCap / 1000000000 | number:'1.0-2'}}B</div></div>
+    <div class="col"><div class="stat-label">Debt-to-Equity</div><div>{{stats.debtToEquity | number:'1.0-2'}}</div></div>
+    <div class="col"><div class="stat-label">Put/Call Ratio</div><div>{{stats.putCallRatio | number:'1.0-2'}}</div></div>
+    <div class="col"><div class="stat-label">Price/Book</div><div>{{stats.priceToBook | number:'1.0-2'}}</div></div>
   </div>
   <div class="row mb-2">
     <div class="col"><div class="stat-label">Revenue</div><div>{{stats.revenue / 1000000 | number:'1.0-0'}}M</div></div>
