@@ -3,9 +3,8 @@
 
   <div class="mt-5">
     <ul>
-      <span *ngFor="let link of chain.links">
-        {{link.success ? '✔️' : '❌'}}
-      </span>
+      <span *ngFor="let link of chain.links" class="badge" [ngClass]="{'badge-success': link.success, 'badge-danger': !link.success}">
+      &nbsp;&nbsp;&nbsp;&nbsp;</span>
     </ul>
   </div>
 
