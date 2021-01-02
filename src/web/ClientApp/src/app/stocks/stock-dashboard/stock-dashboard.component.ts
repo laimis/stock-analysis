@@ -114,7 +114,7 @@ export class StockDashboardComponent implements OnInit {
       case "ticker":
         return (a:OwnedStock, b:OwnedStock) => a.ticker.localeCompare(b.ticker)
       case "currentPrice":
-        return (a:OwnedStock, b:OwnedStock) => a.currentPrice - b.currentPrice
+        return (a:OwnedStock, b:OwnedStock) => a.price - b.price
       case "averageCost":
         return (a:OwnedStock, b:OwnedStock) => a.averageCost - b.averageCost
       case "owned":

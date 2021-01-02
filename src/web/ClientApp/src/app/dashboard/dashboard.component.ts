@@ -119,8 +119,6 @@ export class DashboardComponent implements OnInit {
     switch(column) {
       case "ticker":
         return (a:OwnedStock, b:OwnedStock) => a.ticker.localeCompare(b.ticker)
-      case "currentPrice":
-        return (a:OwnedStock, b:OwnedStock) => a.currentPrice - b.currentPrice
       case "averageCost":
         return (a:OwnedStock, b:OwnedStock) => a.averageCost - b.averageCost
       case "owned":
