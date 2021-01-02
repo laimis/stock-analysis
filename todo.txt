@@ -1,5 +1,10 @@
 Generate view models for various stocks, I think it's time my friend :)
 
+- Dashboard
+    number of stocks
+    number of options
+    alerts triggered
+
 Upcoming earnings in watch/holdings
 Upcoming expirations in options
 

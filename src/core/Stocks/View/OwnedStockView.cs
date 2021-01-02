@@ -12,7 +12,7 @@ namespace core.Stocks.View
             var profitsPct = profits / (1.0 * cost);
 
             Id = o.Id;
-            CurrentPrice = price.Amount;
+            Price = price.Amount;
             Category = o.State.Category;
             Ticker = o.State.Ticker;
             Owned = o.State.Owned;
@@ -27,7 +27,7 @@ namespace core.Stocks.View
         }
 
         public System.Guid Id { get; }
-        public double CurrentPrice { get; }
+        public double Price { get; }
         public string Category { get; }
         public int DaysHeld { get; }
         public string Ticker { get; }
