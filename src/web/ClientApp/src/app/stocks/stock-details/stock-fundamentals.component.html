@@ -13,12 +13,6 @@
     <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52Low | currency}}</div></div>
   </div>
   <div class="row mb-2">
-    <div class="col"><div class="stat-label">Next Earnings</div><div>{{stats.nextEarningsDate | date}}</div></div>
-    <div class="col"><div class="stat-label">Ex Div Date</div><div>{{stats.exDividendDate | date}}</div></div>
-    <div class="col"><div class="stat-label">Next Div Date</div><div>{{stats.nextDividendDate | date}}</div></div>
-    <div class="col"><div class="stat-label">Dividend Yield</div><div>{{stats.dividendYield | percent}}</div></div>
-  </div>
-  <div class="row mb-2">
     <div class="col"><div class="stat-label">Market Cap</div><div>{{stats.marketCap / 1000000000 | number:'1.0-2'}}B</div></div>
     <div class="col"><div class="stat-label">Debt-to-Equity</div><div>{{stats.debtToEquity | number:'1.0-2'}}</div></div>
     <div class="col"><div class="stat-label">Put/Call Ratio</div><div>{{stats.putCallRatio | number:'1.0-2'}}</div></div>

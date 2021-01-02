@@ -22,8 +22,6 @@ import { ReviewComponent } from './review/review.component';
 import { RouterModule } from '@angular/router';
 import { SoldOptionDetailComponent } from './options/sold-option-detail/sold-option-detail.component';
 import { StockDetailsComponent } from './stocks/stock-details/stock-details.component';
-import { StockListComponent } from './stocks/stock-lists/stock-list.component';
-import { StockListsComponent } from './stocks/stock-lists/stock-lists.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
 import { ProfileVerifyComponent } from './profile/profile-verify.component';
@@ -93,8 +91,6 @@ var routes = [
 
   { path: 'stocks', component: StockDashboardComponent},
   { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
-  { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
-  { path: 'stocks/lists', component: StockListsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
 
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
@@ -146,8 +142,6 @@ var routes = [
     StockDetailsComponent,
     StockFundamentalsComponent,
     StockGridComponent,
-    StockListComponent,
-    StockListsComponent,
     StockNotesComponent,
     StockSettingsComponent,
     StockOptionComponent,
