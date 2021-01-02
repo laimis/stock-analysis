@@ -24,9 +24,7 @@ namespace web.Utils
         public override async Task SigningIn(CookieSigningInContext context)
         {
             var email = context.Principal.Email();
-            var firstname = context.Principal.Firstname();
-            var lastname = context.Principal.Lastname();
-
+            
             var id = await _mediator.Send(new SignInViaGoogle.Command(email));
             if (id == null)
             {
