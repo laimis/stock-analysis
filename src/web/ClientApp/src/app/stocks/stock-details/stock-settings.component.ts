@@ -58,15 +58,25 @@ export class StockSettingsComponent {
 
     var initialPrice = this.priceLevel()
 
+    var percentages = []
+
     for(var i = - this.percentage; i < this.percentage*10; i=i+this.percentage)
     {
+      percentages.push(i)
+    }
+
+    percentages.push(50)
+    percentages.push(100)
+    percentages.push(200)
+
+    percentages.forEach(element => {
       var l = {
-        description: i + "%",
-        price: (initialPrice * i / 100.0) + initialPrice
+        description: element + "%",
+        price: (initialPrice * element / 100.0) + initialPrice
       }
 
       levels.push(l)
-    }
+    });
 
     return levels
   }

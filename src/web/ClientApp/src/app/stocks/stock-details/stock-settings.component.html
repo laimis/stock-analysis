@@ -14,7 +14,7 @@
       <input class="form-control" type="number" id="percentage" value="5" [(ngModel)]="percentage" />
     </div>
     <div class="mt-2">
-      <div class="row row-striped" *ngFor="let level of levels()">
+      <div class="row row-striped mt-1" *ngFor="let level of levels()">
         <div class="col">{{level.description}}</div>
         <div class="col">{{level.price | currency}}</div>
       </div>

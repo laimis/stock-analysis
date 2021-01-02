@@ -8,7 +8,7 @@
     <th>Profit/Loss %</th>
   </tr>
   <tr *ngFor="let p of past">
-    <td>{{p.ticker}}</td>
+    <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
     <td>{{p.date | date}}</td>
     <td>{{p.profit | currency}}</td>
     <td>
