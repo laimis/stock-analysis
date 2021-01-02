@@ -18,7 +18,9 @@ export class StockSettingsComponent {
 
   @Input()
   set stock(stock: OwnedStock) {
-    this.price = stock.currentPrice
+    console.log("seeit price" + stock)
+    console.log(stock)
+    this.price = stock.price
   }
 
   @Input()
@@ -48,7 +50,7 @@ export class StockSettingsComponent {
   }
 
   priceLevel() : number {
-    if (this.cost) return this.cost
+    if (this.cost > 0) return this.cost
     return this.price
   }
 
