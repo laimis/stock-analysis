@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Account;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Logging;
 
@@ -26,11 +27,18 @@ namespace web.Utils
             var firstname = context.Principal.Firstname();
             var lastname = context.Principal.Lastname();
 
-            var id = await _mediator.Send(new CreateOrGet.Command(email, firstname, lastname));
-
-            (context.Principal.Identity as ClaimsIdentity).AddClaim(
-                new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())
-            );
+            var id = await _mediator.Send(new SignInViaGoogle.Command(email));
+            if (id == null)
+            {
+                await context.HttpContext.SignOutAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+            else
+            {
+                (context.Principal.Identity as ClaimsIdentity).AddClaim(
+                    new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())
+                );
+            }
         }
     }
 }
