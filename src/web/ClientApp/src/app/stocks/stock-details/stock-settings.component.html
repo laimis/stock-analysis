@@ -1,8 +1,23 @@
 <div>
-  <label for="category">Category</label>
-  <select class="form-control btn border rounded" name="category" [(ngModel)]="category" (ngModelChange)="saveSettings()">
-    <option value="longterm">Long-Term</option>
-    <option value="shortterm">Short-Term</option>
-  </select>
-  <div *ngIf="success">Saved</div>
+  <div *ngIf="ticker">
+    <label for="category">Category</label>
+    <select class="form-control btn border rounded" name="category" [(ngModel)]="category" (ngModelChange)="saveSettings()">
+      <option value="longterm">Long-Term</option>
+      <option value="shortterm">Short-Term</option>
+    </select>
+    <div *ngIf="success">Saved</div>
+  </div>
+
+  <div>
+    <div class="mt-2">
+      Breakdown of {{priceLevel() | currency}} By %
+      <input class="form-control" type="number" id="percentage" value="5" [(ngModel)]="percentage" />
+    </div>
+    <div class="mt-2">
+      <div class="row row-striped" *ngFor="let level of levels()">
+        <div class="col">{{level.description}}</div>
+        <div class="col">{{level.price | currency}}</div>
+      </div>
+    </div>
+  </div>
 </div>

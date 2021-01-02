@@ -4,19 +4,33 @@ import { OwnedStock, StocksService, GetErrors } from '../../services/stocks.serv
 @Component({
   selector: 'stock-settings',
   templateUrl: './stock-settings.component.html',
-  // styleUrls: ['./stock-notes.component.css']
+  styleUrls: ['./stock-settings.component.css']
 })
 
 export class StockSettingsComponent {
-  category: string;
-  success: boolean;
-  ticker: string;
-  errors: any;
+  category: string
+  success: boolean
+  ticker: string
+  errors: any
+  price: number
+  cost: number
+  percentage: number = 5
 
   @Input()
   set stock(stock: OwnedStock) {
-    this.ticker = stock.ticker
-    this.category = stock.category
+    this.price = stock.currentPrice
+  }
+
+  @Input()
+  set ownership(ownership: OwnedStock) {
+    if (ownership == null)
+    {
+      return
+    }
+
+    this.ticker = ownership.ticker
+    this.category = ownership.category
+    this.cost = ownership.averageCost
   }
 
 	constructor(private service: StocksService) { }
@@ -31,5 +45,29 @@ export class StockSettingsComponent {
     }, err => {
       this.errors = GetErrors(err)
     })
+  }
+
+  priceLevel() : number {
+    if (this.cost) return this.cost
+    return this.price
+  }
+
+  levels() : Array<object> {
+
+    var levels = []
+
+    var initialPrice = this.priceLevel()
+
+    for(var i = - this.percentage; i < this.percentage*10; i=i+this.percentage)
+    {
+      var l = {
+        description: i + "%",
+        price: (initialPrice * i / 100.0) + initialPrice
+      }
+
+      levels.push(l)
+    }
+
+    return levels
   }
 }

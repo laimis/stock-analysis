@@ -33,7 +33,7 @@
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('settings')}" [routerLink]="" (click)="activateTab('settings')">
-      Settings
+      Misc
     </a>
 
   </div>
@@ -56,7 +56,10 @@
 
   <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
 
-  <stock-settings *ngIf="isActive('settings')" [stock]=ownership></stock-settings>
+  <stock-settings *ngIf="isActive('settings')"
+    [stock]=stock
+    [ownership]=ownership >
+  </stock-settings>
 
 </div>
 
