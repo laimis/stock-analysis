@@ -1,10 +1,19 @@
-- Add R:R ratio to performance...
-% winning * % gain / % lossing * % loss
-
 - add ability to filter the performance by time period
     - all time
     - 6 months
     - 12 months
+
+
+Break down of cost by percentages
+
+Generate view models for various stocks, I think it's time my friend :)
+
+
+Change the % capture to be % gains
+P/L in review for stocks
+P/L in review for options
+Upcoming earnings in watch/holdings
+Upcoming expirations in options
 
 
 Ticker soup page:

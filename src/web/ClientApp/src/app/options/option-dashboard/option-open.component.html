@@ -23,8 +23,6 @@
         <th>Price</th>
         <th>OTM/ITM</th>
         <th>Premium</th>
-        <th>Premium/Day</th>
-        <th>Days Held %</th>
         <th>Days Left</th>
         <th></th>
       </tr>
@@ -46,12 +44,6 @@
       </td>
       <td>
         {{option.profit | currency}}
-      </td>
-      <td>
-        {{(option.profit / option.days) | currency}}
-      </td>
-      <td>
-        {{option.daysHeld / option.days | percent}}
       </td>
       <td>
         {{(option.days - option.daysHeld) | number}}

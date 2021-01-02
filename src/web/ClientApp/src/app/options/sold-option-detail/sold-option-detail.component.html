@@ -20,7 +20,9 @@
         <h5 class="card-subtitle text-muted">
           Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
           <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-          <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
+          <span *ngIf="option.isExpired && !option.closed" class="ml-1 badge badge-danger">expired</span>
+          <span *ngIf="option.closed && option.profit >= 0" class="badge badge-success">win</span>
+          <span *ngIf="option.closed && option.profit < 0" class="badge badge-warning">loss</span>
         </h5>
 
         <div *ngIf="!option.closed">
@@ -33,57 +35,21 @@
                 {{option.currentPrice | currency}}
               </div>
             </div>
-            <div class="col"><div class="stat-label">Days Held</div><div>{{option.daysHeld | number}}</div></div>
-            <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
+            <div class="col"><div class="stat-label">Premium</div><div>{{option.profit | currency}}</div></div>
             <div class="col"><div class="stat-label">Days Left</div><div>{{(option.days - option.daysHeld) | number}}</div></div>
-          </div>
-
-          <div class="mt-2 row">
-            <div class="col"><div class="stat-label">Premium Received</div><div>{{option.premiumReceived | currency}}</div></div>
-            <div class="col"><div class="stat-label">Premium Paid</div><div>{{option.premiumPaid | currency}}</div></div>
-            <div class="col"><div class="stat-label">Premium / Day</div><div>{{(option.premiumReceived / option.days) | currency}}</div></div>
-            <div class="col"><div class="stat-label"></div><div></div></div>
+            <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
           </div>
         </div>
 
         <div *ngIf="option.closed">
           <div class="mt-2 row">
             <div class="col"><div class="stat-label">Profit</div><div>{{option.profit | currency}}</div></div>
-            <div class="col"><div class="stat-label">Days Held</div><div>{{option.daysHeld | number}}</div></div>
-            <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
-            <div class="col">
-              <div class="stat-label">Win/Loss</div>
-              <div>
-                <span class="badge badge-success" *ngIf="option.profit >= 0">win</span>
-                <span class="badge badge-warning" *ngIf="option.profit < 0">loss</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-2 row">
-            <div class="col"><div class="stat-label">Premium Received</div><div>{{option.premiumReceived | currency}}</div></div>
-            <div class="col"><div class="stat-label">Premium Paid</div><div>{{option.premiumPaid | currency}}</div></div>
-            <div class="col"><div class="stat-label">Premium / Day</div><div>{{(option.profit / option.daysHeld) | currency}}</div></div>
-            <div class="col"><div class="stat-label"></div><div></div></div>
+            <div class="col"><div class="stat-label">Profit / Day Held</div><div>{{(option.profit / option.daysHeld) | currency}}</div></div>
           </div>
         </div>
 
         <q *ngFor="let n of notes">{{n}}</q>
 
-      </div>
-    </div>
-
-    <div class="card mt-2" *ngIf="!option.closed">
-      <div class="card-body">
-        <div class="card-title">
-          Close Option Position
-        </div>
-        <form>
-          <div>
-            <button type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(false)">Close - Expired Worthless</button>
-            <button *ngIf="option.boughtOrSold == 'Sold'" type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(true)">Close - It was assigned</button>
-          </div>
-        </form>
       </div>
     </div>
 
@@ -117,6 +83,20 @@
 
           <div>
             <button type="button" class="btn btn-primary mb-1 mr-2" (click)="record()">Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-2" *ngIf="!option.closed">
+      <div class="card-body">
+        <div class="card-title">
+          Close Option Position
+        </div>
+        <form>
+          <div>
+            <button type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(false)">Close - Expired Worthless</button>
+            <button *ngIf="option.boughtOrSold == 'Sold'" type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(true)">Close - It was assigned</button>
           </div>
         </form>
       </div>
