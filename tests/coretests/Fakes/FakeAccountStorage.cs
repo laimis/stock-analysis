@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
-using core.Account.Responses;
 
 namespace coretests.Fakes
 {
@@ -52,12 +51,12 @@ namespace coretests.Fakes
             throw new NotImplementedException();
         }
 
-        public Task SaveViewModel(AccountStatusView user, Guid userId)
+        public Task SaveViewModel<T>(T user, Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<AccountStatusView> ViewModel(Guid userId)
+        public Task<T> ViewModel<T>(Guid userId)
         {
             throw new NotImplementedException();
         }

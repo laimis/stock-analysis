@@ -126,22 +126,22 @@ namespace storage.redis
             return id.Select(i => (i.Name.ToString(), i.Value.ToString()));
         }
 
-        public async Task<AccountStatusView> ViewModel(Guid userId)
+        public async Task<T> ViewModel<T>(Guid userId)
         {
             var db = _redis.GetDatabase();
 
-            var key = nameof(AccountStatusView) + ":" + userId;
+            var key = typeof(T).Name + ":" + userId;
 
             var json = await db.StringGetAsync(key);
 
-            return json.IsNull ? null : JsonConvert.DeserializeObject<AccountStatusView>(json);
+            return json.IsNull ? default(T) : JsonConvert.DeserializeObject<T>(json);
         }
 
-        public async Task SaveViewModel(AccountStatusView user, Guid userId)
+        public async Task SaveViewModel<T>(T user, Guid userId)
         {
             var db = _redis.GetDatabase();
 
-            var key = nameof(AccountStatusView) + ":" + userId;
+            var key = typeof(T).Name + ":" + userId;
 
             await db.StringSetAsync(key, JsonConvert.SerializeObject(user));
         }

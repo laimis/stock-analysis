@@ -29,7 +29,7 @@ namespace core.Account
 
             public async Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                var cached = await _storage.ViewModel(request.UserId);
+                var cached = await _storage.ViewModel<AccountStatusView>(request.UserId);
                 if (cached != null)
                 {
                     cached.LoggedIn = true;
