@@ -32,6 +32,11 @@ namespace storage.shared
             return _blobStorage.Get<T>(typeof(T).Name + "#" + userId);
         }
 
+        public Task SaveViewModel<T>(Guid userId, T t)
+        {
+            return _blobStorage.Save<T>(typeof(T).Name + "#" + userId, t);
+        }
+
         public async Task<OwnedStock> GetStock(string ticker, Guid userId)
         {
             var stocks = await GetStocks(userId);

@@ -6,6 +6,7 @@ using core.Adapters.Stocks;
 using core.Alerts;
 using core.Portfolio.Output;
 using core.Shared;
+using MediatR;
 
 namespace core.Portfolio
 {
@@ -18,7 +19,9 @@ namespace core.Portfolio
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, PortfolioResponse>
+        public class Handler :
+            HandlerWithStorage<Query, PortfolioResponse>,
+            INotificationHandler<UserRecalculate>
         {
             private IStocksService2 _stocksService;
             private StockMonitorContainer _alerts;
@@ -38,17 +41,24 @@ namespace core.Portfolio
 
                 return fromCache switch {
                     not null => fromCache,
-                    null => await GetFromDatabase(request)
+                    null => await GetFromDatabase(request.UserId)
                 };
             }
 
-            private async Task<PortfolioResponse> GetFromDatabase(Query request)
+            public async Task Handle(UserRecalculate notification, CancellationToken cancellationToken)
             {
-                var stocks = await _storage.GetStocks(request.UserId);
+                var data = await GetFromDatabase(notification.UserId);
+
+                await _storage.SaveViewModel(notification.UserId, data);
+            }
+
+            private async Task<PortfolioResponse> GetFromDatabase(Guid userId)
+            {
+                var stocks = await _storage.GetStocks(userId);
 
                 var owned = stocks.Where(s => s.State.Owned > 0);
 
-                var options = await _storage.GetOwnedOptions(request.UserId);
+                var options = await _storage.GetOwnedOptions(userId);
 
                 var openOptions = options
                     .Where(o => o.State.NumberOfContracts != 0 && o.State.DaysUntilExpiration > -5)
@@ -58,8 +68,8 @@ namespace core.Portfolio
                 {
                     OwnedStockCount = owned.Count(),
                     OpenOptionCount = openOptions.Count(),
-                    TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == request.UserId && s.IsTriggered),
-                    AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == request.UserId)
+                    TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId && s.IsTriggered),
+                    AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId)
                 };
                 return obj;
             }

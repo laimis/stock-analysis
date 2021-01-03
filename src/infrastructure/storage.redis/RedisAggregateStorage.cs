@@ -34,7 +34,11 @@ namespace storage.redis
 
         public Task Save<T>(string key, T t)
         {
-            throw new NotImplementedException();
+            var redisKey = typeof(T).Name + ":" + key;
+
+            var db = _redis.GetDatabase();
+
+            return db.StringSetAsync(redisKey, JsonConvert.SerializeObject(t));
         }
 
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
@@ -95,6 +99,9 @@ namespace storage.redis
             foreach(var e in eventsToBlast)
                 if (e is INotification n)
                     await _mediator.Publish(n);
+
+            if (eventsToBlast.Count > 0)
+                await _mediator.Publish(new UserRecalculate(userId));
         }
 
         internal static storage.shared.StoredAggregateEvent ToEvent(string entity, Guid userId, HashEntry[] result)
