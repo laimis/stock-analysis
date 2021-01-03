@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
+using core.Account.Responses;
 
 namespace coretests.Fakes
 {
@@ -47,6 +48,16 @@ namespace coretests.Fakes
         }
 
         public Task SaveUserAssociation(ProcessIdToUserAssociation r)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveViewModel(AccountStatusView user, Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<AccountStatusView> ViewModel(Guid userId)
         {
             throw new NotImplementedException();
         }

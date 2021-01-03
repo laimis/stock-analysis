@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
+using core.Account.Responses;
+using core.Shared;
 using MediatR;
+using Newtonsoft.Json;
 
 namespace storage.redis
 {
@@ -56,6 +59,8 @@ namespace storage.redis
                 StackExchange.Redis.When.NotExists);
 
             await SaveEventsAsync(u, USER_ENTITY, userId);
+
+            await _mediator.Publish(new UserStatusRecalculate(userId));
         }
 
         public async Task Delete(User user)
@@ -119,6 +124,26 @@ namespace storage.redis
             var id = await db.HashGetAllAsync(USER_RECORDS_KEY);
 
             return id.Select(i => (i.Name.ToString(), i.Value.ToString()));
+        }
+
+        public async Task<AccountStatusView> ViewModel(Guid userId)
+        {
+            var db = _redis.GetDatabase();
+
+            var key = nameof(AccountStatusView) + ":" + userId;
+
+            var json = await db.StringGetAsync(key);
+
+            return json.IsNull ? null : JsonConvert.DeserializeObject<AccountStatusView>(json);
+        }
+
+        public async Task SaveViewModel(AccountStatusView user, Guid userId)
+        {
+            var db = _redis.GetDatabase();
+
+            var key = nameof(AccountStatusView) + ":" + userId;
+
+            await db.StringSetAsync(key, JsonConvert.SerializeObject(user));
         }
     }
 }
