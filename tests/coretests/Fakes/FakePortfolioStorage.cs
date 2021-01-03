@@ -83,5 +83,15 @@ namespace coretests.Fakes
         {
             throw new NotImplementedException();
         }
+
+        public Task<T> ViewModel<T>(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveViewModel<T>(Guid userId, T model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
