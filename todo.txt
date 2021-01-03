@@ -1,9 +1,9 @@
 Generate view models for various stocks, I think it's time my friend :)
 
 - Dashboard
-    number of stocks
-    number of options
-    alerts triggered
+    - trigger rebuild when any new stock is added/closed
+    - trigger rebuild when any new option is added/closed
+    - 
 
 Upcoming earnings in watch/holdings
 Upcoming expirations in options

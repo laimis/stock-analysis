@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="row" *ngIf="openOptions.length == 0 && owned.length == 0">
+    <div class="row" *ngIf="dashboard.openOptionCount == 0 && dashboard.openStockCount == 0">
       <div class="col">
         <div class="alert alert-secondary">
           <h3>Welcome!</h3>
@@ -37,7 +37,7 @@
               <i class="fas fa-certificate"></i>
               Shares
             </h5>
-            <p class="card-text">You have <b>{{owned.length}}</b> tickers on file</p>
+            <p class="card-text">You have <b>{{dashboard.ownedStockCount}}</b> tickers on file</p>
             <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
           </div>
         </div>
@@ -48,7 +48,7 @@
               <i class="fas fa-dice-five"></i>
               Options
             </h5>
-            <p class="card-text">You have <b>{{openOptions.length}}</b> open contracts</p>
+            <p class="card-text">You have <b>{{dashboard.openOptionCount}}</b> open contracts</p>
             <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
           </div>
         </div>
@@ -73,7 +73,7 @@
               <i class="fas fa-bell"></i>
               Alerts
             </h5>
-            <p class="card-text">Triggered: <b>{{triggered.length}}</b>, total: <b>{{alerts.length}}</b></p>
+            <p class="card-text">Triggered: <b>{{dashboard.triggeredAlertCount}}</b>, total: <b>{{dashboard.alertCount}}</b></p>
             <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
           </div>
         </div>

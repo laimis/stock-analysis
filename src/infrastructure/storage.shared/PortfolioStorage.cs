@@ -17,10 +17,24 @@ namespace storage.shared
         private const string _note_entity = "note3";
 
         private IAggregateStorage _aggregateStorage;
+        private IBlobStorage _blobStorage;
 
-        public PortfolioStorage(IAggregateStorage aggregateStorage)
+        public PortfolioStorage(
+            IAggregateStorage aggregateStorage,
+            IBlobStorage blobStorage)
         {
             _aggregateStorage = aggregateStorage;
+            _blobStorage = blobStorage;
+        }
+
+        public Task<T> ViewModel<T>(Guid userId)
+        {
+            return _blobStorage.Get<T>(typeof(T).Name + "#" + userId);
+        }
+
+        public Task SaveViewModel<T>(Guid userId, T t)
+        {
+            return _blobStorage.Save<T>(typeof(T).Name + "#" + userId, t);
         }
 
         public async Task<OwnedStock> GetStock(string ticker, Guid userId)

@@ -9,6 +9,9 @@ namespace core
 {
     public interface IPortfolioStorage
     {
+        Task<T> ViewModel<T>(Guid userId);
+        Task SaveViewModel<T>(Guid userId, T model);
+
         Task<OwnedStock> GetStock(string ticker, Guid userId);
         Task<OwnedStock> GetStock(Guid id, Guid userId);
         Task<IEnumerable<OwnedStock>> GetStocks(Guid userId);

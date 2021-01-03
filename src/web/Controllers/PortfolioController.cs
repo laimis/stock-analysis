@@ -23,7 +23,7 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<object> Index()
+        public Task<PortfolioResponse> Index()
         {
             var query = new Get.Query(this.User.Identifier());
 

@@ -88,6 +88,10 @@ namespace web
             {
                 return new storage.redis.RedisAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
             });
+            services.AddSingleton<IBlobStorage>(s => 
+            {
+                return new storage.redis.RedisAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
+            });
             services.AddSingleton<storage.redis.RedisAggregateStorage>(c => 
                 (storage.redis.RedisAggregateStorage)c.GetService<IAggregateStorage>());
             services.AddSingleton<Migration>(_ =>
