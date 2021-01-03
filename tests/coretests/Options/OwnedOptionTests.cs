@@ -30,7 +30,7 @@ namespace coretests.Options
             
             var pl = option.State.Transactions.Where(t => t.IsPL);
 
-            Assert.Equal(1, pl.Count());
+            Assert.Single(pl);
         }
 
         [Fact]

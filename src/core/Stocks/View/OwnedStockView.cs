@@ -16,7 +16,6 @@ namespace core.Stocks.View
             Description = o.State.Description;
             AverageCost = o.State.AverageCost;
             Cost = o.State.Cost;
-            Transactions = new TransactionList(o.State.Transactions, null, null);
             DaysHeld = o.State.DaysHeld;
         }
 

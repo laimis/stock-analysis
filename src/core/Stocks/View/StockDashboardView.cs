@@ -8,7 +8,7 @@ namespace core.Stocks.View
     {
         public List<OwnedStockView> Owned { get; set; }
         public List<StockTransactionView> Past { get; set; }
-        internal StockOwnershipPerformance Performance { get; set; }
+        public StockOwnershipPerformance Performance { get; set; }
         public DateTimeOffset Calculated { get; set; }
     }
 }

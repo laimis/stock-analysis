@@ -4,6 +4,7 @@ namespace core.Stocks.View
 {
     public class StockTransactionView
     {
+        public  StockTransactionView(){}
         public StockTransactionView(Transaction t)
         {
             this.Ticker = t.Ticker;
@@ -12,9 +13,9 @@ namespace core.Stocks.View
             this.ReturnPct = t.ReturnPct;
         }
 
-        public string Ticker { get; }
-        public string Date { get; }
-        public double Profit { get; }
-        public double ReturnPct { get; }
+        public string Ticker { get; set; }
+        public string Date { get; set; }
+        public double Profit { get; set; }
+        public double ReturnPct { get; set; }
     }
 }
