@@ -4,40 +4,40 @@ namespace core.Stocks.View
 {
     public class OwnedStockView
     {
-        public OwnedStockView(OwnedStock o, TickerPrice price)
-        {
-            var equity = o.State.Owned * price.Amount;
-            var cost = o.State.Cost;
-            var profits = equity - cost;
-            var profitsPct = profits / (1.0 * cost);
+        public OwnedStockView() {}
 
+        public OwnedStockView(OwnedStock o)
+        {
             Id = o.Id;
-            Price = price.Amount;
             Category = o.State.Category;
             Ticker = o.State.Ticker;
             Owned = o.State.Owned;
-            Equity = equity;
+            
             Description = o.State.Description;
             AverageCost = o.State.AverageCost;
-            Cost = cost;
-            Profits = profits;
-            ProfitsPct = profitsPct;
+            Cost = o.State.Cost;
             Transactions = new TransactionList(o.State.Transactions, null, null);
             DaysHeld = o.State.DaysHeld;
         }
 
-        public System.Guid Id { get; }
-        public double Price { get; }
-        public string Category { get; }
-        public int DaysHeld { get; }
-        public string Ticker { get; }
-        public int Owned { get; }
-        public double Equity { get; }
-        public string Description { get; }
-        public double AverageCost { get; }
-        public double Cost { get; }
-        public double Profits { get; }
-        public double ProfitsPct { get; }
-        public TransactionList Transactions { get; }
+        public void ApplyPrice(TickerPrice price)
+        {
+            Price = price.Amount;
+
+            Equity = Owned * price.Amount;
+        }
+
+        public System.Guid Id { get; set; }
+        public double Price { get; set; }
+        public string Category { get; set; }
+        public int DaysHeld { get; set; }
+        public string Ticker { get; set; }
+        public int Owned { get; set; }
+        public double Equity { get; set; }
+        public string Description { get; set; }
+        public double AverageCost { get; set; }
+        public double Cost { get; set; }
+        public double Profits => Equity - Cost;
+        public double ProfitsPct => Profits / (1.0 * Cost);
     }
 }
