@@ -6,6 +6,9 @@ namespace core.Account
 {
     public interface IAccountStorage
     {
+        Task<T> ViewModel<T>(Guid userId);
+        Task SaveViewModel<T>(T user, Guid userId);
+
         Task<User> GetUserByEmail(string emailAddress);
         Task<User> GetUser(Guid userId);
         Task Save(User u);

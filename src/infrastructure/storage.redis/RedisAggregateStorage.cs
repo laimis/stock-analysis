@@ -12,7 +12,7 @@ namespace storage.redis
 {
     public class RedisAggregateStorage : IAggregateStorage, IBlobStorage
     {
-        private IMediator _mediator;
+        protected IMediator _mediator;
         protected ConnectionMultiplexer _redis;
 
         public RedisAggregateStorage(IMediator mediator, string redisCnn)

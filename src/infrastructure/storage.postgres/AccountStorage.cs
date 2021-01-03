@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using Dapper;
@@ -93,6 +92,16 @@ namespace storage.postgres
             var query = @"SELECT email,id FROM users";
 
             return await db.QueryAsync<(string, string)>(query);
+        }
+
+        public Task<T> ViewModel<T>(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveViewModel<T>(T user, Guid userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

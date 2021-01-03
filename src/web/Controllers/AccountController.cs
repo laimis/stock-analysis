@@ -27,7 +27,7 @@ namespace web.Controllers
         [HttpGet("status")]
         public Task<object> IdentityAsync()
         {
-            return _mediator.Send(new Get.Query(this.User.Identifier()));
+            return _mediator.Send(new Status.Query(this.User.Identifier()));
         }
 
         [HttpPost("validate")]
