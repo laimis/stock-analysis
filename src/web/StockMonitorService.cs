@@ -85,16 +85,12 @@ namespace web
             var time = DateTimeOffset.UtcNow;
             if (_marketHours.IsOn(time))
             {
-                _logger.LogInformation($"market hours {time.TimeOfDay}");
-
                 await ScanAlerts();
 
                 await Task.Delay(LONG_INTERVAL, stoppingToken);
             }
             else
             {
-                _logger.LogInformation($"non market hours {time.TimeOfDay}");
-
                 await Task.Delay(SHORT_INTERVAL, stoppingToken);
             }
         }

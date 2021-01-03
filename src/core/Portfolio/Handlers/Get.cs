@@ -4,21 +4,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Alerts;
+using core.Portfolio.Output;
 using core.Shared;
-using core.Stocks.View;
 
 namespace core.Portfolio
 {
     public class Get
     {
-        public class Query : RequestWithUserId<object>
+        public class Query : RequestWithUserId<PortfolioResponse>
         {
             public Query(Guid userId) : base(userId)
             {
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, object>
+        public class Handler : HandlerWithStorage<Query, PortfolioResponse>
         {
             private IStocksService2 _stocksService;
             private StockMonitorContainer _alerts;
@@ -32,7 +32,17 @@ namespace core.Portfolio
                 _alerts = alerts;
             }
 
-            public override async Task<object> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<PortfolioResponse> Handle(Query request, CancellationToken cancellationToken)
+            {
+                var fromCache = await _storage.ViewModel<PortfolioResponse>(request.UserId);
+
+                return fromCache switch {
+                    not null => fromCache,
+                    null => await GetFromDatabase(request)
+                };
+            }
+
+            private async Task<PortfolioResponse> GetFromDatabase(Query request)
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
@@ -44,18 +54,13 @@ namespace core.Portfolio
                     .Where(o => o.State.NumberOfContracts != 0 && o.State.DaysUntilExpiration > -5)
                     .OrderBy(o => o.State.Expiration);
 
-                var prices = owned.Select(o => o.State.Ticker).Union(openOptions.Select(o => o.State.Ticker))
-                    .Distinct()
-                    .ToDictionary(s => s, s => new TickerPrice(0));
-
-                var obj = new
+                var obj = new PortfolioResponse
                 {
-                    owned = owned.Select(o => new OwnedStockView(o, prices[o.State.Ticker])),
-                    openOptions = openOptions.Select(o => new Options.OwnedOptionSummary(o, prices[o.State.Ticker])),
-                    triggered = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId && s.IsTriggered),
-                    alerts = _alerts.Monitors.Where(s => s.Alert.UserId == request.UserId)
+                    OwnedStockCount = owned.Count(),
+                    OpenOptionCount = openOptions.Count(),
+                    TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == request.UserId && s.IsTriggered),
+                    AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == request.UserId)
                 };
-
                 return obj;
             }
         }

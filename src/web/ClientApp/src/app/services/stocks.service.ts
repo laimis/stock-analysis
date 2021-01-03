@@ -157,8 +157,8 @@ export class StocksService {
 
   // ------- portfolio ----------------
 
-  getPortfolio(): Observable<Portfolio> {
-		return this.http.get<Portfolio>('/api/portfolio')
+  getPortfolio(): Observable<Dashboard> {
+		return this.http.get<Dashboard>('/api/portfolio')
   }
 
   // ------- options ----------------
@@ -306,6 +306,13 @@ export class OwnedStock {
 }
 
 export class Alert {}
+
+export class Dashboard {
+  openOptionCount: number
+  ownedStockCount: number
+  triggeredAlertCount: number
+  alertCount: number
+}
 
 export class OwnedOption {
   id:string

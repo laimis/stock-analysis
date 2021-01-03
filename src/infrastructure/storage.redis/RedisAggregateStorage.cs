@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Shared;
 using MediatR;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using storage.shared;
 
 namespace storage.redis
 {
-    public class RedisAggregateStorage : IAggregateStorage
+    public class RedisAggregateStorage : IAggregateStorage, IBlobStorage
     {
         private IMediator _mediator;
         protected ConnectionMultiplexer _redis;
@@ -18,6 +19,22 @@ namespace storage.redis
         {
             _mediator = mediator;
             _redis = ConnectionMultiplexer.Connect(redisCnn);
+        }
+
+        public async Task<T> Get<T>(string key)
+        {
+            var redisKey = typeof(T).Name + ":" + key;
+
+            var db = _redis.GetDatabase();
+
+            var val = await db.StringGetAsync(redisKey);
+
+            return val.HasValue ? JsonConvert.DeserializeObject<T>(val) : default(T);
+        }
+
+        public Task Save<T>(string key, T t)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
