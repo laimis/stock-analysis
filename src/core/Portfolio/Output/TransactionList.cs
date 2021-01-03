@@ -56,9 +56,9 @@ namespace core.Portfolio.Output
             return t.DateAsDate.ToString("MMMM, yyyy");
         }
 
-        public IEnumerable<Transaction> Transactions { get; }
-        public IEnumerable<string> Tickers { get; }
-        public IEnumerable<TransactionGroup> Grouped { get; } 
+        public IEnumerable<Transaction> Transactions { get; set; }
+        public IEnumerable<string> Tickers { get; set; }
+        public IEnumerable<TransactionGroup> Grouped { get; set; } 
         
         public double Credit => Transactions.Sum(t => t.Credit);
         public double Debit => Transactions.Sum(t => t.Debit);
@@ -72,7 +72,7 @@ namespace core.Portfolio.Output
             this.Transactions = transactions;
         }
 
-        public string Name { get; }
-        public TransactionList Transactions { get; }
+        public string Name { get; set; }
+        public TransactionList Transactions { get; set; }
     }
 }

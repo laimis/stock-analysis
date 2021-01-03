@@ -5,8 +5,10 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    internal class StockOwnershipPerformance
+    public class StockOwnershipPerformance
     {
+        public StockOwnershipPerformance(){}
+        
         public StockOwnershipPerformance(List<Transaction> closedTransactions)
         {
             if (closedTransactions.Count == 0)
@@ -39,17 +41,17 @@ namespace core.Stocks
             this.AvgReturnPct = closedTransactions.Average(t => t.ReturnPct);
         }
 
-        public int Total { get; }
-        public int Wins { get; }
-        public double AvgWinAmount { get; }
-        public double MaxWinAmount { get; }
-        public double WinAvgReturnPct { get; }
-        public int Losses { get; }
-        public double AvgLossAmount { get; }
-        public double MaxLossAmount { get; }
-        public double LossAvgReturnPct { get; }
-        public double WinPct { get; }
-        public double EV { get; }
-        public double AvgReturnPct { get; }
+        public int Total { get; set; }
+        public int Wins { get; set; }
+        public double AvgWinAmount { get; set; }
+        public double MaxWinAmount { get; set; }
+        public double WinAvgReturnPct { get; set; }
+        public int Losses { get; set; }
+        public double AvgLossAmount { get; set; }
+        public double MaxLossAmount { get; set; }
+        public double LossAvgReturnPct { get; set; }
+        public double WinPct { get; set; }
+        public double EV { get; set; }
+        public double AvgReturnPct { get; set; }
     }
 }
