@@ -38,11 +38,12 @@ namespace core.Portfolio
             public override async Task<PortfolioResponse> Handle(Query request, CancellationToken cancellationToken)
             {
                 var fromCache = await _storage.ViewModel<PortfolioResponse>(request.UserId);
+                if (fromCache != null)
+                {
+                    return fromCache;
+                }
 
-                return fromCache switch {
-                    not null => fromCache,
-                    null => await GetFromDatabase(request.UserId)
-                };
+                return await GetFromDatabase(request.UserId);
             }
 
             public async Task Handle(UserRecalculate notification, CancellationToken cancellationToken)
