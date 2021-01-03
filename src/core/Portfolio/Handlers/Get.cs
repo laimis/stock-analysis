@@ -69,7 +69,8 @@ namespace core.Portfolio
                     OwnedStockCount = owned.Count(),
                     OpenOptionCount = openOptions.Count(),
                     TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId && s.IsTriggered),
-                    AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId)
+                    AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId),
+                    Calculated = DateTimeOffset.UtcNow
                 };
                 return obj;
             }
