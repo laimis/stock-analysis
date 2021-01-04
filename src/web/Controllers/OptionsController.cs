@@ -35,7 +35,7 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/active")]
-        public Task<OwnedOptionStatsContainer> List(string ticker)
+        public Task<OwnedOptionStatsView> List(string ticker)
         {
             return _mediator.Send(new List.Query(ticker, this.User.Identifier()));
         }
@@ -130,7 +130,7 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<OwnedOptionStatsContainer> Dashboard()
+        public Task<OwnedOptionStatsView> Dashboard()
         {
             return _mediator.Send(
                 new Dashboard.Query(this.User.Identifier())

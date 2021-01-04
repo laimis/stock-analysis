@@ -2,8 +2,6 @@ Generate view models for various stocks, I think it's time my friend :)
 
 - Option dashboard cache
 
-- Stock batch endpoint
-    https://sandbox.iexapis.com/stable/stock/market/batch?symbols=aapl,fb,terrible&types=price&token=Tsk_79b66b544be248118b5e9c9379fb4806
 
 Upcoming earnings in watch/holdings
 Upcoming expirations in options

@@ -6,7 +6,7 @@ namespace core.Options
 {
     public class OwnedOptionStats
     {
-        public OwnedOptionStats(IEnumerable<OwnedOptionSummary> summaries)
+        public OwnedOptionStats(IEnumerable<OwnedOptionView> summaries)
         {
             var transactions = summaries.ToList();
             if (transactions.Count == 0)
