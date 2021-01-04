@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using core.Shared;
 
 namespace core.Options
 {
-    public class OptionDashboardView
+    public class OptionDashboardView : IViewModel
     {
         public OptionDashboardView(){}
         public OptionDashboardView(IEnumerable<OwnedOptionView> closed, IEnumerable<OwnedOptionView> open)
@@ -15,6 +17,7 @@ namespace core.Options
             Buy = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Bought"));
             Sell = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Sold"));
 
+            Calculated = DateTimeOffset.UtcNow;
         }
 
         public IEnumerable<OwnedOptionView> ClosedOptions { get; set; }
@@ -22,5 +25,6 @@ namespace core.Options
         public OwnedOptionStats Overall { get; set; }
         public OwnedOptionStats Buy { get; set; }
         public OwnedOptionStats Sell { get; set; }
+        public DateTimeOffset Calculated { get; set; }
     }
 }
