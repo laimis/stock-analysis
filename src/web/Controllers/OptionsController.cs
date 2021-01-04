@@ -132,9 +132,9 @@ namespace web.Controllers
         [HttpGet]
         public Task<OptionDashboardView> Dashboard()
         {
-            return _mediator.Send(
-                new Dashboard.Query(this.User.Identifier())
-            );
+            var query = new Dashboard.Query(this.User.Identifier());
+            
+            return _mediator.Send(query);
         }
     }
 }
