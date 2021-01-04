@@ -32,12 +32,11 @@ namespace core.Options
 
                 var price = await _stockService.GetPrice(option.State.Ticker);
                 
-                return Map(option, price);
-            }
+                var view = new OwnedOptionView(option);
 
-            private object Map(OwnedOption o, TickerPrice currentPrice)
-            {
-                return new OwnedOptionSummary(o, currentPrice);
+                view.ApplyPrice(price.Amount);
+                
+                return view;
             }
         }
     }

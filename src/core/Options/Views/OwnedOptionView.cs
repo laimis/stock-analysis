@@ -5,14 +5,13 @@ using core.Portfolio.Output;
 
 namespace core.Options
 {
-    public class OwnedOptionSummary
+    public class OwnedOptionView
     {
-        public OwnedOptionSummary(){}
-        public OwnedOptionSummary(OwnedOption o, TickerPrice currentPrice)
+        public OwnedOptionView(){}
+        public OwnedOptionView(OwnedOption o)
         {
             Id = o.State.Id;
             Ticker = o.State.Ticker;
-            CurrentPrice = currentPrice.Amount;
             OptionType = o.State.OptionType.ToString();
             StrikePrice = o.State.StrikePrice;
             ExpirationDate = o.State.Expiration.ToString("yyyy-MM-dd");
@@ -33,13 +32,14 @@ namespace core.Options
 
             if (credits.Any()) PremiumReceived = credits.Sum(t => t.Credit);
             if (debits.Any()) PremiumPaid = debits.Sum(t => t.Debit);
+        }
 
-            if (!currentPrice.NotFound)
-            {
-                ItmOtmLabel = GetItmOtmLabel(currentPrice.Amount, o.State.OptionType, o.State.StrikePrice);
-                IsFavorable = GetIsFavorable();
-                StrikePriceDiff = Math.Abs(o.State.StrikePrice - currentPrice.Amount)/currentPrice.Amount;
-            }
+        public void ApplyPrice(double price)
+        {
+            CurrentPrice = price;
+            ItmOtmLabel = GetItmOtmLabel(price, OptionType, StrikePrice);
+            IsFavorable = GetIsFavorable();
+            StrikePriceDiff = Math.Abs(StrikePrice - price) / price;
         }
 
         private bool GetIsFavorable()
@@ -65,14 +65,14 @@ namespace core.Options
             }},
         };
         
-        public static string GetItmOtmLabel(double currentPrice, OptionType optionType, double strikePrice)
+        public static string GetItmOtmLabel(double currentPrice, string optionType, double strikePrice)
         {
-            return _otmLogic[optionType.ToString()](currentPrice, strikePrice);
+            return _otmLogic[optionType](currentPrice, strikePrice);
         }
 
         public Guid Id { get; set; }
         public string Ticker { get; set; }
-        public double CurrentPrice { get; }
+        public double CurrentPrice { get; set; }
         public string OptionType { get; set; }
         public double StrikePrice { get; set; }
         public double PremiumReceived { get; set; }
@@ -99,11 +99,11 @@ namespace core.Options
         public TransactionList Transactions { get; set; }
         public bool ExpiresSoon { get; set; }
         public bool IsExpired { get; set; }
-        public DateTimeOffset? Closed { get; }
+        public DateTimeOffset? Closed { get; set; }
         public bool Assigned { get; set; }
         public List<string> Notes { get; }
-        public string ItmOtmLabel { get; }
-        public bool IsFavorable { get; }
-        public double StrikePriceDiff { get; }
+        public string ItmOtmLabel { get; set; }
+        public bool IsFavorable { get; set; }
+        public double StrikePriceDiff { get; set; }
     }
 }

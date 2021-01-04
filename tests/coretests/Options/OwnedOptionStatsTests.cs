@@ -10,7 +10,7 @@ namespace coretests.Options
 
         public OwnedOptionStatsTests()
         {
-            var o1 = new OwnedOptionSummary {
+            var o1 = new OwnedOptionView {
                 Assigned = true,
                 BoughtOrSold = "SOLD",
                 Days = 10,
@@ -29,7 +29,7 @@ namespace coretests.Options
                 Transactions = null
             };
 
-            var o2 = new OwnedOptionSummary {
+            var o2 = new OwnedOptionView {
                 Assigned = false,
                 BoughtOrSold = "SOLD",
                 Days = 20,

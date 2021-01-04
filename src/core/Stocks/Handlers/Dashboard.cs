@@ -44,7 +44,7 @@ namespace core.Stocks
                 foreach (var o in cached.Owned)
                 {
                     tickerPrices.TryGetValue(o.Ticker, out var price);
-                    o.ApplyPrice(price.Price);
+                    o.ApplyPrice(price?.Price ?? 0);
                 }
 
                 return cached;

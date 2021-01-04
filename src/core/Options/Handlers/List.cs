@@ -10,7 +10,7 @@ namespace core.Options
 {
     public class List
     {
-        public class Query : RequestWithUserId<OwnedOptionStatsContainer>
+        public class Query : RequestWithUserId<OwnedOptionStatsView>
         {
             public Query(string ticker, Guid userId) :base(userId)
             {
@@ -21,32 +21,22 @@ namespace core.Options
             public string Ticker { get; set; }
         }
 
-        public class Handler : HandlerWithStorage<Query, OwnedOptionStatsContainer>
+        public class Handler : HandlerWithStorage<Query, OwnedOptionStatsView>
         {
             public Handler(IPortfolioStorage storage) : base(storage)
             {
             }
 
-            public override async Task<OwnedOptionStatsContainer> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<OwnedOptionStatsView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
-                options = options.Where(o => o.State.Active && o.State.Ticker == request.Ticker);
-                options = options.OrderByDescending(o => o.State.FirstFill);
+                var open = options
+                    .Where(o => o.State.Active && o.State.Ticker == request.Ticker)
+                    .OrderByDescending(o => o.State.FirstFill)
+                    .Select(o => new OwnedOptionView(o));
 
-                return Map(options);
-            }
-
-            private OwnedOptionStatsContainer Map(IEnumerable<OwnedOption> options)
-            {
-                var open = options.Select(o => Map(o));
-
-                return new OwnedOptionStatsContainer(new List<OwnedOptionSummary>(), open);
-            }
-
-            private OwnedOptionSummary Map(OwnedOption o)
-            {
-                return new OwnedOptionSummary(o, new TickerPrice());
+                return new OwnedOptionStatsView(open);
             }
         }
     }
