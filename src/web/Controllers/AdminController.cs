@@ -51,6 +51,18 @@ namespace web.Controllers
             return this.Redirect("~/");
         }
 
+        [HttpGet("delete/{userId}")]
+        public async Task<ActionResult> Delete(Guid userId)
+        {
+            var cmd = new Delete.Command();
+            
+            cmd.WithUserId(userId);
+
+            await _mediator.Send(cmd);
+
+            return Ok();
+        }
+
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)
         {
