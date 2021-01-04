@@ -38,12 +38,6 @@ namespace iexclienttests
 
             Price = price.Result;
 
-            var active = Client.GetMostActive();
-
-            active.Wait();
-
-            MostActive = active.Result;
-
             var search = Client.Search("stitch");
 
             search.Wait();

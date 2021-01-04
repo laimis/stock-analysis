@@ -95,22 +95,6 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
-        [HttpGet("lists")]
-        public async Task<object> MostActive()
-        {
-            var active = _mediator.Send(new StockLists.QueryMostActive());
-            var gainers = _mediator.Send(new StockLists.QueryGainers());
-            var losers = _mediator.Send(new StockLists.QueryLosers());
-
-            await Task.WhenAll(active, gainers, losers);
-
-            return new {
-                active,
-                gainers,
-                losers
-            };
-        }
-
         [HttpGet("export")]
         public Task<ActionResult> Export()
         {

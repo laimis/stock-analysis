@@ -100,11 +100,6 @@ export class StocksService {
   }
   //
 
-  // ------------------ stocks ------------------
-	getStockLists(): Observable<StockLists> {
-    return this.http.get<StockLists>('/api/stocks/lists')
-  }
-
   getStocks(): Observable<any> {
 		return this.http.get<any>('/api/stocks')
   }
@@ -273,12 +268,6 @@ export interface TransactionList {
 export interface NoteList {
   tickers: string[]
   notes: object[]
-}
-
-export interface StockLists {
-  active : object[]
-  gainers: object[]
-  losers: object[]
 }
 
 export interface Portfolio {

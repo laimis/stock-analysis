@@ -103,30 +103,6 @@ namespace iexclient
             return JsonConvert.DeserializeObject<Dictionary<string, BatchStockPrice>>(response);
         }
 
-        public Task<List<StockQueryResult>> GetMostActive()
-        {
-            return GetList("mostactive");
-        }
-
-        public Task<List<StockQueryResult>> GetLosers()
-        {
-            return GetList("losers");
-        }
-
-        public Task<List<StockQueryResult>> GetGainers()
-        {
-            return GetList("gainers");
-        }
-
-        private Task<List<StockQueryResult>> GetList(string listname)
-        {
-            var url = MakeUrl($"stock/market/list/{listname}");
-
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd-hh") + $"{listname}.json";
-
-            return GetCachedResponse<List<StockQueryResult>>(url, key);
-        }
-
         private string MakeUrl(string function)
         {
             return $"{_endpoint}/{function}?token={_token}";
