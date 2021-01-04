@@ -37,10 +37,14 @@ namespace core.Stocks
                     cached = await LoadFromDb(query.UserId);
                 }
 
+                var tickers = cached.Owned.Select(o => o.Ticker).Distinct();
+
+                var tickerPrices = await _stocksService.GetPrices(tickers);
+
                 foreach (var o in cached.Owned)
                 {
-                    var price = await _stocksService.GetPrice(o.Ticker);
-                    o.ApplyPrice(price);
+                    tickerPrices.TryGetValue(o.Ticker, out var price);
+                    o.ApplyPrice(price.Price);
                 }
 
                 return cached;

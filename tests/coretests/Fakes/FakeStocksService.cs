@@ -69,5 +69,10 @@ namespace coretests.Fakes
         {
             return Task.FromResult(new List<SearchResult>());
         }
+
+        public Task<Dictionary<string, BatchStockPrice>> GetPrices(IEnumerable<string> tickers)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
