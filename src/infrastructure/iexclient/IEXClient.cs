@@ -90,6 +90,19 @@ namespace iexclient
             return new TickerPrice(JsonConvert.DeserializeObject<double>(response));
         }
 
+        public async Task<Dictionary<string, BatchStockPrice>> GetPrices(IEnumerable<string> tickers)
+        {
+            var url = MakeUrl($"stock/market/batch");
+
+            url += $"&symbols={string.Join(",", tickers)}&types=price";
+
+            var r = await _client.GetAsync(url);
+
+            var response = await r.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<Dictionary<string, BatchStockPrice>>(response);
+        }
+
         public Task<List<StockQueryResult>> GetMostActive()
         {
             return GetList("mostactive");

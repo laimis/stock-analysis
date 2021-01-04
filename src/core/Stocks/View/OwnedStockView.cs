@@ -19,11 +19,10 @@ namespace core.Stocks.View
             DaysHeld = o.State.DaysHeld;
         }
 
-        public void ApplyPrice(TickerPrice price)
+        public void ApplyPrice(double price)
         {
-            Price = price.Amount;
-
-            Equity = Owned * price.Amount;
+            Price = price;
+            Equity = Owned * price;
         }
 
         public System.Guid Id { get; set; }

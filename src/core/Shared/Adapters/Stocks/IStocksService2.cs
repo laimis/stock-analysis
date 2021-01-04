@@ -8,6 +8,7 @@ namespace core.Adapters.Stocks
         Task<CompanyProfile> GetCompanyProfile(string ticker);
         Task<StockAdvancedStats> GetAdvancedStats(string ticker);
         Task<TickerPrice> GetPrice(string ticker);
+        Task<Dictionary<string, BatchStockPrice>> GetPrices(IEnumerable<string> tickers);
         Task<List<StockQueryResult>> GetMostActive();
         Task<List<StockQueryResult>> GetGainers();
         Task<List<StockQueryResult>> GetLosers();
