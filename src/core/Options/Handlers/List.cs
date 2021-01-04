@@ -36,7 +36,7 @@ namespace core.Options
                     .OrderByDescending(o => o.State.FirstFill)
                     .Select(o => new OwnedOptionView(o));
 
-                return new OwnedOptionStatsView(new List<OwnedOptionView>(), open);
+                return new OwnedOptionStatsView(open);
             }
         }
     }

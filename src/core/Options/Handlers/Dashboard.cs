@@ -11,14 +11,14 @@ namespace core.Options
 {
     public class Dashboard
     {
-        public class Query : RequestWithUserId<OwnedOptionStatsView>
+        public class Query : RequestWithUserId<OptionDashboardView>
         {
             public Query(Guid userId) :base(userId)
             {
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, OwnedOptionStatsView>,
+        public class Handler : HandlerWithStorage<Query, OptionDashboardView>,
             INotificationHandler<UserRecalculate>
         {
             private IStocksService2 _stockService;
@@ -30,9 +30,9 @@ namespace core.Options
                 _stockService = stockService;
             }
 
-            public override async Task<OwnedOptionStatsView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<OptionDashboardView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var view = await _storage.ViewModel<OwnedOptionStatsView>(request.UserId);
+                var view = await _storage.ViewModel<OptionDashboardView>(request.UserId);
                 if (view == null)
                 {
                     view = await FromDb(request.UserId);
@@ -58,7 +58,7 @@ namespace core.Options
                 await _storage.SaveViewModel(notification.UserId, view);
             }
 
-            private async Task<OwnedOptionStatsView> FromDb(Guid userId)
+            private async Task<OptionDashboardView> FromDb(Guid userId)
             {
                 var options = await _storage.GetOwnedOptions(userId);
                 options = options.Where(o => !o.State.Deleted);
@@ -72,7 +72,7 @@ namespace core.Options
                     .Where(o => o.State.Closed != null)
                     .OrderByDescending(o => o.State.FirstFill);
 
-                var view = new OwnedOptionStatsView(
+                var view = new OptionDashboardView(
                     closedOptions.Select(o => new OwnedOptionView(o)),
                     openOptions.Select(o => new Options.OwnedOptionView(o))
                 );

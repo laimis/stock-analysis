@@ -33,7 +33,7 @@ namespace core.Admin
         {
             if (re.OptionType != null)
             {
-                return OwnedOptionView.GetItmOtmLabel(p.Price.Amount, re.OptionType.Value, re.StrikePrice);
+                return OwnedOptionView.GetItmOtmLabel(p.Price.Amount, re.OptionType.Value.ToString(), re.StrikePrice);
             }
 
             return null;

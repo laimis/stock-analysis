@@ -130,7 +130,7 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<OwnedOptionStatsView> Dashboard()
+        public Task<OptionDashboardView> Dashboard()
         {
             return _mediator.Send(
                 new Dashboard.Query(this.User.Identifier())
