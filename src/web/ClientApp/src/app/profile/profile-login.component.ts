@@ -15,6 +15,8 @@ export class ProfileLoginComponent implements OnInit {
 
   public errors     :string[]
 
+  inProgress : boolean
+
   public resetPasswordRequest : boolean
   public passwordRequestSuccess : boolean
 
@@ -28,15 +30,17 @@ export class ProfileLoginComponent implements OnInit {
   login() {
 
     this.errors = null
+    this.inProgress = true
 
     var obj = {
       email: this.email,
       password: this.password
     }
 
-    this.stockService.loginAccount(obj).subscribe(r => {
+    this.stockService.loginAccount(obj).subscribe(_ => {
       this.router.navigate(['/dashboard'])
     }, err => {
+      this.inProgress = false
       this.errors = GetErrors(err)
     })
   }
