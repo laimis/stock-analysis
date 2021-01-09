@@ -35,7 +35,7 @@ namespace core.Stocks
                 
                 await Task.WhenAll(profile, advanced, price);
                 
-                return new StockDetailView
+                return new StockDetailsView
                 {
                     Ticker = request.Ticker,
                     Price = price.Result.Amount,

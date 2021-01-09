@@ -2,7 +2,7 @@ using core.Adapters.Stocks;
 
 namespace core.Stocks.View
 {
-    public class StockDetailView
+    public class StockDetailsView
     {
         public string Ticker { get; internal set; }
         public double Price { get; internal set; }

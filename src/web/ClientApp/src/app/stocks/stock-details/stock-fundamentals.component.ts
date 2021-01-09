@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StockSummary } from '../../services/stocks.service';
+import { StockDetails } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-fundamentals',
@@ -9,17 +9,17 @@ import { StockSummary } from '../../services/stocks.service';
 
 export class StockFundamentalsComponent {
 
-  public summary : StockSummary;
+  public summary : StockDetails;
   public profile: object;
   public stats: object;
 
   @Input()
-  set stock(stock: StockSummary) {
+  set stock(stock: StockDetails) {
     this.profile = stock.profile;
     this.stats = stock.stats;
     this.summary = stock
   }
-  get stock(): StockSummary { return this.summary; }
+  get stock(): StockDetails { return this.summary; }
 
 	constructor(){}
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockSummary, NoteList, OwnedOption } from '../../services/stocks.service';
+import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -12,9 +12,9 @@ export class StockDetailsComponent {
   profile: object
   ticker: string
 	loaded: boolean = false
-  stock: StockSummary
+  stock: StockDetails
   notes: NoteList
-  ownership: object
+  ownership: StockOwnership
   options: OwnedOption[]
   alerts: object
   activeTab: string = 'stocks'
@@ -32,7 +32,7 @@ export class StockDetailsComponent {
 	}
 
 	fetchStock() {
-		this.stocks.getStockSummary(this.ticker).subscribe(result => {
+		this.stocks.getStockDetails(this.ticker).subscribe(result => {
       this.stock = result;
       this.profile = result.profile
 			this.loaded = true;
@@ -67,7 +67,7 @@ export class StockDetailsComponent {
   }
 
   loadStockOwnership() {
-    this.stocks.getStock(this.ticker).subscribe(result => {
+    this.stocks.getStockOwnership(this.ticker).subscribe(result => {
       this.ownership = result
     })
   }

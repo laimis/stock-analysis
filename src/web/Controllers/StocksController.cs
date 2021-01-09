@@ -34,8 +34,8 @@ namespace web.Controllers
             return await _mediator.Send(new Details.Query(ticker));
         }
 
-        [HttpGet("details/{ticker}")]
-        public async Task<object> OwnedStockDetails(string ticker)
+        [HttpGet("{ticker}/ownership")]
+        public async Task<object> Ownership(string ticker)
         {
             var query = new Get.Query(ticker);
             query.WithUserId(User.Identifier());

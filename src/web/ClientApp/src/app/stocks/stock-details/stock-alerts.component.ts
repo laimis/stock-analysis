@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { StockSummary, StocksService, GetErrors, AlertLabelValue } from '../../services/stocks.service';
+import { StockDetails, StocksService, GetErrors, AlertLabelValue } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-alerts',
@@ -14,7 +14,7 @@ export class StockAlertsComponent {
   errors            : string[]
   success           : boolean
 
-  summary           : StockSummary
+  summary           : StockDetails
   owned : any
 
   newPricePoint :number
@@ -33,11 +33,11 @@ export class StockAlertsComponent {
   get alerts(): object { return this.alert }
 
   @Input()
-  set stock(stock: StockSummary) {
+  set stock(stock: StockDetails) {
     this.summary = stock
     this.updatePriceBasedPoints()
   }
-  get stock(): StockSummary { return this.summary}
+  get stock(): StockDetails { return this.summary}
 
   @Input()
   set ownership(ownership: any) {

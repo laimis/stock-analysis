@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { StocksService, GetErrors, StockSummary } from '../../services/stocks.service';
+import { StocksService, GetErrors, StockDetails, StockOwnership } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
@@ -12,10 +12,10 @@ import { DatePipe } from '@angular/common';
 export class StockOwnershipComponent implements OnInit {
 
   @Input()
-  public ownership: any;
+  public ownership: StockOwnership;
 
   @Input()
-  public stock: StockSummary;
+  public stock: StockDetails;
 
   @Output()
   ownershipChanged = new EventEmitter();

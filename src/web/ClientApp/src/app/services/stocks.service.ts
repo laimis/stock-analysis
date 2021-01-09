@@ -104,20 +104,20 @@ export class StocksService {
 		return this.http.get<any>('/api/stocks')
   }
 
-	getStockSummary(symbol:string): Observable<StockSummary> {
-		return this.http.get<StockSummary>('/api/stocks/' + symbol)
+	getStockDetails(symbol:string): Observable<StockDetails> {
+		return this.http.get<StockDetails>('/api/stocks/' + symbol)
   }
 
   getStockGrid(): Observable<StockGridEntry[]> {
 		return this.http.get<StockGridEntry[]>('/api/portfolio/grid')
   }
 
-  getStock(id:string): Observable<object> {
-		return this.http.get<object>(`/api/stocks/details/${id}`)
-  }
-
   deleteStocks(id: string): Observable<object> {
     return this.http.delete(`/api/stocks/${id}`)
+  }
+
+  getStockOwnership(ticker:string): Observable<StockOwnership> {
+		return this.http.get<StockOwnership>(`/api/stocks/${ticker}/ownership`)
   }
 
   deleteStockTransaction(id: string, transactionId:string): Observable<object>{
@@ -326,12 +326,22 @@ export class AlertLabelValue {
   }
 }
 
-export interface StockSummary {
+export interface StockDetails {
   ticker: string
   price: number
   stats: object
   profile : object
 	alert: object
+}
+
+export interface StockOwnership {
+  id: string
+  ticker: string
+  cost: number
+  averageCost: number
+  owned: number
+  category: string
+  transactions: object[]
 }
 
 export interface StockGridEntry {

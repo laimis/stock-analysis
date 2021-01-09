@@ -1,10 +1,10 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Portfolio.Output;
 using core.Shared;
+using core.Stocks.View;
 
 namespace core.Stocks
 {
@@ -37,14 +37,14 @@ namespace core.Stocks
                     return null;
                 }
 
-                return new {
-                    id = stock.State.Id,
-                    averageCost = stock.State.AverageCost,
-                    cost = stock.State.Cost,
-                    owned = stock.State.Owned,
-                    ticker = stock.State.Ticker,
-                    category = stock.State.Category,
-                    transactions = new TransactionList(
+                return new StockOwnershipView {
+                    Id = stock.State.Id,
+                    AverageCost = stock.State.AverageCost,
+                    Cost = stock.State.Cost,
+                    Owned = stock.State.Owned,
+                    Ticker = stock.State.Ticker,
+                    Category = stock.State.Category,
+                    Transactions = new TransactionList(
                         stock.State.Transactions.Where(t => !t.IsPL), null, null
                     )
                 };
