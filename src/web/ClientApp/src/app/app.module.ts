@@ -30,7 +30,6 @@ import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { SymbolSearchComponent } from './symbol-search/symbol-search.component';
 import { PlaygroundComponent } from './playground/playground.component';
-import { OwnedStockDetailComponent } from './stocks/owned-stock-detail/owned-stock-detail.component';
 import { AdminEmailComponent } from './admin/email/admin-email.component';
 import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
 import { PaymentsComponent } from './payments/payments.component';
@@ -90,7 +89,6 @@ var routes = [
   { path: 'privacy', component: PrivacyComponent},
 
   { path: 'stocks', component: StockDashboardComponent},
-  { path: 'stockdetails/:id', component: OwnedStockDetailComponent},
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
 
   { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
@@ -125,7 +123,6 @@ var routes = [
     OptionPerformanceComponent,
     OptionClosedComponent,
 
-    OwnedStockDetailComponent,
     PaymentsComponent,
     PlaygroundComponent,
     PrivacyComponent,

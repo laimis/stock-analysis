@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
+using core.Stocks.View;
 using MediatR;
 
 namespace core.Stocks
@@ -34,12 +35,12 @@ namespace core.Stocks
                 
                 await Task.WhenAll(profile, advanced, price);
                 
-                return new
+                return new StockDetailView
                 {
-                    ticker = request.Ticker,
-                    price = price.Result.Amount,
-                    profile = profile.Result,
-                    stats = advanced.Result,
+                    Ticker = request.Ticker,
+                    Price = price.Result.Amount,
+                    Profile = profile.Result,
+                    Stats = advanced.Result,
                 };
             }
         }

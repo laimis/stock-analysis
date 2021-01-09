@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockSummary, NoteList, OptionDetail, OwnedOption } from '../../services/stocks.service';
+import { StocksService, StockSummary, NoteList, OwnedOption } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -17,7 +17,7 @@ export class StockDetailsComponent {
   ownership: object
   options: OwnedOption[]
   alerts: object
-  activeTab: string = 'fundamentals'
+  activeTab: string = 'stocks'
 
 	constructor(
 		private stocks : StocksService,

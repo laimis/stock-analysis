@@ -2,12 +2,12 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-  <div *ngIf="stock && stock.owned > 0" class="mt-4">
-    You own <b>{{stock.owned}}</b> shares at <b>{{stock.averageCost | currency}}</b> per share
+  <div *ngIf="ownership && ownership.owned > 0" class="mt-4">
+    You own <b>{{ownership.owned}}</b> shares at <b>{{ownership.averageCost | currency}}</b> per share
   </div>
 
   <div class="card mt-4">
-    <div class="card-header">Record trades for {{ticker}}</div>
+    <div class="card-header">Record trades for {{stock.ticker}}</div>
     <div class="card-body">
       <div *ngIf="success" class="alert alert-success" role="alert">
         Successfully recorded the transaction
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-	<div *ngIf="stock && stock.transactions.transactions.length > 0">
+	<div *ngIf="ownership && ownership.transactions.transactions.length > 0">
     <div class="mt-4">
       <div class="text-muted">Past Transactions</div>
       <table class="table table-striped border">
@@ -67,7 +67,7 @@
         <tbody>
           <tr
             [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
-            *ngFor="let t of stock.transactions.transactions">
+            *ngFor="let t of ownership.transactions.transactions">
             <td>{{ t.date | date:'shortDate'}}</td>
             <td>{{ t.description }}</td>
             <td>{{ t.debit | currency }}</td>

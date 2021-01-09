@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { StocksService, GetErrors } from '../../services/stocks.service';
+import { StocksService, GetErrors, StockSummary } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
@@ -12,10 +12,10 @@ import { DatePipe } from '@angular/common';
 export class StockOwnershipComponent implements OnInit {
 
   @Input()
-  public stock: any;
+  public ownership: any;
 
   @Input()
-  public ticker: any;
+  public stock: StockSummary;
 
   @Output()
   ownershipChanged = new EventEmitter();
@@ -53,7 +53,7 @@ export class StockOwnershipComponent implements OnInit {
     {
       this.errors = null
 
-      this.service.deleteStocks(this.stock.id).subscribe(r => {
+      this.service.deleteStocks(this.ownership.id).subscribe(r => {
         this.router.navigateByUrl('/dashboard')
       })
     }
@@ -64,7 +64,7 @@ export class StockOwnershipComponent implements OnInit {
     {
       this.errors = null
 
-      this.service.deleteStockTransaction(this.stock.id, transactionId).subscribe(_ => {
+      this.service.deleteStockTransaction(this.ownership.id, transactionId).subscribe(_ => {
         this.ownershipChanged.emit("deletetransaction")
         this.success = true
       })
@@ -77,7 +77,7 @@ export class StockOwnershipComponent implements OnInit {
     this.success = false;
 
     var op = {
-      ticker: this.ticker,
+      ticker: this.stock.ticker,
       numberOfShares: this.numberOfShares,
       price: this.pricePerShare,
       date: this.filled,

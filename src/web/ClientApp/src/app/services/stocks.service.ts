@@ -327,14 +327,11 @@ export class AlertLabelValue {
 }
 
 export interface StockSummary {
+  ticker: string
   price: number
   stats: object
   profile : object
-	priceChartData : object[]
-	volumeChartData : object[]
-	peChartData : object[]
-  bookChartData : object[]
-  alert: object
+	alert: object
 }
 
 export interface StockGridEntry {
