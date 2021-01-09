@@ -1,10 +1,6 @@
-Generate view models for various stocks, I think it's time my friend :)
+Input box for price for breakdown
+Input box for how much money you want to spend
 
-- Option dashboard cache
-
-
-Upcoming earnings in watch/holdings
-Upcoming expirations in options
 
 Ticker soup page:
     - paste a bunch of tickers, looks them up as valid or not valid and returns entries for each with links to RH
