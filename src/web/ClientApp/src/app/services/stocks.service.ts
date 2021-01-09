@@ -263,7 +263,24 @@ export interface ReviewList {
 }
 
 export interface TransactionList {
-  transactions: object[]
+  credit: number
+  debit: number
+  transactions: Transaction[]
+}
+
+export interface Transaction {
+  aggregateId: string
+  credit: number
+  date: string
+  dateAsDate: string
+  debit: number
+  description: string
+  eventId: string
+  isOption: boolean
+  isPL: boolean
+  profit: number
+  returnPct: number
+  ticker: string
 }
 export interface NoteList {
   tickers: string[]
@@ -341,7 +358,7 @@ export interface StockOwnership {
   averageCost: number
   owned: number
   category: string
-  transactions: object[]
+  transactions: TransactionList
 }
 
 export interface StockGridEntry {
