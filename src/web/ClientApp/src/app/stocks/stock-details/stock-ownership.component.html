@@ -3,9 +3,14 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <div *ngIf="ownership && ownership.owned > 0" class="mt-4">
-    Ownership: <b>{{ownership.owned}}</b> @ <b>{{ownership.averageCost | currency}}</b> ({{(stock.price - ownership.averageCost) / stock.price | percent}})
-    <br />
-    Current price: <b>{{stock.price | currency}}</b>
+    <div class="row">
+      <div class="col">
+        Ownership: <b>{{ownership.owned}}</b> @ <b>{{ownership.averageCost | currency}}</b> ({{(stock.price - ownership.averageCost) / stock.price | percent}})
+      </div>
+      <div class="col">
+        Current price: <b>{{stock.price | currency}}</b>
+      </div>
+    </div>
   </div>
 
   <div class="card mt-4">
