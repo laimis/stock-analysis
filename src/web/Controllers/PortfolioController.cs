@@ -39,7 +39,7 @@ namespace web.Controllers
         }
 
         [HttpGet("review")]
-        public async Task<ReviewList> Review(string period)
+        public async Task<ReviewView> Review(string period)
         {
             var cmd = new Review.Generate(period);
 
