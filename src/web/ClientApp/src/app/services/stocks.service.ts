@@ -258,8 +258,13 @@ export interface Link {
 export interface ReviewList {
   start: string
   end: string
-  transactions: TransactionList,
-  entries: object[]
+  stocks: ReviewTicker[]
+  options: ReviewTicker[]
+}
+
+export interface ReviewTicker {
+  ticker: string
+  transactions: TransactionList
 }
 
 export interface TransactionList {

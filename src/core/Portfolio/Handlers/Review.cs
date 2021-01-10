@@ -14,7 +14,7 @@ namespace core.Portfolio
 {
     public class Review
     {
-        public class Generate : RequestWithUserId<ReviewList>
+        public class Generate : RequestWithUserId<ReviewView>
         {
             public Generate(string period)
             {
@@ -49,7 +49,7 @@ namespace core.Portfolio
             }
         }
 
-        public class Handler : HandlerWithStorage<Generate, ReviewList>
+        public class Handler : HandlerWithStorage<Generate, ReviewView>
         {
             public Handler(
                 IPortfolioStorage storage,
@@ -63,55 +63,32 @@ namespace core.Portfolio
             private IAlertsStorage _alerts;
             private IStocksService2 _stocks;
 
-            public override async Task<ReviewList> Handle(Generate request, CancellationToken cancellationToken)
+            public override async Task<ReviewView> Handle(Generate request, CancellationToken cancellationToken)
             {
                 var options = await _storage.GetOwnedOptions(request.UserId);
                 var stocks = await _storage.GetStocks(request.UserId);
-
-                var groups = await CreateReviewGroups(options, stocks);
 
                 var transactions = options.SelectMany(o => o.State.Transactions)
                     .Union(stocks.SelectMany(s => s.State.Transactions))
                     .Where(t => t.DateAsDate >= request.Start)
                     .Where(t => !t.IsPL);
 
-                return new ReviewList(
+                var stockTickers = transactions.Where(t => !t.IsOption)
+                    .GroupBy(t => t.Ticker)
+                    .Select(g => new ReviewTicker(g.Key, g))
+                    .ToList();
+
+                var optionTickers = transactions.Where(t => t.IsOption)
+                    .GroupBy(t => t.Ticker)
+                    .Select(g => new ReviewTicker(g.Key, g))
+                    .ToList();
+
+                return new ReviewView(
                     request.Start,
                     request.End,
-                    groups,
-                    new TransactionList(transactions.Where(t => !t.IsOption), "ticker", null),
-                    new TransactionList(transactions.Where(t => t.IsOption), "ticker", null)
+                    stockTickers,
+                    optionTickers
                 );
-            }
-
-            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(
-                IEnumerable<OwnedOption> options,
-                IEnumerable<OwnedStock> stocks)
-            {
-                var entries = new List<ReviewEntry>();
-
-                foreach (var o in options.Where(s => s.State.Active))
-                {
-                    entries.Add(new ReviewEntry(o));
-                }
-
-                foreach (var s in stocks.Where(s => s.State.Owned > 0))
-                {
-                    entries.Add(new ReviewEntry(s));
-                }
-
-                var grouped = entries.GroupBy(r => r.Ticker);
-                var groups = new List<ReviewEntryGroup>();
-
-                foreach (var group in grouped)
-                {
-                    var price = await _stocks.GetPrice(group.Key);
-                    var advanced = await _stocks.GetAdvancedStats(group.Key);
-
-                    groups.Add(new ReviewEntryGroup(group, price, advanced));
-                }
-
-                return groups;
             }
         }
     }

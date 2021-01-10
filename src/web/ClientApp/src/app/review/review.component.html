@@ -19,15 +19,15 @@
       <th colspan="3">Stock transactions</th>
       <th class="text-right">Debit/Credit</th>
     </tr>
-    <tr *ngIf="result.stocks.transactions.length == 0">
+    <tr *ngIf="result.stocks.length == 0">
       <td colspan="4">None</td>
     </tr>
-    <tr *ngFor="let g of result.stocks.grouped">
+    <tr *ngFor="let g of result.stocks">
       <td colspan="4">
-        <div>{{g.name}}</div>
+        <div>{{g.ticker}}</div>
 
         <table class="table">
-          <tr *ngFor="let t of g.transactions.transactions">
+          <tr *ngFor="let t of g.transactions">
             <td>{{t.date | date}}</td>
             <td>{{t.description}}</td>
             <td align="right">{{t.profit | currency}}</td>
@@ -42,40 +42,21 @@
       <th colspan="3">Option transactions</th>
       <th class="text-right">Debit/Credit</th>
     </tr>
-    <tr *ngIf="result.options.transactions.length == 0">
+    <tr *ngIf="result.options.length == 0">
       <td colspan="4">None</td>
     </tr>
-    <tr *ngFor="let t of result.options.transactions">
-      <td>{{t.ticker}}</td>
-      <td>{{t.date | date}}</td>
-      <td>{{t.description}}</td>
-      <td align="right">{{t.profit | currency}}</td>
-    </tr>
-  </table>
+    <tr *ngFor="let g of result.options">
+      <td colspan="4">
+        <div>{{g.ticker}}</div>
 
-  <table class="table table-hover">
-    <tr>
-      <th colspan="2">Earnings in the next 7 days</th>
-    </tr>
-    <tr *ngIf="result.shortEarnings.length == 0">
-      <td colspan="2">None</td>
-    </tr>
-    <tr *ngFor="let t of result.shortEarnings">
-      <td>{{t.ticker}}</td>
-      <td>{{t.earningsDate | date}}</td>
-    </tr>
-  </table>
-
-  <table class="table table-hover">
-    <tr>
-      <th colspan="2">Earnings in the next 30 days</th>
-    </tr>
-    <tr *ngIf="result.longEarnings.length == 0">
-      <td colspan="2">None</td>
-    </tr>
-    <tr *ngFor="let t of result.longEarnings">
-      <td>{{t.ticker}}</td>
-      <td>{{t.earningsDate | date}}</td>
+        <table class="table">
+          <tr *ngFor="let t of g.transactions">
+            <td>{{t.date | date}}</td>
+            <td>{{t.description}}</td>
+            <td align="right">{{t.profit | currency}}</td>
+          </tr>
+        </table>
+      </td>
     </tr>
   </table>
 </div>
