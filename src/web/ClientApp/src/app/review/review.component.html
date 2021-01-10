@@ -11,16 +11,34 @@
     <option value="last7days">Last 7 days</option>
   </select>
 
-  <div class="card-header">
-    <span class="font-weight-bold">Week of {{ result.start | date }} review</span>
+  <div class="card-header mb-2 mt-2 border">
+    <div class="mb-2 font-weight-bold">Week of {{ result.start | date }} review</div>
+    <div class="mb-2"><b>Profit</b> {{ result.stockProfit + result.optionProfit | currency }}</div>
+    <div><b>Stocks</b>: {{ result.stockProfit | currency }}</div>
+    <div><b>Options</b>: {{ result.optionProfit | currency }}</div>
   </div>
   <table class="table table-hover">
     <tr>
-      <th colspan="3">Stock transactions</th>
+      <th colspan="3">Stock P/L transactions</th>
       <th class="text-right">Debit/Credit</th>
     </tr>
     <tr *ngIf="result.stocks.length == 0">
       <td colspan="4">None</td>
+    </tr>
+    <tr *ngFor="let g of result.plStocks">
+      <td colspan="4">
+        <div>{{g.ticker}}</div>
+        <table class="table">
+          <tr *ngFor="let t of g.transactions">
+            <td>{{t.date | date}}</td>
+            <td>{{t.description}}</td>
+            <td align="right">{{t.profit | currency}}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr *ngIf="result.plStocks.length > 0">
+      <td colspan="4">Non-PL Breakdown</td>
     </tr>
     <tr *ngFor="let g of result.stocks">
       <td colspan="4">
@@ -39,11 +57,26 @@
 
   <table class="table table-hover">
     <tr>
-      <th colspan="3">Option transactions</th>
+      <th colspan="3">Option P/L transactions</th>
       <th class="text-right">Debit/Credit</th>
     </tr>
     <tr *ngIf="result.options.length == 0">
       <td colspan="4">None</td>
+    </tr>
+    <tr *ngFor="let g of result.plOptions">
+      <td colspan="4">
+        <div>{{g.ticker}}</div>
+        <table class="table">
+          <tr *ngFor="let t of g.transactions">
+            <td>{{t.date | date}}</td>
+            <td>{{t.description}}</td>
+            <td align="right">{{t.profit | currency}}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr *ngIf="result.plOptions.length > 0">
+      <td colspan="4">Non-PL Breakdown</td>
     </tr>
     <tr *ngFor="let g of result.options">
       <td colspan="4">
