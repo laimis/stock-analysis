@@ -27,7 +27,7 @@
     </tr>
     <tr *ngFor="let g of result.plStocks">
       <td colspan="4">
-        <div>{{g.ticker}}</div>
+        <div><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></div>
         <table class="table">
           <tr *ngFor="let t of g.transactions">
             <td>{{t.date | date}}</td>
@@ -42,7 +42,7 @@
     </tr>
     <tr *ngFor="let g of result.stocks">
       <td colspan="4">
-        <div>{{g.ticker}}</div>
+        <div><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></div>
 
         <table class="table">
           <tr *ngFor="let t of g.transactions">
@@ -65,7 +65,7 @@
     </tr>
     <tr *ngFor="let g of result.plOptions">
       <td colspan="4">
-        <div>{{g.ticker}}</div>
+        <div><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></div>
         <table class="table">
           <tr *ngFor="let t of g.transactions">
             <td>{{t.date | date}}</td>
@@ -80,7 +80,7 @@
     </tr>
     <tr *ngFor="let g of result.options">
       <td colspan="4">
-        <div>{{g.ticker}}</div>
+        <div><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></div>
 
         <table class="table">
           <tr *ngFor="let t of g.transactions">
