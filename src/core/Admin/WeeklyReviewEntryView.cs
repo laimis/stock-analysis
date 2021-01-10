@@ -1,12 +1,11 @@
 using System;
 using core.Options;
-using core.Portfolio;
 
 namespace core.Admin
 {
     internal class WeeklyReviewEntryView
     {
-        public WeeklyReviewEntryView((ReviewEntryGroup p, ReviewEntry re) pair)
+        public WeeklyReviewEntryView((EmailReviewEntryGroup p, EmailReviewEntry re) pair)
         {
             ticker = pair.p.Ticker;
             price = pair.p.Price.Amount;
@@ -29,7 +28,7 @@ namespace core.Admin
         public string expiration { get; }
         public string earnings { get; }
 
-        private static object CalcItmOtm(ReviewEntryGroup p, ReviewEntry re)
+        private static object CalcItmOtm(EmailReviewEntryGroup p, EmailReviewEntry re)
         {
             if (re.OptionType != null)
             {
@@ -39,7 +38,7 @@ namespace core.Admin
             return null;
         }
 
-        private static object CalcGainPct(double current, ReviewEntry re)
+        private static object CalcGainPct(double current, EmailReviewEntry re)
         {
             if (re.AverageCost == 0)
             {
