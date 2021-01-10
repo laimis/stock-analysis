@@ -14,7 +14,9 @@
   <tbody>
     <tr *ngFor="let o of options">
       <td width="100">
-        <div>{{o.ticker}} {{o.strikePrice |currency}}</div>
+        <div>
+          <a [routerLink]="[ '/stocks', o.ticker ]">{{o.ticker}}</a>
+          {{o.strikePrice |currency}}</div>
         <div>
           <span *ngIf="o.boughtOrSold=='Sold'" class="badge badge-info mr-1">sell</span>
           <span *ngIf="o.boughtOrSold=='Bought'" class="badge badge-secondary mr-1">buy</span>

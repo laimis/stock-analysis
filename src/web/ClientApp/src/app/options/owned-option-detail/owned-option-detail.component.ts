@@ -4,12 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-sold-option-detail',
-  templateUrl: './sold-option-detail.component.html',
-  styleUrls: ['./sold-option-detail.component.css'],
+  selector: 'app-owned-option-detail',
+  templateUrl: './owned-option-detail.component.html',
+  styleUrls: ['./owned-option-detail.component.css'],
   providers: [DatePipe]
 })
-export class SoldOptionDetailComponent implements OnInit {
+export class OwnedOptionComponent implements OnInit {
   public option: OptionDefinition;
 
   public positionType: string

@@ -20,7 +20,7 @@ import { ProfileCreateComponent } from './profile/profile-create.component';
 import { ProfileLoginComponent } from './profile/profile-login.component';
 import { ReviewComponent } from './review/review.component';
 import { RouterModule } from '@angular/router';
-import { SoldOptionDetailComponent } from './options/sold-option-detail/sold-option-detail.component';
+import { OwnedOptionComponent } from './options/owned-option-detail/owned-option-detail.component';
 import { StockDetailsComponent } from './stocks/stock-details/stock-details.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { ProfilePasswordResetComponent } from './profile/profile-passwordreset.component';
@@ -81,7 +81,7 @@ var routes = [
   { path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard] },
-  { path: 'optiondetails/:id', component: SoldOptionDetailComponent, canActivate: [AuthGuard]},
+  { path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
 
   { path: 'review', component: ReviewComponent, canActivate: [AuthGuard] },
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
@@ -132,7 +132,7 @@ var routes = [
     ProfilePasswordResetComponent,
     ProfileVerifyComponent,
     ReviewComponent,
-    SoldOptionDetailComponent,
+    OwnedOptionComponent,
 
     StockAlertsComponent,
     StockDashboardComponent,

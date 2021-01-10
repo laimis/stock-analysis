@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using core.Portfolio.Output;
+using core.Shared;
 
 namespace core.Options
 {
@@ -20,7 +20,7 @@ namespace core.Options
             Filled = o.State.FirstFill.Value;
             Days = o.State.Days;
             DaysHeld = o.State.DaysHeld;
-            Transactions = new TransactionList(o.State.Transactions.Where(t => !t.IsPL), null, null);
+            Transactions = o.State.Transactions.Where(t => !t.IsPL).ToList();
             ExpiresSoon = o.State.ExpiresSoon;
             IsExpired = o.State.IsExpired;
             Closed = o.State.Closed;
@@ -96,7 +96,7 @@ namespace core.Options
         public DateTimeOffset Filled { get; set; }
         public double Days { get; set; }
         public int DaysHeld { get; set; }
-        public TransactionList Transactions { get; set; }
+        public List<Transaction> Transactions { get; set; }
         public bool ExpiresSoon { get; set; }
         public bool IsExpired { get; set; }
         public DateTimeOffset? Closed { get; set; }

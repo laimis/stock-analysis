@@ -15,6 +15,8 @@ namespace storage.redis
         protected IMediator _mediator;
         protected ConnectionMultiplexer _redis;
 
+        const string VERSION = "1";
+
         public RedisAggregateStorage(IMediator mediator, string redisCnn)
         {
             _mediator = mediator;
@@ -23,7 +25,7 @@ namespace storage.redis
 
         public async Task<T> Get<T>(string key)
         {
-            var redisKey = typeof(T).Name + ":" + key;
+            var redisKey = typeof(T).Name + ":" + key + ":" + VERSION;
 
             var db = _redis.GetDatabase();
 
@@ -34,7 +36,7 @@ namespace storage.redis
 
         public Task Save<T>(string key, T t)
         {
-            var redisKey = typeof(T).Name + ":" + key;
+            var redisKey = typeof(T).Name + ":" + key + ":" + VERSION;
 
             var db = _redis.GetDatabase();
 
