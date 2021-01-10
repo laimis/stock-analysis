@@ -44,9 +44,9 @@ namespace core.Stocks
                     Owned = stock.State.Owned,
                     Ticker = stock.State.Ticker,
                     Category = stock.State.Category,
-                    Transactions = new TransactionList(
-                        stock.State.Transactions.Where(t => !t.IsPL), null, null
-                    )
+                    Transactions = stock.State.Transactions.Where(t => !t.IsPL)
+                        .OrderByDescending(t => t.Date)
+                        .ToList()
                 };
             }
         }

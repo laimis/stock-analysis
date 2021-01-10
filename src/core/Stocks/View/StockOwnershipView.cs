@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using core.Portfolio.Output;
+using core.Shared;
 
 namespace core.Stocks.View
 {
@@ -11,6 +13,6 @@ namespace core.Stocks.View
         public int Owned { get; set; }
         public string Ticker { get; set; }
         public string Category { get; set; }
-        public TransactionList Transactions { get; set; }
+        public List<Transaction> Transactions { get; set; }
     }
 }

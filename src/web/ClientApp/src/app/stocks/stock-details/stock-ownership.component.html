@@ -58,7 +58,7 @@
     </div>
   </div>
 
-	<div *ngIf="ownership && ownership.transactions.transactions.length > 0">
+	<div *ngIf="ownership && ownership.transactions.length > 0">
     <div class="mt-4">
       <div class="text-muted">Past Transactions</div>
       <table class="table table-striped border">
@@ -74,7 +74,7 @@
         <tbody>
           <tr
             [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
-            *ngFor="let t of ownership.transactions.transactions">
+            *ngFor="let t of ownership.transactions">
             <td>{{ t.date | date:'shortDate'}}</td>
             <td>{{ t.description }}</td>
             <td>{{ t.debit | currency }}</td>
