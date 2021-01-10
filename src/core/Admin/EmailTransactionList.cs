@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using core.Shared;
 
-namespace core.Portfolio.Output
+namespace core.Admin
 {
-    public class TransactionList
+    public class EmailTransactionList
     {
-        public TransactionList(
+        public EmailTransactionList(
             IEnumerable<Transaction> transactions,
             string groupBy,
             IEnumerable<string> tickers)
@@ -18,9 +18,9 @@ namespace core.Portfolio.Output
             {
                 this.Grouped = Ordered(transactions, groupBy)
                     .GroupBy(t => GroupByValue(groupBy, t))
-                    .Select(g => new TransactionGroup(
+                    .Select(g => new EmailTransactionGroup(
                         g.Key,
-                        new TransactionList(g, null, null)
+                        new EmailTransactionList(g, null, null)
                     ));
 
                 if (groupBy == "ticker")
@@ -58,7 +58,7 @@ namespace core.Portfolio.Output
 
         public IEnumerable<Transaction> Transactions { get; set; }
         public IEnumerable<string> Tickers { get; set; }
-        public IEnumerable<TransactionGroup> Grouped { get; set; } 
+        public IEnumerable<EmailTransactionGroup> Grouped { get; set; } 
         
         public double Credit => Transactions.Sum(t => t.Credit);
         public double Debit => Transactions.Sum(t => t.Debit);

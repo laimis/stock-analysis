@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using core.Adapters.Stocks;
 
-namespace core.Portfolio
+namespace core.Admin
 {
-    public struct ReviewEntryGroup
+    public struct EmailReviewEntryGroup
     {
-        public ReviewEntryGroup(IEnumerable<ReviewEntry> entries, TickerPrice price, StockAdvancedStats stats)
+        public EmailReviewEntryGroup(IEnumerable<EmailReviewEntry> entries, TickerPrice price, StockAdvancedStats stats)
         {
-            this.Alerts = new List<ReviewEntry>();
-            this.Ownership = new List<ReviewEntry>();
+            this.Alerts = new List<EmailReviewEntry>();
+            this.Ownership = new List<EmailReviewEntry>();
             this.Price = price;
             this.Ticker = null;
             this.Stats = stats;
@@ -32,8 +32,8 @@ namespace core.Portfolio
 
         public string Ticker { get; }
         public StockAdvancedStats Stats { get; }
-        public List<ReviewEntry> Alerts { get; }
-        public List<ReviewEntry> Ownership { get; }
+        public List<EmailReviewEntry> Alerts { get; }
+        public List<EmailReviewEntry> Ownership { get; }
         public TickerPrice Price { get; }
 
         public DateTimeOffset? EarningsDate

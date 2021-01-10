@@ -5,11 +5,11 @@ using core.Alerts;
 using core.Options;
 using core.Stocks;
 
-namespace core.Portfolio
+namespace core.Admin
 {
-    public struct ReviewEntry
+    public struct EmailReviewEntry
     {
-        public ReviewEntry(OwnedOption o)
+        public EmailReviewEntry(OwnedOption o)
         {
             Created = null;
             Ticker = o.State.Ticker;
@@ -28,7 +28,7 @@ namespace core.Portfolio
             PricePoints = new List<AlertPricePoint>();
         }
 
-        public ReviewEntry(OwnedStock s)
+        public EmailReviewEntry(OwnedStock s)
         {
             Created = null;
             Ticker = s.State.Ticker;
@@ -47,7 +47,7 @@ namespace core.Portfolio
             PricePoints = new List<AlertPricePoint>();
         }
 
-        public ReviewEntry(Alert a)
+        public EmailReviewEntry(Alert a)
         {
             Ticker = a.Ticker;
             IsAlert = true;

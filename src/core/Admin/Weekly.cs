@@ -9,8 +9,6 @@ using core.Adapters.Emails;
 using core.Adapters.Stocks;
 using core.Alerts;
 using core.Options;
-using core.Portfolio;
-using core.Portfolio.Output;
 using core.Stocks;
 using MediatR;
 using Newtonsoft.Json;
@@ -107,12 +105,12 @@ namespace core.Admin
                     .Where(t => t.DateAsDate >= start)
                     .Where(t => !t.IsPL);
 
-                var r = new ReviewList(
+                var r = new EmailReviewList(
                     start,
                     end,
                     groups,
-                    new TransactionList(transactions.Where(t => !t.IsOption), null, null),
-                    new TransactionList(transactions.Where(t => t.IsOption), null, null)
+                    new EmailTransactionList(transactions.Where(t => !t.IsOption), null, null),
+                    new EmailTransactionList(transactions.Where(t => t.IsOption), null, null)
                 );
 
                 var portfolioEntries = r.Entries.Where(e => e.Ownership.Count > 0).ToList();
@@ -153,46 +151,46 @@ namespace core.Admin
                 return data;
             }
 
-            private async Task<List<ReviewEntryGroup>> CreateReviewGroups(
+            private async Task<List<EmailReviewEntryGroup>> CreateReviewGroups(
                 Task<IEnumerable<OwnedOption>> options,
                 Task<IEnumerable<OwnedStock>> stocks,
                 Task<IEnumerable<Alert>> alerts)
             {
-                var entries = new List<ReviewEntry>();
+                var entries = new List<EmailReviewEntry>();
 
                 foreach (var o in options.Result.Where(s => s.State.Active))
                 {
-                    entries.Add(new ReviewEntry(o));
+                    entries.Add(new EmailReviewEntry(o));
                 }
 
                 foreach (var s in stocks.Result.Where(s => s.State.Owned > 0))
                 {
-                    entries.Add(new ReviewEntry(s));
+                    entries.Add(new EmailReviewEntry(s));
                 }
 
                 foreach (var a in alerts.Result)
                 {
                     if (a.PricePoints.Count > 0)
                     {
-                        entries.Add(new ReviewEntry(a));
+                        entries.Add(new EmailReviewEntry(a));
                     }
                 }
 
                 var grouped = entries.GroupBy(r => r.Ticker);
-                var groups = new List<ReviewEntryGroup>();
+                var groups = new List<EmailReviewEntryGroup>();
 
                 foreach (var group in grouped)
                 {
                     var price = await _stocks.GetPrice(group.Key);
                     var advanced = await _stocks.GetAdvancedStats(group.Key);
 
-                    groups.Add(new ReviewEntryGroup(group, price, advanced));
+                    groups.Add(new EmailReviewEntryGroup(group, price, advanced));
                 }
 
                 return groups;
             }
 
-            private static WeeklyReviewEntryView Map((ReviewEntryGroup p, ReviewEntry re) pair)
+            private static WeeklyReviewEntryView Map((EmailReviewEntryGroup p, EmailReviewEntry re) pair)
             {
                 return new WeeklyReviewEntryView(pair);
             }

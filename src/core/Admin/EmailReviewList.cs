@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using core.Portfolio.Output;
 
-namespace core.Portfolio
+namespace core.Admin
 {
-    public class ReviewList
+    public class EmailReviewList
     {
-        public ReviewList(
+        public EmailReviewList(
             DateTimeOffset start,
             DateTimeOffset end,
-            List<ReviewEntryGroup> entries,
-            TransactionList stocks,
-            TransactionList options)
+            List<EmailReviewEntryGroup> entries,
+            EmailTransactionList stocks,
+            EmailTransactionList options)
         {
             this.Start = start;
             this.End = end;
@@ -24,10 +23,10 @@ namespace core.Portfolio
         }
         public DateTimeOffset Start { get; }
         public DateTimeOffset End { get; }
-        public IEnumerable<ReviewEntryGroup> Entries { get; }
-        public IEnumerable<ReviewEntryGroup> ShortEarnings { get; }
-        public IEnumerable<ReviewEntryGroup> LongEarnings { get; }
-        public TransactionList Stocks { get; }
-        public TransactionList Options { get; }
+        public IEnumerable<EmailReviewEntryGroup> Entries { get; }
+        public IEnumerable<EmailReviewEntryGroup> ShortEarnings { get; }
+        public IEnumerable<EmailReviewEntryGroup> LongEarnings { get; }
+        public EmailTransactionList Stocks { get; }
+        public EmailTransactionList Options { get; }
     }
 }
