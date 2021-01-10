@@ -15,7 +15,7 @@ namespace storage.redis
         protected IMediator _mediator;
         protected ConnectionMultiplexer _redis;
 
-        const string VERSION = "1";
+        const string VERSION = "2";
 
         public RedisAggregateStorage(IMediator mediator, string redisCnn)
         {
