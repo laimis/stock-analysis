@@ -260,6 +260,8 @@ export interface ReviewList {
   end: string
   stocks: ReviewTicker[]
   options: ReviewTicker[]
+  stockProfit: number
+  optionProfit: number
 }
 
 export interface ReviewTicker {

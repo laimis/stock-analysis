@@ -71,14 +71,24 @@ namespace core.Portfolio
                 var transactions = options.SelectMany(o => o.State.Transactions)
                     .Union(stocks.SelectMany(s => s.State.Transactions))
                     .Where(t => t.DateAsDate >= request.Start)
-                    .Where(t => !t.IsPL);
+                    .ToList();
 
-                var stockTickers = transactions.Where(t => !t.IsOption)
+                var stockTickers = transactions.Where(t => !t.IsOption && !t.IsPL)
                     .GroupBy(t => t.Ticker)
                     .Select(g => new ReviewTicker(g.Key, g))
                     .ToList();
 
-                var optionTickers = transactions.Where(t => t.IsOption)
+                var optionTickers = transactions.Where(t => t.IsOption && !t.IsPL)
+                    .GroupBy(t => t.Ticker)
+                    .Select(g => new ReviewTicker(g.Key, g))
+                    .ToList();
+
+                var plStockTickers = transactions.Where(t => !t.IsOption && t.IsPL)
+                    .GroupBy(t => t.Ticker)
+                    .Select(g => new ReviewTicker(g.Key, g))
+                    .ToList();
+
+                var plOptionTickers = transactions.Where(t => t.IsOption && t.IsPL)
                     .GroupBy(t => t.Ticker)
                     .Select(g => new ReviewTicker(g.Key, g))
                     .ToList();
@@ -87,7 +97,9 @@ namespace core.Portfolio
                     request.Start,
                     request.End,
                     stockTickers,
-                    optionTickers
+                    optionTickers,
+                    plStockTickers,
+                    plOptionTickers
                 );
             }
         }
