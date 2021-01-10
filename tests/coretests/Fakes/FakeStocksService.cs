@@ -38,7 +38,7 @@ namespace coretests.Fakes
 
         public Task<Dictionary<string, BatchStockPrice>> GetPrices(IEnumerable<string> tickers)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(new Dictionary<string, BatchStockPrice>());
         }
     }
 }
