@@ -365,7 +365,7 @@ export interface StockOwnership {
   averageCost: number
   owned: number
   category: string
-  transactions: TransactionList
+  transactions: Transaction[]
 }
 
 export interface StockGridEntry {
