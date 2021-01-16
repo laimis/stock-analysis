@@ -37,7 +37,7 @@ namespace core.Stocks
                     cached = await LoadFromDb(query.UserId);
                 }
 
-                var tickers = cached.Owned.Select(o => o.Ticker).Distinct();
+                var tickers = cached.Owned.Select(o => o.Ticker).Distinct().ToList();
 
                 var tickerPrices = await _stocksService.GetPrices(tickers);
 

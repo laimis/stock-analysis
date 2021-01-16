@@ -39,7 +39,7 @@ namespace core.Options
                 }
 
                 var prices = await _stockService.GetPrices(
-                    view.OpenOptions.Select(o => o.Ticker)
+                    view.OpenOptions.Select(o => o.Ticker).ToList()
                 );
 
                 foreach (var op in view.OpenOptions)

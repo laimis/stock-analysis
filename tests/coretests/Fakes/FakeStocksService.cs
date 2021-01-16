@@ -36,7 +36,7 @@ namespace coretests.Fakes
             return Task.FromResult(new List<SearchResult>());
         }
 
-        public Task<Dictionary<string, BatchStockPrice>> GetPrices(IEnumerable<string> tickers)
+        public Task<Dictionary<string, BatchStockPrice>> GetPrices(List<string> tickers)
         {
             return Task.FromResult(new Dictionary<string, BatchStockPrice>());
         }
