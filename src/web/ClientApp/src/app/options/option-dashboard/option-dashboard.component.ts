@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { StocksService } from '../../services/stocks.service';
 
 @Component({
@@ -15,10 +16,12 @@ export class OptionsComponent implements OnInit {
   activeTab: string = 'open'
 
   constructor(
-    private service: StocksService
+    private service: StocksService,
+    private title: Title
   ) { }
 
   ngOnInit() {
+    this.title.setTitle("Options - Nightingale Trading")
     this.getOptions()
   }
 

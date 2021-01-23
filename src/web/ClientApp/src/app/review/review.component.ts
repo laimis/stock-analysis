@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { StocksService, TransactionList, ReviewList } from '../services/stocks.service';
 
 @Component({
@@ -11,9 +12,13 @@ export class ReviewComponent implements OnInit {
   loaded: boolean = false
   timePeriod: string = 'thisweek'
 
-  constructor(private stockService:StocksService) { }
+  constructor(
+    private stockService:StocksService,
+    private title: Title
+    ) { }
 
   ngOnInit() {
+    this.title.setTitle("Review - Nightingale Trading")
     this.loadEntries()
   }
 

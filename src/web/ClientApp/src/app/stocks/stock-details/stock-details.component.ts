@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'stock-details',
@@ -21,12 +22,13 @@ export class StockDetailsComponent {
 
 	constructor(
 		private stocks : StocksService,
-		private route: ActivatedRoute){}
+    private route: ActivatedRoute,
+    private title: Title){}
 
 	ngOnInit(): void {
 		var ticker = this.route.snapshot.paramMap.get('ticker');
 		if (ticker){
-			this.ticker = ticker;
+      this.ticker = ticker;
 			this.fetchStock();
 		}
 	}
@@ -35,7 +37,8 @@ export class StockDetailsComponent {
 		this.stocks.getStockDetails(this.ticker).subscribe(result => {
       this.stock = result;
       this.profile = result.profile
-			this.loaded = true;
+      this.loaded = true;
+      this.title.setTitle(this.stock.ticker + " - Nightingale Trading")
 		}, error => {
 			console.error(error);
 			this.loaded = true;

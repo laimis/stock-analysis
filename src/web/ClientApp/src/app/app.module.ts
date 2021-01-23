@@ -2,7 +2,7 @@
 import { AddNoteComponent } from './notes/add-note.component';
 import { AppComponent } from './app.component';
 import { AuthGuard, AuthGuardUnverifiedAllowed, AuthGuardAdminOnly } from './auth/auth.guard';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ErrorDisplayComponent } from './shared/error-display/error-display.component';
 import { EventsComponent } from './events/events.component';
@@ -161,7 +161,8 @@ var routes = [
     RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })
   ],
   providers: [
-	  { provide: "windowObject", useValue: window}
+    { provide: "windowObject", useValue: window},
+    Title
   ],
   bootstrap: [AppComponent]
 })

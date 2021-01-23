@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, TransactionList } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-transactions',
@@ -19,6 +20,7 @@ export class TransactionsComponent implements OnInit {
   constructor(
     private stockService:StocksService,
     private route:ActivatedRoute,
+    private title:Title
   ) { }
 
   ngOnInit() {
@@ -35,6 +37,7 @@ export class TransactionsComponent implements OnInit {
     this.stockService.getTransactions(this.ticker, this.groupBy, this.filterType, this.txType).subscribe(r => {
       this.response = r
       this.loading = false
+      this.title.setTitle("Transactions - Nightingale Trading")
     }, _ => {
       this.loading = false
     })

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { StocksService, OwnedStock } from '../../services/stocks.service';
 
@@ -26,10 +27,13 @@ export class StockDashboardComponent implements OnInit {
 
 	constructor(
 		private stocks : StocksService,
-		private router : Router)
+    private router : Router,
+    private title : Title)
 	{ }
 
 	ngOnInit() {
+
+    this.title.setTitle("Stocks - Nightingale Trading")
 
 		this.stocks.getStocks().subscribe(result => {
       this.owned = result.owned;

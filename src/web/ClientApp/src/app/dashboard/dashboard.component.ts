@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { StocksService, OwnedStock, OwnedOption, Alert, Dashboard } from '../services/stocks.service';
 
@@ -15,10 +16,13 @@ export class DashboardComponent implements OnInit {
 
 	constructor(
 		private stocks : StocksService,
-		private router : Router)
+    private router : Router,
+    private title: Title)
 	{ }
 
 	ngOnInit() {
+
+    this.title.setTitle("Dashboard - Nightingale Trading")
 
 		this.stocks.getPortfolio().subscribe(result => {
       this.dashboard = result;

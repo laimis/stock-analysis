@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition, GetErrors } from '../../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-owned-option-detail',
@@ -23,7 +24,8 @@ export class OwnedOptionComponent implements OnInit {
     private service: StocksService,
     private route: ActivatedRoute,
     private router: Router,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private title: Title
   ) { }
 
   ngOnInit() {
@@ -40,6 +42,7 @@ export class OwnedOptionComponent implements OnInit {
       this.option = result
       this.positionType = this.option.boughtOrSold == 'Bought' ? 'sell' : 'buy'
       this.numberOfContracts = this.option.numberOfContracts
+      this.title.setTitle(this.option.ticker + " " + this.option.strikePrice + " " + this.option.optionType + " - Nightingale Trading")
     })
   }
 
