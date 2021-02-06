@@ -19,6 +19,7 @@ namespace iexclienttests
         private ITestOutputHelper _output;
         private List<StockQueryResult> _mostActive;
         private List<SearchResult> _search;
+        private StockAdvancedStats _advanced;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {
@@ -29,6 +30,7 @@ namespace iexclienttests
             _output = output;
             _mostActive = fixture.MostActive;
             _search = fixture.SearchResults;
+            _advanced = fixture.AdvancedStats;
         }
 
         [Fact]
@@ -94,6 +96,12 @@ namespace iexclienttests
         {
             Assert.Single(_search);
             Assert.NotNull(_search.SingleOrDefault(r => r.Symbol == "SFIX"));
+        }
+
+        [Fact]
+        public void AdvancedHasEarnings()
+        {
+            Assert.NotNull(_advanced.NextEarningsDate);
         }
     }
 }

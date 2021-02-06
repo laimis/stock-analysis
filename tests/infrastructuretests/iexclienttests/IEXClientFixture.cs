@@ -15,6 +15,7 @@ namespace iexclienttests
         public IEXClient Client;
         public List<StockQueryResult> MostActive;
         public List<SearchResult> SearchResults;
+        public StockAdvancedStats AdvancedStats;
 
         public IEXClientFixture()
         {
@@ -43,6 +44,12 @@ namespace iexclienttests
             search.Wait();
 
             SearchResults = search.Result;
+
+            var advancedStats = Client.GetAdvancedStats("GOOGL");
+
+            advancedStats.Wait();
+
+            AdvancedStats = advancedStats.Result;
         }
     }
 }
