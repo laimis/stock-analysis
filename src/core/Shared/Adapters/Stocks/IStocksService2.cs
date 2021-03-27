@@ -11,5 +11,6 @@ namespace core.Adapters.Stocks
         Task<Dictionary<string, BatchStockPrice>> GetPrices(List<string> tickers);
         
         Task<List<SearchResult>> Search(string fragment);
+        Task<Quote> Quote(string ticker);
     }
 }

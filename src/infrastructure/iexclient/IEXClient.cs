@@ -34,13 +34,20 @@ namespace iexclient
             return Get<string[]>(MakeUrl($"stock/{ticker}/options"));
         }
 
+        private string CacheKeyDaily(string key) => 
+            $"{System.DateTime.UtcNow.ToString("yyyy-MM-dd")}{key}.json";
+
+        private string CacheKeyMonthly(string key) => 
+            $"{System.DateTime.UtcNow.ToString("yyyy-MM")}{key}.json";
+
+        private string CacheKeyMinute(string key) => 
+            $"{System.DateTime.UtcNow.ToString("yyyy-MM-dd-mm")}{key}.json";
+
         public async Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate)
         {
             var url = MakeUrl($"stock/{ticker}/options/{optionDate}");
             
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + ticker + optionDate + ".json";
-
-            var details = await GetCachedResponse<OptionDetail[]>(url, key);
+            var details = await GetCachedResponse<OptionDetail[]>(url, CacheKeyDaily(ticker + optionDate));
 
             return details
                 .OrderByDescending(o => o.StrikePrice)
@@ -50,28 +57,29 @@ namespace iexclient
         public async Task<List<SearchResult>> Search(string fragment)
         {
             var url = MakeUrl($"search/{fragment}");
-            
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + fragment + ".json";
 
-            return await GetCachedResponse<List<SearchResult>>(url, key);
+            return await GetCachedResponse<List<SearchResult>>(url, CacheKeyDaily(fragment));
         }
 
         public Task<CompanyProfile> GetCompanyProfile(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/company");
 
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM") + ticker + "company.json";
+            return GetCachedResponse<CompanyProfile>(url, CacheKeyMonthly(ticker));
+        }
 
-            return GetCachedResponse<CompanyProfile>(url, key);
+        public Task<Quote> Quote(string ticker)
+        {
+            var url = MakeUrl($"stock/{ticker}/quote");
+
+            return GetCachedResponse<Quote>(url, CacheKeyMinute(ticker + "quote"));
         }
 
         public Task<StockAdvancedStats> GetAdvancedStats(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/advanced-stats");
 
-            var key = System.DateTime.UtcNow.ToString("yyyy-MM-dd") + ticker + "advancedstats.json";
-
-            return GetCachedResponse<StockAdvancedStats>(url, key);
+            return GetCachedResponse<StockAdvancedStats>(url, CacheKeyMinute(ticker + "advanced"));
         }
 
         public async Task<TickerPrice> GetPrice(string ticker)

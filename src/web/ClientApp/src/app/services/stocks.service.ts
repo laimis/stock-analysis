@@ -27,6 +27,10 @@ export class StocksService {
 
   // ----------------- misc ---------------------
 
+  registerForTracking(ticker:string): Observable<TrackingPreview> {
+    return this.http.get<any>('/api/tracking/' + ticker + '/register')
+  }
+
   getEvents(type:string): Observable<object[]> {
     return this.http.get<object[]>('/api/events?entity=' + type)
   }
@@ -128,11 +132,11 @@ export class StocksService {
     return this.http.post('/api/stocks/import', file)
   }
 
-	purchase(obj:object) : Observable<any> {
+	purchase(obj:stocktransactioncommand) : Observable<any> {
 		return this.http.post('/api/stocks/purchase', obj)
 	}
 
-	sell(obj:object) : Observable<any> {
+	sell(obj:stocktransactioncommand) : Observable<any> {
 		return this.http.post('/api/stocks/sell', obj)
   }
 
@@ -416,4 +420,39 @@ export interface AccountStatus {
   verified: boolean
   loggedIn: boolean
   isAdmin: boolean
+}
+
+export interface TrackingPreview {
+  companyName: string
+  issueType: string
+  description: string
+  website: string
+
+  avg30Volume: number
+  open: number
+  close: number
+  high: number
+  low: number
+  change: number
+  volume: number
+  range: number
+  volumeIncrease: number
+}
+
+export class job {
+  date: string
+  ticker: string
+  amount: number
+  price: number
+  bought: boolean
+  sold: boolean
+  id: string
+}
+
+export class stocktransactioncommand {
+  ticker: string
+  numberOfShares: number
+  price: number
+  date: string
+  notes: string
 }

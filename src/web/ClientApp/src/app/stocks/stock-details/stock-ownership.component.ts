@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { StocksService, GetErrors, StockDetails, StockOwnership } from '../../services/stocks.service';
+import { StocksService, GetErrors, StockDetails, StockOwnership, stocktransactioncommand } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
@@ -23,8 +23,8 @@ export class StockOwnershipComponent implements OnInit {
   public errors: string[]
   success : boolean
 
-  numberOfShares: Number
-	pricePerShare:  Number
+  numberOfShares: number
+	pricePerShare:  number
 	filled:         string
   positionType:   string
   notes:          string
@@ -76,19 +76,18 @@ export class StockOwnershipComponent implements OnInit {
     this.errors = null;
     this.success = false;
 
-    var op = {
-      ticker: this.stock.ticker,
-      numberOfShares: this.numberOfShares,
-      price: this.pricePerShare,
-      date: this.filled,
-      notes: this.notes
-    }
+    var op = new stocktransactioncommand()
+    op.ticker = this.stock.ticker
+    op.numberOfShares = this.numberOfShares
+    op.price = this.pricePerShare
+    op.date = this.filled
+    op.notes = this.notes
 
     if (this.positionType == 'buy') this.recordBuy(op)
     if (this.positionType == 'sell') this.recordSell(op)
   }
 
-  recordBuy(stock: object) {
+  recordBuy(stock: stocktransactioncommand) {
     this.service.purchase(stock).subscribe( _ => {
       this.ownershipChanged.emit("buy")
       this.clearFields()
@@ -98,7 +97,7 @@ export class StockOwnershipComponent implements OnInit {
     })
   }
 
-  recordSell(stock: object) {
+  recordSell(stock: stocktransactioncommand) {
     this.service.sell(stock).subscribe( _ => {
       this.ownershipChanged.emit("sell")
       this.clearFields()

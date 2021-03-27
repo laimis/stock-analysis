@@ -1,19 +1,24 @@
 <div>
 
-  <div class="row">
-    <div class="col">
-      <app-symbol-search
-        label="Search"
-        (tickerSelected)="onTickerSelected($event)"
-        cssClass="form-control">
-      </app-symbol-search>
-    </div>
-    <div class="col">
-      Another col
-    </div>
+  <div *ngIf="!parsed">
+    <textarea type="text" rows="16" class="form-control" #logs></textarea>
+
+    <button type="button" class="btn btn-primary" (click)="parse(logs.value)">Fetch</button>
   </div>
 
-  <div>
-    Playground will use this value: {{ticker}}
+  <div *ngIf="job">
+    Processing {{job.id}}
+  </div>
+
+  <div *ngIf="processed">
+    Finished processing
+  </div>
+
+  <div *ngIf="parsed">
+    <div *ngFor="let j of jobs">
+      <span *ngIf="j.bought">Bought</span>
+      <span *ngIf="j.sold">Sold</span> {{j.ticker}}
+      {{j.amount}} @ {{j.price}}
+    </div>
   </div>
 </div>
