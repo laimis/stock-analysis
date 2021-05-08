@@ -40,5 +40,10 @@ namespace coretests.Fakes
         {
             return Task.FromResult(new Dictionary<string, BatchStockPrice>());
         }
+
+        public Task<Quote> Quote(string ticker)
+        {
+            return Task.FromResult(new core.Adapters.Stocks.Quote());
+        }
     }
 }
