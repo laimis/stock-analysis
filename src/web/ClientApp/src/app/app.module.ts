@@ -55,7 +55,7 @@ import { StockSettingsComponent } from './stocks/stock-details/stock-settings.co
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 
 var routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'alerts', component: AlertsComponent, canActivate: [AuthGuard] },
   { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly] },
