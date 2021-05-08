@@ -1,0 +1,29 @@
+
+<div *ngIf="sells && sells.length > 0">
+
+  <table class="table">
+    <thead>
+      <tr>
+        <td>Ticker</td>
+        <td>Date</td>
+        <td>Number of Shares</td>
+        <td>Price</td>
+        <td>Older Than 30 Days</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of sells">
+        <td>{{s.ticker}}</td>
+        <td>{{s.date | date}}</td>
+        <td>{{s.numberOfShares}}</td>
+        <td>{{s.price}}</td>
+        <td><span class="badge badge-success" *ngIf="s.olderThan30Days">yes</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div *ngIf="sells && sells.length == 0">
+  No sells found
+</div>

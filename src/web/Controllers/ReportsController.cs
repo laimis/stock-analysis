@@ -30,5 +30,13 @@ namespace web.Controllers
 
             return _mediator.Send(query);
         }
+
+        [HttpGet("sells")]
+        public Task<object> Sells()
+        {
+            var query = new Sells.Query(this.User.Identifier());
+
+            return _mediator.Send(query);
+        }
     }
 }
