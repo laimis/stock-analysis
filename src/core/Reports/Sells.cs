@@ -42,6 +42,7 @@ namespace core.Reports
                         price = t.latest.buyOrSell.Price,
                         olderThan30Days = t.latest.buyOrSell.When < DateTimeOffset.UtcNow.AddDays(-30)
                     })
+                    .OrderByDescending(a => a.date)
                     .ToList();
 
                 return sells;
