@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
@@ -8,17 +8,17 @@ namespace core.Stocks
 {
     public class Search
     {
-        public class Query : IRequest<object>
+        public class Query : IRequest<List<SearchResult>>
         {
             public string Term { get; private set; }
 
             public Query(string term)
             {
-                this.Term = term;
+                Term = term;
             }
         }
 
-        public class Handler : IRequestHandler<Query, object>
+        public class Handler : IRequestHandler<Query, List<SearchResult>>
         {
             private IStocksService2 _stocksService;
 
@@ -27,14 +27,8 @@ namespace core.Stocks
                 _stocksService = stockService2;
             }
 
-            public async Task<object> Handle(Query request, CancellationToken cancellationToken)
-            {
-                var list = await _stocksService.Search(request.Term);
-
-                return list
-                    .Where(s => s.IsSupportedType)
-                    .Take(5);
-            }
+            public Task<List<SearchResult>> Handle(Query request, CancellationToken cancellationToken) =>
+                _stocksService.Search(request.Term, 5);
         }
     }
 }

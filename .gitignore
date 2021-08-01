@@ -235,4 +235,4 @@ coverage.opencover.xml
 coverage/
 
 # dev secrets
-*_secret.*
+*_secret*

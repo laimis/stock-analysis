@@ -10,7 +10,7 @@ namespace core.Adapters.Stocks
         Task<TickerPrice> GetPrice(string ticker);
         Task<Dictionary<string, BatchStockPrice>> GetPrices(List<string> tickers);
         
-        Task<List<SearchResult>> Search(string fragment);
+        Task<List<SearchResult>> Search(string fragment, int maxResults);
         Task<Quote> Quote(string ticker);
     }
 }

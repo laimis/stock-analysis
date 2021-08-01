@@ -42,7 +42,7 @@ namespace iexclienttests
         [Fact]
         public void OptionHasYear()
         {
-            Assert.Equal("202001", _options[0]);
+            Assert.Equal("20210806", _options[0]);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace iexclienttests
 
             var strike = _optionDetails.Single(o => o.Spread == maxSpread);
 
-            Assert.Equal(0.7, maxSpread, 1);
+            Assert.Equal(2.2, maxSpread, 1);
             Assert.Equal(7.5, strike.StrikePrice);
         }
         
@@ -94,7 +94,7 @@ namespace iexclienttests
         [Fact]
         public void SearchWorks()
         {
-            Assert.Single(_search);
+            Assert.NotEmpty(_search);
             Assert.NotNull(_search.SingleOrDefault(r => r.Symbol == "SFIX"));
         }
 

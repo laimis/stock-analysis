@@ -31,7 +31,7 @@ namespace coretests.Fakes
             return Task.FromResult(new TickerPrice());
         }
 
-        public Task<List<SearchResult>> Search(string fragment)
+        public Task<List<SearchResult>> Search(string fragment, int maxResults)
         {
             return Task.FromResult(new List<SearchResult>());
         }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using core;
 using core.Adapters.Options;
@@ -19,27 +18,27 @@ namespace iexclienttests
 
         public IEXClientFixture()
         {
-            Client = new IEXClient("pk_71ba0d8d98ed4d2caac8089588d62973");
+            Client = new IEXClient(CredsHelper.GetIEXToken(), useCache: false);
 
-            var t = Client.GetOptions("TEUM");
+            var t = Client.GetOptions("AMD");
 
             t.Wait();
             
             Options = t.Result;
 
-            var dt = Client.GetOptionDetails("TEUM", "201909");
+            var dt = Client.GetOptionDetails("AMD", "20210806");
 
             dt.Wait();
 
             OptionDetails = dt.Result;
 
-            var price = Client.GetPrice("TEUM");
+            var price = Client.GetPrice("AMD");
 
             price.Wait();
 
             Price = price.Result;
 
-            var search = Client.Search("stitch");
+            var search = Client.Search("stitch", 5);
 
             search.Wait();
 

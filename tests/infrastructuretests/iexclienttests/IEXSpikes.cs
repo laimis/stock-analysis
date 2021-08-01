@@ -13,7 +13,7 @@ namespace iexclienttests
         public IEXSpikes(Xunit.Abstractions.ITestOutputHelper helper)
         {
             _helper = helper;
-            _client = new IEXClient("pk_71ba0d8d98ed4d2caac8089588d62973");
+            _client = new IEXClient(CredsHelper.GetIEXToken());
         }
 
         [Fact]

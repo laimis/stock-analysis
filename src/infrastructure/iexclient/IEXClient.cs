@@ -16,12 +16,15 @@ namespace iexclient
         private static string _endpoint = "https://cloud.iexapis.com/stable";
         private string _token;
         private string _tempDir;
+        private bool _useCache;
 
-        public IEXClient(string accessToken)
+        public IEXClient(string accessToken, bool useCache = true)
         {
-            this._token = accessToken;
+            _token = accessToken;
             
-            this._tempDir = Path.Combine(Path.GetTempPath(), "iexcache");
+            _tempDir = Path.Combine(Path.GetTempPath(), "iexcache");
+
+            _useCache = useCache;
 
             if (!Directory.Exists(_tempDir))
             {
@@ -54,11 +57,13 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        public async Task<List<SearchResult>> Search(string fragment)
+        public async Task<List<SearchResult>> Search(string fragment, int maxResults)
         {
             var url = MakeUrl($"search/{fragment}");
 
-            return await GetCachedResponse<List<SearchResult>>(url, CacheKeyDaily(fragment));
+            var list = await GetCachedResponse<List<SearchResult>>(url, CacheKeyDaily(fragment));
+
+            return list.Where(r => r.IsSupportedType).Take(5).ToList();
         }
 
         public Task<CompanyProfile> GetCompanyProfile(string ticker)
@@ -126,7 +131,7 @@ namespace iexclient
             var file = Path.Combine(_tempDir, key);
 
             string contents = null;
-            if (File.Exists(file))
+            if (File.Exists(file) && _useCache)
             {
                 contents = File.ReadAllText(file);
             }
