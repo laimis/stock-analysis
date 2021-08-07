@@ -82,7 +82,7 @@ namespace core.Account
 
         protected void ApplyInternal(dynamic obj)
         {
-            this.ApplyInternal(obj);
+            ApplyInternal(obj);
         }
     }
 }

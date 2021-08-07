@@ -8,7 +8,7 @@ namespace core.Stocks.View
             Ticker = t.Ticker;
             Date = t.Closed.Value.ToString("yyyy-MM-dd");
             Profit = t.Profit;
-            ReturnPct = t.Profit;
+            ReturnPct = t.Percentage;
         }
 
         public string Ticker { get; set; }
