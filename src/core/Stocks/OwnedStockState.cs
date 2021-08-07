@@ -18,35 +18,35 @@ namespace core.Stocks
         internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
         internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
 
-        public string Description => $"{this.Owned} shares owned at avg cost {Math.Round(this.AverageCost, 2)}";
+        public string Description => $"{Owned} shares owned at avg cost {Math.Round(AverageCost, 2)}";
 
         public string Category { get; private set; }
         public int DaysHeld { get; private set; }
 
         internal void ApplyInternal(TickerObtained o)
         {
-            this.Id = o.AggregateId;
-            this.Ticker = o.Ticker;
-            this.UserId = o.UserId;
+            Id = o.AggregateId;
+            Ticker = o.Ticker;
+            UserId = o.UserId;
         }
 
         internal void ApplyInternal(StockCategoryChanged c)
         {
-            this.Category = c.Category;
+            Category = c.Category;
         }
 
         internal void ApplyInternal(StockPurchased purchased)
         {
-            this.BuyOrSell.Add(purchased);
+            BuyOrSell.Add(purchased);
 
             StateUpdateLoop();
         }
 
         internal void ApplyInternal(StockDeleted deleted)
         {
-            foreach(var t in this.BuyOrSell)
+            foreach(var t in BuyOrSell)
             {
-                this.Deletes.Add(t.Id);
+                Deletes.Add(t.Id);
             }
 
             StateUpdateLoop();
@@ -54,14 +54,14 @@ namespace core.Stocks
 
         internal void ApplyInternal(StockTransactionDeleted deleted)
         {
-            this.Deletes.Add(deleted.TransactionId);
+            Deletes.Add(deleted.TransactionId);
 
             StateUpdateLoop();
         }
 
         internal void ApplyInternal(StockSold sold)
         {
-            this.BuyOrSell.Add(sold);
+            BuyOrSell.Add(sold);
 
             StateUpdateLoop();
         }
@@ -83,9 +83,9 @@ namespace core.Stocks
 
                 txs.Add(
                     Transaction.DebitTx(
-                        this.Id,
+                        Id,
                         st.Id,
-                        this.Ticker,
+                        Ticker,
                         $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
                         st.Price * st.NumberOfShares,
                         st.When,
@@ -98,25 +98,25 @@ namespace core.Stocks
             {
                 txs.Add(
                     Transaction.CreditTx(
-                        this.Id,
+                        Id,
                         st.Id,
-                        this.Ticker,
+                        Ticker,
                         $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
                         st.Price * st.NumberOfShares,
                         st.When,
-                        false
+                        isOption: false
                     )
                 );
 
                 txs.Add(
                     Transaction.PLTx(
-                        this.Id,
-                        this.Ticker,
+                        Id,
+                        Ticker,
                         $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
                         avgCost * st.NumberOfShares,
                         st.Price * st.NumberOfShares,
                         st.When,
-                        false
+                        isOption: false
                     )
                 );
                 
@@ -124,9 +124,9 @@ namespace core.Stocks
                 cost -= avgCost * st.NumberOfShares;
             }
 
-            foreach(var st in this.BuyOrSell.OrderBy(e => e.When).ThenBy(i => this.BuyOrSell.IndexOf(i)))
+            foreach(var st in BuyOrSell.OrderBy(e => e.When).ThenBy(i => BuyOrSell.IndexOf(i)))
             {
-                if (this.Deletes.Contains(st.Id))
+                if (Deletes.Contains(st.Id))
                 {
                     continue;
                 }
@@ -153,12 +153,12 @@ namespace core.Stocks
                 }
             }
 
-            this.AverageCost = avgCost;
-            this.Owned = owned;
-            this.Cost = cost;
-            this.Transactions.Clear();
-            this.Transactions.AddRange(txs);
-            this.DaysHeld = mostRecentOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(mostRecentOpen.Value).TotalDays)
+            AverageCost = avgCost;
+            Owned = owned;
+            Cost = cost;
+            Transactions.Clear();
+            Transactions.AddRange(txs);
+            DaysHeld = mostRecentOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(mostRecentOpen.Value).TotalDays)
                 : 0;
         }
 
@@ -169,7 +169,7 @@ namespace core.Stocks
 
         protected void ApplyInternal(dynamic obj)
         {
-            this.ApplyInternal(obj);
+            ApplyInternal(obj);
         }
     }
 
