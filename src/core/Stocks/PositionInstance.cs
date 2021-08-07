@@ -14,6 +14,7 @@ namespace core.Stocks
         public double Cost { get; private set; } = 0;
         public double Return { get; private set; } = 0;
         public double Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
+        public double Profit => Return - Cost;
 
         public void Buy(int amount, double price, DateTimeOffset when)
         {

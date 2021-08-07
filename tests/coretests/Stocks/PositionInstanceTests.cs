@@ -41,5 +41,11 @@ namespace coretests.Stocks
         {
             Assert.Equal(0.1846, _position.Percentage);
         }
+
+        [Fact]
+        public void Profit()
+        {
+            Assert.Equal(120, _position.Profit);
+        }
     }
 }

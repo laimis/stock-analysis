@@ -112,6 +112,9 @@ namespace coretests.Stocks
             Assert.Equal(0, stock.State.AverageCost);
             Assert.Equal(0, stock.State.Cost);
             Assert.Single(stock.State.PositionInstances);
+            Assert.Equal(0, stock.State.PositionInstances[0].DaysHeld);
+            Assert.Equal(1, stock.State.PositionInstances[0].Profit);
+            Assert.Equal(0.04, stock.State.PositionInstances[0].Percentage);
         }
 
         [Fact]
