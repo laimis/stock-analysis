@@ -1,5 +1,3 @@
-using core.Shared;
-
 namespace core.Stocks.View
 {
     public class PositionInstanceView

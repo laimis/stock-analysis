@@ -77,8 +77,14 @@ namespace core.Stocks
             DateTimeOffset? oldestOpen = null;
             var positionInstances = new List<PositionInstance>();
 
-            void PurchaseProcessing(IStockTransaction st)
+            bool PurchaseProcessing(IStockTransaction st)
             {
+                if (owned == 0)
+                {
+                    oldestOpen = st.When;
+                    positionInstances.Add(new PositionInstance(Ticker));
+                }
+
                 avgCost = (avgCost * owned + st.Price * st.NumberOfShares)
                         / (owned + st.NumberOfShares);
                 owned += st.NumberOfShares;
@@ -97,11 +103,16 @@ namespace core.Stocks
                 );
 
                 positionInstances[positionInstances.Count - 1].Buy(st.NumberOfShares, st.Price, st.When);
+
+                return true;
             }
 
-            void SellProcessing(IStockTransaction st)
+            bool SellProcessing(IStockTransaction st)
             {
-                positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When);
+                // TODO: this should never happen but in prod I see sell get
+                // triggered before purchase... something is amiss
+                if (positionInstances.Count > 0)
+                    positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When);
 
                 txs.Add(
                     Transaction.CreditTx(
@@ -129,6 +140,8 @@ namespace core.Stocks
                 
                 owned -= st.NumberOfShares;
                 cost -= avgCost * st.NumberOfShares;
+
+                return true;
             }
 
             foreach(var st in BuyOrSell.OrderBy(e => e.When).ThenBy(i => BuyOrSell.IndexOf(i)))
@@ -138,20 +151,10 @@ namespace core.Stocks
                     continue;
                 }
 
-                if (st is StockPurchased)
-                {
-                    if (owned == 0)
-                    {
-                        oldestOpen = st.When;
-                        positionInstances.Add(new PositionInstance(Ticker));
-                    }
-
-                    PurchaseProcessing(st);
-                }
-                else
-                {
-                    SellProcessing(st);
-                }
+                _ = st switch {
+                    StockPurchased => PurchaseProcessing(st),
+                    StockSold => SellProcessing(st)
+                };
 
                 if (owned == 0)
                 {
