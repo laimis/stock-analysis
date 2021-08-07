@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 
 namespace iexclienttests
 {
+    [Trait("Category", "Integration")]
     public class IEXSpikes
     {
         private ITestOutputHelper _helper;
