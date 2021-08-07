@@ -111,6 +111,7 @@ namespace coretests.Stocks
             Assert.Equal(0, stock.State.Owned);
             Assert.Equal(0, stock.State.AverageCost);
             Assert.Equal(0, stock.State.Cost);
+            Assert.Single(stock.State.PositionInstances);
         }
 
         [Fact]
