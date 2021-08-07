@@ -143,7 +143,7 @@ namespace core.Stocks
                     if (owned == 0)
                     {
                         oldestOpen = st.When;
-                        positionInstances.Add(new PositionInstance());
+                        positionInstances.Add(new PositionInstance(Ticker));
                     }
 
                     PurchaseProcessing(st);

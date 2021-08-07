@@ -10,7 +10,7 @@ namespace coretests.Stocks
 
         public PositionInstanceTests()
         {
-            _position = new PositionInstance();
+            _position = new PositionInstance("TSLA");
 
             _position.Buy(amount: 10, price: 30, when: DateTime.Parse("2020-01-23"));
             _position.Buy(amount: 10, price: 35, when: DateTime.Parse("2020-01-25"));
@@ -46,6 +46,18 @@ namespace coretests.Stocks
         public void Profit()
         {
             Assert.Equal(120, _position.Profit);
+        }
+
+        [Fact]
+        public void IsClosed()
+        {
+            Assert.True(_position.IsClosed);
+        }
+
+        [Fact]
+        public void Ticker()
+        {
+            Assert.Equal("TSLA", _position.Ticker);
         }
     }
 }

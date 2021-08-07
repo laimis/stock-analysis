@@ -8,13 +8,20 @@ namespace core.Stocks
     {
         private DateTimeOffset? _firstOpen = null;
         private int _amount = 0;
-        private DateTimeOffset? _closed = null;
 
-        public int DaysHeld => _firstOpen != null ? (int)((_closed == null ? DateTimeOffset.UtcNow : _closed.Value).Subtract(_firstOpen.Value)).TotalDays : 0;
+        public PositionInstance(string ticker)
+        {
+            Ticker = ticker;
+        }
+
+        public int DaysHeld => _firstOpen != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(_firstOpen.Value)).TotalDays : 0;
         public double Cost { get; private set; } = 0;
         public double Return { get; private set; } = 0;
         public double Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
         public double Profit => Return - Cost;
+        public bool IsClosed => Closed != null;
+        public string Ticker { get; }
+        public DateTimeOffset? Closed { get; private set; }
 
         public void Buy(int amount, double price, DateTimeOffset when)
         {
@@ -39,7 +46,7 @@ namespace core.Stocks
 
             if (_amount == 0)
             {
-                _closed = when;
+                Closed = when;
             }
 
             Return += amount * price;

@@ -7,7 +7,7 @@ namespace core.Stocks.View
     public class StockDashboardView : IViewModel
     {
         public List<OwnedStockView> Owned { get; set; }
-        public List<StockTransactionView> Past { get; set; }
+        public List<PositionInstanceView> Past { get; set; }
         public StockOwnershipPerformance Performance { get; set; }
         public DateTimeOffset Calculated { get; set; }
     }
