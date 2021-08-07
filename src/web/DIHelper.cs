@@ -13,6 +13,7 @@ using iexclient;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using storage.redis;
 using storage.shared;
 using web.Utils;
@@ -25,7 +26,8 @@ namespace web
         {
             services.AddSingleton<IEXClient>(s =>
                 new IEXClient(
-                    configuration.GetValue<string>("IEXClientToken")
+                    configuration.GetValue<string>("IEXClientToken"),
+                    s.GetService<ILogger<IEXClient>>()
                 )
             );
             

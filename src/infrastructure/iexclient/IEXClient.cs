@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace iexclient
@@ -14,14 +15,15 @@ namespace iexclient
     {
         private static HttpClient _client = new HttpClient();
         private static string _endpoint = "https://cloud.iexapis.com/stable";
+        private ILogger<IEXClient> _logger;
         private string _token;
         private string _tempDir;
         private bool _useCache;
 
-        public IEXClient(string accessToken, bool useCache = true)
+        public IEXClient(string accessToken, ILogger<IEXClient> logger, bool useCache = true)
         {
+            _logger = logger;
             _token = accessToken;
-            
             _tempDir = Path.Combine(Path.GetTempPath(), "iexcache");
 
             _useCache = useCache;
@@ -117,6 +119,12 @@ namespace iexclient
             var r = await _client.GetAsync(url);
 
             var response = await r.Content.ReadAsStringAsync();
+
+            if (!r.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Failed to get stocks with url {url}: " + response);
+                r.EnsureSuccessStatusCode();
+            }
 
             return JsonConvert.DeserializeObject<Dictionary<string, BatchStockPrice>>(response);
         }
