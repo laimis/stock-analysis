@@ -18,6 +18,8 @@ namespace core.Stocks
         internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
         internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
 
+        public List<PositionInstance> PositionInstances { get; } = new List<PositionInstance>();
+
         public string Description => $"{Owned} shares owned at avg cost {Math.Round(AverageCost, 2)}";
 
         public string Category { get; private set; }
@@ -72,7 +74,8 @@ namespace core.Stocks
             int owned = 0;
             double cost = 0;
             var txs = new List<Transaction>();
-            DateTimeOffset? mostRecentOpen = null;
+            DateTimeOffset? oldestOpen = null;
+            var positionInstances = new List<PositionInstance>();
 
             void PurchaseProcessing(IStockTransaction st)
             {
@@ -89,13 +92,17 @@ namespace core.Stocks
                         $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
                         st.Price * st.NumberOfShares,
                         st.When,
-                        false
+                        isOption: false
                     )
                 );
+
+                positionInstances[positionInstances.Count - 1].Buy(st.NumberOfShares, st.Price, st.When);
             }
 
             void SellProcessing(IStockTransaction st)
             {
+                positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When);
+
                 txs.Add(
                     Transaction.CreditTx(
                         Id,
@@ -135,7 +142,8 @@ namespace core.Stocks
                 {
                     if (owned == 0)
                     {
-                        mostRecentOpen = st.When;
+                        oldestOpen = st.When;
+                        positionInstances.Add(new PositionInstance(Ticker));
                     }
 
                     PurchaseProcessing(st);
@@ -149,7 +157,7 @@ namespace core.Stocks
                 {
                     avgCost = 0;
                     cost = 0;
-                    mostRecentOpen = null;
+                    oldestOpen = null;
                 }
             }
 
@@ -158,7 +166,10 @@ namespace core.Stocks
             Cost = cost;
             Transactions.Clear();
             Transactions.AddRange(txs);
-            DaysHeld = mostRecentOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(mostRecentOpen.Value).TotalDays)
+            PositionInstances.Clear();
+            PositionInstances.AddRange(positionInstances);
+
+            DaysHeld = oldestOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(oldestOpen.Value).TotalDays)
                 : 0;
         }
 

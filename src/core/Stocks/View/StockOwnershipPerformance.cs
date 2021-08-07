@@ -9,36 +9,36 @@ namespace core.Stocks
     {
         public StockOwnershipPerformance(){}
         
-        public StockOwnershipPerformance(List<Transaction> closedTransactions)
+        public StockOwnershipPerformance(List<PositionInstance> closedPositions)
         {
-            if (closedTransactions.Count == 0)
+            if (closedPositions.Count == 0)
             {
                 return;
             }
 
-            this.Total = closedTransactions.Count;
+            Total = closedPositions.Count;
             
-            var wins = closedTransactions.Where(t => t.Profit >= 0).ToList();
+            var wins = closedPositions.Where(t => t.Profit >= 0).ToList();
             if (wins.Count > 0)
             {
-                this.Wins = wins.Count;
-                this.AvgWinAmount = wins.Average(t => t.Profit);
-                this.MaxWinAmount = wins.Max(t => t.Profit);
-                this.WinAvgReturnPct = wins.Average(t => t.ReturnPct);
+                Wins = wins.Count;
+                AvgWinAmount = wins.Average(t => t.Profit);
+                MaxWinAmount = wins.Max(t => t.Profit);
+                WinAvgReturnPct = wins.Average(t => t.Percentage);
             }
 
-            var losses = closedTransactions.Where(t => t.Profit < 0).ToList();
+            var losses = closedPositions.Where(t => t.Profit < 0).ToList();
             if (losses.Count > 0)
             {
-                this.Losses = losses.Count;
-                this.AvgLossAmount = Math.Abs(losses.Average(t => t.Profit));
-                this.MaxLossAmount = Math.Abs(losses.Min(t => t.Profit));
-                this.LossAvgReturnPct = Math.Abs(losses.Average(t => t.ReturnPct));
+                Losses = losses.Count;
+                AvgLossAmount = Math.Abs(losses.Average(t => t.Profit));
+                MaxLossAmount = Math.Abs(losses.Min(t => t.Profit));
+                LossAvgReturnPct = Math.Abs(losses.Average(t => t.Percentage));
             }
             
-            this.WinPct = (1.0 * this.Wins) / this.Total;
-            this.EV = WinPct * this.AvgWinAmount - (1-WinPct) * this.AvgLossAmount;
-            this.AvgReturnPct = closedTransactions.Average(t => t.ReturnPct);
+            WinPct = (1.0 * Wins) / Total;
+            EV = WinPct * AvgWinAmount - (1-WinPct) * AvgLossAmount;
+            AvgReturnPct = closedPositions.Average(t => t.Percentage);
         }
 
         public int Total { get; set; }

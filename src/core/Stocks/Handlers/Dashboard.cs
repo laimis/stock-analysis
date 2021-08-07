@@ -67,13 +67,13 @@ namespace core.Stocks
                     .ToList();
 
                 var closedTransactions = stocks
-                    .SelectMany(s => s.State.Transactions.Where(t => t.IsPL))
+                    .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
                     .ToList();
 
                 var performance = new StockOwnershipPerformance(closedTransactions);
 
                 var past = closedTransactions
-                    .Select(t => new StockTransactionView(t))
+                    .Select(t => new PositionInstanceView(t))
                     .OrderByDescending(p => p.Date)
                     .ToList();
 
