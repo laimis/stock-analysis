@@ -54,6 +54,7 @@ import { StockPastComponent } from './stocks/stock-dashboard/stock-past.componen
 import { StockSettingsComponent } from './stocks/stock-details/stock-settings.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
+import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -145,6 +146,7 @@ var routes = [
     StockSettingsComponent,
     StockOptionComponent,
     StockOwnershipComponent,
+    StockDCAGridComponent,
     StockOwnershipGridComponent,
     StockAdvancedStatsGridComponent,
     StockOwnershipPerformanceComponent,

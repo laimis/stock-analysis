@@ -24,6 +24,7 @@ namespace core.Stocks
 
         public string Category { get; private set; }
         public int DaysHeld { get; private set; }
+        public int DaysSinceLastTransaction { get; private set; }
         public IEnumerable<AggregateEvent> UndeletedBuysOrSells =>
             BuyOrSell.Where(a => Deletes.Contains(a.Id)).Cast<AggregateEvent>();
 
@@ -78,9 +79,12 @@ namespace core.Stocks
             var txs = new List<Transaction>();
             DateTimeOffset? oldestOpen = null;
             var positionInstances = new List<PositionInstance>();
+            DateTimeOffset lastTransaction = DateTimeOffset.UtcNow;
 
             bool PurchaseProcessing(IStockTransaction st)
             {
+                lastTransaction = st.When;
+
                 if (owned == 0)
                 {
                     oldestOpen = st.When;
@@ -115,6 +119,8 @@ namespace core.Stocks
                 // triggered before purchase... something is amiss
                 if (positionInstances.Count > 0)
                     positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When);
+
+                lastTransaction = st.When;
 
                 txs.Add(
                     Transaction.CreditTx(
@@ -176,6 +182,8 @@ namespace core.Stocks
 
             DaysHeld = oldestOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(oldestOpen.Value).TotalDays)
                 : 0;
+
+            DaysSinceLastTransaction = (int)DateTimeOffset.UtcNow.Subtract(lastTransaction).TotalDays;
         }
 
         public void Apply(AggregateEvent e)

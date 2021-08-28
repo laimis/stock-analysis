@@ -203,14 +203,17 @@ namespace coretests.Stocks
             stock.Purchase(1, 10, DateTimeOffset.UtcNow.AddDays(-2));
 
             Assert.Equal(5, stock.State.DaysHeld);
+            Assert.Equal(2, stock.State.DaysSinceLastTransaction);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             Assert.Equal(5, stock.State.DaysHeld);
+            Assert.Equal(0, stock.State.DaysSinceLastTransaction);
 
             stock.Sell(1, 10, DateTimeOffset.UtcNow, null);
 
             Assert.Equal(0, stock.State.DaysHeld);
+            Assert.Equal(0, stock.State.DaysSinceLastTransaction);
         }
     }
 }

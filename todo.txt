@@ -1,3 +1,2 @@
 - days since last purchase
 - money spent in the last 30 days
-- add to performance avg hold duration for wins, avg hold duration for losses

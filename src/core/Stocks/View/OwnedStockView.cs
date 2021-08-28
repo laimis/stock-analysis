@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using core.Portfolio.Output;
 
 namespace core.Stocks.View
@@ -17,6 +19,7 @@ namespace core.Stocks.View
             AverageCost = o.State.AverageCost;
             Cost = o.State.Cost;
             DaysHeld = o.State.DaysHeld;
+            DaysSinceLastTransaction = o.State.DaysSinceLastTransaction;
         }
 
         public void ApplyPrice(double price)
@@ -29,6 +32,7 @@ namespace core.Stocks.View
         public double Price { get; set; }
         public string Category { get; set; }
         public int DaysHeld { get; set; }
+        public int DaysSinceLastTransaction { get; set; }
         public string Ticker { get; set; }
         public int Owned { get; set; }
         public double Equity { get; set; }
