@@ -19,7 +19,7 @@ namespace core.Account
 
             public void WithIPAddress(string ipAddress)
             {
-                this.IPAddress = ipAddress;
+                IPAddress = ipAddress;
             }
         }
 
@@ -37,7 +37,7 @@ namespace core.Account
 
             public async Task<CommandResponse<User>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var user = await this._storage.GetUserByEmail(request.Email);
+                var user = await _storage.GetUserByEmail(request.Email);
                 if (user == null)
                 {
                     return CommandResponse<User>.Failed(GENERIC_MSG);
@@ -57,7 +57,7 @@ namespace core.Account
                 {
                     user.LoggedIn(request.IPAddress, DateTimeOffset.UtcNow);
 
-                    await this._storage.Save(user);
+                    await _storage.Save(user);
 
                     return CommandResponse<User>.Success(user);
                 }
