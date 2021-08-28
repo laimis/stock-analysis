@@ -6,6 +6,7 @@
     <th>Date</th>
     <th>Profit/Loss</th>
     <th>Profit/Loss %</th>
+    <th>Days Held</th>
   </tr>
   <tr *ngFor="let p of past">
     <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
@@ -16,5 +17,6 @@
       <span *ngIf="p.profit < 0" class="badge badge-warning mr-1">loss</span>
       {{p.returnPct | percent}}
     </td>
+    <td>{{p.daysHeld}}</td>
   </tr>
 </table>
