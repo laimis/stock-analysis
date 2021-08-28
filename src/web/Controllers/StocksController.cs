@@ -43,6 +43,15 @@ namespace web.Controllers
             return await _mediator.Send(query);
         }
 
+        [HttpGet("{ticker}/ownership/raw")]
+        public async Task<object> Raw(string ticker)
+        {
+            var query = new Get.Query(ticker, true);
+            query.WithUserId(User.Identifier());
+
+            return await _mediator.Send(query);
+        }
+
         [HttpDelete("{id}")]
         public async Task<object> Delete(Guid id)
         {

@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Portfolio.Output;
 using core.Shared;
 using core.Stocks.View;
 
@@ -12,12 +11,14 @@ namespace core.Stocks
     {
         public class Query : RequestWithUserId<object>
         {
-            public Query(string ticker)
+            public Query(string ticker, bool raw = false)
             {
-                this.Ticker = ticker;
+                Ticker = ticker;
+                Raw = raw;
             }
 
             public string Ticker { get; }
+            public bool Raw { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, object>
@@ -35,6 +36,11 @@ namespace core.Stocks
                 if (stock == null)
                 {
                     return null;
+                }
+
+                if (query.Raw)
+                {
+                    return stock.State;
                 }
 
                 return new StockOwnershipView {

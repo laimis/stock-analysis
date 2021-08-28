@@ -61,7 +61,7 @@ namespace core
 
         public static string Generate(IEnumerable<OwnedStock> stocks)
         {
-            var rows = stocks.SelectMany(o => o.State.BuyOrSell.Select(op => (o, (AggregateEvent)op)))
+            var rows = stocks.SelectMany(o => o.State.UndeletedBuysOrSells.Select(op => (o, (AggregateEvent)op)))
                 .OrderBy(t => t.Item2.When)
                 .Select(e => {
                     return StockEventToParts(e);
