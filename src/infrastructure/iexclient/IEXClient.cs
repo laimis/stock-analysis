@@ -122,7 +122,7 @@ namespace iexclient
 
             if (!r.IsSuccessStatusCode)
             {
-                _logger.LogError($"Failed to get stocks with url {url}: " + response);
+                _logger?.LogError($"Failed to get stocks with url {url}: " + response);
                 r.EnsureSuccessStatusCode();
             }
 

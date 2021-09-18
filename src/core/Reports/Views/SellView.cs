@@ -9,5 +9,6 @@ namespace core.Reports.Views
         public int NumberOfShares { get; set; }
         public double Price { get; set; }
         public bool OlderThan30Days { get; set; }
+        public int NumberOfDays => (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(Date).TotalDays);
     }
 }

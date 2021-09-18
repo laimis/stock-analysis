@@ -48,10 +48,9 @@ namespace sendgridclient
             
             var response = await client.SendEmailAsync(msg);
 
-            var json = msg.Serialize();
+            var err = await response.Body.ReadAsStringAsync();
 
-            Console.WriteLine("Sendgrid response: " + response.StatusCode);
-            Console.WriteLine(json);
+            Console.WriteLine($"Sendgrid status {response.StatusCode} with body: {err}");
         }
     }
 }

@@ -66,6 +66,8 @@ namespace web.BackgroundServices
             foreach(var p in pairs)
             {
                 // 30 day crosser
+                _logger.LogInformation($"Scanning {p.email}");
+
                 var sellsOfInterest = new List<SellView>();
                 var query = new Sells.Query(new Guid(p.id));
 
@@ -73,17 +75,27 @@ namespace web.BackgroundServices
 
                 foreach(var s in sellView.Sells)
                 {
-                    if (s.Date.Date == DateTime.UtcNow)
+                    if (s.NumberOfDays >= 27)
                     {
                         sellsOfInterest.Add(s);
                     }
+                }
+
+                if (sellsOfInterest.Count == 0)
+                {
+                    sellsOfInterest.Add(new SellView {
+                        Ticker = "FSLY",
+                        Price = 37,
+                        Date = new DateTimeOffset(year: 2021, month: 8, day: 22, hour: 0, minute: 0, second: 1, offset: TimeSpan.Zero)
+                    });
+                    // continue;
                 }
 
                 await _emails.Send(
                     recipient: p.email,
                     Sender.NoReply,
                     template: EmailTemplate.SellAlert,
-                    sellsOfInterest
+                    new {sells = sellsOfInterest}
                 );
             }
         }

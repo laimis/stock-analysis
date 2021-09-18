@@ -28,7 +28,7 @@ namespace web.Utils
             _logger.LogInformation($"Obtained email {email}");
             
             var id = await _mediator.Send(new SignInViaGoogle.Command(email));
-            
+
             (context.Principal.Identity as ClaimsIdentity).AddClaim(
                 new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())
             );

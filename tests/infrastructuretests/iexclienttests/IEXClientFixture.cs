@@ -18,7 +18,7 @@ namespace iexclienttests
 
         public IEXClientFixture()
         {
-            Client = new IEXClient(CredsHelper.GetIEXToken(), useCache: false);
+            Client = new IEXClient(CredsHelper.GetIEXToken(), logger: null, useCache: false);
 
             var t = Client.GetOptions("AMD");
 
