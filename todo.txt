@@ -1,2 +1,1 @@
-- days since last purchase
-- money spent in the last 30 days
+- ping when 30 days are about to pass
