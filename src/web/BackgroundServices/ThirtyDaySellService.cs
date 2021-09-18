@@ -83,12 +83,7 @@ namespace web.BackgroundServices
 
                 if (sellsOfInterest.Count == 0)
                 {
-                    sellsOfInterest.Add(new SellView {
-                        Ticker = "FSLY",
-                        Price = 37,
-                        Date = new DateTimeOffset(year: 2021, month: 8, day: 22, hour: 0, minute: 0, second: 1, offset: TimeSpan.Zero)
-                    });
-                    // continue;
+                    continue;
                 }
 
                 await _emails.Send(
