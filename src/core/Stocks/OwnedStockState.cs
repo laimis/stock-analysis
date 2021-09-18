@@ -159,12 +159,15 @@ namespace core.Stocks
                     continue;
                 }
 
-                _ = st switch {
-                    StockPurchased => PurchaseProcessing(st),
-                    StockSold => SellProcessing(st),
-                    _ => throw new InvalidOperationException("Unhandled type")
-                };
-
+                if (st is StockPurchased sp)
+                {
+                    PurchaseProcessing(sp);
+                }
+                else if (st is StockSold ss)
+                {
+                    SellProcessing(ss);
+                }
+                
                 if (owned == 0)
                 {
                     avgCost = 0;
