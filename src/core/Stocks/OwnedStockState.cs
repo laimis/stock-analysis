@@ -26,7 +26,7 @@ namespace core.Stocks
         public int DaysHeld { get; private set; }
         public int DaysSinceLastTransaction { get; private set; }
         public IEnumerable<AggregateEvent> UndeletedBuysOrSells =>
-            BuyOrSell.Where(a => Deletes.Contains(a.Id)).Cast<AggregateEvent>();
+            BuyOrSell.Where(a => Deletes.Contains(a.Id) == false).Cast<AggregateEvent>();
 
         internal void ApplyInternal(TickerObtained o)
         {
