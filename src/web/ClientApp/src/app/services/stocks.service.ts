@@ -250,13 +250,16 @@ export class StocksService {
     return this.http.get<Chain>('/api/reports/chain')
   }
 
-  recentSells() : Observable<Sell[]> {
-    return this.http.get<Sell[]>('/api/reports/sells')
+  recentSells() : Observable<Sells> {
+    return this.http.get<Sells>('/api/reports/sells')
   }
 }
 
-export interface Sell {
+export interface Sells {
+  sells: Sell[]
+}
 
+export interface Sell {
 }
 
 export interface Chain {

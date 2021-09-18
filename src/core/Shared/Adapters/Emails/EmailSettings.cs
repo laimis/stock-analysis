@@ -37,6 +37,8 @@ namespace core.Adapters.Emails
 
         public static EmailTemplate NewUserWelcome = new EmailTemplate("d-7fe69a3b1f164830b82112dc10c745b0");
 
+        public static EmailTemplate SellAlert = new EmailTemplate("d-7fe69a3b1f164830b82112dc10c745b0");
+
         public EmailTemplate(string id)
         {
             Id = id;

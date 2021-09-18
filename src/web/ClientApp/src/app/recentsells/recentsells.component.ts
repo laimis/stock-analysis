@@ -13,7 +13,7 @@ export class RecentSellsComponent implements OnInit {
 
   ngOnInit(): void {
     this.service.recentSells().subscribe( result => {
-      this.sells = result
+      this.sells = result.sells
     }, error => {
       console.log("failed: " + error);
 		})

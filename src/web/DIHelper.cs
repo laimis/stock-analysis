@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using storage.redis;
 using storage.shared;
+using web.BackgroundServices;
 using web.Utils;
 
 namespace web
@@ -55,6 +56,7 @@ namespace web
             );
 
             services.AddHostedService<StockMonitorService>();
+            services.AddHostedService<ThirtyDaySellService>();
             
             StorageRegistrations(configuration, services);
         }

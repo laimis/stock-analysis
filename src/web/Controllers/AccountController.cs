@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using web.Utils;
 
 namespace web.Controllers
@@ -17,10 +18,12 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
+        private ILogger<AccountController> _logger;
         private IMediator _mediator;
 
-        public AccountController(IMediator mediator)
+        public AccountController(ILogger<AccountController> logger, IMediator mediator)
         {
+            _logger = logger;
             _mediator = mediator;
         }
         
@@ -88,7 +91,14 @@ namespace web.Controllers
                 this.User.Identifier(),
                 this.Request.HttpContext.Connection.RemoteIpAddress.ToString());
 
-            await _mediator.Send(cmd);
+            var result = await _mediator.Send(cmd);
+
+            if (result != "")
+            {
+                _logger.LogError("Unable to login: " + result);
+
+                return BadRequest(result);
+            }
             
             return this.Redirect("~/");
         }
