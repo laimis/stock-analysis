@@ -66,7 +66,7 @@ namespace web.BackgroundServices
             foreach(var p in pairs)
             {
                 // 30 day crosser
-                var crossers = new List<SellView>();
+                var sellsOfInterest = new List<SellView>();
                 var query = new Sells.Query(new Guid(p.id));
 
                 var sellView = await _mediator.Send(query);
@@ -75,7 +75,7 @@ namespace web.BackgroundServices
                 {
                     if (s.Date.Date == DateTime.UtcNow)
                     {
-                        crossers.Add(s);
+                        sellsOfInterest.Add(s);
                     }
                 }
 
@@ -83,7 +83,7 @@ namespace web.BackgroundServices
                     recipient: p.email,
                     Sender.NoReply,
                     template: EmailTemplate.SellAlert,
-                    sellView
+                    sellsOfInterest
                 );
             }
         }
