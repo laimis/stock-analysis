@@ -75,7 +75,7 @@ namespace web.BackgroundServices
 
                 foreach(var s in sellView.Sells)
                 {
-                    if (s.NumberOfDays >= 27)
+                    if (s.NumberOfDays >= 27 && s.NumberOfDays <= 31)
                     {
                         sellsOfInterest.Add(s);
                     }
