@@ -161,7 +161,8 @@ namespace core.Stocks
 
                 _ = st switch {
                     StockPurchased => PurchaseProcessing(st),
-                    StockSold => SellProcessing(st)
+                    StockSold => SellProcessing(st),
+                    _ => throw new InvalidOperationException("Unhandled type")
                 };
 
                 if (owned == 0)
