@@ -8,7 +8,7 @@ namespace core.Account
 {
     public class Login
     {
-        public class Command : RequestWithUserId
+        public class Command : RequestWithUserId<string>
         {
             public Command(Guid userId, string ipAddress) : base(userId)
             {
@@ -17,10 +17,10 @@ namespace core.Account
             }
 
             public string IPAddress { get; }
-            public DateTimeOffset? Timestamp { get; }
+            public DateTimeOffset Timestamp { get; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, string>
         {
             private IAccountStorage _storage;
 
@@ -29,15 +29,19 @@ namespace core.Account
                 _storage = storage;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<string> Handle(Command request, CancellationToken cancellationToken)
             {
                 var user = await this._storage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    return $"Unable to load user {request.UserId}";
+                }
 
-                user.LoggedIn(request.IPAddress, request.Timestamp.Value);
+                user.LoggedIn(request.IPAddress, request.Timestamp);
 
                 await this._storage.Save(user);
 
-                return new Unit();
+                return "";
             }
         }
     }

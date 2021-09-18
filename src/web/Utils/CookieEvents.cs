@@ -24,18 +24,29 @@ namespace web.Utils
         public override async Task SigningIn(CookieSigningInContext context)
         {
             var email = context.Principal.Email();
+
+            _logger.LogInformation($"Obtained email {email}");
+            
+            var id = await _mediator.Send(new SignInViaGoogle.Command(email));
+
+            (context.Principal.Identity as ClaimsIdentity).AddClaim(
+                new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())
+            );
+        }
+
+        public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
+        {
+            var email = context.Principal.Email();
+
+            _logger.LogInformation($"Obtained email {email}");
             
             var id = await _mediator.Send(new SignInViaGoogle.Command(email));
             if (id == null)
             {
-                await context.HttpContext.SignOutAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-            else
-            {
-                (context.Principal.Identity as ClaimsIdentity).AddClaim(
-                    new Claim(IdentityExtensions.ID_CLAIM_NAME, id.ToString())
-                );
+                _logger.LogInformation($"Failed to validate principal {email}");
+
+                context.RejectPrincipal();
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
 using core.Reports;
+using core.Reports.Views;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace web.Controllers
         }
 
         [HttpGet("sells")]
-        public Task<object> Sells()
+        public Task<SellsView> Sells()
         {
             var query = new Sells.Query(this.User.Identifier());
 

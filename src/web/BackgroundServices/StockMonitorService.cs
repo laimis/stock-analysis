@@ -11,7 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using web.Utils;
 
-namespace web
+namespace web.BackgroundServices
 {
     public class StockMonitorService : BackgroundService
     {

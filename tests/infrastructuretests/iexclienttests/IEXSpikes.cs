@@ -14,7 +14,7 @@ namespace iexclienttests
         public IEXSpikes(Xunit.Abstractions.ITestOutputHelper helper)
         {
             _helper = helper;
-            _client = new IEXClient(CredsHelper.GetIEXToken());
+            _client = new IEXClient(CredsHelper.GetIEXToken(), logger: null);
         }
 
         [Fact]

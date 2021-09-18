@@ -26,7 +26,7 @@ namespace core.Stocks
         public int DaysHeld { get; private set; }
         public int DaysSinceLastTransaction { get; private set; }
         public IEnumerable<AggregateEvent> UndeletedBuysOrSells =>
-            BuyOrSell.Where(a => Deletes.Contains(a.Id)).Cast<AggregateEvent>();
+            BuyOrSell.Where(a => Deletes.Contains(a.Id) == false).Cast<AggregateEvent>();
 
         internal void ApplyInternal(TickerObtained o)
         {
@@ -159,11 +159,15 @@ namespace core.Stocks
                     continue;
                 }
 
-                _ = st switch {
-                    StockPurchased => PurchaseProcessing(st),
-                    StockSold => SellProcessing(st)
-                };
-
+                if (st is StockPurchased sp)
+                {
+                    PurchaseProcessing(sp);
+                }
+                else if (st is StockSold ss)
+                {
+                    SellProcessing(ss);
+                }
+                
                 if (owned == 0)
                 {
                     avgCost = 0;

@@ -21,7 +21,7 @@ namespace coretests.Stocks
         [Fact]
         public void DaysHeld()
         {
-            Assert.Equal(57, _position.DaysHeld);
+            Assert.True(Math.Abs(57 - _position.DaysHeld) <= 1);
         }
 
         [Fact]

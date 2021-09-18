@@ -14,7 +14,7 @@ namespace coretests
         {
             var stock = new OwnedStock("tsla", Guid.NewGuid());
             stock.Purchase(1, 100, DateTime.UtcNow, "some note");
-
+            
             var report = CSVExport.Generate(new[] {stock});
 
             Assert.Contains(CSVExport.STOCK_HEADER, report);
