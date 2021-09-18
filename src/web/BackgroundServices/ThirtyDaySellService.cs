@@ -65,32 +65,42 @@ namespace web.BackgroundServices
 
             foreach(var p in pairs)
             {
-                // 30 day crosser
-                _logger.LogInformation($"Scanning {p.email}");
-
-                var sellsOfInterest = new List<SellView>();
-                var query = new Sells.Query(new Guid(p.id));
-
-                var sellView = await _mediator.Send(query);
-
-                foreach(var s in sellView.Sells)
+                try
                 {
-                    if (s.NumberOfDays >= 27 && s.NumberOfDays <= 31)
-                    {
-                        sellsOfInterest.Add(s);
-                    }
+                    await ProcessUser(p);
                 }
-
-                if (sellsOfInterest.Count == 0)
+                catch(Exception ex)
                 {
-                    continue;
+                    _logger.LogError($"Failed to process 30 day check for {p.email}: {ex}");
                 }
+            }
+        }
 
+        private async Task ProcessUser((string email, string id) p)
+        {
+            // 30 day crosser
+            _logger.LogInformation($"Scanning {p.email}");
+
+            var sellsOfInterest = new List<SellView>();
+            var query = new Sells.Query(new Guid(p.id));
+
+            var sellView = await _mediator.Send(query);
+
+            foreach (var s in sellView.Sells)
+            {
+                if (s.NumberOfDays >= 27 && s.NumberOfDays <= 31)
+                {
+                    sellsOfInterest.Add(s);
+                }
+            }
+
+            if (sellsOfInterest.Count > 0)
+            {
                 await _emails.Send(
                     recipient: p.email,
                     Sender.NoReply,
                     template: EmailTemplate.SellAlert,
-                    new {sells = sellsOfInterest}
+                    new { sells = sellsOfInterest }
                 );
             }
         }
