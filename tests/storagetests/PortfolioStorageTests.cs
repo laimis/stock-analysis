@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Crypto;
 using core.Notes;
 using core.Options;
 using core.Stocks;
@@ -134,6 +135,40 @@ namespace storage.tests
             await storage.Delete(_userId);
 
             var afterDelete = await storage.GetNotes(_userId);
+
+            Assert.Empty(afterDelete);
+        }
+
+        [Fact]
+        public async Task OwnedCryptoWorksAsync()
+        {
+            var crypto = new OwnedCrypto(new Token("BTC"), _userId);
+
+            crypto.Purchase(10, 2.1, DateTimeOffset.UtcNow);
+
+            var storage = CreateStorage();
+
+            await storage.Save(crypto, _userId);
+
+            var loadedList = await storage.GetCryptos(_userId);
+
+            Assert.NotEmpty(loadedList);
+
+            var loaded = await storage.GetCrypto(crypto.State.Token, _userId);
+
+            Assert.Equal(loaded.State.Quantity, crypto.State.Quantity);
+
+            loaded.Purchase(5, 5, DateTime.UtcNow);
+
+            await storage.Save(loaded, _userId);
+
+            loaded = await storage.GetCrypto(loaded.State.Token, loaded.State.UserId);
+
+            Assert.NotEqual(loaded.State.Quantity, crypto.State.Quantity);
+
+            await storage.Delete(_userId);
+
+            var afterDelete = await storage.GetCryptos(_userId);
 
             Assert.Empty(afterDelete);
         }

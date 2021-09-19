@@ -1,3 +1,4 @@
+using System;
 using core.Crypto;
 using Xunit;
 
@@ -20,6 +21,13 @@ namespace coretests.Crypto
 
             Assert.Equal(0.05437703, btc.State.Quantity);
             Assert.Equal(985.32, btc.State.Cost);
+
+            btc.Sell(0.004, dollarAmountReceived: 74, DateTimeOffset.UtcNow, notes: null);
+
+            Assert.Equal(0.05037703, btc.State.Quantity);
+
+            Assert.Equal(2, btc.State.Transactions.Count);
+            Assert.Single(btc.State.PositionInstances);
         }
     }
 }

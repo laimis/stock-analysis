@@ -27,7 +27,10 @@ namespace coretests.Account
         {
             var cmd = CreateCommand();
 
-            Assert.NotNull(cmd.Timestamp);
+            Assert.Equal(
+                DateTimeOffset.UtcNow.DateTime,
+                cmd.Timestamp.DateTime,
+                precision: TimeSpan.FromSeconds(1));
         }
 
         private static Login.Command CreateCommand()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Crypto;
 using core.Notes;
 using core.Options;
 using core.Stocks;
@@ -90,6 +91,26 @@ namespace coretests.Fakes
         }
 
         public Task SaveViewModel<T>(Guid userId, T model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OwnedCrypto> GetCrypto(string token, Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OwnedCrypto> GetCrypto(Guid id, Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<OwnedCrypto>> GetCryptos(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Save(OwnedCrypto crypto, Guid userId)
         {
             throw new NotImplementedException();
         }
