@@ -1,6 +1,7 @@
 - crypto ownership tracking
 
-    - very similar to owned stock, owned crypto can be very close
-    
+    - import transactions
+    - delete transactions
+    - show owned tokens, amount, cost, average cost
 
 - host on ECS

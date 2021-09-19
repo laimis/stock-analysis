@@ -99,6 +99,18 @@ export class ProfileComponent implements OnInit {
     )
   }
 
+  importCrypto($event) {
+
+    this.markProgress('Importing crypto')
+
+    let formData: FormData = this.getFormData($event);
+
+    this.service.importCrypto(formData).subscribe(
+      _ => {this.markSuccess('Crypto imported') },
+      e => this.markError(e)
+    )
+  }
+
   private getFormData($event: any) {
     var file = $event.target.files[0];
     let formData: FormData = new FormData();

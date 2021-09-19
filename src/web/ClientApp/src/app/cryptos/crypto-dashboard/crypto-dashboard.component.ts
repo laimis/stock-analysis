@@ -100,7 +100,7 @@ export class CryptoDashboardComponent implements OnInit {
   private getSortFunc(column:string) {
     switch(column) {
       case "ticker":
-        return (a:OwnedCrypto, b:OwnedCrypto) => a.symbol.localeCompare(b.symbol)
+        return (a:OwnedCrypto, b:OwnedCrypto) => a.token.localeCompare(b.token)
       case "price":
         return (a:OwnedCrypto, b:OwnedCrypto) => a.price - b.price
       case "averageCost":

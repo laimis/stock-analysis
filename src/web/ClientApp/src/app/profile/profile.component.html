@@ -38,6 +38,9 @@
       <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
       <button class="btn btn-secondary mr-2 mb-1" (click)="shareInput.click()">Shares</button>
 
+      <input hidden (change)="importCrypto($event)"  #cryptoInput type="file" id="file">
+      <button class="btn btn-secondary mr-2 mb-1" (click)="cryptoInput.click()">Crypto</button>
+
       <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
       <button class="btn btn-secondary mr-2 mb-1" (click)="optionInput.click()">Options</button>
 

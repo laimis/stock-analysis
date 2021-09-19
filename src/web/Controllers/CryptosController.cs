@@ -27,18 +27,18 @@ namespace web.Controllers
             return await _mediator.Send(new Dashboard.Query(User.Identifier()));
         }
 
-        // [HttpPost("import")]
-        // public async Task<ActionResult> Import(IFormFile file)
-        // {
-        //     using var streamReader = new StreamReader(file.OpenReadStream());
+        [HttpPost("import")]
+        public async Task<ActionResult> Import(IFormFile file)
+        {
+            using var streamReader = new StreamReader(file.OpenReadStream());
 
-        //     var content = await streamReader.ReadToEndAsync();
+            var content = await streamReader.ReadToEndAsync();
 
-        //     var cmd = new Import.Command(content);
+            var cmd = new Import.Command(content);
 
-        //     cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(this.User.Identifier());
 
-        //     return this.OkOrError(await _mediator.Send(cmd));
-        // }
+            return this.OkOrError(await _mediator.Send(cmd));
+        }
     }
 }

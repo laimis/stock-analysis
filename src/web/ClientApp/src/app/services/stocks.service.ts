@@ -107,6 +107,9 @@ export class StocksService {
   getCryptos(): Observable<any> {
 		return this.http.get<any>('/api/cryptos')
   }
+  importCrypto(formData: FormData) {
+    return this.http.post('/api/cryptos/import', formData)
+  }
 
   getStocks(): Observable<any> {
 		return this.http.get<any>('/api/stocks')
@@ -341,7 +344,7 @@ export class OwnedStock {
 export class OwnedCrypto {
   id:string
   price: number
-  symbol: string
+  token: string
   quantity: number
   cost: number
   equity: number

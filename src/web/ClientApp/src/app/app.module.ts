@@ -56,6 +56,7 @@ import { FailuresuccesschainComponent } from './reports/failuresuccesschain/fail
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
+import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -162,7 +163,8 @@ var routes = [
     FailuresuccesschainComponent,
     RecentSellsComponent,
 
-    CryptoDashboardComponent
+    CryptoDashboardComponent,
+    CryptoOwnershipGridComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

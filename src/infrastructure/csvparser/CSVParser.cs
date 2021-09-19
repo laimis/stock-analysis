@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using core.Adapters.CSV;
 using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace csvparser
 {
@@ -15,7 +17,12 @@ namespace csvparser
             {
                 using (var reader = new StringReader(content))
                 {
-                    var csvReader = new CsvReader(reader, CultureInfo.CurrentCulture);
+                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        PrepareHeaderForMatch = (header, pos) => Regex.Replace(header, @"\s", string.Empty)
+                    };
+                    
+                    var csvReader = new CsvReader(reader, config);
                     return (csvReader.GetRecords<T>().ToList(), null);
                 }
             }
