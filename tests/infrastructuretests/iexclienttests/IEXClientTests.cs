@@ -14,7 +14,7 @@ namespace iexclienttests
     {
         private string[] _options;
         private OptionDetail[] _optionDetails;
-        private TickerPrice _price;
+        private Price _price;
         private IEXClient _client;
         private ITestOutputHelper _output;
         private List<StockQueryResult> _mostActive;

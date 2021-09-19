@@ -13,7 +13,7 @@ namespace core.Notes
         public Guid UserId { get; internal set; }
         public DateTimeOffset StatsApplied { get; private set; }
         public StockAdvancedStats Stats { get; private set; }
-        public TickerPrice Price { get; private set; }
+        public Price Price { get; private set; }
 
         public void Apply(AggregateEvent e)
         {

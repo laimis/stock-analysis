@@ -89,7 +89,7 @@ namespace iexclient
             return GetCachedResponse<StockAdvancedStats>(url, CacheKeyMinute(ticker + "advanced"));
         }
 
-        public async Task<TickerPrice> GetPrice(string ticker)
+        public async Task<Price> GetPrice(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/price");
 
@@ -97,12 +97,12 @@ namespace iexclient
 
             if (r.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                return new TickerPrice();
+                return new Price();
             }
 
             var response = await r.Content.ReadAsStringAsync();
 
-            return new TickerPrice(JsonConvert.DeserializeObject<double>(response));
+            return new Price(JsonConvert.DeserializeObject<double>(response));
         }
 
         public async Task<Dictionary<string, BatchStockPrice>> GetPrices(List<string> tickers)

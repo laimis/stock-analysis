@@ -26,9 +26,9 @@ namespace coretests.Fakes
             throw new System.NotImplementedException();
         }
 
-        public Task<TickerPrice> GetPrice(string ticker)
+        public Task<Price> GetPrice(string ticker)
         {
-            return Task.FromResult(new TickerPrice());
+            return Task.FromResult(new Price());
         }
 
         public Task<List<SearchResult>> Search(string fragment, int maxResults)

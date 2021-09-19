@@ -10,7 +10,7 @@ namespace iexclienttests
     {
         public string[] Options;
         public IEnumerable<OptionDetail> OptionDetails;
-        public TickerPrice Price;
+        public Price Price;
         public IEXClient Client;
         public List<StockQueryResult> MostActive;
         public List<SearchResult> SearchResults;

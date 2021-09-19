@@ -1,3 +1,6 @@
-- ping when 30 days are about to pass
+- crypto ownership tracking
+
+    - very similar to owned stock, owned crypto can be very close
+    
 
 - host on ECS
