@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { StocksService, OwnedStock, OwnedOption, Alert, Dashboard } from '../services/stocks.service';
+import { StocksService, Dashboard } from '../services/stocks.service';
 
 
 @Component({

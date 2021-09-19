@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using core.Crypto;
+using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Stocks;

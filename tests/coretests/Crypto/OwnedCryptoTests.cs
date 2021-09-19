@@ -1,5 +1,5 @@
 using System;
-using core.Crypto;
+using core.Cryptos;
 using Xunit;
 
 namespace coretests.Crypto

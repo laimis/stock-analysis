@@ -1,6 +1,6 @@
 using System;
 
-namespace core.Crypto
+namespace core.Cryptos
 {
     // PositionInstance models a stock position from the time the first share is opened
     // to the time when the last share is sold.

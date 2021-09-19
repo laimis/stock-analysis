@@ -2,7 +2,7 @@ using System;
 using core.Shared;
 using MediatR;
 
-namespace core.Crypto
+namespace core.Cryptos
 {
     internal class CryptoDeleted : AggregateEvent
     {

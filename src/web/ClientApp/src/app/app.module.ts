@@ -55,6 +55,7 @@ import { StockSettingsComponent } from './stocks/stock-details/stock-settings.co
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.component';
+import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -98,7 +99,9 @@ var routes = [
   { path: 'test', component: SymbolSearchComponent},
 
   { path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
-  { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]}
+  { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
+
+  { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
 ]
 
 @NgModule({
@@ -157,7 +160,9 @@ var routes = [
     TermsComponent,
 
     FailuresuccesschainComponent,
-    RecentSellsComponent
+    RecentSellsComponent,
+
+    CryptoDashboardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

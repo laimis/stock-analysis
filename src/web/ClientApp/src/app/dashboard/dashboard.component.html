@@ -45,6 +45,17 @@
         <div class="card mt-4">
           <div class="card-body">
             <h5 class="card-title">
+              <i class="fab fa-btc"></i>
+              Crypto
+            </h5>
+            <p class="card-text">You have <b>{{dashboard.ownedCryptoCount}}</b> crypto tokens</p>
+            <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">
               <i class="fas fa-dice-five"></i>
               Options
             </h5>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
-using core.Crypto;
+using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Stocks;

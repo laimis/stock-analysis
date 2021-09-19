@@ -65,10 +65,13 @@ namespace core.Portfolio
                     .Where(o => o.State.NumberOfContracts != 0 && o.State.DaysUntilExpiration > -5)
                     .OrderBy(o => o.State.Expiration);
 
+                var cryptos = await _storage.GetCryptos(userId);
+
                 var obj = new PortfolioResponse
                 {
                     OwnedStockCount = owned.Count(),
                     OpenOptionCount = openOptions.Count(),
+                    OwnedCryptoCount = cryptos.Count(),
                     TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId && s.IsTriggered),
                     AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId),
                     Calculated = DateTimeOffset.UtcNow

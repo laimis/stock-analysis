@@ -1,6 +1,6 @@
 using System;
 
-namespace core.Crypto
+namespace core.Cryptos
 {
     public interface ICryptoTransaction
     {

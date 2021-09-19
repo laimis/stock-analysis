@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using core.Shared;
 
-namespace core.Crypto
+namespace core.Cryptos
 {
     public class OwnedCrypto : Aggregate
     {
