@@ -1,0 +1,25 @@
+using core.Crypto;
+using Xunit;
+
+namespace coretests.Crypto
+{
+    public class OwnedCryptoTests
+    {
+        [Fact]
+        public void Btc_EndToEnd()
+        {
+            var btc = new OwnedCrypto(
+                new Token("BTC"), System.Guid.NewGuid()
+            );
+
+            btc.Purchase(
+                quantity: 0.05437703,
+                dollarAmountSpent: 985.32,
+                date: System.DateTimeOffset.Parse("2017-12-19T15:05:38Z")
+            );
+
+            Assert.Equal(0.05437703, btc.State.Quantity);
+            Assert.Equal(985.32, btc.State.Cost);
+        }
+    }
+}
