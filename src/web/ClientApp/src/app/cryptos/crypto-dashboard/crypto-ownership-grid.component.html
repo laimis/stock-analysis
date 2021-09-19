@@ -8,8 +8,8 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th class="sort-header" (click)="sort('ticker')">Symbol</th>
-          <th class="sort-header" (click)="sort('owned')">Shares</th>
+          <th class="sort-header" (click)="sort('token')">Token</th>
+          <th class="sort-header" (click)="sort('quantity')">Quantity</th>
           <th class="text-right sort-header" (click)="sort('daysheld')">Days Held</th>
           <th class="text-right sort-header" (click)="sort('price')">Price</th>
           <th class="text-right sort-header" (click)="sort('averageCost')">Average Cost</th>
@@ -19,21 +19,21 @@
           <th class="text-right sort-header" (click)="sort('equity')">Equity</th>
         </tr>
       </thead>
-      <tr *ngFor="let ticker of owned" [ngClass]="{'bg-warning': selectedCategory == ticker.category}">
-        <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
-        <td>{{ticker.owned}}</td>
-        <td class="text-right">{{ticker.daysHeld}}</td>
-        <td class="text-right">{{ticker.price | currency}}</td>
-        <td class="text-right">{{ticker.averageCost | currency}}</td>
+      <tr *ngFor="let token of owned">
+        <td><a [routerLink]="[ '/crypto', token.token ]">{{token.token}}</a></td>
+        <td>{{token.quantity}}</td>
+        <td class="text-right">{{token.daysHeld}}</td>
+        <td class="text-right">{{token.price | currency}}</td>
+        <td class="text-right">{{token.averageCost | currency}}</td>
         <td class="text-right">
-          {{ticker.cost | currency}}
-          <small>{{ownershipPct(ticker) | percent}}</small>
+          {{token.cost | currency}}
+          <small>{{ownershipPct(token) | percent}}</small>
         </td>
-        <td class="text-right"><span [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
-        <td class="text-right"><span [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
+        <td class="text-right"><span [ngClass]="{'profits-positive': token.profits > 0, 'profits-negative': token.profits < 0}">{{token.profits | currency }}</span></td>
+        <td class="text-right"><span [ngClass]="{'profits-positive': token.profits > 0, 'profits-negative': token.profits < 0}">{{token.profitsPct | percent:'1.2' }}</span></td>
         <td class="text-right">
-          {{ticker.equity | currency}}
-          <small>{{equityPct(ticker) | percent}}</small>
+          {{token.equity | currency}}
+          <small>{{equityPct(token) | percent}}</small>
         </td>
       </tr>
     </table>

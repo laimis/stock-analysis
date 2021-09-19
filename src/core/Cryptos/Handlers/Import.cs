@@ -56,8 +56,8 @@ namespace core.Cryptos.Handlers
                 {
                     var b = new core.Cryptos.Handlers.Buy.Command {
                         Date = record.Timestamp,
-                        DollarAmount = record.USDSubtotal,
-                        Quantity = record.QuantityTransacted,
+                        DollarAmount = record.USDSubtotal.Value,
+                        Quantity = record.QuantityTransacted.Value,
                         Token = record.Asset
                     };
                     b.WithUserId(userId);
@@ -69,8 +69,8 @@ namespace core.Cryptos.Handlers
                     var s = new core.Cryptos.Handlers.Sell.Command
                     {
                         Date = record.Timestamp,
-                        DollarAmount = record.USDSubtotal,
-                        Quantity = record.QuantityTransacted,
+                        DollarAmount = record.USDSubtotal.Value,
+                        Quantity = record.QuantityTransacted.Value,
                         Token = record.Asset
                     };
                     s.WithUserId(userId);
@@ -91,7 +91,14 @@ namespace core.Cryptos.Handlers
 
                 try
                 {
-                    return await _mediator.Send(cmd);
+                    if (cmd != null)
+                    {
+                        return await _mediator.Send(cmd);
+                    }
+                    else
+                    {
+                        return CommandResponse.Success();
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -105,8 +112,8 @@ namespace core.Cryptos.Handlers
             {
                 public string TransactionType { get; set; }
                 public string Asset { get; set; }
-                public double QuantityTransacted { get; set; }
-                public double USDSubtotal { get; set; }
+                public double? QuantityTransacted { get; set; }
+                public double? USDSubtotal { get; set; }
                 public DateTimeOffset Timestamp { get; set; }
             }
         }

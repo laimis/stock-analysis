@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -19,7 +20,11 @@ namespace csvparser
                 {
                     var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                     {
-                        PrepareHeaderForMatch = (header, pos) => Regex.Replace(header, @"\s", string.Empty)
+                        PrepareHeaderForMatch = (header, pos) =>
+                        {
+                            return Regex.Replace(header, @"\s", string.Empty);
+                        },
+                        
                     };
                     
                     var csvReader = new CsvReader(reader, config);
