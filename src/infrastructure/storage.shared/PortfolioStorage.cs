@@ -116,6 +116,7 @@ namespace storage.shared
             await this._aggregateStorage.DeleteAggregates(_note_entity, userId);
             await this._aggregateStorage.DeleteAggregates(_option_entity, userId);
             await this._aggregateStorage.DeleteAggregates(_stock_entity, userId);
+            await this._aggregateStorage.DeleteAggregates(_crypto_entity, userId);
             await this._aggregateStorage.DeleteAggregates(AlertsStorage._alert_entity, userId);
         }
 
