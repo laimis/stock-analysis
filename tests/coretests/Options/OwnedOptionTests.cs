@@ -44,16 +44,16 @@ namespace coretests.Options
             Assert.Single(option.State.Transactions.Where(t => !t.IsPL));
             Assert.Empty(option.State.Transactions.Where(t => t.IsPL));
             Assert.Equal(3, option.State.DaysHeld);
-            Assert.Equal(12, option.State.Days);
-            Assert.Equal(10, option.State.DaysUntilExpiration);
+            Assert.Equal(13, option.State.Days);
+            Assert.Equal(11, option.State.DaysUntilExpiration);
 
             option.Buy(1, 1, DateTimeOffset.UtcNow, "some notes");
 
             Assert.Equal(0, option.State.NumberOfContracts);
             Assert.Equal(3, option.State.Transactions.Count);
             Assert.Equal(3, option.State.DaysHeld);
-            Assert.Equal(12, option.State.Days);
-            Assert.Equal(10, option.State.DaysUntilExpiration);
+            Assert.Equal(13, option.State.Days);
+            Assert.Equal(11, option.State.DaysUntilExpiration);
 
             option.Delete();
 
@@ -80,8 +80,8 @@ namespace coretests.Options
             Assert.Equal(2, option.State.Transactions.Count);
             Assert.True(option.State.Transactions[1].IsPL);
             Assert.Equal(10, option.State.Transactions[1].Credit);
-            Assert.Equal(1, option.State.Days);
-            Assert.Equal(1, option.State.DaysHeld);
+            Assert.Equal(2, option.State.Days);
+            Assert.Equal(2, option.State.DaysHeld);
             Assert.Equal(0, option.State.DaysUntilExpiration);
         }
 
