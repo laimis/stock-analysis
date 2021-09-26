@@ -8,8 +8,10 @@ namespace core.Shared
         public ScheduleUserChanged(Guid userId)
         {
             UserId = userId;
+            When = DateTimeOffset.UtcNow;
         }
 
         public Guid UserId { get; }
+        public DateTimeOffset When { get; }
     }
 }
