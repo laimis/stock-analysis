@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core;
+using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Shared;
@@ -15,6 +16,7 @@ namespace storage.shared
         private const string _stock_entity = "ownedstock3";
         private const string _option_entity = "soldoption3";
         private const string _note_entity = "note3";
+        private const string _crypto_entity = "ownedcrypto";
 
         private IAggregateStorage _aggregateStorage;
         private IBlobStorage _blobStorage;
@@ -114,7 +116,35 @@ namespace storage.shared
             await this._aggregateStorage.DeleteAggregates(_note_entity, userId);
             await this._aggregateStorage.DeleteAggregates(_option_entity, userId);
             await this._aggregateStorage.DeleteAggregates(_stock_entity, userId);
+            await this._aggregateStorage.DeleteAggregates(_crypto_entity, userId);
             await this._aggregateStorage.DeleteAggregates(AlertsStorage._alert_entity, userId);
+        }
+
+        public async Task<OwnedCrypto> GetCrypto(string token, Guid userId)
+        {
+            var cryptos = await GetCryptos(userId);
+            
+            return cryptos.SingleOrDefault(s => s.State.Token == token);
+        }
+
+        public async Task<OwnedCrypto> GetCrypto(Guid cryptoId, Guid userId)
+        {
+            var cryptos = await GetCryptos(userId);
+            
+            return cryptos.SingleOrDefault(s => s.Id == cryptoId);
+        }
+
+        public Task Save(OwnedCrypto crypto, Guid userId)
+        {
+            return Save(crypto, _crypto_entity, userId);
+        }
+
+        public async Task<IEnumerable<OwnedCrypto>> GetCryptos(Guid userId)
+        {
+            var list = await _aggregateStorage.GetEventsAsync(_crypto_entity, userId);
+
+            return list.GroupBy(e => e.AggregateId)
+                .Select(g => new OwnedCrypto(g));
         }
     }
 }

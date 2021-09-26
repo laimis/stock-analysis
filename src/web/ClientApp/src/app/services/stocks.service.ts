@@ -104,6 +104,13 @@ export class StocksService {
   }
   //
 
+  getCryptos(): Observable<any> {
+		return this.http.get<any>('/api/cryptos')
+  }
+  importCrypto(formData: FormData) {
+    return this.http.post('/api/cryptos/import', formData)
+  }
+
   getStocks(): Observable<any> {
 		return this.http.get<any>('/api/stocks')
   }
@@ -334,11 +341,28 @@ export class OwnedStock {
   category: string;
 }
 
+export class OwnedCrypto {
+  id:string
+  price: number
+  token: string
+  quantity: number
+  cost: number
+  equity: number
+  profits: number
+  profitsPct: number
+  daysHeld: number
+  daysSinceLastTransaction: number
+  description: string
+  averageCost: number
+  transactions: TransactionList
+}
+
 export class Alert {}
 
 export class Dashboard {
   openOptionCount: number
   ownedStockCount: number
+  ownedCryptoCount: number
   triggeredAlertCount: number
   alertCount: number
 }

@@ -7,7 +7,7 @@ namespace core.Portfolio
 {
     public struct GridEntry
     {
-        public GridEntry(string ticker, TickerPrice price, StockAdvancedStats stats)
+        public GridEntry(string ticker, Price price, StockAdvancedStats stats)
         {
             this.Price = price.Amount;
             this.Ticker = ticker;

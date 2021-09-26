@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Stocks;
@@ -24,6 +25,12 @@ namespace core
         Task Save(Note note, Guid userId);
         Task<IEnumerable<Note>> GetNotes(Guid userId);
         Task<Note> GetNote(Guid userId, Guid noteId);
+
+        Task<OwnedCrypto> GetCrypto(string token, Guid userId);
+        Task<OwnedCrypto> GetCrypto(Guid id, Guid userId);
+        Task<IEnumerable<OwnedCrypto>> GetCryptos(Guid userId);
+        Task Save(OwnedCrypto crypto, Guid userId);
+
         Task Delete(Guid userId);
     }
 }

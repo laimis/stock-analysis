@@ -53,7 +53,7 @@ namespace core.Notes
             return this.State.RelatedToTicker == filter.Value;
         }
 
-        internal void Enrich(TickerPrice p, StockAdvancedStats d)
+        internal void Enrich(Price p, StockAdvancedStats d)
         {
             Apply(
                 new NoteEnrichedWithPrice(

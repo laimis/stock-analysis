@@ -7,7 +7,7 @@ namespace core.Admin
 {
     public struct EmailReviewEntryGroup
     {
-        public EmailReviewEntryGroup(IEnumerable<EmailReviewEntry> entries, TickerPrice price, StockAdvancedStats stats)
+        public EmailReviewEntryGroup(IEnumerable<EmailReviewEntry> entries, Price price, StockAdvancedStats stats)
         {
             this.Alerts = new List<EmailReviewEntry>();
             this.Ownership = new List<EmailReviewEntry>();
@@ -34,7 +34,7 @@ namespace core.Admin
         public StockAdvancedStats Stats { get; }
         public List<EmailReviewEntry> Alerts { get; }
         public List<EmailReviewEntry> Ownership { get; }
-        public TickerPrice Price { get; }
+        public Price Price { get; }
 
         public DateTimeOffset? EarningsDate
         {

@@ -1,0 +1,30 @@
+<div *ngIf="owned">
+
+  <span *ngIf="owned.length==0">
+    You have no crypto purchases recorded.
+  </span>
+  <div class="mt-4" *ngIf="owned.length > 0">
+    <a href="/api/stocks/export/owned" class="btn btn-link">Export owned</a>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th class="sort-header" (click)="sort('token')">Token</th>
+          <th class="sort-header" (click)="sort('quantity')">Quantity</th>
+          <th class="text-right sort-header" (click)="sort('daysheld')">Days Held</th>
+          <th class="text-right sort-header" (click)="sort('averageCost')">Average Cost</th>
+          <th class="text-right sort-header" (click)="sort('invested')" align="center">Invested</th>
+        </tr>
+      </thead>
+      <tr *ngFor="let token of owned">
+        <td><a [routerLink]="[ '/crypto', token.token ]">{{token.token}}</a></td>
+        <td>{{token.quantity}}</td>
+        <td class="text-right">{{token.daysHeld}}</td>
+        <td class="text-right">{{token.averageCost | currency}}</td>
+        <td class="text-right">
+          {{token.cost | currency}}
+          <small>{{ownershipPct(token) | percent}}</small>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

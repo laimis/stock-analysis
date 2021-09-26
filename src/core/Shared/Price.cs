@@ -1,10 +1,10 @@
 namespace core
 {
-    public struct TickerPrice
+    public struct Price
     {
         public double Amount { get; }
 
-        public TickerPrice(double amount)
+        public Price(double amount)
         {
             this.Amount = amount;
         }

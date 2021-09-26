@@ -41,14 +41,14 @@ namespace core.Notes
 
     public class NoteEnrichedWithPrice : AggregateEvent
     {
-        public NoteEnrichedWithPrice(Guid id, Guid aggregateId, DateTimeOffset when, TickerPrice price, StockAdvancedStats stats)
+        public NoteEnrichedWithPrice(Guid id, Guid aggregateId, DateTimeOffset when, Price price, StockAdvancedStats stats)
             : base(id, aggregateId, when)
         {
             this.Price = price;
             this.Stats = stats;
         }
 
-        public TickerPrice Price { get; }
+        public Price Price { get; }
         public StockAdvancedStats Stats { get; }
     }
 
