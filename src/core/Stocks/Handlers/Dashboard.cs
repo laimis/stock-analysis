@@ -20,7 +20,7 @@ namespace core.Stocks
         }
 
         public class Handler : HandlerWithStorage<Query, object>,
-            INotificationHandler<UserRecalculate>
+            INotificationHandler<UserChanged>
         {
             private IStocksService2 _stocksService;
 
@@ -50,7 +50,7 @@ namespace core.Stocks
                 return cached;
             }
 
-            public async Task Handle(UserRecalculate notification, CancellationToken cancellationToken)
+            public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
             {
                 var fromDb = await LoadFromDb(notification.UserId);
 

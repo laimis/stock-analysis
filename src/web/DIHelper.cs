@@ -39,7 +39,7 @@ namespace web
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddSingleton<MarketHours>();
             services.AddSingleton<StockMonitorContainer>();
-            services.AddMediatR(typeof(Sell).Assembly);
+            services.AddMediatR(typeof(Sell).Assembly, typeof(DIHelper).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             
@@ -57,6 +57,7 @@ namespace web
 
             services.AddHostedService<StockMonitorService>();
             services.AddHostedService<ThirtyDaySellService>();
+            services.AddHostedService<UserChangedScheduler>();
             
             StorageRegistrations(configuration, services);
         }

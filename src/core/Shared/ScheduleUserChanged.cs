@@ -3,9 +3,9 @@ using MediatR;
 
 namespace core.Shared
 {
-    public class UserRecalculate : INotification
+    public class ScheduleUserChanged : INotification
     {
-        public UserRecalculate(Guid userId)
+        public ScheduleUserChanged(Guid userId)
         {
             UserId = userId;
         }

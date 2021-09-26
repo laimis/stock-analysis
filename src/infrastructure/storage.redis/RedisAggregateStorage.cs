@@ -103,7 +103,9 @@ namespace storage.redis
                     await _mediator.Publish(n);
 
             if (eventsToBlast.Count > 0)
-                await _mediator.Publish(new UserRecalculate(userId));
+            {
+                await _mediator.Publish(new ScheduleUserChanged(userId));
+            }
         }
 
         internal static storage.shared.StoredAggregateEvent ToEvent(string entity, Guid userId, HashEntry[] result)

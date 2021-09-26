@@ -21,7 +21,7 @@ namespace core.Portfolio
 
         public class Handler :
             HandlerWithStorage<Query, PortfolioResponse>,
-            INotificationHandler<UserRecalculate>
+            INotificationHandler<UserChanged>
         {
             private IStocksService2 _stocksService;
             private StockMonitorContainer _alerts;
@@ -46,7 +46,7 @@ namespace core.Portfolio
                 return await GetFromDatabase(request.UserId);
             }
 
-            public async Task Handle(UserRecalculate notification, CancellationToken cancellationToken)
+            public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
             {
                 var data = await GetFromDatabase(notification.UserId);
 

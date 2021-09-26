@@ -19,7 +19,7 @@ namespace core.Options
         }
 
         public class Handler : HandlerWithStorage<Query, OptionDashboardView>,
-            INotificationHandler<UserRecalculate>
+            INotificationHandler<UserChanged>
         {
             private IStocksService2 _stockService;
 
@@ -53,7 +53,7 @@ namespace core.Options
                 return view;
             }
 
-            public async Task Handle(UserRecalculate notification, CancellationToken cancellationToken)
+            public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
             {
                 var view = await FromDb(notification.UserId);
 
