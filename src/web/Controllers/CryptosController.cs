@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using core.Cryptos.Handlers;
+using core.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,8 @@ namespace web.Controllers
 
             var content = await streamReader.ReadToEndAsync();
 
-            var cmd = new Import.Command(content);
+            RequestWithUserId<CommandResponse> cmd = file.FileName.Contains("coinbasepro") ?
+                new ImportCoinbasePro.Command(content) : new Import.Command(content);
 
             cmd.WithUserId(this.User.Identifier());
 
