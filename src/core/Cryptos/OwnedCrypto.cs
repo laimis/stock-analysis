@@ -24,7 +24,7 @@ namespace core.Cryptos
             Apply(new CryptoObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, token, userId));
         }
 
-        public void Purchase(double quantity, double dollarAmountSpent, DateTimeOffset date, string notes = null)
+        public void Purchase(decimal quantity, decimal dollarAmountSpent, DateTimeOffset date, string notes = null)
         {
             if (quantity <= 0)
             {
@@ -84,7 +84,7 @@ namespace core.Cryptos
             );
         }
 
-        public void Sell(double quantity, double dollarAmountReceived, DateTimeOffset date, string notes)
+        public void Sell(decimal quantity, decimal dollarAmountReceived, DateTimeOffset date, string notes)
         {
             if (quantity > State.Quantity)
             {

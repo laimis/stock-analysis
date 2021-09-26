@@ -6,7 +6,7 @@ namespace core.Cryptos
     {
         Guid Id { get; }
         DateTimeOffset When { get; }
-        double Quantity { get; }
-        double DollarAmount { get; }
+        decimal Quantity { get; }
+        decimal DollarAmount { get; }
     }
 }

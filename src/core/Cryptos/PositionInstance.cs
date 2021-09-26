@@ -7,7 +7,7 @@ namespace core.Cryptos
     public class PositionInstance
     {
         private DateTimeOffset? _firstOpen = null;
-        private double _quantity = 0;
+        private decimal _quantity = 0;
 
         public PositionInstance(string token)
         {
@@ -15,15 +15,15 @@ namespace core.Cryptos
         }
 
         public int DaysHeld => _firstOpen != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(_firstOpen.Value)).TotalDays : 0;
-        public double Cost { get; private set; } = 0;
-        public double Return { get; private set; } = 0;
-        public double Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
-        public double Profit => Return - Cost;
+        public decimal Cost { get; private set; } = 0;
+        public decimal Return { get; private set; } = 0;
+        public decimal Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
+        public decimal Profit => Return - Cost;
         public bool IsClosed => Closed != null;
         public string Token { get; }
         public DateTimeOffset? Closed { get; private set; }
 
-        public void Buy(double quantity, double dollarAmountSpent, DateTimeOffset when)
+        public void Buy(decimal quantity, decimal dollarAmountSpent, DateTimeOffset when)
         {
             if (_quantity == 0)
             {
@@ -35,7 +35,7 @@ namespace core.Cryptos
             Cost += dollarAmountSpent;
         }
 
-        public void Sell(double quantity, double dollarAmountReceived, DateTimeOffset when)
+        public void Sell(decimal quantity, decimal dollarAmountReceived, DateTimeOffset when)
         {
             _quantity -= quantity;
 

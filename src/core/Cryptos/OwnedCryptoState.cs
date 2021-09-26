@@ -11,9 +11,9 @@ namespace core.Cryptos
         public string Token { get; private set; }
         public Guid UserId { get; private set; }
 
-        public double Quantity { get; private set; }
-        public double Cost { get; private set; }
-        public double AverageCost { get; private set; }
+        public decimal Quantity { get; private set; }
+        public decimal Cost { get; private set; }
+        public decimal AverageCost { get; private set; }
         public List<CryptoTransaction> Transactions { get; } = new List<CryptoTransaction>();
         internal List<ICryptoTransaction> BuyOrSell { get; } = new List<ICryptoTransaction>();
         internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
@@ -67,9 +67,9 @@ namespace core.Cryptos
 
         private void StateUpdateLoop()
         {
-            double avgCost = 0;
-            double quantity = 0;
-            double cost = 0;
+            decimal avgCost = 0;
+            decimal quantity = 0;
+            decimal cost = 0;
             var txs = new List<CryptoTransaction>();
             DateTimeOffset? oldestOpen = null;
             var positionInstances = new List<PositionInstance>();

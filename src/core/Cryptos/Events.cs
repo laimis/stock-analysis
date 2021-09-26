@@ -22,8 +22,8 @@ namespace core.Cryptos
             DateTimeOffset when,
             Guid userId,
             string token,
-            double quantity,
-            double dollarAmountSpent,
+            decimal quantity,
+            decimal dollarAmountSpent,
             string notes)
             : base(id, aggregateId, when)
         {
@@ -36,10 +36,10 @@ namespace core.Cryptos
 
         public Guid UserId { get; }
         public string Token { get; }
-        public double Quantity { get; }
-        public double DollarAmountSpent { get; }
+        public decimal Quantity { get; }
+        public decimal DollarAmountSpent { get; }
         public string Notes { get; }
-        public double DollarAmount => DollarAmountSpent;
+        public decimal DollarAmount => DollarAmountSpent;
     }
 
     public class CryptoSold :
@@ -53,8 +53,8 @@ namespace core.Cryptos
             DateTimeOffset when,
             Guid userId,
             string token,
-            double quantity,
-            double dollarAmountReceived,
+            decimal quantity,
+            decimal dollarAmountReceived,
             string notes)
             : base(id, aggregateId, when)
         {
@@ -67,11 +67,11 @@ namespace core.Cryptos
 
         public Guid UserId { get; }
         public string Token { get; }
-        public double Quantity { get; }
-        public double DollarAmountReceived { get; }
+        public decimal Quantity { get; }
+        public decimal DollarAmountReceived { get; }
         public string Notes { get; }
 
-        public double DollarAmount => DollarAmountReceived;
+        public decimal DollarAmount => DollarAmountReceived;
     }
 
     internal class CryptoTransactionDeleted : AggregateEvent

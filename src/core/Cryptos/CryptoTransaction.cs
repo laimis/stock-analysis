@@ -8,11 +8,11 @@ namespace core.Cryptos
         private Guid transactionId;
         private string token;
         private string description;
-        private double debit;
-        private double credit;
+        private decimal debit;
+        private decimal credit;
         private DateTimeOffset when;
 
-        public CryptoTransaction(Guid aggregateId, Guid transactionId, string token, string description, double debit, double credit, DateTimeOffset when)
+        public CryptoTransaction(Guid aggregateId, Guid transactionId, string token, string description, decimal debit, decimal credit, DateTimeOffset when)
         {
             this.aggregateId = aggregateId;
             this.transactionId = transactionId;
@@ -23,7 +23,7 @@ namespace core.Cryptos
             this.when = when;
         }
 
-        internal static CryptoTransaction DebitTx(Guid aggregateId, Guid transactionId, string token, string description, double dollarAmount, DateTimeOffset when)
+        internal static CryptoTransaction DebitTx(Guid aggregateId, Guid transactionId, string token, string description, decimal dollarAmount, DateTimeOffset when)
         {
             return new CryptoTransaction(
                 aggregateId,
@@ -36,7 +36,7 @@ namespace core.Cryptos
             );
         }
 
-        internal static CryptoTransaction CreditTx(Guid aggregateId, Guid transactionId, string token, string description, double dollarAmount, DateTimeOffset when)
+        internal static CryptoTransaction CreditTx(Guid aggregateId, Guid transactionId, string token, string description, decimal dollarAmount, DateTimeOffset when)
         {
             return new CryptoTransaction(
                 aggregateId,
