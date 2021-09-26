@@ -10,7 +10,7 @@ WORKDIR /app
 
 RUN dotnet publish ./src/web --self-contained -r linux-musl-x64 -c Release -o /app/out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine3.10
+FROM mcr.microsoft.com/dotnet/core/aspnet:5.0-alpine
 
 WORKDIR /app
 COPY --from=build-env /app/out /app
