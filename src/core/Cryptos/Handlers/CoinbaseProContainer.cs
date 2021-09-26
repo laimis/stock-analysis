@@ -22,11 +22,9 @@ namespace core.Cryptos.Handlers
 
         public class TransactionGroup
         {
-            private IGrouping<string, CoinbaseProRecord> g;
-
-            public TransactionGroup(IGrouping<string, CoinbaseProRecord> g)
+            public TransactionGroup(IGrouping<string, CoinbaseProRecord> group)
             {
-                var records = g.ToList();
+                var records = group.ToList();
 
                 if (records.Count > 2)
                 {
