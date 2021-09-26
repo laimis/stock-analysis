@@ -29,5 +29,43 @@ namespace coretests.Crypto
             Assert.Equal(2, btc.State.Transactions.Count);
             Assert.Single(btc.State.PositionInstances);
         }
+
+        [Fact]
+        public void Airdrops()
+        {
+            var xlm = new OwnedCrypto(
+                new Token("XLM"), System.Guid.NewGuid()
+            );
+
+            xlm.Reward(quantity: 0.012m,
+                       dollarAmountWorth: 2.0m,
+                       date: DateTimeOffset.UtcNow,
+                       notes: "Received 4.9954541 XLM from Coinbase Earn");
+
+            Assert.Equal("XLM", xlm.State.Token);
+            Assert.Equal(0.012m, xlm.State.Quantity);
+            Assert.Equal(0, xlm.State.Cost);
+            Assert.Empty(xlm.State.PositionInstances);
+            Assert.Empty(xlm.State.Transactions);
+        }
+
+        [Fact]
+        public void Yields()
+        {
+            var algo = new OwnedCrypto(
+                new Token("ALGO"), System.Guid.NewGuid()
+            );
+
+            algo.Yield(quantity: 0.080861m,
+                       dollarAmountWorth: 0.11m,
+                       date: DateTimeOffset.UtcNow,
+                       notes: "Received 0.080861 ALGO from Coinbase Rewards");
+
+            Assert.Equal("ALGO", algo.State.Token);
+            Assert.Equal(0.080861m, algo.State.Quantity);
+            Assert.Equal(0, algo.State.Cost);
+            Assert.Empty(algo.State.PositionInstances);
+            Assert.Empty(algo.State.Transactions);
+        }
     }
 }

@@ -74,6 +74,68 @@ namespace core.Cryptos
         public decimal DollarAmount => DollarAmountReceived;
     }
 
+    public class CryptoAwarded :
+        AggregateEvent,
+        INotification,
+        ICryptoTransaction
+    {
+        public CryptoAwarded(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            Guid userId,
+            string token,
+            decimal quantity,
+            decimal dollarAmountWorth,
+            string notes)
+            : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Token = token;
+            Quantity = quantity;
+            DollarAmountWorth = dollarAmountWorth;
+            Notes = notes;
+        }
+
+        public Guid UserId { get; }
+        public string Token { get; }
+        public decimal Quantity { get; }
+        public decimal DollarAmountWorth { get; }
+        public string Notes { get; }
+        public decimal DollarAmount => DollarAmountWorth;
+    }
+
+    public class CryptoYielded :
+        AggregateEvent,
+        INotification,
+        ICryptoTransaction
+    {
+        public CryptoYielded(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            Guid userId,
+            string token,
+            decimal quantity,
+            decimal dollarAmountWorth,
+            string notes)
+            : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Token = token;
+            Quantity = quantity;
+            DollarAmountWorth = dollarAmountWorth;
+            Notes = notes;
+        }
+
+        public Guid UserId { get; }
+        public string Token { get; }
+        public decimal Quantity { get; }
+        public decimal DollarAmountWorth { get; }
+        public string Notes { get; }
+        public decimal DollarAmount => DollarAmountWorth;
+    }
+
     internal class CryptoTransactionDeleted : AggregateEvent
     {
         public CryptoTransactionDeleted(

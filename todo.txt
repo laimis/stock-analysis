@@ -1,7 +1,10 @@
-- crypto ownership tracking
+- how to categorize coinbase earn?
+    Rewards Income
+    Coinbase Earn
 
-    - import transactions
-    - delete transactions
-    - show owned tokens, amount, cost, average cost
+- show how much was obtained via awards
+- show how much was obtained via yield
+
+- crypto details
 
 - host on ECS

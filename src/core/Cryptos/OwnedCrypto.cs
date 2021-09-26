@@ -55,6 +55,58 @@ namespace core.Cryptos
             );
         }
 
+        public void Reward(decimal quantity, decimal dollarAmountWorth, DateTimeOffset date, string notes)
+        {
+            if (quantity < 0)
+            {
+                throw new InvalidOperationException("Quantity cannot be negative quantity");
+            }
+
+            if (dollarAmountWorth < 0)
+            {
+                throw new InvalidOperationException("dollar amount worth cannot be negative");
+            }
+
+            Apply(
+                new CryptoAwarded(
+                    id: Guid.NewGuid(),
+                    aggregateId: State.Id,
+                    when: date,
+                    userId: State.UserId,
+                    token: State.Token,
+                    quantity,
+                    dollarAmountWorth,
+                    notes
+                )
+            );
+        }
+
+        public void Yield(decimal quantity, decimal dollarAmountWorth, DateTimeOffset date, string notes)
+        {
+            if (quantity < 0)
+            {
+                throw new InvalidOperationException("Quantity cannot be negative quantity");
+            }
+
+            if (dollarAmountWorth < 0)
+            {
+                throw new InvalidOperationException("dollar amount worth cannot be negative");
+            }
+
+            Apply(
+                new CryptoYielded(
+                    id: Guid.NewGuid(),
+                    aggregateId: State.Id,
+                    when: date,
+                    userId: State.UserId,
+                    token: State.Token,
+                    quantity,
+                    dollarAmountWorth,
+                    notes
+                )
+            );
+        }
+
         public void DeleteTransaction(Guid transactionId)
         {
             if (!State.BuyOrSell.Any(t => t.Id == transactionId))

@@ -77,6 +77,34 @@ namespace core.Cryptos.Handlers
                     return s;
                 }
 
+                RequestWithUserId<CommandResponse> CreateAward(CryptoRecord r)
+                {
+                    var s = new core.Cryptos.Handlers.Reward.Command
+                    {
+                        Date = record.Timestamp,
+                        DollarAmount = record.USDSubtotal.Value,
+                        Quantity = record.QuantityTransacted.Value,
+                        Notes = record.Notes,
+                        Token = record.Asset
+                    };
+                    s.WithUserId(userId);
+                    return s;
+                }
+
+                RequestWithUserId<CommandResponse> CreateYield(CryptoRecord r)
+                {
+                    var s = new core.Cryptos.Handlers.Yield.Command
+                    {
+                        Date = record.Timestamp,
+                        DollarAmount = record.USDSubtotal.Value,
+                        Quantity = record.QuantityTransacted.Value,
+                        Notes = record.Notes,
+                        Token = record.Asset
+                    };
+                    s.WithUserId(userId);
+                    return s;
+                }
+
                 RequestWithUserId<CommandResponse> cmd = null;
                 switch (record.TransactionType.ToLower())
                 {
@@ -86,6 +114,14 @@ namespace core.Cryptos.Handlers
 
                     case "sell":
                         cmd = CreateSell(record);
+                        break;
+
+                    case "coinbase earn":
+                        cmd = CreateAward(record);
+                        break;
+
+                    case "rewards income":
+                        cmd = CreateYield(record);
                         break;
                 }
 
@@ -115,6 +151,7 @@ namespace core.Cryptos.Handlers
                 public decimal? QuantityTransacted { get; set; }
                 public decimal? USDSubtotal { get; set; }
                 public DateTimeOffset Timestamp { get; set; }
+                public string Notes { get; set; }
             }
         }
     }

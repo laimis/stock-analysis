@@ -27,6 +27,9 @@ namespace core.Cryptos
         public IEnumerable<AggregateEvent> UndeletedBuysOrSells =>
             BuyOrSell.Where(a => Deletes.Contains(a.Id) == false).Cast<AggregateEvent>();
 
+        public List<CryptoAwarded> Awards { get; } = new List<CryptoAwarded>();
+        public List<CryptoYielded> Yields { get; } = new List<CryptoYielded>();
+
         internal void ApplyInternal(CryptoObtained o)
         {
             Id = o.AggregateId;
@@ -61,6 +64,20 @@ namespace core.Cryptos
         internal void ApplyInternal(CryptoSold sold)
         {
             BuyOrSell.Add(sold);
+
+            StateUpdateLoop();
+        }
+
+        internal void ApplyInternal(CryptoAwarded awarded)
+        {
+            Awards.Add(awarded);
+
+            StateUpdateLoop();
+        }
+
+        internal void ApplyInternal(CryptoYielded yielded)
+        {
+            Yields.Add(yielded);
 
             StateUpdateLoop();
         }
@@ -152,6 +169,26 @@ namespace core.Cryptos
                     cost = 0;
                     oldestOpen = null;
                 }
+            }
+
+            foreach(var a in Awards)
+            {
+                if (Deletes.Contains(a.Id))
+                {
+                    continue;
+                }
+
+                quantity += a.Quantity;
+            }
+
+            foreach(var y in Yields)
+            {
+                if (Deletes.Contains(y.Id))
+                {
+                    continue;
+                }
+
+                quantity += y.Quantity;
             }
 
             AverageCost = avgCost;
