@@ -13,7 +13,7 @@ namespace core.Cryptos
 
         public decimal Quantity { get; private set; }
         public decimal Cost { get; private set; }
-        public decimal AverageCost { get; private set; }
+        public decimal AverageCost => Cost / Quantity;
         public List<CryptoTransaction> Transactions { get; } = new List<CryptoTransaction>();
         internal List<ICryptoTransaction> BuyOrSell { get; } = new List<ICryptoTransaction>();
         internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
@@ -84,7 +84,6 @@ namespace core.Cryptos
 
         private void StateUpdateLoop()
         {
-            decimal avgCost = 0;
             decimal quantity = 0;
             decimal cost = 0;
             var txs = new List<CryptoTransaction>();
@@ -165,7 +164,6 @@ namespace core.Cryptos
                 
                 if (quantity == 0)
                 {
-                    avgCost = 0;
                     cost = 0;
                     oldestOpen = null;
                 }
@@ -176,6 +174,11 @@ namespace core.Cryptos
                 if (Deletes.Contains(a.Id))
                 {
                     continue;
+                }
+
+                if (quantity == 0)
+                {
+                    oldestOpen = a.When;
                 }
 
                 quantity += a.Quantity;
@@ -191,7 +194,6 @@ namespace core.Cryptos
                 quantity += y.Quantity;
             }
 
-            AverageCost = avgCost;
             Quantity = quantity;
             Cost = cost;
             Transactions.Clear();

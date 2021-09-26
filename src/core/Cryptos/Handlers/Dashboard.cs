@@ -34,6 +34,7 @@ namespace core.Cryptos.Handlers
                 var ownedStocks = cryptos
                     .Where(c => c.State.Quantity > 0)
                     .Select(c => new OwnedCryptoView(c))
+                    .OrderByDescending(c => c.Cost)
                     .ToList();
 
                 return new CryptoDashboardView(ownedStocks);
