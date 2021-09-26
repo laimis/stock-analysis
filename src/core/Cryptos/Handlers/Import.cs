@@ -112,8 +112,8 @@ namespace core.Cryptos.Handlers
             {
                 public string TransactionType { get; set; }
                 public string Asset { get; set; }
-                public double? QuantityTransacted { get; set; }
-                public double? USDSubtotal { get; set; }
+                public decimal? QuantityTransacted { get; set; }
+                public decimal? USDSubtotal { get; set; }
                 public DateTimeOffset Timestamp { get; set; }
             }
         }

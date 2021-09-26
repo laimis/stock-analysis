@@ -14,17 +14,17 @@ namespace coretests.Crypto
             );
 
             btc.Purchase(
-                quantity: 0.05437703,
-                dollarAmountSpent: 985.32,
+                quantity: 0.05437703m,
+                dollarAmountSpent: 985.32m,
                 date: System.DateTimeOffset.Parse("2017-12-19T15:05:38Z")
             );
 
-            Assert.Equal(0.05437703, btc.State.Quantity);
-            Assert.Equal(985.32, btc.State.Cost);
+            Assert.Equal(0.05437703m, btc.State.Quantity);
+            Assert.Equal(985.32m, btc.State.Cost);
 
-            btc.Sell(0.004, dollarAmountReceived: 74, DateTimeOffset.UtcNow, notes: null);
+            btc.Sell(0.004m, dollarAmountReceived: 74, DateTimeOffset.UtcNow, notes: null);
 
-            Assert.Equal(0.05037703, btc.State.Quantity);
+            Assert.Equal(0.05037703m, btc.State.Quantity);
 
             Assert.Equal(2, btc.State.Transactions.Count);
             Assert.Single(btc.State.PositionInstances);

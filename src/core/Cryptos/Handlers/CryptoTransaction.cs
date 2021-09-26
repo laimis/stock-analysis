@@ -7,10 +7,10 @@ namespace core.Cryptos.Handlers
     public class CryptoTransaction : RequestWithToken<CommandResponse>
     {
         [Range(0.00000000000000000001, 1000000)]
-        public double Quantity { get; set; }
+        public decimal Quantity { get; set; }
 
         [Range(0, 100000)]
-        public double DollarAmount { get; set; }
+        public decimal DollarAmount { get; set; }
         
         [Required]
         public DateTimeOffset? Date { get; set; }

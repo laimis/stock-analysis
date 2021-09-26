@@ -10,7 +10,7 @@ namespace core.Cryptos.Views
         }
 
         public string Token { get; }
-        public double Quantity { get; }
-        public double Cost { get; }
+        public decimal Quantity { get; }
+        public decimal Cost { get; }
     }
 }

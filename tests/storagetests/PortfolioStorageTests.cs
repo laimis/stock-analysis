@@ -144,7 +144,7 @@ namespace storage.tests
         {
             var crypto = new OwnedCrypto(new Token("BTC"), _userId);
 
-            crypto.Purchase(10, 2.1, DateTimeOffset.UtcNow);
+            crypto.Purchase(10, 2.1m, DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
