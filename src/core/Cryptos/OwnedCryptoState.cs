@@ -201,8 +201,8 @@ namespace core.Cryptos
             PositionInstances.Clear();
             PositionInstances.AddRange(positionInstances);
 
-            DaysHeld = oldestOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(oldestOpen.Value).TotalDays)
-                : 0;
+            DaysHeld = oldestOpen.HasValue ? 
+                (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(oldestOpen.Value).TotalDays) : 0;
 
             DaysSinceLastTransaction = (int)DateTimeOffset.UtcNow.Subtract(lastTransaction).TotalDays;
         }

@@ -1,6 +1,4 @@
-- how to categorize coinbase earn?
-    Rewards Income
-    Coinbase Earn
+
 
 - show how much was obtained via awards
 - show how much was obtained via yield
