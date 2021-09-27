@@ -34,13 +34,19 @@ namespace web.Controllers
             using var streamReader = new StreamReader(file.OpenReadStream());
 
             var content = await streamReader.ReadToEndAsync();
-
-            RequestWithUserId<CommandResponse> cmd = file.FileName.Contains("coinbasepro") ?
-                new ImportCoinbasePro.Command(content) : new Import.Command(content);
+            
+            var cmd = SelectCommand(file, content);
 
             cmd.WithUserId(this.User.Identifier());
 
             return this.OkOrError(await _mediator.Send(cmd));
         }
+
+        private static RequestWithUserId<CommandResponse> SelectCommand(IFormFile file, string content) => file.FileName switch {
+            string filename when filename.Contains("coinbasepro") => new ImportCoinbasePro.Command(content),
+            string filename when filename.Contains("blockfi") => new ImportBlockFi.Command(content),
+            string filename when filename.Contains("coinbase") => new ImportCoinbase.Command(content),
+            _ => new ImportCoinbase.Command(content)
+        };
     }
 }

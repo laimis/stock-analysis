@@ -1,8 +1,5 @@
+- import blockfi rewards
+- crypto price feeds
 
-
-- show how much was obtained via awards
-- show how much was obtained via yield
-
+- better tests for csv imports
 - crypto details
-
-- host on ECS

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace core.Cryptos.Handlers
 {
-    public class Import
+    public class ImportCoinbase
     {
         public class Command : RequestWithUserId<CommandResponse>
         {
