@@ -10,9 +10,10 @@
     </div>
     <div class="col">
       <select class="filterDropdown btn border rounded" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
-        <option value="">Shares and options</option>
-        <option value="shares">Just shares</option>
-        <option value="options">Just options</option>
+        <option value="crypto">Crypto</option>
+        <option value="options">Options</option>
+        <option value="shares">Shares</option>
+        <option value="">Shares and Options</option>
       </select>
     </div>
     <div class="col">

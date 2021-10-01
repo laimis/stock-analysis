@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Cryptos;
 using core.Options;
 using core.Portfolio.Output;
 using core.Shared;
@@ -38,12 +39,14 @@ namespace core.Portfolio
             {
                 var stocks = _storage.GetStocks(request.UserId);
                 var options = _storage.GetOwnedOptions(request.UserId);
+                var crypto = _storage.GetCryptos(request.UserId);
 
-                await Task.WhenAll(stocks, options);
+                await Task.WhenAll(stocks, options, crypto);
 
                 return ToTransactionLog(
                     stocks.Result,
                     options.Result,
+                    crypto.Result,
                     request.Ticker,
                     request.GroupBy,
                     request.Show,
@@ -53,6 +56,7 @@ namespace core.Portfolio
             internal static TransactionList ToTransactionLog(
                 IEnumerable<OwnedStock> stocks,
                 IEnumerable<OwnedOption> options,
+                IEnumerable<OwnedCrypto> cryptos,
                 string ticker,
                 string groupBy,
                 string show,
@@ -77,6 +81,15 @@ namespace core.Portfolio
                     log.AddRange(
                         options.Where(o => o.State.Ticker == (ticker != null ? ticker : o.State.Ticker))
                             .SelectMany(o => o.State.Transactions)
+                            .Where(t => txType == "pl" ? t.IsPL : !t.IsPL)
+                    );
+                }
+
+                if (show == "crypto")
+                {
+                    log.AddRange(
+                        cryptos.Where(o => o.State.Token == (ticker != null ? ticker : o.State.Token))
+                            .SelectMany(o => o.State.Transactions.Select(t => t.ToSharedTransaction()))
                             .Where(t => txType == "pl" ? t.IsPL : !t.IsPL)
                     );
                 }

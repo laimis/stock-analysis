@@ -1,4 +1,5 @@
 using System;
+using core.Shared;
 
 namespace core.Cryptos
 {
@@ -48,5 +49,10 @@ namespace core.Cryptos
                 when
             );
         }
+
+        internal Transaction ToSharedTransaction() => credit switch {
+            > 0 => Transaction.CreditTx(aggregateId, transactionId, token, description, Decimal.ToDouble(credit), when, isOption: false),
+            _ => Transaction.DebitTx(aggregateId, transactionId, token, description, Decimal.ToDouble(debit), when, isOption: false)
+        };
     }
 }

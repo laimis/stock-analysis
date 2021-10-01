@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using core.Portfolio;
-using core.Portfolio.Output;
 using core.Reports;
 using core.Reports.Views;
 using MediatR;

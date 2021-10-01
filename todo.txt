@@ -1,4 +1,3 @@
+- add ability to see crypto details
+- add ability to see crypto history
 - crypto price feeds
-
-- better tests for csv imports
-- crypto details
