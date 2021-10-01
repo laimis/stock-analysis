@@ -35,18 +35,11 @@ namespace web.Controllers
 
             var content = await streamReader.ReadToEndAsync();
             
-            var cmd = SelectCommand(file, content);
+            var cmd = ImportCryptoCommandFactory.Create(file.FileName, content);
 
             cmd.WithUserId(this.User.Identifier());
 
             return this.OkOrError(await _mediator.Send(cmd));
         }
-
-        private static RequestWithUserId<CommandResponse> SelectCommand(IFormFile file, string content) => file.FileName switch {
-            string filename when filename.Contains("coinbasepro") => new ImportCoinbasePro.Command(content),
-            string filename when filename.Contains("blockfi") => new ImportBlockFi.Command(content),
-            string filename when filename.Contains("coinbase") => new ImportCoinbase.Command(content),
-            _ => new ImportCoinbase.Command(content)
-        };
     }
 }

@@ -1,4 +1,3 @@
-- import blockfi rewards
 - crypto price feeds
 
 - better tests for csv imports
