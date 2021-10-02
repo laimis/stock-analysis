@@ -16,10 +16,17 @@ $version = new-object System.Version($v.Substring(1))
 
 $newVersion = new-object System.Version($version.Major, $version.Minor, ($version.Build + 1))
 
+Set-Location .\src\web\ClientApp
+
+Invoke-Expression "npm version $($newVersion)"
+
+Invoke-Expression "git add ."
+Invoke-Expression "git commit -m '$message'"
+
 $cmd = "git tag -a v$($newVersion) -m '$message'"
 
-write-host $cmd 
+Invoke-Expression $cmd
 
-iex $cmd
+Invoke-Expression "git push --tags"
 
-iex "git push --tags"
+Set-Location ..\..\..
