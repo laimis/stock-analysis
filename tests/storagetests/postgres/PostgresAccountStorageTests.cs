@@ -1,4 +1,5 @@
-﻿using core.Account;
+﻿using System;
+using core.Account;
 using storage.postgres;
 using Xunit;
 
@@ -11,7 +12,8 @@ namespace storagetests.postgres
         {
             return new AccountStorage(
                 new Fakes.FakeMediator(),
-                PostgresPortfolioStorageTests._cnn);
+                Environment.GetEnvironmentVariable("DB_CNN")
+            );
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using storage.postgres;
 using storagetests.Fakes;
@@ -13,7 +14,7 @@ namespace storagetests.postgres
         {
             var storage = new PostgresAggregateStorage(
                 new FakeMediator(),
-                PostgresPortfolioStorageTests._cnn);
+                Environment.GetEnvironmentVariable("DB_CNN"));
 
             await storage.DoHealthCheck();
         }

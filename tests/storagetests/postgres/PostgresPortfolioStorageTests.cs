@@ -1,4 +1,5 @@
-﻿using core;
+﻿using System;
+using core;
 using storage.postgres;
 using storage.shared;
 using storage.tests;
@@ -9,10 +10,16 @@ namespace storagetests.postgres
     [Trait("Category", "Database")]
     public class PostgresPortfolioStorageTests : PortfolioStorageTests
     {
-        internal static string _cnn = "Server=localhost;Database=stocks;User id=stocks;password=stocks";
+        protected string _cnn = null;
+
+        public PostgresPortfolioStorageTests()
+        {
+            _cnn = Environment.GetEnvironmentVariable("DB_CNN");
+        }
 
         protected override IPortfolioStorage CreateStorage()
         {
+            
             return new PortfolioStorage(
                 new PostgresAggregateStorage(new Fakes.FakeMediator(), _cnn),
                 null

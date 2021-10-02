@@ -6,9 +6,9 @@ if ([System.String]::IsNullOrEmpty($message))
     exit
 }
 
-iex 'git push'
+Invoke-Expression 'git push'
 
-$v = iex 'git describe --tags --abbrev=0'
+$v = Invoke-Expression 'git describe --tags --abbrev=0'
 
 write-host $v
 
