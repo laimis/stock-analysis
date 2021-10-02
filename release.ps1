@@ -22,11 +22,10 @@ Invoke-Expression "npm version $($newVersion)"
 
 Invoke-Expression "git add ."
 Invoke-Expression "git commit -m '$message'"
+Invoke-Expression "git push"
 
 $cmd = "git tag -a v$($newVersion) -m '$message'"
-
 Invoke-Expression $cmd
-
 Invoke-Expression "git push --tags"
 
 Set-Location ..\..\..
