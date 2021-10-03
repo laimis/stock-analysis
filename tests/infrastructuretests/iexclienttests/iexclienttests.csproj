@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\infrastructure\iexclient\iexclient.csproj" />
     <ProjectReference Include="..\..\..\src\core\core.csproj" />
+    <ProjectReference Include="..\..\testutils\testutils.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using iexclient;
+using testutils;
 using Xunit;
 using Xunit.Abstractions;
 

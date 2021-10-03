@@ -3,6 +3,7 @@ using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
 using iexclient;
+using testutils;
 
 namespace iexclienttests
 {
