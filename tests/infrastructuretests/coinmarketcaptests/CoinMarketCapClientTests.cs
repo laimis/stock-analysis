@@ -6,6 +6,7 @@ using Xunit;
 
 namespace coinmarketcaptests
 {
+    [Trait("Category", "Integration")]
     public class CoinMarketCapClientTests
     {
         [Fact]
