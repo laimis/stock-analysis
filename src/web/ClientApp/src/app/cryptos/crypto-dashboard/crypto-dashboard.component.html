@@ -23,27 +23,6 @@
       </div>
     </div>
 
-    <div class="col text-center">
-      <div class="container">
-        <div class="row">
-          <div class="col text-right">Gains</div>
-          <div class="col text-left">
-            <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">
-              {{currentEquity - moneySpentOnShares | currency}}
-            </span>
-          </div>
-        </div>
-        <div class="row mt-0">
-          <div class="col text-right">Gains %</div>
-          <div class="col text-left">
-            <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">
-              {{(currentEquity - moneySpentOnShares)/moneySpentOnShares | percent}}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
 </div>
