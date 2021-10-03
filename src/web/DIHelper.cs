@@ -8,6 +8,7 @@ using core.Adapters.Stocks;
 using core.Adapters.Subscriptions;
 using core.Alerts;
 using core.Options;
+using core.Shared.Adapters.Cryptos;
 using csvparser;
 using iexclient;
 using MediatR;
@@ -32,8 +33,15 @@ namespace web
                 )
             );
             
+            services.AddSingleton<coinmarketcap.CoinMarketCapClient>(s =>
+                new coinmarketcap.CoinMarketCapClient(
+                    configuration.GetValue<string>("COINMARKETCAPToken")
+                )
+            );
+
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
             services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
+            services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>());
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<IAlertsStorage, AlertsStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();

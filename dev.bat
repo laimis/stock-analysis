@@ -6,5 +6,7 @@ REM set DB_CNN=Server=...;Database=...;User id=...;password=... # database conne
 REM set GoogleClientId=...  # for google oauth, get client id from google console
 REM set GoogleSecret=... # for google oauth, get secret from google console
 
+REM set COINMARKETCAPToken=.... # coinmarketcap token that you will need for crypto prices
+
 cd src\web
 dotnet watch run

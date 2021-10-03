@@ -1,3 +1,5 @@
+using System;
+
 namespace core.Cryptos.Views
 {
     public class OwnedCryptoView
@@ -16,5 +18,17 @@ namespace core.Cryptos.Views
         public decimal Cost { get; }
         public int DaysHeld { get; }
         public decimal AverageCost { get; }
+        public decimal Price { get; private set; }
+        public decimal Equity => Price * Quantity;
+        public decimal Profits => Equity - Cost;
+        public decimal ProfitsPct => Cost switch {
+            0 => 1m,
+            _ => Profits / (1.0m * Cost)
+        };
+
+        internal void ApplyPrice(Price price)
+        {
+            Price = Convert.ToDecimal(price.Amount);
+        }
     }
 }

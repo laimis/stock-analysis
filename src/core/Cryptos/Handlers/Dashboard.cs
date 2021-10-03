@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Cryptos.Views;
 using core.Shared;
+using core.Shared.Adapters.Cryptos;
 
 namespace core.Cryptos.Handlers
 {
@@ -18,13 +19,32 @@ namespace core.Cryptos.Handlers
 
         public class Handler : HandlerWithStorage<Query, CryptoDashboardView>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private ICryptoService _prices;
+
+            public Handler(IPortfolioStorage storage, ICryptoService prices) : base(storage)
             {
+                _prices = prices;
             }
 
-            public override Task<CryptoDashboardView> Handle(Query query, CancellationToken cancellationToken)
+            public override async Task<CryptoDashboardView> Handle(Query query, CancellationToken cancellationToken)
             {
-                return LoadFromDb(query.UserId);
+                var dashboardView = await LoadFromDb(query.UserId);
+
+                var prices = await _prices.Get();
+
+                foreach(var owned in dashboardView.Owned)
+                {
+                    if (prices.TryGet(owned.Token, out var price))
+                    {
+                        owned.ApplyPrice(price.Value);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Did not find price for " + owned.Token);
+                    }
+                }
+
+                return dashboardView;
             }
 
             private async Task<CryptoDashboardView> LoadFromDb(Guid userId)
