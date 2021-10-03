@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let s of sells">
-        <td>{{s.ticker}}</td>
+        <td><a [routerLink]="[ '/stocks', s.ticker ]">{{s.ticker}}</a></td>
         <td>{{s.date | date}}</td>
         <td>{{s.numberOfShares}}</td>
         <td>{{s.price}}</td>
