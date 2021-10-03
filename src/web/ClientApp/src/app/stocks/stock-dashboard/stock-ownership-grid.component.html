@@ -24,17 +24,11 @@
         <td>{{ticker.owned}}</td>
         <td class="text-right">{{ticker.price | currency}}</td>
         <td class="text-right">{{ticker.averageCost | currency}}</td>
-        <td class="text-right">{{ticker.daysHeld}}</td>
-        <td class="text-right">
-          {{ticker.cost | currency}}
-          <small>{{ownershipPct(ticker) | percent}}</small>
-        </td>
+        <td class="text-right">{{ticker.cost | currency}} <small>{{ownershipPct(ticker) | percent}}</small></td>
         <td class="text-right"><span [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profits | currency }}</span></td>
         <td class="text-right"><span [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
-        <td class="text-right">
-          {{ticker.equity | currency}}
-          <small>{{equityPct(ticker) | percent}}</small>
-        </td>
+        <td class="text-right">{{ticker.equity | currency}} <small>{{equityPct(ticker) | percent}}</small></td>
+        <td class="text-right">{{ticker.daysHeld}}</td>
       </tr>
     </table>
   </div>
