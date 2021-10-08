@@ -2,9 +2,9 @@ namespace core
 {
     public struct Price
     {
-        public double Amount { get; }
+        public decimal Amount { get; }
 
-        public Price(double amount)
+        public Price(decimal amount)
         {
             this.Amount = amount;
         }

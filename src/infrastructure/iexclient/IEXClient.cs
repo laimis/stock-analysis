@@ -102,7 +102,7 @@ namespace iexclient
 
             var response = await r.Content.ReadAsStringAsync();
 
-            return new Price(JsonConvert.DeserializeObject<double>(response));
+            return new Price(JsonConvert.DeserializeObject<decimal>(response));
         }
 
         public async Task<Dictionary<string, BatchStockPrice>> GetPrices(List<string> tickers)

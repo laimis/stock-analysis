@@ -12,8 +12,8 @@ namespace core.Stocks
         public Guid UserId { get; private set; }
 
         public int Owned { get; private set; }
-        public double Cost { get; private set; }
-        public double AverageCost { get; private set; }
+        public decimal Cost { get; private set; }
+        public decimal AverageCost { get; private set; }
         public List<Transaction> Transactions { get; } = new List<Transaction>();
         internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
         internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
@@ -73,9 +73,9 @@ namespace core.Stocks
 
         private void StateUpdateLoop()
         {
-            double avgCost = 0;
+            decimal avgCost = 0;
             int owned = 0;
-            double cost = 0;
+            decimal cost = 0;
             var txs = new List<Transaction>();
             DateTimeOffset? oldestOpen = null;
             var positionInstances = new List<PositionInstance>();
@@ -204,7 +204,7 @@ namespace core.Stocks
     internal interface IStockTransaction
     {
         int NumberOfShares { get; }
-        double Price { get; }
+        decimal Price { get; }
         Guid Id { get; }
         DateTimeOffset When { get; }
     }

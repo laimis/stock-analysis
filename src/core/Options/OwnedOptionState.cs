@@ -17,7 +17,7 @@ namespace core.Options
 
         public Guid Id { get; private set; }
         public string Ticker { get; internal set; }
-        public double StrikePrice { get; internal set; }
+        public decimal StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; private set; }
         public bool IsExpired => DateTimeOffset.UtcNow.Date > this.Expiration;
         public OptionType OptionType { get; internal set; }
@@ -65,8 +65,8 @@ namespace core.Options
         public bool ExpiresSoon => !IsExpired && DaysUntilExpiration >= 0 && DaysUntilExpiration < 7;
         public long? DaysLeft => this.DaysUntilExpiration;
         public bool Deleted { get; private set; }
-        private double PremiumReceived { get; set; }
-        private double PremiumPaid { get; set; }
+        private decimal PremiumReceived { get; set; }
+        private decimal PremiumPaid { get; set; }
         public List<string> Notes { get; }
 
         internal void ApplyInternal(OptionDeleted deleted)
@@ -167,7 +167,7 @@ namespace core.Options
             this.UserId = opened.UserId;
         }
 
-        internal bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
+        internal bool IsMatch(string ticker, decimal strike, OptionType type, DateTimeOffset expiration)
         {
             return this.Ticker == ticker 
                 && this.StrikePrice == strike 

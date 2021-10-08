@@ -26,7 +26,7 @@ namespace coretests
         {
             var option = new OwnedOption(
                 "tlsa",
-                2.5,
+                2.5m,
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
                 Guid.NewGuid());

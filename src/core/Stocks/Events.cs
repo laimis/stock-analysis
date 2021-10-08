@@ -23,7 +23,7 @@ namespace core.Stocks
             Guid userId,
             string ticker,
             int numberOfShares,
-            double price,
+            decimal price,
             string notes)
             : base(id, aggregateId, when)
         {
@@ -37,7 +37,7 @@ namespace core.Stocks
         public Guid UserId { get; }
         public string Ticker { get; }
         public int NumberOfShares { get; }
-        public double Price { get; }
+        public decimal Price { get; }
         public string Notes { get; }
     }
 
@@ -53,7 +53,7 @@ namespace core.Stocks
             Guid userId,
             string ticker,
             int numberOfShares,
-            double price,
+            decimal price,
             string notes)
             : base(id, aggregateId, when)
         {
@@ -67,7 +67,7 @@ namespace core.Stocks
         public Guid UserId { get; }
         public string Ticker { get; }
         public int NumberOfShares { get; }
-        public double Price { get; }
+        public decimal Price { get; }
         public string Notes { get; }
     }
 

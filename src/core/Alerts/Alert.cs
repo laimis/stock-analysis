@@ -36,7 +36,7 @@ namespace core.Alerts
             );
         }
 
-        public bool AddPricePoint(string description, double value)
+        public bool AddPricePoint(string description, decimal value)
         {
             var exists = this.PricePoints.Any(p => p.Value == value);
             if (exists)
@@ -90,7 +90,7 @@ namespace core.Alerts
 
     public struct AlertPricePoint
     {
-        public AlertPricePoint(Guid id, string description, double value)
+        public AlertPricePoint(Guid id, string description, decimal value)
         {
             Id = id;
             Description = description;
@@ -99,6 +99,6 @@ namespace core.Alerts
 
         public Guid Id { get; }
         public string Description { get; }
-        public double Value { get; }
+        public decimal Value { get; }
     }
 }

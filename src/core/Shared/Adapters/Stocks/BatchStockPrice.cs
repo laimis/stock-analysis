@@ -2,6 +2,6 @@ namespace core.Adapters.Stocks
 {
     public class BatchStockPrice
     {
-        public double Price { get; set; }
+        public decimal Price { get; set; }
     }
 }

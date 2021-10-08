@@ -37,7 +37,7 @@ namespace storage.tests
         {
             var stock = new OwnedStock(GenerateTestTicker(), _userId);
 
-            stock.Purchase(10, 2.1, DateTime.UtcNow);
+            stock.Purchase(10, 2.1m, DateTime.UtcNow);
 
             var storage = CreateStorage();
 
@@ -78,7 +78,7 @@ namespace storage.tests
 
             var option = new OwnedOption(
                 GenerateTestTicker(),
-                2.5,
+                2.5m,
                 OptionType.CALL,
                 expiration,
                 _userId

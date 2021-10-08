@@ -16,7 +16,7 @@ namespace core.Options
 
         public OwnedOption(
             Ticker ticker,
-            double strikePrice,
+            decimal strikePrice,
             OptionType type,
             DateTimeOffset expiration,
             Guid userId)
@@ -63,10 +63,10 @@ namespace core.Options
             );
         }
 
-        public bool IsMatch(string ticker, double strike, OptionType type, DateTimeOffset expiration)
+        public bool IsMatch(string ticker, decimal strike, OptionType type, DateTimeOffset expiration)
             => this.State.IsMatch(ticker, strike, type, expiration);
 
-        public void Buy(int numberOfContracts, double premium, DateTimeOffset filled, string notes)
+        public void Buy(int numberOfContracts, decimal premium, DateTimeOffset filled, string notes)
         {
             if (numberOfContracts <= 0)
             {
@@ -91,7 +91,7 @@ namespace core.Options
             );
         }
 
-        public void Sell(int numberOfContracts, double premium, DateTimeOffset filled, string notes)
+        public void Sell(int numberOfContracts, decimal premium, DateTimeOffset filled, string notes)
         {
             if (numberOfContracts <= 0)
             {

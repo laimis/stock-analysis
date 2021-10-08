@@ -60,7 +60,7 @@ namespace core.Admin
         public IEnumerable<string> Tickers { get; set; }
         public IEnumerable<EmailTransactionGroup> Grouped { get; set; } 
         
-        public double Credit => Transactions.Sum(t => t.Credit);
-        public double Debit => Transactions.Sum(t => t.Debit);
+        public decimal Credit => Transactions.Sum(t => t.Credit);
+        public decimal Debit => Transactions.Sum(t => t.Debit);
     }
 }

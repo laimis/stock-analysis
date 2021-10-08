@@ -15,7 +15,7 @@ namespace core.Stocks.View
 
         public string Ticker { get; set; }
         public string Date { get; set; }
-        public double Profit { get; set; }
-        public double ReturnPct { get; set; }
+        public decimal Profit { get; set; }
+        public decimal ReturnPct { get; set; }
     }
 }

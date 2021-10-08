@@ -10,7 +10,7 @@ namespace core.Stocks
         public int NumberOfShares { get; set; }
 
         [Range(0, 100000)]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         
         [Required]
         public DateTimeOffset? Date { get; set; }

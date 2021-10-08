@@ -17,7 +17,7 @@ namespace core.Alerts
 
             [Required]
             [Range(0.01, 10000)]
-            public double Value { get; set; }
+            public decimal Value { get; set; }
         }
 
         public class Handler : HandlerWithStorage<Command, object>

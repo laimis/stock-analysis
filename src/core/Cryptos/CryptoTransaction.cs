@@ -51,8 +51,8 @@ namespace core.Cryptos
         }
 
         internal Transaction ToSharedTransaction() => credit switch {
-            > 0 => Transaction.CreditTx(aggregateId, transactionId, token, description, Decimal.ToDouble(credit), when, isOption: false),
-            _ => Transaction.DebitTx(aggregateId, transactionId, token, description, Decimal.ToDouble(debit), when, isOption: false)
+            > 0 => Transaction.CreditTx(aggregateId, transactionId, token, description, credit, when, isOption: false),
+            _ => Transaction.DebitTx(aggregateId, transactionId, token, description, debit, when, isOption: false)
         };
     }
 }

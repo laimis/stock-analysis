@@ -13,11 +13,11 @@ namespace core.Alerts
 
         public Alert Alert { get; }
         public AlertPricePoint PricePoint { get; }
-        public double? Value { get; private set; }
+        public decimal? Value { get; private set; }
         public DateTimeOffset LastTrigger { get; private set; }
         public bool IsTriggered => LastTrigger.Date == DateTimeOffset.UtcNow.Date;
 
-        public bool CheckTrigger(string ticker, double newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
+        public bool CheckTrigger(string ticker, decimal newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
         {
             if (this.Alert.State.Ticker != ticker)
             {

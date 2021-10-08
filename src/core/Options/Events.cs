@@ -33,7 +33,7 @@ namespace core.Options
             Guid aggregateId,
             DateTimeOffset when,
             string ticker,
-            double strikePrice,
+            decimal strikePrice,
             OptionType optionType,
             DateTimeOffset expiration,
             Guid userId)
@@ -48,7 +48,7 @@ namespace core.Options
 
         public string Ticker { get; }
         public OptionType OptionType { get; }
-        public double StrikePrice { get; }
+        public decimal StrikePrice { get; }
         public DateTimeOffset Expiration { get; }
         public Guid UserId { get; }
     }
@@ -61,7 +61,7 @@ namespace core.Options
             DateTimeOffset when,
             Guid userId,
             int numberOfContracts,
-            double premium,
+            decimal premium,
             string notes)
             : base(id, aggregateId, when)
         {
@@ -73,7 +73,7 @@ namespace core.Options
 
         public Guid UserId { get; }
         public int NumberOfContracts { get; }
-        public double Premium { get; }
+        public decimal Premium { get; }
         public string Notes { get; }
     }
 
@@ -85,7 +85,7 @@ namespace core.Options
             DateTimeOffset when,
             Guid userId,
             int numberOfContracts,
-            double premium,
+            decimal premium,
             string notes)
             : base(id, aggregateId, when)
         {
@@ -97,7 +97,7 @@ namespace core.Options
 
         public Guid UserId { get; }
         public int NumberOfContracts { get; }
-        public double Premium { get; }
+        public decimal Premium { get; }
         public string Notes { get; }
     }
 }

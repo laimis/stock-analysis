@@ -106,7 +106,7 @@ namespace core.Stocks
                 public int amount { get; set; }
                 public string type { get; set; }
                 public DateTimeOffset? date { get; set; }
-                public double price { get; set; }
+                public decimal price { get; set; }
                 public string ticker { get; set; }
             }
         }

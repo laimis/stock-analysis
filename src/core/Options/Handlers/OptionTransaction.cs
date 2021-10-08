@@ -8,7 +8,7 @@ namespace core.Options
     public class OptionTransaction : RequestWithTicker<CommandResponse<OwnedOption>>
     {
         [Range(1, 10000)]
-        public double StrikePrice { get; set; }
+        public decimal StrikePrice { get; set; }
 
         [Required]
         public DateTimeOffset? ExpirationDate { get; set; }
@@ -21,7 +21,7 @@ namespace core.Options
         public int NumberOfContracts { get; set; }
 
         [Range(1, 100000)]
-        public double Premium { get; set; }
+        public decimal Premium { get; set; }
 
         [Required]
         public DateTimeOffset? Filled { get; set; }

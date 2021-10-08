@@ -22,24 +22,24 @@ namespace core.Stocks.View
             DaysSinceLastTransaction = o.State.DaysSinceLastTransaction;
         }
 
-        public void ApplyPrice(double price)
+        public void ApplyPrice(decimal price)
         {
             Price = price;
             Equity = Owned * price;
         }
 
         public System.Guid Id { get; set; }
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         public string Category { get; set; }
         public int DaysHeld { get; set; }
         public int DaysSinceLastTransaction { get; set; }
         public string Ticker { get; set; }
         public int Owned { get; set; }
-        public double Equity { get; set; }
+        public decimal Equity { get; set; }
         public string Description { get; set; }
-        public double AverageCost { get; set; }
-        public double Cost { get; set; }
-        public double Profits => Equity - Cost;
-        public double ProfitsPct => Profits / (1.0 * Cost);
+        public decimal AverageCost { get; set; }
+        public decimal Cost { get; set; }
+        public decimal Profits => Equity - Cost;
+        public decimal ProfitsPct => Profits / (1.0m * Cost);
     }
 }

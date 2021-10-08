@@ -16,6 +16,6 @@ namespace core.Portfolio
 
         public string Ticker { get; }
         public StockAdvancedStats Stats { get; }
-        public double Price { get; }
+        public decimal Price { get; }
     }
 }

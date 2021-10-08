@@ -102,7 +102,7 @@ namespace core.Shared.Adapters.Cryptos
     public partial class Usd
     {
         [JsonPropertyName("price")]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         [JsonPropertyName("volume_24h")]
         public double Volume24H { get; set; }

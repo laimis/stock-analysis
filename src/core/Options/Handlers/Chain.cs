@@ -54,7 +54,7 @@ namespace core.Options
         }
 
         public static OptionDetailsViewModel MapOptionDetails(
-            double price,
+            decimal price,
             IEnumerable<OptionDetail> options)
         {
             var optionList = options
