@@ -71,7 +71,7 @@ namespace core.Admin
         public DateTimeOffset? Expiration { get; }
         public long? DaysLeft { get; }
         public bool IsAlert { get; }
-        public double AverageCost { get; }
+        public decimal AverageCost { get; }
         public DateTimeOffset? Created { get; }
         public StockAdvancedStats Stats { get; }
         public List<AlertPricePoint> PricePoints { get; }
@@ -79,6 +79,6 @@ namespace core.Admin
         public bool ExpiresSoon { get; }
         public bool IsOption { get; }
         public OptionType? OptionType { get; internal set; }
-        public double StrikePrice { get; internal set; }
+        public decimal StrikePrice { get; internal set; }
     }
 }

@@ -15,15 +15,15 @@ namespace core.Stocks
         }
 
         public int DaysHeld => _firstOpen != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(_firstOpen.Value)).TotalDays : 0;
-        public double Cost { get; private set; } = 0;
-        public double Return { get; private set; } = 0;
-        public double Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
-        public double Profit => Return - Cost;
+        public decimal Cost { get; private set; } = 0;
+        public decimal Return { get; private set; } = 0;
+        public decimal Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
+        public decimal Profit => Return - Cost;
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
 
-        public void Buy(int amount, double price, DateTimeOffset when)
+        public void Buy(int amount, decimal price, DateTimeOffset when)
         {
             if (_amount == 0)
             {
@@ -35,7 +35,7 @@ namespace core.Stocks
             Cost += amount * price;
         }
 
-        public void Sell(int amount, double price, DateTimeOffset when)
+        public void Sell(int amount, decimal price, DateTimeOffset when)
         {
             _amount -= amount;
 

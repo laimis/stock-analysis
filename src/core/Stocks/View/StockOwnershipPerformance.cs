@@ -37,7 +37,7 @@ namespace core.Stocks
                 LossAvgDaysHeld = losses.Average(t => t.DaysHeld);
             }
             
-            WinPct = (1.0 * Wins) / Total;
+            WinPct = (1.0m * Wins) / Total;
             EV = WinPct * AvgWinAmount - (1-WinPct) * AvgLossAmount;
             AvgReturnPct = closedPositions.Average(t => t.Percentage);
             AvgDaysHeld = closedPositions.Average(t => t.DaysHeld);
@@ -45,18 +45,18 @@ namespace core.Stocks
 
         public int Total { get; set; }
         public int Wins { get; set; }
-        public double AvgWinAmount { get; set; }
-        public double MaxWinAmount { get; set; }
-        public double WinAvgReturnPct { get; set; }
+        public decimal AvgWinAmount { get; set; }
+        public decimal MaxWinAmount { get; set; }
+        public decimal WinAvgReturnPct { get; set; }
         public double WinAvgDaysHeld { get; set; }
         public int Losses { get; set; }
-        public double AvgLossAmount { get; set; }
-        public double MaxLossAmount { get; set; }
-        public double LossAvgReturnPct { get; set; }
+        public decimal AvgLossAmount { get; set; }
+        public decimal MaxLossAmount { get; set; }
+        public decimal LossAvgReturnPct { get; set; }
         public double LossAvgDaysHeld { get; set; }
-        public double WinPct { get; set; }
-        public double EV { get; set; }
-        public double AvgReturnPct { get; set; }
+        public decimal WinPct { get; set; }
+        public decimal EV { get; set; }
+        public decimal AvgReturnPct { get; set; }
         public double AvgDaysHeld { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace core.Alerts
 {
     public struct StockMonitorTrigger
     {
-        public StockMonitorTrigger(StockMonitor m, DateTimeOffset when, double oldValue, double newValue)
+        public StockMonitorTrigger(StockMonitor m, DateTimeOffset when, decimal oldValue, decimal newValue)
         {
             this.Monitor = m;
             this.When = when;
@@ -13,8 +13,8 @@ namespace core.Alerts
         }
 
         public StockMonitor Monitor { get; }
-        public double OldValue { get; }
-        public double NewValue { get; }
+        public decimal OldValue { get; }
+        public decimal NewValue { get; }
         public DateTimeOffset When { get; }
 
         public Guid UserId => this.Monitor.Alert.UserId;

@@ -16,8 +16,8 @@ namespace coretests.Alerts
 
             _uat.AddPricePoint("initial", 50);
             _uat.AddPricePoint("updated", 50); // the same price point twice
-            _uat.AddPricePoint("10% up", 50 + 0.1*50);
-            _uat.AddPricePoint("10% down", 50 - 0.1*50);
+            _uat.AddPricePoint("10% up", 50m + 0.1m*50);
+            _uat.AddPricePoint("10% down", 50m - 0.1m*50);
 
             _uat.AddPricePoint("real high", 60);
 
@@ -39,14 +39,14 @@ namespace coretests.Alerts
         [InlineData(45)]
         [InlineData(50)]
         [InlineData(55)]
-        public void PricePointsMatch(double point)
+        public void PricePointsMatch(decimal point)
         {
             Assert.Contains(point, _uat.PricePoints.Select(pp => pp.Value));
         }
 
         [Theory]
         [InlineData(60)]
-        public void PricePointsRemoved(double point)
+        public void PricePointsRemoved(decimal point)
         {
             Assert.DoesNotContain(point, _uat.PricePoints.Select(pp => pp.Value));
         }

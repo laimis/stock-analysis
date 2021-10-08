@@ -45,16 +45,16 @@ namespace core.Options
         public int Count { get; set; }
         public int Wins { get; set; }
         public int Assigned { get; set; }
-        public double AveragePremiumCapture { get; set; }
+        public decimal AveragePremiumCapture { get; set; }
 
-        public double AvgWinAmount { get; set; }
+        public decimal AvgWinAmount { get; set; }
         public int Losses { get; set; }
-        public double AverageLossAmount { get; set; }
-        public double MaxWinAmount { get; set; }
-        public double MaxLossAmount { get; set; }
+        public decimal AverageLossAmount { get; set; }
+        public decimal MaxWinAmount { get; set; }
+        public decimal MaxLossAmount { get; set; }
 
-        public double EV { get; set; }
-        public double AverageProfitPerDay { get; set; }
+        public decimal EV { get; set; }
+        public decimal AverageProfitPerDay { get; set; }
         public double AverageDays { get; set; }
         public double AverageDaysHeld { get; set; }
         public double AverageDaysHeldPercentage { get; set; }

@@ -22,10 +22,10 @@ namespace core.Portfolio.Output
             PLOptions = plOptions;
 
             StockProfit = plStocks.SelectMany(t => t.Transactions).Select(t => t.Profit)
-                .Aggregate(0d, (sum, next) => sum + next, sum => sum);
+                .Aggregate(0m, (sum, next) => sum + next, sum => sum);
 
             OptionProfit = plOptions.SelectMany(t => t.Transactions).Select(t => t.Profit)
-                .Aggregate(0d, (sum, next) => sum + next, sum => sum);
+                .Aggregate(0m, (sum, next) => sum + next, sum => sum);
         }
         public DateTimeOffset Start { get; }
         public DateTimeOffset End { get; }
@@ -33,7 +33,7 @@ namespace core.Portfolio.Output
         public List<ReviewTicker> Options { get; }
         public List<ReviewTicker> PLStocks { get; }
         public List<ReviewTicker> PLOptions { get; }
-        public double StockProfit { get; }
-        public double OptionProfit { get; }
+        public decimal StockProfit { get; }
+        public decimal OptionProfit { get; }
     }
 }

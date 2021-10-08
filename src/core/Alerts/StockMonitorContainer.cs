@@ -36,7 +36,7 @@ namespace core.Alerts
 
         public IEnumerable<StockMonitorTrigger> UpdateValue(
             string ticker,
-            double newPrice,
+            decimal newPrice,
             DateTimeOffset time)
         {
             foreach (var m in _monitors.Values)

@@ -31,13 +31,13 @@ namespace core.Alerts
 
     internal class AlertPricePointAdded : AggregateEvent
     {
-        public AlertPricePointAdded(Guid id, Guid aggregateId, DateTimeOffset when, double value)
+        public AlertPricePointAdded(Guid id, Guid aggregateId, DateTimeOffset when, decimal value)
             : base(id, aggregateId, when)
         {
             this.Value = value;
         }
 
-        public double Value { get; }
+        public decimal Value { get; }
     }
 
     public class AlertPricePointRemoved : AggregateEvent, INotification
@@ -58,7 +58,7 @@ namespace core.Alerts
             Guid aggregateId,
             DateTimeOffset when,
             string description,
-            double value)
+            decimal value)
             : base(id, aggregateId, when)
         {
             this.Description = description;
@@ -66,6 +66,6 @@ namespace core.Alerts
         }
 
         public string Description { get; }
-        public double Value { get; }
+        public decimal Value { get; }
     }
 }

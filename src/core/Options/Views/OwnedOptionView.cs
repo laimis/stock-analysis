@@ -34,7 +34,7 @@ namespace core.Options
             if (debits.Any()) PremiumPaid = debits.Sum(t => t.Debit);
         }
 
-        public void ApplyPrice(double price)
+        public void ApplyPrice(decimal price)
         {
             CurrentPrice = price;
             ItmOtmLabel = GetItmOtmLabel(price, OptionType, StrikePrice);
@@ -52,7 +52,7 @@ namespace core.Options
             { "Sold", (otm) => otm == "OTM"}
         };
 
-        private static Dictionary<string, Func<double, double, string>> _otmLogic = new Dictionary<string, Func<double, double, string>> {
+        private static Dictionary<string, Func<decimal, decimal, string>> _otmLogic = new Dictionary<string, Func<decimal, decimal, string>> {
             { core.Options.OptionType.CALL.ToString(), (price, strike) => {
                 if (price > strike) return "ITM";
                 else if (price == strike) return "ATM";
@@ -65,19 +65,19 @@ namespace core.Options
             }},
         };
         
-        public static string GetItmOtmLabel(double currentPrice, string optionType, double strikePrice)
+        public static string GetItmOtmLabel(decimal currentPrice, string optionType, decimal strikePrice)
         {
             return _otmLogic[optionType](currentPrice, strikePrice);
         }
 
         public Guid Id { get; set; }
         public string Ticker { get; set; }
-        public double CurrentPrice { get; set; }
+        public decimal CurrentPrice { get; set; }
         public string OptionType { get; set; }
-        public double StrikePrice { get; set; }
-        public double PremiumReceived { get; set; }
-        public double PremiumPaid { get; set; }
-        public double PremiumCapture
+        public decimal StrikePrice { get; set; }
+        public decimal PremiumReceived { get; set; }
+        public decimal PremiumPaid { get; set; }
+        public decimal PremiumCapture
         {
             get
             {
@@ -89,7 +89,7 @@ namespace core.Options
                 return (PremiumReceived - PremiumPaid) / PremiumReceived;
             }
         }
-        public double Profit => this.PremiumReceived - this.PremiumPaid;
+        public decimal Profit => this.PremiumReceived - this.PremiumPaid;
         public string ExpirationDate { get; set; }
         public int NumberOfContracts { get; set; }
         public string BoughtOrSold { get; set; }
@@ -104,6 +104,6 @@ namespace core.Options
         public List<string> Notes { get; }
         public string ItmOtmLabel { get; set; }
         public bool IsFavorable { get; set; }
-        public double StrikePriceDiff { get; set; }
+        public decimal StrikePriceDiff { get; set; }
     }
 }

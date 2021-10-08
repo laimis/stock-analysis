@@ -16,7 +16,7 @@ namespace coretests.Options
             var date = new DateTimeOffset(2020, 3, 13, 0, 0, 0, 0, TimeSpan.FromHours(0));
             var user = Guid.NewGuid();
 
-            var option = new OwnedOption(new Ticker("SFIX"), 17.5, OptionType.CALL, date, user);
+            var option = new OwnedOption(new Ticker("SFIX"), 17.5m, OptionType.CALL, date, user);
 
             option.Sell(3, 100, date.AddDays(-20), null);
             option.Buy(2, 10, date.AddDays(-10), null);
@@ -113,13 +113,13 @@ namespace coretests.Options
         {
             var option = GetTestOption(_expiration);
 
-            option.IsMatch("TEUM", 2.5, OptionType.PUT, _expiration);
+            option.IsMatch("TEUM", 2.5m, OptionType.PUT, _expiration);
         }
 
         [Theory]
         [InlineData("tlsa",   -1)]
         [InlineData("tlsa",   0)]
-        public void CreateWithBadTickerFails(string ticker, double strikePrice)
+        public void CreateWithBadTickerFails(string ticker, decimal strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>
                 new OwnedOption(ticker, strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, Guid.NewGuid()));
@@ -142,7 +142,7 @@ namespace coretests.Options
         [InlineData(-1, 0)] // negative contracts
         [InlineData(0, 0)]    // zero contracts
         [InlineData(1, -10)]    // negative money
-        public void CloseWithInvalidInput(int numberOfContracts, double money)
+        public void CloseWithInvalidInput(int numberOfContracts, decimal money)
         {
             var opt = GetTestOption(_expiration);
 
@@ -155,7 +155,7 @@ namespace coretests.Options
         {
             var owned = new OwnedOption(
                 new Ticker("SFIX"),
-                23.5,
+                23.5m,
                 OptionType.CALL,
                 DateTimeOffset.Parse("2020-08-07"),
                 Guid.NewGuid());
@@ -177,7 +177,7 @@ namespace coretests.Options
             DateTimeOffset expiration,
             string ticker = "TEUM",
             OptionType optionType = OptionType.PUT,
-            double strikePrice = 2.5)
+            decimal strikePrice = 2.5m)
         {
             var option = new OwnedOption(
                 ticker,

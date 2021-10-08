@@ -136,11 +136,11 @@ namespace core.Options
             {
                 public string ticker { get; set; }
                 public string type { get; set; }
-                public double strike { get; set; }
+                public decimal strike { get; set; }
                 public string optiontype { get; set; }
                 public DateTimeOffset? expiration { get; set; }
                 public int amount { get; set; }
-                public double premium { get; set; }
+                public decimal premium { get; set; }
                 public DateTimeOffset? filled { get; set; }
             }
         }

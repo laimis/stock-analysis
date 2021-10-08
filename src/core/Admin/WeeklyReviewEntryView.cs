@@ -19,12 +19,12 @@ namespace core.Admin
         }
 
         public string ticker { get; }
-        public double price { get; }
+        public decimal price { get; }
         public string cost { get; }
         public object gainsPct { get; }
         public object itmOtmLabel { get; }
         public string optionType { get; }
-        public double strikePrice { get; }
+        public decimal strikePrice { get; }
         public string expiration { get; }
         public string earnings { get; }
 
@@ -38,7 +38,7 @@ namespace core.Admin
             return null;
         }
 
-        private static object CalcGainPct(double current, EmailReviewEntry re)
+        private static object CalcGainPct(decimal current, EmailReviewEntry re)
         {
             if (re.AverageCost == 0)
             {
