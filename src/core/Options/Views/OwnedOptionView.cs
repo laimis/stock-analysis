@@ -39,7 +39,10 @@ namespace core.Options
             CurrentPrice = price;
             ItmOtmLabel = GetItmOtmLabel(price, OptionType, StrikePrice);
             IsFavorable = GetIsFavorable();
-            StrikePriceDiff = Math.Abs(StrikePrice - price) / price;
+            if (price > 0)
+            {
+                StrikePriceDiff = Math.Abs(StrikePrice - price) / price;
+            }
         }
 
         private bool GetIsFavorable()

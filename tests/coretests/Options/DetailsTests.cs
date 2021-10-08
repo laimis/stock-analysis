@@ -7,11 +7,11 @@ using Xunit;
 
 namespace coretests.Options
 {
-    public class GetTests : IClassFixture<OptionsTestsFixture>
+    public class DetailsTests : IClassFixture<OptionsTestsFixture>
     {
         private OptionsTestsFixture _fixture;
 
-        public GetTests(OptionsTestsFixture fixture)
+        public DetailsTests(OptionsTestsFixture fixture)
         {
             _fixture = fixture;
         }
