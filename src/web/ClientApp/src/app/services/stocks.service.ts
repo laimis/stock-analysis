@@ -110,6 +110,15 @@ export class StocksService {
   importCrypto(formData: FormData) {
     return this.http.post('/api/cryptos/import', formData)
   }
+  getCryptoDetails(token:string): Observable<CryptoDetails> {
+		return this.http.get<CryptoDetails>('/api/cryptos/' + token)
+  }
+  getCryptoOwnership(token:string): Observable<CryptoOwnership> {
+		return this.http.get<CryptoOwnership>('/api/cryptos/' + token + '/ownership')
+  }
+  deleteCryptoTransaction(token: string, transactionId:string): Observable<object>{
+    return this.http.delete(`/api/cryptos/${token}/transactions/${transactionId}`)
+  }
 
   getStocks(): Observable<any> {
 		return this.http.get<any>('/api/stocks')
@@ -339,6 +348,17 @@ export class OwnedStock {
   averageCost: number
   transactions: TransactionList
   category: string;
+}
+
+export interface CryptoDetails {
+  token: string
+  price: number
+}
+
+export interface CryptoOwnership {
+  quantity: number
+  averageCost: number
+  transactions: TransactionList
 }
 
 export class OwnedCrypto {

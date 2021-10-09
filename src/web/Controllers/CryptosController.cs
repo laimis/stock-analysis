@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using core.Cryptos.Handlers;
+using core.Cryptos.Views;
 using core.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -23,10 +25,20 @@ namespace web.Controllers
         }
 
         [HttpGet()]
-        public async Task<object> Dashboard()
-        {
-            return await _mediator.Send(new Dashboard.Query(User.Identifier()));
-        }
+        public Task<CryptoDashboardView> Dashboard() =>
+            _mediator.Send(new Dashboard.Query(User.Identifier()));
+
+        [HttpGet("{token}")]
+        public Task<CryptoDetailsView> DetailsAsync(string token) =>
+            _mediator.Send(new Details.Query(token));
+
+        [HttpGet("{token}/ownership")]
+        public Task<CryptoOwnershipView> Ownership(string token) =>
+            _mediator.Send(new Ownership.Query(token, User.Identifier()));
+
+        [HttpDelete("{token}/transactions/{transactionId}")]
+        public Task<bool> DeleteTransaction(string token, Guid transactionId) =>
+            _mediator.Send(new DeleteTransaction.Command(token, transactionId, User.Identifier()));
 
         [HttpPost("import")]
         public async Task<ActionResult> Import(IFormFile file)

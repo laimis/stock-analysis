@@ -4,7 +4,7 @@ using core.Shared;
 
 namespace core.Stocks.View
 {
-    internal class StockOwnershipView
+    public class StockOwnershipView
     {
         public Guid Id { get; set; }
         public decimal AverageCost { get; set; }

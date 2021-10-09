@@ -7,9 +7,9 @@ using core.Stocks.View;
 
 namespace core.Stocks
 {
-    public class Get
+    public class Ownership
     {
-        public class Query : RequestWithUserId<object>
+        public class Query : RequestWithUserId<StockOwnershipView>
         {
             public Query(string ticker, bool raw = false)
             {
@@ -21,7 +21,7 @@ namespace core.Stocks
             public bool Raw { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, object>
+        public class Handler : HandlerWithStorage<Query, StockOwnershipView>
         {
             private IAccountStorage _accounts;
 
@@ -30,17 +30,12 @@ namespace core.Stocks
                 _accounts = accounts;
             }
 
-            public override async Task<object> Handle(Query query, CancellationToken cancellationToken)
+            public override async Task<StockOwnershipView> Handle(Query query, CancellationToken cancellationToken)
             {
                 var stock = await this._storage.GetStock(query.Ticker, query.UserId);
                 if (stock == null)
                 {
                     return null;
-                }
-
-                if (query.Raw)
-                {
-                    return stock.State;
                 }
 
                 return new StockOwnershipView {
