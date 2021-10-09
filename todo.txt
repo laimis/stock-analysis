@@ -1,3 +1,2 @@
-- crypto price feeds
-
-- decimal instead of double for stocks and options
+- crypto detail page that lists transactions
+- import page where I can drop ameritrade exports

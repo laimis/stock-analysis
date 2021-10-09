@@ -21,7 +21,7 @@
         </tr>
       </thead>
       <tr *ngFor="let token of owned">
-        <td><a [routerLink]="[ '/crypto', token.token ]">{{token.token}}</a></td>
+        <td><a [routerLink]="[ '/cryptos', token.token ]">{{token.token}}</a></td>
         <td>{{token.quantity}}</td>
         <td>{{token.price | currency}}</td>
         <td class="text-right">{{token.averageCost | currency}}</td>

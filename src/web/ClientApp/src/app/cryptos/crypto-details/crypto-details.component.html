@@ -1,0 +1,73 @@
+<div *ngIf="loaded" class="mt-2 mb-4">
+
+  <div>
+    <div>
+      <h3>{{crypto.token}}: {{crypto.name}}
+      <a class="float-right ml-3" href="https://coinmarketcap.com/currencies/{{crypto.name}}/" target="_blank">
+        <img src="cml.png" height="35px" />
+      </a>
+      </h3>
+    </div>
+    <div>
+      <div id="crypto-description">
+        <a [routerLink]="[ '/cryptos' ]" class="h6">Back to cryptos</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-container mt-2">
+
+    <div class="mt-4">
+      <div class="row">
+        <div class="col" *ngIf="ownership && ownership.quantity > 0">
+          Ownership: <b>{{ownership.quantity}}</b> @ <b>{{ownership.averageCost | currency}}</b> ({{(crypto.price.amount - ownership.averageCost) / crypto.price.amount | percent}})
+        </div>
+        <div class="col" *ngIf="crypto.price">
+          Current price: <b>{{crypto.price.amount | currency}}</b>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="ownership && ownership.transactions.length > 0">
+      <div class="mt-4">
+        <div class="text-muted">Past Transactions</div>
+        <table class="table table-striped border">
+          <thead class="thead-light">
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Debit</th>
+              <th>Credit</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit == 0}"
+              *ngFor="let t of ownership.transactions">
+              <td>{{ t.date | date:'shortDate'}}</td>
+              <td>{{ t.description }}</td>
+              <td>{{ t.debit | currency }}</td>
+              <td>{{ t.credit | currency }}</td>
+              <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.eventId)"></i></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mb-3">
+        <label>Delete this stock from your portfolio</label>
+        <div>
+          <button type="button float-right" class="btn btn-secondary mb-1 mr-2" (click)="delete()">Delete</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+<div *ngIf="!loaded">
+	Fetching crypto information...
+</div>

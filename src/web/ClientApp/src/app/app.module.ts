@@ -57,6 +57,7 @@ import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
+import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -103,6 +104,7 @@ var routes = [
   { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
 
   { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
+  { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
 ]
 
 @NgModule({
@@ -164,7 +166,8 @@ var routes = [
     RecentSellsComponent,
 
     CryptoDashboardComponent,
-    CryptoOwnershipGridComponent
+    CryptoOwnershipGridComponent,
+    CryptoDetailsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

@@ -37,7 +37,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/ownership")]
         public async Task<object> Ownership(string ticker)
         {
-            var query = new Get.Query(ticker);
+            var query = new Ownership.Query(ticker);
             query.WithUserId(User.Identifier());
 
             return await _mediator.Send(query);
@@ -46,7 +46,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/ownership/raw")]
         public async Task<object> Raw(string ticker)
         {
-            var query = new Get.Query(ticker, true);
+            var query = new Ownership.Query(ticker, true);
             query.WithUserId(User.Identifier());
 
             return await _mediator.Send(query);
