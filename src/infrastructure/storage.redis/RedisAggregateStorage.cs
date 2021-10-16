@@ -112,6 +112,8 @@ namespace storage.redis
         {
             var eventJson = result.Single(h => h.Name == "event").Value;
 
+            // eventJson = eventJson.Replace("core.TickerPrice,", "core.Price,");
+
             try
             {
                 return new storage.shared.StoredAggregateEvent {
@@ -122,6 +124,10 @@ namespace storage.redis
                     UserId = new Guid(result.Single(h => h.Name == "userId").Value.ToString()),
                     Version = int.Parse(result.Single(h => h.Name == "version").Value),
                 };
+            }
+            catch(JsonSerializationException ex)
+            {
+                throw new Exception("Failed to build event from JSON: " + eventJson, ex);
             }
             catch(InvalidOperationException ex)
             {
