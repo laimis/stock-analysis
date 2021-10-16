@@ -25,5 +25,8 @@ namespace core
         }
 
         public bool NotFound => Amount == 0;
+
+        public static implicit operator Price(TickerPrice t) => new Price(t.Amount);
+        public static implicit operator TickerPrice(Price t) => new TickerPrice(t.Amount);
     }
 }
