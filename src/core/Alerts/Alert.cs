@@ -38,7 +38,7 @@ namespace core.Alerts
 
         public bool AddPricePoint(string description, decimal value)
         {
-            var exists = this.PricePoints.Any(p => p.Value == value);
+            var exists = PricePoints.Any(p => p.Value == value);
             if (exists)
             {
                 return false;
@@ -47,7 +47,7 @@ namespace core.Alerts
             Apply(
                 new AlertPricePointWithDescripitionAdded(
                     Guid.NewGuid(),
-                    this.Id,
+                    Id,
                     DateTimeOffset.UtcNow,
                     description,
                     value
@@ -59,7 +59,7 @@ namespace core.Alerts
 
         public void RemovePricePoint(Guid pricePointId)
         {
-            var exists = this.PricePoints.Any(p => p.Id == pricePointId);
+            var exists = PricePoints.Any(p => p.Id == pricePointId);
             if (!exists)
             {
                 return;
@@ -68,20 +68,20 @@ namespace core.Alerts
             Apply(
                 new AlertPricePointRemoved(
                     Guid.NewGuid(),
-                    this.Id,
+                    Id,
                     DateTimeOffset.UtcNow,
                     pricePointId
                 )
             );
 
-            if (this.PricePoints.Count == 0)
+            if (PricePoints.Count == 0)
             {
                 Apply(
                     new AlertCleared(
                         Guid.NewGuid(),
-                        this.Id,
+                        Id,
                         DateTimeOffset.UtcNow,
-                        this.UserId
+                        UserId
                     )
                 );
             }

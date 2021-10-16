@@ -27,11 +27,11 @@ namespace core.Stocks
             string notes)
             : base(id, aggregateId, when)
         {
-            this.UserId = userId;
-            this.Ticker = ticker;
-            this.NumberOfShares = numberOfShares;
-            this.Price = price;
-            this.Notes = notes;
+            UserId = userId;
+            Ticker = ticker;
+            NumberOfShares = numberOfShares;
+            Price = price;
+            Notes = notes;
         }
 
         public Guid UserId { get; }
@@ -57,11 +57,11 @@ namespace core.Stocks
             string notes)
             : base(id, aggregateId, when)
         {
-            this.UserId = userId;
-            this.Ticker = ticker;
-            this.NumberOfShares = numberOfShares;
-            this.Price = price;
-            this.Notes = notes;
+            UserId = userId;
+            Ticker = ticker;
+            NumberOfShares = numberOfShares;
+            Price = price;
+            Notes = notes;
         }
 
         public Guid UserId { get; }
@@ -89,7 +89,7 @@ namespace core.Stocks
     {
         public StockCategoryChanged(Guid id, Guid aggregateId, string category, DateTimeOffset when) : base(id, aggregateId, when)
         {
-            this.Category =category;
+            Category =category;
         }
 
         public string Category { get; }
@@ -99,8 +99,8 @@ namespace core.Stocks
     {
         public TickerObtained(Guid id, Guid aggregateId, DateTimeOffset when, string ticker, Guid userId) : base(id, aggregateId, when)
         {
-            this.Ticker = ticker;
-            this.UserId = userId;
+            Ticker = ticker;
+            UserId = userId;
         }
 
         public string Ticker { get; }

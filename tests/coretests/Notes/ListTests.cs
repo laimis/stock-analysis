@@ -8,7 +8,7 @@ namespace coretests.Notes
     {
         public ListTests(NotesTestsFixture fixture)
         {
-            this.Fixture = fixture;
+            Fixture = fixture;
         }
 
         public NotesTestsFixture Fixture { get; }

@@ -8,18 +8,18 @@ namespace core.Options
     {
         public OwnedOptionState()
         {
-            this.Transactions = new List<Transaction>();
-            this.Buys = new List<OptionPurchased>();
-            this.Sells = new List<OptionSold>();
-            this.Expirations = new List<OptionExpired>();
-            this.Notes = new List<string>();
+            Transactions = new List<Transaction>();
+            Buys = new List<OptionPurchased>();
+            Sells = new List<OptionSold>();
+            Expirations = new List<OptionExpired>();
+            Notes = new List<string>();
         }
 
         public Guid Id { get; private set; }
         public string Ticker { get; internal set; }
         public decimal StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; private set; }
-        public bool IsExpired => DateTimeOffset.UtcNow.Date > this.Expiration;
+        public bool IsExpired => DateTimeOffset.UtcNow.Date > Expiration;
         public OptionType OptionType { get; internal set; }
         public Guid UserId { get; internal set; }
         public int NumberOfContracts { get; internal set; }
@@ -32,8 +32,8 @@ namespace core.Options
         public bool? SoldToOpen { get; private set; }
         public DateTimeOffset? FirstFill { get; private set; }
 
-        public long DaysUntilExpiration => this.IsExpired ? 0 :
-            (long)Math.Ceiling(Math.Abs(this.Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
+        public long DaysUntilExpiration => IsExpired ? 0 :
+            (long)Math.Ceiling(Math.Abs(Expiration.Subtract(DateTimeOffset.UtcNow).TotalDays));
 
         public DateTimeOffset? Closed { get; private set; }
         public int DaysHeld
@@ -41,17 +41,17 @@ namespace core.Options
             get
             {
                 DateTimeOffset date = DateTimeOffset.UtcNow;
-                if (this.Closed != null)
+                if (Closed != null)
                 {
-                    date = this.Closed.Value;
+                    date = Closed.Value;
                 }
 
-                if (this.IsExpired)
+                if (IsExpired)
                 {
-                    date = this.Expiration;
+                    date = Expiration;
                 }
 
-                var val = (int)Math.Floor(date.Subtract(this.FirstFill.Value).TotalDays);
+                var val = (int)Math.Floor(date.Subtract(FirstFill.Value).TotalDays);
                 if (val == 0)
                 {
                     val = 1;
@@ -60,10 +60,10 @@ namespace core.Options
             }
         }
         
-        public bool Assigned => this.Expirations.Count > 0 && this.Expirations[0].Assigned;
-        public bool Active => !this.Deleted && !this.IsExpired && this.NumberOfContracts != 0;
+        public bool Assigned => Expirations.Count > 0 && Expirations[0].Assigned;
+        public bool Active => !Deleted && !IsExpired && NumberOfContracts != 0;
         public bool ExpiresSoon => !IsExpired && DaysUntilExpiration >= 0 && DaysUntilExpiration < 7;
-        public long? DaysLeft => this.DaysUntilExpiration;
+        public long? DaysLeft => DaysUntilExpiration;
         public bool Deleted { get; private set; }
         private decimal PremiumReceived { get; set; }
         private decimal PremiumPaid { get; set; }
@@ -71,53 +71,53 @@ namespace core.Options
 
         internal void ApplyInternal(OptionDeleted deleted)
         {
-            this.NumberOfContracts = 0;
-            this.Transactions.Clear();
-            this.Buys.Clear();
-            this.Sells.Clear();
-            this.FirstFill = null;
-            this.SoldToOpen = null;
-            this.Closed = null;
-            this.Notes.Clear();
-            this.Expirations.Clear();
+            NumberOfContracts = 0;
+            Transactions.Clear();
+            Buys.Clear();
+            Sells.Clear();
+            FirstFill = null;
+            SoldToOpen = null;
+            Closed = null;
+            Notes.Clear();
+            Expirations.Clear();
 
-            this.Deleted = true;
+            Deleted = true;
         }
 
         internal void ApplyInternal(OptionSold sold)
         {
-            if (this.SoldToOpen == null)
+            if (SoldToOpen == null)
             {
                 ApplyFirstTransactionLogic(true, sold.When);
             }
 
-            if (this.Deleted == true)
+            if (Deleted == true)
             {
-                this.Deleted = false;
+                Deleted = false;
             }
 
             AddNoteIfNotEmpty(sold.Notes);
 
-            if (this.NumberOfContracts == 0)
+            if (NumberOfContracts == 0)
             {
-                this.PremiumReceived = 0;
-                this.PremiumPaid = 0;
+                PremiumReceived = 0;
+                PremiumPaid = 0;
             }
 
-            this.NumberOfContracts -= sold.NumberOfContracts;
+            NumberOfContracts -= sold.NumberOfContracts;
 
-            this.Sells.Add(sold);
+            Sells.Add(sold);
 
             var credit = (sold.NumberOfContracts * sold.Premium);
 
             PremiumReceived += credit;
 
-            this.Transactions.Add(
+            Transactions.Add(
                 Transaction.CreditTx(
-                    this.Id,
+                    Id,
                     sold.Id,
-                    this.Ticker,
-                    $"Sold {sold.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
+                    Ticker,
+                    $"Sold {sold.NumberOfContracts} x ${StrikePrice} {OptionType} {Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
                     credit,
                     sold.When,
                     true
@@ -129,87 +129,87 @@ namespace core.Options
 
         private void AddNoteIfNotEmpty(string notes)
         {
-            if (!string.IsNullOrEmpty(notes)) this.Notes.Add(notes);
+            if (!string.IsNullOrEmpty(notes)) Notes.Add(notes);
         }
 
         private void ApplyClosedLogicIfApplicable(DateTimeOffset when, Guid eventId)
         {
-            if (this.NumberOfContracts != 0)
+            if (NumberOfContracts != 0)
             {
                 return;
             }
 
-            this.Closed = when;
+            Closed = when;
 
             var profit = PremiumReceived - PremiumPaid;
 
-            var description = $"${this.StrikePrice.ToString("0.00")} {OptionType.ToString()}";
+            var description = $"${StrikePrice.ToString("0.00")} {OptionType.ToString()}";
 
-            this.Transactions.Add(
-                Transaction.PLTx(this.Id, this.Ticker, description, PremiumPaid, PremiumReceived, when, true)
+            Transactions.Add(
+                Transaction.PLTx(Id, Ticker, description, PremiumPaid, PremiumReceived, when, true)
             );
         }
 
         private void ApplyFirstTransactionLogic(bool soldToOpen, DateTimeOffset filled)
         {
-            this.Days = Math.Floor(this.Expiration.Subtract(filled).TotalDays);
-            this.SoldToOpen = soldToOpen;
-            this.FirstFill = filled;
+            Days = Math.Floor(Expiration.Subtract(filled).TotalDays);
+            SoldToOpen = soldToOpen;
+            FirstFill = filled;
         }
 
         internal void ApplyInternal(OptionOpened opened)
         {
-            this.Id = opened.AggregateId;
-            this.Ticker = opened.Ticker;
-            this.StrikePrice = opened.StrikePrice;
-            this.Expiration = opened.Expiration;
-            this.OptionType = opened.OptionType;
-            this.UserId = opened.UserId;
+            Id = opened.AggregateId;
+            Ticker = opened.Ticker;
+            StrikePrice = opened.StrikePrice;
+            Expiration = opened.Expiration;
+            OptionType = opened.OptionType;
+            UserId = opened.UserId;
         }
 
         internal bool IsMatch(string ticker, decimal strike, OptionType type, DateTimeOffset expiration)
         {
-            return this.Ticker == ticker 
-                && this.StrikePrice == strike 
-                && this.OptionType == type 
-                && this.Expiration.Date == expiration.Date;
+            return Ticker == ticker 
+                && StrikePrice == strike 
+                && OptionType == type 
+                && Expiration.Date == expiration.Date;
         }
 
         internal void ApplyInternal(OptionPurchased purchased)
         {
-            if (this.FirstFill == null)
+            if (FirstFill == null)
             {
                 ApplyFirstTransactionLogic(false, purchased.When);
             }
 
-            if (this.Deleted == true)
+            if (Deleted == true)
             {
-                this.Deleted = false;
+                Deleted = false;
             }
 
-            if (this.NumberOfContracts == 0)
+            if (NumberOfContracts == 0)
             {
-                this.PremiumReceived = 0;
-                this.PremiumPaid = 0;
+                PremiumReceived = 0;
+                PremiumPaid = 0;
             }
 
             AddNoteIfNotEmpty(purchased.Notes);
 
-            this.NumberOfContracts += purchased.NumberOfContracts;
+            NumberOfContracts += purchased.NumberOfContracts;
 
             var debit = purchased.NumberOfContracts * purchased.Premium;
 
-            this.PremiumPaid += debit;
+            PremiumPaid += debit;
 
-            this.Buys.Add(purchased);
+            Buys.Add(purchased);
 
-            var description = $"Bought {purchased.NumberOfContracts} x ${this.StrikePrice} {this.OptionType} {this.Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract";
+            var description = $"Bought {purchased.NumberOfContracts} x ${StrikePrice} {OptionType} {Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract";
 
-            this.Transactions.Add(
+            Transactions.Add(
                 Transaction.DebitTx(
-                    this.Id,
+                    Id,
                     purchased.Id,
-                    this.Ticker,
+                    Ticker,
                     description,
                     debit,
                     purchased.When,
@@ -222,9 +222,9 @@ namespace core.Options
 
         internal void ApplyInternal(OptionExpired expired)
         {
-            this.NumberOfContracts = 0;
+            NumberOfContracts = 0;
 
-            this.Expirations.Add(expired);
+            Expirations.Add(expired);
 
             ApplyClosedLogicIfApplicable(expired.When, expired.Id);
         }
@@ -236,7 +236,7 @@ namespace core.Options
 
         protected void ApplyInternal(dynamic obj)
         {
-            this.ApplyInternal(obj);
+            ApplyInternal(obj);
         }
     }
 }

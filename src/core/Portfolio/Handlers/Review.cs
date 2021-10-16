@@ -20,8 +20,8 @@ namespace core.Portfolio
             {
                 var dt = GetDateForPeriod(period);
 
-                this.Start = dt.start;
-                this.End = dt.end;
+                Start = dt.start;
+                End = dt.end;
             }
 
             public DateTimeOffset Start { get; }

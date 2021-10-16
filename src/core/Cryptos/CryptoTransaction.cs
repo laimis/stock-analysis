@@ -5,23 +5,23 @@ namespace core.Cryptos
 {
     public class CryptoTransaction
     {
-        private Guid aggregateId;
-        private Guid transactionId;
-        private string token;
-        private string description;
-        private decimal debit;
-        private decimal credit;
-        private DateTimeOffset when;
+        public Guid AggregateId;
+        public Guid TransactionId;
+        public string Token;
+        public string Description;
+        public decimal Debit;
+        public decimal Credit;
+        public DateTimeOffset When;
 
         public CryptoTransaction(Guid aggregateId, Guid transactionId, string token, string description, decimal debit, decimal credit, DateTimeOffset when)
         {
-            this.aggregateId = aggregateId;
-            this.transactionId = transactionId;
-            this.token = token;
-            this.description = description;
-            this.debit = debit;
-            this.credit = credit;
-            this.when = when;
+            AggregateId = aggregateId;
+            TransactionId = transactionId;
+            Token = token;
+            Description = description;
+            Debit = debit;
+            Credit = credit;
+            When = when;
         }
 
         internal static CryptoTransaction DebitTx(Guid aggregateId, Guid transactionId, string token, string description, decimal dollarAmount, DateTimeOffset when)
@@ -50,9 +50,9 @@ namespace core.Cryptos
             );
         }
 
-        internal Transaction ToSharedTransaction() => credit switch {
-            > 0 => Transaction.CreditTx(aggregateId, transactionId, token, description, credit, when, isOption: false),
-            _ => Transaction.DebitTx(aggregateId, transactionId, token, description, debit, when, isOption: false)
+        internal Transaction ToSharedTransaction() => Credit switch {
+            > 0 => Transaction.CreditTx(AggregateId, TransactionId, Token, Description, Credit, When, isOption: false),
+            _ => Transaction.DebitTx(AggregateId, TransactionId, Token, Description, Debit, When, isOption: false)
         };
     }
 }

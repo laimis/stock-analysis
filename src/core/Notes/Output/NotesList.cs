@@ -7,8 +7,8 @@ namespace core.Notes.Output
     {
         public NotesList(IEnumerable<NoteState> notes)
         {
-            this.Notes = notes;
-            this.Tickers = notes
+            Notes = notes;
+            Tickers = notes
                 .Select(n => n.RelatedToTicker)
                 .Distinct()
                 .OrderBy(s => s);

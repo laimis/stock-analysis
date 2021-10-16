@@ -18,11 +18,11 @@ namespace storage.shared
 
         public string EventJson
         {
-            get { return JsonConvert.SerializeObject(this.Event, _formatting); }
+            get { return JsonConvert.SerializeObject(Event, _formatting); }
 
             set
             {
-                this.Event = JsonConvert.DeserializeObject<AggregateEvent>(value, _formatting);
+                Event = JsonConvert.DeserializeObject<AggregateEvent>(value, _formatting);
             }
         }
 

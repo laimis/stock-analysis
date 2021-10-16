@@ -8,7 +8,7 @@ namespace coretests.Options
     {
         public ExportTests(OptionsTestsFixture fixture)
         {
-            this.Fixture = fixture;
+            Fixture = fixture;
         }
 
         public OptionsTestsFixture Fixture { get; }

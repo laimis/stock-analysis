@@ -14,7 +14,7 @@ namespace core.Options
         {
             public Command(string content)
             {
-                this.Content = content;
+                Content = content;
             }
 
             public string Content { get; }

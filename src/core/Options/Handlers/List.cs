@@ -14,7 +14,7 @@ namespace core.Options
         {
             public Query(string ticker, Guid userId) :base(userId)
             {
-                this.Ticker = ticker;
+                Ticker = ticker;
             }
 
             [Required]

@@ -37,7 +37,7 @@ namespace core.Options
 
                 option.Expire(cmd.Assigned.Value);
 
-                await this._storage.Save(option, cmd.UserId);
+                await _storage.Save(option, cmd.UserId);
 
                 return CommandResponse<OwnedOption>.Success(option);
             }

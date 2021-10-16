@@ -17,10 +17,10 @@ namespace core.Portfolio
         {
             public Query(Guid userId, string ticker, string groupBy, string show, string txType) : base(userId)
             {
-                this.Ticker = ticker;
-                this.GroupBy = groupBy;
-                this.Show = show;
-                this.TxType = txType;
+                Ticker = ticker;
+                GroupBy = groupBy;
+                Show = show;
+                TxType = txType;
             }
 
             public string Ticker { get; }

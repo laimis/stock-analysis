@@ -14,7 +14,7 @@ namespace core.Account
 
             public Command(Guid id)
             {
-                this.Id = id;
+                Id = id;
             }
         }
 

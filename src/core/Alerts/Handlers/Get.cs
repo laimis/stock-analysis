@@ -12,7 +12,7 @@ namespace core.Alerts
         {
             public Query(Guid userId, string ticker) : base(userId)
             {
-                this.Ticker = ticker;
+                Ticker = ticker;
             }
 
             public string Ticker { get; }

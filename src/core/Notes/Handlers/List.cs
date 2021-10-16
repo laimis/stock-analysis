@@ -15,7 +15,7 @@ namespace core.Notes
             {
                 if (ticker != null)
                 {
-                    this.Ticker = ticker;
+                    Ticker = ticker;
                 }
             }
 

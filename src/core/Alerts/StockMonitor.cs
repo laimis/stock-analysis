@@ -6,9 +6,9 @@ namespace core.Alerts
     {
         public StockMonitor(Alert alert, AlertPricePoint pricePoint)
         {
-            this.Alert = alert;
-            this.PricePoint = pricePoint;
-            this.Value = null;
+            Alert = alert;
+            PricePoint = pricePoint;
+            Value = null;
         }
 
         public Alert Alert { get; }
@@ -19,7 +19,7 @@ namespace core.Alerts
 
         public bool CheckTrigger(string ticker, decimal newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
         {
-            if (this.Alert.State.Ticker != ticker)
+            if (Alert.State.Ticker != ticker)
             {
                 trigger = new StockMonitorTrigger();
                 return false;
@@ -32,8 +32,8 @@ namespace core.Alerts
                 return false;
             }
                 
-            var prev = Value < this.PricePoint.Value;
-            var curr = newValue < this.PricePoint.Value;
+            var prev = Value < PricePoint.Value;
+            var curr = newValue < PricePoint.Value;
 
             if (prev != curr)
             {

@@ -7,17 +7,17 @@ namespace core.Shared
     {
         public Aggregate()
         {
-            this._events = new List<AggregateEvent>();
+            _events = new List<AggregateEvent>();
         }
 
         public Aggregate(IEnumerable<AggregateEvent> events)
         {
-            this._events = new List<AggregateEvent>();
-            this.Version = 0;
+            _events = new List<AggregateEvent>();
+            Version = 0;
             foreach (var e in events)
             {
                 Apply(e);
-                this.Version++;
+                Version++;
             }
         }
 
@@ -25,7 +25,7 @@ namespace core.Shared
 
         protected void Apply(AggregateEvent e)
         {
-            this._events.Add(e);
+            _events.Add(e);
 
             AggregateState.Apply(e);
         }

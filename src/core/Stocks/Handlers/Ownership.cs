@@ -32,7 +32,7 @@ namespace core.Stocks
 
             public override async Task<StockOwnershipView> Handle(Query query, CancellationToken cancellationToken)
             {
-                var stock = await this._storage.GetStock(query.Ticker, query.UserId);
+                var stock = await _storage.GetStock(query.Ticker, query.UserId);
                 if (stock == null)
                 {
                     return null;

@@ -16,9 +16,9 @@ namespace core.Shared
                 throw new InvalidOperationException("aggregateId cannot be empty");
             }
 
-            this.Id = id;
-            this.AggregateId = aggregateId;
-            this.When = when;
+            Id = id;
+            AggregateId = aggregateId;
+            When = when;
         }
 
         public Guid Id { get; }

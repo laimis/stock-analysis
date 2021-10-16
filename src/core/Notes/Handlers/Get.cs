@@ -11,7 +11,7 @@ namespace core.Notes
         {
             public Query(Guid userId, Guid noteId) : base(userId)
             {
-                this.NoteId = noteId;
+                NoteId = noteId;
             }
 
             public Guid NoteId { get; }

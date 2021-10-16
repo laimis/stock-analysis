@@ -57,14 +57,14 @@ namespace core.Options
             Apply(
                 new OptionDeleted(
                     Guid.NewGuid(),
-                    this.Id,
+                    Id,
                     DateTimeOffset.UtcNow
                 )
             );
         }
 
         public bool IsMatch(string ticker, decimal strike, OptionType type, DateTimeOffset expiration)
-            => this.State.IsMatch(ticker, strike, type, expiration);
+            => State.IsMatch(ticker, strike, type, expiration);
 
         public void Buy(int numberOfContracts, decimal premium, DateTimeOffset filled, string notes)
         {
@@ -81,9 +81,9 @@ namespace core.Options
             Apply(
                 new OptionPurchased(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     filled,
-                    this.State.UserId,
+                    State.UserId,
                     numberOfContracts,
                     premium,
                     notes
@@ -103,7 +103,7 @@ namespace core.Options
                 throw new InvalidOperationException("Premium money cannot be negative");
             }
 
-            if (filled > this.State.Expiration)
+            if (filled > State.Expiration)
             {
                 throw new InvalidOperationException("Filled date cannot be past expiration");
             }
@@ -111,9 +111,9 @@ namespace core.Options
             Apply(
                 new OptionSold(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     filled,
-                    this.State.UserId,
+                    State.UserId,
                     numberOfContracts,
                     premium,
                     notes
@@ -123,12 +123,12 @@ namespace core.Options
 
         public void Expire(bool assigned)
         {
-            if (this.State.Expirations.Count > 0)
+            if (State.Expirations.Count > 0)
             {
                 throw new InvalidOperationException("You already marked this option as expired");
             }
 
-            Apply(new OptionExpired(Guid.NewGuid(), this.State.Id, this.State.Expiration, assigned));
+            Apply(new OptionExpired(Guid.NewGuid(), State.Id, State.Expiration, assigned));
         }
     }
 

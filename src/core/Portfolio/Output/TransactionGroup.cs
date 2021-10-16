@@ -4,8 +4,8 @@ namespace core.Portfolio.Output
     {
         public TransactionGroup(string name, TransactionList transactions)
         {
-            this.Name = name;
-            this.Transactions = transactions;
+            Name = name;
+            Transactions = transactions;
         }
 
         public string Name { get; set; }

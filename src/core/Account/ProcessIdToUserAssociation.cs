@@ -6,9 +6,9 @@ namespace core.Account
     {
         private ProcessIdToUserAssociation(Guid id, Guid userId, DateTimeOffset timestamp)
         {
-            this.Id = id;
-            this.UserId = userId;
-            this.Timestamp = timestamp;
+            Id = id;
+            UserId = userId;
+            Timestamp = timestamp;
         }
 
         public ProcessIdToUserAssociation(Guid userId, DateTimeOffset timestamp) 
@@ -24,6 +24,6 @@ namespace core.Account
         public Guid Id { get; }
         public Guid UserId { get; }
         public DateTimeOffset Timestamp { get; }
-        public bool IsOlderThan(long minutes) => DateTimeOffset.UtcNow.Subtract(this.Timestamp).TotalMinutes > minutes;
+        public bool IsOlderThan(long minutes) => DateTimeOffset.UtcNow.Subtract(Timestamp).TotalMinutes > minutes;
     }
 }

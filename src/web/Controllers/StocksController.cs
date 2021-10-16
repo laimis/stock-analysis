@@ -77,7 +77,7 @@ namespace web.Controllers
         [HttpPost("settings")]
         public async Task<ActionResult> Settings(Settings.Command model)
         {
-            model.WithUserId(this.User.Identifier());
+            model.WithUserId(User.Identifier());
 
             var r = await _mediator.Send(model);
 
@@ -87,7 +87,7 @@ namespace web.Controllers
         [HttpPost("sell")]
         public async Task<ActionResult> Sell(Sell.Command model)
         {
-            model.WithUserId(this.User.Identifier());
+            model.WithUserId(User.Identifier());
 
             var r = await _mediator.Send(model);
 
@@ -97,7 +97,7 @@ namespace web.Controllers
         [HttpPost("purchase")]
         public async Task<ActionResult> Purchase(Buy.Command model)
         {
-            model.WithUserId(this.User.Identifier());
+            model.WithUserId(User.Identifier());
 
             var r = await _mediator.Send(model);
 
@@ -107,19 +107,19 @@ namespace web.Controllers
         [HttpGet("export")]
         public Task<ActionResult> Export()
         {
-            return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
+            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
         }
 
         [HttpGet("export/closed")]
         public Task<ActionResult> ExportClosed()
         {
-            return this.GenerateExport(_mediator, new ExportClosed.Query(this.User.Identifier()));
+            return this.GenerateExport(_mediator, new ExportClosed.Query(User.Identifier()));
         }
 
         [HttpGet("export/owned")]
         public Task<ActionResult> ExportOwned()
         {
-            return this.GenerateExport(_mediator, new ExportOpen.Query(this.User.Identifier()));
+            return this.GenerateExport(_mediator, new ExportOpen.Query(User.Identifier()));
         }
 
         [HttpPost("import")]
@@ -131,7 +131,7 @@ namespace web.Controllers
 
             var cmd = new Import.Command(content);
 
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             return this.OkOrError(await _mediator.Send(cmd));
         }

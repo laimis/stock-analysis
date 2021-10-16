@@ -9,23 +9,23 @@ namespace core.Admin
     {
         public EmailReviewEntryGroup(IEnumerable<EmailReviewEntry> entries, Price price, StockAdvancedStats stats)
         {
-            this.Alerts = new List<EmailReviewEntry>();
-            this.Ownership = new List<EmailReviewEntry>();
-            this.Price = price;
-            this.Ticker = null;
-            this.Stats = stats;
+            Alerts = new List<EmailReviewEntry>();
+            Ownership = new List<EmailReviewEntry>();
+            Price = price;
+            Ticker = null;
+            Stats = stats;
             
             foreach(var e in entries.OrderByDescending(e => e.Created))
             {
-                this.Ticker = e.Ticker;
+                Ticker = e.Ticker;
 
                 if (e.IsAlert)
                 {
-                    this.Alerts.Add(e);
+                    Alerts.Add(e);
                 }
                 else
                 {
-                    this.Ownership.Add(e);
+                    Ownership.Add(e);
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace core.Admin
         {
             get
             {
-                if (!DateTimeOffset.TryParse(this.Stats.NextEarningsDate, out var result))
+                if (!DateTimeOffset.TryParse(Stats.NextEarningsDate, out var result))
                 {
                     return null;
                 }

@@ -22,43 +22,43 @@ namespace core.Account
 
         public UserState()
         {
-            this.SubscriptionLevel = "Free";
+            SubscriptionLevel = "Free";
         }
 
         internal void ApplyInternal(UserCreated c)
         {
-            this.Id = c.AggregateId;
-            this.Created = c.When;
-            this.Email = c.Email;
-            this.Firstname = c.Firstname;
-            this.Lastname = c.Lastname;
+            Id = c.AggregateId;
+            Created = c.When;
+            Email = c.Email;
+            Firstname = c.Firstname;
+            Lastname = c.Lastname;
         }
 
         internal void ApplyInternal(UserPasswordSet p)
         {
-            this.PasswordHash = p.Hash;
-            this.Salt = p.Salt;
+            PasswordHash = p.Hash;
+            Salt = p.Salt;
         }
 
         internal void ApplyInternal(UserLoggedIn l)
         {
-            this.LastLogin = l.When;
+            LastLogin = l.When;
         }
 
         internal void ApplyInternal(UserDeleted d)
         {
-            this.Deleted = d.When;
-            this.DeleteFeedback = d.Feedback;
+            Deleted = d.When;
+            DeleteFeedback = d.Feedback;
         }
 
         internal void ApplyInternal(UserConfirmed d)
         {
-            this.Verified = d.When;
+            Verified = d.When;
         }
 
         internal void ApplyInternal(UserSubscribedToPlan p)
         {
-            this.SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
+            SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
         }
 
         internal void ApplyInternal(UserPasswordResetRequested r)
@@ -67,12 +67,12 @@ namespace core.Account
 
         internal bool PasswordHashMatches(string hash)
         {
-            return this.PasswordHash == hash;
+            return PasswordHash == hash;
         }
 
         internal string GetSalt()
         {
-            return this.Salt;
+            return Salt;
         }
 
         public void Apply(AggregateEvent e)

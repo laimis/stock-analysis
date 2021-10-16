@@ -20,7 +20,7 @@ namespace core.Options
             bool assigned)
             : base(id, aggregateId, when)
         {
-            this.Assigned = assigned;
+            Assigned = assigned;
         }
 
         public bool Assigned { get; }
@@ -39,11 +39,11 @@ namespace core.Options
             Guid userId)
             : base(id, aggregateId, when)
         {
-            this.Ticker = ticker;
-            this.OptionType = optionType;
-            this.StrikePrice = strikePrice;
-            this.Expiration = expiration;
-            this.UserId = userId;
+            Ticker = ticker;
+            OptionType = optionType;
+            StrikePrice = strikePrice;
+            Expiration = expiration;
+            UserId = userId;
         }
 
         public string Ticker { get; }
@@ -65,10 +65,10 @@ namespace core.Options
             string notes)
             : base(id, aggregateId, when)
         {
-            this.UserId = userId;
-            this.NumberOfContracts = numberOfContracts;
-            this.Premium = premium;
-            this.Notes = notes;
+            UserId = userId;
+            NumberOfContracts = numberOfContracts;
+            Premium = premium;
+            Notes = notes;
         }
 
         public Guid UserId { get; }
@@ -89,10 +89,10 @@ namespace core.Options
             string notes)
             : base(id, aggregateId, when)
         {
-            this.UserId = userId;
-            this.NumberOfContracts = numberOfContracts;
-            this.Premium = premium;
-            this.Notes = notes;
+            UserId = userId;
+            NumberOfContracts = numberOfContracts;
+            Premium = premium;
+            Notes = notes;
         }
 
         public Guid UserId { get; }

@@ -27,7 +27,7 @@ namespace core.Cryptos.Handlers
                         "Unable to find user account for stock operation");
                 }
 
-                var crypto = await this._storage.GetCrypto(cmd.Token, cmd.UserId);
+                var crypto = await _storage.GetCrypto(cmd.Token, cmd.UserId);
                 if (crypto == null)
                 {
                     return CommandResponse.Failed(
@@ -40,7 +40,7 @@ namespace core.Cryptos.Handlers
                     date: cmd.Date.Value,
                     notes: cmd.Notes);
 
-                await this._storage.Save(crypto, cmd.UserId);
+                await _storage.Save(crypto, cmd.UserId);
 
                 return CommandResponse.Success();
             }

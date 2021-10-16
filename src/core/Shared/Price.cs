@@ -6,9 +6,9 @@ namespace core
 
         public Price(decimal amount)
         {
-            this.Amount = amount;
+            Amount = amount;
         }
 
-        public bool NotFound => this.Amount == 0;
+        public bool NotFound => Amount == 0;
     }
 }

@@ -16,9 +16,9 @@ namespace core.Account
         public UserCreated(Guid id, Guid aggregateId, DateTimeOffset when, string email, string firstname, string lastname)
             : base(id, aggregateId, when)
         {
-            this.Email = email;
-            this.Firstname = firstname;
-            this.Lastname = lastname;
+            Email = email;
+            Firstname = firstname;
+            Lastname = lastname;
         }
 
         public string Email { get; }
@@ -30,7 +30,7 @@ namespace core.Account
     {
         public UserDeleted(Guid id, Guid aggregateId, DateTimeOffset when, string feedback) : base(id, aggregateId, when)
         {
-            this.Feedback = feedback;
+            Feedback = feedback;
         }
 
         public string Feedback { get; }
@@ -55,8 +55,8 @@ namespace core.Account
         public UserPasswordSet(Guid id, Guid aggregateId, DateTimeOffset when, string hash, string salt)
             : base(id, aggregateId, when)
         {
-            this.Hash = hash;
-            this.Salt = salt;
+            Hash = hash;
+            Salt = salt;
         }
 
         public string Hash { get; }
@@ -74,9 +74,9 @@ namespace core.Account
             string subscriptionId)
             : base(id, aggregateId, when)
         {
-            this.PlanId = planId;
-            this.CustomerId = customerId;
-            this.SubscriptionId = subscriptionId;
+            PlanId = planId;
+            CustomerId = customerId;
+            SubscriptionId = subscriptionId;
         }
 
         public string PlanId { get; }

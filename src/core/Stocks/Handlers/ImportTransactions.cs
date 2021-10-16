@@ -7,7 +7,7 @@ using MediatR;
 
 namespace core.Stocks
 {
-    public class Import
+    public class ImportTransactions
     {
         public class Command : RequestWithUserId<CommandResponse>
         {

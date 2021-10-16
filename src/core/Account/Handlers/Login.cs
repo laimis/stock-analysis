@@ -12,8 +12,8 @@ namespace core.Account
         {
             public Command(Guid userId, string ipAddress) : base(userId)
             {
-                this.IPAddress = ipAddress;
-                this.Timestamp = DateTimeOffset.UtcNow;
+                IPAddress = ipAddress;
+                Timestamp = DateTimeOffset.UtcNow;
             }
 
             public string IPAddress { get; }
@@ -31,7 +31,7 @@ namespace core.Account
 
             public async Task<string> Handle(Command request, CancellationToken cancellationToken)
             {
-                var user = await this._storage.GetUser(request.UserId);
+                var user = await _storage.GetUser(request.UserId);
                 if (user == null)
                 {
                     return $"Unable to load user {request.UserId}";
@@ -39,7 +39,7 @@ namespace core.Account
 
                 user.LoggedIn(request.IPAddress, request.Timestamp);
 
-                await this._storage.Save(user);
+                await _storage.Save(user);
 
                 return "";
             }

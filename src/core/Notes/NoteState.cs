@@ -17,12 +17,12 @@ namespace core.Notes
 
         public void Apply(AggregateEvent e)
         {
-            this.ApplyInternal(e);
+            ApplyInternal(e);
         }
 
         protected void ApplyInternal(dynamic obj)
         {
-            this.ApplyInternal(obj);
+            ApplyInternal(obj);
         }
         
         protected void ApplyInternal(NoteArchived archived)
@@ -40,29 +40,29 @@ namespace core.Notes
 
         internal void ApplyInternal(NoteEnriched enriched)
         {
-            this.StatsApplied = enriched.When;
-            this.Stats = enriched.Stats;
+            StatsApplied = enriched.When;
+            Stats = enriched.Stats;
         }
 
         internal void ApplyInternal(NoteEnrichedWithPrice enriched)
         {
-            this.StatsApplied = enriched.When;
-            this.Stats = enriched.Stats;
-            this.Price = enriched.Price;
+            StatsApplied = enriched.When;
+            Stats = enriched.Stats;
+            Price = enriched.Price;
         }
 
         internal void ApplyInternal(NoteUpdated updated)
         {
-            this.Note = updated.Note;
+            Note = updated.Note;
         }
 
         internal void ApplyInternal(NoteCreated c)
         {
-            this.Id = c.AggregateId;
-            this.UserId = c.UserId;
-            this.RelatedToTicker = c.Ticker;
-            this.Created = c.When;
-            this.Note = c.Note;
+            Id = c.AggregateId;
+            UserId = c.UserId;
+            RelatedToTicker = c.Ticker;
+            Created = c.When;
+            Note = c.Note;
         }
     }
 }

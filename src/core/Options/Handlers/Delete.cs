@@ -13,7 +13,7 @@ namespace core.Options
         {
             public Command(Guid optionId, Guid userId)
             {
-                this.Id = optionId;
+                Id = optionId;
                 WithUserId(userId);
             }
 
@@ -39,7 +39,7 @@ namespace core.Options
 
                 option.Delete();
 
-                await this._storage.Save(option, cmd.UserId);
+                await _storage.Save(option, cmd.UserId);
 
                 return CommandResponse<OwnedOption>.Success(option);
             }

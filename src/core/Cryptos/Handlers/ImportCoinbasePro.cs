@@ -15,7 +15,7 @@ namespace core.Cryptos.Handlers
         {
             public Command(string content)
             {
-                this.Content = content;
+                Content = content;
             }
 
             public string Content { get; }

@@ -27,7 +27,7 @@ namespace core.Cryptos.Handlers
 
             public override async Task<bool> Handle(Command query, CancellationToken cancellationToken)
             {
-                var crypto = await this._storage.GetCrypto(query.Token, query.UserId);
+                var crypto = await _storage.GetCrypto(query.Token, query.UserId);
                 if (crypto == null)
                 {
                     return false;

@@ -4,8 +4,8 @@ namespace core
     {
         public ExportResponse(string filename, string content)
         {
-            this.Filename = filename;
-            this.Content = content;
+            Filename = filename;
+            Content = content;
         }
 
         public string Filename { get; }

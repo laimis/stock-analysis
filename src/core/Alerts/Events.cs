@@ -10,7 +10,7 @@ namespace core.Alerts
         public AlertCleared(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId)
             : base(id, aggregateId, when)
         {
-            this.UserId = userId;
+            UserId = userId;
         }
 
         public Guid UserId { get; }
@@ -21,8 +21,8 @@ namespace core.Alerts
         public AlertCreated(Guid id, Guid aggregateId, DateTimeOffset when, string ticker, Guid userId)
             : base(id, aggregateId, when)
         {
-            this.Ticker = ticker;
-            this.UserId = userId;
+            Ticker = ticker;
+            UserId = userId;
         }
 
         public string Ticker { get; }
@@ -34,7 +34,7 @@ namespace core.Alerts
         public AlertPricePointAdded(Guid id, Guid aggregateId, DateTimeOffset when, decimal value)
             : base(id, aggregateId, when)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public decimal Value { get; }
@@ -45,7 +45,7 @@ namespace core.Alerts
         public AlertPricePointRemoved(Guid id, Guid aggregateId, DateTimeOffset when, Guid pricePointId)
             : base(id, aggregateId, when)
         {
-            this.PricePointId = pricePointId;
+            PricePointId = pricePointId;
         }
 
         public Guid PricePointId { get; }
@@ -61,8 +61,8 @@ namespace core.Alerts
             decimal value)
             : base(id, aggregateId, when)
         {
-            this.Description = description;
-            this.Value = value;
+            Description = description;
+            Value = value;
         }
 
         public string Description { get; }

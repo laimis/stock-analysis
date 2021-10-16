@@ -33,7 +33,7 @@ namespace core.Stocks
                         "Please verify your email first before you can record sell transaction");
                 }
 
-                var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
+                var stock = await _storage.GetStock(cmd.Ticker, cmd.UserId);
                 if (stock == null)
                 {
                     return CommandResponse.Failed(
@@ -42,7 +42,7 @@ namespace core.Stocks
 
                 stock.Sell(cmd.NumberOfShares, cmd.Price, cmd.Date.Value, cmd.Notes);
 
-                await this._storage.Save(stock, cmd.UserId);
+                await _storage.Save(stock, cmd.UserId);
 
                 return CommandResponse.Success();
             }

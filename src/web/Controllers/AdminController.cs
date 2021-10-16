@@ -48,7 +48,7 @@ namespace web.Controllers
 
             await AccountController.EstablishSignedInIdentity(HttpContext, u);
 
-            return this.Redirect("~/");
+            return Redirect("~/");
         }
 
         [HttpGet("delete/{userId}")]
@@ -66,14 +66,14 @@ namespace web.Controllers
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)
         {
-            await this._email.Send(
+            await _email.Send(
                 obj.To,
                 new Sender(obj.From, obj.FromName),
                 obj.Subject,
                 obj.Body
             );
 
-            return this.Ok();
+            return Ok();
         }
 
         [HttpGet("welcome")]
@@ -81,14 +81,14 @@ namespace web.Controllers
         {
             var user = await _storage.GetUser(userId);
 
-            await this._email.Send(
+            await _email.Send(
                 user.State.Email,
                 new Sender("support@nightingaletrading.com", "Nightingale Trading"),
                 EmailTemplate.NewUserWelcome,
                 new object()
             );
 
-            return this.Ok();
+            return Ok();
         }
 
         [HttpGet("users")]

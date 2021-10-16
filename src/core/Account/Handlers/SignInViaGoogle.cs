@@ -10,7 +10,7 @@ namespace core.Account
         {
             public Command(string email)
             {
-                this.Email = email;
+                Email = email;
             }
 
             public string Email { get; }

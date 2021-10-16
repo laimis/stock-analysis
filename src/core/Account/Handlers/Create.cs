@@ -71,7 +71,7 @@ namespace core.Account
 
             public async Task<CommandResponse<User>> Handle(Command cmd, CancellationToken cancellationToken)
             {
-                var exists = await this._storage.GetUserByEmail(cmd.UserInfo.Email);
+                var exists = await _storage.GetUserByEmail(cmd.UserInfo.Email);
                 if (exists != null)
                 {
                     return CommandResponse<User>.Failed($"Account with {cmd.UserInfo} already exists");

@@ -84,7 +84,7 @@ namespace core.Options
         {
             get
             {
-                if (this.BoughtOrSold == "Bought")
+                if (BoughtOrSold == "Bought")
                 {
                     return (PremiumReceived - PremiumPaid) / PremiumPaid;
                 }
@@ -92,7 +92,7 @@ namespace core.Options
                 return (PremiumReceived - PremiumPaid) / PremiumReceived;
             }
         }
-        public decimal Profit => this.PremiumReceived - this.PremiumPaid;
+        public decimal Profit => PremiumReceived - PremiumPaid;
         public string ExpirationDate { get; set; }
         public int NumberOfContracts { get; set; }
         public string BoughtOrSold { get; set; }

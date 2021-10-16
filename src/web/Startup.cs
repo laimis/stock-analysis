@@ -22,7 +22,7 @@ namespace web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            AuthHelper.Configure(this.Configuration, services);
+            AuthHelper.Configure(Configuration, services);
 
             services.AddControllers().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
@@ -45,7 +45,7 @@ namespace web
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            DIHelper.RegisterServices(this.Configuration, services);
+            DIHelper.RegisterServices(Configuration, services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

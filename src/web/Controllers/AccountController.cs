@@ -30,13 +30,13 @@ namespace web.Controllers
         [HttpGet("status")]
         public Task<object> IdentityAsync()
         {
-            return _mediator.Send(new Status.Query(this.User.Identifier()));
+            return _mediator.Send(new Status.Query(User.Identifier()));
         }
 
         [HttpPost("validate")]
         public async Task<ActionResult> Validate(Validate.Command cmd)
         {
-            if (this.User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 return BadRequest("User already has an account");
             }
@@ -49,7 +49,7 @@ namespace web.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(Create.Command cmd)
         {
-            if (this.User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 return BadRequest("User already has an account");
             }
@@ -88,8 +88,8 @@ namespace web.Controllers
         public async Task<ActionResult> LoginAsync()
         {
             var cmd = new Login.Command(
-                this.User.Identifier(),
-                this.Request.HttpContext.Connection.RemoteIpAddress.ToString());
+                User.Identifier(),
+                Request.HttpContext.Connection.RemoteIpAddress.ToString());
 
             var result = await _mediator.Send(cmd);
 
@@ -100,14 +100,14 @@ namespace web.Controllers
                 return BadRequest(result);
             }
             
-            return this.Redirect("~/");
+            return Redirect("~/");
         }
 
         [HttpPost("requestpasswordreset")]
         public async Task<ActionResult> RequestPasswordReset(PasswordReset.Request cmd)
         {
             cmd.WithIPAddress(
-                this.Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                Request.HttpContext.Connection.RemoteIpAddress.ToString()
             );
 
             var r = await _mediator.Send(cmd);
@@ -119,7 +119,7 @@ namespace web.Controllers
         public async Task<ActionResult> Authenticate(Authenticate.Command cmd)
         {
             cmd.WithIPAddress(
-                this.Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                Request.HttpContext.Connection.RemoteIpAddress.ToString()
             );
 
             var r = await _mediator.Send(cmd);
@@ -147,14 +147,14 @@ namespace web.Controllers
         {
             await HttpContext.SignOutAsync();
 
-            return this.Redirect("~/");
+            return Redirect("~/");
         }
 
         [HttpPost("delete")]
         [Authorize]
         public async Task<ActionResult> Delete(Delete.Command cmd)
         {
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
             
             await _mediator.Send(cmd);
 
@@ -167,7 +167,7 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> Clear(Clear.Command cmd)
         {
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
             
             await _mediator.Send(cmd);
 

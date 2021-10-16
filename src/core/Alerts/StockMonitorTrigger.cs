@@ -6,10 +6,10 @@ namespace core.Alerts
     {
         public StockMonitorTrigger(StockMonitor m, DateTimeOffset when, decimal oldValue, decimal newValue)
         {
-            this.Monitor = m;
-            this.When = when;
-            this.OldValue = oldValue;
-            this.NewValue = newValue;
+            Monitor = m;
+            When = when;
+            OldValue = oldValue;
+            NewValue = newValue;
         }
 
         public StockMonitor Monitor { get; }
@@ -17,8 +17,8 @@ namespace core.Alerts
         public decimal NewValue { get; }
         public DateTimeOffset When { get; }
 
-        public Guid UserId => this.Monitor.Alert.UserId;
-        public string Ticker => this.Monitor.Alert.Ticker;
-        public object Direction => this.OldValue < this.NewValue ? "UP" : "DOWN";
+        public Guid UserId => Monitor.Alert.UserId;
+        public string Ticker => Monitor.Alert.Ticker;
+        public object Direction => OldValue < NewValue ? "UP" : "DOWN";
     }
 }

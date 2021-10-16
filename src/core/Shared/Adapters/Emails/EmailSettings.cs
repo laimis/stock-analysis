@@ -15,8 +15,8 @@ namespace core.Adapters.Emails
 
         public Sender(string email, string name)
         {
-            this.Email = email;
-            this.Name = name;
+            Email = email;
+            Name = name;
         }
 
         public string Email { get; }

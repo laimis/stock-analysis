@@ -57,7 +57,7 @@ namespace core.Options
 
                 option.Buy(cmd.NumberOfContracts, cmd.Premium, cmd.Filled.Value, cmd.Notes);
 
-                await this._storage.Save(option, cmd.UserId);
+                await _storage.Save(option, cmd.UserId);
 
                 return CommandResponse<OwnedOption>.Success(option);
             }

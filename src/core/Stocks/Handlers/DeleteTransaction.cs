@@ -12,8 +12,8 @@ namespace core.Stocks
         {
             public Command(Guid stockId, Guid transactionId, Guid userId) : base(userId)
             {
-                this.Id = stockId;
-                this.TransactionId = transactionId;
+                Id = stockId;
+                TransactionId = transactionId;
             }
 
             public Guid Id { get; }
@@ -41,7 +41,7 @@ namespace core.Stocks
 
                 stock.DeleteTransaction(cmd.TransactionId);
 
-                await this._storage.Save(stock, cmd.UserId);
+                await _storage.Save(stock, cmd.UserId);
 
                 return CommandResponse<OwnedStock>.Success(stock);
             }

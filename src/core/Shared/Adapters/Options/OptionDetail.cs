@@ -27,22 +27,22 @@ namespace core.Adapters.Options
         public double Ask { get; set; }
 
         public DateTimeOffset LastUpdated { get; set; }
-        public string OptionType => this.Side;
-        public bool IsCall => this.Side == "call";
-        public bool IsPut => this.Side == "put";
-        public double Spread => (this.Ask - this.Bid);
+        public string OptionType => Side;
+        public bool IsCall => Side == "call";
+        public bool IsPut => Side == "put";
+        public double Spread => (Ask - Bid);
 
         public double PerDayPrice
         {
             get
             {
-                var date = this.ParsedExpirationDate;
+                var date = ParsedExpirationDate;
 
                 var today = DateTime.UtcNow.Date;
 
                 var diff = (int)date.Subtract(today).TotalDays;
 
-                return this.Bid * 100 / diff;
+                return Bid * 100 / diff;
             }
         }
 
@@ -50,14 +50,14 @@ namespace core.Adapters.Options
         {
             get
             {
-                return this.IsCall ?
-                    this.StrikePrice + this.Bid
-                    : this.StrikePrice - this.Bid;
+                return IsCall ?
+                    StrikePrice + Bid
+                    : StrikePrice - Bid;
             }
         }
 
-        public double Risk => this.Bid / this.StrikePrice;
+        public double Risk => Bid / StrikePrice;
 
-        public DateTime ParsedExpirationDate => DateTime.ParseExact(this.ExpirationDate, "yyyyMMdd", null).Date;
+        public DateTime ParsedExpirationDate => DateTime.ParseExact(ExpirationDate, "yyyyMMdd", null).Date;
     }
 }

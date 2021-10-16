@@ -14,7 +14,7 @@ namespace core.Options
         {
             public Query(string ticker)
             {
-                this.Ticker = ticker;
+                Ticker = ticker;
             }
 
             public string Ticker { get; }

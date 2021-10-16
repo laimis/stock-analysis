@@ -25,7 +25,7 @@ namespace web.Controllers
         [HttpPost]
         public async Task<object> Add(Add.Command input)
         {
-            input.WithUserId(this.User.Identifier());
+            input.WithUserId(User.Identifier());
 
             var r = await _mediator.Send(input);
 
@@ -40,7 +40,7 @@ namespace web.Controllers
         [HttpPatch]
         public async Task<object> Update(Save.Command input)
         {
-            input.WithUserId(this.User.Identifier());
+            input.WithUserId(User.Identifier());
 
             await _mediator.Send(input);
             
@@ -50,7 +50,7 @@ namespace web.Controllers
         [HttpGet]
         public async Task<object> List(string ticker)
         {
-            var query = new List.Query(this.User.Identifier(), ticker);
+            var query = new List.Query(User.Identifier(), ticker);
 
             var result = await _mediator.Send(query);
             
@@ -60,13 +60,13 @@ namespace web.Controllers
         [HttpGet("export")]
         public Task<ActionResult> Export()
         {
-            return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
+            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
         }
 
         [HttpGet("{noteId}")]
         public async Task<object> Get(Guid noteId)
         {
-            var query = new Get.Query(this.User.Identifier(), noteId);
+            var query = new Get.Query(User.Identifier(), noteId);
 
             var result = await _mediator.Send(query);
             
@@ -82,7 +82,7 @@ namespace web.Controllers
 
             var cmd = new Import.Command(content);
 
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             return this.OkOrError(await _mediator.Send(cmd));
         }

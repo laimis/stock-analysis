@@ -17,13 +17,13 @@ namespace web.Controllers
 
         public ReportsController(IMediator mediator)
         {
-            this._mediator = mediator;
+            _mediator = mediator;
         }
 
         [HttpGet("chain")]
         public Task<object> Chain()
         {
-            var query = new Chain.Query(this.User.Identifier());
+            var query = new Chain.Query(User.Identifier());
 
             return _mediator.Send(query);
         }
@@ -31,7 +31,7 @@ namespace web.Controllers
         [HttpGet("sells")]
         public Task<SellsView> Sells()
         {
-            var query = new Sells.Query(this.User.Identifier());
+            var query = new Sells.Query(User.Identifier());
 
             return _mediator.Send(query);
         }

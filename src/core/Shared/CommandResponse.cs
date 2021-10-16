@@ -8,7 +8,7 @@ namespace core.Shared
 
         protected CommandResponse(T agg) : base(null)
         {
-            this.Aggregate = agg;
+            Aggregate = agg;
         }
 
         public T Aggregate { get; }
@@ -22,7 +22,7 @@ namespace core.Shared
     {
         protected CommandResponse(string error)
         {
-            this.Error = error;
+            Error = error;
         }
 
         public string Error { get; }

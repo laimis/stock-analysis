@@ -4,8 +4,8 @@ namespace core.Adapters.Subscriptions
     {
         public SubscriptionResult(string customerId, string subscriptionId)
         {
-            this.CustomerId = customerId;
-            this.SubscriptionId = subscriptionId;
+            CustomerId = customerId;
+            SubscriptionId = subscriptionId;
         }
         
         public string CustomerId { get; }

@@ -11,15 +11,15 @@ namespace core.Shared
         public decimal Debit { get; }
         public decimal Credit { get; }
         public DateTimeOffset DateAsDate { get; }
-        public string Date => this.DateAsDate.ToString("yyyy-MM-dd");
-        public decimal Profit => this.Credit - this.Debit;
+        public string Date => DateAsDate.ToString("yyyy-MM-dd");
+        public decimal Profit => Credit - Debit;
         public decimal ReturnPct
         {
             get
             {
-                if (this.Debit > 0)
+                if (Debit > 0)
                 {
-                    return (this.Credit - this.Debit) * 1.0m / this.Debit;
+                    return (Credit - Debit) * 1.0m / Debit;
                 }
 
                 return 0;
@@ -40,15 +40,15 @@ namespace core.Shared
             bool isOption,
             bool isPL)
         {
-            this.AggregateId = aggregateId;
-            this.EventId = eventId;
-            this.Ticker = ticker;
-            this.Description = description;
-            this.Debit = debit;
-            this.Credit = credit;
-            this.DateAsDate = when;
-            this.IsOption = isOption;
-            this.IsPL = isPL;
+            AggregateId = aggregateId;
+            EventId = eventId;
+            Ticker = ticker;
+            Description = description;
+            Debit = debit;
+            Credit = credit;
+            DateAsDate = when;
+            IsOption = isOption;
+            IsPL = isPL;
         }
 
         public static Transaction CreditTx(Guid aggregateId, Guid eventId, string ticker, string description, decimal credit, DateTimeOffset when, bool isOption)

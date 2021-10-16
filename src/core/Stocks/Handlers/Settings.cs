@@ -32,7 +32,7 @@ namespace core.Stocks
                         "Unable to find user account for stock operation");
                 }
 
-                var stock = await this._storage.GetStock(cmd.Ticker, cmd.UserId);
+                var stock = await _storage.GetStock(cmd.Ticker, cmd.UserId);
                 if (stock == null)
                 {
                     return CommandResponse.Failed(
@@ -42,7 +42,7 @@ namespace core.Stocks
 
                 stock.UpdateSettings(cmd.Category);
 
-                await this._storage.Save(stock, cmd.UserId);
+                await _storage.Save(stock, cmd.UserId);
 
                 return CommandResponse.Success();
             }

@@ -13,13 +13,13 @@ namespace core.Admin
             EmailTransactionList stocks,
             EmailTransactionList options)
         {
-            this.Start = start;
-            this.End = end;
-            this.Entries = entries.OrderBy(e => e.Ticker);
-            this.ShortEarnings = entries.Where(g => g.EarningsDaysLeft >= 0 && g.EarningsDaysLeft <= 7).OrderBy(e => e.EarningsDate);
-            this.LongEarnings = entries.Where(g => g.EarningsDaysLeft > 7 && g.EarningsDaysLeft <= 35).OrderBy(e => e.EarningsDate);
-            this.Stocks = stocks;
-            this.Options = options;
+            Start = start;
+            End = end;
+            Entries = entries.OrderBy(e => e.Ticker);
+            ShortEarnings = entries.Where(g => g.EarningsDaysLeft >= 0 && g.EarningsDaysLeft <= 7).OrderBy(e => e.EarningsDate);
+            LongEarnings = entries.Where(g => g.EarningsDaysLeft > 7 && g.EarningsDaysLeft <= 35).OrderBy(e => e.EarningsDate);
+            Stocks = stocks;
+            Options = options;
         }
         public DateTimeOffset Start { get; }
         public DateTimeOffset End { get; }

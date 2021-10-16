@@ -39,10 +39,10 @@ namespace core.Stocks
             Apply(
                 new StockPurchased(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     date,
-                    this.State.UserId,
-                    this.State.Ticker,
+                    State.UserId,
+                    State.Ticker,
                     numberOfShares,
                     price,
                     notes
@@ -65,7 +65,7 @@ namespace core.Stocks
             Apply(
                 new StockCategoryChanged(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     category,
                     DateTimeOffset.UtcNow
                 )
@@ -74,7 +74,7 @@ namespace core.Stocks
 
         public void DeleteTransaction(Guid transactionId)
         {
-            if (!this.State.BuyOrSell.Any(t => t.Id == transactionId))
+            if (!State.BuyOrSell.Any(t => t.Id == transactionId))
             {
                 throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);
             }
@@ -82,7 +82,7 @@ namespace core.Stocks
             Apply(
                 new StockTransactionDeleted(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     transactionId,
                     DateTimeOffset.UtcNow
                     
@@ -95,7 +95,7 @@ namespace core.Stocks
             Apply(
                 new StockDeleted(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     DateTimeOffset.UtcNow
                 )
             );
@@ -103,7 +103,7 @@ namespace core.Stocks
 
         public void Sell(int numberOfShares, decimal price, DateTimeOffset date, string notes)
         {
-            if (numberOfShares > this.State.Owned)
+            if (numberOfShares > State.Owned)
             {
                 throw new InvalidOperationException("Number of shares owned is less than what is desired to sell");
             }
@@ -111,10 +111,10 @@ namespace core.Stocks
             Apply(
                 new StockSold(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     date,
-                    this.State.UserId,
-                    this.State.Ticker,
+                    State.UserId,
+                    State.Ticker,
                     numberOfShares,
                     price,
                     notes)

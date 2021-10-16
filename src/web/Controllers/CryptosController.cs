@@ -49,7 +49,7 @@ namespace web.Controllers
             
             var cmd = ImportCryptoCommandFactory.Create(file.FileName, content);
 
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             return this.OkOrError(await _mediator.Send(cmd));
         }

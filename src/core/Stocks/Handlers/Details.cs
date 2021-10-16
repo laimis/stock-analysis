@@ -14,7 +14,7 @@ namespace core.Stocks
 
             public Query(string ticker)
             {
-                this.Ticker = ticker;
+                Ticker = ticker;
             }
         }
 

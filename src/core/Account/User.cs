@@ -44,52 +44,52 @@ namespace core.Account
         public void SubscribeToPlan(string planId, string customerId, string subscriptionId)
         {
             Apply(
-                new UserSubscribedToPlan(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, planId, customerId, subscriptionId)
+                new UserSubscribedToPlan(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, planId, customerId, subscriptionId)
             );
         }
 
         public void LoggedIn(string ipAddress, DateTimeOffset when)
         {
             Apply(
-                new UserLoggedIn(Guid.NewGuid(), this.Id, when)
+                new UserLoggedIn(Guid.NewGuid(), Id, when)
             );
         }
 
         public void Delete(string feedback)
         {
             Apply(
-                new UserDeleted(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, feedback)
+                new UserDeleted(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, feedback)
             );
         }
 
         public bool PasswordHashMatches(string hash)
         {
-            return this.State.PasswordHashMatches(hash);
+            return State.PasswordHashMatches(hash);
         }
 
         public void Confirm()
         {
-            if (this.State.Verified != null)
+            if (State.Verified != null)
             {
                 return;
             }
             
             Apply(
-                new UserConfirmed(Guid.NewGuid(), this.State.Id, DateTimeOffset.UtcNow)
+                new UserConfirmed(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow)
             );
         }
 
         public void SetPassword(string hash, string salt)
         {
             Apply(
-                new UserPasswordSet(Guid.NewGuid(), this.State.Id, DateTimeOffset.UtcNow, hash, salt)
+                new UserPasswordSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, hash, salt)
             );
         }
 
         public void RequestPasswordReset(DateTimeOffset when)
         {
             Apply(
-                new UserPasswordResetRequested(Guid.NewGuid(), this.State.Id, when)
+                new UserPasswordResetRequested(Guid.NewGuid(), State.Id, when)
             );
         }
     }

@@ -28,9 +28,9 @@ namespace web.Controllers
         [HttpGet]
         public async Task<object> Index(string entity, Guid? userId, Guid? aggregateId)
         {
-            var list = await this._storage.GetStoredEvents(
+            var list = await _storage.GetStoredEvents(
                 entity,
-                userId ?? this.User.Identifier());
+                userId ?? User.Identifier());
 
             if (aggregateId != null)
             {

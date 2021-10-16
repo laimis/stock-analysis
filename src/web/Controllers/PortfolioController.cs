@@ -19,13 +19,13 @@ namespace web.Controllers
 
         public PortfolioController(IMediator mediator)
         {
-            this._mediator = mediator;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public Task<PortfolioResponse> Index()
         {
-            var query = new Get.Query(this.User.Identifier());
+            var query = new Get.Query(User.Identifier());
 
             return _mediator.Send(query);
         }
@@ -33,7 +33,7 @@ namespace web.Controllers
         [HttpGet("transactions")]
         public Task<TransactionList> TransactionsAsync(string ticker, string groupBy, string show, string txType)
         {
-            var query = new Transactions.Query(this.User.Identifier(), ticker, groupBy, show, txType);
+            var query = new Transactions.Query(User.Identifier(), ticker, groupBy, show, txType);
 
             return _mediator.Send(query);
         }
@@ -43,7 +43,7 @@ namespace web.Controllers
         {
             var cmd = new Review.Generate(period);
 
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             return await _mediator.Send(cmd);
         }
@@ -52,7 +52,7 @@ namespace web.Controllers
         public async Task<IEnumerable<GridEntry>> Grid()
         {
             var cmd = new Grid.Generate();
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             return await _mediator.Send(cmd);
         }

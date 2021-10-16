@@ -4,8 +4,8 @@ namespace core.Admin
     {
         public EmailTransactionGroup(string name, EmailTransactionList transactions)
         {
-            this.Name = name;
-            this.Transactions = transactions;
+            Name = name;
+            Transactions = transactions;
         }
 
         public string Name { get; set; }

@@ -37,7 +37,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/active")]
         public Task<OwnedOptionStatsView> List(string ticker)
         {
-            return _mediator.Send(new List.Query(ticker, this.User.Identifier()));
+            return _mediator.Send(new List.Query(ticker, User.Identifier()));
         }
 
         [HttpGet("{id}")]
@@ -45,7 +45,7 @@ namespace web.Controllers
         {
             var query = new Details.Query { Id = id };
 
-            query.WithUserId(this.User.Identifier());
+            query.WithUserId(User.Identifier());
             
             var option =  await _mediator.Send(query);
             if (option == null)
@@ -59,7 +59,7 @@ namespace web.Controllers
         [HttpPost("sell")]
         public Task<object> Sell(Sell.Command cmd)
         {
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             return ExecTransaction(cmd);
         }
@@ -67,7 +67,7 @@ namespace web.Controllers
         [HttpPost("buy")]
         public Task<object> Buy(Buy.Command cmd)
         {
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
             
             return ExecTransaction(cmd);
         }
@@ -75,7 +75,7 @@ namespace web.Controllers
         [HttpDelete("{id}")]
         public async Task<object> Delete(Guid id)
         {
-            var cmd = new Delete.Command(id, this.User.Identifier());
+            var cmd = new Delete.Command(id, User.Identifier());
             
             await _mediator.Send(cmd);
 
@@ -85,7 +85,7 @@ namespace web.Controllers
         [HttpPost("expire")]
         public async Task<object> Expire(Expire.Command cmd)
         {
-            cmd.WithUserId(this.User.Identifier());
+            cmd.WithUserId(User.Identifier());
 
             var r = await _mediator.Send(cmd);
             
@@ -108,7 +108,7 @@ namespace web.Controllers
         [HttpGet("export")]
         public Task<ActionResult> Export()
         {
-            return this.GenerateExport(_mediator, new Export.Query(this.User.Identifier()));
+            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
         }
 
         [HttpPost("import")]
@@ -120,7 +120,7 @@ namespace web.Controllers
 
             var cmd = new Import.Command(content);
 
-            var userId = this.User.Identifier();
+            var userId = User.Identifier();
 
             cmd.WithUserId(userId);
 
@@ -132,7 +132,7 @@ namespace web.Controllers
         [HttpGet]
         public Task<OptionDashboardView> Dashboard()
         {
-            var query = new Dashboard.Query(this.User.Identifier());
+            var query = new Dashboard.Query(User.Identifier());
             
             return _mediator.Send(query);
         }

@@ -18,9 +18,9 @@ namespace core.Notes
         public NoteCreated(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string note, string ticker)
             : base(id, aggregateId, when)
         {
-            this.UserId = userId;
-            this.Note = note;
-            this.Ticker = ticker;
+            UserId = userId;
+            Note = note;
+            Ticker = ticker;
         }
 
         public Guid UserId { get; }
@@ -33,7 +33,7 @@ namespace core.Notes
         public NoteEnriched(Guid id, Guid aggregateId, DateTimeOffset when, StockAdvancedStats stats)
             : base(id, aggregateId, when)
         {
-            this.Stats = stats;
+            Stats = stats;
         }
 
         public StockAdvancedStats Stats { get; }
@@ -44,8 +44,8 @@ namespace core.Notes
         public NoteEnrichedWithPrice(Guid id, Guid aggregateId, DateTimeOffset when, Price price, StockAdvancedStats stats)
             : base(id, aggregateId, when)
         {
-            this.Price = price;
-            this.Stats = stats;
+            Price = price;
+            Stats = stats;
         }
 
         public Price Price { get; }
@@ -81,7 +81,7 @@ namespace core.Notes
         public NoteUpdated(Guid id, Guid aggregateId, DateTimeOffset when, string note)
             : base(id, aggregateId, when)
         {
-            this.Note = note;
+            Note = note;
         }
 
         public string Note { get; private set; }

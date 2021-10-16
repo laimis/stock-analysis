@@ -50,7 +50,7 @@ namespace core.Notes
                 return true;
             }
 
-            return this.State.RelatedToTicker == filter.Value;
+            return State.RelatedToTicker == filter.Value;
         }
 
         internal void Enrich(Price p, StockAdvancedStats d)
@@ -58,7 +58,7 @@ namespace core.Notes
             Apply(
                 new NoteEnrichedWithPrice(
                     Guid.NewGuid(),
-                    this.Id,
+                    Id,
                     DateTimeOffset.UtcNow,
                     p,
                     d
@@ -76,7 +76,7 @@ namespace core.Notes
             Apply(
                 new NoteUpdated(
                     Guid.NewGuid(),
-                    this.State.Id,
+                    State.Id,
                     DateTimeOffset.UtcNow,
                     note
                 )

@@ -12,7 +12,7 @@ namespace core.Stocks
         {
             public Command(Guid stockId, Guid userId)
             {
-                this.Id = stockId;
+                Id = stockId;
                 WithUserId(userId);
             }
 
@@ -38,7 +38,7 @@ namespace core.Stocks
 
                 stock.Delete();
 
-                await this._storage.Save(stock, cmd.UserId);
+                await _storage.Save(stock, cmd.UserId);
 
                 return CommandResponse<OwnedStock>.Success(stock);
             }

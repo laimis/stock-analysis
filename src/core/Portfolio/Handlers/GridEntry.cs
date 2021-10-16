@@ -9,9 +9,9 @@ namespace core.Portfolio
     {
         public GridEntry(string ticker, Price price, StockAdvancedStats stats)
         {
-            this.Price = price.Amount;
-            this.Ticker = ticker;
-            this.Stats = stats;
+            Price = price.Amount;
+            Ticker = ticker;
+            Stats = stats;
         }
 
         public string Ticker { get; }

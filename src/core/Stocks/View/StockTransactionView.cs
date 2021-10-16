@@ -7,10 +7,10 @@ namespace core.Stocks.View
         public  StockTransactionView(){}
         public StockTransactionView(Transaction t)
         {
-            this.Ticker = t.Ticker;
-            this.Date = t.Date;
-            this.Profit = t.Profit;
-            this.ReturnPct = t.ReturnPct;
+            Ticker = t.Ticker;
+            Date = t.Date;
+            Profit = t.Profit;
+            ReturnPct = t.ReturnPct;
         }
 
         public string Ticker { get; set; }

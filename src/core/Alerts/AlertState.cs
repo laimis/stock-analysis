@@ -20,7 +20,7 @@ namespace core.Alerts
 
         private void ApplyInternal(dynamic obj)
         {
-            this.ApplyInternal(obj);
+            ApplyInternal(obj);
         }
 
         internal void ApplyInternal(AlertCleared c)
@@ -29,27 +29,27 @@ namespace core.Alerts
 
         internal void ApplyInternal(AlertCreated c)
         {
-            this.Id = c.AggregateId;
-            this.Ticker = c.Ticker;
-            this.UserId = c.UserId;
-            this.Created = c.When;
+            Id = c.AggregateId;
+            Ticker = c.Ticker;
+            UserId = c.UserId;
+            Created = c.When;
         }
 
         internal void ApplyInternal(AlertPricePointAdded a)
         {
-            this.PricePoints.Add(new AlertPricePoint(a.Id, null, a.Value));
+            PricePoints.Add(new AlertPricePoint(a.Id, null, a.Value));
         }
 
         internal void ApplyInternal(AlertPricePointWithDescripitionAdded a)
         {
-            this.PricePoints.Add(new AlertPricePoint(a.Id, a.Description, a.Value));
+            PricePoints.Add(new AlertPricePoint(a.Id, a.Description, a.Value));
         }
 
         internal void ApplyInternal(AlertPricePointRemoved a)
         {
-            var pp = this.PricePoints.Single(p => p.Id == a.PricePointId);
+            var pp = PricePoints.Single(p => p.Id == a.PricePointId);
 
-            this.PricePoints.Remove(pp);
+            PricePoints.Remove(pp);
         }
     }
 }

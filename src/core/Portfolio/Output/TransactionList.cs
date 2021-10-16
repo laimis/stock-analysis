@@ -11,12 +11,12 @@ namespace core.Portfolio.Output
             string groupBy,
             IEnumerable<string> tickers)
         {
-            this.Transactions = Ordered(transactions, groupBy);
-            this.Tickers = tickers;
+            Transactions = Ordered(transactions, groupBy);
+            Tickers = tickers;
             
             if (groupBy != null)
             {
-                this.Grouped = Ordered(transactions, groupBy)
+                Grouped = Ordered(transactions, groupBy)
                     .GroupBy(t => GroupByValue(groupBy, t))
                     .Select(g => new TransactionGroup(
                         g.Key,
@@ -25,7 +25,7 @@ namespace core.Portfolio.Output
 
                 if (groupBy == "ticker")
                 {
-                    this.Grouped = this.Grouped.OrderByDescending(a => a.Transactions.Credit - a.Transactions.Debit);
+                    Grouped = Grouped.OrderByDescending(a => a.Transactions.Credit - a.Transactions.Debit);
                 }
             }
         }
