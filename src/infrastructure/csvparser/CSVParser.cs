@@ -22,9 +22,16 @@ namespace csvparser
                     {
                         PrepareHeaderForMatch = (header, pos) =>
                         {
-                            return Regex.Replace(header, @"\s", string.Empty);
+                            var spacesRemoved = Regex.Replace(header, @"\s", string.Empty);
+
+                            // capitalize first
+                            var result = Char.ToUpper(spacesRemoved[0]) + spacesRemoved.ToLower().Substring(1);
+
+                            Console.WriteLine("Prepared: " + result);
+
+                            return result;
                         },
-                        
+                        ShouldSkipRecord = (arr) => arr.Length == 0 || arr[0] == "***END OF FILE***"
                     };
                     
                     var csvReader = new CsvReader(reader, config);

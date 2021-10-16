@@ -123,7 +123,7 @@ namespace iexclient
             if (!r.IsSuccessStatusCode)
             {
                 _logger?.LogError($"Failed to get stocks with url {url}: " + response);
-                r.EnsureSuccessStatusCode();
+                return new Dictionary<string, BatchStockPrice>();
             }
 
             return JsonConvert.DeserializeObject<Dictionary<string, BatchStockPrice>>(response);

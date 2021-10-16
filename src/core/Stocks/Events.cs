@@ -22,7 +22,7 @@ namespace core.Stocks
             DateTimeOffset when,
             Guid userId,
             string ticker,
-            int numberOfShares,
+            decimal numberOfShares,
             decimal price,
             string notes)
             : base(id, aggregateId, when)
@@ -36,7 +36,7 @@ namespace core.Stocks
 
         public Guid UserId { get; }
         public string Ticker { get; }
-        public int NumberOfShares { get; }
+        public decimal NumberOfShares { get; }
         public decimal Price { get; }
         public string Notes { get; }
     }
@@ -52,7 +52,7 @@ namespace core.Stocks
             DateTimeOffset when,
             Guid userId,
             string ticker,
-            int numberOfShares,
+            decimal numberOfShares,
             decimal price,
             string notes)
             : base(id, aggregateId, when)
@@ -66,7 +66,7 @@ namespace core.Stocks
 
         public Guid UserId { get; }
         public string Ticker { get; }
-        public int NumberOfShares { get; }
+        public decimal NumberOfShares { get; }
         public decimal Price { get; }
         public string Notes { get; }
     }

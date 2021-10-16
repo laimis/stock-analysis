@@ -7,7 +7,7 @@ namespace core.Stocks
     public class PositionInstance
     {
         private DateTimeOffset? _firstOpen = null;
-        private int _amount = 0;
+        private decimal _amount = 0;
 
         public PositionInstance(string ticker)
         {
@@ -23,7 +23,7 @@ namespace core.Stocks
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
 
-        public void Buy(int amount, decimal price, DateTimeOffset when)
+        public void Buy(decimal amount, decimal price, DateTimeOffset when)
         {
             if (_amount == 0)
             {
@@ -35,7 +35,7 @@ namespace core.Stocks
             Cost += amount * price;
         }
 
-        public void Sell(int amount, decimal price, DateTimeOffset when)
+        public void Sell(decimal amount, decimal price, DateTimeOffset when)
         {
             _amount -= amount;
 

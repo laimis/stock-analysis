@@ -46,8 +46,6 @@ namespace core.Options
                 {
                     prices.TryGetValue(op.Ticker, out var val);
                     if (val != null) op.ApplyPrice(val.Price);
-                    Console.WriteLine(">>>>>>>>>>>>>>     price for " + op.Ticker + " is " + val?.Price);
-                    Console.WriteLine(">>>>>>>>>>>>>>     price for " + op.Ticker + " is " + op.CurrentPrice);
                 }
 
                 return view;

@@ -11,7 +11,7 @@ namespace core.Stocks
         public string Ticker { get; private set; }
         public Guid UserId { get; private set; }
 
-        public int Owned { get; private set; }
+        public decimal Owned { get; private set; }
         public decimal Cost { get; private set; }
         public decimal AverageCost { get; private set; }
         public List<Transaction> Transactions { get; } = new List<Transaction>();
@@ -74,7 +74,7 @@ namespace core.Stocks
         private void StateUpdateLoop()
         {
             decimal avgCost = 0;
-            int owned = 0;
+            decimal owned = 0;
             decimal cost = 0;
             var txs = new List<Transaction>();
             DateTimeOffset? oldestOpen = null;
@@ -203,7 +203,7 @@ namespace core.Stocks
 
     internal interface IStockTransaction
     {
-        int NumberOfShares { get; }
+        decimal NumberOfShares { get; }
         decimal Price { get; }
         Guid Id { get; }
         DateTimeOffset When { get; }

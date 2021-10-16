@@ -87,14 +87,14 @@ export class ProfileComponent implements OnInit {
     )
   }
 
-  importNotes($event) {
+  importTransactions($event) {
 
-    this.markProgress('Importing notes')
+    this.markProgress('Importing transactions')
 
     let formData: FormData = this.getFormData($event);
 
-    this.service.importNotes(formData).subscribe(
-      _ => {this.markSuccess('Notes imported') },
+    this.service.importTransactions(formData).subscribe(
+      _ => {this.markSuccess('Transactions imported') },
       e => this.markError(e)
     )
   }
