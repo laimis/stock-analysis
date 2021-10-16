@@ -24,7 +24,7 @@ namespace core.Stocks
             Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker, userId));
         }
 
-        public void Purchase(int numberOfShares, decimal price, DateTimeOffset date, string notes = null)
+        public void Purchase(decimal numberOfShares, decimal price, DateTimeOffset date, string notes = null)
         {
             if (price <= 0)
             {
@@ -101,7 +101,7 @@ namespace core.Stocks
             );
         }
 
-        public void Sell(int numberOfShares, decimal price, DateTimeOffset date, string notes)
+        public void Sell(decimal numberOfShares, decimal price, DateTimeOffset date, string notes)
         {
             if (numberOfShares > State.Owned)
             {

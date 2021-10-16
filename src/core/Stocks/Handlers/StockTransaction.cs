@@ -7,7 +7,7 @@ namespace core.Stocks
     public class StockTransaction : RequestWithTicker<CommandResponse>
     {
         [Range(1, 1000000)]
-        public int NumberOfShares { get; set; }
+        public decimal NumberOfShares { get; set; }
 
         [Range(0, 100000)]
         public decimal Price { get; set; }

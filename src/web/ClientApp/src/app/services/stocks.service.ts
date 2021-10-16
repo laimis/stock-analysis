@@ -148,6 +148,10 @@ export class StocksService {
     return this.http.post('/api/stocks/import', file)
   }
 
+  importTransactions(file: any) : Observable<any> {
+    return this.http.post('/api/transactions/import', file)
+  }
+
 	purchase(obj:stocktransactioncommand) : Observable<any> {
 		return this.http.post('/api/stocks/purchase', obj)
 	}

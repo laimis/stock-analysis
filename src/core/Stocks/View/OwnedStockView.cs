@@ -34,7 +34,7 @@ namespace core.Stocks.View
         public int DaysHeld { get; set; }
         public int DaysSinceLastTransaction { get; set; }
         public string Ticker { get; set; }
-        public int Owned { get; set; }
+        public decimal Owned { get; set; }
         public decimal Equity { get; set; }
         public string Description { get; set; }
         public decimal AverageCost { get; set; }

@@ -40,7 +40,7 @@ namespace core.Options
                         "Please verify your email first before you can record option transaction");
                 }
 
-                var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType);
+                var optionType = (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType, ignoreCase: true);
                 
                 var options = await _storage.GetOwnedOptions(cmd.UserId);
                 var option = options.SingleOrDefault(o => o.IsMatch(cmd.Ticker, cmd.StrikePrice, optionType, cmd.ExpirationDate.Value));
