@@ -112,7 +112,7 @@ namespace storage.redis
         {
             var eventJson = result.Single(h => h.Name == "event").Value;
 
-            // eventJson = eventJson.Replace("core.TickerPrice,", "core.Price,");
+            eventJson = eventJson.ToString().Replace("core.TickerPrice, core", "core.Price, core");
 
             try
             {
