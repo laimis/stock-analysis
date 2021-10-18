@@ -70,7 +70,9 @@ namespace core.Stocks
                     .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
                     .ToList();
 
-                var performance = new StockOwnershipPerformance(closedTransactions);
+                var performance = new StockOwnershipPerformanceContainerView(
+                    closedTransactions
+                );
 
                 var past = closedTransactions
                     .Select(t => new PositionInstanceView(t))

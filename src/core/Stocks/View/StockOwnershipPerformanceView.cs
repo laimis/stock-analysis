@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace core.Stocks
 {
-    public class StockOwnershipPerformance
+    public class StockOwnershipPerformanceView
     {
-        public StockOwnershipPerformance(){}
+        public StockOwnershipPerformanceView(){}
         
-        public StockOwnershipPerformance(List<PositionInstance> closedPositions)
+        public StockOwnershipPerformanceView(List<PositionInstance> closedPositions)
         {
             if (closedPositions.Count == 0)
             {
