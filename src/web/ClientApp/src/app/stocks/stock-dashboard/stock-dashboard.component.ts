@@ -13,6 +13,7 @@ export class StockDashboardComponent implements OnInit {
 
   owned : OwnedStock[]
   performance : any
+  performanceRecent : any
   past : any
   loaded : boolean = false
 
@@ -36,11 +37,12 @@ export class StockDashboardComponent implements OnInit {
     this.title.setTitle("Stocks - Nightingale Trading")
 
 		this.stocks.getStocks().subscribe(result => {
-      this.owned = result.owned;
-      this.performance = result.performance;
-      this.past = result.past;
-      this.loaded = true;
-      this.calculateProperties();
+      this.owned = result.owned
+      this.performance = result.performance.overall
+      this.performanceRecent = result.performance.recent
+      this.past = result.past
+      this.loaded = true
+      this.calculateProperties()
       this.sort("profits")
 		}, error => {
 			console.log(error);
