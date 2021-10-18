@@ -1,6 +1,6 @@
 {
   "name": "tradewatch",
-  "version": "2.0.27",
+  "version": "2.0.28",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
