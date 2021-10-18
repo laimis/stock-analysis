@@ -9,7 +9,7 @@ namespace core.Stocks.View
         public StockOwnershipPerformanceContainerView(List<PositionInstance> closedTransactions)
         {
             Recent = new StockOwnershipPerformanceView(closedTransactions.OrderByDescending(p => p.Closed).Take(20).ToList());
-            Overall = new StockOwnershipPerformanceView(closedTransactions.Take(20).ToList());
+            Overall = new StockOwnershipPerformanceView(closedTransactions);
         }
 
         public StockOwnershipPerformanceView Recent { get; set; }
