@@ -2,13 +2,15 @@
 
 <table *ngIf="past" class="table">
   <tr>
+    <th width="100"></th>
     <th>Stock</th>
     <th>Date</th>
     <th>Profit/Loss</th>
     <th>Profit/Loss %</th>
     <th>Days Held</th>
   </tr>
-  <tr *ngFor="let p of past">
+  <tr *ngFor="let p of past; let i = index">
+    <td>{{i + 1}}</td>
     <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
     <td>{{p.date | date}}</td>
     <td>{{p.profit | currency}}</td>
