@@ -39,8 +39,12 @@ namespace core.Stocks
             
             WinPct = (1.0m * Wins) / Total;
             EV = WinPct * AvgWinAmount - (1-WinPct) * AvgLossAmount;
-            AvgReturnPct = closedPositions.Average(t => t.Percentage);
             AvgDaysHeld = closedPositions.Average(t => t.DaysHeld);
+
+            var totalCost = closedPositions.Sum(t => t.Cost);
+            var totalProfit = closedPositions.Sum(t => t.Profit);
+            var totalReturnPct = totalCost > 0 ? totalProfit / totalCost : 0;
+            AvgReturnPct = totalReturnPct;
         }
 
         public int Total { get; set; }
