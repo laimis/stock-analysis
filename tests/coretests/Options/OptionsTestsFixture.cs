@@ -4,6 +4,7 @@ using core.Account;
 using core.Options;
 using core.Shared;
 using coretests.Fakes;
+using Moq;
 
 namespace coretests.Options
 {
@@ -62,13 +63,17 @@ namespace coretests.Options
             return cmd;
         }
 
-        internal async Task<IAccountStorage> CreateAccountStorageWithUserAsync()
+        internal IAccountStorage CreateAccountStorageWithUserAsync()
         {
-            var storage = new FakeAccountStorage();
+            var mock = new Mock<IAccountStorage>();
 
-            await storage.Save(User);
+            mock.Setup(s => s.GetUserByEmail(User.State.Email))
+                .ReturnsAsync(User);
 
-            return storage;
+            mock.Setup(s => s.GetUser(User.State.Id))
+                .ReturnsAsync(User);
+
+            return mock.Object;
         }
     }
 }
