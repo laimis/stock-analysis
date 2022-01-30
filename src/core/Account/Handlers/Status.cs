@@ -32,9 +32,12 @@ namespace core.Account
                 var cached = await _storage.ViewModel<AccountStatusView>(request.UserId);
                 if (cached != null)
                 {
+                    Console.WriteLine("Status check from cache");
                     cached.LoggedIn = true;
                     return cached;
                 }
+
+                Console.WriteLine("Status check from db");
 
                 return await GetFromDatabase(request.UserId);
             }
