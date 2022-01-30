@@ -28,9 +28,7 @@ namespace core.Reports
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                var prices = await _stockService.GetPrices(stocks.Select(s => s.State.Ticker));
-
-                return new SellsView(stocks, prices);
+                return await SellsView.Create(stocks, _stockService);
             }
         }
     }
