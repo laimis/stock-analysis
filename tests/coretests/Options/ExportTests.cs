@@ -16,7 +16,9 @@ namespace coretests.Options
         [Fact]
         public async Task ExportContainsExpectedData()
         {
-            var handler = new core.Options.Export.Handler(Fixture.CreateStorageWithSoldOption());
+            var (storage, _) = Fixture.CreateStorageWithSoldOption();
+            
+            var handler = new core.Options.Export.Handler(storage);
 
             var query = new core.Options.Export.Query(OptionsTestsFixture.User.Id);
 

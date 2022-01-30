@@ -1,7 +1,10 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core;
 using core.Options;
+using Moq;
 using Xunit;
 
 namespace coretests.Options
@@ -18,39 +21,21 @@ namespace coretests.Options
         [Fact]
         public async Task Sell_OpensNewOneAsync()
         {
-            var storage = _fixture.CreateStorageWithNoOptions();
+            var mock = new Mock<IPortfolioStorage>();
+
+            mock.Setup(x => x.Save(It.IsAny<OwnedOption>(), It.IsAny<Guid>()))
+                .Callback((OwnedOption option, Guid userId) =>
+                {
+                    Assert.Equal(-1, option.State.NumberOfContracts);
+                });
+
             var account = _fixture.CreateAccountStorageWithUserAsync();
 
-            var handler = new Sell.Handler(storage, account);
+            var handler = new Sell.Handler(mock.Object, account);
 
             await handler.Handle(
                 OptionsTestsFixture.CreateSellCommand(),
                 CancellationToken.None);
-
-            Assert.Single(storage.SavedOptions);
-            Assert.Equal(-1, storage.SavedOptions.Single().State.NumberOfContracts);
-        }
-
-        [Fact]
-        public async Task SellingOption_Decreases()
-        {
-            var storage = _fixture.CreateStorageWithNoOptions();
-
-            var handler = new Sell.Handler(
-                storage,
-                _fixture.CreateAccountStorageWithUserAsync());
-
-            await handler.Handle(
-                OptionsTestsFixture.CreateSellCommand(),
-                CancellationToken.None);
-
-            await handler.Handle(
-                OptionsTestsFixture.CreateSellCommand(),
-                CancellationToken.None);
-
-            var opt = storage.SavedOptions.Single();
-
-            Assert.Equal(-2, opt.State.NumberOfContracts);
         }
     }
 }

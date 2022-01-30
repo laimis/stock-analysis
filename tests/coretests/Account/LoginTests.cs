@@ -1,9 +1,5 @@
 using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using core.Account;
-using coretests.Fakes;
 using Xunit;
 
 namespace coretests.Account

@@ -21,8 +21,8 @@ namespace coretests.Options
         [Fact]
         public async Task List_WorksAsync()
         {
-            var storage = _fixture.CreateStorageWithSoldOption();
-            var opt = storage.SavedOptions.First();
+            var (storage, _) = _fixture.CreateStorageWithSoldOption();
+            
             var query = new Dashboard.Query(Guid.NewGuid());
 
             var handler = new Dashboard.Handler(storage, Mock.Of<IStocksService2>());

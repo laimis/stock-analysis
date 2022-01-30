@@ -1,9 +1,8 @@
 using System;
-using System.Threading.Tasks;
+using core;
 using core.Account;
 using core.Options;
 using core.Shared;
-using coretests.Fakes;
 using Moq;
 
 namespace coretests.Options
@@ -20,10 +19,8 @@ namespace coretests.Options
             User = u;
         }
 
-        public FakePortfolioStorage CreateStorageWithSoldOption()
+        public (IPortfolioStorage, OwnedOption) CreateStorageWithSoldOption()
         {
-            var storage = new FakePortfolioStorage();
-
             var cmd = CreateSellCommand();
 
             var opt = new OwnedOption(
@@ -35,14 +32,15 @@ namespace coretests.Options
 
             opt.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
-            storage.Register(opt);
+            var mock = new Mock<IPortfolioStorage>();
 
-            return storage;
-        }
+            mock.Setup(s => s.GetOwnedOptions(User.Id))
+                .ReturnsAsync(new[] { opt });
 
-        public FakePortfolioStorage CreateStorageWithNoOptions()
-        {
-            return new FakePortfolioStorage();
+            mock.Setup(s => s.GetOwnedOption(opt.Id, User.Id))
+                .ReturnsAsync(opt);
+
+            return (mock.Object, opt);
         }
 
         public static Sell.Command CreateSellCommand()

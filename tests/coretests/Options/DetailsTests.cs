@@ -21,8 +21,8 @@ namespace coretests.Options
         [Fact]
         public async Task Get_WorksAsync()
         {
-            var storage = _fixture.CreateStorageWithSoldOption();
-            var opt = storage.SavedOptions.First();
+            var (storage, opt) = _fixture.CreateStorageWithSoldOption();
+            
             var query = new Details.Query {
                 Id = opt.State.Id
             };

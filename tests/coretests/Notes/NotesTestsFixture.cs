@@ -1,7 +1,8 @@
 using System;
+using core;
 using core.Notes;
 using core.Shared;
-using coretests.Fakes;
+using Moq;
 
 namespace coretests.Notes
 {
@@ -10,25 +11,15 @@ namespace coretests.Notes
         public static readonly Ticker Ticker = "tsla";
         public static Guid UserId = Guid.NewGuid();
 
-        public NotesTestsFixture()
+        public IPortfolioStorage CreateStorageWithNotes()
         {
-        }
-
-        public FakePortfolioStorage CreateStorageWithNotes()
-        {
-            return CreateStorage();
-        }
-
-        private FakePortfolioStorage CreateStorage()
-        {
-            var storage = new FakePortfolioStorage();
-
             var note = new Note(UserId, @"multi line
             note", Ticker, DateTimeOffset.UtcNow);
 
-            storage.Save(note, UserId);
-
-            return storage;
+            var mock = new Mock<IPortfolioStorage>();
+            mock.Setup(x => x.GetNotes(UserId))
+                .ReturnsAsync(new[] { note });
+            return mock.Object;
         }
     }
 }
