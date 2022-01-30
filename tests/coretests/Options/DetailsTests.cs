@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.Stocks;
 using core.Options;
+using Moq;
 using Xunit;
 
 namespace coretests.Options
@@ -27,7 +29,7 @@ namespace coretests.Options
 
             query.WithUserId(opt.State.UserId);
 
-            var handler = new Details.Handler(storage, new Fakes.FakeStocksService());
+            var handler = new Details.Handler(storage, Mock.Of<IStocksService2>());
 
             var result = await handler.Handle(query, CancellationToken.None);
 
