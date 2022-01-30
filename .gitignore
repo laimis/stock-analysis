@@ -234,5 +234,7 @@ coverage.json
 coverage.opencover.xml
 coverage/
 
+.angular/
+
 # dev secrets
 *_secret*
