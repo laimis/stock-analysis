@@ -7,7 +7,7 @@ namespace core.Reports.Views
 {
     public class SellsView
     {
-        public SellsView(IEnumerable<OwnedStock> stocks)
+        public SellsView(IEnumerable<OwnedStock> stocks, Dictionary<string, Adapters.Stocks.BatchStockPrice> prices)
         {
             Sells = stocks
                     .SelectMany(s => s.State.BuyOrSell.Select(t => new { stock = s, buyOrSell = t}))
@@ -21,6 +21,7 @@ namespace core.Reports.Views
                         Date = t.latest.buyOrSell.When,
                         NumberOfShares = t.latest.buyOrSell.NumberOfShares,
                         Price = t.latest.buyOrSell.Price,
+                        CurrentPrice = prices.ContainsKey(t.ticker) ? prices[t.ticker].Price : null,
                         OlderThan30Days = t.latest.buyOrSell.When < DateTimeOffset.UtcNow.AddDays(-30)
                     })
                     .OrderByDescending(a => a.Date)

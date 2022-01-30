@@ -7,7 +7,9 @@
         <td>Ticker</td>
         <td>Date</td>
         <td>Number of Shares</td>
-        <td>Price</td>
+        <td>Price@Sale</td>
+        <td>Current Price</td>
+        <td>% Diff</td>
         <td>Older Than 30 Days</td>
       </tr>
     </thead>
@@ -17,6 +19,8 @@
         <td>{{s.date | date}}</td>
         <td>{{s.numberOfShares}}</td>
         <td>{{s.price}}</td>
+        <td>{{s.currentPrice}}</td>
+        <td>{{s.diff | percent:'1.2'}}</td>
         <td><span class="badge badge-success" *ngIf="s.olderThan30Days">yes</span></td>
       </tr>
     </tbody>
