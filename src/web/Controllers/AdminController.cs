@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using core;
 using core.Account;
@@ -32,6 +33,8 @@ namespace web.Controllers
             _portfolio = portfolio;
             _email = email;
         }
+
+        public ActionResult Test() => Ok();
 
         [HttpPost("weekly")]
         public async Task<object> Weekly(Weekly.Command cmd)
@@ -102,5 +105,19 @@ namespace web.Controllers
         {
             return this.GenerateExport(_mediator, new Users.Export());
         }
+    }
+
+    public class EmailInput
+    {
+        [Required]
+        public string From { get; set; }
+        [Required]
+        public string FromName { get; set; }
+        [Required]
+        public string Subject { get; set; }
+        [Required]
+        public string Body { get; set; }
+        [Required]
+        public string To { get; set; }
     }
 }
