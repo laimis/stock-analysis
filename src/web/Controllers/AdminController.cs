@@ -34,6 +34,7 @@ namespace web.Controllers
             _email = email;
         }
 
+        [HttpGet("test")]
         public ActionResult Test() => Ok();
 
         [HttpPost("weekly")]
