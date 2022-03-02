@@ -18,8 +18,6 @@ $newVersion = new-object System.Version($version.Major, $version.Minor, ($versio
 
 Set-Location .\src\web\ClientApp
 
-Invoke-Expression "npm version $($newVersion)"
-
 Invoke-Expression "git add ."
 Invoke-Expression "git commit -m '$message'"
 Invoke-Expression "git push"
