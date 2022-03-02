@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using core.Account;
 using core.Alerts;
+using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Shared;
@@ -22,6 +23,7 @@ namespace core
         public const string ALERTS_HEADER = "ticker,pricepoints";
         public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
         public const string OWNED_STOCKS_HEADER = "ticker,shares,averagecost,invested,daysheld,category";
+        public const string CRYPTOS_HEADER = "symbol,type,amount,price,date";
 
         public static string Generate(IEnumerable<User> users)
         {
@@ -39,6 +41,19 @@ namespace core
             );
 
             return Generate(OWNED_STOCKS_HEADER, rows);
+        }
+
+        
+        public static string Generate(IEnumerable<OwnedCrypto> cryptos)
+        {
+            var rows = cryptos.SelectMany(o => 
+                o.State.UndeletedBuysOrSells.Select(op => (o, (AggregateEvent)op)))
+                .OrderBy(t => t.Item2.When)
+                .Select(e => {
+                    return StockEventToParts(e);
+                });
+
+            return Generate(CRYPTOS_HEADER, rows);
         }
 
         public static string Generate(IEnumerable<Alert> alerts)
@@ -130,6 +145,26 @@ namespace core
                         ss.NumberOfShares,
                         ss.Price,
                         ss.When.ToString(DATE_FORMAT)
+                    };
+
+                case CryptoPurchased cp:
+
+                    return new object[] {
+                        cp.Token,
+                        "buy",
+                        cp.Quantity,
+                        cp.DollarAmount,
+                        cp.When.ToString(DATE_FORMAT)
+                    };
+
+                case CryptoSold cs:
+
+                    return new object[] {
+                        cs.Token,
+                        "sell",
+                        cs.Quantity,
+                        cs.DollarAmount,
+                        cs.When.ToString(DATE_FORMAT)
                     };
 
                 default:

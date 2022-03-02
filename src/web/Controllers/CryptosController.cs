@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using core.Cryptos.Handlers;
 using core.Cryptos.Views;
-using core.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -53,5 +52,9 @@ namespace web.Controllers
 
             return this.OkOrError(await _mediator.Send(cmd));
         }
+
+        [HttpGet("export")]
+        public Task<ActionResult> Export() =>
+            this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
     }
 }
