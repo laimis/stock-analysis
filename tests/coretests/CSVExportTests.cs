@@ -1,5 +1,6 @@
 using System;
 using core;
+using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Stocks;
@@ -19,6 +20,22 @@ namespace coretests
 
             Assert.Contains(CSVExport.STOCK_HEADER, report);
             Assert.Contains("TSLA", report);
+        }
+
+        [Fact]
+        public void ExportCryptos()
+        {
+            var crypto = new OwnedCrypto("btc", Guid.NewGuid());
+
+            crypto.Purchase(quantity: 1.2m, dollarAmountSpent: 200, date: DateTimeOffset.UtcNow);
+            crypto.Sell(quantity: 0.2m, dollarAmountReceived: 100, date: DateTimeOffset.UtcNow);
+
+            var report = CSVExport.Generate(new[] {crypto});
+
+            Assert.Contains(CSVExport.CRYPTOS_HEADER, report);
+            Assert.Contains("BTC", report);
+            Assert.Contains("buy", report);
+            Assert.Contains("sell", report);
         }
 
         [Fact]
