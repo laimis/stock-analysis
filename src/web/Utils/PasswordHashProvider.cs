@@ -13,7 +13,7 @@ namespace web.Utils
         {
             return Generate(
                 Encoding.UTF8.GetBytes(password),
-                GenerateRandomCryptographicBytes(saltLength)
+                RandomNumberGenerator.GetBytes(saltLength)
             );
         }
 
@@ -34,14 +34,6 @@ namespace web.Utils
             passwordWithSaltBytes.AddRange(saltBytes);
             byte[] hashBytes = SHA512.Create().ComputeHash(passwordWithSaltBytes.ToArray());
             return (Convert.ToBase64String(hashBytes), Convert.ToBase64String(saltBytes));
-        }
-
-        private static byte[] GenerateRandomCryptographicBytes(int keyLength)
-        {
-            var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-            byte[] randomBytes = new byte[keyLength];
-            rngCryptoServiceProvider.GetBytes(randomBytes);
-            return randomBytes;
         }
     }
 }

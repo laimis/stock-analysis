@@ -20,14 +20,13 @@ namespace core.Cryptos.Handlers
             {
             }
 
-            public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
-            {
-                var cryptos = await _storage.GetCryptos(request.UserId);
-
-                var filename = CSVExport.GenerateFilename("cryptos");
-
-                return new ExportResponse(filename, CSVExport.Generate(cryptos));
-            }
+            public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken) =>
+                new ExportResponse(
+                    CSVExport.GenerateFilename("cryptos"),
+                    CSVExport.Generate(
+                        (await _storage.GetCryptos(request.UserId))
+                    )
+                );
         }
     }
 }
