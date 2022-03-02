@@ -24,7 +24,7 @@ namespace web
         {
             AuthHelper.Configure(Configuration, services);
 
-            services.AddControllers().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers();
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
