@@ -136,7 +136,7 @@ namespace core.Cryptos
             );
         }
 
-        public void Sell(decimal quantity, decimal dollarAmountReceived, DateTimeOffset date, string notes)
+        public void Sell(decimal quantity, decimal dollarAmountReceived, DateTimeOffset date, string notes = null)
         {
             if (quantity > State.Quantity)
             {
