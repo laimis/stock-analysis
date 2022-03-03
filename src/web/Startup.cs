@@ -7,17 +7,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using web.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory)
         {
+            Logger = loggerFactory.CreateLogger<Startup>();
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
+        public ILogger Logger { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -45,7 +50,7 @@ namespace web
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            DIHelper.RegisterServices(Configuration, services);
+            DIHelper.RegisterServices(Configuration, services, Logger);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

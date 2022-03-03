@@ -24,7 +24,10 @@ namespace web
 {
     public class DIHelper
     {
-        internal static void RegisterServices(IConfiguration configuration, IServiceCollection services)
+        internal static void RegisterServices(
+            IConfiguration configuration,
+            IServiceCollection services,
+            ILogger logger)
         {
             services.AddSingleton<IEXClient>(s =>
                 new IEXClient(
@@ -67,10 +70,10 @@ namespace web
             services.AddHostedService<ThirtyDaySellService>();
             services.AddHostedService<UserChangedScheduler>();
             
-            StorageRegistrations(configuration, services);
+            StorageRegistrations(configuration, services, logger);
         }
 
-        private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services)
+        private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)
         {
             var storage = configuration.GetValue<string>("storage");
 
@@ -80,7 +83,7 @@ namespace web
             }
             else if (storage == "redis")
             {
-                RegisterRedisImplemenations(configuration, services);
+                RegisterRedisImplemenations(configuration, services, logger);
             }
             else
             {
@@ -90,9 +93,10 @@ namespace web
             }
         }
 
-        private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services)
+        private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services, ILogger logger)
         {
             var cnn = configuration.GetValue<string>("REDIS_CNN");
+            
             services.AddSingleton<IAccountStorage>(s =>
             {
                 return new storage.redis.AccountStorage(s.GetRequiredService<IMediator>(), cnn);
