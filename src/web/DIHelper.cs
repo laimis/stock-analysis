@@ -85,12 +85,31 @@ namespace web
             {
                 RegisterRedisImplemenations(configuration, services, logger);
             }
+            else if (storage == "memory")
+            {
+                RegisterMemoryImplementations(configuration, services);
+            }
             else
             {
                 throw new InvalidOperationException(
-                    $"configuration 'storage' has value '{storage}', only 'redis' or 'postgres' is supported"
+                    $"configuration 'storage' has value '{storage}', only 'redis', 'postgres', or 'memory' is supported"
                 );
             }
+        }
+
+        private static void RegisterMemoryImplementations(IConfiguration configuration, IServiceCollection services)
+        {
+            services.AddSingleton<IAccountStorage>(s =>
+                new storage.memory.AccountStorage(s.GetRequiredService<IMediator>())
+            );
+
+            services.AddSingleton<IAggregateStorage>(s =>
+                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IMediator>())
+            );
+
+            services.AddSingleton<IBlobStorage>(s =>
+                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IMediator>())
+            );
         }
 
         private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services, ILogger logger)

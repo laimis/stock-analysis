@@ -103,7 +103,7 @@ namespace core.Stocks
 
             private class StockRecord
             {
-                public int amount { get; set; }
+                public decimal amount { get; set; }
                 public string type { get; set; }
                 public DateTimeOffset? date { get; set; }
                 public decimal price { get; set; }

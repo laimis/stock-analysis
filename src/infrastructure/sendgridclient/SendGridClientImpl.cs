@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using core.Adapters.Emails;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -8,37 +9,66 @@ namespace sendgridclient
 {
     public class SendGridClientImpl : IEmailService
     {
-        private string _key;
+        private SendGridClient _sendGridClient;
         private const string NO_REPLY = "noreply@nightingaletrading.com";
 
         public SendGridClientImpl(string apiKey)
         {
-            _key = apiKey;
+            if (apiKey != null)
+            {
+                _sendGridClient = new SendGridClient(apiKey);
+            }
         }
 
-        public async Task Send(string to, Sender sender, string subject, string body)
+        public Task Send(string to, Sender sender, string subject, string body)
         {
-            var client = new SendGridClient(_key);
+            return _sendGridClient switch {
+                not null => SendWithClient(to, sender, subject, body),
+                null => SendWithoutClient(to, sender, subject, body)
+            };
+        }
+
+        private Task SendWithoutClient(string to, Sender sender, string subject, string body)
+        {
+            Console.WriteLine($"Sending email to {to} with subject {subject} and body {body}");
+            return Task.CompletedTask;
+        }
+
+        private async Task SendWithClient(string to, Sender sender, string subject, string body)
+        {
             var fromAddr = new EmailAddress(sender.Email, sender.Name);
             var toAddr = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromAddr, toAddr, subject, body, null);
             
-            var response = await client.SendEmailAsync(msg);
+            var response = await _sendGridClient.SendEmailAsync(msg);
 
             Console.WriteLine("Sendgrid response: " + response.StatusCode);
             
-            var err = await response.Body.ReadAsStringAsync();
+            var responseBody = await response.Body.ReadAsStringAsync();
 
-            Console.WriteLine("Sendgrid response: " + err);
+            Console.WriteLine("Sendgrid response: " + responseBody);
         }
 
-        public async Task Send(
+        public Task Send(
             string recipient,
             Sender sender,
             EmailTemplate template,
             object properties)
         {
-            var client = new SendGridClient(_key);
+            return _sendGridClient switch {
+                not null => SendWithClient(recipient, sender, template, properties),
+                null => SendWithoutClient(recipient, sender, template, properties)
+            };
+        }
+
+        private Task SendWithoutClient(string recipient, Sender sender, EmailTemplate template, object properties)
+        {
+            Console.WriteLine($"Sending email to {recipient} with template {template.Id} and body {JsonConvert.SerializeObject(properties)}");
+            return Task.CompletedTask;
+        }
+
+        private async Task SendWithClient(string recipient, Sender sender, EmailTemplate template, object properties)
+        {
             var from = new EmailAddress(sender.Email, sender.Name);
             var to = new EmailAddress(recipient);
             
@@ -46,11 +76,11 @@ namespace sendgridclient
                 from, to, template.Id, properties
             );
             
-            var response = await client.SendEmailAsync(msg);
+            var response = await _sendGridClient.SendEmailAsync(msg);
 
-            var err = await response.Body.ReadAsStringAsync();
+            var responseBody = await response.Body.ReadAsStringAsync();
 
-            Console.WriteLine($"Sendgrid status {response.StatusCode} with body: {err}");
+            Console.WriteLine($"Sendgrid status {response.StatusCode} with body: {responseBody}");
         }
     }
 }
