@@ -7,7 +7,6 @@ using Xunit;
 
 namespace storagetests.memory
 {
-    [Trait("Category", "Database")]
     public class AggregateStorageTests
     {
         [Fact]

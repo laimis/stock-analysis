@@ -6,7 +6,6 @@ using Xunit;
 
 namespace storagetests.memory
 {
-    [Trait("Category", "Database")]
     public class MemoryPortfolioStorageTests : PortfolioStorageTests
     {
         protected override IPortfolioStorage CreateStorage()

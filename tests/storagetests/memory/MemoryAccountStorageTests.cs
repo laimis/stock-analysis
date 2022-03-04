@@ -4,7 +4,6 @@ using Xunit;
 
 namespace storagetests.memory
 {
-    [Trait("Category", "Database")]
     public class MemoryAccountStorageTests : AccountStorageTests
     {
         protected override IAccountStorage GetStorage()
