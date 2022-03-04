@@ -2,7 +2,6 @@
 using storage.memory;
 using storage.shared;
 using storage.tests;
-using Xunit;
 
 namespace storagetests.memory
 {

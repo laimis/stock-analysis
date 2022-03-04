@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace web.BackgroundServices
         private ILogger<UserChangedScheduler> _logger;
         private IMediator _mediator;
 
-        public static Queue<ScheduleUserChanged> _queue = new Queue<ScheduleUserChanged>();
+        public static ConcurrentQueue<ScheduleUserChanged> _queue = new ConcurrentQueue<ScheduleUserChanged>();
         public static void Schedule(ScheduleUserChanged e) => _queue.Enqueue(e);
 
         public UserChangedScheduler(
@@ -52,7 +53,7 @@ namespace web.BackgroundServices
 
         private Task Loop(CancellationToken stoppingToken)
         {
-            if (_queue.TryDequeue(out var r))
+            while (_queue.TryDequeue(out var r))
             {
                 _userLastIssued.TryGetValue(r.UserId, out var lastScheduled);
                 if (r.When > lastScheduled)
