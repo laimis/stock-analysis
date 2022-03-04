@@ -10,7 +10,7 @@ namespace web
     {
         internal static void Configure(IConfiguration configuration, IServiceCollection services)
         {
-            services.AddAuthentication(options =>
+            var authBuilder = services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -20,12 +20,17 @@ namespace web
             {
                 opt.Cookie.Name = "tw";
                 opt.EventsType = typeof(CookieEvents);
-            })
-            .AddGoogle("Google", options =>
-            {
-                options.ClientId = configuration.GetValue<string>("GoogleClientId");
-                options.ClientSecret = configuration.GetValue<string>("GoogleSecret");
             });
+
+            var googleClientId = configuration.GetValue<string>("GoogleClientId");
+            if (googleClientId != null)
+            {
+                authBuilder.AddGoogle("Google", options =>
+                {
+                    options.ClientId = googleClientId;
+                    options.ClientSecret = configuration.GetValue<string>("GoogleSecret");
+                });   
+            }
 
             services.AddAuthorization(opt => 
                 opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Email, "laimis@gmail.com"))
