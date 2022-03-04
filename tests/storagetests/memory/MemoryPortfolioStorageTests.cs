@@ -7,7 +7,7 @@ using Xunit;
 namespace storagetests.memory
 {
     [Trait("Category", "Database")]
-    public class PortfolioStorageTests : PortfolioStorageTests
+    public class MemoryPortfolioStorageTests : PortfolioStorageTests
     {
         protected override IPortfolioStorage CreateStorage()
         {
