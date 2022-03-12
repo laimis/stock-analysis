@@ -26,7 +26,7 @@ jobs:
         owner: ${{ github.repository_owner }}
         name: ${{ github.repository }}
         branch: ${{ github.ref }}
-        dir: ${{ './github-actions/DotNet.GitHubAction' }}
+        dir: ${{ './laimis/stock-analysis' }}
 
     # Create a pull request if there are changes.
     - name: Create pull request
