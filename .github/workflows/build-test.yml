@@ -8,7 +8,6 @@ on:
             - 'v*'
         paths-ignore:
             - 'todo.txt'
-            - '.github\workflows\*'
 
 jobs:
   build:
