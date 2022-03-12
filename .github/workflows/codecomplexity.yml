@@ -1,0 +1,38 @@
+name: '.NET code metrics'
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+    # Ignore CODE_METRICS.md and README.md files
+    - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: write
+        pull-requests: write
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Analyze repositories source metrics:
+    # Create (or update) CODE_METRICS.md file.
+    - name: .NET code metrics
+      id: dotnet-code-metrics
+      uses: dotnet/samples/github-actions/DotNet.GitHubAction@main
+      with:
+        owner: ${{ github.repository_owner }}
+        name: ${{ github.repository }}
+        branch: ${{ github.ref }}
+        dir: ${{ './github-actions/DotNet.GitHubAction' }}
+
+    # Create a pull request if there are changes.
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@v3.4.1
+      if: ${{ steps.dotnet-code-metrics.outputs.updated-metrics }} == 'true'
+      with:
+        title: '${{ steps.dotnet-code-metrics.outputs.summary-title }}'
+        body: '${{ steps.dotnet-code-metrics.outputs.summary-details }}'
+        commit-message: '.NET code metrics, automated pull request.'
