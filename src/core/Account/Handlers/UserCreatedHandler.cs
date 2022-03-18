@@ -48,7 +48,7 @@ namespace core.Account
             var confirmurl = $"{EmailSettings.ConfirmAccountUrl}/{request.Id}";
 
             await _email.Send(
-                u.State.Email,
+                new Recipient(email: u.State.Email, name: u.State.Name),
                 Sender.NoReply,
                 EmailTemplate.ConfirmAccount,
                 new { confirmurl }

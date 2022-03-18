@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using core;
 using core.Cryptos;
 using core.Notes;

@@ -146,7 +146,12 @@ namespace core.Admin
                     timestamp = date.ToString("yyyy-MM-dd HH:mm:ss") + " UTC"
                 };
 
-                await _emails.Send(u.email, Sender.Support, EmailTemplate.ReviewEmail, data);
+                await _emails.Send(
+                    new Recipient(email: u.email, name: null),
+                    Sender.Support,
+                    EmailTemplate.ReviewEmail,
+                    data
+                );
 
                 return data;
             }

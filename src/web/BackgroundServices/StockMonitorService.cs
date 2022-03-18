@@ -140,7 +140,12 @@ namespace web.BackgroundServices
 
                 var data = new { alerts = alerts.Select(Map) };
 
-                await _emails.Send(u.State.Email, Sender.NoReply, EmailTemplate.Alerts, data);
+                await _emails.Send(
+                    new Recipient(email: u.State.Email, name: u.State.Name),
+                    Sender.NoReply,
+                    EmailTemplate.Alerts,
+                    data
+                );
             }
         }
 

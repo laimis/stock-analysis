@@ -25,7 +25,7 @@ namespace core.Account
             }
 
             await _email.Send(
-                u.State.Email,
+                new Recipient(email: u.State.Email, name: u.State.Name),
                 Sender.Support,
                 EmailTemplate.NewUserWelcome,
                 new {}

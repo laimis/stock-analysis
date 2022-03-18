@@ -37,7 +37,7 @@ namespace core.Account
             var reseturl = $"{EmailSettings.PasswordResetUrl}/{association.Id}";
 
             await _email.Send(
-                u.State.Email,
+                new Recipient(email: u.State.Email, name: u.State.Name),
                 Sender.NoReply,
                 EmailTemplate.PasswordReset,
                 new {reseturl}

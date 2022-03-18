@@ -97,7 +97,7 @@ namespace web.BackgroundServices
             if (sellsOfInterest.Count > 0)
             {
                 await _emails.Send(
-                    recipient: p.email,
+                    recipient: new Recipient(email: p.email, name: null),
                     Sender.NoReply,
                     template: EmailTemplate.SellAlert,
                     new { sells = sellsOfInterest }

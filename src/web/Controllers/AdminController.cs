@@ -71,7 +71,7 @@ namespace web.Controllers
         public async Task<ActionResult> Email(EmailInput obj)
         {
             await _email.Send(
-                obj.To,
+                new Recipient(email: obj.To, name: null),
                 new Sender(obj.From, obj.FromName),
                 obj.Subject,
                 obj.Body
@@ -86,7 +86,7 @@ namespace web.Controllers
             var user = await _storage.GetUser(userId);
 
             await _email.Send(
-                user.State.Email,
+                new Recipient(email: user.State.Email, name: user.State.Name),
                 new Sender("support@nightingaletrading.com", "Nightingale Trading"),
                 EmailTemplate.NewUserWelcome,
                 new object()
