@@ -20,24 +20,24 @@ namespace sendgridclient
             }
         }
 
-        public Task Send(string to, Sender sender, string subject, string body)
+        public Task Send(Recipient recipient, Sender sender, string subject, string body)
         {
             return _sendGridClient switch {
-                not null => SendWithClient(to, sender, subject, body),
-                null => SendWithoutClient(to, sender, subject, body)
+                not null => SendWithClient(recipient, sender, subject, body),
+                null => SendWithoutClient(recipient, sender, subject, body)
             };
         }
 
-        private Task SendWithoutClient(string to, Sender sender, string subject, string body)
+        private Task SendWithoutClient(Recipient recipient, Sender sender, string subject, string body)
         {
-            Console.WriteLine($"Sending email to {to} with subject {subject} and body {body}");
+            Console.WriteLine($"Sending email to {recipient.Email} with subject {subject} and body {body}");
             return Task.CompletedTask;
         }
 
-        private async Task SendWithClient(string to, Sender sender, string subject, string body)
+        private async Task SendWithClient(Recipient recipient, Sender sender, string subject, string body)
         {
-            var fromAddr = new EmailAddress(sender.Email, sender.Name);
-            var toAddr = new EmailAddress(to);
+            var fromAddr = new EmailAddress(email: sender.Email, name: sender.Name);
+            var toAddr = new EmailAddress(email: recipient.Email, name: recipient.Name);
             var msg = MailHelper.CreateSingleEmail(fromAddr, toAddr, subject, body, null);
             
             var response = await _sendGridClient.SendEmailAsync(msg);
@@ -50,7 +50,7 @@ namespace sendgridclient
         }
 
         public Task Send(
-            string recipient,
+            Recipient recipient,
             Sender sender,
             EmailTemplate template,
             object properties)
@@ -61,16 +61,16 @@ namespace sendgridclient
             };
         }
 
-        private Task SendWithoutClient(string recipient, Sender sender, EmailTemplate template, object properties)
+        private Task SendWithoutClient(Recipient recipient, Sender sender, EmailTemplate template, object properties)
         {
             Console.WriteLine($"Sending email to {recipient} with template {template.Id} and body {JsonConvert.SerializeObject(properties)}");
             return Task.CompletedTask;
         }
 
-        private async Task SendWithClient(string recipient, Sender sender, EmailTemplate template, object properties)
+        private async Task SendWithClient(Recipient recipient, Sender sender, EmailTemplate template, object properties)
         {
-            var from = new EmailAddress(sender.Email, sender.Name);
-            var to = new EmailAddress(recipient);
+            var from = new EmailAddress(email: sender.Email, name: sender.Name);
+            var to = new EmailAddress(email: recipient.Email, name: recipient.Name);
             
             var msg = MailHelper.CreateSingleTemplateEmail(
                 from, to, template.Id, properties

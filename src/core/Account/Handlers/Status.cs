@@ -69,7 +69,7 @@ namespace core.Account
                     Email = user.State.Email,
                     Firstname = user.State.Firstname,
                     Lastname = user.State.Lastname,
-                    IsAdmin = user.State.Email == EmailSettings.Admin,
+                    IsAdmin = user.State.Email == EmailSettings.Admin.Email,
                     SubscriptionLevel = user.State.SubscriptionLevel
                 };
             }

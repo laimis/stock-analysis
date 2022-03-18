@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.CSV;
+using core.Adapters.Emails;
 using core.Options;
 using core.Shared;
 using core.Stocks;
@@ -26,13 +28,21 @@ namespace core.Transactions.Handlers
 
         public class Handler : IRequestHandler<Command, CommandResponse>
         {
+            private IEmailService _emailService;
             private IMediator _mediator;
             private ICSVParser _parser;
+            private IAccountStorage _storage;
 
-            public Handler(IMediator mediator, ICSVParser parser)
+            public Handler(
+                IEmailService emailService,
+                IMediator mediator,
+                ICSVParser parser,
+                IAccountStorage storage)
             {
+                _emailService = emailService;
                 _mediator = mediator;
                 _parser = parser;
+                _storage = storage;
             }
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
@@ -43,10 +53,16 @@ namespace core.Transactions.Handlers
                     return CommandResponse.Failed(err);
                 }
 
+                var user = await _storage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    return CommandResponse.Failed("User not found");
+                }
+
                 var errors = new List<string>();
                 try
                 {
-                    foreach(var cmd in GetCommands(records))
+                    foreach (var cmd in GetCommands(records))
                     {
                         cmd.WithUserId(request.UserId);
                         var response = await _mediator.Send(cmd);
@@ -56,18 +72,59 @@ namespace core.Transactions.Handlers
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    return CommandResponse.Failed(
-                        $"Entry Failed: {ex}"
+                    await SendEmail(
+                        user: user,
+                        subject: "Failed to import transactions",
+                        body: ex.ToString()
                     );
+
+                    return CommandResponse.Failed($"Entry Failed: {ex}");
                 }
 
-                return errors.Count switch {
-                    0 => CommandResponse.Success(),
-                    _ => CommandResponse.Failed(string.Join(",", errors))
-                } ;
+                var onFinished = errors.Count switch
+                {
+                    0 => AfterSuccess(user),
+                    _ => AfterFailure(errors, user)
+                };
+
+                return await onFinished;
             }
+
+            private async Task<CommandResponse> AfterFailure(List<string> errors, User user)
+            {
+                var body = string.Join(",", errors);
+
+                await _emailService.Send(
+                    recipient: new Recipient(email: user.State.Email, name: user.State.Name),
+                    sender: Sender.NoReply,
+                    subject: "Failed to import transactions",
+                    body: body
+                );
+
+                return CommandResponse.Failed(body);
+            }
+
+            private async Task<CommandResponse> AfterSuccess(User user)
+            {
+                await _emailService.Send(
+                    recipient: new Recipient(email: user.State.Email, name: user.State.Name),
+                    sender: Sender.NoReply,
+                    subject: "Finished importing transactions",
+                    body: ""
+                );
+
+                return CommandResponse.Success();
+            }
+
+            private Task SendEmail(User user, string subject, string body) =>
+                _emailService.Send(
+                    recipient: new Recipient(email: user.State.Email, name: user.State.Name),
+                    sender: Sender.NoReply,
+                    subject: subject,
+                    body: body
+                );
 
             private IEnumerable<RequestWithUserIdBase> GetCommands(IEnumerable<TransactionRecord> records)
             {

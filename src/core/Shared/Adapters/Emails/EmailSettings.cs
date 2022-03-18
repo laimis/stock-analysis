@@ -2,10 +2,21 @@ namespace core.Adapters.Emails
 {
     public static class EmailSettings
     {
-        public const string Admin = "laimis@gmail.com";
-
+        public static readonly Recipient Admin = new Recipient(email: "laimis@gmail.com", name: null);
         public const string PasswordResetUrl = "https://www.nightingaletrading.com/profile/passwordreset";
         public const string ConfirmAccountUrl = "https://www.nightingaletrading.com/api/account/confirm";
+    }
+
+    public struct Recipient
+    {
+        public Recipient(string email, string name)
+        {
+            Email = email;
+            Name = name;
+        }
+
+        public string Email { get; set; }
+        public string Name { get; set; }
     }
 
     public struct Sender
