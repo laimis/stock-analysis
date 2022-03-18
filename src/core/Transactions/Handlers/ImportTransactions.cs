@@ -59,6 +59,8 @@ namespace core.Transactions.Handlers
                     return CommandResponse.Failed("User not found");
                 }
 
+                await SendEmail(user, subject: "Started importing transactions", body: "");
+
                 var errors = new List<string>();
                 try
                 {
