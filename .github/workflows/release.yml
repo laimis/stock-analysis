@@ -33,7 +33,7 @@ jobs:
             docker build -t $ECR_REGISTRY:${IMAGE_TAG} .
             docker image ls
             echo "pushing $ECR_REGISTRY:${IMAGE_TAG}"
-            docker push $ECR_REPOSITORY:${IMAGE_TAG}
+            docker push registry.digitalocean.com/nightingale-trading/web:latest
             echo "::set-output name=image::$ECR_REPOSITORY:${IMAGE_TAG}"
       
       - name: Create Release
