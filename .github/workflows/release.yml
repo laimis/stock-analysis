@@ -24,7 +24,7 @@ jobs:
       - name: Build, tag, and push image to DigitalOcean
         id: build-image
         env:
-            ECR_REGISTRY: ${{ secrets.DIGITALOCEAN_REGISTRY }}
+            ECR_REGISTRY: registry.digitalocean.com/nightingale-trading/web
         run: |
             IMAGE_TAG=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
             # rename it to latest, that's what I use right now
