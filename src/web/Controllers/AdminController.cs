@@ -87,7 +87,7 @@ namespace web.Controllers
 
             await _email.Send(
                 new Recipient(email: user.State.Email, name: user.State.Name),
-                new Sender("support@nightingaletrading.com", "Nightingale Trading"),
+                Sender.Support,
                 EmailTemplate.NewUserWelcome,
                 new object()
             );
