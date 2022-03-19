@@ -11,35 +11,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to DigitalOcean
+        run: doctl registry login
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push image to DigitalOcean
         id: build-image
         env:
-            ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-            ECR_REPOSITORY: stock-site
+            ECR_REGISTRY: ${{ secrets.DIGITALOCEAN_REGISTRY }}
         run: |
             IMAGE_TAG=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
-            # Build a docker container and
-            # push it to ECR so that it can
-            # be deployed to ECS.
-            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG} .
-            docker tag $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG} $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}"
+            # rename it to latest, that's what I use right now
+            IMAGE_TAG=latest
+            docker build -t $ECR_REGISTRY:${IMAGE_TAG} .
+            docker push $ECR_REPOSITORY:${IMAGE_TAG}
+            echo "::set-output name=image::$ECR_REPOSITORY:${IMAGE_TAG}"
       
       - name: Create Release
         id: create_release
