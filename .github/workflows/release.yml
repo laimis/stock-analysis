@@ -29,7 +29,9 @@ jobs:
             IMAGE_TAG=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
             # rename it to latest, that's what I use right now
             IMAGE_TAG=latest
+            echo "building $ECR_REGISTRY:${IMAGE_TAG}"
             docker build -t $ECR_REGISTRY:${IMAGE_TAG} .
+            echo "pushing $ECR_REGISTRY:${IMAGE_TAG}"
             docker push $ECR_REPOSITORY:${IMAGE_TAG}
             echo "::set-output name=image::$ECR_REPOSITORY:${IMAGE_TAG}"
       
