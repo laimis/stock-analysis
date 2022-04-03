@@ -8,7 +8,6 @@ services:
       IEXClientToken: iex token
       GoogleClientId: google client id
       GoogleSecret: google secret
-      storage: redis (use 'postgres' if running on postgres)
-      REDIS_CNN: redis connection string
+      storage: postgres (you can also use 'memory' but data will be gone on restarts)
       DB_CNN: postgres connection string
       SENDGRID_API_KEY: api key from send grid

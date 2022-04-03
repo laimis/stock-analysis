@@ -86,6 +86,11 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
 
     public Task Save<T>(string key, T t)
     {
+        if (t == null)
+        {
+            throw new ArgumentNullException(nameof(t));
+        }
+        
         _blobs[key] = t;
         return Task.CompletedTask;
     }

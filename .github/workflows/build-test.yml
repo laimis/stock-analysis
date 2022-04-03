@@ -25,4 +25,4 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-      run: dotnet test /p:CollectCoverage=true --filter "Category!=Integration&Category!=Redis&Category!=Postgres"
+      run: dotnet test /p:CollectCoverage=true --filter "Category!=Integration&Category!=Postgres"

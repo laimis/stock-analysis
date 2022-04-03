@@ -1,6 +1,6 @@
 # Project for tracking stock, option, and crypto currency buys and sells
 
-The site allows to track stock, option, and crypto currency purchases. For storage it can use redis, postgres, or in-memory storage. BE AWARE: in-memory storage is cleared on each restart.
+The site allows to track stock, option, and crypto currency purchases. For storage it can use postgres or in-memory storage. BE AWARE: in-memory storage is cleared on each restart.
 
 Stock information is fetched using IEX API (https://iexcloud.io/docs/api/), and for crypto CoinMarketCap API (https://coinmarketcap.com/api) is used. For both you will need your own key when running the project.
 # Current Build and Release status
@@ -21,7 +21,7 @@ ASP.NET core, background tasks for stock price monitoring and 30 day sell remind
 
 ## Storage
 
-Supports Postgres, Redis, In-Memory for storing information.
+Supports Postgres and In-Memory for storing information.
 
 ## Deployments
 
