@@ -5,7 +5,7 @@ using Xunit;
 
 namespace storagetests.postgres
 {
-    [Trait("Category", "Database")]
+    [Trait("Category", "Postgres")]
     public class PostgresAccountStorageTests : AccountStorageTests
     {
         protected override IAccountStorage GetStorage()

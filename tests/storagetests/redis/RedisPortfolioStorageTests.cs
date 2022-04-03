@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using core;
+﻿using core;
 using storage.redis;
 using storage.shared;
 using storage.tests;
@@ -8,7 +6,7 @@ using Xunit;
 
 namespace storagetests.redis
 {
-    [Trait("Category", "Database")]
+    [Trait("Category", "Redis")]
     public class RedisPortfolioStorageTests : PortfolioStorageTests
     {
         protected override IPortfolioStorage CreateStorage()

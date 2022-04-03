@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using core.Shared;
 using Dapper;
 using MediatR;
+using Newtonsoft.Json;
 using Npgsql;
 using storage.shared;
 
 namespace storage.postgres
 {
-    public class PostgresAggregateStorage : IAggregateStorage
+    public class PostgresAggregateStorage : IAggregateStorage, IBlobStorage
     {
         private IMediator _mediator;
         protected string _cnn;
@@ -120,6 +121,31 @@ namespace storage.postgres
 
                 return list;
             }
+        }
+
+        public async Task<T> Get<T>(string key)
+        {
+            using var db = GetConnection();
+
+            var query = @"select blob FROM blobs WHERE key = :key";
+
+            var blob = await db.QuerySingleOrDefaultAsync<string>(query, new { key });
+
+            if (string.IsNullOrEmpty(blob))
+                return default;
+
+            return JsonConvert.DeserializeObject<T>(blob);
+        }
+
+        public Task Save<T>(string key, T t)
+        {
+            var blob = JsonConvert.SerializeObject(t);
+
+            using var db = GetConnection();
+
+            var query = @"INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp)";
+
+            return db.ExecuteAsync(query, new { key, blob });
         }
     }
 }

@@ -143,6 +143,10 @@ namespace web
             {
                 return new storage.postgres.AccountStorage(s.GetRequiredService<IMediator>(), cnn);
             });
+            services.AddSingleton<IBlobStorage>(s =>
+            {
+                return new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
+            });
             services.AddSingleton<IAggregateStorage>(s =>
             {
                 return new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
