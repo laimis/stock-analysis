@@ -1,0 +1,20 @@
+.badge-level-3-success {
+    background-color: #228B22;
+}
+.badge-level-3-failure {
+    background-color: #880808;
+}
+
+.badge-level-2-success {
+    background-color: #50C878;
+}
+.badge-level-2-failure {
+    background-color: #D22B2B;
+}
+
+.badge-level-1-success {
+    background-color: #AFE1AF;
+}
+.badge-level-1-failure {
+    background-color: #FAA0A0;
+}

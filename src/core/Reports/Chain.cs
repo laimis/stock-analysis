@@ -38,12 +38,21 @@ namespace core.Reports
                     .Select(t => new
                     {
                         success = t.Profit >= 0,
-                        ticker = t.Ticker
+                        ticker = t.Ticker,
+                        level = GetLevel(t)
                     })
                     .ToList();
 
                 return new { links };
             }
+
+            private int GetLevel(StockTransactionView t) =>
+                Math.Abs(t.Profit) switch
+                {
+                    var p when p > 1000 => 3,
+                    var p when p > 500 => 2,
+                    _ => 1
+                };
         }
     }
 }
