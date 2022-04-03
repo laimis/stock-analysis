@@ -7,7 +7,7 @@ using Xunit;
 
 namespace storagetests.postgres
 {
-    [Trait("Category", "Postgresgit ")]
+    [Trait("Category", "Postgres")]
     public class PostgresPortfolioStorageTests : PortfolioStorageTests
     {
         protected string _cnn = null;
