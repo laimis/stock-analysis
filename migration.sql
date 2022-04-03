@@ -1,3 +1,7 @@
+CREATE DATABASE stockanalysis;
+create user ___ with encrypted password ___;
+grant all privileges on database stockanalysis to stockanalysis;
+
 CREATE TABLE analysis (
 	ticker TEXT,
 	created TIMESTAMP,
@@ -75,3 +79,10 @@ CREATE TABLE processidtouserassociations (
 ALTER TABLE processidtouserassociations OWNER TO stocks;
 
 CREATE UNIQUE INDEX processidtouserassociations_id ON processidtouserassociations USING BTREE(id);
+
+CREATE TABLE blobs (
+	key text,
+	blob text,
+	inserted timestamp,
+	PRIMARY KEY (key) 
+);

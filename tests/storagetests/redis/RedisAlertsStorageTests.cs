@@ -5,7 +5,7 @@ using Xunit;
 
 namespace storagetests.redis
 {
-    [Trait("Category", "Database")]
+    [Trait("Category", "Redis")]
     public class RedisAlertsStorageTests : AlertsStorageTests
     {
         protected override IAlertsStorage GetStorage()

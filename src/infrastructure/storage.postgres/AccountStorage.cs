@@ -96,12 +96,12 @@ namespace storage.postgres
 
         public Task<T> ViewModel<T>(Guid userId)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<T>(default(T));
         }
 
         public Task SaveViewModel<T>(T user, Guid userId)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }
