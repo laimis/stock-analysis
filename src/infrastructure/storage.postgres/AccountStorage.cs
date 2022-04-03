@@ -94,14 +94,12 @@ namespace storage.postgres
             return await db.QueryAsync<(string, string)>(query);
         }
 
-        public Task<T> ViewModel<T>(Guid userId)
-        {
-            return Task.FromResult<T>(default(T));
-        }
+        public Task<T> ViewModel<T>(Guid userId) =>
+            Get<T>(typeof(T).Name + ":" + userId.ToString());
 
-        public Task SaveViewModel<T>(T user, Guid userId)
-        {
-            return Task.CompletedTask;
-        }
+        public Task SaveViewModel<T>(T user, Guid userId) =>
+            Save<T>(
+                typeof(T).Name + ":" + userId.ToString(),
+                user);
     }
 }
