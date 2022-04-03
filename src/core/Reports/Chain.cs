@@ -27,22 +27,6 @@ namespace core.Reports
                 return RealThing(request);
             }
 
-            // public Task<object> Random()
-            // {
-            //     var links = new List<object>();
-
-            //     var rand = new Random();
-
-            //     const int count = 241;
-
-            //     while (links.Count < count)
-            //     {
-            //         links.Add(new { success = rand.NextDouble() >= 0.5 });
-            //     }
-
-            //     return Task.FromResult(new { links });
-            // }
-
             private async Task<object> RealThing(Query request)
             {
                 var stocks = await _storage.GetStocks(request.UserId);
@@ -53,7 +37,8 @@ namespace core.Reports
                     .OrderByDescending(p => p.Date)
                     .Select(t => new
                     {
-                        success = t.Profit >= 0
+                        success = t.Profit >= 0,
+                        ticker = t.Ticker
                     })
                     .ToList();
 

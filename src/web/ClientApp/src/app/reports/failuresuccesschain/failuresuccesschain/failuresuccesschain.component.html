@@ -3,8 +3,11 @@
 
   <div class="mt-5">
     <ul>
-      <span *ngFor="let link of chain.links" class="badge" [ngClass]="{'badge-success': link.success, 'badge-danger': !link.success}">
-      &nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <span
+        *ngFor="let link of chain.links"
+        class="badge mr-2"
+        [ngClass]="{'badge-success': link.success, 'badge-danger': !link.success}">
+      {{link.ticker}}</span>
     </ul>
   </div>
 
