@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using storage.redis;
 using storage.shared;
 using web.Utils;
 
@@ -17,12 +14,10 @@ namespace web.Controllers
     public class EventsController : ControllerBase
     {
         private IAggregateStorage _storage;
-        private Migration _migration;
-
-        public EventsController(IAggregateStorage storage, Migration migration)
+        
+        public EventsController(IAggregateStorage storage)
         {
             _storage = storage;
-            _migration = migration;
         }
 
         [HttpGet]

@@ -31,15 +31,6 @@ Resources:
                 - Key: Name
                   Value: !Ref AWS::StackName
 
-    SecurityGroupRedisIngress:
-        Type: "AWS::EC2::SecurityGroupIngress"
-        Properties:
-            GroupId: "sg-091f6ab93e91f4a6a"
-            IpProtocol: "tcp"
-            FromPort: 6379
-            ToPort: 6379
-            SourceSecurityGroupId: !GetAtt SecurityGroup.GroupId
-
     InstanceRole:
         Type: "AWS::IAM::Role"
         Properties:

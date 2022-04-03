@@ -60,6 +60,11 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task SaveViewModel<T>(T user, Guid userId)
     {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        
         _viewModels[userId] = user;
         return Task.CompletedTask;
     }

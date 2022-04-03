@@ -15,7 +15,6 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using storage.redis;
 using storage.shared;
 using web.BackgroundServices;
 using web.Utils;
@@ -81,10 +80,6 @@ namespace web
             {
                 RegisterPostgresImplemenations(configuration, services);
             }
-            else if (storage == "redis")
-            {
-                RegisterRedisImplemenations(configuration, services, logger);
-            }
             else if (storage == "memory")
             {
                 RegisterMemoryImplementations(configuration, services);
@@ -92,7 +87,7 @@ namespace web
             else
             {
                 throw new InvalidOperationException(
-                    $"configuration 'storage' has value '{storage}', only 'redis', 'postgres', or 'memory' is supported"
+                    $"configuration 'storage' has value '{storage}', only 'postgres' or 'memory' is supported"
                 );
             }
         }
@@ -110,30 +105,6 @@ namespace web
             services.AddSingleton<IBlobStorage>(s =>
                 new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IMediator>())
             );
-        }
-
-        private static void RegisterRedisImplemenations(IConfiguration configuration, IServiceCollection services, ILogger logger)
-        {
-            var cnn = configuration.GetValue<string>("REDIS_CNN");
-            
-            services.AddSingleton<IAccountStorage>(s =>
-            {
-                return new storage.redis.AccountStorage(s.GetRequiredService<IMediator>(), cnn);
-            });
-            services.AddSingleton<IAggregateStorage>(s =>
-            {
-                return new storage.redis.RedisAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
-            });
-            services.AddSingleton<IBlobStorage>(s => 
-            {
-                return new storage.redis.RedisAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
-            });
-            services.AddSingleton<storage.redis.RedisAggregateStorage>(c => 
-                (storage.redis.RedisAggregateStorage)c.GetService<IAggregateStorage>());
-            services.AddSingleton<Migration>(_ =>
-            {
-                return new storage.redis.Migration(cnn);
-            });
         }
 
         private static void RegisterPostgresImplemenations(IConfiguration configuration, IServiceCollection services)
