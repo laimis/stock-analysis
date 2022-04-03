@@ -7,7 +7,7 @@ using Xunit;
 
 namespace storagetests.postgres
 {
-    [Trait("Category", "Postgres")]
+    [Trait("Category", "Postgresgit ")]
     public class PostgresPortfolioStorageTests : PortfolioStorageTests
     {
         protected string _cnn = null;
@@ -17,13 +17,10 @@ namespace storagetests.postgres
             _cnn = Environment.GetEnvironmentVariable("DB_CNN");
         }
 
-        protected override IPortfolioStorage CreateStorage()
-        {
-            
-            return new PortfolioStorage(
+        protected override IPortfolioStorage CreateStorage() =>
+            new PortfolioStorage(
                 new PostgresAggregateStorage(new Fakes.FakeMediator(), _cnn),
                 null
             );
-        }
     }
 }
