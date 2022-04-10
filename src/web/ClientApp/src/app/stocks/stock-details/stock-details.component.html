@@ -1,7 +1,7 @@
 <div *ngIf="loaded" class="mt-2 mb-4">
 
   <div>
-    <div>
+    <div *ngIf="profile">
       <h3>{{profile.symbol}}: {{profile.companyName}}
       <a class="float-right ml-3" href="https://www.cmlviz.com/stocks/{{stock.ticker}}/tear-sheet" target="_blank">
         <img src="cml.png" height="35px" />

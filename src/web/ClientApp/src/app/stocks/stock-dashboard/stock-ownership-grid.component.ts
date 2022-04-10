@@ -80,4 +80,9 @@ export class StockOwnershipGridComponent implements OnInit {
 
     return ticker.equity / total
   }
+
+  highlightRow(ticker:OwnedStock) {
+    return (ticker.category == null && this.selectedCategory == "notset")
+      || this.selectedCategory == ticker.category
+  }
 }

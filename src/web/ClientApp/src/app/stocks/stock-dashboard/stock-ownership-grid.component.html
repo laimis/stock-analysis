@@ -19,7 +19,7 @@
           <th class="text-right sort-header" (click)="sort('daysheld')">Days Held</th>
         </tr>
       </thead>
-      <tr *ngFor="let ticker of owned" [ngClass]="{'bg-warning': selectedCategory == ticker.category}">
+      <tr *ngFor="let ticker of owned" [ngClass]="{'bg-warning': highlightRow(ticker)}">
         <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
         <td>{{ticker.owned}}</td>
         <td class="text-right">{{ticker.price | currency}}</td>

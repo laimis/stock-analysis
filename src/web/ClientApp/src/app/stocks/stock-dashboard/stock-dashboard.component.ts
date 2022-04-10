@@ -81,6 +81,12 @@ export class StockDashboardComponent implements OnInit {
         }
       }
 
+      if (this.selectedCategory == "notset") {
+        if (i.category != null) {
+          continue
+        }
+      }
+
       this.numberOfSharesOwned += i.owned
       this.moneySpentOnShares += i.cost
       this.currentEquity += i.equity
