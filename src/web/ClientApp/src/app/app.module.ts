@@ -58,6 +58,7 @@ import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.c
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
+import { TradingComponent } from './trading/trading.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -92,6 +93,7 @@ var routes = [
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
+  { path: 'trading', component: TradingComponent},
 
   { path: 'stocks', component: StockDashboardComponent},
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
@@ -161,6 +163,7 @@ var routes = [
     SymbolSearchComponent,
     TransactionsComponent,
     TermsComponent,
+    TradingComponent,
 
     FailuresuccesschainComponent,
     RecentSellsComponent,
