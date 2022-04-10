@@ -13,6 +13,15 @@
     <div><b>Invested</b>: {{ invested | currency}} </div>
   </div>
 
+  <div class="row mb-2 mt-2">
+    <div class="col">
+      <label for="singleR">Single R:</label><input type="text" class="form-control" [(ngModel)]="singleR" id="singleR" name="singleR" />
+    </div>
+    <div class="col">
+      <label for="singleR">R:R Target</label><input type="text" class="form-control" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
+    </div>
+  </div>
+
   <div *ngFor="let p of result">
     <h6>{{p.ticker}}</h6>
     <div>
@@ -20,7 +29,8 @@
       <div>Current Price: {{p.price | currency}}</div>
       <div>Gain: {{p.gain | currency}}</div>
       <div>Gain %: {{ ( (p.price - p.averageCost) / p.averageCost ) | percent }}</div>
-      <div>R:R Target: {{ (p.averageCost + (p.averageCost *  0.125)) | currency}}</div>
+      <div>1st Target: {{ p.averageCost + p.averageCost * singleR | currency }}</div>
+      <div>R:R Target: {{ (p.averageCost + (p.averageCost * rrTarget)) | currency}}</div>
     </div>
   </div>
   
