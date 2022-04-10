@@ -32,11 +32,10 @@ namespace core.Options
 
                 var price = await _stockService.GetPrice(option.State.Ticker);
                 
-                var view = new OwnedOptionView(option);
-
-                view.ApplyPrice(price.Success.Amount);
-                
-                return view;
+                return price.IsOk switch {
+                    true => new OwnedOptionView(option, price.Success.Amount),
+                    false => new OwnedOptionView(option)
+                };
             }
         }
     }
