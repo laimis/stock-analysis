@@ -49,29 +49,6 @@ namespace core.Stocks.Views
                 }
 
                 return tradingEntries;
-
-                // var tickers = owned.Select(o => o.Ticker).Distinct();
-
-                // var tickerPrices = await _stocks.GetPrices(tickers);
-
-                // return tickerPrices.IsOk switch
-                // {
-                //     EnrichWithStockPrice(view, tickerPrices.Success)
-                // };
-
-                // var profile = _stocks.GetCompanyProfile(request.Ticker);
-                // var advanced = _stocks.GetAdvancedStats(request.Ticker);
-                // var price = _stocks.GetPrice(request.Ticker);
-                
-                // await Task.WhenAll(profile, advanced, price);
-                
-                // return new StockDetailsView
-                // {
-                //     Ticker = request.Ticker,
-                //     Price = price.Result.Success.Amount,
-                //     Profile = profile.Result.Success,
-                //     Stats = advanced.Result.Success,
-                // };
             }
         }
     }
