@@ -189,7 +189,7 @@ namespace core.Admin
                     var price = await _stocks.GetPrice(group.Key);
                     var advanced = await _stocks.GetAdvancedStats(group.Key);
 
-                    groups.Add(new EmailReviewEntryGroup(group, price, advanced));
+                    groups.Add(new EmailReviewEntryGroup(group, price.Success, advanced.Success));
                 }
 
                 return groups;

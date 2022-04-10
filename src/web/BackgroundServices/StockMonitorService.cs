@@ -118,13 +118,13 @@ namespace web.BackgroundServices
             {
                 var price = await _stocks.GetPrice(t);
 
-                if (price.NotFound)
+                if (!price.IsOk || price.Success.NotFound)
                 {
                     _logger.LogError($"price not found for {t}");
                     continue;
                 }
 
-                foreach(var trigger in _container.UpdateValue(t, price.Amount, DateTimeOffset.UtcNow))
+                foreach(var trigger in _container.UpdateValue(t, price.Success.Amount, DateTimeOffset.UtcNow))
                 {
                     triggered.Add(trigger);
                 }

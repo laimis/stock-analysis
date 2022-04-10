@@ -38,9 +38,9 @@ namespace core.Stocks
                 return new StockDetailsView
                 {
                     Ticker = request.Ticker,
-                    Price = price.Result.Amount,
-                    Profile = profile.Result,
-                    Stats = advanced.Result,
+                    Price = price.Result.Success.Amount,
+                    Profile = profile.Result.Success,
+                    Stats = advanced.Result.Success,
                 };
             }
         }

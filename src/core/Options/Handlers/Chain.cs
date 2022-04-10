@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Options;
+using core.Adapters.Stocks;
 using MediatR;
 
 namespace core.Options
@@ -23,16 +24,18 @@ namespace core.Options
         public class Handler : IRequestHandler<Query, OptionDetailsViewModel>
         {
             private IOptionsService _options;
+            private IStocksService2 _stocks;
 
-            public Handler(IOptionsService options)
+            public Handler(IOptionsService options, IStocksService2 stocks)
             {
                 _options = options;
+                _stocks = stocks;
             }
             
             public async Task<OptionDetailsViewModel> Handle(Query request, CancellationToken cancellationToken)
             {
-                var price = await _options.GetPrice(request.Ticker);
-                if (price.NotFound)
+                var price = await _stocks.GetPrice(request.Ticker);
+                if (!price.IsOk || price.Success.NotFound)
                 {
                     return null;
                 }
@@ -49,7 +52,7 @@ namespace core.Options
                     options.AddRange(details);
                 }
 
-                return MapOptionDetails(price.Amount, options);
+                return MapOptionDetails(price.Success.Amount, options);
             }
         }
 

@@ -50,7 +50,7 @@ namespace core.Alerts
                     var price = await _stock.GetPrice(a.Ticker);
 
                     list.Add(new {
-                        currentPrice = price.Amount,
+                        currentPrice = price.Success.Amount,
                         ticker = a.State.Ticker.Value,
                         points = a.State.PricePoints.Select(pp => new {
                             pp.Id,

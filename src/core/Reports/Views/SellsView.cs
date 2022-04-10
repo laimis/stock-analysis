@@ -22,7 +22,7 @@ namespace core.Reports.Views
                     .GroupBy(s => s.stock.State.Ticker)
                     .Select(g => new {ticker = g.Key, latest = g.OrderByDescending(s => s.buyOrSell.When).First()});
 
-            var prices = await priceFeed.GetPrices(filteredData.Select(s => s.ticker));
+            var prices = (await priceFeed.GetPrices(filteredData.Select(s => s.ticker))).Success;
 
             var sells = filteredData.Select(t => new SellView
                 {

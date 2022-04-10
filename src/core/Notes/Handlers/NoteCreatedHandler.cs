@@ -32,9 +32,11 @@ namespace core.Notes
             var d = await _stocks.GetAdvancedStats(n.State.RelatedToTicker);
             var p = await _stocks.GetPrice(n.State.RelatedToTicker);
 
-            n.Enrich(p, d);
-
-            await _storage.Save(n, n.State.UserId);
+            if (d.IsOk && p.IsOk)
+            {
+                n.Enrich(p.Success, d.Success);
+                await _storage.Save(n, n.State.UserId);
+            }
         }
     }
 }

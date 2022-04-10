@@ -34,7 +34,7 @@ namespace core.Options
                 
                 var view = new OwnedOptionView(option);
 
-                view.ApplyPrice(price.Amount);
+                view.ApplyPrice(price.Success.Amount);
                 
                 return view;
             }

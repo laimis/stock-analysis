@@ -35,7 +35,7 @@ namespace core.Portfolio
                             var adv = await _stocks.GetAdvancedStats(s.State.Ticker);
                             var price = await _stocks.GetPrice(s.State.Ticker);
 
-                            return new GridEntry(s.State.Ticker, price, adv);
+                            return new GridEntry(s.State.Ticker, price.Success, adv.Success);
                         }
                     })
                     .Select(t => t.Result);

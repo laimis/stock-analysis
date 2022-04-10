@@ -1,6 +1,5 @@
 ﻿namespace core.Adapters.Stocks
 {
-
     public class StockQueryResult
     {
         public string Symbol { get; set; }

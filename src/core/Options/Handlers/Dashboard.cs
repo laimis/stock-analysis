@@ -42,12 +42,19 @@ namespace core.Options
                     view.OpenOptions.Select(o => o.Ticker).ToList()
                 );
 
+                return prices.IsOk switch {
+                    false => view,
+                    true => EnrichWithStockPrice(view, prices.Success)
+                };
+            }
+
+            private OptionDashboardView EnrichWithStockPrice(OptionDashboardView view, Dictionary<string, BatchStockPrice> prices)
+            {
                 foreach (var op in view.OpenOptions)
                 {
                     prices.TryGetValue(op.Ticker, out var val);
                     if (val != null) op.ApplyPrice(val.Price);
                 }
-
                 return view;
             }
 
