@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using core.Stocks;
+using core.Stocks.Views;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -134,6 +135,14 @@ namespace web.Controllers
             cmd.WithUserId(User.Identifier());
 
             return this.OkOrError(await _mediator.Send(cmd));
+        }
+
+        [HttpGet("tradingentries")]
+        public Task<TradingEntryView[]> TradingEntries()
+        {
+            var query = new TradingEntries.Query(User.Identifier());
+
+            return _mediator.Send(query);
         }
     }
 }

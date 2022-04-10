@@ -39,6 +39,10 @@ export class StocksService {
     return this.http.get<ReviewList>('/api/portfolio/review?period=' + period)
   }
 
+  getTradingEntries(): Observable<StockTradingGridEntry[]> {
+    return this.http.get<StockTradingGridEntry[]>('/api/stocks/tradingentries')
+  }
+
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionList> {
     if (ticker === null) {
       ticker = ''
@@ -436,6 +440,16 @@ export interface StockGridEntry {
   price: number,
   stats: any,
   ticker: string
+}
+
+export interface StockTradingGridEntry {
+  price: number,
+  stats: any,
+  ticker: string,
+  owned: number,
+  averageCost: number,
+  profitTarget: number,
+  gain: number,
 }
 
 export class OptionDefinition {
