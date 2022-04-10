@@ -37,19 +37,19 @@ namespace iexclienttests
 
             price.Wait();
 
-            Price = price.Result;
+            Price = price.Result.Success;
 
             var search = Client.Search("stitch", 5);
 
             search.Wait();
 
-            SearchResults = search.Result;
+            SearchResults = search.Result.Success;
 
             var advancedStats = Client.GetAdvancedStats("GOOGL");
 
             advancedStats.Wait();
 
-            AdvancedStats = advancedStats.Result;
+            AdvancedStats = advancedStats.Result.Success;
         }
     }
 }

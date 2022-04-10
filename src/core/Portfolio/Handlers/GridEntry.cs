@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using core.Adapters.Stocks;
 
 namespace core.Portfolio

@@ -6,7 +6,6 @@ namespace core.Adapters.Options
     public interface IOptionsService
     {
         Task<string[]> GetOptions(string ticker);
-        Task<Price> GetPrice(string ticker);
         Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate);
     }
 }

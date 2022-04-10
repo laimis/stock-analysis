@@ -34,6 +34,12 @@ namespace core.Options
             if (debits.Any()) PremiumPaid = debits.Sum(t => t.Debit);
         }
 
+        public OwnedOptionView(OwnedOption option, decimal currentPrice)
+            : this(option)
+        {
+            ApplyPrice(currentPrice);
+        }
+
         public void ApplyPrice(decimal price)
         {
             CurrentPrice = price;

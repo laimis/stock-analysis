@@ -23,7 +23,7 @@ namespace iexclienttests
         {
             var stats = await _client.GetAdvancedStats("VIOT");
 
-            _helper.WriteLine("Earnings " + stats.NextEarningsDate);
+            _helper.WriteLine("Earnings " + stats.Success.NextEarningsDate);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace iexclienttests
         {
             var stats = await _client.GetCompanyProfile("VIOT");
 
-            _helper.WriteLine("Country " + stats.Country);
+            _helper.WriteLine("Country " + stats.Success.Country);
         }
 
         [Fact]

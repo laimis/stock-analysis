@@ -31,7 +31,7 @@ namespace core.Tracking.Handlers
                 var a = await _stocksService.GetAdvancedStats(cmd.Ticker);
                 var q = await _stocksService.Quote(cmd.Ticker);
 
-                return new RegisterPreview(c, a, q);
+                return new RegisterPreview(c.Success, a.Success, q.Success);
             }
         }
     }

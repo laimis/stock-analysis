@@ -27,9 +27,17 @@ namespace coretests.Options
                 Id = opt.State.Id
             };
 
+            var mock = new Mock<IStocksService2>();
+            mock.Setup(x => x.GetPrice(opt.State.Ticker))
+                .Returns(Task.FromResult(
+                    new StockServiceResponse<core.Price, string>(
+                        new core.Price(100)
+                    )
+                ));
+
             query.WithUserId(opt.State.UserId);
 
-            var handler = new Details.Handler(storage, Mock.Of<IStocksService2>());
+            var handler = new Details.Handler(storage, mock.Object);
 
             var result = await handler.Handle(query, CancellationToken.None);
 

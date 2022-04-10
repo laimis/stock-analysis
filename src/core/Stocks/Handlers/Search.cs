@@ -27,8 +27,8 @@ namespace core.Stocks
                 _stocksService = stockService2;
             }
 
-            public Task<List<SearchResult>> Handle(Query request, CancellationToken cancellationToken) =>
-                _stocksService.Search(request.Term, 5);
+            public async Task<List<SearchResult>> Handle(Query request, CancellationToken cancellationToken) =>
+                (await _stocksService.Search(request.Term, 5)).Success;
         }
     }
 }

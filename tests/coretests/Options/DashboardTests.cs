@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,15 @@ namespace coretests.Options
             
             var query = new Dashboard.Query(Guid.NewGuid());
 
-            var handler = new Dashboard.Handler(storage, Mock.Of<IStocksService2>());
+            var mock = new Mock<IStocksService2>();
+            mock.Setup(x => x.GetPrices(It.IsAny<IEnumerable<string>>()))
+                .Returns(Task.FromResult(
+                    new StockServiceResponse<Dictionary<string, BatchStockPrice>, string>(
+                        new Dictionary<string, BatchStockPrice>()
+                    )
+                ));
+            
+            var handler = new Dashboard.Handler(storage, mock.Object);
 
             var result = await handler.Handle(query, CancellationToken.None);
 

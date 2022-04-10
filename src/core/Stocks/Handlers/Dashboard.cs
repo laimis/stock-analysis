@@ -31,23 +31,32 @@ namespace core.Stocks
 
             public override async Task<object> Handle(Query query, CancellationToken cancellationToken)
             {
-                var cached = await _storage.ViewModel<StockDashboardView>(query.UserId);
-                if (cached == null)
+                var view = await _storage.ViewModel<StockDashboardView>(query.UserId);
+                if (view == null)
                 {
-                    cached = await LoadFromDb(query.UserId);
+                    view = await LoadFromDb(query.UserId);
                 }
 
-                var tickers = cached.Owned.Select(o => o.Ticker).Distinct().ToList();
+                var tickers = view.Owned.Select(o => o.Ticker).Distinct();
 
                 var tickerPrices = await _stocksService.GetPrices(tickers);
 
-                foreach (var o in cached.Owned)
+                return tickerPrices.IsOk switch
                 {
-                    tickerPrices.TryGetValue(o.Ticker, out var price);
+                    false => view,
+                    true => EnrichWithStockPrice(view, tickerPrices.Success)
+                };
+            }
+
+            private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)
+            {
+                foreach (var o in view.Owned)
+                {
+                    prices.TryGetValue(o.Ticker, out var price);
                     o.ApplyPrice(price?.Price ?? 0);
                 }
 
-                return cached;
+                return view;
             }
 
             public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
