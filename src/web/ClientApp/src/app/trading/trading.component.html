@@ -15,22 +15,33 @@
 
   <div class="row mb-2 mt-2">
     <div class="col">
-      <label for="singleR">Single R:</label><input type="text" class="form-control" [(ngModel)]="singleR" id="singleR" name="singleR" />
+      <label for="stopLoss">Stop Loss</label><input type="number" id="stopLoss" class="form-control" [(ngModel)]="stopLoss" />
     </div>
     <div class="col">
-      <label for="singleR">R:R Target</label><input type="text" class="form-control" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
+      <label for="firstTarget">First Target</label><input type="number" class="form-control" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
+    </div>
+    <div class="col">
+      <label for="rrTarget">R:R Target</label><input type="number" class="form-control" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
     </div>
   </div>
 
-  <div *ngFor="let p of result">
-    <h6>{{p.ticker}}</h6>
-    <div>
-      <div>Cost: {{p.averageCost | currency}}</div>
+  <div class="card mb-2" *ngFor="let p of result">
+    <div class="card-body">
+      <h5 class="card-title">{{p.ticker}}</h5>
       <div>Current Price: {{p.price | currency}}</div>
-      <div>Gain: {{p.gain | currency}}</div>
-      <div>Gain %: {{ ( (p.price - p.averageCost) / p.averageCost ) | percent }}</div>
-      <div>1st Target: {{ p.averageCost + p.averageCost * singleR | currency }}</div>
-      <div>R:R Target: {{ (p.averageCost + (p.averageCost * rrTarget)) | currency}}</div>
+      
+      <div class="row">
+        <div class="col">
+          <div>Cost: {{p.averageCost | currency}}</div>
+          <div>Gain: {{p.gain | currency}}</div>
+          <div>Gain %: {{ ( (p.price - p.averageCost) / p.averageCost ) | percent }}</div>    
+        </div>
+        <div class="col">
+          <div>Stop: {{ p.averageCost - p.averageCost * stopLoss | currency }}</div>
+          <div>1st Target: {{ p.averageCost + p.averageCost * firstTarget | currency }}</div>
+          <div>R:R Target: {{ (p.averageCost + (p.averageCost * rrTarget)) | currency}}</div>
+        </div>
+      </div>
     </div>
   </div>
   
