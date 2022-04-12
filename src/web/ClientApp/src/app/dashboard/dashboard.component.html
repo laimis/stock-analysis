@@ -67,14 +67,11 @@
         <div class="card mt-4">
           <div class="card-body">
             <h5 class="card-title">
-              <i class="fas fa-toolbox"></i>
-              Tools</h5>
-            <a class="card-link" [routerLink]="[ '/notes' ]">Journal</a>
-            <a class="card-link" [routerLink]="[ '/review' ]">Review</a>
-            <a class="card-link" [routerLink]="[ '/transactions' ]">Transactions</a>
-            <a class="card-link" [routerLink]="[ '/reports/chain' ]">Chain</a>
-            <a class="card-link" [routerLink]="[ '/reports/recentsells' ]">Sells</a>
-            <a class="card-link" [routerLink]="[ '/trading' ]">Trading</a>
+              <i class="fas fa-bell"></i>
+              Alerts
+            </h5>
+            <p class="card-text">Triggered: <b>{{dashboard.triggeredAlertCount}}</b>, total: <b>{{dashboard.alertCount}}</b></p>
+            <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
           </div>
         </div>
 
@@ -84,11 +81,14 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">
-              <i class="fas fa-bell"></i>
-              Alerts
-            </h5>
-            <p class="card-text">Triggered: <b>{{dashboard.triggeredAlertCount}}</b>, total: <b>{{dashboard.alertCount}}</b></p>
-            <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
+              <i class="fas fa-toolbox"></i>
+              Tools</h5>
+            <a class="card-link" [routerLink]="[ '/notes' ]">Journal</a>
+            <a class="card-link" [routerLink]="[ '/review' ]">Review</a>
+            <a class="card-link" [routerLink]="[ '/transactions' ]">Transactions</a>
+            <a class="card-link" [routerLink]="[ '/reports/chain' ]">Chain</a>
+            <a class="card-link" [routerLink]="[ '/reports/recentsells' ]">Sells</a>
+            <a class="card-link" [routerLink]="[ '/trading' ]">Trading</a>
           </div>
         </div>
       </div>
