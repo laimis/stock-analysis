@@ -28,15 +28,21 @@
   <div class="card mb-2" *ngFor="let p of result">
     <div class="card-body">
       <h5 class="card-title">
-        <span class="float-right">Price: {{p.price | currency}}</span>
-        {{p.ticker}}
+        <span class="float-right">
+          Price: {{p.price | currency}}
+          ({{ ( (p.price - p.averageCost) / p.averageCost ) | percent }})
+        </span>
+        <a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a>
       </h5>
       
       <div class="row">
         <div class="col">
-          <div>Cost: {{p.averageCost | currency}}</div>
-          <div>Gain: {{p.gain | currency}}</div>
-          <div>Gain %: {{ ( (p.price - p.averageCost) / p.averageCost ) | percent }}</div>    
+          <div>Average Cost: {{p.averageCost | currency}}</div>
+          <div>Size: {{p.maxCost | currency}}</div>
+        </div>
+        <div clsss="col">
+          <div>Shares: {{ p.numberOfShares }} / {{ p.maxNumberOfShares }}</div>
+          <div>Sell Size: {{ p.maxNumberOfShares / 3 | number : '1.0-0' }}</div>
         </div>
         <div class="col text-right">
           <div>Stop: {{ p.averageCost - p.averageCost * stopLoss | currency }}</div>

@@ -12,8 +12,8 @@ namespace coretests.Stocks
         {
             _position = new PositionInstance("TSLA");
 
-            _position.Buy(amount: 10, price: 30, when: DateTime.Parse("2020-01-23"));
-            _position.Buy(amount: 10, price: 35, when: DateTime.Parse("2020-01-25"));
+            _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"));
+            _position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"));
             _position.Sell(amount: 10, price: 40, when: DateTime.Parse("2020-02-25"));
             _position.Sell(amount: 10, price: 37, when: DateTime.Parse("2020-03-21"));
         }

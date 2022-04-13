@@ -19,6 +19,7 @@ namespace core.Stocks
         internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
 
         public List<PositionInstance> PositionInstances { get; } = new List<PositionInstance>();
+        public PositionInstance CurrentPosition => PositionInstances.LastOrDefault();
 
         public string Description => $"{Owned} shares owned at avg cost {Math.Round(AverageCost, 2)}";
 
