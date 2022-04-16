@@ -48,7 +48,9 @@ namespace core.Stocks.Views
                     }   
                 }
 
-                return tradingEntries;
+                return tradingEntries
+                    .OrderByDescending(s => s.Gain)
+                    .ToArray();
             }
         }
     }
