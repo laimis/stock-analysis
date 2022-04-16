@@ -42,7 +42,7 @@ export class TradingComponent implements OnInit {
     
     this.invested = 0
     this.result.forEach(e => {
-      this.invested += e.averageCost * e.owned
+      this.invested += e.averageCost * e.numberOfShares
     })
   }
 
