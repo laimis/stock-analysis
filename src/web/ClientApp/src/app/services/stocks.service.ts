@@ -439,7 +439,9 @@ export interface StockOwnership {
 export interface StockGridEntry {
   price: number,
   stats: any,
-  ticker: string
+  ticker: string,
+  above50: number,
+  above200: number
 }
 
 export interface StockTradingGridEntry {

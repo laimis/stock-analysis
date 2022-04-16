@@ -14,5 +14,14 @@ namespace core.Portfolio
         public string Ticker { get; }
         public StockAdvancedStats Stats { get; }
         public decimal Price { get; }
+
+        public decimal Above50 => CompareToPrice(Stats.Day50MovingAvg);
+        public decimal Above200 => CompareToPrice(Stats.Day200MovingAvg);
+
+        private decimal CompareToPrice(decimal? value) =>
+            value.HasValue switch {
+                true => (Price - value.Value) / value.Value,
+                false => 0
+            };
     }
 }

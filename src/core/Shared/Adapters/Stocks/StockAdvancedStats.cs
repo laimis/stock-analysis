@@ -7,10 +7,10 @@ namespace core.Adapters.Stocks
         public double? Week52Low { get; set; }
         public double? MarketCap { get; set; }
         public int? Employees { get; set; }
-        public double? Day200MovingAvg { get; set; }
-        public double? Day50MovingAvg { get; set; }
-        public double? Float { get; set; }
-        public double? Avg10Volume { get; set; }
+        public decimal? Day200MovingAvg { get; set; }
+        public decimal? Day50MovingAvg { get; set; }
+        public decimal? Float { get; set; }
+        public decimal? Avg10Volume { get; set; }
         public double? Avg30Volume { get; set; }
         public double? TTMEPS { get; set; }
         public double? TTMDividendRate { get; set; }

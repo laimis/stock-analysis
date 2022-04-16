@@ -60,10 +60,10 @@ export class StockGridComponent {
         return (a:StockGridEntry, b:StockGridEntry) => a.stats.avg30Volume - b.stats.avg30Volume
       case "marketCap":
         return (a:StockGridEntry, b:StockGridEntry) => a.stats.marketCap - b.stats.marketCap
-      case "debtToEquity":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.debtToEquity - b.stats.debtToEquity
-      case "priceToBook":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.priceToBook - b.stats.priceToBook
+      case "above50":
+        return (a:StockGridEntry, b:StockGridEntry) => a.above50 - b.above50
+      case "above200":
+        return (a:StockGridEntry, b:StockGridEntry) => a.above200 - b.above200
       case "revenue":
         return (a:StockGridEntry, b:StockGridEntry) => a.stats.revenue - b.stats.revenue
       case "grossProfit":
