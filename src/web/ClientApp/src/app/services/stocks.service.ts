@@ -20,6 +20,10 @@ export function GetErrors(err:any): string[] {
   })
 }
 
+export function HideIfHidden(value, hidden) {
+  return hidden ? 0 : value;
+}
+
 @Injectable({providedIn: 'root'})
 export class StocksService {
 

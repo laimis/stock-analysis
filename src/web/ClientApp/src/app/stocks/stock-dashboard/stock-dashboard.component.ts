@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { StocksService, OwnedStock } from '../../services/stocks.service';
-
+import { HideIfHidden, StocksService, OwnedStock } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-dashboard',
@@ -49,6 +48,10 @@ export class StockDashboardComponent implements OnInit {
 			this.loaded = false;
     })
 	}
+
+  hideIfHidden(value : number) : number {
+    return HideIfHidden(value, true)
+  }
 
   onTickerSelected(ticker:string) {
     this.router.navigateByUrl('/stocks/' + ticker)
