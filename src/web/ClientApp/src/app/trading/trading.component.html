@@ -10,10 +10,49 @@
   <div class="card-header mb-2 mt-2 border">
     <div class="mb-2 font-weight-bold">Trading Holdings</div>
     <div class="mb-2"><b>Positions</b> {{ numberOfPositions}} </div>
-    <div><b>Invested</b>: {{ invested | currency}} </div>
+    <!-- <div><b>Invested</b>: {{ invested | currency}} </div> -->
   </div>
 
-  <div class="row mb-2 mt-2">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <app-symbol-search
+                label="Ticker"
+                placeholder="New position symbol"
+                (tickerSelected)="onBuyTickerSelected($event)"
+                cssClass="form-control">
+            </app-symbol-search>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="positionSize">Position Size</label>
+            <input type="number" class="form-control" id="positionSize" [(ngModel)]="positionSize">
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="costToBuy">
+        <div class="col">Price: <strong>{{ costToBuy | currency }}</strong></div>
+        <div class="col">Shares #: <strong>{{ stocksToBuy }}</strong></div>
+        <div class="col">Stop Price: <strong>{{ stopPrice | currency }}</strong></div>
+        <div class="col">Exit Price: <strong>{{ exitPrice | currency }}</strong></div>
+      </div>
+      <div class="row">
+        <div class="col">Gains: <strong>{{ potentialGains | currency }}</strong></div>
+        <div class="col">Losses: <strong>{{ potentialLoss | currency }}</strong></div>
+        <div class="col">R:R <strong>{{ potentialRr | number }}</strong></div>
+        <div class="col"></div>
+      </div>
+      <div class="row" *ngIf="stats">
+        <div class="col">Above 50: <strong>{{ costToBuy > stats.day50MovingAvg  ? 'yes' : 'no'}}</strong></div>
+        <div class="col">Above 200: <strong>{{ costToBuy > stats.day200MovingAvg  ? 'yes' : 'no'}}</strong></div>
+        <div class="col"></div>
+        <div class="col"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-2 mt-5">
     <div class="col">
       <label for="stopLoss">Stop Loss</label><input type="number" id="stopLoss" class="form-control" [(ngModel)]="stopLoss" />
     </div>
