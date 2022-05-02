@@ -27,12 +27,26 @@
         <div class="col">
           <div class="form-group">
             <label for="positionSize">Position Size</label>
-            <input type="number" class="form-control" id="positionSize" [(ngModel)]="positionSize">
+            <input
+              type="number"
+              class="form-control"
+              id="positionSize"
+              [(ngModel)]="positionSize"
+              (ngModelChange)="updateBuyingValues($event)">
           </div>
         </div>
       </div>
       <div class="row" *ngIf="costToBuy">
-        <div class="col">Price: <strong>{{ costToBuy | currency }}</strong></div>
+        <div class="col">
+          <label for="costToBuy">Price: </label>
+          <input
+            type="number"
+            id="costToBuy"
+            class="form-control-sm"
+            [(ngModel)]="costToBuy"
+            (ngModelChange)="updateBuyingValues($event)"
+          >
+        </div>
         <div class="col">Shares #: <strong>{{ stocksToBuy }}</strong></div>
         <div class="col">Stop Price: <strong>{{ stopPrice | currency }}</strong></div>
         <div class="col">Exit Price: <strong>{{ exitPrice | currency }}</strong></div>

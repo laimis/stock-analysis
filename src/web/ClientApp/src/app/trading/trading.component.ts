@@ -54,17 +54,21 @@ export class TradingComponent implements OnInit {
     this.stockService.getStockDetails(ticker).subscribe(stockDetails => {
       console.log(stockDetails)
       this.costToBuy = stockDetails.price
-      this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
-      this.stopPrice = this.costToBuy * (1 - this.stopLoss)
-      this.exitPrice = this.costToBuy * (1 + this.rrTarget)
-      this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
-      this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
-      this.potentialRr = Math.abs(this.potentialGains / this.potentialLoss)
+      this.updateBuyingValues()
       this.stats = stockDetails.stats
 		}, error => {
 			console.error(error);
 			this.loaded = true;
     });
+  }
+
+  updateBuyingValues() {
+    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    this.stopPrice = this.costToBuy * (1 - this.stopLoss)
+    this.exitPrice = this.costToBuy * (1 + this.rrTarget)
+    this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
+    this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
+    this.potentialRr = Math.abs(this.potentialGains / this.potentialLoss)
   }
 
   updateModel() {
