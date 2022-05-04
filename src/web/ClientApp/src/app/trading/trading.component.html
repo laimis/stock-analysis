@@ -51,16 +51,16 @@
         <div class="col">Stop Price: <strong>{{ stopPrice | currency }}</strong></div>
         <div class="col">Exit Price: <strong>{{ exitPrice | currency }}</strong></div>
       </div>
-      <div class="row">
-        <div class="col">Gains: <strong>{{ potentialGains | currency }}</strong></div>
-        <div class="col">Losses: <strong>{{ potentialLoss | currency }}</strong></div>
-        <div class="col">R:R <strong>{{ potentialRr | number }}</strong></div>
+      <div class="row mt-2" *ngIf="stats">
+        <div class="col">Ema 20 Price: <strong>{{ emaPrice | currency }}</strong></div>
+        <div class="col">Stop below 20: <strong>{{ stopPrice < emaPrice ? 'yes' : 'no' }}</strong></div>
+        <div class="col">% from 20: <strong>{{ (costToBuy - emaPrice) / costToBuy | percent }}  </strong></div>
         <div class="col"></div>
       </div>
-      <div class="row" *ngIf="stats">
+      <div class="row mt-2" *ngIf="stats">
+        <div class="col">Above 20: <strong>{{ costToBuy > emaPrice ? 'yes' : 'no' }}</strong> </div>
         <div class="col">Above 50: <strong>{{ costToBuy > stats.day50MovingAvg  ? 'yes' : 'no'}}</strong></div>
         <div class="col">Above 200: <strong>{{ costToBuy > stats.day200MovingAvg  ? 'yes' : 'no'}}</strong></div>
-        <div class="col"></div>
         <div class="col"></div>
       </div>
     </div>

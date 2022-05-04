@@ -47,13 +47,15 @@ export class TradingComponent implements OnInit {
   potentialLoss: number | null = null
   potentialRr: number | null = null
   stats: object | null = null
+  emaPrice: number;
 
   onBuyTickerSelected(ticker: string) {
     this.costToBuy = null
 
-    this.stockService.getStockDetails(ticker).subscribe(stockDetails => {
+    this.stockService.getStockDetails(ticker, 20).subscribe(stockDetails => {
       console.log(stockDetails)
       this.costToBuy = stockDetails.price
+      this.emaPrice = stockDetails.emaPrice
       this.updateBuyingValues()
       this.stats = stockDetails.stats
 		}, error => {

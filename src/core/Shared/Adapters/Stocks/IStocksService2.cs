@@ -5,12 +5,14 @@ namespace core.Adapters.Stocks
 {
     public interface IStocksService2
     {
-        Task<StockServiceResponse<CompanyProfile, string>> GetCompanyProfile(string ticker);
-        Task<StockServiceResponse<StockAdvancedStats, string>> GetAdvancedStats(string ticker);
-        Task<StockServiceResponse<Price, string>> GetPrice(string ticker);
-        Task<StockServiceResponse<Dictionary<string, BatchStockPrice>, string>> GetPrices(IEnumerable<string> tickers);
+        Task<StockServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker);
+        Task<StockServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker);
+        Task<StockServiceResponse<Price>> GetPrice(string ticker);
+        Task<StockServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers);
         
-        Task<StockServiceResponse<List<SearchResult>,string>> Search(string fragment, int maxResults);
-        Task<StockServiceResponse<Quote,string>> Quote(string ticker);
+        Task<StockServiceResponse<List<SearchResult>>> Search(string fragment, int maxResults);
+        Task<StockServiceResponse<Quote>> Quote(string ticker);
+
+        Task<StockServiceResponse<Price?>> GetEmaPrice(string ticker, int period);
     }
 }

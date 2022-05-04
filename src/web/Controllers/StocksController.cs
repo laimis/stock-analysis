@@ -30,9 +30,9 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}")]
-        public async Task<object> DetailsAsync(string ticker)
+        public async Task<object> DetailsAsync(string ticker, int? emaPeriod)
         {
-            return await _mediator.Send(new Details.Query(ticker));
+            return await _mediator.Send(new Details.Query(emaPeriod, ticker));
         }
 
         [HttpGet("{ticker}/ownership")]

@@ -29,7 +29,7 @@ namespace coretests.Options
             var mock = new Mock<IStocksService2>();
             mock.Setup(x => x.GetPrices(It.IsAny<IEnumerable<string>>()))
                 .Returns(Task.FromResult(
-                    new StockServiceResponse<Dictionary<string, BatchStockPrice>, string>(
+                    new StockServiceResponse<Dictionary<string, BatchStockPrice>>(
                         new Dictionary<string, BatchStockPrice>()
                     )
                 ));

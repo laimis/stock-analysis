@@ -132,8 +132,8 @@ export class StocksService {
 		return this.http.get<any>('/api/stocks')
   }
 
-	getStockDetails(symbol:string): Observable<StockDetails> {
-		return this.http.get<StockDetails>('/api/stocks/' + symbol)
+	getStockDetails(symbol:string, emaPeriod:number = null): Observable<StockDetails> {
+		return this.http.get<StockDetails>('/api/stocks/' + symbol + '?emaPeriod=' + emaPeriod)
   }
 
   getStockGrid(): Observable<StockGridEntry[]> {
@@ -428,6 +428,7 @@ export interface StockDetails {
   stats: object
   profile : object
 	alert: object
+  emaPrice: number | null
 }
 
 export interface StockOwnership {
