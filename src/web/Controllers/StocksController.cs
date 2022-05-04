@@ -117,6 +117,12 @@ namespace web.Controllers
             return this.GenerateExport(_mediator, new ExportClosed.Query(User.Identifier()));
         }
 
+        [HttpGet("export/trades")]
+        public Task<ActionResult> ExportTrades()
+        {
+            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier()));
+        }
+
         [HttpGet("export/owned")]
         public Task<ActionResult> ExportOwned()
         {
