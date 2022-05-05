@@ -101,22 +101,6 @@ namespace iexclient
             return GetCachedResponse<StockAdvancedStats>(url, CacheKeyMinute(ticker + "advanced"));
         }
 
-        public async Task<StockServiceResponse<Price?>> GetEmaPrice(string ticker, int period)
-        {
-            var url = MakeUrl($"stock/{ticker}/indicator/ema");
-
-            url += $"&range={period}d&input1={period}&lastIndicator=true&indicatorOnly=true";
-
-            var response = await GetCachedResponse<IndicatorResponse>(url, CacheKeyDaily(ticker + "ema" + period));
-
-            return response.IsOk switch {
-                false => throw new Exception("Url " + url + "responded with: " + response.Error.Message),
-                true => new StockServiceResponse<Price?>(
-                    new Price(response.Success.Indicator[0][0])
-                )
-            };
-        }
-
         public async Task<StockServiceResponse<Price>> GetPrice(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/price");

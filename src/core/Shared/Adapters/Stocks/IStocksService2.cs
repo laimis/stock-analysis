@@ -12,7 +12,5 @@ namespace core.Adapters.Stocks
         
         Task<StockServiceResponse<List<SearchResult>>> Search(string fragment, int maxResults);
         Task<StockServiceResponse<Quote>> Quote(string ticker);
-
-        Task<StockServiceResponse<Price?>> GetEmaPrice(string ticker, int period);
     }
 }

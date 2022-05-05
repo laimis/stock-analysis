@@ -8,6 +8,5 @@ namespace core.Stocks.View
         public decimal Price { get; internal set; }
         public CompanyProfile Profile { get; internal set; }
         public StockAdvancedStats Stats { get; internal set; }
-        public decimal? EmaPrice { get; internal set; }
     }
 }
