@@ -453,6 +453,7 @@ export interface StockTradingGridEntry {
   stats: any,
   ticker: string,
   numberOfShares: number,
+  maxNumberOfShares: number,
   averageCost: number,
   profitTarget: number,
   gain: number,
