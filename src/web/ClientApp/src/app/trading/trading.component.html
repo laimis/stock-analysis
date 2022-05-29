@@ -74,29 +74,64 @@
 
   <div class="card mb-2" *ngFor="let p of result">
     <div class="card-body">
-      <h5 class="card-title">
-        <span class="float-right">
-          Price: {{p.price | currency}}
-          ({{ ( (p.price - p.averageCost) / p.averageCost ) | percent }})
-        </span>
-        <a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a>
-      </h5>
-      
-      <div class="row">
-        <div class="col">
-          <div>Average Cost: {{p.averageCost | currency}}</div>
-          <div>Size: {{p.maxCost | currency}}</div>
-        </div>
-        <div clsss="col">
-          <div>Shares: {{ p.numberOfShares }} / {{ p.maxNumberOfShares }}</div>
-          <div>Sell Size: {{ p.maxNumberOfShares / 3 | number : '1.0-0' }}</div>
-        </div>
-        <div class="col text-right">
-          <div>Stop: {{ p.averageCost - p.averageCost * stopLoss | currency }}</div>
-          <div>1st Target: {{ p.averageCost + p.averageCost * firstTarget | currency }}</div>
-          <div>R:R Target: {{ (p.averageCost + (p.averageCost * rrTarget)) | currency}}</div>
+      <div class="card-title">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a>
+              <span class="position-price">{{p.price | currency}}</span>
+            </div>
+            <div class="col-2 text-center">
+            </div>
+            <div class="col text-right">
+              {{ ( (p.price - p.averageCost) / p.averageCost ) | percent }}
+            </div>
+          </div>  
         </div>
       </div>
+  
+      <div class="card-text">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <span class="badge">stop</span>
+              {{ p.averageCost - p.averageCost * stopLoss | currency }}
+            </div>
+            <div class="col text-center">
+              <span class="badge">cost</span>
+              {{p.averageCost | currency}}
+            </div>
+            <div class="col text-center">
+              <span class="badge">1st PT</span>
+              {{ p.averageCost + p.averageCost * firstTarget | currency }}
+            </div>
+            <div class="col text-right">
+              <span class="badge">2nd PT</span>
+              {{ (p.averageCost + (p.averageCost * rrTarget)) | currency}}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <span class="badge">gain</span>
+              {{ ( (p.price - p.averageCost) / p.averageCost ) | percent }}
+            </div>
+            <div class="col text-center">
+              <span class="badge">shares</span>
+              {{ p.numberOfShares }} / {{ p.maxNumberOfShares }}
+            </div>
+            <div class="col text-center">
+              <span class="badge">portion</span>
+              {{ p.maxNumberOfShares / 3 | number : '1.0-0' }}
+            </div>
+            <div class="col"></div>
+          </div>
+        </div>
+      </div>
+          <!-- <div class="col">
+            <div>Average Cost: </div>
+            <div>Size: {{p.maxCost | currency}}</div>
+           -->
     </div>
   </div>
   
