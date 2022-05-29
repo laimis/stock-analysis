@@ -1,0 +1,62 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <div class="card-title">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a>
+            <span class="position-price">{{p.price | currency}}</span>
+          </div>
+          <div class="col-2 text-center">
+          </div>
+          <div class="col text-right">
+            {{ gain() | percent }}
+          </div>
+        </div>  
+      </div>
+    </div>
+
+    <div class="card-text">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <span class="badge" [ngClass]="stopNumber() < p.price ? 'badge-success' : 'badge-primary'">stop</span>
+            {{ stopNumber() | currency }}
+          </div>
+          <div class="col text-center">
+            <span class="badge" [ngClass]="p.averageCost < p.price ? 'badge-success' : 'badge-primary'">cost</span>
+            {{p.averageCost | currency}}
+          </div>
+          <div class="col text-center">
+            <span class="badge" [ngClass]="firstTargetNumber() < p.price ? 'badge-success' : 'badge-primary'">1st PT</span>
+            {{ firstTargetNumber() | currency }}
+          </div>
+          <div class="col text-right">
+            <span class="badge" [ngClass]="rrTargetNumber() < p.price ? 'badge-success' : 'badge-primary'">2nd PT</span>
+            {{ rrTargetNumber() | currency}}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <span class="badge" [ngClass]="gain() > 0 ? 'badge-success' : 'badge-primary'" >gain</span>
+            {{ gain() | percent }}
+          </div>
+          <div class="col text-center">
+            <span class="badge">shares</span>
+            {{ p.numberOfShares }} / {{ p.maxNumberOfShares }}
+          </div>
+          <div class="col text-center">
+            <span class="badge">portion</span>
+            {{ p.maxNumberOfShares / 3 | number : '1.0-0' }}
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+    </div>
+        <!-- <div class="col">
+          <div>Average Cost: </div>
+          <div>Size: {{p.maxCost | currency}}</div>
+          -->
+  </div>
+</div>
