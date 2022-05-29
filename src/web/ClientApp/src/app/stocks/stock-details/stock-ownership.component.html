@@ -10,6 +10,15 @@
       <div class="col">
         Current price: <b>{{stock.price | currency}}</b>
       </div>
+      <div class="col">
+        <select class="form-control btn border rounded" name="category" (change)="categoryChanged($event.target.value)" value="{{ownership.category}}">
+          <option value="">Select Category</option>
+          <option value="longterm">Long-Term</option>
+          <option value="shortterm">Short-Term</option>
+          <option value="recommendation">Recommended</option>
+        </select>
+        <div *ngIf="success">Saved</div>  
+      </div>
     </div>
   </div>
 

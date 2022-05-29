@@ -51,7 +51,6 @@ import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-owne
 import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
 import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
 import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
-import { StockSettingsComponent } from './stocks/stock-details/stock-settings.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.component';
@@ -152,7 +151,6 @@ var routes = [
     StockFundamentalsComponent,
     StockGridComponent,
     StockNotesComponent,
-    StockSettingsComponent,
     StockOptionComponent,
     StockOwnershipComponent,
     StockDCAGridComponent,

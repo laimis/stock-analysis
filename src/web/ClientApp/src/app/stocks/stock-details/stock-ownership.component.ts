@@ -47,6 +47,14 @@ export class StockOwnershipComponent implements OnInit {
     this.notes = null
   }
 
+  categoryChanged(newCategory) {
+    this.service.settings(this.ownership.ticker, newCategory).subscribe( _ => {
+      alert("all good")
+    }, err => {
+      this.errors = GetErrors(err)
+    })
+  }
+
   delete() {
 
     if (confirm("are you sure you want to delete this stock?"))
