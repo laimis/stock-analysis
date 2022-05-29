@@ -59,6 +59,7 @@ import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dash
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 import { TradingComponent } from './trading/trading.component';
+import { TradingPositionComponent } from './trading/trading-position.component';
 
 var routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -164,6 +165,7 @@ var routes = [
     TransactionsComponent,
     TermsComponent,
     TradingComponent,
+    TradingPositionComponent,
 
     FailuresuccesschainComponent,
     RecentSellsComponent,
