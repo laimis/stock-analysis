@@ -3,10 +3,16 @@
 }
 
 .position-price {
-    font-weight: lighter;
+    font-size: larger;
     padding-left: 10px;
 }
 
-.bg-lightblue {
-    background-color: #ADD8E6;
+.position-gain {
+    font-size: larger;
+    font-weight: bold;
+}
+
+.position-ticker {
+    font-size: larger;
+    font-weight: bold;
 }

@@ -4,13 +4,13 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a>
+            <a [routerLink]="[ '/stocks', p.ticker ]" class="position-ticker">{{p.ticker}}</a>
             <span class="position-price">{{p.price | currency}}</span>
           </div>
           <div class="col-2 text-center">
           </div>
           <div class="col text-right">
-            {{ gain() | percent }}
+            <span class="position-gain">{{ gain() | percent }}</span>
           </div>
         </div>  
       </div>
