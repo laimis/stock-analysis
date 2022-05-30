@@ -39,8 +39,8 @@
 
         <div class="row">
           <div class="col">
-            <span class="badge" [ngClass]="gain() > 0 ? 'badge-success' : 'badge-primary'" >gain</span>
-            {{ gain() | percent }}
+            <span class="badge">size</span>
+            {{ positionSize() | currency }}
           </div>
           <div class="col text-center">
             <span class="badge">shares</span>

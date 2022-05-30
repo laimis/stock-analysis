@@ -38,5 +38,9 @@ export class TradingPositionComponent {
     positionProgress() {
         return this.p.numberOfShares * 1.0 / this.p.maxNumberOfShares * 100
     }
+
+    positionSize() {
+        return this.p.maxNumberOfShares * this.p.averageCost
+    }
 }
 
