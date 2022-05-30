@@ -7,13 +7,14 @@
 
 <div *ngIf="loaded">
   
-  <div class="card-header mb-2 mt-2 border">
-    <div class="mb-2 font-weight-bold">Trading Holdings</div>
-    <div class="mb-2"><b>Positions</b> {{ numberOfPositions}} </div>
-    <!-- <div><b>Invested</b>: {{ invested | currency}} </div> -->
+  <div class="card mb-2 mt-2">
+    <div class="card-header">
+      <div class="mb-2 font-weight-bold">Trading Holdings</div>
+      <div class="mb-2"><b>Positions</b> {{ numberOfPositions}} </div>
+    </div>
   </div>
 
-  <div class="card">
+  <div class="card border-info">
     <div class="card-body">
       <div class="row">
         <div class="col">
@@ -60,17 +61,23 @@
     </div>
   </div>
 
-  <div class="row mb-2 mt-4">
-    <div class="col">
-      <label for="stopLoss">Stop Loss</label><input type="number" id="stopLoss" class="form-control" [(ngModel)]="stopLoss" />
-    </div>
-    <div class="col">
-      <label for="firstTarget">First Target</label><input type="number" class="form-control" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
-    </div>
-    <div class="col">
-      <label for="rrTarget">R:R Target</label><input type="number" class="form-control" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
+  <div class="card border-info mb-2 mt-4">
+    <div class="card-header">
+      <div class="row">
+        <div class="col">
+          <label for="stopLoss">Stop Loss</label><input type="number" id="stopLoss" class="form-control" [(ngModel)]="stopLoss" />
+        </div>
+        <div class="col">
+          <label for="firstTarget">First Target</label><input type="number" class="form-control" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
+        </div>
+        <div class="col">
+          <label for="rrTarget">R:R Target</label><input type="number" class="form-control" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
+        </div>
+      </div>
+      
     </div>
   </div>
+    
 
   <app-trading-position
     *ngFor="let p of result"
