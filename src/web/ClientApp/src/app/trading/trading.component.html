@@ -43,7 +43,7 @@
           <input
             type="number"
             id="costToBuy"
-            class="form-control-sm"
+            class="form-control"
             [(ngModel)]="costToBuy"
             (ngModelChange)="updateBuyingValues($event)"
           >
@@ -61,21 +61,18 @@
     </div>
   </div>
 
-  <div class="card border-info mb-2 mt-4">
-    <div class="card-header">
+  <div class="border-info mb-2 mt-4">
       <div class="row">
         <div class="col">
-          <label for="stopLoss">Stop Loss</label><input type="number" id="stopLoss" class="form-control" [(ngModel)]="stopLoss" />
+          <label for="stopLoss" class="filterLabel">Stop Loss</label><input type="number" id="stopLoss" class="form-control form-control-sm" [(ngModel)]="stopLoss" />
         </div>
         <div class="col">
-          <label for="firstTarget">First Target</label><input type="number" class="form-control" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
+          <label for="firstTarget" class="filterLabel">First Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
         </div>
         <div class="col">
-          <label for="rrTarget">R:R Target</label><input type="number" class="form-control" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
+          <label for="rrTarget" class="filterLabel">R:R Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
         </div>
       </div>
-      
-    </div>
   </div>
     
 
