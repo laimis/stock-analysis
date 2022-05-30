@@ -18,8 +18,12 @@
         public decimal MaxNumberOfShares { get; }
         public decimal MaxCost { get; }
         public decimal Price { get; private set; }
-        public decimal Gain { get; }
+        public decimal Gain { get; private set; }
 
-        internal void ApplyPrice(decimal currentPrice) => Price = currentPrice;
+        internal void ApplyPrice(decimal currentPrice)
+        {
+            Price = currentPrice;
+            Gain = (Price - AverageCost) / AverageCost;
+        }
     }
 }

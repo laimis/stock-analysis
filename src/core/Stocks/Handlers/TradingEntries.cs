@@ -49,7 +49,7 @@ namespace core.Stocks.Views
                 }
 
                 return tradingEntries
-                    .OrderBy(s => s.Gain)
+                    .OrderByDescending(s => s.Gain)
                     .ToArray();
             }
         }
