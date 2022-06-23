@@ -6,18 +6,40 @@ using Twilio.Types;
 namespace twilioclient;
 public class TwilioClientWrapper : ISMSClient
 {
-    private PhoneNumber _fromPhoneNumber;
-    private PhoneNumber _toPhoneNumber;
+    private PhoneNumber? _fromPhoneNumber = null;
+    private PhoneNumber? _toPhoneNumber = null;
+    private bool _configured;
 
     public TwilioClientWrapper(string accountSid, string authToken, string fromPhoneNumber, string toPhoneNumber)
     {
-         TwilioClient.Init(accountSid, authToken);
+        // check for all params to be not null
+        if (string.IsNullOrEmpty(accountSid) || string.IsNullOrEmpty(authToken) || string.IsNullOrEmpty(fromPhoneNumber) || string.IsNullOrEmpty(toPhoneNumber))
+        {
+            return;
+        }
+
+        TwilioClient.Init(accountSid, authToken);
 
         _fromPhoneNumber = new Twilio.Types.PhoneNumber(fromPhoneNumber);
         _toPhoneNumber = new Twilio.Types.PhoneNumber(toPhoneNumber);
+        _configured = true;
     }
 
     public Task SendSMS(string message)
+    {
+        return _configured switch {
+            true => SendViaTwilio(message),
+            false => ToConsole(message)
+        };
+    }
+
+    private Task ToConsole(string message)
+    {
+        Console.WriteLine($"Sending SMS: {message}");
+        return Task.CompletedTask;
+    }
+
+    private Task SendViaTwilio(string message)
     {
         // Send SMS
         Console.WriteLine($"Sending SMS to {_toPhoneNumber}: {message}");
