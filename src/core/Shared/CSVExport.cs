@@ -24,13 +24,13 @@ namespace core
         public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
         public const string OWNED_STOCKS_HEADER = "ticker,shares,averagecost,invested,daysheld,category";
         public const string CRYPTOS_HEADER = "symbol,type,amount,price,date";
-        public const string TRADES_HEADER = "symbol,opened,closed,daysheld,maxcost,maxshares,profit,returnpct,buys,sells";
+        public const string TRADES_HEADER = "symbol,opened,closed,daysheld,firstbuycost,maxcost,maxshares,profit,returnpct,buys,sells";
 
         public static string Generate(IEnumerable<StockTradeView> trades)
         {
             var rows = trades.Select(t =>
                 new object[] { t.Ticker, t.Opened, t.Closed, t.DaysHeld,
-                t.MaxCost, t.MaxNumberOfShares,
+                t.FirstBuyCost,t.MaxCost, t.MaxNumberOfShares,
                 t.Profit, t.ReturnPct,
                 t.NumberOfBuys, t.NumberOfSells
             });

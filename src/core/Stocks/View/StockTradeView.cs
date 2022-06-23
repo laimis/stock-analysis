@@ -17,6 +17,7 @@ namespace core.Stocks.View
             ReturnPct = position.Percentage;
             NumberOfBuys = position.NumberOfBuys;
             NumberOfSells = position.NumberOfSells;
+            FirstBuyCost = position.FirstBuyCost;
         }
 
         public string Ticker { get; set; }
@@ -29,5 +30,6 @@ namespace core.Stocks.View
         public decimal ReturnPct { get; }
         public int NumberOfBuys { get; }
         public int NumberOfSells { get; }
+        public decimal? FirstBuyCost { get; }
     }
 }

@@ -25,6 +25,7 @@ namespace core.Stocks
         public decimal MaxCost { get; private set; }
         public int NumberOfBuys { get; private set; }
         public int NumberOfSells { get; private set; }
+        public decimal? FirstBuyCost { get; private set; }
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when)
         {
@@ -45,6 +46,11 @@ namespace core.Stocks
             if (Cost > MaxCost)
             {
                 MaxCost = Cost;
+            }
+
+            if (FirstBuyCost == null)
+            {
+                FirstBuyCost = price;
             }
         }
 
