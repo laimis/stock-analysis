@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Alerts;
@@ -88,5 +89,11 @@ namespace web.Controllers
 
             return await _mediator.Send(cmd);
         }
+
+        [AllowAnonymous]
+        [Consumes("text/plain")]
+        [HttpPost("sms")]
+        public Task SMS([FromBody] string body) =>
+            _mediator.Send(new SendSMS.Command(body));
     }
 }
