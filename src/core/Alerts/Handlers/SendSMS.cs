@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
+using core.Shared.Adapters.SMS;
 using MediatR;
 
 namespace core.Alerts
@@ -20,10 +21,18 @@ namespace core.Alerts
 
         public class Handler : IRequestHandler<Command, CommandResponse>
         {
-            public Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
+            private ISMSClient _smsClient;
+
+            public Handler(ISMSClient smsClient)
             {
-                Console.WriteLine("Received: " + request.Body);
-                return Task.FromResult(CommandResponse.Success());
+                _smsClient = smsClient;
+            }
+
+            public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
+            {
+                await _smsClient.SendSMS(request.Body);
+
+                return CommandResponse.Success();
             }
         }
     }

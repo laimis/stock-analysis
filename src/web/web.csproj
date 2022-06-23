@@ -36,6 +36,7 @@
     <ProjectReference Include="..\infrastructure\stripe\stripe.csproj" />
     <ProjectReference Include="..\infrastructure\coinmarketcap\coinmarketcap.csproj" />
     <ProjectReference Include="..\infrastructure\storage.memory\storage.memory.csproj" />
+    <ProjectReference Include="..\infrastructure\twilioclient\twilioclient.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

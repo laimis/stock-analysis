@@ -9,6 +9,7 @@ using core.Adapters.Subscriptions;
 using core.Alerts;
 using core.Options;
 using core.Shared.Adapters.Cryptos;
+using core.Shared.Adapters.SMS;
 using csvparser;
 using iexclient;
 using MediatR;
@@ -64,6 +65,13 @@ namespace web
                     configuration.GetValue<string>("SENDGRID_API_KEY")
                 )
             );
+
+            services.AddSingleton<ISMSClient>(s => 
+                new twilioclient.TwilioClientWrapper(
+                    configuration.GetValue<string>("TWILIO_ACCOUNT_SID"),
+                    configuration.GetValue<string>("TWILIO_AUTH_TOKEN"),
+                    configuration.GetValue<string>("TWILIO_FROM_NUMBER"),
+                    configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
             services.AddHostedService<StockMonitorService>();
             services.AddHostedService<ThirtyDaySellService>();
