@@ -1,24 +1,13 @@
 <div>
 
-  <div *ngIf="!parsed">
-    <textarea type="text" rows="16" class="form-control" #logs></textarea>
+  <canvas baseChart
+    [datasets]="lineChartData"
+    [labels]="lineChartLabels"
+    [options]="lineChartOptions"
+    [colors]="lineChartColors"
+    [legend]="lineChartLegend"
+    [chartType]="lineChartType"
+    [plugins]="lineChartPlugins">
+  </canvas>
 
-    <button type="button" class="btn btn-primary" (click)="parse(logs.value)">Fetch</button>
-  </div>
-
-  <div *ngIf="job">
-    Processing {{job.id}}
-  </div>
-
-  <div *ngIf="processed">
-    Finished processing
-  </div>
-
-  <div *ngIf="parsed">
-    <div *ngFor="let j of jobs">
-      <span *ngIf="j.bought">Bought</span>
-      <span *ngIf="j.sold">Sold</span> {{j.ticker}}
-      {{j.amount}} @ {{j.price}}
-    </div>
-  </div>
 </div>

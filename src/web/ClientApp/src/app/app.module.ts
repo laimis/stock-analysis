@@ -59,6 +59,7 @@ import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 import { TradingComponent } from './trading/trading.component';
 import { TradingPositionComponent } from './trading/trading-position.component';
+import { NgChartsModule } from 'ng2-charts';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -176,6 +177,7 @@ var routes: Routes = [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    NgChartsModule,
     RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })
   ],
   providers: [
