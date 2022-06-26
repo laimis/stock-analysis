@@ -32,6 +32,10 @@ export class PlaygroundComponent implements OnInit {
     Chart.register(LogarithmicScale);
   }
 
+  ngOnDestroy() {
+    Chart.unregister(LogarithmicScale);
+  }
+
   render() {
 
     var ticker = "AAPL"
@@ -46,7 +50,6 @@ export class PlaygroundComponent implements OnInit {
           data: prices,
           label: ticker,
           fill: false,
-          // borderColor: '#4bc0c0',
           tension: 0.1,
           pointRadius: 1,
           pointBackgroundColor: '#ff0000',
