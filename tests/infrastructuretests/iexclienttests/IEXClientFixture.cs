@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using core.Shared.Adapters.Stocks;
 using iexclient;
 using testutils;
 
@@ -16,6 +17,8 @@ namespace iexclienttests
         public List<StockQueryResult> MostActive;
         public List<SearchResult> SearchResults;
         public StockAdvancedStats AdvancedStats;
+        public HistoricalPrice[] HistoricalPrices { get; }
+        
 
         public IEXClientFixture()
         {
@@ -50,6 +53,11 @@ namespace iexclienttests
             advancedStats.Wait();
 
             AdvancedStats = advancedStats.Result.Success;
+
+            var historicalPrices = Client.GetHistoricalPrices("AMD", "2y");
+            historicalPrices.Wait();
+
+            HistoricalPrices = historicalPrices.Result.Success;
         }
     }
 }

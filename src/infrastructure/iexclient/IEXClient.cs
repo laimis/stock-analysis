@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -148,10 +149,16 @@ namespace iexclient
             );
         }
 
-        private string MakeUrl(string function)
+        public Task<StockServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(string ticker, string interval)
         {
-            return $"{_endpoint}/{function}?token={_token}";
+            var url = MakeUrl($"stock/{ticker}/chart/{interval}");
+
+            url += $"&chartCloseOnly=true";
+
+            return GetCachedResponse<HistoricalPrice[]>(url, CacheKeyDaily(ticker + interval));
         }
+
+        private string MakeUrl(string function) =>  $"{_endpoint}/{function}?token={_token}";
 
         private async Task<StockServiceResponse<T>> GetCachedResponse<T>(string url, string key)
         {
