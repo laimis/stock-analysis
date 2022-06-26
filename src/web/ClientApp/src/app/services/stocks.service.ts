@@ -136,6 +136,10 @@ export class StocksService {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
   }
 
+  getStockPrices2y(symbol:string): Observable<StockHistoricalPrice[]> {
+		return this.http.get<StockHistoricalPrice[]>(`/api/stocks/${symbol}/prices/2y`)
+  }
+
   getStockGrid(): Observable<StockGridEntry[]> {
 		return this.http.get<StockGridEntry[]>('/api/portfolio/grid')
   }
@@ -420,6 +424,12 @@ export class AlertLabelValue {
     this.label = label;
     this.value = value;
   }
+}
+
+export interface StockHistoricalPrice {
+  date: string
+  close: number
+  volume: number
 }
 
 export interface StockDetails {

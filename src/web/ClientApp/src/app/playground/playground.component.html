@@ -1,13 +1,14 @@
 <div>
 
+  <button class="btn btn-primary" (click)="render()">Render</button>
+
   <canvas baseChart
     [datasets]="lineChartData"
     [labels]="lineChartLabels"
     [options]="lineChartOptions"
-    [colors]="lineChartColors"
     [legend]="lineChartLegend"
-    [chartType]="lineChartType"
-    [plugins]="lineChartPlugins">
+    [plugins]="lineChartPlugins"
+    [type]="lineChartType">
   </canvas>
 
 </div>

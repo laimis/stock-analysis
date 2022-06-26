@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService } from '../services/stocks.service';
 
-import { ChartDataset, ChartOptions, Color } from 'chart.js';
+import { ChartDataset, ChartOptions, Chart, LogarithmicScale } from 'chart.js';
 
 @Component({
   selector: 'app-playground',
@@ -11,20 +11,56 @@ import { ChartDataset, ChartOptions, Color } from 'chart.js';
 
 export class PlaygroundComponent implements OnInit {
 
-  public lineChartData: ChartDataset[] = [
-    { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A' },
-  ];
-  public lineChartLabels: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  public lineChartData: ChartDataset[] = [];
+  public lineChartLabels: string[] = [];
   public lineChartOptions: ChartOptions = {
     responsive: true,
+    scales: {
+      y: {
+        type: 'logarithmic'
+      }
+    }
   };
-  public lineChartColors: Color[] = ["#000000"];
+  
   public lineChartLegend = true;
   public lineChartType = 'line';
   public lineChartPlugins = [];
+
   constructor(private stocks:StocksService) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    Chart.register(LogarithmicScale);
+  }
+
+  render() {
+
+    var ticker = "AAPL"
+
+    this.stocks.getStockPrices2y(ticker).subscribe(r => {
+      
+      var labels = r.map(x => x.date)
+      var prices = r.map(x => x.close)
+
+      this.lineChartData = [
+        {
+          data: prices,
+          label: ticker,
+          fill: false,
+          // borderColor: '#4bc0c0',
+          tension: 0.1,
+          pointRadius: 1,
+          pointBackgroundColor: '#ff0000',
+          pointStyle: 'line'
+        }]
+      this.lineChartLabels = labels
+
+      var minPrice = Math.min.apply(null, prices)
+      var maxPrice = Math.max.apply(null, prices)
+
+      this.lineChartOptions.scales.y.max = maxPrice + 20
+      this.lineChartOptions.scales.y.min = minPrice - 20
+    })
+  }
 
   fetch(ticker:string) {
     console.log(ticker)
