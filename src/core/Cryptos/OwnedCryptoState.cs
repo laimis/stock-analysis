@@ -110,6 +110,7 @@ namespace core.Cryptos
                         st.Id,
                         Token,
                         $"Purchased {st.Quantity} for ${st.DollarAmount}",
+                        st.DollarAmount / st.Quantity,
                         st.DollarAmount,
                         st.When
                     )
@@ -135,6 +136,7 @@ namespace core.Cryptos
                         st.Id,
                         Token,
                         $"Sold {st.Quantity} for ${st.DollarAmount}",
+                        st.DollarAmount / st.Quantity,
                         st.DollarAmount,
                         st.When
                     )

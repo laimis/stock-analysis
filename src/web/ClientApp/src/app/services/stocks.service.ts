@@ -136,8 +136,8 @@ export class StocksService {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
   }
 
-  getStockPrices2y(symbol:string): Observable<StockHistoricalPrice[]> {
-		return this.http.get<StockHistoricalPrice[]>(`/api/stocks/${symbol}/prices/2y`)
+  getStockPrices2y(symbol:string): Observable<Prices> {
+		return this.http.get<Prices>(`/api/stocks/${symbol}/prices/2y`)
   }
 
   getStockGrid(): Observable<StockGridEntry[]> {
@@ -325,6 +325,7 @@ export interface TransactionList {
 export interface Transaction {
   aggregateId: string
   credit: number
+  price: number
   date: string
   dateAsDate: string
   debit: number
@@ -431,6 +432,18 @@ export interface StockHistoricalPrice {
   close: number
   volume: number
 }
+
+export interface SMA {
+  values: number[]
+  interval: number
+  description: string
+}
+
+export interface Prices {
+  prices: StockHistoricalPrice[]
+  sma: SMA[]
+}
+
 
 export interface StockDetails {
   ticker: string

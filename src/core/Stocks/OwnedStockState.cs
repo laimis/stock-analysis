@@ -103,6 +103,7 @@ namespace core.Stocks
                         st.Id,
                         Ticker,
                         $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price,
                         st.Price * st.NumberOfShares,
                         st.When,
                         isOption: false
@@ -129,6 +130,7 @@ namespace core.Stocks
                         st.Id,
                         Ticker,
                         $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price,
                         st.Price * st.NumberOfShares,
                         st.When,
                         isOption: false
@@ -140,6 +142,7 @@ namespace core.Stocks
                         Id,
                         Ticker,
                         $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
+                        st.Price,
                         avgCost * st.NumberOfShares,
                         st.Price * st.NumberOfShares,
                         st.When,

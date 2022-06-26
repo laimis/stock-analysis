@@ -118,6 +118,7 @@ namespace core.Options
                     sold.Id,
                     Ticker,
                     $"Sold {sold.NumberOfContracts} x ${StrikePrice} {OptionType} {Expiration.ToString("MM/dd")} contract(s) for ${sold.Premium} premium/contract",
+                    sold.Premium,
                     credit,
                     sold.When,
                     true
@@ -146,7 +147,7 @@ namespace core.Options
             var description = $"${StrikePrice.ToString("0.00")} {OptionType.ToString()}";
 
             Transactions.Add(
-                Transaction.PLTx(Id, Ticker, description, PremiumPaid, PremiumReceived, when, true)
+                Transaction.PLTx(Id, Ticker, description, profit, PremiumPaid, PremiumReceived, when, true)
             );
         }
 
@@ -211,6 +212,7 @@ namespace core.Options
                     purchased.Id,
                     Ticker,
                     description,
+                    purchased.Premium,
                     debit,
                     purchased.When,
                     true

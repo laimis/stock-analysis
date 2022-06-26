@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using core.Stocks;
 using core.Stocks.Handlers;
+using core.Stocks.View;
 using core.Stocks.Views;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -37,13 +38,9 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/prices/{interval}")]
-        public async Task<ActionResult> Prices(string ticker, string interval)
+        public Task<PricesView> Prices(string ticker, string interval)
         {
-            var result = await _mediator.Send(new Prices.Query(ticker, interval));
-            return result.IsOk switch {
-                true => new JsonResult(result.Success),
-                false => BadRequest(result.Error)
-            };
+            return _mediator.Send(new Prices.Query(ticker, interval));
         }
         
         [HttpGet("{ticker}/ownership")]

@@ -1,14 +1,17 @@
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Shared.Adapters.Stocks;
+using core.Stocks.View;
 using MediatR;
 
 namespace core.Stocks.Handlers
 {
     public class Prices
     {
-        public class Query : IRequest<StockServiceResponse<HistoricalPrice[]>>
+        public class Query : IRequest<PricesView>
         {
             public string Interval { get; }
             public string Ticker { get; }
@@ -20,7 +23,7 @@ namespace core.Stocks.Handlers
             }
         }
 
-        public class Handler : IRequestHandler<Query, StockServiceResponse<HistoricalPrice[]>>
+        public class Handler : IRequestHandler<Query, PricesView>
         {
             private IStocksService2 _stocksService2;
 
@@ -29,9 +32,14 @@ namespace core.Stocks.Handlers
                 _stocksService2 = stockService2;
             }
 
-            public Task<StockServiceResponse<HistoricalPrice[]>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<PricesView> Handle(Query request, CancellationToken cancellationToken)
             {
-                return _stocksService2.GetHistoricalPrices(request.Ticker, request.Interval);
+                var prices = await _stocksService2.GetHistoricalPrices(request.Ticker, request.Interval);
+
+                return new PricesView(
+                    prices.Success,
+                    new [] {20, 50, 150}
+                );
             }
         }
     }

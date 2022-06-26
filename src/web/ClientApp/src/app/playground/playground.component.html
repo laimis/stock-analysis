@@ -2,7 +2,9 @@
 
   <button class="btn btn-primary" (click)="render()">Render</button>
 
-  <canvas baseChart
+  <canvas 
+    *ngIf="readyToRender"
+    baseChart
     [datasets]="lineChartData"
     [labels]="lineChartLabels"
     [options]="lineChartOptions"
