@@ -25,45 +25,28 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public async Task<object> List()
-        {
-            var query = new List.Query(User.Identifier());
-
-            return await _mediator.Send(query);
-        }
+        public Task<object> List() => _mediator.Send(new List.Query(User.Identifier()));
 
         [HttpGet("diagnostics")]
-        public object Diagnostics()
-        {
-            return _container.Monitors.Select(
+        public object Diagnostics() => _container.Monitors.Select(
                 m => new {
                     m.Alert.Ticker,
                     m.Alert.PricePoints
                 }
             );
-        }
 
         [HttpGet("migrate")]
-        public async Task<object> Migrate()
-        {
-            var query = new Migrate.Command(User.Identifier());
-
-            return await _mediator.Send(query);
-        }
+        public Task<object> Migrate() =>
+            _mediator.Send(new Migrate.Command(User.Identifier()));
 
         [HttpGet("clear")]
-        public async Task<object> Clear()
-        {
-            var query = new Clear.Command(User.Identifier());
-
-            return await _mediator.Send(query);
-        }
+        public Task<object> Clear() =>
+            _mediator.Send(
+                new Clear.Command(User.Identifier())
+            );
 
         [HttpGet("export")]
-        public Task<ActionResult> Export()
-        {
-            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
-        }
+        public Task<ActionResult> Export() => this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
 
         [HttpPost("delete")]
         public async Task<object> Delete(Delete.Command cmd)
@@ -74,12 +57,7 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}")]
-        public async Task<object> Get(string ticker)
-        {
-            var query = new Get.Query(User.Identifier(), ticker);
-
-            return await _mediator.Send(query);
-        }
+        public Task<object> Get(string ticker) => _mediator.Send(new Get.Query(User.Identifier(), ticker));
 
         [HttpPost]
         public async Task<object> AddPricePoint(Create.Command cmd)
@@ -88,5 +66,11 @@ namespace web.Controllers
 
             return await _mediator.Send(cmd);
         }
+
+        [AllowAnonymous]
+        [Consumes("text/plain")]
+        [HttpPost("sms")]
+        public Task SMS([FromBody] string body) =>
+            _mediator.Send(new SendSMS.Command(body));
     }
 }

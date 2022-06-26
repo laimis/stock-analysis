@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +28,7 @@ namespace web
         {
             AuthHelper.Configure(Configuration, services);
 
-            services.AddControllers();
+            services.AddControllers(o => o.InputFormatters.Add(new TextPlainInputFormatter()));
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
