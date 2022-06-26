@@ -22,9 +22,11 @@
     "@angular/router": "^14.0.3",
     "bootstrap": "^4.3.1",
     "c": "^1.1.1",
+    "chart.js": "^3.6.0",
     "kind-of": ">=6.0.3",
     "lodash": "^4.17.21",
     "minimist": ">=1.2.3",
+    "ng2-charts": "^3.0.11",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.4"
