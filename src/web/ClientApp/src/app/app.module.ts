@@ -19,7 +19,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { ProfileCreateComponent } from './profile/profile-create.component';
 import { ProfileLoginComponent } from './profile/profile-login.component';
 import { ReviewComponent } from './review/review.component';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { OwnedOptionComponent } from './options/owned-option-detail/owned-option-detail.component';
 import { StockDetailsComponent } from './stocks/stock-details/stock-details.component';
 import { TransactionsComponent } from './transactions/transactions.component';
@@ -60,7 +60,7 @@ import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.
 import { TradingComponent } from './trading/trading.component';
 import { TradingPositionComponent } from './trading/trading-position.component';
 
-var routes = [
+var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'alerts', component: AlertsComponent, canActivate: [AuthGuard] },
   { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
