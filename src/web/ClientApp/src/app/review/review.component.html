@@ -21,10 +21,10 @@
   <h5>Stock P&L</h5>
   <table class="table">
     <tr *ngFor="let g of result.plStockTransactions">
-      <td><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td>{{g.date | date}}</td>
+      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+      <td width="140">{{g.profit | currency}}</td>
+      <td width="140">{{g.date | date}}</td>
       <td>{{g.description}}</td>
-      <td>{{g.profit | currency}}</td>
     </tr>
     <tr *ngIf="result.plStockTransactions.length == 0">
       <td colspan="4">No stock P&L transactions</td>
@@ -34,10 +34,10 @@
   <h5>Non-PL Breakdown</h5>
   <table class="table">
     <tr *ngFor="let g of result.stockTransactions">
-      <td><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td>{{g.date | date}}</td>
+      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+      <td width="140">{{g.profit | currency}}</td>
+      <td width="140">{{g.date | date}}</td>
       <td>{{g.description}}</td>
-      <td>{{g.profit | currency}}</td>
     </tr>
     <tr *ngIf="result.stockTransactions.length == 0">
       <td colspan="4">No stock transactions</td>
@@ -47,10 +47,10 @@
   <h5>Option P&L</h5>
   <table class="table">
     <tr *ngFor="let g of result.plOptionTransactions">
-      <td><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td>{{g.date | date}}</td>
+      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+      <td width="140">{{g.profit | currency}}</td>
+      <td width="140">{{g.date | date}}</td>
       <td>{{g.description}}</td>
-      <td>{{g.profit | currency}}</td>
     </tr>
     <tr *ngIf="result.plOptionTransactions.length == 0">
       <td colspan="4">No option P&L transactions</td>
@@ -60,10 +60,10 @@
   <h5>Non-PL Breakdown</h5>
   <table class="table">
     <tr *ngFor="let g of result.optionTransactions">
-      <td><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td>{{g.date | date}}</td>
+      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+      <td width="140">{{g.profit | currency}}</td>
+      <td width="140">{{g.date | date}}</td>
       <td>{{g.description}}</td>
-      <td>{{g.profit | currency}}</td>
     </tr>
     <tr *ngIf="result.optionTransactions.length == 0">
       <td colspan="4">No option transactions</td>
