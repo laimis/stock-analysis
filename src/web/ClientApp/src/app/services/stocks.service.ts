@@ -305,15 +305,17 @@ export interface Link {
 export interface ReviewList {
   start: string
   end: string
-  stocks: ReviewTicker[]
-  options: ReviewTicker[]
   stockProfit: number
   optionProfit: number
+  plStockTransactions: Transaction[]
+  plOptionTransactions: Transaction[]
+  stockTransactions: Transaction[]
+  optionTransactions: Transaction[]
 }
 
 export interface ReviewTicker {
   ticker: string
-  transactions: TransactionList
+  transactions: Transaction[]
 }
 
 export interface TransactionList {

@@ -73,33 +73,33 @@ namespace core.Portfolio
                     .Where(t => t.DateAsDate >= request.Start)
                     .ToList();
 
-                var stockTickers = transactions.Where(t => !t.IsOption && !t.IsPL)
+                var stockTransactions = transactions.Where(t => !t.IsOption && !t.IsPL)
                     .GroupBy(t => t.Ticker)
-                    .Select(g => new ReviewTicker(g.Key, g))
+                    .SelectMany(g => g)
                     .ToList();
 
-                var optionTickers = transactions.Where(t => t.IsOption && !t.IsPL)
+                var optionTransactions = transactions.Where(t => t.IsOption && !t.IsPL)
                     .GroupBy(t => t.Ticker)
-                    .Select(g => new ReviewTicker(g.Key, g))
+                    .SelectMany(g => g)
                     .ToList();
 
-                var plStockTickers = transactions.Where(t => !t.IsOption && t.IsPL)
+                var plStockTransactions = transactions.Where(t => !t.IsOption && t.IsPL)
                     .GroupBy(t => t.Ticker)
-                    .Select(g => new ReviewTicker(g.Key, g))
+                    .SelectMany(g => g)
                     .ToList();
 
-                var plOptionTickers = transactions.Where(t => t.IsOption && t.IsPL)
+                var plOptionTransactions = transactions.Where(t => t.IsOption && t.IsPL)
                     .GroupBy(t => t.Ticker)
-                    .Select(g => new ReviewTicker(g.Key, g))
+                    .SelectMany(g => g)
                     .ToList();
 
                 return new ReviewView(
                     request.Start,
                     request.End,
-                    stockTickers,
-                    optionTickers,
-                    plStockTickers,
-                    plOptionTickers
+                    stockTransactions,
+                    optionTransactions,
+                    plStockTransactions,
+                    plOptionTransactions
                 );
             }
         }

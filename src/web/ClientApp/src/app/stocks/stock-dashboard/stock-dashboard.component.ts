@@ -50,7 +50,7 @@ export class StockDashboardComponent implements OnInit {
 	}
 
   hideIfHidden(value : number) : number {
-    return HideIfHidden(value, false)
+    return HideIfHidden(value, true)
   }
 
   onTickerSelected(ticker:string) {

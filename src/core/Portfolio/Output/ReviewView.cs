@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using core.Shared;
 
 namespace core.Portfolio.Output
 {
@@ -9,30 +10,28 @@ namespace core.Portfolio.Output
         public ReviewView(
             DateTimeOffset start,
             DateTimeOffset end,
-            List<ReviewTicker> stocks,
-            List<ReviewTicker> options,
-            List<ReviewTicker> plStocks,
-            List<ReviewTicker> plOptions)
+            List<Transaction> stockTransactions,
+            List<Transaction> optionTransactions,
+            List<Transaction> plStockTransactions,
+            List<Transaction> plOptionTransactions)
         {
             Start = start;
             End = end;
-            Stocks = stocks;
-            Options = options;
-            PLStocks = plStocks;
-            PLOptions = plOptions;
+            StockTransactions = stockTransactions;
+            OptionTransactions = optionTransactions;
+            PLStockTransactions = plStockTransactions;
+            PLOptionTransactions = plOptionTransactions;
 
-            StockProfit = plStocks.SelectMany(t => t.Transactions).Select(t => t.Profit)
-                .Aggregate(0m, (sum, next) => sum + next, sum => sum);
-
-            OptionProfit = plOptions.SelectMany(t => t.Transactions).Select(t => t.Profit)
-                .Aggregate(0m, (sum, next) => sum + next, sum => sum);
+            StockProfit = plStockTransactions.Select(t => t.Profit).Sum();
+            OptionProfit = plOptionTransactions.Select(t => t.Profit).Sum();
         }
+
         public DateTimeOffset Start { get; }
         public DateTimeOffset End { get; }
-        public List<ReviewTicker> Stocks { get; }
-        public List<ReviewTicker> Options { get; }
-        public List<ReviewTicker> PLStocks { get; }
-        public List<ReviewTicker> PLOptions { get; }
+        public List<Transaction> StockTransactions { get; }
+        public List<Transaction> OptionTransactions { get; }
+        public List<Transaction> PLStockTransactions { get; }
+        public List<Transaction> PLOptionTransactions { get; }
         public decimal StockProfit { get; }
         public decimal OptionProfit { get; }
     }
