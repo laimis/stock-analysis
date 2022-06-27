@@ -313,11 +313,6 @@ export interface ReviewList {
   optionTransactions: Transaction[]
 }
 
-export interface ReviewTicker {
-  ticker: string
-  transactions: Transaction[]
-}
-
 export interface TransactionList {
   credit: number
   debit: number
@@ -494,10 +489,21 @@ export class OptionDefinition {
   bid: number
   premium: number
   filled: string
+  closed: string
   breakEven: number
   risk: number
   volume : number
   boughtOrSold : string
+  expiresSoon : boolean
+  isExpired: boolean
+  profit: number
+  strikePriceDiff: number
+  currentPrice: number
+  isFavorable: boolean
+  itmOtmLabel: string
+  days: number
+  daysHeld: number
+  transactions: Transaction[]
 }
 
 export class OptionBreakdown {
