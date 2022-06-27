@@ -25,8 +25,6 @@ namespace web.Utils
         {
             var email = context.Principal.Email();
 
-            _logger.LogInformation($"Obtained email {email}");
-            
             var id = await _mediator.Send(new SignInViaGoogle.Command(email));
 
             (context.Principal.Identity as ClaimsIdentity).AddClaim(
@@ -38,8 +36,6 @@ namespace web.Utils
         {
             var email = context.Principal.Email();
 
-            _logger.LogInformation($"Obtained email {email}");
-            
             var id = await _mediator.Send(new SignInViaGoogle.Command(email));
             if (id == null)
             {
