@@ -12,12 +12,12 @@ RUN dotnet publish ./src/web --self-contained -r linux-musl-x64 -c Release -o /a
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine
 
-WORKDIR /app
-COPY --from=build-env /app/out /app
-
 RUN apk add --no-cache -U \
     curl \
     tzdata
+
+WORKDIR /app
+COPY --from=build-env /app/out /app
 
 HEALTHCHECK CMD curl -f http://localhost/health || exit 1
 
