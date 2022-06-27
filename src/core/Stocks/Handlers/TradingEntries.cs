@@ -34,7 +34,7 @@ namespace core.Stocks.Views
             {
                 var stocks = await _portfolio.GetStocks(request.UserId);
 
-                var tradingEntries = stocks.Where(s => s.State.Owned > 0 && s.State.Category == "shortterm")
+                var tradingEntries = stocks.Where(s => s.State.Owned > 0 && s.State.Category == StockCategory.ShortTerm)
                     .Select(s => new TradingEntryView(s.State))
                     .ToArray();
 

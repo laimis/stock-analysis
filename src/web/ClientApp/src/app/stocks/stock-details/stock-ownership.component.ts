@@ -48,7 +48,7 @@ export class StockOwnershipComponent implements OnInit {
 
   categoryChanged(newCategory) {
     this.service.settings(this.ownership.ticker, newCategory).subscribe( _ => {
-      alert("all good")
+      
     }, err => {
       this.errors = GetErrors(err)
     })

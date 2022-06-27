@@ -45,6 +45,11 @@ namespace core.Stocks
         {
             BuyOrSell.Add(purchased);
 
+            if (Category == null && Owned == 0)
+            {
+                Category = StockCategory.Default;
+            }
+
             StateUpdateLoop();
         }
 

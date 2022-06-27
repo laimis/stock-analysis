@@ -62,6 +62,13 @@ namespace core.Stocks
                 return;
             }
 
+            if (!StockCategory.IsValid(category))
+            {
+                throw new InvalidOperationException(
+                    $"Invalid stock category: {category}, only {string.Join(", ", StockCategory.All)} are valid"
+                );
+            }
+
             Apply(
                 new StockCategoryChanged(
                     Guid.NewGuid(),
