@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="row" *ngIf="dashboard.openOptionCount == 0 && dashboard.openStockCount == 0">
+    <div class="row" *ngIf="dashboard.openOptionCount == 0 && dashboard.ownedStockCount == 0">
       <div class="col">
         <div class="alert alert-secondary">
           <h3>Welcome!</h3>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="row">
-      <div class="col-8">
+      <div class="col">
 
         <div class="card">
           <div class="card-body">
@@ -41,8 +41,10 @@
             <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
           </div>
         </div>
+      </div>
 
-        <div class="card mt-4">
+      <div class="col">
+        <div class="card">
           <div class="card-body">
             <h5 class="card-title">
               <i class="fab fa-btc"></i>
@@ -52,8 +54,10 @@
             <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
           </div>
         </div>
-
-        <div class="card mt-4">
+      </div>
+      
+      <div class="col">
+        <div class="card">
           <div class="card-body">
             <h5 class="card-title">
               <i class="fas fa-dice-five"></i>
@@ -63,32 +67,23 @@
             <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
           </div>
         </div>
-
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
         <div class="card mt-4">
           <div class="card-body">
             <h5 class="card-title">
-              <i class="fas fa-bell"></i>
-              Alerts
-            </h5>
-            <p class="card-text">Triggered: <b>{{dashboard.triggeredAlertCount}}</b>, total: <b>{{dashboard.alertCount}}</b></p>
-            <a class="card-link" [routerLink]="[ '/alerts' ]">Visit Alerts</a>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="col-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
               <i class="fas fa-toolbox"></i>
-              Tools</h5>
-            <a class="card-link" [routerLink]="[ '/notes' ]">Journal</a>
-            <a class="card-link" [routerLink]="[ '/review' ]">Review</a>
-            <a class="card-link" [routerLink]="[ '/transactions' ]">Transactions</a>
-            <a class="card-link" [routerLink]="[ '/reports/chain' ]">Chain</a>
-            <a class="card-link" [routerLink]="[ '/reports/recentsells' ]">Sells</a>
-            <a class="card-link" [routerLink]="[ '/trading' ]">Trading</a>
+              Tools
+            </h5>
+            <ul>
+              <li><a [routerLink]="[ '/trading' ]">Trading</a></li>
+              <li><a [routerLink]="[ '/summary' ]">Weekly Summary</a></li>
+              <li><a [routerLink]="[ '/reports/recentsells' ]">Sells</a></li>
+              <li><a [routerLink]="[ '/transactions' ]">Transactions</a></li>
+              <li><a [routerLink]="[ '/reports/chain' ]">Chain</a></li>
+            </ul>
           </div>
         </div>
       </div>

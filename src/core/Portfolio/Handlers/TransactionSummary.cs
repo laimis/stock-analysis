@@ -1,20 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Alerts;
-using core.Options;
 using core.Portfolio.Output;
 using core.Shared;
-using core.Stocks;
 
 namespace core.Portfolio
 {
-    public class Review
+    public class TransactionSummary
     {
-        public class Generate : RequestWithUserId<ReviewView>
+        public class Generate : RequestWithUserId<TransactionSummaryView>
         {
             public Generate(string period)
             {
@@ -49,7 +46,7 @@ namespace core.Portfolio
             }
         }
 
-        public class Handler : HandlerWithStorage<Generate, ReviewView>
+        public class Handler : HandlerWithStorage<Generate, TransactionSummaryView>
         {
             public Handler(
                 IPortfolioStorage storage,
@@ -63,7 +60,7 @@ namespace core.Portfolio
             private IAlertsStorage _alerts;
             private IStocksService2 _stocks;
 
-            public override async Task<ReviewView> Handle(Generate request, CancellationToken cancellationToken)
+            public override async Task<TransactionSummaryView> Handle(Generate request, CancellationToken cancellationToken)
             {
                 var options = await _storage.GetOwnedOptions(request.UserId);
                 var stocks = await _storage.GetStocks(request.UserId);
@@ -93,7 +90,7 @@ namespace core.Portfolio
                     .SelectMany(g => g)
                     .ToList();
 
-                return new ReviewView(
+                return new TransactionSummaryView(
                     request.Start,
                     request.End,
                     stockTransactions,

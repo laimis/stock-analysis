@@ -39,8 +39,8 @@ export class StocksService {
     return this.http.get<object[]>('/api/events?entity=' + type)
   }
 
-  getReviewEntires(period:string): Observable<ReviewList> {
-    return this.http.get<ReviewList>('/api/portfolio/review?period=' + period)
+  getTransactionSummary(period:string): Observable<ReviewList> {
+    return this.http.get<ReviewList>('/api/portfolio/transactionsummary?period=' + period)
   }
 
   getTradingEntries(): Observable<StockTradingGridEntry[]> {

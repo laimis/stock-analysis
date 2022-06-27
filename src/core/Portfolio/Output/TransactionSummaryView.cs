@@ -5,9 +5,9 @@ using core.Shared;
 
 namespace core.Portfolio.Output
 {
-    public class ReviewView
+    public class TransactionSummaryView
     {
-        public ReviewView(
+        public TransactionSummaryView(
             DateTimeOffset start,
             DateTimeOffset end,
             List<Transaction> stockTransactions,

@@ -38,10 +38,10 @@ namespace web.Controllers
             return _mediator.Send(query);
         }
 
-        [HttpGet("review")]
-        public async Task<ReviewView> Review(string period)
+        [HttpGet("transactionsummary")]
+        public async Task<TransactionSummaryView> Review(string period)
         {
-            var cmd = new Review.Generate(period);
+            var cmd = new TransactionSummary.Generate(period);
 
             cmd.WithUserId(User.Identifier());
 
