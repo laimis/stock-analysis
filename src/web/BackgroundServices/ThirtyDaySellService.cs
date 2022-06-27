@@ -103,6 +103,10 @@ namespace web.BackgroundServices
                     new { sells = sellsOfInterest }
                 );
             }
+            else
+            {
+                _logger.LogInformation($"No sells of interest for {p.email}");
+            }
         }
     }
 }
