@@ -11,14 +11,13 @@
     <option value="last7days">Last 7 days</option>
   </select>
 
-  <div class="card-header mb-2 mt-2 border">
-    <div class="mb-2 font-weight-bold">Week of {{ result.start | date }} review</div>
-    <div class="mb-2"><b>Profit</b> {{ result.stockProfit + result.optionProfit | currency }}</div>
-    <div><b>Stocks</b>: {{ result.stockProfit | currency }}</div>
-    <div><b>Options</b>: {{ result.optionProfit | currency }}</div>
-  </div>
-
-  <h5>Stock P&L</h5>
+  <h5 class="mt-2">Week of {{ result.start | date }} review</h5>
+  
+  <div class="mt-2 mb-2">Profit {{ result.stockProfit + result.optionProfit | currency }}</div>
+  <div>Stocks: {{ result.stockProfit | currency }}</div>
+  <div>Options: {{ result.optionProfit | currency }}</div>
+  
+  <h5 class="mt-5">Stock P&L</h5>
   <table class="table">
     <tr *ngFor="let g of result.plStockTransactions">
       <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
@@ -31,7 +30,7 @@
     </tr>
   </table>
   
-  <h5>Non-PL Breakdown</h5>
+  <h5 class="mt-2">Non-PL Breakdown</h5>
   <table class="table">
     <tr *ngFor="let g of result.stockTransactions">
       <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
