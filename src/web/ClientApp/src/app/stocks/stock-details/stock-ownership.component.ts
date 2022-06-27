@@ -21,8 +21,7 @@ export class StockOwnershipComponent implements OnInit {
   ownershipChanged = new EventEmitter();
 
   public errors: string[]
-  success : boolean
-
+  
   numberOfShares: number
 	pricePerShare:  number
 	filled:         string
@@ -74,7 +73,6 @@ export class StockOwnershipComponent implements OnInit {
 
       this.service.deleteStockTransaction(this.ownership.id, transactionId).subscribe(_ => {
         this.ownershipChanged.emit("deletetransaction")
-        this.success = true
       })
     }
   }
@@ -82,8 +80,7 @@ export class StockOwnershipComponent implements OnInit {
   record() {
 
     this.errors = null;
-    this.success = false;
-
+    
     var op = new stocktransactioncommand()
     op.ticker = this.stock.ticker
     op.numberOfShares = this.numberOfShares
@@ -99,7 +96,6 @@ export class StockOwnershipComponent implements OnInit {
     this.service.purchase(stock).subscribe( _ => {
       this.ownershipChanged.emit("buy")
       this.clearFields()
-      this.success = true
     }, err => {
       this.errors = GetErrors(err)
     })
@@ -109,7 +105,6 @@ export class StockOwnershipComponent implements OnInit {
     this.service.sell(stock).subscribe( _ => {
       this.ownershipChanged.emit("sell")
       this.clearFields()
-      this.success = true
     }, err => {
       this.errors = GetErrors(err)
     })
