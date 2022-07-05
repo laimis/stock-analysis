@@ -59,6 +59,8 @@ export class StockOwnershipGridComponent implements OnInit {
         return (a:OwnedStock, b:OwnedStock) => a.owned - b.owned
       case "ticker":
         return (a:OwnedStock, b:OwnedStock) => a.ticker.localeCompare(b.ticker)
+      case "daysSinceLastTransaction":
+        return (a:OwnedStock, b:OwnedStock) => a.daysSinceLastTransaction - b.daysSinceLastTransaction
     }
 
     console.log("unrecognized sort column " + column)
