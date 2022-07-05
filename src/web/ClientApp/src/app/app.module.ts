@@ -53,7 +53,6 @@ import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/sto
 import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
-import { StockDCAGridComponent } from './stocks/stock-dashboard/stock-dca-grid.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
@@ -154,7 +153,6 @@ var routes: Routes = [
     StockNotesComponent,
     StockOptionComponent,
     StockOwnershipComponent,
-    StockDCAGridComponent,
     StockOwnershipGridComponent,
     StockAdvancedStatsGridComponent,
     StockOwnershipPerformanceComponent,

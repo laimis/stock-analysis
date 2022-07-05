@@ -17,6 +17,7 @@
           <th class="text-right sort-header" (click)="sort('profitsPct')">%</th>
           <th class="text-right sort-header" (click)="sort('equity')">Equity</th>
           <th class="text-right sort-header" (click)="sort('daysheld')">Days Held</th>
+          <th class="text-right sort-header" (click)="sort('daysSinceLastTransaction')">Days Since Last Tx</th>
         </tr>
       </thead>
       <tr *ngFor="let ticker of owned" [ngClass]="{'bg-warning': highlightRow(ticker)}">
@@ -29,6 +30,7 @@
         <td class="text-right"><span [ngClass]="{'profits-positive': ticker.profits > 0, 'profits-negative': ticker.profits < 0}">{{ticker.profitsPct | percent:'1.2' }}</span></td>
         <td class="text-right">{{ticker.equity | currency}} <small>{{equityPct(ticker) | percent}}</small></td>
         <td class="text-right">{{ticker.daysHeld}}</td>
+        <td class="text-right">{{ticker.daysSinceLastTransaction}}</td>
       </tr>
     </table>
   </div>
