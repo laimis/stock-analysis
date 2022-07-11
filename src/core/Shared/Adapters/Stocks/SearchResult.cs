@@ -7,7 +7,8 @@ namespace core.Adapters.Stocks
         private static readonly HashSet<string> _supportedTypes = new HashSet<string>{
             "SHARE",
             "cs",
-            "et"
+            "et",
+            "ad"
         };
 
         public string Symbol { get; set; }
