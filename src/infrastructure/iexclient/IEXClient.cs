@@ -81,26 +81,23 @@ namespace iexclient
             };
         }
 
-        public Task<StockServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker)
-        {
-            var url = MakeUrl($"stock/{ticker}/company");
+        public Task<StockServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker) =>
+            GetCachedResponse<CompanyProfile>(
+                MakeUrl($"stock/{ticker}/company"),
+                CacheKeyMonthly(ticker)
+            );
 
-            return GetCachedResponse<CompanyProfile>(url, CacheKeyMonthly(ticker));
-        }
+        public Task<StockServiceResponse<Quote>> Quote(string ticker) =>
+            GetCachedResponse<Quote>(
+                MakeUrl($"stock/{ticker}/quote"),
+                CacheKeyMinute(ticker + "quote")
+            );
 
-        public Task<StockServiceResponse<Quote>> Quote(string ticker)
-        {
-            var url = MakeUrl($"stock/{ticker}/quote");
-
-            return GetCachedResponse<Quote>(url, CacheKeyMinute(ticker + "quote"));
-        }
-
-        public Task<StockServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker)
-        {
-            var url = MakeUrl($"stock/{ticker}/advanced-stats");
-
-            return GetCachedResponse<StockAdvancedStats>(url, CacheKeyMinute(ticker + "advanced"));
-        }
+        public Task<StockServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker) =>
+            GetCachedResponse<StockAdvancedStats>(
+                MakeUrl($"stock/{ticker}/advanced-stats"),
+                CacheKeyMinute(ticker + "advanced")
+            );
 
         public async Task<StockServiceResponse<Price>> GetPrice(string ticker)
         {
@@ -149,14 +146,11 @@ namespace iexclient
             );
         }
 
-        public Task<StockServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(string ticker, string interval)
-        {
-            var url = MakeUrl($"stock/{ticker}/chart/{interval}");
-
-            url += $"&chartCloseOnly=true";
-
-            return GetCachedResponse<HistoricalPrice[]>(url, CacheKeyDaily(ticker + interval));
-        }
+        public Task<StockServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(string ticker, string interval) =>
+            GetCachedResponse<HistoricalPrice[]>(
+                MakeUrl($"stock/{ticker}/chart/{interval}") + $"&chartCloseOnly=true",
+                CacheKeyDaily(ticker + interval)
+            );
 
         private string MakeUrl(string function) =>  $"{_endpoint}/{function}?token={_token}";
 
