@@ -3,6 +3,7 @@ import { StocksService, Transaction } from '../services/stocks.service';
 import { ChartDataset, ChartOptions, Chart, LogarithmicScale } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { PointAnnotationOptions } from 'chartjs-plugin-annotation';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-playground',
@@ -28,17 +29,30 @@ export class PlaygroundComponent implements OnInit {
     }
   };
   
+  public ticker = undefined;
   public lineChartLegend = true;
   public lineChartType = 'line';
   public lineChartPlugins = [];
   public readyToRender = false;
   public transactions:Transaction[] = []
 
-  constructor(private stocks:StocksService) { }
+  constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
   ngOnInit() {
     Chart.register(LogarithmicScale);
     Chart.register(annotationPlugin);
+    
+    this.route.queryParams
+      .subscribe(params => {
+        console.log(params);
+        this.ticker = params.ticker;
+        if (this.ticker === undefined) {
+          this.ticker = "STNG"
+        }
+        console.log(this.ticker);
+      }
+    );
+
   }
 
   ngOnDestroy() {
@@ -47,9 +61,7 @@ export class PlaygroundComponent implements OnInit {
 
   render() {
 
-    var ticker = "STNG"
-
-    this.addAnnotations(ticker)
+    this.addAnnotations(this.ticker)
   }
 
   renderPrices(ticker:string) {
@@ -132,14 +144,6 @@ export class PlaygroundComponent implements OnInit {
       this.renderPrices(ticker)
       
     })
-  }
-
-  fetch(ticker:string) {
-    console.log(ticker)
-    
-    // this.stocks.registerForTracking(ticker).subscribe(r => {
-    //   this.result = r
-    // })
   }
 
 }
