@@ -1,15 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 a {
-  color: darkcyan;
+  color: #004289;
 }
 
 .badge-info {
-  background-color: darkcyan
+  background-color: #004289;
 }
 
 .btn-primary {
-  background-color: darkcyan;
-  border-color: darkcyan;
+  background-color: #004289;
+  border-color: #004289;
 }
 
 .sort-header {
