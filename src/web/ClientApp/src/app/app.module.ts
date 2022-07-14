@@ -56,9 +56,9 @@ import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
-import { TradingComponent } from './trading/trading.component';
-import { TradingPositionComponent } from './trading/trading-position.component';
 import { NgChartsModule } from 'ng2-charts';
+import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
+import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -93,7 +93,7 @@ var routes: Routes = [
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
-  { path: 'trading', component: TradingComponent},
+  { path: 'trading', component: StockTradingComponent},
 
   { path: 'stocks', component: StockDashboardComponent},
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
@@ -157,13 +157,13 @@ var routes: Routes = [
     StockAdvancedStatsGridComponent,
     StockOwnershipPerformanceComponent,
     StockPastComponent,
+    StockTradingComponent,
+    StockTradingPositionComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,
     TermsComponent,
-    TradingComponent,
-    TradingPositionComponent,
-
+    
     FailuresuccesschainComponent,
     RecentSellsComponent,
 

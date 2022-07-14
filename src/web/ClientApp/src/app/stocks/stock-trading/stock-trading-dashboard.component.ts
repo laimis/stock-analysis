@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, ReviewList, StockTradingGridEntry, stocktransactioncommand, StockStats } from '../services/stocks.service';
+import { StocksService, StockTradingGridEntry, StockStats } from '../../services/stocks.service';
 
 @Component({
-  selector: 'app-trading',
-  templateUrl: './trading.component.html',
-  styleUrls: ['./trading.component.css']
+  selector: 'stock-trading',
+  templateUrl: './stock-trading-dashboard.component.html',
+  styleUrls: ['./stock-trading-dashboard.component.css']
 })
-export class TradingComponent implements OnInit {
+export class StockTradingComponent implements OnInit {
   result: StockTradingGridEntry[]
   loaded: boolean = false
   timePeriod: string = 'thisweek'

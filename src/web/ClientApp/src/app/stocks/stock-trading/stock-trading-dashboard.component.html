@@ -76,11 +76,11 @@
   </div>
     
 
-  <app-trading-position
+  <stock-trading-position
     *ngFor="let p of result"
     [p]="p"
     [stopLoss]="stopLoss"
     [firstTarget]="firstTarget"
-    [rrTarget]="rrTarget"></app-trading-position>
+    [rrTarget]="rrTarget"></stock-trading-position>
   
 </div>

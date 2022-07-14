@@ -1,12 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { StockTradingGridEntry } from '../services/stocks.service';
+import { StockTradingGridEntry } from '../../services/stocks.service';
 
 @Component({
-  selector: 'app-trading-position',
-  templateUrl: './trading-position.component.html',
-  styleUrls: ['./trading-position.component.css']
+  selector: 'stock-trading-position',
+  templateUrl: './stock-trading-position.component.html',
+  styleUrls: ['./stock-trading-position.component.css']
 })
-export class TradingPositionComponent {
+export class StockTradingPositionComponent {
     @Input()
     p: StockTradingGridEntry
 
