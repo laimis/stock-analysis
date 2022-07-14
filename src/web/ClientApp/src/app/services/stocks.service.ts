@@ -177,13 +177,11 @@ export class StocksService {
 		return this.http.post('/api/stocks/settings', obj)
   }
 
-  search(term: string): Observable<object[]> {
+  search(term: string): Observable<StockSearchResult[]> {
     if (!term.trim()) {
-      return of([]);
+      return of([])
     }
-    return this.http.get<object[]>(`/api/stocks/search/${term}`).pipe(
-      tap(_ => console.log(`found stocks matching "${term}"`))
-    );
+    return this.http.get<StockSearchResult[]>(`/api/stocks/search/${term}`)
   }
 
   // ------- portfolio ----------------
@@ -300,6 +298,11 @@ export interface Chain {
 
 export interface Link {
   success: boolean
+}
+
+export interface StockSearchResult {
+  symbol: string
+  securityName: string
 }
 
 export interface ReviewList {
