@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, ReviewList, StockTradingGridEntry, stocktransactioncommand } from '../services/stocks.service';
+import { StocksService, ReviewList, StockTradingGridEntry, stocktransactioncommand, StockStats } from '../services/stocks.service';
 
 @Component({
   selector: 'app-trading',
@@ -46,7 +46,7 @@ export class TradingComponent implements OnInit {
   potentialGains: number | null = null
   potentialLoss: number | null = null
   potentialRr: number | null = null
-  stats: object | null = null
+  stats: StockStats | null = null
 
 
   onBuyTickerSelected(ticker: string) {

@@ -441,11 +441,15 @@ export interface Prices {
   sma: SMA[]
 }
 
+export interface StockStats {
+  day50MovingAvg: number
+  day200MovingAvg: number
+}
 
 export interface StockDetails {
   ticker: string
   price: number
-  stats: object
+  stats: StockStats
   profile : object
 	alert: object
 }

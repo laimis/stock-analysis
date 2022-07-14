@@ -33,7 +33,7 @@
               class="form-control"
               id="positionSize"
               [(ngModel)]="positionSize"
-              (ngModelChange)="updateBuyingValues($event)">
+              (ngModelChange)="updateBuyingValues()">
           </div>
         </div>
       </div>
@@ -45,7 +45,7 @@
             id="costToBuy"
             class="form-control"
             [(ngModel)]="costToBuy"
-            (ngModelChange)="updateBuyingValues($event)"
+            (ngModelChange)="updateBuyingValues()"
           >
         </div>
         <div class="col">Shares #: <strong>{{ stocksToBuy }}</strong></div>

@@ -37,7 +37,7 @@ import { StockFundamentalsComponent } from './stocks/stock-details/stock-fundame
 import { StockNotesComponent } from './stocks/stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
-import { StockGridComponent } from './stocks/stock-grid/stock-grid.component';
+import { StockGridComponent } from './stocks/stock-grid.component';
 import { StockAlertsComponent } from './stocks/stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
