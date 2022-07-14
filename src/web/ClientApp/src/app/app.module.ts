@@ -50,7 +50,6 @@ import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboar
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
 import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
 import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
-import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
@@ -60,6 +59,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
+import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -157,10 +157,10 @@ var routes: Routes = [
     StockOwnershipGridComponent,
     StockAdvancedStatsGridComponent,
     StockOwnershipPerformanceComponent,
-    StockPastComponent,
     StockTradingComponent,
     StockTradingPositionComponent,
     StockTradingNewPositionComponent,
+    StockTradingPastComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,

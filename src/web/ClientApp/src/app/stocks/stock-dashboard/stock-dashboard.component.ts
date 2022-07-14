@@ -13,7 +13,6 @@ export class StockDashboardComponent implements OnInit {
   owned : OwnedStock[]
   performance : any
   performanceRecent : any
-  past : any
   loaded : boolean = false
 
   numberOfSharesOwned: number;
@@ -39,7 +38,6 @@ export class StockDashboardComponent implements OnInit {
       this.owned = result.owned
       this.performance = result.performance.overall
       this.performanceRecent = result.performance.recent
-      this.past = result.past
       this.loaded = true
       this.calculateProperties()
       this.sort("profits")

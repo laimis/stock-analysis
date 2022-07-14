@@ -35,7 +35,7 @@
     <a class="tab" [ngClass]="{'is-active': isActive('newposition')}" [routerLink]="" (click)="activateTab('newposition')">
       New Position
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('pastpositions')}" [routerLink]="" (click)="activateTab('pastpositions')">
+    <a class="tab" [ngClass]="{'is-active': isActive('past')}" [routerLink]="" (click)="activateTab('past')">
       Past Positions
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
@@ -58,11 +58,13 @@
 
   <div *ngIf="isActive('positions')">
     <stock-trading-position
-    *ngFor="let p of result"
+    *ngFor="let p of current"
     [p]="p"
     [stopLoss]="stopLoss"
     [firstTarget]="firstTarget"
     [rrTarget]="rrTarget"></stock-trading-position>
   </div>
+
+  <stock-past *ngIf="isActive('past')" [past]=past></stock-past>
   
 </div>

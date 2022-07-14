@@ -83,16 +83,10 @@ namespace core.Stocks
                     closedTransactions
                 );
 
-                var past = closedTransactions
-                    .Select(t => new PositionInstanceView(t))
-                    .OrderByDescending(p => p.Date)
-                    .ToList();
-
                 var obj = new StockDashboardView
                 {
                     Owned = ownedStocks,
                     Performance = performance,
-                    Past = past,
                     Calculated = DateTimeOffset.UtcNow
                 };
                 return obj;

@@ -152,11 +152,9 @@ namespace web.Controllers
         }
 
         [HttpGet("tradingentries")]
-        public Task<TradingEntryView[]> TradingEntries()
-        {
-            var query = new TradingEntries.Query(User.Identifier());
-
-            return _mediator.Send(query);
-        }
+        public Task<TradingEntriesView> TradingEntries() =>
+            _mediator.Send(
+                new TradingEntries.Query(User.Identifier())
+            );
     }
 }

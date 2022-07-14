@@ -1,5 +1,6 @@
 ﻿namespace core.Stocks.Views
 {
+
     public class TradingEntryView
     {
         public TradingEntryView(OwnedStockState state)

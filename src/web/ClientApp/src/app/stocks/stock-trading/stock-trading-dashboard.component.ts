@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, StockTradingGridEntry, StockStats } from '../../services/stocks.service';
+import { StocksService, StockTradingGridEntry, StockStats, StockTradingEntries } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -8,7 +8,8 @@ import { StocksService, StockTradingGridEntry, StockStats } from '../../services
   styleUrls: ['./stock-trading-dashboard.component.css']
 })
 export class StockTradingComponent implements OnInit {
-  result: StockTradingGridEntry[]
+  current: StockTradingGridEntry[]
+  past: StockTradingGridEntry[]
   loaded: boolean = false
   timePeriod: string = 'thisweek'
 
@@ -33,9 +34,9 @@ export class StockTradingComponent implements OnInit {
   }
 
   private loadEntries() {
-    this.stockService.getTradingEntries().subscribe((r: StockTradingGridEntry[]) => {
-      this.result = r
-      this.updateModel()
+    this.stockService.getTradingEntries().subscribe((r: StockTradingEntries) => {
+      this.current = r.current
+      this.past = r.past
       this.loaded = true
       
     }, _ => { this.loaded = true})
@@ -46,19 +47,5 @@ export class StockTradingComponent implements OnInit {
   rrTarget: number = 0.15 // this is const, not sure yet where we will keep
   firstTarget: number = 0.07
   stopLoss: number = 0.05
-
-
-  updateModel() {
-    this.numberOfPositions = this.result.length
-    
-    this.invested = 0
-    this.result.forEach(e => {
-      this.invested += e.averageCost * e.numberOfShares
-    })
-  }
-
-  periodChanged() {
-    this.loadEntries()
-  }
 }
 
