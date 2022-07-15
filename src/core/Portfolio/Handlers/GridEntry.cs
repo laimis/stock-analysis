@@ -4,9 +4,9 @@ namespace core.Portfolio
 {
     public struct GridEntry
     {
-        public GridEntry(string ticker, Price price, StockAdvancedStats stats)
+        public GridEntry(string ticker, decimal price, StockAdvancedStats stats)
         {
-            Price = price.Amount;
+            Price = price;
             Ticker = ticker;
             Stats = stats;
         }

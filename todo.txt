@@ -1,7 +1,3 @@
-- move the existing stocks/performance to trading place
-    - move the component that accepts performance
-    - make sure performance is loaded as part of "trading" call
-    - remove the performance being returned by the stock dashboard - no one cares
 - load stock grid as part of the stock-dashboard - that's the good stuff that we care about
 
 - turn chart into its own component that can be reused

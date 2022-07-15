@@ -37,7 +37,7 @@ import { StockFundamentalsComponent } from './stocks/stock-details/stock-fundame
 import { StockNotesComponent } from './stocks/stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
-import { StockGridComponent } from './stocks/stock-grid.component';
+import { StockGridComponent } from './stocks/stock-dashboard/stock-grid.component';
 import { StockAlertsComponent } from './stocks/stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
@@ -48,7 +48,6 @@ import { OptionPerformanceComponent } from './options/option-dashboard/option-pe
 import { OptionClosedComponent } from './options/option-dashboard/option-closed.component';
 import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboard.component';
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
-import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
@@ -70,7 +69,6 @@ var routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
-  { path: 'grid', component: StockGridComponent, canActivate: [AuthGuard]},
   { path: 'landing', component: LandingComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
   { path: 'profile/create', component: ProfileCreateComponent },
@@ -155,7 +153,6 @@ var routes: Routes = [
     StockOptionComponent,
     StockOwnershipComponent,
     StockOwnershipGridComponent,
-    StockAdvancedStatsGridComponent,
     StockTradingComponent,
     StockTradingPositionComponent,
     StockTradingNewPositionComponent,

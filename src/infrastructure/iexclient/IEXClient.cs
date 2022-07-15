@@ -96,7 +96,7 @@ namespace iexclient
         public Task<StockServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker) =>
             GetCachedResponse<StockAdvancedStats>(
                 MakeUrl($"stock/{ticker}/advanced-stats"),
-                CacheKeyMinute(ticker + "advanced")
+                CacheKeyDaily(ticker + "advanced")
             );
 
         public async Task<StockServiceResponse<Price>> GetPrice(string ticker)

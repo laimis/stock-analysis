@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { OwnedStock } from '../../services/stocks.service';
-import { InvokeFunctionExpr } from '@angular/compiler';
 
 
 @Component({

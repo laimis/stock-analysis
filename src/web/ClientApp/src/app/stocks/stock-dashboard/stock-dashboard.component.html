@@ -70,6 +70,10 @@
   <a class="tab" [ngClass]="{'is-active': isActive('owned')}" [routerLink]="" (click)="activateTab('owned')">
     Ownership
   </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('grid')}" [routerLink]="" (click)="activateTab('grid')">
+    Grid
+  </a>
 </div>
 
 <stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
+<stock-grid *ngIf="loaded && isActive('grid')"></stock-grid>
