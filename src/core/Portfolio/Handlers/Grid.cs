@@ -28,7 +28,12 @@ namespace core.Portfolio
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                var prices = await _stocks.GetPrices(stocks.Select(s => s.State.Ticker).ToArray());
+                var prices = await _stocks.GetPrices(
+                    stocks
+                        .Where(s => s.State.Owned > 0)
+                        .Select(s => s.State.Ticker)
+                        .ToArray()
+                );
 
                 return stocks
                     .Where(s => s.State.Owned > 0)
