@@ -8,7 +8,7 @@ import { StocksService, StockTradingGridEntry, StockTradingEntries, StockTrading
   styleUrls: ['./stock-trading-dashboard.component.css']
 })
 export class StockTradingComponent implements OnInit {
-  current: StockTradingGridEntry[]
+  positions: StockTradingGridEntry[]
   past: StockTradingGridEntry[]
   loaded: boolean = false
   timePeriod: string = 'thisweek'
@@ -36,7 +36,7 @@ export class StockTradingComponent implements OnInit {
 
   private loadEntries() {
     this.stockService.getTradingEntries().subscribe((r: StockTradingEntries) => {
-      this.current = r.current
+      this.positions = r.current
       this.past = r.past
       this.performance = r.performance
       this.loaded = true

@@ -56,7 +56,7 @@ import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
-import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
+import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-positions.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
 import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';

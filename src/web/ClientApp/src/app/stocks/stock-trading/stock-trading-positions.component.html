@@ -1,4 +1,4 @@
-<div class="card border-info mb-4">
+<div class="card border-info mb-4" *ngFor="let p of positions">
   <div class="card-body">
     <div class="card-title">
       <div class="container">
@@ -10,7 +10,7 @@
           <div class="col-2 text-center">
           </div>
           <div class="col text-right">
-            <span class="position-gain">{{ gain() | percent }}</span>
+            <span class="position-gain">{{ gain(p) | percent }}</span>
           </div>
         </div>  
       </div>
@@ -20,27 +20,27 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <span class="badge" [ngClass]="stopNumber() < p.price ? 'badge-success' : 'badge-primary'">stop</span>
-            {{ stopNumber() | currency }}
+            <span class="badge" [ngClass]="stopNumber(p) < p.price ? 'badge-success' : 'badge-primary'">stop</span>
+            {{ stopNumber(p) | currency }}
           </div>
           <div class="col text-center">
             <span class="badge" [ngClass]="p.averageCost < p.price ? 'badge-success' : 'badge-primary'">cost</span>
             {{p.averageCost | currency}}
           </div>
           <div class="col text-center">
-            <span class="badge" [ngClass]="firstTargetNumber() < p.price ? 'badge-success' : 'badge-primary'">1st PT</span>
-            {{ firstTargetNumber() | currency }}
+            <span class="badge" [ngClass]="firstTargetNumber(p) < p.price ? 'badge-success' : 'badge-primary'">1st PT</span>
+            {{ firstTargetNumber(p) | currency }}
           </div>
           <div class="col text-right">
-            <span class="badge" [ngClass]="rrTargetNumber() < p.price ? 'badge-success' : 'badge-primary'">2nd PT</span>
-            {{ rrTargetNumber() | currency}}
+            <span class="badge" [ngClass]="rrTargetNumber(p) < p.price ? 'badge-success' : 'badge-primary'">2nd PT</span>
+            {{ rrTargetNumber(p) | currency}}
           </div>
         </div>
 
         <div class="row">
           <div class="col">
             <span class="badge">size</span>
-            {{ positionSize() | currency }}
+            {{ positionSize(p) | currency }}
           </div>
           <div class="col text-center">
             <span class="badge">shares</span>
@@ -54,28 +54,7 @@
         </div>
       </div>
 
-      <!-- <div class="container mt-2">
-        <div class="row">
-          <div class="col">
-            <div class="progress">
-              <div
-                class="progress-bar bg-lightblue"
-                role="progressbar"
-                [ngStyle]="{'width': positionProgress() + '%'}"
-                aria-valuenow="positionProgress()"
-                aria-valuemin="0"
-                aria-valuemax="100">
-                {{ positionProgress() | number : '1.0-0' }}%
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
-      
     </div>
-        <!-- <div class="col">
-          <div>Average Cost: </div>
-          <div>Size: {{p.maxCost | currency}}</div>
-          -->
+        
   </div>
 </div>
