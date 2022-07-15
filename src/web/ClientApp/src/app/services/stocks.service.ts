@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -475,9 +474,32 @@ export interface StockGridEntry {
   above200: number
 }
 
+export interface StockTradingPerformance {
+  wins: number,
+  losses: number,
+  total: number,
+  avgDaysHeld: number,
+  avgWinAmount: number,
+  maxWinAmount: number,
+  winAvgReturnPct: number,
+  winAvgDaysHeld: number,
+  avgLossAmount: number,
+  maxLossAmount: number,
+  lossAvgReturnPct: number,
+  lossAvgDaysHeld: number,
+  ev: number,
+  avgReturnPct: number,
+}
+
+export interface StockTradingPerformanceCollection {
+  overall: StockTradingPerformance,
+  recent: StockTradingPerformance
+}
+
 export interface StockTradingEntries {
   current: StockTradingGridEntry[]
   past: StockTradingGridEntry[]
+  performance: StockTradingPerformanceCollection
 }
 
 export interface StockTradingGridEntry {

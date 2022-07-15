@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using core.Stocks;
 using core.Stocks.Handlers;
 using core.Stocks.View;
-using core.Stocks.Views;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

@@ -49,7 +49,6 @@ import { OptionClosedComponent } from './options/option-dashboard/option-closed.
 import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboard.component';
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
 import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
-import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
@@ -60,6 +59,7 @@ import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dash
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
 import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
+import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -156,11 +156,11 @@ var routes: Routes = [
     StockOwnershipComponent,
     StockOwnershipGridComponent,
     StockAdvancedStatsGridComponent,
-    StockOwnershipPerformanceComponent,
     StockTradingComponent,
     StockTradingPositionComponent,
     StockTradingNewPositionComponent,
     StockTradingPastComponent,
+    StockTradingPerformanceComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,

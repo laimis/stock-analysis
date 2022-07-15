@@ -1,4 +1,4 @@
-﻿namespace core.Stocks.Views
+﻿namespace core.Stocks.View
 {
 
     public class TradingEntryView

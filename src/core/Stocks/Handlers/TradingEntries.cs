@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
+using core.Stocks.View;
 using MediatR;
 
-namespace core.Stocks.Views
+namespace core.Stocks
 {
     public class TradingEntries
     {
@@ -54,17 +55,22 @@ namespace core.Stocks.Views
 
                 var closedPositions = stocks
                     .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
-                    .ToArray();
+                    .ToList();
 
                 var past = closedPositions
                     .OrderByDescending(p => p.Closed)
                     .ToArray();
 
+                var performance = new TradingPerformanceContainerView(
+                    closedPositions,
+                    20
+                );
+
                 return new TradingEntriesView(
                     current: current,
-                    past: past
+                    past: past,
+                    performance: performance
                 );
-                
             }
         }
     }

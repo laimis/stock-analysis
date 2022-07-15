@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, StockTradingGridEntry, StockStats, StockTradingEntries } from '../../services/stocks.service';
+import { StocksService, StockTradingGridEntry, StockTradingEntries, StockTradingPerformanceCollection } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -12,6 +12,7 @@ export class StockTradingComponent implements OnInit {
   past: StockTradingGridEntry[]
   loaded: boolean = false
   timePeriod: string = 'thisweek'
+  performance: StockTradingPerformanceCollection;
 
   constructor(
     private stockService:StocksService,
@@ -37,6 +38,7 @@ export class StockTradingComponent implements OnInit {
     this.stockService.getTradingEntries().subscribe((r: StockTradingEntries) => {
       this.current = r.current
       this.past = r.past
+      this.performance = r.performance
       this.loaded = true
       
     }, _ => { this.loaded = true})
