@@ -510,7 +510,11 @@ export interface StockTradingGridEntry {
   maxNumberOfShares: number,
   averageCost: number,
   profitTarget: number,
-  gain: number,
+  profit: number,
+  daysHeld: number,
+  opened: string,
+  closed: string,
+  returnPct: number
 }
 
 export class OptionDefinition {

@@ -1,0 +1,17 @@
+<div>
+  <h3>{{currentPosition.ticker}}</h3>
+
+  Held it for {{currentPosition.daysHeld}} days, from {{currentPosition.opened | date:'medium'}} to {{currentPosition.closed | date:'medium'}}
+  
+  Entry cost: {{currentPosition.averageCost}}
+
+  Return: {{currentPosition.profit}} ( {{ currentPosition.returnPct | percent }} )
+
+  Chart will go here
+
+</div>
+
+<div>
+  <button (click)="previous()" class="btn btn-primary">Previous</button>
+  <button (click)="next()" class="btn btn-primary">Next</button>
+</div>

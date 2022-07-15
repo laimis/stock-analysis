@@ -59,6 +59,7 @@ import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trad
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
 import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
+import { StockTradingReviewComponent } from './stocks/stock-trading/stock-trading-review.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -158,6 +159,7 @@ var routes: Routes = [
     StockTradingNewPositionComponent,
     StockTradingPastComponent,
     StockTradingPerformanceComponent,
+    StockTradingReviewComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,
