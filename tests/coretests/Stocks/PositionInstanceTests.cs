@@ -39,7 +39,7 @@ namespace coretests.Stocks
         [Fact]
         public void Percentage()
         {
-            Assert.Equal(0.1846m, _position.Percentage);
+            Assert.Equal(0.1846m, _position.ReturnPct);
         }
 
         [Fact]

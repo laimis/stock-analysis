@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, StockTradingGridEntry, StockStats } from '../../services/stocks.service';
+import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -8,9 +8,11 @@ import { StocksService, StockTradingGridEntry, StockStats } from '../../services
   styleUrls: ['./stock-trading-dashboard.component.css']
 })
 export class StockTradingComponent implements OnInit {
-  result: StockTradingGridEntry[]
+  positions: StockTradingPosition[]
+  past: StockTradingPosition[]
   loaded: boolean = false
   timePeriod: string = 'thisweek'
+  performance: StockTradingPerformanceCollection;
 
   constructor(
     private stockService:StocksService,
@@ -22,10 +24,21 @@ export class StockTradingComponent implements OnInit {
     this.loadEntries()
   }
 
+  activeTab = 'positions'
+  
+  isActive(tabName:string) {
+    return tabName == this.activeTab
+  }
+
+  activateTab(tabName:string) {
+    this.activeTab = tabName
+  }
+
   private loadEntries() {
-    this.stockService.getTradingEntries().subscribe((r: StockTradingGridEntry[]) => {
-      this.result = r
-      this.updateModel()
+    this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
+      this.positions = r.current
+      this.past = r.past
+      this.performance = r.performance
       this.loaded = true
       
     }, _ => { this.loaded = true})
@@ -36,53 +49,5 @@ export class StockTradingComponent implements OnInit {
   rrTarget: number = 0.15 // this is const, not sure yet where we will keep
   firstTarget: number = 0.07
   stopLoss: number = 0.05
-
-  // variables for new positions
-  positionSize: number = 3000
-  costToBuy: number | null = null
-  stocksToBuy : number | null = null
-  stopPrice: number | null = null
-  exitPrice: number | null = null
-  potentialGains: number | null = null
-  potentialLoss: number | null = null
-  potentialRr: number | null = null
-  stats: StockStats | null = null
-
-
-  onBuyTickerSelected(ticker: string) {
-    this.costToBuy = null
-
-    this.stockService.getStockDetails(ticker).subscribe(stockDetails => {
-      console.log(stockDetails)
-      this.costToBuy = stockDetails.price
-      this.updateBuyingValues()
-      this.stats = stockDetails.stats
-		}, error => {
-			console.error(error);
-			this.loaded = true;
-    });
-  }
-
-  updateBuyingValues() {
-    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
-    this.stopPrice = this.costToBuy * (1 - this.stopLoss)
-    this.exitPrice = this.costToBuy * (1 + this.rrTarget)
-    this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
-    this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
-    this.potentialRr = Math.abs(this.potentialGains / this.potentialLoss)
-  }
-
-  updateModel() {
-    this.numberOfPositions = this.result.length
-    
-    this.invested = 0
-    this.result.forEach(e => {
-      this.invested += e.averageCost * e.numberOfShares
-    })
-  }
-
-  periodChanged() {
-    this.loadEntries()
-  }
 }
 

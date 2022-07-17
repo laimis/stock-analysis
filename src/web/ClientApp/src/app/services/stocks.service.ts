@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { DecimalPipe } from '@angular/common';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -43,8 +43,8 @@ export class StocksService {
     return this.http.get<ReviewList>('/api/portfolio/transactionsummary?period=' + period)
   }
 
-  getTradingEntries(): Observable<StockTradingGridEntry[]> {
-    return this.http.get<StockTradingGridEntry[]>('/api/stocks/tradingentries')
+  getTradingEntries(): Observable<StockTradingPositions> {
+    return this.http.get<StockTradingPositions>('/api/stocks/tradingentries')
   }
 
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionList> {
@@ -177,13 +177,11 @@ export class StocksService {
 		return this.http.post('/api/stocks/settings', obj)
   }
 
-  search(term: string): Observable<object[]> {
+  search(term: string): Observable<StockSearchResult[]> {
     if (!term.trim()) {
-      return of([]);
+      return of([])
     }
-    return this.http.get<object[]>(`/api/stocks/search/${term}`).pipe(
-      tap(_ => console.log(`found stocks matching "${term}"`))
-    );
+    return this.http.get<StockSearchResult[]>(`/api/stocks/search/${term}`)
   }
 
   // ------- portfolio ----------------
@@ -300,6 +298,11 @@ export interface Chain {
 
 export interface Link {
   success: boolean
+}
+
+export interface StockSearchResult {
+  symbol: string
+  securityName: string
 }
 
 export interface ReviewList {
@@ -472,7 +475,41 @@ export interface StockGridEntry {
   above200: number
 }
 
-export interface StockTradingGridEntry {
+export interface StockTradingPerformance {
+  wins: number,
+  losses: number,
+  total: number,
+  avgDaysHeld: number,
+  avgWinAmount: number,
+  maxWinAmount: number,
+  winAvgReturnPct: number,
+  winAvgDaysHeld: number,
+  avgLossAmount: number,
+  maxLossAmount: number,
+  lossAvgReturnPct: number,
+  lossAvgDaysHeld: number,
+  ev: number,
+  avgReturnPct: number,
+}
+
+export interface StockTradingPerformanceCollection {
+  overall: StockTradingPerformance,
+  recent: StockTradingPerformance
+}
+
+export interface StockTradingPositions {
+  current: StockTradingPosition[]
+  past: StockTradingPosition[]
+  performance: StockTradingPerformanceCollection
+}
+
+export interface PositionTransaction {
+  quantity: number,
+  price: number,
+  when: string
+}
+
+export interface StockTradingPosition {
   price: number,
   stats: any,
   ticker: string,
@@ -480,7 +517,13 @@ export interface StockTradingGridEntry {
   maxNumberOfShares: number,
   averageCost: number,
   profitTarget: number,
-  gain: number,
+  profit: number,
+  daysHeld: number,
+  opened: string,
+  closed: string,
+  returnPct: number,
+  buys: PositionTransaction[]
+  sells: PositionTransaction[]
 }
 
 export class OptionDefinition {

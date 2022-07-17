@@ -37,7 +37,7 @@ import { StockFundamentalsComponent } from './stocks/stock-details/stock-fundame
 import { StockNotesComponent } from './stocks/stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
-import { StockGridComponent } from './stocks/stock-grid.component';
+import { StockGridComponent } from './stocks/stock-dashboard/stock-grid.component';
 import { StockAlertsComponent } from './stocks/stock-details/stock-alerts.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
@@ -48,9 +48,6 @@ import { OptionPerformanceComponent } from './options/option-dashboard/option-pe
 import { OptionClosedComponent } from './options/option-dashboard/option-closed.component';
 import { StockDashboardComponent } from './stocks/stock-dashboard/stock-dashboard.component';
 import { StockOwnershipGridComponent } from './stocks/stock-dashboard/stock-ownership-grid.component';
-import { StockAdvancedStatsGridComponent } from './stocks/stock-dashboard/stock-advancedstats-grid.component';
-import { StockOwnershipPerformanceComponent } from './stocks/stock-dashboard/stock-performance.component';
-import { StockPastComponent } from './stocks/stock-dashboard/stock-past.component';
 import { FailuresuccesschainComponent } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
 import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
@@ -58,7 +55,12 @@ import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
-import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
+import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-positions.component';
+import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
+import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
+import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
+import { StockTradingReviewComponent } from './stocks/stock-trading/stock-trading-review.component';
+import { StockTradingChartComponent } from './stocks/stock-trading/stock-trading-chart.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -69,7 +71,6 @@ var routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
-  { path: 'grid', component: StockGridComponent, canActivate: [AuthGuard]},
   { path: 'landing', component: LandingComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
   { path: 'profile/create', component: ProfileCreateComponent },
@@ -154,11 +155,13 @@ var routes: Routes = [
     StockOptionComponent,
     StockOwnershipComponent,
     StockOwnershipGridComponent,
-    StockAdvancedStatsGridComponent,
-    StockOwnershipPerformanceComponent,
-    StockPastComponent,
     StockTradingComponent,
     StockTradingPositionComponent,
+    StockTradingNewPositionComponent,
+    StockTradingPastComponent,
+    StockTradingPerformanceComponent,
+    StockTradingReviewComponent,
+    StockTradingChartComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,

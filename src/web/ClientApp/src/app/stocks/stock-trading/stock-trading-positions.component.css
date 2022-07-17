@@ -1,0 +1,18 @@
+.point-label {
+    font-weight: bold;
+}
+
+.position-price {
+    font-size: larger;
+    padding-left: 10px;
+}
+
+.position-gain {
+    font-size: larger;
+    font-weight: bold;
+}
+
+.position-ticker {
+    font-size: larger;
+    font-weight: bold;
+}

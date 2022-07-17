@@ -1,7 +1,22 @@
 using System;
+using System.Collections.Generic;
 
 namespace core.Stocks
 {
+    public struct PositionTransaction
+    {
+        public PositionTransaction(decimal quantity, decimal price, DateTimeOffset when)
+        {
+            Quantity = quantity;
+            Price = price;
+            When = when;
+        }
+
+        public decimal Price { get; }
+        public DateTimeOffset When { get; }
+        public decimal Quantity { get; }
+    }
+
     // PositionInstance models a stock position from the time the first share is opened
     // to the time when the last share is sold.
     public class PositionInstance
@@ -16,7 +31,7 @@ namespace core.Stocks
         public int DaysHeld => Opened != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value)).TotalDays : 0;
         public decimal Cost { get; private set; } = 0;
         public decimal Return { get; private set; } = 0;
-        public decimal Percentage => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
+        public decimal ReturnPct => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
         public decimal Profit => Return - Cost;
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
@@ -26,6 +41,9 @@ namespace core.Stocks
         public int NumberOfBuys { get; private set; }
         public int NumberOfSells { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
+        public List<PositionTransaction> Buys { get; private set; } = new List<PositionTransaction>();
+        public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
+        private decimal TotalPrice { get; set; } = 0;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when)
         {
@@ -37,6 +55,8 @@ namespace core.Stocks
             NumberOfShares += numberOfShares;
             Cost += numberOfShares * price;
             NumberOfBuys++;
+            TotalPrice += price;
+            Buys.Add(new PositionTransaction(numberOfShares, price, when));
 
             if (NumberOfShares > MaxNumberOfShares)
             {
@@ -58,6 +78,8 @@ namespace core.Stocks
         {
             NumberOfShares -= amount;
             NumberOfSells++;
+            Return += amount * price;
+            Sells.Add(new PositionTransaction(amount, price, when));
 
             if (NumberOfShares < 0)
             {
@@ -68,8 +90,6 @@ namespace core.Stocks
             {
                 Closed = when;
             }
-
-            Return += amount * price;
         }
     }
 }

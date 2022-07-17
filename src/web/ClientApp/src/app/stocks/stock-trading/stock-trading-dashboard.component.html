@@ -9,78 +9,52 @@
   
   <div class="card mb-2 mt-2">
     <div class="card-header">
-      <div class="mb-2 font-weight-bold">Trading Holdings</div>
-      <div class="mb-2"><b>Positions</b> {{ numberOfPositions}} </div>
-    </div>
-  </div>
+      <div class="mb-2 font-weight-bold">Trading Parameters</div>
 
-  <div class="card border-info">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <app-symbol-search
-                label="Ticker"
-                placeholder="New position symbol"
-                (tickerSelected)="onBuyTickerSelected($event)"
-                cssClass="form-control">
-            </app-symbol-search>
-        </div>
-        <div class="col">
-          <div class="form-group">
-            <label for="positionSize">Position Size</label>
-            <input
-              type="number"
-              class="form-control"
-              id="positionSize"
-              [(ngModel)]="positionSize"
-              (ngModelChange)="updateBuyingValues()">
+      <div class="border-info mb-2 mt-4">
+        <div class="row">
+          <div class="col">
+            <label for="stopLoss" class="filterLabel">Stop Loss</label><input type="number" id="stopLoss" class="form-control form-control-sm" [(ngModel)]="stopLoss" />
+          </div>
+          <div class="col">
+            <label for="firstTarget" class="filterLabel">First Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
+          </div>
+          <div class="col">
+            <label for="rrTarget" class="filterLabel">R:R Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
           </div>
         </div>
       </div>
-      <div class="row" *ngIf="costToBuy">
-        <div class="col">
-          <label for="costToBuy">Price: </label>
-          <input
-            type="number"
-            id="costToBuy"
-            class="form-control"
-            [(ngModel)]="costToBuy"
-            (ngModelChange)="updateBuyingValues()"
-          >
-        </div>
-        <div class="col">Shares #: <strong>{{ stocksToBuy }}</strong></div>
-        <div class="col">Stop Price: <strong>{{ stopPrice | currency }}</strong></div>
-        <div class="col">Exit Price: <strong>{{ exitPrice | currency }}</strong></div>
-      </div>
-      <div class="row mt-2" *ngIf="stats">
-        <div class="col">Above 50: <strong>{{ costToBuy > stats.day50MovingAvg  ? 'yes' : 'no'}}</strong></div>
-        <div class="col">Above 200: <strong>{{ costToBuy > stats.day200MovingAvg  ? 'yes' : 'no'}}</strong></div>
-        <div class="col"></div>
-        <div class="col"></div>
-      </div>
+    
     </div>
   </div>
 
-  <div class="border-info mb-2 mt-4">
-      <div class="row">
-        <div class="col">
-          <label for="stopLoss" class="filterLabel">Stop Loss</label><input type="number" id="stopLoss" class="form-control form-control-sm" [(ngModel)]="stopLoss" />
-        </div>
-        <div class="col">
-          <label for="firstTarget" class="filterLabel">First Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
-        </div>
-        <div class="col">
-          <label for="rrTarget" class="filterLabel">R:R Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
-        </div>
-      </div>
+  <div class="tab-container mt-2" *ngIf="loaded">
+    <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
+      Current Positions
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('newposition')}" [routerLink]="" (click)="activateTab('newposition')">
+      New Position
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('past')}" [routerLink]="" (click)="activateTab('past')">
+      Past Positions
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('performancerecent')}" [routerLink]="" (click)="activateTab('performancerecent')">
+      Performance (Recent)
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
+      Performance
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
+      Review
+    </a>
   </div>
-    
-
-  <stock-trading-position
-    *ngFor="let p of result"
-    [p]="p"
-    [stopLoss]="stopLoss"
-    [firstTarget]="firstTarget"
-    [rrTarget]="rrTarget"></stock-trading-position>
   
+
+  <stock-trading-newposition  *ngIf="isActive('newposition')" [stopLoss]=stopLoss [firstTarget]=firstTarget [rrTarget]=rrTarget></stock-trading-newposition>
+  <stock-trading-positions    *ngIf="isActive('positions')" [positions]=positions [stopLoss]=stopLoss [firstTarget]=firstTarget [rrTarget]=rrTarget></stock-trading-positions>
+  <stock-past                 *ngIf="isActive('past')" [past]=past></stock-past>
+  <stock-trading-performance  *ngIf="isActive('performancerecent')" [performance]=performance.recent></stock-trading-performance>
+  <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance.overall></stock-trading-performance>
+  <stock-trading-review       *ngIf="isActive('review')" [positions]=past></stock-trading-review>
+
 </div>

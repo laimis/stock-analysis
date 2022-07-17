@@ -29,7 +29,6 @@ namespace core.Stocks
                 var trades = stocks
                     .SelectMany(s => s.State.PositionInstances)
                     .Where(p => p.IsClosed)
-                    .Select(p => new StockTradeView(p))
                     .OrderByDescending(p => p.Closed)
                     .ToList();
 

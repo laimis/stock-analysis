@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockGridEntry } from '../services/stocks.service';
+import { StocksService, StockGridEntry } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-grid',
@@ -16,6 +16,7 @@ export class StockGridComponent {
 	constructor(private service : StocksService){}
 
 	ngOnInit(): void {
+    console.log("loading grid")
     this.fetchGrid()
   }
 

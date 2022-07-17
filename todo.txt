@@ -1,0 +1,7 @@
+- turn chart into its own component that can be reused
+    - accepts price data as param
+    - accepts annotation data as param
+- new component, review
+    - loads all trades, then has trade index that can be iterated over
+
+- new position show where the stops and exists will be on a chart

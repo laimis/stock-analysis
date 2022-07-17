@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, Transaction } from '../services/stocks.service';
-import { ChartDataset, ChartOptions, Chart, LogarithmicScale } from 'chart.js';
+import { ChartDataset, ChartOptions, Chart, LogarithmicScale, ChartType } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { PointAnnotationOptions } from 'chartjs-plugin-annotation';
 import { ActivatedRoute } from '@angular/router';
@@ -31,7 +31,7 @@ export class PlaygroundComponent implements OnInit {
   
   public ticker = undefined;
   public lineChartLegend = true;
-  public lineChartType = 'line';
+  public lineChartType : ChartType = 'line';
   public lineChartPlugins = [];
   public readyToRender = false;
   public transactions:Transaction[] = []
@@ -57,6 +57,7 @@ export class PlaygroundComponent implements OnInit {
 
   ngOnDestroy() {
     Chart.unregister(LogarithmicScale);
+    Chart.unregister(annotationPlugin);
   }
 
   render() {

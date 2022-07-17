@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
-import { StocksService } from '../services/stocks.service';
+import { StockSearchResult, StocksService } from '../services/stocks.service';
 
 @Component({
   selector: 'app-symbol-search',
@@ -19,7 +19,7 @@ export class SymbolSearchComponent implements OnInit {
   selectedValue: string = null
 
   public resultCount: number = 0
-  public searchResults$: Observable<object[]>;
+  public searchResults$: Observable<StockSearchResult[]>;
   private searchTerms = new Subject<string>();
 
   constructor(

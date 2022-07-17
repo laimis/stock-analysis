@@ -1,9 +1,9 @@
-using System;
-
 namespace core
 {
     public struct Price
     {
+        public static readonly Price Zero = new Price(0);
+        
         public decimal Amount { get; }
 
         public Price(decimal amount)

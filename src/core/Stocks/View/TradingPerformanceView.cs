@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace core.Stocks
 {
-    public class StockOwnershipPerformanceView
+    public class TradingPerformanceView
     {
-        public StockOwnershipPerformanceView(){}
+        public TradingPerformanceView(){}
         
-        public StockOwnershipPerformanceView(List<PositionInstance> closedPositions)
+        public TradingPerformanceView(List<PositionInstance> closedPositions)
         {
             if (closedPositions.Count == 0)
             {
@@ -23,7 +23,7 @@ namespace core.Stocks
                 Wins = wins.Count;
                 AvgWinAmount = wins.Average(t => t.Profit);
                 MaxWinAmount = wins.Max(t => t.Profit);
-                WinAvgReturnPct = wins.Average(t => t.Percentage);
+                WinAvgReturnPct = wins.Average(t => t.ReturnPct);
                 WinAvgDaysHeld = wins.Average(t => t.DaysHeld);
             }
 
@@ -33,7 +33,7 @@ namespace core.Stocks
                 Losses = losses.Count;
                 AvgLossAmount = Math.Abs(losses.Average(t => t.Profit));
                 MaxLossAmount = Math.Abs(losses.Min(t => t.Profit));
-                LossAvgReturnPct = Math.Abs(losses.Average(t => t.Percentage));
+                LossAvgReturnPct = Math.Abs(losses.Average(t => t.ReturnPct));
                 LossAvgDaysHeld = losses.Average(t => t.DaysHeld);
             }
             

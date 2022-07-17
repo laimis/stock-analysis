@@ -75,27 +75,7 @@ namespace core.Stocks
                     .Select(s => new OwnedStockView(s))
                     .ToList();
 
-                var closedTransactions = stocks
-                    .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
-                    .ToList();
-
-                var performance = new StockOwnershipPerformanceContainerView(
-                    closedTransactions
-                );
-
-                var past = closedTransactions
-                    .Select(t => new PositionInstanceView(t))
-                    .OrderByDescending(p => p.Date)
-                    .ToList();
-
-                var obj = new StockDashboardView
-                {
-                    Owned = ownedStocks,
-                    Performance = performance,
-                    Past = past,
-                    Calculated = DateTimeOffset.UtcNow
-                };
-                return obj;
+                return new StockDashboardView(ownedStocks);
             }
         }
     }

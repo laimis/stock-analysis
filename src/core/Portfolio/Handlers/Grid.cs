@@ -28,14 +28,21 @@ namespace core.Portfolio
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
+                var prices = await _stocks.GetPrices(
+                    stocks
+                        .Where(s => s.State.Owned > 0)
+                        .Select(s => s.State.Ticker)
+                        .ToArray()
+                );
+
                 return stocks
                     .Where(s => s.State.Owned > 0)
                     .Select(async s => {
                         {
                             var adv = await _stocks.GetAdvancedStats(s.State.Ticker);
-                            var price = await _stocks.GetPrice(s.State.Ticker);
+                            var price = prices.Success.TryGetValue(s.State.Ticker, out var p) ? p.Price : 0;
 
-                            return new GridEntry(s.State.Ticker, price.Success, adv.Success);
+                            return new GridEntry(s.State.Ticker, price, adv.Success);
                         }
                     })
                     .Select(t => t.Result);
