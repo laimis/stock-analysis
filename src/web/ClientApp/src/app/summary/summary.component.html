@@ -19,6 +19,12 @@
   
   <h5 class="mt-5">Stock P&L</h5>
   <table class="table">
+    <tr>
+      <th>Symbol</th>
+      <th>P/L</th>
+      <th>Date</th>
+      <th>Grade</th>
+    </tr>
     <tr *ngFor="let g of result.plStockTransactions">
       <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
       <td width="140">{{g.profit | currency}}</td>
@@ -32,6 +38,12 @@
   
   <h5 class="mt-2">Non-PL Breakdown</h5>
   <table class="table">
+    <tr>
+      <th>Symbol</th>
+      <th>P/L</th>
+      <th>Date</th>
+      <th>Grade</th>
+    </tr>
     <tr *ngFor="let g of result.stockTransactions">
       <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
       <td width="140">{{g.profit | currency}}</td>
