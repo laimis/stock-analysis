@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, Transaction } from '../services/stocks.service';
 import { ChartDataset, ChartOptions, Chart, LogarithmicScale, ChartType } from 'chart.js';
-import annotationPlugin from 'chartjs-plugin-annotation';
+import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { PointAnnotationOptions } from 'chartjs-plugin-annotation';
 import { ActivatedRoute } from '@angular/router';
 
@@ -127,13 +127,13 @@ export class PlaygroundComponent implements OnInit {
       if (r != null) {
         this.transactions = r.transactions;
 
-        var annotations : PointAnnotationOptions[] = r.transactions
+        var annotations : AnnotationOptions[] = r.transactions
           .map(x => {
             
             return {
-              type: 'point',
-              xValue: x.date,
-              yValue: x.price,
+              type: 'line',
+              yMin: x.price,
+              yMax: x.price,
               backgroundColor: x.debit > 0 ? "#0000FF" : '#ff0000',
               radius: 5
             }

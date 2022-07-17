@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { StocksService, StockStats } from 'src/app/services/stocks.service';
+import { Prices, StocksService, StockStats } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -40,6 +40,9 @@ export class StockTradingNewPositionComponent implements OnChanges {
   potentialRr: number | null = null
   stats: StockStats | null = null
 
+  prices: Prices | null = null
+  stopAndExitPoints: number[] | null = null
+
   onBuyTickerSelected(ticker: string) {
       this.costToBuy = null
   
@@ -49,11 +52,20 @@ export class StockTradingNewPositionComponent implements OnChanges {
           this.costToBuy = stockDetails.price
           this.stats = stockDetails.stats
           this.updateBuyingValues()
+          this.updateChart(ticker)
         }, error => {
           console.error(error);
         }
       );
     }
+
+  updateChart(ticker:string) {
+    this.stockService.getStockPrices2y(ticker).subscribe(
+      prices => {
+        this.prices = prices
+      }
+    )
+  }
 
   updateBuyingValues() {
     this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
@@ -62,6 +74,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
     this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
     this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
     this.potentialRr = Math.abs(this.potentialGains / this.potentialLoss)
+    this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
   }
 }
 

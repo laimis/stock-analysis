@@ -42,5 +42,13 @@
       <div class="col"></div>
       <div class="col"></div>
     </div>
+    <div class="row mt-2" *ngIf="prices">
+      <div class="col">
+        <stock-trading-chart
+          [prices]="prices"
+          [horizontalLines]="stopAndExitPoints"
+          [maxPrice]="exitPrice"></stock-trading-chart>
+      </div>
+    </div>
   </div>
 </div>

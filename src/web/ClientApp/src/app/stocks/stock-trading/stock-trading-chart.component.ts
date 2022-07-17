@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
-import { PositionTransaction, Prices, StockHistoricalPrice } from 'src/app/services/stocks.service';
-import annotationPlugin, { PointAnnotationOptions } from 'chartjs-plugin-annotation';
+import { PositionTransaction, Prices } from 'src/app/services/stocks.service';
+import annotationPlugin, { AnnotationOptions, PointAnnotationOptions } from 'chartjs-plugin-annotation';
 
 @Component({
   selector: 'stock-trading-chart',
@@ -30,10 +30,14 @@ export class StockTradingChartComponent implements OnInit {
   
   _buys: PositionTransaction[];
   _sells: PositionTransaction[];
+  _horizontalLines: number[] = [];
 
   private readonly _color_buy = "#0000FF"
   private readonly _color_sell = "#ff0000"
   private readonly _color_close = 'rgb(75, 192, 192)'
+
+  // generate random color for horizontal line
+  private readonly _color_horizontal_line = '#' + Math.floor(Math.random() * 16777215).toString(16)
 
   private readonly _sma_colors = {
     20: '#ff0000',
@@ -51,6 +55,19 @@ export class StockTradingChartComponent implements OnInit {
   set sells(transactions: PositionTransaction[]) {
     this._sells = transactions;
     this.updateAnnotations();
+  }
+
+  @Input()
+  set horizontalLines(lines: number[]) {
+    this._horizontalLines = lines;
+    this.updateAnnotations();
+  }
+
+  _maxPrice: number
+  @Input()
+  set maxPrice(value: number) {
+    this._maxPrice = value
+    this.lineChartOptions.scales.y.max = value + value * 0.1
   }
 
   @Input()
@@ -92,13 +109,16 @@ export class StockTradingChartComponent implements OnInit {
     this.lineChartLabels = prices.prices.map(x => x.date).slice(-cutoff)
 
     var minPrice = Math.min.apply(null, closes)
-    var maxPrice = Math.max.apply(null, closes)
-    
-    this.lineChartOptions.scales.y.max = maxPrice + maxPrice * 0.1
     this.lineChartOptions.scales.y.min = minPrice - minPrice * 0.1
+
+    if (this._maxPrice == undefined) {
+      var maxPrice = Math.max.apply(null, closes)
+      this.lineChartOptions.scales.y.max = maxPrice + maxPrice * 0.1
+    }
+    
   }
 
-  toAnnotation(transaction: PositionTransaction, color: string) {
+  toAnnotation(transaction: PositionTransaction, color: string) : AnnotationOptions {
     return {
       type: 'point',
       xValue: transaction.when.split("T")[0],
@@ -108,16 +128,30 @@ export class StockTradingChartComponent implements OnInit {
     }
   }
 
+  toAnnotationLine(value: number, color: string) : AnnotationOptions {
+    return {
+      type: 'line',
+      yMin: value,
+      yMax: value,
+      borderColor: color
+    }
+  }
+
   updateAnnotations() {
     var buys = this._buys != undefined ? this._buys : [];
     var sells = this._sells != undefined ? this._sells : [];
+    var lines = this._horizontalLines != undefined ? this._horizontalLines : [];
 
-    var annotations : PointAnnotationOptions[] = 
+    var annotations : AnnotationOptions[] = 
       buys
         .map(x => this.toAnnotation(x, this._color_buy))
         .concat(
           sells
             .map(x => this.toAnnotation(x, this._color_sell))
+        )
+        .concat(
+          lines
+            .map(x => this.toAnnotationLine(x, this._color_horizontal_line))
         )
 
     this.lineChartOptions.plugins.annotation.annotations = annotations

@@ -1,3 +1,1 @@
-- shares have review tab that shows entries of the current position
-- summary to include headers
 - new position show where the stops and exists will be on a chart
