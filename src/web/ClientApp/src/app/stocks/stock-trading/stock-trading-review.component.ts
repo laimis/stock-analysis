@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { StockTradingGridEntry } from 'src/app/services/stocks.service';
-import { StockGridComponent } from '../stock-dashboard/stock-grid.component';
+import { Prices, StockHistoricalPrice, StocksService, StockTradingPosition } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -9,23 +8,34 @@ import { StockGridComponent } from '../stock-dashboard/stock-grid.component';
   styleUrls: ['./stock-trading-review.component.css']
 })
 export class StockTradingReviewComponent implements OnInit {
-  updateCurrentPosition() {
-    this.currentPosition = this._positions[this._index]
+  ngOnInit() {
   }
-  private _positions: StockTradingGridEntry[];
 
-	ngOnInit() {
-  }
+  private _positions: StockTradingPosition[]
+  private _index: number = 0
+  currentPosition: StockTradingPosition
+  prices: StockHistoricalPrice[]
+
+  constructor (private stockService: StocksService) { }
 
   @Input()
-  set positions(positions:StockTradingGridEntry[]) {
+  set positions(positions:StockTradingPosition[]) {
     this._positions = positions
     this._index = 0
     this.updateCurrentPosition()
   }
 
-  private _index: number = 0
-  currentPosition: StockTradingGridEntry
+  updateCurrentPosition() {
+    this.currentPosition = this._positions[this._index]
+
+    // get price data and pass it to chart
+    this.stockService.getStockPrices2y(this.currentPosition.ticker).subscribe(
+      (r: Prices) => {
+        this.prices = r.prices
+      }
+    )
+  }
+
 
   next() {
     this._index++

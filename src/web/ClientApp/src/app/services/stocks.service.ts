@@ -42,8 +42,8 @@ export class StocksService {
     return this.http.get<ReviewList>('/api/portfolio/transactionsummary?period=' + period)
   }
 
-  getTradingEntries(): Observable<StockTradingEntries> {
-    return this.http.get<StockTradingEntries>('/api/stocks/tradingentries')
+  getTradingEntries(): Observable<StockTradingPositions> {
+    return this.http.get<StockTradingPositions>('/api/stocks/tradingentries')
   }
 
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionList> {
@@ -496,13 +496,13 @@ export interface StockTradingPerformanceCollection {
   recent: StockTradingPerformance
 }
 
-export interface StockTradingEntries {
-  current: StockTradingGridEntry[]
-  past: StockTradingGridEntry[]
+export interface StockTradingPositions {
+  current: StockTradingPosition[]
+  past: StockTradingPosition[]
   performance: StockTradingPerformanceCollection
 }
 
-export interface StockTradingGridEntry {
+export interface StockTradingPosition {
   price: number,
   stats: any,
   ticker: string,

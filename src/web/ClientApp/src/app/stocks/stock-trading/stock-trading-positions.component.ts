@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { StockTradingGridEntry } from '../../services/stocks.service';
+import { StockTradingPosition } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -8,7 +8,7 @@ import { StockTradingGridEntry } from '../../services/stocks.service';
 })
 export class StockTradingPositionComponent {
     @Input()
-    positions: StockTradingGridEntry[]
+    positions: StockTradingPosition[]
 
     @Input()
     stopLoss: number
@@ -19,27 +19,27 @@ export class StockTradingPositionComponent {
     @Input()
     rrTarget: number
 
-    gain(p:StockTradingGridEntry) {
+    gain(p:StockTradingPosition) {
         return (p.price - p.averageCost) / p.averageCost
     }
 
-    stopNumber(p:StockTradingGridEntry) {
+    stopNumber(p:StockTradingPosition) {
         return p.averageCost - p.averageCost * this.stopLoss
     }
 
-    firstTargetNumber(p:StockTradingGridEntry) {
+    firstTargetNumber(p:StockTradingPosition) {
         return p.averageCost + p.averageCost * this.firstTarget
     }
 
-    rrTargetNumber(p:StockTradingGridEntry) {
+    rrTargetNumber(p:StockTradingPosition) {
         return p.averageCost + p.averageCost * this.rrTarget
     }
 
-    positionProgress(p:StockTradingGridEntry) {
+    positionProgress(p:StockTradingPosition) {
         return p.numberOfShares * 1.0 / p.maxNumberOfShares * 100
     }
 
-    positionSize(p:StockTradingGridEntry) {
+    positionSize(p:StockTradingPosition) {
         return p.maxNumberOfShares * p.averageCost
     }
 }

@@ -19,7 +19,9 @@
       </div>
     </div>
     <div class="row">
-      chart goes here
+      <div class="col">
+        <stock-trading-chart *ngIf="prices" [prices]=prices></stock-trading-chart>
+      </div>
     </div>
   </div>
 </div>
