@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { DecimalPipe } from '@angular/common';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -502,6 +503,12 @@ export interface StockTradingPositions {
   performance: StockTradingPerformanceCollection
 }
 
+export interface PositionTransaction {
+  quantity: number,
+  price: number,
+  when: string
+}
+
 export interface StockTradingPosition {
   price: number,
   stats: any,
@@ -514,7 +521,9 @@ export interface StockTradingPosition {
   daysHeld: number,
   opened: string,
   closed: string,
-  returnPct: number
+  returnPct: number,
+  buys: PositionTransaction[]
+  sells: PositionTransaction[]
 }
 
 export class OptionDefinition {

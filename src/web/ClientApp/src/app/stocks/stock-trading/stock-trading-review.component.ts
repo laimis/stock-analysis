@@ -27,7 +27,6 @@ export class StockTradingReviewComponent implements OnInit {
 
   updateCurrentPosition() {
     this.currentPosition = this._positions[this._index]
-
     // get price data and pass it to chart
     this.stockService.getStockPrices2y(this.currentPosition.ticker).subscribe(
       (r: Prices) => {
@@ -35,7 +34,6 @@ export class StockTradingReviewComponent implements OnInit {
       }
     )
   }
-
 
   next() {
     this._index++

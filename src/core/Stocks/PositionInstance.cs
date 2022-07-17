@@ -1,7 +1,22 @@
 using System;
+using System.Collections.Generic;
 
 namespace core.Stocks
 {
+    public struct PositionTransaction
+    {
+        public PositionTransaction(decimal quantity, decimal price, DateTimeOffset when)
+        {
+            Quantity = quantity;
+            Price = price;
+            When = when;
+        }
+
+        public decimal Price { get; }
+        public DateTimeOffset When { get; }
+        public decimal Quantity { get; }
+    }
+
     // PositionInstance models a stock position from the time the first share is opened
     // to the time when the last share is sold.
     public class PositionInstance
@@ -26,6 +41,8 @@ namespace core.Stocks
         public int NumberOfBuys { get; private set; }
         public int NumberOfSells { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
+        public List<PositionTransaction> Buys { get; private set; } = new List<PositionTransaction>();
+        public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
         private decimal TotalPrice { get; set; } = 0;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when)
@@ -39,6 +56,7 @@ namespace core.Stocks
             Cost += numberOfShares * price;
             NumberOfBuys++;
             TotalPrice += price;
+            Buys.Add(new PositionTransaction(numberOfShares, price, when));
 
             if (NumberOfShares > MaxNumberOfShares)
             {
@@ -60,6 +78,8 @@ namespace core.Stocks
         {
             NumberOfShares -= amount;
             NumberOfSells++;
+            Return += amount * price;
+            Sells.Add(new PositionTransaction(amount, price, when));
 
             if (NumberOfShares < 0)
             {
@@ -70,8 +90,6 @@ namespace core.Stocks
             {
                 Closed = when;
             }
-
-            Return += amount * price;
         }
     }
 }

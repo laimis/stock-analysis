@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
-import { StockHistoricalPrice } from 'src/app/services/stocks.service';
-import annotationPlugin from 'chartjs-plugin-annotation';
+import { PositionTransaction, StockHistoricalPrice } from 'src/app/services/stocks.service';
+import annotationPlugin, { PointAnnotationOptions } from 'chartjs-plugin-annotation';
 
 @Component({
   selector: 'stock-trading-chart',
@@ -29,7 +29,24 @@ export class StockTradingChartComponent implements OnInit {
   };
   
   _prices: StockHistoricalPrice[];
+  _buys: PositionTransaction[];
+  _sells: PositionTransaction[];
+
+  private readonly _color_buy = "#0000FF"
+  private readonly _color_sell = "#ff0000"
   
+  @Input()
+  set buys(transactions: PositionTransaction[]) {
+    this._buys = transactions;
+    this.updateAnnotations();
+  }
+
+  @Input()
+  set sells(transactions: PositionTransaction[]) {
+    this._sells = transactions;
+    this.updateAnnotations();
+  }
+
   @Input()
   set prices(prices: StockHistoricalPrice[]) {
 
@@ -60,7 +77,31 @@ export class StockTradingChartComponent implements OnInit {
     
     this.lineChartOptions.scales.y.max = maxPrice + maxPrice * 0.1
     this.lineChartOptions.scales.y.min = minPrice - minPrice * 0.1
-    
+  }
+
+  toAnnotation(transaction: PositionTransaction, color: string) {
+    return {
+      type: 'point',
+      xValue: transaction.when.split("T")[0],
+      yValue: transaction.price,
+      backgroundColor: color,
+      radius: 3
+    }
+  }
+
+  updateAnnotations() {
+    var buys = this._buys != undefined ? this._buys : [];
+    var sells = this._sells != undefined ? this._sells : [];
+
+    var annotations : PointAnnotationOptions[] = 
+      buys
+        .map(x => this.toAnnotation(x, this._color_buy))
+        .concat(
+          sells
+            .map(x => this.toAnnotation(x, this._color_sell))
+        )
+
+    this.lineChartOptions.plugins.annotation.annotations = annotations
   }
   
   ngOnInit() {
