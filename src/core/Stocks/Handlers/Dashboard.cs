@@ -77,6 +77,7 @@ namespace core.Stocks
 
                 var positions = stocks.Where(s => s.State.Owned > 0)
                     .Select(s => s.State.CurrentPosition)
+                    .OrderBy(p => p.Ticker)
                     .ToList();
 
                 return new StockDashboardView(ownedStocks, positions);

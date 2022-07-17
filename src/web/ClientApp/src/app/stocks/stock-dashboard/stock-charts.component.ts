@@ -14,7 +14,7 @@ export class StockChartsComponent implements OnInit {
   private _positions: StockTradingPosition[]
   private _index: number = 0
   currentPosition: StockTradingPosition
-  prices: StockHistoricalPrice[]
+  prices: Prices
 
   constructor (private stockService: StocksService) { }
 
@@ -30,7 +30,7 @@ export class StockChartsComponent implements OnInit {
     // get price data and pass it to chart
     this.stockService.getStockPrices2y(this.currentPosition.ticker).subscribe(
       (r: Prices) => {
-        this.prices = r.prices
+        this.prices = r
       }
     )
   }

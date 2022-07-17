@@ -516,6 +516,7 @@ export interface PositionTransaction {
 export interface StockTradingPosition {
   price: number,
   cost: number,
+  return: number,
   ticker: string,
   numberOfShares: number,
   maxNumberOfShares: number,

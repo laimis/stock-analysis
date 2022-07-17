@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
-import { PositionTransaction, StockHistoricalPrice } from 'src/app/services/stocks.service';
+import { PositionTransaction, Prices, StockHistoricalPrice } from 'src/app/services/stocks.service';
 import annotationPlugin, { PointAnnotationOptions } from 'chartjs-plugin-annotation';
 
 @Component({
@@ -28,12 +28,18 @@ export class StockTradingChartComponent implements OnInit {
     }
   };
   
-  _prices: StockHistoricalPrice[];
   _buys: PositionTransaction[];
   _sells: PositionTransaction[];
 
   private readonly _color_buy = "#0000FF"
   private readonly _color_sell = "#ff0000"
+  private readonly _color_close = 'rgb(75, 192, 192)'
+
+  private readonly _sma_colors = {
+    20: '#ff0000',
+    50: '#32a84a',
+    150: '#3260a8',
+  }
   
   @Input()
   set buys(transactions: PositionTransaction[]) {
@@ -48,29 +54,42 @@ export class StockTradingChartComponent implements OnInit {
   }
 
   @Input()
-  set prices(prices: StockHistoricalPrice[]) {
+  set prices(prices: Prices) {
 
-    this._prices = prices
-
-    var closes = prices.map(p => p.close)
+    var closes = prices.prices.map(p => p.close)
 
     var cutoff = 300 // take the last 300 days, this will be changed later
 
     var data = [
       {
         data: closes.slice(-cutoff),
-        label: "Price",
+        label: "Close",
         fill: false,
         tension: 0.1,
         pointRadius: 1,
         borderWidth: 1,
-        pointBackgroundColor: '#ff0000',
+        backgroundColor: this._color_close,
+        borderColor: this._color_close,
         pointStyle: 'line'
       }]
 
-    this.lineChartData = data
+    var sma_data = prices.sma.map( sma => {
+      return {
+        data: sma.values.slice(-cutoff),
+        label: sma.interval + " SMA",
+        fill: false,
+        tension: 0.1,
+        pointRadius: 1,
+        borderWidth: 1,
+        backgroundColor: this._sma_colors[sma.interval],
+        borderColor: this._sma_colors[sma.interval],
+        pointStyle: 'line'
+      }
+    })
 
-    this.lineChartLabels = this._prices.map(x => x.date).slice(-cutoff)
+    this.lineChartData = data.concat(sma_data)
+
+    this.lineChartLabels = prices.prices.map(x => x.date).slice(-cutoff)
 
     var minPrice = Math.min.apply(null, closes)
     var maxPrice = Math.max.apply(null, closes)
