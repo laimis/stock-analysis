@@ -75,7 +75,11 @@ namespace core.Stocks
                     .Select(s => new OwnedStockView(s))
                     .ToList();
 
-                return new StockDashboardView(ownedStocks);
+                var positions = stocks.Where(s => s.State.Owned > 0)
+                    .Select(s => s.State.CurrentPosition)
+                    .ToList();
+
+                return new StockDashboardView(ownedStocks, positions);
             }
         }
     }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { DecimalPipe } from '@angular/common';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -128,7 +127,7 @@ export class StocksService {
     return this.http.delete(`/api/cryptos/${token}/transactions/${transactionId}`)
   }
 
-  getStocks(): Observable<any> {
+  getStocks(): Observable<StockSummary> {
 		return this.http.get<any>('/api/stocks')
   }
 
@@ -314,6 +313,11 @@ export interface ReviewList {
   plOptionTransactions: Transaction[]
   stockTransactions: Transaction[]
   optionTransactions: Transaction[]
+}
+
+export interface StockSummary {
+  owned: OwnedStock[]
+  positions: StockTradingPosition[]
 }
 
 export interface TransactionList {
@@ -511,7 +515,7 @@ export interface PositionTransaction {
 
 export interface StockTradingPosition {
   price: number,
-  stats: any,
+  cost: number,
   ticker: string,
   numberOfShares: number,
   maxNumberOfShares: number,
