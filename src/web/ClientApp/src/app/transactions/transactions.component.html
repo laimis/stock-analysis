@@ -94,8 +94,8 @@
             <a [routerLink]="[ '/optiondetails', t.aggregateId ]" target="_blank" *ngIf="t.isOption">{{t.ticker}}</a>
           </td>
           <td>
-            <span *ngIf="t.profit >= 0" class="badge badge-success">&nbsp;&nbsp;</span>
-            <span *ngIf="t.profit < 0" class="badge badge-warning">&nbsp;&nbsp;</span>
+            <span *ngIf="t.profit >= 0" class="badge bg-success">&nbsp;&nbsp;</span>
+            <span *ngIf="t.profit < 0" class="badge bg-warning">&nbsp;&nbsp;</span>
             {{ t.description }}
           </td>
           <td class="text-right">{{ t.credit - t.debit | currency }}</td>

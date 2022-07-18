@@ -24,19 +24,19 @@
 
   <div class="tab-container mt-2">
     <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
-      Shares <span *ngIf="ownership && ownership.owned > 0" class="badge badge-pill badge-info">{{ownership.owned}}</span>
+      Shares <span *ngIf="ownership && ownership.owned > 0" class="badge rounded-pill bg-info">{{ownership.owned}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
-      Options <span *ngIf="options && options.length > 0" class="badge badge-pill badge-info">{{options.length}}</span>
+      Options <span *ngIf="options && options.length > 0" class="badge rounded-pill bg-info">{{options.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
       Fundamentals
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('alerts')}" [routerLink]="" (click)="activateTab('alerts')">
-      Alerts <span *ngIf="alerts && alerts.points.length > 0" class="badge badge-pill badge-info">{{alerts.points.length}}</span>
+      Alerts <span *ngIf="alerts && alerts.points.length > 0" class="badge rounded-pill bg-info">{{alerts.points.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
-      Notes <span *ngIf="notes && notes.notes.length > 0" class="badge badge-pill badge-info">{{notes.notes.length}}</span>
+      Notes <span *ngIf="notes && notes.notes.length > 0" class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
     </a>
 
   </div>

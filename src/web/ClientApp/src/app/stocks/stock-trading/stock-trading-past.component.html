@@ -1,24 +1,28 @@
 <a href="/api/stocks/export/trades" class="btn btn-link">Export trades</a>
 
 <table *ngIf="past" class="table">
-  <tr>
-    <th width="100"></th>
-    <th>Stock</th>
-    <th>Date</th>
-    <th>Profit/Loss</th>
-    <th>Profit/Loss %</th>
-    <th>Days Held</th>
-  </tr>
-  <tr *ngFor="let p of past; let i = index">
-    <td>{{i + 1}}</td>
-    <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
-    <td>{{p.date | date}}</td>
-    <td>{{p.profit | currency}}</td>
-    <td>
-      <span *ngIf="p.profit >= 0" class="badge badge-success mr-1">win</span>
-      <span *ngIf="p.profit < 0" class="badge badge-warning mr-1">loss</span>
-      {{p.returnPct | percent}}
-    </td>
-    <td>{{p.daysHeld}}</td>
-  </tr>
+  <thead>
+    <tr>
+      <th width="100"></th>
+      <th>Stock</th>
+      <th>Date</th>
+      <th>Profit/Loss</th>
+      <th>Profit/Loss %</th>
+      <th>Days Held</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of past; let i = index">
+      <td>{{i + 1}}</td>
+      <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+      <td>{{p.date | date}}</td>
+      <td>{{p.profit | currency}}</td>
+      <td>
+        <span *ngIf="p.profit >= 0" class="badge bg-success mr-1">win</span>
+        <span *ngIf="p.profit < 0" class="badge bg-warning mr-1">loss</span>
+        {{p.returnPct | percent}}
+      </td>
+      <td>{{p.daysHeld}}</td>
+    </tr>
+  </tbody>
 </table>

@@ -19,10 +19,10 @@
         </h3>
         <h5 class="card-subtitle text-muted">
           Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
-          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-          <span *ngIf="option.isExpired && !option.closed" class="ml-1 badge badge-danger">expired</span>
-          <span *ngIf="option.closed && option.profit >= 0" class="badge badge-success">win</span>
-          <span *ngIf="option.closed && option.profit < 0" class="badge badge-warning">loss</span>
+          <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
+          <span *ngIf="option.isExpired && !option.closed" class="ml-1 badge bg-danger">expired</span>
+          <span *ngIf="option.closed && option.profit >= 0" class="badge bg-success">win</span>
+          <span *ngIf="option.closed && option.profit < 0" class="badge bg-warning">loss</span>
         </h5>
 
         <div *ngIf="!option.closed">
@@ -31,7 +31,7 @@
               <div class="stat-label">Current price</div>
               <div>
                 {{option.strikePriceDiff | percent}}
-                <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+                <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
                 {{option.currentPrice | currency}}
               </div>
             </div>

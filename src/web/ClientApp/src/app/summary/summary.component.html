@@ -19,66 +19,78 @@
   
   <h5 class="mt-5">Stock P&L</h5>
   <table class="table">
-    <tr>
-      <th>Symbol</th>
-      <th>P/L</th>
-      <th>Date</th>
-      <th>Grade</th>
-    </tr>
-    <tr *ngFor="let g of result.plStockTransactions">
-      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td width="140">{{g.profit | currency}}</td>
-      <td width="140">{{g.date | date}}</td>
-      <td>{{g.description}}</td>
-    </tr>
-    <tr *ngIf="result.plStockTransactions.length == 0">
-      <td colspan="4">No stock P&L transactions</td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>P/L</th>
+        <th>Date</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of result.plStockTransactions">
+        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+        <td width="140">{{g.profit | currency}}</td>
+        <td width="140">{{g.date | date}}</td>
+        <td>{{g.description}}</td>
+      </tr>
+      <tr *ngIf="result.plStockTransactions.length == 0">
+        <td colspan="4">No stock P&L transactions</td>
+      </tr>
+    </tbody>
   </table>
   
   <h5 class="mt-2">Non-PL Breakdown</h5>
   <table class="table">
-    <tr>
-      <th>Symbol</th>
-      <th>P/L</th>
-      <th>Date</th>
-      <th>Grade</th>
-    </tr>
-    <tr *ngFor="let g of result.stockTransactions">
-      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td width="140">{{g.profit | currency}}</td>
-      <td width="140">{{g.date | date}}</td>
-      <td>{{g.description}}</td>
-    </tr>
-    <tr *ngIf="result.stockTransactions.length == 0">
-      <td colspan="4">No stock transactions</td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>P/L</th>
+        <th>Date</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of result.stockTransactions">
+        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+        <td width="140">{{g.profit | currency}}</td>
+        <td width="140">{{g.date | date}}</td>
+        <td>{{g.description}}</td>
+      </tr>
+      <tr *ngIf="result.stockTransactions.length == 0">
+        <td colspan="4">No stock transactions</td>
+      </tr>
+    </tbody>
   </table>
 
   <h5>Option P&L</h5>
   <table class="table">
-    <tr *ngFor="let g of result.plOptionTransactions">
-      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td width="140">{{g.profit | currency}}</td>
-      <td width="140">{{g.date | date}}</td>
-      <td>{{g.description}}</td>
-    </tr>
-    <tr *ngIf="result.plOptionTransactions.length == 0">
-      <td colspan="4">No option P&L transactions</td>
-    </tr>
+    <tbody>
+      <tr *ngFor="let g of result.plOptionTransactions">
+        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+        <td width="140">{{g.profit | currency}}</td>
+        <td width="140">{{g.date | date}}</td>
+        <td>{{g.description}}</td>
+      </tr>
+      <tr *ngIf="result.plOptionTransactions.length == 0">
+        <td colspan="4">No option P&L transactions</td>
+      </tr>
+    </tbody>
   </table>
 
   <h5>Non-PL Breakdown</h5>
   <table class="table">
-    <tr *ngFor="let g of result.optionTransactions">
-      <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-      <td width="140">{{g.profit | currency}}</td>
-      <td width="140">{{g.date | date}}</td>
-      <td>{{g.description}}</td>
-    </tr>
-    <tr *ngIf="result.optionTransactions.length == 0">
-      <td colspan="4">No option transactions</td>
-    </tr>
+    <tbody>
+      <tr *ngFor="let g of result.optionTransactions">
+        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+        <td width="140">{{g.profit | currency}}</td>
+        <td width="140">{{g.date | date}}</td>
+        <td>{{g.description}}</td>
+      </tr>
+      <tr *ngIf="result.optionTransactions.length == 0">
+        <td colspan="4">No option transactions</td>
+      </tr>
+    </tbody>
   </table>
   
 </div>
