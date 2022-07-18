@@ -27,15 +27,15 @@
   <div class="card row">
     <div class="card-body">
       <div class="row">
-        <div class="col text-left"><h4>Below current price</h4></div>
-        <div class="col text-right"><h4>Above current price</h4></div>
+        <div class="col text-start"><h4>Below current price</h4></div>
+        <div class="col text-end"><h4>Above current price</h4></div>
       </div>
     </div>
   </div>
   <div class="card row mt-3" *ngFor="let a of alerts">
     <div class="card-body">
       <div class="row">
-        <div class="col text-left">
+        <div class="col text-start">
           <div *ngFor="let pp of below(a.currentPrice, a.points)">
             {{pp.value | currency}} <q *ngIf="pp.description">{{pp.description}}</q>
             <span class="badge bg-warning" *ngIf="pp.triggered">triggered</span>
@@ -47,7 +47,7 @@
           <h6>{{a.currentPrice | currency}}</h6>
         </div>
 
-        <div class="col text-right">
+        <div class="col text-end">
           <div *ngFor="let pp of above(a.currentPrice, a.points)">
             {{pp.value | currency}} {{pp.description}}
             <span class="badge bg-warning" *ngIf="pp.triggered">triggered</span>

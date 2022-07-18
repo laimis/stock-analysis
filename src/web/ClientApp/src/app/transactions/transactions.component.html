@@ -38,14 +38,14 @@
   <div class="card mt-2 mb-3">
     <div class="card-header">
       <span class="font-weight-bold">Transaction Summary</span>
-      <span class="float-right">({{ response.transactions.length}})</span>
+      <span class="float-end">({{ response.transactions.length}})</span>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col">
           <span class="font-weight-bold">{{response.debit | currency}}</span> debit
         </div>
-        <div class="col text-right">
+        <div class="col text-end">
           <span class="font-weight-bold">{{response.credit | currency}}</span> credit
         </div>
       </div>
@@ -71,7 +71,7 @@
         <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails == g.name">[ - ]</button>
         {{g.name}} ({{g.transactions.transactions.length}})
       </div>
-      <div class="col-2 font-weight-bold text-right">
+      <div class="col-2 font-weight-bold text-end">
         {{ g.transactions.credit - g.transactions.debit | currency }}
       </div>
       <div class="col-4"></div>
@@ -82,7 +82,7 @@
           <th width="100">Date</th>
           <th width="100">Symbol</th>
           <th>Description</th>
-          <th width="125" class="text-right">Amount</th>
+          <th width="125" class="text-end">Amount</th>
         </tr>
       </thead>
       <tbody>
@@ -98,7 +98,7 @@
             <span *ngIf="t.profit < 0" class="badge bg-warning">&nbsp;&nbsp;</span>
             {{ t.description }}
           </td>
-          <td class="text-right">{{ t.credit - t.debit | currency }}</td>
+          <td class="text-end">{{ t.credit - t.debit | currency }}</td>
         </tr>
       </tbody>
     </table>

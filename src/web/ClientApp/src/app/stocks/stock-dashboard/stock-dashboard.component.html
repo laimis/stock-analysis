@@ -13,12 +13,12 @@
     <div class="col text-center">
       <div class="container">
         <div class="row">
-          <div class="col text-right">Invested</div>
-          <div class="col text-left"><b>{{moneySpentOnShares | currency}}</b></div>
+          <div class="col text-end">Invested</div>
+          <div class="col text-start"><b>{{moneySpentOnShares | currency}}</b></div>
         </div>
         <div class="row mt-0">
-          <div class="col text-right">Equity</div>
-          <div class="col text-left"><b>{{ hideIfHidden(currentEquity) | currency}}</b></div>
+          <div class="col text-end">Equity</div>
+          <div class="col text-start"><b>{{ hideIfHidden(currentEquity) | currency}}</b></div>
         </div>
       </div>
     </div>
@@ -26,16 +26,16 @@
     <div class="col text-center">
       <div class="container">
         <div class="row">
-          <div class="col text-right">Gains</div>
-          <div class="col text-left">
+          <div class="col text-end">Gains</div>
+          <div class="col text-start">
             <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">
               {{ hideIfHidden(currentEquity - moneySpentOnShares) | currency}}
             </span>
           </div>
         </div>
         <div class="row mt-0">
-          <div class="col text-right">Gains %</div>
-          <div class="col text-left">
+          <div class="col text-end">Gains %</div>
+          <div class="col text-start">
             <span [ngClass]="{'profits-positive': profits > 0, 'profits-negative': profits < 0}">
               {{ hideIfHidden((currentEquity - moneySpentOnShares)/moneySpentOnShares) | percent}}
             </span>

@@ -39,7 +39,7 @@
         </td>
         <td>{{option.expirationDate | date:'MM/dd'}}</td>
         <td>{{option.currentPrice | currency}}</td>
-        <td class="text-left">
+        <td class="text-start">
           <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
           {{option.strikePriceDiff | percent}}
         </td>
