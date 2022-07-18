@@ -10,19 +10,19 @@
           <a [routerLink]="[ '/stocks', option.ticker ]">{{option.ticker}}</a>
            @ {{option.strikePrice | currency}} {{option.optionType}}
 
-          <span class="float-right" *ngIf="!option.closed">
+          <span class="float-end" *ngIf="!option.closed">
             {{option.numberOfContracts}} contracts {{option.boughtOrSold}}
           </span>
-          <span class="float-right" *ngIf="option.closed">
+          <span class="float-end" *ngIf="option.closed">
             position closed
           </span>
         </h3>
         <h5 class="card-subtitle text-muted">
           Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
-          <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-          <span *ngIf="option.isExpired && !option.closed" class="ml-1 badge badge-danger">expired</span>
-          <span *ngIf="option.closed && option.profit >= 0" class="badge badge-success">win</span>
-          <span *ngIf="option.closed && option.profit < 0" class="badge badge-warning">loss</span>
+          <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
+          <span *ngIf="option.isExpired && !option.closed" class="ml-1 badge bg-danger">expired</span>
+          <span *ngIf="option.closed && option.profit >= 0" class="badge bg-success">win</span>
+          <span *ngIf="option.closed && option.profit < 0" class="badge bg-warning">loss</span>
         </h5>
 
         <div *ngIf="!option.closed">
@@ -31,7 +31,7 @@
               <div class="stat-label">Current price</div>
               <div>
                 {{option.strikePriceDiff | percent}}
-                <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+                <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
                 {{option.currentPrice | currency}}
               </div>
             </div>
@@ -61,23 +61,23 @@
           If you closed via a trade, record it below:
         </div>
         <form>
-          <div class="form-row">
-            <div class="form-group col">
+          <div class="row">
+            <div class="col">
               <label for="positionType">Trade type</label>
               <input class="form-control" type="text" readonly value="{{positionType}}" />
             </div>
 
-            <div class="form-group col">
+            <div class="col">
               <label for="numberOfContracts">Number of Contracts</label>
               <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
             </div>
 
-            <div class="form-group col">
+            <div class="col">
               <label for="premium">Premium Per Contract</label>
               <input type="number" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
             </div>
 
-            <div class="form-group col">
+            <div class="col">
               <label for="filled">Filled</label>
               <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
             </div>
@@ -131,7 +131,7 @@
     <div class="mb-3">
       <label>Delete this option position from your portfolio</label>
       <div>
-        <button type="button float-right" class="btn btn-secondary mb-1 mr-2" (click)="delete()">Delete</button>
+        <button type="button float-end" class="btn btn-secondary mb-1 mr-2" (click)="delete()">Delete</button>
       </div>
     </div>
 

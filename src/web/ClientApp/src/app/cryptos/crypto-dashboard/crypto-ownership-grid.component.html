@@ -11,26 +11,28 @@
           <th class="sort-header" (click)="sort('token')">Token</th>
           <th class="sort-header" (click)="sort('quantity')">Quantity</th>
           <th class="sort-header" (click)="sort('price')">Price</th>
-          <th class="text-right sort-header" (click)="sort('averageCost')">Average Cost</th>
-          <th class="text-right sort-header" (click)="sort('invested')" align="center">Invested</th>
-          <th class="text-right sort-header" (click)="sort('profits')">Gain/Loss</th>
-          <th class="text-right sort-header" (click)="sort('profitsPct')">%</th>
-          <th class="text-right sort-header" (click)="sort('equity')">Equity</th>
-          <th class="text-right sort-header" (click)="sort('daysheld')">Days Held</th>
+          <th class="text-end sort-header" (click)="sort('averageCost')">Average Cost</th>
+          <th class="text-end sort-header" (click)="sort('invested')" align="center">Invested</th>
+          <th class="text-end sort-header" (click)="sort('profits')">Gain/Loss</th>
+          <th class="text-end sort-header" (click)="sort('profitsPct')">%</th>
+          <th class="text-end sort-header" (click)="sort('equity')">Equity</th>
+          <th class="text-end sort-header" (click)="sort('daysheld')">Days Held</th>
 
         </tr>
       </thead>
-      <tr *ngFor="let token of owned">
-        <td><a [routerLink]="[ '/cryptos', token.token ]">{{token.token}}</a></td>
-        <td>{{token.quantity}}</td>
-        <td>{{token.price | currency}}</td>
-        <td class="text-right">{{token.averageCost | currency}}</td>
-        <td class="text-right">{{token.cost | currency}}<small> {{ownershipPct(token) | percent}}</small></td>
-        <td class="text-right" [ngClass]="{'profits-positive': token.profits > 0, 'profits-negative': token.profits < 0}">{{token.profits | currency }}</td>
-        <td class="text-right" [ngClass]="{'profits-positive': token.profits > 0, 'profits-negative': token.profits < 0}">{{token.profitsPct | percent:'1.2' }}</td>
-        <td class="text-right">{{token.equity | currency }} <small>{{equityPct(token) | percent}}</small></td>
-        <td class="text-right">{{token.daysHeld}}</td>
-      </tr>
+      <tbody>
+        <tr *ngFor="let token of owned">
+          <td><a [routerLink]="[ '/cryptos', token.token ]">{{token.token}}</a></td>
+          <td>{{token.quantity}}</td>
+          <td>{{token.price | currency}}</td>
+          <td class="text-end">{{token.averageCost | currency}}</td>
+          <td class="text-end">{{token.cost | currency}}<small> {{ownershipPct(token) | percent}}</small></td>
+          <td class="text-end" [ngClass]="{'profits-positive': token.profits > 0, 'profits-negative': token.profits < 0}">{{token.profits | currency }}</td>
+          <td class="text-end" [ngClass]="{'profits-positive': token.profits > 0, 'profits-negative': token.profits < 0}">{{token.profitsPct | percent:'1.2' }}</td>
+          <td class="text-end">{{token.equity | currency }} <small>{{equityPct(token) | percent}}</small></td>
+          <td class="text-end">{{token.daysHeld}}</td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </div>

@@ -5,18 +5,18 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <form *ngIf="!saved">
-    <div class="form-group">
+    <div>
       <label for="title">Your email</label>
       <input autofocus type="email" class="form-control" id="email" name="email" [(ngModel)]="email">
     </div>
 
-    <div class="form-group">
+    <div>
       <label for="description">Message</label>
       <textarea class="form-control" id="message" name="message" [(ngModel)]="message" rows="10">
       </textarea>
     </div>
 
-    <div class="form-group">
+    <div>
       <button class="btn btn-primary mr-1" (click)="sendMessage()">Submit</button>
     </div>
   </form>

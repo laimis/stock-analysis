@@ -27,32 +27,34 @@
         <th></th>
       </tr>
     </thead>
-    <tr *ngFor="let option of openOptions">
-      <td>
-        <span class="badge" [ngClass]="{'badge-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
-      </td>
-      <td>
-        <span class="font-weight-bold">
-          {{option.ticker}} {{option.strikePrice | currency}} {{option.optionType}}
-        </span>
-      </td>
-      <td>{{option.expirationDate | date:'MM/dd'}}</td>
-      <td>{{option.currentPrice | currency}}</td>
-      <td class="text-left">
-        <span class="badge" [ngClass]="{'badge-warning': !option.isFavorable, 'badge-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
-        {{option.strikePriceDiff | percent}}
-      </td>
-      <td>
-        {{option.profit | currency}}
-      </td>
-      <td>
-        {{(option.days - option.daysHeld) | number}}
-        <span *ngIf="option.expiresSoon" class="ml-1 badge badge-warning">expires soon</span>
-        <span *ngIf="option.isExpired" class="ml-1 badge badge-danger">expired</span>
-      </td>
-      <td>
-        <a class="btn btn-primary btn-sm" [routerLink]="[ '/optiondetails', option.id ]">Edit</a>
-      </td>
-    </tr>
+    <tbody>
+      <tr *ngFor="let option of openOptions">
+        <td>
+          <span class="badge" [ngClass]="{'bg-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
+        </td>
+        <td>
+          <span class="font-weight-bold">
+            {{option.ticker}} {{option.strikePrice | currency}} {{option.optionType}}
+          </span>
+        </td>
+        <td>{{option.expirationDate | date:'MM/dd'}}</td>
+        <td>{{option.currentPrice | currency}}</td>
+        <td class="text-start">
+          <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+          {{option.strikePriceDiff | percent}}
+        </td>
+        <td>
+          {{option.profit | currency}}
+        </td>
+        <td>
+          {{(option.days - option.daysHeld) | number}}
+          <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
+          <span *ngIf="option.isExpired" class="ml-1 badge bg-danger">expired</span>
+        </td>
+        <td>
+          <a class="btn btn-primary btn-sm" [routerLink]="[ '/optiondetails', option.id ]">Edit</a>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </div>

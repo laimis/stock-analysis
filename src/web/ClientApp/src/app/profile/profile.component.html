@@ -2,14 +2,14 @@
   <div class="card mb-3" *ngIf="profile">
     <div class="card-header">
       Profile
-      <span class="text-muted float-right">Member since {{profile.created | date}}</span>
+      <span class="text-muted float-end">Member since {{profile.created | date}}</span>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col">
           <div class="card-title">{{profile.firstname}} {{profile.lastname}}, {{profile.subscriptionLevel}} Plan</div>
         </div>
-        <div class="col text-right">
+        <div class="col text-end">
           <span class="text-muted">{{profile.email}}</span>
         </div>
       </div>
@@ -17,7 +17,7 @@
         <div class="col mb-1">
           <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
         </div>
-        <div class="col text-right"></div>
+        <div class="col text-end"></div>
       </div>
     </div>
   </div>

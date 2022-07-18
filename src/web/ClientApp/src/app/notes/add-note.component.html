@@ -7,7 +7,7 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <form>
-    <div class="form-group">
+    <div>
       <app-symbol-search
         label="Ticker"
         (tickerSelected)="onTickerSelected($event)"
@@ -16,13 +16,13 @@
       </app-symbol-search>
     </div>
 
-    <div class="form-group">
+    <div>
       <label for="description">Note</label>
       <textarea class="form-control" id="description" name="Note" [(ngModel)]="note" rows="10">
       </textarea>
     </div>
 
-    <div class="form-group">
+    <div>
       <button class="btn btn-primary mr-1" (click)="addNote()">Add</button>
       <a [routerLink]="[ '/notes' ]" class="btn btn-secondary mr-1">Cancel</a>
     </div>

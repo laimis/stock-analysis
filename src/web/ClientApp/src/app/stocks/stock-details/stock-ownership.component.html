@@ -11,7 +11,7 @@
         Current price: <b>{{stock.price | currency}}</b>
       </div>
       <div class="col">
-        <select class="form-control btn border rounded" name="category" (change)="categoryChanged($event.target.value)" value="{{ownership.category}}">
+        <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target.value)" value="{{ownership.category}}">
           <option value="">Select Category</option>
           <option value="longterm">Long-Term</option>
           <option value="shortterm">Short-Term</option>
@@ -28,32 +28,32 @@
         Successfully recorded the transaction
       </div>
       <form>
-        <div class="form-row">
-          <div class="form-group col">
+        <div class="row">
+          <div class="col">
             <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
-            <select class="form-control btn border rounded" name="positionType" [(ngModel)]="positionType">
+            <select class="form-select btn border rounded" name="positionType" [(ngModel)]="positionType">
               <option value="buy">Bought</option>
               <option value="sell">Sold</option>
             </select>
           </div>
 
-          <div class="form-group col">
+          <div class="col">
             <label for="numberOfShares">Number of Shares</label>
             <input type="number" class="form-control" id="numberOfShares" name="numberOfShares" [(ngModel)]="numberOfShares">
           </div>
 
-          <div class="form-group col">
+          <div class="col">
             <label for="pricePerShare">Price per Share</label>
             <input type="number" class="form-control" id="pricePerShare" name="pricePerShare" [(ngModel)]="pricePerShare">
           </div>
 
-          <div class="form-group col">
+          <div class="col">
             <label for="filled">Filled</label>
             <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
           </div>
         </div>
-        <div class="form-row mt-2">
-          <div class="form-group col">
+        <div class="row mt-2">
+          <div class="col">
             <label for="notes">Notes and your thoughts around this transaction</label>
             <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="3"></textarea>
           </div>
@@ -95,7 +95,7 @@
     <div class="mb-3">
       <label>Delete this stock from your portfolio</label>
       <div>
-        <button type="button float-right" class="btn btn-secondary mb-1 mr-2" (click)="delete()">Delete</button>
+        <button type="button float-end" class="btn btn-secondary mb-1 mr-2" (click)="delete()">Delete</button>
       </div>
     </div>
 

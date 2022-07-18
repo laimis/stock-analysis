@@ -8,8 +8,8 @@
     <span class="sr-only">Loading...</span>
   </div>
 
-  <a *ngIf="!symbolFilter" class="float-right" [routerLink]="[ '/notes/add' ]">New note</a>
-  <a *ngIf="symbolFilter" class="float-right" [routerLink]="[ '/notes/add', symbolFilter ]">New note</a>
+  <a *ngIf="!symbolFilter" class="float-end" [routerLink]="[ '/notes/add' ]">New note</a>
+  <a *ngIf="symbolFilter" class="float-end" [routerLink]="[ '/notes/add', symbolFilter ]">New note</a>
 </div>
 
 <div *ngIf="notes && notes.length > 0">
@@ -28,7 +28,7 @@
 
       <div>
         <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
-        <a class="float-right" [routerLink]="[ '/notes/filtered', note.relatedToTicker ]">view all {{note.relatedToTicker}} notes</a>
+        <a class="float-end" [routerLink]="[ '/notes/filtered', note.relatedToTicker ]">view all {{note.relatedToTicker}} notes</a>
       </div>
     </div>
   </div>

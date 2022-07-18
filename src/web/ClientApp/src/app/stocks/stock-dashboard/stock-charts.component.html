@@ -2,19 +2,19 @@
     <div class="container">
       <div class="row">
         <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-        <div class="col text-right"><button (click)="next()" class="btn btn-primary">Next</button></div>
+        <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
       </div>
     </div>
   
     <div class="container mt-5">
       <div class="row">
-        <div class="col text-left">
+        <div class="col text-start">
           <h3>{{currentPosition.ticker}}</h3>
         </div>
         <div class="col text-center">
           <h3>{{currentPosition.cost - currentPosition.return | currency}}</h3>
         </div>
-        <div class="col text-right">
+        <div class="col text-end">
           <h3>{{currentPosition.daysHeld}} days held</h3>
         </div>
       </div>
