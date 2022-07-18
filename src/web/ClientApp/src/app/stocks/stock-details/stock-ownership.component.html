@@ -11,7 +11,7 @@
         Current price: <b>{{stock.price | currency}}</b>
       </div>
       <div class="col">
-        <select class="form-control btn border rounded" name="category" (change)="categoryChanged($event.target.value)" value="{{ownership.category}}">
+        <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target.value)" value="{{ownership.category}}">
           <option value="">Select Category</option>
           <option value="longterm">Long-Term</option>
           <option value="shortterm">Short-Term</option>
@@ -31,7 +31,7 @@
         <div class="row">
           <div class="col">
             <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
-            <select class="form-control btn border rounded" name="positionType" [(ngModel)]="positionType">
+            <select class="form-select btn border rounded" name="positionType" [(ngModel)]="positionType">
               <option value="buy">Bought</option>
               <option value="sell">Sold</option>
             </select>

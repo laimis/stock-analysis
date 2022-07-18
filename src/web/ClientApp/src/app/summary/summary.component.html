@@ -6,7 +6,7 @@
 </div>
 
 <div *ngIf="loaded">
-  <select class="form-control" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
+  <select class="form-select" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
     <option value="thisweek" selected>This week</option>
     <option value="last7days">Last 7 days</option>
   </select>
