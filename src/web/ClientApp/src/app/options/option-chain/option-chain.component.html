@@ -34,7 +34,7 @@
     </div>
 
 
-    <div class="form-group">
+    <div>
       <label for="expirationSelect">Expiration</label>&nbsp;&nbsp;
       <select class="btn border rounded" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
         <option value=""></option>
@@ -52,7 +52,7 @@
       <input type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
     </div>
 
-    <div class="form-group">
+    <div>
       <label for="minStrikePrice">Min Strike Price</label>&nbsp;&nbsp;
       <input type="number" id="minStrikePrice" name="minStrikePrice" [(ngModel)]="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()" />
 

@@ -1,25 +1,25 @@
 <form>
-  <div class="form-group">
+  <div>
     <label for="to">To</label>
     <input type="email" class="form-control" id="to" name="to" [(ngModel)]="to">
   </div>
-  <div class="form-group">
+  <div>
     <label for="from">From Email</label>
     <input type="email" class="form-control" id="from" name="from" [(ngModel)]="from">
   </div>
-  <div class="form-group">
+  <div>
     <label for="from">From Name</label>
     <input type="email" class="form-control" id="fromName" name="fromName" [(ngModel)]="fromName">
   </div>
-  <div class="form-group">
+  <div>
     <label for="subject">Subject</label>
     <input type="email" class="form-control" id="subject" name="subject" [(ngModel)]="subject">
   </div>
-  <div class="form-group">
+  <div>
     <label for="to">Body</label>
     <textarea class="form-control" id="body" name="body" rows="5" [(ngModel)]="body"></textarea>
   </div>
-  <div class="form-group">
+  <div>
     <button type="button" class="btn btn-primary" (click)="send()">Send</button>
   </div>
 </form>

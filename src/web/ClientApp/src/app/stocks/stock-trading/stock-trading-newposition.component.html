@@ -10,15 +10,13 @@
           </app-symbol-search>
       </div>
       <div class="col">
-        <div class="form-group">
-          <label for="positionSize">Position Size</label>
-          <input
-            type="number"
-            class="form-control"
-            id="positionSize"
-            [(ngModel)]="positionSize"
-            (ngModelChange)="updateBuyingValues()">
-        </div>
+        <label for="positionSize" class="form-label">Position Size</label>
+        <input
+          type="number"
+          class="form-control"
+          id="positionSize"
+          [(ngModel)]="positionSize"
+          (ngModelChange)="updateBuyingValues()">
       </div>
     </div>
     <div class="row" *ngIf="costToBuy">
