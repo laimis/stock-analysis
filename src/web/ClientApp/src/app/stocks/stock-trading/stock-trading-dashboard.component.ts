@@ -20,7 +20,7 @@ export class StockTradingComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.title.setTitle("Review - Nightingale Trading")
+    this.title.setTitle("Trading Dashboard - Nightingale Trading")
     this.loadEntries()
   }
 
