@@ -1,13 +1,17 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
 import { PositionTransaction, Prices } from 'src/app/services/stocks.service';
 import annotationPlugin, { AnnotationOptions, PointAnnotationOptions } from 'chartjs-plugin-annotation';
+import { BaseChartDirective } from 'ng2-charts';
+
 
 @Component({
   selector: 'stock-trading-chart',
   templateUrl: './stock-trading-chart.component.html',
 })
 export class StockTradingChartComponent implements OnInit {
+  
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   
   public lineChartPlugins = [];
   public lineChartType : ChartType = 'line';
@@ -59,6 +63,7 @@ export class StockTradingChartComponent implements OnInit {
 
   @Input()
   set horizontalLines(lines: number[]) {
+    console.log('horizontalLines: ' + lines)
     this._horizontalLines = lines;
     this.updateAnnotations();
   }
@@ -155,6 +160,12 @@ export class StockTradingChartComponent implements OnInit {
         )
 
     this.lineChartOptions.plugins.annotation.annotations = annotations
+    
+    if (this.chart) {
+      this.chart.ngOnChanges({})
+      // this.chart.update()
+      console.log('chart updated')
+    }
   }
   
   ngOnInit() {

@@ -68,6 +68,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
   }
 
   updateBuyingValues() {
+    console.log("updateBuyingValues")
     this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
     this.stopPrice = this.costToBuy * (1 - this.stopLoss)
     this.exitPrice = this.costToBuy * (1 + this.rrTarget)
