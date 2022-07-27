@@ -39,15 +39,15 @@
 
         <div class="row">
           <div class="col">
-            <span class="badge">size</span>
+            <span class="badge bg-secondary">size</span>
             {{ positionSize(p) | currency }}
           </div>
           <div class="col text-center">
-            <span class="badge">shares</span>
+            <span class="badge bg-secondary">shares</span>
             {{ p.numberOfShares }} / {{ p.maxNumberOfShares }}
           </div>
           <div class="col text-center">
-            <span class="badge">portion</span>
+            <span class="badge bg-secondary">portion</span>
             {{ p.maxNumberOfShares / 3 | number : '1.0-0' }}
           </div>
           <div class="col"></div>

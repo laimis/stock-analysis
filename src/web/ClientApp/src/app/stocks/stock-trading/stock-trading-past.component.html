@@ -18,8 +18,8 @@
       <td>{{p.closed | date}}</td>
       <td>{{p.profit | currency}}</td>
       <td>
-        <span *ngIf="p.profit >= 0" class="badge bg-success mr-1">win</span>
-        <span *ngIf="p.profit < 0" class="badge bg-warning mr-1">loss</span>
+        <span *ngIf="p.profit >= 0" class="badge bg-success me-1">win</span>
+        <span *ngIf="p.profit < 0" class="badge bg-warning me-1">loss</span>
         {{p.returnPct | percent}}
       </td>
       <td>{{p.daysHeld}}</td>

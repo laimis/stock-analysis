@@ -8,7 +8,7 @@
         {{planName}} plan
       </span>
     </div>
-    <div class="form-row">
+    <div class="row">
       <div class="col">
         <label for="firstname">First name</label>
         <input class="form-control" type="text" id="firstname" name="firstname" [(ngModel)]="firstname" />
@@ -18,7 +18,7 @@
         <input class="form-control" type="text" id="lastname" name="lastname" [(ngModel)]="lastname" />
       </div>
     </div>
-    <div class="form-row">
+    <div class="row">
       <div class="col">
         <label for="email">Email</label>
         <input class="form-control" type="email" id="email" name="email" [(ngModel)]="email" />
@@ -28,15 +28,15 @@
         <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
       </div>
     </div>
-    <div class="form-row">
+    <div class="row">
       <div class="col">
         <input type="checkbox" class="form-control" class="mt-2" id="terms" name="terms" [(ngModel)]="terms" />
         <label for="terms">&nbsp; Agree to Terms & Conditions</label>
       </div>
     </div>
-    <div class="form-row mt-2">
+    <div class="row mt-2">
       <div class="col">
-        <button class="btn btn-primary mr-2" [disabled]="disableButton" (click)="validate()">Create {{payLabel}}</button>
+        <button class="btn btn-primary me-2" [disabled]="disableButton" (click)="validate()">Create {{payLabel}}</button>
         <button class="btn btn-secondary" (click)="back()">Back</button>
       </div>
     </div>

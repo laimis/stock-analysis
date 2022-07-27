@@ -5,7 +5,7 @@
     <ul>
       <span
         *ngFor="let link of chain.links"
-        class="badge mr-2"
+        class="badge me-2"
         [ngClass]="{
           'bg-level-3-success': link.success && link.level == 3,
           'bg-level-3-failure': !link.success && link.level == 3,

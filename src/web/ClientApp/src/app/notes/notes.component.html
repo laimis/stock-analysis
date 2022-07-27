@@ -1,5 +1,5 @@
 <div class="clearfix mb-3">
-  <select class="btn border rounded mr-3" [(ngModel)]="symbolFilter" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+  <select class="btn border rounded me-3" [(ngModel)]="symbolFilter" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
     <option value="">Filter by symbol</option>
     <option *ngFor="let t of tickers" value="{{t}}">{{t}}</option>
   </select>

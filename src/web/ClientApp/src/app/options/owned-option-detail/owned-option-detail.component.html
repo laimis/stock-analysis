@@ -84,7 +84,7 @@
           </div>
 
           <div>
-            <button type="button" class="btn btn-primary mb-1 mr-2" (click)="record()">Record</button>
+            <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
           </div>
         </form>
       </div>
@@ -97,8 +97,8 @@
         </div>
         <form>
           <div>
-            <button type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(false)">Close - Expired Worthless</button>
-            <button *ngIf="option.boughtOrSold == 'Sold'" type="button" class="btn btn-secondary mb-1 mr-2" (click)="expire(true)">Close - It was assigned</button>
+            <button type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(false)">Close - Expired Worthless</button>
+            <button *ngIf="option.boughtOrSold == 'Sold'" type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(true)">Close - It was assigned</button>
           </div>
         </form>
       </div>
@@ -131,7 +131,7 @@
     <div class="mb-3">
       <label>Delete this option position from your portfolio</label>
       <div>
-        <button type="button float-end" class="btn btn-secondary mb-1 mr-2" (click)="delete()">Delete</button>
+        <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
       </div>
     </div>
 

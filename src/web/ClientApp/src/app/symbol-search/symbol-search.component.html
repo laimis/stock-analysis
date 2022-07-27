@@ -16,7 +16,7 @@
       class="search-results">
 
       <div class="row" *ngFor="let r of searchResults$ | async" (click)="clicked(r.symbol)">
-        <div class="col ml-2 mb-2">{{r.symbol}}</div>
+        <div class="col ms-2 mb-2">{{r.symbol}}</div>
         <div class="col-10">{{r.securityName}}</div>
       </div>
     </div>

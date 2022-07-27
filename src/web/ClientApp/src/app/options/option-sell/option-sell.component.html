@@ -9,7 +9,7 @@
   <h3>Record your option transaction</h3>
   <div class="option-purchase-c-container">
 		<form>
-      <div class="form-row">
+      <div class="row">
         <div class="col">
           <app-symbol-search
             label="Ticker"
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <div class="form-row mt-2">
+      <div class="row mt-2">
         <div class="col">
           <label for="expirationDate">Expiration</label>
           <input type="date" class="form-control" id="expirationDate" name="expirationDate" [(ngModel)]="expirationDate">
@@ -39,7 +39,7 @@
         </div>
       </div>
 
-      <div class="form-row mt-2">
+      <div class="row mt-2">
         <div class="col">
           <label for="numberOfContracts">Number of Contracts</label>
           <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="form-row mt-2">
+      <div class="row mt-2">
         <div class="col">
           <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
           <select class="form-control btn border rounded" name="positionType" [(ngModel)]="positionType">
@@ -65,13 +65,13 @@
         </div>
       </div>
 
-      <div class="form-row mt-2">
+      <div class="row mt-2">
         <label for="notes">Notes and your thoughts around this transaction</label>
         <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="5"></textarea>
       </div>
 
       <div class="mt-2">
-        <button type="submit" class="btn btn-primary mb-2 mr-2" (click)="record()">Record</button>
+        <button type="submit" class="btn btn-primary mb-2 me-2" (click)="record()">Record</button>
         <button type="button" class="btn btn-secondary mb-2" (click)="back()">Back</button>
       </div>
 		</form>

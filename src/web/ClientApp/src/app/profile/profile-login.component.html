@@ -1,27 +1,27 @@
 <div>
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
   <form *ngIf="!resetPasswordRequest">
-    <div class="form-row">
+    <div class="row">
       <div class="col">
-        <label for="email">Email</label>
+        <label for="email" class="form-label">Email</label>
         <input class="form-control" autofocus type="email" id="email" name="email" [(ngModel)]="email" />
       </div>
     </div>
-    <div class="form-row mt-2">
+    <div class="row mt-2">
       <div class="col">
-        <label for="lastname">Password</label>
+        <label for="password" class="form-label">Password</label>
         <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
       </div>
     </div>
-    <div class="form-row mt-2">
+    <div class="row mt-2">
       <div class="col">
         <a [routerLink]="" (click)="!!forgotPassword()">Forgot Password?</a>
       </div>
     </div>
-    <div class="form-row mt-2">
+    <div class="row mt-2">
       <div class="col">
-        <button *ngIf="!inProgress" type="submit" class="btn btn-primary mr-2" (click)="login()">Login</button>
-        <button *ngIf="inProgress" type="submit" disabled class="btn btn-primary mr-2" >Almost there...</button>
+        <button *ngIf="!inProgress" type="submit" class="btn btn-primary me-3" (click)="login()">Login</button>
+        <button *ngIf="inProgress" type="submit" disabled class="btn btn-primary me-3" >Almost there...</button>
         <button class="btn btn-secondary" (click)="back()">Back</button>
         <a href="/api/account/login" role="button" class="float-end">
           <img src="btn_google_signin_dark_normal_web@2x.png" height="45px" />
@@ -32,16 +32,16 @@
 
   <div class="alert alert-success" *ngIf="passwordRequestSuccess && resetPasswordRequest">If you have a valid account, you will receive a password reset email.</div>
   <form *ngIf="resetPasswordRequest">
-    <div class="form-row">
+    <div class="row">
       <div class="col">
         <label for="email">Email</label>
         <input class="form-control" autofocus type="email" id="email" name="email" [(ngModel)]="email" />
       </div>
     </div>
-    <div class="form-row mt-2">
+    <div class="row mt-2">
       <div class="col">
         <button type="submit" class="btn btn-primary" (click)="requestReset()">Request Reset</button>
-        <button class="btn btn-secondary ml-3" (click)="cancelReset()">Cancel</button>
+        <button class="btn btn-secondary ms-3" (click)="cancelReset()">Cancel</button>
       </div>
     </div>
   </form>
