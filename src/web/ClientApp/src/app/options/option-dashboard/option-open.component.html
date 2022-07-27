@@ -30,7 +30,7 @@
     <tbody>
       <tr *ngFor="let option of openOptions">
         <td>
-          <span class="badge" [ngClass]="{'bg-info': option.boughtOrSold == 'Bought'}">{{option.boughtOrSold}}</span>
+          <span class="badge bg-primary" [ngClass]="{'bg-info': option.boughtOrSold == 'Bought', 'bg-secondary': option.boughtOrSold != 'Bought'}">{{option.boughtOrSold}}</span>
         </td>
         <td>
           <span class="font-weight-bold">
@@ -40,7 +40,7 @@
         <td>{{option.expirationDate | date:'MM/dd'}}</td>
         <td>{{option.currentPrice | currency}}</td>
         <td class="text-start">
-          <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+          <span class="badge bg-primary" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
           {{option.strikePriceDiff | percent}}
         </td>
         <td>
