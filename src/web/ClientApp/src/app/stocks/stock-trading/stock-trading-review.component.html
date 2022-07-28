@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <div class="container mt-5">
+  <div class="container mt-2">
     <div class="row">
       <div class="col text-start">
         <h3>{{currentPosition.ticker}}</h3>
@@ -19,6 +19,18 @@
       </div>
     </div>
     <div class="row">
+      <!-- generate span for each buy showing the price and when it was executed -->
+      <div class="col">
+        <h4>Buys [{{currentPosition.buys.length}}]</h4>
+        <span class="badge bg-success me-1" *ngFor="let buy of currentPosition.buys">{{buy.price | currency}} on {{buy.when | date: 'MM/dd/yyyy'}}</span>
+      </div>
+      <!-- generate span for each sell showing the price and when it was executed -->
+      <div class="col text-end">
+        <h4>Sells [{{currentPosition.sells.length}}]</h4>
+        <span class="badge bg-danger me-1" *ngFor="let sell of currentPosition.sells">{{sell.price | currency}} on {{sell.when | date: 'MM/dd/yyyy'}}</span>
+      </div>
+    </div>
+    <div class="row mt-2">
       <div class="col">
         <stock-trading-chart *ngIf="prices"
           [buys]="currentPosition.buys"
