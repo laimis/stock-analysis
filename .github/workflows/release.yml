@@ -37,10 +37,10 @@ jobs:
             echo "::set-output name=image::$ECR_REPOSITORY:${IMAGE_TAG}"
       
       - name: Create Deployment
-      - run: doctl apps create-deployment ${{ secrets.DO_APP_ID }}
+        run: doctl apps create-deployment ${{ secrets.DO_APP_ID }}
 
       - name: Kick off garbage collection
-      - run: doctl registry garbage-collection start -f
+        run: doctl registry garbage-collection start -f
 
       - name: Create Release
         id: create_release
