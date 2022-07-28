@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Prices, StockHistoricalPrice, StocksService, StockTradingPosition } from 'src/app/services/stocks.service';
+import { Prices, StocksService, StockTradingPosition } from 'src/app/services/stocks.service';
 
 
 @Component({

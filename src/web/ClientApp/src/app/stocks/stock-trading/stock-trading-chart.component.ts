@@ -1,7 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
 import { PositionTransaction, Prices } from 'src/app/services/stocks.service';
-import annotationPlugin, { AnnotationOptions, PointAnnotationOptions } from 'chartjs-plugin-annotation';
+import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
+import {CrosshairPlugin} from 'chartjs-plugin-crosshair';
 import { BaseChartDirective } from 'ng2-charts';
 
 
@@ -22,7 +23,8 @@ export class StockTradingChartComponent implements OnInit {
     responsive: true,
     scales: {
       y: {
-        type: 'logarithmic'
+        type: 'logarithmic',
+        display: true,
       }
     },
     plugins: {
@@ -169,15 +171,17 @@ export class StockTradingChartComponent implements OnInit {
   }
   
   ngOnInit() {
-    console.log("StockTradingChartComponent.ngOnInit()");
-    Chart.register(LogarithmicScale);
-    Chart.register(annotationPlugin);
+    console.log("StockTradingChartComponent.ngOnInit()")
+    Chart.register(LogarithmicScale)
+    Chart.register(annotationPlugin)
+    Chart.register(CrosshairPlugin)
   }
 
   ngOnDestroy() {
-    console.log("StockTradingChartComponent.ngOnDestroy()");
-    Chart.unregister(LogarithmicScale);
-    Chart.unregister(annotationPlugin);
+    console.log("StockTradingChartComponent.ngOnDestroy()")
+    Chart.unregister(LogarithmicScale)
+    Chart.unregister(annotationPlugin)
+    Chart.unregister(CrosshairPlugin)
   }
 
 }
