@@ -36,6 +36,12 @@ jobs:
             docker push registry.digitalocean.com/nightingale-trading/web:latest
             echo "::set-output name=image::$ECR_REPOSITORY:${IMAGE_TAG}"
       
+      - name: Create Deployment
+      - run: doctl apps create-deployment ${{ secrets.DO_APP_ID }}
+
+      - name: Kick off garbage collection
+      - run: doctl registry garbage-collection start -f
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
