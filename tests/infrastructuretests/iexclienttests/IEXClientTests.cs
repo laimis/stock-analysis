@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Shared.Adapters.Stocks;
+using core.Stocks.View;
 using iexclient;
 using Xunit;
 using Xunit.Abstractions;

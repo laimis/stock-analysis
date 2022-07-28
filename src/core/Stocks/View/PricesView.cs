@@ -5,19 +5,19 @@ namespace core.Stocks.View
 {
     public class PricesView
     {
-        public PricesView(HistoricalPrice[] prices, int[] ints)
+        public PricesView(HistoricalPrice[] prices, int[] smaIntervals)
         {
             Prices = prices;
-            SMA = ints.Select(i => ToSMA(prices, i)).ToArray();
+            SMA = smaIntervals.Select(interval => ToSMA(prices, interval)).ToArray();
         }
 
         public HistoricalPrice[] Prices { get; }
         public SMA[] SMA { get; }
 
-        private SMA ToSMA(HistoricalPrice[] success, int interval)
+        private SMA ToSMA(HistoricalPrice[] prices, int interval)
         {
-            var sma = new decimal?[success.Length];
-            for(var i = 0; i<success.Length-1; i++)
+            var sma = new decimal?[prices.Length];
+            for(var i = 0; i<prices.Length; i++)
             {
                 if (i < interval)
                 {
@@ -26,9 +26,9 @@ namespace core.Stocks.View
                 }
 
                 var sum = 0m;
-                for (var j = i; j >= i - interval; j--)
+                for (var j = i - 1; j >= i - interval; j--)
                 {
-                    sum += success[j].Close;
+                    sum += prices[j].Close;
                 }
                 sma[i] = sum / interval;
             }
