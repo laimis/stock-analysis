@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Prices, StocksService, StockStats } from 'src/app/services/stocks.service';
+import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -7,7 +7,7 @@ import { Prices, StocksService, StockStats } from 'src/app/services/stocks.servi
   styleUrls: ['./stock-trading-newposition.component.css']
 })
 export class StockTradingNewPositionComponent implements OnChanges {
-
+  
   constructor(
       private stockService:StocksService
       )
@@ -29,6 +29,9 @@ export class StockTradingNewPositionComponent implements OnChanges {
   @Input()
   rrTarget: number
 
+  @Output()
+  stockPurchased: EventEmitter<string> = new EventEmitter<string>()
+
   // variables for new positions
   positionSize: number = 3000
   costToBuy: number | null = null
@@ -38,19 +41,19 @@ export class StockTradingNewPositionComponent implements OnChanges {
   potentialGains: number | null = null
   potentialLoss: number | null = null
   potentialRr: number | null = null
-  stats: StockStats | null = null
 
   prices: Prices | null = null
   stopAndExitPoints: number[] | null = null
+  ticker: string;
 
   onBuyTickerSelected(ticker: string) {
       this.costToBuy = null
-  
-      this.stockService.getStockDetails(ticker)
-        .subscribe(stockDetails => {
-          console.log(stockDetails)
-          this.costToBuy = stockDetails.price
-          this.stats = stockDetails.stats
+      this.ticker = ticker
+      
+      this.stockService.getStockPrice(ticker)
+        .subscribe(price => {
+          console.log(price)
+          this.costToBuy = price
           this.updateBuyingValues()
           this.updateChart(ticker)
         }, error => {
@@ -70,12 +73,28 @@ export class StockTradingNewPositionComponent implements OnChanges {
   updateBuyingValues() {
     console.log("updateBuyingValues")
     this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
-    this.stopPrice = this.costToBuy * (1 - this.stopLoss)
-    this.exitPrice = this.costToBuy * (1 + this.rrTarget)
+    this.stopPrice = Math.round(this.costToBuy * (1 - this.stopLoss) * 100) / 100
+    this.exitPrice = Math.round(this.costToBuy * (1 + this.rrTarget) * 100) / 100
     this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
     this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
     this.potentialRr = Math.abs(this.potentialGains / this.potentialLoss)
     this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
+  }
+
+  buy() {
+    console.log("buy")
+    var cmd = new stocktransactioncommand()
+    cmd.ticker = this.ticker
+    cmd.numberOfShares = this.stocksToBuy
+    cmd.price = this.costToBuy
+    cmd.date = new Date().toISOString()
+
+    this.stockService.purchase(cmd).subscribe(
+      _ => { 
+        this.stockPurchased.emit("purchased")
+    },
+      _ => { alert('purchase failed') }
+    )
   }
 }
 

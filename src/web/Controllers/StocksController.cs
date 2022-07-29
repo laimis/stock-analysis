@@ -25,22 +25,16 @@ namespace web.Controllers
         }
 
         [HttpGet()]
-        public async Task<object> Dashboard()
-        {
-            return await _mediator.Send(new Dashboard.Query(User.Identifier()));
-        }
+        public Task<object> Dashboard() => _mediator.Send(new Dashboard.Query(User.Identifier()));
 
         [HttpGet("{ticker}")]
-        public async Task<object> DetailsAsync(string ticker)
-        {
-            return await _mediator.Send(new Details.Query(ticker));
-        }
+        public Task<object> DetailsAsync(string ticker) => _mediator.Send(new Details.Query(ticker));
 
         [HttpGet("{ticker}/prices/{interval}")]
-        public Task<PricesView> Prices(string ticker, string interval)
-        {
-            return _mediator.Send(new Prices.Query(ticker, interval));
-        }
+        public Task<PricesView> Prices(string ticker, string interval) => _mediator.Send(new Prices.Query(ticker, interval));
+
+        [HttpGet("{ticker}/price")]
+        public Task<decimal> Price(string ticker) => _mediator.Send(new Price.Query(ticker));
         
         [HttpGet("{ticker}/ownership")]
         public async Task<object> Ownership(string ticker)

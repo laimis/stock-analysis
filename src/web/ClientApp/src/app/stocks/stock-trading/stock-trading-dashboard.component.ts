@@ -34,6 +34,11 @@ export class StockTradingComponent implements OnInit {
     this.activeTab = tabName
   }
 
+  stockPurchased() {
+    this.loadEntries()
+    this.activateTab('positions')
+  }
+
   private loadEntries() {
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
       this.positions = r.current

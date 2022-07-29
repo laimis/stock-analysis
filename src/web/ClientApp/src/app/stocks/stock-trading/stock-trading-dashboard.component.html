@@ -50,7 +50,7 @@
   </div>
   
 
-  <stock-trading-newposition  *ngIf="isActive('newposition')" [stopLoss]=stopLoss [firstTarget]=firstTarget [rrTarget]=rrTarget></stock-trading-newposition>
+  <stock-trading-newposition  *ngIf="isActive('newposition')" [stopLoss]=stopLoss [firstTarget]=firstTarget [rrTarget]=rrTarget (stockPurchased)="stockPurchased()"></stock-trading-newposition>
   <stock-trading-positions    *ngIf="isActive('positions')" [positions]=positions [stopLoss]=stopLoss [firstTarget]=firstTarget [rrTarget]=rrTarget></stock-trading-positions>
   <stock-past                 *ngIf="isActive('past')" [past]=past></stock-past>
   <stock-trading-performance  *ngIf="isActive('performancerecent')" [performance]=performance.recent></stock-trading-performance>
