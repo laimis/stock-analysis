@@ -68,4 +68,38 @@ namespace core.Account
             }
         }
     }
+
+    public class Disconnect
+    {
+        public class Command : IRequest<CommandResponse>
+        {
+            public Command(Guid userId) => UserId = userId;
+
+            [Required]
+            public Guid UserId { get; }
+        }
+
+        public class Handler : IRequestHandler<Command, CommandResponse>
+        {
+            private IBrokerage _brokerage;
+            private IAccountStorage _storage;
+
+            public Handler(IBrokerage brokerage, IAccountStorage storage)
+            {
+                _brokerage = brokerage;
+                _storage = storage;
+            }
+
+            public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
+            {
+                var user = await _storage.GetUser(request.UserId);
+
+                user.DisconnectFromBrokerage();
+
+                await _storage.Save(user);
+                
+                return CommandResponse.Success();
+            }
+        }
+    }
 }

@@ -79,6 +79,14 @@ namespace core.Account
             BrokerageAccessTokenExpires = e.When.AddSeconds(e.ExpiresInSeconds);
         }
 
+        internal void ApplyInternal(UserDisconnectedFromBrokerage e)
+        {
+            ConnectedToBrokerage = false;
+            BrokerageAccessToken = null;
+            BrokerageRefreshToken = null;
+            BrokerageAccessTokenExpires = DateTimeOffset.MinValue;
+        }
+
         internal bool PasswordHashMatches(string hash)
         {
             return PasswordHash == hash;

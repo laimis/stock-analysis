@@ -62,10 +62,24 @@ namespace core.Account
             );
         }
 
-        internal void ConnectToBrokerage(string access_token, string refresh_token, string token_type, long expires_in_seconds, string scope, long refresh_token_expires_in_seconds)
+        public void ConnectToBrokerage(string accessToken, string refreshToken, string tokenType, long expiresInSeconds, string scope, long refreshTokenExpiresInSeconds)
         {
             Apply(
-                new UserConnectedToBrokerage(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, access_token, refresh_token, token_type, expires_in_seconds, scope, refresh_token_expires_in_seconds)
+                new UserConnectedToBrokerage(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, refreshTokenExpiresInSeconds)
+            );
+        }
+
+        internal void RefreshBrokerageConnection(string accessToken, string refreshToken, string tokenType, long expiresInSeconds, string scope, long refreshTokenExpiresInSeconds)
+        {
+            Apply(
+                new UserRefreshedBrokerageConnection(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, refreshTokenExpiresInSeconds)
+            );
+        }
+
+        internal void DisconnectFromBrokerage()
+        {
+            Apply(
+                new UserDisconnectedFromBrokerage(Guid.NewGuid(), Id, DateTimeOffset.UtcNow)
             );
         }
 

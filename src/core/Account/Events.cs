@@ -90,20 +90,20 @@ namespace core.Account
             Guid id,
             Guid aggregateId,
             DateTimeOffset when,
-            string access_token,
-            string refresh_token,
-            string token_type,
-            long expires_in_seconds,
+            string accessToken,
+            string refreshToken,
+            string tokenType,
+            long expiresInSeconds,
             string scope,
-            long refresh_token_expires_in_seconds)
+            long refreshTokenExpiresInSeconds)
             : base(id, aggregateId, when)
         {
-            AccessToken = access_token;
-            RefreshToken = refresh_token;
-            TokenType = token_type;
-            ExpiresInSeconds = expires_in_seconds;
+            AccessToken = accessToken;
+            RefreshToken = refreshToken;
+            TokenType = tokenType;
+            ExpiresInSeconds = expiresInSeconds;
             Scope = scope;
-            RefreshTokenExpiresInSeconds = refresh_token_expires_in_seconds;
+            RefreshTokenExpiresInSeconds = refreshTokenExpiresInSeconds;
         }
 
         public string AccessToken { get; }
@@ -112,5 +112,42 @@ namespace core.Account
         public long ExpiresInSeconds { get; }
         public string Scope { get; }
         public long RefreshTokenExpiresInSeconds { get; }
+    }
+
+    internal class UserRefreshedBrokerageConnection : AggregateEvent
+    {
+        public UserRefreshedBrokerageConnection(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string accessToken,
+            string refreshToken,
+            string tokenType,
+            long expiresInSeconds,
+            string scope,
+            long refreshTokenExpiresInSeconds)
+            : base(id, aggregateId, when)
+        {
+            AccessToken = accessToken;
+            RefreshToken = refreshToken;
+            TokenType = tokenType;
+            ExpiresInSeconds = expiresInSeconds;
+            Scope = scope;
+            RefreshTokenExpiresInSeconds = refreshTokenExpiresInSeconds;
+        }
+
+        public string AccessToken { get; }
+        public string RefreshToken { get; }
+        public string TokenType { get; }
+        public long ExpiresInSeconds { get; }
+        public string Scope { get; }
+        public long RefreshTokenExpiresInSeconds { get; }
+    }
+
+    internal class UserDisconnectedFromBrokerage : AggregateEvent
+    {
+        public UserDisconnectedFromBrokerage(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
+        {
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace testutils
@@ -7,6 +8,13 @@ namespace testutils
         public static string GetIEXToken()
         {
             var path = @"..\..\..\..\..\..\iex_secret";
+
+            return File.ReadAllText(path);
+        }
+
+        public static string GetTDAmeritradeConfig()
+        {
+            var path = @"..\..\..\..\..\..\tdameritrade_secret";
 
             return File.ReadAllText(path);
         }

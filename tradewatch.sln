@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "twilioclient", "src\infrast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdameritradeclient", "src\infrastructure\tdameritradeclient\tdameritradeclient.csproj", "{582E150E-986C-4B49-836A-A8CF3558D3C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdameritradeclienttests", "tests\infrastructuretests\tdameritradeclienttests\tdameritradeclienttests.csproj", "{C1848435-5966-4F9A-AAC2-28EB122C28CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -276,6 +278,18 @@ Global
 		{582E150E-986C-4B49-836A-A8CF3558D3C9}.Release|x64.Build.0 = Release|Any CPU
 		{582E150E-986C-4B49-836A-A8CF3558D3C9}.Release|x86.ActiveCfg = Release|Any CPU
 		{582E150E-986C-4B49-836A-A8CF3558D3C9}.Release|x86.Build.0 = Release|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Debug|x64.Build.0 = Debug|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Debug|x86.Build.0 = Debug|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x64.ActiveCfg = Release|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x64.Build.0 = Release|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x86.ActiveCfg = Release|Any CPU
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3B806027-868A-4619-894A-82A32E9F9037} = {D067D9A3-32FE-4B01-85C3-9158417FE12C}
@@ -298,5 +312,6 @@ Global
 		{420CE0BB-9522-411C-8E0E-6B509A3054FE} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{871EEBCA-2882-4817-AFB6-BACF02008FB1} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{582E150E-986C-4B49-836A-A8CF3558D3C9} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
+		{C1848435-5966-4F9A-AAC2-28EB122C28CC} = {E32D8CC2-C013-4386-BDAF-840EC6AE86F5}
 	EndGlobalSection
 EndGlobal

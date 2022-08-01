@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
 using MediatR;
 
@@ -22,11 +25,19 @@ namespace core.Stocks
 
         public class Handler : IRequestHandler<Query, TradingEntriesView>
         {
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
             private IPortfolioStorage _portfolio;
             private IStocksService2 _stocks;
 
-            public Handler(IPortfolioStorage portfolio, IStocksService2 stocks)
+            public Handler(
+                IAccountStorage accounts,
+                IBrokerage brokerage,
+                IPortfolioStorage portfolio,
+                IStocksService2 stocks)
             {
+                _accounts = accounts;
+                _brokerage = brokerage;
                 _portfolio = portfolio;
                 _stocks = stocks;
             }
@@ -34,6 +45,13 @@ namespace core.Stocks
             public async Task<TradingEntriesView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stocks = await _portfolio.GetStocks(request.UserId);
+
+                var user = await _accounts.GetUser(request.UserId);
+
+                var pendingOrders = await (user.State.ConnectedToBrokerage switch {
+                    true => GetPendingOrdersAsync(user),
+                    false => Task.FromResult(new PendingOrderView[0])
+                });
 
                 var tradingEntries = stocks.Where(s => s.State.Owned > 0 && s.State.Category == StockCategory.ShortTerm)
                     .Select(s => new TradingEntryView(s.State))
@@ -69,8 +87,15 @@ namespace core.Stocks
                 return new TradingEntriesView(
                     current: current,
                     past: past,
+                    pendingOrders: pendingOrders,
                     performance: performance
                 );
+            }
+
+            private async Task<PendingOrderView[]> GetPendingOrdersAsync(User user)
+            {
+                var orders = await _brokerage.GetPendingOrders(user.State);
+                return orders.Select(o => new PendingOrderView(ticker: o.Ticker, quantity: o.Quantity, price: o.Price, type: o.Type)).ToArray();
             }
         }
     }

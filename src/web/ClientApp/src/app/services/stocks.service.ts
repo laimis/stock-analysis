@@ -505,10 +505,16 @@ export interface StockTradingPerformanceCollection {
   recent: StockTradingPerformance
 }
 
+export interface StockTradingOrder {
+  ticker: string
+  price: number
+}
+
 export interface StockTradingPositions {
   current: StockTradingPosition[]
   past: StockTradingPosition[]
   performance: StockTradingPerformanceCollection
+  pendingOrders: StockTradingOrder[]
 }
 
 export interface PositionTransaction {

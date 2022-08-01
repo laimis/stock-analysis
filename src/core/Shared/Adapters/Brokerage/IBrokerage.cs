@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Account;
 
 namespace core.Shared.Adapters.Brokerage
 {
@@ -6,5 +8,6 @@ namespace core.Shared.Adapters.Brokerage
     {
         Task<string> GetOAuthUrl();
         Task<OAuthResponse> ConnectCallback(string code);
+        Task<IEnumerable<Order>> GetPendingOrders(UserState state);
     }
 }

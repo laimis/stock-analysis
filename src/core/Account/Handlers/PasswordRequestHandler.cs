@@ -22,8 +22,6 @@ namespace core.Account
             // store it in the storage
             // send email
 
-            Console.WriteLine("Issuing password reset");
-
             var u = await _storage.GetUser(e.AggregateId);
             if (u == null)
             {

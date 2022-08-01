@@ -105,13 +105,24 @@ namespace web.Controllers
 
         [HttpGet("integrations/tdameritrade")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeAsync()
+        public async Task<ActionResult> TdAmeritrade()
         {
             var cmd = new Connect.Command();
 
             var result = await _mediator.Send(cmd);
 
             return Redirect(result);
+        }
+
+        [HttpGet("integrations/tdameritrade/disconnect")]
+        [Authorize]
+        public async Task<ActionResult> TdAmeritradeDisconnect()
+        {
+            var cmd = new Disconnect.Command(this.User.Identifier());
+
+            var result = await _mediator.Send(cmd);
+
+            return Redirect("~/profile");
         }
 
         [HttpGet("integrations/tdameritrade/callback")]

@@ -1,0 +1,6 @@
+- ability to store keys, or is it to inject instead?
+- two environment variables needed
+
+
+- add ability to enter order from trading UI
+

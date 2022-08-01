@@ -1,0 +1,22 @@
+Pending orders
+
+<table *ngIf="pending" class="table">
+  <thead>
+    <tr>
+      <th width="100"></th>
+      <th>Stock</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <td>Price</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of pending; let i = index">
+      <td>{{i + 1}}</td>
+      <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+      <td>{{p.type }}</td>
+      <td>{{p.quantity}}</td>
+      <td>{{p.price | currency}}</td>
+    </tr>
+  </tbody>
+</table>

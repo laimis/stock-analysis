@@ -161,7 +161,7 @@ namespace core.Stocks
                 return true;
             }
 
-            foreach(var st in BuyOrSell.OrderBy(e => e.When).ThenBy(i => BuyOrSell.IndexOf(i)))
+            foreach(var st in BuyOrSell)
             {
                 if (Deletes.Contains(st.Id))
                 {

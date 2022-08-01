@@ -30,7 +30,8 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, string subject, string body)
         {
-            Console.WriteLine($"Sending email to {recipient.Email} with subject {subject} and body {body}");
+            // TODO: replace with logging
+            // Console.WriteLine($"Sending email to {recipient.Email} with subject {subject} and body {body}");
             return Task.CompletedTask;
         }
 
