@@ -83,4 +83,34 @@ namespace core.Account
         public string CustomerId { get; }
         public string SubscriptionId { get; }
     }
+
+    internal class UserConnectedToBrokerage : AggregateEvent
+    {
+        public UserConnectedToBrokerage(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string access_token,
+            string refresh_token,
+            string token_type,
+            long expires_in_seconds,
+            string scope,
+            long refresh_token_expires_in_seconds)
+            : base(id, aggregateId, when)
+        {
+            AccessToken = access_token;
+            RefreshToken = refresh_token;
+            TokenType = token_type;
+            ExpiresInSeconds = expires_in_seconds;
+            Scope = scope;
+            RefreshTokenExpiresInSeconds = refresh_token_expires_in_seconds;
+        }
+
+        public string AccessToken { get; }
+        public string RefreshToken { get; }
+        public string TokenType { get; }
+        public long ExpiresInSeconds { get; }
+        public string Scope { get; }
+        public long RefreshTokenExpiresInSeconds { get; }
+    }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { StocksService, GetErrors, AccountStatus } from '../services/stocks.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class ProfileComponent implements OnInit {
 
-  profile:object
+  profile:AccountStatus
 
   importErrors: string[]
   importSuccess: string

@@ -588,6 +588,8 @@ export interface AccountStatus {
   verified: boolean
   loggedIn: boolean
   isAdmin: boolean
+  subscriptionLevel: string
+  connectedToBrokerage: boolean
 }
 
 export interface TrackingPreview {

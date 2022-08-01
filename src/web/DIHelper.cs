@@ -8,6 +8,7 @@ using core.Adapters.Stocks;
 using core.Adapters.Subscriptions;
 using core.Alerts;
 using core.Options;
+using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
 using core.Shared.Adapters.SMS;
 using csvparser;
@@ -72,6 +73,13 @@ namespace web
                     configuration.GetValue<string>("TWILIO_AUTH_TOKEN"),
                     configuration.GetValue<string>("TWILIO_FROM_NUMBER"),
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
+
+            services.AddSingleton<IBrokerage>(s =>
+                new tdameritradeclient.TDAmeritradeClient(
+                    s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>(),
+                    configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL"),
+                    configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID")
+                ));
 
             services.AddHostedService<StockMonitorService>();
             services.AddHostedService<ThirtyDaySellService>();

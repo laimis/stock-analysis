@@ -70,7 +70,9 @@ namespace core.Account
                     Firstname = user.State.Firstname,
                     Lastname = user.State.Lastname,
                     IsAdmin = user.State.Email == EmailSettings.Admin.Email,
-                    SubscriptionLevel = user.State.SubscriptionLevel
+                    SubscriptionLevel = user.State.SubscriptionLevel,
+                    ConnectedToBrokerage = user.State.ConnectedToBrokerage,
+                    BrokerageAccessTokenExpired = user.State.BrokerageAccessTokenExpired
                 };
             }
         }
