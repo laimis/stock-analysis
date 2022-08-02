@@ -24,6 +24,7 @@ namespace core.Stocks
                 AvgWinAmount = wins.Average(t => t.Profit);
                 MaxWinAmount = wins.Max(t => t.Profit);
                 WinAvgReturnPct = wins.Average(t => t.ReturnPct);
+                WinMaxReturnPct = wins.Max(t => t.ReturnPct);
                 WinAvgDaysHeld = wins.Average(t => t.DaysHeld);
             }
 
@@ -34,6 +35,7 @@ namespace core.Stocks
                 AvgLossAmount = Math.Abs(losses.Average(t => t.Profit));
                 MaxLossAmount = Math.Abs(losses.Min(t => t.Profit));
                 LossAvgReturnPct = Math.Abs(losses.Average(t => t.ReturnPct));
+                LossMaxReturnPct = Math.Abs(losses.Min(t => t.ReturnPct));
                 LossAvgDaysHeld = losses.Average(t => t.DaysHeld);
             }
             
@@ -52,11 +54,13 @@ namespace core.Stocks
         public decimal AvgWinAmount { get; set; }
         public decimal MaxWinAmount { get; set; }
         public decimal WinAvgReturnPct { get; set; }
+        public decimal WinMaxReturnPct { get; set; }
         public double WinAvgDaysHeld { get; set; }
         public int Losses { get; set; }
         public decimal AvgLossAmount { get; set; }
         public decimal MaxLossAmount { get; set; }
         public decimal LossAvgReturnPct { get; set; }
+        public decimal LossMaxReturnPct { get; set; }
         public double LossAvgDaysHeld { get; set; }
         public decimal WinPct { get; set; }
         public decimal EV { get; set; }

@@ -35,11 +35,11 @@
     <a class="tab" [ngClass]="{'is-active': isActive('newposition')}" [routerLink]="" (click)="activateTab('newposition')">
       New Position
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('past')}" [routerLink]="" (click)="activateTab('past')">
-      Past Positions
-    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
       Pending Orders
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('past')}" [routerLink]="" (click)="activateTab('past')">
+      Past Positions
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('performancerecent')}" [routerLink]="" (click)="activateTab('performancerecent')">
       Performance (Recent)
