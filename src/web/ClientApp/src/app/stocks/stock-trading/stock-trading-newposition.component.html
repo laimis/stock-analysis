@@ -27,7 +27,7 @@
           id="costToBuy"
           class="form-control"
           [(ngModel)]="costToBuy"
-          (ngModelChange)="updateBuyingValues()"
+          (ngModelChange)="updateBuyingValuesWithCostToBuy()"
         />
       </div>
       <div class="col">
@@ -41,21 +41,29 @@
         />
       </div>
       <div class="col">
-        <label for="stopPrice" class="form-label">Stop Price</label>
+        <label for="stopPrice" class="form-label">Stop</label>
         <input
           type="number"
           id="stopPrice"
           class="form-control"
           [(ngModel)]="stopPrice"
-          (ngModelChange)="updateBuyingValues()"
+          (ngModelChange)="updateBuyingValuesStopPrice()"
         />
-      </div>
-      <div class="col">
-        <div>Postion Size: {{ positionSizeAdjusted | currency }}</div>
-        <div>Exit Price: {{ exitPrice | currency }}</div>
       </div>
       <div class="col d-flex" >
         <button class="btn btn-primary align-self-end w-100" (click)="buy()">Buy</button>
+      </div>
+    </div>
+    <div class="row mt-2" *ngIf="prices">
+      <div class="col fs-6">
+        <span class="me-2">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
+        <span class="me-2">Profit: <strong>{{ potentialProfit | currency }}</strong></span>
+        <span class="me-2">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
+      </div>
+      <div class="col text-end">
+        <span class="me-2">20SMA: <strong>{{ get20sma() | currency }}</strong></span>
+        <span class="me-2">50SMA: <strong>{{ get50sma() | currency }}</strong></span>
+        <span class="me-2">150SMA: <strong>{{ get150sma() | currency }}</strong></span>
       </div>
     </div>
     <div class="row mt-2" *ngIf="prices">
