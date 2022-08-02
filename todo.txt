@@ -4,3 +4,6 @@
 
 - add ability to enter order from trading UI
 
+- fix issues with calculating stocks to buy and re-enter the trades from Monday
+
+- position 

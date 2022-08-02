@@ -33,7 +33,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
   stockPurchased: EventEmitter<string> = new EventEmitter<string>()
 
   // variables for new positions
-  positionSize: number = 3000
+  positionSize: number = null
+  positionSizeAdjusted: number = null
   costToBuy: number | null = null
   stocksToBuy : number | null = null
   stopPrice: number | null = null
@@ -48,6 +49,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
 
   onBuyTickerSelected(ticker: string) {
       this.costToBuy = null
+      this.stocksToBuy = null
+      this.stopPrice = null
       this.ticker = ticker
       
       this.stockService.getStockPrice(ticker)
@@ -70,9 +73,32 @@ export class StockTradingNewPositionComponent implements OnChanges {
     )
   }
 
+  updateBuyingValuesWithNumberOfShares() {
+    // output to console log stocks to buy and cost to buy values
+    console.log("num of shares: stocks to buy: " + this.stocksToBuy + " cost to buy: " + this.costToBuy)
+
+    this.positionSize = this.stocksToBuy * this.costToBuy
+    this.updateBuyingValues()
+  }
+
+  updateBuyingValuesWithPositionSize() {
+    // output to console log stocks to buy and cost to buy values
+    console.log("position size: position size: " + this.positionSize + " cost to buy: " + this.costToBuy)
+
+    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    this.updateBuyingValues()
+  }
+
   updateBuyingValues() {
     console.log("updateBuyingValues")
-    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    console.log("stocks to buy: " + this.stocksToBuy + " cost to buy: " + this.costToBuy)
+    if (this.stocksToBuy == null)
+    {
+      this.positionSize = this.positionSize ? this.positionSize : 3000
+      this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    }
+    
+    this.positionSizeAdjusted = Math.round(this.stocksToBuy * this.costToBuy * 100) / 100
     this.stopPrice = Math.round(this.costToBuy * (1 - this.stopLoss) * 100) / 100
     this.exitPrice = Math.round(this.costToBuy * (1 + this.rrTarget) * 100) / 100
     this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy

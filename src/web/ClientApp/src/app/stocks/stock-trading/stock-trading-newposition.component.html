@@ -16,7 +16,7 @@
           class="form-control"
           id="positionSize"
           [(ngModel)]="positionSize"
-          (ngModelChange)="updateBuyingValues()">
+          (ngModelChange)="updateBuyingValuesWithPositionSize()">
       </div>
     </div>
     <div class="row" *ngIf="costToBuy">
@@ -37,7 +37,7 @@
           id="stocksToBuy"
           class="form-control"
           [(ngModel)]="stocksToBuy"
-          (ngModelChange)="updateBuyingValues()"
+          (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
         />
       </div>
       <div class="col">
@@ -51,14 +51,8 @@
         />
       </div>
       <div class="col">
-        <label for="exitPrice" class="form-label">Exit Price</label>
-        <input
-          type="number"
-          id="exitPrice"
-          class="form-control"
-          [(ngModel)]="exitPrice"
-          (ngModelChange)="updateBuyingValues()"
-        />
+        <div>Postion Size: {{ positionSizeAdjusted | currency }}</div>
+        <div>Exit Price: {{ exitPrice | currency }}</div>
       </div>
       <div class="col d-flex" >
         <button class="btn btn-primary align-self-end w-100" (click)="buy()">Buy</button>
