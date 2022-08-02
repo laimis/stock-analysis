@@ -103,6 +103,42 @@ namespace web.Controllers
             return Redirect("~/");
         }
 
+        [HttpGet("integrations/tdameritrade")]
+        [Authorize]
+        public async Task<ActionResult> TdAmeritrade()
+        {
+            var cmd = new Connect.Command();
+
+            var result = await _mediator.Send(cmd);
+
+            return Redirect(result);
+        }
+
+        [HttpGet("integrations/tdameritrade/disconnect")]
+        [Authorize]
+        public async Task<ActionResult> TdAmeritradeDisconnect()
+        {
+            var cmd = new Disconnect.Command(this.User.Identifier());
+
+            var result = await _mediator.Send(cmd);
+
+            return Redirect("~/profile");
+        }
+
+        [HttpGet("integrations/tdameritrade/callback")]
+        [Authorize]
+        public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code)
+        {
+            var cmd = new ConnectCallback.Command(code: code, userId: User.Identifier());
+
+            var result = await _mediator.Send(cmd);
+
+            return result.Error switch {
+                null => Redirect("~/profile"),
+                _ => BadRequest(result.Error)
+            };
+        }
+
         [HttpPost("requestpasswordreset")]
         public async Task<ActionResult> RequestPasswordReset(PasswordReset.Request cmd)
         {

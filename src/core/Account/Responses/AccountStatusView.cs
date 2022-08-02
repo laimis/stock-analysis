@@ -15,5 +15,7 @@ namespace core.Account.Responses
         public bool IsAdmin { get; set; }
         public string SubscriptionLevel { get; set; }
         public DateTimeOffset Calculated { get; set; }
+        public bool ConnectedToBrokerage { get; set; }
+        public bool BrokerageAccessTokenExpired { get; set; }
     }
 }

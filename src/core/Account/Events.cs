@@ -83,4 +83,71 @@ namespace core.Account
         public string CustomerId { get; }
         public string SubscriptionId { get; }
     }
+
+    internal class UserConnectedToBrokerage : AggregateEvent
+    {
+        public UserConnectedToBrokerage(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string accessToken,
+            string refreshToken,
+            string tokenType,
+            long expiresInSeconds,
+            string scope,
+            long refreshTokenExpiresInSeconds)
+            : base(id, aggregateId, when)
+        {
+            AccessToken = accessToken;
+            RefreshToken = refreshToken;
+            TokenType = tokenType;
+            ExpiresInSeconds = expiresInSeconds;
+            Scope = scope;
+            RefreshTokenExpiresInSeconds = refreshTokenExpiresInSeconds;
+        }
+
+        public string AccessToken { get; }
+        public string RefreshToken { get; }
+        public string TokenType { get; }
+        public long ExpiresInSeconds { get; }
+        public string Scope { get; }
+        public long RefreshTokenExpiresInSeconds { get; }
+    }
+
+    internal class UserRefreshedBrokerageConnection : AggregateEvent
+    {
+        public UserRefreshedBrokerageConnection(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string accessToken,
+            string refreshToken,
+            string tokenType,
+            long expiresInSeconds,
+            string scope,
+            long refreshTokenExpiresInSeconds)
+            : base(id, aggregateId, when)
+        {
+            AccessToken = accessToken;
+            RefreshToken = refreshToken;
+            TokenType = tokenType;
+            ExpiresInSeconds = expiresInSeconds;
+            Scope = scope;
+            RefreshTokenExpiresInSeconds = refreshTokenExpiresInSeconds;
+        }
+
+        public string AccessToken { get; }
+        public string RefreshToken { get; }
+        public string TokenType { get; }
+        public long ExpiresInSeconds { get; }
+        public string Scope { get; }
+        public long RefreshTokenExpiresInSeconds { get; }
+    }
+
+    internal class UserDisconnectedFromBrokerage : AggregateEvent
+    {
+        public UserDisconnectedFromBrokerage(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
+        {
+        }
+    }
 }

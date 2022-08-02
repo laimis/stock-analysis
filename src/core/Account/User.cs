@@ -62,6 +62,27 @@ namespace core.Account
             );
         }
 
+        public void ConnectToBrokerage(string accessToken, string refreshToken, string tokenType, long expiresInSeconds, string scope, long refreshTokenExpiresInSeconds)
+        {
+            Apply(
+                new UserConnectedToBrokerage(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, refreshTokenExpiresInSeconds)
+            );
+        }
+
+        internal void RefreshBrokerageConnection(string accessToken, string refreshToken, string tokenType, long expiresInSeconds, string scope, long refreshTokenExpiresInSeconds)
+        {
+            Apply(
+                new UserRefreshedBrokerageConnection(Guid.NewGuid(), Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, refreshTokenExpiresInSeconds)
+            );
+        }
+
+        internal void DisconnectFromBrokerage()
+        {
+            Apply(
+                new UserDisconnectedFromBrokerage(Guid.NewGuid(), Id, DateTimeOffset.UtcNow)
+            );
+        }
+
         public bool PasswordHashMatches(string hash)
         {
             return State.PasswordHashMatches(hash);

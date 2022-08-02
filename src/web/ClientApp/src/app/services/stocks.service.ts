@@ -491,10 +491,12 @@ export interface StockTradingPerformance {
   avgWinAmount: number,
   maxWinAmount: number,
   winAvgReturnPct: number,
+  winMaxReturnPct: number,
   winAvgDaysHeld: number,
   avgLossAmount: number,
   maxLossAmount: number,
   lossAvgReturnPct: number,
+  lossMaxReturnPct: number,
   lossAvgDaysHeld: number,
   ev: number,
   avgReturnPct: number,
@@ -505,10 +507,16 @@ export interface StockTradingPerformanceCollection {
   recent: StockTradingPerformance
 }
 
+export interface StockTradingOrder {
+  ticker: string
+  price: number
+}
+
 export interface StockTradingPositions {
   current: StockTradingPosition[]
   past: StockTradingPosition[]
   performance: StockTradingPerformanceCollection
+  pendingOrders: StockTradingOrder[]
 }
 
 export interface PositionTransaction {
@@ -588,6 +596,8 @@ export interface AccountStatus {
   verified: boolean
   loggedIn: boolean
   isAdmin: boolean
+  subscriptionLevel: string
+  connectedToBrokerage: boolean
 }
 
 export interface TrackingPreview {

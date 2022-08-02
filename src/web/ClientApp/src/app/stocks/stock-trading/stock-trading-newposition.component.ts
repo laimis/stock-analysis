@@ -33,12 +33,13 @@ export class StockTradingNewPositionComponent implements OnChanges {
   stockPurchased: EventEmitter<string> = new EventEmitter<string>()
 
   // variables for new positions
-  positionSize: number = 3000
+  positionSize: number = null
+  positionSizeCalculated: number = null
   costToBuy: number | null = null
   stocksToBuy : number | null = null
   stopPrice: number | null = null
   exitPrice: number | null = null
-  potentialGains: number | null = null
+  potentialProfit: number | null = null
   potentialLoss: number | null = null
   potentialRr: number | null = null
 
@@ -48,6 +49,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
 
   onBuyTickerSelected(ticker: string) {
       this.costToBuy = null
+      this.stocksToBuy = null
+      this.stopPrice = null
       this.ticker = ticker
       
       this.stockService.getStockPrice(ticker)
@@ -70,14 +73,75 @@ export class StockTradingNewPositionComponent implements OnChanges {
     )
   }
 
+  get20sma(): number {
+    return this.getLastSma(0)
+  }
+
+  get50sma(): number {
+    return this.getLastSma(1)
+  }
+
+  get150sma(): number {
+    return this.getLastSma(2)
+  }
+
+  getLastSma(smaIndex): number {
+    return this.prices.sma[smaIndex].values.slice(-1)[0]
+  }
+
+  updateBuyingValuesWithCostToBuy() {
+    console.log("cost to buy: " + this.costToBuy)
+
+    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    this.updateBuyingValues()
+  }
+
+  updateBuyingValuesWithNumberOfShares() {
+    // output to console log stocks to buy and cost to buy values
+    console.log("num of shares: stocks to buy: " + this.stocksToBuy + " cost to buy: " + this.costToBuy)
+
+    this.positionSize = this.stocksToBuy * this.costToBuy
+    this.updateBuyingValues()
+  }
+
+  updateBuyingValuesWithPositionSize() {
+    // output to console log stocks to buy and cost to buy values
+    console.log("position size: position size: " + this.positionSize + " cost to buy: " + this.costToBuy)
+
+    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    this.updateBuyingValues()
+  }
+
+  updateBuyingValuesStopPrice() {
+    // first, we calculate the absolute amount that could be lost if we used the position size and the stop loss % that's specified
+    var potentialLoss = this.positionSize * this.stopLoss
+
+    var diff = this.costToBuy - this.stopPrice
+
+    console.log("diff: " + diff + " potential loss: " + potentialLoss)
+
+    // now we take the cost to buy and figure out how many shares can we buy that will keep us from losing the potential loss
+    this.stocksToBuy = Math.floor(potentialLoss / diff)
+    this.positionSize = this.stocksToBuy * this.costToBuy 
+  }
+
   updateBuyingValues() {
     console.log("updateBuyingValues")
-    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    console.log("stocks to buy: " + this.stocksToBuy + " cost to buy: " + this.costToBuy)
+    
+    if (this.stocksToBuy == null)
+    {
+      this.positionSize = this.positionSize ? this.positionSize : 3000
+      this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
+    }
+    
+    this.positionSizeCalculated = Math.round(this.stocksToBuy * this.costToBuy * 100) / 100
+
     this.stopPrice = Math.round(this.costToBuy * (1 - this.stopLoss) * 100) / 100
     this.exitPrice = Math.round(this.costToBuy * (1 + this.rrTarget) * 100) / 100
-    this.potentialGains = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
+    this.potentialProfit = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
     this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
-    this.potentialRr = Math.abs(this.potentialGains / this.potentialLoss)
+    this.potentialRr = Math.abs(this.potentialProfit / this.potentialLoss)
     this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
   }
 

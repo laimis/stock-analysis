@@ -20,6 +20,11 @@ namespace core.Account
         public string SubscriptionLevel { get; private set; }
         public bool IsPasswordAvailable => GetSalt() != null;
         public string Name => $"{Firstname} {Lastname}";
+        public string BrokerageAccessToken { get; private set; }
+        public string BrokerageRefreshToken { get; private set; }
+        public DateTimeOffset BrokerageAccessTokenExpires { get; private set; }
+        public bool ConnectedToBrokerage { get; private set; }
+        public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
 
         public UserState()
         {
@@ -64,6 +69,22 @@ namespace core.Account
 
         internal void ApplyInternal(UserPasswordResetRequested r)
         {
+        }
+
+        internal void ApplyInternal(UserConnectedToBrokerage e)
+        {
+            ConnectedToBrokerage = true;
+            BrokerageAccessToken = e.AccessToken;
+            BrokerageRefreshToken = e.RefreshToken;
+            BrokerageAccessTokenExpires = e.When.AddSeconds(e.ExpiresInSeconds);
+        }
+
+        internal void ApplyInternal(UserDisconnectedFromBrokerage e)
+        {
+            ConnectedToBrokerage = false;
+            BrokerageAccessToken = null;
+            BrokerageRefreshToken = null;
+            BrokerageAccessTokenExpires = DateTimeOffset.MinValue;
         }
 
         internal bool PasswordHashMatches(string hash)

@@ -32,12 +32,9 @@ namespace core.Account
                 var cached = await _storage.ViewModel<AccountStatusView>(request.UserId);
                 if (cached != null)
                 {
-                    Console.WriteLine("Status check from cache");
                     cached.LoggedIn = true;
                     return cached;
                 }
-
-                Console.WriteLine("Status check from db");
 
                 return await GetFromDatabase(request.UserId);
             }
@@ -70,7 +67,9 @@ namespace core.Account
                     Firstname = user.State.Firstname,
                     Lastname = user.State.Lastname,
                     IsAdmin = user.State.Email == EmailSettings.Admin.Email,
-                    SubscriptionLevel = user.State.SubscriptionLevel
+                    SubscriptionLevel = user.State.SubscriptionLevel,
+                    ConnectedToBrokerage = user.State.ConnectedToBrokerage,
+                    BrokerageAccessTokenExpired = user.State.BrokerageAccessTokenExpired
                 };
             }
         }

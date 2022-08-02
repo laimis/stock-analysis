@@ -35,6 +35,9 @@
     <a class="tab" [ngClass]="{'is-active': isActive('newposition')}" [routerLink]="" (click)="activateTab('newposition')">
       New Position
     </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
+      Pending Orders
+    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('past')}" [routerLink]="" (click)="activateTab('past')">
       Past Positions
     </a>
@@ -56,5 +59,6 @@
   <stock-trading-performance  *ngIf="isActive('performancerecent')" [performance]=performance.recent></stock-trading-performance>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance.overall></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=past></stock-trading-review>
+  <stock-trading-pending      *ngIf="isActive('pending')" [pending]=pending></stock-trading-pending>
 
 </div>

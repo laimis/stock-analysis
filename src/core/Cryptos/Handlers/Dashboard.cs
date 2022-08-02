@@ -38,10 +38,11 @@ namespace core.Cryptos.Handlers
                     {
                         owned.ApplyPrice(price.Value);
                     }
-                    else
-                    {
-                        Console.WriteLine("Did not find price for " + owned.Token);
-                    }
+                    // TODO: replace with logging
+                    // else
+                    // {
+                    //     Console.WriteLine("Did not find price for " + owned.Token);
+                    // }
                 }
 
                 return dashboardView;

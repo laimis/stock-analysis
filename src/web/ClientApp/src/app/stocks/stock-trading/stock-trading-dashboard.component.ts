@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection } from '../../services/stocks.service';
+import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection, StockTradingOrder } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -10,6 +10,7 @@ import { StocksService, StockTradingPosition, StockTradingPositions, StockTradin
 export class StockTradingComponent implements OnInit {
   positions: StockTradingPosition[]
   past: StockTradingPosition[]
+  pending: StockTradingOrder[]
   loaded: boolean = false
   timePeriod: string = 'thisweek'
   performance: StockTradingPerformanceCollection;
@@ -44,6 +45,7 @@ export class StockTradingComponent implements OnInit {
       this.positions = r.current
       this.past = r.past
       this.performance = r.performance
+      this.pending = r.pendingOrders
       this.loaded = true
       
     }, _ => { this.loaded = true})
