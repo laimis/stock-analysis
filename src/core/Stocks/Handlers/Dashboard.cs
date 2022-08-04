@@ -82,7 +82,7 @@ namespace core.Stocks
                     }
                     else
                     {
-                        violations.Add($"{position.Ticker} owned {position.Quantity} but NGTrading says none");
+                        violations.Add($"{position.Ticker} owned {position.Quantity} @ ${position.AveragePrice} but NGTrading says none");
                     }
                 }
 

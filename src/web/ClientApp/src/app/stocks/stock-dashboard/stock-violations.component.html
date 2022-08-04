@@ -2,4 +2,8 @@
     <ul>
       <li *ngFor="let violation of violations">{{violation}}</li>
     </ul>
+    <span *ngIf="violations.length==0">
+      You have no violations.
+    </span>
 </div>
+
