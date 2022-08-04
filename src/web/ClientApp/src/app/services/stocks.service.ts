@@ -175,6 +175,10 @@ export class StocksService {
 		return this.http.post('/api/stocks/sell', obj)
   }
 
+  brokerageBuy(obj:brokerageordercommand) : Observable<any> {
+		return this.http.post('/api/brokerage/buy', obj)
+	}
+
   settings(ticker:string,category:string) : Observable<any> {
     var obj = {ticker, category}
 		return this.http.post('/api/stocks/settings', obj)
@@ -634,4 +638,11 @@ export class stocktransactioncommand {
   price: number
   date: string
   notes: string
+}
+
+export class brokerageordercommand {
+  ticker: string
+  numberOfShares: number
+  price: number
+  type: string
 }

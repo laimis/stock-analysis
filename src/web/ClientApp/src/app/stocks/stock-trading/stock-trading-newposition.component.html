@@ -19,7 +19,7 @@
           (ngModelChange)="updateBuyingValuesWithPositionSize()">
       </div>
     </div>
-    <div class="row" *ngIf="costToBuy">
+    <div class="row mt-2" *ngIf="costToBuy">
       <div class="col">
         <label for="costToBuy" class="form-label">Price</label>
         <input
@@ -50,9 +50,6 @@
           (ngModelChange)="updateBuyingValuesStopPrice()"
         />
       </div>
-      <div class="col d-flex" >
-        <button class="btn btn-primary align-self-end w-100" (click)="buy()">Buy</button>
-      </div>
     </div>
     <div class="row mt-2" *ngIf="prices">
       <div class="col fs-6">
@@ -64,6 +61,17 @@
         <span class="me-2">20SMA: <strong>{{ get20sma() | currency }}</strong></span>
         <span class="me-2">50SMA: <strong>{{ get50sma() | currency }}</strong></span>
         <span class="me-2">150SMA: <strong>{{ get150sma() | currency }}</strong></span>
+      </div>
+    </div>
+    <div class="row mt-2" *ngIf="prices">
+      <div class="col" >
+        <button class="btn btn-primary w-100" (click)="record()">Record</button>
+      </div>
+      <div class="col" >
+        <button class="btn btn-primary w-100" (click)="brokerageBuy('limit')">Brokerage [Limit]</button>
+      </div>
+      <div class="col" >
+        <button class="btn btn-primary w-100" (click)="brokerageBuy('market')">Brokerage [Market]</button>
       </div>
     </div>
     <div class="row mt-2" *ngIf="prices">

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
@@ -129,15 +130,73 @@ public class TDAmeritradeClient : IBrokerage
         });
     }
 
-    private async Task<HttpResponseMessage> CallApi(UserState user, string function)
+    public async Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, string type)
+    {
+        var legCollection = new {
+            instruction = "Buy",
+            quantity = numberOfShares,
+            instrument = new {
+                symbol = ticker,
+                assetType = "EQUITY"
+            }
+        };
+
+        var postData = new
+        {
+            orderType = GetBuyOrderType(type),
+            session = "NORMAL",
+            duration = "DAY",
+            price = price,
+            orderStrategyType = "SINGLE",
+            orderLegCollection = new [] {legCollection}
+        };
+
+        // get account first
+        var accounts = await CallApi(user, "/accounts");
+
+        LogAndThrowIfFailed(accounts, "get account");
+
+        var account = await accounts.Content.ReadAsStringAsync();
+        var deserialized = JsonSerializer.Deserialize<AccountsResponse[]>(account);
+        if (deserialized == null)
+        {
+            throw new Exception("Could not deserialize account: " + account);
+        }
+
+        var accountId = deserialized[0].securitiesAccount?.accountId;
+
+        var url = $"/accounts/{accountId}/orders";
+
+        var data = JsonSerializer.Serialize(postData);
+
+        _logger?.LogError("Posting to " + url + ": " + data);
+
+        var response = await CallApi(user, url, data);
+
+        LogAndThrowIfFailed(response, "buy order");
+    }
+
+    private string GetBuyOrderType(string type) =>
+        type switch {
+            "limit" => "LIMIT",
+            "market" => "MARKET",
+            _ => throw new Exception("Invalid order type: " + type)
+        };
+
+    private async Task<HttpResponseMessage> CallApi(UserState user, string function, string? jsonData = null)
     {
         var accessToken = await GetAccessTokenAsync(user);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, GenerateApiUrl(function));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        var methodType = jsonData == null ? HttpMethod.Get : HttpMethod.Post;
 
-        var response = await _httpClient.SendAsync(request);
-        return response;
+        var request = new HttpRequestMessage(methodType, GenerateApiUrl(function));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        if (jsonData != null)
+        {
+            request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+        }
+
+        return await _httpClient.SendAsync(request);
     }
 
     private async Task<string> GetAccessTokenAsync(UserState user)

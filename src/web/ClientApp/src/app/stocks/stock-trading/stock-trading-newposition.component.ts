@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { Condition } from 'selenium-webdriver';
+import { brokerageordercommand, Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -64,6 +65,14 @@ export class StockTradingNewPositionComponent implements OnChanges {
         }
       );
     }
+
+  reset() {
+    this.costToBuy = null
+    this.stocksToBuy = null
+    this.stopPrice = null
+    this.ticker = null
+    this.prices = null
+  }
 
   updateChart(ticker:string) {
     this.stockService.getStockPrices2y(ticker).subscribe(
@@ -145,8 +154,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
     this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
   }
 
-  buy() {
-    console.log("buy")
+  record() {
+    console.log("record")
     var cmd = new stocktransactioncommand()
     cmd.ticker = this.ticker
     cmd.numberOfShares = this.stocksToBuy
@@ -158,6 +167,25 @@ export class StockTradingNewPositionComponent implements OnChanges {
         this.stockPurchased.emit("purchased")
     },
       _ => { alert('purchase failed') }
+    )
+  }
+
+  brokerageBuy(type:string) {
+    console.log("buy " + type)
+    var cmd = new brokerageordercommand()
+    cmd.ticker = this.ticker
+    cmd.numberOfShares = this.stocksToBuy
+    cmd.price = this.costToBuy
+    cmd.type = type
+
+    this.stockService.brokerageBuy(cmd).subscribe(
+      _ => { 
+        this.reset()
+    },
+      err => { 
+        console.error(err)
+        alert('brokerage failed') 
+      }
     )
   }
 }

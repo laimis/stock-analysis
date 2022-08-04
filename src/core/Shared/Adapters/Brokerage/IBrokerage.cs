@@ -10,5 +10,6 @@ namespace core.Shared.Adapters.Brokerage
         Task<OAuthResponse> ConnectCallback(string code);
         Task<IEnumerable<Order>> GetPendingOrders(UserState state);
         Task<IEnumerable<Position>> GetPositions(UserState state);
+        Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, string type);
     }
 }
