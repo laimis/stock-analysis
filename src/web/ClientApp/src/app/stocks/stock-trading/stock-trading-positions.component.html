@@ -10,7 +10,7 @@
           <div class="col-2 text-center">
           </div>
           <div class="col">
-            <span class="position-gain float-end">{{ gain(p) | percent }}</span>
+            <span class="position-gain float-end">{{ rr(p) | number:'1.0-2' }}</span>
           </div>
         </div>  
       </div>
@@ -28,12 +28,12 @@
             {{p.averageCost | currency}}
           </div>
           <div class="col text-center">
-            <span class="badge" [ngClass]="firstTargetNumber(p) < p.price ? 'bg-success' : 'bg-primary'">1st PT</span>
+            <span class="badge" [ngClass]="firstTargetNumber(p) < p.price ? 'bg-success' : 'bg-primary'">1R</span>
             {{ firstTargetNumber(p) | currency }}
           </div>
           <div class="col text-end">
-            <span class="badge" [ngClass]="rrTargetNumber(p) < p.price ? 'bg-success' : 'bg-primary'">2nd PT</span>
-            {{ rrTargetNumber(p) | currency}}
+            <span class="badge" [ngClass]="secondTargetNumber(p) < p.price ? 'bg-success' : 'bg-primary'">2.5R</span>
+            {{ secondTargetNumber(p) | currency}}
           </div>
         </div>
 
@@ -48,9 +48,10 @@
           </div>
           <div class="col text-center">
             <span class="badge bg-secondary">portion</span>
-            {{ p.maxNumberOfShares / 3 | number : '1.0-0' }}
+            {{ p.maxNumberOfShares / 3 | number : '1.0-2' }}
           </div>
-          <div class="col"></div>
+          <div class="col text-end">
+          </div>
         </div>
       </div>
 

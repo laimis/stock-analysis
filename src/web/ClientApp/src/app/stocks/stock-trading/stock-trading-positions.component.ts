@@ -19,8 +19,8 @@ export class StockTradingPositionComponent {
     @Input()
     rrTarget: number
 
-    gain(p:StockTradingPosition) {
-        return (p.price - p.averageCost) / p.averageCost
+    rr(p:StockTradingPosition) {
+        return (p.price - p.averageCost) / p.averageCost / this.stopLoss
     }
 
     stopNumber(p:StockTradingPosition) {
@@ -28,11 +28,11 @@ export class StockTradingPositionComponent {
     }
 
     firstTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * this.firstTarget
+        return p.averageCost + p.averageCost * this.stopLoss
     }
 
-    rrTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * this.rrTarget
+    secondTargetNumber(p:StockTradingPosition) {
+        return p.averageCost + p.averageCost * 2.5 * this.stopLoss
     }
 
     positionProgress(p:StockTradingPosition) {
