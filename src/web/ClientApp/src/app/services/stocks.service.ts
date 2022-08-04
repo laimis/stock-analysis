@@ -322,6 +322,7 @@ export interface ReviewList {
 export interface StockSummary {
   owned: OwnedStock[]
   positions: StockTradingPosition[]
+  violations: string[]
 }
 
 export interface TransactionList {

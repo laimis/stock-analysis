@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Headers;
+using System.Text.Json;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,9 @@ public class TDAmeritradeClient : IBrokerage
 
     // in memory dictionary of access tokens (they expire every 30 mins)
     private Dictionary<Guid, OAuthResponse> _accessTokens = new Dictionary<Guid, OAuthResponse>();
+
+    private const string _apiUrl = "https://api.tdameritrade.com/v1";
+    private const string _authUrl = "https://auth.tdameritrade.com";
 
     private HttpClient _httpClient;
 
@@ -36,7 +40,9 @@ public class TDAmeritradeClient : IBrokerage
 
         var content = new FormUrlEncodedContent(postData);
 
-        var response = await _httpClient.PostAsync("https://api.tdameritrade.com/v1/oauth2/token", content);
+        var response = await _httpClient.PostAsync(GenerateApiUrl("/oauth2/token"), content);
+
+        LogAndThrowIfFailed(response, "connect callback");
 
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -45,22 +51,29 @@ public class TDAmeritradeClient : IBrokerage
         return JsonSerializer.Deserialize<OAuthResponse>(responseString);
     }
 
+    private async void LogAndThrowIfFailed(HttpResponseMessage response, string message)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            _logger?.LogError("TDAmeritrade client failed at " + message + ": " + content);
+        }
+    }
+
     public Task<string> GetOAuthUrl()
     {
         var encodedClientId = Uri.EscapeDataString($"{_clientId}@AMER.OAUTHAP");
         var encodedCallbackUrl = Uri.EscapeDataString(_callbackUrl);
+        var url = $"{_authUrl}/auth?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}";
         
-        return Task.FromResult($"https://auth.tdameritrade.com/auth?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}");
+        return Task.FromResult(url);
     }
 
     public async Task<IEnumerable<Order>> GetPendingOrders(UserState user)
     {
-        var accessToken = await GetAccessTokenAsync(user);
+        var response = await CallApi(user, "/accounts?fields=orders");
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.tdameritrade.com/v1/accounts?fields=orders");
-        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-
-        var response = await _httpClient.SendAsync(request);
+        LogAndThrowIfFailed(response, "get pending orders");
 
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -76,15 +89,55 @@ public class TDAmeritradeClient : IBrokerage
         {
             throw new Exception("Could not find order strategies in response");
         }
-        
+
         return strategies
             .Where(o => o.IsPending)
-            .Select(o => new Order {
+            .Select(o => new Order
+            {
                 Price = o.price.GetValueOrDefault(),
                 Quantity = Convert.ToInt32(o.quantity),
                 Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
                 Type = o.orderLegCollection?[0]?.instruction
             });
+    }
+
+    public async Task<IEnumerable<Position>> GetPositions(UserState user)
+    {
+        var request = await CallApi(user, "/accounts?fields=positions");
+
+        LogAndThrowIfFailed(request, "get positions");
+
+        var responseString = await request.Content.ReadAsStringAsync();
+
+        var deserialized = JsonSerializer.Deserialize<AccountsResponse[]>(responseString);
+        if (deserialized == null)
+        {
+            throw new Exception("Could not deserialize positions: " + responseString);
+        }
+
+        var positions = deserialized[0].securitiesAccount?.positions;
+        if (positions == null)
+        {
+            throw new Exception("Could not find positions in response");
+        }
+
+        return positions.Select(p => new Position
+        {
+            Ticker = p.instrument?.symbol,
+            Quantity = p.longQuantity,
+            AveragePrice = p.averagePrice
+        });
+    }
+
+    private async Task<HttpResponseMessage> CallApi(UserState user, string function)
+    {
+        var accessToken = await GetAccessTokenAsync(user);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GenerateApiUrl(function));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        var response = await _httpClient.SendAsync(request);
+        return response;
     }
 
     private async Task<string> GetAccessTokenAsync(UserState user)
@@ -107,7 +160,9 @@ public class TDAmeritradeClient : IBrokerage
 
         var content = new FormUrlEncodedContent(postData);
 
-        var response = await _httpClient.PostAsync("https://api.tdameritrade.com/v1/oauth2/token", content);
+        var response = await _httpClient.PostAsync(GenerateApiUrl("/oauth2/token"), content);
+
+        LogAndThrowIfFailed(response, "refresh access token");
 
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -118,4 +173,6 @@ public class TDAmeritradeClient : IBrokerage
         }
         return deserialized;
     }
+
+    private string GenerateApiUrl(string function) => $"{_apiUrl}/{function}";
 }

@@ -78,6 +78,6 @@
   </a>
 </div>
 
-<stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
+<stock-ownership-grid *ngIf="loaded && isActive('owned')" [violations]="violations" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
 <stock-grid *ngIf="loaded && isActive('grid')"></stock-grid>
 <stock-charts *ngIf="loaded && isActive('charts')" [positions]="positions" ></stock-charts>

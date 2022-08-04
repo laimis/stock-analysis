@@ -94,6 +94,14 @@ public partial class SecuritiesAccount
     public string? accountId { get; set; }
 
     public OrderStrategy[]? orderStrategies { get; set; }
+    public TDPosition[]? positions { get; set; }
+}
+
+public class TDPosition
+{
+    public decimal averagePrice { get; set; }
+    public decimal longQuantity { get; set; }
+    public Instrument? instrument { get; set; }
 }
 
 public class AccountsResponse

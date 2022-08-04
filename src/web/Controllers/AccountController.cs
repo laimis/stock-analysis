@@ -103,24 +103,31 @@ namespace web.Controllers
             return Redirect("~/");
         }
 
-        [HttpGet("integrations/tdameritrade")]
+        [HttpGet("integrations/tdameritrade/connect")]
         [Authorize]
         public async Task<ActionResult> TdAmeritrade()
         {
-            var cmd = new Connect.Command();
+            var cmd = new BrokerageConnect.Command();
 
             var result = await _mediator.Send(cmd);
 
             return Redirect(result);
         }
 
+        [HttpGet("integrations/tdameritrade")]
+        [Authorize]
+        public Task<object> TdAmeritradeInfo() =>
+            _mediator.Send(
+                new BrokerageInfo.Query(User.Identifier())
+            );
+
         [HttpGet("integrations/tdameritrade/disconnect")]
         [Authorize]
         public async Task<ActionResult> TdAmeritradeDisconnect()
         {
-            var cmd = new Disconnect.Command(this.User.Identifier());
-
-            var result = await _mediator.Send(cmd);
+            var result = await _mediator.Send(
+                new BrokerageDisconnect.Command(this.User.Identifier())
+            );
 
             return Redirect("~/profile");
         }
@@ -129,7 +136,7 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code)
         {
-            var cmd = new ConnectCallback.Command(code: code, userId: User.Identifier());
+            var cmd = new BrokerageConnectCallback.Command(code: code, userId: User.Identifier());
 
             var result = await _mediator.Send(cmd);
 

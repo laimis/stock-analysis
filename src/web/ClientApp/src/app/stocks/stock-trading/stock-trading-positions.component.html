@@ -20,19 +20,19 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <span class="badge" [ngClass]="stopNumber(p) < p.price ? 'bg-success' : 'bg-primary'">stop</span>
+            <span class="badge" [ngClass]="p.price > stopNumber(p) ? 'bg-success' : 'bg-primary'">stop</span>
             {{ stopNumber(p) | currency }}
           </div>
           <div class="col text-center">
-            <span class="badge" [ngClass]="p.averageCost < p.price ? 'bg-success' : 'bg-primary'">cost</span>
+            <span class="badge" [ngClass]="p.price > p.averageCost ? 'bg-success' : 'bg-primary'">cost</span>
             {{p.averageCost | currency}}
           </div>
           <div class="col text-center">
-            <span class="badge" [ngClass]="firstTargetNumber(p) < p.price ? 'bg-success' : 'bg-primary'">1R</span>
+            <span class="badge" [ngClass]="p.price > firstTargetNumber(p) ? 'bg-success' : 'bg-primary'">1R</span>
             {{ firstTargetNumber(p) | currency }}
           </div>
           <div class="col text-end">
-            <span class="badge" [ngClass]="secondTargetNumber(p) < p.price ? 'bg-success' : 'bg-primary'">2.5R</span>
+            <span class="badge" [ngClass]="p.price > secondTargetNumber(p)  ? 'bg-success' : 'bg-primary'">2.5R</span>
             {{ secondTargetNumber(p) | currency}}
           </div>
         </div>

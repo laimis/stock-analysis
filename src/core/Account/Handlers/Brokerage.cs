@@ -8,7 +8,7 @@ using MediatR;
 
 namespace core.Account
 {
-    public class Connect
+    public class BrokerageConnect
     {
         public class Command : IRequest<string>
         {
@@ -26,7 +26,7 @@ namespace core.Account
         }
     }
 
-    public class ConnectCallback
+    public class BrokerageConnectCallback
     {
         public class Command : IRequest<CommandResponse>
         {
@@ -69,7 +69,7 @@ namespace core.Account
         }
     }
 
-    public class Disconnect
+    public class BrokerageDisconnect
     {
         public class Command : IRequest<CommandResponse>
         {
@@ -99,6 +99,39 @@ namespace core.Account
                 await _storage.Save(user);
                 
                 return CommandResponse.Success();
+            }
+        }
+    }
+
+    public class BrokerageInfo
+    {
+        public class Query : IRequest<object>
+        {
+            public Query(Guid userId) => UserId = userId;
+
+            [Required]
+            public Guid UserId { get; }
+        }
+
+        public class Handler : IRequestHandler<Query, object>
+        {
+            private IBrokerage _brokerage;
+            private IAccountStorage _storage;
+
+            public Handler(IBrokerage brokerage, IAccountStorage storage)
+            {
+                _brokerage = brokerage;
+                _storage = storage;
+            }
+
+            public async Task<object> Handle(Query request, CancellationToken cancellationToken)
+            {
+                var user = await _storage.GetUser(request.UserId);
+
+                return new {
+                    user.State.BrokerageAccessToken,
+                    user.State.BrokerageRefreshToken
+                };
             }
         }
     }

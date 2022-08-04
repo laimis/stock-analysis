@@ -11,6 +11,7 @@ import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition } from '.
 export class StockDashboardComponent implements OnInit {
 
   owned : OwnedStock[]
+  violations: string[] = []
   positions : StockTradingPosition[]
   loaded : boolean = false
 
@@ -36,6 +37,7 @@ export class StockDashboardComponent implements OnInit {
 		this.stocks.getStocks().subscribe(result => {
       this.owned = result.owned
       this.positions = result.positions
+      this.violations = result.violations
       this.loaded = true
       this.calculateProperties()
       this.sort("profits")

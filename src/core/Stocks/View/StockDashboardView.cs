@@ -17,5 +17,6 @@ namespace core.Stocks.View
         public List<OwnedStockView> Owned { get; set; }
         public List<PositionInstance> Positions { get; }
         public DateTimeOffset Calculated { get; set; }
+        public List<string> Violations { get; set; }
     }
 }

@@ -27,3 +27,10 @@ public class Order
     public int Quantity { get; set; }
     public string Type { get; set; }
 }
+
+public class Position
+{
+    public string Ticker { get; set; }
+    public decimal AveragePrice { get; set; }
+    public decimal Quantity { get; set; }
+}
