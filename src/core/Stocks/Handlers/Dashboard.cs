@@ -94,6 +94,13 @@ namespace core.Stocks
                     {
                         violations.Add($"{portfolio.Ticker} owned {portfolio.Owned} but TDAmeritrade says none");
                     }
+                    else
+                    {
+                        if (existing.Quantity != portfolio.Owned)
+                        {
+                            violations.Add($"{portfolio.Ticker} owned {portfolio.Owned} but TDAmeritrade says {existing.Quantity}");
+                        }
+                    }
                 }
 
                 view.Violations = violations;

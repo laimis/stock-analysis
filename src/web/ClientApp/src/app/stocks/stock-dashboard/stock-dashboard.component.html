@@ -76,8 +76,13 @@
   <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]="" (click)="activateTab('charts')">
     Charts
   </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]="" (click)="activateTab('violations')">
+    Violations 
+    <span *ngIf="violations && violations.length > 0" class="badge rounded-pill bg-info">{{violations.length}}</span>
+  </a>
 </div>
 
-<stock-ownership-grid *ngIf="loaded && isActive('owned')" [violations]="violations" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
+<stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
 <stock-grid *ngIf="loaded && isActive('grid')"></stock-grid>
 <stock-charts *ngIf="loaded && isActive('charts')" [positions]="positions" ></stock-charts>
+<stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations"></stock-violations>

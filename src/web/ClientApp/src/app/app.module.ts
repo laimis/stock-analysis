@@ -63,6 +63,7 @@ import { StockTradingReviewComponent } from './stocks/stock-trading/stock-tradin
 import { StockTradingChartComponent } from './stocks/stock-trading/stock-trading-chart.component';
 import { StockChartsComponent } from './stocks/stock-dashboard/stock-charts.component';
 import { StockTradingPendingComponent } from './stocks/stock-trading/stock-trading-pending.component';
+import { StockViolationsComponent } from './stocks/stock-dashboard/stock-violations.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -158,6 +159,7 @@ var routes: Routes = [
     StockOwnershipComponent,
     StockOwnershipGridComponent,
     StockChartsComponent,
+    StockViolationsComponent,
     
     StockTradingComponent,
     StockTradingPositionComponent,
