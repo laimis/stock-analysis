@@ -11,5 +11,6 @@ namespace core.Shared.Adapters.Brokerage
         Task<IEnumerable<Order>> GetPendingOrders(UserState state);
         Task<IEnumerable<Position>> GetPositions(UserState state);
         Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, string type);
+        Task CancelOrder(UserState state, string orderId);
     }
 }

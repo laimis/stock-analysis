@@ -1,4 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -8,9 +9,25 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class StockTradingPendingComponent implements OnInit {
 
+  constructor(
+    private stockService: StocksService
+  ) { }
+
 	ngOnInit() {
   }
 
   @Input()
   pending: any
+
+  @Output()
+  orderCancelled: EventEmitter<string> = new EventEmitter<string>()
+
+  cancelOrder(orderId: string) {
+    this.stockService.brokerageCancelOrder(orderId).subscribe(() => {
+      this.orderCancelled.emit("cancelled")
+    }, (err) => {
+      console.log(err)
+    }
+    )
+  }
 }

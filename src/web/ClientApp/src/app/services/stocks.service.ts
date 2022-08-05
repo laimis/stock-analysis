@@ -179,6 +179,10 @@ export class StocksService {
 		return this.http.post('/api/brokerage/buy', obj)
 	}
 
+  brokerageCancelOrder(orderId:string) : Observable<any> {
+    return this.http.delete('/api/brokerage/orders/' + orderId)
+  }
+
   settings(ticker:string,category:string) : Observable<any> {
     var obj = {ticker, category}
 		return this.http.post('/api/stocks/settings', obj)

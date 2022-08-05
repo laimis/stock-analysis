@@ -72,7 +72,7 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<IEnumerable<Order>> GetPendingOrders(UserState user)
     {
-        var response = await CallApi(user, "/accounts?fields=orders");
+        var response = await CallApi(user, "/accounts?fields=orders", HttpMethod.Get);
 
         LogAndThrowIfFailed(response, "get pending orders");
 
@@ -95,6 +95,7 @@ public class TDAmeritradeClient : IBrokerage
             .Where(o => o.IsPending)
             .Select(o => new Order
             {
+                OrderId = o.orderId.ToString(),
                 Price = o.price.GetValueOrDefault(),
                 Quantity = Convert.ToInt32(o.quantity),
                 Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
@@ -104,7 +105,7 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<IEnumerable<Position>> GetPositions(UserState user)
     {
-        var request = await CallApi(user, "/accounts?fields=positions");
+        var request = await CallApi(user, "/accounts?fields=positions", HttpMethod.Get);
 
         LogAndThrowIfFailed(request, "get positions");
 
@@ -130,6 +131,29 @@ public class TDAmeritradeClient : IBrokerage
         });
     }
 
+    public async Task CancelOrder(UserState user, string orderId)
+    {
+        // get account first
+        var accounts = await CallApi(user, "/accounts", HttpMethod.Get);
+
+        LogAndThrowIfFailed(accounts, "get account for cancel order");
+
+        var account = await accounts.Content.ReadAsStringAsync();
+        var deserialized = JsonSerializer.Deserialize<AccountsResponse[]>(account);
+        if (deserialized == null)
+        {
+            throw new Exception("Could not deserialize account: " + account);
+        }
+
+        var accountId = deserialized[0].securitiesAccount?.accountId;
+
+        var url = $"/accounts/{accountId}/orders/{orderId}";
+
+        var response = await CallApi(user, url, HttpMethod.Delete);
+
+        LogAndThrowIfFailed(response, "cancel order");
+    }
+
     public async Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, string type)
     {
         var legCollection = new {
@@ -152,7 +176,7 @@ public class TDAmeritradeClient : IBrokerage
         };
 
         // get account first
-        var accounts = await CallApi(user, "/accounts");
+        var accounts = await CallApi(user, "/accounts", HttpMethod.Get);
 
         LogAndThrowIfFailed(accounts, "get account");
 
@@ -171,7 +195,7 @@ public class TDAmeritradeClient : IBrokerage
 
         _logger?.LogError("Posting to " + url + ": " + data);
 
-        var response = await CallApi(user, url, data);
+        var response = await CallApi(user, url, HttpMethod.Post, data);
 
         LogAndThrowIfFailed(response, "buy order");
     }
@@ -183,13 +207,12 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new Exception("Invalid order type: " + type)
         };
 
-    private async Task<HttpResponseMessage> CallApi(UserState user, string function, string? jsonData = null)
+    private async Task<HttpResponseMessage> CallApi(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
         var accessToken = await GetAccessTokenAsync(user);
 
-        var methodType = jsonData == null ? HttpMethod.Get : HttpMethod.Post;
+        var request = new HttpRequestMessage(method, GenerateApiUrl(function));
 
-        var request = new HttpRequestMessage(methodType, GenerateApiUrl(function));
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         if (jsonData != null)
         {

@@ -22,6 +22,7 @@ public class OAuthResponse
 
 public class Order
 {
+    public string OrderId { get; set; }
     public string Ticker { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }

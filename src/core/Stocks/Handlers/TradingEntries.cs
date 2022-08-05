@@ -95,7 +95,13 @@ namespace core.Stocks
             private async Task<PendingOrderView[]> GetPendingOrdersAsync(User user)
             {
                 var orders = await _brokerage.GetPendingOrders(user.State);
-                return orders.Select(o => new PendingOrderView(ticker: o.Ticker, quantity: o.Quantity, price: o.Price, type: o.Type)).ToArray();
+                return orders.Select(o => new PendingOrderView(
+                    orderId: o.OrderId,
+                    price: o.Price,
+                    quantity: o.Quantity,
+                    ticker: o.Ticker,
+                    type: o.Type
+                    )).ToArray();
             }
         }
     }

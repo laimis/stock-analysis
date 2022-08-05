@@ -7,16 +7,18 @@ Pending orders
       <th>Stock</th>
       <th>Type</th>
       <th>Quantity</th>
-      <td>Price</td>
+      <th>Price</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let p of pending; let i = index">
-      <td>{{i + 1}}</td>
+      <td>{{p.orderId}}</td>
       <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
       <td>{{p.type }}</td>
       <td>{{p.quantity}}</td>
       <td>{{p.price | currency}}</td>
+      <td><button (click)="cancelOrder(p.orderId)">Cancel</button></td>
     </tr>
   </tbody>
 </table>
