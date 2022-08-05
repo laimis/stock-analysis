@@ -45,6 +45,10 @@ export class StockTradingComponent implements OnInit {
     this.loadEntries()
   }
 
+  totalCost() {
+    return this.positions.reduce((acc, cur) => acc + (cur.averageCost * cur.numberOfShares), 0)
+  }
+
   private loadEntries() {
     this.loading = true
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {

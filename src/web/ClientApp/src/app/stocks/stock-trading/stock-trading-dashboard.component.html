@@ -7,26 +7,23 @@
 
 <div *ngIf="loaded">
   
-  <!-- <div class="card mb-2 mt-2">
+  <div class="card mb-2 mt-2">
     <div class="card-header">
-      <div class="mb-2 font-weight-bold">Trading Parameters</div>
+      <div class="mb-2 font-weight-bold">Summary</div>
 
       <div class="border-info mb-2 mt-4">
         <div class="row">
           <div class="col">
-            <label for="stopLoss" class="filterLabel">Stop Loss</label><input type="number" id="stopLoss" class="form-control form-control-sm" [(ngModel)]="stopLoss" />
+            {{ positions.length }} positions
           </div>
-          <div class="col">
-            <label for="firstTarget" class="filterLabel">First Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="firstTarget" id="firstTarget" name="firstTarget" />
-          </div>
-          <div class="col">
-            <label for="rrTarget" class="filterLabel">R:R Target</label><input type="number" class="form-control form-control-sm" [(ngModel)]="rrTarget" id="rrTarget" name="rrTarget" />
+          <div class="col text-right">
+            {{ totalCost() | currency:'USD':true:'1.2-2' }}
           </div>
         </div>
       </div>
     
     </div>
-  </div> -->
+  </div>
 
   <div class="tab-container mt-2" *ngIf="loaded">
     <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
