@@ -12,6 +12,7 @@ export class StockTradingComponent implements OnInit {
   past: StockTradingPosition[]
   pending: StockTradingOrder[]
   loaded: boolean = false
+  loading: boolean = true
   timePeriod: string = 'thisweek'
   performance: StockTradingPerformanceCollection;
 
@@ -40,15 +41,23 @@ export class StockTradingComponent implements OnInit {
     this.activateTab('positions')
   }
 
+  refresh() {
+    this.loadEntries()
+  }
+
   private loadEntries() {
+    this.loading = true
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
       this.positions = r.current
       this.past = r.past
       this.performance = r.performance
       this.pending = r.pendingOrders
+      this.loading = false
       this.loaded = true
-      
-    }, _ => { this.loaded = true})
+    }, _ => {
+      this.loading = false
+      this.loaded = true
+    })
   }
 
   numberOfPositions: number = 0
