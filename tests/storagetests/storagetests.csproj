@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\src\infrastructure\storage.postgres\storage.postgres.csproj" />
 	  <ProjectReference Include="..\..\src\core\core.csproj" />
 	  <ProjectReference Include="..\..\src\infrastructure\storage.memory\storage.memory.csproj" />
+	  <ProjectReference Include="..\testutils\testutils.csproj" />
   </ItemGroup>
 
 </Project>

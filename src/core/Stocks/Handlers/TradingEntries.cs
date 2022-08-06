@@ -71,16 +71,13 @@ namespace core.Stocks
                     .OrderByDescending(s => s.Gain)
                     .ToArray();
 
-                var closedPositions = stocks
+                var past = stocks
                     .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
-                    .ToList();
-
-                var past = closedPositions
                     .OrderByDescending(p => p.Closed)
                     .ToArray();
 
                 var performance = new TradingPerformanceContainerView(
-                    closedPositions,
+                    new Span<PositionInstance>(past),
                     20
                 );
 
