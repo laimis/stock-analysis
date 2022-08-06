@@ -13,9 +13,14 @@ namespace core.Shared
         public List<DataPoint<T>> Data { get; private set; } = new List<DataPoint<T>>();
         public string Label { get; }
 
-        public void Add(DateTimeOffset dateTime, T value)
+        public void Add(DateTimeOffset label, T value)
         {
-            Data.Add(new DataPoint<T>(dateTime, value));
+            Data.Add(new DataPoint<T>(label, value));
+        }
+
+        public void Add(string label, T value)
+        {
+            Data.Add(new DataPoint<T>(label, value));
         }
     }
     

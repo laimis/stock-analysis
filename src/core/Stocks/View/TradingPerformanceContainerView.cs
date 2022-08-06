@@ -57,6 +57,30 @@ namespace core.Stocks.View
             Trends.Add(rrAmount);
             Trends.Add(maxWin);
             Trends.Add(maxLoss);
+
+            // histogram of gains
+            var gains = new DataPointContainer<decimal>("Gains");
+
+            var min = Overall.MaxLossAmount * -1 - 100;
+            var max = Overall.MaxWinAmount + 100;
+
+            var buckets = 100;
+            var step = (max - min) / buckets;
+
+            for (var i = 0; i < buckets; i++)
+            {
+                var lower = min + (step * i);
+                var upper = min + (step * (i + 1));
+                var count = 0;
+                for (var j = 0; j < closedTransactions.Length; j++)
+                {
+                    if (closedTransactions[j].Profit >= lower && closedTransactions[j].Profit < upper)
+                        count++;
+                }
+                gains.Add(lower.ToString(), count);
+            }
+
+            Trends.Add(gains);
         }
 
         public TradingPerformanceView Recent { get; set; }
