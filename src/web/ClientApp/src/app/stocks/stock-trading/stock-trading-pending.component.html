@@ -18,7 +18,7 @@ Pending orders
       <td>{{p.type }}</td>
       <td>{{p.quantity}}</td>
       <td>{{p.price | currency}}</td>
-      <td><button (click)="cancelOrder(p.orderId)">Cancel</button></td>
+      <td><button class="btn btn-warning" (click)="cancelOrder(p.orderId)">Cancel</button></td>
     </tr>
   </tbody>
 </table>
