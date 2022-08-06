@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using storage.postgres;
 using storagetests.Fakes;
+using testutils;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -20,9 +21,7 @@ namespace storagetests.postgres
         [Fact]
         public async Task HealthCheckWorks()
         {
-            var cnn = Environment.GetEnvironmentVariable("DB_CNN");
-
-            _output.WriteLine(cnn);
+            var cnn = CredsHelper.GetDbCreds();
             
             var storage = new PostgresAggregateStorage(
                 new FakeMediator(),

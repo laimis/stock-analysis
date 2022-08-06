@@ -1,5 +1,8 @@
 using System;
+<<<<<<< HEAD
 using System.Collections.Generic;
+=======
+>>>>>>> 388f20d2743e14f04f8393e8e58e78af31742003
 using core.Stocks;
 using Xunit;
 
@@ -11,26 +14,12 @@ namespace coretests.Stocks
 
         public TradingPerformanceViewTests()
         {
-            // create a set of closed positions
-            var closedPositions = new List<PositionInstance>();
-
-            var position = new PositionInstance("AMD");
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 110m, DateTimeOffset.Now);
-            closedPositions.Add(position);
-
-            position = new PositionInstance("AMD");
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 110m, DateTimeOffset.Now);
-            closedPositions.Add(position);
-
-            position = new PositionInstance("AMD");
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 90m, DateTimeOffset.Now);
-            closedPositions.Add(position);
-
-            _performance = new TradingPerformanceView(closedPositions);
+            _performance = TradingPerformanceView.Create(TradingDataGenerator.GetClosedPositions());
         }
+
+        [Fact]
+        public void TestTotal() => Assert.Equal(3, _performance.Total);
+
         [Fact]
         public void WinsCorrect() => Assert.Equal(2, _performance.Wins);
 

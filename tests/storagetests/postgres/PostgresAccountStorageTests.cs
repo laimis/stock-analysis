@@ -1,6 +1,6 @@
-﻿using System;
-using core.Account;
+﻿using core.Account;
 using storage.postgres;
+using testutils;
 using Xunit;
 
 namespace storagetests.postgres
@@ -12,7 +12,7 @@ namespace storagetests.postgres
         {
             return new AccountStorage(
                 new Fakes.FakeMediator(),
-                Environment.GetEnvironmentVariable("DB_CNN")
+                CredsHelper.GetDbCreds()
             );
         }
     }
