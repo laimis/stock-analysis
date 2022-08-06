@@ -1,31 +1,51 @@
-<div class="row mb-2">
-  <div class="col"><div class="stat-label">Wins</div><div>{{performance.wins}}</div></div>
-  <div class="col"><div class="stat-label">Losses</div><div>{{performance.losses}}</div></div>
-  <div class="col"><div class="stat-label">Win %</div><div>{{performance.wins / performance.total | percent:'1.2'}}</div></div>
-  <div class="col"><div class="stat-label">Avg Days Held</div><div>{{performance.avgDaysHeld | number:'1.0-0'}}</div></div>
-  <div class="col"><div class="stat-label">Return %</div><div>{{performance.avgReturnPct | percent}}</div></div>
-</div>
+<div>
 
-<div class="row mb-2">
-  <div class="col"><div class="stat-label">Avg Win</div><div>{{performance.avgWinAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Max Win</div><div>{{performance.maxWinAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Avg % Return Wins</div><div>{{performance.winAvgReturnPct | percent}}</div></div>
-  <div class="col"><div class="stat-label">Max % Return Wins</div><div>{{performance.winMaxReturnPct | percent}}</div></div>
-  <div class="col"><div class="stat-label">Avg Win Days Held</div><div>{{performance.winAvgDaysHeld | number:'1.0-0'}}</div></div>
-</div>
+  <div>
+    <div class="row mb-2">
+      <div class="col"><div class="stat-label">Wins</div><div>{{performance.wins}}</div></div>
+      <div class="col"><div class="stat-label">Losses</div><div>{{performance.losses}}</div></div>
+      <div class="col"><div class="stat-label">Win %</div><div>{{performance.wins / performance.total | percent:'1.2'}}</div></div>
+      <div class="col"><div class="stat-label">Avg Days Held</div><div>{{performance.avgDaysHeld | number:'1.0-0'}}</div></div>
+      <div class="col"><div class="stat-label">Return %</div><div>{{performance.avgReturnPct | percent}}</div></div>
+    </div>
 
-<div class="row mb-2">
-  <div class="col"><div class="stat-label">Avg Loss</div><div>{{performance.avgLossAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Max Loss</div><div>{{performance.maxLossAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Avg % Return Losses</div><div>{{performance.lossAvgReturnPct | percent}}</div></div>
-  <div class="col"><div class="stat-label">Max % Return Losses</div><div>{{performance.lossMaxReturnPct | percent}}</div></div>
-  <div class="col"><div class="stat-label">Avg Loss Days Held</div><div>{{performance.lossAvgDaysHeld | number:'1.0-0'}}</div></div>
-</div>
+    <div class="row mb-2">
+      <div class="col"><div class="stat-label">Avg Win</div><div>{{performance.avgWinAmount | currency}}</div></div>
+      <div class="col"><div class="stat-label">Max Win</div><div>{{performance.maxWinAmount | currency}}</div></div>
+      <div class="col"><div class="stat-label">Avg % Return Wins</div><div>{{performance.winAvgReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Max % Return Wins</div><div>{{performance.winMaxReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Avg Win Days Held</div><div>{{performance.winAvgDaysHeld | number:'1.0-0'}}</div></div>
+    </div>
 
-<div class="row mb-2">
-  <div class="col"><div class="stat-label">Expected Value</div><div>{{performance.ev | currency}}</div></div>
-  <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.avgWinAmount / performance.avgLossAmount | number:'1.0-2'}}</div></div>
-  <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.winAvgReturnPct / performance.lossAvgReturnPct | number:'1.0-2'}}</div></div>
-  <div class="col"></div>
-  <div class="col"></div>
+    <div class="row mb-2">
+      <div class="col"><div class="stat-label">Avg Loss</div><div>{{performance.avgLossAmount | currency}}</div></div>
+      <div class="col"><div class="stat-label">Max Loss</div><div>{{performance.maxLossAmount | currency}}</div></div>
+      <div class="col"><div class="stat-label">Avg % Return Losses</div><div>{{performance.lossAvgReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Max % Return Losses</div><div>{{performance.lossMaxReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Avg Loss Days Held</div><div>{{performance.lossAvgDaysHeld | number:'1.0-0'}}</div></div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col"><div class="stat-label">Expected Value</div><div>{{performance.ev | currency}}</div></div>
+      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.avgWinAmount / performance.avgLossAmount | number:'1.0-2'}}</div></div>
+      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.winAvgReturnPct / performance.lossAvgReturnPct | number:'1.0-2'}}</div></div>
+      <div class="col"></div>
+      <div class="col"></div>
+    </div>  
+  </div>
+  <div class="row mt-2">
+    chart ready
+    <canvas
+      class="mb-2"
+      style="height: 400px"
+      *ngFor="let t of trends"
+      baseChart
+      [datasets]="getData(t)"
+      [labels]="getLabels(t)"
+      [options]="lineChartOptions"
+      [legend]="lineChartLegend"
+      [plugins]="lineChartPlugins"
+      [type]="lineChartType">
+    </canvas>
+  </div>
 </div>
