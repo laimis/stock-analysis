@@ -511,9 +511,20 @@ export interface StockTradingPerformance {
   avgReturnPct: number,
 }
 
+export interface DataPoint {
+  value: number
+  label: string
+}
+
+export interface DataPointContainer {
+  label: string
+  data: DataPoint[]
+}
+
 export interface StockTradingPerformanceCollection {
   overall: StockTradingPerformance,
-  recent: StockTradingPerformance
+  recent: StockTradingPerformance,
+  trends: DataPointContainer[]
 }
 
 export interface StockTradingOrder {

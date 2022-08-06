@@ -25,5 +25,18 @@ namespace testutils
 
             return File.ReadAllText(path);
         }
+
+        public static string GetDbCreds()
+        {
+            var val = Environment.GetEnvironmentVariable("DB_CNN");
+            if (val != null)
+            {
+                return val;
+            }
+
+            var path = @"..\..\..\..\..\postgres_secret";
+
+            return File.ReadAllText(path);
+        }
     }
 }

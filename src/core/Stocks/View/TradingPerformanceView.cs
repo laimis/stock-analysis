@@ -1,52 +1,85 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace core.Stocks
 {
-    public class TradingPerformanceView
+    public struct TradingPerformanceView
     {
-        public TradingPerformanceView(){}
-        
-        public TradingPerformanceView(List<PositionInstance> closedPositions)
+        public static TradingPerformanceView Create(Span<PositionInstance> closedPositions)
         {
-            if (closedPositions.Count == 0)
+            if (closedPositions.Length == 0)
             {
-                return;
+                return new TradingPerformanceView();
             }
 
-            Total = closedPositions.Count;
+            var wins = 0;
+            var maxWinAmount = 0m;
+            var winMaxReturnPct = 0m;
+            var total = closedPositions.Length;
+            var totalWinAmount = 0m;
+            var totalWinReturnPct = 0m;
+            var totalWinDaysHeld = 0;
+
+            var losses = 0;
+            var maxLossAmount = 0m;
+            var lossMaxReturnPct = 0m;
+            var totalLossAmount = 0m;
+            var totalLossReturnPct = 0m;
+            var totalLossDaysHeld = 0;
+
+            var totalDaysHeld = 0;
+            var totalCost = 0m;
+            var totalProfit = 0m;
             
-            var wins = closedPositions.Where(t => t.Profit >= 0).ToList();
-            if (wins.Count > 0)
+            foreach(var e in closedPositions)
             {
-                Wins = wins.Count;
-                AvgWinAmount = wins.Average(t => t.Profit);
-                MaxWinAmount = wins.Max(t => t.Profit);
-                WinAvgReturnPct = wins.Average(t => t.ReturnPct);
-                WinMaxReturnPct = wins.Max(t => t.ReturnPct);
-                WinAvgDaysHeld = wins.Average(t => t.DaysHeld);
-            }
+                totalDaysHeld += e.DaysHeld;
+                totalProfit += e.Profit;
+                totalCost += e.Cost;
 
-            var losses = closedPositions.Where(t => t.Profit < 0).ToList();
-            if (losses.Count > 0)
-            {
-                Losses = losses.Count;
-                AvgLossAmount = Math.Abs(losses.Average(t => t.Profit));
-                MaxLossAmount = Math.Abs(losses.Min(t => t.Profit));
-                LossAvgReturnPct = Math.Abs(losses.Average(t => t.ReturnPct));
-                LossMaxReturnPct = Math.Abs(losses.Min(t => t.ReturnPct));
-                LossAvgDaysHeld = losses.Average(t => t.DaysHeld);
+                if (e.Profit >= 0)
+                {
+                    wins++;
+                    totalWinAmount += e.Profit;
+                    maxWinAmount = Math.Max(maxWinAmount, e.Profit);
+                    totalWinReturnPct += e.ReturnPct;
+                    winMaxReturnPct = Math.Max(winMaxReturnPct, e.ReturnPct);
+                    totalWinDaysHeld += e.DaysHeld;
+                }
+                else
+                {
+                    losses++;
+                    totalLossAmount += Math.Abs(e.Profit);
+                    maxLossAmount = Math.Max(maxLossAmount, Math.Abs(e.Profit));
+                    totalLossReturnPct += Math.Abs(e.ReturnPct);
+                    lossMaxReturnPct = Math.Max(lossMaxReturnPct, Math.Abs(e.ReturnPct));
+                    totalLossDaysHeld += e.DaysHeld;
+                }
             }
             
-            WinPct = (1.0m * Wins) / Total;
-            EV = WinPct * AvgWinAmount - (1-WinPct) * AvgLossAmount;
-            AvgDaysHeld = closedPositions.Average(t => t.DaysHeld);
+            var winningPct = wins * 1.0m / total;
 
-            var totalCost = closedPositions.Sum(t => t.Cost);
-            var totalProfit = closedPositions.Sum(t => t.Profit);
-            var totalReturnPct = totalCost > 0 ? totalProfit / totalCost : 0;
-            AvgReturnPct = totalReturnPct;
+            var adjustedWinningAmount = wins > 0 ? winningPct * totalWinAmount / wins : 0m;
+            var adjustedLossingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 1000m;
+
+            return new TradingPerformanceView {
+                AvgDaysHeld = totalDaysHeld / total,
+                AvgLossAmount = losses > 0 ? totalLossAmount / losses : 0,
+                AvgReturnPct = totalCost > 0 ? totalProfit / totalCost : 0,
+                AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
+                EV = adjustedWinningAmount - adjustedLossingAmount,
+                MaxLossAmount = maxLossAmount,
+                LossAvgDaysHeld = losses > 0 ? totalLossDaysHeld / losses : 0,
+                LossMaxReturnPct = lossMaxReturnPct,
+                LossAvgReturnPct = totalLossReturnPct > 0 ? totalLossReturnPct / losses : 0,
+                Losses = losses,
+                MaxWinAmount = maxWinAmount,
+                Total = total,
+                WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
+                WinAvgReturnPct = totalWinReturnPct > 0 ? totalWinReturnPct / wins : 0,
+                WinMaxReturnPct = winMaxReturnPct,
+                WinPct = winningPct,
+                Wins = wins
+            };
         }
 
         public int Total { get; set; }

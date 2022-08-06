@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using core;
+using core.Stocks;
+using core.Stocks.View;
 using storage.postgres;
 using storage.shared;
 using storage.tests;
+using testutils;
 using Xunit;
 
 namespace storagetests.postgres
@@ -14,7 +19,15 @@ namespace storagetests.postgres
 
         public PostgresPortfolioStorageTests()
         {
-            _cnn = Environment.GetEnvironmentVariable("DB_CNN");
+            _cnn = CredsHelper.GetDbCreds();
+        }
+
+        
+
+        [Fact]
+        public async Task EndToEnd()
+        {
+            // use this test to spike up tests that need db access
         }
 
         protected override IPortfolioStorage CreateStorage() =>
