@@ -1,8 +1,4 @@
 using System;
-<<<<<<< HEAD
-using System.Collections.Generic;
-=======
->>>>>>> 388f20d2743e14f04f8393e8e58e78af31742003
 using core.Stocks;
 using Xunit;
 
