@@ -83,6 +83,9 @@ namespace core.Stocks.View
             }
 
             Trends.Add(gains);
+
+            // unreversed
+            closedTransactions.Reverse();
         }
 
         public TradingPerformanceView Recent { get; set; }
