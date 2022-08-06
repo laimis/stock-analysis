@@ -28,6 +28,8 @@ namespace core.Stocks.View
             var maxWin = new DataPointContainer<decimal>("Max Win $");
             var maxLoss = new DataPointContainer<decimal>("Max Loss $");
 
+            closedTransactions.Reverse();
+
             for(var i=0; i<closedTransactions.Length; i++)
             {
                 var window = closedTransactions.Slice(i, Math.Min(20, closedTransactions.Length));

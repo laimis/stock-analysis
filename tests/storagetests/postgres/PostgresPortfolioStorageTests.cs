@@ -27,27 +27,7 @@ namespace storagetests.postgres
         [Fact]
         public async Task EndToEnd()
         {
-            var storage = new AccountStorage(
-                new Fakes.FakeMediator(),
-                _cnn
-            );
-
-            var user = await storage.GetUserByEmail("laimis@gmail.com");
-
-            var portfolioStorage = CreateStorage();
-            var stocks = await portfolioStorage.GetStocks(user.Id);
-
-            var closedPositions = stocks
-                    .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
-                    .OrderByDescending(p => p.Closed)
-                    .ToArray();
-
-            var performance = new TradingPerformanceContainerView(
-                    new Span<PositionInstance>(closedPositions),
-                    20
-                );
-
-            Assert.True(performance.Recent.WinPct == 35);
+            // use this test to spike up tests that need db access
         }
 
         protected override IPortfolioStorage CreateStorage() =>
