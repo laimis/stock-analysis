@@ -20,8 +20,8 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <span class="badge" [ngClass]="p.price > stopNumber(p) ? 'bg-success' : 'bg-primary'">stop</span>
-            {{ stopNumber(p) | currency }}
+            <span class="badge" [ngClass]="p.price > stopPrice(p) ? 'bg-success' : 'bg-primary'">stop</span>
+            {{ stopPrice(p) | currency }}
           </div>
           <div class="col text-center">
             <span class="badge" [ngClass]="p.price > p.averageCost ? 'bg-success' : 'bg-primary'">cost</span>
@@ -48,7 +48,7 @@
           </div>
           <div class="col text-center">
             <span class="badge bg-secondary">portion</span>
-            {{ p.maxNumberOfShares / 3 | number : '1.0-2' }}
+            {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
           <div class="col text-end">
           </div>

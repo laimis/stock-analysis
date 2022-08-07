@@ -43,6 +43,7 @@ namespace core.Stocks
         public decimal? FirstBuyCost { get; private set; }
         public List<PositionTransaction> Buys { get; private set; } = new List<PositionTransaction>();
         public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
+        public decimal? StopPrice { get; private set; }
         private decimal TotalPrice { get; set; } = 0;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when)
@@ -90,6 +91,11 @@ namespace core.Stocks
             {
                 Closed = when;
             }
+        }
+
+        internal void SetStopPrice(decimal? stopPrice)
+        {
+            StopPrice = stopPrice;
         }
     }
 }

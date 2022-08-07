@@ -40,7 +40,7 @@ namespace core.Stocks
                     stock = new OwnedStock(cmd.Ticker, cmd.UserId);
                 }
 
-                stock.Purchase(cmd.NumberOfShares, cmd.Price, cmd.Date.Value, cmd.Notes);
+                stock.Purchase(cmd.NumberOfShares, cmd.Price, cmd.Date.Value, cmd.Notes, cmd.StopPrice);
 
                 await _storage.Save(stock, cmd.UserId);
 

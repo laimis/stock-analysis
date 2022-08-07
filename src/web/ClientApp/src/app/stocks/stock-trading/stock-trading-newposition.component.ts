@@ -160,6 +160,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
     cmd.ticker = this.ticker
     cmd.numberOfShares = this.stocksToBuy
     cmd.price = this.costToBuy
+    cmd.stopPrice = this.stopPrice
     cmd.date = new Date().toISOString()
 
     this.stockService.purchase(cmd).subscribe(

@@ -41,6 +41,39 @@ namespace core.Stocks
         public string Notes { get; }
     }
 
+    public class StockPurchased_v2 : 
+        AggregateEvent,
+        INotification,
+        IStockTransactionWithStopPrice
+    {
+        public StockPurchased_v2(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            Guid userId,
+            string ticker,
+            decimal numberOfShares,
+            decimal price,
+            string notes,
+            decimal? stopPrice)
+            : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Ticker = ticker;
+            NumberOfShares = numberOfShares;
+            Price = price;
+            Notes = notes;
+            StopPrice = stopPrice;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+        public decimal NumberOfShares { get; }
+        public decimal Price { get; }
+        public string Notes { get; }
+        public decimal? StopPrice { get; }
+    }
+
     public class StockSold :
         AggregateEvent,
         INotification,

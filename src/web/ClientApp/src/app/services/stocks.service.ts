@@ -560,7 +560,8 @@ export interface StockTradingPosition {
   closed: string,
   returnPct: number,
   buys: PositionTransaction[]
-  sells: PositionTransaction[]
+  sells: PositionTransaction[],
+  stopPrice: number | null
 }
 
 export class OptionDefinition {
@@ -653,6 +654,7 @@ export class stocktransactioncommand {
   price: number
   date: string
   notes: string
+  stopPrice: number | null
 }
 
 export class brokerageordercommand {

@@ -11,6 +11,7 @@
             MaxNumberOfShares = state.CurrentPosition.MaxNumberOfShares;
             MaxCost         = state.CurrentPosition.MaxCost;
             Gain            = state.CurrentPosition.Profit;
+            StopPrice       = state.CurrentPosition.StopPrice;
         }
 
         public decimal NumberOfShares { get; }
@@ -20,6 +21,7 @@
         public decimal MaxCost { get; }
         public decimal Price { get; private set; }
         public decimal Gain { get; private set; }
+        public decimal? StopPrice { get; }
 
         internal void ApplyPrice(decimal currentPrice)
         {

@@ -22,14 +22,6 @@ namespace storagetests.postgres
             _cnn = CredsHelper.GetDbCreds();
         }
 
-        
-
-        [Fact]
-        public async Task EndToEnd()
-        {
-            // use this test to spike up tests that need db access
-        }
-
         protected override IPortfolioStorage CreateStorage() =>
             new PortfolioStorage(
                 new PostgresAggregateStorage(new Fakes.FakeMediator(), _cnn),

@@ -23,7 +23,10 @@ export class StockTradingPositionComponent {
         return (p.price - p.averageCost) / p.averageCost / this.stopLoss
     }
 
-    stopNumber(p:StockTradingPosition) {
+    stopPrice(p:StockTradingPosition) {
+        if (p.stopPrice) {
+            return p.stopPrice
+        }
         return p.averageCost - p.averageCost * this.stopLoss
     }
 
@@ -41,6 +44,10 @@ export class StockTradingPositionComponent {
 
     positionSize(p:StockTradingPosition) {
         return p.maxNumberOfShares * p.averageCost
+    }
+
+    tradingPortion(p:StockTradingPosition) {
+        return Math.floor(p.maxNumberOfShares / 3)
     }
 }
 

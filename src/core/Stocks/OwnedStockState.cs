@@ -43,6 +43,13 @@ namespace core.Stocks
 
         internal void ApplyInternal(StockPurchased purchased)
         {
+            ApplyInternal(
+                new StockPurchased_v2(purchased.Id, purchased.AggregateId, purchased.When, purchased.UserId, purchased.Ticker, purchased.NumberOfShares, purchased.Price, purchased.Notes, null)
+            );
+        }
+
+        internal void ApplyInternal(StockPurchased_v2 purchased)
+        {
             BuyOrSell.Add(purchased);
 
             if (Category == null && Owned == 0)
@@ -116,6 +123,10 @@ namespace core.Stocks
                 );
 
                 positionInstances[positionInstances.Count - 1].Buy(st.NumberOfShares, st.Price, st.When);
+                if (st is IStockTransactionWithStopPrice stWithStop)
+                {
+                    positionInstances[positionInstances.Count - 1].SetStopPrice(stWithStop.StopPrice);
+                }
 
                 return true;
             }
@@ -168,14 +179,12 @@ namespace core.Stocks
                     continue;
                 }
 
-                if (st is StockPurchased sp)
-                {
-                    PurchaseProcessing(sp);
-                }
-                else if (st is StockSold ss)
-                {
-                    SellProcessing(ss);
-                }
+                var processed = st switch {
+                    StockPurchased_v2 p => PurchaseProcessing(p),
+                    StockPurchased p => PurchaseProcessing(p),
+                    StockSold s => SellProcessing(s),
+                    _ => throw new Exception("Unknown buy or sell type: " + st.GetType().Name)
+                };
                 
                 if (owned == 0)
                 {
@@ -216,5 +225,10 @@ namespace core.Stocks
         decimal Price { get; }
         Guid Id { get; }
         DateTimeOffset When { get; }
+    }
+
+    internal interface IStockTransactionWithStopPrice : IStockTransaction
+    {
+        decimal? StopPrice { get; }
     }
 }
