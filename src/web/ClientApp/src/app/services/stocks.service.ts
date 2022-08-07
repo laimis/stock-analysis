@@ -563,6 +563,7 @@ export interface StockTradingPosition {
   sells: PositionTransaction[]
   stopPrice: number | null
   notes: string[] | null
+  rr: number | null
 }
 
 export class OptionDefinition {

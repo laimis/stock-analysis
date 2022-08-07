@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace core.Stocks
 {
@@ -37,7 +38,6 @@ namespace core.Stocks
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
         public decimal MaxNumberOfShares { get; private set; }
-        public decimal MaxCost { get; private set; }
         public int NumberOfBuys { get; private set; }
         public int NumberOfSells { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
@@ -45,7 +45,18 @@ namespace core.Stocks
         public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
         public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
-        private decimal TotalPrice { get; set; } = 0;
+        public decimal AveragePrice => BuysForAverageCostCalculations.Aggregate(0m, (a, b) => a +  b.Item1 * b.Item2) / 
+            BuysForAverageCostCalculations.Sum(b => b.Item1);
+        private List<(decimal, decimal)> BuysForAverageCostCalculations { get; set; } = new List<(decimal, decimal)>();
+
+        public decimal RiskedPct => StopPrice switch {
+            not null => (AveragePrice - StopPrice.Value) / AveragePrice,
+            null => 0.05m
+        };
+
+        public decimal RiskedAmount => Cost * RiskedPct;
+
+        public decimal RR => Profit / RiskedAmount;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, string notes = null)
         {
@@ -54,20 +65,16 @@ namespace core.Stocks
                 Opened = when;
             }
 
+            BuysForAverageCostCalculations.Add((numberOfShares, price));
             NumberOfShares += numberOfShares;
             Cost += numberOfShares * price;
             NumberOfBuys++;
-            TotalPrice += price;
+            
             Buys.Add(new PositionTransaction(numberOfShares, price, when));
 
             if (NumberOfShares > MaxNumberOfShares)
             {
                 MaxNumberOfShares = NumberOfShares;
-            }
-
-            if (Cost > MaxCost)
-            {
-                MaxCost = Cost;
             }
 
             if (FirstBuyCost == null)
@@ -99,7 +106,7 @@ namespace core.Stocks
             }
         }
 
-        internal void SetStopPrice(decimal? stopPrice)
+        public void SetStopPrice(decimal? stopPrice)
         {
             StopPrice = stopPrice;
         }

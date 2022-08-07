@@ -19,13 +19,6 @@ export class StockTradingPositionComponent {
     @Input()
     rrTarget: number
 
-    rr(p:StockTradingPosition) {
-        var currentReturn = p.price - p.averageCost
-        var risk = p.averageCost - this.stopPrice(p)
-
-        return currentReturn / risk
-    }
-
     stopPrice(p:StockTradingPosition) {
         if (p.stopPrice) {
             return p.stopPrice
