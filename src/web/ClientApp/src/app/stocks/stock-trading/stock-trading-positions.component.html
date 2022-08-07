@@ -6,6 +6,11 @@
           <div class="col">
             <a [routerLink]="[ '/stocks', p.ticker ]" class="position-ticker">{{p.ticker}}</a>
             <span class="position-price">{{p.price | currency}}</span>
+            <i
+              (click)="noteRow.className = (noteRow.className == '' ? 'visually-hidden' : '')"
+              *ngIf="p.notes.length > 0"
+              class="bi bi-sticky-fill ms-2"
+              style="color: orange"></i>
           </div>
           <div class="col-2 text-center">
           </div>
@@ -51,15 +56,15 @@
             {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
           <div class="col text-end">
-            <!-- note icon if position has notes -->
-            <button (click)="noteRow.className = (noteRow.className == '' ? 'visually-hidden' : '')" type="button" class="btn btn-secondary btn-sm" *ngIf="p.notes.length > 0">
-              <i class="bi bi-sticky-fill"></i>
-            </button>
           </div>
         </div>
 
         <div class="row" #noteRow class="visually-hidden">
-          {{ p.notes }}
+          <div class="col">
+            <div *ngFor="let note of p.notes">
+              {{ note }}
+            </div>
+          </div>
         </div>
       </div>
 
