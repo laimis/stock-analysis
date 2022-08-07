@@ -149,6 +149,15 @@ namespace core
                         sp.When.ToString(DATE_FORMAT)
                     };
                 
+                case StockPurchased_v2 sp:
+                    return new object[] {
+                        sp.Ticker,
+                        "buy",
+                        sp.NumberOfShares,
+                        sp.Price,
+                        sp.When.ToString(DATE_FORMAT)
+                    };
+                
                 case StockSold ss:
 
                     return new object[] {
