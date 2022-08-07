@@ -1,4 +1,6 @@
-﻿namespace core.Stocks.View
+﻿using System.Collections.Generic;
+
+namespace core.Stocks.View
 {
 
     public class TradingEntryView
@@ -12,6 +14,7 @@
             MaxCost         = state.CurrentPosition.MaxCost;
             Gain            = state.CurrentPosition.Profit;
             StopPrice       = state.CurrentPosition.StopPrice;
+            Notes           = state.CurrentPosition.Notes;
         }
 
         public decimal NumberOfShares { get; }
@@ -22,6 +25,7 @@
         public decimal Price { get; private set; }
         public decimal Gain { get; private set; }
         public decimal? StopPrice { get; }
+        public List<string> Notes { get; }
 
         internal void ApplyPrice(decimal currentPrice)
         {

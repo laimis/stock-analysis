@@ -51,7 +51,15 @@
             {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
           <div class="col text-end">
+            <!-- note icon if position has notes -->
+            <button (click)="noteRow.className = (noteRow.className == '' ? 'visually-hidden' : '')" type="button" class="btn btn-secondary btn-sm" *ngIf="p.notes.length > 0">
+              <i class="bi bi-sticky-fill"></i>
+            </button>
           </div>
+        </div>
+
+        <div class="row" #noteRow class="visually-hidden">
+          {{ p.notes }}
         </div>
       </div>
 

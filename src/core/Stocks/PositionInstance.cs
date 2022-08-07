@@ -43,10 +43,11 @@ namespace core.Stocks
         public decimal? FirstBuyCost { get; private set; }
         public List<PositionTransaction> Buys { get; private set; } = new List<PositionTransaction>();
         public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
+        public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
         private decimal TotalPrice { get; set; } = 0;
 
-        public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when)
+        public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, string notes = null)
         {
             if (NumberOfShares == 0)
             {
@@ -72,6 +73,11 @@ namespace core.Stocks
             if (FirstBuyCost == null)
             {
                 FirstBuyCost = price;
+            }
+
+            if (notes != null)
+            {
+                Notes.Add(notes);
             }
         }
 

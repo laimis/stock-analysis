@@ -122,7 +122,7 @@ namespace core.Stocks
                     )
                 );
 
-                positionInstances[positionInstances.Count - 1].Buy(st.NumberOfShares, st.Price, st.When);
+                positionInstances[positionInstances.Count - 1].Buy(st.NumberOfShares, st.Price, st.When, st.Notes);
                 if (st is IStockTransactionWithStopPrice stWithStop)
                 {
                     positionInstances[positionInstances.Count - 1].SetStopPrice(stWithStop.StopPrice);
@@ -225,6 +225,7 @@ namespace core.Stocks
         decimal Price { get; }
         Guid Id { get; }
         DateTimeOffset When { get; }
+        string Notes { get; }
     }
 
     internal interface IStockTransactionWithStopPrice : IStockTransaction

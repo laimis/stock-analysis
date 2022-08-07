@@ -39,6 +39,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
   costToBuy: number | null = null
   stocksToBuy : number | null = null
   stopPrice: number | null = null
+  notes: string | null = null
   exitPrice: number | null = null
   potentialProfit: number | null = null
   potentialLoss: number | null = null
@@ -161,6 +162,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
     cmd.numberOfShares = this.stocksToBuy
     cmd.price = this.costToBuy
     cmd.stopPrice = this.stopPrice
+    cmd.notes = this.notes
     cmd.date = new Date().toISOString()
 
     this.stockService.purchase(cmd).subscribe(
