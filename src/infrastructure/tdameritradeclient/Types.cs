@@ -1,6 +1,6 @@
 namespace tdameritradeclient;
 
-public partial class OrderLegCollection
+public partial class OrderLeg
 {
     public string? orderLegType { get; set; }
 
@@ -13,6 +13,23 @@ public partial class OrderLegCollection
     public string? positionEffect { get; set; }
 
     public double quantity { get; set; }
+}
+
+public class ExecutionLeg
+{
+    public long legId { get; set; }
+    public decimal quantity { get; set; }
+    public double mismarkedQuantity { get; set; }
+    public decimal price { get; set; }
+}
+
+public class OrderActivity
+{
+    public string? executionType { get; set; }
+
+    public double quantity { get; set; }
+
+    public ExecutionLeg[]? executionLegs { get; set; }
 }
 
 public partial class Instrument
@@ -83,9 +100,38 @@ public class OrderStrategy
 
     public string? statusDescription { get; set; }
     
-    public OrderLegCollection[]? orderLegCollection { get; set; }
+    public OrderLeg[]? orderLegCollection { get; set; }
+    public OrderActivity[]? orderActivityCollection { get; set; }
 
     public bool IsPending => status == "WORKING";
+
+    internal decimal ResolvePrice()
+    {
+        if (price != null)
+        {
+            return price.Value;
+        }
+        
+        if (stopPrice != null)
+        {
+            return stopPrice.Value;
+        }
+
+        if (orderActivityCollection != null)
+        {
+            var executionPrices = orderActivityCollection
+                .Where(x => x.executionLegs != null)
+                .SelectMany(o => o.executionLegs!)
+                .Select(o => o.price);
+
+            if (executionPrices.Any())
+            {
+                return executionPrices.Average();
+            }
+        }
+
+        return 0m;
+    }
 }
 public partial class SecuritiesAccount
 {

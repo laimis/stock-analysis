@@ -529,8 +529,11 @@ export interface StockTradingPerformanceCollection {
 }
 
 export interface StockTradingOrder {
-  ticker: string
+  orderId: string
   price: number
+  quantity: number
+  status: string
+  ticker: string
 }
 
 export interface StockTradingPositions {

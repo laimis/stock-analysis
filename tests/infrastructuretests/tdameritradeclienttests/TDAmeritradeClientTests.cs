@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared.Adapters.Brokerage;
 using tdameritradeclient;
 using Xunit;
 
@@ -12,6 +13,8 @@ namespace tdameritradeclienttests
         public async Task AccountTest()
         {
             var config = testutils.CredsHelper.GetTDAmeritradeConfig().Split(',');
+            var tokenJson = testutils.CredsHelper.GetTDAmeritradeToken();
+            var at = System.Text.Json.JsonSerializer.Deserialize<OAuthResponse>(tokenJson);
             var client = new TDAmeritradeClient(
                 null,
                 config[0],
@@ -20,17 +23,17 @@ namespace tdameritradeclienttests
 
             var user = new User("test", "test", "test");
             user.ConnectToBrokerage(
-                config[2],
-                config[3],
+                at!.access_token,
+                at!.refresh_token,
                 "type",
                 1,
                 "name",
                 1
             );
 
-            var positions = await client.GetPositions(user.State);
+            var orders = await client.GetOrders(user.State);
 
-            Assert.NotEmpty(positions);
+            Assert.NotEmpty(orders);
         }
     }
 }

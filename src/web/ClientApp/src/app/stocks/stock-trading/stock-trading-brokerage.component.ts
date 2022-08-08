@@ -3,9 +3,9 @@ import { StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
-  selector: 'stock-trading-pending',
-  templateUrl: './stock-trading-pending.component.html',
-  styleUrls: ['./stock-trading-pending.component.css']
+  selector: 'stock-trading-brokerage',
+  templateUrl: './stock-trading-brokerage.component.html',
+  styleUrls: ['./stock-trading-brokerage.component.css']
 })
 export class StockTradingPendingComponent implements OnInit {
 

@@ -1,5 +1,3 @@
-Pending orders
-
 <table *ngIf="pending" class="table">
   <thead>
     <tr>
@@ -12,13 +10,17 @@ Pending orders
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let p of pending; let i = index">
-      <td>{{p.orderId}}</td>
+    <tr *ngFor="let p of pending; let i = index" [ngClass]="{'table-success': p.status == 'WORKING', 'table-light': p.status != 'WORKING'}">
+      <td>
+        <div class="small">{{p.status}}</div>
+      </td>
       <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
       <td>{{p.type }}</td>
       <td>{{p.quantity}}</td>
       <td>{{p.price | currency}}</td>
-      <td><button class="btn btn-warning" (click)="cancelOrder(p.orderId)">Cancel</button></td>
+      <td>
+        <button *ngIf="p.status == 'WORKING'" class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
+      </td>
     </tr>
   </tbody>
 </table>

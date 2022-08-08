@@ -70,7 +70,7 @@ public class TDAmeritradeClient : IBrokerage
         return Task.FromResult(url);
     }
 
-    public async Task<IEnumerable<Order>> GetPendingOrders(UserState user)
+    public async Task<IEnumerable<Order>> GetOrders(UserState user)
     {
         var response = await CallApi(user, "/accounts?fields=orders", HttpMethod.Get);
 
@@ -92,11 +92,11 @@ public class TDAmeritradeClient : IBrokerage
         }
 
         return strategies
-            .Where(o => o.IsPending)
             .Select(o => new Order
             {
+                Status = o.status,
                 OrderId = o.orderId.ToString(),
-                Price = o.price.GetValueOrDefault(),
+                Price = o.ResolvePrice(),
                 Quantity = Convert.ToInt32(o.quantity),
                 Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
                 Type = o.orderLegCollection?[0]?.instruction

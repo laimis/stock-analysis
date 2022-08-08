@@ -62,6 +62,6 @@
   <stock-trading-performance  *ngIf="isActive('performancerecent')" [performance]=performance.recent></stock-trading-performance>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance.overall [trends]="performance.trends"></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=past></stock-trading-review>
-  <stock-trading-pending      *ngIf="isActive('pending')" [pending]=pending (orderCancelled)="orderCancelled()"></stock-trading-pending>
+  <stock-trading-brokerage      *ngIf="isActive('pending')" [pending]=pending (orderCancelled)="orderCancelled()"></stock-trading-brokerage>
 
 </div>

@@ -23,10 +23,21 @@ public class OAuthResponse
 public class Order
 {
     public string OrderId { get; set; }
-    public string Ticker { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public string Status { get; set; }
+    public string Ticker { get; set; }
     public string Type { get; set; }
+    public int StatusOrder => Status switch
+    {
+        "WORKING" => 0,
+        "PENDING_ACTIVATION" => 0,
+        "FILLED" => 1,
+        "EXPIRED" => 2,
+        "CANCELED" => 3,
+        _ => 4
+    };
+    public bool IncludeInResponses => Status != "CANCELED" && Status != "REJECTED" && Status != "EXPIRED";
 }
 
 public class Position

@@ -19,6 +19,13 @@ namespace testutils
             return File.ReadAllText(path);
         }
 
+        public static string GetTDAmeritradeToken()
+        {
+            var path = @"..\..\..\..\..\..\tdameritrade_token_secret";
+
+            return File.ReadAllText(path);
+        }
+
         public static string GetCoinMarketCapToken()
         {
             var path = @"..\..\..\..\..\..\coinmarketcap_secret";

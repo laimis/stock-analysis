@@ -49,8 +49,8 @@ namespace core.Stocks
                 var user = await _accounts.GetUser(request.UserId);
 
                 var pendingOrders = await (user.State.ConnectedToBrokerage switch {
-                    true => GetPendingOrdersAsync(user),
-                    false => Task.FromResult(new PendingOrderView[0])
+                    true => GetBrokerageOrders(user),
+                    false => Task.FromResult(new BrokerageOrderView[0])
                 });
 
                 var tradingEntries = stocks.Where(s => s.State.Owned > 0 && s.State.Category == StockCategory.ShortTerm)
@@ -89,16 +89,21 @@ namespace core.Stocks
                 );
             }
 
-            private async Task<PendingOrderView[]> GetPendingOrdersAsync(User user)
+            private async Task<BrokerageOrderView[]> GetBrokerageOrders(User user)
             {
-                var orders = await _brokerage.GetPendingOrders(user.State);
-                return orders.Select(o => new PendingOrderView(
-                    orderId: o.OrderId,
-                    price: o.Price,
-                    quantity: o.Quantity,
-                    ticker: o.Ticker,
-                    type: o.Type
-                    )).ToArray();
+                var orders = await _brokerage.GetOrders(user.State);
+                return 
+                    orders
+                        .Where(o => o.IncludeInResponses)
+                        .OrderBy(o => o.StatusOrder)
+                        .Select(o => new BrokerageOrderView(
+                            orderId: o.OrderId,
+                            price: o.Price,
+                            quantity: o.Quantity,
+                            status: o.Status,
+                            ticker: o.Ticker,
+                            type: o.Type
+                            )).ToArray();
             }
         }
     }
