@@ -27,6 +27,7 @@ namespace core.Stocks.View
             var rrAmount = new DataPointContainer<decimal>("RR $");
             var maxWin = new DataPointContainer<decimal>("Max Win $");
             var maxLoss = new DataPointContainer<decimal>("Max Loss $");
+            var rrSum = new DataPointContainer<decimal>("RR Sum");
 
             closedTransactions.Reverse();
 
@@ -44,6 +45,7 @@ namespace core.Stocks.View
                 rrAmount.Add(window[0].Closed.Value, perfView.AvgWinAmount / perfView.AvgLossAmount);
                 maxWin.Add(window[0].Closed.Value, perfView.MaxWinAmount);
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
+                rrSum.Add(window[0].Closed.Value, perfView.rrSum);
 
                 if (i + 20 >= closedTransactions.Length)
                     break;
@@ -57,6 +59,7 @@ namespace core.Stocks.View
             Trends.Add(avgLossAmount);
             Trends.Add(rrPct);
             Trends.Add(rrAmount);
+            Trends.Add(rrSum);
             Trends.Add(maxWin);
             Trends.Add(maxLoss);
 

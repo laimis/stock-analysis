@@ -19,6 +19,18 @@ namespace coretests.Stocks
         }
 
         [Fact]
+        public void RR_Accurate() => Assert.Equal(3.69m, _position.RR, 2);
+
+        [Fact]
+        public void RiskedPct_Accurate() => Assert.Equal(0.05m, _position.RiskedPct);
+
+        [Fact]
+        public void RiskedAmount_Accurate() => Assert.Equal(32.5m, _position.RiskedAmount);
+
+        [Fact]
+        public void AverageCost_Accurate() => Assert.Equal(32.5m, _position.AveragePrice);
+
+        [Fact]
         public void DaysHeld()
         {
             Assert.True(Math.Abs(57 - _position.DaysHeld) <= 1);

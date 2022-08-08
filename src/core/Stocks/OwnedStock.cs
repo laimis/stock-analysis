@@ -24,11 +24,11 @@ namespace core.Stocks
             Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker, userId));
         }
 
-        public void Purchase(decimal numberOfShares, decimal price, DateTimeOffset date, string notes = null)
+        public void Purchase(decimal numberOfShares, decimal price, DateTimeOffset date, string notes = null, decimal? stopPrice = null)
         {
             if (price <= 0)
             {
-                throw new InvalidOperationException("Price cannot be empty or zero");
+                throw new InvalidOperationException("Price cannot be negative or zero");
             }
 
             if (date == DateTime.MinValue)
@@ -37,7 +37,7 @@ namespace core.Stocks
             }
 
             Apply(
-                new StockPurchased(
+                new StockPurchased_v2(
                     Guid.NewGuid(),
                     State.Id,
                     date,
@@ -45,7 +45,8 @@ namespace core.Stocks
                     State.Ticker,
                     numberOfShares,
                     price,
-                    notes
+                    notes,
+                    stopPrice
                 )
             );
         }

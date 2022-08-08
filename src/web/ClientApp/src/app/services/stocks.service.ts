@@ -509,6 +509,7 @@ export interface StockTradingPerformance {
   lossAvgDaysHeld: number,
   ev: number,
   avgReturnPct: number,
+  rrSum: number,
 }
 
 export interface DataPoint {
@@ -561,6 +562,9 @@ export interface StockTradingPosition {
   returnPct: number,
   buys: PositionTransaction[]
   sells: PositionTransaction[]
+  stopPrice: number | null
+  notes: string[] | null
+  rr: number | null
 }
 
 export class OptionDefinition {
@@ -653,6 +657,7 @@ export class stocktransactioncommand {
   price: number
   date: string
   notes: string
+  stopPrice: number | null
 }
 
 export class brokerageordercommand {

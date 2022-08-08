@@ -7,7 +7,8 @@ namespace core.Stocks
 {
     public class StockTransactionHandler : 
         MediatR.INotificationHandler<StockSold>,
-        MediatR.INotificationHandler<StockPurchased>
+        MediatR.INotificationHandler<StockPurchased>,
+        MediatR.INotificationHandler<StockPurchased_v2>
     {
         private IPortfolioStorage _storage;
         private IMediator _mediator;
@@ -34,6 +35,21 @@ namespace core.Stocks
         }
 
         public async Task Handle(StockPurchased e, CancellationToken cancellationToken)
+        {
+            var s = await _storage.GetStock(e.Ticker, e.UserId);
+            if (s == null)
+            {
+                return;
+            }
+
+            var when = e.When;
+            var notes = e.Notes;
+            var ticker = e.Ticker;
+
+            await CreateNote(e.UserId, when, notes, ticker);
+        }
+
+        public async Task Handle(StockPurchased_v2 e, CancellationToken cancellationToken)
         {
             var s = await _storage.GetStock(e.Ticker, e.UserId);
             if (s == null)

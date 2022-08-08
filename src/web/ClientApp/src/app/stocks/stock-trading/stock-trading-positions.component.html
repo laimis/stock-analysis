@@ -6,11 +6,16 @@
           <div class="col">
             <a [routerLink]="[ '/stocks', p.ticker ]" class="position-ticker">{{p.ticker}}</a>
             <span class="position-price">{{p.price | currency}}</span>
+            <i
+              (click)="noteRow.className = (noteRow.className == '' ? 'visually-hidden' : '')"
+              *ngIf="p.notes.length > 0"
+              class="bi bi-sticky-fill ms-2"
+              style="color: orange"></i>
           </div>
           <div class="col-2 text-center">
           </div>
           <div class="col">
-            <span class="position-gain float-end">{{ rr(p) | number:'1.0-2' }}</span>
+            <span class="position-gain float-end">{{ p.rr | number:'1.0-2' }}</span>
           </div>
         </div>  
       </div>
@@ -20,8 +25,8 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <span class="badge" [ngClass]="p.price > stopNumber(p) ? 'bg-success' : 'bg-primary'">stop</span>
-            {{ stopNumber(p) | currency }}
+            <span class="badge" [ngClass]="p.price > stopPrice(p) ? 'bg-success' : 'bg-primary'">stop</span>
+            {{ stopPrice(p) | currency }}
           </div>
           <div class="col text-center">
             <span class="badge" [ngClass]="p.price > p.averageCost ? 'bg-success' : 'bg-primary'">cost</span>
@@ -48,9 +53,17 @@
           </div>
           <div class="col text-center">
             <span class="badge bg-secondary">portion</span>
-            {{ p.maxNumberOfShares / 3 | number : '1.0-2' }}
+            {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
           <div class="col text-end">
+          </div>
+        </div>
+
+        <div class="row" #noteRow class="visually-hidden">
+          <div class="col">
+            <div *ngFor="let note of p.notes">
+              {{ note }}
+            </div>
           </div>
         </div>
       </div>

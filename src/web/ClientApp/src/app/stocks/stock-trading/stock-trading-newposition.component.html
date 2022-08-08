@@ -64,6 +64,10 @@
       </div>
     </div>
     <div class="row mt-2" *ngIf="prices">
+      <div class="col">
+        <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>
+      </div>
+    <div class="row mt-2" *ngIf="prices">
       <div class="col" >
         <button class="btn btn-primary w-100" (click)="record()">Record</button>
       </div>

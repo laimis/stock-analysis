@@ -29,12 +29,14 @@ namespace core.Stocks
             var totalDaysHeld = 0;
             var totalCost = 0m;
             var totalProfit = 0m;
+            var rrSum = 0m;
             
             foreach(var e in closedPositions)
             {
                 totalDaysHeld += e.DaysHeld;
                 totalProfit += e.Profit;
                 totalCost += e.Cost;
+                rrSum += e.RR;
 
                 if (e.Profit >= 0)
                 {
@@ -73,6 +75,7 @@ namespace core.Stocks
                 LossAvgReturnPct = totalLossReturnPct > 0 ? totalLossReturnPct / losses : 0,
                 Losses = losses,
                 MaxWinAmount = maxWinAmount,
+                rrSum = rrSum,
                 Total = total,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
                 WinAvgReturnPct = totalWinReturnPct > 0 ? totalWinReturnPct / wins : 0,
@@ -99,5 +102,6 @@ namespace core.Stocks
         public decimal EV { get; set; }
         public decimal AvgReturnPct { get; set; }
         public double AvgDaysHeld { get; set; }
+        public decimal rrSum { get; set; }
     }
 }

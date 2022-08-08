@@ -15,6 +15,8 @@ namespace core.Stocks
         [Required]
         public DateTimeOffset? Date { get; set; }
 
+        public decimal? StopPrice { get; set; }
+
         public string Notes { get; set; }
     }
 }

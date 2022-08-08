@@ -6,6 +6,7 @@
       <th width="100"></th>
       <th>Stock</th>
       <th>Date</th>
+      <th>R:R</th>
       <th>Profit/Loss</th>
       <th>Profit/Loss %</th>
       <th>Days Held</th>
@@ -16,6 +17,7 @@
       <td>{{i + 1}}</td>
       <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
       <td>{{p.closed | date}}</td>
+      <td>{{p.rr | number:'1.0-2' }}</td>
       <td>{{p.profit | currency}}</td>
       <td>
         <span *ngIf="p.profit >= 0" class="badge bg-success me-1">win</span>

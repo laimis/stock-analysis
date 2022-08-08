@@ -1,4 +1,6 @@
-﻿namespace core.Stocks.View
+﻿using System.Collections.Generic;
+
+namespace core.Stocks.View
 {
 
     public class TradingEntryView
@@ -9,22 +11,28 @@
             AverageCost     = state.AverageCost;
             Ticker          = state.Ticker;
             MaxNumberOfShares = state.CurrentPosition.MaxNumberOfShares;
-            MaxCost         = state.CurrentPosition.MaxCost;
             Gain            = state.CurrentPosition.Profit;
+            StopPrice       = state.CurrentPosition.StopPrice;
+            Notes           = state.CurrentPosition.Notes;
+            RiskedPct       = state.CurrentPosition.RiskedPct;
         }
 
         public decimal NumberOfShares { get; }
         public decimal AverageCost { get; }
         public string Ticker { get; }
         public decimal MaxNumberOfShares { get; }
-        public decimal MaxCost { get; }
         public decimal Price { get; private set; }
         public decimal Gain { get; private set; }
+        public decimal? StopPrice { get; }
+        public List<string> Notes { get; }
+        public decimal RiskedPct { get; }
 
         internal void ApplyPrice(decimal currentPrice)
         {
             Price = currentPrice;
             Gain = (Price - AverageCost) / AverageCost;
         }
+
+        public decimal RR => (Price - AverageCost) / AverageCost / RiskedPct;
     }
 }
