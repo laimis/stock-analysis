@@ -18,6 +18,14 @@
           [(ngModel)]="positionSize"
           (ngModelChange)="updateBuyingValuesWithPositionSize()">
       </div>
+      <div class="col">
+        <label for="date" class="form-label">Purchase Date</label>
+        <input
+          type="date"
+          class="form-control"
+          id="date"
+          [(ngModel)]="date">
+      </div>
     </div>
     <div class="row mt-2" *ngIf="costToBuy">
       <div class="col">

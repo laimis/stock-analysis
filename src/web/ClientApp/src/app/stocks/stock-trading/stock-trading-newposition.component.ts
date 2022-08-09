@@ -44,6 +44,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
   potentialProfit: number | null = null
   potentialLoss: number | null = null
   potentialRr: number | null = null
+  date: string | null = null
 
   prices: Prices | null = null
   stopAndExitPoints: number[] | null = null
@@ -125,6 +126,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
   updateBuyingValuesStopPrice() {
     var diff = this.costToBuy - this.stopPrice
     this.potentialLoss = diff * this.stocksToBuy
+    this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
   }
 
   updateBuyingValues() {
@@ -155,7 +157,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
     cmd.price = this.costToBuy
     cmd.stopPrice = this.stopPrice
     cmd.notes = this.notes
-    cmd.date = new Date().toISOString()
+    cmd.date = this.date
 
     this.stockService.purchase(cmd).subscribe(
       _ => { 
