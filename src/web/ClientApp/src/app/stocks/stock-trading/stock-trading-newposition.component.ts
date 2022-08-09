@@ -123,16 +123,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
   }
 
   updateBuyingValuesStopPrice() {
-    // first, we calculate the absolute amount that could be lost if we used the position size and the stop loss % that's specified
-    var potentialLoss = this.positionSize * this.stopLoss
-
     var diff = this.costToBuy - this.stopPrice
-
-    console.log("diff: " + diff + " potential loss: " + potentialLoss)
-
-    // now we take the cost to buy and figure out how many shares can we buy that will keep us from losing the potential loss
-    this.stocksToBuy = Math.floor(potentialLoss / diff)
-    this.positionSize = this.stocksToBuy * this.costToBuy 
+    this.potentialLoss = diff * this.stocksToBuy
   }
 
   updateBuyingValues() {
