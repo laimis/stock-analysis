@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership } from '../../services/stocks.service';
+import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile, StockAlert } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
@@ -10,14 +10,14 @@ import { Title } from '@angular/platform-browser';
 })
 export class StockDetailsComponent {
 
-  profile: object
+  profile: StockProfile
   ticker: string
 	loaded: boolean = false
   stock: StockDetails
   notes: NoteList
   ownership: StockOwnership
   options: OwnedOption[]
-  alerts: object
+  alerts: StockAlert
   activeTab: string = 'stocks'
 
 	constructor(

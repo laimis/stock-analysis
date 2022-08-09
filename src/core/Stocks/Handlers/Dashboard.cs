@@ -66,39 +66,40 @@ namespace core.Stocks
 
             private async Task EnrichWithPositionCheckAsync(StockDashboardView view, UserState state)
             {
-                var positions = await _brokerage.GetPositions(state);
+                var localPositions = view.Owned;
+                var brokeragePositions = await _brokerage.GetPositions(state);
                 var violations = new List<string>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
-                foreach (var position in positions)
+                foreach (var brokeragePosition in brokeragePositions)
                 {
-                    var existing = view.Owned.SingleOrDefault(o => o.Ticker == position.Ticker);
-                    if (existing != null)
+                    var localPosition = localPositions.SingleOrDefault(o => o.Ticker == brokeragePosition.Ticker);
+                    if (localPosition != null)
                     {
-                        if (existing.Owned != position.Quantity)
+                        if (localPosition.Owned != brokeragePosition.Quantity)
                         {
-                            violations.Add($"{position.Ticker} owned {position.Quantity} but NGTrading says {existing.Owned}");
+                            violations.Add($"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.Owned}");
                         }
                     }
                     else
                     {
-                        violations.Add($"{position.Ticker} owned {position.Quantity} @ ${position.AveragePrice} but NGTrading says none");
+                        violations.Add($"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AveragePrice} but NGTrading says none");
                     }
                 }
 
                 // go through each portfolion and see if it's in positions
-                foreach (var portfolio in view.Owned)
+                foreach (var localPosition in localPositions)
                 {
-                    var existing = positions.SingleOrDefault(p => p.Ticker == portfolio.Ticker);
-                    if (existing == null)
+                    var brokeragePosition = brokeragePositions.SingleOrDefault(p => p.Ticker == localPosition.Ticker);
+                    if (brokeragePosition == null)
                     {
-                        violations.Add($"{portfolio.Ticker} owned {portfolio.Owned} but TDAmeritrade says none");
+                        violations.Add($"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says none");
                     }
                     else
                     {
-                        if (existing.Quantity != portfolio.Owned)
+                        if (brokeragePosition.Quantity != localPosition.Owned)
                         {
-                            violations.Add($"{portfolio.Ticker} owned {portfolio.Owned} but TDAmeritrade says {existing.Quantity}");
+                            violations.Add($"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says {brokeragePosition.Quantity}");
                         }
                     }
                 }

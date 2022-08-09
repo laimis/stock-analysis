@@ -93,13 +93,13 @@ export class StocksService {
   }
 
   // ------------------ alerts ------------------
-  getAlerts(ticker: string): Observable<object> {
+  getAlerts(ticker: string): Observable<StockAlert> {
     if (ticker === null)
     {
       ticker = ''
     }
 
-    return this.http.get<object>('/api/alerts/' + ticker)
+    return this.http.get<StockAlert>('/api/alerts/' + ticker)
   }
 
   addAlert(ticker: string, description: string, value: number): Observable<object> {
@@ -470,8 +470,32 @@ export interface StockDetails {
   ticker: string
   price: number
   stats: StockStats
-  profile : object
+  profile : StockProfile
 	alert: object
+}
+
+export interface StockAlert {
+  ticker: string
+  points: AlertPricePoint[]
+}
+
+export interface AlertPricePoint {
+  id: string
+  description: string
+  value: number
+}
+
+export interface StockProfile {
+  description: string
+  sector: string
+  industry: string
+  companyName: string
+  country: string
+  employees: number
+  website: string
+  issueType: string
+  securityName: string
+  symbol: string
 }
 
 export interface StockOwnership {

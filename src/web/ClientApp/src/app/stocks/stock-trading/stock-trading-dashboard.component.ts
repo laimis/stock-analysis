@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection, StockTradingOrder } from '../../services/stocks.service';
 
 @Component({
@@ -13,20 +14,21 @@ export class StockTradingComponent implements OnInit {
   pending: StockTradingOrder[]
   loaded: boolean = false
   loading: boolean = true
-  timePeriod: string = 'thisweek'
+  activeTab:string = 'positions'
   performance: StockTradingPerformanceCollection;
 
   constructor(
     private stockService:StocksService,
-    private title: Title
+    private title: Title,
+    private route: ActivatedRoute
     ) { }
 
   ngOnInit() {
+    this.activeTab = this.route.snapshot.paramMap.get('tab') || 'positions'
     this.title.setTitle("Trading Dashboard - Nightingale Trading")
     this.loadEntries()
   }
 
-  activeTab = 'positions'
   
   isActive(tabName:string) {
     return tabName == this.activeTab

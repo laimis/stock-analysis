@@ -15,9 +15,13 @@
       </h3>
 
     </div>
-    <div>
-      <div id="company-description">
-        <a [routerLink]="[ '/stocks' ]" class="h6">Back to stocks</a>
+    <div class="row">
+      <div class="col">
+        {{ profile.sector }} / {{ profile.industry }}
+      </div>
+      <div class="col text-end">
+        <a [routerLink]="[ '/stocks' ]" class="h6 me-3">Portfolio Dashboard</a>
+        <a [routerLink]="[ '/trading' ]" class="h6">Trading Dashboard</a>
       </div>
     </div>
   </div>

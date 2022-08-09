@@ -2,6 +2,10 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
+  <div *ngIf="ownership && ownership.owned == 0">
+    Current price: <b>{{stock.price | currency}}</b>
+  </div>
+
   <div *ngIf="ownership && ownership.owned > 0" class="mt-4">
     <div class="row">
       <div class="col">

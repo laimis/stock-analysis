@@ -98,6 +98,7 @@ var routes: Routes = [
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'trading', component: StockTradingComponent},
+  { path: 'trading/[:tab]', component: StockTradingComponent},
 
   { path: 'stocks', component: StockDashboardComponent},
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
