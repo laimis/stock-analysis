@@ -3,9 +3,9 @@ import { StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
-  selector: 'stock-trading-brokerage',
-  templateUrl: './stock-trading-brokerage.component.html',
-  styleUrls: ['./stock-trading-brokerage.component.css']
+  selector: 'brokerage-orders',
+  templateUrl: './orders.component.html',
+  styleUrls: ['./orders.component.css']
 })
 export class StockTradingPendingComponent implements OnInit {
 
@@ -17,7 +17,7 @@ export class StockTradingPendingComponent implements OnInit {
   }
 
   @Input()
-  pending: any
+  orders: any
 
   @Output()
   orderCancelled: EventEmitter<string> = new EventEmitter<string>()

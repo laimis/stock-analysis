@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
-import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection, StockTradingOrder } from '../../services/stocks.service';
+import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -11,7 +11,7 @@ import { StocksService, StockTradingPosition, StockTradingPositions, StockTradin
 export class StockTradingComponent implements OnInit {
   positions: StockTradingPosition[]
   past: StockTradingPosition[]
-  pending: StockTradingOrder[]
+  brokerageOrders: BrokerageOrder[]
   loaded: boolean = false
   loading: boolean = true
   activeTab:string = 'positions'
@@ -61,7 +61,7 @@ export class StockTradingComponent implements OnInit {
       this.positions = r.current
       this.past = r.past
       this.performance = r.performance
-      this.pending = r.pendingOrders
+      this.brokerageOrders = r.brokerageOrders
       this.loading = false
       this.loaded = true
     }, _ => {

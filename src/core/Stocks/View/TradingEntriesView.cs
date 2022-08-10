@@ -3,20 +3,20 @@ namespace core.Stocks.View
     public class TradingEntriesView
     {
         public TradingEntriesView(
+            BrokerageOrderView[] brokerageOrders,
             TradingEntryView[] current,
             PositionInstance[] past,
-            BrokerageOrderView[] pendingOrders,
             TradingPerformanceContainerView performance)
         {
             Current = current;
             Past = past;
-            PendingOrders = pendingOrders;
+            BrokerageOrders = brokerageOrders;
             Performance = performance;
         }
 
+        public BrokerageOrderView[] BrokerageOrders { get; }
         public TradingEntryView[] Current { get; }
         public PositionInstance[] Past { get; }
-        public BrokerageOrderView[] PendingOrders { get; }
         public TradingPerformanceContainerView Performance { get; }
     }
 }

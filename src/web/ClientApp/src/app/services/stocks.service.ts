@@ -331,6 +331,7 @@ export interface StockSummary {
   owned: OwnedStock[]
   positions: StockTradingPosition[]
   violations: string[]
+  orders: BrokerageOrder[]
 }
 
 export interface TransactionList {
@@ -552,7 +553,7 @@ export interface StockTradingPerformanceCollection {
   trends: DataPointContainer[]
 }
 
-export interface StockTradingOrder {
+export interface BrokerageOrder {
   orderId: string
   price: number
   quantity: number
@@ -564,7 +565,7 @@ export interface StockTradingPositions {
   current: StockTradingPosition[]
   past: StockTradingPosition[]
   performance: StockTradingPerformanceCollection
-  pendingOrders: StockTradingOrder[]
+  brokerageOrders: BrokerageOrder[]
 }
 
 export interface PositionTransaction {

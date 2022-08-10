@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition } from '../../services/stocks.service';
+import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, BrokerageOrder } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-dashboard',
@@ -13,6 +13,7 @@ export class StockDashboardComponent implements OnInit {
   owned : OwnedStock[]
   violations: string[] = []
   positions : StockTradingPosition[]
+  orders : BrokerageOrder[]
   loaded : boolean = false
 
   numberOfSharesOwned: number;
@@ -38,6 +39,7 @@ export class StockDashboardComponent implements OnInit {
       this.owned = result.owned
       this.positions = result.positions
       this.violations = result.violations
+      this.orders = result.orders
       this.loaded = true
       this.calculateProperties()
       this.sort("profits")

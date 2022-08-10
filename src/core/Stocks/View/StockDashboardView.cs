@@ -18,5 +18,11 @@ namespace core.Stocks.View
         public List<PositionInstance> Positions { get; }
         public DateTimeOffset Calculated { get; set; }
         public List<string> Violations { get; set; }
+        public BrokerageOrderView[] Orders { get; private set; }
+
+        internal void SetOrders(BrokerageOrderView[] brokerageOrders)
+        {
+            Orders = brokerageOrders;
+        }
     }
 }

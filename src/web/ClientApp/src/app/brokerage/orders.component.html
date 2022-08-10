@@ -1,4 +1,4 @@
-<table *ngIf="pending" class="table">
+<table *ngIf="orders" class="table">
   <thead>
     <tr>
       <th width="100"></th>
@@ -10,7 +10,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let p of pending; let i = index" [ngClass]="{'table-success': p.status == 'WORKING', 'table-light': p.status != 'WORKING'}">
+    <tr *ngFor="let p of orders; let i = index" [ngClass]="{'table-success': p.status == 'WORKING', 'table-light': p.status != 'WORKING'}">
       <td>
         <div class="small">{{p.status}}</div>
       </td>

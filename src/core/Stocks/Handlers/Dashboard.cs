@@ -27,7 +27,7 @@ namespace core.Stocks
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
             private IStocksService2 _stocksService;
-
+            
             public Handler(
                 IAccountStorage accounts,
                 IBrokerage brokerage,
@@ -58,16 +58,25 @@ namespace core.Stocks
                 var user = await _accounts.GetUser(query.UserId);
                 if (user.State.ConnectedToBrokerage)
                 {
-                    await EnrichWithPositionCheckAsync(view, user.State);
+                    var brokeragePositions = await _brokerage.GetPositions(user.State);
+                    EnrichWithPositionViolations(view, brokeragePositions);
+
+                    var brokerageOrders = await TradingEntries.Handler.GetBrokerageOrders(_brokerage, user);
+                    EnrichWithBrokerageOrders(view, brokerageOrders);
                 }
 
                 return view;
             }
 
-            private async Task EnrichWithPositionCheckAsync(StockDashboardView view, UserState state)
+            private void EnrichWithBrokerageOrders(StockDashboardView view, BrokerageOrderView[] brokerageOrders)
+            {
+                view.SetOrders(brokerageOrders);
+            }
+
+            private void EnrichWithPositionViolations(StockDashboardView view, IEnumerable<Position> brokeragePositions)
             {
                 var localPositions = view.Owned;
-                var brokeragePositions = await _brokerage.GetPositions(state);
+                
                 var violations = new List<string>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
