@@ -12,7 +12,7 @@
               class="bi bi-sticky-fill ms-2"
               style="color: orange"></i>
           </div>
-          <div class="col-2 text-center">
+          <div class="col text-center">
           </div>
           <div class="col">
             <span class="position-gain float-end">{{ p.rr | number:'1.0-2' }}</span>
@@ -59,9 +59,9 @@
           </div>
         </div>
 
-        <div class="row" #noteRow class="visually-hidden">
+        <div class="row mt-3" #noteRow class="visually-hidden">
           <div class="col">
-            <div *ngFor="let note of p.notes">
+            <div *ngFor="let note of p.notes" style="white-space: pre-wrap;">
               {{ note }}
             </div>
           </div>
