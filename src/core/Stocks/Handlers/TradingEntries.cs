@@ -68,7 +68,7 @@ namespace core.Stocks
                 }
 
                 var current = tradingEntries
-                    .OrderByDescending(s => s.Gain)
+                    .OrderByDescending(s => s.RR)
                     .ToArray();
 
                 var past = stocks
