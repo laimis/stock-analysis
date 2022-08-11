@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using web.Utils;
 using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization;
 
 namespace web
 {
@@ -28,7 +29,15 @@ namespace web
         {
             AuthHelper.Configure(Configuration, services);
 
-            services.AddControllers(o => o.InputFormatters.Add(new TextPlainInputFormatter()));
+            services
+                .AddControllers(
+                    o => {
+                        o.InputFormatters.Add(new TextPlainInputFormatter());
+                })
+                .AddJsonOptions(
+                    o => {
+                        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {

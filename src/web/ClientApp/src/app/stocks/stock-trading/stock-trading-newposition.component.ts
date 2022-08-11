@@ -45,6 +45,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
   potentialLoss: number | null = null
   potentialRr: number | null = null
   date: string | null = null
+  brokerageOrderType: string | null = null
+  brokerageOrderDuration: string | null = null
 
   prices: Prices | null = null
   stopAndExitPoints: number[] | null = null
@@ -167,13 +169,14 @@ export class StockTradingNewPositionComponent implements OnChanges {
     )
   }
 
-  brokerageBuy(type:string) {
-    console.log("buy " + type)
-    var cmd = new brokerageordercommand()
-    cmd.ticker = this.ticker
-    cmd.numberOfShares = this.stocksToBuy
-    cmd.price = this.costToBuy
-    cmd.type = type
+  brokerageBuy() {
+    var cmd : brokerageordercommand = {
+      ticker: this.ticker,
+      numberOfShares: this.stocksToBuy,
+      price: this.costToBuy,
+      type: this.brokerageOrderType,
+      duration: this.brokerageOrderDuration
+    }
 
     this.stockService.brokerageBuy(cmd).subscribe(
       _ => { 

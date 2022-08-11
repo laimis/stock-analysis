@@ -80,10 +80,22 @@
         <button class="btn btn-primary w-100" (click)="record()">Record</button>
       </div>
       <div class="col" >
-        <button class="btn btn-primary w-100" (click)="brokerageBuy('limit')">Brokerage [Limit]</button>
+        <select class="form-control" [(ngModel)]="brokerageOrderType">
+          <option value="Limit">Limit</option>
+          <option value="Market">Market</option>
+          <option value="StopMarket">StopMarket</option>
+        </select>
       </div>
       <div class="col" >
-        <button class="btn btn-primary w-100" (click)="brokerageBuy('market')">Brokerage [Market]</button>
+        <select class="form-control" [(ngModel)]="brokerageOrderDuration">
+          <option value="Day">Day</option>
+          <option value="Gtc">GTC</option>
+          <option value="DayPlus">Day+AH</option>
+          <option value="GtcPlus">GTC+AH</option>
+        </select>
+      </div>
+      <div class="col" >
+        <button class="btn btn-primary w-100" (click)="brokerageBuy()">Brokerage Order</button>
       </div>
     </div>
     <div class="row mt-2" *ngIf="prices">

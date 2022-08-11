@@ -154,7 +154,13 @@ public class TDAmeritradeClient : IBrokerage
         LogAndThrowIfFailed(response, "cancel order");
     }
 
-    public async Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, string type)
+    public async Task BuyOrder(
+        UserState user,
+        string ticker,
+        decimal numberOfShares,
+        decimal price,
+        BrokerageOrderType type,
+        BrokerageOrderDuration duration)
     {
         var legCollection = new {
             instruction = "Buy",
@@ -168,8 +174,8 @@ public class TDAmeritradeClient : IBrokerage
         var postData = new
         {
             orderType = GetBuyOrderType(type),
-            session = "NORMAL",
-            duration = "DAY",
+            session = GetSession(duration),
+            duration = GetBuyOrderDuration(duration),
             price = price,
             orderStrategyType = "SINGLE",
             orderLegCollection = new [] {legCollection}
@@ -200,11 +206,30 @@ public class TDAmeritradeClient : IBrokerage
         LogAndThrowIfFailed(response, "buy order");
     }
 
-    private string GetBuyOrderType(string type) =>
+    private string GetBuyOrderType(BrokerageOrderType type) =>
         type switch {
-            "limit" => "LIMIT",
-            "market" => "MARKET",
-            _ => throw new Exception("Invalid order type: " + type)
+            BrokerageOrderType.Limit => "LIMIT",
+            BrokerageOrderType.Market => "MARKET",
+            BrokerageOrderType.StopMarket => "STOP",
+            _ => throw new ArgumentException("Unknown order type: " + type)
+        };
+
+    private string GetBuyOrderDuration(BrokerageOrderDuration duration) =>
+        duration switch {
+            BrokerageOrderDuration.Day => "DAY",
+            BrokerageOrderDuration.Gtc => "GOOD_TILL_CANCEL",
+            BrokerageOrderDuration.DayPlus => "DAY",
+            BrokerageOrderDuration.GtcPlus => "GOOD_TILL_CANCEL",
+            _ => throw new ArgumentException("Unknown order type: " + duration)
+        };
+
+    private string GetSession(BrokerageOrderDuration duration) =>
+        duration switch {
+            BrokerageOrderDuration.Day => "NORMAL",
+            BrokerageOrderDuration.Gtc => "NORMAL",
+            BrokerageOrderDuration.DayPlus => "SEAMLESS",
+            BrokerageOrderDuration.GtcPlus => "SEAMLESS",
+            _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
     private async Task<HttpResponseMessage> CallApi(UserState user, string function, HttpMethod method, string? jsonData = null)

@@ -19,8 +19,10 @@ namespace core.Brokerage
             public decimal Price { get; set; }
             
             [Required]
-            [ValidValues("limit", "market")]
-            public string Type { get; set; }
+            public BrokerageOrderType Type { get; set; }
+
+            [Required]
+            public BrokerageOrderDuration Duration  { get; set; }
         }
 
         public class Handler : HandlerWithStorage<Command, CommandResponse>
@@ -43,7 +45,7 @@ namespace core.Brokerage
                         "Unable to find user account for stock operation");
                 }
 
-                await _brokerage.BuyOrder(user.State, cmd.Ticker, cmd.NumberOfShares, cmd.Price, cmd.Type);
+                await _brokerage.BuyOrder(user.State, cmd.Ticker, cmd.NumberOfShares, cmd.Price, cmd.Type, cmd.Duration);
 
                 return CommandResponse.Success();
             }

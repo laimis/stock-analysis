@@ -693,4 +693,5 @@ export class brokerageordercommand {
   numberOfShares: number
   price: number
   type: string
+  duration: string
 }
