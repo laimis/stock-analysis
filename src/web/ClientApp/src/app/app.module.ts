@@ -64,6 +64,7 @@ import { StockTradingChartComponent } from './stocks/stock-trading/stock-trading
 import { StockChartsComponent } from './stocks/stock-dashboard/stock-charts.component';
 import { StockTradingPendingComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-dashboard/stock-violations.component';
+import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -157,6 +158,7 @@ var routes: Routes = [
     StockGridComponent,
     StockNotesComponent,
     StockOptionComponent,
+    StockTransactionComponent,
     StockOwnershipComponent,
     StockOwnershipGridComponent,
     StockChartsComponent,

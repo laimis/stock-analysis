@@ -327,10 +327,15 @@ export interface ReviewList {
   optionTransactions: Transaction[]
 }
 
+export interface StockViolation {
+  ticker: string
+  message: string
+}
+
 export interface StockSummary {
   owned: OwnedStock[]
   positions: StockTradingPosition[]
-  violations: string[]
+  violations: StockViolation[]
   orders: BrokerageOrder[]
 }
 

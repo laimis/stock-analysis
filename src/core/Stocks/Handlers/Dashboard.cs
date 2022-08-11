@@ -77,7 +77,7 @@ namespace core.Stocks
             {
                 var localPositions = view.Owned;
                 
-                var violations = new List<string>();
+                var violations = new List<StockViolationView>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
                 foreach (var brokeragePosition in brokeragePositions)
@@ -87,12 +87,22 @@ namespace core.Stocks
                     {
                         if (localPosition.Owned != brokeragePosition.Quantity)
                         {
-                            violations.Add($"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.Owned}");
+                            violations.Add(
+                                new StockViolationView {
+                                    Ticker = brokeragePosition.Ticker,
+                                    Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.Owned}"
+                                }
+                            );
                         }
                     }
                     else
                     {
-                        violations.Add($"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AveragePrice} but NGTrading says none");
+                        violations.Add(
+                            new StockViolationView {
+                                Ticker = brokeragePosition.Ticker,
+                                Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AveragePrice} but NGTrading says none"
+                            }
+                        );
                     }
                 }
 
@@ -102,18 +112,27 @@ namespace core.Stocks
                     var brokeragePosition = brokeragePositions.SingleOrDefault(p => p.Ticker == localPosition.Ticker);
                     if (brokeragePosition == null)
                     {
-                        violations.Add($"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says none");
+                        violations.Add(
+                            new StockViolationView {
+                                Ticker = localPosition.Ticker,
+                                Message = $"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says none"
+                        });
                     }
                     else
                     {
                         if (brokeragePosition.Quantity != localPosition.Owned)
                         {
-                            violations.Add($"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says {brokeragePosition.Quantity}");
+                            violations.Add(
+                                new StockViolationView {
+                                    Ticker = localPosition.Ticker,
+                                    Message = $"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says {brokeragePosition.Quantity}"
+                                }
+                            );
                         }
                     }
                 }
 
-                view.Violations = violations;
+                view.SetViolations(violations);
             }
 
             private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)

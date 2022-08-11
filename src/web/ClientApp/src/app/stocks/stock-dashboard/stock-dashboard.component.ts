@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, BrokerageOrder } from '../../services/stocks.service';
+import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, BrokerageOrder, StockViolation } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-dashboard',
@@ -11,7 +11,7 @@ import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, Brokerag
 export class StockDashboardComponent implements OnInit {
 
   owned : OwnedStock[]
-  violations: string[] = []
+  violations: StockViolation[] = []
   positions : StockTradingPosition[]
   orders : BrokerageOrder[]
   loaded : boolean = false
@@ -35,7 +35,11 @@ export class StockDashboardComponent implements OnInit {
 
     this.title.setTitle("Stocks - Nightingale Trading")
 
-		this.stocks.getStocks().subscribe(result => {
+		this.fetchData()
+	}
+
+  fetchData() {
+    this.stocks.getStocks().subscribe(result => {
       this.owned = result.owned
       this.positions = result.positions
       this.violations = result.violations
@@ -47,7 +51,7 @@ export class StockDashboardComponent implements OnInit {
 			console.log(error);
 			this.loaded = false;
     })
-	}
+  }
 
   hideIfHidden(value : number) : number {
     return HideIfHidden(value, true)

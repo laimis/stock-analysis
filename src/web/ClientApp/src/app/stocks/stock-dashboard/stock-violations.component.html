@@ -1,7 +1,17 @@
 <div class="mt-4" *ngIf="violations">
-    <ul>
-      <li *ngFor="let violation of violations">{{violation}}</li>
+    <ul *ngIf="violations.length > 0">
+      <li class="mt-3" *ngFor="let violation of violations">
+        {{violation.message}}
+        <button type="button" class="btn btn-secondary me-2" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
+        <button type="button" class="btn btn-secondary" (click)="openPosition(violation.ticker)">Open Position</button>
+
+        <div>
+          <stock-transaction *ngIf="activeTicker == violation.ticker && fixType =='transaction'" [ticker]="activeTicker" (transactionFailed)="transactionFailed($event)" (transactionRecorded)="transactionRecorded($event)"></stock-transaction>
+          <stock-trading-newposition *ngIf="activeTicker == violation.ticker && fixType =='position'" (stockPurchased)="transactionRecorded($event)"></stock-trading-newposition>
+        </div>
+      </li>
     </ul>
+
     <span *ngIf="violations.length==0">
       You have no violations.
     </span>

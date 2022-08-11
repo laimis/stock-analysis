@@ -17,12 +17,23 @@ namespace core.Stocks.View
         public List<OwnedStockView> Owned { get; set; }
         public List<PositionInstance> Positions { get; }
         public DateTimeOffset Calculated { get; set; }
-        public List<string> Violations { get; set; }
+        public List<StockViolationView> Violations { get; private set; }
         public BrokerageOrderView[] Orders { get; private set; }
 
         internal void SetOrders(BrokerageOrderView[] brokerageOrders)
         {
             Orders = brokerageOrders;
         }
+
+        internal void SetViolations(List<StockViolationView> violations)
+        {
+            Violations = violations;
+        }
+    }
+
+    public class StockViolationView
+    {
+        public string Ticker { get; set; }
+        public string Message { get; set; }
     }
 }
