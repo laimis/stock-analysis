@@ -108,7 +108,10 @@ namespace core.Stocks
 
         public void SetStopPrice(decimal? stopPrice)
         {
-            StopPrice = stopPrice;
+            if (stopPrice != null)
+            {
+                StopPrice = stopPrice;
+            }
         }
     }
 }

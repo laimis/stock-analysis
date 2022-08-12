@@ -17,6 +17,7 @@ namespace coretests.Stocks
             _position.Sell(amount: 10, price: 40, when: DateTime.Parse("2020-02-25"));
             _position.Sell(amount: 10, price: 37, when: DateTime.Parse("2020-03-21"));
             _position.SetStopPrice(20);
+            _position.SetStopPrice(null); // subsequent assignment should be ignored because it's null
         }
 
         [Fact]
