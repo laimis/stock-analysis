@@ -598,6 +598,8 @@ export interface StockTradingPosition {
   stopPrice: number | null
   notes: string[] | null
   rr: number | null
+  potentialLoss: number | null
+  riskedAmount: number | null
 }
 
 export class OptionDefinition {

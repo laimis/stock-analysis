@@ -34,5 +34,6 @@ namespace core.Stocks.View
         }
 
         public decimal RR => (Price - AverageCost) / AverageCost / RiskedPct;
+        public decimal PotentialLoss => NumberOfShares * AverageCost * RiskedPct;
     }
 }
