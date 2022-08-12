@@ -599,7 +599,8 @@ export interface StockTradingPosition {
   notes: string[] | null
   rr: number | null
   potentialLoss: number | null
-  riskedAmount: number | null
+  riskedPct: number | null
+  unrealizedGain: number | null
 }
 
 export class OptionDefinition {

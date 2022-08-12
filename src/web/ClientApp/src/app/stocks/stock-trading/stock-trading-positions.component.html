@@ -56,8 +56,8 @@
             {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
           <div class="col text-end">
-            <span class="badge bg-secondary">loss $</span>
-            {{ p.potentialLoss | currency }} / {{ p.riskedPct | percent}}
+            <span class="badge bg-secondary me-2" (click)="plInfo.className = (plInfo.className == '' ? 'visually-hidden':'')">loss $</span>
+            <span #plInfo class="visually-hidden">{{ p.unrealizedGain | currency}} {{ p.potentialLoss | currency }} / {{ p.riskedPct | percent}}</span>
           </div>
         </div>
 

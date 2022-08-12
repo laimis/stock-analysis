@@ -26,11 +26,13 @@ namespace core.Stocks.View
         public decimal? StopPrice { get; }
         public List<string> Notes { get; }
         public decimal RiskedPct { get; }
+        public decimal? UnrealizedGain { get; private set; }
 
         internal void ApplyPrice(decimal currentPrice)
         {
             Price = currentPrice;
             Gain = (Price - AverageCost) / AverageCost;
+            UnrealizedGain = (Price - AverageCost) * NumberOfShares;
         }
 
         public decimal RR => (Price - AverageCost) / AverageCost / RiskedPct;
