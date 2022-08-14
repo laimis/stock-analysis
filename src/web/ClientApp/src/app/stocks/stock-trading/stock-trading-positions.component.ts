@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { StockTradingPosition } from '../../services/stocks.service';
 
 @Component({
@@ -27,11 +27,11 @@ export class StockTradingPositionComponent {
     }
 
     firstTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * this.stopLoss
+        return p.averageCost + p.averageCost * p.riskedPct
     }
 
     secondTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * 2.5 * this.stopLoss
+        return p.averageCost + p.averageCost * 2.5 * p.riskedPct
     }
 
     positionProgress(p:StockTradingPosition) {
