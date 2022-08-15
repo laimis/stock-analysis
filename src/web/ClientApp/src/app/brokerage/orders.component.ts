@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { StocksService } from 'src/app/services/stocks.service';
+import { BrokerageOrder, StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -17,7 +17,7 @@ export class StockTradingPendingComponent implements OnInit {
   }
 
   @Input()
-  orders: any
+  orders: BrokerageOrder[]
 
   @Output()
   orderCancelled: EventEmitter<string> = new EventEmitter<string>()
@@ -29,5 +29,10 @@ export class StockTradingPendingComponent implements OnInit {
       console.log(err)
     }
     )
+  }
+
+  getTotalPrice() {
+    return this.orders
+      .filter(o => o.status == 'WORKING').reduce((total, order) => total + order.price, 0)
   }
 }

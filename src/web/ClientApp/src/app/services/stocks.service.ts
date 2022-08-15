@@ -561,6 +561,7 @@ export interface StockTradingPerformanceCollection {
 export interface BrokerageOrder {
   orderId: string
   price: number
+  type: string
   quantity: number
   status: string
   ticker: string
