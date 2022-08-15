@@ -88,7 +88,7 @@ namespace core.Stocks
             }
         }
 
-        public void Sell(decimal amount, decimal price, DateTimeOffset when)
+        public void Sell(decimal amount, decimal price, DateTimeOffset when, string notes = null)
         {
             NumberOfShares -= amount;
             NumberOfSells++;
@@ -103,6 +103,11 @@ namespace core.Stocks
             if (NumberOfShares == 0)
             {
                 Closed = when;
+            }
+
+            if (notes != null)
+            {
+                Notes.Add(notes);
             }
         }
 

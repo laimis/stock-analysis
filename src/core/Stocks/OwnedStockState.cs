@@ -136,7 +136,7 @@ namespace core.Stocks
                 // TODO: this should never happen but in prod I see sell get
                 // triggered before purchase... something is amiss
                 if (positionInstances.Count > 0)
-                    positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When);
+                    positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When, st.Notes);
 
                 lastTransaction = st.When;
 
