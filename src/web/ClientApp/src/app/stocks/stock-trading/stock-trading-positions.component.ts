@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StockTradingPosition, toggleVisuallHidden } from '../../services/stocks.service';
+import { BrokerageOrder, StockTradingPosition, toggleVisuallHidden } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -9,6 +9,9 @@ import { StockTradingPosition, toggleVisuallHidden } from '../../services/stocks
 export class StockTradingPositionComponent {
     @Input()
     positions: StockTradingPosition[]
+
+    @Input()
+    pendingOrders: BrokerageOrder[]
 
     @Input()
     stopLoss: number
@@ -49,6 +52,10 @@ export class StockTradingPositionComponent {
     toggleVisibility(elem:HTMLElement) {
         console.log(elem)
         toggleVisuallHidden(elem)
+    }
+
+    getPendingOrders(p:StockTradingPosition) {
+        return this.pendingOrders.filter(o => o.ticker == p.ticker)
     }
 }
 

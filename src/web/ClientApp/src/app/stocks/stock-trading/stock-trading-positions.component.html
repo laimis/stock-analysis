@@ -20,6 +20,13 @@
     </div>
 
     <div class="card-text">
+      <div #pendingOrdersDiv>
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let o of getPendingOrders(p)">
+            {{o.quantity}} {{o.ticker}} @ {{o.price | currency}}
+        </ul>
+      </div>
+
       <div class="visually-hidden" #detailDiv>
         <div class="row">
           <div class="col">

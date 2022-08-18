@@ -15,7 +15,7 @@
         Current price: <b>{{stock.price | currency}}</b>
       </div>
       <div class="col">
-        <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target.value)" value="{{ownership.category}}">
+        <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target)" value="{{ownership.category}}">
           <option value="">Select Category</option>
           <option value="longterm">Long-Term</option>
           <option value="shortterm">Short-Term</option>
