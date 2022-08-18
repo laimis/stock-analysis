@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StockTradingPosition } from '../../services/stocks.service';
+import { StockTradingPosition, toggleVisuallHidden } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -44,6 +44,11 @@ export class StockTradingPositionComponent {
 
     tradingPortion(p:StockTradingPosition) {
         return Math.floor(p.maxNumberOfShares / 3)
+    }
+
+    toggleVisibility(elem:HTMLElement) {
+        console.log(elem)
+        toggleVisuallHidden(elem)
     }
 }
 

@@ -9,6 +9,8 @@
               cssClass="form-control">
           </app-symbol-search>
       </div>
+    </div>
+    <div class="row mt-3" *ngIf="ticker">
       <div class="col">
         <label for="positionSize" class="form-label">Position Size</label>
         <input
@@ -18,16 +20,6 @@
           [(ngModel)]="positionSize"
           (ngModelChange)="updateBuyingValuesWithPositionSize()">
       </div>
-      <div class="col">
-        <label for="date" class="form-label">Purchase Date</label>
-        <input
-          type="date"
-          class="form-control"
-          id="date"
-          [(ngModel)]="date">
-      </div>
-    </div>
-    <div class="row mt-2" *ngIf="costToBuy">
       <div class="col">
         <label for="costToBuy" class="form-label">Price</label>
         <input
@@ -58,8 +50,16 @@
           (ngModelChange)="updateBuyingValuesStopPrice()"
         />
       </div>
+      <div class="col">
+        <label for="date" class="form-label">Purchase Date</label>
+        <input
+          type="date"
+          class="form-control"
+          id="date"
+          [(ngModel)]="date">
+      </div>
     </div>
-    <div class="row mt-2" *ngIf="prices">
+    <div class="row mt-3" *ngIf="prices">
       <div class="col fs-6">
         <span class="me-2">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
         <span class="me-2">Profit: <strong>{{ potentialProfit | currency }}</strong></span>
@@ -71,23 +71,23 @@
         <span class="me-2">150SMA: <strong>{{ get150sma() | currency }}</strong></span>
       </div>
     </div>
-    <div class="row mt-2" *ngIf="prices">
+    <div class="row mt-3" *ngIf="prices">
       <div class="col">
         <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>
       </div>
-    <div class="row mt-2" *ngIf="prices">
+    <div class="row mt-3" *ngIf="prices">
       <div class="col" >
         <button class="btn btn-primary w-100" (click)="record()">Record</button>
       </div>
       <div class="col" >
-        <select class="form-control" [(ngModel)]="brokerageOrderType">
+        <select class="form-select" [(ngModel)]="brokerageOrderType">
           <option value="Limit">Limit</option>
           <option value="Market">Market</option>
           <option value="StopMarket">StopMarket</option>
         </select>
       </div>
       <div class="col" >
-        <select class="form-control" [(ngModel)]="brokerageOrderDuration">
+        <select class="form-select" [(ngModel)]="brokerageOrderDuration">
           <option value="Day">Day</option>
           <option value="Gtc">GTC</option>
           <option value="DayPlus">Day+AH</option>

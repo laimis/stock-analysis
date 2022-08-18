@@ -1,16 +1,18 @@
+import { DatePipe } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { Condition } from 'selenium-webdriver';
 import { brokerageordercommand, Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
   templateUrl: './stock-trading-newposition.component.html',
-  styleUrls: ['./stock-trading-newposition.component.css']
+  styleUrls: ['./stock-trading-newposition.component.css'],
+  providers: [DatePipe]
 })
 export class StockTradingNewPositionComponent implements OnChanges {
   
   constructor(
-      private stockService:StocksService
+      private stockService:StocksService,
+      private datePipe: DatePipe
       )
   { }
 
@@ -57,6 +59,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
       this.stocksToBuy = null
       this.stopPrice = null
       this.ticker = ticker
+      this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
       
       this.stockService.getStockPrice(ticker)
         .subscribe(price => {

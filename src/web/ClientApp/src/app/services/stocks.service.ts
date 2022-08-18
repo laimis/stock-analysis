@@ -23,6 +23,15 @@ export function HideIfHidden(value, hidden) {
   return hidden ? 0 : value;
 }
 
+export function toggleVisuallHidden(element:HTMLElement) {
+  const className = 'visually-hidden';
+  if (element.classList.contains(className)) {
+    element.classList.remove(className);
+  } else {
+    element.classList.add(className);
+  }
+}
+
 @Injectable({providedIn: 'root'})
 export class StocksService {
 

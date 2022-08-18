@@ -7,10 +7,8 @@
             <a [routerLink]="[ '/stocks', p.ticker ]" class="position-ticker">{{p.ticker}}</a>
             <span class="position-price">{{p.price | currency}}</span>
             <i
-              (click)="noteRow.className = (noteRow.className == '' ? 'visually-hidden' : '')"
-              *ngIf="p.notes.length > 0"
-              class="bi bi-sticky-fill ms-2"
-              style="color: orange"></i>
+              (click)="toggleVisibility(detailDiv)"
+              class="bi bi-info-square-fill ms-2"></i>
           </div>
           <div class="col text-center">
           </div>
@@ -22,7 +20,7 @@
     </div>
 
     <div class="card-text">
-      <div class="container">
+      <div class="visually-hidden" #detailDiv>
         <div class="row">
           <div class="col">
             <span class="badge" [ngClass]="p.price > stopPrice(p) ? 'bg-success' : 'bg-primary'">stop</span>
@@ -42,7 +40,7 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row mt-3">
           <div class="col">
             <span class="badge bg-secondary">size</span>
             {{ positionSize(p) | currency }}
@@ -55,13 +53,26 @@
             <span class="badge bg-secondary">portion</span>
             {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
-          <div class="col text-end">
-            <span class="badge bg-secondary me-2" (click)="plInfo.className = (plInfo.className == '' ? 'visually-hidden':'')">loss $</span>
-            <span #plInfo class="visually-hidden">{{ p.unrealizedGain | currency}} {{ p.potentialLoss | currency }} / {{ p.riskedPct | percent}}</span>
+          <div class="col"></div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col">
+            <span class="badge bg-secondary">Unrealized P/L</span>
+            {{ p.unrealizedGain | currency}}
           </div>
+          <div class="col text-center">
+            <span class="badge bg-secondary">Risk</span>
+            {{ p.potentialLoss | currency }}
+          </div>
+          <div class="col text-center">
+            <span class="badge bg-secondary">Risk %</span>
+            {{ p.riskedPct | percent}}
+          </div>
+          <div class="col"></div>
         </div>
 
-        <div class="row mt-3" #noteRow class="visually-hidden">
+        <div class="row mt-3">
           <div class="col">
             <div *ngFor="let note of p.notes" style="white-space: pre-wrap;">
               {{ note }}
