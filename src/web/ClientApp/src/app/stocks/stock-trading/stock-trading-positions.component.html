@@ -23,7 +23,7 @@
       <div #pendingOrdersDiv>
         <ul class="list-group">
           <li class="list-group-item" *ngFor="let o of getPendingOrders(p)">
-            {{o.quantity}} {{o.ticker}} @ {{o.price | currency}}
+            {{o.type}} {{o.quantity}} @ {{o.price | currency}}
         </ul>
       </div>
 
