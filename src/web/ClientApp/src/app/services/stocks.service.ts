@@ -549,6 +549,7 @@ export interface StockTradingPerformance {
   ev: number,
   avgReturnPct: number,
   rrSum: number,
+  rrSumWeighted: number,
 }
 
 export interface DataPoint {

@@ -57,6 +57,7 @@ namespace core.Stocks
         public decimal RiskedAmount => Cost * RiskedPct;
 
         public decimal RR => Profit / RiskedAmount;
+        public decimal RRWeighted => RR * Profit;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, string notes = null)
         {

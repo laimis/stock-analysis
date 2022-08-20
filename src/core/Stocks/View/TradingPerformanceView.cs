@@ -30,6 +30,7 @@ namespace core.Stocks
             var totalCost = 0m;
             var totalProfit = 0m;
             var rrSum = 0m;
+            var rrSumWeighted = 0m;
             
             foreach(var e in closedPositions)
             {
@@ -37,6 +38,7 @@ namespace core.Stocks
                 totalProfit += e.Profit;
                 totalCost += e.Cost;
                 rrSum += e.RR;
+                rrSumWeighted += e.RRWeighted;
 
                 if (e.Profit >= 0)
                 {
@@ -76,6 +78,7 @@ namespace core.Stocks
                 Losses = losses,
                 MaxWinAmount = maxWinAmount,
                 rrSum = rrSum,
+                rrSumWeighted = rrSumWeighted,
                 Total = total,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
                 WinAvgReturnPct = totalWinReturnPct > 0 ? totalWinReturnPct / wins : 0,
@@ -103,6 +106,7 @@ namespace core.Stocks
         public decimal AvgReturnPct { get; set; }
         public double AvgDaysHeld { get; set; }
         public decimal rrSum { get; set; }
+        public decimal rrSumWeighted { get; set; }
         public decimal ReturnPctRatio => LossAvgReturnPct switch {
             0m => 0m,
             _ => WinAvgReturnPct / LossAvgReturnPct
