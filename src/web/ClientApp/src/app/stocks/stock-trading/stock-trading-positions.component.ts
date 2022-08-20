@@ -55,7 +55,9 @@ export class StockTradingPositionComponent {
     }
 
     getPendingOrders(p:StockTradingPosition) {
-        return this.pendingOrders.filter(o => o.status != "FILLED" && o.ticker == p.ticker)
+        return this.pendingOrders
+            .filter(o => o.ticker == p.ticker)
+            .filter(o => o.status != "FILLED" && o.status != "REPLACED")
     }
 }
 
