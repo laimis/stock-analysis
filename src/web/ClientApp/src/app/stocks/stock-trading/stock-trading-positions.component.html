@@ -29,66 +29,34 @@
 
       <div class="visually-hidden" #detailDiv>
         <div class="row">
-          <div class="col">
-            <span class="badge w-25" [ngClass]="p.price > stopPrice(p) ? 'bg-success' : 'bg-primary'">stop</span>
-            {{ stopPrice(p) | currency }}
-          </div>
-          <div class="col text-center">
-            <span class="badge w-25" [ngClass]="p.price > p.averageCost ? 'bg-success' : 'bg-primary'">cost</span>
-            {{p.averageCost | currency}}
-          </div>
-          <div class="col text-center">
-            <span class="badge w-25" [ngClass]="p.price > firstTargetNumber(p) ? 'bg-success' : 'bg-primary'">1R</span>
-            {{ firstTargetNumber(p) | currency }}
-          </div>
-          <div class="col text-end">
-            <span class="badge w-25" [ngClass]="p.price > secondTargetNumber(p)  ? 'bg-success' : 'bg-primary'">2.5R</span>
-            {{ secondTargetNumber(p) | currency}}
-          </div>
+          <div class="col"><div class="stat-label">Stop</div><div>{{ stopPrice(p) | currency }}</div></div>
+          <div class="col"><div class="stat-label">Cost</div><div>{{p.averageCost | currency}}</div></div>
+          <div class="col"><div class="stat-label">1R</div><div>{{ firstTargetNumber(p) | currency }}</div></div>
+          <div class="col"><div class="stat-label">2.5R</div><div>{{ secondTargetNumber(p) | currency}}</div></div>
         </div>
 
         <div class="row mt-3">
-          <div class="col">
-            <span class="badge bg-secondary w-25">size</span>
-            {{ positionSize(p) | currency }}
-          </div>
-          <div class="col text-center">
-            <span class="badge bg-secondary w-25">shares</span>
-            {{ p.numberOfShares }} / {{ p.maxNumberOfShares }}
-          </div>
-          <div class="col text-center">
-            <span class="badge bg-secondary w-25">portion</span>
-            {{ tradingPortion(p) | number : '1.0-0' }}
-          </div>
-          <div class="col text-end">
-            <span class="badge bg-secondary w-25">days</span>
-            {{ p.daysHeld }}
-          </div>
+          <div class="col"><div class="stat-label">Size</div><div>{{ positionSize(p) | currency }}</div></div>
+          <div class="col"><div class="stat-label">Shares</div><div>{{ p.numberOfShares }} / {{ p.maxNumberOfShares }}</div></div>
+          <div class="col"><div class="stat-label">Portion</div><div>{{ tradingPortion(p) | number : '1.0-0' }}</div></div>
+          <div class="col"><div class="stat-label">Days</div><div>{{ p.daysHeld }}</div></div>
         </div>
         
         <div class="row mt-3">
-          <div class="col">
-            <span class="badge bg-secondary w-25">P/L</span>
-            {{ p.unrealizedGain | currency}}
-          </div>
-          <div class="col text-center">
-            <span class="badge bg-secondary w-25">Risk</span>
-            {{ p.potentialLoss | currency }}
-          </div>
-          <div class="col text-center">
-            <span class="badge bg-secondary w-25">Risk %</span>
-            {{ p.riskedPct | percent}}
-          </div>
-          <div class="col"></div>
+          <div class="col"><div class="stat-label">P/L</div><div>{{ p.unrealizedGain | currency}}</div></div>
+          <div class="col"><div class="stat-label">Risk</div><div>{{ p.potentialLoss | currency }}</div></div>
+          <div class="col"><div class="stat-label">Risk %</div><div>{{ p.riskedPct | percent}}</div></div>
+          <div class="col"><div class="stat-label">Opened</div><div>{{ p.opened | date }}</div></div>
         </div>
 
         <div class="row mt-3">
-          <div class="col">
-            <div *ngFor="let note of p.notes" style="white-space: pre-wrap;">
-              {{ note }}
-            </div>
+          <div class="col"><div class="stat-label">Notes</div>
+          <div>
+            <div *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{ note }}</div>
+          </div>
           </div>
         </div>
+
       </div>
 
     </div>

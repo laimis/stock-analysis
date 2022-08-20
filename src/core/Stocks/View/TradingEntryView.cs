@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace core.Stocks.View
 {
@@ -8,6 +9,7 @@ namespace core.Stocks.View
         public TradingEntryView(OwnedStockState state)
         {
             AverageCost     = state.AverageCost;
+            Opened          = state.CurrentPosition.Opened;
             DaysHeld        = state.DaysHeld;
             Gain            = state.CurrentPosition.Profit;
             MaxNumberOfShares = state.CurrentPosition.MaxNumberOfShares;
@@ -20,6 +22,7 @@ namespace core.Stocks.View
 
         public decimal NumberOfShares { get; }
         public decimal AverageCost { get; }
+        public DateTimeOffset? Opened { get; }
         public int DaysHeld { get; }
         public string Ticker { get; }
         public decimal MaxNumberOfShares { get; }
