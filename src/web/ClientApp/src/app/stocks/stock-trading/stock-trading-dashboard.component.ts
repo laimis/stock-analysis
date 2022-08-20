@@ -43,6 +43,11 @@ export class StockTradingComponent implements OnInit {
     this.activateTab('positions')
   }
 
+  brokerageOrderEntered() {
+    this.loadEntries()
+    this.activateTab('brokerage')
+  }
+
   orderCancelled() {
     this.loadEntries()
   }

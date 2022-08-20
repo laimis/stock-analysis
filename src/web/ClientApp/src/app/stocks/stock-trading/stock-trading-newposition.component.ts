@@ -35,6 +35,9 @@ export class StockTradingNewPositionComponent implements OnChanges {
   @Output()
   stockPurchased: EventEmitter<string> = new EventEmitter<string>()
 
+  @Output()
+  brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
+
   // variables for new positions
   positionSize: number = null
   positionSizeCalculated: number = null
@@ -184,6 +187,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
     this.stockService.brokerageBuy(cmd).subscribe(
       _ => { 
         this.reset()
+        this.brokerageOrderEntered.emit("entered")
     },
       err => { 
         console.error(err)
