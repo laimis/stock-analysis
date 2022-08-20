@@ -7,18 +7,20 @@ namespace core.Stocks.View
     {
         public TradingEntryView(OwnedStockState state)
         {
-            NumberOfShares  = state.Owned;
             AverageCost     = state.AverageCost;
-            Ticker          = state.Ticker;
-            MaxNumberOfShares = state.CurrentPosition.MaxNumberOfShares;
+            DaysHeld        = state.DaysHeld;
             Gain            = state.CurrentPosition.Profit;
-            StopPrice       = state.CurrentPosition.StopPrice;
+            MaxNumberOfShares = state.CurrentPosition.MaxNumberOfShares;
             Notes           = state.CurrentPosition.Notes;
+            NumberOfShares  = state.Owned;
             RiskedPct       = state.CurrentPosition.RiskedPct;
+            StopPrice       = state.CurrentPosition.StopPrice;
+            Ticker          = state.Ticker;
         }
 
         public decimal NumberOfShares { get; }
         public decimal AverageCost { get; }
+        public int DaysHeld { get; }
         public string Ticker { get; }
         public decimal MaxNumberOfShares { get; }
         public decimal Price { get; private set; }

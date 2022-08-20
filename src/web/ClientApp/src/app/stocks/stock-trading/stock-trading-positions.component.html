@@ -60,7 +60,10 @@
             <span class="badge bg-secondary w-25">portion</span>
             {{ tradingPortion(p) | number : '1.0-0' }}
           </div>
-          <div class="col"></div>
+          <div class="col text-end">
+            <span class="badge bg-secondary w-25">days</span>
+            {{ p.daysHeld }}
+          </div>
         </div>
         
         <div class="row mt-3">

@@ -41,8 +41,8 @@ namespace core.Stocks.View
                 ev.Add(window[0].Closed.Value, perfView.EV);
                 avgWinAmount.Add(window[0].Closed.Value, perfView.AvgWinAmount);
                 avgLossAmount.Add(window[0].Closed.Value, perfView.AvgLossAmount);
-                rrPct.Add(window[0].Closed.Value, perfView.WinAvgReturnPct / perfView.LossAvgReturnPct);
-                rrAmount.Add(window[0].Closed.Value, perfView.AvgWinAmount / perfView.AvgLossAmount);
+                rrPct.Add(window[0].Closed.Value, perfView.ReturnPctRatio);
+                rrAmount.Add(window[0].Closed.Value, perfView.ProfitRatio);
                 maxWin.Add(window[0].Closed.Value, perfView.MaxWinAmount);
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);

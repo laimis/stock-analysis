@@ -103,5 +103,14 @@ namespace core.Stocks
         public decimal AvgReturnPct { get; set; }
         public double AvgDaysHeld { get; set; }
         public decimal rrSum { get; set; }
+        public decimal ReturnPctRatio => LossAvgReturnPct switch {
+            0m => 0m,
+            _ => WinAvgReturnPct / LossAvgReturnPct
+        };
+
+        public decimal ProfitRatio => AvgLossAmount switch {
+            0m => 0m,
+            _ => AvgWinAmount / AvgLossAmount
+        };
     }
 }
