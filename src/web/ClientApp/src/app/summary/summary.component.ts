@@ -32,5 +32,17 @@ export class SummaryComponent implements OnInit {
   periodChanged() {
     this.loadEntries()
   }
+
+  stockTransactionTotal() : number {
+    return this.result.stockTransactions.reduce((acc, cur) => acc + cur.credit * 1 + cur.debit * -1, 0)
+  }
+
+  closedPositionProfit() : number {
+    return this.result.closedPositions.reduce((acc, cur) => acc + cur.profit, 0)
+  }
+
+  closedPositionRR() : number {
+    return this.result.closedPositions.reduce((acc, cur) => acc + cur.rr, 0)
+  }
 }
 

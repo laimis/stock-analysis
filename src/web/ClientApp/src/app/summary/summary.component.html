@@ -32,7 +32,7 @@
     <tbody>
       <tr *ngFor="let p of result.closedPositions">
         <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
-        <td width="140">{{p.profit | currency}}</td>
+        <td width="140">{{p.profit  | number:'1.0-2'}}</td>
         <td width="140">{{p.rr | number:'1.0-2'}}</td>
         <td width="140">
           <div class="badge bg-success me-1" *ngFor="let buy of p.buys">{{buy.price | currency}} on {{buy.when | date: 'MM/dd/yyyy'}}</div>
@@ -42,7 +42,7 @@
         </td>
         <td>
           <ul class="list-unstyled" *ngIf="p.notes.length > 0">
-            <li *ngFor="let note of p.notes">{{note}}</li>
+            <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
           </ul>
           <span *ngIf="p.notes.length == 0"> no notes </span>
         </td>
@@ -51,6 +51,12 @@
         <td colspan="6">No stock positions closed</td>
       </tr>
     </tbody>
+    <tfoot *ngIf="result.closedPositions.length > 0">
+      <td class="text-end"></td>
+      <td>{{ closedPositionProfit() | number:'1.0-2' }}</td>
+      <td>{{ closedPositionRR() | number:'1.0-2' }}</td>
+      <td colspan="3"></td>
+    </tfoot>
   </table>
   
   <h5 class="mt-2">Non-PL Breakdown</h5>
@@ -60,13 +66,13 @@
         <th>Symbol</th>
         <th>P/L</th>
         <th>Date</th>
-        <th>Grade</th>
+        <th>Notes</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let g of result.stockTransactions">
         <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-        <td width="140">{{g.profit | currency}}</td>
+        <td width="140">{{g.profit }}</td>
         <td width="140">{{g.date | date}}</td>
         <td>{{g.description}}</td>
       </tr>
@@ -74,6 +80,11 @@
         <td colspan="4">No stock transactions</td>
       </tr>
     </tbody>
+    <tfoot *ngIf="result.stockTransactions.length > 0">
+      <td class="text-end"></td>
+      <td>{{ stockTransactionTotal() }}</td>
+      <td colspan="2"></td>
+    </tfoot>
   </table>
 
   <h5>Option P&L</h5>
