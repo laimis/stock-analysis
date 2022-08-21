@@ -31,8 +31,10 @@ export class StockTradingPendingComponent implements OnInit {
     )
   }
 
-  getTotalPrice() {
+  getTotalForBuys() {
     return this.orders
-      .filter(o => o.isActive).reduce((total, order) => total + order.price, 0)
+      .filter(o => o.isActive)
+      .filter(o => o.type == 'BUY')
+      .reduce((total, order) => total + order.price, 0)
   }
 }
