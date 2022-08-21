@@ -43,6 +43,12 @@ public class Order
         "PENDING_ACTIVATION" => true,
         _ => false
     };
+    public bool IsActive => Status switch
+    {
+        "WORKING" => true,
+        "PENDING_ACTIVATION" => true,
+        _ => false
+    };
     public bool IncludeInResponses => Status != "CANCELED" && Status != "REJECTED" && Status != "EXPIRED";
 }
 

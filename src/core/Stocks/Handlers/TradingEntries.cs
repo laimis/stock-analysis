@@ -98,6 +98,7 @@ namespace core.Stocks
                         .OrderBy(o => o.StatusOrder)
                         .Select(o => new BrokerageOrderView(
                             canBeCancelled: o.CanBeCancelled,
+                            isActive: o.IsActive,
                             orderId: o.OrderId,
                             price: o.Price,
                             quantity: o.Quantity,

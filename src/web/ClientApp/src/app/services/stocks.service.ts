@@ -576,6 +576,7 @@ export interface BrokerageOrder {
   status: string
   ticker: string
   canBeCancelled: boolean
+  isActive: boolean
 }
 
 export interface StockTradingPositions {
