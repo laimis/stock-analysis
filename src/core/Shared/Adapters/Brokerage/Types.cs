@@ -37,6 +37,12 @@ public class Order
         "CANCELED" => 3,
         _ => 4
     };
+    public bool CanBeCancelled => Status switch
+    {
+        "WORKING" => true,
+        "PENDING_ACTIVATION" => true,
+        _ => false
+    };
     public bool IncludeInResponses => Status != "CANCELED" && Status != "REJECTED" && Status != "EXPIRED";
 }
 

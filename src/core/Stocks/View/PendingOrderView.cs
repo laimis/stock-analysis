@@ -2,8 +2,9 @@ namespace core.Stocks.View
 {
     public class BrokerageOrderView
     {
-        public BrokerageOrderView(string orderId, int quantity, decimal price, string status, string ticker, string type)
+        public BrokerageOrderView(bool canBeCancelled, string orderId, int quantity, decimal price, string status, string ticker, string type)
         {
+            CanBeCancelled = canBeCancelled;
             OrderId = orderId;
             Price = price;
             Quantity = quantity;
@@ -12,6 +13,7 @@ namespace core.Stocks.View
             Type = type;
         }
 
+        public bool CanBeCancelled { get; }
         public string OrderId { get; }
         public int Quantity { get; }
         public decimal Price { get; }

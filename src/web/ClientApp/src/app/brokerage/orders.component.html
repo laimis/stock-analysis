@@ -19,7 +19,7 @@
       <td>{{p.quantity}}</td>
       <td class="text-end">{{p.price | currency}}</td>
       <td class="text-end">
-        <button *ngIf="p.status == 'WORKING'" class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
+        <button *ngIf="p.canBeCancelled" class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
       </td>
     </tr>
   </tbody>

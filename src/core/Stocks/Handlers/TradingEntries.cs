@@ -97,6 +97,7 @@ namespace core.Stocks
                         .Where(o => o.IncludeInResponses)
                         .OrderBy(o => o.StatusOrder)
                         .Select(o => new BrokerageOrderView(
+                            canBeCancelled: o.CanBeCancelled,
                             orderId: o.OrderId,
                             price: o.Price,
                             quantity: o.Quantity,

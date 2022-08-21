@@ -575,6 +575,7 @@ export interface BrokerageOrder {
   quantity: number
   status: string
   ticker: string
+  canBeCancelled: boolean
 }
 
 export interface StockTradingPositions {
