@@ -27,13 +27,18 @@ export class StockTradingNewPositionComponent implements OnChanges {
   stopLoss: number
 
   @Input()
+  showChart: boolean = true
+  @Input()
+  recordPositions: boolean = true
+
+  @Input()
   firstTarget: number
 
   @Input()
   rrTarget: number
 
   @Output()
-  stockPurchased: EventEmitter<string> = new EventEmitter<string>()
+  stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
   @Output()
   brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
@@ -167,9 +172,14 @@ export class StockTradingNewPositionComponent implements OnChanges {
     cmd.notes = this.notes
     cmd.date = this.date
 
+    if (!this.recordPositions) {
+      this.stockPurchased.emit(cmd)
+      return
+    }
+
     this.stockService.purchase(cmd).subscribe(
       _ => { 
-        this.stockPurchased.emit("purchased")
+        this.stockPurchased.emit(cmd)
     },
       _ => { alert('purchase failed') }
     )

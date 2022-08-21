@@ -98,7 +98,7 @@
         <button class="btn btn-primary w-100" (click)="brokerageBuy()">Brokerage Order</button>
       </div>
     </div>
-    <div class="row mt-2" *ngIf="prices">
+    <div class="row mt-2" *ngIf="prices && showChart">
       <div class="col">
         <stock-trading-chart
           [prices]="prices"

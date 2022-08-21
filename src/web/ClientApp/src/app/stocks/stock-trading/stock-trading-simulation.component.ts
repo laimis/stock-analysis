@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, stocktransactioncommand } from '../services/stocks.service';
+import { StocksService, stocktransactioncommand } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-playground',
-  templateUrl: './playground.component.html',
-  styleUrls: ['./playground.component.css']
+  selector: 'stock-trading-simulation',
+  templateUrl: './stock-trading-simulation.component.html',
+  styleUrls: ['./stock-trading-simulation.component.css']
 })
 
-export class PlaygroundComponent implements OnInit {
+export class StockTradingSimulationComponent implements OnInit {
 
   stopPrice: number | null = null
   positions: stocktransactioncommand[] = []

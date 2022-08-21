@@ -65,6 +65,7 @@ import { StockChartsComponent } from './stocks/stock-dashboard/stock-charts.comp
 import { StockTradingPendingComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-dashboard/stock-violations.component';
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
+import { StockTradingSimulationComponent } from './stocks/stock-trading/stock-trading-simulation.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -99,6 +100,7 @@ var routes: Routes = [
   { path: 'playground', component: PlaygroundComponent},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'trading', component: StockTradingComponent},
+  { path: 'trading/simulation', component: StockTradingSimulationComponent},
   { path: 'trading/:tab', component: StockTradingComponent},
 
   { path: 'stocks', component: StockDashboardComponent},
@@ -172,6 +174,7 @@ var routes: Routes = [
     StockTradingPerformanceComponent,
     StockTradingReviewComponent,
     StockTradingChartComponent,
+    StockTradingSimulationComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,
