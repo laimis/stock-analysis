@@ -58,7 +58,7 @@
 
   <div class="mt-2">
 
-    <div class="alert alert-secondary mt-2" *ngIf="!ticker && response.transactions.length == 0">
+    <div class="alert alert-secondary mt-2" *ngIf="!ticker && response.transactions.length === 0">
       You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
     </div>
 
@@ -67,8 +67,8 @@
   <div *ngFor="let g of response.grouped">
     <div class="text-muted font-size-small row mb-2 mt-3">
       <div class="col-4">
-        <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails != g.name">[ + ]</button>
-        <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails == g.name">[ - ]</button>
+        <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails !== g.name">[ + ]</button>
+        <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails === g.name">[ - ]</button>
         {{g.name}} ({{g.transactions.transactions.length}})
       </div>
       <div class="col-2 font-weight-bold text-end">
@@ -76,7 +76,7 @@
       </div>
       <div class="col-4"></div>
     </div>
-    <table class="table table-hover border rounded" *ngIf="showDetails == g.name">
+    <table class="table table-hover border rounded" *ngIf="showDetails === g.name">
       <thead class="thead-light">
         <tr>
           <th width="100">Date</th>

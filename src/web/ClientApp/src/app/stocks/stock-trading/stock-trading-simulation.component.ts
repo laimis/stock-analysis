@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { StocksService, stocktransactioncommand } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./stock-trading-simulation.component.css']
 })
 
-export class StockTradingSimulationComponent implements OnInit {
+export class StockTradingSimulationComponent {
 
   stopPrice: number | null = null
   positions: stocktransactioncommand[] = []
@@ -16,9 +16,6 @@ export class StockTradingSimulationComponent implements OnInit {
   profit: number | null = null
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
-
-  ngOnInit() {
-  }
 
   stockPurchased(stocktransactioncommand: stocktransactioncommand) {
     console.log(stocktransactioncommand)

@@ -17,8 +17,4 @@ export class StockNotesComponent {
     this._notes = notes
   }
   get notes(): NoteList { return this._notes; }
-
-	constructor(){}
-
-	ngOnInit(): void {}
 }

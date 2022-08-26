@@ -44,10 +44,10 @@
           <ul class="list-unstyled" *ngIf="p.notes.length > 0">
             <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
           </ul>
-          <span *ngIf="p.notes.length == 0"> no notes </span>
+          <span *ngIf="p.notes.length === 0"> no notes </span>
         </td>
       </tr>
-      <tr *ngIf="result.closedPositions.length == 0">
+      <tr *ngIf="result.closedPositions.length === 0">
         <td colspan="6">No stock positions closed</td>
       </tr>
     </tbody>
@@ -76,7 +76,7 @@
         <td width="140">{{g.date | date}}</td>
         <td>{{g.description}}</td>
       </tr>
-      <tr *ngIf="result.stockTransactions.length == 0">
+      <tr *ngIf="result.stockTransactions.length === 0">
         <td colspan="4">No stock transactions</td>
       </tr>
     </tbody>
@@ -96,7 +96,7 @@
         <td width="140">{{g.date | date}}</td>
         <td>{{g.description}}</td>
       </tr>
-      <tr *ngIf="result.plOptionTransactions.length == 0">
+      <tr *ngIf="result.plOptionTransactions.length === 0">
         <td colspan="4">No option P&L transactions</td>
       </tr>
     </tbody>
@@ -111,7 +111,7 @@
         <td width="140">{{g.date | date}}</td>
         <td>{{g.description}}</td>
       </tr>
-      <tr *ngIf="result.optionTransactions.length == 0">
+      <tr *ngIf="result.optionTransactions.length === 0">
         <td colspan="4">No option transactions</td>
       </tr>
     </tbody>

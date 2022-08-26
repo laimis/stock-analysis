@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
-import { DataPoint, DataPointContainer, StockTradingPerformance } from 'src/app/services/stocks.service';
+import { DataPointContainer, StockTradingPerformance } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -8,10 +8,8 @@ import { DataPoint, DataPointContainer, StockTradingPerformance } from 'src/app/
   templateUrl: './stock-trading-performance.component.html',
   styleUrls: ['./stock-trading-performance.component.css']
 })
-export class StockTradingPerformanceComponent implements OnInit {
+export class StockTradingPerformanceComponent {
 
-  ngOnInit() {
-  }
 
   @Input()
   performance: StockTradingPerformance
