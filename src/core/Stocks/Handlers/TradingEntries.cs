@@ -54,7 +54,7 @@ namespace core.Stocks
                 });
 
                 var tradingEntries = stocks.Where(s => s.State.Owned > 0 && s.State.Category == StockCategory.ShortTerm)
-                    .Select(s => new TradingEntryView(s.State))
+                    .Select(s => s.State.CurrentPosition)
                     .ToArray();
 
                 var prices = await _stocks.GetPrices(tradingEntries.Select(s => s.Ticker).Distinct());

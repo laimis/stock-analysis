@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { StocksService } from 'src/app/services/stocks.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { StocksService } from 'src/app/services/stocks.service';
   templateUrl: './admin-email.component.html',
   styleUrls: ['./admin-email.component.css']
 })
-export class AdminEmailComponent implements OnInit {
+export class AdminEmailComponent {
 
   to: string
   from: string
@@ -15,9 +15,6 @@ export class AdminEmailComponent implements OnInit {
   body: string
 
   constructor(private stockService : StocksService) { }
-
-  ngOnInit() {
-  }
 
   send() {
     var obj = {

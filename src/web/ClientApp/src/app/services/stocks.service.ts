@@ -614,6 +614,8 @@ export interface StockTradingPosition {
   potentialLoss: number | null
   riskedPct: number | null
   unrealizedGain: number | null
+  unrealizedGainPct: number | null
+  unrealizedRR: number | null
 }
 
 export class OptionDefinition {

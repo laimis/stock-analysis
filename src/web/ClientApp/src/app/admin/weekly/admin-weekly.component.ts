@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { StocksService } from 'src/app/services/stocks.service';
 
 @Component({
@@ -6,12 +6,9 @@ import { StocksService } from 'src/app/services/stocks.service';
   templateUrl: './admin-weekly.component.html',
   styleUrls: ['./admin-weekly.component.css']
 })
-export class AdminWeeklyComponent implements OnInit {
+export class AdminWeeklyComponent {
 
   constructor(private stockService:StocksService) { }
-
-  ngOnInit() {
-  }
 
   kickOff(everyone:boolean) {
     this.stockService.weeklyReview({everyone:everyone}).subscribe(

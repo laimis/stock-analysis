@@ -100,7 +100,7 @@ namespace core.Stocks
                         violations.Add(
                             new StockViolationView {
                                 Ticker = brokeragePosition.Ticker,
-                                Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AveragePrice} but NGTrading says none"
+                                Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none"
                             }
                         );
                     }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { StocksService, GetErrors } from '../services/stocks.service';
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.css']
 })
-export class ContactComponent implements OnInit {
+export class ContactComponent {
 
   public saved: boolean = false
   public email: string
@@ -16,9 +16,6 @@ export class ContactComponent implements OnInit {
   constructor(
     private stockService:StocksService
   ) { }
-
-  ngOnInit() {
-  }
 
   sendMessage() {
     var obj = {

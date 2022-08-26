@@ -1,65 +1,82 @@
-<div class="card border-info mb-4" *ngFor="let p of positions">
-  <div class="card-body">
-    <div class="card-title">
-      <div class="container">
-        <div class="row">
-          <div class="col">
-            <a [routerLink]="[ '/stocks', p.ticker ]" class="position-ticker">{{p.ticker}}</a>
-            <span class="position-price">{{p.price | currency}}</span>
-            <i
-              (click)="toggleVisibility(detailDiv); toggleVisibility(pendingOrdersDiv)"
-              class="bi bi-info-square-fill ms-2"></i>
-          </div>
-          <div class="col text-center">
-          </div>
-          <div class="col">
-            <span class="position-gain float-end">{{ p.rr | number:'1.0-2' }}</span>
-          </div>
-        </div>  
-      </div>
+<div>
+  <div class="row">
+    <div class="col">
+      <a class="btn btn-primary" href="/api/stocks/export/owned">Export</a>
     </div>
-
-    <div class="card-text">
-      <div #pendingOrdersDiv>
-        <ul class="list-group">
-          <li class="list-group-item" *ngFor="let o of getPendingOrders(p)">
-            {{o.type}} {{o.quantity}} @ {{o.price | currency}}
-        </ul>
-      </div>
-
-      <div class="visually-hidden" #detailDiv>
-        <div class="row">
-          <div class="col"><div class="stat-label">Stop</div><div>{{ stopPrice(p) | currency }}</div></div>
-          <div class="col"><div class="stat-label">Cost</div><div>{{p.averageCost | currency}}</div></div>
-          <div class="col"><div class="stat-label">1R</div><div>{{ firstTargetNumber(p) | currency }}</div></div>
-          <div class="col"><div class="stat-label">2.5R</div><div>{{ secondTargetNumber(p) | currency}}</div></div>
-        </div>
-
-        <div class="row mt-3">
-          <div class="col"><div class="stat-label">Size</div><div>{{ positionSize(p) | currency }}</div></div>
-          <div class="col"><div class="stat-label">Shares</div><div>{{ p.numberOfShares }} / {{ p.maxNumberOfShares }}</div></div>
-          <div class="col"><div class="stat-label">Portion</div><div>{{ tradingPortion(p) | number : '1.0-0' }}</div></div>
-          <div class="col"><div class="stat-label">Days</div><div>{{ p.daysHeld }}</div></div>
-        </div>
-        
-        <div class="row mt-3">
-          <div class="col"><div class="stat-label">P/L</div><div>{{ p.unrealizedGain | currency}}</div></div>
-          <div class="col"><div class="stat-label">Risk</div><div>{{ p.potentialLoss | currency }}</div></div>
-          <div class="col"><div class="stat-label">Risk %</div><div>{{ p.riskedPct | percent}}</div></div>
-          <div class="col"><div class="stat-label">Opened</div><div>{{ p.opened | date }}</div></div>
-        </div>
-
-        <div class="row mt-3">
-          <div class="col"><div class="stat-label">Notes</div>
-          <div>
-            <div *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{ note }}</div>
-          </div>
-          </div>
-        </div>
-
-      </div>
-
+    <div class="col text-end">  
+      <select class="form-select" id="metricToRender" (click)="metricChanged($event.target)">
+        <option value="">Metric to render:</option>
+        <option value="rr">R/R</option>
+        <option value="pl">P/L</option>
+        <option value="plPercent">P/L %</option>
+        <option value="cost">Cost</option>
+      </select>
     </div>
-        
   </div>
+  <div class="card border-info mt-4" *ngFor="let p of sortedPositions">
+    <div class="card-body">
+      <div class="card-title">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <a [routerLink]="[ '/stocks', p.ticker ]" class="position-ticker">{{p.ticker}}</a>
+              <span class="position-price">{{p.price | currency}}</span>
+              <i
+                (click)="toggleVisibility(detailDiv); toggleVisibility(pendingOrdersDiv)"
+                class="bi bi-info-square-fill ms-2"></i>
+            </div>
+            <div class="col text-center">
+            </div>
+            <div class="col">
+              <span class="position-gain float-end">{{ getMetricToRender(p) | number:'1.0-2' }}</span>
+            </div>
+          </div>  
+        </div>
+      </div>
+
+      <div class="card-text">
+        <div #pendingOrdersDiv>
+          <ul class="list-group">
+            <li class="list-group-item" *ngFor="let o of getPendingOrders(p)">
+              {{o.type}} {{o.quantity}} @ {{o.price | currency}}
+          </ul>
+        </div>
+
+        <div class="visually-hidden" #detailDiv>
+          <div class="row">
+            <div class="col"><div class="stat-label">Stop</div><div>{{ stopPrice(p) | currency }}</div></div>
+            <div class="col"><div class="stat-label">Cost</div><div>{{p.averageCost | currency}}</div></div>
+            <div class="col"><div class="stat-label">1R</div><div>{{ firstTargetNumber(p) | currency }}</div></div>
+            <div class="col"><div class="stat-label">2.5R</div><div>{{ secondTargetNumber(p) | currency}}</div></div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col"><div class="stat-label">Size</div><div>{{ positionSize(p) | currency }}</div></div>
+            <div class="col"><div class="stat-label">Shares</div><div>{{ p.numberOfShares }} / {{ p.maxNumberOfShares }}</div></div>
+            <div class="col"><div class="stat-label">Portion</div><div>{{ tradingPortion(p) | number : '1.0-0' }}</div></div>
+            <div class="col"><div class="stat-label">Days</div><div>{{ p.daysHeld }}</div></div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col"><div class="stat-label">P/L</div><div>{{ p.unrealizedGain | currency}}</div></div>
+            <div class="col"><div class="stat-label">Risk</div><div>{{ p.potentialLoss | currency }}</div></div>
+            <div class="col"><div class="stat-label">Risk %</div><div>{{ p.riskedPct | percent}}</div></div>
+            <div class="col"><div class="stat-label">Opened</div><div>{{ p.opened | date }}</div></div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col"><div class="stat-label">Notes</div>
+            <div>
+              <div *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{ note }}</div>
+            </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+          
+    </div>
+  </div>
+
 </div>

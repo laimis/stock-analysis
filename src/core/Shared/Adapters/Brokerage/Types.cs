@@ -55,6 +55,6 @@ public class Order
 public class Position
 {
     public string Ticker { get; set; }
-    public decimal AveragePrice { get; set; }
+    public decimal AverageCost { get; set; }
     public decimal Quantity { get; set; }
 }

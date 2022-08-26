@@ -10,7 +10,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let p of orders; let i = index" [ngClass]="{'table-success': p.isActive && p.type == 'BUY', 'table-info': p.isActive && p.type == 'SELL', 'table-light': !p.isActive}">
+    <tr *ngFor="let p of orders; let i = index" [ngClass]="{'table-success': p.isActive && p.type === 'BUY', 'table-info': p.isActive && p.type === 'SELL', 'table-light': !p.isActive}">
       <td>
         <div class="small">{{p.status}}</div>
       </td>

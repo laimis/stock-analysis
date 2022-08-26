@@ -7,8 +7,16 @@ import { BrokerageOrder, StockTradingPosition, toggleVisuallHidden } from '../..
   styleUrls: ['./stock-trading-positions.component.css']
 })
 export class StockTradingPositionComponent {
+    sortedPositions: StockTradingPosition[];
+    _positions: StockTradingPosition[];
+    metricToRender: string = "rr"
+    metricFunc: (p: StockTradingPosition) => number = (p:StockTradingPosition) => p.unrealizedRR;
+
     @Input()
-    positions: StockTradingPosition[]
+    set positions(input: StockTradingPosition[]) {
+        this._positions = input
+        this.updatePositions()
+    }
 
     @Input()
     pendingOrders: BrokerageOrder[]
@@ -58,6 +66,38 @@ export class StockTradingPositionComponent {
         return this.pendingOrders
             .filter(o => o.ticker == p.ticker)
             .filter(o => o.status != "FILLED" && o.status != "REPLACED")
+    }
+
+    metricChanged(elem: EventTarget) {
+        var value = (elem as HTMLInputElement).value
+        
+        this.metricToRender = value
+
+        switch (value) {
+            case "pl":
+                this.metricFunc = (p:StockTradingPosition) => p.unrealizedGain
+                break;
+            case "plPercent":
+                this.metricFunc = (p:StockTradingPosition) => p.unrealizedGainPct
+                break;
+            case "cost":
+                this.metricFunc = (p:StockTradingPosition) => p.cost
+                break;
+            default:
+                this.metricFunc = (p:StockTradingPosition) => p.unrealizedRR
+        }
+
+        this.updatePositions()
+    }
+
+    getMetricToRender(p:StockTradingPosition) {
+        return this.metricFunc(p)
+    }
+
+    updatePositions() {
+        this.sortedPositions = this._positions.sort((a, b) => {
+            return this.metricFunc(b) - this.metricFunc(a)
+        })
     }
 }
 

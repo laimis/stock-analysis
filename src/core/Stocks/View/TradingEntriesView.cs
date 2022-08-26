@@ -4,7 +4,7 @@ namespace core.Stocks.View
     {
         public TradingEntriesView(
             BrokerageOrderView[] brokerageOrders,
-            TradingEntryView[] current,
+            PositionInstance[] current,
             PositionInstance[] past,
             TradingPerformanceContainerView performance)
         {
@@ -15,7 +15,7 @@ namespace core.Stocks.View
         }
 
         public BrokerageOrderView[] BrokerageOrders { get; }
-        public TradingEntryView[] Current { get; }
+        public PositionInstance[] Current { get; }
         public PositionInstance[] Past { get; }
         public TradingPerformanceContainerView Performance { get; }
     }

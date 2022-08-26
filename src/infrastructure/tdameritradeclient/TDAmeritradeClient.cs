@@ -127,7 +127,7 @@ public class TDAmeritradeClient : IBrokerage
         {
             Ticker = p.instrument?.symbol,
             Quantity = p.longQuantity,
-            AveragePrice = p.averagePrice
+            AverageCost = p.averagePrice
         });
     }
 

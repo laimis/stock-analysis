@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { BrokerageOrder, StocksService } from 'src/app/services/stocks.service';
 
 
@@ -7,14 +7,11 @@ import { BrokerageOrder, StocksService } from 'src/app/services/stocks.service';
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css']
 })
-export class StockTradingPendingComponent implements OnInit {
+export class StockTradingPendingComponent {
 
   constructor(
     private stockService: StocksService
   ) { }
-
-	ngOnInit() {
-  }
 
   @Input()
   orders: BrokerageOrder[]

@@ -45,12 +45,21 @@ namespace core.Stocks
         public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
         public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
-        public decimal AveragePrice => BuysForAverageCostCalculations.Aggregate(0m, (a, b) => a +  b.Item1 * b.Item2) / 
+        public decimal AverageCost => BuysForAverageCostCalculations.Aggregate(0m, (a, b) => a +  b.Item1 * b.Item2) / 
             BuysForAverageCostCalculations.Sum(b => b.Item1);
         private List<(decimal, decimal)> BuysForAverageCostCalculations { get; set; } = new List<(decimal, decimal)>();
 
+        internal void ApplyPrice(decimal currentPrice)
+        {
+            Price = currentPrice;
+            UnrealizedGain = (Price - AverageCost) * NumberOfShares;
+            UnrealizedGainPct = (Price - AverageCost) / AverageCost;
+        }
+
+        public decimal PotentialLoss => NumberOfShares * AverageCost * RiskedPct;
+
         public decimal RiskedPct => StopPrice switch {
-            not null => (AveragePrice - StopPrice.Value) / AveragePrice,
+            not null => (AverageCost - StopPrice.Value) / AverageCost,
             null => 0.05m
         };
 
@@ -58,6 +67,10 @@ namespace core.Stocks
 
         public decimal RR => Profit / RiskedAmount;
         public decimal RRWeighted => RR * Profit;
+        public decimal UnrealizedRR => UnrealizedGain / RiskedAmount;
+        public decimal Price { get; private set; }
+        public decimal UnrealizedGain { get; private set; }
+        public decimal UnrealizedGainPct { get; private set; }
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, string notes = null)
         {
