@@ -6,8 +6,8 @@
         <button type="button" class="btn btn-secondary" (click)="openPosition(violation.ticker)">Open Position</button>
 
         <div>
-          <stock-transaction *ngIf="activeTicker == violation.ticker && fixType =='transaction'" [ticker]="activeTicker" (transactionFailed)="transactionFailed($event)" (transactionRecorded)="transactionRecorded($event)"></stock-transaction>
-          <stock-trading-newposition *ngIf="activeTicker == violation.ticker && fixType =='position'" (stockPurchased)="transactionRecorded($event)"></stock-trading-newposition>
+          <stock-transaction *ngIf="activeTicker == violation.ticker && fixType ==='transaction'" [ticker]="activeTicker" (transactionFailed)="transactionFailed($event)" (transactionRecorded)="transactionRecorded($event)"></stock-transaction>
+          <stock-trading-newposition *ngIf="activeTicker == violation.ticker && fixType ==='position'" (stockPurchased)="transactionRecorded($event)"></stock-trading-newposition>
         </div>
       </li>
     </ul>

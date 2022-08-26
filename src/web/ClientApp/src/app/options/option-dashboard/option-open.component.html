@@ -30,7 +30,7 @@
     <tbody>
       <tr *ngFor="let option of openOptions">
         <td>
-          <span class="badge bg-primary" [ngClass]="{'bg-info': option.boughtOrSold == 'Bought', 'bg-secondary': option.boughtOrSold != 'Bought'}">{{option.boughtOrSold}}</span>
+          <span class="badge bg-primary" [ngClass]="{'bg-info': option.boughtOrSold === 'Bought', 'bg-secondary': option.boughtOrSold !== 'Bought'}">{{option.boughtOrSold}}</span>
         </td>
         <td>
           <span class="font-weight-bold">

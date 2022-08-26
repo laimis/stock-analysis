@@ -98,7 +98,7 @@
         <form>
           <div>
             <button type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(false)">Close - Expired Worthless</button>
-            <button *ngIf="option.boughtOrSold == 'Sold'" type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(true)">Close - It was assigned</button>
+            <button *ngIf="option.boughtOrSold === 'Sold'" type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(true)">Close - It was assigned</button>
           </div>
         </form>
       </div>

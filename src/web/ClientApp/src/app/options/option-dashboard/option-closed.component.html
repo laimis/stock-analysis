@@ -18,11 +18,11 @@
           <a [routerLink]="[ '/stocks', o.ticker ]">{{o.ticker}}</a>
           {{o.strikePrice |currency}}</div>
         <div>
-          <span *ngIf="o.boughtOrSold=='Sold'" class="badge bg-info me-1">sell</span>
-          <span *ngIf="o.boughtOrSold=='Bought'" class="badge bg-secondary me-1">buy</span>
+          <span *ngIf="o.boughtOrSold==='Sold'" class="badge bg-info me-1">sell</span>
+          <span *ngIf="o.boughtOrSold==='Bought'" class="badge bg-secondary me-1">buy</span>
 
-          <span *ngIf="o.optionType=='CALL'" class="badge bg-success me-1">call</span>
-          <span *ngIf="o.optionType=='PUT'" class="badge bg-warning me-1">put</span>
+          <span *ngIf="o.optionType==='CALL'" class="badge bg-success me-1">call</span>
+          <span *ngIf="o.optionType==='PUT'" class="badge bg-warning me-1">put</span>
         </div>
         <div *ngIf="o.assigned">
           <span class="badge bg-warning me-1">assigned</span>
