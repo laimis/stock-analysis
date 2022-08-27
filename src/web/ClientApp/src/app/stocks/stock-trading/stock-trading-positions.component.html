@@ -44,23 +44,23 @@
 
         <div class="visually-hidden" #detailDiv>
           <div class="row">
+            <div class="col"><div class="stat-label">P/L $</div><div>{{ p.unrealizedGain | currency}}</div></div>
+            <div class="col"><div class="stat-label">P/L %</div><div>{{ p.unrealizedGainPct | percent}}</div></div>
+            <div class="col"><div class="stat-label">Risk $</div><div>{{ p.potentialLoss | currency }}</div></div>
+            <div class="col"><div class="stat-label">Risk %</div><div>{{ p.riskedPct | percent}}</div></div>
+          </div>
+
+          <div class="row mt-3">
             <div class="col"><div class="stat-label">Stop</div><div>{{ stopPrice(p) | currency }}</div></div>
             <div class="col"><div class="stat-label">Cost</div><div>{{p.averageCost | currency}}</div></div>
             <div class="col"><div class="stat-label">1R</div><div>{{ firstTargetNumber(p) | currency }}</div></div>
             <div class="col"><div class="stat-label">2.5R</div><div>{{ secondTargetNumber(p) | currency}}</div></div>
           </div>
-
-          <div class="row mt-3">
-            <div class="col"><div class="stat-label">Size</div><div>{{ positionSize(p) | currency }}</div></div>
-            <div class="col"><div class="stat-label">Shares</div><div>{{ p.numberOfShares }} / {{ p.maxNumberOfShares }}</div></div>
-            <div class="col"><div class="stat-label">Portion</div><div>{{ tradingPortion(p) | number : '1.0-0' }}</div></div>
-            <div class="col"><div class="stat-label">Days</div><div>{{ p.daysHeld }}</div></div>
-          </div>
           
           <div class="row mt-3">
-            <div class="col"><div class="stat-label">P/L</div><div>{{ p.unrealizedGain | currency}}</div></div>
-            <div class="col"><div class="stat-label">Risk</div><div>{{ p.potentialLoss | currency }}</div></div>
-            <div class="col"><div class="stat-label">Risk %</div><div>{{ p.riskedPct | percent}}</div></div>
+            <div class="col"><div class="stat-label">Shares</div><div>{{ p.numberOfShares }} for {{ positionSize(p) | currency }}</div></div>
+            <div class="col"><div class="stat-label">Portion</div><div>{{ tradingPortion(p) | number : '1.0-0' }}</div></div>
+            <div class="col"><div class="stat-label">Days</div><div>{{ p.daysHeld }}</div></div>
             <div class="col"><div class="stat-label">Opened</div><div>{{ p.opened | date }}</div></div>
           </div>
 

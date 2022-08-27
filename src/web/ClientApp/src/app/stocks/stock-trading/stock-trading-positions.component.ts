@@ -50,7 +50,7 @@ export class StockTradingPositionComponent {
     }
 
     positionSize(p:StockTradingPosition) {
-        return p.maxNumberOfShares * p.averageCost
+        return p.numberOfShares * p.averageCost
     }
 
     tradingPortion(p:StockTradingPosition) {
@@ -81,7 +81,7 @@ export class StockTradingPositionComponent {
                 this.metricFunc = (p:StockTradingPosition) => p.unrealizedGainPct
                 break;
             case "cost":
-                this.metricFunc = (p:StockTradingPosition) => p.cost
+                this.metricFunc = (p:StockTradingPosition) => this.positionSize(p)
                 break;
             default:
                 this.metricFunc = (p:StockTradingPosition) => p.unrealizedRR
