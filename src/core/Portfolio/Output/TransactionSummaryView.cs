@@ -11,6 +11,7 @@ namespace core.Portfolio.Output
         public TransactionSummaryView(
             DateTimeOffset start,
             DateTimeOffset end,
+            List<PositionInstance> openPositions,
             List<PositionInstance> closedPositions,
             List<Transaction> stockTransactions,
             List<Transaction> optionTransactions,
@@ -19,6 +20,7 @@ namespace core.Portfolio.Output
         {
             Start = start;
             End = end;
+            OpenPositions = openPositions;
             ClosedPositions = closedPositions;
             StockTransactions = stockTransactions;
             OptionTransactions = optionTransactions;
@@ -31,6 +33,7 @@ namespace core.Portfolio.Output
 
         public DateTimeOffset Start { get; }
         public DateTimeOffset End { get; }
+        public List<PositionInstance> OpenPositions { get; }
         public List<PositionInstance> ClosedPositions { get; }
         public List<Transaction> StockTransactions { get; }
         public List<Transaction> OptionTransactions { get; }

@@ -8,6 +8,7 @@ using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using core.Stocks;
 using core.Stocks.View;
 
@@ -16,158 +17,103 @@ namespace core
     public class CSVExport
     {
         private const string DATE_FORMAT = "yyyy-MM-dd";
-        public const string STOCK_HEADER = "ticker,type,amount,price,date";
-        public const string NOTE_HEADER = "created,ticker,note";
-        public const string OPTION_HEADER = "ticker,type,strike,optiontype,expiration,amount,premium,filled";
-        public const string USER_HEADER = "email,first_name,last_name";
-        public const string ALERTS_HEADER = "ticker,pricepoints";
-        public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
-        public const string OWNED_STOCKS_HEADER = "ticker,shares,averagecost,invested,daysheld,category";
-        public const string CRYPTOS_HEADER = "symbol,type,amount,price,date";
-        public const string TRADES_HEADER = "symbol,opened,closed,daysheld,firstbuycost,cost,maxshares,profit,returnpct,rr,buys,sells";
+        private record struct StockRecord(string ticker, string type, decimal amount, decimal price, string date, string notes);
+        private record struct NoteRecord(string created, string ticker, string note);
+        private record struct OptionRecord(string ticker, string type, decimal strike, string optiontype, string expiration, decimal amount, decimal premium, string filled);
+        private record struct UserRecord(string email, string first_name, string last_name);
+        // public const string ALERTS_HEADER = "ticker,pricepoints";
+        private record struct AlertsRecord(string ticker, string pricepoints);
+        // public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
+        private record struct PastTradesRecord(string ticker, string date, decimal profit, decimal percentage);
+        // public const string OWNED_STOCKS_HEADER = "ticker,shares,averagecost,invested,daysheld,category";
+        private record struct OwnedStocksRecord(string ticker, decimal shares, decimal averagecost, decimal invested, decimal daysheld, string category);
+        // public const string CRYPTOS_HEADER = ;
+        private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
+        // public const string TRADES_HEADER = "symbol,opened,closed,daysheld,firstbuycost,cost,maxshares,profit,returnpct,rr,buys,sells";
+        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal maxshares, decimal profit, decimal returnpct, decimal rr, decimal buys, decimal sells);
 
-        public static string Generate(IEnumerable<Stocks.PositionInstance> trades)
+        public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
         {
             var rows = trades.Select(t =>
-                new object[] { t.Ticker, t.Opened, t.Closed, t.DaysHeld,
-                t.FirstBuyCost, t.Cost, t.MaxNumberOfShares,
+                new TradesRecord(t.Ticker, t.Opened?.ToString(DATE_FORMAT), t.Closed?.ToString(DATE_FORMAT), t.DaysHeld,
+                t.FirstBuyCost.Value, t.Cost, t.MaxNumberOfShares,
                 t.Profit, t.ReturnPct,t.RR,
-                t.NumberOfBuys, t.NumberOfSells
-            });
-
-            return Generate(TRADES_HEADER, rows);
-        }
-        public static string Generate(IEnumerable<User> users)
-        {
-            var rows = users.Select(u =>
-                new object[] { u.State.Email, u.State.Firstname, u.State.Lastname}
+                t.NumberOfBuys, t.NumberOfSells)
             );
 
-            return Generate(USER_HEADER, rows);
+            return writer.Generate(rows);
+        }
+        public static string Generate(ICSVWriter writer, IEnumerable<User> users)
+        {
+            var rows = users.Select(u => new UserRecord(u.State.Email, u.State.Firstname, u.State.Lastname));
+
+            return writer.Generate(rows);
         }
 
-        public static string Generate(IEnumerable<OwnedStockView> stocks)
+        public static string Generate(ICSVWriter writer, IEnumerable<OwnedStockView> stocks)
         {
             var rows = stocks.Select(s =>
-                new object[] { s.Ticker, s.Owned, s.AverageCost, s.Cost, s.DaysHeld, s.Category}
+                new OwnedStocksRecord(s.Ticker, s.Owned, s.AverageCost, s.Cost, s.DaysHeld, s.Category)
             );
 
-            return Generate(OWNED_STOCKS_HEADER, rows);
+            return writer.Generate(rows);
         }
 
         
-        public static string Generate(IEnumerable<OwnedCrypto> cryptos)
+        public static string Generate(ICSVWriter writer, IEnumerable<OwnedCrypto> cryptos)
         {
-            var rows = cryptos.SelectMany(o => 
-                o.State.UndeletedBuysOrSells.Select(op => (o, (AggregateEvent)op)))
-                .OrderBy(t => t.Item2.When)
-                .Select(e => {
-                    return StockEventToParts(e);
-                });
+            var rows = cryptos.SelectMany(o => o.State.UndeletedBuysOrSells.Select(e => (o, e)))
+                .OrderBy(t => t.e.When)
+                .Select(t => t.e switch {
+                    CryptoPurchased cp => new CryptosRecord(t.o.State.Token, "buy", cp.Quantity, cp.DollarAmount, cp.When.ToString(DATE_FORMAT)),
+                    CryptoSold cs => new CryptosRecord(t.o.State.Token, "sell", cs.Quantity, cs.DollarAmount, cs.When.ToString(DATE_FORMAT)),
+                    _ => new CryptosRecord()
+                })
+                .Where(r => r.symbol != null);
 
-            return Generate(CRYPTOS_HEADER, rows);
+            return writer.Generate(rows);
         }
 
-        public static string Generate(IEnumerable<Alert> alerts)
+        public static string Generate(ICSVWriter writer, IEnumerable<Alert> alerts)
         {
             var rows = alerts.Select(u =>
-                new object[] { u.State.Ticker.Value, string.Join(";", u.State.PricePoints.Select(p => p.Value))}
+                new AlertsRecord(u.State.Ticker.Value, string.Join(";", u.State.PricePoints.Select(p => p.Value)))
             );
 
-            return Generate(ALERTS_HEADER, rows);
+            return writer.Generate(rows);
         }
 
-        public static string Generate(IEnumerable<StockTransactionView> pastTrades)
+        public static string Generate(ICSVWriter writer, IEnumerable<StockTransactionView> pastTrades)
         {
             var rows = pastTrades.Select(t =>
-                new object[] { t.Ticker, t.Date, t.Profit, t.ReturnPct }
+                new PastTradesRecord(t.Ticker, t.Date, t.Profit, t.ReturnPct)
             );
 
-            return Generate(PAST_TRADES_HEADER, rows);
+            return writer.Generate(rows);
         }
 
-        public static string Generate(IEnumerable<OwnedStock> stocks)
+        public static string Generate(ICSVWriter writer, IEnumerable<OwnedStock> stocks)
         {
-            var rows = stocks.SelectMany(o => o.State.UndeletedBuysOrSells.Select(op => (o, (AggregateEvent)op)))
-                .OrderBy(t => t.Item2.When)
-                .Select(e => {
-                    return StockEventToParts(e);
-                });
+            var rows = stocks
+                .SelectMany(o => o.State.UndeletedBuysOrSells)
+                .OrderBy(t => t.When)
+                .Select(e => 
+                    e switch {
+                        StockPurchased sp => new StockRecord(sp.Ticker, "buy", sp.NumberOfShares, sp.Price, sp.When.ToString(DATE_FORMAT), sp.Notes),
+                        StockPurchased_v2 sp => new StockRecord(sp.Ticker, "buy", sp.NumberOfShares, sp.Price, sp.When.ToString(DATE_FORMAT), sp.Notes),
+                        StockSold ss => new StockRecord(ss.Ticker, "sell", ss.NumberOfShares, ss.Price, ss.When.ToString(DATE_FORMAT), ss.Notes),
+                        _ => new StockRecord()
+                    }
+                )
+                .Where(s => s.ticker != null);
 
-            return Generate(STOCK_HEADER, rows);
+            return writer.Generate(rows);
         }
 
         private static IEnumerable<object> StockEventToParts((Aggregate a, AggregateEvent ae) tuple)
         {
             switch(tuple.ae)
             {
-                case OptionSold os:
-                    var o1 = tuple.a as OwnedOption;
-                    return new object[] {
-                        o1.State.Ticker,
-                        "sell",
-                        o1.State.StrikePrice,
-                        o1.State.OptionType.ToString(),
-                        o1.State.Expiration.ToString(DATE_FORMAT),
-                        os.NumberOfContracts,
-                        os.Premium,
-                        os.When.ToString(DATE_FORMAT)
-                    };
-
-                case OptionPurchased op:
-                    var o2 = tuple.a as OwnedOption;
-                    return new object[] {
-                        o2.State.Ticker,
-                        "buy",
-                        o2.State.StrikePrice,
-                        o2.State.OptionType.ToString(),
-                        o2.State.Expiration.ToString(DATE_FORMAT),
-                        op.NumberOfContracts,
-                        op.Premium * -1,
-                        op.When.ToString(DATE_FORMAT)
-                    };
-
-                case OptionExpired expired:
-                    var o3 = tuple.a as OwnedOption;
-                    return new object[] {
-                        o3.State.Ticker,
-                        expired.Assigned ? "assigned" : "expired",
-                        o3.State.StrikePrice,
-                        o3.State.OptionType.ToString(),
-                        o3.State.Expiration.ToString(DATE_FORMAT),
-                        0,
-                        0,
-                        expired.When.ToString(DATE_FORMAT)
-                    };
-
-                case StockPurchased sp:
-                    return new object[] {
-                        sp.Ticker,
-                        "buy",
-                        sp.NumberOfShares,
-                        sp.Price,
-                        sp.When.ToString(DATE_FORMAT)
-                    };
-                
-                case StockPurchased_v2 sp:
-                    return new object[] {
-                        sp.Ticker,
-                        "buy",
-                        sp.NumberOfShares,
-                        sp.Price,
-                        sp.When.ToString(DATE_FORMAT)
-                    };
-                
-                case StockSold ss:
-
-                    return new object[] {
-                        ss.Ticker,
-                        "sell",
-                        ss.NumberOfShares,
-                        ss.Price,
-                        ss.When.ToString(DATE_FORMAT)
-                    };
-
                 case CryptoPurchased cp:
 
                     return new object[] {
@@ -193,46 +139,63 @@ namespace core
             }
         }
 
-        public static string Generate(IEnumerable<Note> notes)
+        public static string Generate(ICSVWriter writer, IEnumerable<Note> notes)
         {
             var rows = notes.Select(n => {
                 var state = n.State;
 
-                return new object[]{
+                return new NoteRecord(
                     state.Created.ToString(DATE_FORMAT),
                     state.RelatedToTicker,
-                    "\"" + state.Note.Replace("\"", "\"\"") + "\""
-                };
+                    state.Note
+                );
             });
 
-            return Generate(NOTE_HEADER, rows);
+            return writer.Generate(rows);
         }
 
-        public static string Generate(IEnumerable<OwnedOption> options)
+        public static string Generate(ICSVWriter writer, IEnumerable<OwnedOption> options)
         {
             var rows = options.SelectMany(o => o.State.Buys.Select(op => (o, (AggregateEvent)op)))
                 .Union(options.SelectMany(o => o.State.Sells.Select(os => (o, (AggregateEvent)os))))
                 .Union(options.SelectMany(o => o.State.Expirations.Select(os => (o, (AggregateEvent)os))))
                 .OrderBy(t => t.Item2.When)
-                .Select(e => {
-                    return StockEventToParts(e);
-                });
+                .Select(t => t.Item2 switch {
+                    OptionSold s => new OptionRecord(
+                        t.o.State.Ticker,
+                        "sell",
+                        t.o.State.StrikePrice,
+                        t.o.State.OptionType.ToString(),
+                        t.o.State.Expiration.ToString(DATE_FORMAT),
+                        s.NumberOfContracts,
+                        s.Premium,
+                        s.When.ToString(DATE_FORMAT)
+                    ),
+                    OptionPurchased p => new OptionRecord(
+                        t.o.State.Ticker,
+                        "buy",
+                        t.o.State.StrikePrice,
+                        t.o.State.OptionType.ToString(),
+                        t.o.State.Expiration.ToString(DATE_FORMAT),
+                        p.NumberOfContracts,
+                        p.Premium,
+                        p.When.ToString(DATE_FORMAT)
+                    ),
+                    OptionExpired ex => new OptionRecord(
+                        t.o.State.Ticker,
+                        ex.Assigned ? "assigned" : "expired",
+                        t.o.State.StrikePrice,
+                        t.o.State.OptionType.ToString(),
+                        t.o.State.Expiration.ToString(DATE_FORMAT),
+                        0,
+                        0,
+                        ex.When.ToString(DATE_FORMAT)
+                    ),
+                    _ => new OptionRecord()
+                })
+                .Where(s => s.ticker != null);
 
-            return Generate(OPTION_HEADER, rows);
-        }
-
-        private static string Generate(string header, IEnumerable<IEnumerable<object>> rows)
-        {
-            var builder = new StringBuilder();
-
-            builder.AppendLine(header);
-            
-            foreach (var r in rows)
-            {
-                builder.AppendLine(string.Join(",", r));
-            }
-
-            return builder.ToString();
+            return writer.Generate(rows);
         }
 
         public static string GenerateFilename(string exportType)

@@ -17,7 +17,7 @@
   <div>Stocks: {{ result.stockProfit | currency }}</div>
   <div>Options: {{ result.optionProfit | currency }}</div>
   
-  <h5 class="mt-5">Stock P&L</h5>
+  <h5 class="mt-5">Closed Positions</h5>
   <table class="table">
     <thead>
       <tr>
@@ -58,34 +58,52 @@
       <td colspan="3"></td>
     </tfoot>
   </table>
-  
-  <h5 class="mt-2">Non-PL Breakdown</h5>
+
+  <h5 class="mt-5">Opened Positions</h5>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th># of Shares</th>
+        <th>Cost</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of result.openPositions">
+        <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+        <td width="140">{{p.numberOfShares}}</td>
+        <td width="140">{{p.cost  | number:'1.0-2'}}</td>
+        <td width="140">{{p.opened | date: 'MM/dd/yyyy'}}</td>
+      </tr>
+      <tr *ngIf="result.openPositions.length === 0">
+        <td colspan="6">No stock positions opened</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h5 class="mt-5">Stocks P&L</h5>
   <table class="table">
     <thead>
       <tr>
         <th>Symbol</th>
         <th>P/L</th>
         <th>Date</th>
-        <th>Notes</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let g of result.stockTransactions">
-        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
-        <td width="140">{{g.profit }}</td>
-        <td width="140">{{g.date | date}}</td>
-        <td>{{g.description}}</td>
+      <tr *ngFor="let p of result.plStockTransactions">
+        <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+        <td width="140">{{p.profit  | number:'1.0-2'}}</td>
+        <td width="140">{{p.date | date: 'MM/dd/yyyy'}}</td>
       </tr>
-      <tr *ngIf="result.stockTransactions.length === 0">
-        <td colspan="4">No stock transactions</td>
+      <tr *ngIf="result.plStockTransactions.length === 0">
+        <td colspan="3">No stock P&L transactions </td>
       </tr>
     </tbody>
-    <tfoot *ngIf="result.stockTransactions.length > 0">
-      <td class="text-end"></td>
-      <td>{{ stockTransactionTotal() }}</td>
-      <td colspan="2"></td>
-    </tfoot>
   </table>
+  
+  
 
   <h5>Option P&L</h5>
   <table class="table">

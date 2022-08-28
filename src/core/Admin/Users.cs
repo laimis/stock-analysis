@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Emails;
 using core.Alerts;
+using core.Shared.Adapters.CSV;
 using MediatR;
 using Newtonsoft.Json;
 
@@ -26,20 +27,23 @@ namespace core.Admin
         public class Handler : IRequestHandler<Users.Query, object>,
             IRequestHandler<Users.Export, ExportResponse>
         {
-            private IAccountStorage _storage;
-            private IPortfolioStorage _portfolio;
             private IAlertsStorage _alerts;
+            private ICSVWriter _csvWriter;
+            private IPortfolioStorage _portfolio;
+            private IAccountStorage _storage;
 
             public Handler(
+                ICSVWriter csvWriter,
                 IAccountStorage storage,
                 IPortfolioStorage portfolio,
                 IAlertsStorage alerts,
                 IEmailService emails,
                 IMediator mediator)
             {
-                _storage = storage;
-                _portfolio = portfolio;
                 _alerts = alerts;
+                _csvWriter = csvWriter;
+                _portfolio = portfolio;
+                _storage = storage;
             }
 
             public async Task<object> Handle(Users.Query cmd, CancellationToken cancellationToken)
@@ -81,7 +85,7 @@ namespace core.Admin
 
                 var filename = CSVExport.GenerateFilename("users");
 
-                return new ExportResponse(filename, CSVExport.Generate(users));
+                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, users));
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 
 namespace core.Options
 {
@@ -16,8 +17,13 @@ namespace core.Options
 
         public class Handler : HandlerWithStorage<Query, ExportResponse>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private ICSVWriter _csvWriter;
+
+            public Handler(
+                ICSVWriter csvWriter,
+                IPortfolioStorage storage) : base(storage)
             {
+                _csvWriter = csvWriter;
             }
 
             public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -26,7 +32,7 @@ namespace core.Options
 
                 var filename = CSVExport.GenerateFilename("options");
 
-                return new ExportResponse(filename, CSVExport.Generate(options));
+                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, options));
             }
         }
     }

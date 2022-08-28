@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using MediatR;
 
 namespace core.Notes
@@ -17,8 +18,13 @@ namespace core.Notes
 
         public class Handler : HandlerWithStorage<Query, ExportResponse>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private ICSVWriter _csvWriter;
+
+            public Handler(
+                ICSVWriter csvWriter,
+                IPortfolioStorage storage) : base(storage)
             {
+                _csvWriter = csvWriter;
             }
 
             public override async Task<ExportResponse> Handle(Query query, CancellationToken cancellationToken)
@@ -27,7 +33,7 @@ namespace core.Notes
 
                 var filename = CSVExport.GenerateFilename("notes");
 
-                return new ExportResponse(filename, CSVExport.Generate(notes));
+                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, notes));
             }
         }
     }

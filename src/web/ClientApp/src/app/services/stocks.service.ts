@@ -330,8 +330,10 @@ export interface ReviewList {
   end: string
   stockProfit: number
   optionProfit: number
+  openPositions: StockTradingPosition[]
   closedPositions: StockTradingPosition[]
   plOptionTransactions: Transaction[]
+  plStockTransactions: Transaction[]
   stockTransactions: Transaction[]
   optionTransactions: Transaction[]
 }

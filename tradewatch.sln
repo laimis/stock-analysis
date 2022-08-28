@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdameritradeclient", "src\i
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdameritradeclienttests", "tests\infrastructuretests\tdameritradeclienttests\tdameritradeclienttests.csproj", "{C1848435-5966-4F9A-AAC2-28EB122C28CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csvparsertests", "tests\infrastructuretests\csvparsertests\csvparsertests.csproj", "{CF876311-D1F1-4B78-9459-F24FD75B22B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -290,6 +292,18 @@ Global
 		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x64.Build.0 = Release|Any CPU
 		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x86.ActiveCfg = Release|Any CPU
 		{C1848435-5966-4F9A-AAC2-28EB122C28CC}.Release|x86.Build.0 = Release|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Debug|x64.Build.0 = Debug|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Release|x64.Build.0 = Release|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3B806027-868A-4619-894A-82A32E9F9037} = {D067D9A3-32FE-4B01-85C3-9158417FE12C}
@@ -313,5 +327,6 @@ Global
 		{871EEBCA-2882-4817-AFB6-BACF02008FB1} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{582E150E-986C-4B49-836A-A8CF3558D3C9} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{C1848435-5966-4F9A-AAC2-28EB122C28CC} = {E32D8CC2-C013-4386-BDAF-840EC6AE86F5}
+		{CF876311-D1F1-4B78-9459-F24FD75B22B5} = {E32D8CC2-C013-4386-BDAF-840EC6AE86F5}
 	EndGlobalSection
 EndGlobal

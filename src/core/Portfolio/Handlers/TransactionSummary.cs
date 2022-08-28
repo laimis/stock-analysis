@@ -94,14 +94,19 @@ namespace core.Portfolio
                     .Where(p => p.IsClosed && p.Closed >= request.Start && p.Closed <= request.End)
                     .ToList();
 
+                var openPositions = stocks.SelectMany(s => s.State.PositionInstances)
+                    .Where(p => !p.IsClosed && p.Opened >= request.Start && p.Opened <= request.End)
+                    .ToList();
+
                 return new TransactionSummaryView(
-                    request.Start,
-                    request.End,
-                    closedPositions,
-                    stockTransactions,
-                    optionTransactions,
-                    plStockTransactions,
-                    plOptionTransactions
+                    start: request.Start,
+                    end: request.End,
+                    openPositions: openPositions,
+                    closedPositions: closedPositions,
+                    stockTransactions: stockTransactions,
+                    optionTransactions: optionTransactions,
+                    plStockTransactions: plStockTransactions,
+                    plOptionTransactions: plOptionTransactions
                 );
             }
         }

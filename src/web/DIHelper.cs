@@ -10,6 +10,7 @@ using core.Alerts;
 using core.Options;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
+using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.SMS;
 using csvparser;
 using iexclient;
@@ -54,6 +55,7 @@ namespace web
             services.AddMediatR(typeof(Sell).Assembly, typeof(DIHelper).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
+            services.AddSingleton<ICSVWriter, CsvWriterImpl>();
             
             services.AddSingleton<ISubscriptions>(s => 
                 new stripe.Subscriptions(
