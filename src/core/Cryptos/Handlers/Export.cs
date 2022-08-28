@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 
 namespace core.Cryptos.Handlers
 {
@@ -16,14 +17,20 @@ namespace core.Cryptos.Handlers
 
         public class Handler : HandlerWithStorage<Query, ExportResponse>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private ICSVWriter _csvWriter;
+
+            public Handler(
+                ICSVWriter csvWriter,
+                IPortfolioStorage storage) : base(storage)
             {
+                _csvWriter = csvWriter;
             }
 
             public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken) =>
                 new ExportResponse(
                     CSVExport.GenerateFilename("cryptos"),
                     CSVExport.Generate(
+                        _csvWriter,
                         (await _storage.GetCryptos(request.UserId))
                     )
                 );
