@@ -21,15 +21,10 @@ namespace core
         private record struct NoteRecord(string created, string ticker, string note);
         private record struct OptionRecord(string ticker, string type, decimal strike, string optiontype, string expiration, decimal amount, decimal premium, string filled);
         private record struct UserRecord(string email, string first_name, string last_name);
-        // public const string ALERTS_HEADER = "ticker,pricepoints";
         private record struct AlertsRecord(string ticker, string pricepoints);
-        // public const string PAST_TRADES_HEADER = "ticker,date,profit,percentage";
         private record struct PastTradesRecord(string ticker, string date, decimal profit, decimal percentage);
-        // public const string OWNED_STOCKS_HEADER = "ticker,shares,averagecost,invested,daysheld,category";
         private record struct OwnedStocksRecord(string ticker, decimal shares, decimal averagecost, decimal invested, decimal daysheld, string category);
-        // public const string CRYPTOS_HEADER = ;
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
-        // public const string TRADES_HEADER = "symbol,opened,closed,daysheld,firstbuycost,cost,maxshares,profit,returnpct,rr,buys,sells";
         private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal maxshares, decimal profit, decimal returnpct, decimal rr, decimal buys, decimal sells);
 
         public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
