@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, NoteList } from '../services/stocks.service';
+import { StocksService, NoteList, Note } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class NotesComponent implements OnInit {
 
-  notes: object[]
+  notes: Note[]
   tickers: string[]
   symbolFilter: string = ''
   loading: boolean = false

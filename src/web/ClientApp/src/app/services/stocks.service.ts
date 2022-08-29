@@ -353,7 +353,14 @@ export interface StockSummary {
 export interface TransactionList {
   credit: number
   debit: number
+  tickers: string[]
   transactions: Transaction[]
+  grouped: TransactionGroup[]
+}
+
+export interface TransactionGroup {
+  name: string
+  transactions: TransactionList
 }
 
 export interface Transaction {
@@ -373,7 +380,20 @@ export interface Transaction {
 }
 export interface NoteList {
   tickers: string[]
-  notes: object[]
+  notes: Note[]
+}
+
+export interface Note {
+  relatedToTicker: string
+  created: string
+  price: Price
+  note: string
+  id: string
+  stats: StockAdvancedStats
+}
+
+export interface Price {
+  amount: number
 }
 
 export interface Portfolio {
@@ -403,13 +423,14 @@ export class OwnedStock {
 
 export interface CryptoDetails {
   token: string
-  price: number
+  price: Price
+  name: string
 }
 
 export interface CryptoOwnership {
   quantity: number
   averageCost: number
-  transactions: TransactionList
+  transactions: Transaction[]
 }
 
 export class OwnedCrypto {
@@ -443,6 +464,7 @@ export class OwnedOption {
   currentPrice: Number
   ticker: string
   optionType: string
+  expirationDate: string
   strikePrice: number
   numberOfContracts: number
   boughtOrSold: string
@@ -453,9 +475,9 @@ export class OwnedOption {
 
 export class AlertLabelValue {
   label: string
-  value: string
+  value: number
 
-  constructor(label: string, value: string) {
+  constructor(label: string, value: number) {
     this.label = label;
     this.value = value;
   }
@@ -478,7 +500,27 @@ export interface Prices {
   sma: SMA[]
 }
 
-export interface StockStats {
+export interface StockAdvancedStats {
+  companyName: string
+  peRatio: number
+  avg10Volume: number
+  avg30Volume: number
+  week52High: number
+  week52Low: number
+  week52highDate: number
+  week52lowDate: number
+  marketCap: number
+  debtToEquity: number
+  putCallRatio: number
+  priceToBook: number
+  revenue: number
+  grossProfit: number
+  profitMargin: number
+  totalCash : number
+  year5ChangePercent: number
+  year1ChangePercent: number
+  month3ChangePercent: number
+  month1ChangePercent: number
   day50MovingAvg: number
   day200MovingAvg: number
 }
@@ -486,7 +528,7 @@ export interface StockStats {
 export interface StockDetails {
   ticker: string
   price: number
-  stats: StockStats
+  stats: StockAdvancedStats
   profile : StockProfile
 	alert: object
 }
@@ -623,11 +665,17 @@ export interface StockTradingPosition {
 export class OptionDefinition {
   id: string
   ticker: string
+  side: string
+  openInterest: number
   strikePrice: number
   expirationDate: string
   optionType: string
   numberOfContracts: number
   bid: number
+  ask: number
+  spread: number
+  perDayPrice: number
+  lastUpdated: string
   premium: number
   filled: string
   closed: string

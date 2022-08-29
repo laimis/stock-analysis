@@ -38,7 +38,7 @@
             <div class="col" *ngIf="this.owned && this.owned.averageCost > 0">
               <label>Cost based shortcuts</label>
               <div>
-                <select class="form-select" #costBasedSelect (click)="newPricePoint = costBasedSelect.value">
+                <select class="form-select" #costBasedSelect (click)="newPricePoint = parseFloat(costBasedSelect.value)">
                   <option *ngFor="let pp of costBasedAlerts"
                     value="{{pp.value}}"
                     [attr.selected]="pp.value == this.owned.averageCost.toFixed(2) ? true : null">{{pp.label}}</option>
@@ -48,7 +48,7 @@
             <div class="col">
               <label>Price based shortcuts</label>
               <div>
-                <select class="form-select" #priceBasedSelect (click)="newPricePoint = priceBasedSelect.value">
+                <select class="form-select" #priceBasedSelect (click)="newPricePoint = parseFloat(priceBasedSelect.value)">
                   <option *ngFor="let pp of priceBasedAlerts"
                     value="{{pp.value}}"
                     [attr.selected]="pp.value == stock.price ? true : null">{{pp.label}}</option>

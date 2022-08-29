@@ -62,8 +62,9 @@ export class ProfileLoginComponent implements OnInit {
     })
   }
 
-  forgotPassword() {
+  forgotPassword() : boolean {
     this.resetPasswordRequest = true
+    return false
   }
 
   cancelReset() {

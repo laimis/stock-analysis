@@ -55,4 +55,11 @@ export class CryptoDetailsComponent {
       })
     }
   }
+
+  delete() {
+    if (confirm("are you sure you want to delete this crypto?"))
+    {
+      alert("not implemented")
+    }
+  }
 }

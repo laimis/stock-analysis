@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { StockViolation } from 'src/app/services/stocks.service';
+import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-violations',
@@ -34,7 +34,7 @@ export class StockViolationsComponent implements OnInit {
     alert("failures" + errors.join("\n"))
   }
 
-  transactionRecorded(type:string) {
-    this.refreshRequested.emit(type)
+  transactionRecorded(val:stocktransactioncommand) {
+    this.refreshRequested.emit(val.ticker)
   }
 }

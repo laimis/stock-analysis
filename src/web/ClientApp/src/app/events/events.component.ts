@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./events.component.css']
 })
 export class EventsComponent implements OnInit {
-  events: object[]
+  events: any[]
 
   constructor(
     private stockService:StocksService,

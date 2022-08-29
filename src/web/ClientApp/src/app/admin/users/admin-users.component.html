@@ -24,9 +24,9 @@
     <tbody>
       <tr *ngFor="let u of users">
         <td>
-          <div (click)="showId=true">{{u.email}}</div>
-          <div><span *ngIf="showId">{{u.userId}}</span></div>
-          <div><span *ngIf="showId"> <a target="_blank" [routerLink]="[ '/api/admin/delete', u.userId ]">delete</a> </span></div>
+          <div>{{u.email}}</div>
+          <div><span>{{u.userId}}</span></div>
+          <div><a target="_blank" [routerLink]="[ '/api/admin/delete', u.userId ]">delete</a></div>
         </td>
         <td>{{u.firstname}}</td>
         <td>{{u.lastname}}</td>

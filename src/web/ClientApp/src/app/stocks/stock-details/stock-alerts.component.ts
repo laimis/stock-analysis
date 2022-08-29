@@ -26,6 +26,8 @@ export class StockAlertsComponent {
 
   showShortcuts : boolean = false
 
+  parseFloat = parseFloat
+
   @Input()
   set alerts(alert: object) {
     this.alert = alert
@@ -77,7 +79,7 @@ export class StockAlertsComponent {
 
       var bandVal = this.alertBands[index]
 
-      var val = (base + base * bandVal / 100.0).toFixed(2)
+      var val = Math.round(base + base * bandVal) / 100
       var label = "+" + bandVal + "% " + val
 
       arr.push( new AlertLabelValue(label, val) )
@@ -86,7 +88,7 @@ export class StockAlertsComponent {
     arr.push(
       new AlertLabelValue(
         base.toString(),
-        base.toString()
+        base
       )
     )
 
@@ -94,7 +96,7 @@ export class StockAlertsComponent {
 
       var bandVal = this.alertBands[index]
 
-      var val = (base - base * bandVal / 100.0).toFixed(2)
+      var val = Math.round(base - base * bandVal) / 100
       var label = "-" + bandVal + "% " + val
 
       arr.push( new AlertLabelValue(label, val) )
