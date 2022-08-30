@@ -51,13 +51,9 @@ export class StockTradingNewPositionComponent implements OnChanges {
   stopPrice: number | null = null
   notes: string | null = null
   exitPrice: number | null = null
-  potentialProfit: number | null = null
   potentialLoss: number | null = null
-  potentialRr: number | null = null
   date: string | null = null
-  brokerageOrderType: string | null = null
-  brokerageOrderDuration: string | null = null
-
+  
   prices: Prices | null = null
   stopAndExitPoints: number[] | null = null
   ticker: string;
@@ -101,12 +97,24 @@ export class StockTradingNewPositionComponent implements OnChanges {
     return this.getLastSma(0)
   }
 
+  smaCheck20(): boolean {
+    return this.get20sma() < this.costToBuy && this.get20sma() > this.get50sma()
+  }
+
   get50sma(): number {
     return this.getLastSma(1)
   }
 
+  smaCheck50(): boolean {
+    return this.get50sma() < this.costToBuy && this.get50sma() > this.get150sma()
+  }
+
   get150sma(): number {
     return this.getLastSma(2)
+  }
+
+  smaCheck150(): boolean {
+    return this.get150sma() < this.costToBuy && this.get150sma() < this.get50sma()
   }
 
   getLastSma(smaIndex): number {
@@ -156,9 +164,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
 
     this.stopPrice = Math.round(this.costToBuy * (1 - this.stopLoss) * 100) / 100
     this.exitPrice = Math.round(this.costToBuy * (1 + this.rrTarget) * 100) / 100
-    this.potentialProfit = this.exitPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
-    this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy 
-    this.potentialRr = Math.abs(this.potentialProfit / this.potentialLoss)
+    this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
     this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
   }
 
@@ -182,27 +188,6 @@ export class StockTradingNewPositionComponent implements OnChanges {
         this.stockPurchased.emit(cmd)
     },
       _ => { alert('purchase failed') }
-    )
-  }
-
-  brokerageBuy() {
-    var cmd : brokerageordercommand = {
-      ticker: this.ticker,
-      numberOfShares: this.stocksToBuy,
-      price: this.costToBuy,
-      type: this.brokerageOrderType,
-      duration: this.brokerageOrderDuration
-    }
-
-    this.stockService.brokerageBuy(cmd).subscribe(
-      _ => { 
-        this.reset()
-        this.brokerageOrderEntered.emit("entered")
-    },
-      err => { 
-        console.error(err)
-        alert('brokerage failed') 
-      }
     )
   }
 }

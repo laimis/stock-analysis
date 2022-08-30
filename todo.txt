@@ -1,6 +1,0 @@
-ability to change stop in the simulator
-show R/R in Summary
-show % gain in Summary
-ability to store the simulations with purchases
-ability to delete a purchase
-ability to sell a purchase

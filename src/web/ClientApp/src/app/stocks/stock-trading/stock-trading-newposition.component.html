@@ -62,13 +62,12 @@
     <div class="row mt-3" *ngIf="prices">
       <div class="col fs-6">
         <span class="me-2">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
-        <span class="me-2">Profit: <strong>{{ potentialProfit | currency }}</strong></span>
         <span class="me-2">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
       </div>
       <div class="col text-end">
-        <span class="me-2">20SMA: <strong>{{ get20sma() | currency }}</strong></span>
-        <span class="me-2">50SMA: <strong>{{ get50sma() | currency }}</strong></span>
-        <span class="me-2">150SMA: <strong>{{ get150sma() | currency }}</strong></span>
+        <span class="me-2">20SMA: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
+        <span class="me-2">50SMA: <strong [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
+        <span class="me-2">150SMA: <strong [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
       </div>
     </div>
     <div class="row mt-3" *ngIf="prices">
@@ -78,24 +77,6 @@
     <div class="row mt-3" *ngIf="prices">
       <div class="col" >
         <button class="btn btn-primary w-100" (click)="record()">Record</button>
-      </div>
-      <div class="col" >
-        <select class="form-select" [(ngModel)]="brokerageOrderType">
-          <option value="Limit">Limit</option>
-          <option value="Market">Market</option>
-          <option value="StopMarket">StopMarket</option>
-        </select>
-      </div>
-      <div class="col" >
-        <select class="form-select" [(ngModel)]="brokerageOrderDuration">
-          <option value="Day">Day</option>
-          <option value="Gtc">GTC</option>
-          <option value="DayPlus">Day+AH</option>
-          <option value="GtcPlus">GTC+AH</option>
-        </select>
-      </div>
-      <div class="col" >
-        <button class="btn btn-primary w-100" (click)="brokerageBuy()">Brokerage Order</button>
       </div>
     </div>
     <div class="row mt-2" *ngIf="prices && showChart">
