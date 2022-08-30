@@ -28,6 +28,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
 
   @Input()
   showChart: boolean = true
+
   @Input()
   recordPositions: boolean = true
 
@@ -50,29 +51,30 @@ export class StockTradingNewPositionComponent implements OnChanges {
   exitPrice: number | null = null
   potentialLoss: number | null = null
   date: string | null = null
-  
+  ticker: string | null = null
+
   prices: Prices | null = null
   stopAndExitPoints: number[] | null = null
-  ticker: string;
 
   onBuyTickerSelected(ticker: string) {
-      this.costToBuy = null
-      this.stocksToBuy = null
-      this.stopPrice = null
-      this.ticker = ticker
-      this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
-      
-      this.stockService.getStockPrice(ticker)
-        .subscribe(price => {
-          console.log(price)
-          this.costToBuy = price
-          this.updateBuyingValues()
-          this.updateChart(ticker)
-        }, error => {
-          console.error(error);
-        }
-      );
-    }
+    
+    this.costToBuy = null
+    this.stocksToBuy = null
+    this.stopPrice = null
+    this.ticker = ticker
+    this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
+    
+    this.stockService.getStockPrice(ticker)
+      .subscribe(price => {
+        console.log(price)
+        this.costToBuy = price
+        this.updateBuyingValues()
+        this.updateChart(ticker)
+      }, error => {
+        console.error(error);
+      }
+    );
+  }
 
   reset() {
     this.costToBuy = null

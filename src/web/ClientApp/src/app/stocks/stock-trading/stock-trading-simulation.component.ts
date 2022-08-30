@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StocksService, stocktransactioncommand } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { tick } from '@angular/core/testing';
 
 @Component({
   selector: 'stock-trading-simulation',
@@ -8,17 +9,38 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./stock-trading-simulation.component.css']
 })
 
-export class StockTradingSimulationComponent {
+export class StockTradingSimulationComponent implements OnInit {
 
   stopPrice: number | null = null
   positions: stocktransactioncommand[] = []
   currentCost: number | null = null
   profit: number | null = null
+  ticker: string
+
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
+  ngOnInit(): void {
+    var simulations = localStorage.getItem('simulations')
+    
+    if (simulations) {
+      var data = JSON.parse(simulations)
+
+      this.ticker = data.ticker
+      this.stopPrice = data.stopPrice
+      this.positions = data.positions
+      this.currentCost = data.currentCost
+
+      this.updateProfit()
+    }
+  }
+
+  reset() {
+    localStorage.removeItem('simulations')
+    this.positions = []
+  }
 
   stockPurchased(stocktransactioncommand: stocktransactioncommand) {
-    console.log(stocktransactioncommand)
+    
     if (stocktransactioncommand.stopPrice) {
       this.stopPrice = stocktransactioncommand.stopPrice
     }
@@ -28,6 +50,8 @@ export class StockTradingSimulationComponent {
     }
 
     this.positions.push(stocktransactioncommand)
+
+    this.update()
   }
 
   totalCost() {
@@ -45,6 +69,24 @@ export class StockTradingSimulationComponent {
   riskedAmount() {
     // average cost per share - stopPrice multipled by number of shares
     return (this.averageCostPerShare() - this.stopPrice) * this.numberOfShares()
+  }
+
+  removePosition(index:number) {
+    this.positions.splice(index, 1)
+    this.update()
+  }
+
+  update() {
+    var data = {
+      stopPrice: this.stopPrice,
+      positions: this.positions,
+      currentCost: this.currentCost,
+      ticker: this.ticker
+    }
+
+    localStorage.setItem('simulations', JSON.stringify(data))
+
+    this.updateProfit()
   }
 
   updateProfit() {
