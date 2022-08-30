@@ -62,10 +62,11 @@ import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-t
 import { StockTradingReviewComponent } from './stocks/stock-trading/stock-trading-review.component';
 import { StockTradingChartComponent } from './stocks/stock-trading/stock-trading-chart.component';
 import { StockChartsComponent } from './stocks/stock-dashboard/stock-charts.component';
-import { StockTradingPendingComponent } from './brokerage/orders.component';
+import { BrokerageOrdersComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-dashboard/stock-violations.component';
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
 import { StockTradingSimulationComponent } from './stocks/stock-trading/stock-trading-simulation.component';
+import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -170,11 +171,14 @@ var routes: Routes = [
     StockTradingPositionComponent,
     StockTradingNewPositionComponent,
     StockTradingPastComponent,
-    StockTradingPendingComponent,
     StockTradingPerformanceComponent,
     StockTradingReviewComponent,
     StockTradingChartComponent,
     StockTradingSimulationComponent,
+
+    
+    BrokerageOrdersComponent,
+    BrokerageNewOrderComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,

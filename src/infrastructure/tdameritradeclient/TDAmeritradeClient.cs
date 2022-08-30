@@ -154,7 +154,7 @@ public class TDAmeritradeClient : IBrokerage
         LogAndThrowIfFailed(response, "cancel order");
     }
 
-    public async Task BuyOrder(
+    public Task BuyOrder(
         UserState user,
         string ticker,
         decimal numberOfShares,
@@ -181,7 +181,42 @@ public class TDAmeritradeClient : IBrokerage
             orderLegCollection = new [] {legCollection}
         };
 
+        return EnterOrder(user, postData);
+    }
+
+    public Task SellOrder(
+        UserState user,
+        string ticker,
+        decimal numberOfShares,
+        decimal price,
+        BrokerageOrderType type,
+        BrokerageOrderDuration duration)
+    {
+        var legCollection = new {
+            instruction = "Sell",
+            quantity = numberOfShares,
+            instrument = new {
+                symbol = ticker,
+                assetType = "EQUITY"
+            }
+        };
+
+        var postData = new
+        {
+            orderType = GetBuyOrderType(type),
+            session = GetSession(duration),
+            duration = GetBuyOrderDuration(duration),
+            price = price,
+            orderStrategyType = "SINGLE",
+            orderLegCollection = new [] {legCollection}
+        };
+
         // get account first
+        return EnterOrder(user, postData);
+    }
+
+    private async Task EnterOrder(UserState user, object postData)
+    {
         var accounts = await CallApi(user, "/accounts", HttpMethod.Get);
 
         LogAndThrowIfFailed(accounts, "get account");
@@ -203,7 +238,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var response = await CallApi(user, url, HttpMethod.Post, data);
 
-        LogAndThrowIfFailed(response, "buy order");
+        LogAndThrowIfFailed(response, "brokerage order");
     }
 
     private string GetBuyOrderType(BrokerageOrderType type) =>

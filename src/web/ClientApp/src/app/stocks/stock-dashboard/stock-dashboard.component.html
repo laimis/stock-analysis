@@ -87,6 +87,6 @@
 
 <stock-ownership-grid *ngIf="loaded && isActive('owned')" [owned]=owned [selectedCategory]=selectedCategory></stock-ownership-grid>
 <stock-grid *ngIf="loaded && isActive('grid')"></stock-grid>
-<brokerage-orders *ngIf="loaded && isActive('orders')" [orders]="orders"></brokerage-orders>
+<app-brokerage-orders *ngIf="loaded && isActive('orders')" [orders]="orders"></app-brokerage-orders>
 <stock-charts *ngIf="loaded && isActive('charts')" [positions]="positions" ></stock-charts>
 <stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="fetchData()"></stock-violations>

@@ -3,11 +3,11 @@ import { BrokerageOrder, StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
-  selector: 'brokerage-orders',
+  selector: 'app-brokerage-orders',
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css']
 })
-export class StockTradingPendingComponent {
+export class BrokerageOrdersComponent {
 
   constructor(
     private stockService: StocksService

@@ -32,6 +32,16 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
+        [HttpPost("sell")]
+        public async Task<ActionResult> Sell(Sell.Command cmd)
+        {
+            cmd.WithUserId(User.Identifier());
+
+            var r = await _mediator.Send(cmd);
+
+            return this.OkOrError(r);
+        }
+
         [HttpDelete("orders/{orderId}")]
         public async Task<ActionResult> Delete(string orderId)
         {

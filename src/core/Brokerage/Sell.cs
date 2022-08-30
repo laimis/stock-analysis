@@ -7,7 +7,7 @@ using core.Shared.Adapters.Brokerage;
 
 namespace core.Brokerage
 {
-    public class Buy
+    public class Sell
     {
         public class Command : RequestWithTicker<CommandResponse>
         {
@@ -44,7 +44,7 @@ namespace core.Brokerage
                         "Unable to find user account for stock operation");
                 }
 
-                await _brokerage.BuyOrder(user.State, cmd.Ticker, cmd.NumberOfShares, cmd.Price, cmd.Type, cmd.Duration);
+                await _brokerage.SellOrder(user.State, cmd.Ticker, cmd.NumberOfShares, cmd.Price, cmd.Type, cmd.Duration);
 
                 return CommandResponse.Success();
             }

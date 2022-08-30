@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { brokerageordercommand, Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -39,9 +39,6 @@ export class StockTradingNewPositionComponent implements OnChanges {
 
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
-
-  @Output()
-  brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
 
   // variables for new positions
   positionSize: number = null
