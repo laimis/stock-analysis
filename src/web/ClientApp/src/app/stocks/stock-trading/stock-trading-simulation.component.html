@@ -5,49 +5,97 @@
 
   <div class="row">
     <div class="col-md-8">
-      <stock-trading-newposition [showChart]="false" [recordPositions]="false" (stockPurchased)="stockPurchased($event)" ></stock-trading-newposition>
+      <div class="row">
+        <div class="col">
+          <label for="ticker" class="form-label">Ticker</label>
+          <input type="text" class="form-control text-uppercase" id="ticker" [(ngModel)]="ticker" placeholder="Ticker">
+        </div>
+        <div class="col">
+          <label for="price" class="form-label">Price</label>
+          <input type="number" class="form-control" id="price" [(ngModel)]="price" placeholder="Price">
+        </div>
+        <div class="col">
+          <label for="quantity" class="form-label">Quantity</label>
+          <input type="number" class="form-control" id="quantity" [(ngModel)]="quantity" placeholder="Quantity">
+        </div>
+        <div class="col">
+          <label for="date" class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" [(ngModel)]="date">
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col">
+          <button class="btn btn-primary" (click)="buy()">Buy</button>
+        </div>
+        <div class="col text-end">
+          <button class="btn btn-primary" (click)="sell()">Sell</button>
+        </div>
+      </div>
+      <div class="row mt-3" *ngIf="transactions.length > 0">
+        <h3>Purchases</h3>
+        <div class="row" *ngFor="let p of transactions; let i = index">
+          <div class="col">{{p.date}}</div>
+          <div class="col">{{p.type}}</div>
+          <div class="col">{{p.price}}</div>
+          <div class="col">{{p.numberOfShares}}</div>
+          <div class="col">{{p.numberOfShares * p.price | number}}</div>
+          <div class="col text-end"><button class="btn btn-primary btn-sm" (click)="removeTransaction(i)">delete</button></div>
+        </div>
+      </div>
     </div>
     <div class="col-md-4">
-      <div *ngIf="positions.length > 0">
+      <div *ngIf="transactions.length > 0">
         <label for="currentCost" class="form-label">Current Cost</label>
         <input type="number" id="currentCost" [(ngModel)]="currentCost" (ngModelChange)="update()" class="form-control">
 
         <label for="stopPrice" class="form-label">Stop</label>
         <input type="number" id="stopPrice" [(ngModel)]="stopPrice" (ngModelChange)="update()" class="form-control">
 
+        <label for="riskedAmount" class="form-label">Risked Amount (<a (click)="calculateRiskedAmount()" class="link-primary">calculate based on stop</a>)</label>
+        <input type="number" id="riskedAmount" [(ngModel)]="riskedAmount" (ngModelChange)="update()" class="form-control">
+
         <h3 class="mt-3">Summary</h3>
         <table class="table">
           <tbody>
             <tr>
-              <td>Profit</td>
-              <td>{{profit | currency}}</td>
+              <td>Unrealized Profit</td>
+              <td>{{unrealizedProfit | currency}}</td>
             </tr>
             <tr>
-              <td>Gain</td>
-              <td>{{profit / totalCost() | percent:'1.0-2'}}</td>
+              <td>Unrealized Gain</td>
+              <td>{{unrealizedProfit / cost | percent:'1.0-2'}}</td>
             </tr>
             <tr>
-              <td>R/R</td>
-              <td>{{profit / riskedAmount() | number}}</td>
+              <td>Unrealize R/R</td>
+              <td>{{unrealizedProfit / riskedAmount | number}}</td>
             </tr>
             <tr>
               <td></td><td></td>
             </tr>
             <tr>
               <td>Cost</td>
-              <td>{{totalCost() | currency}}</td>
+              <td>{{cost | currency}}</td>
             </tr>
             <tr>
               <td>Cost/Share</td>
-              <td>{{averageCostPerShare() | currency}}</td>
+              <td>{{averageCostPerShare | currency}}</td>
             </tr>
             <tr>
               <td>Stop</td>
-              <td>{{stopPrice | currency}} ( {{ (stopPrice - averageCostPerShare())/averageCostPerShare() | percent:'1.0-2' }}) </td>
+              <td>{{stopPrice | currency}} ( {{ (stopPrice - averageCostPerShare)/averageCostPerShare | percent:'1.0-2' }}) </td>
+            </tr>
+            
+            
+            <tr>
+              <td></td><td></td>
             </tr>
             <tr>
-              <td>Risked</td>
-              <td>{{riskedAmount() | currency}}</td>
+              <td>Profit</td>
+              <td>{{profit | currency}}</td>
+            </tr>
+            <tr>
+              <td>R/R</td>
+              <td>{{profit / riskedAmount | number}}</td>
             </tr>
           </tbody>
         </table>
@@ -55,16 +103,7 @@
     </div>
   </div>
   
-  <div *ngIf="positions.length > 0">
-    <h3>Purchases</h3>
-    <div class="row" *ngFor="let p of positions; let i = index">
-      <div class="col">{{p.date}}</div>
-      <div class="col">{{p.price}}</div>
-      <div class="col">{{p.numberOfShares}}</div>
-      <div class="col">{{p.numberOfShares * p.price | number}}</div>
-      <div class="col"><button class="btn btn-primary btn-sm" (click)="removePosition(i)">delete</button></div>
-    </div>
-  </div>
+  
 
   <div>
     <button class="btn btn-primary" (click)="reset()">Reset</button>
