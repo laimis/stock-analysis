@@ -34,12 +34,9 @@ export class StockTradingSimulationComponent implements OnInit {
     }
   }
 
-  reset() {
-    localStorage.removeItem('simulations')
-    this.positions = []
-  }
-
   stockPurchased(stocktransactioncommand: stocktransactioncommand) {
+
+    this.ticker = stocktransactioncommand.ticker
     
     if (stocktransactioncommand.stopPrice) {
       this.stopPrice = stocktransactioncommand.stopPrice
@@ -74,6 +71,15 @@ export class StockTradingSimulationComponent implements OnInit {
   removePosition(index:number) {
     this.positions.splice(index, 1)
     this.update()
+  }
+
+  reset() {
+    localStorage.removeItem('simulations')
+    this.positions = []
+    this.currentCost = null
+    this.profit = null
+    this.ticker = null
+    this.stopPrice = null
   }
 
   update() {

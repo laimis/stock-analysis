@@ -19,6 +19,21 @@
         <table class="table">
           <tbody>
             <tr>
+              <td>Profit</td>
+              <td>{{profit | currency}}</td>
+            </tr>
+            <tr>
+              <td>Gain</td>
+              <td>{{profit / totalCost() | percent:'1.0-2'}}</td>
+            </tr>
+            <tr>
+              <td>R/R</td>
+              <td>{{profit / riskedAmount() | number}}</td>
+            </tr>
+            <tr>
+              <td></td><td></td>
+            </tr>
+            <tr>
               <td>Cost</td>
               <td>{{totalCost() | currency}}</td>
             </tr>
@@ -28,15 +43,11 @@
             </tr>
             <tr>
               <td>Stop</td>
-              <td>{{stopPrice | currency}}</td>
+              <td>{{stopPrice | currency}} ( {{ (stopPrice - averageCostPerShare())/averageCostPerShare() | percent:'1.0-2' }}) </td>
             </tr>
             <tr>
               <td>Risked</td>
               <td>{{riskedAmount() | currency}}</td>
-            </tr>
-            <tr>
-              <td>Profit</td>
-              <td>{{profit | currency}}</td>
             </tr>
           </tbody>
         </table>
