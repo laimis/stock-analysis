@@ -5,11 +5,12 @@
     </div>
     <div class="col text-end">  
       <select class="form-select" id="metricToRender" (click)="metricChanged($event.target)">
-        <option value="">Metric to render:</option>
+        <option value="">Sort by:</option>
         <option value="rr">R/R</option>
         <option value="pl">P/L</option>
         <option value="plPercent">P/L %</option>
         <option value="cost">Cost</option>
+        <option value="ticker">Ticker</option>
       </select>
     </div>
   </div>
@@ -28,7 +29,7 @@
             <div class="col text-center">
             </div>
             <div class="col">
-              <span class="position-gain float-end">{{ getMetricToRender(p) | number:'1.0-2' }}</span>
+              <span class="position-gain float-end">{{ getMetricToRender(p) }}</span>
             </div>
           </div>  
         </div>

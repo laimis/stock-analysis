@@ -10,7 +10,7 @@ export class StockTradingPositionComponent {
     sortedPositions: StockTradingPosition[];
     _positions: StockTradingPosition[];
     metricToRender: string = "rr"
-    metricFunc: (p: StockTradingPosition) => number = (p:StockTradingPosition) => p.unrealizedRR;
+    metricFunc: (p: StockTradingPosition) => any = (p:StockTradingPosition) => p.unrealizedRR;
 
     @Input()
     set positions(input: StockTradingPosition[]) {
@@ -83,6 +83,9 @@ export class StockTradingPositionComponent {
             case "cost":
                 this.metricFunc = (p:StockTradingPosition) => this.positionSize(p)
                 break;
+            case "ticker":
+                this.metricFunc = (p:StockTradingPosition) => p.ticker
+                break
             default:
                 this.metricFunc = (p:StockTradingPosition) => p.unrealizedRR
         }
@@ -91,12 +94,20 @@ export class StockTradingPositionComponent {
     }
 
     getMetricToRender(p:StockTradingPosition) {
-        return this.metricFunc(p)
+        var val = this.metricFunc(p)
+        if (Number.isFinite(val)) {
+            return Math.round(val * 100) / 100
+        }
+        return val
     }
 
     updatePositions() {
         this.sortedPositions = this._positions.sort((a, b) => {
-            return this.metricFunc(b) - this.metricFunc(a)
+            console.log(this.metricFunc(a), this.metricFunc(b))
+            if (Number.isFinite(this.metricFunc(a))) {
+                return this.metricFunc(b) - this.metricFunc(a)
+            }
+            return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
         })
     }
 }
