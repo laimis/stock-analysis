@@ -143,6 +143,12 @@ namespace core.Stocks
                     o.ApplyPrice(price?.Price ?? 0);
                 }
 
+                foreach(var o in view.Positions)
+                {
+                    prices.TryGetValue(o.Ticker, out var price);
+                    o.ApplyPrice(price?.Price ?? 0);
+                }
+
                 return view;
             }
 
