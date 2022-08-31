@@ -6,16 +6,18 @@ namespace core.Stocks
 {
     public struct PositionTransaction
     {
-        public PositionTransaction(decimal quantity, decimal price, DateTimeOffset when)
+        public PositionTransaction(decimal quantity, decimal price, string type, DateTimeOffset when)
         {
             Quantity = quantity;
             Price = price;
+            Type = type;
             When = when;
         }
 
         public decimal Price { get; }
         public DateTimeOffset When { get; }
         public decimal Quantity { get; }
+        public string Type { get; set; }
     }
 
     // PositionInstance models a stock position from the time the first share is opened
@@ -84,7 +86,7 @@ namespace core.Stocks
             Cost += numberOfShares * price;
             NumberOfBuys++;
             
-            Buys.Add(new PositionTransaction(numberOfShares, price, when));
+            Buys.Add(new PositionTransaction(numberOfShares, price, "buy", when));
 
             if (NumberOfShares > MaxNumberOfShares)
             {
@@ -107,7 +109,7 @@ namespace core.Stocks
             NumberOfShares -= amount;
             NumberOfSells++;
             Return += amount * price;
-            Sells.Add(new PositionTransaction(amount, price, when));
+            Sells.Add(new PositionTransaction(amount, price, "sell", when));
 
             if (NumberOfShares < 0)
             {

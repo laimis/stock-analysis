@@ -637,7 +637,8 @@ export interface StockTradingPositions {
 export interface PositionTransaction {
   quantity: number,
   price: number,
-  when: string
+  type: string,
+  when: string,
 }
 
 export interface StockTradingPosition {

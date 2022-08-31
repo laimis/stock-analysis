@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../../services/stocks.service';
+import { StocksService, stocktransactioncommand, StockTradingPosition } from '../../services/stocks.service';
 
 class StockTransaction {
   numberOfShares: number
@@ -33,11 +33,14 @@ export class StockTradingSimulationComponent implements OnInit {
   riskedAmount: number = 0
   unrealizedProfit: number = 0
 
+
+  showExisting: boolean = false
+  positions:StockTradingPosition[] = []
+
   constructor(private stocks:StocksService) { }
 
   ngOnInit(): void {
     var simulations = localStorage.getItem('simulations')
-    
     if (simulations) {
       var data = JSON.parse(simulations)
 
@@ -49,6 +52,20 @@ export class StockTradingSimulationComponent implements OnInit {
 
       this.runCalculations()
     }
+
+    
+    this.stocks.getStocks().subscribe(data => {
+      this.positions = data.positions
+    } )
+  }
+
+  initialPosition(cmd:stocktransactioncommand) {
+    this.ticker = cmd.ticker
+    this.stopPrice = cmd.stopPrice
+    this.price = cmd.price
+    this.quantity = cmd.numberOfShares
+    this.date = cmd.date
+    this.addTransaction('buy')
   }
 
   buy() {
@@ -114,17 +131,51 @@ export class StockTradingSimulationComponent implements OnInit {
     this.update()
   }
 
+  showExistingPositions() {
+    this.showExisting = true
+  }
+
+  loadPosition(p:StockTradingPosition) {
+    
+    this.reset()
+    var tx = p.buys.concat(p.sells).sort((a, b) => Date.parse(a.when) - Date.parse(b.when))
+    var first = true;
+    this.currentCost = p.price
+    tx.forEach(t => {
+      if (first) {
+        var cmd:stocktransactioncommand = {
+          ticker: p.ticker,
+          stopPrice: p.stopPrice,
+          price: t.price,
+          numberOfShares: t.quantity,
+          date: t.when,
+          notes: null
+        }
+        this.initialPosition(cmd)
+        first = false
+      }
+      else {
+        this.price = t.price
+        this.quantity = t.quantity
+        this.date = t.when
+        this.addTransaction(t.type)
+      }
+    })
+    this.showExisting = false
+  }
+
   runCalculations() {
     var slots : number[] = []
     var cost : number = 0
     var profit : number = 0
+    var numberOfShares : number = 0
 
     this.transactions.forEach(transaction => {
       if (transaction.type == 'buy') {
         for (let i = 0; i < transaction.numberOfShares; i++) {
           slots.push(transaction.price)
           cost += transaction.price
-          this.numberOfShares++
+          numberOfShares++
         }
       } else {
         // remove quantity number of slots from the beginning of an array
@@ -132,7 +183,7 @@ export class StockTradingSimulationComponent implements OnInit {
         removed.forEach(removedElement => {
           profit += transaction.price - removedElement
           cost -= removedElement
-          this.numberOfShares--
+          numberOfShares--
         })
       }
     });
@@ -141,8 +192,8 @@ export class StockTradingSimulationComponent implements OnInit {
     this.averageCostPerShare = slots.reduce((acc, curr) => acc + curr, 0) / slots.length
     this.cost = cost
     this.profit = profit
+    this.numberOfShares = numberOfShares
     
-
     this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0)
 
     console.log(slots)

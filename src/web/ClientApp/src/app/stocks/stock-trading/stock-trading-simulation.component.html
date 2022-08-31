@@ -3,8 +3,19 @@
   
   <h2>Position simulator</h2>
 
-  <div class="row">
-    <div class="col-md-8">
+  <div class="row" *ngIf="showExisting">
+    <ul>
+      <li *ngFor="let position of positions">
+        <a [routerLink]="" (click)="loadPosition(position)">{{position.ticker}}</a>
+      </li>
+    </ul>
+  </div>
+  
+  <div class="row" *ngIf="!showExisting">
+    <div class="col-md-8" *ngIf="!ticker">
+      <stock-trading-newposition (stockPurchased)="initialPosition($event)" [recordPositions]="false"></stock-trading-newposition>
+    </div>
+    <div class="col-md-8" *ngIf="ticker">
       <div class="row">
         <div class="col">
           <label for="ticker" class="form-label">Ticker</label>
@@ -39,7 +50,11 @@
           <div class="col">{{p.price}}</div>
           <div class="col">{{p.numberOfShares}}</div>
           <div class="col">{{p.numberOfShares * p.price | number}}</div>
-          <div class="col text-end"><button class="btn btn-primary btn-sm" (click)="removeTransaction(i)">delete</button></div>
+          <div class="col text-end">
+            <a [routerLink]="" (click)="removeTransaction(i)">
+              <i class="bi bi-trash"></i>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -106,7 +121,8 @@
   
 
   <div>
-    <button class="btn btn-primary" (click)="reset()">Reset</button>
+    <button class="btn btn-primary me-3" (click)="showExistingPositions()">Load</button>
+    <button class="btn btn-primary me-3" (click)="reset()">Reset</button>
   </div>
   
 
