@@ -45,11 +45,11 @@
       <div class="row mt-3" *ngIf="transactions.length > 0">
         <h3>Purchases</h3>
         <div class="row" *ngFor="let p of transactions; let i = index">
-          <div class="col">{{p.date}}</div>
+          <div class="col">{{p.date | date:'shortDate'}}</div>
           <div class="col">{{p.type}}</div>
-          <div class="col">{{p.price}}</div>
-          <div class="col">{{p.numberOfShares}}</div>
-          <div class="col">{{p.numberOfShares * p.price | number}}</div>
+          <div class="col">{{p.price | currency}}</div>
+          <div class="col">{{p.numberOfShares | number }}</div>
+          <div class="col">{{p.numberOfShares * p.price | currency}}</div>
           <div class="col text-end">
             <a [routerLink]="" (click)="removeTransaction(i)">
               <i class="bi bi-trash"></i>
