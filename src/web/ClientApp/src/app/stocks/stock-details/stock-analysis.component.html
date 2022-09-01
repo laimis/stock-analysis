@@ -30,19 +30,19 @@
             <tr>
                 <td>SMA 20</td>
                 <td>
-                    <span [ngClass]="{'text-danger': getLatestSma(0) > analysis.price, 'text-success': getLatestSma(0) < analysis.price}">{{getLatestSma(0) | currency}}</span>
+                    <span [ngClass]="{'text-success': is20Healthy()}">{{get20Sma() | currency}}</span>
                 </td>
             </tr>
             <tr>
                 <td>SMA 50</td>
                 <td>
-                    <span [ngClass]="{'text-danger': getLatestSma(1) > analysis.price, 'text-success': getLatestSma(1) < analysis.price}">{{getLatestSma(1) | currency}}</span>
+                    <span [ngClass]="{'text-success': is50Healthy()}">{{get50Sma() | currency}}</span>
                 </td>
             </tr>
             <tr>
                 <td>SMA 150</td>
                 <td>
-                    <span [ngClass]="{'text-danger': getLatestSma(2) > analysis.price, 'text-success': getLatestSma(2) < analysis.price}">{{getLatestSma(2) | currency}}</span>
+                    <span [ngClass]="{'text-success': is150Healthy()}">{{get150Sma() | currency}}</span>
                 </td>
             </tr>
             <tr>
