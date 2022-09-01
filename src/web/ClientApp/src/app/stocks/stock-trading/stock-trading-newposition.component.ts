@@ -112,8 +112,16 @@ export class StockTradingNewPositionComponent implements OnChanges {
     return this.getLastSma(2)
   }
 
+  get200sma(): number {
+    return this.getLastSma(3)
+  }
+
   smaCheck150(): boolean {
     return this.get150sma() < this.costToBuy && this.get150sma() < this.get50sma()
+  }
+
+  smaCheck200(): boolean {
+    return this.get200sma() < this.costToBuy && this.get200sma() < this.get150sma()
   }
 
   getLastSma(smaIndex): number {

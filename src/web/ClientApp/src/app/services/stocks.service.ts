@@ -144,6 +144,10 @@ export class StocksService {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
   }
 
+  getStockAnalysis(symbol:string): Observable<StockAnalysis> {
+		return this.http.get<StockAnalysis>(`/api/stocks/${symbol}/analysis`)
+  }
+
   getStockPrice(symbol:string): Observable<number> {
     return this.http.get<number>(`/api/stocks/${symbol}/price`)
   }
@@ -307,6 +311,13 @@ export class StocksService {
   recentSells() : Observable<Sells> {
     return this.http.get<Sells>('/api/reports/sells')
   }
+}
+
+export interface StockAnalysis {
+  high: StockHistoricalPrice
+  low: StockHistoricalPrice
+  price: number
+  historicalPrices: Prices
 }
 
 export interface Sells {
@@ -490,6 +501,9 @@ export class AlertLabelValue {
 export interface StockHistoricalPrice {
   date: string
   close: number
+  open: number
+  high: number
+  low: number
   volume: number
 }
 

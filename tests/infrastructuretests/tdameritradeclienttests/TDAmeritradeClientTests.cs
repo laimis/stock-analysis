@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
@@ -10,7 +11,7 @@ namespace tdameritradeclienttests
     public class TDAmeritradeClientTests
     {
         [Fact]
-        public async Task AccountTest()
+        public async Task PriceHistoryTest()
         {
             var config = testutils.CredsHelper.GetTDAmeritradeConfig().Split(',');
             var tokenJson = testutils.CredsHelper.GetTDAmeritradeToken();
@@ -31,9 +32,15 @@ namespace tdameritradeclienttests
                 1
             );
 
-            var orders = await client.GetOrders(user.State);
+            var orders = await client.GetHistoricalPrices(user.State, "AAPL");
 
             Assert.NotEmpty(orders);
+            Assert.True(orders[0].Close > 0);
+            Assert.True(orders[0].High > 0);
+            Assert.True(orders[0].Low > 0);
+            Assert.True(orders[0].Open > 0);
+            Assert.True(orders[0].Volume > 0);
+            Assert.Equal(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"), orders[orders.Length - 1].Date);
         }
     }
 }

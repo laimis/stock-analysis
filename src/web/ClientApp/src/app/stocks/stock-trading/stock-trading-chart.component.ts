@@ -48,7 +48,8 @@ export class StockTradingChartComponent implements OnInit {
   private readonly _sma_colors = {
     20: '#ff0000',
     50: '#32a84a',
-    150: '#3260a8',
+    150: '#00BCD4',
+    200: '#2962FF',
   }
   
   @Input()
@@ -65,8 +66,10 @@ export class StockTradingChartComponent implements OnInit {
 
   @Input()
   set horizontalLines(lines: number[]) {
+    // take out null values
+    lines = lines.filter(x => !isNaN(x))
     console.log('horizontalLines: ' + lines)
-    this._horizontalLines = lines;
+    this._horizontalLines = lines
     this.updateAnnotations();
   }
 

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared.Adapters.Stocks;
 
 namespace core.Shared.Adapters.Brokerage
 {
@@ -13,6 +15,7 @@ namespace core.Shared.Adapters.Brokerage
         Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, BrokerageOrderType type, BrokerageOrderDuration duration);
         Task SellOrder(UserState user, string ticker, decimal numberOfShares, decimal price, BrokerageOrderType type, BrokerageOrderDuration duration);
         Task CancelOrder(UserState state, string orderId);
+        Task<HistoricalPrice[]> GetHistoricalPrices(UserState state, string ticker, DateTimeOffset start = default, DateTimeOffset end = default);
     }
 
     public enum BrokerageOrderDuration

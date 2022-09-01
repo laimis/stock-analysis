@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Stocks;
-using core.Shared.Adapters.Stocks;
+using core.Account;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
 using MediatR;
 
@@ -13,32 +12,39 @@ namespace core.Stocks.Handlers
     {
         public class Query : IRequest<PricesView>
         {
-            public string Interval { get; }
             public string Ticker { get; }
+            public Guid UserId { get; }
 
-            public Query(string ticker, string interval)
+            public Query(string ticker, Guid userId)
             {
-                Interval = interval;
                 Ticker = ticker;
+                UserId = userId;
             }
         }
 
         public class Handler : IRequestHandler<Query, PricesView>
         {
-            private IStocksService2 _stocksService2;
+            private IAccountStorage _storage;
+            private IBrokerage _brokerage;
 
-            public Handler(IStocksService2 stockService2)
+            public Handler(IAccountStorage storage, IBrokerage brokerage)
             {
-                _stocksService2 = stockService2;
+                _storage = storage;
+                _brokerage = brokerage;
             }
 
             public async Task<PricesView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var prices = await _stocksService2.GetHistoricalPrices(request.Ticker, request.Interval);
+                var user = await _storage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker);
 
                 return new PricesView(
-                    prices.Success,
-                    new [] {20, 50, 150}
+                    prices
                 );
             }
         }
