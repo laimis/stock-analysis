@@ -21,7 +21,7 @@ namespace coretests.Stocks
                 };
             }
 
-            var view = new PricesView(prices, new[] { 20, 50, 150 });
+            var view = new PricesView(prices);
 
             Assert.Equal(504, view.Prices.Length);
             Assert.Equal(3, view.SMA.Length);

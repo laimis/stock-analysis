@@ -42,6 +42,9 @@
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
     </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+      Analysis
+    </a>
 
   </div>
 
@@ -62,6 +65,8 @@
     (alertsChanged)="alertsChanged($event)"></stock-alerts>
 
   <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
+
+  <app-stock-analysis *ngIf="isActive('analysis')" [ticker]=stock.ticker></app-stock-analysis>
 
 </div>
 

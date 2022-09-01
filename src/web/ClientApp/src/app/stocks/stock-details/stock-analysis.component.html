@@ -1,0 +1,57 @@
+<div>
+    <table class="table table-striped table-hover border" *ngIf="analysis">
+        <tbody>
+            <tr>
+                <td>Price</td>
+                <td>{{analysis.price | currency}}</td>
+            </tr>
+            <tr>
+                <td>High</td>
+                <td>
+                    {{analysis.high.close | currency}} on {{ analysis.high.date | date }}
+                    <span class="ms-3">
+                        <span [ngClass]="{'text-success': priceDiffFromHigh() <= 0.1}">
+                            {{priceDiffFromHigh() | percent}}
+                        </span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Low</td>
+                <td>
+                    {{analysis.low.close | currency}} on {{ analysis.low.date | date }}
+                    <span class="ms-3">
+                        <span [ngClass]="{'text-danger': priceDiffFromLow() >= -0.1}">
+                            {{priceDiffFromLow() | percent}}
+                        </span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>SMA 20</td>
+                <td>
+                    <span [ngClass]="{'text-danger': getLatestSma(0) > analysis.price, 'text-success': getLatestSma(0) < analysis.price}">{{getLatestSma(0) | currency}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>SMA 50</td>
+                <td>
+                    <span [ngClass]="{'text-danger': getLatestSma(1) > analysis.price, 'text-success': getLatestSma(1) < analysis.price}">{{getLatestSma(1) | currency}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>SMA 150</td>
+                <td>
+                    <span [ngClass]="{'text-danger': getLatestSma(2) > analysis.price, 'text-success': getLatestSma(2) < analysis.price}">{{getLatestSma(2) | currency}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>SMA 200</td>
+                <td>
+                    <span [ngClass]="{'text-success': is200Healthy()}">{{get200Sma() | currency}}</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+

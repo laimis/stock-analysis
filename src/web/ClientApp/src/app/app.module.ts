@@ -67,6 +67,7 @@ import { StockViolationsComponent } from './stocks/stock-dashboard/stock-violati
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
 import { StockTradingSimulatorComponent } from './stocks/stock-trading/stock-trading-simulator.component';
 import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
+import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -190,6 +191,7 @@ var routes: Routes = [
     CryptoDashboardComponent,
     CryptoOwnershipGridComponent,
     CryptoDetailsComponent,
+    StockAnalysisComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

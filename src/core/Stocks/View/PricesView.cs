@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 
@@ -5,10 +6,12 @@ namespace core.Stocks.View
 {
     public class PricesView
     {
-        public PricesView(HistoricalPrice[] prices, int[] smaIntervals)
+        private static readonly IEnumerable<int> _smaIntervals = new [] {20, 50, 150, 200};
+
+        public PricesView(HistoricalPrice[] prices)
         {
             Prices = prices;
-            SMA = smaIntervals.Select(interval => ToSMA(prices, interval)).ToArray();
+            SMA = _smaIntervals.Select(interval => ToSMA(prices, interval)).ToArray();
         }
 
         public HistoricalPrice[] Prices { get; }

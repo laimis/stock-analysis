@@ -44,8 +44,7 @@ namespace core.Stocks.Handlers
                 var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker);
 
                 return new PricesView(
-                    prices,
-                    new [] {20, 50, 150, 200}
+                    prices
                 );
             }
         }
