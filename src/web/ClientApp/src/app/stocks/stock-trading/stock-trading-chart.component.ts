@@ -66,8 +66,10 @@ export class StockTradingChartComponent implements OnInit {
 
   @Input()
   set horizontalLines(lines: number[]) {
+    // take out null values
+    lines = lines.filter(x => !isNaN(x))
     console.log('horizontalLines: ' + lines)
-    this._horizontalLines = lines;
+    this._horizontalLines = lines
     this.updateAnnotations();
   }
 
