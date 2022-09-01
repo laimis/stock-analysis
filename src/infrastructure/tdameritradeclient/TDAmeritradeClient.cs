@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 
 namespace tdameritradeclient;
@@ -213,6 +214,34 @@ public class TDAmeritradeClient : IBrokerage
 
         // get account first
         return EnterOrder(user, postData);
+    }
+
+    public async Task<HistoricalPrice[]> GetHistoricalPrices(UserState state, string ticker, DateTimeOffset start = default, DateTimeOffset end = default)
+    {
+        var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
+        var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
+
+        var response = await CallApi(state, $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType=daily&startDate={startUnix}&endDate={endUnix}", HttpMethod.Get);
+
+        LogAndThrowIfFailed(response, "get historical prices");
+
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        var deserialized = JsonSerializer.Deserialize<HistoricalPriceResponse>(responseString);
+        if (deserialized == null || deserialized.candles == null)
+        {
+            throw new Exception("Could not deserialize historical prices: " + responseString);
+        }
+
+        return deserialized.candles.Select(c => new HistoricalPrice
+        {
+            Close = c.close,
+            High = c.high,
+            Low = c.low,
+            Open = c.open,
+            Date = DateTimeOffset.FromUnixTimeMilliseconds(c.datetime).ToString("yyyy-MM-dd"),
+            Volume = c.volume
+        }).ToArray();
     }
 
     private async Task EnterOrder(UserState user, object postData)

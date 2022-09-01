@@ -1,5 +1,18 @@
 namespace tdameritradeclient;
 
+public class HistoricalPriceResponse {
+    public Candle[]? candles { get; set; }
+}
+
+public class Candle {
+    public long datetime { get; set; }
+    public decimal open { get; set; }
+    public decimal high { get; set; }
+    public decimal low { get; set; }
+    public decimal close { get; set; }
+    public int volume { get; set; }
+}
+
 public partial class OrderLeg
 {
     public string? orderLegType { get; set; }
