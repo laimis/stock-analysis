@@ -74,43 +74,50 @@
           <tbody>
             <tr>
               <td>Unrealized Profit</td>
-              <td>{{unrealizedProfit | currency}}</td>
+              <td class="value">{{unrealizedProfit | currency}}</td>
             </tr>
             <tr>
               <td>Unrealized Gain</td>
-              <td>{{unrealizedProfit / cost | percent:'1.0-2'}}</td>
+              <td class="value">{{unrealizedProfit / cost | percent:'1.0-2'}}</td>
             </tr>
             <tr>
               <td>Unrealize R/R</td>
-              <td>{{unrealizedProfit / riskedAmount | number}}</td>
+              <td class="value">{{unrealizedProfit / riskedAmount | number}}</td>
             </tr>
-            <tr>
+            
+            <tr class="table-success">
               <td></td><td></td>
             </tr>
+
             <tr>
               <td>Cost</td>
-              <td>{{cost | currency}}</td>
+              <td class="value">{{cost | currency}}</td>
             </tr>
             <tr>
               <td>Cost/Share</td>
-              <td>{{averageCostPerShare | currency}}</td>
+              <td class="value">{{averageCostPerShare | currency}}</td>
             </tr>
             <tr>
               <td>Stop</td>
-              <td>{{stopPrice | currency}} ( {{ (stopPrice - averageCostPerShare)/averageCostPerShare | percent:'1.0-2' }}) </td>
+              <td class="value">{{stopPrice | currency}} ( {{ (stopPrice - averageCostPerShare)/averageCostPerShare | percent:'1.0-2' }}) </td>
+            </tr>
+            <tr>
+              <td>Number of Shares</td>
+              <td class="value">{{numberOfShares | number}}</td>
             </tr>
             
             
-            <tr>
+            <tr class="table-success">
               <td></td><td></td>
             </tr>
+            
             <tr>
               <td>Profit</td>
-              <td>{{profit | currency}}</td>
+              <td class="value">{{profit | currency}}</td>
             </tr>
             <tr>
               <td>R/R</td>
-              <td>{{profit / riskedAmount | number}}</td>
+              <td class="value">{{profit / riskedAmount | number}}</td>
             </tr>
           </tbody>
         </table>

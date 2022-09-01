@@ -10,11 +10,11 @@ class StockTransaction {
 
 @Component({
   selector: 'stock-trading-simulation',
-  templateUrl: './stock-trading-simulation.component.html',
-  styleUrls: ['./stock-trading-simulation.component.css']
+  templateUrl: './stock-trading-simulator.component.html',
+  styleUrls: ['./stock-trading-simulator.component.css']
 })
 
-export class StockTradingSimulationComponent implements OnInit {
+export class StockTradingSimulatorComponent implements OnInit {
 
   stopPrice: number | null = null
   transactions: StockTransaction[] = []
@@ -112,7 +112,7 @@ export class StockTradingSimulationComponent implements OnInit {
   }
 
   update() {
-    console.log('running update')
+    
     var data = {
       stopPrice: this.stopPrice,
       positions: this.transactions,
@@ -194,10 +194,8 @@ export class StockTradingSimulationComponent implements OnInit {
     this.profit = profit
     this.numberOfShares = numberOfShares
     
-    this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0)
-
-    console.log(slots)
-    console.log(profit)
+    // unrealized profit is profit that is realized + unrealized
+    this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0) + profit
   }
 
 }
