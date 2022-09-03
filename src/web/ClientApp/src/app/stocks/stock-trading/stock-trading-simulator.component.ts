@@ -35,7 +35,6 @@ export class StockTradingSimulatorComponent implements OnInit {
 
 
   showExisting: boolean = false
-  positions:StockTradingPosition[] = []
 
   constructor(private stocks:StocksService) { }
 
@@ -52,11 +51,6 @@ export class StockTradingSimulatorComponent implements OnInit {
 
       this.runCalculations()
     }
-
-    
-    this.stocks.getStocks().subscribe(data => {
-      this.positions = data.positions
-    } )
   }
 
   initialPosition(cmd:stocktransactioncommand) {
@@ -131,8 +125,20 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.update()
   }
 
+  positionFilter:string = ''
+  positions:StockTradingPosition[] = []
+  filteredPositions:StockTradingPosition[] = []
+
   showExistingPositions() {
-    this.showExisting = true
+    this.stocks.getStockPositions().subscribe(positions => {
+      this.positions = positions
+      this.filteredPositions = positions
+      this.showExisting = true
+    })
+  }
+
+  filterPositions() {
+    this.filteredPositions = this.positions.filter(p => p.ticker.toLowerCase().indexOf(this.positionFilter.toLowerCase()) > -1)
   }
 
   loadPosition(p:StockTradingPosition) {

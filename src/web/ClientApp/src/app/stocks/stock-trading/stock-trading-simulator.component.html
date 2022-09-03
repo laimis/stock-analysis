@@ -4,9 +4,13 @@
   <h2>Position simulator</h2>
 
   <div class="row" *ngIf="showExisting">
-    <ul>
-      <li *ngFor="let position of positions">
-        <a [routerLink]="" (click)="loadPosition(position)">{{position.ticker}}</a>
+    <label for="tickerFilter" class="form-label">Ticker filter</label>
+    <input type="text" class="form-control" placeholder="Ticker filter" [(ngModel)]="positionFilter" (ngModelChange)="filterPositions()" name="tickerFilter">
+
+
+    <ul class="overflow-auto" style="max-height: 600px">
+      <li *ngFor="let position of filteredPositions">
+        <a [routerLink]="" (click)="loadPosition(position)">{{position.ticker}} {{position.opened | date }} - P/L {{ position.profit | currency }}</a>
       </li>
     </ul>
   </div>

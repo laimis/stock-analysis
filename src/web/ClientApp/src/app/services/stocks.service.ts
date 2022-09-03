@@ -140,6 +140,10 @@ export class StocksService {
 		return this.http.get<any>('/api/stocks')
   }
 
+  getStockPositions(): Observable<StockTradingPosition[]> {
+		return this.http.get<any>('/api/portfolio/stockpositions')
+  }
+
 	getStockDetails(symbol:string): Observable<StockDetails> {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
   }

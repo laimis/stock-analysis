@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,11 +10,12 @@ namespace core.Portfolio
 {
     public class Grid
     {
-        public class Generate : RequestWithUserId<IEnumerable<GridEntry>>
+        public class Query : RequestWithUserId<IEnumerable<GridEntry>>
         {
+            public Query(Guid userId) : base(userId){}
         }
 
-        public class Handler : HandlerWithStorage<Generate, IEnumerable<GridEntry>>
+        public class Handler : HandlerWithStorage<Query, IEnumerable<GridEntry>>
         {
             public Handler(
                 IPortfolioStorage storage,
@@ -24,7 +26,7 @@ namespace core.Portfolio
 
             private IStocksService2 _stocks { get; }
 
-            public override async Task<IEnumerable<GridEntry>> Handle(Generate request, CancellationToken cancellationToken)
+            public override async Task<IEnumerable<GridEntry>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 

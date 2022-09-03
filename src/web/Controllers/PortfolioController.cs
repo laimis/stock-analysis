@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
+using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,12 +49,9 @@ namespace web.Controllers
         }
 
         [HttpGet("grid")]
-        public async Task<IEnumerable<GridEntry>> Grid()
-        {
-            var cmd = new Grid.Generate();
-            cmd.WithUserId(User.Identifier());
+        public Task<IEnumerable<GridEntry>> Grid() => _mediator.Send(new Grid.Query(User.Identifier()));
 
-            return await _mediator.Send(cmd);
-        }
+        [HttpGet("stockpositions")]
+        public Task<IEnumerable<PositionInstance>> Positions() => _mediator.Send(new Positions.Query(User.Identifier()));
     }
 }
