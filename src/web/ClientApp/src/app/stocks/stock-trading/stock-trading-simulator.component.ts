@@ -32,7 +32,12 @@ export class StockTradingSimulatorComponent implements OnInit {
   numberOfShares: number = 0
   riskedAmount: number = 0
   unrealizedProfit: number = 0
-
+  unrealizedGain: number = 0
+  unrealizedRR: number = 0
+  r1: number = 0
+  r2: number = 0
+  r4: number = 0
+  rrs: number[] = []
 
   showExisting: boolean = false
 
@@ -121,8 +126,24 @@ export class StockTradingSimulatorComponent implements OnInit {
   }
 
   calculateRiskedAmount() {
-    this.riskedAmount = Math.round((this.averageCostPerShare - this.stopPrice) * this.numberOfShares * 100) / 100
+    var r = this.averageCostPerShare - this.stopPrice
+    this.riskedAmount = Math.round(r * this.numberOfShares * 100) / 100
+    
+    this.updateRiskParameters()
+
     this.update()
+  }
+
+  updateRiskParameters() {
+    var r = this.averageCostPerShare - this.stopPrice
+    this.r1 = this.averageCostPerShare + r
+    this.r2 = this.averageCostPerShare + r * 2
+    this.r4 = this.averageCostPerShare + r * 4
+    
+    this.rrs = []
+    for (var i = 1; i < 10; i++) {
+      this.rrs.push(this.averageCostPerShare + r * i)
+    }
   }
 
   positionFilter:string = ''
@@ -201,7 +222,16 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.numberOfShares = numberOfShares
     
     // unrealized profit is profit that is realized + unrealized
-    this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0) + profit
+    if (this.numberOfShares > 0) {   
+      this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0) + this.profit
+      this.unrealizedGain = this.unrealizedProfit / this.cost
+      this.unrealizedRR = this.unrealizedProfit / this.riskedAmount
+    }
+    else {
+      this.unrealizedProfit = 0
+      this.unrealizedGain = 0
+      this.unrealizedRR = 0
+    }
   }
 
 }

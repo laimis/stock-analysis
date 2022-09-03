@@ -43,7 +43,7 @@
           <button class="btn btn-primary" (click)="buy()">Buy</button>
         </div>
         <div class="col text-end">
-          <button class="btn btn-primary" (click)="sell()">Sell</button>
+          <button *ngIf="numberOfShares > 0" class="btn btn-primary" (click)="sell()">Sell</button>
         </div>
       </div>
       <div class="row mt-3" *ngIf="transactions.length > 0">
@@ -73,6 +73,13 @@
         <label for="riskedAmount" class="form-label">Risked Amount (<a (click)="calculateRiskedAmount()" class="link-primary">calculate based on stop</a>)</label>
         <input type="number" id="riskedAmount" [(ngModel)]="riskedAmount" (ngModelChange)="update()" class="form-control">
 
+        <label class="form-label me-3">{{ r1 | currency }}</label>
+        <label class="form-label me-3">{{ r2 | currency }}</label>
+        <label class="form-label me-3">{{ r4 | currency }}</label>
+        <select>
+          <option *ngFor="let r of rrs">{{r}}</option>
+        </select>
+
         <h3 class="mt-3">Summary</h3>
         <table class="table">
           <tbody>
@@ -82,11 +89,11 @@
             </tr>
             <tr>
               <td>Unrealized Gain</td>
-              <td class="value">{{unrealizedProfit / cost | percent:'1.0-2'}}</td>
+              <td class="value">{{unrealizedGain | percent:'1.0-2'}}</td>
             </tr>
             <tr>
               <td>Unrealize R/R</td>
-              <td class="value">{{unrealizedProfit / riskedAmount | number}}</td>
+              <td class="value">{{unrealizedRR | number}}</td>
             </tr>
             
             <tr class="table-success">
@@ -118,6 +125,10 @@
             <tr>
               <td>Profit</td>
               <td class="value">{{profit | currency}}</td>
+            </tr>
+            <tr>
+              <td>Risked</td>
+              <td class="value">{{riskedAmount | currency}}</td>
             </tr>
             <tr>
               <td>R/R</td>
