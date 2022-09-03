@@ -4,17 +4,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
 using core.Shared.Adapters.CSV;
-using core.Stocks.View;
 
 namespace core.Stocks
 {
     public class ExportTrades
     {
+        public enum ExportType
+        {
+            Open,
+            Closed
+        }
+
         public class Query : RequestWithUserId<ExportResponse>
         {
-            public Query(Guid userId) : base(userId)
+            public Query(Guid userId, ExportType exportType) : base(userId)
             {
+                ExportType = exportType;
             }
+
+            public ExportType ExportType { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, ExportResponse>
@@ -32,13 +40,19 @@ namespace core.Stocks
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
+                Func<PositionInstance, bool> filter = request.ExportType switch {
+                    ExportType.Open => t => !t.IsClosed,
+                    ExportType.Closed => t => t.IsClosed,
+                    _ => throw new NotImplementedException()
+                };
+
                 var trades = stocks
                     .SelectMany(s => s.State.PositionInstances)
-                    .Where(p => p.IsClosed)
+                    .Where(filter)
                     .OrderByDescending(p => p.Closed)
                     .ToList();
 
-                var filename = CSVExport.GenerateFilename("closedstocks");
+                var filename = CSVExport.GenerateFilename("positions");
 
                 return new ExportResponse(filename, CSVExport.Generate(_csvWriter, trades));
             }

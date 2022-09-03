@@ -11,14 +11,12 @@ namespace core.Stocks
     {
         public class Query : RequestWithUserId<StockOwnershipView>
         {
-            public Query(string ticker, bool raw = false)
+            public Query(string ticker)
             {
                 Ticker = ticker;
-                Raw = raw;
             }
 
             public string Ticker { get; }
-            public bool Raw { get; }
         }
 
         public class Handler : HandlerWithStorage<Query, StockOwnershipView>

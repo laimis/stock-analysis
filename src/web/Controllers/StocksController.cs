@@ -48,15 +48,6 @@ namespace web.Controllers
             return await _mediator.Send(query);
         }
 
-        [HttpGet("{ticker}/ownership/raw")]
-        public async Task<object> Raw(string ticker)
-        {
-            var query = new Ownership.Query(ticker, true);
-            query.WithUserId(User.Identifier());
-
-            return await _mediator.Send(query);
-        }
-
         [HttpDelete("{id}")]
         public async Task<object> Delete(Guid id)
         {
@@ -112,25 +103,19 @@ namespace web.Controllers
         [HttpGet("export")]
         public Task<ActionResult> Export()
         {
-            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
+            return this.GenerateExport(_mediator, new ExportTransactions.Query(User.Identifier()));
         }
 
         [HttpGet("export/closed")]
         public Task<ActionResult> ExportClosed()
         {
-            return this.GenerateExport(_mediator, new ExportClosed.Query(User.Identifier()));
+            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.ExportTrades.ExportType.Closed));
         }
 
-        [HttpGet("export/trades")]
+        [HttpGet("export/open")]
         public Task<ActionResult> ExportTrades()
         {
-            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier()));
-        }
-
-        [HttpGet("export/owned")]
-        public Task<ActionResult> ExportOwned()
-        {
-            return this.GenerateExport(_mediator, new ExportOpen.Query(User.Identifier()));
+            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.ExportTrades.ExportType.Open));
         }
 
         [HttpPost("import")]
