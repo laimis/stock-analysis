@@ -15,15 +15,6 @@
     </div>
     <div class="row mt-3" *ngIf="ticker">
       <div class="col">
-        <label for="positionSize" class="form-label">Position Size</label>
-        <input
-          type="number"
-          class="form-control"
-          id="positionSize"
-          [(ngModel)]="positionSize"
-          (ngModelChange)="updateBuyingValuesWithPositionSize()">
-      </div>
-      <div class="col">
         <label for="costToBuy" class="form-label">Price</label>
         <input
           type="number"
@@ -34,16 +25,6 @@
         />
       </div>
       <div class="col">
-        <label for="stocksToBuy" class="form-label">Shares #</label>
-        <input
-          type="number"
-          id="stocksToBuy"
-          class="form-control"
-          [(ngModel)]="stocksToBuy"
-          (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
-        />
-      </div>
-      <div class="col">
         <label for="stopPrice" class="form-label">Stop</label>
         <input
           type="number"
@@ -51,6 +32,16 @@
           class="form-control"
           [(ngModel)]="stopPrice"
           (ngModelChange)="updateBuyingValuesStopPrice()"
+        />
+      </div>
+      <div class="col">
+        <label for="stocksToBuy" class="form-label">Shares #</label>
+        <input
+          type="number"
+          id="stocksToBuy"
+          class="form-control"
+          [(ngModel)]="numberOfShares"
+          (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
         />
       </div>
       <div class="col">
@@ -88,7 +79,7 @@
         <stock-trading-chart
           [prices]="prices"
           [horizontalLines]="stopAndExitPoints"
-          [maxPrice]="exitPrice"></stock-trading-chart>
+          [maxPrice]="oneR"></stock-trading-chart>
       </div>
     </div>
   </div>

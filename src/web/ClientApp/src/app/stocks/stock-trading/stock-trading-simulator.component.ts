@@ -34,10 +34,12 @@ export class StockTradingSimulatorComponent implements OnInit {
   unrealizedProfit: number = 0
   unrealizedGain: number = 0
   unrealizedRR: number = 0
+  averageSaleCostPerShare : number = 0
+  averageBuyCostPerShare : number = 0
   r1: number = 0
   r2: number = 0
   r4: number = 0
-  rrs: number[] = []
+  rrs: string[] = []
 
   showExisting: boolean = false
 
@@ -84,9 +86,7 @@ export class StockTradingSimulatorComponent implements OnInit {
         type: type
       }
 
-      if (this.currentCost == null) {
-        this.currentCost = transaction.price
-      }
+      this.currentCost = transaction.price
 
       this.transactions.push(transaction)
 
@@ -142,7 +142,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     
     this.rrs = []
     for (var i = 1; i < 10; i++) {
-      this.rrs.push(this.averageCostPerShare + r * i)
+      this.rrs.push(i + "R: " + (this.averageCostPerShare + r * i))
     }
   }
 
@@ -196,6 +196,12 @@ export class StockTradingSimulatorComponent implements OnInit {
     var cost : number = 0
     var profit : number = 0
     var numberOfShares : number = 0
+    
+    var totalSale : number = 0
+    var totalNumberOfSharesSold = 0
+
+    var totalBuy : number = 0
+    var totalNumberOfSharesBought = 0
 
     this.transactions.forEach(transaction => {
       if (transaction.type == 'buy') {
@@ -204,6 +210,9 @@ export class StockTradingSimulatorComponent implements OnInit {
           cost += transaction.price
           numberOfShares++
         }
+
+        totalBuy += transaction.price * transaction.numberOfShares
+        totalNumberOfSharesBought += transaction.numberOfShares
       } else {
         // remove quantity number of slots from the beginning of an array
         var removed = slots.splice(0, transaction.numberOfShares)
@@ -212,6 +221,9 @@ export class StockTradingSimulatorComponent implements OnInit {
           cost -= removedElement
           numberOfShares--
         })
+        
+        totalSale += transaction.price * transaction.numberOfShares
+        totalNumberOfSharesSold += transaction.numberOfShares
       }
     });
 
@@ -220,10 +232,13 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.cost = cost
     this.profit = profit
     this.numberOfShares = numberOfShares
+
+    this.averageSaleCostPerShare = totalSale / totalNumberOfSharesSold
+    this.averageBuyCostPerShare = totalBuy / totalNumberOfSharesBought
     
     // unrealized profit is profit that is realized + unrealized
     if (this.numberOfShares > 0) {   
-      this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0) + this.profit
+      this.unrealizedProfit = slots.reduce((acc, curr) => acc + this.currentCost - curr, 0)
       this.unrealizedGain = this.unrealizedProfit / this.cost
       this.unrealizedRR = this.unrealizedProfit / this.riskedAmount
     }

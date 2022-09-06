@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, OnInit } from '@angular/core';
 import { Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { Prices, StocksService, stocktransactioncommand } from 'src/app/services
   styleUrls: ['./stock-trading-newposition.component.css'],
   providers: [DatePipe]
 })
-export class StockTradingNewPositionComponent implements OnChanges {
+export class StockTradingNewPositionComponent implements OnInit {
   
   constructor(
       private stockService:StocksService,
@@ -16,15 +16,8 @@ export class StockTradingNewPositionComponent implements OnChanges {
       )
   { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.costToBuy != null) {
-      console.log("on changes fired")
-      this.updateBuyingValues()
-    }
-  }
-
   @Input()
-  stopLoss: number
+  maxLoss: number = 100
 
   @Input()
   showChart: boolean = true
@@ -32,34 +25,31 @@ export class StockTradingNewPositionComponent implements OnChanges {
   @Input()
   recordPositions: boolean = true
 
-  @Input()
-  firstTarget: number
-
-  @Input()
-  rrTarget: number
-
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
   // variables for new positions
-  positionSize: number = null
   positionSizeCalculated: number = null
   costToBuy: number | null = null
-  stocksToBuy : number | null = null
+  numberOfShares : number | null = null
   stopPrice: number | null = null
-  notes: string | null = null
-  exitPrice: number | null = null
+  oneR: number | null = null
   potentialLoss: number | null = null
   date: string | null = null
   ticker: string | null = null
+  notes: string | null = null
 
   prices: Prices | null = null
-  stopAndExitPoints: number[] | null = null
+  stopAndExitPoints: number[] = []
+
+  ngOnInit(): void {
+    this.onBuyTickerSelected("AAPL")
+  }
 
   onBuyTickerSelected(ticker: string) {
     
     this.costToBuy = null
-    this.stocksToBuy = null
+    this.numberOfShares = null
     this.stopPrice = null
     this.ticker = ticker
     this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
@@ -68,7 +58,6 @@ export class StockTradingNewPositionComponent implements OnChanges {
       .subscribe(price => {
         console.log(price)
         this.costToBuy = price
-        this.updateBuyingValues()
         this.updateChart(ticker)
       }, error => {
         console.error(error);
@@ -78,7 +67,7 @@ export class StockTradingNewPositionComponent implements OnChanges {
 
   reset() {
     this.costToBuy = null
-    this.stocksToBuy = null
+    this.numberOfShares = null
     this.stopPrice = null
     this.ticker = null
     this.prices = null
@@ -128,58 +117,49 @@ export class StockTradingNewPositionComponent implements OnChanges {
     return this.prices.sma[smaIndex].values.slice(-1)[0]
   }
 
-  updateBuyingValuesWithCostToBuy() {
-    console.log("cost to buy: " + this.costToBuy)
-
-    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
-    this.updateBuyingValues()
-  }
-
   updateBuyingValuesWithNumberOfShares() {
-    // output to console log stocks to buy and cost to buy values
-    console.log("num of shares: stocks to buy: " + this.stocksToBuy + " cost to buy: " + this.costToBuy)
-
-    this.positionSize = this.stocksToBuy * this.costToBuy
-    this.updateBuyingValues()
-  }
-
-  updateBuyingValuesWithPositionSize() {
-    // output to console log stocks to buy and cost to buy values
-    console.log("position size: position size: " + this.positionSize + " cost to buy: " + this.costToBuy)
-
-    this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
-    this.updateBuyingValues()
+    if (!this.costToBuy || !this.stopPrice) {
+      console.log("not enough info to calculate")
+      return
+    }
+    var singleShareLoss = this.costToBuy - this.stopPrice
+    this.updateBuyingValues(singleShareLoss)
   }
 
   updateBuyingValuesStopPrice() {
-    var diff = this.costToBuy - this.stopPrice
-    this.potentialLoss = diff * this.stocksToBuy
-    this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
+    this.updateBuyingValuesPricesChanged()
   }
 
-  updateBuyingValues() {
-    console.log("updateBuyingValues")
-    console.log("stocks to buy: " + this.stocksToBuy + " cost to buy: " + this.costToBuy)
-    
-    if (this.stocksToBuy == null)
-    {
-      this.positionSize = this.positionSize ? this.positionSize : 3000
-      this.stocksToBuy = Math.floor(this.positionSize / this.costToBuy)
-    }
-    
-    this.positionSizeCalculated = Math.round(this.stocksToBuy * this.costToBuy * 100) / 100
+  updateBuyingValuesWithCostToBuy() {
+    this.updateBuyingValuesPricesChanged()
+  }
 
-    this.stopPrice = Math.round(this.costToBuy * (1 - this.stopLoss) * 100) / 100
-    this.exitPrice = Math.round(this.costToBuy * (1 + this.rrTarget) * 100) / 100
-    this.potentialLoss = this.stopPrice * this.stocksToBuy - this.costToBuy * this.stocksToBuy
-    this.stopAndExitPoints = [this.stopPrice, this.exitPrice]
+  updateBuyingValuesPricesChanged() {
+    if (!this.costToBuy || !this.stopPrice) {
+      console.log("not enough info to calculate")
+      return
+    }
+
+    var singleShareLoss = this.costToBuy - this.stopPrice
+    this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
+    
+    this.updateBuyingValues(singleShareLoss)
+  }
+
+  updateBuyingValues(singleShareLoss:number) {
+    console.log("updateBuyingValues")
+    // how many shares can we buy to keep the loss under $100
+    this.positionSizeCalculated = Math.round(this.numberOfShares * this.costToBuy * 100) / 100
+    this.oneR = this.costToBuy + singleShareLoss
+    this.potentialLoss = this.stopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
+    this.stopAndExitPoints = [this.stopPrice, this.oneR]
   }
 
   record() {
     console.log("record")
     var cmd = new stocktransactioncommand()
     cmd.ticker = this.ticker
-    cmd.numberOfShares = this.stocksToBuy
+    cmd.numberOfShares = this.numberOfShares
     cmd.price = this.costToBuy
     cmd.stopPrice = this.stopPrice
     cmd.notes = this.notes
