@@ -8,7 +8,7 @@ import { Prices, StocksService, stocktransactioncommand } from 'src/app/services
   styleUrls: ['./stock-trading-newposition.component.css'],
   providers: [DatePipe]
 })
-export class StockTradingNewPositionComponent implements OnInit {
+export class StockTradingNewPositionComponent {
   
   constructor(
       private stockService:StocksService,
@@ -41,10 +41,6 @@ export class StockTradingNewPositionComponent implements OnInit {
 
   prices: Prices | null = null
   stopAndExitPoints: number[] = []
-
-  ngOnInit(): void {
-    this.onBuyTickerSelected("AAPL")
-  }
 
   onBuyTickerSelected(ticker: string) {
     
