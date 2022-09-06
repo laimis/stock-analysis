@@ -77,8 +77,5 @@ export class StockTradingComponent implements OnInit {
 
   numberOfPositions: number = 0
   invested: number = 0
-  rrTarget: number = 0.15 // this is const, not sure yet where we will keep
-  firstTarget: number = 0.07
-  stopLoss: number = 0.05
 }
 

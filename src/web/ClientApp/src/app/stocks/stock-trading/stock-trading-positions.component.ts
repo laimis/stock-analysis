@@ -21,20 +21,8 @@ export class StockTradingPositionComponent {
     @Input()
     pendingOrders: BrokerageOrder[]
 
-    @Input()
-    stopLoss: number
-
-    @Input()
-    firstTarget: number
-
-    @Input()
-    rrTarget: number
-
     stopPrice(p:StockTradingPosition) {
-        if (p.stopPrice) {
-            return p.stopPrice
-        }
-        return p.averageCost - p.averageCost * this.stopLoss
+        return p.stopPrice
     }
 
     firstTargetNumber(p:StockTradingPosition) {
