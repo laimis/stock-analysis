@@ -73,6 +73,8 @@ namespace core.Stocks
         public decimal Price { get; private set; }
         public decimal UnrealizedGain { get; private set; }
         public decimal UnrealizedGainPct { get; private set; }
+        public DateTimeOffset LastTransaction { get; private set; }
+        public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, string notes = null)
         {
@@ -102,6 +104,8 @@ namespace core.Stocks
             {
                 Notes.Add(notes);
             }
+
+            LastTransaction = when;
         }
 
         public void Sell(decimal amount, decimal price, DateTimeOffset when, string notes = null)
@@ -125,6 +129,8 @@ namespace core.Stocks
             {
                 Notes.Add(notes);
             }
+
+            LastTransaction = when;
         }
 
         public void SetStopPrice(decimal? stopPrice)

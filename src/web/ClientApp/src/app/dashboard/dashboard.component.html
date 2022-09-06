@@ -37,7 +37,7 @@
               <i class="fas fa-certificate"></i>
               Shares
             </h5>
-            <p class="card-text">You have <b>{{dashboard.ownedStockCount}}</b> tickers on file</p>
+            <p class="card-text">You have <b>{{dashboard.openStockCount}}</b> tickers on file</p>
             <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
           </div>
         </div>
@@ -50,7 +50,7 @@
               <i class="fab fa-btc"></i>
               Crypto
             </h5>
-            <p class="card-text">You have <b>{{dashboard.ownedCryptoCount}}</b> crypto tokens</p>
+            <p class="card-text">You have <b>{{dashboard.openCryptoCount}}</b> crypto tokens</p>
             <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
           </div>
         </div>

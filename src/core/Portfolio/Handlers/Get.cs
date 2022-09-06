@@ -57,7 +57,7 @@ namespace core.Portfolio
             {
                 var stocks = await _storage.GetStocks(userId);
 
-                var owned = stocks.Where(s => s.State.Owned > 0);
+                var openStocks = stocks.Where(s => s.State.Owned > 0).Select(s => s.State.CurrentPosition).ToList();
 
                 var options = await _storage.GetOwnedOptions(userId);
 
@@ -69,9 +69,9 @@ namespace core.Portfolio
 
                 var obj = new PortfolioResponse
                 {
-                    OwnedStockCount = owned.Count(),
+                    OpenStockCount = openStocks.Count(),
                     OpenOptionCount = openOptions.Count(),
-                    OwnedCryptoCount = cryptos.Count(),
+                    OpenCryptoCount = cryptos.Count(),
                     TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId && s.IsTriggered),
                     AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId),
                     Calculated = DateTimeOffset.UtcNow

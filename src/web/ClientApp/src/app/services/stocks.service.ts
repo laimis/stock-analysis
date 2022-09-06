@@ -363,7 +363,6 @@ export interface StockViolation {
 }
 
 export interface StockSummary {
-  owned: OwnedStock[]
   positions: StockTradingPosition[]
   violations: StockViolation[]
   orders: BrokerageOrder[]
@@ -413,13 +412,6 @@ export interface Note {
 
 export interface Price {
   amount: number
-}
-
-export interface Portfolio {
-  owned: OwnedStock[]
-  openOptions: OwnedOption[]
-  alerts: Alert[]
-  triggered: Alert[]
 }
 
 export class OwnedStock {
@@ -472,8 +464,8 @@ export class Alert {}
 
 export class Dashboard {
   openOptionCount: number
-  ownedStockCount: number
-  ownedCryptoCount: number
+  openStockCount: number
+  openCryptoCount: number
   triggeredAlertCount: number
   alertCount: number
 }
@@ -661,6 +653,7 @@ export interface PositionTransaction {
 
 export interface StockTradingPosition {
   price: number,
+  category: string,
   cost: number,
   return: number,
   ticker: string,
@@ -683,6 +676,7 @@ export interface StockTradingPosition {
   unrealizedGain: number | null
   unrealizedGainPct: number | null
   unrealizedRR: number | null
+  daysSinceLastTransaction: number | null
 }
 
 export class OptionDefinition {

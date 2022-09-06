@@ -44,16 +44,6 @@ namespace core
 
             return writer.Generate(rows);
         }
-
-        public static string Generate(ICSVWriter writer, IEnumerable<OwnedStockView> stocks)
-        {
-            var rows = stocks.Select(s =>
-                new OwnedStocksRecord(s.Ticker, s.Owned, s.AverageCost, s.Cost, s.DaysHeld, s.Category)
-            );
-
-            return writer.Generate(rows);
-        }
-
         
         public static string Generate(ICSVWriter writer, IEnumerable<OwnedCrypto> cryptos)
         {

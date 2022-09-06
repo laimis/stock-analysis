@@ -10,7 +10,6 @@ import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, Brokerag
 })
 export class StockDashboardComponent implements OnInit {
 
-  owned : OwnedStock[]
   violations: StockViolation[] = []
   positions : StockTradingPosition[]
   orders : BrokerageOrder[]
@@ -40,7 +39,6 @@ export class StockDashboardComponent implements OnInit {
 
   fetchData() {
     this.stocks.getStocks().subscribe(result => {
-      this.owned = result.owned
       this.positions = result.positions
       this.violations = result.violations
       this.orders = result.orders
@@ -79,24 +77,24 @@ export class StockDashboardComponent implements OnInit {
     this.moneySpentOnShares = 0.0
     this.currentEquity = 0.0
 
-    for (var i of this.owned) {
+    for (var p of this.positions) {
 
       if (this.selectedCategory == "longterm" || this.selectedCategory == "shortterm") {
-        console.log('doing comparison of ' + i.category + ' vs ' + this.selectedCategory)
-        if (i.category != this.selectedCategory) {
+        console.log('doing comparison of ' + p.category + ' vs ' + this.selectedCategory)
+        if (p.category != this.selectedCategory) {
           continue
         }
       }
 
       if (this.selectedCategory == "notset") {
-        if (i.category != null) {
+        if (p.category != null) {
           continue
         }
       }
 
-      this.numberOfSharesOwned += i.owned
-      this.moneySpentOnShares += i.cost
-      this.currentEquity += i.equity
+      this.numberOfSharesOwned += p.numberOfShares
+      this.moneySpentOnShares += p.cost
+      this.currentEquity += p.cost + p.profit
     }
 
     this.profits = 0.0
@@ -125,25 +123,25 @@ export class StockDashboardComponent implements OnInit {
       return result * this.sortDirection
     }
 
-    this.owned.sort(finalFunc)
+    this.positions.sort(finalFunc)
   }
 
   private getSortFunc(column:string) {
     switch(column) {
       case "ticker":
-        return (a:OwnedStock, b:OwnedStock) => a.ticker.localeCompare(b.ticker)
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.ticker.localeCompare(b.ticker)
       case "price":
-        return (a:OwnedStock, b:OwnedStock) => a.price - b.price
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.price - b.price
       case "averageCost":
-        return (a:OwnedStock, b:OwnedStock) => a.averageCost - b.averageCost
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCost - b.averageCost
       case "owned":
-        return (a:OwnedStock, b:OwnedStock) => a.owned - b.owned
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.numberOfShares - b.numberOfShares
       case "equity":
-        return (a:OwnedStock, b:OwnedStock) => a.equity - b.equity
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedGain - (b.cost + b.unrealizedGain)
       case "profits":
-        return (a:OwnedStock, b:OwnedStock) => a.profits - b.profits
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGain - b.unrealizedGain
       case "profitsPct":
-        return (a:OwnedStock, b:OwnedStock) => a.profitsPct - b.profitsPct
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGainPct - b.unrealizedGainPct
     }
 
     console.log("unrecognized sort column " + column)

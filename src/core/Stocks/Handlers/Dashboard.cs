@@ -47,7 +47,7 @@ namespace core.Stocks
                     view = await LoadFromDb(query.UserId);
                 }
 
-                var tickers = view.Owned.Select(o => o.Ticker).Distinct();
+                var tickers = view.Positions.Select(o => o.Ticker).Distinct();
 
                 var tickerPrices = await _stocksService.GetPrices(tickers);
                 if (tickerPrices.IsOk)
@@ -75,7 +75,7 @@ namespace core.Stocks
 
             private void EnrichWithPositionViolations(StockDashboardView view, IEnumerable<Position> brokeragePositions)
             {
-                var localPositions = view.Owned;
+                var localPositions = view.Positions;
                 
                 var violations = new List<StockViolationView>();
 
@@ -85,12 +85,12 @@ namespace core.Stocks
                     var localPosition = localPositions.SingleOrDefault(o => o.Ticker == brokeragePosition.Ticker);
                     if (localPosition != null)
                     {
-                        if (localPosition.Owned != brokeragePosition.Quantity)
+                        if (localPosition.NumberOfShares != brokeragePosition.Quantity)
                         {
                             violations.Add(
                                 new StockViolationView {
                                     Ticker = brokeragePosition.Ticker,
-                                    Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.Owned}"
+                                    Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.NumberOfShares}"
                                 }
                             );
                         }
@@ -115,17 +115,17 @@ namespace core.Stocks
                         violations.Add(
                             new StockViolationView {
                                 Ticker = localPosition.Ticker,
-                                Message = $"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says none"
+                                Message = $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says none"
                         });
                     }
                     else
                     {
-                        if (brokeragePosition.Quantity != localPosition.Owned)
+                        if (brokeragePosition.Quantity != localPosition.NumberOfShares)
                         {
                             violations.Add(
                                 new StockViolationView {
                                     Ticker = localPosition.Ticker,
-                                    Message = $"{localPosition.Ticker} owned {localPosition.Owned} but TDAmeritrade says {brokeragePosition.Quantity}"
+                                    Message = $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says {brokeragePosition.Quantity}"
                                 }
                             );
                         }
@@ -137,12 +137,6 @@ namespace core.Stocks
 
             private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)
             {
-                foreach (var o in view.Owned)
-                {
-                    prices.TryGetValue(o.Ticker, out var price);
-                    o.ApplyPrice(price?.Price ?? 0);
-                }
-
                 foreach(var o in view.Positions)
                 {
                     prices.TryGetValue(o.Ticker, out var price);
@@ -163,17 +157,12 @@ namespace core.Stocks
             {
                 var stocks = await _storage.GetStocks(userId);
 
-                var ownedStocks = stocks
-                    .Where(s => s.State.Owned > 0)
-                    .Select(s => new OwnedStockView(s))
-                    .ToList();
-
                 var positions = stocks.Where(s => s.State.Owned > 0)
                     .Select(s => s.State.CurrentPosition)
                     .OrderBy(p => p.Ticker)
                     .ToList();
 
-                return new StockDashboardView(ownedStocks, positions);
+                return new StockDashboardView(positions);
             }
         }
     }
