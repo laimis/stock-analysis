@@ -44,11 +44,11 @@ export class BrokerageNewOrderComponent {
   }
 
   brokerageBuy() {
-    this.execute(this.stockService.brokerageBuy)
+    this.execute(cmd => this.stockService.brokerageBuy(cmd))
   }
 
   brokerageSell() {
-    this.execute(this.stockService.brokerageSell)
+    this.execute(cmd => this.stockService.brokerageSell(cmd))
   }
 
   execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
