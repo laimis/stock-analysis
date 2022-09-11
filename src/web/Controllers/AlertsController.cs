@@ -35,10 +35,6 @@ namespace web.Controllers
                 }
             );
 
-        [HttpGet("migrate")]
-        public Task<object> Migrate() =>
-            _mediator.Send(new Migrate.Command(User.Identifier()));
-
         [HttpGet("clear")]
         public Task<object> Clear() =>
             _mediator.Send(

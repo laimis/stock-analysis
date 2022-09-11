@@ -11,18 +11,18 @@ namespace coretests.Stocks
             var closedPositions = new List<PositionInstance>();
 
             var position = new PositionInstance("AMD");
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 110m, DateTimeOffset.Now);
+            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
+            position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
             position = new PositionInstance("AMD");
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 110m, DateTimeOffset.Now);
+            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
+            position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
             position = new PositionInstance("AMD");
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 90m, DateTimeOffset.Now);
+            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
+            position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
             return new Span<PositionInstance>(closedPositions.ToArray());

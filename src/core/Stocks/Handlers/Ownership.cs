@@ -36,13 +36,19 @@ namespace core.Stocks
                     return null;
                 }
 
+                var openPosition = stock.State.OpenPosition;
+                if (openPosition == null)
+                {
+                    return null;
+                }
+
                 return new StockOwnershipView {
                     Id = stock.State.Id,
-                    AverageCost = stock.State.AverageCost,
-                    Cost = stock.State.Cost,
-                    Owned = stock.State.Owned,
-                    Ticker = stock.State.Ticker,
-                    Category = stock.State.Category,
+                    AverageCost = openPosition.AverageCostPerShare,
+                    Cost = openPosition.Cost,
+                    Owned = openPosition.NumberOfShares,
+                    Ticker = openPosition.Ticker,
+                    Category = openPosition.Category,
                     Transactions = stock.State.Transactions.Where(t => !t.IsPL)
                         .OrderByDescending(t => t.Date)
                         .ToList()

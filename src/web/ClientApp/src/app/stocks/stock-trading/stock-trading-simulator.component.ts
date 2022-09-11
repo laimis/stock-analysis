@@ -151,7 +151,8 @@ export class StockTradingSimulatorComponent implements OnInit {
   filteredPositions:StockTradingPosition[] = []
 
   showExistingPositions() {
-    this.stocks.getStockPositions().subscribe(positions => {
+    this.stocks.getTradingEntries().subscribe(entries => {
+      var positions = entries.current.concat(entries.past)
       this.positions = positions
       this.filteredPositions = positions
       this.showExisting = true

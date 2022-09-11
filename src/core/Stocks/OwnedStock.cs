@@ -58,7 +58,7 @@ namespace core.Stocks
                 return;
             }
             
-            if (State.Category == category)
+            if (State.OpenPosition.Category == category)
             {
                 return;
             }
@@ -82,6 +82,11 @@ namespace core.Stocks
 
         public void DeleteTransaction(Guid transactionId)
         {
+            if (State.OpenPosition == null)
+            {
+                throw new InvalidOperationException("Unable to delete transaction, no open position");
+            }
+
             if (!State.BuyOrSell.Any(t => t.Id == transactionId))
             {
                 throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);
@@ -111,9 +116,19 @@ namespace core.Stocks
 
         public void Sell(decimal numberOfShares, decimal price, DateTimeOffset date, string notes)
         {
-            if (numberOfShares > State.Owned)
+            if (State.OpenPosition == null)
             {
-                throw new InvalidOperationException("Number of shares owned is less than what is desired to sell");
+                throw new InvalidOperationException("No open position to sell");
+            }
+            
+            if (State.OpenPosition.NumberOfShares < numberOfShares)
+            {
+                throw new InvalidOperationException("Cannot sell more shares than owned");
+            }
+
+            if (price < 0)
+            {
+                throw new InvalidOperationException("Price cannot be negative or zero");
             }
 
             Apply(

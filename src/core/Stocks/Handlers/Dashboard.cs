@@ -157,8 +157,8 @@ namespace core.Stocks
             {
                 var stocks = await _storage.GetStocks(userId);
 
-                var positions = stocks.Where(s => s.State.Owned > 0)
-                    .Select(s => s.State.CurrentPosition)
+                var positions = stocks.Where(s => s.State.OpenPosition != null)
+                    .Select(s => s.State.OpenPosition)
                     .OrderBy(p => p.Ticker)
                     .ToList();
 

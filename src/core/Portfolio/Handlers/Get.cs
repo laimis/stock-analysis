@@ -57,7 +57,7 @@ namespace core.Portfolio
             {
                 var stocks = await _storage.GetStocks(userId);
 
-                var openStocks = stocks.Where(s => s.State.Owned > 0).Select(s => s.State.CurrentPosition).ToList();
+                var openStocks = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition).ToList();
 
                 var options = await _storage.GetOwnedOptions(userId);
 

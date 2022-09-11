@@ -6,17 +6,19 @@ namespace core.Stocks
 {
     public struct PositionTransaction
     {
-        public PositionTransaction(decimal quantity, decimal price, string type, DateTimeOffset when)
+        public PositionTransaction(decimal numberOfShares, decimal price, Guid transactionId, string type, DateTimeOffset when)
         {
-            Quantity = quantity;
+            NumberOfShares = numberOfShares;
             Price = price;
+            TransactionId = transactionId;
             Type = type;
             When = when;
         }
 
         public decimal Price { get; }
+        public Guid TransactionId { get; }
         public DateTimeOffset When { get; }
-        public decimal Quantity { get; }
+        public decimal NumberOfShares { get; }
         public string Type { get; set; }
     }
 
@@ -30,70 +32,57 @@ namespace core.Stocks
         }
 
         public decimal NumberOfShares { get; private set; } = 0;
+        public decimal AverageCostPerShare { get; private set; } = 0;
+        public decimal AverageSaleCostPerShare { get; private set; } = 0;
+        public decimal AverageBuyCostPerShare { get; private set; } = 0;
         public DateTimeOffset? Opened { get; private set; }
         public int DaysHeld => Opened != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value)).TotalDays : 0;
         public decimal Cost { get; private set; } = 0;
-        public decimal Return { get; private set; } = 0;
-        public decimal ReturnPct => Cost == 0 ? 0 : Math.Round((Return - Cost) / Cost, 4);
-        public decimal Profit => Return - Cost;
+        public decimal Profit { get; private set; } = 0;
+        public decimal GainPct => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare;
+        public decimal RR => RiskedAmount switch {
+            not null => Profit / RiskedAmount.Value,
+            _ => 0
+        };
+        public decimal RRWeighted => RR * Cost;
+
+        public decimal UnrealizedProfit { get; private set; } = 0;
+        public decimal UnrealizedGainPct { get; private set; } = 0;
+        public decimal UnrealizedRR { get; private set; } = 0;
+        
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
-        public decimal MaxNumberOfShares { get; private set; }
         public int NumberOfBuys { get; private set; }
         public int NumberOfSells { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
-        public List<PositionTransaction> Buys { get; private set; } = new List<PositionTransaction>();
-        public List<PositionTransaction> Sells { get; private set; } = new List<PositionTransaction>();
+        public decimal? RiskedAmount { get; private set; }
+        
+        public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
+
         public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
-        public decimal AverageCost => BuysForAverageCostCalculations.Aggregate(0m, (a, b) => a +  b.Item1 * b.Item2) / 
-            BuysForAverageCostCalculations.Sum(b => b.Item1);
-        private List<(decimal, decimal)> BuysForAverageCostCalculations { get; set; } = new List<(decimal, decimal)>();
-
-        internal void ApplyPrice(decimal currentPrice)
-        {
-            Price = currentPrice;
-            UnrealizedGain = (Price - AverageCost) * NumberOfShares;
-            UnrealizedGainPct = (Price - AverageCost) / AverageCost;
-        }
-
-        public decimal PotentialLoss => NumberOfShares * AverageCost * RiskedPct;
-
-        public decimal RiskedPct => StopPrice switch {
-            not null => (AverageCost - StopPrice.Value) / AverageCost,
-            null => 0.05m
-        };
-
-        public decimal RiskedAmount => Cost * RiskedPct;
-
-        public decimal RR => Profit / RiskedAmount;
-        public decimal RRWeighted => RR * Profit;
-        public decimal UnrealizedRR => UnrealizedGain / RiskedAmount;
-        public decimal Price { get; private set; }
-        public decimal UnrealizedGain { get; private set; }
-        public decimal UnrealizedGainPct { get; private set; }
         public DateTimeOffset LastTransaction { get; private set; }
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
+        public string Category { get; private set; }
+        private List<decimal> _slots = new List<decimal>();
 
-        public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, string notes = null)
+        public void SetCategory(string category) => Category = category;
+
+        public void SetPrice(decimal price)
+        {
+            UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
+            UnrealizedGainPct = UnrealizedProfit / Cost;
+            UnrealizedRR = UnrealizedProfit / RiskedAmount.Value;
+        }
+        public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
             if (NumberOfShares == 0)
             {
                 Opened = when;
             }
 
-            BuysForAverageCostCalculations.Add((numberOfShares, price));
-            NumberOfShares += numberOfShares;
-            Cost += numberOfShares * price;
-            NumberOfBuys++;
-            
-            Buys.Add(new PositionTransaction(numberOfShares, price, "buy", when));
-
-            if (NumberOfShares > MaxNumberOfShares)
-            {
-                MaxNumberOfShares = NumberOfShares;
-            }
+            Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
 
             if (FirstBuyCost == null)
             {
@@ -106,24 +95,37 @@ namespace core.Stocks
             }
 
             LastTransaction = when;
+
+            RunCalculations();
         }
 
-        public void Sell(decimal amount, decimal price, DateTimeOffset when, string notes = null)
+        internal void RemoveTransaction(Guid transactionId)
         {
-            NumberOfShares -= amount;
-            NumberOfSells++;
-            Return += amount * price;
-            Sells.Add(new PositionTransaction(amount, price, "sell", when));
+            var tx = Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
+            if (tx.TransactionId == null)
+            {
+                throw new InvalidOperationException($"Transaction {transactionId} not found");
+            }
 
-            if (NumberOfShares < 0)
+            Transactions.Remove(tx);
+
+            RunCalculations();
+        }
+
+        public void Sell(decimal numberOfShares, decimal price, Guid transactionId, DateTimeOffset when, string notes = null)
+        {
+            if (NumberOfShares <= 0)
             {
                 throw new InvalidOperationException("Transaction would make amount owned invalid");
             }
 
-            if (NumberOfShares == 0)
+            // if we haven't set the risked amount, when we set it at 5% from the first buy price?
+            if (StopPrice == null)
             {
-                Closed = when;
+                SetStopPrice(FirstBuyCost.Value * 0.95m);
             }
+
+            Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
 
             if (notes != null)
             {
@@ -131,6 +133,13 @@ namespace core.Stocks
             }
 
             LastTransaction = when;
+
+            RunCalculations();
+
+            if (NumberOfShares == 0)
+            {
+                Closed = when;
+            }
         }
 
         public void SetStopPrice(decimal? stopPrice)
@@ -138,7 +147,84 @@ namespace core.Stocks
             if (stopPrice != null)
             {
                 StopPrice = stopPrice;
+
+                if (RiskedAmount == null)
+                {
+                    RiskedAmount = (AverageCostPerShare - stopPrice.Value) * NumberOfShares;
+                }
             }
+        }
+
+        private void RunCalculations()
+        {
+            _slots.Clear();
+            decimal cost = 0;
+            decimal profit = 0;
+            decimal numberOfShares = 0;
+            
+            decimal totalSale = 0;
+            decimal totalNumberOfSharesSold = 0;
+
+            decimal totalBuy = 0;
+            decimal totalNumberOfSharesBought = 0;
+
+            Transactions.ForEach(transaction => {
+            if (transaction.Type == "buy")
+            {
+                for (var i = 0; i < transaction.NumberOfShares; i++)
+                {
+                    _slots.Add(transaction.Price);
+                    cost += transaction.Price;
+                    numberOfShares++;
+                }
+
+                totalBuy += transaction.Price * transaction.NumberOfShares;
+                totalNumberOfSharesBought += transaction.NumberOfShares;
+            }
+            else
+            {
+                // remove quantity number of slots from the beginning of an array
+                var removed = _slots.Take((int)transaction.NumberOfShares).ToList();
+                _slots.RemoveRange(0, (int)transaction.NumberOfShares);
+                removed.ForEach(
+                    removedElement =>
+                    {
+                        profit += transaction.Price - removedElement;
+                        cost -= removedElement;
+                        numberOfShares--;
+                    }
+                );
+                
+                totalSale += transaction.Price * transaction.NumberOfShares;
+                totalNumberOfSharesSold += transaction.NumberOfShares;
+            }
+            });
+
+            // calculate average cost per share using slots
+            this.AverageCostPerShare = _slots.Count switch {
+                0 => 0,
+                _ => _slots.Sum() / _slots.Count
+            };
+            this.Cost = cost;
+            this.Profit = profit;
+            this.NumberOfShares = numberOfShares;
+
+            this.AverageSaleCostPerShare = totalNumberOfSharesSold switch {
+                0 => 0,
+                _ => totalSale / totalNumberOfSharesSold
+            };
+
+            this.AverageBuyCostPerShare = totalBuy / totalNumberOfSharesBought;
+        }
+
+        internal void ApplyPrice(decimal price)
+        {
+            UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
+            UnrealizedGainPct = (price - AverageBuyCostPerShare) / AverageBuyCostPerShare;
+            UnrealizedRR = RiskedAmount switch {
+                not null => UnrealizedProfit / RiskedAmount.Value,
+                _ => 0
+            };
         }
     }
 }

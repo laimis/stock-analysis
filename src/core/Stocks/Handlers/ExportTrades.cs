@@ -40,16 +40,14 @@ namespace core.Stocks
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                Func<PositionInstance, bool> filter = request.ExportType switch {
-                    ExportType.Open => t => !t.IsClosed,
-                    ExportType.Closed => t => t.IsClosed,
+                var trades = request.ExportType switch {
+                    ExportType.Open => stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition),
+                    ExportType.Closed => stocks.SelectMany(s => s.State.ClosedPositions),
                     _ => throw new NotImplementedException()
                 };
 
-                var trades = stocks
-                    .SelectMany(s => s.State.PositionInstances)
-                    .Where(filter)
-                    .OrderByDescending(p => p.Closed)
+                var final = trades
+                    .OrderByDescending(p => p.Closed ?? p.Opened)
                     .ToList();
 
                 var filename = CSVExport.GenerateFilename("positions");

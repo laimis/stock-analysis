@@ -49,7 +49,7 @@ namespace storage.tests
 
             var loaded = await storage.GetStock(stock.State.Ticker, _userId);
 
-            Assert.Equal(loaded.State.Owned, stock.State.Owned);
+            Assert.Equal(loaded.State.OpenPosition.NumberOfShares, stock.State.OpenPosition.NumberOfShares);
 
             loaded.Purchase(5, 5, DateTime.UtcNow);
 
@@ -57,7 +57,7 @@ namespace storage.tests
 
             loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
 
-            Assert.NotEqual(loaded.State.Owned, stock.State.Owned);
+            Assert.NotEqual(loaded.State.OpenPosition.NumberOfShares, stock.State.OpenPosition.NumberOfShares);
 
             await storage.Delete(_userId);
 
