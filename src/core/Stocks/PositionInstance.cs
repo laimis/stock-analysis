@@ -218,7 +218,10 @@ namespace core.Stocks
                 _ => totalSale / totalNumberOfSharesSold
             };
 
-            this.AverageBuyCostPerShare = totalBuy / totalNumberOfSharesBought;
+            this.AverageBuyCostPerShare = totalNumberOfSharesBought switch {
+                0 => 0,
+                _ => totalBuy / totalNumberOfSharesBought
+            };
         }
     }
 }

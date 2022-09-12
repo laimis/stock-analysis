@@ -100,6 +100,11 @@ namespace core.Stocks
             Transactions.Remove(transaction);
 
             OpenPosition.RemoveTransaction(deleted.TransactionId);
+
+            if (OpenPosition.NumberOfShares == 0)
+            {
+                OpenPosition = null;
+            }
         }
 
         internal void ApplyInternal(StockSold sold)
