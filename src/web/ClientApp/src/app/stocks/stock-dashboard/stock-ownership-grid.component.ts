@@ -41,7 +41,7 @@ export class StockOwnershipGridComponent implements OnInit {
   private getSortFunc(column:string) {
     switch(column) {
       case "averageCost":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCost - b.averageCost
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCostPerShare - b.averageCostPerShare
       case "price":
         return (a:StockTradingPosition, b:StockTradingPosition) => a.price - b.price
       case "daysheld":
@@ -49,9 +49,9 @@ export class StockOwnershipGridComponent implements OnInit {
       case "invested":
         return (a:StockTradingPosition, b:StockTradingPosition) => a.cost - b.cost
       case "profits":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGain - b.unrealizedGain
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedProfit - b.unrealizedProfit
       case "equity":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedGain - b.cost - b.unrealizedGain
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedProfit - b.cost - b.unrealizedProfit
       case "profitsPct":
         return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGainPct - b.unrealizedGainPct
       case "owned":
@@ -76,10 +76,10 @@ export class StockOwnershipGridComponent implements OnInit {
 
   equityPct(position:StockTradingPosition) {
     let total = this.positions
-      .map(s => s.cost  + s.unrealizedGain)
+      .map(s => s.cost  + s.unrealizedProfit)
       .reduce((acc, curr) => acc + curr)
 
-    return (position.cost + position.unrealizedGain) / total
+    return (position.cost + position.unrealizedProfit) / total
   }
 
   highlightRow(position:StockTradingPosition) {

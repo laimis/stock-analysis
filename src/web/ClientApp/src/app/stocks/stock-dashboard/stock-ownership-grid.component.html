@@ -25,11 +25,11 @@
           <td><a [routerLink]="[ '/stocks', ticker.ticker ]">{{ticker.ticker}}</a></td>
           <td>{{ticker.numberOfShares}}</td>
           <td class="text-end">{{ticker.price | currency}}</td>
-          <td class="text-end">{{ticker.averageCost | currency}}</td>
+          <td class="text-end">{{ticker.averageCostPerShare | currency}}</td>
           <td class="text-end">{{ticker.cost | currency}} <small>{{ownershipPct(ticker) | percent}}</small></td>
-          <td class="text-end"><span [ngClass]="{'profits-positive': ticker.unrealizedGain > 0, 'profits-negative': ticker.unrealizedGain < 0}">{{ticker.unrealizedGain | currency }}</span></td>
-          <td class="text-end"><span [ngClass]="{'profits-positive': ticker.unrealizedGain > 0, 'profits-negative': ticker.unrealizedGain < 0}">{{ticker.unrealizedGainPct | percent:'1.2' }}</span></td>
-          <td class="text-end">{{ticker.cost + ticker.unrealizedGain | currency}} <small>{{equityPct(ticker) | percent}}</small></td>
+          <td class="text-end"><span [ngClass]="{'profits-positive': ticker.unrealizedProfit > 0, 'profits-negative': ticker.unrealizedProfit < 0}">{{ticker.unrealizedProfit | currency }}</span></td>
+          <td class="text-end"><span [ngClass]="{'profits-positive': ticker.unrealizedProfit > 0, 'profits-negative': ticker.unrealizedProfit < 0}">{{ticker.unrealizedGainPct | percent:'1.2' }}</span></td>
+          <td class="text-end">{{ticker.cost + ticker.unrealizedProfit | currency}} <small>{{equityPct(ticker) | percent}}</small></td>
           <td class="text-end">{{ticker.daysHeld}}</td>
           <td class="text-end">{{ticker.daysSinceLastTransaction}}</td>
         </tr>  

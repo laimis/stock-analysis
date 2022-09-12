@@ -46,6 +46,7 @@ namespace core.Stocks
         };
         public decimal RRWeighted => RR * Cost;
 
+        public decimal? Price { get; private set; }
         public decimal UnrealizedProfit { get; private set; } = 0;
         public decimal UnrealizedGainPct { get; private set; } = 0;
         public decimal UnrealizedRR { get; private set; } = 0;
@@ -69,12 +70,6 @@ namespace core.Stocks
 
         public void SetCategory(string category) => Category = category;
 
-        public void SetPrice(decimal price)
-        {
-            UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
-            UnrealizedGainPct = UnrealizedProfit / Cost;
-            UnrealizedRR = UnrealizedProfit / RiskedAmount.Value;
-        }
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
             if (NumberOfShares == 0)
@@ -219,6 +214,7 @@ namespace core.Stocks
 
         internal void ApplyPrice(decimal price)
         {
+            Price = price;
             UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
             UnrealizedGainPct = (price - AverageBuyCostPerShare) / AverageBuyCostPerShare;
             UnrealizedRR = RiskedAmount switch {

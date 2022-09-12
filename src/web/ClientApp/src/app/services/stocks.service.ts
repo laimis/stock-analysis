@@ -655,7 +655,7 @@ export interface StockTradingPosition {
   ticker: string,
   numberOfShares: number,
   maxNumberOfShares: number,
-  averageCost: number,
+  averageCostPerShare: number,
   profitTarget: number,
   profit: number,
   daysHeld: number,
@@ -669,7 +669,7 @@ export interface StockTradingPosition {
   rr: number | null
   potentialLoss: number | null
   riskedPct: number | null
-  unrealizedGain: number | null
+  unrealizedProfit: number | null
   unrealizedGainPct: number | null
   unrealizedRR: number | null
   daysSinceLastTransaction: number | null

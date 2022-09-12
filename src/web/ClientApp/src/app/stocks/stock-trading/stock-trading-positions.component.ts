@@ -26,11 +26,11 @@ export class StockTradingPositionComponent {
     }
 
     firstTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * p.riskedPct
+        return p.averageCostPerShare + p.averageCostPerShare * p.riskedPct
     }
 
     secondTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * 2.5 * p.riskedPct
+        return p.averageCostPerShare + p.averageCostPerShare * 2.5 * p.riskedPct
     }
 
     positionProgress(p:StockTradingPosition) {
@@ -38,7 +38,7 @@ export class StockTradingPositionComponent {
     }
 
     positionSize(p:StockTradingPosition) {
-        return p.numberOfShares * p.averageCost
+        return p.numberOfShares * p.averageCostPerShare
     }
 
     tradingPortion(p:StockTradingPosition) {
@@ -63,7 +63,7 @@ export class StockTradingPositionComponent {
 
         switch (value) {
             case "pl":
-                this.metricFunc = (p:StockTradingPosition) => p.unrealizedGain
+                this.metricFunc = (p:StockTradingPosition) => p.unrealizedProfit
                 break;
             case "plPercent":
                 this.metricFunc = (p:StockTradingPosition) => p.unrealizedGainPct

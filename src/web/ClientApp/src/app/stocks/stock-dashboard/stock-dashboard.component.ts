@@ -133,13 +133,13 @@ export class StockDashboardComponent implements OnInit {
       case "price":
         return (a:StockTradingPosition, b:StockTradingPosition) => a.price - b.price
       case "averageCost":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCost - b.averageCost
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCostPerShare - b.averageCostPerShare
       case "owned":
         return (a:StockTradingPosition, b:StockTradingPosition) => a.numberOfShares - b.numberOfShares
       case "equity":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedGain - (b.cost + b.unrealizedGain)
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedProfit - (b.cost + b.unrealizedProfit)
       case "profits":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGain - b.unrealizedGain
+        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedProfit - b.unrealizedProfit
       case "profitsPct":
         return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGainPct - b.unrealizedGainPct
     }
