@@ -51,4 +51,12 @@ export class StockTradingReviewComponent implements OnInit {
     this.updateCurrentPosition()
   }
 
+  buys(positionInstance:PositionInstance) {
+    return positionInstance.transactions.filter(t => t.type == 'buy')
+  }
+
+  sells(positionInstance:PositionInstance) {
+    return positionInstance.transactions.filter(t => t.type == 'sell')
+  }
+
 }

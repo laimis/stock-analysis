@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService, ReviewList } from '../services/stocks.service';
+import { StocksService, ReviewList, PositionInstance } from '../services/stocks.service';
 
 @Component({
   selector: 'app-review',
@@ -43,6 +43,14 @@ export class SummaryComponent implements OnInit {
 
   closedPositionRR() : number {
     return this.result.closedPositions.reduce((acc, cur) => acc + cur.rr, 0)
+  }
+
+  buys(positionInstance:PositionInstance) {
+    return positionInstance.transactions.filter(t => t.type == 'buy')
+  }
+
+  sells(positionInstance:PositionInstance) {
+    return positionInstance.transactions.filter(t => t.type == 'sell')
   }
 }
 

@@ -21,20 +21,20 @@
     <div class="row">
       <!-- generate span for each buy showing the price and when it was executed -->
       <div class="col">
-        <h4>Buys [{{currentPosition.buys.length}}]</h4>
-        <span class="badge bg-success me-1" *ngFor="let buy of currentPosition.buys">{{buy.price | currency}} on {{buy.when | date: 'MM/dd/yyyy'}}</span>
+        <h4>Buys [{{buys(currentPosition).length}}]</h4>
+        <span class="badge bg-success me-1" *ngFor="let buy of buys(currentPosition)">{{buy.price | currency}} on {{buy.when | date: 'MM/dd/yyyy'}}</span>
       </div>
       <!-- generate span for each sell showing the price and when it was executed -->
       <div class="col text-end">
-        <h4>Sells [{{currentPosition.sells.length}}]</h4>
-        <span class="badge bg-success me-1" *ngFor="let sell of currentPosition.sells">{{sell.price | currency}} on {{sell.when | date: 'MM/dd/yyyy'}}</span>
+        <h4>Sells [{{sells(currentPosition).length}}]</h4>
+        <span class="badge bg-success me-1" *ngFor="let sell of sells(currentPosition)">{{sell.price | currency}} on {{sell.when | date: 'MM/dd/yyyy'}}</span>
       </div>
     </div>
     <div class="row mt-2">
       <div class="col">
         <stock-trading-chart *ngIf="prices"
-          [buys]="currentPosition.buys"
-          [sells]="currentPosition.sells"
+          [buys]="buys(currentPosition)"
+          [sells]="sells(currentPosition)"
           [prices]=prices>
         </stock-trading-chart>
       </div>
