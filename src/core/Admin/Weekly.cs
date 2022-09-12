@@ -168,9 +168,9 @@ namespace core.Admin
                     entries.Add(new EmailReviewEntry(o));
                 }
 
-                foreach (var s in stocks.Result.Where(s => s.State.Owned > 0))
+                foreach (var s in stocks.Result.Where(s => s.State.OpenPosition != null))
                 {
-                    entries.Add(new EmailReviewEntry(s));
+                    entries.Add(new EmailReviewEntry(s.State.OpenPosition));
                 }
 
                 foreach (var a in alerts.Result)

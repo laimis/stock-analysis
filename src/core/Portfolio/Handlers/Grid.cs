@@ -32,13 +32,13 @@ namespace core.Portfolio
 
                 var prices = await _stocks.GetPrices(
                     stocks
-                        .Where(s => s.State.Owned > 0)
+                        .Where(s => s.State.OpenPosition != null)
                         .Select(s => s.State.Ticker)
                         .ToArray()
                 );
 
                 return stocks
-                    .Where(s => s.State.Owned > 0)
+                    .Where(s => s.State.OpenPosition != null)
                     .Select(async s => {
                         {
                             var adv = await _stocks.GetAdvancedStats(s.State.Ticker);

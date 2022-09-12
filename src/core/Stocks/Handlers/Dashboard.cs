@@ -140,7 +140,7 @@ namespace core.Stocks
                 foreach(var o in view.Positions)
                 {
                     prices.TryGetValue(o.Ticker, out var price);
-                    o.ApplyPrice(price?.Price ?? 0);
+                    o.SetPrice(price?.Price ?? 0);
                 }
 
                 return view;
@@ -157,8 +157,8 @@ namespace core.Stocks
             {
                 var stocks = await _storage.GetStocks(userId);
 
-                var positions = stocks.Where(s => s.State.Owned > 0)
-                    .Select(s => s.State.CurrentPosition)
+                var positions = stocks.Where(s => s.State.OpenPosition != null)
+                    .Select(s => s.State.OpenPosition)
                     .OrderBy(p => p.Ticker)
                     .ToList();
 

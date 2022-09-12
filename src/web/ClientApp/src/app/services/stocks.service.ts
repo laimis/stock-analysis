@@ -140,10 +140,6 @@ export class StocksService {
 		return this.http.get<any>('/api/stocks')
   }
 
-  getStockPositions(): Observable<StockTradingPosition[]> {
-		return this.http.get<any>('/api/portfolio/stockpositions')
-  }
-
 	getStockDetails(symbol:string): Observable<StockDetails> {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
   }
@@ -349,8 +345,8 @@ export interface ReviewList {
   end: string
   stockProfit: number
   optionProfit: number
-  openPositions: StockTradingPosition[]
-  closedPositions: StockTradingPosition[]
+  openPositions: PositionInstance[]
+  closedPositions: PositionInstance[]
   plOptionTransactions: Transaction[]
   plStockTransactions: Transaction[]
   stockTransactions: Transaction[]
@@ -363,7 +359,7 @@ export interface StockViolation {
 }
 
 export interface StockSummary {
-  positions: StockTradingPosition[]
+  positions: PositionInstance[]
   violations: StockViolation[]
   orders: BrokerageOrder[]
 }
@@ -638,20 +634,20 @@ export interface BrokerageOrder {
 }
 
 export interface StockTradingPositions {
-  current: StockTradingPosition[]
-  past: StockTradingPosition[]
+  current: PositionInstance[]
+  past: PositionInstance[]
   performance: StockTradingPerformanceCollection
   brokerageOrders: BrokerageOrder[]
 }
 
 export interface PositionTransaction {
-  quantity: number,
+  numberOfShares: number,
   price: number,
   type: string,
   when: string,
 }
 
-export interface StockTradingPosition {
+export interface PositionInstance {
   price: number,
   category: string,
   cost: number,
@@ -659,21 +655,21 @@ export interface StockTradingPosition {
   ticker: string,
   numberOfShares: number,
   maxNumberOfShares: number,
-  averageCost: number,
+  averageCostPerShare: number,
   profitTarget: number,
   profit: number,
   daysHeld: number,
   opened: string,
   closed: string,
   returnPct: number,
-  buys: PositionTransaction[]
-  sells: PositionTransaction[]
+  transactions: PositionTransaction[]
   stopPrice: number | null
   notes: string[] | null
   rr: number | null
   potentialLoss: number | null
   riskedPct: number | null
-  unrealizedGain: number | null
+  riskedAmount: number | null
+  unrealizedProfit: number | null
   unrealizedGainPct: number | null
   unrealizedRR: number | null
   daysSinceLastTransaction: number | null

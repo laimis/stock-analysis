@@ -11,23 +11,11 @@ namespace core.Stocks
         public string Ticker { get; private set; }
         public Guid UserId { get; private set; }
 
-        public decimal Owned { get; private set; }
-        public decimal Cost { get; private set; }
-        public decimal AverageCost { get; private set; }
         public List<Transaction> Transactions { get; } = new List<Transaction>();
         internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
-        internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
-
-        public List<PositionInstance> PositionInstances { get; } = new List<PositionInstance>();
-        public PositionInstance CurrentPosition => PositionInstances.LastOrDefault();
-
-        public string Description => $"{Owned} shares owned at avg cost {Math.Round(AverageCost, 2)}";
-
-        public string Category { get; private set; }
-        public int DaysHeld { get; private set; }
-        public int DaysSinceLastTransaction { get; private set; }
-        public IEnumerable<AggregateEvent> UndeletedBuysOrSells =>
-            BuyOrSell.Where(a => Deletes.Contains(a.Id) == false).Cast<AggregateEvent>();
+        
+        public List<PositionInstance> ClosedPositions { get; } = new List<PositionInstance>();
+        public PositionInstance OpenPosition { get; private set;}
 
         internal void ApplyInternal(TickerObtained o)
         {
@@ -36,10 +24,7 @@ namespace core.Stocks
             UserId = o.UserId;
         }
 
-        internal void ApplyInternal(StockCategoryChanged c)
-        {
-            Category = c.Category;
-        }
+        internal void ApplyInternal(StockCategoryChanged c) => OpenPosition.SetCategory(c.Category);
 
         internal void ApplyInternal(StockPurchased purchased)
         {
@@ -52,160 +37,119 @@ namespace core.Stocks
         {
             BuyOrSell.Add(purchased);
 
-            if (Category == null && Owned == 0)
+            if (OpenPosition == null)
             {
-                Category = StockCategory.Default;
+                OpenPosition = new PositionInstance(purchased.Ticker);
             }
 
-            StateUpdateLoop();
+            OpenPosition.Buy(numberOfShares: purchased.NumberOfShares, price: purchased.Price, transactionId: purchased.Id, when: purchased.When, notes: purchased.Notes);
+
+            if (purchased.StopPrice.HasValue)
+            {
+                OpenPosition.SetStopPrice(purchased.StopPrice.Value);
+            }
+
+            Transactions.Add(
+                Transaction.DebitTx(
+                    Id,
+                    purchased.Id,
+                    Ticker,
+                    $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
+                    purchased.Price,
+                    purchased.Price * purchased.NumberOfShares,
+                    purchased.When,
+                    isOption: false
+                )
+            );
         }
 
         internal void ApplyInternal(StockDeleted deleted)
         {
-            foreach(var t in BuyOrSell)
-            {
-                Deletes.Add(t.Id);
-            }
-
-            StateUpdateLoop();
+            OpenPosition = null;
+            BuyOrSell.Clear();
+            ClosedPositions.Clear();
+            Transactions.Clear();
         }
 
         internal void ApplyInternal(StockTransactionDeleted deleted)
         {
-            Deletes.Add(deleted.TransactionId);
+            if (OpenPosition == null)
+            {
+                throw new InvalidOperationException("Cannot delete a transaction from a stock that has no open position");
+            }
 
-            StateUpdateLoop();
+            // only last one should be allowed to be deleted?
+            var last = BuyOrSell.LastOrDefault();
+            if (last == null)
+            {
+                return;
+            }
+            if (last.Id != deleted.TransactionId)
+            {
+                throw new InvalidOperationException($"Only the last transaction can be deleted. Expected {last.Id} but got {deleted.TransactionId}");
+            }
+
+            BuyOrSell.Remove(last);
+            
+            var transaction = Transactions.LastOrDefault();
+            if (transaction.EventId != deleted.TransactionId)
+            {
+                throw new InvalidOperationException($"Only the last transaction can be deleted. Expected {transaction.EventId} but got {deleted.TransactionId}");
+            }
+
+            Transactions.Remove(transaction);
+
+            OpenPosition.RemoveTransaction(deleted.TransactionId);
         }
 
         internal void ApplyInternal(StockSold sold)
         {
             BuyOrSell.Add(sold);
 
-            StateUpdateLoop();
-        }
-
-        private void StateUpdateLoop()
-        {
-            decimal avgCost = 0;
-            decimal owned = 0;
-            decimal cost = 0;
-            var txs = new List<Transaction>();
-            DateTimeOffset? oldestOpen = null;
-            var positionInstances = new List<PositionInstance>();
-            DateTimeOffset lastTransaction = DateTimeOffset.UtcNow;
-
-            bool PurchaseProcessing(IStockTransaction st)
+            if (OpenPosition == null)
             {
-                lastTransaction = st.When;
-
-                if (owned == 0)
-                {
-                    oldestOpen = st.When;
-                    positionInstances.Add(new PositionInstance(Ticker));
-                }
-
-                avgCost = (avgCost * owned + st.Price * st.NumberOfShares)
-                        / (owned + st.NumberOfShares);
-                owned += st.NumberOfShares;
-                cost += st.Price * st.NumberOfShares;
-
-                txs.Add(
-                    Transaction.DebitTx(
-                        Id,
-                        st.Id,
-                        Ticker,
-                        $"Purchased {st.NumberOfShares} shares @ ${st.Price}/share",
-                        st.Price,
-                        st.Price * st.NumberOfShares,
-                        st.When,
-                        isOption: false
-                    )
-                );
-
-                positionInstances[positionInstances.Count - 1].Buy(st.NumberOfShares, st.Price, st.When, st.Notes);
-                if (st is IStockTransactionWithStopPrice stWithStop)
-                {
-                    positionInstances[positionInstances.Count - 1].SetStopPrice(stWithStop.StopPrice);
-                }
-
-                return true;
+                throw new InvalidOperationException("Cannot sell stock that is not owned");
             }
 
-            bool SellProcessing(IStockTransaction st)
+            Transactions.Add(
+                Transaction.CreditTx(
+                    Id,
+                    sold.Id,
+                    Ticker,
+                    $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
+                    sold.Price,
+                    sold.Price * sold.NumberOfShares,
+                    sold.When,
+                    isOption: false
+                )
+            );
+
+            Transactions.Add(
+                Transaction.PLTx(
+                    Id,
+                    Ticker,
+                    $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
+                    sold.Price,
+                    OpenPosition.AverageCostPerShare * sold.NumberOfShares,
+                    sold.Price * sold.NumberOfShares,
+                    sold.When,
+                    isOption: false
+                )
+            );
+
+            OpenPosition.Sell(
+                numberOfShares: sold.NumberOfShares,
+                price: sold.Price,
+                transactionId: sold.Id,
+                when: sold.When,
+                notes: sold.Notes
+            );
+
+            if (OpenPosition.NumberOfShares == 0)
             {
-                // TODO: this should never happen but in prod I see sell get
-                // triggered before purchase... something is amiss
-                if (positionInstances.Count > 0)
-                    positionInstances[positionInstances.Count - 1].Sell(st.NumberOfShares, st.Price, st.When, st.Notes);
-
-                lastTransaction = st.When;
-
-                txs.Add(
-                    Transaction.CreditTx(
-                        Id,
-                        st.Id,
-                        Ticker,
-                        $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
-                        st.Price,
-                        st.Price * st.NumberOfShares,
-                        st.When,
-                        isOption: false
-                    )
-                );
-
-                txs.Add(
-                    Transaction.PLTx(
-                        Id,
-                        Ticker,
-                        $"Sold {st.NumberOfShares} shares @ ${st.Price}/share",
-                        st.Price,
-                        avgCost * st.NumberOfShares,
-                        st.Price * st.NumberOfShares,
-                        st.When,
-                        isOption: false
-                    )
-                );
-                
-                owned -= st.NumberOfShares;
-                cost -= avgCost * st.NumberOfShares;
-
-                return true;
+                ClosedPositions.Add(OpenPosition);
+                OpenPosition = null;
             }
-
-            foreach(var st in BuyOrSell)
-            {
-                if (Deletes.Contains(st.Id))
-                {
-                    continue;
-                }
-
-                var processed = st switch {
-                    StockPurchased_v2 p => PurchaseProcessing(p),
-                    StockPurchased p => PurchaseProcessing(p),
-                    StockSold s => SellProcessing(s),
-                    _ => throw new Exception("Unknown buy or sell type: " + st.GetType().Name)
-                };
-                
-                if (owned == 0)
-                {
-                    avgCost = 0;
-                    cost = 0;
-                    oldestOpen = null;
-                }
-            }
-
-            AverageCost = avgCost;
-            Owned = owned;
-            Cost = cost;
-            Transactions.Clear();
-            Transactions.AddRange(txs);
-            PositionInstances.Clear();
-            PositionInstances.AddRange(positionInstances);
-
-            DaysHeld = oldestOpen.HasValue ? (int)Math.Floor(DateTimeOffset.UtcNow.Subtract(oldestOpen.Value).TotalDays)
-                : 0;
-
-            DaysSinceLastTransaction = (int)DateTimeOffset.UtcNow.Subtract(lastTransaction).TotalDays;
         }
 
         public void Apply(AggregateEvent e)

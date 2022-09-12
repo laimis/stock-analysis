@@ -53,8 +53,8 @@ namespace core.Stocks
                     false => Task.FromResult(new BrokerageOrderView[0])
                 });
 
-                var tradingEntries = stocks.Where(s => s.State.Owned > 0 && s.State.Category == StockCategory.ShortTerm)
-                    .Select(s => s.State.CurrentPosition)
+                var tradingEntries = stocks.Where(s => s.State.OpenPosition != null && (s.State.OpenPosition.Category == null || s.State.OpenPosition.Category == StockCategory.ShortTerm))
+                    .Select(s => s.State.OpenPosition)
                     .ToArray();
 
                 var prices = await _stocks.GetPrices(tradingEntries.Select(s => s.Ticker).Distinct());
@@ -63,7 +63,7 @@ namespace core.Stocks
                     foreach (var entry in tradingEntries)
                     {
                         prices.Success.TryGetValue(entry.Ticker, out var price);
-                        entry.ApplyPrice(price?.Price ?? 0);    
+                        entry.SetPrice(price?.Price ?? 0);    
                     }   
                 }
 
@@ -72,7 +72,7 @@ namespace core.Stocks
                     .ToArray();
 
                 var past = stocks
-                    .SelectMany(s => s.State.PositionInstances.Where(t => t.IsClosed))
+                    .SelectMany(s => s.State.ClosedPositions)
                     .OrderByDescending(p => p.Closed)
                     .ToArray();
 

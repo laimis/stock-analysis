@@ -28,11 +28,11 @@ namespace core.Admin
             PricePoints = new List<AlertPricePoint>();
         }
 
-        public EmailReviewEntry(OwnedStock s)
+        public EmailReviewEntry(PositionInstance position)
         {
             Created = null;
-            Ticker = s.State.Ticker;
-            Description = s.State.Description;
+            Ticker = position.Ticker;
+            Description = position.Ticker;
             Expiration = null;
             IsExpired = false;
             ExpiresSoon = false;
@@ -40,7 +40,7 @@ namespace core.Admin
             Stats = null;
             IsOption = false;
             IsAlert = false;
-            AverageCost = s.State.AverageCost;
+            AverageCost = position.AverageCostPerShare;
             OptionType = null;
             StrikePrice = 0;
             OptionType = null;

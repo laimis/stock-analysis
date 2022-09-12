@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, BrokerageOrder, StockViolation } from '../../services/stocks.service';
+import { HideIfHidden, StocksService, OwnedStock, PositionInstance, BrokerageOrder, StockViolation } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-dashboard',
@@ -11,7 +11,7 @@ import { HideIfHidden, StocksService, OwnedStock, StockTradingPosition, Brokerag
 export class StockDashboardComponent implements OnInit {
 
   violations: StockViolation[] = []
-  positions : StockTradingPosition[]
+  positions : PositionInstance[]
   orders : BrokerageOrder[]
   loaded : boolean = false
 
@@ -129,19 +129,19 @@ export class StockDashboardComponent implements OnInit {
   private getSortFunc(column:string) {
     switch(column) {
       case "ticker":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.ticker.localeCompare(b.ticker)
+        return (a:PositionInstance, b:PositionInstance) => a.ticker.localeCompare(b.ticker)
       case "price":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.price - b.price
+        return (a:PositionInstance, b:PositionInstance) => a.price - b.price
       case "averageCost":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCost - b.averageCost
+        return (a:PositionInstance, b:PositionInstance) => a.averageCostPerShare - b.averageCostPerShare
       case "owned":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.numberOfShares - b.numberOfShares
+        return (a:PositionInstance, b:PositionInstance) => a.numberOfShares - b.numberOfShares
       case "equity":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedGain - (b.cost + b.unrealizedGain)
+        return (a:PositionInstance, b:PositionInstance) => a.cost + a.unrealizedProfit - (b.cost + b.unrealizedProfit)
       case "profits":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGain - b.unrealizedGain
+        return (a:PositionInstance, b:PositionInstance) => a.unrealizedProfit - b.unrealizedProfit
       case "profitsPct":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGainPct - b.unrealizedGainPct
+        return (a:PositionInstance, b:PositionInstance) => a.unrealizedGainPct - b.unrealizedGainPct
     }
 
     console.log("unrecognized sort column " + column)

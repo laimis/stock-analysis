@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using core.Account;
 using core.Alerts;
 using core.Cryptos;
@@ -25,15 +24,14 @@ namespace core
         private record struct PastTradesRecord(string ticker, string date, decimal profit, decimal percentage);
         private record struct OwnedStocksRecord(string ticker, decimal shares, decimal averagecost, decimal invested, decimal daysheld, string category);
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
-        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal maxshares, decimal profit, decimal returnpct, decimal rr, decimal buys, decimal sells);
+        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
 
         public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
         {
             var rows = trades.Select(t =>
                 new TradesRecord(t.Ticker, t.Opened?.ToString(DATE_FORMAT), t.Closed?.ToString(DATE_FORMAT), t.DaysHeld,
-                t.FirstBuyCost.Value, t.Cost, t.MaxNumberOfShares,
-                t.Profit, t.ReturnPct,t.RR,
-                t.NumberOfBuys, t.NumberOfSells)
+                t.FirstBuyCost.Value, t.Cost,
+                t.Profit, t.IsClosed ? t.GainPct : t.UnrealizedGainPct,t.RR, t.RiskedAmount)
             );
 
             return writer.Generate(rows);
@@ -80,8 +78,7 @@ namespace core
         public static string Generate(ICSVWriter writer, IEnumerable<OwnedStock> stocks)
         {
             var rows = stocks
-                .SelectMany(o => o.State.UndeletedBuysOrSells)
-                .OrderBy(t => t.When)
+                .SelectMany(o => o.State.BuyOrSell)
                 .Select(e => 
                     e switch {
                         StockPurchased sp => new StockRecord(sp.Ticker, "buy", sp.NumberOfShares, sp.Price, sp.When.ToString(DATE_FORMAT), sp.Notes),

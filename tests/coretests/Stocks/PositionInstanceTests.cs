@@ -12,23 +12,23 @@ namespace coretests.Stocks
         {
             _position = new PositionInstance("TSLA");
 
-            _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"));
-            _position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"));
-            _position.Sell(amount: 10, price: 40, when: DateTime.Parse("2020-02-25"));
-            _position.Sell(amount: 10, price: 37, when: DateTime.Parse("2020-03-21"));
+            _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
+            _position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
+            _position.Sell(numberOfShares: 10, price: 40, when: DateTime.Parse("2020-02-25"), transactionId: Guid.NewGuid());
+            _position.Sell(numberOfShares: 10, price: 37, when: DateTime.Parse("2020-03-21"), transactionId: Guid.NewGuid());
         }
 
         [Fact]
-        public void RR_Accurate() => Assert.Equal(3.69m, _position.RR, 2);
+        public void RR_Accurate() => Assert.Equal(1.5m, _position.RR, 2);
 
         [Fact]
-        public void RiskedPct_Accurate() => Assert.Equal(0.05m, _position.RiskedPct);
+        public void GainPct_Accurate() => Assert.Equal(0.185m, _position.GainPct, 3);
 
         [Fact]
-        public void RiskedAmount_Accurate() => Assert.Equal(32.5m, _position.RiskedAmount);
+        public void RiskedAmount_Accurate() => Assert.Equal(80, _position.RiskedAmount);
 
         [Fact]
-        public void AverageCost_Accurate() => Assert.Equal(32.5m, _position.AverageCost);
+        public void AverageCost_Accurate() => Assert.Equal(32.5m, _position.AverageBuyCostPerShare);
 
         [Fact]
         public void DaysHeld()
@@ -39,19 +39,12 @@ namespace coretests.Stocks
         [Fact]
         public void Cost()
         {
-            Assert.Equal(650, _position.Cost);
-        }
+            var position = new PositionInstance("TSLA");
 
-        [Fact]
-        public void Return()
-        {
-            Assert.Equal(770, _position.Return);
-        }
+            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
+            position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
 
-        [Fact]
-        public void Percentage()
-        {
-            Assert.Equal(0.1846m, _position.ReturnPct);
+            Assert.Equal(650, position.Cost);
         }
 
         [Fact]

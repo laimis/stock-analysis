@@ -90,12 +90,13 @@ namespace core.Portfolio
                     .SelectMany(g => g)
                     .ToList();
 
-                var closedPositions = stocks.SelectMany(s => s.State.PositionInstances)
-                    .Where(p => p.IsClosed && p.Closed >= request.Start && p.Closed <= request.End)
+                var closedPositions = stocks.SelectMany(s => s.State.ClosedPositions)
+                    .Where(p => p.Closed >= request.Start && p.Closed <= request.End)
                     .ToList();
 
-                var openPositions = stocks.SelectMany(s => s.State.PositionInstances)
-                    .Where(p => !p.IsClosed && p.Opened >= request.Start && p.Opened <= request.End)
+                var openPositions = stocks.Select(s => s.State.OpenPosition)
+                    .Where(p => p != null)
+                    .Where(p => p.Opened >= request.Start && p.Opened <= request.End)
                     .ToList();
 
                 return new TransactionSummaryView(

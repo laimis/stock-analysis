@@ -18,17 +18,17 @@ namespace coretests.Stocks
 
             Assert.Equal("TEUM", stock.State.Ticker);
             Assert.Equal(_userId, stock.State.UserId);
-            Assert.Equal(10, stock.State.Owned);
-            Assert.Equal(21, stock.State.Cost);
+            Assert.Equal(10, stock.State.OpenPosition.NumberOfShares);
+            Assert.Equal(21, stock.State.OpenPosition.Cost);
 
             stock.Purchase(5, 2, DateTime.UtcNow);
 
-            Assert.Equal(15, stock.State.Owned);
-            Assert.Equal(31, stock.State.Cost, 0);
+            Assert.Equal(15, stock.State.OpenPosition.NumberOfShares);
+            Assert.Equal(31, stock.State.OpenPosition.Cost, 0);
 
             stock.Sell(5, 20, DateTime.UtcNow, "sample note");
 
-            Assert.Equal(10, stock.State.Owned);
+            Assert.Equal(10, stock.State.OpenPosition.NumberOfShares);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace coretests.Stocks
 
             var stock2 = new OwnedStock(events);
 
-            Assert.Equal(stock.State.Owned, stock2.State.Owned);
+            Assert.Equal(stock.State.OpenPosition.NumberOfShares, stock2.State.OpenPosition.NumberOfShares);
         }
 
         [Fact]
@@ -93,28 +93,27 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(7.5m, stock.State.AverageCost);
-            Assert.Equal(15, stock.State.Cost);
+            Assert.Equal(7.5m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(15, stock.State.OpenPosition.Cost);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(7.5m, stock.State.AverageCost);
-            Assert.Equal(7.5m, stock.State.Cost);
+            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(10m, stock.State.OpenPosition.Cost);
 
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(8.75m, stock.State.AverageCost);
-            Assert.Equal(17.5m, stock.State.Cost);
+            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(20m, stock.State.OpenPosition.Cost);
 
             stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(0, stock.State.Owned);
-            Assert.Equal(0, stock.State.AverageCost);
-            Assert.Equal(0, stock.State.Cost);
-            Assert.Single(stock.State.PositionInstances);
-            Assert.Equal(0, stock.State.PositionInstances[0].DaysHeld);
-            Assert.Equal(1, stock.State.PositionInstances[0].Profit);
-            Assert.Equal(0.04m, stock.State.PositionInstances[0].ReturnPct);
+            Assert.Null(stock.State.OpenPosition);
+
+            Assert.Single(stock.State.ClosedPositions);
+            Assert.Equal(0, stock.State.ClosedPositions[0].DaysHeld);
+            Assert.Equal(1, stock.State.ClosedPositions[0].Profit);
+            Assert.Equal(0.04m, stock.State.ClosedPositions[0].GainPct, 2);
         }
 
         [Fact]
@@ -125,8 +124,8 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(7.5m, stock.State.AverageCost);
-            Assert.Equal(15, stock.State.Cost);
+            Assert.Equal(7.5m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(15, stock.State.OpenPosition.Cost);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
@@ -139,16 +138,16 @@ namespace coretests.Stocks
 
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(8.75m, stock.State.AverageCost);
+            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
             
             stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
 
             tx = stock.State.Transactions.Last();
 
             Assert.True(tx.IsPL);
-            Assert.Equal(2.5m, tx.Profit);
+            Assert.Equal(0, tx.Profit);
             Assert.Equal(20, tx.Credit);
-            Assert.Equal(17.5m, tx.Debit);
+            Assert.Equal(20, tx.Debit);
         }
 
         [Fact]
@@ -159,39 +158,26 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(7.5m, stock.State.AverageCost);
-            Assert.Equal(15, stock.State.Cost);
+            Assert.Equal(7.5m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(15, stock.State.OpenPosition.Cost);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(7.5m, stock.State.AverageCost);
-            Assert.Equal(7.5m, stock.State.Cost);
+            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(10m, stock.State.OpenPosition.Cost);
 
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
-            Assert.Equal(8.75m, stock.State.AverageCost);
-            Assert.Equal(17.5m, stock.State.Cost);
+            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
+            Assert.Equal(20m, stock.State.OpenPosition.Cost);
 
             stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(0, stock.State.Owned);
-            Assert.Equal(0, stock.State.AverageCost);
-            Assert.Equal(0, stock.State.Cost);
+            Assert.Null(stock.State.OpenPosition);
 
             var last = stock.State.Transactions.Where(t => !t.IsPL).Last();
 
-            stock.DeleteTransaction(last.EventId);
-
-            Assert.Equal(2, stock.State.Owned);
-            Assert.Equal(8.75m, stock.State.AverageCost);
-            Assert.Equal(17.5m, stock.State.Cost);
-
-            stock.Delete();
-
-            Assert.Equal(0, stock.State.Owned);
-            Assert.Equal(0, stock.State.AverageCost);
-            Assert.Equal(0, stock.State.AverageCost);
-            Assert.Empty(stock.State.Transactions);
+            Assert.Throws<InvalidOperationException>(() => stock.DeleteTransaction(last.EventId));
         }
 
         [Fact]
@@ -202,18 +188,17 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Purchase(1, 10, DateTimeOffset.UtcNow.AddDays(-2));
 
-            Assert.Equal(5, stock.State.DaysHeld);
-            Assert.Equal(2, stock.State.DaysSinceLastTransaction);
+            Assert.Equal(5, stock.State.OpenPosition.DaysHeld);
+            Assert.Equal(2, stock.State.OpenPosition.DaysSinceLastTransaction);
 
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(5, stock.State.DaysHeld);
-            Assert.Equal(0, stock.State.DaysSinceLastTransaction);
+            Assert.Equal(5, stock.State.OpenPosition.DaysHeld);
+            Assert.Equal(0, stock.State.OpenPosition.DaysSinceLastTransaction);
 
             stock.Sell(1, 10, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(0, stock.State.DaysHeld);
-            Assert.Equal(0, stock.State.DaysSinceLastTransaction);
+            Assert.Null(stock.State.OpenPosition);
         }
     }
 }

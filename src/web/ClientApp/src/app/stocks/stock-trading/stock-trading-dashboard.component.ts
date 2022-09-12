@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
-import { StocksService, StockTradingPosition, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder } from '../../services/stocks.service';
+import { StocksService, PositionInstance, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -9,8 +9,8 @@ import { StocksService, StockTradingPosition, StockTradingPositions, StockTradin
   styleUrls: ['./stock-trading-dashboard.component.css']
 })
 export class StockTradingComponent implements OnInit {
-  positions: StockTradingPosition[]
-  past: StockTradingPosition[]
+  positions: PositionInstance[]
+  past: PositionInstance[]
   brokerageOrders: BrokerageOrder[]
   loaded: boolean = false
   loading: boolean = true
@@ -57,7 +57,7 @@ export class StockTradingComponent implements OnInit {
   }
 
   totalCost() {
-    return this.positions.reduce((acc, cur) => acc + (cur.averageCost * cur.numberOfShares), 0)
+    return this.positions.reduce((acc, cur) => acc + (cur.averageCostPerShare * cur.numberOfShares), 0)
   }
 
   private loadEntries() {

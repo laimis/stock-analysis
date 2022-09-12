@@ -50,8 +50,5 @@ namespace web.Controllers
 
         [HttpGet("grid")]
         public Task<IEnumerable<GridEntry>> Grid() => _mediator.Send(new Grid.Query(User.Identifier()));
-
-        [HttpGet("stockpositions")]
-        public Task<IEnumerable<PositionInstance>> Positions() => _mediator.Send(new Positions.Query(User.Identifier()));
     }
 }

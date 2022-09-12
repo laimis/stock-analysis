@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, StockTradingPosition, toggleVisuallHidden } from '../../services/stocks.service';
+import { BrokerageOrder, PositionInstance, toggleVisuallHidden } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -7,13 +7,13 @@ import { BrokerageOrder, StockTradingPosition, toggleVisuallHidden } from '../..
   styleUrls: ['./stock-trading-positions.component.css']
 })
 export class StockTradingPositionComponent {
-    sortedPositions: StockTradingPosition[];
-    _positions: StockTradingPosition[];
+    sortedPositions: PositionInstance[];
+    _positions: PositionInstance[];
     metricToRender: string = "rr"
-    metricFunc: (p: StockTradingPosition) => any = (p:StockTradingPosition) => p.unrealizedRR;
+    metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.unrealizedRR;
 
     @Input()
-    set positions(input: StockTradingPosition[]) {
+    set positions(input: PositionInstance[]) {
         this._positions = input
         this.updatePositions()
     }
@@ -21,36 +21,13 @@ export class StockTradingPositionComponent {
     @Input()
     pendingOrders: BrokerageOrder[]
 
-    stopPrice(p:StockTradingPosition) {
-        return p.stopPrice
-    }
-
-    firstTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * p.riskedPct
-    }
-
-    secondTargetNumber(p:StockTradingPosition) {
-        return p.averageCost + p.averageCost * 2.5 * p.riskedPct
-    }
-
-    positionProgress(p:StockTradingPosition) {
-        return p.numberOfShares * 1.0 / p.maxNumberOfShares * 100
-    }
-
-    positionSize(p:StockTradingPosition) {
-        return p.numberOfShares * p.averageCost
-    }
-
-    tradingPortion(p:StockTradingPosition) {
-        return Math.floor(p.maxNumberOfShares / 3)
-    }
-
+    
     toggleVisibility(elem:HTMLElement) {
         console.log(elem)
         toggleVisuallHidden(elem)
     }
 
-    getPendingOrders(p:StockTradingPosition) {
+    getPendingOrders(p:PositionInstance) {
         return this.pendingOrders
             .filter(o => o.ticker == p.ticker)
             .filter(o => o.status != "FILLED" && o.status != "REPLACED")
@@ -63,25 +40,25 @@ export class StockTradingPositionComponent {
 
         switch (value) {
             case "pl":
-                this.metricFunc = (p:StockTradingPosition) => p.unrealizedGain
+                this.metricFunc = (p:PositionInstance) => p.unrealizedProfit
                 break;
             case "plPercent":
-                this.metricFunc = (p:StockTradingPosition) => p.unrealizedGainPct
+                this.metricFunc = (p:PositionInstance) => p.unrealizedGainPct
                 break;
             case "cost":
-                this.metricFunc = (p:StockTradingPosition) => this.positionSize(p)
+                this.metricFunc = (p:PositionInstance) => p.cost
                 break;
             case "ticker":
-                this.metricFunc = (p:StockTradingPosition) => p.ticker
+                this.metricFunc = (p:PositionInstance) => p.ticker
                 break
             default:
-                this.metricFunc = (p:StockTradingPosition) => p.unrealizedRR
+                this.metricFunc = (p:PositionInstance) => p.unrealizedRR
         }
 
         this.updatePositions()
     }
 
-    getMetricToRender(p:StockTradingPosition) {
+    getMetricToRender(p:PositionInstance) {
         var val = this.metricFunc(p)
         if (Number.isFinite(val)) {
             return Math.round(val * 100) / 100
