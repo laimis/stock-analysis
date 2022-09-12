@@ -21,8 +21,8 @@
       <div class="row">
         <div class="col">
           <stock-trading-chart *ngIf="prices"
-            [buys]="currentPosition.buys"
-            [sells]="currentPosition.sells"
+            [buys]="buys(currentPosition)"
+            [sells]="sells(currentPosition)"
             [prices]=prices>
           </stock-trading-chart>
         </div>
