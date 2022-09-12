@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, stocktransactioncommand, StockTradingPosition } from '../../services/stocks.service';
+import { StocksService, stocktransactioncommand, PositionInstance } from '../../services/stocks.service';
 
 class StockTransaction {
   numberOfShares: number
@@ -52,7 +52,7 @@ export class StockTradingSimulatorComponent implements OnInit {
 
       this.ticker = data.ticker
       this.stopPrice = data.stopPrice
-      this.transactions = data.positions
+      this.transactions = data.transactions
       this.currentCost = data.currentCost
       this.riskedAmount = data.riskedAmount
 
@@ -114,7 +114,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     
     var data = {
       stopPrice: this.stopPrice,
-      positions: this.transactions,
+      transactions: this.transactions,
       currentCost: this.currentCost,
       ticker: this.ticker,
       riskedAmount: this.riskedAmount
@@ -147,8 +147,8 @@ export class StockTradingSimulatorComponent implements OnInit {
   }
 
   positionFilter:string = ''
-  positions:StockTradingPosition[] = []
-  filteredPositions:StockTradingPosition[] = []
+  positions:PositionInstance[] = []
+  filteredPositions:PositionInstance[] = []
 
   showExistingPositions() {
     this.stocks.getTradingEntries().subscribe(entries => {
@@ -163,19 +163,18 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.filteredPositions = this.positions.filter(p => p.ticker.toLowerCase().indexOf(this.positionFilter.toLowerCase()) > -1)
   }
 
-  loadPosition(p:StockTradingPosition) {
+  loadPosition(p:PositionInstance) {
     
     this.reset()
-    var tx = p.buys.concat(p.sells).sort((a, b) => Date.parse(a.when) - Date.parse(b.when))
     var first = true;
     this.currentCost = p.price
-    tx.forEach(t => {
+    p.transactions.forEach(t => {
       if (first) {
         var cmd:stocktransactioncommand = {
           ticker: p.ticker,
           stopPrice: p.stopPrice,
           price: t.price,
-          numberOfShares: t.quantity,
+          numberOfShares: t.numberOfShares,
           date: t.when,
           notes: null
         }
@@ -184,7 +183,7 @@ export class StockTradingSimulatorComponent implements OnInit {
       }
       else {
         this.price = t.price
-        this.quantity = t.quantity
+        this.quantity = t.numberOfShares
         this.date = t.when
         this.addTransaction(t.type)
       }

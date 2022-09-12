@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Prices, StocksService, StockTradingPosition } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -11,15 +11,15 @@ export class StockChartsComponent implements OnInit {
   ngOnInit() {
   }
 
-  private _positions: StockTradingPosition[]
+  private _positions: PositionInstance[]
   private _index: number = 0
-  currentPosition: StockTradingPosition
+  currentPosition: PositionInstance
   prices: Prices
 
   constructor (private stockService: StocksService) { }
 
   @Input()
-  set positions(positions:StockTradingPosition[]) {
+  set positions(positions:PositionInstance[]) {
     this._positions = positions
     this._index = 0
     this.updateCurrentPosition()

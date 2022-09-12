@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { StockTradingPosition } from '../../services/stocks.service';
+import { PositionInstance } from '../../services/stocks.service';
 
 
 @Component({
@@ -11,7 +11,7 @@ export class StockOwnershipGridComponent implements OnInit {
 
 	public loaded : boolean = false;
 
-  @Input() positions: StockTradingPosition[];
+  @Input() positions: PositionInstance[];
   @Input() selectedCategory: string
 
 	ngOnInit() {}
@@ -41,32 +41,32 @@ export class StockOwnershipGridComponent implements OnInit {
   private getSortFunc(column:string) {
     switch(column) {
       case "averageCost":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.averageCostPerShare - b.averageCostPerShare
+        return (a:PositionInstance, b:PositionInstance) => a.averageCostPerShare - b.averageCostPerShare
       case "price":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.price - b.price
+        return (a:PositionInstance, b:PositionInstance) => a.price - b.price
       case "daysheld":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.daysHeld - b.daysHeld
+        return (a:PositionInstance, b:PositionInstance) => a.daysHeld - b.daysHeld
       case "invested":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost - b.cost
+        return (a:PositionInstance, b:PositionInstance) => a.cost - b.cost
       case "profits":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedProfit - b.unrealizedProfit
+        return (a:PositionInstance, b:PositionInstance) => a.unrealizedProfit - b.unrealizedProfit
       case "equity":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.cost + a.unrealizedProfit - b.cost - b.unrealizedProfit
+        return (a:PositionInstance, b:PositionInstance) => a.cost + a.unrealizedProfit - b.cost - b.unrealizedProfit
       case "profitsPct":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.unrealizedGainPct - b.unrealizedGainPct
+        return (a:PositionInstance, b:PositionInstance) => a.unrealizedGainPct - b.unrealizedGainPct
       case "owned":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.numberOfShares - b.numberOfShares
+        return (a:PositionInstance, b:PositionInstance) => a.numberOfShares - b.numberOfShares
       case "ticker":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.ticker.localeCompare(b.ticker)
+        return (a:PositionInstance, b:PositionInstance) => a.ticker.localeCompare(b.ticker)
       case "daysSinceLastTransaction":
-        return (a:StockTradingPosition, b:StockTradingPosition) => a.daysSinceLastTransaction - b.daysSinceLastTransaction
+        return (a:PositionInstance, b:PositionInstance) => a.daysSinceLastTransaction - b.daysSinceLastTransaction
     }
 
     console.log("unrecognized sort column " + column)
     return null;
   }
 
-  ownershipPct(ticker:StockTradingPosition) {
+  ownershipPct(ticker:PositionInstance) {
     let total = this.positions
       .map(s => s.cost)
       .reduce((acc, curr) => acc + curr)
@@ -74,7 +74,7 @@ export class StockOwnershipGridComponent implements OnInit {
     return ticker.cost / total
   }
 
-  equityPct(position:StockTradingPosition) {
+  equityPct(position:PositionInstance) {
     let total = this.positions
       .map(s => s.cost  + s.unrealizedProfit)
       .reduce((acc, curr) => acc + curr)
@@ -82,7 +82,7 @@ export class StockOwnershipGridComponent implements OnInit {
     return (position.cost + position.unrealizedProfit) / total
   }
 
-  highlightRow(position:StockTradingPosition) {
+  highlightRow(position:PositionInstance) {
     return (position.category == null && this.selectedCategory == "notset")
       || this.selectedCategory == position.category
   }

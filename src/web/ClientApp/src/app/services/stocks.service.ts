@@ -345,8 +345,8 @@ export interface ReviewList {
   end: string
   stockProfit: number
   optionProfit: number
-  openPositions: StockTradingPosition[]
-  closedPositions: StockTradingPosition[]
+  openPositions: PositionInstance[]
+  closedPositions: PositionInstance[]
   plOptionTransactions: Transaction[]
   plStockTransactions: Transaction[]
   stockTransactions: Transaction[]
@@ -359,7 +359,7 @@ export interface StockViolation {
 }
 
 export interface StockSummary {
-  positions: StockTradingPosition[]
+  positions: PositionInstance[]
   violations: StockViolation[]
   orders: BrokerageOrder[]
 }
@@ -634,20 +634,20 @@ export interface BrokerageOrder {
 }
 
 export interface StockTradingPositions {
-  current: StockTradingPosition[]
-  past: StockTradingPosition[]
+  current: PositionInstance[]
+  past: PositionInstance[]
   performance: StockTradingPerformanceCollection
   brokerageOrders: BrokerageOrder[]
 }
 
 export interface PositionTransaction {
-  quantity: number,
+  numberOfShares: number,
   price: number,
   type: string,
   when: string,
 }
 
-export interface StockTradingPosition {
+export interface PositionInstance {
   price: number,
   category: string,
   cost: number,
@@ -662,13 +662,13 @@ export interface StockTradingPosition {
   opened: string,
   closed: string,
   returnPct: number,
-  buys: PositionTransaction[]
-  sells: PositionTransaction[]
+  transactions: PositionTransaction[]
   stopPrice: number | null
   notes: string[] | null
   rr: number | null
   potentialLoss: number | null
   riskedPct: number | null
+  riskedAmount: number | null
   unrealizedProfit: number | null
   unrealizedGainPct: number | null
   unrealizedRR: number | null

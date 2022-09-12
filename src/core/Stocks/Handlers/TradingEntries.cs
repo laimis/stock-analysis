@@ -53,7 +53,7 @@ namespace core.Stocks
                     false => Task.FromResult(new BrokerageOrderView[0])
                 });
 
-                var tradingEntries = stocks.Where(s => s.State.OpenPosition?.Category == StockCategory.ShortTerm)
+                var tradingEntries = stocks.Where(s => s.State.OpenPosition != null && (s.State.OpenPosition.Category == null || s.State.OpenPosition.Category == StockCategory.ShortTerm))
                     .Select(s => s.State.OpenPosition)
                     .ToArray();
 
