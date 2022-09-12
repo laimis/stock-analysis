@@ -78,25 +78,28 @@ namespace core.Stocks
                 throw new InvalidOperationException("Cannot delete a transaction from a stock that has no open position");
             }
 
-            // only last one should be allowed to be deleted?
-            var last = BuyOrSell.LastOrDefault();
-            if (last == null)
-            {
-                return;
-            }
-            if (last.Id != deleted.TransactionId)
-            {
-                throw new InvalidOperationException($"Only the last transaction can be deleted. Expected {last.Id} but got {deleted.TransactionId}");
-            }
 
+            // only last one should be allowed to be deleted?
+            // var last = BuyOrSell.LastOrDefault();
+            // if (last == null)
+            // {
+            //     return;
+            // }
+            // if (last.Id != deleted.TransactionId)
+            // {
+            //     throw new InvalidOperationException($"Only the last transaction can be deleted for {Ticker}. Expected {last.Id} but got {deleted.TransactionId}");
+            // }
+
+            var last = BuyOrSell.Single(t => t.Id == deleted.TransactionId);
             BuyOrSell.Remove(last);
             
-            var transaction = Transactions.LastOrDefault();
-            if (transaction.EventId != deleted.TransactionId)
-            {
-                throw new InvalidOperationException($"Only the last transaction can be deleted. Expected {transaction.EventId} but got {deleted.TransactionId}");
-            }
+            // var transaction = Transactions.LastOrDefault();
+            // if (transaction.EventId != deleted.TransactionId)
+            // {
+            //     throw new InvalidOperationException($"Only the last transaction can be deleted for {Ticker}. Expected {transaction.EventId} but got {deleted.TransactionId}");
+            // }
 
+            var transaction = Transactions.Single(t => t.EventId == deleted.TransactionId);
             Transactions.Remove(transaction);
 
             OpenPosition.RemoveTransaction(deleted.TransactionId);
