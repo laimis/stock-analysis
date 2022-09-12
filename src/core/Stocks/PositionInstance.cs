@@ -54,8 +54,6 @@ namespace core.Stocks
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
-        public int NumberOfBuys { get; private set; }
-        public int NumberOfSells { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
         public decimal? RiskedAmount { get; private set; }
         
@@ -150,6 +148,17 @@ namespace core.Stocks
             }
         }
 
+        internal void SetPrice(decimal price)
+        {
+            Price = price;
+            UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
+            UnrealizedGainPct = (price - AverageBuyCostPerShare) / AverageBuyCostPerShare;
+            UnrealizedRR = RiskedAmount switch {
+                not null => UnrealizedProfit / RiskedAmount.Value,
+                _ => 0
+            };
+        }
+
         private void RunCalculations()
         {
             _slots.Clear();
@@ -210,17 +219,6 @@ namespace core.Stocks
             };
 
             this.AverageBuyCostPerShare = totalBuy / totalNumberOfSharesBought;
-        }
-
-        internal void ApplyPrice(decimal price)
-        {
-            Price = price;
-            UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
-            UnrealizedGainPct = (price - AverageBuyCostPerShare) / AverageBuyCostPerShare;
-            UnrealizedRR = RiskedAmount switch {
-                not null => UnrealizedProfit / RiskedAmount.Value,
-                _ => 0
-            };
         }
     }
 }

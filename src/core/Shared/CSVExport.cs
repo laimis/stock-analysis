@@ -24,15 +24,14 @@ namespace core
         private record struct PastTradesRecord(string ticker, string date, decimal profit, decimal percentage);
         private record struct OwnedStocksRecord(string ticker, decimal shares, decimal averagecost, decimal invested, decimal daysheld, string category);
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
-        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal buys, decimal sells);
+        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
 
         public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
         {
             var rows = trades.Select(t =>
                 new TradesRecord(t.Ticker, t.Opened?.ToString(DATE_FORMAT), t.Closed?.ToString(DATE_FORMAT), t.DaysHeld,
                 t.FirstBuyCost.Value, t.Cost,
-                t.Profit, t.GainPct,t.RR,
-                t.NumberOfBuys, t.NumberOfSells)
+                t.Profit, t.IsClosed ? t.GainPct : t.UnrealizedGainPct,t.RR, t.RiskedAmount)
             );
 
             return writer.Generate(rows);

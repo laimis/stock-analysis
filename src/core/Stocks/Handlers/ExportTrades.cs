@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 
@@ -28,12 +29,15 @@ namespace core.Stocks
         public class Handler : HandlerWithStorage<Query, ExportResponse>
         {
             private ICSVWriter _csvWriter;
+            private IStocksService2 _stockService;
 
             public Handler(
                 ICSVWriter csvWriter,
+                IStocksService2 stocksService,
                 IPortfolioStorage storage) : base(storage)
             {
                 _csvWriter = csvWriter;
+                _stockService = stocksService;
             }
 
             public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -50,9 +54,22 @@ namespace core.Stocks
                     .OrderByDescending(p => p.Closed ?? p.Opened)
                     .ToList();
 
+                var prices = request.ExportType switch {
+                    ExportType.Open => await _stockService.GetPrices(final.Select(p => p.Ticker)),
+                    _ => new StockServiceResponse<System.Collections.Generic.Dictionary<string, BatchStockPrice>>()
+                };
+
+                foreach(var p in final)
+                {
+                    if (prices.Success.TryGetValue(p.Ticker, out var price))
+                    {
+                        p.SetPrice(price.Price);
+                    }
+                }
+
                 var filename = CSVExport.GenerateFilename("positions");
 
-                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, trades));
+                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, final));
             }
         }
     }

@@ -140,7 +140,7 @@ namespace core.Stocks
                 foreach(var o in view.Positions)
                 {
                     prices.TryGetValue(o.Ticker, out var price);
-                    o.ApplyPrice(price?.Price ?? 0);
+                    o.SetPrice(price?.Price ?? 0);
                 }
 
                 return view;

@@ -63,7 +63,7 @@ namespace core.Stocks
                     foreach (var entry in tradingEntries)
                     {
                         prices.Success.TryGetValue(entry.Ticker, out var price);
-                        entry.ApplyPrice(price?.Price ?? 0);    
+                        entry.SetPrice(price?.Price ?? 0);    
                     }   
                 }
 
