@@ -68,6 +68,26 @@ namespace core.Stocks
 
         public void SetCategory(string category) => Category = category;
 
+        // RRLevels is a concept that I am thinking about right now (09/2022). It's taking
+        // the risked amount and creating internvals to the upside by a risked amount per share,
+        // based on the initial purchase price
+        public List<decimal> RRLevels
+        {
+            get
+            {
+                var stopPrice = StopPrice switch {
+                    not null => StopPrice.Value,
+                    _ => FirstBuyCost.Value * 0.95m
+                };
+                
+                var r1 = (FirstBuyCost.Value - stopPrice);
+
+                return new [] {1m,2m,3m,4m}
+                    .Select(x => r1 * x + FirstBuyCost.Value)
+                    .ToList();
+            }
+        }
+
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
             if (NumberOfShares == 0)

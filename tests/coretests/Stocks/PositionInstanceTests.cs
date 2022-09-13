@@ -64,5 +64,15 @@ namespace coretests.Stocks
         {
             Assert.Equal("TSLA", _position.Ticker);
         }
+
+        [Fact]
+        public void RRLevels()
+        {
+            Assert.Equal(4, _position.RRLevels.Count);
+            Assert.Equal(31.5m, _position.RRLevels[0]);
+            Assert.Equal(33m, _position.RRLevels[1]);
+            Assert.Equal(34.5m, _position.RRLevels[2]);
+            Assert.Equal(36m, _position.RRLevels[3]);
+        }
     }
 }

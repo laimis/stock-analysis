@@ -666,6 +666,7 @@ export interface PositionInstance {
   stopPrice: number | null
   notes: string[] | null
   rr: number | null
+  rrLevels: number[] | null
   potentialLoss: number | null
   riskedPct: number | null
   riskedAmount: number | null
