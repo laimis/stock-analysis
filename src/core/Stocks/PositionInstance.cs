@@ -168,6 +168,11 @@ namespace core.Stocks
             }
         }
 
+        public void SetRiskAmount(decimal riskAmount)
+        {
+            RiskedAmount = riskAmount;
+        }
+
         internal void SetPrice(decimal price)
         {
             Price = price;

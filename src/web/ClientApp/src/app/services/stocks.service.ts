@@ -172,6 +172,14 @@ export class StocksService {
     return this.http.delete(`/api/stocks/${id}/transactions/${transactionId}`)
   }
 
+  setStopPrice(ticker:string, stopPrice:number): Observable<object> {
+    return this.http.post(`/api/stocks/${ticker}/stop`, {stopPrice, ticker})
+  }
+
+  setRiskAmount(ticker:string, riskAmount:number): Observable<object> {
+    return this.http.post(`/api/stocks/${ticker}/risk`, {riskAmount, ticker})
+  }
+
   importStocks(file: any) : Observable<any> {
     return this.http.post('/api/stocks/import', file)
   }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, PositionInstance, toggleVisuallHidden } from '../../services/stocks.service';
+import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallHidden } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -11,6 +11,8 @@ export class StockTradingPositionComponent {
     _positions: PositionInstance[];
     metricToRender: string = "rr"
     metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.unrealizedRR;
+    candidateRiskAmount: number = 0
+    candidateStopPrice: number = 0
 
     @Input()
     set positions(input: PositionInstance[]) {
@@ -21,10 +23,41 @@ export class StockTradingPositionComponent {
     @Input()
     pendingOrders: BrokerageOrder[]
 
+    // constructor that takes stock service
+    constructor(
+        private stockService:StocksService
+    ) {}
     
     toggleVisibility(elem:HTMLElement) {
         console.log(elem)
         toggleVisuallHidden(elem)
+    }
+
+    setCandidateValues(p:PositionInstance) {
+        this.candidateRiskAmount = p.riskedAmount
+        this.candidateStopPrice = p.stopPrice
+    }
+
+    recalculateRiskAmount(p:PositionInstance) {
+        var newRiskAmount = (p.averageCostPerShare - this.candidateStopPrice) * p.numberOfShares
+        this.candidateRiskAmount = newRiskAmount
+        p.riskedAmount = newRiskAmount
+    }
+
+    setStopPrice(p:PositionInstance) {
+        this.stockService.setStopPrice(p.ticker, this.candidateStopPrice).subscribe(
+            (_) => {
+                p.stopPrice = this.candidateStopPrice
+            }
+        )
+    }
+
+    setRiskAmount(p:PositionInstance) {
+        this.stockService.setRiskAmount(p.ticker, this.candidateRiskAmount).subscribe(
+            (_) => {
+                p.riskedAmount = this.candidateRiskAmount
+            }
+        )
     }
 
     getPendingOrders(p:PositionInstance) {

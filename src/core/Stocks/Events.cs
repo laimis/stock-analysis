@@ -139,4 +139,32 @@ namespace core.Stocks
         public string Ticker { get; }
         public Guid UserId { get; }
     }
+
+    internal class StopPriceSet : AggregateEvent
+    {
+        public StopPriceSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker, decimal stopPrice) : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Ticker = ticker;
+            StopPrice = stopPrice;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+        public decimal StopPrice { get; }
+    }
+
+    internal class RiskAmountSet : AggregateEvent
+    {
+        public RiskAmountSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker, decimal riskAmount) : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Ticker = ticker;
+            RiskAmount = riskAmount;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+        public decimal RiskAmount { get; }
+    }
 }

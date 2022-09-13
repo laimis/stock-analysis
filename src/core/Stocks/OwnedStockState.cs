@@ -33,6 +33,16 @@ namespace core.Stocks
             );
         }
 
+        internal void ApplyInternal(StopPriceSet stopPriceSet)
+        {
+            OpenPosition.SetStopPrice(stopPriceSet.StopPrice);
+        }
+
+        internal void ApplyInternal(RiskAmountSet riskAmountSet)
+        {
+            OpenPosition.SetRiskAmount(riskAmountSet.RiskAmount);
+        }
+
         internal void ApplyInternal(StockPurchased_v2 purchased)
         {
             BuyOrSell.Add(purchased);

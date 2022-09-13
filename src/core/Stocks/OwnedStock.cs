@@ -51,6 +51,38 @@ namespace core.Stocks
             );
         }
 
+        internal void SetRiskAmount(decimal riskAmount)
+        {
+            if (State.OpenPosition == null)
+            {
+                throw new InvalidOperationException("Cannot set risk amount on a stock that has no open position");
+            }
+
+            if (riskAmount < 0)
+            {
+                throw new InvalidOperationException("Risk amount cannot be negative");
+            }
+
+            Apply(new RiskAmountSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker, riskAmount));
+        }
+
+        internal void SetStop(decimal stopPrice)
+        {
+            if (State.OpenPosition == null)
+            {
+                throw new InvalidOperationException("No open position to set stop on");
+            }
+
+            if (stopPrice < 0)
+            {
+                throw new InvalidOperationException("Stop price cannot be negative");
+            }
+
+            Apply(
+                new StopPriceSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker, stopPrice)
+            );
+        }
+
         public void UpdateSettings(string category)
         {
             if (string.IsNullOrEmpty(category))
