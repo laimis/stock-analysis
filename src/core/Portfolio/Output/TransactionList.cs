@@ -60,7 +60,7 @@ namespace core.Portfolio.Output
         public IEnumerable<string> Tickers { get; set; }
         public IEnumerable<TransactionGroup> Grouped { get; set; } 
         
-        public decimal Credit => Transactions.Sum(t => t.Credit);
-        public decimal Debit => Transactions.Sum(t => t.Debit);
+        public decimal Credit => Transactions.Sum(t => t.Amount);
+        public decimal Debit => Transactions.Sum(t => t.Amount);
     }
 }

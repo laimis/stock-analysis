@@ -113,7 +113,7 @@ namespace core.Options
             PremiumReceived += credit;
 
             Transactions.Add(
-                Transaction.CreditTx(
+                Transaction.NonPLTx(
                     Id,
                     sold.Id,
                     Ticker,
@@ -147,7 +147,7 @@ namespace core.Options
             var description = $"${StrikePrice.ToString("0.00")} {OptionType.ToString()}";
 
             Transactions.Add(
-                Transaction.PLTx(Id, Ticker, description, profit, PremiumPaid, PremiumReceived, when, true)
+                Transaction.PLTx(Id, Ticker, description, profit, PremiumReceived - PremiumPaid, when, true)
             );
         }
 
@@ -207,7 +207,7 @@ namespace core.Options
             var description = $"Bought {purchased.NumberOfContracts} x ${StrikePrice} {OptionType} {Expiration.ToString("MM/dd")} contracts for ${purchased.Premium}/contract";
 
             Transactions.Add(
-                Transaction.DebitTx(
+                Transaction.NonPLTx(
                     Id,
                     purchased.Id,
                     Ticker,

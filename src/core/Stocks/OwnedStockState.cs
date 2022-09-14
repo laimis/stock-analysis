@@ -60,13 +60,13 @@ namespace core.Stocks
             }
 
             Transactions.Add(
-                Transaction.DebitTx(
+                Transaction.NonPLTx(
                     Id,
                     purchased.Id,
                     Ticker,
                     $"Purchased {purchased.NumberOfShares} shares @ ${purchased.Price}/share",
                     purchased.Price,
-                    purchased.Price * purchased.NumberOfShares,
+                    -purchased.Price * purchased.NumberOfShares,
                     purchased.When,
                     isOption: false
                 )
@@ -129,8 +129,20 @@ namespace core.Stocks
                 throw new InvalidOperationException("Cannot sell stock that is not owned");
             }
 
+            var profitBefore = OpenPosition.Profit;
+
+            OpenPosition.Sell(
+                numberOfShares: sold.NumberOfShares,
+                price: sold.Price,
+                transactionId: sold.Id,
+                when: sold.When,
+                notes: sold.Notes
+            );
+
+            var profitAfter = OpenPosition.Profit;
+
             Transactions.Add(
-                Transaction.CreditTx(
+                Transaction.NonPLTx(
                     Id,
                     sold.Id,
                     Ticker,
@@ -148,19 +160,10 @@ namespace core.Stocks
                     Ticker,
                     $"Sold {sold.NumberOfShares} shares @ ${sold.Price}/share",
                     sold.Price,
-                    OpenPosition.AverageCostPerShare * sold.NumberOfShares,
-                    sold.Price * sold.NumberOfShares,
-                    sold.When,
+                    amount: profitAfter - profitBefore,
+                    when: sold.When,
                     isOption: false
                 )
-            );
-
-            OpenPosition.Sell(
-                numberOfShares: sold.NumberOfShares,
-                price: sold.Price,
-                transactionId: sold.Id,
-                when: sold.When,
-                notes: sold.Notes
             );
 
             if (OpenPosition.NumberOfShares == 0)

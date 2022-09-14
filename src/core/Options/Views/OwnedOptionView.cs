@@ -27,11 +27,11 @@ namespace core.Options
             Assigned = o.State.Assigned;
             Notes = o.State.Notes;
 
-            var credits = o.State.Transactions.Where(t => !t.IsPL && t.Profit >= 0);
-            var debits = o.State.Transactions.Where(t => !t.IsPL && t.Profit < 0);
+            var credits = o.State.Transactions.Where(t => !t.IsPL && t.Amount >= 0);
+            var debits = o.State.Transactions.Where(t => !t.IsPL && t.Amount < 0);
 
-            if (credits.Any()) PremiumReceived = credits.Sum(t => t.Credit);
-            if (debits.Any()) PremiumPaid = debits.Sum(t => t.Debit);
+            if (credits.Any()) PremiumReceived = credits.Sum(t => t.Amount);
+            if (debits.Any()) PremiumPaid = debits.Sum(t => t.Amount);
         }
 
         public OwnedOptionView(OwnedOption option, decimal currentPrice)

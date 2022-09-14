@@ -37,14 +37,6 @@ namespace web.Controllers
         [HttpGet("test")]
         public ActionResult Test() => Ok();
 
-        [HttpPost("weekly")]
-        public async Task<object> Weekly(Weekly.Command cmd)
-        {
-            var r = await _mediator.Send(cmd);
-
-            return r;
-        }
-
         [HttpGet("loginas/{userId}")]
         public async Task<ActionResult> LoginAs(Guid userId)
         {

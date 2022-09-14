@@ -37,7 +37,7 @@ namespace core.Reports
                     .OrderByDescending(p => p.Date)
                     .Select(t => new
                     {
-                        success = t.Profit >= 0,
+                        success = t.Amount >= 0,
                         ticker = t.Ticker,
                         level = GetLevel(t)
                     })
@@ -47,7 +47,7 @@ namespace core.Reports
             }
 
             private int GetLevel(StockTransactionView t) =>
-                Math.Abs(t.Profit) switch
+                Math.Abs(t.Amount) switch
                 {
                     var p when p > 1000 => 3,
                     var p when p > 500 => 2,

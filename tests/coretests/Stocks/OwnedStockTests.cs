@@ -121,33 +121,34 @@ namespace coretests.Stocks
         {
             var stock = new OwnedStock("tsla", _userId);
 
+            // buying two shares one at a time, average cost should be 7.5
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
             Assert.Equal(7.5m, stock.State.OpenPosition.AverageCostPerShare);
             Assert.Equal(15, stock.State.OpenPosition.Cost);
 
+            // sold one for 6, so I should have a profit of 1
+            // and then average cost would go up to 10
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             var tx = stock.State.Transactions.Last();
 
             Assert.True(tx.IsPL);
-            Assert.Equal(-1.5m, tx.Profit);
-            Assert.Equal(7.5m, tx.Debit);
-            Assert.Equal(6, tx.Credit); // average cost is 7.5, selling for 6 is 1.5 loss
+            Assert.Equal(1m, tx.Amount);
 
+            // buy another share for 10, keeps my average cost at 10
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
 
             Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
             
+            // sell those two for 10. since average cost is also 10, profit transaction is there, but its amount is zero
             stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
 
             tx = stock.State.Transactions.Last();
 
             Assert.True(tx.IsPL);
-            Assert.Equal(0, tx.Profit);
-            Assert.Equal(20, tx.Credit);
-            Assert.Equal(20, tx.Debit);
+            Assert.Equal(0, tx.Amount);
         }
 
         [Fact]

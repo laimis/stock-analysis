@@ -387,17 +387,14 @@ export interface TransactionGroup {
 
 export interface Transaction {
   aggregateId: string
-  credit: number
+  amount: number
   price: number
   date: string
   dateAsDate: string
-  debit: number
   description: string
   eventId: string
   isOption: boolean
   isPL: boolean
-  profit: number
-  returnPct: number
   ticker: string
 }
 export interface NoteList {

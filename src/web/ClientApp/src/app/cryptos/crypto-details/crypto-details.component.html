@@ -36,19 +36,17 @@
             <tr>
               <th>Date</th>
               <th>Description</th>
-              <th>Debit</th>
-              <th>Credit</th>
+              <th>Amount</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr
-              [ngClass]="{'table-success': t.profit > 0, 'table-warning': t.profit < 0, 'table-light': t.profit === 0}"
+              [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount === 0}"
               *ngFor="let t of ownership.transactions">
               <td>{{ t.date | date:'shortDate'}}</td>
               <td>{{ t.description }}</td>
-              <td>{{ t.debit | currency }}</td>
-              <td>{{ t.credit | currency }}</td>
+              <td>{{ t.amount | currency }}</td>
               <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.eventId)"></i></td>
             </tr>
           </tbody>

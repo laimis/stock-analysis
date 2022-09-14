@@ -34,7 +34,7 @@ export class SummaryComponent implements OnInit {
   }
 
   stockTransactionTotal() : number {
-    return this.result.stockTransactions.reduce((acc, cur) => acc + cur.credit * 1 + cur.debit * -1, 0)
+    return this.result.stockTransactions.reduce((acc, cur) => acc + cur.amount, 0)
   }
 
   closedPositionProfit() : number {

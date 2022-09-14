@@ -21,8 +21,6 @@ namespace core
         private record struct OptionRecord(string ticker, string type, decimal strike, string optiontype, string expiration, decimal amount, decimal premium, string filled);
         private record struct UserRecord(string email, string first_name, string last_name);
         private record struct AlertsRecord(string ticker, string pricepoints);
-        private record struct PastTradesRecord(string ticker, string date, decimal profit, decimal percentage);
-        private record struct OwnedStocksRecord(string ticker, decimal shares, decimal averagecost, decimal invested, decimal daysheld, string category);
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
         private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
 
@@ -61,15 +59,6 @@ namespace core
         {
             var rows = alerts.Select(u =>
                 new AlertsRecord(u.State.Ticker.Value, string.Join(";", u.State.PricePoints.Select(p => p.Value)))
-            );
-
-            return writer.Generate(rows);
-        }
-
-        public static string Generate(ICSVWriter writer, IEnumerable<StockTransactionView> pastTrades)
-        {
-            var rows = pastTrades.Select(t =>
-                new PastTradesRecord(t.Ticker, t.Date, t.Profit, t.ReturnPct)
             );
 
             return writer.Generate(rows);

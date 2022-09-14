@@ -27,8 +27,8 @@ namespace core.Portfolio.Output
             PLStockTransactions = plStockTransactions;
             PLOptionTransactions = plOptionTransactions;
 
-            StockProfit = plStockTransactions.Select(t => t.Profit).Sum();
-            OptionProfit = plOptionTransactions.Select(t => t.Profit).Sum();
+            StockProfit = plStockTransactions.Select(t => t.Amount).Sum();
+            OptionProfit = plOptionTransactions.Select(t => t.Amount).Sum();
         }
 
         public DateTimeOffset Start { get; }
