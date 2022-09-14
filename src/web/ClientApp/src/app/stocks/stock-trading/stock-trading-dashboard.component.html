@@ -44,6 +44,10 @@
     <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
       Performance
     </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]="" (click)="activateTab('violations')">
+      Violations
+      <span *ngIf="violations && violations.length > 0" class="badge rounded-pill bg-info">{{violations.length}}</span>
+    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
       Review
     </a>
@@ -65,5 +69,6 @@
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance.overall [trends]="performance.trends"></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=past></stock-trading-review>
   <app-brokerage-orders      *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
+  <app-stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
 
 </div>

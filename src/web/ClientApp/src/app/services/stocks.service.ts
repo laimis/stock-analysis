@@ -646,6 +646,7 @@ export interface StockTradingPositions {
   past: PositionInstance[]
   performance: StockTradingPerformanceCollection
   brokerageOrders: BrokerageOrder[]
+  violations: StockViolation[]
 }
 
 export interface PositionTransaction {

@@ -53,21 +53,26 @@ namespace core.Stocks
                     false => Task.FromResult(new BrokerageOrderView[0])
                 });
 
-                var tradingEntries = stocks.Where(s => s.State.OpenPosition != null && (s.State.OpenPosition.Category == null || s.State.OpenPosition.Category == StockCategory.ShortTerm))
+                var brokeragePositions = await (user.State.ConnectedToBrokerage switch {
+                    true => GetBrokeragePositions(_brokerage, user),
+                    false => Task.FromResult<IEnumerable<Position>>(new Position[0])
+                });
+
+                var positions = stocks.Where(s => s.State.OpenPosition != null && (s.State.OpenPosition.Category == null || s.State.OpenPosition.Category == StockCategory.ShortTerm))
                     .Select(s => s.State.OpenPosition)
                     .ToArray();
 
-                var prices = await _stocks.GetPrices(tradingEntries.Select(s => s.Ticker).Distinct());
+                var prices = await _stocks.GetPrices(positions.Select(s => s.Ticker).Distinct());
                 if (prices.IsOk)
                 {
-                    foreach (var entry in tradingEntries)
+                    foreach (var entry in positions)
                     {
                         prices.Success.TryGetValue(entry.Ticker, out var price);
                         entry.SetPrice(price?.Price ?? 0);    
                     }   
                 }
 
-                var current = tradingEntries
+                var current = positions
                     .OrderByDescending(s => s.RR)
                     .ToArray();
 
@@ -81,14 +86,19 @@ namespace core.Stocks
                     20
                 );
 
+                var violations = Dashboard.Handler.GetViolations(brokeragePositions, positions);
+
                 return new TradingEntriesView(
                     current: current,
                     past: past,
                     brokerageOrders: brokerageOrders,
-                    performance: performance
+                    performance: performance,
+                    violations: violations
                 );
             }
 
+            private Task<IEnumerable<Position>> GetBrokeragePositions(IBrokerage brokerage, User user) => brokerage.GetPositions(user.State);
+            
             internal static async Task<BrokerageOrderView[]> GetBrokerageOrders(IBrokerage brokerage, User user)
             {
                 var orders = await brokerage.GetOrders(user.State);

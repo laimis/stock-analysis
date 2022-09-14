@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks.service';
 
 @Component({
-  selector: 'stock-violations',
+  selector: 'app-stock-violations',
   templateUrl: './stock-violations.component.html',
   styleUrls: ['./stock-violations.component.css']
 })

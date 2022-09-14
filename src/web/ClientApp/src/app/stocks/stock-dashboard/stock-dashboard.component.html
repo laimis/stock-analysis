@@ -89,4 +89,4 @@
 <stock-grid *ngIf="loaded && isActive('grid')"></stock-grid>
 <app-brokerage-orders *ngIf="loaded && isActive('orders')" [orders]="orders"></app-brokerage-orders>
 <stock-charts *ngIf="loaded && isActive('charts')" [positions]="positions" ></stock-charts>
-<stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="fetchData()"></stock-violations>
+<app-stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="fetchData()"></app-stock-violations>

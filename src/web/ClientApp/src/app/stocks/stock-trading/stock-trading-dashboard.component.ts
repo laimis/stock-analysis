@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
-import { StocksService, PositionInstance, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder } from '../../services/stocks.service';
+import { StocksService, PositionInstance, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder, StockViolation } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading',
@@ -16,6 +16,7 @@ export class StockTradingComponent implements OnInit {
   loading: boolean = true
   activeTab:string = 'positions'
   performance: StockTradingPerformanceCollection;
+  violations: StockViolation[]
 
   constructor(
     private stockService:StocksService,
@@ -67,6 +68,7 @@ export class StockTradingComponent implements OnInit {
       this.past = r.past
       this.performance = r.performance
       this.brokerageOrders = r.brokerageOrders
+      this.violations = r.violations
       this.loading = false
       this.loaded = true
     }, _ => {

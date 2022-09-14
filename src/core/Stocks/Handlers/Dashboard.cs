@@ -59,7 +59,7 @@ namespace core.Stocks
                 if (user.State.ConnectedToBrokerage)
                 {
                     var brokeragePositions = await _brokerage.GetPositions(user.State);
-                    EnrichWithPositionViolations(view, brokeragePositions);
+                    view.SetViolations(GetViolations(brokeragePositions, view.Positions));
 
                     var brokerageOrders = await TradingEntries.Handler.GetBrokerageOrders(_brokerage, user);
                     EnrichWithBrokerageOrders(view, brokerageOrders);
@@ -73,10 +73,8 @@ namespace core.Stocks
                 view.SetOrders(brokerageOrders);
             }
 
-            private void EnrichWithPositionViolations(StockDashboardView view, IEnumerable<Position> brokeragePositions)
+            public static List<StockViolationView> GetViolations(IEnumerable<Position> brokeragePositions, IEnumerable<PositionInstance> localPositions)
             {
-                var localPositions = view.Positions;
-                
                 var violations = new List<StockViolationView>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
@@ -132,7 +130,7 @@ namespace core.Stocks
                     }
                 }
 
-                view.SetViolations(violations);
+                return violations;
             }
 
             private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)
