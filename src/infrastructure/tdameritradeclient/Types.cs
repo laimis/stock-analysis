@@ -120,16 +120,6 @@ public class OrderStrategy
 
     internal decimal ResolvePrice()
     {
-        if (price != null)
-        {
-            return price.Value;
-        }
-        
-        if (stopPrice != null)
-        {
-            return stopPrice.Value;
-        }
-
         if (orderActivityCollection != null)
         {
             var executionPrices = orderActivityCollection
@@ -141,6 +131,16 @@ public class OrderStrategy
             {
                 return executionPrices.Average();
             }
+        }
+
+        if (price != null)
+        {
+            return price.Value;
+        }
+        
+        if (stopPrice != null)
+        {
+            return stopPrice.Value;
         }
 
         return 0m;

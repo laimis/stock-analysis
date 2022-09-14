@@ -79,6 +79,8 @@ public class TDAmeritradeClient : IBrokerage
 
         var responseString = await response.Content.ReadAsStringAsync();
 
+        _logger?.LogError("Response from tdameritrade: " + responseString);
+
         // parse response string into Order objects
         var deserialized = JsonSerializer.Deserialize<AccountsResponse[]>(responseString);
         if (deserialized == null)
