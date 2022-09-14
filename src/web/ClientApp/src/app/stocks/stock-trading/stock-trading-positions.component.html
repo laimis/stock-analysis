@@ -56,7 +56,7 @@
             <div class="col"><div class="stat-label">Unrealized Profit</div><div>{{ p.unrealizedProfit | currency }}</div></div>
             <div class="col"><div class="stat-label">Unrealized Gain</div><div>{{p.unrealizedGainPct | percent}}</div></div>
             <div class="col"><div class="stat-label">Unrealized R/R</div><div>{{ p.unrealizedRR | number }}</div></div>
-            <div class="col"><div class="stat-label">Days Held</div><div>{{ p.daysHeld }}</div></div>
+            <div class="col"><div class="stat-label">Opened</div><div>{{ p.opened | date }} ({{ p.daysHeld }})</div></div>
           </div>
           
           <div class="row mt-3">
