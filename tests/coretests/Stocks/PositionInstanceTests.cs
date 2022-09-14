@@ -68,11 +68,16 @@ namespace coretests.Stocks
         [Fact]
         public void RRLevels()
         {
-            Assert.Equal(4, _position.RRLevels.Count);
-            Assert.Equal(31.5m, _position.RRLevels[0]);
-            Assert.Equal(33m, _position.RRLevels[1]);
-            Assert.Equal(34.5m, _position.RRLevels[2]);
-            Assert.Equal(36m, _position.RRLevels[3]);
+            var position = new PositionInstance("TSLA");
+
+            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
+            position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
+
+            Assert.Equal(4, position.RRLevels.Count);
+            Assert.Equal(33.25m, position.RRLevels[0]);
+            Assert.Equal(34m, position.RRLevels[1]);
+            Assert.Equal(34.75m, position.RRLevels[2]);
+            Assert.Equal(35.5m, position.RRLevels[3]);
         }
     }
 }

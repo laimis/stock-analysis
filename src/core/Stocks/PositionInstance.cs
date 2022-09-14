@@ -55,6 +55,7 @@ namespace core.Stocks
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
+        public decimal? FirstBuyNumberOfShares { get; private set; }
         public decimal? RiskedAmount { get; private set; }
         
         public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
@@ -75,15 +76,21 @@ namespace core.Stocks
         {
             get
             {
-                var stopPrice = StopPrice switch {
-                    not null => StopPrice.Value,
-                    _ => FirstBuyCost.Value * 0.95m
+                if (NumberOfShares == 0)
+                {
+                    return new List<decimal>();
+                }
+
+                var riskedAmount = RiskedAmount switch {
+                    not null => RiskedAmount.Value,
+                    _ => FirstBuyCost.Value * 0.05m * FirstBuyNumberOfShares.Value
                 };
-                
-                var r1 = (FirstBuyCost.Value - stopPrice);
+
+                var riskLeft = riskedAmount - Profit;
+                var riskPerShare = riskLeft / NumberOfShares;
 
                 return new [] {1m,2m,3m,4m}
-                    .Select(x => r1 * x + FirstBuyCost.Value)
+                    .Select(x => riskPerShare * x + AverageCostPerShare)
                     .ToList();
             }
         }
@@ -100,6 +107,7 @@ namespace core.Stocks
             if (FirstBuyCost == null)
             {
                 FirstBuyCost = price;
+                FirstBuyNumberOfShares = numberOfShares;
             }
 
             if (notes != null)
