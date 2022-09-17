@@ -29,6 +29,7 @@ namespace core.Stocks
         public PositionInstance(string ticker)
         {
             Ticker = ticker;
+            Category = StockCategory.ShortTerm;
         }
 
         public decimal NumberOfShares { get; private set; } = 0;
@@ -50,7 +51,6 @@ namespace core.Stocks
         public decimal UnrealizedProfit { get; private set; } = 0;
         public decimal UnrealizedGainPct { get; private set; } = 0;
         public decimal UnrealizedRR { get; private set; } = 0;
-        
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
@@ -65,9 +65,10 @@ namespace core.Stocks
         public DateTimeOffset LastTransaction { get; private set; }
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
         public string Category { get; private set; }
-        private List<decimal> _slots = new List<decimal>();
-
         public void SetCategory(string category) => Category = category;
+        internal bool IsShortTerm => Category == null ||  Category == StockCategory.ShortTerm;
+
+        private List<decimal> _slots = new List<decimal>();
 
         // RRLevels is a concept that I am thinking about right now (09/2022). It's taking
         // the risked amount and creating internvals to the upside by a risked amount per share,
