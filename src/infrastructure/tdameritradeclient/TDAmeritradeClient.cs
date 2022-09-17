@@ -5,6 +5,8 @@ using core.Account;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Timeout;
 
 namespace tdameritradeclient;
 public class TDAmeritradeClient : IBrokerage
@@ -20,6 +22,7 @@ public class TDAmeritradeClient : IBrokerage
     private const string _authUrl = "https://auth.tdameritrade.com";
 
     private HttpClient _httpClient;
+    private readonly AsyncTimeoutPolicy _timeoutPolicy;
 
     public TDAmeritradeClient(ILogger<TDAmeritradeClient>? logger, string callbackUrl, string clientId)
     {
@@ -27,6 +30,7 @@ public class TDAmeritradeClient : IBrokerage
         _callbackUrl = callbackUrl;
         _clientId = clientId;
         _httpClient = new HttpClient();
+        _timeoutPolicy = Policy.TimeoutAsync((int)TimeSpan.FromSeconds(15).TotalSeconds);
     }
 
     public async Task<OAuthResponse?> ConnectCallback(string code)
@@ -44,7 +48,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var response = await _httpClient.PostAsync(GenerateApiUrl("/oauth2/token"), content);
 
-        LogAndThrowIfFailed(response, "connect callback");
+        LogIfFailed(response, "connect callback");
 
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -53,7 +57,7 @@ public class TDAmeritradeClient : IBrokerage
         return JsonSerializer.Deserialize<OAuthResponse>(responseString);
     }
 
-    private async void LogAndThrowIfFailed(HttpResponseMessage response, string message)
+    private async void LogIfFailed(HttpResponseMessage response, string message)
     {
         if (!response.IsSuccessStatusCode)
         {
@@ -75,7 +79,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var response = await CallApi(user, "/accounts?fields=orders", HttpMethod.Get);
 
-        LogAndThrowIfFailed(response, "get pending orders");
+        LogIfFailed(response, "get pending orders");
 
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -108,7 +112,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var request = await CallApi(user, "/accounts?fields=positions", HttpMethod.Get);
 
-        LogAndThrowIfFailed(request, "get positions");
+        LogIfFailed(request, "get positions");
 
         var responseString = await request.Content.ReadAsStringAsync();
 
@@ -137,7 +141,7 @@ public class TDAmeritradeClient : IBrokerage
         // get account first
         var accounts = await CallApi(user, "/accounts", HttpMethod.Get);
 
-        LogAndThrowIfFailed(accounts, "get account for cancel order");
+        LogIfFailed(accounts, "get account for cancel order");
 
         var account = await accounts.Content.ReadAsStringAsync();
         var deserialized = JsonSerializer.Deserialize<AccountsResponse[]>(account);
@@ -152,7 +156,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var response = await CallApi(user, url, HttpMethod.Delete);
 
-        LogAndThrowIfFailed(response, "cancel order");
+        LogIfFailed(response, "cancel order");
     }
 
     public Task BuyOrder(
@@ -223,7 +227,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var response = await CallApi(state, $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType=daily&startDate={startUnix}&endDate={endUnix}", HttpMethod.Get);
 
-        LogAndThrowIfFailed(response, "get historical prices");
+        LogIfFailed(response, "get historical prices");
 
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -248,7 +252,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var accounts = await CallApi(user, "/accounts", HttpMethod.Get);
 
-        LogAndThrowIfFailed(accounts, "get account");
+        LogIfFailed(accounts, "get account");
 
         var account = await accounts.Content.ReadAsStringAsync();
         var deserialized = JsonSerializer.Deserialize<AccountsResponse[]>(account);
@@ -267,7 +271,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var response = await CallApi(user, url, HttpMethod.Post, data);
 
-        LogAndThrowIfFailed(response, "brokerage order");
+        LogIfFailed(response, "brokerage order");
     }
 
     private string GetBuyOrderType(BrokerageOrderType type) =>
@@ -308,7 +312,14 @@ public class TDAmeritradeClient : IBrokerage
             request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
         }
 
-        return await _httpClient.SendAsync(request);
+        var policy = Policy.TimeoutAsync(30);
+
+        var response = await policy.ExecuteAsync(
+            async ct => await _httpClient.SendAsync(request, ct),
+            CancellationToken.None
+        );
+
+        return response;
     }
 
     private async Task<string> GetAccessTokenAsync(UserState user)
@@ -333,7 +344,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var response = await _httpClient.PostAsync(GenerateApiUrl("/oauth2/token"), content);
 
-        LogAndThrowIfFailed(response, "refresh access token");
+        LogIfFailed(response, "refresh access token");
 
         var responseString = await response.Content.ReadAsStringAsync();
 

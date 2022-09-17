@@ -30,7 +30,7 @@ namespace coretests.Options
             var mock = new Mock<IStocksService2>();
             mock.Setup(x => x.GetPrice(opt.State.Ticker))
                 .Returns(Task.FromResult(
-                    new StockServiceResponse<core.Price>(
+                    new ServiceResponse<core.Price>(
                         new core.Price(100)
                     )
                 ));

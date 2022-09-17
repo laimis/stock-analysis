@@ -56,7 +56,7 @@ namespace core.Stocks
 
                 var prices = request.ExportType switch {
                     ExportType.Open => await _stockService.GetPrices(final.Select(p => p.Ticker)),
-                    _ => new StockServiceResponse<System.Collections.Generic.Dictionary<string, BatchStockPrice>>()
+                    _ => new ServiceResponse<System.Collections.Generic.Dictionary<string, BatchStockPrice>>()
                 };
 
                 foreach(var p in final)

@@ -66,7 +66,7 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        public async Task<StockServiceResponse<List<SearchResult>>> Search(string fragment, int maxResults)
+        public async Task<ServiceResponse<List<SearchResult>>> Search(string fragment, int maxResults)
         {
             var url = MakeUrl($"search/{fragment}");
 
@@ -74,32 +74,32 @@ namespace iexclient
 
             return response.IsOk switch {
                 true => 
-                    new StockServiceResponse<List<SearchResult>>(
+                    new ServiceResponse<List<SearchResult>>(
                         response.Success.Where(r => r.IsSupportedType).Take(5).ToList()
                     ),
                 false => throw new Exception(response.Error.Message)
             };
         }
 
-        public Task<StockServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker) =>
+        public Task<ServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker) =>
             GetCachedResponse<CompanyProfile>(
                 MakeUrl($"stock/{ticker}/company"),
                 CacheKeyMonthly(ticker)
             );
 
-        public Task<StockServiceResponse<Quote>> Quote(string ticker) =>
+        public Task<ServiceResponse<Quote>> Quote(string ticker) =>
             GetCachedResponse<Quote>(
                 MakeUrl($"stock/{ticker}/quote"),
                 CacheKeyMinute(ticker + "quote")
             );
 
-        public Task<StockServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker) =>
+        public Task<ServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker) =>
             GetCachedResponse<StockAdvancedStats>(
                 MakeUrl($"stock/{ticker}/advanced-stats"),
                 CacheKeyDaily(ticker + "advanced")
             );
 
-        public async Task<StockServiceResponse<Price>> GetPrice(string ticker)
+        public async Task<ServiceResponse<Price>> GetPrice(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/price");
 
@@ -107,20 +107,20 @@ namespace iexclient
 
             if (r.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                return new StockServiceResponse<Price>(new Price());
+                return new ServiceResponse<Price>(new Price());
             }
 
             var response = await r.Content.ReadAsStringAsync();
 
-            return new StockServiceResponse<Price>(new Price(JsonConvert.DeserializeObject<decimal>(response)));
+            return new ServiceResponse<Price>(new Price(JsonConvert.DeserializeObject<decimal>(response)));
         }
 
-        public async Task<StockServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers)
+        public async Task<ServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers)
         {
             var symbols = string.Join(",", tickers);
             if (symbols == "")
             {
-                return new StockServiceResponse<Dictionary<string, BatchStockPrice>>(
+                return new ServiceResponse<Dictionary<string, BatchStockPrice>>(
                     new Dictionary<string, BatchStockPrice>()
                 );
             }
@@ -136,17 +136,17 @@ namespace iexclient
             if (!r.IsSuccessStatusCode)
             {
                 _logger?.LogError($"Failed to get stocks with url {url}: " + response);
-                return new StockServiceResponse<Dictionary<string, BatchStockPrice>>(
+                return new ServiceResponse<Dictionary<string, BatchStockPrice>>(
                     new Dictionary<string, BatchStockPrice>()
                 );
             }
 
-            return new StockServiceResponse<Dictionary<string, BatchStockPrice>>(
+            return new ServiceResponse<Dictionary<string, BatchStockPrice>>(
                 JsonConvert.DeserializeObject<Dictionary<string, BatchStockPrice>>(response)
             );
         }
 
-        public Task<StockServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(string ticker, string interval) =>
+        public Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(string ticker, string interval) =>
             GetCachedResponse<HistoricalPrice[]>(
                 MakeUrl($"stock/{ticker}/chart/{interval}") + $"&chartCloseOnly=true",
                 CacheKeyDaily(ticker + interval)
@@ -154,7 +154,7 @@ namespace iexclient
 
         private string MakeUrl(string function) =>  $"{_endpoint}/{function}?token={_token}";
 
-        private async Task<StockServiceResponse<T>> GetCachedResponse<T>(string url, string key)
+        private async Task<ServiceResponse<T>> GetCachedResponse<T>(string url, string key)
         {
             var file = Path.Combine(_tempDir, key);
 
@@ -175,13 +175,13 @@ namespace iexclient
                 }
                 else
                 {
-                    return new StockServiceResponse<T>(
+                    return new ServiceResponse<T>(
                         new ServiceError(contents)
                     );
                 }
             }
 
-            return new StockServiceResponse<T>(
+            return new ServiceResponse<T>(
                 JsonConvert.DeserializeObject<T>(contents)
             );
         }

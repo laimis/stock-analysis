@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
@@ -29,7 +28,7 @@ namespace coretests.Options
             var mock = new Mock<IStocksService2>();
             mock.Setup(x => x.GetPrices(It.IsAny<IEnumerable<string>>()))
                 .Returns(Task.FromResult(
-                    new StockServiceResponse<Dictionary<string, BatchStockPrice>>(
+                    new ServiceResponse<Dictionary<string, BatchStockPrice>>(
                         new Dictionary<string, BatchStockPrice>()
                     )
                 ));
