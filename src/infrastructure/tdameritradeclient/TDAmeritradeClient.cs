@@ -141,7 +141,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var url = $"/accounts/{accountId}/orders/{orderId}";
 
-        await CallApi<string>(user, url, HttpMethod.Delete);
+        await CallApiWithoutSerialization(user, url, HttpMethod.Delete);
     }
 
     public Task BuyOrder(
@@ -244,7 +244,7 @@ public class TDAmeritradeClient : IBrokerage
 
         _logger?.LogError("Posting to " + url + ": " + data);
 
-        await CallApi<string>(user, url, HttpMethod.Post, data);
+        await CallApiWithoutSerialization(user, url, HttpMethod.Post, data);
     }
 
     private string GetBuyOrderType(BrokerageOrderType type) =>
@@ -275,6 +275,19 @@ public class TDAmeritradeClient : IBrokerage
 
     private async Task<T> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
+        var responseString = await CallApiWithoutSerialization(user, function, method, jsonData);
+
+        var deserialized = JsonSerializer.Deserialize<T>(responseString);
+        if (deserialized == null)
+        {
+            throw new Exception($"Could not deserialize response for {function}: {responseString}");
+        }
+
+        return deserialized;
+    }
+
+    private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
+    {
         var accessToken = await GetAccessTokenAsync(user);
 
         var request = new HttpRequestMessage(method, GenerateApiUrl(function));
@@ -294,15 +307,7 @@ public class TDAmeritradeClient : IBrokerage
 
         LogIfFailed(response, function);
 
-        var responseString = await response.Content.ReadAsStringAsync();
-
-        var deserialized = JsonSerializer.Deserialize<T>(responseString);
-        if (deserialized == null)
-        {
-            throw new Exception($"Could not deserialize response for {function}: {responseString}");
-        }
-
-        return deserialized;
+        return await response.Content.ReadAsStringAsync();
     }
 
     private async Task<string> GetAccessTokenAsync(UserState user)
