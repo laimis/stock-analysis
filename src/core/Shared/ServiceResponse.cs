@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace core.Adapters.Stocks
+namespace core.Shared
 {
     public class ServiceResponse<TSuccess>
     {

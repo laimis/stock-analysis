@@ -32,7 +32,9 @@ namespace tdameritradeclienttests
                 1
             );
 
-            var orders = await client.GetHistoricalPrices(user.State, "AAPL");
+            var ordersResponse = await client.GetHistoricalPrices(user.State, "AAPL");
+
+            var orders = ordersResponse.Success!;
 
             Assert.NotEmpty(orders);
             Assert.True(orders[0].Close > 0);

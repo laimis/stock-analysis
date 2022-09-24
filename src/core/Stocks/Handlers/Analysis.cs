@@ -44,7 +44,13 @@ namespace core.Stocks
                     throw new Exception("User not found");
                 }
 
-                var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker);
+                var pricesResponse = await _brokerage.GetHistoricalPrices(user.State, request.Ticker);
+                if (!pricesResponse.IsOk)
+                {
+                    throw new Exception("Failed to get historical prices");
+                }
+                var prices = pricesResponse.Success;
+                
                 var price = await _stocksService2.GetPrice(request.Ticker);
                 
                 // find historical price with the lowest closing price

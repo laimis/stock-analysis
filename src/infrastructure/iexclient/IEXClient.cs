@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
 using core.Adapters.Stocks;
+using core.Shared;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

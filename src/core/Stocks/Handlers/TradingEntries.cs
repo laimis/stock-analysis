@@ -97,13 +97,26 @@ namespace core.Stocks
                 );
             }
 
-            private Task<IEnumerable<Position>> GetBrokeragePositions(IBrokerage brokerage, User user) => brokerage.GetPositions(user.State);
+            private static async Task<IEnumerable<Position>> GetBrokeragePositions(IBrokerage brokerage, User user)
+            {
+                var positions = await brokerage.GetPositions(user.State);
+
+                return positions.IsOk switch {
+                    true => positions.Success,
+                    false => new Position[0]
+                };
+            }   
             
             internal static async Task<BrokerageOrderView[]> GetBrokerageOrders(IBrokerage brokerage, User user)
             {
                 var orders = await brokerage.GetOrders(user.State);
+                if (!orders.IsOk)
+                {
+                    return new BrokerageOrderView[0];
+                }
+
                 return 
-                    orders
+                    orders.Success
                         .Where(o => o.IncludeInResponses)
                         .OrderBy(o => o.StatusOrder)
                         .Select(o => new BrokerageOrderView(

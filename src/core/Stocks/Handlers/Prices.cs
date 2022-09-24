@@ -42,9 +42,13 @@ namespace core.Stocks.Handlers
                 }
 
                 var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker);
+                if (!prices.IsOk)
+                {
+                    throw new Exception("Failed to get historical prices");
+                }
 
                 return new PricesView(
-                    prices
+                    prices.Success
                 );
             }
         }

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using core.Account;
+using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
@@ -75,73 +76,85 @@ public class TDAmeritradeClient : IBrokerage
         return Task.FromResult(url);
     }
 
-    public async Task<IEnumerable<Order>> GetOrders(UserState user)
+    public async Task<ServiceResponse<IEnumerable<Order>>> GetOrders(UserState user)
     {
-        try
+        var response = await CallApi<AccountsResponse[]>(
+            user,
+            "/accounts?fields=orders",
+            HttpMethod.Get);
+
+        if (response.Error != null)
         {
-            var accounts = await CallApi<AccountsResponse[]>(user, "/accounts?fields=orders", HttpMethod.Get);
-
-            var strategies = accounts[0].securitiesAccount?.orderStrategies;
-            if (strategies == null)
-            {
-                throw new Exception("Could not find order strategies in response");
-            }
-
-            return strategies
-                .Select(o => new Order
-                {
-                    Status = o.status,
-                    OrderId = o.orderId.ToString(),
-                    Price = o.ResolvePrice(),
-                    Quantity = Convert.ToInt32(o.quantity),
-                    Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
-                    Type = o.orderLegCollection?[0]?.instruction
-                });
+            return new ServiceResponse<IEnumerable<Order>>(response.Error);
         }
-        catch (Exception e)
+
+        var accounts = response.Success!;
+
+        var strategies = accounts[0].securitiesAccount?.orderStrategies;
+        if (strategies == null)
         {
-            _logger?.LogError(e, "Failed to get orders");
-            return new List<Order>();
-        }   
-    }
+            throw new Exception("Could not find order strategies in response");
+        }
 
-    public async Task<IEnumerable<Position>> GetPositions(UserState user)
-    {
-        try
-        {
-            var accounts = await CallApi<AccountsResponse[]>(user, "/accounts?fields=positions", HttpMethod.Get);
-
-            var positions = accounts[0].securitiesAccount?.positions;
-            if (positions == null)
+        var payload = strategies
+            .Select(o => new Order
             {
-                throw new Exception("Could not find positions in response");
-            }
-
-            return positions.Select(p => new Position
-            {
-                Ticker = p.instrument?.symbol,
-                Quantity = p.longQuantity,
-                AverageCost = p.averagePrice
+                Status = o.status,
+                OrderId = o.orderId.ToString(),
+                Price = o.ResolvePrice(),
+                Quantity = Convert.ToInt32(o.quantity),
+                Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
+                Type = o.orderLegCollection?[0]?.instruction
             });
-        }
-        catch(TimeoutRejectedException ex)
-        {
-            _logger?.LogError(ex, "Timeout getting positions");
-            return new List<Position>();
-        }
-        
+
+        return new ServiceResponse<IEnumerable<Order>>(payload);
     }
 
-    public async Task CancelOrder(UserState user, string orderId)
+    public async Task<ServiceResponse<IEnumerable<Position>>> GetPositions(UserState user)
+    {
+        var response = await CallApi<AccountsResponse[]>(user, "/accounts?fields=positions", HttpMethod.Get);
+        if (response.Error != null)
+        {
+            return new ServiceResponse<IEnumerable<Position>>(response.Error);
+        }
+
+        var accounts = response.Success!;
+
+        var positions = accounts[0].securitiesAccount?.positions;
+        if (positions == null)
+        {
+            throw new Exception("Could not find positions in response");
+        }
+
+        var payload = positions.Select(p => new Position
+        {
+            Ticker = p.instrument?.symbol,
+            Quantity = p.longQuantity,
+            AverageCost = p.averagePrice
+        });
+
+        return new ServiceResponse<IEnumerable<Position>>(payload);
+    }
+
+    public async Task<ServiceResponse<bool>> CancelOrder(UserState user, string orderId)
     {
         // get account first
-        var accounts = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
+        var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
+
+        if (response.Error != null)
+        {
+            return new ServiceResponse<bool>(response.Error);
+        }
+
+        var accounts = response.Success!;
 
         var accountId = accounts[0].securitiesAccount?.accountId;
 
         var url = $"/accounts/{accountId}/orders/{orderId}";
 
         await CallApiWithoutSerialization(user, url, HttpMethod.Delete);
+
+        return new ServiceResponse<bool>(true);
     }
 
     public Task BuyOrder(
@@ -205,23 +218,32 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public async Task<HistoricalPrice[]> GetHistoricalPrices(UserState state, string ticker, DateTimeOffset start = default, DateTimeOffset end = default)
+    public async Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(UserState state, string ticker, DateTimeOffset start = default, DateTimeOffset end = default)
     {
         var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
         var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
 
-        var prices = await CallApi<HistoricalPriceResponse>(
+        var function = $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType=daily&startDate={startUnix}&endDate={endUnix}";
+
+        var response = await CallApi<HistoricalPriceResponse>(
             state,
-            $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType=daily&startDate={startUnix}&endDate={endUnix}",
+            function,
             HttpMethod.Get
         );
+
+        if (response.Error != null)
+        {
+            return new ServiceResponse<HistoricalPrice[]>(response.Error);
+        }
+
+        var prices = response.Success!;
 
         if (prices.candles == null)
         {
             throw new Exception($"Null candles for historcal prices for {ticker} {start} {end}");
         }
 
-        return prices.candles.Select(c => new HistoricalPrice
+        var payload = prices.candles.Select(c => new HistoricalPrice
         {
             Close = c.close,
             High = c.high,
@@ -230,11 +252,20 @@ public class TDAmeritradeClient : IBrokerage
             Date = DateTimeOffset.FromUnixTimeMilliseconds(c.datetime).ToString("yyyy-MM-dd"),
             Volume = c.volume
         }).ToArray();
+
+        return new ServiceResponse<HistoricalPrice[]>(payload);
     }
 
-    private async Task EnterOrder(UserState user, object postData)
+    private async Task<ServiceResponse<bool>> EnterOrder(UserState user, object postData)
     {
-        var accounts = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
+        var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
+
+        if (response.Error != null)
+        {
+            return new ServiceResponse<bool>(response.Error);
+        }
+
+        var accounts = response.Success!;
 
         var accountId = accounts[0].securitiesAccount?.accountId;
 
@@ -245,6 +276,8 @@ public class TDAmeritradeClient : IBrokerage
         _logger?.LogError("Posting to " + url + ": " + data);
 
         await CallApiWithoutSerialization(user, url, HttpMethod.Post, data);
+
+        return new ServiceResponse<bool>(true);
     }
 
     private string GetBuyOrderType(BrokerageOrderType type) =>
@@ -273,17 +306,26 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
-    private async Task<T> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null)
+    private async Task<ServiceResponse<T>> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
-        var responseString = await CallApiWithoutSerialization(user, function, method, jsonData);
-
-        var deserialized = JsonSerializer.Deserialize<T>(responseString);
-        if (deserialized == null)
+        try
         {
-            throw new Exception($"Could not deserialize response for {function}: {responseString}");
-        }
+            var responseString = await CallApiWithoutSerialization(user, function, method, jsonData);
 
-        return deserialized;
+            var deserialized = JsonSerializer.Deserialize<T>(responseString);
+            if (deserialized == null)
+            {
+                throw new Exception($"Could not deserialize response for {function}: {responseString}");
+            }
+
+            return new ServiceResponse<T>(deserialized);
+        }
+        catch (TimeoutRejectedException e)
+        {
+            _logger?.LogError(e, $"Failed to call {function}");
+
+            return new ServiceResponse<T>(new ServiceError(e.Message));
+        }
     }
 
     private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)

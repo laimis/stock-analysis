@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Options;
+using core.Shared;
 using Moq;
 using Xunit;
 
