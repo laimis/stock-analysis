@@ -321,11 +321,19 @@ export class StocksService {
   }
 }
 
+export interface StockAnalysisOutcome {
+  type: string
+  message: string
+  key: string
+  value: number
+}
+
 export interface StockAnalysis {
   high: StockHistoricalPrice
   low: StockHistoricalPrice
   price: number
   historicalPrices: Prices
+  outcomes: StockAnalysisOutcome[]
 }
 
 export interface Sells {

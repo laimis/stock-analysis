@@ -32,43 +32,4 @@ export class StockAnalysisComponent implements OnInit {
     return (this.analysis.low.close - this.analysis.price) / this.analysis.price;
   }
 
-  getLatestSma(smaIndex:number): number {
-    return this.analysis.historicalPrices.sma[smaIndex].values.splice(-1)[0]
-  }
-
-  get200Sma(): number {
-    return this.getLatestSma(3)
-  }
-
-  get150Sma(): number {
-    return this.getLatestSma(2)
-  }
-
-  get50Sma(): number {
-    return this.getLatestSma(1)
-  }
-
-  get20Sma(): number {
-    return this.getLatestSma(0)
-  }
-
-  is20Healthy(): boolean {
-    return this.get20Sma() < this.analysis.price
-  }
-
-  is50Healthy(): boolean {
-    return this.get50Sma() < this.analysis.price
-      && this.get50Sma() < this.get20Sma()
-  }
-
-  is150Healthy(): boolean {
-    return this.get150Sma() < this.analysis.price
-      && this.get150Sma() < this.get50Sma()
-  }
-
-  is200Healthy(): boolean {
-    return this.get200Sma() < this.analysis.price
-      && this.get200Sma() < this.get150Sma()
-  }
-
 }

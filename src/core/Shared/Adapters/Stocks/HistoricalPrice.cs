@@ -1,8 +1,11 @@
+using System;
+
 namespace core.Shared.Adapters.Stocks
 {
-    public class HistoricalPrice
+    public struct HistoricalPrice
     {
         public string Date { get; set; }
+        public DateTimeOffset DateParsed => DateTimeOffset.Parse(Date);
         public decimal Close { get; set; }
         public decimal High { get; set; }
         public decimal Low { get; set; }

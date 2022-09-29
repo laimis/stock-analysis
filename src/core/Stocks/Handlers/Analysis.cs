@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Stocks;
 using core.Shared.Adapters.Brokerage;
+using core.Stocks.Services;
 using core.Stocks.View;
 using MediatR;
 
@@ -51,7 +52,13 @@ namespace core.Stocks
                 }
                 var prices = pricesResponse.Success;
                 
-                var price = await _stocksService2.GetPrice(request.Ticker);
+                var priceResponse = await _stocksService2.GetPrice(request.Ticker);
+                if (!priceResponse.IsOk)
+                {
+                    throw new Exception("Failed to get price");
+                }
+
+                var price = priceResponse.Success.Amount;
                 
                 // find historical price with the lowest closing price
                 var lowest = prices[0];
@@ -73,13 +80,16 @@ namespace core.Stocks
                     }
                 }
 
+                var outcomes = StockPriceAnalysis.Run(price, prices);
+
                 return new
                 {
                     Ticker = request.Ticker,
-                    Price = price.Success.Amount,
+                    Price = price,
                     historicalPrices = new PricesView(prices),
                     High = highest,
                     Low = lowest,
+                    Outcomes = outcomes
                 };
             }
         }
