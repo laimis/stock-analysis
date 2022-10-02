@@ -1,27 +1,17 @@
-using core.Adapters.Stocks;
+using System.Collections.Generic;
+using core.Stocks.Services;
 
 namespace core.Portfolio
 {
     public struct GridEntry
     {
-        public GridEntry(string ticker, decimal price, StockAdvancedStats stats)
+        public GridEntry(string ticker, List<AnalysisOutcome> outcomes)
         {
-            Price = price;
+            Outcomes = outcomes;
             Ticker = ticker;
-            Stats = stats;
         }
 
+        public List<AnalysisOutcome> Outcomes { get; }
         public string Ticker { get; }
-        public StockAdvancedStats Stats { get; }
-        public decimal Price { get; }
-
-        public decimal Above50 => CompareToPrice(Stats.Day50MovingAvg);
-        public decimal Above200 => CompareToPrice(Stats.Day200MovingAvg);
-
-        private decimal CompareToPrice(decimal? value) =>
-            value.HasValue switch {
-                true => (Price - value.Value) / value.Value,
-                false => 0
-            };
     }
 }

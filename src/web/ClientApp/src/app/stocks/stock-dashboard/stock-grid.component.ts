@@ -30,6 +30,10 @@ export class StockGridComponent {
     });
   }
 
+  getKeys() {
+    return this.ownership[0].outcomes.map(o => o.key)
+  }
+
   sort(column:string) {
 
     var func = this.getSortFunc(column);
@@ -50,32 +54,11 @@ export class StockGridComponent {
   }
 
   private getSortFunc(column:string) {
-    switch(column) {
-      case "stock":
-        return (a:StockGridEntry, b:StockGridEntry) => a.ticker.localeCompare(b.ticker)
-      case "price":
-        return (a:StockGridEntry, b:StockGridEntry) => a.price - b.price
-      case "pe":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.peRatio - b.stats.peRatio
-      case "volume":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.avg30Volume - b.stats.avg30Volume
-      case "marketCap":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.marketCap - b.stats.marketCap
-      case "above50":
-        return (a:StockGridEntry, b:StockGridEntry) => a.above50 - b.above50
-      case "above200":
-        return (a:StockGridEntry, b:StockGridEntry) => a.above200 - b.above200
-      case "revenue":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.revenue - b.stats.revenue
-      case "grossProfit":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.grossProfit - b.stats.grossProfit
-      case "profitMargin":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.profitMargin - b.stats.profitMargin
-      case "totalCash":
-        return (a:StockGridEntry, b:StockGridEntry) => a.stats.totalCash - b.stats.totalCash
-    }
+    return (a:StockGridEntry, b:StockGridEntry) => {
+      var aVal = a.outcomes.find(o => o.key === column).value
+      var bVal = b.outcomes.find(o => o.key === column).value
 
-    console.log("unrecognized sort column " + column)
-    return null;
+      return aVal - bVal
+    }
   }
 }

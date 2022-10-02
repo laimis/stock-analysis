@@ -3,32 +3,14 @@
   <table class="table striped">
     <thead>
       <tr>
-        <th class="sort-header"            (click)="sort('stock')">Stock</th>
-        <th class="text-end sort-header" (click)="sort('price')">Price</th>
-        <th class="text-end sort-header" (click)="sort('above50')">Above 50</th>
-        <th class="text-end sort-header" (click)="sort('above200')">Above 200</th>
-        <th class="text-end sort-header" (click)="sort('pe')">PE</th>
-        <th class="text-end sort-header" (click)="sort('volume')">30d Volume</th>
-        <th class="text-end sort-header" (click)="sort('marketCap')">Market Cap</th>
-        <th class="text-end sort-header" (click)="sort('revenue')">Revenue</th>
-        <th class="text-end sort-header" (click)="sort('grossProfit')">Gross Profit</th>
-        <th class="text-end sort-header" (click)="sort('profitMargin')">Profit Margin</th>
-        <th class="text-end sort-header" (click)="sort('totalCash')">Total Cash</th>
+        <th>Ticker</th>
+        <th *ngFor="let key of getKeys()" class="sort-header" (click)="sort(key)">{{key}}</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let s of ownership">
         <td>{{s.ticker}}</td>
-        <td class="text-end">{{s.price | currency}}</td>
-        <td class="text-end" [ngClass]="{'positive': s.above50 > 0}">{{s.above50 | percent}}</td>
-        <td class="text-end" [ngClass]="{'positive': s.above200 > 0}">{{s.above200 | percent}}</td>
-        <td class="text-end">{{s.stats.peRatio | number:'1.0-2' }}</td>
-        <td class="text-end">{{s.stats.avg30Volume / 1000000 | number:'1.0-2'}}M</td>
-        <td class="text-end">{{s.stats.marketCap / 1000000000 | number:'1.0-2'}}B</td>
-        <td class="text-end">{{s.stats.revenue / 1000000 | number:'1.0-2'}}M</td>
-        <td class="text-end">{{s.stats.grossProfit / 1000000 | number:'1.0-2'}}M</td>
-        <td class="text-end">{{s.stats.profitMargin | percent}}</td>
-        <td class="text-end">{{s.stats.totalCash / 1000000 | number:'1.0-2'}}M</td>
+        <td *ngFor="let o of s.outcomes" class="text-end">{{o.value }}</td>
       </tr>
     </tbody>
   </table>

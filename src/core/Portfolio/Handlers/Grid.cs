@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
+using core.Stocks.Services;
 
 namespace core.Portfolio
 {
@@ -18,33 +21,39 @@ namespace core.Portfolio
         public class Handler : HandlerWithStorage<Query, IEnumerable<GridEntry>>
         {
             public Handler(
+                IAccountStorage accountStorage,
                 IPortfolioStorage storage,
-                IStocksService2 stocks) : base(storage)
+                IBrokerage brokerage) : base(storage)
             {
-                _stocks = stocks;
+                _accountStorage = accountStorage;
+                _brokerage = brokerage;
             }
 
-            private IStocksService2 _stocks { get; }
+            private IAccountStorage _accountStorage;
+            private IBrokerage _brokerage { get; }
 
             public override async Task<IEnumerable<GridEntry>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var stocks = await _storage.GetStocks(request.UserId);
+                var user = await _accountStorage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
 
-                var prices = await _stocks.GetPrices(
-                    stocks
-                        .Where(s => s.State.OpenPosition != null)
-                        .Select(s => s.State.Ticker)
-                        .ToArray()
-                );
+                var stocks = await _storage.GetStocks(request.UserId);
 
                 return stocks
                     .Where(s => s.State.OpenPosition != null)
                     .Select(async s => {
                         {
-                            var adv = await _stocks.GetAdvancedStats(s.State.Ticker);
-                            var price = prices.Success.TryGetValue(s.State.Ticker, out var p) ? p.Price : 0;
+                            var historicalResponse = await _brokerage.GetHistoricalPrices(user.State, s.State.Ticker);
 
-                            return new GridEntry(s.State.Ticker, price, adv.Success);
+                            var outcomes = StockPriceAnalysis.Run(
+                                currentPrice: historicalResponse.Success.Last().Close,
+                                historicalResponse.Success
+                            );
+
+                            return new GridEntry(s.State.Ticker, outcomes);
                         }
                     })
                     .Select(t => t.Result);

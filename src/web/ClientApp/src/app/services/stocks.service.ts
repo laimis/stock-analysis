@@ -321,11 +321,19 @@ export class StocksService {
   }
 }
 
+export interface StockAnalysisOutcome {
+  type: string
+  message: string
+  key: string
+  value: number
+}
+
 export interface StockAnalysis {
   high: StockHistoricalPrice
   low: StockHistoricalPrice
   price: number
   historicalPrices: Prices
+  outcomes: StockAnalysisOutcome[]
 }
 
 export interface Sells {
@@ -583,11 +591,8 @@ export interface StockOwnership {
 }
 
 export interface StockGridEntry {
-  price: number,
-  stats: any,
   ticker: string,
-  above50: number,
-  above200: number
+  outcomes: StockAnalysisOutcome[]
 }
 
 export interface StockTradingPerformance {
