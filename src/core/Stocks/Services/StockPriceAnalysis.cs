@@ -81,7 +81,7 @@ namespace core.Stocks.Services
             // find average volume over the last 30 days
             var totalVolume = 0m;
             var interval = 30;
-            foreach (var p in prices.Take(interval))
+            foreach (var p in prices.AsSpan().Slice(start: prices.Length - 30))
             {
                 totalVolume += p.Volume;
             }
@@ -103,12 +103,13 @@ namespace core.Stocks.Services
             // add all smas to outcomes
             foreach (var sma in smas)
             {
+                var value = sma.Values.Last().Value;
                 outcomes.Add(
                     new AnalysisOutcome(
                         OutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
-                        sma.Values.Last().Value,
-                        $"SMA {sma.Interval} is {sma.Values.Last()}"
+                        Round(value, 2),
+                        $"SMA {sma.Interval} is {value}"
                     )
                 );
             }
@@ -151,7 +152,56 @@ namespace core.Stocks.Services
                     OutcomeKeys.SMASequence,
                     smaSequenceOutcomeType,
                     smaSequenceValue,
-                    "SMA sequence is positive"
+                    $"SMA sequence is {smaSequenceOutcomeType.ToString()}"
+                )
+            );
+
+            // 20 is below 50, negative
+            var sma20Above50Diff = Round(smas[0].Values.Last().Value - smas[1].Values.Last().Value, 2);
+            var sma20Above50 = sma20Above50Diff > 0;
+            var sma20Above50OutcomeType = sma20Above50 ? OutcomeType.Positive : OutcomeType.Negative;
+            outcomes.Add(
+                new AnalysisOutcome(
+                    OutcomeKeys.SMA20Above50,
+                    sma20Above50OutcomeType,
+                    sma20Above50Diff,
+                    $"SMA 20 - SMA 50: {sma20Above50Diff}"
+                )
+            );
+
+            // 50 is below 150, negative
+            var sma50Above150Diff = Round(smas[1].Values.Last().Value - smas[2].Values.Last().Value, 2);
+            var sma50Above150 = sma50Above150Diff > 0;
+            var sma50Above150OutcomeType = sma50Above150 ? OutcomeType.Positive : OutcomeType.Negative;
+            outcomes.Add(
+                new AnalysisOutcome(
+                    OutcomeKeys.SMA50Above150,
+                    sma50Above150OutcomeType,
+                    sma50Above150Diff,
+                    $"SMA 50 - SMA 150: {sma50Above150Diff}"
+                )
+            );
+
+            // percent below recent high
+            var percentBelowHigh = Round((currentPrice - highest.Close) / highest.Close * 100, 2);
+            var percentBelowHighOutcomeType = OutcomeType.Neutral;
+            outcomes.Add(
+                new AnalysisOutcome(
+                    OutcomeKeys.PercentBelowHigh,
+                    percentBelowHighOutcomeType,
+                    percentBelowHigh,
+                    $"Percent below recent high: {percentBelowHigh}%"
+                )
+            );
+
+            var percentAboveLow = Round((currentPrice - lowest.Close) / lowest.Close * 100, 2);
+            var percentAboveLowOutcomeType = OutcomeType.Neutral;
+            outcomes.Add(
+                new AnalysisOutcome(
+                    OutcomeKeys.PercentAbovLow,
+                    percentAboveLowOutcomeType,
+                    percentAboveLow,
+                    $"Percent above recent low: {percentAboveLow}%"
                 )
             );
 
@@ -173,6 +223,10 @@ namespace core.Stocks.Services
         public static string HighestPriceDaysAgo = "HighestPriceDaysAgo";
         public static string AverageVolume = "AverageVolume";
         public static string SMASequence = "SMASequence";
+        public static string SMA20Above50 = "SMA20Above50";
+        public static string SMA50Above150 = "SMA50Above150";
+        public static string PercentBelowHigh = "PercentBelowHigh";
+        public static string PercentAbovLow = "PercentAboveLow";
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }
@@ -217,7 +271,7 @@ namespace core.Stocks.Services
         }
     }
 
-    internal enum OutcomeType { Positive, Negative, Neutral };
+    public enum OutcomeType { Positive, Negative, Neutral };
 
-    internal record AnalysisOutcome(string key, OutcomeType type, decimal value, string message);
+    public record AnalysisOutcome(string key, OutcomeType type, decimal value, string message);
 }

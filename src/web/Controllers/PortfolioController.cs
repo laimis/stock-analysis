@@ -49,6 +49,7 @@ namespace web.Controllers
         }
 
         [HttpGet("grid")]
-        public Task<IEnumerable<GridEntry>> Grid() => _mediator.Send(new Grid.Query(User.Identifier()));
+        public Task<IEnumerable<GridEntry>> Grid() =>
+            _mediator.Send(new Grid.Query(User.Identifier()));
     }
 }

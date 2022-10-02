@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -52,33 +53,7 @@ namespace core.Stocks
                 }
                 var prices = pricesResponse.Success;
                 
-                var priceResponse = await _stocksService2.GetPrice(request.Ticker);
-                if (!priceResponse.IsOk)
-                {
-                    throw new Exception("Failed to get price");
-                }
-
-                var price = priceResponse.Success.Amount;
-                
-                // find historical price with the lowest closing price
-                var lowest = prices[0];
-                foreach (var p in prices)
-                {
-                    if (p.Close < lowest.Close)
-                    {
-                        lowest = p;
-                    }
-                }
-
-                // find historical price with the highest closing price
-                var highest = prices[0];
-                foreach (var p in prices)
-                {
-                    if (p.Close > highest.Close)
-                    {
-                        highest = p;
-                    }
-                }
+                var price = prices[prices.Length - 1].Close;
 
                 var outcomes = StockPriceAnalysis.Run(price, prices);
 
@@ -87,8 +62,8 @@ namespace core.Stocks
                     Ticker = request.Ticker,
                     Price = price,
                     historicalPrices = new PricesView(prices),
-                    High = highest,
-                    Low = lowest,
+                    High = outcomes.Where(o => o.key == OutcomeKeys.HighestPrice).FirstOrDefault(),
+                    Low = outcomes.Where(o => o.key == OutcomeKeys.LowestPrice).FirstOrDefault(),
                     Outcomes = outcomes
                 };
             }
