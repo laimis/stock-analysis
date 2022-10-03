@@ -102,7 +102,7 @@ namespace core.Stocks.Services
             var smaContainer = SMAContainer.Generate(prices);
 
             // add all smas to outcomes
-            foreach (var sma in smaContainer.All)
+            foreach (var sma in smaContainer.GetEnumerable())
             {
                 var value = sma.LastValue;
                 outcomes.Add(
@@ -268,9 +268,15 @@ namespace core.Stocks.Services
             _all = new SMA[] { sma20, sma50, sma150, sma200 };
         }
 
-        public IReadOnlyList<SMA> All => _all;
+        // public IReadOnlyList<SMA> All => _all;
 
         public int Length => _all.Length;
+
+        public SMA SMA20 => _sma20;
+        public SMA SMA50 => _sma50;
+        public SMA SMA150 => _sma150;
+        public SMA SMA200 => _sma200;
+
 
         public static SMAContainer Generate(HistoricalPrice[] prices)
         {
@@ -302,6 +308,8 @@ namespace core.Stocks.Services
             }
             return new SMA(sma, interval);
         }
+
+        internal IEnumerable<SMA> GetEnumerable() => _all;
 
         internal decimal? LastValueOfSMA(int index) => _all[index].LastValue;
     }
