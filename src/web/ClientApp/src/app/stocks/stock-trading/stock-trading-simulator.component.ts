@@ -168,6 +168,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.reset()
     var first = true;
     this.currentCost = p.price
+    this.riskedAmount = p.riskedAmount
     p.transactions.forEach(t => {
       if (first) {
         var cmd:stocktransactioncommand = {

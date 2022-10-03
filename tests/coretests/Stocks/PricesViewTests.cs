@@ -25,18 +25,18 @@ namespace coretests.Stocks
 
             Assert.Equal(504, view.Prices.Length);
             Assert.Equal(4, view.SMA.Length);
-            Assert.Equal(20, view.SMA[0].Interval);
-            Assert.Equal(50, view.SMA[1].Interval);
-            Assert.Equal(150, view.SMA[2].Interval);
-            Assert.Equal(200, view.SMA[3].Interval);
-            Assert.Equal(504, view.SMA[0].Values.Length);
-            Assert.Equal(504, view.SMA[1].Values.Length);
-            Assert.Equal(504, view.SMA[2].Values.Length);
-            Assert.Equal(504, view.SMA[3].Values.Length);
-            Assert.Equal(493.5m, view.SMA[0].Values[view.SMA[0].Values.Length - 1]);
-            Assert.Equal(478.5m, view.SMA[1].Values[view.SMA[1].Values.Length - 1]);
-            Assert.Equal(428.5m, view.SMA[2].Values[view.SMA[2].Values.Length - 1]);
-            Assert.Equal(403.5m, view.SMA[3].Values[view.SMA[3].Values.Length - 1]);
+            Assert.Equal(20, view.SMA.All[0].Interval);
+            Assert.Equal(50, view.SMA.All[1].Interval);
+            Assert.Equal(150, view.SMA.All[2].Interval);
+            Assert.Equal(200, view.SMA.All[3].Interval);
+            Assert.Equal(504, view.SMA.All[0].Values.Length);
+            Assert.Equal(504, view.SMA.All[1].Values.Length);
+            Assert.Equal(504, view.SMA.All[2].Values.Length);
+            Assert.Equal(504, view.SMA.All[3].Values.Length);
+            Assert.Equal(493.5m, view.SMA.All[0].LastValue);
+            Assert.Equal(478.5m, view.SMA.All[1].LastValue);
+            Assert.Equal(428.5m, view.SMA.All[2].LastValue);
+            Assert.Equal(403.5m, view.SMA.All[3].LastValue);
         }    
     }
 }

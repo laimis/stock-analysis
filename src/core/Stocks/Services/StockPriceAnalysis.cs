@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,41 +99,41 @@ namespace core.Stocks.Services
 
 
             // generate SMAs
-            var smas = SMA.Generate(prices);
+            var smaContainer = SMAContainer.Generate(prices);
 
             // add all smas to outcomes
-            foreach (var sma in smas)
+            foreach (var sma in smaContainer.All)
             {
-                var value = sma.Values.Last().Value;
+                var value = sma.LastValue;
                 outcomes.Add(
                     new AnalysisOutcome(
                         OutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
-                        Round(value, 2),
+                        Round(value ?? 0, 2),
                         $"SMA {sma.Interval} is {value}"
                     )
                 );
             }
 
             // positive SMA is if each interval is higher than the next
-            var positiveSMA = currentPrice > smas[0].Values.Last().Value;
-            for (var i = 0; i < smas.Length - 1; i++)
+            var positiveSMA = currentPrice > smaContainer.LastValueOfSMA(0);
+            for (var i = 0; i < smaContainer.Length - 1; i++)
             {
-                var current = smas[i];
-                var next = smas[i + 1];
-                if (current.Values.Last() < next.Values.Last())
+                var current = smaContainer.LastValueOfSMA(0);
+                var next = smaContainer.LastValueOfSMA(i + 1);
+                if (current < next)
                 {
                     positiveSMA = false;
                     break;
                 }
             }
 
-            var negativeSMA = currentPrice < smas[0].Values.Last().Value;
-            for (var i = 0; i < smas.Length - 1; i++)
+            var negativeSMA = currentPrice < smaContainer.LastValueOfSMA(0);
+            for (var i = 0; i < smaContainer.Length - 1; i++)
             {
-                var current = smas[i];
-                var next = smas[i + 1];
-                if (current.Values.Last() > next.Values.Last())
+                var current = smaContainer.LastValueOfSMA(i);
+                var next = smaContainer.LastValueOfSMA(i + 1);
+                if (current > next)
                 {
                     negativeSMA = false;
                     break;
@@ -157,7 +158,7 @@ namespace core.Stocks.Services
             );
 
             // 20 is below 50, negative
-            var sma20Above50Diff = Round(smas[0].Values.Last().Value - smas[1].Values.Last().Value, 2);
+            var sma20Above50Diff = Round(smaContainer.LastValueOfSMA(0) - smaContainer.LastValueOfSMA(1), 2);
             var sma20Above50 = sma20Above50Diff > 0;
             var sma20Above50OutcomeType = sma20Above50 ? OutcomeType.Positive : OutcomeType.Negative;
             outcomes.Add(
@@ -170,7 +171,7 @@ namespace core.Stocks.Services
             );
 
             // 50 is below 150, negative
-            var sma50Above150Diff = Round(smas[1].Values.Last().Value - smas[2].Values.Last().Value, 2);
+            var sma50Above150Diff = Round(smaContainer.LastValueOfSMA(1) - smaContainer.LastValueOfSMA(2), 2);
             var sma50Above150 = sma50Above150Diff > 0;
             var sma50Above150OutcomeType = sma50Above150 ? OutcomeType.Positive : OutcomeType.Negative;
             outcomes.Add(
@@ -211,8 +212,11 @@ namespace core.Stocks.Services
         private static decimal Round(double value, int digits) => 
             (decimal)Math.Round(value, digits);
 
-        private static decimal Round(decimal value, int digits) => 
-            Math.Round(value, digits);
+        private static decimal Round(decimal? value, int digits) => 
+            value switch {
+                null => 0,
+                _ => Math.Round(value.Value, digits)
+            };
     }
 
     internal class OutcomeKeys
@@ -243,10 +247,39 @@ namespace core.Stocks.Services
         public decimal?[] Values { get; }
         public string Description => $"SMA {Interval}";
 
-        private static readonly IEnumerable<int> _smaIntervals = new [] {20, 50, 150, 200};
-        public static SMA[] Generate(HistoricalPrice[] prices)
+        public decimal? LastValue => Values?.Last();
+    }
+
+    public class SMAContainer
+    {
+        private SMA _sma20;
+        private SMA _sma50;
+        private SMA _sma150;
+        private SMA _sma200;
+        private SMA[] _all;
+
+        public SMAContainer(SMA sma20, SMA sma50, SMA sma150, SMA sma200)
         {
-            return _smaIntervals.Select(interval => ToSMA(prices, interval)).ToArray();
+            _sma20 = sma20;
+            _sma50 = sma50;
+            _sma150 = sma150;
+            _sma200 = sma200;
+
+            _all = new SMA[] { sma20, sma50, sma150, sma200 };
+        }
+
+        public IReadOnlyList<SMA> All => _all;
+
+        public int Length => _all.Length;
+
+        public static SMAContainer Generate(HistoricalPrice[] prices)
+        {
+            return new SMAContainer(
+                ToSMA(prices, 20),
+                ToSMA(prices, 50),
+                ToSMA(prices, 150),
+                ToSMA(prices, 200)
+            );
         }
 
         private static SMA ToSMA(HistoricalPrice[] prices, int interval)
@@ -269,9 +302,12 @@ namespace core.Stocks.Services
             }
             return new SMA(sma, interval);
         }
+
+        internal decimal? LastValueOfSMA(int index) => _all[index].LastValue;
     }
 
     public enum OutcomeType { Positive, Negative, Neutral };
 
     public record AnalysisOutcome(string key, OutcomeType type, decimal value, string message);
 }
+#nullable restore

@@ -8,10 +8,10 @@ namespace core.Stocks.View
         public PricesView(HistoricalPrice[] prices)
         {
             Prices = prices;
-            SMA = core.Stocks.Services.SMA.Generate(prices);
+            SMA = core.Stocks.Services.SMAContainer.Generate(prices);
         }
 
         public HistoricalPrice[] Prices { get; }
-        public SMA[] SMA { get; }
+        public SMAContainer SMA { get; }
     }
 }
