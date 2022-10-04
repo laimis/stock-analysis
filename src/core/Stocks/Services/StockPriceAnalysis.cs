@@ -272,10 +272,10 @@ namespace core.Stocks.Services
 
         public int Length => _all.Length;
 
-        public SMA SMA20 => _sma20;
-        public SMA SMA50 => _sma50;
-        public SMA SMA150 => _sma150;
-        public SMA SMA200 => _sma200;
+        public SMA sma20 => _sma20;
+        public SMA sma50 => _sma50;
+        public SMA sma150 => _sma150;
+        public SMA sma200 => _sma200;
 
 
         public static SMAContainer Generate(HistoricalPrice[] prices)

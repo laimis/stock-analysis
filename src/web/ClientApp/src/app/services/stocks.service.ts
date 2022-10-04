@@ -520,7 +520,14 @@ export interface SMA {
 
 export interface Prices {
   prices: StockHistoricalPrice[]
-  sma: SMA[]
+  sma: SMAContainer
+}
+
+export interface SMAContainer {
+  sma20: SMA
+  sma50: SMA
+  sma150: SMA
+  sma200: SMA
 }
 
 export interface StockAdvancedStats {

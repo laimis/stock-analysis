@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, OnInit } from '@angular/core';
-import { Prices, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { Prices, SMA, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -78,7 +78,7 @@ export class StockTradingNewPositionComponent {
   }
 
   get20sma(): number {
-    return this.getLastSma(0)
+    return this.getLastSma(this.prices.sma.sma20)
   }
 
   smaCheck20(): boolean {
@@ -86,7 +86,7 @@ export class StockTradingNewPositionComponent {
   }
 
   get50sma(): number {
-    return this.getLastSma(1)
+    return this.getLastSma(this.prices.sma.sma50)
   }
 
   smaCheck50(): boolean {
@@ -94,11 +94,11 @@ export class StockTradingNewPositionComponent {
   }
 
   get150sma(): number {
-    return this.getLastSma(2)
+    return this.getLastSma(this.prices.sma.sma150)
   }
 
   get200sma(): number {
-    return this.getLastSma(3)
+    return this.getLastSma(this.prices.sma.sma200)
   }
 
   smaCheck150(): boolean {
@@ -109,8 +109,8 @@ export class StockTradingNewPositionComponent {
     return this.get200sma() < this.costToBuy && this.get200sma() < this.get150sma()
   }
 
-  getLastSma(smaIndex): number {
-    return this.prices.sma[smaIndex].values.slice(-1)[0]
+  getLastSma(sma:SMA): number {
+    return sma.values.slice(-1)[0]
   }
 
   updateBuyingValuesWithNumberOfShares() {

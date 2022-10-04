@@ -100,7 +100,9 @@ export class StockTradingChartComponent implements OnInit {
         pointStyle: 'line'
       }]
 
-    var sma_data = prices.sma.map( sma => {
+    var smas = [prices.sma.sma20, prices.sma.sma50, prices.sma.sma150, prices.sma.sma200]
+
+    var sma_data = smas.map( sma => {
       return {
         data: sma.values.slice(-cutoff),
         label: sma.interval + " SMA",
