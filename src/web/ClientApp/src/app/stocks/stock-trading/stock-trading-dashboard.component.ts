@@ -10,7 +10,7 @@ import { StocksService, PositionInstance, StockTradingPositions, StockTradingPer
 })
 export class StockTradingComponent implements OnInit {
   positions: PositionInstance[]
-  past: PositionInstance[]
+  closed: PositionInstance[]
   brokerageOrders: BrokerageOrder[]
   loaded: boolean = false
   loading: boolean = true
@@ -65,7 +65,7 @@ export class StockTradingComponent implements OnInit {
     this.loading = true
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
       this.positions = r.current
-      this.past = r.past
+      this.closed = r.past
       this.performance = r.performance
       this.brokerageOrders = r.brokerageOrders
       this.violations = r.violations

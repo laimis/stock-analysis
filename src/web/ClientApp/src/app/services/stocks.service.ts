@@ -666,32 +666,34 @@ export interface PositionTransaction {
 }
 
 export interface PositionInstance {
-  price: number,
-  category: string,
-  cost: number,
-  return: number,
-  ticker: string,
-  numberOfShares: number,
-  maxNumberOfShares: number,
+  averageBuyCostPerShare: number,
   averageCostPerShare: number,
-  profitTarget: number,
-  profit: number,
-  daysHeld: number,
-  opened: string,
+  averageSaleCostPerShare: number,
+  category: string,
   closed: string,
-  returnPct: number,
-  transactions: PositionTransaction[]
-  stopPrice: number | null
-  notes: string[] | null
-  rr: number | null
-  rrLevels: number[] | null
-  potentialLoss: number | null
-  riskedPct: number | null
-  riskedAmount: number | null
-  unrealizedProfit: number | null
-  unrealizedGainPct: number | null
-  unrealizedRR: number | null
-  daysSinceLastTransaction: number | null
+  cost: number,
+  daysHeld: number,
+  daysSinceLastTransaction: number,
+  firstBuyCost: number,
+  firstBuyNumberOfShares: number,
+  gainPct: number,
+  isClosed: boolean,
+  lastTransaction: string,
+  notes: string[],
+  numberOfShares: number,
+  opened: string,
+  price: number,
+  profit: number,
+  riskedAmount: number,
+  rr: number,
+  rrLevels: number[],
+  rrWeighted: number,
+  stopPrice: number,
+  ticker: string,
+  transactions: PositionTransaction[],
+  unrealizedGainPct: number,
+  unrealizedProfit: number,
+  unrealizedRR: number
 }
 
 export class OptionDefinition {
