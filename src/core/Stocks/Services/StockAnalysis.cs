@@ -11,7 +11,7 @@ namespace System.Runtime.CompilerServices
 
 namespace core.Stocks.Services
 {
-    public class StockPriceAnalysis
+    public class StockAnalysis
     {
         internal static List<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
         {

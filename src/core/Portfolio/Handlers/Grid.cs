@@ -48,7 +48,7 @@ namespace core.Portfolio
                         {
                             var historicalResponse = await _brokerage.GetHistoricalPrices(user.State, s.State.Ticker);
 
-                            var outcomes = StockPriceAnalysis.Run(
+                            var outcomes = StockAnalysis.Run(
                                 currentPrice: historicalResponse.Success.Last().Close,
                                 historicalResponse.Success
                             );
