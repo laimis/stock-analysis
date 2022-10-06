@@ -11,12 +11,15 @@ namespace System.Runtime.CompilerServices
 
 namespace core.Stocks.Services
 {
-    public class StockAnalysis
+    internal interface IStockAnalysis
     {
-        internal static List<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
-        {
-            var outcomes = new List<AnalysisOutcome>();
+        IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices);
+    }
 
+    internal class LowestPrice : IStockAnalysis
+    {
+        public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
+        {
             var lowest = prices[0];
             foreach (var p in prices)
             {
@@ -26,28 +29,40 @@ namespace core.Stocks.Services
                 }
             }
 
-            outcomes.Add(
-                new AnalysisOutcome(
-                    OutcomeKeys.LowestPrice,
-                    OutcomeType.Neutral,
-                    lowest.Close,
-                    $"Lowest price was {lowest.Close} on {lowest.Date}"
-                )
+            yield return new AnalysisOutcome(
+                OutcomeKeys.LowestPrice,
+                OutcomeType.Neutral,
+                lowest.Close,
+                $"Lowest price was {lowest.Close} on {lowest.Date}"
             );
 
-            // if low is within 30 days, theb add negative outcome
-            var lowestPriceDaysAgo = Round(DateTimeOffset.Now.Subtract(lowest.DateParsed).TotalDays, 0);
+             // if low is within 30 days, theb add negative outcome
+            var lowestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(lowest.DateParsed).TotalDays, 0);
             var lowestPriceDaysAgoOutcomeType = lowestPriceDaysAgo <= 30 ? OutcomeType.Negative : OutcomeType.Neutral;
-            outcomes.Add(
-                new AnalysisOutcome(
-                    OutcomeKeys.LowestPriceDaysAgo,
-                    lowestPriceDaysAgoOutcomeType,
-                    lowestPriceDaysAgo,
-                    $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
-                )
-            );
             
-            // find historical price with the highest closing price
+            yield return new AnalysisOutcome(
+                OutcomeKeys.LowestPriceDaysAgo,
+                lowestPriceDaysAgoOutcomeType,
+                lowestPriceDaysAgo,
+                $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
+            );
+
+            var percentAboveLow = (decimal)Math.Round((currentPrice - lowest.Close) / lowest.Close * 100, 2);
+            var percentAboveLowOutcomeType = OutcomeType.Neutral;
+            yield return
+                new AnalysisOutcome(
+                    OutcomeKeys.PercentAbovLow,
+                    percentAboveLowOutcomeType,
+                    percentAboveLow,
+                    $"Percent above recent low: {percentAboveLow}%"
+                );
+        }
+    }
+
+    internal class HighestPrice : IStockAnalysis
+    {
+        public IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices)
+        {
             var highest = prices[0];
             foreach (var p in prices)
             {
@@ -57,47 +72,63 @@ namespace core.Stocks.Services
                 }
             }
 
-            outcomes.Add(
-                new AnalysisOutcome(
-                    OutcomeKeys.HighestPrice,
-                    OutcomeType.Neutral,
-                    highest.Close,
-                    $"Highest price was {highest.Close} on {highest.Date}"
-                )
+            yield return new AnalysisOutcome(
+                OutcomeKeys.HighestPrice,
+                OutcomeType.Neutral,
+                highest.Close,
+                $"Highest price was {highest.Close} on {highest.Date}"
             );
 
-            // if high is within 30 days, theb add positive outcome
-            var highestPriceDaysAgo = Round(DateTimeOffset.Now.Subtract(highest.DateParsed).TotalDays, 0);
-            var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo < 30 ? OutcomeType.Positive : OutcomeType.Neutral;
+            // if high is within 30 days, theb add negative outcome
+            var highestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(highest.DateParsed).TotalDays, 0);
+            var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo <= 30 ? OutcomeType.Negative : OutcomeType.Neutral;
             
-            outcomes.Add(
-                new AnalysisOutcome(
-                    OutcomeKeys.HighestPriceDaysAgo,
-                    OutcomeType.Positive,
-                    highestPriceDaysAgo,
-                    $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
-                )
+            yield return new AnalysisOutcome(
+                OutcomeKeys.HighestPriceDaysAgo,
+                highestPriceDaysAgoOutcomeType,
+                highestPriceDaysAgo,
+                $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
             );
 
+            var percentBelowHigh = (decimal)Math.Round((highest.Close - price) / highest.Close * 100, 2);
+            var percentBelowHighOutcomeType = OutcomeType.Neutral;
+            yield return
+                new AnalysisOutcome(
+                    OutcomeKeys.PercentBelowHigh,
+                    percentBelowHighOutcomeType,
+                    percentBelowHigh,
+                    $"Percent below recent high: {percentBelowHigh}%"
+                );
+        }
+    }
+
+    public class Volume : IStockAnalysis
+    {
+        public IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices)
+        {
             // find average volume over the last 30 days
             var totalVolume = 0m;
             var interval = 30;
-            foreach (var p in prices.AsSpan().Slice(start: prices.Length - 30))
+            for (var i = prices.Length - 1; i < prices.Length; i++)
             {
-                totalVolume += p.Volume;
+                totalVolume += prices[i].Volume;
             }
-            var averageVolume = Round(totalVolume / interval, 0);
+            var averageVolume = (decimal)Math.Round(totalVolume / interval, 0);
 
-            outcomes.Add(
+            yield return
                 new AnalysisOutcome(
                     OutcomeKeys.AverageVolume,
                     OutcomeType.Neutral,
                     averageVolume,
                     $"Average volume over the last {interval} days is {averageVolume}"
-                )
-            );
+                );
+        }
+    }
 
-
+    public class SMAOutcomes : IStockAnalysis
+    {
+        public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
+        {
             // generate SMAs
             var smaContainer = SMAContainer.Generate(prices);
 
@@ -105,14 +136,13 @@ namespace core.Stocks.Services
             foreach (var sma in smaContainer.GetEnumerable())
             {
                 var value = sma.LastValue;
-                outcomes.Add(
+                yield return
                     new AnalysisOutcome(
                         OutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
-                        Round(value ?? 0, 2),
+                        Math.Round(value ?? 0, 2),
                         $"SMA {sma.Interval} is {value}"
-                    )
-                );
+                    );
             }
 
             // positive SMA is if each interval is higher than the next
@@ -148,63 +178,51 @@ namespace core.Stocks.Services
 
             var smaSequenceMessage = $"SMA sequence is {smaSequenceOutcomeType.ToString()}";
 
-            outcomes.Add(
+            yield return
                 new AnalysisOutcome(
                     OutcomeKeys.SMASequence,
                     smaSequenceOutcomeType,
                     smaSequenceValue,
                     $"SMA sequence is {smaSequenceOutcomeType.ToString()}"
-                )
-            );
+                );
 
             // 20 is below 50, negative
-            var sma20Above50Diff = Round(smaContainer.LastValueOfSMA(0) - smaContainer.LastValueOfSMA(1), 2);
+            var sma20Above50Diff = Math.Round((smaContainer.LastValueOfSMA(0) - smaContainer.LastValueOfSMA(1) ?? 0), 2);
             var sma20Above50 = sma20Above50Diff > 0;
             var sma20Above50OutcomeType = sma20Above50 ? OutcomeType.Positive : OutcomeType.Negative;
-            outcomes.Add(
+            yield return
                 new AnalysisOutcome(
                     OutcomeKeys.SMA20Above50,
                     sma20Above50OutcomeType,
                     sma20Above50Diff,
                     $"SMA 20 - SMA 50: {sma20Above50Diff}"
-                )
-            );
+                );
 
             // 50 is below 150, negative
-            var sma50Above150Diff = Round(smaContainer.LastValueOfSMA(1) - smaContainer.LastValueOfSMA(2), 2);
+            var sma50Above150Diff = Math.Round((smaContainer.LastValueOfSMA(1) - smaContainer.LastValueOfSMA(2) ?? 0), 2);
             var sma50Above150 = sma50Above150Diff > 0;
             var sma50Above150OutcomeType = sma50Above150 ? OutcomeType.Positive : OutcomeType.Negative;
-            outcomes.Add(
+            yield return
                 new AnalysisOutcome(
                     OutcomeKeys.SMA50Above150,
                     sma50Above150OutcomeType,
                     sma50Above150Diff,
                     $"SMA 50 - SMA 150: {sma50Above150Diff}"
-                )
-            );
+                );
+        }
+    }
 
-            // percent below recent high
-            var percentBelowHigh = Round((currentPrice - highest.Close) / highest.Close * 100, 2);
-            var percentBelowHighOutcomeType = OutcomeType.Neutral;
-            outcomes.Add(
-                new AnalysisOutcome(
-                    OutcomeKeys.PercentBelowHigh,
-                    percentBelowHighOutcomeType,
-                    percentBelowHigh,
-                    $"Percent below recent high: {percentBelowHigh}%"
-                )
-            );
 
-            var percentAboveLow = Round((currentPrice - lowest.Close) / lowest.Close * 100, 2);
-            var percentAboveLowOutcomeType = OutcomeType.Neutral;
-            outcomes.Add(
-                new AnalysisOutcome(
-                    OutcomeKeys.PercentAbovLow,
-                    percentAboveLowOutcomeType,
-                    percentAboveLow,
-                    $"Percent above recent low: {percentAboveLow}%"
-                )
-            );
+    public class StockAnalysis
+    {
+        public static List<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
+        {
+            var outcomes = new List<AnalysisOutcome>();
+
+            outcomes.AddRange(new LowestPrice().Run(currentPrice, prices));
+            outcomes.AddRange(new HighestPrice().Run(currentPrice, prices));
+            outcomes.AddRange(new Volume().Run(currentPrice, prices));
+            outcomes.AddRange(new SMAOutcomes().Run(currentPrice, prices));
 
             return outcomes;
         }
