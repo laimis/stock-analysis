@@ -97,7 +97,7 @@ namespace core.Stocks.Services
             var highestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(highest.DateParsed).TotalDays, 0);
             var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo <= 30 ? OutcomeType.Positive : OutcomeType.Neutral;
             
-            yield return new AnalysisOutcome(
+        yield return new AnalysisOutcome(
                 OutcomeKeys.HighestPriceDaysAgo,
                 highestPriceDaysAgoOutcomeType,
                 highestPriceDaysAgo,

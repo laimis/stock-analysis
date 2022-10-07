@@ -62,8 +62,6 @@ namespace core.Stocks
                     Ticker = request.Ticker,
                     Price = price,
                     historicalPrices = new PricesView(prices),
-                    High = outcomes.Where(o => o.key == OutcomeKeys.HighestPrice).FirstOrDefault(),
-                    Low = outcomes.Where(o => o.key == OutcomeKeys.LowestPrice).FirstOrDefault(),
                     Outcomes = outcomes
                 };
             }

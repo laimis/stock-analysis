@@ -329,8 +329,6 @@ export interface StockAnalysisOutcome {
 }
 
 export interface StockAnalysis {
-  high: StockHistoricalPrice
-  low: StockHistoricalPrice
   price: number
   historicalPrices: Prices
   outcomes: StockAnalysisOutcome[]

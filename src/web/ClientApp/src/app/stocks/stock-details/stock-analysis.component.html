@@ -6,25 +6,9 @@
                 <td>{{analysis.price | currency}}</td>
             </tr>
             <tr>
-                <td>High</td>
-                <td>
-                    {{analysis.high.close | currency}} on {{ analysis.high.date | date }}
-                    <span class="ms-3">
-                        <span [ngClass]="{'text-success': priceDiffFromHigh() <= 0.1}">
-                            {{priceDiffFromHigh() | percent}}
-                        </span>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td>Low</td>
-                <td>
-                    {{analysis.low.close | currency}} on {{ analysis.low.date | date }}
-                    <span class="ms-3">
-                        <span [ngClass]="{'text-danger': priceDiffFromLow() >= -0.1}">
-                            {{priceDiffFromLow() | percent}}
-                        </span>
-                    </span>
+                <td>Positive / Negative</td>
+                <td [ngClass]="{'text-danger': positiveCount() < negativeCount(), 'text-success': positiveCount() > negativeCount()}">
+                    {{ positiveCount() }} / {{ negativeCount() }}
                 </td>
             </tr>
         </tbody>

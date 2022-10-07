@@ -24,12 +24,12 @@ export class StockAnalysisComponent implements OnInit {
     );
   }
 
-  priceDiffFromHigh(): number {
-    return (this.analysis.high.close - this.analysis.price) / this.analysis.high.close;
+  positiveCount() {
+    return this.analysis.outcomes.filter(r => r.type === 'Positive').length;
   }
 
-  priceDiffFromLow(): number {
-    return (this.analysis.low.close - this.analysis.price) / this.analysis.price;
+  negativeCount() {
+    return this.analysis.outcomes.filter(r => r.type === 'Negative').length;
   }
 
 }
