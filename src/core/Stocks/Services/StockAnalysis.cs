@@ -21,8 +21,7 @@ namespace core.Stocks.Services
         {
             var outcomes = new List<AnalysisOutcome>();
 
-            outcomes.AddRange(new LowestPrice().Run(currentPrice, prices));
-            outcomes.AddRange(new HighestPrice().Run(currentPrice, prices));
+            outcomes.AddRange(new Price().Run(currentPrice, prices));
             outcomes.AddRange(new Volume().Run(currentPrice, prices));
             outcomes.AddRange(new SMAOutcomes().Run(currentPrice, prices));
 
@@ -30,16 +29,29 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class LowestPrice : IStockAnalysis
+    internal class Price : IStockAnalysis
     {
         public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
         {
+            yield return new AnalysisOutcome(
+                OutcomeKeys.CurrentPrice,
+                OutcomeType.Neutral,
+                currentPrice,
+                $"Current price is {currentPrice:C2}"
+            );
+
             var lowest = prices[0];
+            var highest = prices[0];
             foreach (var p in prices)
             {
                 if (p.Close < lowest.Close)
                 {
                     lowest = p;
+                }
+
+                if (p.Close > highest.Close)
+                {
+                    highest = p;
                 }
             }
 
@@ -70,21 +82,6 @@ namespace core.Stocks.Services
                     percentAboveLow,
                     $"Percent above recent low: {percentAboveLow}%"
                 );
-        }
-    }
-
-    internal class HighestPrice : IStockAnalysis
-    {
-        public IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices)
-        {
-            var highest = prices[0];
-            foreach (var p in prices)
-            {
-                if (p.Close > highest.Close)
-                {
-                    highest = p;
-                }
-            }
 
             yield return new AnalysisOutcome(
                 OutcomeKeys.HighestPrice,
@@ -97,14 +94,14 @@ namespace core.Stocks.Services
             var highestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(highest.DateParsed).TotalDays, 0);
             var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo <= 30 ? OutcomeType.Positive : OutcomeType.Neutral;
             
-        yield return new AnalysisOutcome(
+            yield return new AnalysisOutcome(
                 OutcomeKeys.HighestPriceDaysAgo,
                 highestPriceDaysAgoOutcomeType,
                 highestPriceDaysAgo,
                 $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
             );
 
-            var percentBelowHigh = (decimal)Math.Round((highest.Close - price) / highest.Close * 100, 2);
+            var percentBelowHigh = (decimal)Math.Round((highest.Close - currentPrice) / highest.Close * 100, 2);
             var percentBelowHighOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
@@ -223,6 +220,31 @@ namespace core.Stocks.Services
                     sma50Above150Diff,
                     $"SMA 50 - SMA 150: {sma50Above150Diff}"
                 );
+
+            // how many days is 20 below 50
+            var sma20Below50Days = 0;
+            var sma20 = smaContainer.sma20;
+            var sma50 = smaContainer.sma50;
+            for (var i = sma20.Values.Length - 1; i >= 0; i--)
+            {
+                if (sma20.Values[i] < sma50.Values[i])
+                {
+                    sma20Below50Days++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            var sma20Below50OutcomeType = sma20Below50Days > 0 ? OutcomeType.Negative : OutcomeType.Neutral;
+            yield return
+                new AnalysisOutcome(
+                    OutcomeKeys.SMA20Below50Days,
+                    sma20Below50OutcomeType,
+                    sma20Below50Days,
+                    $"SMA 20 has been below SMA 50 for {sma20Below50Days} days"
+                );
         }
     }
 
@@ -238,6 +260,8 @@ namespace core.Stocks.Services
         public static string SMA50Above150 = "SMA50Above150";
         public static string PercentBelowHigh = "PercentBelowHigh";
         public static string PercentAbovLow = "PercentAboveLow";
+        public static string SMA20Below50Days = "SMA20Below50Days";
+        public static string CurrentPrice = "CurrentPrice";
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }

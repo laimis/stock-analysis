@@ -70,7 +70,7 @@ export class StockTradingNewPositionComponent {
   }
 
   updateChart(ticker:string) {
-    this.stockService.getStockPrices2y(ticker).subscribe(
+    this.stockService.getStockPrices(ticker, 365).subscribe(
       prices => {
         this.prices = prices
       }

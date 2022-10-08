@@ -12,11 +12,13 @@ namespace core.Stocks.Handlers
     {
         public class Query : IRequest<PricesView>
         {
+            public int NumberOfDays { get; }
             public string Ticker { get; }
             public Guid UserId { get; }
 
-            public Query(string ticker, Guid userId)
+            public Query(int numberOfDays, string ticker, Guid userId)
             {
+                NumberOfDays = numberOfDays;
                 Ticker = ticker;
                 UserId = userId;
             }
@@ -41,7 +43,10 @@ namespace core.Stocks.Handlers
                     throw new Exception("User not found");
                 }
 
-                var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker);
+                var start = DateTimeOffset.UtcNow.AddDays(-request.NumberOfDays);
+                var end = DateTimeOffset.UtcNow;
+
+                var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker, start: start, end: end);
                 if (!prices.IsOk)
                 {
                     throw new Exception("Failed to get historical prices");

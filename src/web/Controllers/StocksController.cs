@@ -33,8 +33,8 @@ namespace web.Controllers
         [HttpGet("{ticker}/analysis")]
         public Task<object> Analysis(string ticker) => _mediator.Send(new Analysis.Query(ticker, User.Identifier()));
 
-        [HttpGet("{ticker}/prices/{interval}")]
-        public Task<PricesView> Prices(string ticker, string interval) => _mediator.Send(new Prices.Query(ticker, User.Identifier()));
+        [HttpGet("{ticker}/prices")]
+        public Task<PricesView> Prices(string ticker, [FromQuery] int numberOfDays) => _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
 
         [HttpGet("{ticker}/price")]
         public Task<decimal> Price(string ticker) => _mediator.Send(new Price.Query(ticker));

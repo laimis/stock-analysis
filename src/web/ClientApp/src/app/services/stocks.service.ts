@@ -152,8 +152,8 @@ export class StocksService {
     return this.http.get<number>(`/api/stocks/${symbol}/price`)
   }
   
-  getStockPrices2y(symbol:string): Observable<Prices> {
-		return this.http.get<Prices>(`/api/stocks/${symbol}/prices/2y`)
+  getStockPrices(symbol:string, numberOfDays:number): Observable<Prices> {
+		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
   }
 
   getStockGrid(): Observable<StockGridEntry[]> {
