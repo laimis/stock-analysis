@@ -14,9 +14,33 @@
       </select>
     </div>
   </div>
-  <div class="card border-info mt-4" *ngFor="let p of sortedPositions">
+  <div class="card border-info mt-4" *ngFor="let position of sortedPositions">
     
-    <app-stock-trading-position [position]="p" [metricFunc]="metricFunc" [pendingOrders]="pendingOrders"></app-stock-trading-position>
+    <div class="card-body" *ngIf="position">
+      <div class="card-title">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <a [routerLink]="[ '/stocks', position.ticker ]" class="position-ticker">{{position.ticker}}</a>
+              <span class="position-price">{{position.price | currency}}</span>
+              <i
+                (click)="toggleVisibility(detailDiv);"
+                class="bi bi-info-square-fill ms-2"></i>
+            </div>
+            <div class="col text-center">
+            </div>
+            <div class="col">
+              <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
+            </div>
+          </div>  
+        </div>
+      </div>
+    
+      <div class="card-text" class="visually-hidden" #detailDiv>
+        <app-stock-trading-position [position]="position" [pendingOrders]="pendingOrders"></app-stock-trading-position>
+      </div>
+          
+    </div>
 
   </div>
 

@@ -9,12 +9,13 @@ import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallHidden } 
 export class StockTradingPositionComponent {
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
+    _position: PositionInstance;
 
     @Input()
-    position : PositionInstance
-
-    @Input()
-    metricFunc: (p:PositionInstance) => number
+    set position(v:PositionInstance) {
+        this._position = v
+        this.setCandidateValues(v)
+    }
 
     @Input()
     pendingOrders: BrokerageOrder[]
@@ -24,11 +25,6 @@ export class StockTradingPositionComponent {
         private stockService:StocksService
     ) {}
     
-    toggleVisibility(elem:HTMLElement) {
-        console.log(elem)
-        toggleVisuallHidden(elem)
-    }
-
     setCandidateValues(p:PositionInstance) {
         this.candidateRiskAmount = p.riskedAmount
         this.candidateStopPrice = p.stopPrice
@@ -60,14 +56,6 @@ export class StockTradingPositionComponent {
         return this.pendingOrders
             .filter(o => o.ticker == p.ticker)
             .filter(o => o.status != "FILLED" && o.status != "REPLACED")
-    }
-
-    getMetricToRender(p:PositionInstance) {
-        var val = this.metricFunc(p)
-        if (Number.isFinite(val)) {
-            return Math.round(val * 100) / 100
-        }
-        return val
     }
 }
 
