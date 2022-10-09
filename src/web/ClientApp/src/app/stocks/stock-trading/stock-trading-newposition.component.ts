@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, OnInit } from '@angular/core';
-import { Prices, SMA, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { Prices, SMA, StockAnalysis, StockAnalysisOutcome, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -42,6 +42,8 @@ export class StockTradingNewPositionComponent {
   prices: Prices | null = null
   stopAndExitPoints: number[] = []
 
+  analysis: StockAnalysis
+
   onBuyTickerSelected(ticker: string) {
     
     this.costToBuy = null
@@ -56,7 +58,16 @@ export class StockTradingNewPositionComponent {
         this.costToBuy = price
         this.updateChart(ticker)
       }, error => {
-        console.error(error);
+        console.error(error)
+      }
+    );
+
+    this.stockService.getStockAnalysis(ticker)
+      .subscribe(analysis => {
+        console.log(analysis)
+        this.analysis = analysis
+      }, error => {
+        console.error(error)
       }
     );
   }
@@ -172,6 +183,13 @@ export class StockTradingNewPositionComponent {
     },
       _ => { alert('purchase failed') }
     )
+  }
+
+  filteredOutcomes(): StockAnalysisOutcome[] {
+    if (!this.analysis) {
+      return []
+    }
+    return this.analysis.outcomes.filter(o => o.type !== "Neutral")
   }
 }
 

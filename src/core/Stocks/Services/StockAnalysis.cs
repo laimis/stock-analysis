@@ -251,7 +251,7 @@ namespace core.Stocks.Services
             }
 
             var sma20Above50DaysOutcomeType = sma20Below50Days > 0 ? OutcomeType.Negative : OutcomeType.Positive;
-            var sma20Above50DaysValue = sma20Below50Days > 0 ? sma20Below50Days : sma20Above50Days;
+            var sma20Above50DaysValue = sma20Below50Days > 0 ? sma20Below50Days * -1 : sma20Above50Days;
             yield return
                 new AnalysisOutcome(
                     OutcomeKeys.SMA20Above50Days,

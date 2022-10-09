@@ -65,6 +65,27 @@
         <span class="me-2">200: <strong [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
       </div>
     </div>
+    <div class="row mt-3" *ngIf="analysis">
+      <div class="col">
+        <table class="table table-hover border">
+          <tbody>
+            <tr *ngFor="let o of filteredOutcomes()">
+              <td>
+                <span
+                        class="badge"
+                        [ngClass]="{'bg-success': o.type === 'Positive', 'bg-danger': o.type === 'Negative', 'bg-secondary': o.type === 'Neutral'}">
+                        &nbsp;
+                    </span>
+                </td>
+                <td>{{o.key}}</td>
+                <td>{{o.value}}</td>
+                <td>{{o.type}}</td>
+                <td>{{o.message}}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div class="row mt-3" *ngIf="prices">
       <div class="col">
         <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>
