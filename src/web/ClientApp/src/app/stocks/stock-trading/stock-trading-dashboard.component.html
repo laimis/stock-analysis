@@ -38,9 +38,6 @@
     <a class="tab" [ngClass]="{'is-active': isActive('past')}" [routerLink]="" (click)="activateTab('past')">
       Past Positions
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('performancerecent')}" [routerLink]="" (click)="activateTab('performancerecent')">
-      Performance (Recent)
-    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
       Performance
     </a>
@@ -64,9 +61,8 @@
   
 
   <stock-trading-positions    *ngIf="isActive('positions')" [pendingOrders]="brokerageOrders" [positions]=positions></stock-trading-positions>
-  <app-stock-trading-past                 *ngIf="isActive('past')" [positions]=closed></app-stock-trading-past>
-  <stock-trading-performance  *ngIf="isActive('performancerecent')" [performance]=performance.recent></stock-trading-performance>
-  <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance.overall [trends]="performance.trends"></stock-trading-performance>
+  <app-stock-trading-past     *ngIf="isActive('past')" [positions]=closed></app-stock-trading-past>
+  <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>
   <app-brokerage-orders      *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
   <app-stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>

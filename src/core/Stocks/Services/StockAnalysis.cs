@@ -120,7 +120,7 @@ namespace core.Stocks.Services
             // find average volume over the last 30 days
             var totalVolume = 0m;
             var interval = 30;
-            for (var i = prices.Length - 1; i < prices.Length; i++)
+            for (var i = prices.Length - interval - 1; i < prices.Length; i++)
             {
                 totalVolume += prices[i].Volume;
             }
