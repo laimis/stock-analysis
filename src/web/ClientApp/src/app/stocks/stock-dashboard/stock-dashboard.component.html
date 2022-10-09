@@ -73,9 +73,6 @@
   <a class="tab" [ngClass]="{'is-active': isActive('grid')}" [routerLink]="" (click)="activateTab('grid')">
     Grid
   </a>
-  <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]="" (click)="activateTab('charts')">
-    Charts
-  </a>
   <a class="tab" [ngClass]="{'is-active': isActive('orders')}" [routerLink]="" (click)="activateTab('orders')">
     Orders 
   </a>
@@ -88,5 +85,4 @@
 <stock-ownership-grid *ngIf="loaded && isActive('owned')" [positions]=positions [selectedCategory]=selectedCategory></stock-ownership-grid>
 <stock-grid *ngIf="loaded && isActive('grid')"></stock-grid>
 <app-brokerage-orders *ngIf="loaded && isActive('orders')" [orders]="orders"></app-brokerage-orders>
-<stock-charts *ngIf="loaded && isActive('charts')" [positions]="positions" ></stock-charts>
 <app-stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="fetchData()"></app-stock-violations>
