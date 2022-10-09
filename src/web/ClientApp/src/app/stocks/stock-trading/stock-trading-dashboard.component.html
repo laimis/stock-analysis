@@ -14,10 +14,10 @@
       <div class="border-info mb-2 mt-4">
         <div class="row">
           <div class="col">
-            {{ positions.length }} positions
+            {{ positions.length }} ( {{shortTermCount()}} ) positions
           </div>
           <div class="col text-right">
-            {{ totalCost() | currency:'USD':true:'1.2-2' }}
+            {{ totalCost() | currency }} ( {{ shortTermTotalCost() | currency }} )
           </div>
         </div>
       </div>

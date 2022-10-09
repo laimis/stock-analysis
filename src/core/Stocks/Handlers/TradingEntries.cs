@@ -58,7 +58,7 @@ namespace core.Stocks
                     false => Task.FromResult<IEnumerable<Position>>(new Position[0])
                 });
 
-                var positions = stocks.Where(s => s.State.OpenPosition != null && s.State.OpenPosition.IsShortTerm)
+                var positions = stocks.Where(s => s.State.OpenPosition != null)
                     .Select(s => s.State.OpenPosition)
                     .ToArray();
 

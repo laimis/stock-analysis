@@ -61,6 +61,14 @@ export class StockTradingComponent implements OnInit {
     return this.positions.reduce((acc, cur) => acc + (cur.averageCostPerShare * cur.numberOfShares), 0)
   }
 
+  shortTermCount() {
+    return this.positions.filter(p => p.isShortTerm).length
+  }
+
+  shortTermTotalCost() {
+    return this.positions.filter(p => p.isShortTerm).reduce((acc, cur) => acc + cur.cost, 0)
+  }
+
   private loadEntries() {
     this.loading = true
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {

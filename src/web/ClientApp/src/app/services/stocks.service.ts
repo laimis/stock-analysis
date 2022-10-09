@@ -676,6 +676,7 @@ export interface PositionInstance {
   firstBuyNumberOfShares: number,
   gainPct: number,
   isClosed: boolean,
+  isShortTerm: boolean,
   lastTransaction: string,
   notes: string[],
   numberOfShares: number,
