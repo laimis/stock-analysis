@@ -8,27 +8,7 @@
 
   <div class="container mt-2">
     <div class="row">
-      <div class="col text-start">
-        <h3>{{currentPosition.ticker}}</h3>
-      </div>
-      <div class="col text-center">
-        <h3>{{currentPosition.profit | currency}} ( {{ currentPosition.gainPct | percent }} )</h3>
-      </div>
-      <div class="col text-end">
-        <h3>{{currentPosition.daysHeld}} days held</h3>
-      </div>
-    </div>
-    <div class="row">
-      <!-- generate span for each buy showing the price and when it was executed -->
-      <div class="col">
-        <h4>Buys [{{buys(currentPosition).length}}]</h4>
-        <span class="badge bg-success me-1" *ngFor="let buy of buys(currentPosition)">{{buy.price | currency}} on {{buy.when | date: 'MM/dd/yyyy'}}</span>
-      </div>
-      <!-- generate span for each sell showing the price and when it was executed -->
-      <div class="col text-end">
-        <h4>Sells [{{sells(currentPosition).length}}]</h4>
-        <span class="badge bg-success me-1" *ngFor="let sell of sells(currentPosition)">{{sell.price | currency}} on {{sell.when | date: 'MM/dd/yyyy'}}</span>
-      </div>
+      <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
     </div>
     <div class="row mt-2">
       <div class="col">

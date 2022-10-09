@@ -35,6 +35,7 @@ export class StockTradingNewPositionComponent {
   stopPrice: number | null = null
   oneR: number | null = null
   potentialLoss: number | null = null
+  stopPct: number | null = null
   date: string | null = null
   ticker: string | null = null
   notes: string | null = null
@@ -159,6 +160,7 @@ export class StockTradingNewPositionComponent {
     this.positionSizeCalculated = Math.round(this.numberOfShares * this.costToBuy * 100) / 100
     this.oneR = this.costToBuy + singleShareLoss
     this.potentialLoss = this.stopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
+    this.stopPct = Math.round((this.stopPrice - this.costToBuy) / this.costToBuy * 100) / 100
     this.stopAndExitPoints = [this.stopPrice, this.oneR]
   }
 
