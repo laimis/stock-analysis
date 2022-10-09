@@ -38,7 +38,7 @@
               Shares
             </h5>
             <p class="card-text">You have <b>{{dashboard.openStockCount}}</b> tickers on file</p>
-            <a class="card-link" [routerLink]="[ '/stocks' ]">Manage Shares</a>
+            <a class="card-link" [routerLink]="[ '/trading' ]">Manage Shares</a>
           </div>
         </div>
       </div>
@@ -78,7 +78,6 @@
               Tools
             </h5>
             <ul>
-              <li><a [routerLink]="[ '/trading' ]">Trading</a></li>
               <li><a [routerLink]="[ '/summary' ]">Weekly Summary</a></li>
               <li><a [routerLink]="[ '/trading/simulator' ]">Simulator</a></li>
               <li><a [routerLink]="[ '/reports/recentsells' ]">Sells</a></li>
