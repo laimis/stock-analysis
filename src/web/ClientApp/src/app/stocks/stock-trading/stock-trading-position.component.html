@@ -1,0 +1,100 @@
+<div class="card-body" *ngIf="position">
+  <div class="card-title">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <a [routerLink]="[ '/stocks', position.ticker ]" class="position-ticker">{{position.ticker}}</a>
+          <span class="position-price">{{position.price | currency}}</span>
+          <i
+            (click)="toggleVisibility(detailDiv); toggleVisibility(pendingOrdersDiv); setCandidateValues(position)"
+            class="bi bi-info-square-fill ms-2"></i>
+        </div>
+        <div class="col text-center">
+        </div>
+        <div class="col">
+          <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
+        </div>
+      </div>  
+    </div>
+  </div>
+
+  <div class="card-text">
+    <div #pendingOrdersDiv>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let o of getPendingOrders(position)">
+          {{o.type}} {{o.quantity}} @ {{o.price | currency}}
+      </ul>
+    </div>
+
+    <div class="visually-hidden" #detailDiv>
+
+      <div class="row">
+        <div class="col"><div class="stat-label">Cost/Share</div><div>{{ position.averageCostPerShare | currency}}</div></div>
+        <div class="col"><div class="stat-label">Cost</div><div>{{ position.cost | currency}}</div></div>
+        <div class="col"><div class="stat-label">Stop</div><div>{{ position.stopPrice | currency }} ({{ (position.stopPrice - position.averageCostPerShare) / position.averageCostPerShare | percent }})</div></div>
+        <div class="col"><div class="stat-label">Number of Shares</div><div>{{ position.numberOfShares }}</div></div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col"><div class="stat-label">Unrealized Profit</div><div>{{ position.unrealizedProfit | currency }}</div></div>
+        <div class="col"><div class="stat-label">Unrealized Gain</div><div>{{position.unrealizedGainPct | percent}}</div></div>
+        <div class="col"><div class="stat-label">Unrealized R/R</div><div>{{ position.unrealizedRR | number }}</div></div>
+        <div class="col"><div class="stat-label">Opened</div><div>{{ position.opened | date }} ({{ position.daysHeld }})</div></div>
+      </div>
+      
+      <div class="row mt-3">
+        <div class="col"><div class="stat-label">Profit</div><div>{{ position.profit | currency }}</div></div>
+        <div class="col"><div class="stat-label">Risked</div><div>{{ position.riskedAmount | currency }} </div></div>
+        <div class="col"><div class="stat-label">R/R</div><div>{{ position.rr | number }}</div></div>
+        <div class="col">
+          <div class="stat-label">Levels</div>
+          <div>
+            <span *ngFor="let l of position.rrLevels">{{l | currency}} </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col">
+          <label class="form-label" for="candidateRiskAmount">Risk Amount</label>
+          <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
+        </div>
+        <div class="col">
+          <button class="btn btn-link" (click)="setRiskAmount(position)">Set Risk Amount</button>
+        </div>
+        <div class="col">
+          <label class="form-label" for="candidateStopPrice">Stop Price</label>
+          <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
+        </div>
+        <div class="col">
+          <div>
+            <button class="btn btn-link" (click)="recalculateRiskAmount(position)">Recalculate Risk</button>
+          </div>
+          <div>
+            <button class="btn btn-link" (click)="setStopPrice(position)">Set Stop Price</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col"><div class="stat-label">Notes</div>
+        <div>
+          <div *ngFor="let note of position.notes" style="white-space: pre-wrap;">{{ note }}</div>
+        </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="row" *ngFor="let t of position.transactions">
+          <div class="col">{{t.when | date }}</div>
+          <div class="col">{{t.type}}</div>
+          <div class="col">{{t.numberOfShares}}</div>
+          <div class="col">{{t.price | currency}}</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+      
+</div>

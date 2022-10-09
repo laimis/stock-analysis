@@ -43,7 +43,9 @@ namespace core.Stocks.Handlers
                     throw new Exception("User not found");
                 }
 
-                var start = DateTimeOffset.UtcNow.AddDays(-request.NumberOfDays);
+                var totalDays = request.NumberOfDays + 200; // to make sure we have enough for the moving averages
+
+                var start = DateTimeOffset.UtcNow.AddDays(-totalDays);
                 var end = DateTimeOffset.UtcNow;
 
                 var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker, start: start, end: end);

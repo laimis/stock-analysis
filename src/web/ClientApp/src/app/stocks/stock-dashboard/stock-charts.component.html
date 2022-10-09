@@ -8,15 +8,7 @@
   
     <div class="container mt-5">
       <div class="row">
-        <div class="col text-start">
-          <h3>{{currentPosition.ticker}}</h3>
-        </div>
-        <div class="col text-center">
-          <h3>{{currentPosition.cost - currentPosition.profit | currency}}</h3>
-        </div>
-        <div class="col text-end">
-          <h3>{{currentPosition.daysHeld}} days held</h3>
-        </div>
+        <app-stock-trading-position [position]="currentPosition" [metricFunc]="metricFunc" [pendingOrders]="[]"></app-stock-trading-position>
       </div>
       <div class="row">
         <div class="col">

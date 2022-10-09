@@ -55,7 +55,7 @@ import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
-import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-positions.component';
+import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-trading-positions.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
 import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
@@ -68,6 +68,7 @@ import { StockTransactionComponent } from './stocks/stock-details/stock-transact
 import { StockTradingSimulatorComponent } from './stocks/stock-trading/stock-trading-simulator.component';
 import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
 import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.component';
+import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -170,6 +171,7 @@ var routes: Routes = [
     
     StockTradingComponent,
     StockTradingPositionComponent,
+    StockTradingPositionsComponent,
     StockTradingNewPositionComponent,
     StockTradingPastComponent,
     StockTradingPerformanceComponent,

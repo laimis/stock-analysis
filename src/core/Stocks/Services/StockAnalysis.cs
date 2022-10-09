@@ -199,7 +199,7 @@ namespace core.Stocks.Services
 
             // 20 is below 50, negative
             var sma20Above50Diff = Math.Round((smaContainer.LastValueOfSMA(0) - smaContainer.LastValueOfSMA(1) ?? 0), 2);
-            var sma20Above50 = sma20Above50Diff > 0;
+            var sma20Above50 = sma20Above50Diff >= 0;
             var sma20Above50OutcomeType = sma20Above50 ? OutcomeType.Positive : OutcomeType.Negative;
             yield return
                 new AnalysisOutcome(
@@ -237,13 +237,27 @@ namespace core.Stocks.Services
                 }
             }
 
-            var sma20Below50OutcomeType = sma20Below50Days > 0 ? OutcomeType.Negative : OutcomeType.Neutral;
+            var sma20Above50Days = 0;
+            for (var i = sma20.Values.Length - 1; i >= 0; i--)
+            {
+                if (sma20.Values[i] > sma50.Values[i])
+                {
+                    sma20Above50Days++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            var sma20Above50DaysOutcomeType = sma20Below50Days > 0 ? OutcomeType.Negative : OutcomeType.Positive;
+            var sma20Above50DaysValue = sma20Below50Days > 0 ? sma20Below50Days : sma20Above50Days;
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.SMA20Below50Days,
-                    sma20Below50OutcomeType,
-                    sma20Below50Days,
-                    $"SMA 20 has been below SMA 50 for {sma20Below50Days} days"
+                    OutcomeKeys.SMA20Above50Days,
+                    sma20Above50DaysOutcomeType,
+                    sma20Above50DaysValue,
+                    "SMA 20 has been " + (sma20Below50Days > 0 ? "below" : "above") + $" SMA 50 for {sma20Above50DaysValue} days"
                 );
         }
     }
@@ -260,7 +274,7 @@ namespace core.Stocks.Services
         public static string SMA50Above150 = "SMA50Above150";
         public static string PercentBelowHigh = "PercentBelowHigh";
         public static string PercentAbovLow = "PercentAboveLow";
-        public static string SMA20Below50Days = "SMA20Below50Days";
+        public static string SMA20Above50Days = "SMA20Above50Days";
         public static string CurrentPrice = "CurrentPrice";
 
         internal static string SMA(int interval) => $"sma_{interval}";

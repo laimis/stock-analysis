@@ -28,6 +28,8 @@ export class StockChartsComponent implements OnInit {
     this.updateCurrentPosition()
   }
 
+  metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.unrealizedRR;
+
   updateCurrentPosition() {
     this.currentPosition = this._positions[this._index]
     // get price data and pass it to chart

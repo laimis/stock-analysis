@@ -1,3 +1,4 @@
+using System;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services;
 
