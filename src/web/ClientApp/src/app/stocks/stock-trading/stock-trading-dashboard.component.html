@@ -27,7 +27,10 @@
 
   <div class="tab-container mt-2" *ngIf="loaded">
     <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
-      Current Positions
+      Open Positions
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]="" (click)="activateTab('openreview')">
+      Open Review
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('newposition')}" [routerLink]="" (click)="activateTab('newposition')">
       New Position
@@ -46,7 +49,7 @@
       <span *ngIf="violations && violations.length > 0" class="badge rounded-pill bg-info">{{violations.length}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
-      Review
+      Closed Review
     </a>
     <a class="tab float-end" [routerLink]="" (click)="refresh()">
       Refresh
@@ -65,6 +68,7 @@
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>
   <app-brokerage-orders      *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
+  <stock-charts              *ngIf="isActive('openreview')" [positions]=positions></stock-charts>
   <app-stock-violations *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
 
 </div>

@@ -9,7 +9,6 @@
   <div>
 
     <div class="row mt-3" *ngIf="_position.isClosed">
-      <div class="col"><div class="stat-label">Ticker</div><div>{{ _position.ticker }}</div></div>
       <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
       <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
       <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
