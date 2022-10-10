@@ -33,11 +33,11 @@ export class StockTradingPositionComponent {
     recalculateRiskAmount() {
         var newRiskAmount = (this._position.averageCostPerShare - this.candidateStopPrice) * this._position.numberOfShares
         this.candidateRiskAmount = newRiskAmount
-        p.riskedAmount = newRiskAmount
+        this._position.riskedAmount = newRiskAmount
     }
 
     setStopPrice() {
-        this.stockService.setStopPrice(p.ticker, this.candidateStopPrice).subscribe(
+        this.stockService.setStopPrice(this._position.ticker, this.candidateStopPrice).subscribe(
             (_) => {
                 this._position.stopPrice = this.candidateStopPrice
             }
@@ -45,7 +45,7 @@ export class StockTradingPositionComponent {
     }
 
     setRiskAmount() {
-        this.stockService.setRiskAmount(p.ticker, this.candidateRiskAmount).subscribe(
+        this.stockService.setRiskAmount(this._position.ticker, this.candidateRiskAmount).subscribe(
             (_) => {
                 this._position.riskedAmount = this.candidateRiskAmount
             }
