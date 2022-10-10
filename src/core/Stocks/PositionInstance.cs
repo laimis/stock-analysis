@@ -66,7 +66,7 @@ namespace core.Stocks
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
         public string Category { get; private set; }
         public void SetCategory(string category) => Category = category;
-        internal bool IsShortTerm => Category == null ||  Category == StockCategory.ShortTerm;
+        public bool IsShortTerm => Category == null ||  Category == StockCategory.ShortTerm;
 
         private List<decimal> _slots = new List<decimal>();
 
