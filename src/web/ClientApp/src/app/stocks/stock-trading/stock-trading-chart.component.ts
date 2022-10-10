@@ -41,15 +41,13 @@ export class StockTradingChartComponent implements OnInit {
   private readonly _color_buy = "#0000FF"
   private readonly _color_sell = "#ff0000"
   private readonly _color_close = 'rgb(75, 192, 192)'
-
-  // generate random color for horizontal line
-  private readonly _color_horizontal_line = '#' + Math.floor(Math.random() * 16777215).toString(16)
+  private readonly _color_horizontal_line = '#00BCD4' // blue
 
   private readonly _sma_colors = {
     20: '#ff0000',
     50: '#32a84a',
-    150: '#00BCD4',
-    200: '#2962FF',
+    150: '#2962FF',
+    200: '#00BCD4',
   }
   
   @Input()

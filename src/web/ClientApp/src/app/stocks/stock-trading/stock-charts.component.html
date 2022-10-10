@@ -11,16 +11,6 @@
       <div class="row">
         <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
       </div>
-      <div class="row">
-        <div class="col">
-          <stock-trading-chart *ngIf="prices"
-            [buys]="buys(currentPosition)"
-            [sells]="sells(currentPosition)"
-            [prices]=prices
-            [horizontalLines]="[currentPosition.averageCostPerShare]">
-          </stock-trading-chart>
-        </div>
-      </div>
       <div class="row" *ngIf="analysis">
         <div class="col">
           <table class="table table-hover border">
@@ -41,6 +31,16 @@
                 </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <stock-trading-chart *ngIf="prices"
+            [buys]="buys(currentPosition)"
+            [sells]="sells(currentPosition)"
+            [prices]=prices
+            [horizontalLines]="[currentPosition.averageCostPerShare, currentPosition.stopPrice]">
+          </stock-trading-chart>
         </div>
       </div>
     </div>
