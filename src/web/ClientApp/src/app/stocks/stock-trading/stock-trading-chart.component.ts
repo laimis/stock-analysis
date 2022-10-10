@@ -41,13 +41,13 @@ export class StockTradingChartComponent implements OnInit {
   private readonly _color_buy = "#0000FF"
   private readonly _color_sell = "#ff0000"
   private readonly _color_close = 'rgb(75, 192, 192)'
-  private readonly _color_horizontal_line = '#00BCD4' // blue
+  private readonly _color_horizontal_line = '#2962FF' // blue
 
   private readonly _sma_colors = {
     20: '#ff0000',
     50: '#32a84a',
-    150: '#2962FF',
-    200: '#00BCD4',
+    150: '#00BCD4',
+    200: '#2962FF',
   }
   
   @Input()

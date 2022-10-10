@@ -47,7 +47,7 @@
         <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
       </div>
       <div class="col">
-        <button class="btn btn-link" (click)="setRiskAmount(position)">Set Risk Amount</button>
+        <button class="btn btn-link" (click)="setRiskAmount(_position)">Set Risk Amount</button>
       </div>
       <div class="col">
         <label class="form-label" for="candidateStopPrice">Stop Price</label>
@@ -55,10 +55,10 @@
       </div>
       <div class="col">
         <div>
-          <button class="btn btn-link" (click)="recalculateRiskAmount(position)">Recalculate Risk</button>
+          <button class="btn btn-link" (click)="recalculateRiskAmount(_position)">Recalculate Risk</button>
         </div>
         <div>
-          <button class="btn btn-link" (click)="setStopPrice(position)">Set Stop Price</button>
+          <button class="btn btn-link" (click)="setStopPrice(_position)">Set Stop Price</button>
         </div>
       </div>
     </div>
