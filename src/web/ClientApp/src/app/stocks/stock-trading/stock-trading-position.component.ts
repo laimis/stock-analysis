@@ -14,7 +14,7 @@ export class StockTradingPositionComponent {
     @Input()
     set position(v:PositionInstance) {
         this._position = v
-        this.setCandidateValues(v)
+        this.setCandidateValues()
     }
 
     @Input()
@@ -25,29 +25,29 @@ export class StockTradingPositionComponent {
         private stockService:StocksService
     ) {}
     
-    setCandidateValues(p:PositionInstance) {
-        this.candidateRiskAmount = p.riskedAmount
-        this.candidateStopPrice = p.stopPrice
+    setCandidateValues() {
+        this.candidateRiskAmount = this._position.riskedAmount
+        this.candidateStopPrice = this._position.stopPrice
     }
 
-    recalculateRiskAmount(p:PositionInstance) {
-        var newRiskAmount = (p.averageCostPerShare - this.candidateStopPrice) * p.numberOfShares
+    recalculateRiskAmount() {
+        var newRiskAmount = (this._position.averageCostPerShare - this.candidateStopPrice) * this._position.numberOfShares
         this.candidateRiskAmount = newRiskAmount
         p.riskedAmount = newRiskAmount
     }
 
-    setStopPrice(p:PositionInstance) {
+    setStopPrice() {
         this.stockService.setStopPrice(p.ticker, this.candidateStopPrice).subscribe(
             (_) => {
-                p.stopPrice = this.candidateStopPrice
+                this._position.stopPrice = this.candidateStopPrice
             }
         )
     }
 
-    setRiskAmount(p:PositionInstance) {
+    setRiskAmount() {
         this.stockService.setRiskAmount(p.ticker, this.candidateRiskAmount).subscribe(
             (_) => {
-                p.riskedAmount = this.candidateRiskAmount
+                this._position.riskedAmount = this.candidateRiskAmount
             }
         )
     }
