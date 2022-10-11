@@ -50,7 +50,7 @@ namespace core.Stocks
 
                 var brokerageOrders = await (user.State.ConnectedToBrokerage switch {
                     true => GetBrokerageOrders(_brokerage, user),
-                    false => Task.FromResult(new BrokerageOrderView[0])
+                    false => Task.FromResult(new Order[0])
                 });
 
                 var brokeragePositions = await (user.State.ConnectedToBrokerage switch {
@@ -107,28 +107,19 @@ namespace core.Stocks
                 };
             }   
             
-            internal static async Task<BrokerageOrderView[]> GetBrokerageOrders(IBrokerage brokerage, User user)
+            internal static async Task<Order[]> GetBrokerageOrders(IBrokerage brokerage, User user)
             {
                 var orders = await brokerage.GetOrders(user.State);
                 if (!orders.IsOk)
                 {
-                    return new BrokerageOrderView[0];
+                    return new Order[0];
                 }
 
                 return 
                     orders.Success
                         .Where(o => o.IncludeInResponses)
                         .OrderBy(o => o.StatusOrder)
-                        .Select(o => new BrokerageOrderView(
-                            canBeCancelled: o.CanBeCancelled,
-                            isActive: o.IsActive,
-                            orderId: o.OrderId,
-                            price: o.Price,
-                            quantity: o.Quantity,
-                            status: o.Status,
-                            ticker: o.Ticker,
-                            type: o.Type
-                            )).ToArray();
+                        .ToArray();
             }
         }
     }

@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using core.Shared.Adapters.Brokerage;
 
 namespace core.Stocks.View
 {
     public class TradingEntriesView
     {
         public TradingEntriesView(
-            BrokerageOrderView[] brokerageOrders,
+            Order[] brokerageOrders,
             PositionInstance[] current,
             PositionInstance[] past,
             TradingPerformanceContainerView performance,
@@ -18,7 +19,7 @@ namespace core.Stocks.View
             Violations = violations;
         }
 
-        public BrokerageOrderView[] BrokerageOrders { get; }
+        public Order[] BrokerageOrders { get; }
         public PositionInstance[] Current { get; }
         public PositionInstance[] Past { get; }
         public TradingPerformanceContainerView Performance { get; }

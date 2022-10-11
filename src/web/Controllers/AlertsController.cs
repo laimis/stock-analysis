@@ -1,10 +1,10 @@
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Alerts;
+using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using web.Utils;
 
 namespace web.Controllers
 {
@@ -29,5 +29,9 @@ namespace web.Controllers
         [HttpPost("sms")]
         public Task SMS([FromBody] string body) =>
             _mediator.Send(new SendSMS.Command(body));
+
+        [HttpGet("triggered")]
+        public Task<List<PositionInstance>> Triggered() =>
+            _mediator.Send(new Triggered.Query());
     }
 }

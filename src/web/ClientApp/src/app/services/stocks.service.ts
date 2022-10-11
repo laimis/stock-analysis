@@ -599,7 +599,9 @@ export interface BrokerageOrder {
   quantity: number
   status: string
   ticker: string
+  date: string
   canBeCancelled: boolean
+  canBeRecorded: boolean
   isActive: boolean
 }
 

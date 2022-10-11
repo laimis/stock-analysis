@@ -28,6 +28,7 @@ public class Order
     public string Status { get; set; }
     public string Ticker { get; set; }
     public string Type { get; set; }
+    public DateTimeOffset? Date { get; set; }
     public int StatusOrder => Status switch
     {
         "WORKING" => 0,
@@ -49,6 +50,8 @@ public class Order
         "PENDING_ACTIVATION" => true,
         _ => false
     };
+
+    public bool CanBeRecorded => Status == "FILLED";
     public bool IncludeInResponses => Status != "CANCELED" && Status != "REJECTED" && Status != "EXPIRED";
 }
 

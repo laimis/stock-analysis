@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 
 namespace core.Stocks.View
 {
@@ -16,9 +17,9 @@ namespace core.Stocks.View
         public List<PositionInstance> Positions { get; set; }
         public DateTimeOffset Calculated { get; set; }
         public List<StockViolationView> Violations { get; private set; }
-        public BrokerageOrderView[] Orders { get; private set; }
+        public Order[] Orders { get; private set; }
 
-        internal void SetOrders(BrokerageOrderView[] brokerageOrders)
+        internal void SetOrders(Order[] brokerageOrders)
         {
             Orders = brokerageOrders;
         }

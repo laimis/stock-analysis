@@ -99,6 +99,7 @@ public class TDAmeritradeClient : IBrokerage
         var payload = strategies
             .Select(o => new Order
             {
+                Date = o.closeTime == null ? null : DateTimeOffset.Parse(o.closeTime),
                 Status = o.status,
                 OrderId = o.orderId.ToString(),
                 Price = o.ResolvePrice(),

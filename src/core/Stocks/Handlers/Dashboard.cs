@@ -71,7 +71,7 @@ namespace core.Stocks
                 return view;
             }
 
-            private void EnrichWithBrokerageOrders(StockDashboardView view, BrokerageOrderView[] brokerageOrders)
+            private void EnrichWithBrokerageOrders(StockDashboardView view, Order[] brokerageOrders)
             {
                 view.SetOrders(brokerageOrders);
             }
