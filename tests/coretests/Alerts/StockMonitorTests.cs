@@ -28,7 +28,7 @@ namespace coretests.Alerts
             triggered = m.CheckTrigger("AMD", 8.9m, DateTimeOffset.UtcNow, out trigger);
             Assert.True(triggered);
             Assert.Equal("AMD", trigger.Ticker);
-            Assert.Equal(8.9, trigger.Value);
+            Assert.Equal(8.9m, trigger.Value);
 
             triggered = m.CheckTrigger("BING", 52, DateTimeOffset.UtcNow, out trigger);
             Assert.False(triggered);
