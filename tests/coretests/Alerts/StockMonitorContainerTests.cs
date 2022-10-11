@@ -18,17 +18,23 @@ namespace coretests.Alerts
 
         public StockMonitorContainerTests()
         {
+            var userId = Guid.NewGuid();
             _uat = new StockMonitorContainer();
 
-            _uat.Register(_amd = new OwnedStock(new Ticker("AMD"), Guid.NewGuid()));
-            _uat.Register(_bac = new OwnedStock(new Ticker("BAC"), Guid.NewGuid()));
+            _amd = new OwnedStock(new Ticker("AMD"), userId);
+            _amd.Purchase(100, 50, DateTimeOffset.Now, null, 49);
+            _uat.Register(_amd);
+
+            _bac = new OwnedStock(new Ticker("BAC"), userId);
+            _bac.Purchase(100, 50, DateTimeOffset.Now, null, 49);
+            _uat.Register(_bac);
 
             _uat.Register(_amd);
             _uat.Register(_bac);
             _uat.Register(_amd);
 
             _initialTriggers = _uat.UpdateValue("AMD", 50, DateTimeOffset.UtcNow).ToList();
-            _subsequentTriggers = _uat.UpdateValue("AMD", 49, DateTimeOffset.UtcNow).ToList();
+            _subsequentTriggers = _uat.UpdateValue("AMD", 48.9m, DateTimeOffset.UtcNow).ToList();
         }
 
         [Fact]
@@ -54,7 +60,7 @@ namespace coretests.Alerts
         {
             var t = _subsequentTriggers[0];
 
-            Assert.Equal(49, t.Value);
+            Assert.Equal(48.9m, t.Value);
         }
 
         [Fact]
