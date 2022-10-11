@@ -53,23 +53,12 @@ namespace web.BackgroundServices
         {
             _logger.LogInformation("exec enter");
 
-            var firstRun = true;
+            await BuildUpAlerts();
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await BuildUpAlerts();
-
-                    if (firstRun)
-                    {
-                        _logger.LogInformation("First run scan");
-                        
-                        await ScanAlerts();
-
-                        firstRun = false;
-                    }
-
                     await Loop(stoppingToken);
                 }
                 catch(Exception ex)
