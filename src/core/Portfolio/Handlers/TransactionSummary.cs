@@ -50,14 +50,10 @@ namespace core.Portfolio
         {
             public Handler(
                 IPortfolioStorage storage,
-                IAlertsStorage alerts,
                 IStocksService2 stocks) : base(storage)
             {
-                _alerts = alerts;
                 _stocks = stocks;
             }
-
-            private IAlertsStorage _alerts;
             private IStocksService2 _stocks;
 
             public override async Task<TransactionSummaryView> Handle(Generate request, CancellationToken cancellationToken)

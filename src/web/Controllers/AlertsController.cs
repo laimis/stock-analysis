@@ -24,45 +24,6 @@ namespace web.Controllers
             _container = container;
         }
 
-        [HttpGet]
-        public Task<object> List() => _mediator.Send(new List.Query(User.Identifier()));
-
-        [HttpGet("diagnostics")]
-        public object Diagnostics() => _container.Monitors.Select(
-                m => new {
-                    m.Alert.Ticker,
-                    m.Alert.PricePoints
-                }
-            );
-
-        [HttpGet("clear")]
-        public Task<object> Clear() =>
-            _mediator.Send(
-                new Clear.Command(User.Identifier())
-            );
-
-        [HttpGet("export")]
-        public Task<ActionResult> Export() => this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
-
-        [HttpPost("delete")]
-        public async Task<object> Delete(Delete.Command cmd)
-        {
-            cmd.WithUserId(User.Identifier());
-
-            return await _mediator.Send(cmd);
-        }
-
-        [HttpGet("{ticker}")]
-        public Task<object> Get(string ticker) => _mediator.Send(new Get.Query(User.Identifier(), ticker));
-
-        [HttpPost]
-        public async Task<object> AddPricePoint(Create.Command cmd)
-        {
-            cmd.WithUserId(User.Identifier());
-
-            return await _mediator.Send(cmd);
-        }
-
         [AllowAnonymous]
         [Consumes("text/plain")]
         [HttpPost("sms")]

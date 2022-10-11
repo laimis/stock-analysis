@@ -140,7 +140,7 @@ namespace core.Stocks
         public Guid UserId { get; }
     }
 
-    internal class StopPriceSet : AggregateEvent
+    public class StopPriceSet : AggregateEvent, INotification
     {
         public StopPriceSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker, decimal stopPrice) : base(id, aggregateId, when)
         {

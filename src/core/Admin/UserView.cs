@@ -11,7 +11,7 @@ namespace core.Admin
 {
     internal class UserView
     {
-        public UserView(User user, IEnumerable<OwnedStock> stocks, IEnumerable<OwnedOption> options, IEnumerable<Note> notes, IEnumerable<Alert> alerts)
+        public UserView(User user, IEnumerable<OwnedStock> stocks, IEnumerable<OwnedOption> options, IEnumerable<Note> notes)
         {
             Email = user.State.Email;
             UserId = user.Id;
@@ -22,7 +22,6 @@ namespace core.Admin
             Stock = stocks.Count();
             Options = options.Count();
             Notes = notes.Count();
-            Alerts = alerts.Count();
         }
 
         public string Email { get; }
@@ -34,6 +33,5 @@ namespace core.Admin
         public int Stock { get; }
         public int Options { get; }
         public int Notes { get; }
-        public int Alerts { get; }
     }
 }

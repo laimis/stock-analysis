@@ -55,15 +55,6 @@ namespace core
             return writer.Generate(rows);
         }
 
-        public static string Generate(ICSVWriter writer, IEnumerable<Alert> alerts)
-        {
-            var rows = alerts.Select(u =>
-                new AlertsRecord(u.State.Ticker.Value, string.Join(";", u.State.PricePoints.Select(p => p.Value)))
-            );
-
-            return writer.Generate(rows);
-        }
-
         public static string Generate(ICSVWriter writer, IEnumerable<OwnedStock> stocks)
         {
             var rows = stocks

@@ -27,7 +27,6 @@ namespace core.Admin
         public class Handler : IRequestHandler<Users.Query, object>,
             IRequestHandler<Users.Export, ExportResponse>
         {
-            private IAlertsStorage _alerts;
             private ICSVWriter _csvWriter;
             private IPortfolioStorage _portfolio;
             private IAccountStorage _storage;
@@ -36,11 +35,9 @@ namespace core.Admin
                 ICSVWriter csvWriter,
                 IAccountStorage storage,
                 IPortfolioStorage portfolio,
-                IAlertsStorage alerts,
                 IEmailService emails,
                 IMediator mediator)
             {
-                _alerts = alerts;
                 _csvWriter = csvWriter;
                 _portfolio = portfolio;
                 _storage = storage;
@@ -60,9 +57,8 @@ namespace core.Admin
                     var options = await _portfolio.GetOwnedOptions(guid);
                     var notes = await _portfolio.GetNotes(guid);
                     var stocks = await _portfolio.GetStocks(guid);
-                    var alerts = await _alerts.GetAlerts(guid);
                     
-                    var u = new UserView(user, stocks, options, notes, alerts);
+                    var u = new UserView(user, stocks, options, notes);
 
                     result.Add(u);
                 }

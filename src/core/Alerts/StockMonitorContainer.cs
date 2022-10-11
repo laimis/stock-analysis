@@ -1,38 +1,30 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using core.Stocks;
 
 namespace core.Alerts
 {
     public class StockMonitorContainer
     {
-        private ConcurrentDictionary<Guid, StockMonitor> _monitors = new ConcurrentDictionary<Guid, StockMonitor>();
+        private ConcurrentDictionary<string, StockPositionMonitor> _monitors = new ConcurrentDictionary<string, StockPositionMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
 
-        public IEnumerable<StockMonitor> Monitors => _monitors.Values;
+        public IEnumerable<StockPositionMonitor> Monitors => _monitors.Values;
 
-        public void Register(Alert a)
+        public void Register(OwnedStock stock)
         {
-            _tickers.Add(a.State.Ticker);
+            _tickers.Add(stock.State.Ticker);
 
-            foreach(var pp in a.PricePoints)
-            {
-                if (!_monitors.ContainsKey(pp.Id))
-                {
-                    _monitors[pp.Id] = new StockMonitor(a, pp);
-                }
-            }
+            _monitors[ToKey(stock)] = new StockPositionMonitor(stock.State.OpenPosition, stock.State.UserId);
         }
 
-        internal void Deregister(Guid pricePointId)
-        {
-            _monitors.TryRemove(pricePointId, out var val);
-        }
+        private static string ToKey(OwnedStock stock) => ToKey(stock.State.Ticker, stock.State.UserId);
+        private static string ToKey(string ticker, Guid userId) => userId.ToString() + ticker;
 
-        public IEnumerable<string> GetTickers()
-        {
-            return _tickers;
-        }
+        internal void Deregister(OwnedStock stock) => _monitors.TryRemove(ToKey(stock), out var val);
+
+        public IEnumerable<string> GetTickers() => _tickers;
 
         public IEnumerable<StockMonitorTrigger> UpdateValue(
             string ticker,
@@ -48,9 +40,9 @@ namespace core.Alerts
             }
         }
 
-        public bool HasTriggered(AlertPricePoint pp)
+        public bool HasTriggered(string ticker, Guid userId)
         {
-            _monitors.TryGetValue(pp.Id, out var m);
+            _monitors.TryGetValue(ToKey(ticker, userId), out var m);
 
             return m != null && m.IsTriggered;
         }

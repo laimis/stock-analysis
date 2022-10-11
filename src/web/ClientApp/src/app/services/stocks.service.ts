@@ -473,8 +473,6 @@ export class Dashboard {
   openOptionCount: number
   openStockCount: number
   openCryptoCount: number
-  triggeredAlertCount: number
-  alertCount: number
 }
 
 export class OwnedOption {

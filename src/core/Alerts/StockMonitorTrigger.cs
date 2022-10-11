@@ -4,21 +4,20 @@ namespace core.Alerts
 {
     public struct StockMonitorTrigger
     {
-        public StockMonitorTrigger(StockMonitor m, DateTimeOffset when, decimal oldValue, decimal newValue)
+        public StockMonitorTrigger(StockPositionMonitor m, DateTimeOffset when, decimal stopPrice, decimal value)
         {
             Monitor = m;
             When = when;
-            OldValue = oldValue;
-            NewValue = newValue;
+            StopPrice = stopPrice;
+            Value = value;
         }
 
-        public StockMonitor Monitor { get; }
-        public decimal OldValue { get; }
-        public decimal NewValue { get; }
+        public StockPositionMonitor Monitor { get; }
+        public decimal Value { get; }
         public DateTimeOffset When { get; }
+        public decimal StopPrice { get; }
 
-        public Guid UserId => Monitor.Alert.UserId;
-        public string Ticker => Monitor.Alert.Ticker;
-        public object Direction => OldValue < NewValue ? "UP" : "DOWN";
+        public Guid UserId => Monitor.UserId;
+        public string Ticker => Monitor.Position.Ticker;
     }
 }

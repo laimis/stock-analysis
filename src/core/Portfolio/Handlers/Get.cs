@@ -72,8 +72,6 @@ namespace core.Portfolio
                     OpenStockCount = openStocks.Count(),
                     OpenOptionCount = openOptions.Count(),
                     OpenCryptoCount = cryptos.Count(),
-                    TriggeredAlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId && s.IsTriggered),
-                    AlertCount = _alerts.Monitors.Count(s => s.Alert.UserId == userId),
                     Calculated = DateTimeOffset.UtcNow
                 };
                 return obj;

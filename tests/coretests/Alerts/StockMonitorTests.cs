@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Concurrent;
 using core.Alerts;
 using core.Shared;
+using core.Stocks;
 using Xunit;
 
 namespace coretests.Alerts
@@ -11,27 +11,24 @@ namespace coretests.Alerts
         [Fact]
         public void StockMonitorBehavior()
         {
-            var a = new Alert(new Ticker("AMD"), System.Guid.NewGuid());
+            var a = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
             
-            a.AddPricePoint("initial", 50);
+            a.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
 
-            var m = new StockMonitor(a, a.PricePoints[0]);
+            var m = new StockPositionMonitor(a.State.OpenPosition, a.State.UserId);
 
-            Assert.Null(m.Value);
+            var triggered = m.CheckTrigger("AMD", 10, DateTimeOffset.UtcNow, out var trigger);
 
-            var triggered = m.CheckTrigger("AMD", 50, DateTimeOffset.UtcNow, out var trigger);
-
-            Assert.Equal(50, m.Value);
+            Assert.Equal(10, m.Value);
             Assert.False(triggered);
 
-            triggered = m.CheckTrigger("AMD", 51, DateTimeOffset.UtcNow, out trigger);
+            triggered = m.CheckTrigger("AMD", 11, DateTimeOffset.UtcNow, out trigger);
             Assert.False(triggered);
 
-            triggered = m.CheckTrigger("AMD", 48, DateTimeOffset.UtcNow, out trigger);
+            triggered = m.CheckTrigger("AMD", 9, DateTimeOffset.UtcNow, out trigger);
             Assert.True(triggered);
             Assert.Equal("AMD", trigger.Ticker);
-            Assert.Equal(48, trigger.NewValue);
-            Assert.Equal("DOWN", trigger.Direction);
+            Assert.Equal(9, trigger.Value);
 
             triggered = m.CheckTrigger("BING", 52, DateTimeOffset.UtcNow, out trigger);
             Assert.False(triggered);
