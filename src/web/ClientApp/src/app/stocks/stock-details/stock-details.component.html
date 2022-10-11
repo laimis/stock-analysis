@@ -36,9 +36,6 @@
     <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
       Fundamentals
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('alerts')}" [routerLink]="" (click)="activateTab('alerts')">
-      Alerts <span *ngIf="alerts && alerts.points.length > 0" class="badge rounded-pill bg-info">{{alerts.points.length}}</span>
-    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
     </a>
@@ -57,12 +54,6 @@
   <stock-option *ngIf="isActive('options')"
     [ticker]=stock.ticker [options]=options
     (ownershipChanged)="optionOwnershipChanged($event)"></stock-option>
-
-  <stock-alerts *ngIf="isActive('alerts')"
-    [alerts]=alerts [ticker]=stock.ticker
-    [stock]=stock
-    [ownership]=ownership
-    (alertsChanged)="alertsChanged($event)"></stock-alerts>
 
   <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
 

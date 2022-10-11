@@ -38,8 +38,6 @@ import { StockNotesComponent } from './stocks/stock-details/stock-notes.componen
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
 import { StockGridComponent } from './stocks/stock-trading/stock-grid.component';
-import { StockAlertsComponent } from './stocks/stock-details/stock-alerts.component';
-import { AlertsComponent } from './alerts/alerts.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
 import { OptionsComponent } from './options/option-dashboard/option-dashboard.component';
 import { OptionStatsComponent } from './options/option-dashboard/option-stats.component';
@@ -70,7 +68,6 @@ import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trad
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'alerts', component: AlertsComponent, canActivate: [AuthGuard] },
   { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly] },
@@ -119,7 +116,6 @@ var routes: Routes = [
 
 @NgModule({
   declarations: [
-    AlertsComponent,
     AddNoteComponent,
     AdminEmailComponent,
     AdminWeeklyComponent,
@@ -153,7 +149,6 @@ var routes: Routes = [
     SummaryComponent,
     OwnedOptionComponent,
 
-    StockAlertsComponent,
     StockDetailsComponent,
     StockFundamentalsComponent,
     StockGridComponent,

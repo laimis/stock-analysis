@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
-using core.Alerts;
 using core.Portfolio.Output;
 using core.Shared;
 

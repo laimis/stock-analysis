@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Emails;
-using core.Alerts;
 using core.Shared.Adapters.CSV;
 using MediatR;
 using Newtonsoft.Json;
