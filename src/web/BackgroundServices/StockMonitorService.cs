@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core;
 using core.Account;
 using core.Adapters.Emails;
 using core.Adapters.Stocks;
@@ -17,36 +18,36 @@ namespace web.BackgroundServices
     {
         private IAccountStorage _accounts;
         private ILogger<StockMonitorService> _logger;
-        private IAlertsStorage _alerts;
         private IEmailService _emails;
         private IStocksService2 _stocks;
+        private IPortfolioStorage _stockStorage;
         private MarketHours _marketHours;
         public StockMonitorContainer _container;
 
-        public IEnumerable<StockMonitor> Monitors => _container.Monitors;
+        public IEnumerable<StockPositionMonitor> Monitors => _container.Monitors;
 
         public StockMonitorService(
             ILogger<StockMonitorService> logger,
             IAccountStorage accounts,
-            IAlertsStorage alerts,
+            IPortfolioStorage stockStorage,
             IStocksService2 stocks,
             IEmailService emails,
             MarketHours marketHours,
             StockMonitorContainer container)
         {
             _accounts = accounts;
-            _alerts = alerts;
             _emails = emails;
             _logger = logger;
             _stocks = stocks;
+            _stockStorage = stockStorage;
             _marketHours = marketHours;
             _container = container;
         }
 
         
 
-        private const int LONG_INTERVAL = 60_000 * 15;
-        private const int SHORT_INTERVAL = 10_000;
+        private const int LONG_INTERVAL = 60_000; // one minute
+        private const int SHORT_INTERVAL = 10_000; // 10 seconds
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -74,6 +75,8 @@ namespace web.BackgroundServices
                 catch(Exception ex)
                 {
                     _logger.LogError("Failed:" + ex);
+
+                    await Task.Delay(LONG_INTERVAL, stoppingToken);
                 }
             }
 
@@ -101,11 +104,13 @@ namespace web.BackgroundServices
 
             foreach (var pair in users)
             {
-                var alerts = await _alerts.GetAlerts(new Guid(pair.id));
+                var stocks = await _stockStorage.GetStocks(new Guid(pair.id));
 
-                foreach (var a in alerts)
+                var open = stocks.Where(s => s.State.OpenPosition != null);
+
+                foreach(var stock in open)
                 {
-                    _container.Register(a);
+                    _container.Register(stock);
                 }
             }
         }
@@ -136,7 +141,7 @@ namespace web.BackgroundServices
             {
                 var u = await _accounts.GetUser(e.Key);
 
-                var alerts = e.OrderByDescending(m => m.NewValue).ToList();
+                var alerts = e.ToList();
 
                 var data = new { alerts = alerts.Select(Map) };
 
@@ -153,9 +158,9 @@ namespace web.BackgroundServices
         {
             return new {
                 ticker = (string)trigger.Ticker,
-                value = trigger.NewValue,
-                description = trigger.Monitor.PricePoint.Description,
-                direction = $"crossed {trigger.Direction} through {trigger.Monitor.PricePoint.Value}",
+                value = trigger.Value,
+                description = trigger.Ticker,
+                direction = $"Stop price alert hit for {trigger.Ticker} at {trigger.Value}",
                 time = _marketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
             };
         }

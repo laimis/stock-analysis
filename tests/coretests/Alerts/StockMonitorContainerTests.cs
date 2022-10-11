@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using core.Alerts;
 using core.Shared;
+using core.Stocks;
 using Xunit;
 
 namespace coretests.Alerts
@@ -12,28 +13,28 @@ namespace coretests.Alerts
         private StockMonitorContainer _uat;
         private List<StockMonitorTrigger> _initialTriggers;
         private List<StockMonitorTrigger> _subsequentTriggers;
-        private AlertPricePoint _amdPricePoint;
-        private AlertPricePoint _bacPricePoint;
+        private OwnedStock _amd;
+        private OwnedStock _bac;
 
         public StockMonitorContainerTests()
         {
+            var userId = Guid.NewGuid();
             _uat = new StockMonitorContainer();
 
-            var a1 = new Alert(new Ticker("AMD"), Guid.NewGuid());
-            a1.AddPricePoint("initial", 50);
+            _amd = new OwnedStock(new Ticker("AMD"), userId);
+            _amd.Purchase(100, 50, DateTimeOffset.Now, null, 49);
+            _uat.Register(_amd);
 
-            var a2 = new Alert(new Ticker("BAC"), Guid.NewGuid());
-            a2.AddPricePoint("another one" , 20);
+            _bac = new OwnedStock(new Ticker("BAC"), userId);
+            _bac.Purchase(100, 50, DateTimeOffset.Now, null, 49);
+            _uat.Register(_bac);
 
-            _uat.Register(a1);
-            _uat.Register(a2);
-            _uat.Register(a2);
-
-            _amdPricePoint = a1.PricePoints[0];
-            _bacPricePoint = a2.PricePoints[0];
+            _uat.Register(_amd);
+            _uat.Register(_bac);
+            _uat.Register(_amd);
 
             _initialTriggers = _uat.UpdateValue("AMD", 50, DateTimeOffset.UtcNow).ToList();
-            _subsequentTriggers = _uat.UpdateValue("AMD", 49, DateTimeOffset.UtcNow).ToList();
+            _subsequentTriggers = _uat.UpdateValue("AMD", 48.9m, DateTimeOffset.UtcNow).ToList();
         }
 
         [Fact]
@@ -59,14 +60,14 @@ namespace coretests.Alerts
         {
             var t = _subsequentTriggers[0];
 
-            Assert.Equal(49, t.NewValue);
+            Assert.Equal(48.9m, t.Value);
         }
 
         [Fact]
         public void TriggeredCheck()
         {
-            Assert.True(_uat.HasTriggered(_amdPricePoint));
-            Assert.False(_uat.HasTriggered(_bacPricePoint));
+            Assert.True(_uat.HasTriggered(_amd.State.Ticker, _amd.State.UserId));
+            Assert.False(_uat.HasTriggered(_bac.State.Ticker, _bac.State.UserId));
         }
 
     }

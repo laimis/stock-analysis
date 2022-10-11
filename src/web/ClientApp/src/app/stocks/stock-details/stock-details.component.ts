@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile, StockAlert } from '../../services/stocks.service';
+import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
@@ -17,7 +17,6 @@ export class StockDetailsComponent {
   notes: NoteList
   ownership: StockOwnership
   options: OwnedOption[]
-  alerts: StockAlert
   activeTab: string = 'stocks'
 
 	constructor(
@@ -53,14 +52,6 @@ export class StockDetailsComponent {
     this.loadStockOwnership()
 
     this.loadOptionOwnership()
-
-    this.loadAlerts()
-  }
-
-  loadAlerts() {
-    this.stocks.getAlerts(this.ticker).subscribe(result => {
-      this.alerts = result
-    })
   }
 
   loadOptionOwnership() {
@@ -89,9 +80,5 @@ export class StockDetailsComponent {
 
   optionOwnershipChanged(e) {
     this.loadOptionOwnership()
-  }
-
-  alertsChanged(e) {
-    this.loadAlerts()
   }
 }

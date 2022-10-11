@@ -1,49 +1,42 @@
 using System;
+using core.Stocks;
 
 namespace core.Alerts
 {
-    public class StockMonitor
+    public class StockPositionMonitor
     {
-        public StockMonitor(Alert alert, AlertPricePoint pricePoint)
+        public StockPositionMonitor(PositionInstance position, Guid userId)
         {
-            Alert = alert;
-            PricePoint = pricePoint;
-            Value = null;
+            Position = position;
+            UserId = userId;
         }
 
-        public Alert Alert { get; }
-        public AlertPricePoint PricePoint { get; }
-        public decimal? Value { get; private set; }
-        public DateTimeOffset LastTrigger { get; private set; }
-        public bool IsTriggered => LastTrigger.Date == DateTimeOffset.UtcNow.Date;
+        public DateTimeOffset? LastTrigger { get; private set; }
+        public bool IsTriggered => LastTrigger != null;
+        public decimal Value { get; private set; }
+        public PositionInstance Position { get; }
+        public Guid UserId { get; }
 
         public bool CheckTrigger(string ticker, decimal newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
         {
-            if (Alert.State.Ticker != ticker)
+            if (Position.Ticker != ticker)
             {
                 trigger = new StockMonitorTrigger();
                 return false;
             }
 
-            if (Value == null)
+            if (Position.StopPrice == null)
             {
-                Value = newValue;
                 trigger = new StockMonitorTrigger();
                 return false;
             }
                 
-            var prev = Value < PricePoint.Value;
-            var curr = newValue < PricePoint.Value;
-
-            if (prev != curr)
+            if (Position.StopPrice > newValue && LastTrigger == null)
             {
-                if (time.Date != LastTrigger.Date)
-                {
-                    trigger = new StockMonitorTrigger(this, time, Value.Value, newValue);
-                    LastTrigger = time;
-                    Value = newValue;
-                    return true;
-                }
+                trigger = new StockMonitorTrigger(this, time, Value, newValue);
+                LastTrigger = time;
+                Value = newValue;
+                return true;
             }
 
             trigger = new StockMonitorTrigger();

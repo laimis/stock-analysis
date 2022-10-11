@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using core.Account;
-using core.Alerts;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 using core.Stocks;
-using core.Stocks.View;
 
 namespace core
 {
@@ -20,7 +18,6 @@ namespace core
         private record struct NoteRecord(string created, string ticker, string note);
         private record struct OptionRecord(string ticker, string type, decimal strike, string optiontype, string expiration, decimal amount, decimal premium, string filled);
         private record struct UserRecord(string email, string first_name, string last_name);
-        private record struct AlertsRecord(string ticker, string pricepoints);
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
         private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
 
@@ -51,15 +48,6 @@ namespace core
                     _ => new CryptosRecord()
                 })
                 .Where(r => r.symbol != null);
-
-            return writer.Generate(rows);
-        }
-
-        public static string Generate(ICSVWriter writer, IEnumerable<Alert> alerts)
-        {
-            var rows = alerts.Select(u =>
-                new AlertsRecord(u.State.Ticker.Value, string.Join(";", u.State.PricePoints.Select(p => p.Value)))
-            );
 
             return writer.Generate(rows);
         }

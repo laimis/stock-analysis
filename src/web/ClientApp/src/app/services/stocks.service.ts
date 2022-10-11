@@ -101,25 +101,6 @@ export class StocksService {
     return this.http.get<object>('/api/notes/' + id)
   }
 
-  // ------------------ alerts ------------------
-  getAlerts(ticker: string): Observable<StockAlert> {
-    if (ticker === null)
-    {
-      ticker = ''
-    }
-
-    return this.http.get<StockAlert>('/api/alerts/' + ticker)
-  }
-
-  addAlert(ticker: string, description: string, value: number): Observable<object> {
-    return this.http.post<object>('/api/alerts', {ticker, value, description})
-  }
-
-  removeAlert(ticker: string, id: string): Observable<object> {
-    return this.http.post<object>('/api/alerts/delete', {ticker, id})
-  }
-  //
-
   getCryptos(): Observable<any> {
 		return this.http.get<any>('/api/cryptos')
   }
@@ -467,14 +448,10 @@ export class OwnedCrypto {
   transactions: TransactionList
 }
 
-export class Alert {}
-
 export class Dashboard {
   openOptionCount: number
   openStockCount: number
   openCryptoCount: number
-  triggeredAlertCount: number
-  alertCount: number
 }
 
 export class OwnedOption {
@@ -489,16 +466,6 @@ export class OwnedOption {
   premiumReceived: number
   profit: number
   transactions: TransactionList
-}
-
-export class AlertLabelValue {
-  label: string
-  value: number
-
-  constructor(label: string, value: number) {
-    this.label = label;
-    this.value = value;
-  }
 }
 
 export interface StockHistoricalPrice {
@@ -558,18 +525,6 @@ export interface StockDetails {
   price: number
   stats: StockAdvancedStats
   profile : StockProfile
-	alert: object
-}
-
-export interface StockAlert {
-  ticker: string
-  points: AlertPricePoint[]
-}
-
-export interface AlertPricePoint {
-  id: string
-  description: string
-  value: number
 }
 
 export interface StockProfile {
