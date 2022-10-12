@@ -44,6 +44,15 @@ export class StockTradingPositionComponent {
         )
     }
 
+    deleteStopPrice() {
+        this.stockService.deleteStopPrice(this._position.ticker).subscribe(
+            (_) => {
+                this._position.stopPrice = null
+                this._position.riskedAmount = null
+            }
+        )
+    }
+
     setRiskAmount() {
         this.stockService.setRiskAmount(this._position.ticker, this.candidateRiskAmount).subscribe(
             (_) => {

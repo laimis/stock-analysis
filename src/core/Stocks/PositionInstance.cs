@@ -177,6 +177,12 @@ namespace core.Stocks
             }
         }
 
+        public void DeleteStopPrice()
+        {
+            StopPrice = null;
+            RiskedAmount = null;
+        }
+
         public void SetRiskAmount(decimal riskAmount)
         {
             RiskedAmount = riskAmount;

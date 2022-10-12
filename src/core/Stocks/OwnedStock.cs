@@ -51,6 +51,24 @@ namespace core.Stocks
             );
         }
 
+        internal void DeleteStop()
+        {
+            if (State.OpenPosition == null)
+            {
+                throw new InvalidOperationException("No open position to delete stop for");
+            }
+
+            Apply(
+                new StopDeleted(
+                    Guid.NewGuid(),
+                    State.Id,
+                    DateTimeOffset.UtcNow,
+                    State.UserId,
+                    State.Ticker
+                )
+            );
+        }
+
         internal void SetRiskAmount(decimal riskAmount)
         {
             if (State.OpenPosition == null)

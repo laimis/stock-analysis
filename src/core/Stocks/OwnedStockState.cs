@@ -38,6 +38,11 @@ namespace core.Stocks
             OpenPosition.SetStopPrice(stopPriceSet.StopPrice);
         }
 
+        internal void ApplyInternal(StopDeleted deleted)
+        {
+            OpenPosition.DeleteStopPrice();
+        }
+
         internal void ApplyInternal(RiskAmountSet riskAmountSet)
         {
             OpenPosition.SetRiskAmount(riskAmountSet.RiskAmount);

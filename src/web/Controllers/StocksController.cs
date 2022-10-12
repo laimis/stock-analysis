@@ -81,11 +81,22 @@ namespace web.Controllers
         }
 
         [HttpPost("{ticker}/stop")]
-        public async Task<ActionResult> Stop(SetStop.Command model)
+        public async Task<ActionResult> Stop(SetStop.Command command)
         {
-            model.WithUserId(User.Identifier());
+            command.WithUserId(User.Identifier());
 
-            var r = await _mediator.Send(model);
+            var r = await _mediator.Send(command);
+
+            return this.OkOrError(r);
+        }
+
+        [HttpDelete("{ticker}/stop")]
+        public async Task<ActionResult> DeleteStop(string ticker)
+        {
+            var command = new DeleteStop.Command(ticker);
+            command.WithUserId(User.Identifier());
+
+            var r = await _mediator.Send(command);
 
             return this.OkOrError(r);
         }

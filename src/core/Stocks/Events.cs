@@ -167,4 +167,16 @@ namespace core.Stocks
         public string Ticker { get; }
         public decimal RiskAmount { get; }
     }
+
+    internal class StopDeleted : AggregateEvent
+    {
+        public StopDeleted(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker) : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Ticker = ticker;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+    }
 }
