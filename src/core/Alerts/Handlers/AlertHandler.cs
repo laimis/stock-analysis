@@ -1,14 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using core.Stocks;
-using MediatR;
 
 namespace core.Alerts
 {
     public class AlertHandler :
         MediatR.INotificationHandler<StockPurchased_v2>,
         MediatR.INotificationHandler<StockSold>,
-        MediatR.INotificationHandler<StopPriceSet>
+        MediatR.INotificationHandler<StopPriceSet>,
+        MediatR.INotificationHandler<StopDeleted>
     {
         private StockMonitorContainer _container;
         private IPortfolioStorage _storage;
@@ -65,6 +65,23 @@ namespace core.Alerts
             }
 
             _container.Register(stock);
+        }
+
+
+        public async Task Handle(StopDeleted notification, CancellationToken cancellationToken)
+        {
+            var stock = await _storage.GetStock(ticker: notification.Ticker, userId: notification.UserId);
+            if (stock == null)
+            {
+                return;
+            }
+
+            if (stock.State.OpenPosition == null)
+            {
+                return;
+            }
+
+            _container.Deregister(stock);
         }
     }
 }
