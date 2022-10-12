@@ -65,6 +65,7 @@ import { StockTradingSimulatorComponent } from './stocks/stock-trading/stock-tra
 import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
 import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.component';
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
+import { AlertsComponent } from './alerts/alerts.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -92,6 +93,8 @@ var routes: Routes = [
   { path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard] },
   { path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard] },
   { path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
+
+  { path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly] },
 
   { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard] },
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
@@ -183,7 +186,10 @@ var routes: Routes = [
     CryptoDashboardComponent,
     CryptoOwnershipGridComponent,
     CryptoDetailsComponent,
+    
     StockAnalysisComponent,
+
+    AlertsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

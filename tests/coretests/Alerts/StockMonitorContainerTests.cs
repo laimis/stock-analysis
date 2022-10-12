@@ -60,7 +60,7 @@ namespace coretests.Alerts
         {
             var t = _subsequentTriggers[0];
 
-            Assert.Equal(48.9m, t.Value);
+            Assert.Equal(48.9m, t.triggeredValue);
         }
 
         [Fact]

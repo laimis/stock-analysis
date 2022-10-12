@@ -33,9 +33,9 @@ namespace core.Alerts
         {
             foreach (var m in _monitors.Values)
             {
-                if (m.CheckTrigger(ticker, newPrice, time, out var trigger))
+                if (m.CheckTrigger(ticker, newPrice, time))
                 {
-                    yield return trigger;
+                    yield return m.Trigger.Value;
                 }
             }
         }

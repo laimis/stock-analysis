@@ -1,0 +1,21 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Ticker</th>
+      <th>Triggered Price</th>
+      <th>Watched Price</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let alert of alerts">
+      <td>
+        <a [routerLink]="[ '/stocks', alert.ticker ]">{{alert.ticker}}</a>
+      </td>
+      <td>{{alert.triggeredValue}}</td>
+      <td>{{alert.watchedValue}}</td>
+      <td>
+        <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+      </td>
+    </tr>
+</table>

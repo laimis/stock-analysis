@@ -21,7 +21,7 @@ namespace web.BackgroundServices
         private IEmailService _emails;
         private IStocksService2 _stocks;
         private IPortfolioStorage _stockStorage;
-        private MarketHours _marketHours;
+        private IMarketHours _marketHours;
         public StockMonitorContainer _container;
 
         public IEnumerable<StockPositionMonitor> Monitors => _container.Monitors;
@@ -32,7 +32,7 @@ namespace web.BackgroundServices
             IPortfolioStorage stockStorage,
             IStocksService2 stocks,
             IEmailService emails,
-            MarketHours marketHours,
+            IMarketHours marketHours,
             StockMonitorContainer container)
         {
             _accounts = accounts;
@@ -124,7 +124,7 @@ namespace web.BackgroundServices
                 }
             }
 
-            var grouped = triggered.GroupBy(t => t.UserId);
+            var grouped = triggered.GroupBy(t => t.userId);
 
             foreach (var e in grouped)
             {
@@ -146,11 +146,11 @@ namespace web.BackgroundServices
         private object Map(StockMonitorTrigger trigger)
         {
             return new {
-                ticker = (string)trigger.Ticker,
-                value = trigger.Value,
-                description = trigger.Ticker,
-                direction = $"Stop price alert hit for {trigger.Ticker} at {trigger.Value}",
-                time = _marketHours.ToMarketTime(trigger.When).ToString("HH:mm") + " ET"
+                ticker = (string)trigger.ticker,
+                value = trigger.triggeredValue,
+                description = trigger.ticker,
+                direction = $"Stop price alert hit for {trigger.ticker} at {trigger.triggeredValue}",
+                time = _marketHours.ToMarketTime(trigger.when).ToString("HH:mm") + " ET"
             };
         }
     }
