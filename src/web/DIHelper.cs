@@ -49,7 +49,8 @@ namespace web
             services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>());
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
-            services.AddSingleton<MarketHours>();
+            // services.AddSingleton<IMarketHours, MarketHours>();
+            services.AddSingleton<IMarketHours, MarketHoursAlwaysOn>();
             services.AddSingleton<StockMonitorContainer>();
             services.AddMediatR(typeof(Sell).Assembly, typeof(DIHelper).Assembly);
             services.AddSingleton<CookieEvents>();

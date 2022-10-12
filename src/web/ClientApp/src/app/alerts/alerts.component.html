@@ -1,0 +1,15 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Ticker</th>
+      <th>Triggered Price</th>
+      <th>Watched Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let alert of alerts">
+      <td>{{alert.ticker}}</td>
+      <td>{{alert.triggeredValue}}</td>
+      <td>{{alert.watchedValue}}</td>
+    </tr>
+</table>

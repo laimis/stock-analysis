@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { Alert } from 'selenium-webdriver';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -72,6 +73,11 @@ export class StocksService {
 
   getUsers(): Observable<object[]> {
     return this.http.get<object[]>('/api/admin/users')
+  }
+
+  // ----------------- alerts ---------------------
+  getTriggeredAlerts(): Observable<StockAlert[]> {
+    return this.http.get<StockAlert[]>('/api/alerts/triggered')
   }
 
   // ----------------- notes ---------------------
@@ -300,6 +306,12 @@ export class StocksService {
   recentSells() : Observable<Sells> {
     return this.http.get<Sells>('/api/reports/sells')
   }
+}
+
+export interface StockAlert {
+  triggeredValue: number
+  watchedValue: number
+  ticker: string
 }
 
 export interface StockAnalysisOutcome {

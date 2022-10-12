@@ -3,6 +3,14 @@ using core.Stocks;
 
 namespace core.Alerts
 {
+    public record struct StockMonitorTrigger(
+        decimal triggeredValue,
+        decimal watchedValue,
+        DateTimeOffset when,
+        string ticker,
+        Guid userId
+    );
+
     public class StockPositionMonitor
     {
         public StockPositionMonitor(PositionInstance position, Guid userId)
@@ -11,35 +19,29 @@ namespace core.Alerts
             UserId = userId;
         }
 
-        public DateTimeOffset? LastTrigger { get; private set; }
-        public bool IsTriggered => LastTrigger != null;
-        public decimal Value { get; private set; }
+        public bool IsTriggered => Trigger != null;
         public PositionInstance Position { get; }
+        public StockMonitorTrigger? Trigger { get; private set; }
         public Guid UserId { get; }
 
-        public bool CheckTrigger(string ticker, decimal newValue, DateTimeOffset time, out StockMonitorTrigger trigger)
+        public bool CheckTrigger(string ticker, decimal price, DateTimeOffset time)
         {
             if (Position.Ticker != ticker)
             {
-                trigger = new StockMonitorTrigger();
                 return false;
             }
 
             if (Position.StopPrice == null)
             {
-                trigger = new StockMonitorTrigger();
                 return false;
             }
                 
-            if (Position.StopPrice > newValue && LastTrigger == null)
+            if (Position.StopPrice > price && !IsTriggered)
             {
-                trigger = new StockMonitorTrigger(this, time, Value, newValue);
-                LastTrigger = time;
-                Value = newValue;
+                Trigger = new StockMonitorTrigger(price, Position.StopPrice.Value, time, ticker, UserId);
                 return true;
             }
 
-            trigger = new StockMonitorTrigger();
             return false;
         }
     }

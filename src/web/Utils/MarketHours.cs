@@ -3,16 +3,23 @@ using TimeZoneConverter;
 
 namespace web.Utils
 {
-    public class MarketHours
+    public interface IMarketHours
     {
-        private TimeZoneInfo _easternZoneId;
+        bool IsOn(DateTimeOffset time);
+        DateTimeOffset ToMarketTime(DateTimeOffset when);
+    }
+
+    public class MarketHoursAlwaysOn : IMarketHours
+    {
+        public bool IsOn(DateTimeOffset time) => true;
+        public DateTimeOffset ToMarketTime(DateTimeOffset when) => MarketHours.ConvertToEastern(when);
+    }
+
+    public class MarketHours : IMarketHours
+    {
+        private static TimeZoneInfo _easternZoneId = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
         private TimeSpan _start = new TimeSpan(9, 40, 0);
         private TimeSpan _end = new TimeSpan(16, 0, 0);
-
-        public MarketHours()
-        {
-            _easternZoneId = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
-        }
 
         public bool IsOn(DateTimeOffset now)
         {
@@ -32,7 +39,9 @@ namespace web.Utils
             return timeOfDay >= _start && timeOfDay <= _end;
         }
 
-        public DateTime ToMarketTime(DateTimeOffset when)
+        public DateTimeOffset ToMarketTime(DateTimeOffset when) => ConvertToEastern(when);
+
+        public static DateTimeOffset ConvertToEastern(DateTimeOffset when)
         {
             return TimeZoneInfo.ConvertTimeFromUtc(
                 when.DateTime,
