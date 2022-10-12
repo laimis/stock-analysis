@@ -8,7 +8,9 @@
   </thead>
   <tbody>
     <tr *ngFor="let alert of alerts">
-      <td>{{alert.ticker}}</td>
+      <td>
+        <a [routerLink]="[ '/stocks', alert.ticker ]">{{alert.ticker}}</a>
+      </td>
       <td>{{alert.triggeredValue}}</td>
       <td>{{alert.watchedValue}}</td>
     </tr>
