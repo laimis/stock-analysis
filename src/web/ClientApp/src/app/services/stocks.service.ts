@@ -312,6 +312,7 @@ export interface StockAlert {
   triggeredValue: number
   watchedValue: number
   ticker: string
+  numberOfShares: number
 }
 
 export interface StockAnalysisOutcome {

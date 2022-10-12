@@ -8,6 +8,7 @@ namespace core.Alerts
         decimal watchedValue,
         DateTimeOffset when,
         string ticker,
+        decimal numberOfShares,
         Guid userId
     );
 
@@ -38,7 +39,15 @@ namespace core.Alerts
                 
             if (Position.StopPrice > price && !IsTriggered)
             {
-                Trigger = new StockMonitorTrigger(price, Position.StopPrice.Value, time, ticker, UserId);
+                Trigger = new StockMonitorTrigger(
+                    price,
+                    Position.StopPrice.Value,
+                    time,
+                    ticker,
+                    Position.NumberOfShares,
+                    UserId
+                );
+
                 return true;
             }
 
