@@ -189,6 +189,8 @@ export class StockTradingSimulatorComponent implements OnInit {
         this.addTransaction(t.type)
       }
     })
+    this.price = p.price
+    this.updateRiskParameters()
     this.showExisting = false
   }
 
