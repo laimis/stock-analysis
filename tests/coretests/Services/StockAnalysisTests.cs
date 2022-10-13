@@ -19,7 +19,7 @@ namespace coretests.Services
                 .Select(n => new HistoricalPrice { Close = n, Date = start.AddDays(n).ToString()})
                 .ToArray();
 
-            _outcomes = StockAnalysis.Run(10, historcalPrices);
+            _outcomes = HistoricalPriceAnalysis.Run(10, historcalPrices);
         }
 
         [Fact]

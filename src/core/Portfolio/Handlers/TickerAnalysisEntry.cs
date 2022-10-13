@@ -3,9 +3,9 @@ using core.Stocks.Services;
 
 namespace core.Portfolio
 {
-    public struct GridEntry
+    public struct TickerAnalysisEntry
     {
-        public GridEntry(string ticker, List<AnalysisOutcome> outcomes)
+        public TickerAnalysisEntry(string ticker, List<AnalysisOutcome> outcomes)
         {
             Outcomes = outcomes;
             Ticker = ticker;

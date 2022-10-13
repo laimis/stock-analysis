@@ -10,31 +10,31 @@ namespace System.Runtime.CompilerServices
 
 namespace core.Stocks.Services
 {
-    internal interface IStockAnalysis
+    internal interface IHistoricalPriceAnalysis
     {
-        IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices);
+        IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices);
     }
 
-    public class StockAnalysis
+    public class HistoricalPriceAnalysis
     {
         public static List<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
         {
             var outcomes = new List<AnalysisOutcome>();
 
-            outcomes.AddRange(new Price().Run(currentPrice, prices));
-            outcomes.AddRange(new Volume().Run(currentPrice, prices));
-            outcomes.AddRange(new SMAOutcomes().Run(currentPrice, prices));
+            outcomes.AddRange(new PriceAnalysis().Run(currentPrice, prices));
+            outcomes.AddRange(new VolumeAnalysis().Run(currentPrice, prices));
+            outcomes.AddRange(new SMAAnalysis().Run(currentPrice, prices));
 
             return outcomes;
         }
     }
 
-    internal class Price : IStockAnalysis
+    internal class PriceAnalysis : IHistoricalPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
         {
             yield return new AnalysisOutcome(
-                OutcomeKeys.CurrentPrice,
+                HistoricalOutcomeKeys.CurrentPrice,
                 OutcomeType.Neutral,
                 currentPrice,
                 $"Current price is {currentPrice:C2}"
@@ -56,7 +56,7 @@ namespace core.Stocks.Services
             }
 
             yield return new AnalysisOutcome(
-                OutcomeKeys.LowestPrice,
+                HistoricalOutcomeKeys.LowestPrice,
                 OutcomeType.Neutral,
                 lowest.Close,
                 $"Lowest price was {lowest.Close} on {lowest.Date}"
@@ -67,7 +67,7 @@ namespace core.Stocks.Services
             var lowestPriceDaysAgoOutcomeType = lowestPriceDaysAgo <= 30 ? OutcomeType.Negative : OutcomeType.Neutral;
             
             yield return new AnalysisOutcome(
-                OutcomeKeys.LowestPriceDaysAgo,
+                HistoricalOutcomeKeys.LowestPriceDaysAgo,
                 lowestPriceDaysAgoOutcomeType,
                 lowestPriceDaysAgo,
                 $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
@@ -77,14 +77,14 @@ namespace core.Stocks.Services
             var percentAboveLowOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.PercentAbovLow,
+                    HistoricalOutcomeKeys.PercentAbovLow,
                     percentAboveLowOutcomeType,
                     percentAboveLow,
                     $"Percent above recent low: {percentAboveLow}%"
                 );
 
             yield return new AnalysisOutcome(
-                OutcomeKeys.HighestPrice,
+                HistoricalOutcomeKeys.HighestPrice,
                 OutcomeType.Neutral,
                 highest.Close,
                 $"Highest price was {highest.Close} on {highest.Date}"
@@ -95,7 +95,7 @@ namespace core.Stocks.Services
             var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo <= 30 ? OutcomeType.Positive : OutcomeType.Neutral;
             
             yield return new AnalysisOutcome(
-                OutcomeKeys.HighestPriceDaysAgo,
+                HistoricalOutcomeKeys.HighestPriceDaysAgo,
                 highestPriceDaysAgoOutcomeType,
                 highestPriceDaysAgo,
                 $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
@@ -105,7 +105,7 @@ namespace core.Stocks.Services
             var percentBelowHighOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.PercentBelowHigh,
+                    HistoricalOutcomeKeys.PercentBelowHigh,
                     percentBelowHighOutcomeType,
                     percentBelowHigh,
                     $"Percent below recent high: {percentBelowHigh}%"
@@ -113,13 +113,13 @@ namespace core.Stocks.Services
         }
     }
 
-    public class Volume : IStockAnalysis
+    internal class VolumeAnalysis : IHistoricalPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices)
         {
-            // find average volume over the last 30 days
+            // find average volume over the last x days
             var totalVolume = 0m;
-            var interval = 30;
+            var interval = 60;
             for (var i = prices.Length - interval - 1; i < prices.Length; i++)
             {
                 totalVolume += prices[i].Volume;
@@ -128,7 +128,7 @@ namespace core.Stocks.Services
 
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.AverageVolume,
+                    HistoricalOutcomeKeys.AverageVolume,
                     OutcomeType.Neutral,
                     averageVolume,
                     $"Average volume over the last {interval} days is {averageVolume}"
@@ -136,7 +136,7 @@ namespace core.Stocks.Services
         }
     }
 
-    public class SMAOutcomes : IStockAnalysis
+    internal class SMAAnalysis : IHistoricalPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
         {
@@ -149,7 +149,7 @@ namespace core.Stocks.Services
                 var value = sma.LastValue;
                 yield return
                     new AnalysisOutcome(
-                        OutcomeKeys.SMA(sma.Interval),
+                        HistoricalOutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
                         Math.Round(value ?? 0, 2),
                         $"SMA {sma.Interval} is {value}"
@@ -191,7 +191,7 @@ namespace core.Stocks.Services
 
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.SMASequence,
+                    HistoricalOutcomeKeys.SMASequence,
                     smaSequenceOutcomeType,
                     smaSequenceValue,
                     $"SMA sequence is {smaSequenceOutcomeType.ToString()}"
@@ -203,7 +203,7 @@ namespace core.Stocks.Services
             var sma20Above50OutcomeType = sma20Above50 ? OutcomeType.Positive : OutcomeType.Negative;
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.SMA20Above50,
+                    HistoricalOutcomeKeys.SMA20Above50,
                     sma20Above50OutcomeType,
                     sma20Above50Diff,
                     $"SMA 20 - SMA 50: {sma20Above50Diff}"
@@ -215,7 +215,7 @@ namespace core.Stocks.Services
             var sma50Above150OutcomeType = sma50Above150 ? OutcomeType.Positive : OutcomeType.Negative;
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.SMA50Above150,
+                    HistoricalOutcomeKeys.SMA50Above150,
                     sma50Above150OutcomeType,
                     sma50Above150Diff,
                     $"SMA 50 - SMA 150: {sma50Above150Diff}"
@@ -254,7 +254,7 @@ namespace core.Stocks.Services
             var sma20Above50DaysValue = sma20Below50Days > 0 ? sma20Below50Days * -1 : sma20Above50Days;
             yield return
                 new AnalysisOutcome(
-                    OutcomeKeys.SMA20Above50Days,
+                    HistoricalOutcomeKeys.SMA20Above50Days,
                     sma20Above50DaysOutcomeType,
                     sma20Above50DaysValue,
                     "SMA 20 has been " + (sma20Below50Days > 0 ? "below" : "above") + $" SMA 50 for {sma20Above50DaysValue} days"
@@ -262,7 +262,7 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class OutcomeKeys
+    internal class HistoricalOutcomeKeys
     {
         public static string LowestPrice = "LowestPrice";
         public static string LowestPriceDaysAgo = "LowestPriceDaysAgo";
@@ -279,9 +279,5 @@ namespace core.Stocks.Services
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }
-
-    public enum OutcomeType { Positive, Negative, Neutral };
-
-    public record AnalysisOutcome(string key, OutcomeType type, decimal value, string message);
 }
 #nullable restore

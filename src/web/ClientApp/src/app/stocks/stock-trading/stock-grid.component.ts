@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { StocksService, StockGridEntry } from '../../services/stocks.service';
+import { Component, Input } from '@angular/core';
+import { StocksService, StockAnalysisEntry } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-grid',
@@ -8,12 +8,15 @@ import { StocksService, StockGridEntry } from '../../services/stocks.service';
 })
 export class StockGridComponent {
 
-  ownership: StockGridEntry[]
+  entries: StockAnalysisEntry[]
   loaded: boolean = false
   sortColumn: string
   sortDirection: number = -1
 
 	constructor(private service : StocksService){}
+
+  @Input()
+  daily: boolean = false
 
 	ngOnInit(): void {
     console.log("loading grid")
@@ -21,8 +24,9 @@ export class StockGridComponent {
   }
 
 	fetchGrid() {
-		this.service.getStockGrid().subscribe(result => {
-      this.ownership = result;
+    var observable = this.daily ? this.service.getPortfolioDailyAnalysis() : this.service.getPortfolioAnalysis()
+		observable.subscribe(result => {
+      this.entries = result;
       this.loaded = true;
 		}, error => {
 			console.error(error);
@@ -31,7 +35,7 @@ export class StockGridComponent {
   }
 
   getKeys() {
-    return this.ownership[0].outcomes.map(o => o.key)
+    return this.entries[0].outcomes.map(o => o.key)
   }
 
   sort(column:string) {
@@ -50,11 +54,11 @@ export class StockGridComponent {
       return result * this.sortDirection
     }
 
-    this.ownership.sort(finalFunc)
+    this.entries.sort(finalFunc)
   }
 
   private getSortFunc(column:string) {
-    return (a:StockGridEntry, b:StockGridEntry) => {
+    return (a:StockAnalysisEntry, b:StockAnalysisEntry) => {
       var aVal = a.outcomes.find(o => o.key === column).value
       var bVal = b.outcomes.find(o => o.key === column).value
 

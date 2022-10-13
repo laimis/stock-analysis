@@ -55,7 +55,7 @@ namespace core.Stocks
                 
                 var price = prices[prices.Length - 1].Close;
 
-                var outcomes = StockAnalysis.Run(price, prices);
+                var outcomes = HistoricalPriceAnalysis.Run(price, prices);
 
                 return new
                 {

@@ -143,8 +143,12 @@ export class StocksService {
 		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
   }
 
-  getStockGrid(): Observable<StockGridEntry[]> {
-		return this.http.get<StockGridEntry[]>('/api/portfolio/grid')
+  getPortfolioAnalysis(): Observable<StockAnalysisEntry[]> {
+		return this.http.get<StockAnalysisEntry[]>('/api/portfolio/analysis')
+  }
+
+  getPortfolioDailyAnalysis(): Observable<StockAnalysisEntry[]> {
+		return this.http.get<StockAnalysisEntry[]>('/api/portfolio/dailyanalysis')
   }
 
   deleteStocks(id: string): Observable<object> {
@@ -567,7 +571,7 @@ export interface StockOwnership {
   transactions: Transaction[]
 }
 
-export interface StockGridEntry {
+export interface StockAnalysisEntry {
   ticker: string,
   outcomes: StockAnalysisOutcome[]
 }

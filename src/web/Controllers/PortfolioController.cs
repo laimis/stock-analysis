@@ -48,8 +48,12 @@ namespace web.Controllers
             return await _mediator.Send(cmd);
         }
 
-        [HttpGet("grid")]
-        public Task<IEnumerable<GridEntry>> Grid() =>
-            _mediator.Send(new Grid.Query(User.Identifier()));
+        [HttpGet("analysis")]
+        public Task<IEnumerable<TickerAnalysisEntry>> Analysis() =>
+            _mediator.Send(new core.Portfolio.Analysis.Query(User.Identifier()));
+
+        [HttpGet("dailyanalysis")]
+        public Task<IEnumerable<TickerAnalysisEntry>> DailyAnalysis() =>
+            _mediator.Send(new core.Portfolio.Analysis.DailyQuery(User.Identifier()));
     }
 }
