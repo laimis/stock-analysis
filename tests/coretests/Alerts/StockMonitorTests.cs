@@ -31,6 +31,11 @@ namespace coretests.Alerts
 
             triggered = m.CheckTrigger("BING", 52, DateTimeOffset.UtcNow);
             Assert.False(triggered);
+
+            // now run check trigger but with price going up, it should be false
+            triggered = m.CheckTrigger("AMD", 9.1m, DateTimeOffset.UtcNow);
+            Assert.False(triggered);
+            Assert.Null(m.Trigger);
         }
     }
 }
