@@ -15,7 +15,7 @@ namespace coretests.Services
         public StockAnalysisTests()
         {
             var start = new DateTime(2020, 1, 1, 1, 1, 1);
-            var historcalPrices = Enumerable.Range(1, 31)
+            var historcalPrices = Enumerable.Range(1, 61)
                 .Select(n => new HistoricalPrice { Close = n, Date = start.AddDays(n).ToString()})
                 .ToArray();
 
