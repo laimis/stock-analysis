@@ -135,6 +135,10 @@ export class StocksService {
 		return this.http.get<StockAnalysis>(`/api/stocks/${symbol}/analysis`)
   }
 
+  getStockDailyAnalysis(symbol:string): Observable<StockAnalysis> {
+		return this.http.get<StockAnalysis>(`/api/stocks/${symbol}/dailyanalysis`)
+  }
+
   getStockPrice(symbol:string): Observable<number> {
     return this.http.get<number>(`/api/stocks/${symbol}/price`)
   }

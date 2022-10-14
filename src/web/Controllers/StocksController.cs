@@ -33,6 +33,9 @@ namespace web.Controllers
         [HttpGet("{ticker}/analysis")]
         public Task<object> Analysis(string ticker) => _mediator.Send(new Analysis.Query(ticker, User.Identifier()));
 
+        [HttpGet("{ticker}/dailyanalysis")]
+        public Task<object> DailyAnalysis(string ticker) => _mediator.Send(new Analysis.DailyQuery(ticker, User.Identifier()));
+
         [HttpGet("{ticker}/prices")]
         public Task<PricesView> Prices(string ticker, [FromQuery] int numberOfDays) => _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
 

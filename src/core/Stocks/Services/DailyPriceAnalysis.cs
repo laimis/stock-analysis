@@ -99,11 +99,13 @@ namespace core.Stocks.Services
         {
             var outcomes = new List<AnalysisOutcome>();
 
+            var last = prices[prices.Length - 1];
+
             // add volume as a neutral outcome
             outcomes.Add(new AnalysisOutcome(
                 key: "Volume",
                 type: OutcomeType.Neutral,
-                value: prices[prices.Length - 1].Volume,
+                value: last.Volume,
                 message: "Volume"));
 
             // calculate the average volume from the last x days
@@ -116,12 +118,15 @@ namespace core.Stocks.Services
             averageVolume /= interval;
 
             // calculate today's relative volume
-            var relativeVolume = Math.Round(prices[prices.Length - 1].Volume / averageVolume, 2);
+            var relativeVolume = Math.Round(last.Volume / averageVolume, 2);
+
+            var priceDirection = last.Close > last.Open
+                ? OutcomeType.Positive : OutcomeType.Negative;
 
             // add relative volume as outcome
             outcomes.Add(new AnalysisOutcome(
                 key: "RelativeVolume",
-                type: relativeVolume > 1 ? OutcomeType.Positive : OutcomeType.Neutral,
+                type: relativeVolume > 1 ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
                 message: $"Relative volume is {relativeVolume}x the average volume over the last 30 days."
             ));

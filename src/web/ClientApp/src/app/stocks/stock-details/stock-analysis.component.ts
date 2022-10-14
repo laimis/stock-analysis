@@ -8,6 +8,7 @@ import { StockAnalysis, StocksService } from 'src/app/services/stocks.service';
 })
 export class StockAnalysisComponent implements OnInit {
   analysis: StockAnalysis;
+  daily_analysis : StockAnalysis;
 
   constructor(
     private stockService : StocksService
@@ -22,14 +23,20 @@ export class StockAnalysisComponent implements OnInit {
         this.analysis = data
       }
     );
+
+    this.stockService.getStockDailyAnalysis(this.ticker).subscribe(
+      data => {
+        this.daily_analysis = data
+      }
+    );
   }
 
-  positiveCount() {
-    return this.analysis.outcomes.filter(r => r.type === 'Positive').length;
+  positiveCount(analysis: StockAnalysis) {
+    return analysis.outcomes.filter(r => r.type === 'Positive').length;
   }
 
-  negativeCount() {
-    return this.analysis.outcomes.filter(r => r.type === 'Negative').length;
+  negativeCount(analysis: StockAnalysis) {
+    return analysis.outcomes.filter(r => r.type === 'Negative').length;
   }
 
 }
