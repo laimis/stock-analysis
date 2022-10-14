@@ -126,7 +126,7 @@ namespace core.Stocks.Services
             // add relative volume as outcome
             outcomes.Add(new AnalysisOutcome(
                 key: "RelativeVolume",
-                type: relativeVolume > 1 ? priceDirection : OutcomeType.Neutral,
+                type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
                 message: $"Relative volume is {relativeVolume}x the average volume over the last 30 days."
             ));
