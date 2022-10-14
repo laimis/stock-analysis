@@ -99,6 +99,13 @@ namespace core.Stocks.Services
         {
             var outcomes = new List<AnalysisOutcome>();
 
+            // add volume as a neutral outcome
+            outcomes.Add(new AnalysisOutcome(
+                key: "Volume",
+                type: OutcomeType.Neutral,
+                value: prices[prices.Length - 1].Volume,
+                message: "Volume"));
+
             // calculate the average volume from the last x days
             var averageVolume = 0m;
             var interval  = 60;
