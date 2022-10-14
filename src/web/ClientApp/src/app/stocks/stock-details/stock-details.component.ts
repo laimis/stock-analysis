@@ -30,6 +30,8 @@ export class StockDetailsComponent {
       this.ticker = ticker;
 			this.fetchStock();
 		}
+
+    this.activeTab = this.route.snapshot.paramMap.get('tab') || 'stocks'
 	}
 
 	fetchStock() {
