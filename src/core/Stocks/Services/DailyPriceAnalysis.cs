@@ -128,7 +128,7 @@ namespace core.Stocks.Services
                 key: "RelativeVolume",
                 type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
-                message: $"Relative volume is {relativeVolume}x the average volume over the last 30 days."
+                message: $"Relative volume is {relativeVolume}x the average volume over the last {interval} days."
             ));
 
             return outcomes;
