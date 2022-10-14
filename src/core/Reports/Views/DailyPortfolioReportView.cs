@@ -11,6 +11,6 @@ namespace core.Reports.Views
     );
 
     public record struct DailyPortfolioReportView(
-        List<DailyPortfolioReportCategory> categories
+        IEnumerable<DailyPortfolioReportCategory> categories
     );
 }

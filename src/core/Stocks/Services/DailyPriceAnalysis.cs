@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services
@@ -17,8 +18,28 @@ namespace core.Stocks.Services
 
             outcomes.AddRange(new DailyVolumeAnalysis().Analyze(prices));
             outcomes.AddRange(new DailyPriceAnalysis().Analyze(prices));
+            outcomes.AddRange(new SMADailyAnalysis().Analyze(prices));
 
             return outcomes;
+        }
+    }
+
+    internal class SMADailyAnalysis : IDailyPriceAnalysis
+    {
+        public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
+        {
+            var price = prices[prices.Length - 1].Close;
+            
+            var outcomes = new SMAAnalysis().Run(price, prices);
+
+            var outcome = outcomes.Single(x => x.key == HistoricalOutcomeKeys.SMA20Above50Days);
+
+            yield return new AnalysisOutcome(
+                DailyOutcomeKeys.SMA20Above50Days,
+                outcome.type,
+                outcome.value,
+                outcome.message
+            );
         }
     }
 
@@ -154,5 +175,6 @@ namespace core.Stocks.Services
         public static string ClosingRange = "ClosingRange";
         public static string Open = "Open";
         public static string Close = "Close";
+        public static string SMA20Above50Days = "SMA20Above50Days";
     }
 }
