@@ -35,5 +35,13 @@ namespace web.Controllers
 
             return _mediator.Send(query);
         }
+
+        [HttpGet("portfolio/daily")]
+        public Task<DailyPortfolioReportView> PortfolioDaily()
+        {
+            var query = new DailyPortfolio.Query(User.Identifier());
+
+            return _mediator.Send(query);
+        }
     }
 }

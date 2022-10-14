@@ -14,18 +14,18 @@ namespace core.Portfolio
 {
     public class Analysis
     {
-        public class Query : RequestWithUserId<IEnumerable<TickerAnalysisEntry>>
+        public class Query : RequestWithUserId<IEnumerable<PositionAnalysisEntry>>
         {
             public Query(Guid userId) : base(userId){}
         }
 
-        public class DailyQuery : RequestWithUserId<IEnumerable<TickerAnalysisEntry>>
+        public class DailyQuery : RequestWithUserId<IEnumerable<PositionAnalysisEntry>>
         {
             public DailyQuery(Guid userId) : base(userId){}
         }
 
-        public class Handler : HandlerWithStorage<Query, IEnumerable<TickerAnalysisEntry>>,
-            IRequestHandler<DailyQuery, IEnumerable<TickerAnalysisEntry>>
+        public class Handler : HandlerWithStorage<Query, IEnumerable<PositionAnalysisEntry>>,
+            IRequestHandler<DailyQuery, IEnumerable<PositionAnalysisEntry>>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -39,7 +39,7 @@ namespace core.Portfolio
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
 
-            public override Task<IEnumerable<TickerAnalysisEntry>> Handle(Query request, CancellationToken cancellationToken) =>
+            public override Task<IEnumerable<PositionAnalysisEntry>> Handle(Query request, CancellationToken cancellationToken) =>
                 RunAnalysis(
                     request.UserId,
                     prices => HistoricalPriceAnalysis.Run(
@@ -48,13 +48,13 @@ namespace core.Portfolio
                             )
                 );
 
-            public Task<IEnumerable<TickerAnalysisEntry>> Handle(DailyQuery request, CancellationToken cancellationToken) =>
+            public Task<IEnumerable<PositionAnalysisEntry>> Handle(DailyQuery request, CancellationToken cancellationToken) =>
                 RunAnalysis(
                     request.UserId,
                     prices => DailyPriceAnalysisRunner.Run(prices)
                 );
 
-            private async Task<IEnumerable<TickerAnalysisEntry>> RunAnalysis(Guid userId, Func<HistoricalPrice[], List<AnalysisOutcome>> func)
+            private async Task<IEnumerable<PositionAnalysisEntry>> RunAnalysis(Guid userId, Func<HistoricalPrice[], List<AnalysisOutcome>> func)
             {
                 var user = await _accountStorage.GetUser(userId);
                 if (user == null)
@@ -73,7 +73,7 @@ namespace core.Portfolio
 
                             var outcomes = func(historicalResponse.Success);
 
-                            return new TickerAnalysisEntry(s.State.Ticker, outcomes);
+                            return new PositionAnalysisEntry(s.State.OpenPosition, outcomes);
                         }
                     })
                     .Select(t => t.Result);

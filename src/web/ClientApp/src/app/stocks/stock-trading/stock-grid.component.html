@@ -1,6 +1,27 @@
 <div *ngIf="loaded" class="mt-2 mb-4">
 
-  <table class="table striped">
+  <div *ngIf="report">
+    <div *ngFor="let c of report.categories">
+      <h3 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative'}">{{c.name}}</h3>
+      <table class="table" *ngIf="c.analysis.length > 0">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th *ngFor="let key of getKeysForOutcomes(c.analysis)">{{key}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of c.analysis">
+            <td>{{e.position.ticker}}</td>
+            <td *ngFor="let o of e.outcomes">{{o.value}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="c.analysis.length === 0">None</div>
+    </div>
+  </div>
+
+  <table class="table striped mt-4">
     <thead>
       <tr>
         <th>Ticker</th>
@@ -9,7 +30,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let s of entries">
-        <td>{{s.ticker}}</td>
+        <td>{{s.position.ticker}}</td>
         <td *ngFor="let o of s.outcomes"
           [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">{{o.value }}</td>
       </tr>

@@ -147,12 +147,16 @@ export class StocksService {
 		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
   }
 
-  getPortfolioAnalysis(): Observable<StockAnalysisEntry[]> {
-		return this.http.get<StockAnalysisEntry[]>('/api/portfolio/analysis')
+  getPortfolioAnalysis(): Observable<PositionAnalysisEntry[]> {
+		return this.http.get<PositionAnalysisEntry[]>('/api/portfolio/analysis')
   }
 
-  getPortfolioDailyAnalysis(): Observable<StockAnalysisEntry[]> {
-		return this.http.get<StockAnalysisEntry[]>('/api/portfolio/dailyanalysis')
+  getPortfolioDailyAnalysis(): Observable<PositionAnalysisEntry[]> {
+		return this.http.get<PositionAnalysisEntry[]>('/api/portfolio/dailyanalysis')
+  }
+
+  getPortfolioDailyReport(): Observable<PortfolioDailyReport> {
+    return this.http.get<PortfolioDailyReport>('/api/reports/portfolio/daily')
   }
 
   deleteStocks(id: string): Observable<object> {
@@ -575,9 +579,19 @@ export interface StockOwnership {
   transactions: Transaction[]
 }
 
-export interface StockAnalysisEntry {
-  ticker: string,
+export interface PositionAnalysisEntry {
+  position: PositionInstance,
   outcomes: StockAnalysisOutcome[]
+}
+
+export interface PortfolioDailyReport {
+  categories: PortfolioDailyReportCategory[]
+}
+
+export interface PortfolioDailyReportCategory {
+  name: string
+  type: string
+  analysis: PositionAnalysisEntry[]
 }
 
 export interface StockTradingPerformance {

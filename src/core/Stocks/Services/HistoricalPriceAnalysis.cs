@@ -276,7 +276,6 @@ namespace core.Stocks.Services
         public static string PercentAbovLow = "PercentAboveLow";
         public static string SMA20Above50Days = "SMA20Above50Days";
         public static string CurrentPrice = "CurrentPrice";
-
         internal static string SMA(int interval) => $"sma_{interval}";
     }
 }

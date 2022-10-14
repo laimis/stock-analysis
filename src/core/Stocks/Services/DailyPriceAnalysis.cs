@@ -29,17 +29,25 @@ namespace core.Stocks.Services
             var last = prices[prices.Length - 1];
 
             // return open as the neutral outcome
-            yield return new AnalysisOutcome("Open", OutcomeType.Neutral, last.Open, "Open price");
+            yield return new AnalysisOutcome(
+                DailyOutcomeKeys.Open,
+                OutcomeType.Neutral,
+                last.Open,
+                "Open price");
 
             // return close as the neutral outcome
-            yield return new AnalysisOutcome("Close", OutcomeType.Neutral, last.Close, "Close price");
+            yield return new AnalysisOutcome(
+                DailyOutcomeKeys.Close,
+                OutcomeType.Neutral,
+                last.Close,
+                "Close price");
 
             // calculate closing range
             var range = Math.Round((last.Close - last.Low) / (last.High - last.Low) * 100, 2);
 
             // add range as outcome
             yield return new AnalysisOutcome(
-                key: "ClosingRange",
+                key: DailyOutcomeKeys.ClosingRange,
                 type: range >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: range,
                 message: $"Closing range is {range}.");
@@ -49,7 +57,7 @@ namespace core.Stocks.Services
 
             // add change as outcome
             yield return new AnalysisOutcome(
-                key: "HighToLowChangeDay",
+                key: DailyOutcomeKeys.HighToLowChangeDay,
                 type: OutcomeType.Neutral,
                 value: change,
                 message: $"Day change from high to low is {change}.");
@@ -59,7 +67,7 @@ namespace core.Stocks.Services
 
             // add change as outcome
             yield return new AnalysisOutcome(
-                key: "OpenToCloseChangeDay",
+                key: DailyOutcomeKeys.OpenToCloseChangeDay,
                 type: change >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
                 value: change,
                 message: $"Day change from open to close is {change}.");
@@ -72,7 +80,7 @@ namespace core.Stocks.Services
 
             // add change as outcome
             yield return new AnalysisOutcome(
-                key: "PercentChange",
+                key: DailyOutcomeKeys.PercentChange,
                 type: change >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
                 value: change,
                 message: $"% change from close is {change}.");
@@ -86,7 +94,7 @@ namespace core.Stocks.Services
 
             // add true range as outcome
             yield return new AnalysisOutcome(
-                key: "TrueRange",
+                key: DailyOutcomeKeys.TrueRange,
                 type: trueRange >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: trueRange,
                 message: $"True range is {trueRange}.");   
@@ -103,7 +111,7 @@ namespace core.Stocks.Services
 
             // add volume as a neutral outcome
             outcomes.Add(new AnalysisOutcome(
-                key: "Volume",
+                key: DailyOutcomeKeys.Volume,
                 type: OutcomeType.Neutral,
                 value: last.Volume,
                 message: "Volume"));
@@ -125,7 +133,7 @@ namespace core.Stocks.Services
 
             // add relative volume as outcome
             outcomes.Add(new AnalysisOutcome(
-                key: "RelativeVolume",
+                key: DailyOutcomeKeys.RelativeVolume,
                 type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
                 message: $"Relative volume is {relativeVolume}x the average volume over the last {interval} days."
@@ -133,5 +141,18 @@ namespace core.Stocks.Services
 
             return outcomes;
         }
+    }
+
+    internal class DailyOutcomeKeys
+    {
+        public static string RelativeVolume = "RelativeVolume";
+        public static string Volume = "Volume";
+        public static string TrueRange = "TrueRange";
+        public static string PercentChange = "PercentChange";
+        public static string OpenToCloseChangeDay = "OpenToCloseChangeDay";
+        public static string HighToLowChangeDay = "HighToLowChangeDay";
+        public static string ClosingRange = "ClosingRange";
+        public static string Open = "Open";
+        public static string Close = "Close";
     }
 }
