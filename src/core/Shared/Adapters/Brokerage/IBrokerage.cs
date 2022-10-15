@@ -15,7 +15,12 @@ namespace core.Shared.Adapters.Brokerage
         Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, BrokerageOrderType type, BrokerageOrderDuration duration);
         Task SellOrder(UserState user, string ticker, decimal numberOfShares, decimal price, BrokerageOrderType type, BrokerageOrderDuration duration);
         Task<ServiceResponse<bool>> CancelOrder(UserState state, string orderId);
-        Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(UserState state, string ticker, DateTimeOffset start = default, DateTimeOffset end = default);
+        Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(
+            UserState state,
+            string ticker,
+            PriceFrequency frequency = PriceFrequency.Daily,
+            DateTimeOffset start = default,
+            DateTimeOffset end = default);
     }
 
     public enum BrokerageOrderDuration

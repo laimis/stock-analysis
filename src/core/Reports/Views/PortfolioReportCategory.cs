@@ -4,13 +4,13 @@ using core.Stocks.Services;
 
 namespace core.Reports.Views
 {
-    public record struct DailyPortfolioReportCategory(
+    public record struct PortfolioReportCategory(
         string name,
         OutcomeType type,
         List<PositionAnalysisEntry> analysis
     );
 
-    public record struct DailyPortfolioReportView(
-        IEnumerable<DailyPortfolioReportCategory> categories
+    public record struct PortfolioReportView(
+        IEnumerable<PortfolioReportCategory> categories
     );
 }

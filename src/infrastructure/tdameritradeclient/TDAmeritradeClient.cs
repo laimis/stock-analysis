@@ -7,6 +7,7 @@ using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Polly;
+using Polly.RateLimit;
 using Polly.Timeout;
 
 namespace tdameritradeclient;
@@ -219,12 +220,24 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public async Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(UserState state, string ticker, DateTimeOffset start = default, DateTimeOffset end = default)
+    public async Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(
+        UserState state,
+        string ticker,
+        PriceFrequency frequency = PriceFrequency.Daily,
+        DateTimeOffset start = default,
+        DateTimeOffset end = default)
     {
         var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
         var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
 
-        var function = $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType=daily&startDate={startUnix}&endDate={endUnix}";
+        var frequencyType = frequency switch {
+            PriceFrequency.Daily => "daily",
+            PriceFrequency.Weekly => "weekly",
+            PriceFrequency.Monthly => "monthly",
+            _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, null)
+        };
+        
+        var function = $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}";
 
         var response = await CallApi<HistoricalPriceResponse>(
             state,
@@ -329,6 +342,8 @@ public class TDAmeritradeClient : IBrokerage
         }
     }
 
+    private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(40, TimeSpan.FromSeconds(1));
+
     private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
         var accessToken = await GetAccessTokenAsync(user);
@@ -342,15 +357,39 @@ public class TDAmeritradeClient : IBrokerage
         }
 
         var policy = Policy.TimeoutAsync(30);
+        var retryCount = 0;
 
-        var response = await policy.ExecuteAsync(
-            async ct => await _httpClient.SendAsync(request, ct),
-            CancellationToken.None
-        );
+        while(true)
+        {
+            try
+            {
+                var response = await policy.ExecuteAsync(
+                    async ct => await _rateLimit.ExecuteAsync(
+                        ct2 => _httpClient.SendAsync(request, ct2),
+                        ct
+                    ),
+                    CancellationToken.None
+                );
 
-        LogIfFailed(response, function);
+                LogIfFailed(response, function);
 
-        return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (RateLimitRejectedException)
+            {
+                retryCount++;
+
+                if (retryCount > 3)
+                {
+                    throw;
+                }
+                else
+                {
+                    _logger?.LogError($"Rate limit hit for {function}, retrying");
+                    await Task.Delay(1000);
+                }
+            }
+        }
     }
 
     private async Task<string> GetAccessTokenAsync(UserState user)

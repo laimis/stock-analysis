@@ -2,6 +2,13 @@ using System;
 
 namespace core.Shared.Adapters.Stocks
 {
+    public enum PriceFrequency
+    {
+        Daily,
+        Weekly,
+        Monthly
+    }
+    
     public struct HistoricalPrice
     {
         public string Date { get; set; }

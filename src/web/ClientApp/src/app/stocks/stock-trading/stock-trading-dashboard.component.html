@@ -73,10 +73,10 @@
   <app-stock-trading-past     *ngIf="isActive('past')" [positions]=closed></app-stock-trading-past>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>
-  <app-brokerage-orders      *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
-  <stock-charts              *ngIf="isActive('openreview')" [positions]=positions></stock-charts>
-  <app-stock-violations     *ngIf="loaded && isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
-  <stock-grid               *ngIf="isActive('analysis')"></stock-grid>
-  <stock-grid               *ngIf="isActive('dailyanalysis')" [daily]="true"></stock-grid>
+  <app-brokerage-orders       *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
+  <stock-charts               *ngIf="isActive('openreview')" [positions]=positions></stock-charts>
+  <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
+  <app-position-reports       *ngIf="isActive('analysis')" [showOverallAnalysis]="true" [showWeeklyReport]="true" ></app-position-reports>
+  <app-position-reports       *ngIf="isActive('dailyanalysis')" [showDailyAnalysis]="true" [showDailyReport]="true"></app-position-reports>
 
 </div>

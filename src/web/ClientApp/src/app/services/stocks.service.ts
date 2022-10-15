@@ -155,8 +155,12 @@ export class StocksService {
 		return this.http.get<PositionAnalysisEntry[]>('/api/portfolio/dailyanalysis')
   }
 
-  getPortfolioDailyReport(): Observable<PortfolioDailyReport> {
-    return this.http.get<PortfolioDailyReport>('/api/reports/portfolio/daily')
+  getPortfolioDailyReport(): Observable<PortfolioReport> {
+    return this.http.get<PortfolioReport>('/api/reports/portfolio/daily')
+  }
+
+  getPortfolioWeeklyReport(): Observable<PortfolioReport> {
+    return this.http.get<PortfolioReport>('/api/reports/portfolio/weekly')
   }
 
   deleteStocks(id: string): Observable<object> {
@@ -584,11 +588,11 @@ export interface PositionAnalysisEntry {
   outcomes: StockAnalysisOutcome[]
 }
 
-export interface PortfolioDailyReport {
-  categories: PortfolioDailyReportCategory[]
+export interface PortfolioReport {
+  categories: PortfolioReportCategory[]
 }
 
-export interface PortfolioDailyReportCategory {
+export interface PortfolioReportCategory {
   name: string
   type: string
   analysis: PositionAnalysisEntry[]

@@ -37,7 +37,7 @@ import { StockFundamentalsComponent } from './stocks/stock-details/stock-fundame
 import { StockNotesComponent } from './stocks/stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
-import { StockGridComponent } from './stocks/stock-trading/stock-grid.component';
+import { StockPositionReportsComponent } from './stocks/stock-trading/stock-position-reports.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
 import { OptionsComponent } from './options/option-dashboard/option-dashboard.component';
 import { OptionStatsComponent } from './options/option-dashboard/option-stats.component';
@@ -66,6 +66,8 @@ import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
 import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.component';
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 import { AlertsComponent } from './alerts/alerts.component';
+import { AnalysisComponent } from './shared/reports/analysis.component';
+import { PortfolioReportComponent } from './shared/reports/portfolio-report.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -155,7 +157,7 @@ var routes: Routes = [
 
     StockDetailsComponent,
     StockFundamentalsComponent,
-    StockGridComponent,
+    StockPositionReportsComponent,
     StockNotesComponent,
     StockOptionComponent,
     StockTransactionComponent,
@@ -189,6 +191,8 @@ var routes: Routes = [
     CryptoDetailsComponent,
     
     StockAnalysisComponent,
+    AnalysisComponent,
+    PortfolioReportComponent,
 
     AlertsComponent
   ],

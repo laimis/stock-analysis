@@ -5,26 +5,26 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services
 {
-    public interface IDailyPriceAnalysis
+    public interface ISingleBarPriceAnalysis
     {
         IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices);
     }
 
-    public class DailyPriceAnalysisRunner
+    public class LatestBarAnalysisRunner
     {
         public static List<AnalysisOutcome> Run(HistoricalPrice[] prices)
         {
             var outcomes = new List<AnalysisOutcome>();
 
-            outcomes.AddRange(new DailyVolumeAnalysis().Analyze(prices));
-            outcomes.AddRange(new DailyPriceAnalysis().Analyze(prices));
-            outcomes.AddRange(new SMADailyAnalysis().Analyze(prices));
+            outcomes.AddRange(new LatestBarVolumeAnalysis().Analyze(prices));
+            outcomes.AddRange(new LatestBarPriceAnalysis().Analyze(prices));
+            outcomes.AddRange(new SMALatestBarAnalysis().Analyze(prices));
 
             return outcomes;
         }
     }
 
-    internal class SMADailyAnalysis : IDailyPriceAnalysis
+    internal class SMALatestBarAnalysis : ISingleBarPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
@@ -35,7 +35,7 @@ namespace core.Stocks.Services
             var outcome = outcomes.Single(x => x.key == HistoricalOutcomeKeys.SMA20Above50Days);
 
             yield return new AnalysisOutcome(
-                DailyOutcomeKeys.SMA20Above50Days,
+                SingleBarOutcomeKeys.SMA20Above50Days,
                 outcome.type,
                 outcome.value,
                 outcome.message
@@ -43,7 +43,7 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class DailyPriceAnalysis : IDailyPriceAnalysis
+    internal class LatestBarPriceAnalysis : ISingleBarPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
@@ -51,14 +51,14 @@ namespace core.Stocks.Services
 
             // return open as the neutral outcome
             yield return new AnalysisOutcome(
-                DailyOutcomeKeys.Open,
+                SingleBarOutcomeKeys.Open,
                 OutcomeType.Neutral,
                 last.Open,
                 "Open price");
 
             // return close as the neutral outcome
             yield return new AnalysisOutcome(
-                DailyOutcomeKeys.Close,
+                SingleBarOutcomeKeys.Close,
                 OutcomeType.Neutral,
                 last.Close,
                 "Close price");
@@ -68,7 +68,7 @@ namespace core.Stocks.Services
 
             // add range as outcome
             yield return new AnalysisOutcome(
-                key: DailyOutcomeKeys.ClosingRange,
+                key: SingleBarOutcomeKeys.ClosingRange,
                 type: range >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: range,
                 message: $"Closing range is {range}.");
@@ -78,7 +78,7 @@ namespace core.Stocks.Services
 
             // add change as outcome
             yield return new AnalysisOutcome(
-                key: DailyOutcomeKeys.HighToLowChangeDay,
+                key: SingleBarOutcomeKeys.HighToLowChangeDay,
                 type: OutcomeType.Neutral,
                 value: change,
                 message: $"Day change from high to low is {change}.");
@@ -88,7 +88,7 @@ namespace core.Stocks.Services
 
             // add change as outcome
             yield return new AnalysisOutcome(
-                key: DailyOutcomeKeys.OpenToCloseChangeDay,
+                key: SingleBarOutcomeKeys.OpenToCloseChangeDay,
                 type: change >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
                 value: change,
                 message: $"Day change from open to close is {change}.");
@@ -101,7 +101,7 @@ namespace core.Stocks.Services
 
             // add change as outcome
             yield return new AnalysisOutcome(
-                key: DailyOutcomeKeys.PercentChange,
+                key: SingleBarOutcomeKeys.PercentChange,
                 type: change >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
                 value: change,
                 message: $"% change from close is {change}.");
@@ -115,14 +115,14 @@ namespace core.Stocks.Services
 
             // add true range as outcome
             yield return new AnalysisOutcome(
-                key: DailyOutcomeKeys.TrueRange,
+                key: SingleBarOutcomeKeys.TrueRange,
                 type: trueRange >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: trueRange,
                 message: $"True range is {trueRange}.");   
         }
     }
 
-    internal class DailyVolumeAnalysis : IDailyPriceAnalysis
+    internal class LatestBarVolumeAnalysis : ISingleBarPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
@@ -132,7 +132,7 @@ namespace core.Stocks.Services
 
             // add volume as a neutral outcome
             outcomes.Add(new AnalysisOutcome(
-                key: DailyOutcomeKeys.Volume,
+                key: SingleBarOutcomeKeys.Volume,
                 type: OutcomeType.Neutral,
                 value: last.Volume,
                 message: "Volume"));
@@ -154,7 +154,7 @@ namespace core.Stocks.Services
 
             // add relative volume as outcome
             outcomes.Add(new AnalysisOutcome(
-                key: DailyOutcomeKeys.RelativeVolume,
+                key: SingleBarOutcomeKeys.RelativeVolume,
                 type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
                 message: $"Relative volume is {relativeVolume}x the average volume over the last {interval} days."
@@ -164,7 +164,7 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class DailyOutcomeKeys
+    internal class SingleBarOutcomeKeys
     {
         public static string RelativeVolume = "RelativeVolume";
         public static string Volume = "Volume";

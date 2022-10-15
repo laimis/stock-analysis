@@ -63,7 +63,7 @@ namespace core.Stocks
                 => RunAnalysis(
                     request.UserId,
                     request.Ticker,
-                    prices => DailyPriceAnalysisRunner.Run(prices)
+                    prices => LatestBarAnalysisRunner.Run(prices)
                 );
 
             private async Task<object> RunAnalysis(Guid userId, string ticker, Func<HistoricalPrice[], List<AnalysisOutcome>> func)

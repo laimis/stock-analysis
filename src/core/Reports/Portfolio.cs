@@ -9,20 +9,27 @@ using core.Portfolio;
 using core.Reports.Views;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Stocks;
 using core.Stocks.Services;
 
 namespace core.Reports
 {
-    public class DailyPortfolio
+    public class Portfolio
     {
-        public class Query : RequestWithUserId<DailyPortfolioReportView>
+        public class Query : RequestWithUserId<PortfolioReportView>
         {
-            public Query(Guid userId) : base(userId)
+            public Query(PriceFrequency frequey, Guid userId) : base(userId)
             {
+                Frequency = frequey;
             }
+
+            public static Query Daily(Guid userId) => new(PriceFrequency.Daily, userId);
+            public static Query Weekly(Guid userId) => new(PriceFrequency.Weekly, userId);
+
+            public PriceFrequency Frequency { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, DailyPortfolioReportView>
+        public class Handler : HandlerWithStorage<Query, PortfolioReportView>
         {
             private IAccountStorage _accounts;
             private IStocksService2 _stockService;
@@ -39,10 +46,10 @@ namespace core.Reports
             private const decimal RelativeVolumeThresholdPositive = 0.9m;
             private const decimal HighPercentChange = 5m;
             private const decimal SmallPercentChange = 2m;
-            private const decimal ExcellentClosingRange = 0.8m;
-            private const decimal LowClosingRange = 0.2m;
+            private const decimal ExcellentClosingRange = 80m;
+            private const decimal LowClosingRange = 20m;
 
-            public override async Task<DailyPortfolioReportView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<PortfolioReportView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stocks = await _storage.GetStocks(request.UserId);
 
@@ -61,98 +68,99 @@ namespace core.Reports
                 {
                     var prices = await _brokerage.GetHistoricalPrices(
                         user.State,
-                        p.Ticker
+                        p.Ticker,
+                        request.Frequency
                     );
 
-                    var dailyOutcomes = DailyPriceAnalysisRunner.Run(prices.Success);
+                    var outcomes = LatestBarAnalysisRunner.Run(prices.Success);
 
-                    tickerOutcomes.Add(new PositionAnalysisEntry(p, dailyOutcomes));
+                    tickerOutcomes.Add(new PositionAnalysisEntry(p, outcomes));
                 }
 
                 var categories = GenerateReportCategories(tickerOutcomes);
 
-                return new DailyPortfolioReportView(categories);
+                return new PortfolioReportView(categories);
             }
 
-            private static IEnumerable<DailyPortfolioReportCategory> GenerateReportCategories(List<PositionAnalysisEntry> tickerOutcomes)
+            private static IEnumerable<PortfolioReportCategory> GenerateReportCategories(List<PositionAnalysisEntry> tickerOutcomes)
             {
                 // stocks that had above average volume grouping
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "Above Average Volume and High Percent Change",
                     OutcomeType.Positive,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                            && t.Outcomes.Any(o => o.key == DailyOutcomeKeys.PercentChange && o.value >= HighPercentChange))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= HighPercentChange))
                         .ToList()
                 );
 
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "Positive Closes",
                     OutcomeType.Positive,
                     tickerOutcomes
                         .Where(t => t.Outcomes.Any(o =>
-                            o.key == DailyOutcomeKeys.PercentChange && o.value >= 0))
+                            o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0))
                         .ToList()
                 );
 
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
-                            && t.Outcomes.Any(o => o.key == DailyOutcomeKeys.PercentChange && o.value >= HighPercentChange)
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= HighPercentChange)
                         ).ToList()
                 );
 
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "High Volume with Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                            && t.Outcomes.Any(o => o.key == DailyOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
-                            && t.Outcomes.Any(o => o.key == DailyOutcomeKeys.PercentChange && o.value >= HighPercentChange)
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= HighPercentChange)
                         ).ToList()
                 );
 
                 // negative outcome types
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "Above Average Volume and Negative Percent Change",
                     OutcomeType.Negative,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                            && t.Outcomes.Any(o => o.key == DailyOutcomeKeys.PercentChange && o.value < -1 * HighPercentChange))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value < -1 * HighPercentChange))
                         .ToList()
                 );
 
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "Low Closing Range",
                     OutcomeType.Negative,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.ClosingRange && o.value < LowClosingRange))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value < LowClosingRange))
                         .ToList()
                 );
 
-                yield return new Views.DailyPortfolioReportCategory(
-                    "Above Average Volume but Small Percent Change",
+                yield return new Views.PortfolioReportCategory(
+                    "Above Average Volume but Small Positive Percent Change",
                     OutcomeType.Negative,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                            && t.Outcomes.Any(o => o.key == DailyOutcomeKeys.PercentChange && o.value < SmallPercentChange))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0 && o.value < SmallPercentChange))
                         .ToList()
                 );
 
-                yield return new Views.DailyPortfolioReportCategory(
+                yield return new Views.PortfolioReportCategory(
                     "SMA20 Below SMA50 Recent",
                     OutcomeType.Neutral,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == DailyOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
                         .ToList()
                 );
             }

@@ -1,0 +1,8 @@
+<div>
+  <div *ngIf="!report">Loading report ...</div>
+  <div *ngFor="let c of report.categories">
+    <h3 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative'}">{{c.name}}</h3>
+    <app-analysis [analysis]="c.analysis" *ngIf="c.analysis.length > 0"></app-analysis>
+    <span *ngIf="c.analysis.length === 0">No positions in this category.</span>
+  </div>
+</div>

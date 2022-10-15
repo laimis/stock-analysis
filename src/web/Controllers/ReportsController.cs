@@ -37,11 +37,11 @@ namespace web.Controllers
         }
 
         [HttpGet("portfolio/daily")]
-        public Task<DailyPortfolioReportView> PortfolioDaily()
-        {
-            var query = new DailyPortfolio.Query(User.Identifier());
-
-            return _mediator.Send(query);
-        }
+        public Task<PortfolioReportView> PortfolioDaily()
+            => _mediator.Send(Portfolio.Query.Daily(User.Identifier()));
+            
+        [HttpGet("portfolio/weekly")]
+        public Task<PortfolioReportView> PortfolioWeekly()
+            => _mediator.Send(Portfolio.Query.Weekly(User.Identifier()));
     }
 }
