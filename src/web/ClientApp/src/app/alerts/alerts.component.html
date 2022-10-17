@@ -9,7 +9,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let monitor of monitors">
+    <tr *ngFor="let monitor of monitors" [ngClass]="{'bg-warning': monitor.alertType === 'Negative', 'bg-success': monitor.alertType === 'Positive'}">
       <td>
         <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
       </td>

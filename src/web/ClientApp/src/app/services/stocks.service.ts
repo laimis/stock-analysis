@@ -343,6 +343,7 @@ export interface PriceMonitor {
   lastSeenValue: number
   ticker: string
   triggeredAlert: StockAlert|null
+  alertType: string
 }
 
 export interface StockAnalysisOutcome {

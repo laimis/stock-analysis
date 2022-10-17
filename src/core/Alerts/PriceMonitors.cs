@@ -11,7 +11,7 @@ namespace core.Alerts
         string description,
         decimal numberOfShares,
         Guid userId,
-        TriggerType triggerType
+        AlertType triggerType
     );
 
     public interface IStockPositionMonitor
@@ -23,10 +23,11 @@ namespace core.Alerts
         decimal ThresholdValue { get; }
         decimal LastSeenValue { get; }
         bool IsTriggered { get; }
+        AlertType AlertType { get; }
         Guid UserId { get; }
     }
 
-    public enum TriggerType
+    public enum AlertType
     {
         Negative,
         Neutral,
@@ -64,6 +65,8 @@ namespace core.Alerts
         public bool IsTriggered => TriggeredAlert.HasValue;
 
         public Guid UserId { get; }
+
+        public abstract AlertType AlertType { get; }
 
         public bool RunCheck(string ticker, decimal price, DateTimeOffset time)
         {
@@ -108,6 +111,8 @@ namespace core.Alerts
             );
         }
 
+        public override AlertType AlertType => AlertType.Positive;
+
         protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
         {
             return IsTriggered switch {
@@ -151,7 +156,7 @@ namespace core.Alerts
                 $"Profit target hit for {Ticker} at {price}",
                 NumberOfShares,
                 UserId,
-                TriggerType.Positive
+                AlertType.Positive
             );
         }
     }
@@ -183,6 +188,8 @@ namespace core.Alerts
             : base(thresholdValue, numberOfShares, ticker, userId, description)
         {
         }
+
+        public override AlertType AlertType => AlertType.Negative;
 
         protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
         {
@@ -232,7 +239,7 @@ namespace core.Alerts
                 $"Stop price of {ThresholdValue} was triggered at {price}",
                 NumberOfShares,
                 UserId,
-                TriggerType.Negative
+                AlertType.Negative
             );
         }
     }
