@@ -44,6 +44,12 @@ namespace coretests.Alerts
         }
 
         [Fact]
+        public void MonitorCountMatches()
+        {
+            Assert.Equal(2, _uat.Monitors.Count());
+        }
+
+        [Fact]
         public void InitialUpdateNoTriggers()
         {
             Assert.Empty(_initialTriggers);
@@ -69,6 +75,5 @@ namespace coretests.Alerts
             Assert.True(_uat.HasTriggered(_amd.State.Ticker, _amd.State.UserId));
             Assert.False(_uat.HasTriggered(_bac.State.Ticker, _bac.State.UserId));
         }
-
     }
 }

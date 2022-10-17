@@ -149,8 +149,8 @@ namespace web.BackgroundServices
             return new {
                 ticker = (string)trigger.ticker,
                 value = trigger.triggeredValue,
-                description = trigger.ticker,
-                direction = $"Stop price alert hit for {trigger.ticker} at {trigger.triggeredValue}",
+                description = trigger.description,
+                direction = trigger.description,
                 time = _marketHours.ToMarketTime(trigger.when).ToString("HH:mm") + " ET"
             };
         }

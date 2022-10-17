@@ -14,6 +14,7 @@ namespace core.Alerts
 
         public void Register(OwnedStock stock)
         {
+            
             _tickers.Add(stock.State.Ticker);
 
             _monitors[ToKey(stock)] = new StopPriceMonitor(stock.State.OpenPosition, stock.State.UserId);
