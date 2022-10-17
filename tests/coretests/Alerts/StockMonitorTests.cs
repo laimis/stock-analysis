@@ -15,27 +15,27 @@ namespace coretests.Alerts
             
             a.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
 
-            var m = new StockPositionMonitor(a.State.OpenPosition, a.State.UserId);
+            var m = new StopPriceMonitor(a.State.OpenPosition, a.State.UserId);
 
-            var triggered = m.CheckTrigger("AMD", 10, DateTimeOffset.UtcNow);
+            var triggered = m.RunCheck("AMD", 10, DateTimeOffset.UtcNow);
 
             Assert.False(triggered);
 
-            triggered = m.CheckTrigger("AMD", 11, DateTimeOffset.UtcNow);
+            triggered = m.RunCheck("AMD", 11, DateTimeOffset.UtcNow);
             Assert.False(triggered);
 
-            triggered = m.CheckTrigger("AMD", 8.9m, DateTimeOffset.UtcNow);
+            triggered = m.RunCheck("AMD", 8.9m, DateTimeOffset.UtcNow);
             Assert.True(triggered);
-            Assert.Equal("AMD", m.Trigger.Value.ticker);
-            Assert.Equal(8.9m, m.Trigger.Value.triggeredValue);
+            Assert.Equal("AMD", m.TriggeredAlert.Value.ticker);
+            Assert.Equal(8.9m, m.TriggeredAlert.Value.triggeredValue);
 
-            triggered = m.CheckTrigger("BING", 52, DateTimeOffset.UtcNow);
+            triggered = m.RunCheck("BING", 52, DateTimeOffset.UtcNow);
             Assert.False(triggered);
 
             // now run check trigger but with price going up, it should be false
-            triggered = m.CheckTrigger("AMD", 9.1m, DateTimeOffset.UtcNow);
+            triggered = m.RunCheck("AMD", 9.1m, DateTimeOffset.UtcNow);
             Assert.False(triggered);
-            Assert.Null(m.Trigger);
+            Assert.Null(m.TriggeredAlert);
         }
     }
 }

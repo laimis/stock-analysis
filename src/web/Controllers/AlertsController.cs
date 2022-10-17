@@ -31,7 +31,7 @@ namespace web.Controllers
             _mediator.Send(new SendSMS.Command(body));
 
         [HttpGet("triggered")]
-        public Task<List<StockMonitorTrigger>> Triggered() =>
+        public Task<List<TriggeredAlert>> Triggered() =>
             _mediator.Send(new Triggered.Query());
     }
 }

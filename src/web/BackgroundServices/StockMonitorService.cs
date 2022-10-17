@@ -24,7 +24,8 @@ namespace web.BackgroundServices
         private IMarketHours _marketHours;
         public StockMonitorContainer _container;
 
-        public IEnumerable<StockPositionMonitor> Monitors => _container.Monitors;
+        // TODO: can this be removed?
+        public IEnumerable<IStockPositionMonitor> Monitors => _container.Monitors;
 
         public StockMonitorService(
             ILogger<StockMonitorService> logger,
@@ -106,7 +107,7 @@ namespace web.BackgroundServices
 
         private async Task ScanAlerts()
         {
-            var triggered = new List<StockMonitorTrigger>();
+            var triggered = new List<TriggeredAlert>();
 
             foreach (var t in _container.GetTickers())
             {
@@ -118,7 +119,7 @@ namespace web.BackgroundServices
                     continue;
                 }
 
-                foreach(var trigger in _container.UpdateValue(t, price.Success.Amount, DateTimeOffset.UtcNow))
+                foreach(var trigger in _container.RunCheck(t, price.Success.Amount, DateTimeOffset.UtcNow))
                 {
                     triggered.Add(trigger);
                 }
@@ -143,7 +144,7 @@ namespace web.BackgroundServices
             }
         }
 
-        private object Map(StockMonitorTrigger trigger)
+        private object Map(TriggeredAlert trigger)
         {
             return new {
                 ticker = (string)trigger.ticker,

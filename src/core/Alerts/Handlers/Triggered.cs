@@ -2,21 +2,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Stocks;
 using MediatR;
 
 namespace core.Alerts
 {
     public class Triggered
     {
-        public class Query : IRequest<List<StockMonitorTrigger>>
+        public class Query : IRequest<List<TriggeredAlert>>
         {
             public Query()
             {
             }
         }
 
-        public class Handler : IRequestHandler<Query, List<StockMonitorTrigger>>
+        public class Handler : IRequestHandler<Query, List<TriggeredAlert>>
         {
             private StockMonitorContainer _container;
 
@@ -25,12 +24,12 @@ namespace core.Alerts
                 _container = container;
             }
 
-            public Task<List<StockMonitorTrigger>> Handle(Query request, CancellationToken cancellationToken)
+            public Task<List<TriggeredAlert>> Handle(Query request, CancellationToken cancellationToken)
             {
                 return Task.FromResult(
                     _container.Monitors
                         .Where(x => x.IsTriggered)
-                        .Select(x => x.Trigger.Value).ToList()
+                        .Select(x => x.TriggeredAlert.Value).ToList()
                 );
             }
         }

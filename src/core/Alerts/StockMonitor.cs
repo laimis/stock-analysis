@@ -3,29 +3,45 @@ using core.Stocks;
 
 namespace core.Alerts
 {
-    public record struct StockMonitorTrigger(
+    public record struct TriggeredAlert(
         decimal triggeredValue,
         decimal watchedValue,
         DateTimeOffset when,
         string ticker,
+        string description,
         decimal numberOfShares,
-        Guid userId
+        Guid userId,
+        TriggerType triggerType
     );
 
-    public class StockPositionMonitor
+    public enum TriggerType
     {
-        public StockPositionMonitor(PositionInstance position, Guid userId)
+        Negative,
+        Neutral,
+        Positive
+    }
+
+    public interface IStockPositionMonitor
+    {
+        bool RunCheck(string ticker, decimal price, DateTimeOffset time);
+        TriggeredAlert? TriggeredAlert { get; }
+        bool IsTriggered { get; }
+    }
+
+    public class StopPriceMonitor : IStockPositionMonitor
+    {
+        public StopPriceMonitor(PositionInstance position, Guid userId)
         {
             Position = position;
             UserId = userId;
         }
 
-        public bool IsTriggered => Trigger != null;
+        public bool IsTriggered => TriggeredAlert != null;
         public PositionInstance Position { get; }
-        public StockMonitorTrigger? Trigger { get; private set; }
+        public TriggeredAlert? TriggeredAlert { get; private set; }
         public Guid UserId { get; }
 
-        public bool CheckTrigger(string ticker, decimal price, DateTimeOffset time)
+        public bool RunCheck(string ticker, decimal price, DateTimeOffset time)
         {
             if (Position.Ticker != ticker)
             {
@@ -39,13 +55,15 @@ namespace core.Alerts
                 
             if (Position.StopPrice > price && !IsTriggered)
             {
-                Trigger = new StockMonitorTrigger(
+                TriggeredAlert = new TriggeredAlert(
                     price,
                     Position.StopPrice.Value,
                     time,
                     ticker,
+                    $"Stop price of {Position.StopPrice.Value} was triggered at {price}",
                     Position.NumberOfShares,
-                    UserId
+                    UserId,
+                    TriggerType.Negative
                 );
 
                 return true;

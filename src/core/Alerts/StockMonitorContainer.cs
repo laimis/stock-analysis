@@ -7,16 +7,16 @@ namespace core.Alerts
 {
     public class StockMonitorContainer
     {
-        private ConcurrentDictionary<string, StockPositionMonitor> _monitors = new ConcurrentDictionary<string, StockPositionMonitor>();
+        private ConcurrentDictionary<string, StopPriceMonitor> _monitors = new ConcurrentDictionary<string, StopPriceMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
 
-        public IEnumerable<StockPositionMonitor> Monitors => _monitors.Values;
+        public IEnumerable<IStockPositionMonitor> Monitors => _monitors.Values;
 
         public void Register(OwnedStock stock)
         {
             _tickers.Add(stock.State.Ticker);
 
-            _monitors[ToKey(stock)] = new StockPositionMonitor(stock.State.OpenPosition, stock.State.UserId);
+            _monitors[ToKey(stock)] = new StopPriceMonitor(stock.State.OpenPosition, stock.State.UserId);
         }
 
         private static string ToKey(OwnedStock stock) => ToKey(stock.State.Ticker, stock.State.UserId);
@@ -26,16 +26,16 @@ namespace core.Alerts
 
         public IEnumerable<string> GetTickers() => _tickers;
 
-        public IEnumerable<StockMonitorTrigger> UpdateValue(
+        public IEnumerable<TriggeredAlert> RunCheck(
             string ticker,
             decimal newPrice,
             DateTimeOffset time)
         {
             foreach (var m in _monitors.Values)
             {
-                if (m.CheckTrigger(ticker, newPrice, time))
+                if (m.RunCheck(ticker, newPrice, time))
                 {
-                    yield return m.Trigger.Value;
+                    yield return m.TriggeredAlert.Value;
                 }
             }
         }

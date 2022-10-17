@@ -11,8 +11,8 @@ namespace coretests.Alerts
     public class StockMonitorContainerTests
     {
         private StockMonitorContainer _uat;
-        private List<StockMonitorTrigger> _initialTriggers;
-        private List<StockMonitorTrigger> _subsequentTriggers;
+        private List<TriggeredAlert> _initialTriggers;
+        private List<TriggeredAlert> _subsequentTriggers;
         private OwnedStock _amd;
         private OwnedStock _bac;
 
@@ -33,8 +33,8 @@ namespace coretests.Alerts
             _uat.Register(_bac);
             _uat.Register(_amd);
 
-            _initialTriggers = _uat.UpdateValue("AMD", 50, DateTimeOffset.UtcNow).ToList();
-            _subsequentTriggers = _uat.UpdateValue("AMD", 48.9m, DateTimeOffset.UtcNow).ToList();
+            _initialTriggers = _uat.RunCheck("AMD", 50, DateTimeOffset.UtcNow).ToList();
+            _subsequentTriggers = _uat.RunCheck("AMD", 48.9m, DateTimeOffset.UtcNow).ToList();
         }
 
         [Fact]
