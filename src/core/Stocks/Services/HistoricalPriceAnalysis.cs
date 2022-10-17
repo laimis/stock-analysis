@@ -119,8 +119,8 @@ namespace core.Stocks.Services
         {
             // find average volume over the last x days
             var totalVolume = 0m;
-            var interval = 60;
-            for (var i = prices.Length - interval - 1; i < prices.Length; i++)
+            var interval = Math.Min(60, prices.Length);
+            for (var i = prices.Length - interval; i < prices.Length; i++)
             {
                 totalVolume += prices[i].Volume;
             }

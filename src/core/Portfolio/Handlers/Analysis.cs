@@ -51,7 +51,7 @@ namespace core.Portfolio
             public Task<IEnumerable<PositionAnalysisEntry>> Handle(DailyQuery request, CancellationToken cancellationToken) =>
                 RunAnalysis(
                     request.UserId,
-                    prices => LatestBarAnalysisRunner.Run(prices)
+                    prices => SingleBarAnalysisRunner.Run(prices)
                 );
 
             private async Task<IEnumerable<PositionAnalysisEntry>> RunAnalysis(Guid userId, Func<HistoricalPrice[], List<AnalysisOutcome>> func)

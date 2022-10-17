@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services;
@@ -8,14 +7,14 @@ using Xunit;
 
 namespace coretests.Services
 {
-    public class StockAnalysisTests
+    public class HistoricalPriceAnalysisTests
     {
         private List<AnalysisOutcome> _outcomes;
 
-        public StockAnalysisTests()
+        public HistoricalPriceAnalysisTests()
         {
             var start = new DateTime(2020, 1, 1, 1, 1, 1);
-            var historcalPrices = Enumerable.Range(1, 61)
+            var historcalPrices = Enumerable.Range(1, 30)
                 .Select(n => new HistoricalPrice { Close = n, Date = start.AddDays(n).ToString()})
                 .ToArray();
 

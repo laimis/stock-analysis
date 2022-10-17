@@ -81,7 +81,7 @@ namespace core.Reports
                         continue;
                     }
 
-                    var outcomes = LatestBarAnalysisRunner.Run(prices.Success);
+                    var outcomes = SingleBarAnalysisRunner.Run(prices.Success);
 
                     tickerOutcomes.Add(new PositionAnalysisEntry(p, outcomes));
                 }

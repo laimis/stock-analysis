@@ -10,21 +10,21 @@ namespace core.Stocks.Services
         IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices);
     }
 
-    public class LatestBarAnalysisRunner
+    public class SingleBarAnalysisRunner
     {
         public static List<AnalysisOutcome> Run(HistoricalPrice[] prices)
         {
             var outcomes = new List<AnalysisOutcome>();
 
-            outcomes.AddRange(new LatestBarVolumeAnalysis().Analyze(prices));
-            outcomes.AddRange(new LatestBarPriceAnalysis().Analyze(prices));
-            outcomes.AddRange(new SMALatestBarAnalysis().Analyze(prices));
+            outcomes.AddRange(new SingleBarVolumeAnalysis().Analyze(prices));
+            outcomes.AddRange(new SingleBarPriceAnalysis().Analyze(prices));
+            outcomes.AddRange(new SMASingleBarAnalysis().Analyze(prices));
 
             return outcomes;
         }
     }
 
-    internal class SMALatestBarAnalysis : ISingleBarPriceAnalysis
+    internal class SMASingleBarAnalysis : ISingleBarPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
@@ -43,7 +43,7 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class LatestBarPriceAnalysis : ISingleBarPriceAnalysis
+    internal class SingleBarPriceAnalysis : ISingleBarPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
@@ -122,7 +122,7 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class LatestBarVolumeAnalysis : ISingleBarPriceAnalysis
+    internal class SingleBarVolumeAnalysis : ISingleBarPriceAnalysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
@@ -140,7 +140,7 @@ namespace core.Stocks.Services
             // calculate the average volume from the last x days
             var averageVolume = 0m;
             var interval  = Math.Min(60, prices.Length);
-            for (var i = prices.Length - interval - 1; i < prices.Length; i++)
+            for (var i = prices.Length - interval; i < prices.Length; i++)
             {
                 averageVolume += prices[i].Volume;
             }
