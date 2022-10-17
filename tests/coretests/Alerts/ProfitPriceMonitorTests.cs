@@ -15,7 +15,7 @@ namespace coretests.Alerts
             
             a.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
 
-            var m = new ProfitPriceMonitor(a.State.OpenPosition, a.State.UserId);
+            var m = ProfitPriceMonitor.CreateIfApplicable(a.State);
 
             // check for a different ticker
             var triggered = m.RunCheck("BING", 7, DateTimeOffset.UtcNow);

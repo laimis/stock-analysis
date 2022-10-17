@@ -46,7 +46,7 @@ namespace coretests.Alerts
         [Fact]
         public void MonitorCountMatches()
         {
-            Assert.Equal(2, _uat.Monitors.Count());
+            Assert.Equal(4, _uat.Monitors.Count());
         }
 
         [Fact]

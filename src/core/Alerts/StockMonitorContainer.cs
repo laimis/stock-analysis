@@ -8,26 +8,30 @@ namespace core.Alerts
 {
     public class StockMonitorContainer
     {
-        private ConcurrentBag<IStockPositionMonitor> _monitors = new ConcurrentBag<IStockPositionMonitor>();
+        private ConcurrentDictionary<string, IStockPositionMonitor> _monitors = new ConcurrentDictionary<string, IStockPositionMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
 
-        public IEnumerable<IStockPositionMonitor> Monitors => _monitors;
+        public IEnumerable<IStockPositionMonitor> Monitors => _monitors.Values;
 
         public void Register(OwnedStock stock)
         {
-            _tickers.Add(stock.State.Ticker);
-
-            var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock.State);
-            if (stopMonitor != null)
+            
+            void AddIfNotNull(string key, IStockPositionMonitor monitor)
             {
-                _monitors.Add(stopMonitor);
+                if (monitor != null)
+                {
+                    _monitors[key + monitor.GetType().Name] = monitor;
+                }
             }
+
+            _tickers.Add(stock.State.Ticker);
+            
+            var key = ToKey(stock);
+            var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock.State);
+            AddIfNotNull(key, stopMonitor);
 
             var profitMonitor = ProfitPriceMonitor.CreateIfApplicable(stock.State);
-            if (profitMonitor != null)
-            {
-                _monitors.Add(profitMonitor);
-            }
+            AddIfNotNull(key, profitMonitor);
         }
 
         private static string ToKey(OwnedStock stock) => ToKey(stock.State.Ticker, stock.State.UserId);
@@ -35,20 +39,9 @@ namespace core.Alerts
 
         internal void Deregister(OwnedStock stock)
         {
-            IStockPositionMonitor toRemove = null;
-            foreach (var monitor in _monitors)
-            {
-                if (monitor.Ticker == stock.State.Ticker && monitor.UserId == stock.State.UserId)
-                {
-                    toRemove = monitor;
-                    break;
-                }
-            }
-
-            if (toRemove != null)
-            {
-                _monitors.TryTake(out toRemove);
-            }
+            var key = ToKey(stock);
+            _monitors.TryRemove(key + nameof(StopPriceMonitor), out _);
+            _monitors.TryRemove(key + nameof(ProfitPriceMonitor), out _);
         }
 
         public IEnumerable<string> GetTickers() => _tickers;
@@ -58,7 +51,7 @@ namespace core.Alerts
             decimal newPrice,
             DateTimeOffset time)
         {
-            foreach (var m in _monitors)
+            foreach (var m in _monitors.Values)
             {
                 if (m.RunCheck(ticker, newPrice, time))
                 {
@@ -69,7 +62,7 @@ namespace core.Alerts
 
         public bool HasTriggered(string ticker, Guid userId)
         {
-            return _monitors.Where(m => m.Ticker == ticker && m.UserId == userId)
+            return _monitors.Values.Where(m => m.Ticker == ticker && m.UserId == userId)
                 .Where(m => m.IsTriggered)
                 .Any();
         }
