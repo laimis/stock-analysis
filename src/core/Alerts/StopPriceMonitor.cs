@@ -5,12 +5,29 @@ namespace core.Alerts
 {
     public class ProfitPriceMonitor : IStockPositionMonitor
     {
+        
+        internal static ProfitPriceMonitor CreateIfApplicable(OwnedStockState state)
+        {
+            if (state.OpenPosition == null)
+            {
+                return null;
+            }
+
+            if (state.OpenPosition.RRLevels.Count == 0)
+            {
+                return null;
+            }
+
+            return new ProfitPriceMonitor(state.OpenPosition, state.UserId);
+        }
+
         public ProfitPriceMonitor(PositionInstance openPosition, Guid userId)
         {
             ThresholdValue = openPosition.RRLevels[0];
             NumberOfShares = openPosition.NumberOfShares;
             Ticker = openPosition.Ticker;
             UserId = userId;
+            Description = $"Profit Price Monitor for {Ticker}";
         }
 
         public TriggeredAlert? TriggeredAlert { get; private set; }
@@ -19,6 +36,8 @@ namespace core.Alerts
         public decimal NumberOfShares { get; }
         public string Ticker { get; }
         public Guid UserId { get; }
+
+        public string Description { get; }
 
         public bool RunCheck(string ticker, decimal price, DateTimeOffset time)
         {
@@ -75,12 +94,23 @@ namespace core.Alerts
 
     public class StopPriceMonitor : IStockPositionMonitor
     {
+        internal static StopPriceMonitor CreateIfApplicable(OwnedStockState state)
+        {
+            if (state.OpenPosition?.StopPrice == null)
+            {
+                return null;
+            }
+
+            return new StopPriceMonitor(state.OpenPosition, state.UserId);
+        }
+
         public StopPriceMonitor(PositionInstance position, Guid userId)
         {
             NumberOfShares = position.NumberOfShares;
             ThresholdValue = position.StopPrice.Value;
             Ticker = position.Ticker;
             UserId = userId;
+            Description = $"Stop Price Monitor for {Ticker}";
         }
 
         public bool IsTriggered => TriggeredAlert != null;
@@ -90,6 +120,7 @@ namespace core.Alerts
         public decimal ThresholdValue { get; }
         public string Ticker { get; }
         public Guid UserId { get; }
+        public string Description { get; }
 
         public bool RunCheck(string ticker, decimal price, DateTimeOffset time)
         {

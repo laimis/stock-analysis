@@ -80,6 +80,10 @@ export class StocksService {
     return this.http.get<StockAlert[]>('/api/alerts/triggered')
   }
 
+  getPriceMonitors(): Observable<PriceMonitor[]> {
+    return this.http.get<PriceMonitor[]>('/api/alerts/monitors')
+  }
+
   // ----------------- notes ---------------------
 
   addNote(input: any): Observable<any> {
@@ -329,10 +333,15 @@ export class StocksService {
 }
 
 export interface StockAlert {
-  triggeredValue: number
-  watchedValue: number
-  ticker: string
+  description: string
   numberOfShares: number
+  triggeredValue: number
+}
+export interface PriceMonitor {
+  description: string
+  thresholdValue: number
+  ticker: string
+  triggeredAlert: StockAlert|null
 }
 
 export interface StockAnalysisOutcome {

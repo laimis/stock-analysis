@@ -2,20 +2,22 @@
   <thead>
     <tr>
       <th>Ticker</th>
-      <th>Triggered Price</th>
-      <th>Watched Price</th>
+      <th>Description</th>
+      <th>Threshold</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let alert of alerts">
+    <tr *ngFor="let monitor of monitors">
       <td>
-        <a [routerLink]="[ '/stocks', alert.ticker ]">{{alert.ticker}}</a>
+        <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
       </td>
-      <td>{{alert.triggeredValue}}</td>
-      <td>{{alert.watchedValue}}</td>
-      <td>
-        <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+      <td>{{monitor.description}}</td>
+      <td>{{monitor.thresholdValue}}</td>
+      <td *ngIf="monitor.triggeredAlert">
+        Triggered! 
+        <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
       </td>
+      <td *ngIf="!monitor.triggeredAlert"></td>
     </tr>
 </table>

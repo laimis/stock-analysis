@@ -33,5 +33,9 @@ namespace web.Controllers
         [HttpGet("triggered")]
         public Task<List<TriggeredAlert>> Triggered() =>
             _mediator.Send(new Triggered.Query());
+
+        [HttpGet("monitors")]
+        public Task<List<IStockPositionMonitor>> Monitors() =>
+            _mediator.Send(new core.Alerts.Monitors.Query());
     }
 }

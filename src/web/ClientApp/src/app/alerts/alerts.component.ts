@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StockAlert, StocksService } from 'src/app/services/stocks.service';
+import { PriceMonitor, StocksService } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-alerts',
@@ -8,13 +8,13 @@ import { StockAlert, StocksService } from 'src/app/services/stocks.service';
 })
 
 export class AlertsComponent implements OnInit {
-  alerts: StockAlert[];
+  monitors: PriceMonitor[];
 
   constructor(private stockService : StocksService) { }
 
   ngOnInit(): void {
-    this.stockService.getTriggeredAlerts().subscribe(alerts => {
-      this.alerts = alerts;
+    this.stockService.getPriceMonitors().subscribe(monitors => {
+      this.monitors = monitors;
     });
   }
 

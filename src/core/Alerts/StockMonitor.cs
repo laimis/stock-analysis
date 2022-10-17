@@ -24,6 +24,10 @@ namespace core.Alerts
     {
         bool RunCheck(string ticker, decimal price, DateTimeOffset time);
         TriggeredAlert? TriggeredAlert { get; }
+        string Ticker { get; }
+        string Description { get; }
+        decimal ThresholdValue { get; }
         bool IsTriggered { get; }
+        Guid UserId { get; }
     }
 }
