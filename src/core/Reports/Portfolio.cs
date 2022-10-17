@@ -35,7 +35,11 @@ namespace core.Reports
             private IStocksService2 _stockService;
             private IBrokerage _brokerage;
 
-            public Handler(IBrokerage brokerage, IAccountStorage accounts, IPortfolioStorage storage, IStocksService2 stocksService) : base(storage)
+            public Handler(
+                IBrokerage brokerage,
+                IAccountStorage accounts,
+                IPortfolioStorage storage,
+                IStocksService2 stocksService) : base(storage)
             {
                 _accounts = accounts;
                 _stockService = stocksService;
@@ -71,6 +75,11 @@ namespace core.Reports
                         p.Ticker,
                         request.Frequency
                     );
+
+                    if (prices.Success.Length == 0)
+                    {
+                        continue;
+                    }
 
                     var outcomes = LatestBarAnalysisRunner.Run(prices.Success);
 

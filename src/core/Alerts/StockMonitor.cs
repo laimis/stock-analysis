@@ -51,7 +51,6 @@ namespace core.Alerts
                 return true;
             }
 
-            Trigger = null;
             return false;
         }
     }

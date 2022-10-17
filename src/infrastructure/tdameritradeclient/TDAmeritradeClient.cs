@@ -267,6 +267,11 @@ public class TDAmeritradeClient : IBrokerage
             Volume = c.volume
         }).ToArray();
 
+        if (payload.Length == 0)
+        {
+            _logger?.LogError($"No candles for historcal prices for {function}");
+        }
+
         return new ServiceResponse<HistoricalPrice[]>(payload);
     }
 
