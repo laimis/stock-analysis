@@ -28,7 +28,8 @@ namespace core.Alerts
             {
                 return Task.FromResult(
                     _container.Monitors
-                        .OrderBy(p => p.Ticker)
+                        .OrderByDescending(m => m.IsTriggered)
+                        .ThenBy(p => p.Ticker)
                         .ThenBy(p => p.Description)
                         .ToList()
                 );
