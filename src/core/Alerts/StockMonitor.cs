@@ -52,24 +52,50 @@ namespace core.Alerts
             {
                 return false;
             }
-                
-            if (Position.StopPrice > price && !IsTriggered)
+
+            return IsTriggered switch {
+                true => UpdateTriggeredAlert(price, time),
+                false => CheckTrigger(price, time)
+            };
+        }
+
+        private bool UpdateTriggeredAlert(decimal price, DateTimeOffset time)
+        {
+            if (price > Position.StopPrice)
             {
-                TriggeredAlert = new TriggeredAlert(
-                    price,
-                    Position.StopPrice.Value,
-                    time,
-                    ticker,
-                    $"Stop price of {Position.StopPrice.Value} was triggered at {price}",
-                    Position.NumberOfShares,
-                    UserId,
-                    TriggerType.Negative
-                );
+                TriggeredAlert = null;
+            }
+            else if (price != TriggeredAlert.Value.triggeredValue)
+            {
+                SetTriggeredAlert(price, time);
+            }
+            return false;
+        }
+
+        private bool CheckTrigger(decimal price, DateTimeOffset time)
+        {
+            if (Position.StopPrice > price)
+            {
+                SetTriggeredAlert(price, time);
 
                 return true;
             }
 
             return false;
+        }
+
+        private void SetTriggeredAlert(decimal price, DateTimeOffset time)
+        {
+            TriggeredAlert = new TriggeredAlert(
+                price,
+                Position.StopPrice.Value,
+                time,
+                Position.Ticker,
+                $"Stop price of {Position.StopPrice.Value} was triggered at {price}",
+                Position.NumberOfShares,
+                UserId,
+                TriggerType.Negative
+            );
         }
     }
 }
