@@ -27,7 +27,10 @@ namespace core.Alerts
             public Task<List<IStockPositionMonitor>> Handle(Query request, CancellationToken cancellationToken)
             {
                 return Task.FromResult(
-                    _container.Monitors.ToList()
+                    _container.Monitors
+                        .OrderBy(p => p.Ticker)
+                        .ThenBy(p => p.Description)
+                        .ToList()
                 );
             }
         }

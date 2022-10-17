@@ -4,6 +4,7 @@
       <th>Ticker</th>
       <th>Description</th>
       <th>Threshold</th>
+      <th>Last Value</th>
       <th></th>
     </tr>
   </thead>
@@ -13,7 +14,8 @@
         <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
       </td>
       <td>{{monitor.description}}</td>
-      <td>{{monitor.thresholdValue}}</td>
+      <td>{{monitor.thresholdValue | currency}}</td>
+      <td>{{monitor.lastSeenValue | currency}}</td>
       <td *ngIf="monitor.triggeredAlert">
         Triggered! 
         <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>

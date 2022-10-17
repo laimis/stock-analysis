@@ -340,6 +340,7 @@ export interface StockAlert {
 export interface PriceMonitor {
   description: string
   thresholdValue: number
+  lastSeenValue: number
   ticker: string
   triggeredAlert: StockAlert|null
 }
