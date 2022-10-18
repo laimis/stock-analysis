@@ -47,24 +47,24 @@ namespace core.Stocks.Services
     {
         public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
         {
-            var last = prices[prices.Length - 1];
+            var currentBar = prices[prices.Length - 1];
 
             // return open as the neutral outcome
             yield return new AnalysisOutcome(
                 SingleBarOutcomeKeys.Open,
                 OutcomeType.Neutral,
-                last.Open,
+                currentBar.Open,
                 "Open price");
 
             // return close as the neutral outcome
             yield return new AnalysisOutcome(
                 SingleBarOutcomeKeys.Close,
                 OutcomeType.Neutral,
-                last.Close,
+                currentBar.Close,
                 "Close price");
 
             // calculate closing range
-            var range = Math.Round((last.Close - last.Low) / (last.High - last.Low) * 100, 2);
+            var range = Math.Round((currentBar.Close - currentBar.Low) / (currentBar.High - currentBar.Low) * 100, 2);
 
             // add range as outcome
             yield return new AnalysisOutcome(
@@ -74,7 +74,7 @@ namespace core.Stocks.Services
                 message: $"Closing range is {range}.");
 
             // today's change from high to low
-            var change = Math.Round((last.High - last.Low) / last.Low * 100, 2);
+            var change = Math.Round((currentBar.High - currentBar.Low) / currentBar.Low * 100, 2);
 
             // add change as outcome
             yield return new AnalysisOutcome(
@@ -84,7 +84,7 @@ namespace core.Stocks.Services
                 message: $"Day change from high to low is {change}.");
 
             // today's change from open to close
-            change = Math.Round((last.Close - last.Open) / last.Open * 100, 2);
+            change = Math.Round((currentBar.Close - currentBar.Open) / currentBar.Open * 100, 2);
 
             // add change as outcome
             yield return new AnalysisOutcome(
@@ -97,7 +97,7 @@ namespace core.Stocks.Services
             var yesterday = prices[prices.Length - 2];
 
             // today's change from yesterday's close
-            change = Math.Round((last.Close - yesterday.Close) / yesterday.Close * 100, 2);
+            change = Math.Round((currentBar.Close - yesterday.Close) / yesterday.Close * 100, 2);
 
             // add change as outcome
             yield return new AnalysisOutcome(
@@ -107,11 +107,11 @@ namespace core.Stocks.Services
                 message: $"% change from close is {change}.");
 
             // true range uses the previous close as reference
-            var trueHigh = Math.Max(last.High, yesterday.Close);
-            var trueLow = Math.Min(last.Low, yesterday.Close);
+            var trueHigh = Math.Max(currentBar.High, yesterday.Close);
+            var trueLow = Math.Min(currentBar.Low, yesterday.Close);
 
             // today's true range
-            var trueRange = Math.Round((last.Close - trueLow) / (trueHigh - trueLow) * 100, 2);
+            var trueRange = Math.Round((currentBar.Close - trueLow) / (trueHigh - trueLow) * 100, 2);
 
             // add true range as outcome
             yield return new AnalysisOutcome(
@@ -122,13 +122,14 @@ namespace core.Stocks.Services
 
             // see if there was a gap down or gap up
             var gap = 0m;
-            if (last.Open > yesterday.Close)
+
+            if (currentBar.Low > yesterday.High)
             {
-                gap = Math.Round( (last.Open - yesterday.Close)/yesterday.Close * 100, 2);
+                gap = Math.Round( (currentBar.Open - yesterday.Close)/yesterday.Close * 100, 2);
             }
-            else if (last.Open < yesterday.Close)
+            else if (currentBar.High < yesterday.Low)
             {
-                gap = Math.Round( (yesterday.Close - last.Open)/yesterday.Close * 100, 2);
+                gap = Math.Round( (yesterday.Close - currentBar.Open)/yesterday.Close * 100, 2);
             }
 
             var gapType = gap switch {
@@ -145,8 +146,8 @@ namespace core.Stocks.Services
                 message: $"Gap is {gap}%.");
 
             // see if the latest bar is a new high or new low
-            var newHigh = prices.Take(prices.Length - 1).All(x => x.High < last.High);
-            var newLow = prices.Take(prices.Length - 1).All(x => x.Low > last.Low);
+            var newHigh = prices.Take(prices.Length - 1).All(x => x.High < currentBar.High);
+            var newLow = prices.Take(prices.Length - 1).All(x => x.Low > currentBar.Low);
 
             // add new high as outcome
             yield return new AnalysisOutcome(

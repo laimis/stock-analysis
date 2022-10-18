@@ -123,13 +123,13 @@ namespace core.Stocks.Services
                 var prev = prices[i - 1];
                 var curr = prices[i];
 
-                if (curr.Open > prev.Close)
+                if (curr.Low > prev.High)
                 {
                     gapUps++;
                     totalGapUps += curr.Open - prev.Close;
                 }
 
-                if (curr.Open < prev.Close)
+                if (curr.High < prev.Low)
                 {
                     gapDowns++;
                     totalGapDowns = prev.Close - curr.Open;
