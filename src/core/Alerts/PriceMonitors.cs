@@ -236,7 +236,7 @@ namespace core.Alerts
                 ThresholdValue,
                 time,
                 Ticker,
-                $"Stop price of {ThresholdValue} was triggered at {price}",
+                $"Stop price {ThresholdValue} for {Ticker} was triggered at {price}",
                 NumberOfShares,
                 UserId,
                 AlertType.Negative
