@@ -22,6 +22,6 @@ namespace coretests.Services
         }
 
         [Fact]
-        public void OutcomesMatch() => Assert.Equal(16, _outcomes.Count);
+        public void OutcomesMatch() => Assert.Equal(20, _outcomes.Count);
     }
 }

@@ -114,6 +114,8 @@ namespace core.Stocks.Services
             // count gap ups and gap downs
             var gapUps = 0;
             var gapDowns = 0;
+            var totalGapUps = 0m;
+            var totalGapDowns = 0m;
             for (var i = 1; i < prices.Length; i++)
             {
                 var prev = prices[i - 1];
@@ -122,11 +124,13 @@ namespace core.Stocks.Services
                 if (curr.Open > prev.Close)
                 {
                     gapUps++;
+                    totalGapUps += curr.Open - prev.Close;
                 }
 
                 if (curr.Open < prev.Close)
                 {
                     gapDowns++;
+                    totalGapDowns = prev.Close - curr.Open;
                 }
             }
 
@@ -142,6 +146,20 @@ namespace core.Stocks.Services
                 OutcomeType.Neutral,
                 gapDowns,
                 $"Gap downs: {gapDowns}"
+            );
+
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.TotalGapUps,
+                OutcomeType.Neutral,
+                totalGapUps,
+                $"Total gap ups: {totalGapUps}"
+            );
+
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.TotalGapDowns,
+                OutcomeType.Neutral,
+                totalGapDowns,
+                $"Total gap downs: {totalGapDowns}"
             );
         }
     }
@@ -311,6 +329,8 @@ namespace core.Stocks.Services
         public static string CurrentPrice = "CurrentPrice";
         public static string GapUps = "GapUps";
         public static string GapDowns = "GapDowns";
+        public static string TotalGapUps = "TotalGapUps";
+        public static string TotalGapDowns = "TotalGapDowns";
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }
