@@ -159,7 +159,7 @@ namespace core.Stocks.Services
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.NewLow,
                 type: newLow ? OutcomeType.Negative : OutcomeType.Neutral,
-                value: newLow ? 1m : 0m,
+                value: newLow ? -1m : 0m,
                 message: $"New low reached");
         }
     }
