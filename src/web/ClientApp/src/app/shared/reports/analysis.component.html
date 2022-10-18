@@ -1,18 +1,22 @@
 <div>
-  <div *ngIf="!analysis">Loading analysis...</div>
-  <table *ngIf="analysis" class="table striped mt-4">
-    <thead>
-      <tr>
-        <th>Ticker</th>
-        <th *ngFor="let key of getKeys(analysis)" class="sort-header" (click)="sort(key)">{{key}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let s of analysis">
-        <td>{{s.position.ticker}}</td>
-        <td *ngFor="let o of s.outcomes"
-          [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">{{o.value }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngIf="!analysis">Loading {{title}}...</div>
+  <div *ngIf="analysis">
+    <h3 *ngIf="title">{{title}}</h3>
+    <table  class="table striped mb-4">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th *ngFor="let key of getKeys(analysis)" class="sort-header" (click)="sort(key)">{{key}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of analysis">
+          <td>{{s.position.ticker}}</td>
+          <td *ngFor="let o of s.outcomes"
+            [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">{{o.value }}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+  </div>
 </div>

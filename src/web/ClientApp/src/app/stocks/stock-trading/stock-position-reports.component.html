@@ -1,8 +1,9 @@
 <div>
-  <app-portfolio-report *ngIf="showWeeklyReport" [report]="portfolioWeeklyReport"></app-portfolio-report>
-  <app-analysis *ngIf="showOverallAnalysis" [analysis]="overallAnalysis"></app-analysis>
+  <app-analysis *ngIf="showOverallAnalysis" [title]="'Full analysis'" [analysis]="overallAnalysis"></app-analysis>
 
-  <app-portfolio-report *ngIf="showDailyReport" [report]="portfolioDailyReport"></app-portfolio-report>
-  <app-analysis *ngIf="showDailyAnalysis" [analysis]="dailyAnalysis"></app-analysis>
+  <app-portfolio-report *ngIf="showDailyReport" [title]="'Daily report'" [report]="portfolioDailyReport"></app-portfolio-report>
+  <app-portfolio-report *ngIf="showWeeklyReport" [title]="'Weekly report'" [report]="portfolioWeeklyReport"></app-portfolio-report>  
+  
+  <app-analysis *ngIf="showDailyAnalysis" [title]="'Daily analysis'" [analysis]="dailyAnalysis"></app-analysis>
   
 </div>

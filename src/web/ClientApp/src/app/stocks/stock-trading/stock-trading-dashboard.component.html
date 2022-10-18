@@ -76,7 +76,7 @@
   <app-brokerage-orders       *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
   <stock-charts               *ngIf="isActive('openreview')" [positions]=positions></stock-charts>
   <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
-  <app-position-reports       *ngIf="isActive('analysis')" [showOverallAnalysis]="true" [showWeeklyReport]="true" ></app-position-reports>
-  <app-position-reports       *ngIf="isActive('dailyanalysis')" [showDailyAnalysis]="true" [showDailyReport]="true"></app-position-reports>
+  <app-position-reports       *ngIf="isActive('analysis')" [showOverallAnalysis]="true"></app-position-reports>
+  <app-position-reports       *ngIf="isActive('dailyanalysis')" [showDailyAnalysis]="true" [showWeeklyReport]="true" [showDailyReport]="true"></app-position-reports>
 
 </div>

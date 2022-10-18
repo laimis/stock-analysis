@@ -10,6 +10,9 @@ export class PortfolioReportComponent {
 
   @Input()
   report: PortfolioReport
+
+  @Input()
+  title: string
   
 	getKeys(entries:PositionAnalysisEntry[]) {
     return entries[0].outcomes.map(o => o.key)

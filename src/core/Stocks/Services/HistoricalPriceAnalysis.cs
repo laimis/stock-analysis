@@ -116,7 +116,9 @@ namespace core.Stocks.Services
             var gapDowns = 0;
             var totalGapUps = 0m;
             var totalGapDowns = 0m;
-            for (var i = 1; i < prices.Length; i++)
+
+            var interval = Math.Min(60, prices.Length);
+            for (var i = interval + 1; i < prices.Length; i++)
             {
                 var prev = prices[i - 1];
                 var curr = prices[i];
@@ -160,6 +162,35 @@ namespace core.Stocks.Services
                 OutcomeType.Neutral,
                 totalGapDowns,
                 $"Total gap downs: {totalGapDowns}"
+            );
+
+            // return outcome that's a difference between gap ups and gap downs
+            var gapUpsVsDowns = gapUps - gapDowns;
+            var gapUpsVsDownsOutcomeType = gapUpsVsDowns switch {
+                > 0 => OutcomeType.Positive,
+                < 0 => OutcomeType.Negative,
+                _ => OutcomeType.Neutral
+            };
+            
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.GapUpsVsDowns,
+                gapUpsVsDownsOutcomeType,
+                gapUpsVsDowns,
+                $"Gap ups vs downs: {gapUpsVsDowns}"
+            );
+
+            // return outcome that's a difference between total gap ups and total gap downs
+            var totalGapUpsVsDowns = totalGapUps - totalGapDowns;
+            var totalGapUpsVsDownsOutcomeType = totalGapUpsVsDowns switch {
+                > 0 => OutcomeType.Positive,
+                < 0 => OutcomeType.Negative,
+                _ => OutcomeType.Neutral
+            };
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.TotalGapUpsVsDowns,
+                totalGapUpsVsDownsOutcomeType,
+                totalGapUpsVsDowns,
+                $"Total gap ups vs downs: {totalGapUpsVsDowns}"
             );
         }
     }
@@ -331,6 +362,8 @@ namespace core.Stocks.Services
         public static string GapDowns = "GapDowns";
         public static string TotalGapUps = "TotalGapUps";
         public static string TotalGapDowns = "TotalGapDowns";
+        public static string GapUpsVsDowns = "GapUpsVsDowns";
+        public static string TotalGapUpsVsDowns = "TotalGapUpsVsDowns";
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }

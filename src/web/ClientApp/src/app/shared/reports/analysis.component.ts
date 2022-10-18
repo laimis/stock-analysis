@@ -9,6 +9,9 @@ import { PositionAnalysisEntry } from '../../services/stocks.service';
 export class AnalysisComponent {
 
   @Input()
+  title: string
+  
+  @Input()
   analysis: PositionAnalysisEntry[]
 
   sortColumn: string
