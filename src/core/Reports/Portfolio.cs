@@ -196,7 +196,7 @@ namespace core.Reports
                     OutcomeType.Positive,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh && o.value > 0))
                         .ToList()
                 );
 
@@ -205,7 +205,7 @@ namespace core.Reports
                     OutcomeType.Negative,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewLow))
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewLow && o.value < 0))
                         .ToList()
                 );
             }
