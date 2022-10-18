@@ -110,6 +110,39 @@ namespace core.Stocks.Services
                     percentBelowHigh,
                     $"Percent below recent high: {percentBelowHigh}%"
                 );
+
+            // count gap ups and gap downs
+            var gapUps = 0;
+            var gapDowns = 0;
+            for (var i = 1; i < prices.Length; i++)
+            {
+                var prev = prices[i - 1];
+                var curr = prices[i];
+
+                if (curr.Open > prev.Close)
+                {
+                    gapUps++;
+                }
+
+                if (curr.Open < prev.Close)
+                {
+                    gapDowns++;
+                }
+            }
+
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.GapUps,
+                OutcomeType.Neutral,
+                gapUps,
+                $"Gap ups: {gapUps}"
+            );
+
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.GapDowns,
+                OutcomeType.Neutral,
+                gapDowns,
+                $"Gap downs: {gapDowns}"
+            );
         }
     }
 
@@ -276,6 +309,9 @@ namespace core.Stocks.Services
         public static string PercentAbovLow = "PercentAboveLow";
         public static string SMA20Above50Days = "SMA20Above50Days";
         public static string CurrentPrice = "CurrentPrice";
+        public static string GapUps = "GapUps";
+        public static string GapDowns = "GapDowns";
+
         internal static string SMA(int interval) => $"sma_{interval}";
     }
 }
