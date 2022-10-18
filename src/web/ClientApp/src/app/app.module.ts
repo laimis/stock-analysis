@@ -68,9 +68,11 @@ import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trad
 import { AlertsComponent } from './alerts/alerts.component';
 import { AnalysisComponent } from './shared/reports/analysis.component';
 import { PortfolioReportComponent } from './shared/reports/portfolio-report.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly] },
   { path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly] },

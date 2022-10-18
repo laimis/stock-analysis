@@ -5,5 +5,8 @@ namespace core.Shared.Adapters.SMS
     public interface ISMSClient
     {
         Task SendSMS(string message);   
+        void TurnOff();
+        void TurnOn();
+        bool IsOn { get; }
     }
 }

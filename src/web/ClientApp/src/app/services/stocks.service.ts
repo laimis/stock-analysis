@@ -63,6 +63,14 @@ export class StocksService {
     return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
   }
 
+  smsOff(): Observable<any> {
+    return this.http.post<any>('/api/alerts/sms/off', {})
+  }
+
+  smsOn(): Observable<any> {
+    return this.http.post<any>('/api/alerts/sms/on', {})
+  }
+
   sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
     return this.http.post<object>('/api/admin/email', obj)
   }

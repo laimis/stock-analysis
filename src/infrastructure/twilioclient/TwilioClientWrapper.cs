@@ -10,6 +10,8 @@ public class TwilioClientWrapper : ISMSClient
     private PhoneNumber? _toPhoneNumber = null;
     private bool _configured;
 
+    public bool IsOn { get; private set; }
+
     public TwilioClientWrapper(string accountSid, string authToken, string fromPhoneNumber, string toPhoneNumber)
     {
         // check for all params to be not null
@@ -23,11 +25,12 @@ public class TwilioClientWrapper : ISMSClient
         _fromPhoneNumber = new Twilio.Types.PhoneNumber(fromPhoneNumber);
         _toPhoneNumber = new Twilio.Types.PhoneNumber(toPhoneNumber);
         _configured = true;
+        IsOn = true;
     }
 
     public Task SendSMS(string message)
     {
-        return _configured switch {
+        return (_configured && IsOn) switch {
             true => SendViaTwilio(message),
             false => ToConsole(message)
         };
@@ -54,4 +57,7 @@ public class TwilioClientWrapper : ISMSClient
 
         return Task.CompletedTask;
     }
+
+    public void TurnOff() => IsOn = false;
+    public void TurnOn() => IsOn = true;
 }

@@ -30,6 +30,18 @@ namespace web.Controllers
         public Task SMS([FromBody] string body) =>
             _mediator.Send(new SendSMS.Command(body));
 
+        [AllowAnonymous]
+        [HttpGet("sms/status")]
+        public Task<bool> SmsStatus() => _mediator.Send(new SmsStatus.Query());
+
+        [Authorize("admin")]
+        [HttpPost("sms/on")]
+        public Task SmsOn() => _mediator.Send(new SmsOn.Command());
+
+        [Authorize("admin")]
+        [HttpPost("sms/off")]
+        public Task SmsOff() => _mediator.Send(new SmsOff.Command());
+
         [HttpGet("triggered")]
         public Task<List<TriggeredAlert>> Triggered() =>
             _mediator.Send(new Triggered.Query());

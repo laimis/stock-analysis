@@ -8,6 +8,7 @@ using core.Account;
 using core.Adapters.Emails;
 using core.Adapters.Stocks;
 using core.Alerts;
+using core.Shared.Adapters.SMS;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using web.Utils;
@@ -18,6 +19,7 @@ namespace web.BackgroundServices
     {
         private IAccountStorage _accounts;
         private ILogger<StockMonitorService> _logger;
+        private ISMSClient _smsClient;
         private IEmailService _emails;
         private IStocksService2 _stocks;
         private IPortfolioStorage _stockStorage;
@@ -33,12 +35,14 @@ namespace web.BackgroundServices
             IPortfolioStorage stockStorage,
             IStocksService2 stocks,
             IEmailService emails,
+            ISMSClient smsClient,
             IMarketHours marketHours,
             StockMonitorContainer container)
         {
             _accounts = accounts;
             _emails = emails;
             _logger = logger;
+            _smsClient = smsClient;
             _stocks = stocks;
             _stockStorage = stockStorage;
             _marketHours = marketHours;
@@ -56,11 +60,15 @@ namespace web.BackgroundServices
 
             await BuildUpAlerts();
 
+            var firstRun = true;
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await Loop(stoppingToken);
+                    await Loop(firstRun, stoppingToken);
+
+                    firstRun = false;
                 }
                 catch(Exception ex)
                 {
@@ -73,12 +81,12 @@ namespace web.BackgroundServices
             _logger.LogInformation("exec exit");
         }
 
-        private async Task Loop(CancellationToken stoppingToken)
+        private async Task Loop(bool firstRun, CancellationToken stoppingToken)
         {
             var time = DateTimeOffset.UtcNow;
             if (_marketHours.IsOn(time))
             {
-                await ScanAlerts();
+                await ScanAlerts(sendAlerts:!firstRun);
 
                 await Task.Delay(LONG_INTERVAL, stoppingToken);
             }
@@ -105,7 +113,7 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task ScanAlerts()
+        private async Task ScanAlerts(bool sendAlerts)
         {
             var triggered = new List<TriggeredAlert>();
 
@@ -125,6 +133,11 @@ namespace web.BackgroundServices
                 }
             }
 
+            if (!sendAlerts)
+            {
+                return;
+            }
+
             var grouped = triggered.GroupBy(t => t.userId);
 
             foreach (var e in grouped)
@@ -141,6 +154,11 @@ namespace web.BackgroundServices
                     EmailTemplate.Alerts,
                     data
                 );
+
+                foreach(var a in alerts)
+                {
+                    await _smsClient.SendSMS(a.description);
+                }
             }
         }
 
