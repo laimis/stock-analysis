@@ -118,7 +118,31 @@ namespace core.Stocks.Services
                 key: SingleBarOutcomeKeys.TrueRange,
                 type: trueRange >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: trueRange,
-                message: $"True range is {trueRange}.");   
+                message: $"True range is {trueRange}.");
+
+            // see if there was a gap down or gap up
+            var gap = 0m;
+            if (last.Open > yesterday.Close)
+            {
+                gap = Math.Round( (last.Open - yesterday.Close)/yesterday.Close * 100, 2);
+            }
+            else if (last.Open < yesterday.Close)
+            {
+                gap = Math.Round( (yesterday.Close - last.Open)/yesterday.Close * 100, 2);
+            }
+
+            var gapType = gap switch {
+                > 0m => OutcomeType.Negative,
+                < 0m => OutcomeType.Positive,
+                _ => OutcomeType.Neutral
+            };
+
+            // add gap as outcome
+            yield return new AnalysisOutcome(
+                key: SingleBarOutcomeKeys.GapPercentage,
+                type: gapType,
+                value: gap,
+                message: $"Gap is {gap}%.");
         }
     }
 
@@ -176,5 +200,6 @@ namespace core.Stocks.Services
         public static string Open = "Open";
         public static string Close = "Close";
         public static string SMA20Above50Days = "SMA20Above50Days";
+        public static string GapPercentage = "GapPercentage";
     }
 }

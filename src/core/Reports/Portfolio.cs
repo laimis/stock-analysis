@@ -172,6 +172,24 @@ namespace core.Reports
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
                         .ToList()
                 );
+
+                yield return new Views.PortfolioReportCategory(
+                    "Positive gap ups",
+                    OutcomeType.Positive,
+                    tickerOutcomes
+                        .Where(t =>
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value > 0))
+                        .ToList()
+                );
+
+                yield return new Views.PortfolioReportCategory(
+                    "Negative gap downs",
+                    OutcomeType.Negative,
+                    tickerOutcomes
+                        .Where(t =>
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value < 0))
+                        .ToList()
+                );
             }
         }
     }
