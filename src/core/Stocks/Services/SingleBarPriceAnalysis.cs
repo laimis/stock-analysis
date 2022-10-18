@@ -143,6 +143,24 @@ namespace core.Stocks.Services
                 type: gapType,
                 value: gap,
                 message: $"Gap is {gap}%.");
+
+            // see if the latest bar is a new high or new low
+            var newHigh = prices.Take(prices.Length - 1).All(x => x.High < last.High);
+            var newLow = prices.Take(prices.Length - 1).All(x => x.Low > last.Low);
+
+            // add new high as outcome
+            yield return new AnalysisOutcome(
+                key: SingleBarOutcomeKeys.NewHigh,
+                type: newHigh ? OutcomeType.Positive : OutcomeType.Neutral,
+                value: newHigh ? 1m : 0m,
+                message: $"New high reached");
+
+            // add new low as outcome
+            yield return new AnalysisOutcome(
+                key: SingleBarOutcomeKeys.NewLow,
+                type: newLow ? OutcomeType.Negative : OutcomeType.Neutral,
+                value: newLow ? 1m : 0m,
+                message: $"New low reached");
         }
     }
 
@@ -201,5 +219,7 @@ namespace core.Stocks.Services
         public static string Close = "Close";
         public static string SMA20Above50Days = "SMA20Above50Days";
         public static string GapPercentage = "GapPercentage";
+        public static string NewHigh = "NewHigh";
+        public static string NewLow = "NewLow";
     }
 }

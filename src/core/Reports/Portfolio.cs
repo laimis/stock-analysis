@@ -190,6 +190,24 @@ namespace core.Reports
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value < 0))
                         .ToList()
                 );
+
+                yield return new Views.PortfolioReportCategory(
+                    "New Highs",
+                    OutcomeType.Positive,
+                    tickerOutcomes
+                        .Where(t =>
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh))
+                        .ToList()
+                );
+
+                yield return new Views.PortfolioReportCategory(
+                    "New Lows",
+                    OutcomeType.Negative,
+                    tickerOutcomes
+                        .Where(t =>
+                            t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewLow))
+                        .ToList()
+                );
             }
         }
     }
