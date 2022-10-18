@@ -132,8 +132,8 @@ namespace core.Stocks.Services
             }
 
             var gapType = gap switch {
-                > 0m => OutcomeType.Negative,
-                < 0m => OutcomeType.Positive,
+                > 0m => OutcomeType.Positive,
+                < 0m => OutcomeType.Negative,
                 _ => OutcomeType.Neutral
             };
 
