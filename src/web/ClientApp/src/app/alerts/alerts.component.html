@@ -1,25 +1,54 @@
-<table class="table">
-  <thead>
-    <tr>
-      <th>Ticker</th>
-      <th>Description</th>
-      <th>Threshold</th>
-      <th>Last Value</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let monitor of monitors" [ngClass]="{'bg-warning': monitor.alertType === 'Negative' && monitor.triggeredAlert, 'bg-success': monitor.alertType === 'Positive' && monitor.triggeredAlert}">
-      <td>
-        <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
-      </td>
-      <td>{{monitor.description}}</td>
-      <td>{{monitor.thresholdValue | currency}}</td>
-      <td>{{monitor.lastSeenValue | currency}}</td>
-      <td *ngIf="monitor.triggeredAlert">
-        Triggered! 
-        <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
-      </td>
-      <td *ngIf="!monitor.triggeredAlert"></td>
-    </tr>
-</table>
+<div *ngIf="container">
+  <h3>Recent Triggers</h3>
+  <table *ngIf="container.recentlyTriggered" class="table table-hover">
+    <thead>
+      <tr>
+        <th>ticker</th>
+        <th>description</th>
+        <th>date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
+        <td>{{alert.ticker}}</td>
+        <td>{{alert.description}}</td>
+        <td>{{alert.when | date}}</td>
+        <td>
+          <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+        </td>
+      </tr>
+  </table>
+  <div *ngIf="!container.recentlyTriggered">
+    No recent triggers
+  </div>
+  <h3 class="mt-3">Price monitors</h3>
+  <table class="table table-hover" *ngIf="container.monitors">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Description</th>
+        <th>Threshold</th>
+        <th>Last Value</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let monitor of container.monitors" [ngClass]="{'bg-warning': monitor.alertType === 'Negative' && monitor.triggeredAlert, 'bg-success': monitor.alertType === 'Positive' && monitor.triggeredAlert}">
+        <td>
+          <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
+        </td>
+        <td>{{monitor.description}}</td>
+        <td>{{monitor.thresholdValue | currency}}</td>
+        <td>{{monitor.lastSeenValue | currency}}</td>
+        <td *ngIf="monitor.triggeredAlert">
+          Triggered! 
+          <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+        </td>
+        <td *ngIf="!monitor.triggeredAlert"></td>
+      </tr>
+  </table>
+  <div *ngIf="!container.monitors">
+    No price monitors are present
+  </div>
+</div>

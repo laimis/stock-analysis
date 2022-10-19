@@ -11,7 +11,7 @@ namespace core.Alerts
         string description,
         decimal numberOfShares,
         Guid userId,
-        AlertType triggerType
+        AlertType alertType
     );
 
     public interface IStockPositionMonitor

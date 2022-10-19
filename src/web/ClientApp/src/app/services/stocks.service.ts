@@ -84,12 +84,8 @@ export class StocksService {
   }
 
   // ----------------- alerts ---------------------
-  getTriggeredAlerts(): Observable<StockAlert[]> {
-    return this.http.get<StockAlert[]>('/api/alerts/triggered')
-  }
-
-  getPriceMonitors(): Observable<PriceMonitor[]> {
-    return this.http.get<PriceMonitor[]>('/api/alerts/monitors')
+  getAlerts(): Observable<AlertsContainer> {
+    return this.http.get<AlertsContainer>('/api/alerts')
   }
 
   // ----------------- notes ---------------------
@@ -341,9 +337,12 @@ export class StocksService {
 }
 
 export interface StockAlert {
+  when: string
+  ticker: string
   description: string
   numberOfShares: number
   triggeredValue: number
+  alertType: string
 }
 export interface PriceMonitor {
   description: string
@@ -352,6 +351,11 @@ export interface PriceMonitor {
   ticker: string
   triggeredAlert: StockAlert|null
   alertType: string
+}
+
+export interface AlertsContainer {
+  monitors: PriceMonitor[]
+  recentlyTriggered: StockAlert[]
 }
 
 export interface StockAnalysisOutcome {

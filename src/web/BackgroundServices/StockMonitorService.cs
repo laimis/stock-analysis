@@ -26,9 +26,6 @@ namespace web.BackgroundServices
         private IMarketHours _marketHours;
         public StockMonitorContainer _container;
 
-        // TODO: can this be removed?
-        public IEnumerable<IStockPositionMonitor> Monitors => _container.Monitors;
-
         public StockMonitorService(
             ILogger<StockMonitorService> logger,
             IAccountStorage accounts,

@@ -5,6 +5,7 @@ using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using web.Utils;
 
 namespace web.Controllers
 {
@@ -42,12 +43,8 @@ namespace web.Controllers
         [HttpPost("sms/off")]
         public Task SmsOff() => _mediator.Send(new SmsOff.Command());
 
-        [HttpGet("triggered")]
-        public Task<List<TriggeredAlert>> Triggered() =>
-            _mediator.Send(new Triggered.Query());
-
-        [HttpGet("monitors")]
-        public Task<List<IStockPositionMonitor>> Monitors() =>
-            _mediator.Send(new core.Alerts.Monitors.Query());
+        [HttpGet]
+        public Task<object> Index() =>
+            _mediator.Send(new core.Alerts.Get.Query(User.Identifier()));
     }
 }

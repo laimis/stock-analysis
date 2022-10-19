@@ -10,6 +10,7 @@ namespace core.Alerts
     {
         private ConcurrentDictionary<string, IStockPositionMonitor> _monitors = new ConcurrentDictionary<string, IStockPositionMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
+        private const int MAX_RECENT_ALERTS = 20;
 
         public IEnumerable<IStockPositionMonitor> Monitors => _monitors.Values;
 
@@ -34,6 +35,17 @@ namespace core.Alerts
             AddIfNotNull(key, profitMonitor);
         }
 
+        private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts = new Dictionary<Guid, List<TriggeredAlert>>();
+
+        internal List<TriggeredAlert> GetRecentlyTriggeredAlerts(Guid userId) =>
+            (_recentlyTriggeredAlerts.SingleOrDefault(u => u.Key == userId).Value ?? new List<TriggeredAlert>())
+            .OrderByDescending(a => a.alertType)
+            .ThenByDescending(a => a.when)
+            .ToList();
+
+        internal List<IStockPositionMonitor> GetMonitors(Guid userId) => 
+            _monitors.Values.Where(m => m.UserId == userId).ToList();
+
         private static string ToKey(OwnedStock stock) => ToKey(stock.State.Ticker, stock.State.UserId);
         private static string ToKey(string ticker, Guid userId) => userId.ToString() + ticker;
 
@@ -55,9 +67,28 @@ namespace core.Alerts
             {
                 if (m.RunCheck(ticker, newPrice, time))
                 {
+                    AddToRecent(m.TriggeredAlert);
+                    
                     yield return m.TriggeredAlert.Value;
                 }
             }
+        }
+
+        private void AddToRecent(TriggeredAlert? triggeredAlert)
+        {
+            if (!_recentlyTriggeredAlerts.ContainsKey(triggeredAlert.Value.userId))
+            {
+                _recentlyTriggeredAlerts[triggeredAlert.Value.userId] = new List<TriggeredAlert>(MAX_RECENT_ALERTS);
+            }
+
+            var list = _recentlyTriggeredAlerts[triggeredAlert.Value.userId];
+
+            if (list.Count + 1 == MAX_RECENT_ALERTS)
+            {
+                list.RemoveAt(0);
+            }
+
+            list.Add(triggeredAlert.Value);
         }
 
         public bool HasTriggered(string ticker, Guid userId)
