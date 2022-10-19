@@ -125,11 +125,11 @@ namespace core.Stocks.Services
 
             if (currentBar.Low > yesterday.High)
             {
-                gap = Math.Round( (currentBar.Open - yesterday.Close)/yesterday.Close * 100, 2);
+                gap = Math.Round( (currentBar.Low - yesterday.High)/yesterday.High * 100, 2);
             }
             else if (currentBar.High < yesterday.Low)
             {
-                gap = Math.Round( (yesterday.Close - currentBar.Open)/yesterday.Close * 100, 2);
+                gap = -1 * Math.Round( (yesterday.Low - currentBar.High)/yesterday.Low * 100, 2);
             }
 
             var gapType = gap switch {
