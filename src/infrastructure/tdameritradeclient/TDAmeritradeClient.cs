@@ -348,27 +348,27 @@ public class TDAmeritradeClient : IBrokerage
     }
 
     private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(40, TimeSpan.FromSeconds(1));
+    private AsyncTimeoutPolicy _timeOutPolicy = Policy.TimeoutAsync(30);
 
     private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
-        var accessToken = await GetAccessTokenAsync(user);
+        var oauth = await GetAccessToken(user);
 
         var request = new HttpRequestMessage(method, GenerateApiUrl(function));
 
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", oauth.access_token);
         if (jsonData != null)
         {
             request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
         }
-
-        var policy = Policy.TimeoutAsync(30);
+        
         var retryCount = 0;
 
         while(true)
         {
             try
             {
-                var response = await policy.ExecuteAsync(
+                var response = await _timeOutPolicy.ExecuteAsync(
                     async ct => await _rateLimit.ExecuteAsync(
                         ct2 => _httpClient.SendAsync(request, ct2),
                         ct
@@ -397,13 +397,13 @@ public class TDAmeritradeClient : IBrokerage
         }
     }
 
-    private async Task<string> GetAccessTokenAsync(UserState user)
+    public async Task<OAuthResponse> GetAccessToken(UserState user)
     {
         if (!_accessTokens.ContainsKey(user.Id) || _accessTokens[user.Id].IsExpired)
         {
             _accessTokens[user.Id] = await RefreshAccessToken(user);
         }
-        return _accessTokens[user.Id].access_token;
+        return _accessTokens[user.Id];
     }
 
     private async Task<OAuthResponse> RefreshAccessToken(UserState user)

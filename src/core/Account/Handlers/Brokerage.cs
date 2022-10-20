@@ -128,12 +128,7 @@ namespace core.Account
             {
                 var user = await _storage.GetUser(request.UserId);
 
-                var oauth = new OAuthResponse {
-                    access_token = user.State.BrokerageAccessToken,
-                    refresh_token = user.State.BrokerageRefreshToken
-                };
-
-                return oauth;
+                return await _brokerage.GetAccessToken(user.State);
             }
         }
     }

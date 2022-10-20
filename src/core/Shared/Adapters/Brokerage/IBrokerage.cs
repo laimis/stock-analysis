@@ -21,6 +21,7 @@ namespace core.Shared.Adapters.Brokerage
             PriceFrequency frequency = PriceFrequency.Daily,
             DateTimeOffset start = default,
             DateTimeOffset end = default);
+        Task<OAuthResponse> GetAccessToken(UserState state);
     }
 
     public enum BrokerageOrderDuration
