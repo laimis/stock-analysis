@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
-using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,13 +45,5 @@ namespace web.Controllers
 
             return await _mediator.Send(cmd);
         }
-
-        [HttpGet("analysis")]
-        public Task<IEnumerable<TickerAnalysisEntry>> Analysis() =>
-            _mediator.Send(new core.Portfolio.Analysis.Query(User.Identifier()));
-
-        [HttpGet("dailyanalysis")]
-        public Task<IEnumerable<TickerAnalysisEntry>> DailyAnalysis() =>
-            _mediator.Send(new core.Portfolio.Analysis.DailyQuery(User.Identifier()));
     }
 }

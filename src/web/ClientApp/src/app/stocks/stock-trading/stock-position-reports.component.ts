@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StocksService, PositionAnalysisEntry, PortfolioReport } from '../../services/stocks.service';
+import { StocksService, TickerOutcomes, PortfolioReport } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-position-reports',
@@ -8,8 +8,8 @@ import { StocksService, PositionAnalysisEntry, PortfolioReport } from '../../ser
 })
 export class StockPositionReportsComponent {
 
-  overallAnalysis: PositionAnalysisEntry[]
-  dailyAnalysis: PositionAnalysisEntry[]
+  historicalOutcomes: TickerOutcomes[]
+  dailyOutcomes: TickerOutcomes[]
   portfolioDailyReport: PortfolioReport;
   portfolioWeeklyReport: PortfolioReport;
 
@@ -21,16 +21,16 @@ export class StockPositionReportsComponent {
 	constructor(private service : StocksService){}
 
   @Input()
-  showDailyAnalysis: boolean = false
+  showDailyOutcomes: boolean = false
 
   @Input()
-  showOverallAnalysis: boolean = false
+  showOverallOutcomes: boolean = false
 
   @Input()
-  showDailyReport : boolean = false
+  showDailyAnalysisReport : boolean = false
 
   @Input()
-  showWeeklyReport : boolean = false
+  showWeeklyAnalysisReport : boolean = false
 
 
 	ngOnInit(): void {
@@ -38,24 +38,24 @@ export class StockPositionReportsComponent {
   }
 
 	loadData() {
-    if (this.showDailyAnalysis) {
-      this.service.getPortfolioDailyAnalysis().subscribe(result => {
-        this.dailyAnalysis = result;
+    if (this.showDailyOutcomes) {
+      this.service.reportPortfolioOutcomesDaily().subscribe(result => {
+        this.dailyOutcomes = result;
       }, error => {
         console.error(error);
         this.loaded = true;
       });
     }
     
-    if (this.showOverallAnalysis) {
-      this.service.getPortfolioAnalysis().subscribe(result => {
-        this.overallAnalysis = result;
+    if (this.showOverallOutcomes) {
+      this.service.reportPortfolioOutcomesWeekly().subscribe(result => {
+        this.historicalOutcomes = result;
       }, error => {
         console.error(error);
       });
     }
 
-    if (this.showDailyReport) {
+    if (this.showDailyAnalysisReport) {
       this.service.getPortfolioDailyReport().subscribe(result => {
         this.portfolioDailyReport = result;
       }, error => {
@@ -63,7 +63,7 @@ export class StockPositionReportsComponent {
       });
     }
 
-    if (this.showWeeklyReport) {
+    if (this.showWeeklyAnalysisReport) {
       this.service.getPortfolioWeeklyReport().subscribe(result => {
         this.portfolioWeeklyReport = result;
       }, error => {

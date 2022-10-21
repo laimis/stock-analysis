@@ -1,16 +1,16 @@
 <div>
-  <div *ngIf="!analysis">Loading {{title}}...</div>
-  <div *ngIf="analysis">
+  <div *ngIf="!outcomes">Loading {{title}}...</div>
+  <div *ngIf="outcomes">
     <h3 *ngIf="title">{{title}}</h3>
     <table  class="table table-hover striped mb-4">
       <thead>
         <tr>
           <th>Ticker</th>
-          <th *ngFor="let key of getKeys(analysis)" class="sort-header" (click)="sort(key)">{{key}}</th>
+          <th *ngFor="let key of getKeys(outcomes)" class="sort-header" (click)="sort(key)">{{key}}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let s of analysis">
+        <tr *ngFor="let s of outcomes">
           <td>
             <a [routerLink]="['/stock', s.ticker]">{{s.ticker}}</a>
           </td>

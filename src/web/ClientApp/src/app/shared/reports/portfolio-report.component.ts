@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PortfolioReport, PositionAnalysisEntry } from '../../services/stocks.service';
+import { PortfolioReport, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-portfolio-report',
@@ -14,7 +14,7 @@ export class PortfolioReportComponent {
   @Input()
   title: string
   
-	getKeys(entries:PositionAnalysisEntry[]) {
+	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)
   }
 }

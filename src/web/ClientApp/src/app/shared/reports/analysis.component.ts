@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PortfolioReportCategory, PositionAnalysisEntry } from '../../services/stocks.service';
+import { PortfolioReportCategory, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-analysis',
@@ -12,18 +12,18 @@ export class AnalysisComponent {
   title: string
   
   @Input()
-  analysis: PositionAnalysisEntry[]
+  outcomes: TickerOutcomes[]
 
   @Input()
   set category(value:PortfolioReportCategory) {
-    this.analysis = value.analysis
+    this.outcomes = value.outcomes
     this.sort(value.sortColumn)
   }
 
   sortColumn: string;
   sortDirection: number = -1
   
-	getKeys(entries:PositionAnalysisEntry[]) {
+	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)
   }
 
@@ -43,15 +43,15 @@ export class AnalysisComponent {
       return result * this.sortDirection
     }
 
-    this.runSort(this.analysis, finalFunc)
+    this.runSort(this.outcomes, finalFunc)
   }
 
-  private runSort(analysis:PositionAnalysisEntry[], compareFn) {
+  private runSort(analysis:TickerOutcomes[], compareFn) {
     analysis.sort(compareFn)
   }
 
   private getSortFunc(column:string) {
-    return (a:PositionAnalysisEntry, b:PositionAnalysisEntry) => {
+    return (a:TickerOutcomes, b:TickerOutcomes) => {
       var aVal = a.outcomes.find(o => o.key === column).value
       var bVal = b.outcomes.find(o => o.key === column).value
 

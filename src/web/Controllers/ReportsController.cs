@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Reports;
 using core.Reports.Views;
+using core.Shared.Adapters.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,12 +38,14 @@ namespace web.Controllers
             return _mediator.Send(query);
         }
 
-        [HttpGet("portfolio/daily")]
-        public Task<PortfolioReportView> PortfolioDaily()
-            => _mediator.Send(Portfolio.Query.Daily(User.Identifier()));
-            
-        [HttpGet("portfolio/weekly")]
-        public Task<PortfolioReportView> PortfolioWeekly()
-            => _mediator.Send(Portfolio.Query.Weekly(User.Identifier()));
+        [HttpGet("analysis/portfolio")]
+        public Task<AnalysisReportView> AnalysisReportPortfolio([FromQuery]PriceFrequency frequency)
+            => _mediator.Send(new AnalysisReport.ForPortfolioQuery(frequency, User.Identifier()));
+
+        
+
+        [HttpGet("outcomes/portfolio")]
+        public Task<List<TickerOutcomes>> Analysis([FromQuery]PriceFrequency frequency) =>
+            _mediator.Send(new OutcomesReport.ForPortfolioQuery(frequency, User.Identifier()));
     }
 }

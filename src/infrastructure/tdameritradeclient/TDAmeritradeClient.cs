@@ -386,7 +386,7 @@ public class TDAmeritradeClient : IBrokerage
 
                 if (retryCount > 3)
                 {
-                    throw;
+                    throw new TimeoutRejectedException("Rate limit exceeded after retries");
                 }
                 else
                 {

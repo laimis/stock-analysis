@@ -4,8 +4,8 @@
     <h3 *ngIf="title">{{title}}</h3>
     <div *ngFor="let c of report.categories">
       <h3 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative'}">{{c.name}}</h3>
-      <app-analysis *ngIf="c.analysis.length > 0" [category]="c"></app-analysis>
-      <span *ngIf="c.analysis.length === 0">No positions in this category.</span>
+      <app-analysis *ngIf="c.outcomes.length > 0" [category]="c"></app-analysis>
+      <span *ngIf="c.outcomes.length === 0">No positions in this category.</span>
     </div>
   </div>
   

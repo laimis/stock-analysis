@@ -155,22 +155,6 @@ export class StocksService {
 		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
   }
 
-  getPortfolioAnalysis(): Observable<PositionAnalysisEntry[]> {
-		return this.http.get<PositionAnalysisEntry[]>('/api/portfolio/analysis')
-  }
-
-  getPortfolioDailyAnalysis(): Observable<PositionAnalysisEntry[]> {
-		return this.http.get<PositionAnalysisEntry[]>('/api/portfolio/dailyanalysis')
-  }
-
-  getPortfolioDailyReport(): Observable<PortfolioReport> {
-    return this.http.get<PortfolioReport>('/api/reports/portfolio/daily')
-  }
-
-  getPortfolioWeeklyReport(): Observable<PortfolioReport> {
-    return this.http.get<PortfolioReport>('/api/reports/portfolio/weekly')
-  }
-
   deleteStocks(id: string): Observable<object> {
     return this.http.delete(`/api/stocks/${id}`)
   }
@@ -333,6 +317,22 @@ export class StocksService {
 
   recentSells() : Observable<Sells> {
     return this.http.get<Sells>('/api/reports/sells')
+  }
+
+  reportPortfolioOutcomesWeekly(): Observable<TickerOutcomes[]> {
+		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=weekly')
+  }
+
+  reportPortfolioOutcomesDaily(): Observable<TickerOutcomes[]> {
+		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=daily')
+  }
+
+  getPortfolioDailyReport(): Observable<PortfolioReport> {
+    return this.http.get<PortfolioReport>('/api/reports/analysis/portfolio?frequency=daily')
+  }
+
+  getPortfolioWeeklyReport(): Observable<PortfolioReport> {
+    return this.http.get<PortfolioReport>('/api/reports/analysis/portfolio?frequency=weekly')
   }
 }
 
@@ -606,7 +606,7 @@ export interface StockOwnership {
   transactions: Transaction[]
 }
 
-export interface PositionAnalysisEntry {
+export interface TickerOutcomes {
   ticker: string
   outcomes: StockAnalysisOutcome[]
 }
@@ -619,7 +619,7 @@ export interface PortfolioReportCategory {
   name: string
   type: string
   sortColumn: string
-  analysis: PositionAnalysisEntry[]
+  outcomes: TickerOutcomes[]
 }
 
 export interface StockTradingPerformance {

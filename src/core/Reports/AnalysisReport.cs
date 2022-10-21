@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Stocks;
-using core.Portfolio;
 using core.Reports.Views;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
@@ -14,22 +13,19 @@ using core.Stocks.Services;
 
 namespace core.Reports
 {
-    public class Portfolio
+    public class AnalysisReport
     {
-        public class Query : RequestWithUserId<PortfolioReportView>
+        public class ForPortfolioQuery : RequestWithUserId<AnalysisReportView>
         {
-            public Query(PriceFrequency frequey, Guid userId) : base(userId)
+            public ForPortfolioQuery(PriceFrequency frequency, Guid userId) : base(userId)
             {
-                Frequency = frequey;
+                Frequency = frequency;
             }
-
-            public static Query Daily(Guid userId) => new(PriceFrequency.Daily, userId);
-            public static Query Weekly(Guid userId) => new(PriceFrequency.Weekly, userId);
 
             public PriceFrequency Frequency { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, PortfolioReportView>
+        public class Handler : HandlerWithStorage<ForPortfolioQuery, AnalysisReportView>
         {
             private IAccountStorage _accounts;
             private IStocksService2 _stockService;
@@ -53,27 +49,28 @@ namespace core.Reports
             private const decimal ExcellentClosingRange = 80m;
             private const decimal LowClosingRange = 20m;
 
-            public override async Task<PortfolioReportView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<AnalysisReportView> Handle(ForPortfolioQuery request, CancellationToken cancellationToken)
             {
-                var stocks = await _storage.GetStocks(request.UserId);
-
-                var positions = stocks.Where(s => s.State.OpenPosition != null)
-                    .Select(s => s.State.OpenPosition)
-                    .ToList();
-
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
                 {
                     throw new Exception("User not found");
                 }
 
-                var tickerOutcomes = new List<TickerAnalysisEntry>();
-                foreach (var p in positions)
+                var tickers = await GetTickers(user.State);
+
+                return await GenerateAnalysisReport(request.Frequency, tickers, user);
+            }
+
+            private async Task<AnalysisReportView> GenerateAnalysisReport(PriceFrequency frequency, List<string> tickers, User user)
+            {
+                var tickerOutcomes = new List<TickerOutcomes>();
+                foreach (var ticker in tickers)
                 {
                     var prices = await _brokerage.GetHistoricalPrices(
                         user.State,
-                        p.Ticker,
-                        request.Frequency
+                        ticker,
+                        frequency
                     );
 
                     if (prices.Success.Length == 0)
@@ -83,18 +80,27 @@ namespace core.Reports
 
                     var outcomes = SingleBarAnalysisRunner.Run(prices.Success);
 
-                    tickerOutcomes.Add(new TickerAnalysisEntry(outcomes, p.Ticker));
+                    tickerOutcomes.Add(new TickerOutcomes(outcomes, ticker));
                 }
 
                 var categories = GenerateReportCategories(tickerOutcomes);
 
-                return new PortfolioReportView(categories);
+                return new AnalysisReportView(categories);
             }
 
-            private static IEnumerable<PortfolioReportCategory> GenerateReportCategories(List<TickerAnalysisEntry> tickerOutcomes)
+            private async Task<List<string>> GetTickers(UserState user)
+            {
+                var stocks = await _storage.GetStocks(user.Id);
+
+                return stocks.Where(s => s.State.OpenPosition != null)
+                    .Select(s => s.State.OpenPosition.Ticker)
+                    .ToList();
+            }
+
+            private static IEnumerable<AnalysisCategoryGrouping> GenerateReportCategories(List<TickerOutcomes> tickerOutcomes)
             {
                 // stocks that had above average volume grouping
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Above Average Volume and High Percent Change",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.RelativeVolume,
@@ -105,7 +111,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Positive Closes",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.PercentChange,
@@ -115,7 +121,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.ClosingRange,
@@ -126,7 +132,7 @@ namespace core.Reports
                         ).ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "High Volume with Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.RelativeVolume,
@@ -139,7 +145,7 @@ namespace core.Reports
                 );
 
                 // negative outcome types
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Above Average Volume and Negative Percent Change",
                     OutcomeType.Negative,
                     SingleBarOutcomeKeys.RelativeVolume,
@@ -150,7 +156,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Low Closing Range",
                     OutcomeType.Negative,
                     SingleBarOutcomeKeys.ClosingRange,
@@ -160,7 +166,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Above Average Volume but Small Positive Percent Change",
                     OutcomeType.Negative,
                     SingleBarOutcomeKeys.RelativeVolume,
@@ -171,7 +177,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "SMA20 Below SMA50 Recent",
                     OutcomeType.Neutral,
                     SingleBarOutcomeKeys.SMA20Above50Days,
@@ -181,7 +187,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Positive gap ups",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.GapPercentage,
@@ -191,7 +197,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "Negative gap downs",
                     OutcomeType.Negative,
                     SingleBarOutcomeKeys.GapPercentage,
@@ -201,7 +207,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "New Highs",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.NewHigh,
@@ -211,7 +217,7 @@ namespace core.Reports
                         .ToList()
                 );
 
-                yield return new Views.PortfolioReportCategory(
+                yield return new Views.AnalysisCategoryGrouping(
                     "New Lows",
                     OutcomeType.Negative,
                     SingleBarOutcomeKeys.NewLow,
