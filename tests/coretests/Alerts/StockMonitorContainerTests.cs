@@ -38,28 +38,16 @@ namespace coretests.Alerts
         }
 
         [Fact]
-        public void TickersMatch()
-        {
-            Assert.Equal(2, _uat.GetTickers().Count());
-        }
+        public void TickersMatch() => Assert.Equal(2, _uat.GetTickers().Count());
 
         [Fact]
-        public void MonitorCountMatches()
-        {
-            Assert.Equal(4, _uat.Monitors.Count());
-        }
+        public void MonitorCountMatches() => Assert.Equal(4, _uat.Monitors.Count());
 
         [Fact]
-        public void InitialUpdateNoTriggers()
-        {
-            Assert.Empty(_initialTriggers);
-        }
+        public void InitialUpdateNoTriggers() => Assert.Empty(_initialTriggers);
 
         [Fact]
-        public void SubsequentUpdateTriggers()
-        {
-            Assert.Single(_subsequentTriggers);
-        }
+        public void SubsequentUpdateTriggers() => Assert.Single(_subsequentTriggers);
 
         [Fact]
         public void SubsequentUpdateTriggersMatches()
