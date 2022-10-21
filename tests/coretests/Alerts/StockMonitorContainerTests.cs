@@ -70,10 +70,32 @@ namespace coretests.Alerts
         }
 
         [Fact]
+        public void SubsequentUpdateTriggersMatchesType()
+        {
+            var t = _subsequentTriggers[0];
+
+            Assert.Equal(AlertType.Negative, t.alertType);
+        }
+
+        [Fact]
+        public void SubsequentUpdateTriggersMatchesSource()
+        {
+            var t = _subsequentTriggers[0];
+
+            Assert.Equal(nameof(StopPriceMonitor), t.source);
+        }
+
+        [Fact]
         public void TriggeredCheck()
         {
             Assert.True(_uat.HasTriggered(_amd.State.Ticker, _amd.State.UserId));
             Assert.False(_uat.HasTriggered(_bac.State.Ticker, _bac.State.UserId));
+        }
+
+        [Fact]
+        public void RecentTriggerTest()
+        {
+            _uat.HasRecentlyTriggered(_subsequentTriggers[0]);
         }
     }
 }

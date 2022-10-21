@@ -11,7 +11,8 @@ namespace core.Alerts
         string description,
         decimal numberOfShares,
         Guid userId,
-        AlertType alertType
+        AlertType alertType,
+        string source
     );
 
     public interface IStockPositionMonitor
@@ -156,7 +157,8 @@ namespace core.Alerts
                 $"Profit target hit for {Ticker} at {price}",
                 NumberOfShares,
                 UserId,
-                AlertType.Positive
+                AlertType.Positive,
+                nameof(ProfitPriceMonitor)
             );
         }
     }
@@ -239,7 +241,8 @@ namespace core.Alerts
                 $"Stop price {ThresholdValue} for {Ticker} was triggered at {price}",
                 NumberOfShares,
                 UserId,
-                AlertType.Negative
+                AlertType.Negative,
+                nameof(StopPriceMonitor)
             );
         }
     }

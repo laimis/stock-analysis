@@ -154,6 +154,12 @@ namespace web.BackgroundServices
 
                 foreach(var a in alerts)
                 {
+                    // only send alerts via SMS if they haven't recently been hit
+                    if (_container.HasRecentlyTriggered(a))
+                    {
+                        continue;
+                    }
+
                     await _smsClient.SendSMS(a.description);
                 }
             }

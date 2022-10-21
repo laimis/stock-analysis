@@ -97,5 +97,15 @@ namespace core.Alerts
                 .Where(m => m.IsTriggered)
                 .Any();
         }
+
+        public bool HasRecentlyTriggered(TriggeredAlert a)
+        {
+            if (_recentlyTriggeredAlerts.TryGetValue(a.userId, out var list))
+            {
+                return list.Any(r => r.source == a.source && r.ticker == a.ticker);
+            }
+
+            return false;
+        }
     }
 }
