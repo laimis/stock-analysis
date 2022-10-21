@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { Alert } from 'selenium-webdriver';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -137,14 +136,6 @@ export class StocksService {
 
 	getStockDetails(symbol:string): Observable<StockDetails> {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
-  }
-
-  getStockAnalysis(symbol:string): Observable<StockAnalysis> {
-		return this.http.get<StockAnalysis>(`/api/stocks/${symbol}/analysis`)
-  }
-
-  getStockDailyAnalysis(symbol:string): Observable<StockAnalysis> {
-		return this.http.get<StockAnalysis>(`/api/stocks/${symbol}/dailyanalysis`)
   }
 
   getStockPrice(symbol:string): Observable<number> {
@@ -319,6 +310,14 @@ export class StocksService {
     return this.http.get<Sells>('/api/reports/sells')
   }
 
+  reportTickerOutcomesWeekly(ticker:string) : Observable<TickerOutcomes[]> {
+    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?frequency=weekly')
+  }
+
+  reportTickerOutcomesDaily(ticker:string) : Observable<TickerOutcomes[]> {
+    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?frequency=daily')
+  }
+
   reportPortfolioOutcomesWeekly(): Observable<TickerOutcomes[]> {
 		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=weekly')
   }
@@ -363,12 +362,6 @@ export interface StockAnalysisOutcome {
   message: string
   key: string
   value: number
-}
-
-export interface StockAnalysis {
-  price: number
-  historicalPrices: Prices
-  outcomes: StockAnalysisOutcome[]
 }
 
 export interface Sells {

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance, StockAnalysis } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TickerOutcomes } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -17,7 +17,7 @@ export class StockChartsComponent implements OnInit {
   private _index: number = 0
   currentPosition: PositionInstance
   prices: Prices
-  analysis: StockAnalysis;
+  outcomes: TickerOutcomes;
 
   constructor (private stockService: StocksService) { }
 
@@ -40,10 +40,10 @@ export class StockChartsComponent implements OnInit {
       }
     )
 
-    this.analysis = null
-    this.stockService.getStockAnalysis(this.currentPosition.ticker).subscribe(
-      (r: StockAnalysis) => {
-        this.analysis = r
+    this.outcomes = null
+    this.stockService.reportTickerOutcomesWeekly(this.currentPosition.ticker).subscribe(
+      data => {
+        this.outcomes = data[0]
       }
     )
   }
@@ -83,7 +83,7 @@ export class StockChartsComponent implements OnInit {
     return positionInstance.transactions.filter(t => t.type == 'sell')
   }
 
-  interestingOutcomes(a: StockAnalysis): any {
+  interestingOutcomes(a: TickerOutcomes): any {
     return a.outcomes.filter(o => o.type == 'Positive' || o.type == 'Negative')
   }
 

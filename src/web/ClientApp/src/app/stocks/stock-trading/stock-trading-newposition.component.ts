@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, OnInit } from '@angular/core';
-import { Prices, SMA, StockAnalysis, StockAnalysisOutcome, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Prices, SMA, StockAnalysisOutcome, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -43,7 +43,7 @@ export class StockTradingNewPositionComponent {
   prices: Prices | null = null
   stopAndExitPoints: number[] = []
 
-  analysis: StockAnalysis
+  outcomes: TickerOutcomes
 
   onBuyTickerSelected(ticker: string) {
     
@@ -63,10 +63,10 @@ export class StockTradingNewPositionComponent {
       }
     );
 
-    this.stockService.getStockAnalysis(ticker)
-      .subscribe(analysis => {
-        console.log(analysis)
-        this.analysis = analysis
+    this.stockService.reportTickerOutcomesWeekly(ticker)
+      .subscribe(data => {
+        console.log(data)
+        this.outcomes = data[0]
       }, error => {
         console.error(error)
       }
@@ -188,10 +188,10 @@ export class StockTradingNewPositionComponent {
   }
 
   filteredOutcomes(): StockAnalysisOutcome[] {
-    if (!this.analysis) {
+    if (!this.outcomes) {
       return []
     }
-    return this.analysis.outcomes.filter(o => o.type !== "Neutral")
+    return this.outcomes.outcomes.filter(o => o.type !== "Neutral")
   }
 }
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { StockAnalysis, StocksService } from 'src/app/services/stocks.service';
+import { StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -7,8 +7,8 @@ import { StockAnalysis, StocksService } from 'src/app/services/stocks.service';
   styleUrls: ['./stock-analysis.component.css']
 })
 export class StockAnalysisComponent implements OnInit {
-  analysis: StockAnalysis;
-  daily_analysis : StockAnalysis;
+  historicalOutcomes: TickerOutcomes;
+  dailyOutcomes : TickerOutcomes;
 
   constructor(
     private stockService : StocksService
@@ -18,25 +18,25 @@ export class StockAnalysisComponent implements OnInit {
   ticker: string;
 
   ngOnInit(): void {
-    this.stockService.getStockAnalysis(this.ticker).subscribe(
+    this.stockService.reportTickerOutcomesWeekly(this.ticker).subscribe(
       data => {
-        this.analysis = data
+        this.historicalOutcomes = data[0]
       }
     );
 
-    this.stockService.getStockDailyAnalysis(this.ticker).subscribe(
+    this.stockService.reportTickerOutcomesDaily(this.ticker).subscribe(
       data => {
-        this.daily_analysis = data
+        this.dailyOutcomes = data[0]
       }
     );
   }
 
-  positiveCount(analysis: StockAnalysis) {
-    return analysis.outcomes.filter(r => r.type === 'Positive').length;
+  positiveCount(outcomes: TickerOutcomes) {
+    return outcomes.outcomes.filter(r => r.type === 'Positive').length;
   }
 
-  negativeCount(analysis: StockAnalysis) {
-    return analysis.outcomes.filter(r => r.type === 'Negative').length;
+  negativeCount(outcomes: TickerOutcomes) {
+    return outcomes.outcomes.filter(r => r.type === 'Negative').length;
   }
 
 }
