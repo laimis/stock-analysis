@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PositionAnalysisEntry } from '../../services/stocks.service';
+import { PortfolioReportCategory, PositionAnalysisEntry } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-analysis',
@@ -14,7 +14,13 @@ export class AnalysisComponent {
   @Input()
   analysis: PositionAnalysisEntry[]
 
-  sortColumn: string
+  @Input()
+  set category(value:PortfolioReportCategory) {
+    this.analysis = value.analysis
+    this.sort(value.sortColumn)
+  }
+
+  sortColumn: string;
   sortDirection: number = -1
   
 	getKeys(entries:PositionAnalysisEntry[]) {
@@ -37,7 +43,11 @@ export class AnalysisComponent {
       return result * this.sortDirection
     }
 
-    this.analysis.sort(finalFunc)
+    this.runSort(this.analysis, finalFunc)
+  }
+
+  private runSort(analysis:PositionAnalysisEntry[], compareFn) {
+    analysis.sort(compareFn)
   }
 
   private getSortFunc(column:string) {

@@ -7,6 +7,7 @@ namespace core.Reports.Views
     public record struct PortfolioReportCategory(
         string name,
         OutcomeType type,
+        string sortColumn,
         List<PositionAnalysisEntry> analysis
     );
 

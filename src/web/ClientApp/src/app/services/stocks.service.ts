@@ -618,6 +618,7 @@ export interface PortfolioReport {
 export interface PortfolioReportCategory {
   name: string
   type: string
+  sortColumn: string
   analysis: PositionAnalysisEntry[]
 }
 

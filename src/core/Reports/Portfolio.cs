@@ -97,6 +97,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Above Average Volume and High Percent Change",
                     OutcomeType.Positive,
+                    SingleBarOutcomeKeys.RelativeVolume,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
@@ -107,6 +108,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Positive Closes",
                     OutcomeType.Positive,
+                    SingleBarOutcomeKeys.PercentChange,
                     tickerOutcomes
                         .Where(t => t.Outcomes.Any(o =>
                             o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0))
@@ -116,6 +118,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
+                    SingleBarOutcomeKeys.ClosingRange,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
@@ -126,6 +129,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "High Volume with Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
+                    SingleBarOutcomeKeys.RelativeVolume,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
@@ -138,6 +142,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Above Average Volume and Negative Percent Change",
                     OutcomeType.Negative,
+                    SingleBarOutcomeKeys.RelativeVolume,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
@@ -148,6 +153,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Low Closing Range",
                     OutcomeType.Negative,
+                    SingleBarOutcomeKeys.ClosingRange,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value < LowClosingRange))
@@ -157,6 +163,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Above Average Volume but Small Positive Percent Change",
                     OutcomeType.Negative,
+                    SingleBarOutcomeKeys.RelativeVolume,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
@@ -167,6 +174,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "SMA20 Below SMA50 Recent",
                     OutcomeType.Neutral,
+                    SingleBarOutcomeKeys.SMA20Above50Days,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
@@ -176,6 +184,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Positive gap ups",
                     OutcomeType.Positive,
+                    SingleBarOutcomeKeys.GapPercentage,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value > 0))
@@ -185,6 +194,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "Negative gap downs",
                     OutcomeType.Negative,
+                    SingleBarOutcomeKeys.GapPercentage,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value < 0))
@@ -194,6 +204,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "New Highs",
                     OutcomeType.Positive,
+                    SingleBarOutcomeKeys.NewHigh,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh && o.value > 0))
@@ -203,6 +214,7 @@ namespace core.Reports
                 yield return new Views.PortfolioReportCategory(
                     "New Lows",
                     OutcomeType.Negative,
+                    SingleBarOutcomeKeys.NewLow,
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewLow && o.value < 0))
