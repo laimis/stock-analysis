@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StocksService, TickerOutcomes, PortfolioReport } from '../../services/stocks.service';
+import { StocksService, TickerOutcomes, OutcomesAnalysisReport } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-position-reports',
@@ -10,8 +10,8 @@ export class StockPositionReportsComponent {
 
   historicalOutcomes: TickerOutcomes[]
   dailyOutcomes: TickerOutcomes[]
-  portfolioDailyReport: PortfolioReport;
-  portfolioWeeklyReport: PortfolioReport;
+  portfolioDailyReport: OutcomesAnalysisReport;
+  portfolioWeeklyReport: OutcomesAnalysisReport;
 
   loaded: boolean = false
   sortColumn: string
@@ -56,7 +56,7 @@ export class StockPositionReportsComponent {
     }
 
     if (this.showDailyAnalysisReport) {
-      this.service.getPortfolioDailyReport().subscribe(result => {
+      this.service.reportPorfolioAnalysisDaily().subscribe(result => {
         this.portfolioDailyReport = result;
       }, error => {
         console.error(error);
@@ -64,7 +64,7 @@ export class StockPositionReportsComponent {
     }
 
     if (this.showWeeklyAnalysisReport) {
-      this.service.getPortfolioWeeklyReport().subscribe(result => {
+      this.service.reportPortfolioAnalysisWeekly().subscribe(result => {
         this.portfolioWeeklyReport = result;
       }, error => {
         console.error(error);

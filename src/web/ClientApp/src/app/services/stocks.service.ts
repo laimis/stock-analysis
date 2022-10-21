@@ -326,12 +326,20 @@ export class StocksService {
 		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=daily')
   }
 
-  getPortfolioDailyReport(): Observable<PortfolioReport> {
-    return this.http.get<PortfolioReport>('/api/reports/analysis/portfolio?frequency=daily')
+  reportPorfolioAnalysisDaily(): Observable<OutcomesAnalysisReport> {
+    return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/portfolio?frequency=daily')
   }
 
-  getPortfolioWeeklyReport(): Observable<PortfolioReport> {
-    return this.http.get<PortfolioReport>('/api/reports/analysis/portfolio?frequency=weekly')
+  reportPortfolioAnalysisWeekly(): Observable<OutcomesAnalysisReport> {
+    return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/portfolio?frequency=weekly')
+  }
+
+  reportTickerAnalysisDaily(ticker:string): Observable<OutcomesAnalysisReport> {
+    return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/ticker/' + ticker + '?frequency=daily')
+  }
+
+  reportTickerAnalysisWeekly(ticker:string): Observable<OutcomesAnalysisReport> {
+    return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/ticker/' + ticker + '?frequency=weekly')
   }
 }
 
@@ -604,11 +612,11 @@ export interface TickerOutcomes {
   outcomes: StockAnalysisOutcome[]
 }
 
-export interface PortfolioReport {
-  categories: PortfolioReportCategory[]
+export interface OutcomesAnalysisReport {
+  categories: AnalysisCategoryGrouping[]
 }
 
-export interface PortfolioReportCategory {
+export interface AnalysisCategoryGrouping {
   name: string
   type: string
   sortColumn: string

@@ -10,6 +10,7 @@ using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services;
+using MediatR;
 
 namespace core.Reports
 {
@@ -25,7 +26,20 @@ namespace core.Reports
             public PriceFrequency Frequency { get; }
         }
 
-        public class Handler : HandlerWithStorage<ForPortfolioQuery, AnalysisReportView>
+        public class ForTickerQuery: RequestWithUserId<AnalysisReportView>
+        {
+            public ForTickerQuery(PriceFrequency frequency, string ticker, Guid userId) : base(userId)
+            {
+                Frequency = frequency;
+                Ticker = ticker;
+            }
+
+            public PriceFrequency Frequency { get; }
+            public string Ticker { get; }
+        }
+
+        public class Handler : HandlerWithStorage<ForPortfolioQuery, AnalysisReportView>,
+            IRequestHandler<ForTickerQuery, AnalysisReportView>
         {
             private IAccountStorage _accounts;
             private IStocksService2 _stockService;
@@ -49,6 +63,19 @@ namespace core.Reports
             private const decimal ExcellentClosingRange = 80m;
             private const decimal LowClosingRange = 20m;
 
+            public async Task<AnalysisReportView> Handle(ForTickerQuery request, CancellationToken cancellationToken)
+            {
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                var tickers = new [] { request.Ticker };
+
+                return await GenerateAnalysisReport(request.Frequency, tickers, user);
+            }
+
             public override async Task<AnalysisReportView> Handle(ForPortfolioQuery request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
@@ -62,7 +89,7 @@ namespace core.Reports
                 return await GenerateAnalysisReport(request.Frequency, tickers, user);
             }
 
-            private async Task<AnalysisReportView> GenerateAnalysisReport(PriceFrequency frequency, List<string> tickers, User user)
+            private async Task<AnalysisReportView> GenerateAnalysisReport(PriceFrequency frequency, IEnumerable<string> tickers, User user)
             {
                 var tickerOutcomes = new List<TickerOutcomes>();
                 foreach (var ticker in tickers)
