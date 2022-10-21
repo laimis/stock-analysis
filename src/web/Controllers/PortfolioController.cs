@@ -49,11 +49,11 @@ namespace web.Controllers
         }
 
         [HttpGet("analysis")]
-        public Task<IEnumerable<PositionAnalysisEntry>> Analysis() =>
+        public Task<IEnumerable<TickerAnalysisEntry>> Analysis() =>
             _mediator.Send(new core.Portfolio.Analysis.Query(User.Identifier()));
 
         [HttpGet("dailyanalysis")]
-        public Task<IEnumerable<PositionAnalysisEntry>> DailyAnalysis() =>
+        public Task<IEnumerable<TickerAnalysisEntry>> DailyAnalysis() =>
             _mediator.Send(new core.Portfolio.Analysis.DailyQuery(User.Identifier()));
     }
 }

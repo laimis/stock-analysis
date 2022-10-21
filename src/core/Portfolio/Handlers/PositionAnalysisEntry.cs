@@ -4,15 +4,15 @@ using core.Stocks.Services;
 
 namespace core.Portfolio
 {
-    public struct PositionAnalysisEntry
+    public struct TickerAnalysisEntry
     {
-        public PositionAnalysisEntry(PositionInstance position, List<AnalysisOutcome> outcomes)
+        public TickerAnalysisEntry(List<AnalysisOutcome> outcomes, string ticker)
         {
-            Position = position;
             Outcomes = outcomes;
+            Ticker = ticker;
         }
 
-        public PositionInstance Position { get; }
+        public string Ticker { get; }
         public List<AnalysisOutcome> Outcomes { get; }
     }
 }

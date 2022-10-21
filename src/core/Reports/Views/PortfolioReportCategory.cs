@@ -8,7 +8,7 @@ namespace core.Reports.Views
         string name,
         OutcomeType type,
         string sortColumn,
-        List<PositionAnalysisEntry> analysis
+        List<TickerAnalysisEntry> analysis
     );
 
     public record struct PortfolioReportView(

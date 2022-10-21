@@ -67,7 +67,7 @@ namespace core.Reports
                     throw new Exception("User not found");
                 }
 
-                var tickerOutcomes = new List<PositionAnalysisEntry>();
+                var tickerOutcomes = new List<TickerAnalysisEntry>();
                 foreach (var p in positions)
                 {
                     var prices = await _brokerage.GetHistoricalPrices(
@@ -83,7 +83,7 @@ namespace core.Reports
 
                     var outcomes = SingleBarAnalysisRunner.Run(prices.Success);
 
-                    tickerOutcomes.Add(new PositionAnalysisEntry(p, outcomes));
+                    tickerOutcomes.Add(new TickerAnalysisEntry(outcomes, p.Ticker));
                 }
 
                 var categories = GenerateReportCategories(tickerOutcomes);
@@ -91,7 +91,7 @@ namespace core.Reports
                 return new PortfolioReportView(categories);
             }
 
-            private static IEnumerable<PortfolioReportCategory> GenerateReportCategories(List<PositionAnalysisEntry> tickerOutcomes)
+            private static IEnumerable<PortfolioReportCategory> GenerateReportCategories(List<TickerAnalysisEntry> tickerOutcomes)
             {
                 // stocks that had above average volume grouping
                 yield return new Views.PortfolioReportCategory(

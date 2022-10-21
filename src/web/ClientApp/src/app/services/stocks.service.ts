@@ -607,7 +607,7 @@ export interface StockOwnership {
 }
 
 export interface PositionAnalysisEntry {
-  position: PositionInstance,
+  ticker: string
   outcomes: StockAnalysisOutcome[]
 }
 
