@@ -688,6 +688,13 @@ export interface PositionTransaction {
   when: string,
 }
 
+export interface PositionEvent {
+  when: string,
+  value: number | null,
+  type: string,
+  description: string,
+}
+
 export interface PositionInstance {
   averageBuyCostPerShare: number,
   averageCostPerShare: number,
@@ -715,6 +722,7 @@ export interface PositionInstance {
   stopPrice: number,
   ticker: string,
   transactions: PositionTransaction[],
+  events: PositionEvent[],
   unrealizedGainPct: number,
   unrealizedProfit: number,
   unrealizedRR: number

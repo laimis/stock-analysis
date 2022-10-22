@@ -4,23 +4,8 @@ using System.Linq;
 
 namespace core.Stocks
 {
-    public struct PositionTransaction
-    {
-        public PositionTransaction(decimal numberOfShares, decimal price, Guid transactionId, string type, DateTimeOffset when)
-        {
-            NumberOfShares = numberOfShares;
-            Price = price;
-            TransactionId = transactionId;
-            Type = type;
-            When = when;
-        }
-
-        public decimal Price { get; }
-        public Guid TransactionId { get; }
-        public DateTimeOffset When { get; }
-        public decimal NumberOfShares { get; }
-        public string Type { get; set; }
-    }
+    public record struct PositionEvent (string description, string type, decimal? value, DateTimeOffset when);
+    public record struct PositionTransaction(decimal numberOfShares, decimal price, Guid transactionId, string type, DateTimeOffset when);
 
     // PositionInstance models a stock position from the time the first share is opened
     // to the time when the last share is sold.
@@ -59,6 +44,7 @@ namespace core.Stocks
         public decimal? RiskedAmount { get; private set; }
         
         public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
+        public List<PositionEvent> Events { get; private set; } = new List<PositionEvent>();
 
         public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
@@ -123,8 +109,8 @@ namespace core.Stocks
 
         internal void RemoveTransaction(Guid transactionId)
         {
-            var tx = Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
-            if (tx.TransactionId == null)
+            var tx = Transactions.FirstOrDefault(t => t.transactionId == transactionId);
+            if (tx.transactionId == null)
             {
                 throw new InvalidOperationException($"Transaction {transactionId} not found");
             }
@@ -144,7 +130,7 @@ namespace core.Stocks
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null)
             {
-                SetStopPrice(FirstBuyCost.Value * 0.95m);
+                SetStopPrice(FirstBuyCost.Value * 0.95m, when);
             }
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
@@ -164,28 +150,34 @@ namespace core.Stocks
             }
         }
 
-        public void SetStopPrice(decimal? stopPrice)
+        public void SetStopPrice(decimal? stopPrice, DateTimeOffset when)
         {
             if (stopPrice != null)
             {
                 StopPrice = stopPrice;
 
+                Events.Add(new PositionEvent($"Stop price set to {stopPrice}", "stop", stopPrice, when));
+
                 if (RiskedAmount == null)
                 {
-                    RiskedAmount = (AverageCostPerShare - stopPrice.Value) * NumberOfShares;
+                    SetRiskAmount((AverageCostPerShare - stopPrice.Value) * NumberOfShares, when);
                 }
             }
         }
 
-        public void DeleteStopPrice()
+        public void DeleteStopPrice(DateTimeOffset when)
         {
             StopPrice = null;
             RiskedAmount = null;
+
+            Events.Add(new PositionEvent("Stop price deleted", "stop", null, when));
         }
 
-        public void SetRiskAmount(decimal riskAmount)
+        public void SetRiskAmount(decimal riskAmount, DateTimeOffset when)
         {
             RiskedAmount = riskAmount;
+
+            Events.Add(new PositionEvent("Set risk amount", "risk", riskAmount, when));
         }
 
         internal void SetPrice(decimal price)
@@ -213,34 +205,34 @@ namespace core.Stocks
             decimal totalNumberOfSharesBought = 0;
 
             Transactions.ForEach(transaction => {
-            if (transaction.Type == "buy")
+            if (transaction.type == "buy")
             {
-                for (var i = 0; i < transaction.NumberOfShares; i++)
+                for (var i = 0; i < transaction.numberOfShares; i++)
                 {
-                    _slots.Add(transaction.Price);
-                    cost += transaction.Price;
+                    _slots.Add(transaction.price);
+                    cost += transaction.price;
                     numberOfShares++;
                 }
 
-                totalBuy += transaction.Price * transaction.NumberOfShares;
-                totalNumberOfSharesBought += transaction.NumberOfShares;
+                totalBuy += transaction.price * transaction.numberOfShares;
+                totalNumberOfSharesBought += transaction.numberOfShares;
             }
             else
             {
                 // remove quantity number of slots from the beginning of an array
-                var removed = _slots.Take((int)transaction.NumberOfShares).ToList();
-                _slots.RemoveRange(0, (int)transaction.NumberOfShares);
+                var removed = _slots.Take((int)transaction.numberOfShares).ToList();
+                _slots.RemoveRange(0, (int)transaction.numberOfShares);
                 removed.ForEach(
                     removedElement =>
                     {
-                        profit += transaction.Price - removedElement;
+                        profit += transaction.price - removedElement;
                         cost -= removedElement;
                         numberOfShares--;
                     }
                 );
                 
-                totalSale += transaction.Price * transaction.NumberOfShares;
-                totalNumberOfSharesSold += transaction.NumberOfShares;
+                totalSale += transaction.price * transaction.numberOfShares;
+                totalNumberOfSharesSold += transaction.numberOfShares;
             }
             });
 

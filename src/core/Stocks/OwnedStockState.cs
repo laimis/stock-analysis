@@ -35,17 +35,17 @@ namespace core.Stocks
 
         internal void ApplyInternal(StopPriceSet stopPriceSet)
         {
-            OpenPosition.SetStopPrice(stopPriceSet.StopPrice);
+            OpenPosition.SetStopPrice(stopPriceSet.StopPrice, stopPriceSet.When);
         }
 
         internal void ApplyInternal(StopDeleted deleted)
         {
-            OpenPosition.DeleteStopPrice();
+            OpenPosition.DeleteStopPrice(deleted.When);
         }
 
         internal void ApplyInternal(RiskAmountSet riskAmountSet)
         {
-            OpenPosition.SetRiskAmount(riskAmountSet.RiskAmount);
+            OpenPosition.SetRiskAmount(riskAmountSet.RiskAmount, riskAmountSet.When);
         }
 
         internal void ApplyInternal(StockPurchased_v2 purchased)
@@ -61,7 +61,7 @@ namespace core.Stocks
 
             if (purchased.StopPrice.HasValue)
             {
-                OpenPosition.SetStopPrice(purchased.StopPrice.Value);
+                OpenPosition.SetStopPrice(purchased.StopPrice.Value, purchased.When);
             }
 
             Transactions.Add(
