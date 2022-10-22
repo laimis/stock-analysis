@@ -12,7 +12,7 @@
       <tbody>
         <tr *ngFor="let s of outcomes">
           <td>
-            <a [routerLink]="['/stock', s.ticker]">{{s.ticker}}</a>
+            <a [routerLink]="['/stocks', s.ticker]">{{s.ticker}}</a>
           </td>
           <td *ngFor="let o of s.outcomes"
             [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">{{o.value }}</td>

@@ -67,7 +67,7 @@ import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.co
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { AnalysisComponent } from './shared/reports/analysis.component';
-import { PortfolioReportComponent } from './shared/reports/portfolio-report.component';
+import { OutcomesAnalysisReportComponent } from './shared/reports/outcomes-analysis-report.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard.component';
 
 var routes: Routes = [
@@ -194,7 +194,7 @@ var routes: Routes = [
     
     StockAnalysisComponent,
     AnalysisComponent,
-    PortfolioReportComponent,
+    OutcomesAnalysisReportComponent,
 
     AlertsComponent
   ],
