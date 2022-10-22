@@ -41,7 +41,7 @@ export class StockChartsComponent implements OnInit {
     )
 
     this.outcomes = null
-    this.stockService.reportTickerOutcomesWeekly(this.currentPosition.ticker).subscribe(
+    this.stockService.reportTickerOutcomesAllTime(this.currentPosition.ticker).subscribe(
       data => {
         this.outcomes = data[0]
       }
@@ -70,7 +70,7 @@ export class StockChartsComponent implements OnInit {
   previous() {
     this._index--
     if (this._index < 0) {
-      this._index = 0
+      this._index = this._positions.length - 1
     }
     this.updateCurrentPosition()
   }

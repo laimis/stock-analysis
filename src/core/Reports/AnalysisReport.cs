@@ -14,7 +14,7 @@ using MediatR;
 
 namespace core.Reports
 {
-    public class AnalysisReport
+    public class SingleBarAnalysisReport
     {
         public class ForPortfolioQuery : RequestWithUserId<AnalysisReportView>
         {

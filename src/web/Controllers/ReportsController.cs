@@ -38,20 +38,20 @@ namespace web.Controllers
             return _mediator.Send(query);
         }
 
-        [HttpGet("analysis/portfolio")]
-        public Task<AnalysisReportView> PortfolioAnalysis([FromQuery]PriceFrequency frequency)
-            => _mediator.Send(new AnalysisReport.ForPortfolioQuery(frequency, User.Identifier()));
-
         [HttpGet("outcomes/portfolio")]
-        public Task<List<TickerOutcomes>> PortfolioOutcomes([FromQuery]PriceFrequency frequency) =>
-            _mediator.Send(new OutcomesReport.ForPortfolioQuery(frequency, User.Identifier()));
+        public Task<List<TickerOutcomes>> PortfolioOutcomes([FromQuery] OutcomesReport.Duration duration) =>
+            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, User.Identifier()));
 
         [HttpGet("outcomes/ticker/{ticker}")]
-        public Task<List<TickerOutcomes>> TickerOutcomes(string ticker, [FromQuery]PriceFrequency frequency) =>
-            _mediator.Send(new OutcomesReport.ForTickerQuery(frequency, ticker, User.Identifier()));
+        public Task<List<TickerOutcomes>> TickerOutcomes(string ticker, [FromQuery] OutcomesReport.Duration duration) =>
+            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, ticker, User.Identifier()));
 
         [HttpGet("analysis/ticker/{ticker}")]
         public Task<AnalysisReportView> TickerAnalysis(string ticker, [FromQuery]PriceFrequency frequency)
-            => _mediator.Send(new AnalysisReport.ForTickerQuery(frequency, ticker, User.Identifier()));
+            => _mediator.Send(new SingleBarAnalysisReport.ForTickerQuery(frequency, ticker, User.Identifier()));
+
+        [HttpGet("analysis/portfolio")]
+        public Task<AnalysisReportView> PortfolioAnalysis([FromQuery]PriceFrequency frequency)
+            => _mediator.Send(new SingleBarAnalysisReport.ForPortfolioQuery(frequency, User.Identifier()));
     }
 }

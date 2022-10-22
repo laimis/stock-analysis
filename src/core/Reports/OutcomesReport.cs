@@ -15,25 +15,27 @@ namespace core.Reports
 {
     public class OutcomesReport
     {
+        public enum Duration { Day, AllTime }
+
         public class ForPortfolioQuery : RequestWithUserId<List<TickerOutcomes>>
         {
-            public ForPortfolioQuery(PriceFrequency frequency, Guid userId) : base(userId)
+            public ForPortfolioQuery(Duration duration, Guid userId) : base(userId)
             {
-                Frequency = frequency;
+                Duration = duration;
             }
 
-            public PriceFrequency Frequency { get; }
+            public Duration Duration { get; }
         }
 
         public class ForTickerQuery : RequestWithUserId<List<TickerOutcomes>>
         {
-            public ForTickerQuery(PriceFrequency frequency, string ticker, Guid userId) : base(userId)
+            public ForTickerQuery(Duration duration, string ticker, Guid userId) : base(userId)
             {
-                Frequency = frequency;
+                Duration = duration;
                 Ticker = ticker;
             }
 
-            public PriceFrequency Frequency { get; }
+            public Duration Duration { get; }
             public string Ticker { get; }
         }
 
@@ -60,7 +62,7 @@ namespace core.Reports
                     throw new Exception("User not found");
                 }
 
-                var func = GetOutcomesFunction(request.Frequency);
+                var func = GetOutcomesFunction(request.Duration);
 
                 return await RunAnalysis(
                     new[] {request.Ticker},
@@ -81,7 +83,7 @@ namespace core.Reports
 
                 var tickers = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.Ticker).ToList();
 
-                var func = GetOutcomesFunction(request.Frequency);
+                var func = GetOutcomesFunction(request.Duration);
 
                 return await RunAnalysis(
                     tickers,
@@ -90,14 +92,14 @@ namespace core.Reports
                 );
             }
 
-            private static Func<HistoricalPrice[], List<AnalysisOutcome>> GetOutcomesFunction(PriceFrequency frequency) => 
-                frequency switch
+            private static Func<HistoricalPrice[], List<AnalysisOutcome>> GetOutcomesFunction(Duration duration) => 
+                duration switch
                 {
-                    PriceFrequency.Weekly => (Func<HistoricalPrice[], List<AnalysisOutcome>>)(prices => HistoricalPriceAnalysis.Run(
+                    Duration.AllTime => (Func<HistoricalPrice[], List<AnalysisOutcome>>)(prices => HistoricalPriceAnalysis.Run(
                                 currentPrice: prices[prices.Length - 1].Close,
                                 prices
                             )),
-                    PriceFrequency.Daily => prices => SingleBarAnalysisRunner.Run(prices),
+                    Duration.Day => prices => SingleBarAnalysisRunner.Run(prices),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 

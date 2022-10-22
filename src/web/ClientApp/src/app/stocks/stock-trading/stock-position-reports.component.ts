@@ -39,7 +39,7 @@ export class StockPositionReportsComponent {
 
 	loadData() {
     if (this.showDailyOutcomes) {
-      this.service.reportPortfolioOutcomesDaily().subscribe(result => {
+      this.service.reportPortfolioOutcomesDay().subscribe(result => {
         this.dailyOutcomes = result;
       }, error => {
         console.error(error);
@@ -48,7 +48,7 @@ export class StockPositionReportsComponent {
     }
     
     if (this.showOverallOutcomes) {
-      this.service.reportPortfolioOutcomesWeekly().subscribe(result => {
+      this.service.reportPortfolioOutcomesAllTime().subscribe(result => {
         this.historicalOutcomes = result;
       }, error => {
         console.error(error);

@@ -63,7 +63,7 @@ export class StockTradingNewPositionComponent {
       }
     );
 
-    this.stockService.reportTickerOutcomesWeekly(ticker)
+    this.stockService.reportTickerOutcomesAllTime(ticker)
       .subscribe(data => {
         console.log(data)
         this.outcomes = data[0]

@@ -20,13 +20,13 @@ export class StockAnalysisComponent implements OnInit {
   ticker: string;
 
   ngOnInit(): void {
-    this.stockService.reportTickerOutcomesWeekly(this.ticker).subscribe(
+    this.stockService.reportTickerOutcomesAllTime(this.ticker).subscribe(
       data => {
         this.historicalOutcomes = data[0]
       }
     );
 
-    this.stockService.reportTickerOutcomesDaily(this.ticker).subscribe(
+    this.stockService.reportTickerOutcomesDay(this.ticker).subscribe(
       data => {
         this.dailyOutcomes = data[0]
       }

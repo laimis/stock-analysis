@@ -310,20 +310,20 @@ export class StocksService {
     return this.http.get<Sells>('/api/reports/sells')
   }
 
-  reportTickerOutcomesWeekly(ticker:string) : Observable<TickerOutcomes[]> {
-    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?frequency=weekly')
+  reportTickerOutcomesAllTime(ticker:string) : Observable<TickerOutcomes[]> {
+    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=allTime')
   }
 
-  reportTickerOutcomesDaily(ticker:string) : Observable<TickerOutcomes[]> {
-    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?frequency=daily')
+  reportTickerOutcomesDay(ticker:string) : Observable<TickerOutcomes[]> {
+    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=day')
   }
 
-  reportPortfolioOutcomesWeekly(): Observable<TickerOutcomes[]> {
-		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=weekly')
+  reportPortfolioOutcomesAllTime(): Observable<TickerOutcomes[]> {
+		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?duration=allTime')
   }
 
-  reportPortfolioOutcomesDaily(): Observable<TickerOutcomes[]> {
-		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=daily')
+  reportPortfolioOutcomesDay(): Observable<TickerOutcomes[]> {
+		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=day')
   }
 
   reportPorfolioAnalysisDaily(): Observable<OutcomesAnalysisReport> {
