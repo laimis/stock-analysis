@@ -1,9 +1,9 @@
 <div>
-  <app-analysis *ngIf="showOverallOutcomes" [title]="'Historical outcomes'" [outcomes]="historicalOutcomes"></app-analysis>
+  <app-outcomes *ngIf="showOverallOutcomes" [title]="'Historical outcomes'" [outcomes]="historicalOutcomes"></app-outcomes>
 
   <app-outcomes-analysis-report *ngIf="showDailyAnalysisReport" [title]="'Daily report'" [report]="portfolioDailyReport"></app-outcomes-analysis-report>
   <app-outcomes-analysis-report *ngIf="showWeeklyAnalysisReport" [title]="'Weekly report'" [report]="portfolioWeeklyReport"></app-outcomes-analysis-report>  
   
-  <app-analysis *ngIf="showDailyOutcomes" [title]="'Daily outcomes'" [outcomes]="dailyOutcomes"></app-analysis>
+  <app-outcomes *ngIf="showDailyOutcomes" [title]="'Daily outcomes'" [outcomes]="dailyOutcomes"></app-outcomes>
   
 </div>

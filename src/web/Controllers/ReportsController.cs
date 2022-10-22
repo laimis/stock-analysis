@@ -39,12 +39,16 @@ namespace web.Controllers
         }
 
         [HttpGet("outcomes/portfolio")]
-        public Task<List<TickerOutcomes>> PortfolioOutcomes([FromQuery] OutcomesReport.Duration duration) =>
-            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, User.Identifier()));
+        public Task<List<TickerOutcomes>> PortfolioOutcomes([FromQuery] OutcomesReport.Duration duration, [FromQuery] PriceFrequency frequency) =>
+            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, frequency, User.Identifier()));
 
         [HttpGet("outcomes/ticker/{ticker}")]
-        public Task<List<TickerOutcomes>> TickerOutcomes(string ticker, [FromQuery] OutcomesReport.Duration duration) =>
-            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, ticker, User.Identifier()));
+        public Task<List<TickerOutcomes>> TickerOutcomes(string ticker, [FromQuery] PriceFrequency priceFrequency, [FromQuery] OutcomesReport.Duration duration) =>
+            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, priceFrequency, ticker, User.Identifier()));
+
+        [HttpPost("outcomes/tickers")]
+        public Task<List<TickerOutcomes>> TickersOutcomes([FromBody]string[] tickers, [FromQuery] OutcomesReport.Duration duration, [FromQuery] PriceFrequency frequency) =>
+            _mediator.Send(new OutcomesReport.ForTickersQuery(duration, frequency, tickers, User.Identifier()));
 
         [HttpGet("analysis/ticker/{ticker}")]
         public Task<AnalysisReportView> TickerAnalysis(string ticker, [FromQuery]PriceFrequency frequency)

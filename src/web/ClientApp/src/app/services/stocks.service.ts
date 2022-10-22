@@ -311,20 +311,33 @@ export class StocksService {
   }
 
   reportTickerOutcomesAllTime(ticker:string) : Observable<TickerOutcomes[]> {
-    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=allTime')
+    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=allBars&&frequency=weekly')
   }
 
   reportTickerOutcomesDay(ticker:string) : Observable<TickerOutcomes[]> {
-    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=day')
+    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=singleBar&&frequency=weekly')
+  }
+
+  reportTickersOutcomesAllTime(tickers:string[]) : Observable<TickerOutcomes[]> {
+    return this.http.post<TickerOutcomes[]>('/api/reports/outcomes/tickers?duration=allBars&&frequency=daily', tickers)
+  }
+
+  reportTickersOutcomesDay(tickers:string[]) : Observable<TickerOutcomes[]> {
+    return this.http.post<TickerOutcomes[]>('/api/reports/outcomes/tickers?duration=singleBar&frequency=daily', tickers)
+  }
+
+  reportTickersOutcomesWeek(tickers:string[]) : Observable<TickerOutcomes[]> {
+    return this.http.post<TickerOutcomes[]>('/api/reports/outcomes/tickers?duration=singleBar&frequency=weekly', tickers)
   }
 
   reportPortfolioOutcomesAllTime(): Observable<TickerOutcomes[]> {
-		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?duration=allTime')
+		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?duration=allBars')
   }
 
   reportPortfolioOutcomesDay(): Observable<TickerOutcomes[]> {
-		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?frequency=day')
+		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?duration=singleBar')
   }
+
 
   reportPorfolioAnalysisDaily(): Observable<OutcomesAnalysisReport> {
     return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/portfolio?frequency=daily')

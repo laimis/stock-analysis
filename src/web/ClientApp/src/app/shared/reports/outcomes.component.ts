@@ -2,11 +2,11 @@ import { Component, Input } from '@angular/core';
 import { AnalysisCategoryGrouping, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
-  selector: 'app-analysis',
-  templateUrl: './analysis.component.html',
-  styleUrls: ['./analysis.component.css']
+  selector: 'app-outcomes',
+  templateUrl: './outcomes.component.html',
+  styleUrls: ['./outcomes.component.css']
 })
-export class AnalysisComponent {
+export class OutcomesComponent {
 
   @Input()
   title: string

@@ -15,32 +15,51 @@ namespace core.Reports
 {
     public class OutcomesReport
     {
-        public enum Duration { Day, AllTime }
+        public enum Duration { SingleBar, AllBars }
 
         public class ForPortfolioQuery : RequestWithUserId<List<TickerOutcomes>>
         {
-            public ForPortfolioQuery(Duration duration, Guid userId) : base(userId)
+            public ForPortfolioQuery(Duration duration, PriceFrequency frequency, Guid userId) : base(userId)
             {
                 Duration = duration;
+                Frequency = frequency;
             }
 
             public Duration Duration { get; }
+            public PriceFrequency Frequency { get; }
         }
 
         public class ForTickerQuery : RequestWithUserId<List<TickerOutcomes>>
         {
-            public ForTickerQuery(Duration duration, string ticker, Guid userId) : base(userId)
+            public ForTickerQuery(Duration duration, PriceFrequency frequency, string ticker, Guid userId) : base(userId)
             {
                 Duration = duration;
+                Frequency = frequency;
                 Ticker = ticker;
             }
 
             public Duration Duration { get; }
+            public PriceFrequency Frequency { get; }
             public string Ticker { get; }
         }
 
+        public class ForTickersQuery : RequestWithUserId<List<TickerOutcomes>>
+        {
+            public ForTickersQuery(Duration duration, PriceFrequency frequency, string[] tickers, Guid userId) : base(userId)
+            {
+                Duration = duration;
+                Frequency = frequency;
+                Tickers = tickers;
+            }
+
+            public Duration Duration { get; }
+            public PriceFrequency Frequency { get; }
+            public string[] Tickers { get; }
+        }
+
         public class Handler : HandlerWithStorage<ForPortfolioQuery, List<TickerOutcomes>>,
-            IRequestHandler<ForTickerQuery, List<TickerOutcomes>>
+            IRequestHandler<ForTickerQuery, List<TickerOutcomes>>,
+            IRequestHandler<ForTickersQuery, List<TickerOutcomes>>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -65,7 +84,26 @@ namespace core.Reports
                 var func = GetOutcomesFunction(request.Duration);
 
                 return await RunAnalysis(
+                    request.Frequency,
                     new[] {request.Ticker},
+                    user.State,
+                    func
+                );         
+            }
+
+            public async Task<List<TickerOutcomes>> Handle(ForTickersQuery request, CancellationToken cancellationToken)
+            {
+                var user = await _accountStorage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                var func = GetOutcomesFunction(request.Duration);
+
+                return await RunAnalysis(
+                    request.Frequency,
+                    request.Tickers,
                     user.State,
                     func
                 );         
@@ -86,6 +124,7 @@ namespace core.Reports
                 var func = GetOutcomesFunction(request.Duration);
 
                 return await RunAnalysis(
+                    request.Frequency,
                     tickers,
                     user.State,
                     func
@@ -95,21 +134,21 @@ namespace core.Reports
             private static Func<HistoricalPrice[], List<AnalysisOutcome>> GetOutcomesFunction(Duration duration) => 
                 duration switch
                 {
-                    Duration.AllTime => (Func<HistoricalPrice[], List<AnalysisOutcome>>)(prices => HistoricalPriceAnalysis.Run(
+                    Duration.AllBars => (Func<HistoricalPrice[], List<AnalysisOutcome>>)(prices => HistoricalPriceAnalysis.Run(
                                 currentPrice: prices[prices.Length - 1].Close,
                                 prices
                             )),
-                    Duration.Day => prices => SingleBarAnalysisRunner.Run(prices),
+                    Duration.SingleBar => SingleBarAnalysisRunner.Run,
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-            private async Task<List<TickerOutcomes>> RunAnalysis(IEnumerable<string> tickers, UserState user, Func<HistoricalPrice[], List<AnalysisOutcome>> func)
+            private async Task<List<TickerOutcomes>> RunAnalysis(PriceFrequency frequency, IEnumerable<string> tickers, UserState user, Func<HistoricalPrice[], List<AnalysisOutcome>> func)
             {
                 var list = new List<TickerOutcomes>();
 
                 foreach(var ticker in tickers)
                 {
-                    var historicalResponse = await _brokerage.GetHistoricalPrices(user, ticker);
+                    var historicalResponse = await _brokerage.GetHistoricalPrices(user, ticker, frequency);
 
                     var outcomes = func(historicalResponse.Success);
 

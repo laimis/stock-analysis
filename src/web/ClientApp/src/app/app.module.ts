@@ -66,9 +66,10 @@ import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
 import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.component';
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 import { AlertsComponent } from './alerts/alerts.component';
-import { AnalysisComponent } from './shared/reports/analysis.component';
+import { OutcomesComponent } from './shared/reports/outcomes.component';
 import { OutcomesAnalysisReportComponent } from './shared/reports/outcomes-analysis-report.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard.component';
+import { OutcomesReportComponent } from './shared/reports/outcomes-report.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -117,6 +118,7 @@ var routes: Routes = [
 
   { path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
   { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
+  { path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard]},
 
   { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
@@ -193,7 +195,8 @@ var routes: Routes = [
     CryptoDetailsComponent,
     
     StockAnalysisComponent,
-    AnalysisComponent,
+    OutcomesComponent,
+    OutcomesReportComponent,
     OutcomesAnalysisReportComponent,
 
     AlertsComponent
