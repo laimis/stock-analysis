@@ -1,3 +1,10 @@
+<div *ngIf="summary">
+    Summary
+    <span *ngFor="let e of summary.keys()">{{e}}: {{summary[e]}}</span>
+</div>
+
+<app-outcomes-analysis-report [report]="dailyAnalysis" title="Daily Report"></app-outcomes-analysis-report>
+
 <app-outcomes [outcomes]="dayOutcomes" title="Day Outcomes"></app-outcomes>
 
 <app-outcomes [outcomes]="weekOutcomes" title="Week Outcomes"></app-outcomes>

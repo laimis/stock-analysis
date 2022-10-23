@@ -38,8 +38,21 @@ namespace core.Reports
             public string Ticker { get; }
         }
 
+        public class ForTickersQuery: RequestWithUserId<AnalysisReportView>
+        {
+            public ForTickersQuery(PriceFrequency frequency, string[] tickers, Guid userId) : base(userId)
+            {
+                Frequency = frequency;
+                Tickers = tickers;
+            }
+
+            public PriceFrequency Frequency { get; }
+            public string[] Tickers { get; }
+        }
+
         public class Handler : HandlerWithStorage<ForPortfolioQuery, AnalysisReportView>,
-            IRequestHandler<ForTickerQuery, AnalysisReportView>
+            IRequestHandler<ForTickerQuery, AnalysisReportView>,
+            IRequestHandler<ForTickersQuery, AnalysisReportView>
         {
             private IAccountStorage _accounts;
             private IStocksService2 _stockService;
@@ -74,6 +87,17 @@ namespace core.Reports
                 var tickers = new [] { request.Ticker };
 
                 return await GenerateAnalysisReport(request.Frequency, tickers, user);
+            }
+
+            public async Task<AnalysisReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
+            {
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                return await GenerateAnalysisReport(request.Frequency, request.Tickers, user);
             }
 
             public override async Task<AnalysisReportView> Handle(ForPortfolioQuery request, CancellationToken cancellationToken)

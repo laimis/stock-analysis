@@ -347,7 +347,7 @@ public class TDAmeritradeClient : IBrokerage
         }
     }
 
-    private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(40, TimeSpan.FromSeconds(1));
+    private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(10, TimeSpan.FromSeconds(1));
     private AsyncTimeoutPolicy _timeOutPolicy = Policy.TimeoutAsync(30);
 
     private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)

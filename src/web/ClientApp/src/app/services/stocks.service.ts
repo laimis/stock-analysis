@@ -354,6 +354,10 @@ export class StocksService {
   reportTickerAnalysisWeekly(ticker:string): Observable<OutcomesAnalysisReport> {
     return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/ticker/' + ticker + '?frequency=weekly')
   }
+
+  reportTickersAnalysisDaily(tickers:string[]): Observable<OutcomesAnalysisReport> {
+    return this.http.post<OutcomesAnalysisReport>('/api/reports/analysis/tickers?frequency=daily', tickers)
+  }
 }
 
 export interface StockAlert {

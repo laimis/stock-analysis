@@ -149,6 +149,10 @@ namespace core.Reports
                 foreach(var ticker in tickers)
                 {
                     var historicalResponse = await _brokerage.GetHistoricalPrices(user, ticker, frequency);
+                    if (!historicalResponse.IsOk || historicalResponse.Success == null || historicalResponse.Success.Length == 0)
+                    {
+                        continue;
+                    }
 
                     var outcomes = func(historicalResponse.Success);
 
