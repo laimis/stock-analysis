@@ -22,46 +22,39 @@ export class OutcomesReportComponent implements OnInit {
   
   ngOnInit(): void {
     var tickers = this.route.snapshot.queryParamMap.get("tickers").split(",");
-    
+    this.runReportTickersAnalysisDaily(tickers);
+  }
+
+  runReportTickersAnalysisDaily(tickers: string[]) {
     this.stocksService.reportTickersAnalysisDaily(tickers).subscribe((data) => {
       this.dailyAnalysis = data;
+      this.generateOutcomesForDay(tickers)
+    });
+  }
 
-       // summary variable that hodls key/value pair of ticker and count
-      
-      var summary = new Map<string, number>();
-      data.categories.forEach(category => {
-        category.outcomes.forEach(outcome => {
-          var increment = category.type === 'Positive' ? 1 : -1;
-          
-          if (summary[outcome.ticker] == undefined) {
-            summary[outcome.ticker] = 0;
-          }
-
-          summary[outcome.ticker] += increment;
-
-        });
-      });
-      
-      this.summary = summary;
-      console.log(this.summary);
-    }
-  );
+  generateOutcomesForDay(tickers: string[]) {
 
     this.stocksService.reportTickersOutcomesDay(tickers).subscribe((data: TickerOutcomes[]) => {
         this.dayOutcomes = data;
+        this.generateOutcomesForWeek(tickers)
       }
     );
-
-    this.stocksService.reportTickersOutcomesWeek(tickers).subscribe((data: TickerOutcomes[]) => {
-      this.weekOutcomes = data;
-    }
-  );
-
-    this.stocksService.reportTickersOutcomesAllTime(tickers).subscribe((data: TickerOutcomes[]) => {
-      this.allTimeOutcomes = data;
-    }
-  );
   }
 
+  generateOutcomesForWeek(tickers: string[]) {
+
+    this.stocksService.reportTickersOutcomesWeek(tickers).subscribe((data: TickerOutcomes[]) => {
+        this.weekOutcomes = data;
+        this.generateOutcomesForAllTime(tickers);
+      }
+    );
+  }
+
+  generateOutcomesForAllTime(tickers: string[]) {
+    this.stocksService.reportTickersOutcomesAllTime(tickers).subscribe((data: TickerOutcomes[]) => {
+      this.allTimeOutcomes = data;
+      }
+    );
+  }
   
 }
