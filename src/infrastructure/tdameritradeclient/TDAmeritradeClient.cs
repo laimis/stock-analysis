@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using core.Account;
@@ -64,7 +65,7 @@ public class TDAmeritradeClient : IBrokerage
         if (!response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            _logger?.LogError("TDAmeritrade client failed at " + message + ": " + content);
+            _logger?.LogError($"TDAmeritrade client failed with {response.StatusCode} for {message}: {content}");
         }
     }
 
@@ -237,7 +238,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, null)
         };
         
-        var function = $"/marketdata/{ticker}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}";
+        var function = $"marketdata/{ticker}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}";
 
         var response = await CallApi<HistoricalPriceResponse>(
             state,
@@ -347,7 +348,7 @@ public class TDAmeritradeClient : IBrokerage
         }
     }
 
-    private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(20, TimeSpan.FromSeconds(1));
+    private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(10, TimeSpan.FromSeconds(1));
     private AsyncTimeoutPolicy _timeOutPolicy = Policy.TimeoutAsync(30);
 
     private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
@@ -368,8 +369,10 @@ public class TDAmeritradeClient : IBrokerage
         {
             try
             {
-                var response = await _timeOutPolicy.ExecuteAsync(
-                    async ct => await _rateLimit.ExecuteAsync(
+                this._logger?.LogError("Calling " + request.RequestUri);
+
+                var response = await _rateLimit.ExecuteAsync(
+                    async ct => await _timeOutPolicy.ExecuteAsync(
                         ct2 => _httpClient.SendAsync(request, ct2),
                         ct
                     ),
@@ -377,6 +380,14 @@ public class TDAmeritradeClient : IBrokerage
                 );
 
                 LogIfFailed(response, function);
+
+                // HACK: I still get these too many requests exceptions from TDAmeritrade
+                // APIs even though I have an above rate limit that prevents the API from
+                // being called too often
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    throw new RateLimitRejectedException(TimeSpan.FromSeconds(1));
+                }
 
                 return await response.Content.ReadAsStringAsync();
             }

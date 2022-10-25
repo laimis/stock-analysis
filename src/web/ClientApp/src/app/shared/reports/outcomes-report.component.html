@@ -1,6 +1,9 @@
-<div *ngIf="summary">
+<div>
     Summary
-    <span *ngFor="let e of summary.keys()">{{e}}: {{summary[e]}}</span>
+    <span *ngFor="let s of summary"
+        class="badge rounded-pill bg-secondary me-2">
+        <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{getSymbol(s)}}" target="_blank">{{s}}</a>
+    </span>
 </div>
 
 <app-outcomes-analysis-report [report]="dailyAnalysis" title="Daily Report"></app-outcomes-analysis-report>
