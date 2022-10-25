@@ -71,7 +71,7 @@ namespace core.Reports
 
             // report params
             private const decimal RelativeVolumeThresholdPositive = 0.9m;
-            private const decimal HighPercentChange = 5m;
+            private const decimal SigmaRatioThreshold = 1m;
             private const decimal SmallPercentChange = 2m;
             private const decimal ExcellentClosingRange = 80m;
             private const decimal LowClosingRange = 20m;
@@ -158,7 +158,7 @@ namespace core.Reports
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= HighPercentChange))
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold))
                         .ToList()
                 );
 
@@ -179,7 +179,7 @@ namespace core.Reports
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
-                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= HighPercentChange)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
                         ).ToList()
                 );
 
@@ -191,7 +191,7 @@ namespace core.Reports
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
                             && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
-                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= HighPercentChange)
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
                         ).ToList()
                 );
 
@@ -203,7 +203,7 @@ namespace core.Reports
                     tickerOutcomes
                         .Where(t =>
                             t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value < -1 * HighPercentChange))
+                            && t.Outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value < -1 * SigmaRatioThreshold))
                         .ToList()
                 );
 

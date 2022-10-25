@@ -10,6 +10,11 @@ namespace core.Stocks.Services
         IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices);
     }
 
+    public class SingleBarAnalysisConstants
+    {
+        public static int NumberOfDaysForRecentAnalysis = 60;
+    }
+
     public class SingleBarAnalysisRunner
     {
         public static List<AnalysisOutcome> Run(HistoricalPrice[] prices)
@@ -97,14 +102,14 @@ namespace core.Stocks.Services
             var yesterday = prices[prices.Length - 2];
 
             // today's change from yesterday's close
-            change = Math.Round((currentBar.Close - yesterday.Close) / yesterday.Close * 100, 2);
+            var percentChange = Math.Round((currentBar.Close - yesterday.Close) / yesterday.Close * 100, 2);
 
             // add change as outcome
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.PercentChange,
-                type: change >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
-                value: change,
-                message: $"% change from close is {change}.");
+                type: percentChange >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
+                value: percentChange,
+                message: $"% change from close is {percentChange}.");
 
             // true range uses the previous close as reference
             var trueHigh = Math.Max(currentBar.High, yesterday.Close);
@@ -162,6 +167,25 @@ namespace core.Stocks.Services
                 type: newLow ? OutcomeType.Negative : OutcomeType.Neutral,
                 value: newLow ? -1m : 0m,
                 message: $"New low reached");
+
+            // generate percent change statistical data for recent days
+            var descriptor = PercentChangeAnalysis.Generate(prices.Skip(prices.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).ToArray());
+
+            var sigmaRatio = percentChange switch {
+                >=0 => percentChange / (descriptor.average + descriptor.standardDeviation),
+                <0 => percentChange / (descriptor.average - descriptor.standardDeviation)
+            };
+
+            // add sigma ratio as outcome
+            yield return new AnalysisOutcome(
+                key: SingleBarOutcomeKeys.SigmaRatio,
+                type: sigmaRatio switch {
+                    > 1m => OutcomeType.Positive,
+                    < -1m => OutcomeType.Negative,
+                    _ => OutcomeType.Neutral
+                },
+                value: sigmaRatio,
+                message: $"Sigma ratio is {sigmaRatio}.");
         }
     }
 
@@ -182,7 +206,7 @@ namespace core.Stocks.Services
 
             // calculate the average volume from the last x days
             var averageVolume = 0m;
-            var interval  = Math.Min(60, prices.Length);
+            var interval  = Math.Min(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis, prices.Length);
             for (var i = prices.Length - interval; i < prices.Length; i++)
             {
                 averageVolume += prices[i].Volume;
@@ -222,5 +246,6 @@ namespace core.Stocks.Services
         public static string GapPercentage = "GapPercentage";
         public static string NewHigh = "NewHigh";
         public static string NewLow = "NewLow";
+        public static string SigmaRatio = "SigmaRatio";
     }
 }

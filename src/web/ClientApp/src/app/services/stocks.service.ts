@@ -358,6 +358,10 @@ export class StocksService {
   reportTickersAnalysisDaily(tickers:string[]): Observable<OutcomesAnalysisReport> {
     return this.http.post<OutcomesAnalysisReport>('/api/reports/analysis/tickers?frequency=daily', tickers)
   }
+
+  reportTickerPercentChangeDistribution(ticker:string): Observable<StockPercentChangeResponse> {
+    return this.http.get<StockPercentChangeResponse>('/api/reports/percentChangeDistribution/tickers/' + ticker)
+  }
 }
 
 export interface StockAlert {
@@ -638,6 +642,23 @@ export interface AnalysisCategoryGrouping {
   type: string
   sortColumn: string
   outcomes: TickerOutcomes[]
+}
+
+export interface PercentChangeFrequency {
+  percentChange: number
+  frequency: number
+}
+export interface StockPercentChangeDescriptor {
+  average: number
+  min: number
+  max: number
+  standardDeviation: number
+  buckets: PercentChangeFrequency[]
+}
+export interface StockPercentChangeResponse {
+  ticker: string
+  recent: StockPercentChangeDescriptor
+  allTime: StockPercentChangeDescriptor
 }
 
 export interface StockTradingPerformance {

@@ -61,5 +61,9 @@ namespace web.Controllers
         [HttpPost("analysis/tickers")]
         public Task<AnalysisReportView> TickersAnalysis([FromBody]string[] tickers, [FromQuery] PriceFrequency frequency) =>
             _mediator.Send(new SingleBarAnalysisReport.ForTickersQuery(frequency, tickers, User.Identifier()));
+
+        [HttpGet("percentChangeDistribution/tickers/{ticker}")]
+        public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
+            => _mediator.Send(new PercentChangeStatistics.ForTickerQuery(frequency, ticker, User.Identifier()));
     }
 }

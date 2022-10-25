@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService, stocktransactioncommand } from '../services/stocks.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { StockPercentChangeResponse, StocksService } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-playground',
@@ -9,50 +11,43 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 export class PlaygroundComponent implements OnInit {
+  data: StockPercentChangeResponse;
 
-  stopPrice: number | null = null
-  positions: stocktransactioncommand[] = []
-  currentCost: number | null = null
-  profit: number | null = null
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  
+  public lineChartPlugins = [];
+  public chartType : ChartType = 'bar';
+  public lineChartLegend = true;
+  public bucketData: ChartDataset[] = [];
+  public bucketLabels: string[] = [];
+  public chartOptions: ChartOptions = {
+    responsive: true,
+    plugins: {
+      annotation: {
+        annotations: []
+      }
+    }
+  };
 
   ngOnInit() {
-  }
+    console.log('PlaygroundComponent.ngOnInit()');
+    var ticker = this.route.snapshot.queryParamMap.get('ticker');
+    console.log('ticker: ' + ticker);
+    if (ticker){
+      this.stocks.reportTickerPercentChangeDistribution(ticker).subscribe(data => {
+        this.data = data
 
-  stockPurchased(stocktransactioncommand: stocktransactioncommand) {
-    console.log(stocktransactioncommand)
-    if (stocktransactioncommand.stopPrice) {
-      this.stopPrice = stocktransactioncommand.stopPrice
+        this.bucketLabels = data.recent.buckets.map(b => b.percentChange.toString());
+        this.bucketData = [
+          {
+            data: data.recent.buckets.map(b => b.frequency),
+            label: "Frequency",
+            fill: false
+          }]
+      });
     }
-
-    if (this.currentCost == null) {
-      this.currentCost = stocktransactioncommand.price
-    }
-
-    this.positions.push(stocktransactioncommand)
   }
-
-  totalCost() {
-    return this.positions.reduce((acc, curr) => acc + curr.numberOfShares * curr.price, 0)
-  }
-
-  numberOfShares() {
-    return this.positions.reduce((acc, curr) => acc + curr.numberOfShares, 0)
-  }
-
-  averageCostPerShare() {
-    return this.totalCost() / this.numberOfShares()
-  }
-
-  riskedAmount() {
-    // average cost per share - stopPrice multipled by number of shares
-    return (this.averageCostPerShare() - this.stopPrice) * this.numberOfShares()
-  }
-
-  updateProfit() {
-    this.profit = (this.currentCost - this.averageCostPerShare()) * this.numberOfShares()
-  }
-
 }
 
