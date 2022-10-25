@@ -20,27 +20,40 @@ export class StockAnalysisComponent implements OnInit {
   ticker: string;
 
   ngOnInit(): void {
+    this.allTimeOutcomes();
+  }
+
+  private allTimeOutcomes() {
     this.stockService.reportTickerOutcomesAllTime(this.ticker).subscribe(
       data => {
-        this.historicalOutcomes = data[0]
+        this.historicalOutcomes = data[0];
+        this.dayOutcomes();
       }
     );
+  }
 
+  private dayOutcomes() {
     this.stockService.reportTickerOutcomesDay(this.ticker).subscribe(
       data => {
-        this.dailyOutcomes = data[0]
+        this.dailyOutcomes = data[0];
+        this.dailyAnalysisReport();
       }
     );
+  }
 
+  private dailyAnalysisReport() {
     this.stockService.reportTickerAnalysisDaily(this.ticker).subscribe(
       data => {
-        this.dailyAnalysis = data
+        this.dailyAnalysis = data;
+        this.weeklyAnalysisReport();
       }
     );
+  }
 
+  private weeklyAnalysisReport() {
     this.stockService.reportTickerAnalysisWeekly(this.ticker).subscribe(
       data => {
-        this.weeklyAnalysis = data
+        this.weeklyAnalysis = data;
       }
     );
   }

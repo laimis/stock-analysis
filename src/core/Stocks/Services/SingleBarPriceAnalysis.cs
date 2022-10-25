@@ -176,6 +176,8 @@ namespace core.Stocks.Services
                 <0 => percentChange / (descriptor.average - descriptor.standardDeviation)
             };
 
+            sigmaRatio = Math.Round(sigmaRatio, 2);
+
             // add sigma ratio as outcome
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.SigmaRatio,
