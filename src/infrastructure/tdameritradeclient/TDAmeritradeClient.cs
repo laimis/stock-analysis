@@ -369,8 +369,6 @@ public class TDAmeritradeClient : IBrokerage
         {
             try
             {
-                this._logger?.LogError("Calling " + request.RequestUri);
-
                 var response = await _rateLimit.ExecuteAsync(
                     async ct => await _timeOutPolicy.ExecuteAsync(
                         ct2 => _httpClient.SendAsync(request, ct2),

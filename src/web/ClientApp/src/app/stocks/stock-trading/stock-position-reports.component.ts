@@ -13,7 +13,6 @@ export class StockPositionReportsComponent {
   portfolioDailyReport: OutcomesAnalysisReport;
   portfolioWeeklyReport: OutcomesAnalysisReport;
 
-  loaded: boolean = false
   sortColumn: string
   sortDirection: number = -1
   
@@ -21,54 +20,58 @@ export class StockPositionReportsComponent {
 	constructor(private service : StocksService){}
 
   @Input()
-  showDailyOutcomes: boolean = false
+  dailyMode: boolean = false
 
   @Input()
-  showOverallOutcomes: boolean = false
-
-  @Input()
-  showDailyAnalysisReport : boolean = false
-
-  @Input()
-  showWeeklyAnalysisReport : boolean = false
+  allTimeMode: boolean = false
 
 
 	ngOnInit(): void {
-    this.loadData()
+    
+    if (this.allTimeMode) {
+      this.loadAllTimeData()
+    }
+
+    if (this.dailyMode) {
+      this.loadDailyData()
+    }
   }
 
-	loadData() {
-    if (this.showDailyOutcomes) {
-      this.service.reportPortfolioOutcomesDay().subscribe(result => {
-        this.dailyOutcomes = result;
-      }, error => {
-        console.error(error);
-        this.loaded = true;
-      });
-    }
-    
-    if (this.showOverallOutcomes) {
-      this.service.reportPortfolioOutcomesAllTime().subscribe(result => {
-        this.historicalOutcomes = result;
-      }, error => {
-        console.error(error);
-      });
-    }
+  loadAllTimeData() {
+    this.service.reportPortfolioOutcomesAllTime().subscribe(result => {
+      this.historicalOutcomes = result;
+    }, error => {
+      console.error(error);
+    });
+  }
 
-    if (this.showDailyAnalysisReport) {
-      this.service.reportPorfolioAnalysisDaily().subscribe(result => {
-        this.portfolioDailyReport = result;
-      }, error => {
-        console.error(error);
-      });
-    }
+  loadDailyData() {
+    this.loadDailyOutcomes()
+  }
 
-    if (this.showWeeklyAnalysisReport) {
-      this.service.reportPortfolioAnalysisWeekly().subscribe(result => {
-        this.portfolioWeeklyReport = result;
-      }, error => {
-        console.error(error);
-      });
-    }
-  } 
+  loadDailyOutcomes(){
+    this.service.reportPortfolioOutcomesDay().subscribe(result => {
+      this.dailyOutcomes = result;
+      this.loadDailyAnalaysisReport()
+    }, error => {
+      console.error(error);
+    });
+  }
+  
+  loadDailyAnalaysisReport() {
+    this.service.reportPorfolioAnalysisDaily().subscribe(result => {
+      this.portfolioDailyReport = result;
+      this.loadWeeklyAnalaysisReport()
+    }, error => {
+      console.error(error);
+    });
+  }
+
+  loadWeeklyAnalaysisReport() {
+    this.service.reportPortfolioAnalysisWeekly().subscribe(result => {
+      this.portfolioWeeklyReport = result;
+    }, error => {
+      console.error(error);
+    });
+  }
 }
