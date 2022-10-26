@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared.Adapters.Stocks;
 
 namespace System.Runtime.CompilerServices
@@ -192,6 +193,22 @@ namespace core.Stocks.Services
                 totalGapUpsVsDowns,
                 $"Total gap ups vs downs: {totalGapUpsVsDowns}"
             );
+
+            // statistical analysis bits
+            var descriptor = PercentChangeAnalysis.Generate(prices.Skip(prices.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).ToArray());
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.PercentChangeAverage,
+                OutcomeType.Neutral,
+                descriptor.average,
+                $"% Change Average: {descriptor.average}"
+            );
+
+            yield return new AnalysisOutcome(
+                HistoricalOutcomeKeys.PercentChangeStandardDeviation,
+                OutcomeType.Neutral,
+                descriptor.standardDeviation,
+                $"% Change StD: {descriptor.standardDeviation}"
+            );
         }
     }
 
@@ -201,7 +218,7 @@ namespace core.Stocks.Services
         {
             // find average volume over the last x days
             var totalVolume = 0m;
-            var interval = Math.Min(60, prices.Length);
+            var interval = Math.Min(HistoricalPriceAnalysisConstants.NumberOfDaysForRecentAnalysis, prices.Length);
             for (var i = prices.Length - interval; i < prices.Length; i++)
             {
                 totalVolume += prices[i].Volume;
@@ -342,6 +359,11 @@ namespace core.Stocks.Services
                     "SMA 20 has been " + (sma20Below50Days > 0 ? "below" : "above") + $" SMA 50 for {sma20Above50DaysValue} days"
                 );
         }
+    }    
+
+    internal class HistoricalPriceAnalysisConstants
+    {
+        internal static int NumberOfDaysForRecentAnalysis = 60;
     }
 
     internal class HistoricalOutcomeKeys
@@ -364,6 +386,8 @@ namespace core.Stocks.Services
         public static string TotalGapDowns = "TotalGapDowns";
         public static string GapUpsVsDowns = "GapUpsVsDowns";
         public static string TotalGapUpsVsDowns = "TotalGapUpsVsDowns";
+        public static string PercentChangeAverage = "PercentChangeAverage";
+        public static string PercentChangeStandardDeviation = "PercentChangeStandardDeviation";
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }
