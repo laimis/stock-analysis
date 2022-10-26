@@ -31,10 +31,10 @@ namespace coretests.Stocks
         public void AverageCost_Accurate() => Assert.Equal(32.5m, _position.AverageBuyCostPerShare);
 
         [Fact]
-        public void DaysHeld()
-        {
-            Assert.True(Math.Abs(57 - _position.DaysHeld) <= 1);
-        }
+        public void DaysHeld() => Assert.True(Math.Abs(57 - _position.DaysHeld) <= 1);
+
+        [Fact]
+        public void StopPriceGetsSetAfterSell() => Assert.Equal(28.5m, _position.StopPrice);
 
         [Fact]
         public void Cost()
@@ -48,22 +48,13 @@ namespace coretests.Stocks
         }
 
         [Fact]
-        public void Profit()
-        {
-            Assert.Equal(120, _position.Profit);
-        }
+        public void Profit() => Assert.Equal(120, _position.Profit);
 
         [Fact]
-        public void IsClosed()
-        {
-            Assert.True(_position.IsClosed);
-        }
+        public void IsClosed() => Assert.True(_position.IsClosed);
 
         [Fact]
-        public void Ticker()
-        {
-            Assert.Equal("TSLA", _position.Ticker);
-        }
+        public void Ticker() => Assert.Equal("TSLA", _position.Ticker);
 
         [Fact]
         public void RRLevels()
@@ -74,10 +65,10 @@ namespace coretests.Stocks
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
 
             Assert.Equal(4, position.RRLevels.Count);
-            Assert.Equal(33.25m, position.RRLevels[0]);
-            Assert.Equal(34m, position.RRLevels[1]);
-            Assert.Equal(34.75m, position.RRLevels[2]);
-            Assert.Equal(35.5m, position.RRLevels[3]);
+            Assert.Equal(34.125m, position.RRLevels[0]);
+            Assert.Equal(35.75m, position.RRLevels[1]);
+            Assert.Equal(37.375m, position.RRLevels[2]);
+            Assert.Equal(39m, position.RRLevels[3]);
         }
     }
 }

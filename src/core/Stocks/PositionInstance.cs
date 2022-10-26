@@ -27,7 +27,7 @@ namespace core.Stocks
         public decimal Profit { get; private set; } = 0;
         public decimal GainPct => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare;
         public decimal RR => RiskedAmount switch {
-            not null => Profit / RiskedAmount.Value,
+            not null => Profit / RiskedAmount.Value + UnrealizedRR,
             _ => 0
         };
         public decimal RRWeighted => RR * Cost;
@@ -41,6 +41,7 @@ namespace core.Stocks
         public DateTimeOffset? Closed { get; private set; }
         public decimal? FirstBuyCost { get; private set; }
         public decimal? FirstBuyNumberOfShares { get; private set; }
+        public decimal? FirstStop { get; private set; }
         public decimal? RiskedAmount { get; private set; }
         
         public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
@@ -68,16 +69,15 @@ namespace core.Stocks
                     return new List<decimal>();
                 }
 
-                var riskedAmount = RiskedAmount switch {
-                    not null => RiskedAmount.Value,
-                    _ => FirstBuyCost.Value * 0.05m * FirstBuyNumberOfShares.Value
+                var firstStopPrice = FirstStop switch {
+                    not null => FirstStop.Value,
+                    _ => AverageBuyCostPerShare * 0.95m
                 };
 
-                var riskLeft = riskedAmount - Profit;
-                var riskPerShare = riskLeft / NumberOfShares;
+                var riskPerShare = AverageBuyCostPerShare - firstStopPrice;
 
                 return new [] {1m,2m,3m,4m}
-                    .Select(x => riskPerShare * x + AverageCostPerShare)
+                    .Select(x => AverageBuyCostPerShare + x * riskPerShare)
                     .ToList();
             }
         }
@@ -155,6 +155,11 @@ namespace core.Stocks
             if (stopPrice != null)
             {
                 StopPrice = stopPrice;
+
+                if (FirstStop == null)
+                {
+                    FirstStop = stopPrice;
+                }
 
                 Events.Add(new PositionEvent($"Stop price set to {stopPrice}", "stop", stopPrice, when));
 
