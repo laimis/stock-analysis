@@ -88,7 +88,7 @@ export class StockTradingPositionsComponent {
                 this.metricFunc = (p:PositionInstance) => p.daysSinceLastTransaction
                 break
             default:
-                this.metricFunc = (p:PositionInstance) => p.unrealizedRR
+                this.metricFunc = (p:PositionInstance) => p.rr
         }
 
         this.updatePositions()
