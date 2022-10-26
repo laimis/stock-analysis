@@ -173,7 +173,7 @@ namespace core.Stocks.Services
 
             var sigmaRatio = percentChange switch {
                 >=0 => percentChange / (descriptor.average + descriptor.standardDeviation),
-                <0 => percentChange / (descriptor.average - descriptor.standardDeviation)
+                <0 => -1m * (percentChange / (descriptor.average - descriptor.standardDeviation))
             };
 
             sigmaRatio = Math.Round(sigmaRatio, 2);
