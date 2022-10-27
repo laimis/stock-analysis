@@ -10,8 +10,8 @@ import { brokerageordercommand, StocksService } from 'src/app/services/stocks.se
 })
 export class BrokerageNewOrderComponent {
 
-  brokerageOrderDuration : string
-  brokerageOrderType : string
+  brokerageOrderDuration : string = 'GtcPlus'
+  brokerageOrderType : string = 'Limit'
   numberOfShares : number | null = null
   price : number | null = null
   ticker : string
