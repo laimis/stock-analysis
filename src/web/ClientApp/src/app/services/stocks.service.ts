@@ -362,6 +362,10 @@ export class StocksService {
   reportTickerPercentChangeDistribution(ticker:string): Observable<StockPercentChangeResponse> {
     return this.http.get<StockPercentChangeResponse>('/api/reports/percentChangeDistribution/tickers/' + ticker)
   }
+
+  reportTickerGaps(ticker:string): Observable<StockGapsResponse> {
+    return this.http.get<StockGapsResponse>('/api/reports/gaps/tickers/' + ticker)
+  }
 }
 
 export interface StockAlert {
@@ -659,6 +663,16 @@ export interface StockPercentChangeResponse {
   ticker: string
   recent: StockPercentChangeDescriptor
   allTime: StockPercentChangeDescriptor
+}
+
+export interface StockGap {
+  type: string
+  percentChange: number
+  bar: StockHistoricalPrice
+}
+export interface StockGapsResponse {
+  ticker: string
+  gaps: StockGap[]
 }
 
 export interface StockTradingPerformance {

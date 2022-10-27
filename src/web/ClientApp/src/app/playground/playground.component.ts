@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { StockPercentChangeResponse, StocksService } from '../services/stocks.service';
+import { StockGapsResponse, StockPercentChangeResponse, StocksService } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
@@ -12,6 +12,7 @@ import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 
 export class PlaygroundComponent implements OnInit {
   data: StockPercentChangeResponse;
+  gaps: StockGapsResponse;
 
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
@@ -46,6 +47,10 @@ export class PlaygroundComponent implements OnInit {
             label: "Frequency",
             fill: false
           }]
+      });
+
+      this.stocks.reportTickerGaps(ticker).subscribe(data => {
+        this.gaps = data
       });
     }
   }

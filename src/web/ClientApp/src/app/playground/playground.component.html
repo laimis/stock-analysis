@@ -33,4 +33,15 @@
     [type]="chartType">
   </canvas>
 
+
+  <table class="table table-hover" *ngIf="gaps">
+    <tbody>
+      <tr *ngFor="let g of gaps.gaps">
+        <td>{{g.type}}</td>
+        <td>{{g.percentChange}}</td>
+        <td>{{g.bar.date | date}}</td>
+      </tr>
+    </tbody>
+  </table>
+
 </div>

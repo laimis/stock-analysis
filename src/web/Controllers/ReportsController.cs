@@ -65,5 +65,9 @@ namespace web.Controllers
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
             => _mediator.Send(new PercentChangeStatistics.ForTickerQuery(frequency, ticker, User.Identifier()));
+
+        [HttpGet("gaps/tickers/{ticker}")]
+        public Task<GapsView> TickerGaps(string ticker, [FromQuery] PriceFrequency frequency)
+            => _mediator.Send(new GapReport.ForTickerQuery(frequency, ticker, User.Identifier()));
     }
 }

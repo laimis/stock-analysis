@@ -1,6 +1,6 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { Observable } from 'rxjs';
-import { brokerageordercommand, StocksService } from 'src/app/services/stocks.service';
+import { brokerageordercommand, PositionInstance, StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -23,6 +23,9 @@ export class BrokerageNewOrderComponent {
   @Output()
   brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
 
+  @Input()
+  positions: PositionInstance[] = []
+
   updateTotals() {
   }
 
@@ -39,6 +42,11 @@ export class BrokerageNewOrderComponent {
     this.stockService.getStockPrice(ticker).subscribe(
       prices => {
         this.price = prices
+
+        var position = this.positions.find(p => p.ticker === ticker)
+        if (position) {
+          this.numberOfShares = position.numberOfShares
+        }
       }
     )
   }
