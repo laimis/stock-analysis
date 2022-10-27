@@ -18,8 +18,7 @@
               type="number"
               class="form-control"
               id="price"
-              [(ngModel)]="price"
-              (ngModelChange)="updateTotals()">
+              [(ngModel)]="price">
       </div>
       <div class="col">
         <label for="stocksToBuy" class="form-label"># of Shares</label>
@@ -27,8 +26,7 @@
               type="number"
               class="form-control"
               id="stocksToBuy"
-              [(ngModel)]="numberOfShares"
-              (ngModelChange)="updateTotals()">
+              [(ngModel)]="numberOfShares">
       </div>
       <div class="col" >
         <label for="brokerageOrderType" class="form-label">Order Type</label>

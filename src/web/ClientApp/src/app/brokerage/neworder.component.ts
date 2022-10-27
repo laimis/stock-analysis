@@ -26,9 +26,6 @@ export class BrokerageNewOrderComponent {
   @Input()
   positions: PositionInstance[] = []
 
-  updateTotals() {
-  }
-
   reset() {
     this.numberOfShares = null
     this.price = null
@@ -43,8 +40,10 @@ export class BrokerageNewOrderComponent {
       prices => {
         this.price = prices
 
+        console.log("checking for position for ticker " + ticker)
         var position = this.positions.find(p => p.ticker === ticker)
         if (position) {
+          console.log("found position for ticker " + ticker + " with shares " + position.numberOfShares)
           this.numberOfShares = position.numberOfShares
         }
       }
