@@ -17,7 +17,7 @@ namespace iexclienttests
         public List<StockQueryResult> MostActive;
         public List<SearchResult> SearchResults;
         public StockAdvancedStats AdvancedStats;
-        public HistoricalPrice[] HistoricalPrices { get; }
+        public PriceBar[] PriceHistory { get; }
         
 
         public IEXClientFixture()
@@ -54,10 +54,10 @@ namespace iexclienttests
 
             AdvancedStats = advancedStats.Result.Success;
 
-            var historicalPrices = Client.GetHistoricalPrices("AMD", "2y");
-            historicalPrices.Wait();
+            var priceHistory = Client.GetPriceHistory("AMD", "2y");
+            priceHistory.Wait();
 
-            HistoricalPrices = historicalPrices.Result.Success;
+            PriceHistory = priceHistory.Result.Success;
         }
     }
 }

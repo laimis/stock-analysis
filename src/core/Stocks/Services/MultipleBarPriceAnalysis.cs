@@ -11,14 +11,14 @@ namespace System.Runtime.CompilerServices
 
 namespace core.Stocks.Services
 {
-    internal interface IHistoricalPriceAnalysis
+    internal interface IMultipleBarPriceAnalysis
     {
-        IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices);
+        IEnumerable<AnalysisOutcome> Run(decimal currentPrice, PriceBar[] prices);
     }
 
-    public class HistoricalPriceAnalysis
+    public class MultipleBarPriceAnalysis
     {
-        public static List<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
+        public static List<AnalysisOutcome> Run(decimal currentPrice, PriceBar[] prices)
         {
             var outcomes = new List<AnalysisOutcome>();
 
@@ -30,12 +30,12 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class PriceAnalysis : IHistoricalPriceAnalysis
+    internal class PriceAnalysis : IMultipleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
+        public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, PriceBar[] prices)
         {
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.CurrentPrice,
+                MultipleBarOutcomeKeys.CurrentPrice,
                 OutcomeType.Neutral,
                 currentPrice,
                 $"Current price is {currentPrice:C2}"
@@ -57,7 +57,7 @@ namespace core.Stocks.Services
             }
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.LowestPrice,
+                MultipleBarOutcomeKeys.LowestPrice,
                 OutcomeType.Neutral,
                 lowest.Close,
                 $"Lowest price was {lowest.Close} on {lowest.Date}"
@@ -68,7 +68,7 @@ namespace core.Stocks.Services
             var lowestPriceDaysAgoOutcomeType = lowestPriceDaysAgo <= 30 ? OutcomeType.Negative : OutcomeType.Neutral;
             
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.LowestPriceDaysAgo,
+                MultipleBarOutcomeKeys.LowestPriceDaysAgo,
                 lowestPriceDaysAgoOutcomeType,
                 lowestPriceDaysAgo,
                 $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
@@ -78,14 +78,14 @@ namespace core.Stocks.Services
             var percentAboveLowOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.PercentAbovLow,
+                    MultipleBarOutcomeKeys.PercentAbovLow,
                     percentAboveLowOutcomeType,
                     percentAboveLow,
                     $"Percent above recent low: {percentAboveLow}%"
                 );
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.HighestPrice,
+                MultipleBarOutcomeKeys.HighestPrice,
                 OutcomeType.Neutral,
                 highest.Close,
                 $"Highest price was {highest.Close} on {highest.Date}"
@@ -96,7 +96,7 @@ namespace core.Stocks.Services
             var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo <= 30 ? OutcomeType.Positive : OutcomeType.Neutral;
             
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.HighestPriceDaysAgo,
+                MultipleBarOutcomeKeys.HighestPriceDaysAgo,
                 highestPriceDaysAgoOutcomeType,
                 highestPriceDaysAgo,
                 $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
@@ -106,7 +106,7 @@ namespace core.Stocks.Services
             var percentBelowHighOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.PercentBelowHigh,
+                    MultipleBarOutcomeKeys.PercentBelowHigh,
                     percentBelowHighOutcomeType,
                     percentBelowHigh,
                     $"Percent below recent high: {percentBelowHigh}%"
@@ -138,28 +138,28 @@ namespace core.Stocks.Services
             }
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.GapUps,
+                MultipleBarOutcomeKeys.GapUps,
                 OutcomeType.Neutral,
                 gapUps,
                 $"Gap ups: {gapUps}"
             );
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.GapDowns,
+                MultipleBarOutcomeKeys.GapDowns,
                 OutcomeType.Neutral,
                 gapDowns,
                 $"Gap downs: {gapDowns}"
             );
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.TotalGapUps,
+                MultipleBarOutcomeKeys.TotalGapUps,
                 OutcomeType.Neutral,
                 totalGapUps,
                 $"Total gap ups: {totalGapUps}"
             );
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.TotalGapDowns,
+                MultipleBarOutcomeKeys.TotalGapDowns,
                 OutcomeType.Neutral,
                 totalGapDowns,
                 $"Total gap downs: {totalGapDowns}"
@@ -174,7 +174,7 @@ namespace core.Stocks.Services
             };
             
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.GapUpsVsDowns,
+                MultipleBarOutcomeKeys.GapUpsVsDowns,
                 gapUpsVsDownsOutcomeType,
                 gapUpsVsDowns,
                 $"Gap ups vs downs: {gapUpsVsDowns}"
@@ -188,7 +188,7 @@ namespace core.Stocks.Services
                 _ => OutcomeType.Neutral
             };
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.TotalGapUpsVsDowns,
+                MultipleBarOutcomeKeys.TotalGapUpsVsDowns,
                 totalGapUpsVsDownsOutcomeType,
                 totalGapUpsVsDowns,
                 $"Total gap ups vs downs: {totalGapUpsVsDowns}"
@@ -197,14 +197,14 @@ namespace core.Stocks.Services
             // statistical analysis bits
             var descriptor = PercentChangeAnalysis.Generate(prices.Skip(prices.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).ToArray());
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.PercentChangeAverage,
+                MultipleBarOutcomeKeys.PercentChangeAverage,
                 OutcomeType.Neutral,
                 descriptor.average,
                 $"% Change Average: {descriptor.average}"
             );
 
             yield return new AnalysisOutcome(
-                HistoricalOutcomeKeys.PercentChangeStandardDeviation,
+                MultipleBarOutcomeKeys.PercentChangeStandardDeviation,
                 OutcomeType.Neutral,
                 descriptor.standardDeviation,
                 $"% Change StD: {descriptor.standardDeviation}"
@@ -212,13 +212,13 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class VolumeAnalysis : IHistoricalPriceAnalysis
+    internal class VolumeAnalysis : IMultipleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Run(decimal price, HistoricalPrice[] prices)
+        public IEnumerable<AnalysisOutcome> Run(decimal price, PriceBar[] prices)
         {
             // find average volume over the last x days
             var totalVolume = 0m;
-            var interval = Math.Min(HistoricalPriceAnalysisConstants.NumberOfDaysForRecentAnalysis, prices.Length);
+            var interval = Math.Min(MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis, prices.Length);
             for (var i = prices.Length - interval; i < prices.Length; i++)
             {
                 totalVolume += prices[i].Volume;
@@ -227,7 +227,7 @@ namespace core.Stocks.Services
 
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.AverageVolume,
+                    MultipleBarOutcomeKeys.AverageVolume,
                     OutcomeType.Neutral,
                     averageVolume,
                     $"Average volume over the last {interval} days is {averageVolume}"
@@ -235,9 +235,9 @@ namespace core.Stocks.Services
         }
     }
 
-    internal class SMAAnalysis : IHistoricalPriceAnalysis
+    internal class SMAAnalysis : IMultipleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, HistoricalPrice[] prices)
+        public IEnumerable<AnalysisOutcome> Run(decimal currentPrice, PriceBar[] prices)
         {
             // generate SMAs
             var smaContainer = SMAContainer.Generate(prices);
@@ -248,7 +248,7 @@ namespace core.Stocks.Services
                 var value = sma.LastValue;
                 yield return
                     new AnalysisOutcome(
-                        HistoricalOutcomeKeys.SMA(sma.Interval),
+                        MultipleBarOutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
                         Math.Round(value ?? 0, 2),
                         $"SMA {sma.Interval} is {value}"
@@ -290,7 +290,7 @@ namespace core.Stocks.Services
 
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.SMASequence,
+                    MultipleBarOutcomeKeys.SMASequence,
                     smaSequenceOutcomeType,
                     smaSequenceValue,
                     $"SMA sequence is {smaSequenceOutcomeType.ToString()}"
@@ -302,7 +302,7 @@ namespace core.Stocks.Services
             var sma20Above50OutcomeType = sma20Above50 ? OutcomeType.Positive : OutcomeType.Negative;
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.SMA20Above50,
+                    MultipleBarOutcomeKeys.SMA20Above50,
                     sma20Above50OutcomeType,
                     sma20Above50Diff,
                     $"SMA 20 - SMA 50: {sma20Above50Diff}"
@@ -314,7 +314,7 @@ namespace core.Stocks.Services
             var sma50Above150OutcomeType = sma50Above150 ? OutcomeType.Positive : OutcomeType.Negative;
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.SMA50Above150,
+                    MultipleBarOutcomeKeys.SMA50Above150,
                     sma50Above150OutcomeType,
                     sma50Above150Diff,
                     $"SMA 50 - SMA 150: {sma50Above150Diff}"
@@ -353,7 +353,7 @@ namespace core.Stocks.Services
             var sma20Above50DaysValue = sma20Below50Days > 0 ? sma20Below50Days * -1 : sma20Above50Days;
             yield return
                 new AnalysisOutcome(
-                    HistoricalOutcomeKeys.SMA20Above50Days,
+                    MultipleBarOutcomeKeys.SMA20Above50Days,
                     sma20Above50DaysOutcomeType,
                     sma20Above50DaysValue,
                     "SMA 20 has been " + (sma20Below50Days > 0 ? "below" : "above") + $" SMA 50 for {sma20Above50DaysValue} days"
@@ -361,12 +361,12 @@ namespace core.Stocks.Services
         }
     }    
 
-    internal class HistoricalPriceAnalysisConstants
+    internal class MultipleBarPriceAnalysisConstants
     {
         internal static int NumberOfDaysForRecentAnalysis = 60;
     }
 
-    internal class HistoricalOutcomeKeys
+    internal class MultipleBarOutcomeKeys
     {
         public static string LowestPrice = "LowestPrice";
         public static string LowestPriceDaysAgo = "LowestPriceDaysAgo";

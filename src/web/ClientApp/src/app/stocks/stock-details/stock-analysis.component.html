@@ -1,5 +1,5 @@
 <div>
-    <h3>Daily Outcomes</h3>
+    <h3>Single bar outcomes</h3>
     <div *ngIf="dailyOutcomes">
         <table class="table table-striped table-hover border">
             <tbody>
@@ -31,14 +31,14 @@
         </table>
     </div>  
 
-    <h3>Historical outcomes</h3>
-    <div *ngIf="historicalOutcomes">
+    <h3>Multiple bar outcomes</h3>
+    <div *ngIf="multipleBarOutcomes">
         <table class="table table-striped table-hover border">
             <tbody>
                 <tr>
                     <td>Positive / Negative</td>
-                    <td [ngClass]="{'text-danger': positiveCount(historicalOutcomes) < negativeCount(historicalOutcomes), 'text-success': positiveCount(historicalOutcomes) > negativeCount(historicalOutcomes)}">
-                        {{ positiveCount(historicalOutcomes) }} / {{ negativeCount(historicalOutcomes) }}
+                    <td [ngClass]="{'text-danger': positiveCount(multipleBarOutcomes) < negativeCount(multipleBarOutcomes), 'text-success': positiveCount(multipleBarOutcomes) > negativeCount(multipleBarOutcomes)}">
+                        {{ positiveCount(multipleBarOutcomes) }} / {{ negativeCount(multipleBarOutcomes) }}
                     </td>
                 </tr>
             </tbody>
@@ -46,7 +46,7 @@
     
         <table class="table table-hover border">
             <tbody>
-                <tr *ngFor="let o of historicalOutcomes.outcomes">
+                <tr *ngFor="let o of multipleBarOutcomes.outcomes">
                     <td>
                         <span
                             class="badge"

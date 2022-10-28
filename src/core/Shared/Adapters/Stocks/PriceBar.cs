@@ -9,7 +9,7 @@ namespace core.Shared.Adapters.Stocks
         Monthly
     }
     
-    public struct HistoricalPrice
+    public struct PriceBar
     {
         public string Date { get; set; }
         public DateTimeOffset DateParsed => DateTimeOffset.Parse(Date);

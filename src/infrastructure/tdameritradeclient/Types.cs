@@ -1,10 +1,10 @@
 namespace tdameritradeclient;
 
-public class HistoricalPriceResponse {
+internal class PriceHistoryResponse {
     public Candle[]? candles { get; set; }
 }
 
-public class Candle {
+internal class Candle {
     public long datetime { get; set; }
     public decimal open { get; set; }
     public decimal high { get; set; }
@@ -13,7 +13,7 @@ public class Candle {
     public int volume { get; set; }
 }
 
-public partial class OrderLeg
+internal partial class OrderLeg
 {
     public string? orderLegType { get; set; }
 
@@ -28,7 +28,7 @@ public partial class OrderLeg
     public double quantity { get; set; }
 }
 
-public class ExecutionLeg
+internal class ExecutionLeg
 {
     public long legId { get; set; }
     public decimal quantity { get; set; }
@@ -36,7 +36,7 @@ public class ExecutionLeg
     public decimal price { get; set; }
 }
 
-public class OrderActivity
+internal class OrderActivity
 {
     public string? executionType { get; set; }
 
@@ -45,7 +45,7 @@ public class OrderActivity
     public ExecutionLeg[]? executionLegs { get; set; }
 }
 
-public partial class Instrument
+internal class Instrument
 {
     public string? assetType { get; set; }
 
@@ -62,7 +62,7 @@ public partial class Instrument
     public string? underlyingSymbol { get; set; }
 }
 
-public class OrderStrategy
+internal class OrderStrategy
 {
     public string? session { get; set; }
 
@@ -146,7 +146,7 @@ public class OrderStrategy
         return 0m;
     }
 }
-public partial class SecuritiesAccount
+internal class SecuritiesAccount
 {
     public string? type { get; set; }
 
@@ -156,14 +156,14 @@ public partial class SecuritiesAccount
     public TDPosition[]? positions { get; set; }
 }
 
-public class TDPosition
+internal class TDPosition
 {
     public decimal averagePrice { get; set; }
     public decimal longQuantity { get; set; }
     public Instrument? instrument { get; set; }
 }
 
-public class AccountsResponse
+internal class AccountsResponse
 {
     public SecuritiesAccount? securitiesAccount { get; set; }
 }

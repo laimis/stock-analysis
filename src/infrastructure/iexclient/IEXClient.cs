@@ -147,8 +147,8 @@ namespace iexclient
             );
         }
 
-        public Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(string ticker, string interval) =>
-            GetCachedResponse<HistoricalPrice[]>(
+        public Task<ServiceResponse<PriceBar[]>> GetPriceHistory(string ticker, string interval) =>
+            GetCachedResponse<PriceBar[]>(
                 MakeUrl($"stock/{ticker}/chart/{interval}") + $"&chartCloseOnly=true",
                 CacheKeyDaily(ticker + interval)
             );

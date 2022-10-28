@@ -48,10 +48,10 @@ namespace core.Stocks.Handlers
                 var start = DateTimeOffset.UtcNow.AddDays(-totalDays);
                 var end = DateTimeOffset.UtcNow;
 
-                var prices = await _brokerage.GetHistoricalPrices(user.State, request.Ticker, start: start, end: end);
+                var prices = await _brokerage.GetPriceHistory(user.State, request.Ticker, start: start, end: end);
                 if (!prices.IsOk)
                 {
-                    throw new Exception("Failed to get historical prices");
+                    throw new Exception("Failed to get price history");
                 }
 
                 return new PricesView(

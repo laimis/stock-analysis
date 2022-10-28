@@ -229,7 +229,7 @@ public class TDAmeritradeClient : IBrokerage
     }
 
 
-    public async Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(
+    public async Task<ServiceResponse<PriceBar[]>> GetPriceHistory(
         UserState state,
         string ticker,
         PriceFrequency frequency = PriceFrequency.Daily,
@@ -248,7 +248,7 @@ public class TDAmeritradeClient : IBrokerage
         
         var function = $"marketdata/{ticker}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}";
 
-        var response = await CallApi<HistoricalPriceResponse>(
+        var response = await CallApi<PriceHistoryResponse>(
             state,
             function,
             HttpMethod.Get
@@ -256,7 +256,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (response.Error != null)
         {
-            return new ServiceResponse<HistoricalPrice[]>(response.Error);
+            return new ServiceResponse<PriceBar[]>(response.Error);
         }
 
         var prices = response.Success!;
@@ -266,7 +266,7 @@ public class TDAmeritradeClient : IBrokerage
             throw new Exception($"Null candles for historcal prices for {ticker} {start} {end}");
         }
 
-        var payload = prices.candles.Select(c => new HistoricalPrice
+        var payload = prices.candles.Select(c => new PriceBar
         {
             Close = c.close,
             High = c.high,
@@ -281,7 +281,7 @@ public class TDAmeritradeClient : IBrokerage
             _logger?.LogError($"No candles for historcal prices for {function}");
         }
 
-        return new ServiceResponse<HistoricalPrice[]>(payload);
+        return new ServiceResponse<PriceBar[]>(payload);
     }
 
     private async Task<ServiceResponse<bool>> EnterOrder(UserState user, object postData)

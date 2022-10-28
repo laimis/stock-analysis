@@ -554,7 +554,7 @@ export class OwnedOption {
   transactions: TransactionList
 }
 
-export interface StockHistoricalPrice {
+export interface PriceBar {
   date: string
   close: number
   open: number
@@ -570,7 +570,7 @@ export interface SMA {
 }
 
 export interface Prices {
-  prices: StockHistoricalPrice[]
+  prices: PriceBar[]
   sma: SMAContainer
 }
 
@@ -701,7 +701,7 @@ export interface StockPercentChangeResponse {
 export interface StockGap {
   type: string
   percentChange: number
-  bar: StockHistoricalPrice
+  bar: PriceBar
 }
 export interface StockGapsResponse {
   ticker: string

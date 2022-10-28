@@ -23,7 +23,7 @@ namespace iexclienttests
         private List<StockQueryResult> _mostActive;
         private List<SearchResult> _search;
         private StockAdvancedStats _advanced;
-        private HistoricalPrice[] _historicalPrices;
+        private PriceBar[] _priceHistory;
 
         public IEXClientTests(IEXClientFixture fixture, Xunit.Abstractions.ITestOutputHelper output)
         {
@@ -35,7 +35,7 @@ namespace iexclienttests
             _mostActive = fixture.MostActive;
             _search = fixture.SearchResults;
             _advanced = fixture.AdvancedStats;
-            _historicalPrices = fixture.HistoricalPrices;
+            _priceHistory = fixture.PriceHistory;
         }
 
         [Fact]
@@ -110,11 +110,11 @@ namespace iexclienttests
         }
 
         [Fact]
-        public void HistoricalPrices()
+        public void PriceHistory()
         {
-            Assert.NotEmpty(_historicalPrices);
-            Assert.True(_historicalPrices[0].Close > 0);
-            Assert.NotEmpty(_historicalPrices[0].Date);
+            Assert.NotEmpty(_priceHistory);
+            Assert.True(_priceHistory[0].Close > 0);
+            Assert.NotEmpty(_priceHistory[0].Date);
         }
     }
 }

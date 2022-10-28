@@ -6,13 +6,13 @@ namespace core.Stocks.View
 {
     public class PricesView
     {
-        public PricesView(HistoricalPrice[] prices)
+        public PricesView(PriceBar[] prices)
         {
             Prices = prices;
             SMA = core.Stocks.Services.SMAContainer.Generate(prices);
         }
 
-        public HistoricalPrice[] Prices { get; }
+        public PriceBar[] Prices { get; }
         public SMAContainer SMA { get; }
     }
 }

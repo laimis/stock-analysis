@@ -48,7 +48,7 @@ namespace core.Stocks.Services
         public SMA sma200 => _sma200;
 
 
-        public static SMAContainer Generate(HistoricalPrice[] prices)
+        public static SMAContainer Generate(PriceBar[] prices)
         {
             return new SMAContainer(
                 ToSMA(prices, 20),
@@ -58,7 +58,7 @@ namespace core.Stocks.Services
             );
         }
 
-        private static SMA ToSMA(HistoricalPrice[] prices, int interval)
+        private static SMA ToSMA(PriceBar[] prices, int interval)
         {
             var sma = new decimal?[prices.Length];
             for(var i = 0; i<prices.Length; i++)

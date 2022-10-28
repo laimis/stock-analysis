@@ -10,10 +10,10 @@ namespace coretests.Stocks
         public void GivesPrices_SMAs_Are_Correct()
         {
             // generate a set of 504 prices from o to 504 increasing by one each day
-            var prices = new HistoricalPrice[504];
+            var prices = new PriceBar[504];
             for (var i = 0; i < 504; i++)
             {
-                prices[i] = new HistoricalPrice
+                prices[i] = new PriceBar
                 {
                     Date = $"2020-01-{i + 1}",
                     Close = i + 1,

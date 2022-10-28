@@ -7,7 +7,7 @@ namespace core.Stocks.Services
 {
     public class GapAnalysis
     {
-        public static List<Gap> Generate(Span<HistoricalPrice> prices)
+        public static List<Gap> Generate(Span<PriceBar> prices)
         {
             var gaps = new List<Gap>();
 
@@ -42,6 +42,6 @@ namespace core.Stocks.Services
         }
     }
 
-    public record struct Gap(GapType type, decimal percentChange, HistoricalPrice bar);
+    public record struct Gap(GapType type, decimal percentChange, PriceBar bar);
     public enum GapType { Up, Down }
 }

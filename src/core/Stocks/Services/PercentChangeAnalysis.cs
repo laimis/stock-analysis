@@ -7,7 +7,7 @@ namespace core.Stocks.Services
 {
     public class PercentChangeAnalysis
     {
-        public static PercentChangeDescriptor Generate(Span<HistoricalPrice> prices)
+        public static PercentChangeDescriptor Generate(Span<PriceBar> prices)
         {
             var closes = prices.ToArray().Select(x => x.Close);
 

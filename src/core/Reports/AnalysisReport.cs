@@ -118,7 +118,7 @@ namespace core.Reports
                 var tickerOutcomes = new List<TickerOutcomes>();
                 foreach (var ticker in tickers)
                 {
-                    var prices = await _brokerage.GetHistoricalPrices(
+                    var prices = await _brokerage.GetPriceHistory(
                         user.State,
                         ticker,
                         frequency

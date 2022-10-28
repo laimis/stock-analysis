@@ -56,7 +56,7 @@ namespace core.Reports
 
             private async Task<GapsView> Generate(PriceFrequency frequency, string ticker, User user)
             {
-                var pricesResponse = await _brokerage.GetHistoricalPrices(
+                var pricesResponse = await _brokerage.GetPriceHistory(
                     user.State,
                     ticker,
                     frequency
@@ -69,7 +69,7 @@ namespace core.Reports
 
                 var prices = pricesResponse.Success;
 
-                var gaps = GapAnalysis.Generate(new Span<HistoricalPrice>(prices, prices.Length - 60, 60));
+                var gaps = GapAnalysis.Generate(new Span<PriceBar>(prices, prices.Length - 60, 60));
 
                 return new GapsView(
                     ticker,

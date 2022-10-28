@@ -131,10 +131,10 @@ namespace core.Reports
                 );
             }
 
-            private static Func<HistoricalPrice[], List<AnalysisOutcome>> GetOutcomesFunction(Duration duration) => 
+            private static Func<PriceBar[], List<AnalysisOutcome>> GetOutcomesFunction(Duration duration) => 
                 duration switch
                 {
-                    Duration.AllBars => (Func<HistoricalPrice[], List<AnalysisOutcome>>)(prices => HistoricalPriceAnalysis.Run(
+                    Duration.AllBars => (Func<PriceBar[], List<AnalysisOutcome>>)(prices => MultipleBarPriceAnalysis.Run(
                                 currentPrice: prices[prices.Length - 1].Close,
                                 prices
                             )),
@@ -142,19 +142,19 @@ namespace core.Reports
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-            private async Task<List<TickerOutcomes>> RunAnalysis(PriceFrequency frequency, IEnumerable<string> tickers, UserState user, Func<HistoricalPrice[], List<AnalysisOutcome>> func)
+            private async Task<List<TickerOutcomes>> RunAnalysis(PriceFrequency frequency, IEnumerable<string> tickers, UserState user, Func<PriceBar[], List<AnalysisOutcome>> func)
             {
                 var list = new List<TickerOutcomes>();
 
                 foreach(var ticker in tickers)
                 {
-                    var historicalResponse = await _brokerage.GetHistoricalPrices(user, ticker, frequency);
-                    if (!historicalResponse.IsOk || historicalResponse.Success == null || historicalResponse.Success.Length == 0)
+                    var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, frequency);
+                    if (!priceHistoryResponse.IsOk || priceHistoryResponse.Success == null || priceHistoryResponse.Success.Length == 0)
                     {
                         continue;
                     }
 
-                    var outcomes = func(historicalResponse.Success);
+                    var outcomes = func(priceHistoryResponse.Success);
 
                     list.Add(new TickerOutcomes(outcomes, ticker));
                 }

@@ -7,7 +7,7 @@ import { OutcomesAnalysisReport, StocksService, TickerOutcomes } from 'src/app/s
   styleUrls: ['./stock-analysis.component.css']
 })
 export class StockAnalysisComponent implements OnInit {
-  historicalOutcomes: TickerOutcomes;
+  multipleBarOutcomes: TickerOutcomes;
   dailyOutcomes : TickerOutcomes;
   dailyAnalysis: OutcomesAnalysisReport;
   weeklyAnalysis: OutcomesAnalysisReport;
@@ -26,7 +26,7 @@ export class StockAnalysisComponent implements OnInit {
   private allTimeOutcomes() {
     this.stockService.reportTickerOutcomesAllTime(this.ticker).subscribe(
       data => {
-        this.historicalOutcomes = data[0];
+        this.multipleBarOutcomes = data[0];
         this.dayOutcomes();
       }
     );

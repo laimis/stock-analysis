@@ -57,7 +57,7 @@ namespace core.Reports
 
             private async Task<PercentChangeStatisticsView> Generate(PriceFrequency frequency, string ticker, User user)
             {
-                var pricesResponse = await _brokerage.GetHistoricalPrices(
+                var pricesResponse = await _brokerage.GetPriceHistory(
                     user.State,
                     ticker,
                     frequency

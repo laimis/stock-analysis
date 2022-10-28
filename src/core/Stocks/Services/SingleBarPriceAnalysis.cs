@@ -7,7 +7,7 @@ namespace core.Stocks.Services
 {
     public interface ISingleBarPriceAnalysis
     {
-        IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices);
+        IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices);
     }
 
     public class SingleBarAnalysisConstants
@@ -17,7 +17,7 @@ namespace core.Stocks.Services
 
     public class SingleBarAnalysisRunner
     {
-        public static List<AnalysisOutcome> Run(HistoricalPrice[] prices)
+        public static List<AnalysisOutcome> Run(PriceBar[] prices)
         {
             var outcomes = new List<AnalysisOutcome>();
 
@@ -31,13 +31,13 @@ namespace core.Stocks.Services
 
     internal class SMASingleBarAnalysis : ISingleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices)
         {
             var price = prices[prices.Length - 1].Close;
             
             var outcomes = new SMAAnalysis().Run(price, prices);
 
-            var outcome = outcomes.Single(x => x.key == HistoricalOutcomeKeys.SMA20Above50Days);
+            var outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
 
             yield return new AnalysisOutcome(
                 SingleBarOutcomeKeys.SMA20Above50Days,
@@ -50,7 +50,7 @@ namespace core.Stocks.Services
 
     internal class SingleBarPriceAnalysis : ISingleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices)
         {
             var currentBar = prices[prices.Length - 1];
 
@@ -193,7 +193,7 @@ namespace core.Stocks.Services
 
     internal class SingleBarVolumeAnalysis : ISingleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(HistoricalPrice[] prices)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices)
         {
             var outcomes = new List<AnalysisOutcome>();
 

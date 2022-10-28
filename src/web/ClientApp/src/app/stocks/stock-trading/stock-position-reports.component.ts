@@ -8,7 +8,7 @@ import { StocksService, TickerOutcomes, OutcomesAnalysisReport } from '../../ser
 })
 export class StockPositionReportsComponent {
 
-  historicalOutcomes: TickerOutcomes[]
+  multipleBarOutcomes: TickerOutcomes[]
   dailyOutcomes: TickerOutcomes[]
   portfolioDailyReport: OutcomesAnalysisReport;
   portfolioWeeklyReport: OutcomesAnalysisReport;
@@ -39,7 +39,7 @@ export class StockPositionReportsComponent {
 
   loadAllTimeData() {
     this.service.reportPortfolioOutcomesAllTime().subscribe(result => {
-      this.historicalOutcomes = result;
+      this.multipleBarOutcomes = result;
     }, error => {
       console.error(error);
     });
