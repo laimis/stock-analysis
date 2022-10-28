@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { Observable } from 'rxjs';
-import { brokerageordercommand, PositionInstance, StocksService } from 'src/app/services/stocks.service';
+import { brokerageordercommand, PositionInstance, StockQuote, StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -15,6 +15,7 @@ export class BrokerageNewOrderComponent {
   numberOfShares : number | null = null
   price : number | null = null
   ticker : string
+  quote : StockQuote
 
   constructor(
     private stockService: StocksService
@@ -36,14 +37,14 @@ export class BrokerageNewOrderComponent {
 
   onTickerSelected(ticker: string) {
     this.ticker = ticker
-    this.stockService.getStockPrice(ticker).subscribe(
+    this.stockService.getStockQuote(ticker).subscribe(
       prices => {
-        this.price = prices
+        this.quote = prices
+        console.log(this.quote)
+        this.price = prices.mark
 
-        console.log("checking for position for ticker " + ticker)
         var position = this.positions.find(p => p.ticker === ticker)
         if (position) {
-          console.log("found position for ticker " + ticker + " with shares " + position.numberOfShares)
           this.numberOfShares = position.numberOfShares
         }
       }

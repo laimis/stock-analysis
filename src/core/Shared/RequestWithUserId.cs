@@ -54,7 +54,7 @@ namespace core.Shared
             UserId = userId;
         }
 
-        public Guid UserId { get; private set; }
+        public Guid UserId { get; protected set; }
         public void WithUserId(Guid userId) => UserId = userId;
     }
 }

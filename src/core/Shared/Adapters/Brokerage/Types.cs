@@ -20,6 +20,23 @@ public class OAuthResponse
     public bool IsExpired => _created.AddSeconds(expires_in) < DateTimeOffset.UtcNow;
 }
 
+public class StockQuote
+{
+    public string symbol { get; set; }
+    decimal bidPrice { get; set; }
+    decimal bidSize { get; set; }
+    decimal askPrice { get; set; }
+    decimal askSize { get; set; }
+    decimal lastPrice { get; set; }
+    decimal lastSize { get; set; }
+    decimal mark { get; set; }
+    string exchange { get; set; }
+    string exchangeName { get; set; }
+    decimal volatility { get; set; }
+    decimal regularMarketLastPrice { get; set; }
+    decimal regularMarketLastSize { get; set; }
+}
+
 public class Order
 {
     public string OrderId { get; set; }

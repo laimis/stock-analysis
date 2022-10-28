@@ -141,6 +141,10 @@ export class StocksService {
   getStockPrice(symbol:string): Observable<number> {
     return this.http.get<number>(`/api/stocks/${symbol}/price`)
   }
+
+  getStockQuote(symbol:string): Observable<StockQuote> {
+    return this.http.get<StockQuote>(`/api/stocks/${symbol}/quote`)
+  }
   
   getStockPrices(symbol:string, numberOfDays:number): Observable<Prices> {
 		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
@@ -600,6 +604,35 @@ export interface StockAdvancedStats {
   month1ChangePercent: number
   day50MovingAvg: number
   day200MovingAvg: number
+}
+
+export interface StockQuote {
+  symbol: string
+  description: string
+  bidPrice: number
+  bidSize: number
+  bidId: string
+  askPrice: number
+  askSize: number
+  askId: string
+  lastPrice: number
+  lastSize: number
+  lastId: string
+  openPrice: number
+  highPrice: number
+  lowPrice: number
+  closePrice: number
+  netChange: number
+  totalVolume: number
+  quoteTimeInLong: number
+  tradeTimeInLong: number
+  mark: number
+  exchange: string
+  exchangeName: string
+  volatility: number
+  securityStatus: string
+  regularMarketLastPrice: number
+  regularMarketLastSize: number
 }
 
 export interface StockDetails {

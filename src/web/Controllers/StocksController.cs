@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks;
 using core.Stocks.Handlers;
 using core.Stocks.View;
@@ -35,6 +36,9 @@ namespace web.Controllers
 
         [HttpGet("{ticker}/price")]
         public Task<decimal> Price(string ticker) => _mediator.Send(new Price.Query(ticker));
+
+        [HttpGet("{ticker}/quote")]
+        public Task<StockQuote> Quote(string ticker) => _mediator.Send(new Quote.Query(ticker, User.Identifier()));
         
         [HttpGet("{ticker}/ownership")]
         public async Task<object> Ownership(string ticker)

@@ -221,6 +221,14 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
+    public Task<ServiceResponse<StockQuote>> GetQuote(UserState user, string ticker)
+    {
+        var function = $"marketdata/{ticker}/quotes";
+
+        return CallApi<StockQuote>(user, function, HttpMethod.Get);
+    }
+
+
     public async Task<ServiceResponse<HistoricalPrice[]>> GetHistoricalPrices(
         UserState state,
         string ticker,

@@ -46,6 +46,12 @@
         </select>
       </div>
     </div>
+    <div class="row" *ngIf="quote">
+      <div class="col"><div class="stat-label">bid</div><div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div></div>
+      <div class="col"><div class="stat-label">ask</div><div>{{ quote.askSize | currency }} x {{ quote.askSize }}</div></div>
+      <div class="col"><div class="stat-label">last</div><div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div></div>
+      <div class="col"><div class="stat-label">exchange</div><div>{{ quote.exchangeName }}</div></div>
+    </div>
     <div class="row mt-3">
       <div class="col" >
         <button class="btn btn-primary w-100" (click)="brokerageBuy()">Buy</button>
