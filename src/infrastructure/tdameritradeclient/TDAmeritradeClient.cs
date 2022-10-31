@@ -221,11 +221,23 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public Task<ServiceResponse<StockQuote>> GetQuote(UserState user, string ticker)
+    public async Task<ServiceResponse<StockQuote>> GetQuote(UserState user, string ticker)
     {
         var function = $"marketdata/{ticker}/quotes";
 
-        return CallApi<StockQuote>(user, function, HttpMethod.Get);
+        var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+        if (!response.IsOk)
+        {
+            return new ServiceResponse<StockQuote>(response.Error!);
+        }
+
+        var quote = response.Success![ticker];
+        if (quote == null)
+        {
+            return new ServiceResponse<StockQuote>(new ServiceError("Could not find quote for ticker"));
+        }
+
+        return new ServiceResponse<StockQuote>(quote);
     }
 
 
@@ -334,11 +346,16 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
-    private async Task<ServiceResponse<T>> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null)
+    private async Task<ServiceResponse<T>> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null, bool debug = false)
     {
         try
         {
             var responseString = await CallApiWithoutSerialization(user, function, method, jsonData);
+
+            if (debug)
+            {
+                _logger?.LogError(responseString);
+            }
 
             var deserialized = JsonSerializer.Deserialize<T>(responseString);
             if (deserialized == null)

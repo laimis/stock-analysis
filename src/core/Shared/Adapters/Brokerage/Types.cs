@@ -23,18 +23,18 @@ public class OAuthResponse
 public class StockQuote
 {
     public string symbol { get; set; }
-    decimal bidPrice { get; set; }
-    decimal bidSize { get; set; }
-    decimal askPrice { get; set; }
-    decimal askSize { get; set; }
-    decimal lastPrice { get; set; }
-    decimal lastSize { get; set; }
-    decimal mark { get; set; }
-    string exchange { get; set; }
-    string exchangeName { get; set; }
-    decimal volatility { get; set; }
-    decimal regularMarketLastPrice { get; set; }
-    decimal regularMarketLastSize { get; set; }
+    public decimal bidPrice { get; set; }
+    public decimal bidSize { get; set; }
+    public decimal askPrice { get; set; }
+    public decimal askSize { get; set; }
+    public decimal lastPrice { get; set; }
+    public decimal lastSize { get; set; }
+    public decimal mark { get; set; }
+    public string exchange { get; set; }
+    public string exchangeName { get; set; }
+    public decimal volatility { get; set; }
+    public decimal regularMarketLastPrice { get; set; }
+    public decimal regularMarketLastSize { get; set; }
 }
 
 public class Order
