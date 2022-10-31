@@ -69,7 +69,7 @@ namespace core.Reports
 
                 var prices = pricesResponse.Success;
 
-                var gaps = GapAnalysis.Generate(new Span<PriceBar>(prices, prices.Length - 60, 60));
+                var gaps = GapAnalysis.Generate(prices, 60);
 
                 return new GapsView(
                     ticker,
