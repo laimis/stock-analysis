@@ -10,7 +10,7 @@ export class StockTradingPositionsComponent {
     sortedPositions: PositionInstance[];
     _positions: PositionInstance[];
     metricToRender: string = "rr"
-    metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.unrealizedRR;
+    metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.rr;
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
 
