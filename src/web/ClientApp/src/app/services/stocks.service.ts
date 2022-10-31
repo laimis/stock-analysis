@@ -810,7 +810,8 @@ export interface PositionInstance {
   events: PositionEvent[],
   unrealizedGainPct: number,
   unrealizedProfit: number,
-  unrealizedRR: number
+  unrealizedRR: number,
+  percentToStop: number
 }
 
 export class OptionDefinition {

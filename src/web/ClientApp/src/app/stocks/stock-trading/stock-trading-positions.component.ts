@@ -76,7 +76,7 @@ export class StockTradingPositionsComponent {
                 this.metricFunc = (p:PositionInstance) => p.unrealizedProfit
                 break;
             case "plPercent":
-                this.metricFunc = (p:PositionInstance) => p.unrealizedGainPct
+                this.metricFunc = (p:PositionInstance) => p.unrealizedGainPct * 100
                 break;
             case "cost":
                 this.metricFunc = (p:PositionInstance) => p.cost
@@ -86,6 +86,9 @@ export class StockTradingPositionsComponent {
                 break
             case "daysSinceLastTransaction":
                 this.metricFunc = (p:PositionInstance) => p.daysSinceLastTransaction
+                break
+            case "percentToStop":
+                this.metricFunc = (p:PositionInstance) => p.percentToStop * 100
                 break
             default:
                 this.metricFunc = (p:PositionInstance) => p.rr
