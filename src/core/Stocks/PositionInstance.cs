@@ -27,15 +27,15 @@ namespace core.Stocks
         public decimal Profit { get; private set; } = 0;
         public decimal GainPct => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare;
         public decimal RR => RiskedAmount switch {
-            not null => Profit / RiskedAmount.Value + UnrealizedRR,
+            not null => Profit / RiskedAmount.Value + (UnrealizedRR.HasValue ? UnrealizedRR.Value : 0),
             _ => 0
         };
         public decimal RRWeighted => RR * Cost;
 
         public decimal? Price { get; private set; }
-        public decimal UnrealizedProfit { get; private set; } = 0;
-        public decimal UnrealizedGainPct { get; private set; } = 0;
-        public decimal UnrealizedRR { get; private set; } = 0;
+        public decimal? UnrealizedProfit { get; private set; } = null;
+        public decimal? UnrealizedGainPct { get; private set; } = null;
+        public decimal? UnrealizedRR { get; private set; } = null;
         public decimal? PercentToStop { get; private set; } = null;
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
@@ -186,7 +186,7 @@ namespace core.Stocks
             Events.Add(new PositionEvent("Set risk amount", "risk", riskAmount, when));
         }
 
-        internal void SetPrice(decimal price)
+        public void SetPrice(decimal price)
         {
             Price = price;
             UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
