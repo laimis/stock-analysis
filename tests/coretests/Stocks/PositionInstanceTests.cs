@@ -37,6 +37,9 @@ namespace coretests.Stocks
         public void StopPriceGetsSetAfterSell() => Assert.Equal(28.5m, _position.StopPrice);
 
         [Fact]
+        public void PercentToStop_WithoutPrice_IsNull() => Assert.Null(_position.PercentToStop);
+
+        [Fact]
         public void Cost()
         {
             var position = new PositionInstance("TSLA");

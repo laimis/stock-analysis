@@ -25,7 +25,7 @@ namespace core.Stocks
         public int DaysHeld => Opened != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value)).TotalDays : 0;
         public decimal Cost { get; private set; } = 0;
         public decimal Profit { get; private set; } = 0;
-        public decimal GainPct => ToPercent((AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare);
+        public decimal GainPct => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare;
         public decimal RR => RiskedAmount switch {
             not null => Profit / RiskedAmount.Value + UnrealizedRR,
             _ => 0
@@ -36,7 +36,7 @@ namespace core.Stocks
         public decimal UnrealizedProfit { get; private set; } = 0;
         public decimal UnrealizedGainPct { get; private set; } = 0;
         public decimal UnrealizedRR { get; private set; } = 0;
-        public decimal? PercentToStop { get; private set; } = 0;
+        public decimal? PercentToStop { get; private set; } = null;
         public bool IsClosed => Closed != null;
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
@@ -190,18 +190,16 @@ namespace core.Stocks
         {
             Price = price;
             UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
-            UnrealizedGainPct = ToPercent((price - AverageBuyCostPerShare) / AverageBuyCostPerShare);
+            UnrealizedGainPct = (price - AverageBuyCostPerShare) / AverageBuyCostPerShare;
             UnrealizedRR = RiskedAmount switch {
                 not null => UnrealizedProfit / RiskedAmount.Value,
                 _ => 0
             };
             PercentToStop = StopPrice switch {
-                not null => ToPercent((StopPrice.Value - price) / StopPrice.Value),
+                not null => (StopPrice.Value - price) / StopPrice.Value,
                 _ => null
             };
         }
-
-        private decimal ToPercent(decimal value) => Math.Round(value * 100, 2);
 
         private void RunCalculations()
         {
