@@ -91,18 +91,11 @@ namespace core.Alerts
             list.Add(triggeredAlert.Value);
         }
 
-        public bool HasTriggered(string ticker, Guid userId)
-        {
-            return _monitors.Values.Where(m => m.Ticker == ticker && m.UserId == userId)
-                .Where(m => m.IsTriggered)
-                .Any();
-        }
-
         public bool HasRecentlyTriggered(TriggeredAlert a)
         {
             if (_recentlyTriggeredAlerts.TryGetValue(a.userId, out var list))
             {
-                return list.Any(r => r.source == a.source && r.ticker == a.ticker);
+                return list.Any(r => r.source == a.source && r.ticker == a.ticker && a.id != r.id);
             }
 
             return false;

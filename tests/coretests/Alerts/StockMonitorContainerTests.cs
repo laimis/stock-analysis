@@ -74,16 +74,18 @@ namespace coretests.Alerts
         }
 
         [Fact]
-        public void TriggeredCheck()
-        {
-            Assert.True(_uat.HasTriggered(_amd.State.Ticker, _amd.State.UserId));
-            Assert.False(_uat.HasTriggered(_bac.State.Ticker, _bac.State.UserId));
-        }
+        public void RecentlyTriggered_WhereRecentAlertIsTheOneBeingChecked_IsFalse() =>
+            Assert.False(_uat.HasRecentlyTriggered(_subsequentTriggers.First()));
 
         [Fact]
-        public void RecentTriggerTest()
+        public void HasRecentlyTriggered_WithNewTrigger_IsTrue()
         {
-            _uat.HasRecentlyTriggered(_subsequentTriggers[0]);
+            // first, move price up so previous stop alert is no longer triggered
+            _uat.RunCheck("AMD", 51.9m, DateTimeOffset.UtcNow).First();
+            // then move price down again to trigger it
+            var t = _uat.RunCheck("AMD", 48.9m, DateTimeOffset.UtcNow).First();
+            // but since we had already triggered once, recent trigger should now be true
+            Assert.True(_uat.HasRecentlyTriggered(t));
         }
     }
 }

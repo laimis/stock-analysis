@@ -13,7 +13,10 @@ namespace core.Alerts
         Guid userId,
         AlertType alertType,
         string source
-    );
+    )
+    {
+        public Guid id { get; } = Guid.NewGuid();
+    }
 
     public interface IStockPositionMonitor
     {
