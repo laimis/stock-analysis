@@ -69,7 +69,7 @@ import { AlertsComponent } from './alerts/alerts.component';
 import { OutcomesComponent } from './shared/reports/outcomes.component';
 import { OutcomesAnalysisReportComponent } from './shared/reports/outcomes-analysis-report.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard.component';
-import { OutcomesReportComponent } from './shared/reports/outcomes-report.component';
+import { OutcomesReportComponent } from './reports/outcomes-report/outcomes-report.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
