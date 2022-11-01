@@ -14,7 +14,7 @@ namespace core.Stocks.Services
                 : 0;
             return Generate(prices.Slice(start));
         }
-            
+
         public static List<Gap> Generate(Span<PriceBar> prices)
         {
             var gaps = new List<Gap>();
@@ -24,25 +24,32 @@ namespace core.Stocks.Services
                 var yesterday = prices[i - 1];
                 var currentBar = prices[i];
 
-                var gap = 0m;
+                var gapSizePct = 0m;
 
                 if (currentBar.Low > yesterday.High)
                 {
-                    gap = Math.Round( (currentBar.Low - yesterday.High)/yesterday.High * 100, 2);
+                    gapSizePct = Math.Round( (currentBar.Low - yesterday.High)/yesterday.High * 100, 2);
                 }
                 else if (currentBar.High < yesterday.Low)
                 {
-                    gap = -1 * Math.Round( (yesterday.Low - currentBar.High)/yesterday.Low * 100, 2);
+                    gapSizePct = -1 * Math.Round( (yesterday.Low - currentBar.High)/yesterday.Low * 100, 2);
                 }
 
-                if (gap != 0)
+                if (gapSizePct != 0)
                 {
-                    var type = gap switch {
+                    var type = gapSizePct switch {
                         > 0 => GapType.Up,
                         < 0 => GapType.Down,
                         _ => throw new Exception("Invalid gap type")
                     };
-                    gaps.Add(new Gap(type, gap, currentBar));
+                    var percentChange = Math.Round( (currentBar.Close - yesterday.Close)/yesterday.Close * 100, 2);
+                    var gap = new Gap(
+                        type: type,
+                        gapSizePct: gapSizePct,
+                        percentChange: percentChange,
+                        bar: currentBar
+                    );
+                    gaps.Add(gap);
                 }
             }
 
@@ -50,7 +57,12 @@ namespace core.Stocks.Services
         }
     }
 
-    public record struct Gap(GapType type, decimal percentChange, PriceBar bar);
+    public record struct Gap(
+        GapType type,
+        decimal gapSizePct,
+        decimal percentChange,
+        PriceBar bar);
+
     public enum GapType { Up, Down }
 }
 #nullable restore

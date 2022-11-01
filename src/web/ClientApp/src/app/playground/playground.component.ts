@@ -12,7 +12,7 @@ import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 
 export class PlaygroundComponent implements OnInit {
   data: StockPercentChangeResponse;
-  gaps: StockGapsResponse;
+  
 
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
@@ -49,9 +49,7 @@ export class PlaygroundComponent implements OnInit {
           }]
       });
 
-      this.stocks.reportTickerGaps(ticker).subscribe(data => {
-        this.gaps = data
-      });
+      
     }
   }
 }

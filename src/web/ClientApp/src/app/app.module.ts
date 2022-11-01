@@ -70,6 +70,7 @@ import { OutcomesComponent } from './shared/reports/outcomes.component';
 import { OutcomesAnalysisReportComponent } from './shared/reports/outcomes-analysis-report.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard.component';
 import { OutcomesReportComponent } from './reports/outcomes-report/outcomes-report.component';
+import { GapsReportComponent } from './reports/gaps/gaps-report.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -119,6 +120,7 @@ var routes: Routes = [
   { path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
   { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
   { path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard]},
+  { path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard]},
 
   { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
@@ -198,6 +200,7 @@ var routes: Routes = [
     OutcomesComponent,
     OutcomesReportComponent,
     OutcomesAnalysisReportComponent,
+    GapsReportComponent,
 
     AlertsComponent
   ],
