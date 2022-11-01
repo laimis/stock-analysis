@@ -13,15 +13,26 @@
                 <th>% Change</th>
                 <th>Open</th>
                 <th>Close</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr [ngClass]="{'bg-success': g.type === 'Up', 'bg-secondary': g.type === 'Down', 'text-white': true}" *ngFor="let g of gaps.gaps">
-                <td>{{g.bar.date | date}}</td>
+            <tr *ngFor="let g of gaps.gaps">
+                <td>
+                    <i
+                        [ngClass]="{'bg-success': g.type === 'Up', 'bg-secondary': g.type === 'Down', 'text-white': true, 'bi': true, 'bi-arrow-up-circle': g.type === 'Up', 'bi-arrow-down-circle': g.type === 'Down'}"
+                        class="ps-2 pe-2">
+                        
+                    </i>
+                    {{g.bar.date | date}}
+                </td>
                 <td>{{g.gapSizePct}}</td>
                 <td>{{g.percentChange}}</td>
                 <td>{{g.bar.open | currency}}</td>
                 <td>{{g.bar.close | currency}}</td>
+                <td>
+                    <i *ngIf="g.closed" class="bi bi-stop-circle-fill"></i>
+                </td>
             </tr>
         </tbody>
     </table>

@@ -43,11 +43,21 @@ namespace core.Stocks.Services
                         _ => throw new Exception("Invalid gap type")
                     };
                     var percentChange = Math.Round( (currentBar.Close - yesterday.Close)/yesterday.Close * 100, 2);
+
+                    Func<PriceBar, bool> closingCondition = gapSizePct switch {
+                        > 0 => bar => bar.Close <= yesterday.Close,
+                        < 0 => bar => bar.Close >= yesterday.Close,
+                        _ => throw new Exception("Invalid gap type")
+                    };
+
+                    var closed = ClosingConditionMet(prices, i + 1, 10, closingCondition);
+
                     var gap = new Gap(
                         type: type,
                         gapSizePct: gapSizePct,
                         percentChange: percentChange,
-                        bar: currentBar
+                        bar: currentBar,
+                        closed: closed
                     );
                     gaps.Add(gap);
                 }
@@ -55,13 +65,29 @@ namespace core.Stocks.Services
 
             return gaps;
         }
+
+        private static bool ClosingConditionMet(
+            Span<PriceBar> prices,
+            int start, int length,
+            Func<PriceBar, bool> closingCondition)
+        {
+            for(var i = start; i < start + length && i < prices.Length; i++)
+            {
+                if (closingCondition(prices[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public record struct Gap(
         GapType type,
         decimal gapSizePct,
         decimal percentChange,
-        PriceBar bar);
+        PriceBar bar,
+        bool closed);
 
     public enum GapType { Up, Down }
 }

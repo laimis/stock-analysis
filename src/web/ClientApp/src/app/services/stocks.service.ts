@@ -702,7 +702,8 @@ export interface StockGap {
   type: string
   gapSizePct: number
   percentChange: number
-  bar: PriceBar
+  bar: PriceBar,
+  closed: boolean
 }
 export interface StockGapsResponse {
   ticker: string
