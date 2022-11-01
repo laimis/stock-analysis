@@ -7,8 +7,13 @@ namespace core.Stocks.Services
 {
     public class GapAnalysis
     {
-        public static List<Gap> Generate(Span<PriceBar> prices, int numberOfBarsToAnalyze) =>
-            Generate(prices.Slice(prices.Length - numberOfBarsToAnalyze));
+        public static List<Gap> Generate(Span<PriceBar> prices, int numberOfBarsToAnalyze)
+        {
+            var start = prices.Length > numberOfBarsToAnalyze
+                ? prices.Length - numberOfBarsToAnalyze
+                : 0;
+            return Generate(prices.Slice(start));
+        }
             
         public static List<Gap> Generate(Span<PriceBar> prices)
         {
