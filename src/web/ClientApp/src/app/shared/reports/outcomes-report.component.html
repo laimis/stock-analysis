@@ -4,7 +4,8 @@
             <p>{{error}}</p>
         </div>
     </div>
-    <div *ngIf="summary">
+
+    <div class="mb-3" *ngIf="summary">
         Summary
         <span *ngFor="let s of summary"
             class="badge rounded-pill bg-secondary me-2">
