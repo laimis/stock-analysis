@@ -10,10 +10,10 @@ import { OutcomesAnalysisReport, StocksService, TickerOutcomes } from '../../ser
 export class OutcomesReportComponent implements OnInit {
   dayOutcomes: TickerOutcomes[];
   allTimeOutcomes: TickerOutcomes[];
-  weekOutcomes: TickerOutcomes[];
   dailyAnalysis: OutcomesAnalysisReport;
 
   summary: string[];
+  error: string = null;
 
   constructor (
     private stocksService: StocksService,
@@ -21,8 +21,14 @@ export class OutcomesReportComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    var tickers = this.route.snapshot.queryParamMap.get("tickers").split(",");
-    this.runReportTickersAnalysisDaily(tickers);
+    var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
+    if (tickerParam) {
+      var tickers = tickerParam.split(",");
+      this.runReportTickersAnalysisDaily(tickers);
+    } else {
+      this.error = "No tickers were provided";
+    }
+
   }
 
 
