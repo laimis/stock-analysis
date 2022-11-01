@@ -198,11 +198,6 @@ namespace core.Alerts
 
         protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
         {
-            if (Ticker != ticker)
-            {
-                return false;
-            }
-
             return IsTriggered switch {
                 true => UpdateTriggeredAlert(price, time),
                 false => CheckTrigger(price, time)

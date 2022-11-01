@@ -81,9 +81,11 @@ namespace coretests.Alerts
         public void HasRecentlyTriggered_WithNewTrigger_IsTrue()
         {
             // first, move price up so previous stop alert is no longer triggered
-            _uat.RunCheck("AMD", 51.9m, DateTimeOffset.UtcNow).First();
+            var triggers = _uat.RunCheck("AMD", 49.1m, DateTimeOffset.UtcNow);
+            Assert.Empty(triggers);
+
             // then move price down again to trigger it
-            var t = _uat.RunCheck("AMD", 48.9m, DateTimeOffset.UtcNow).First();
+            var t = _uat.RunCheck("AMD", 47.9m, DateTimeOffset.UtcNow).First();
             // but since we had already triggered once, recent trigger should now be true
             Assert.True(_uat.HasRecentlyTriggered(t));
         }
