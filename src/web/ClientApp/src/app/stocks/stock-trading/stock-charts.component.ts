@@ -41,7 +41,7 @@ export class StockChartsComponent implements OnInit {
     )
 
     this.outcomes = null
-    this.stockService.reportTickerOutcomesAllTime(this.currentPosition.ticker).subscribe(
+    this.stockService.reportTickerOutcomesAllTime(this.currentPosition.ticker, false).subscribe(
       data => {
         this.outcomes = data[0]
       }

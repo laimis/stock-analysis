@@ -50,14 +50,16 @@ namespace core.Stocks.Services
                         _ => throw new Exception("Invalid gap type")
                     };
 
-                    var closed = ClosingConditionMet(prices, i + 1, 10, closingCondition);
+                    var closedQuickly = ClosingConditionMet(prices, i + 1, 10, closingCondition);
+                    var open = !ClosingConditionMet(prices, i + 1, prices.Length - i, closingCondition);
 
                     var gap = new Gap(
                         type: type,
                         gapSizePct: gapSizePct,
                         percentChange: percentChange,
                         bar: currentBar,
-                        closed: closed
+                        closedQuickly: closedQuickly,
+                        open: open
                     );
                     gaps.Add(gap);
                 }
@@ -87,7 +89,8 @@ namespace core.Stocks.Services
         decimal gapSizePct,
         decimal percentChange,
         PriceBar bar,
-        bool closed);
+        bool closedQuickly,
+        bool open);
 
     public enum GapType { Up, Down }
 }

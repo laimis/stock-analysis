@@ -3,5 +3,5 @@ using core.Stocks.Services;
 
 namespace core.Reports.Views
 {
-    public record struct GapsView(string ticker, List<Gap> gaps);
+    public record struct GapsView(List<Gap> gaps, string ticker);
 }

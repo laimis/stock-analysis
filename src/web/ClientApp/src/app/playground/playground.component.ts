@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { StockGapsResponse, StockPercentChangeResponse, StocksService } from '../services/stocks.service';
+import { StockGaps, StockPercentChangeResponse, StocksService } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';

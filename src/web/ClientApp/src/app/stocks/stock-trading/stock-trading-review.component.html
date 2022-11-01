@@ -2,15 +2,12 @@
   <div class="container">
     <div class="row">
       <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-      <div class="col text-center">{{currentPosition.ticker}}</div>
+      <div class="col text-center">{{currentPosition.ticker}} ({{currentPosition.profit | currency}})</div>
       <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
     </div>
   </div>
 
   <div class="container mt-2">
-    <div class="row">
-      <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
-    </div>
     <div class="row mt-2">
       <div class="col">
         <stock-trading-chart *ngIf="prices"
@@ -19,6 +16,9 @@
           [prices]=prices>
         </stock-trading-chart>
       </div>
+    </div>
+    <div class="row">
+      <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
     </div>
   </div>
 </div>

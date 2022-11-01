@@ -87,6 +87,9 @@
         </table>
       </div>
     </div>
+    <div class="row mt-3" *ngIf="gaps">
+      <app-gaps [gaps]="gaps"></app-gaps>
+    </div>
     <div class="row mt-3" *ngIf="prices">
       <div class="col">
         <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>

@@ -39,16 +39,27 @@ namespace web.Controllers
         }
 
         [HttpGet("outcomes/portfolio")]
-        public Task<List<TickerOutcomes>> PortfolioOutcomes([FromQuery] OutcomesReport.Duration duration, [FromQuery] PriceFrequency frequency) =>
-            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, frequency, User.Identifier()));
+        public Task<OutcomesReportView> PortfolioOutcomes(
+            [FromQuery] OutcomesReport.Duration duration,
+            [FromQuery] PriceFrequency frequency,
+            [FromQuery] bool includeGapAnalysis) =>
+            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, frequency, includeGapAnalysis, User.Identifier()));
 
         [HttpGet("outcomes/ticker/{ticker}")]
-        public Task<List<TickerOutcomes>> TickerOutcomes(string ticker, [FromQuery] PriceFrequency priceFrequency, [FromQuery] OutcomesReport.Duration duration) =>
-            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, priceFrequency, ticker, User.Identifier()));
+        public Task<OutcomesReportView> TickerOutcomes(
+            string ticker,
+            [FromQuery] PriceFrequency priceFrequency,
+            [FromQuery] OutcomesReport.Duration duration,
+            [FromQuery] bool includeGapAnalysis) =>
+            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, priceFrequency, includeGapAnalysis, ticker, User.Identifier()));
 
         [HttpPost("outcomes/tickers")]
-        public Task<List<TickerOutcomes>> TickersOutcomes([FromBody]string[] tickers, [FromQuery] OutcomesReport.Duration duration, [FromQuery] PriceFrequency frequency) =>
-            _mediator.Send(new OutcomesReport.ForTickersQuery(duration, frequency, tickers, User.Identifier()));
+        public Task<OutcomesReportView> TickersOutcomes(
+            [FromBody]string[] tickers,
+            [FromQuery] OutcomesReport.Duration duration,
+            [FromQuery] PriceFrequency frequency,
+            [FromQuery] bool includeGapAnalysis) =>
+            _mediator.Send(new OutcomesReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
 
         [HttpGet("analysis/ticker/{ticker}")]
         public Task<AnalysisReportView> TickerAnalysis(string ticker, [FromQuery]PriceFrequency frequency)

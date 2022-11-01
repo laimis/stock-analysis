@@ -70,13 +70,10 @@ namespace core.Reports
                 var prices = pricesResponse.Success;
 
                 var gaps = GapAnalysis.Generate(prices, 60);
-                
-                gaps.Reverse();
 
-                return new GapsView(
-                    ticker,
-                    gaps
-                );
+                // gaps.Reverse();
+
+                return new GapsView(gaps, ticker);
             }
         }
     }

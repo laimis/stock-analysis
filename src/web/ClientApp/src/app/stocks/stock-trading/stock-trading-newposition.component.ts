@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Prices, SMA, StockAnalysisOutcome, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
+import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'stock-trading-newposition',
@@ -44,6 +44,7 @@ export class StockTradingNewPositionComponent {
   stopAndExitPoints: number[] = []
 
   outcomes: TickerOutcomes
+  gaps: StockGaps
 
   onBuyTickerSelected(ticker: string) {
     
@@ -63,10 +64,11 @@ export class StockTradingNewPositionComponent {
       }
     );
 
-    this.stockService.reportTickerOutcomesAllTime(ticker)
+    this.stockService.reportTickerOutcomesAllTime(ticker, true)
       .subscribe(data => {
         console.log(data)
-        this.outcomes = data[0]
+        this.outcomes = data.outcomes[0]
+        this.gaps = data.gaps[0]
       }, error => {
         console.error(error)
       }

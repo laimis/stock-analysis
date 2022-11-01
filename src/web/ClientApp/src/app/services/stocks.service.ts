@@ -314,34 +314,33 @@ export class StocksService {
     return this.http.get<Sells>('/api/reports/sells')
   }
 
-  reportTickerOutcomesAllTime(ticker:string) : Observable<TickerOutcomes[]> {
-    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=allBars&&frequency=weekly')
+  reportTickerOutcomesAllTime(ticker:string, includeGapAnalysis:boolean) : Observable<OutcomesReport> {
+    return this.http.get<OutcomesReport>('/api/reports/outcomes/ticker/' + ticker + '?duration=allBars&frequency=weekly&includeGapAnalysis=' + (includeGapAnalysis ? 'true' : 'false'))
   }
 
-  reportTickerOutcomesDay(ticker:string) : Observable<TickerOutcomes[]> {
-    return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/ticker/' + ticker + '?duration=singleBar&&frequency=weekly')
+  reportTickerOutcomesDay(ticker:string, includeGapAnalysis:boolean) : Observable<OutcomesReport> {
+    return this.http.get<OutcomesReport>('/api/reports/outcomes/ticker/' + ticker + '?duration=singleBar&frequency=weekly&includeGapAnalysis=' + (includeGapAnalysis ? 'true' : 'false'))
   }
 
-  reportTickersOutcomesAllTime(tickers:string[]) : Observable<TickerOutcomes[]> {
-    return this.http.post<TickerOutcomes[]>('/api/reports/outcomes/tickers?duration=allBars&&frequency=daily', tickers)
+  reportTickersOutcomesAllTime(tickers:string[], includeGapAnalysis:boolean) : Observable<OutcomesReport> {
+    return this.http.post<OutcomesReport>('/api/reports/outcomes/tickers?duration=allBars&frequency=daily&includeGapAnalysis=' + (includeGapAnalysis ? 'true' : 'false'), tickers)
   }
 
-  reportTickersOutcomesDay(tickers:string[]) : Observable<TickerOutcomes[]> {
-    return this.http.post<TickerOutcomes[]>('/api/reports/outcomes/tickers?duration=singleBar&frequency=daily', tickers)
+  reportTickersOutcomesDay(tickers:string[], includeGapAnalysis:boolean) : Observable<OutcomesReport> {
+    return this.http.post<OutcomesReport>('/api/reports/outcomes/tickers?duration=singleBar&frequency=daily&includeGapAnalysis=' + (includeGapAnalysis ? 'true' : 'false'), tickers)
   }
 
-  reportTickersOutcomesWeek(tickers:string[]) : Observable<TickerOutcomes[]> {
-    return this.http.post<TickerOutcomes[]>('/api/reports/outcomes/tickers?duration=singleBar&frequency=weekly', tickers)
+  reportTickersOutcomesWeek(tickers:string[], includeGapAnalysis:boolean) : Observable<OutcomesReport> {
+    return this.http.post<OutcomesReport>('/api/reports/outcomes/tickers?duration=singleBar&frequency=weekly&includeGapAnalysis=' + (includeGapAnalysis ? 'true':'false'), tickers)
   }
 
-  reportPortfolioOutcomesAllTime(): Observable<TickerOutcomes[]> {
-		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?duration=allBars')
+  reportPortfolioOutcomesAllTime(includeGapAnalysis:boolean): Observable<OutcomesReport> {
+		return this.http.get<OutcomesReport>('/api/reports/outcomes/portfolio?duration=allBars&includeGapAnalysis=' + (includeGapAnalysis ? 'true' : 'false'))
   }
 
-  reportPortfolioOutcomesDay(): Observable<TickerOutcomes[]> {
-		return this.http.get<TickerOutcomes[]>('/api/reports/outcomes/portfolio?duration=singleBar')
+  reportPortfolioOutcomesDay(includeGapAnalysis:boolean): Observable<OutcomesReport> {
+		return this.http.get<OutcomesReport>('/api/reports/outcomes/portfolio?duration=singleBar&includeGapAnalysis=' + (includeGapAnalysis ? 'true' : 'false'))
   }
-
 
   reportPorfolioAnalysisDaily(): Observable<OutcomesAnalysisReport> {
     return this.http.get<OutcomesAnalysisReport>('/api/reports/analysis/portfolio?frequency=daily')
@@ -367,8 +366,8 @@ export class StocksService {
     return this.http.get<StockPercentChangeResponse>('/api/reports/percentChangeDistribution/tickers/' + ticker)
   }
 
-  reportTickerGaps(ticker:string): Observable<StockGapsResponse> {
-    return this.http.get<StockGapsResponse>('/api/reports/gaps/tickers/' + ticker)
+  reportTickerGaps(ticker:string): Observable<StockGaps> {
+    return this.http.get<StockGaps>('/api/reports/gaps/tickers/' + ticker)
   }
 }
 
@@ -670,6 +669,11 @@ export interface TickerOutcomes {
   outcomes: StockAnalysisOutcome[]
 }
 
+export interface OutcomesReport {
+  outcomes: TickerOutcomes[],
+  gaps: StockGaps[]
+}
+
 export interface OutcomesAnalysisReport {
   categories: AnalysisCategoryGrouping[]
 }
@@ -703,9 +707,10 @@ export interface StockGap {
   gapSizePct: number
   percentChange: number
   bar: PriceBar,
-  closed: boolean
+  closedQuickly: boolean
+  open: boolean
 }
-export interface StockGapsResponse {
+export interface StockGaps {
   ticker: string
   gaps: StockGap[]
 }

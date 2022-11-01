@@ -15,6 +15,11 @@ namespace core.Reports.Views
         public List<AnalysisOutcome> Outcomes { get; }
     }
 
+    public record struct OutcomesReportView(
+        List<TickerOutcomes> outcomes,
+        List<GapsView> gaps
+    );
+
     public record struct AnalysisCategoryGrouping(
         string name,
         OutcomeType type,

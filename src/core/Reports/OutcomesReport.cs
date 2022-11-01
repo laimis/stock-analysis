@@ -17,49 +17,52 @@ namespace core.Reports
     {
         public enum Duration { SingleBar, AllBars }
 
-        public class ForPortfolioQuery : RequestWithUserId<List<TickerOutcomes>>
+        public abstract class BaseQuery : RequestWithUserId<OutcomesReportView>
         {
-            public ForPortfolioQuery(Duration duration, PriceFrequency frequency, Guid userId) : base(userId)
+            public BaseQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, Guid userId) : base(userId)
             {
                 Duration = duration;
                 Frequency = frequency;
+                IncludeGapAnalysis = includeGapAnalysis;
             }
 
             public Duration Duration { get; }
             public PriceFrequency Frequency { get; }
+            public bool IncludeGapAnalysis { get; }
         }
 
-        public class ForTickerQuery : RequestWithUserId<List<TickerOutcomes>>
+        public class ForPortfolioQuery : BaseQuery
         {
-            public ForTickerQuery(Duration duration, PriceFrequency frequency, string ticker, Guid userId) : base(userId)
+            public ForPortfolioQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, Guid userId)
+                : base(duration, frequency, includeGapAnalysis, userId)
             {
-                Duration = duration;
-                Frequency = frequency;
+            }
+        }
+
+        public class ForTickerQuery : BaseQuery
+        {
+            public ForTickerQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, string ticker, Guid userId)
+             : base(duration, frequency, includeGapAnalysis, userId)
+            {
                 Ticker = ticker;
             }
-
-            public Duration Duration { get; }
-            public PriceFrequency Frequency { get; }
             public string Ticker { get; }
         }
 
-        public class ForTickersQuery : RequestWithUserId<List<TickerOutcomes>>
+        public class ForTickersQuery : BaseQuery
         {
-            public ForTickersQuery(Duration duration, PriceFrequency frequency, string[] tickers, Guid userId) : base(userId)
+            public ForTickersQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, string[] tickers, Guid userId)
+                : base(duration, frequency, includeGapAnalysis, userId)
             {
-                Duration = duration;
-                Frequency = frequency;
                 Tickers = tickers;
             }
 
-            public Duration Duration { get; }
-            public PriceFrequency Frequency { get; }
             public string[] Tickers { get; }
         }
 
-        public class Handler : HandlerWithStorage<ForPortfolioQuery, List<TickerOutcomes>>,
-            IRequestHandler<ForTickerQuery, List<TickerOutcomes>>,
-            IRequestHandler<ForTickersQuery, List<TickerOutcomes>>
+        public class Handler : HandlerWithStorage<ForPortfolioQuery, OutcomesReportView>,
+            IRequestHandler<ForTickerQuery, OutcomesReportView>,
+            IRequestHandler<ForTickersQuery, OutcomesReportView>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -73,7 +76,7 @@ namespace core.Reports
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
 
-            public async Task<List<TickerOutcomes>> Handle(ForTickerQuery request, CancellationToken cancellationToken)
+            public async Task<OutcomesReportView> Handle(ForTickerQuery request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -87,11 +90,12 @@ namespace core.Reports
                     request.Frequency,
                     new[] {request.Ticker},
                     user.State,
-                    func
+                    func,
+                    includeGapAnalysis: request.IncludeGapAnalysis
                 );         
             }
 
-            public async Task<List<TickerOutcomes>> Handle(ForTickersQuery request, CancellationToken cancellationToken)
+            public async Task<OutcomesReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -105,11 +109,12 @@ namespace core.Reports
                     request.Frequency,
                     request.Tickers,
                     user.State,
-                    func
+                    func,
+                    includeGapAnalysis: request.IncludeGapAnalysis
                 );         
             }
         
-            public override async Task<List<TickerOutcomes>> Handle(ForPortfolioQuery request, CancellationToken cancellationToken)
+            public override async Task<OutcomesReportView> Handle(ForPortfolioQuery request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -127,7 +132,8 @@ namespace core.Reports
                     request.Frequency,
                     tickers,
                     user.State,
-                    func
+                    func,
+                    includeGapAnalysis: request.IncludeGapAnalysis
                 );
             }
 
@@ -142,9 +148,15 @@ namespace core.Reports
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-            private async Task<List<TickerOutcomes>> RunAnalysis(PriceFrequency frequency, IEnumerable<string> tickers, UserState user, Func<PriceBar[], List<AnalysisOutcome>> func)
+            private async Task<OutcomesReportView> RunAnalysis(
+                PriceFrequency frequency,
+                IEnumerable<string> tickers,
+                UserState user,
+                Func<PriceBar[], List<AnalysisOutcome>> priceAnalysisFunc,
+                bool includeGapAnalysis)
             {
-                var list = new List<TickerOutcomes>();
+                var ticketOutcomes = new List<TickerOutcomes>();
+                var tickerGapViews = new List<GapsView>();
 
                 foreach(var ticker in tickers)
                 {
@@ -154,12 +166,18 @@ namespace core.Reports
                         continue;
                     }
 
-                    var outcomes = func(priceHistoryResponse.Success);
+                    var outcomes = priceAnalysisFunc(priceHistoryResponse.Success);
 
-                    list.Add(new TickerOutcomes(outcomes, ticker));
+                    ticketOutcomes.Add(new TickerOutcomes(outcomes, ticker));
+
+                    if (includeGapAnalysis)
+                    {
+                        var gapOutcomes = GapAnalysis.Generate(priceHistoryResponse.Success, 60);
+                        tickerGapViews.Add(new GapsView(gapOutcomes, ticker));
+                    }
                 }
 
-                return list;
+                return new OutcomesReportView(ticketOutcomes, tickerGapViews);
             }
         }
     }

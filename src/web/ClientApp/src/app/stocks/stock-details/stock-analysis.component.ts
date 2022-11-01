@@ -24,7 +24,7 @@ export class StockAnalysisComponent implements OnInit {
   }
 
   private allTimeOutcomes() {
-    this.stockService.reportTickerOutcomesAllTime(this.ticker).subscribe(
+    this.stockService.reportTickerOutcomesAllTime(this.ticker, true).subscribe(
       data => {
         this.multipleBarOutcomes = data[0];
         this.dayOutcomes();
@@ -33,7 +33,7 @@ export class StockAnalysisComponent implements OnInit {
   }
 
   private dayOutcomes() {
-    this.stockService.reportTickerOutcomesDay(this.ticker).subscribe(
+    this.stockService.reportTickerOutcomesDay(this.ticker, false).subscribe(
       data => {
         this.dailyOutcomes = data[0];
         this.dailyAnalysisReport();

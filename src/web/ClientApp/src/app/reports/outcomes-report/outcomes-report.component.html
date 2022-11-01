@@ -18,4 +18,6 @@
     <app-outcomes [outcomes]="dayOutcomes" title="Day Outcomes"></app-outcomes>
 
     <app-outcomes [outcomes]="allTimeOutcomes" title="All-Time Outcomes"></app-outcomes>
+
+    <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
 </div>

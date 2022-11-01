@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { OutcomesAnalysisReport, StocksService, TickerOutcomes } from '../../services/stocks.service';
+import { OutcomesAnalysisReport, OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-outcomes-report',
@@ -11,6 +11,7 @@ export class OutcomesReportComponent implements OnInit {
   dayOutcomes: TickerOutcomes[];
   allTimeOutcomes: TickerOutcomes[];
   dailyAnalysis: OutcomesAnalysisReport;
+  gaps: StockGaps[]
 
   summary: string[];
   error: string = null;
@@ -42,16 +43,17 @@ export class OutcomesReportComponent implements OnInit {
   
   generateOutcomesForDay(tickers: string[]) {
 
-    this.stocksService.reportTickersOutcomesDay(tickers).subscribe((data: TickerOutcomes[]) => {
-        this.dayOutcomes = data;
+    this.stocksService.reportTickersOutcomesDay(tickers, false).subscribe((data: OutcomesReport) => {
+        this.dayOutcomes = data.outcomes;
         this.generateOutcomesForAllTime(tickers)
       }
     );
   }
 
   generateOutcomesForAllTime(tickers: string[]) {
-    this.stocksService.reportTickersOutcomesAllTime(tickers).subscribe((data: TickerOutcomes[]) => {
-      this.allTimeOutcomes = data;
+    this.stocksService.reportTickersOutcomesAllTime(tickers, true).subscribe((data: OutcomesReport) => {
+      this.allTimeOutcomes = data.outcomes;
+      this.gaps = data.gaps;
       }
     );
   }
