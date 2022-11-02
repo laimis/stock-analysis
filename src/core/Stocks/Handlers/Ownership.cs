@@ -36,22 +36,30 @@ namespace core.Stocks
                     return null;
                 }
 
+                var transactions = stock.State.Transactions.Where(t => !t.IsPL)
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+
                 var openPosition = stock.State.OpenPosition;
                 if (openPosition == null)
                 {
-                    return null;
+                    return new StockOwnershipView {
+                        Id = stock.State.Id,
+                        Owned = 0,
+                        Ticker = stock.State.Ticker,
+                        Transactions = transactions
+                    };
                 }
 
-                return new StockOwnershipView {
+                return new StockOwnershipView
+                {
                     Id = stock.State.Id,
                     AverageCost = openPosition.AverageCostPerShare,
                     Cost = openPosition.Cost,
                     Owned = openPosition.NumberOfShares,
                     Ticker = openPosition.Ticker,
                     Category = openPosition.Category,
-                    Transactions = stock.State.Transactions.Where(t => !t.IsPL)
-                        .OrderByDescending(t => t.Date)
-                        .ToList()
+                    Transactions = transactions
                 };
             }
         }

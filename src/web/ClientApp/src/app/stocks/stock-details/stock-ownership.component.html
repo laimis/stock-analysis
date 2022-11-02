@@ -43,7 +43,7 @@
           <tr
             [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount == 0}"
             *ngFor="let t of ownership.transactions">
-            <td>{{ t.date | date:'shortDate'}}</td>
+            <td>{{ t.date | date:'shortDate'}} - {{ t.ageInDays }} days ago</td>
             <td>{{ t.description }}</td>
             <td>{{ t.amount | currency }}</td>
             <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.eventId)"></i></td>

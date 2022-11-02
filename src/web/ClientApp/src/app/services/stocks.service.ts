@@ -464,6 +464,7 @@ export interface Transaction {
   amount: number
   price: number
   date: string
+  ageInDays: number
   dateAsDate: string
   description: string
   eventId: string
