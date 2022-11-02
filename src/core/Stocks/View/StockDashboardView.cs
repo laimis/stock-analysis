@@ -33,7 +33,7 @@ namespace core.Stocks.View
 
     public struct StockViolationView : IEquatable<StockViolationView>
     {
-        public StockViolationView(string message, int numberOfShares, decimal pricePerShare, string ticker)
+        public StockViolationView(string message, decimal numberOfShares, decimal pricePerShare, string ticker)
         {
             Message = message;
             NumberOfShares = numberOfShares;
@@ -42,7 +42,7 @@ namespace core.Stocks.View
         }
 
         public string Message { get; }
-        public int NumberOfShares { get; }
+        public decimal NumberOfShares { get; }
         public decimal PricePerShare { get; }
         public string Ticker { get; }
 

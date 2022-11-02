@@ -142,7 +142,7 @@ namespace core.Stocks
                     }
                 }
 
-                return violations.OrderBy(v => v.ticker).ToList();
+                return violations.OrderBy(v => v.Ticker).ToList();
             }
 
             private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)
