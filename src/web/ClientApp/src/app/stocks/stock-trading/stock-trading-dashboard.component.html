@@ -66,7 +66,7 @@
   </div>
   
   <app-brokerage-neworder     *ngIf="isActive('newposition')" (brokerageOrderEntered)="brokerageOrderEntered()" [positions]="positions" ></app-brokerage-neworder>
-  <stock-trading-newposition  *ngIf="isActive('newposition')" (brokerageOrderEntered)="brokerageOrderEntered()" (stockPurchased)="stockPurchased()"></stock-trading-newposition>
+  <app-stock-newposition  *ngIf="isActive('newposition')" (brokerageOrderEntered)="brokerageOrderEntered()" (stockPurchased)="stockPurchased()"></app-stock-newposition>
   
 
   <stock-trading-positions    *ngIf="isActive('positions')" [pendingOrders]="brokerageOrders" [positions]=positions></stock-trading-positions>

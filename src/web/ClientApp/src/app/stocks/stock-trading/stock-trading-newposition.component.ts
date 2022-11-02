@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
-  selector: 'stock-trading-newposition',
+  selector: 'app-stock-newposition',
   templateUrl: './stock-trading-newposition.component.html',
   styleUrls: ['./stock-trading-newposition.component.css'],
   providers: [DatePipe]
@@ -24,6 +24,11 @@ export class StockTradingNewPositionComponent {
 
   @Input()
   recordPositions: boolean = true
+
+  @Input()
+  set setTicker(ticker:string) {
+    this.onBuyTickerSelected(ticker)
+  }
 
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()

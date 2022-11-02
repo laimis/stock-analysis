@@ -13,15 +13,19 @@ export class StockTransactionComponent implements OnInit {
   @Input()
   ticker: string
 
+  @Input()
+  numberOfShares: number
+
+  @Input()
+  pricePerShare: number
+
   @Output()
   transactionRecorded = new EventEmitter();
 
   @Output()
   transactionFailed = new EventEmitter<string[]>()
 
-  numberOfShares: number
-	pricePerShare:  number
-	filled:         string
+  filled:         string
   positionType:   string
   notes:          string
 

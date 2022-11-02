@@ -30,9 +30,9 @@ namespace core.Stocks.View
         }
     }
 
-    public class StockViolationView
-    {
-        public string Ticker { get; set; }
-        public string Message { get; set; }
-    }
+    public record struct StockViolationView(
+        string message,
+        decimal numberOfShares,
+        decimal pricePerShare,
+        string ticker);
 }

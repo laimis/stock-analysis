@@ -434,8 +434,10 @@ export interface ReviewList {
 }
 
 export interface StockViolation {
-  ticker: string
   message: string
+  numberOfShares: number
+  pricePerShare: number
+  ticker: string
 }
 
 export interface StockSummary {

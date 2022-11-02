@@ -78,7 +78,7 @@ namespace core.Stocks
 
             public static List<StockViolationView> GetViolations(IEnumerable<Position> brokeragePositions, IEnumerable<PositionInstance> localPositions)
             {
-                var violations = new List<StockViolationView>();
+                var violations = new HashSet<StockViolationView>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
                 foreach (var brokeragePosition in brokeragePositions)
@@ -89,20 +89,24 @@ namespace core.Stocks
                         if (localPosition.NumberOfShares != brokeragePosition.Quantity)
                         {
                             violations.Add(
-                                new StockViolationView {
-                                    Ticker = brokeragePosition.Ticker,
-                                    Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.NumberOfShares}"
-                                }
+                                new StockViolationView(
+                                    message: $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.NumberOfShares}",
+                                    numberOfShares: brokeragePosition.Quantity,
+                                    pricePerShare: brokeragePosition.AverageCost,
+                                    ticker: brokeragePosition.Ticker
+                                )
                             );
                         }
                     }
                     else
                     {
                         violations.Add(
-                            new StockViolationView {
-                                Ticker = brokeragePosition.Ticker,
-                                Message = $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none"
-                            }
+                            new StockViolationView(
+                                message: $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none",
+                                numberOfShares: brokeragePosition.Quantity,
+                                pricePerShare: brokeragePosition.AverageCost,
+                                ticker: brokeragePosition.Ticker
+                            )
                         );
                     }
                 }
@@ -114,26 +118,31 @@ namespace core.Stocks
                     if (brokeragePosition == null)
                     {
                         violations.Add(
-                            new StockViolationView {
-                                Ticker = localPosition.Ticker,
-                                Message = $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says none"
-                        });
+                            new StockViolationView(
+                                message: $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says none",
+                                numberOfShares: localPosition.NumberOfShares,
+                                pricePerShare: localPosition.AverageCostPerShare,
+                                ticker: localPosition.Ticker
+                            )
+                        );
                     }
                     else
                     {
                         if (brokeragePosition.Quantity != localPosition.NumberOfShares)
                         {
                             violations.Add(
-                                new StockViolationView {
-                                    Ticker = localPosition.Ticker,
-                                    Message = $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says {brokeragePosition.Quantity}"
-                                }
+                                new StockViolationView(
+                                    message: $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says {brokeragePosition.Quantity}",
+                                    numberOfShares: localPosition.NumberOfShares,
+                                    pricePerShare: localPosition.AverageCostPerShare,
+                                    ticker: localPosition.Ticker
+                                )
                             );
                         }
                     }
                 }
 
-                return violations;
+                return violations.OrderBy(v => v.ticker).ToList();
             }
 
             private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)
