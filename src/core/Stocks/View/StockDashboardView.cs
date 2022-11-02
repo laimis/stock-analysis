@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using core.Shared;
@@ -14,10 +15,10 @@ namespace core.Stocks.View
             Calculated = DateTimeOffset.UtcNow;
         }
 
-        public List<PositionInstance> Positions { get; set; }
+        public List<PositionInstance>? Positions { get; set; }
         public DateTimeOffset Calculated { get; set; }
-        public List<StockViolationView> Violations { get; private set; }
-        public Order[] Orders { get; private set; }
+        public List<StockViolationView>? Violations { get; private set; }
+        public Order[]? Orders { get; private set; }
 
         internal void SetOrders(Order[] brokerageOrders)
         {
@@ -30,9 +31,30 @@ namespace core.Stocks.View
         }
     }
 
-    public record struct StockViolationView(
-        string message,
-        decimal numberOfShares,
-        decimal pricePerShare,
-        string ticker);
+    public struct StockViolationView : IEquatable<StockViolationView>
+    {
+        public StockViolationView(string message, int numberOfShares, decimal pricePerShare, string ticker)
+        {
+            Message = message;
+            NumberOfShares = numberOfShares;
+            PricePerShare = pricePerShare;
+            Ticker = ticker;
+        }
+
+        public string Message { get; }
+        public int NumberOfShares { get; }
+        public decimal PricePerShare { get; }
+        public string Ticker { get; }
+
+        public bool Equals(StockViolationView other) => Ticker == other.Ticker;
+
+        public override bool Equals(object? obj) => obj is StockViolationView other && this.Equals(other);
+
+        public override int GetHashCode() => Ticker.GetHashCode();
+
+        public static bool operator ==(StockViolationView lhs, StockViolationView rhs) => lhs.Equals(rhs);
+
+        public static bool operator !=(StockViolationView lhs, StockViolationView rhs) => !(lhs == rhs);
+    }
 }
+#nullable restore
