@@ -31,6 +31,8 @@ export class StockTradingNewPositionComponent {
   // variables for new positions
   positionSizeCalculated: number = null
   costToBuy: number | null = null
+  ask: number | null = null
+  bid: number | null = null
   numberOfShares : number | null = null
   stopPrice: number | null = null
   oneR: number | null = null
@@ -54,10 +56,11 @@ export class StockTradingNewPositionComponent {
     this.ticker = ticker
     this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
     
-    this.stockService.getStockPrice(ticker)
-      .subscribe(price => {
-        console.log(price)
-        this.costToBuy = price
+    this.stockService.getStockQuote(ticker)
+      .subscribe(quote => {
+        this.costToBuy = quote.mark
+        this.ask = quote.askPrice
+        this.bid = quote.bidPrice
         this.updateChart(ticker)
       }, error => {
         console.error(error)

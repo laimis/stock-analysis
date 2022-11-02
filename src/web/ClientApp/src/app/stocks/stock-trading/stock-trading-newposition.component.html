@@ -15,7 +15,7 @@
     </div>
     <div class="row mt-3" *ngIf="ticker">
       <div class="col">
-        <label for="costToBuy" class="form-label">Price</label>
+        <label for="costToBuy" class="form-label">Price ( {{ this.ask | currency }} x {{ this.bid | currency }} )</label>
         <input
           type="number"
           id="costToBuy"
