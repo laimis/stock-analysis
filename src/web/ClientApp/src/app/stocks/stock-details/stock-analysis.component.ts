@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { OutcomesAnalysisReport, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { OutcomesAnalysisReport, OutcomesReport, StockGap, StockGaps, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -11,6 +11,7 @@ export class StockAnalysisComponent implements OnInit {
   dailyOutcomes : TickerOutcomes;
   dailyAnalysis: OutcomesAnalysisReport;
   weeklyAnalysis: OutcomesAnalysisReport;
+  gaps: StockGaps;
 
   constructor(
     private stockService : StocksService
@@ -25,8 +26,9 @@ export class StockAnalysisComponent implements OnInit {
 
   private allTimeOutcomes() {
     this.stockService.reportTickerOutcomesAllTime(this.ticker, true).subscribe(
-      data => {
-        this.multipleBarOutcomes = data[0];
+      (data:OutcomesReport) => {
+        this.multipleBarOutcomes = data.outcomes[0];
+        this.gaps = data.gaps[0];
         this.dayOutcomes();
       }
     );
@@ -34,8 +36,8 @@ export class StockAnalysisComponent implements OnInit {
 
   private dayOutcomes() {
     this.stockService.reportTickerOutcomesDay(this.ticker, false).subscribe(
-      data => {
-        this.dailyOutcomes = data[0];
+      (data:OutcomesReport) => {
+        this.dailyOutcomes = data.outcomes[0];
         this.dailyAnalysisReport();
       }
     );

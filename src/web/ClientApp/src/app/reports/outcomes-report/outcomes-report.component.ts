@@ -13,7 +13,6 @@ export class OutcomesReportComponent implements OnInit {
   dailyAnalysis: OutcomesAnalysisReport;
   gaps: StockGaps[]
 
-  summary: string[];
   error: string = null;
 
   constructor (
@@ -37,7 +36,6 @@ export class OutcomesReportComponent implements OnInit {
     this.stocksService.reportTickersAnalysisDaily(tickers).subscribe((data) => {
       this.dailyAnalysis = data;
       this.generateOutcomesForDay(tickers)
-      this.calculateSummary(data);
     });
   }
   
@@ -56,37 +54,6 @@ export class OutcomesReportComponent implements OnInit {
       this.gaps = data.gaps;
       }
     );
-  }
-
-  calculateSummary(data: OutcomesAnalysisReport) {
-    // go over each category in data.categories and return an array of tickers
-    // sorted by the number of times they appear in categories
-    var summary = new Map<string, number>();
-    data.categories.forEach((category) => {
-      category.outcomes.forEach((outcome) => {
-        var toAdd = category.type === 'Positive' ? 1 : -1;
-        if (summary.has(outcome.ticker)) {
-          summary.set(outcome.ticker, summary.get(outcome.ticker) + toAdd);
-        } else {
-          summary.set(outcome.ticker, toAdd);
-        }
-      });
-    });
-
-    // sort the map by the number of times the ticker appears
-    var sorted = [...summary.entries()].sort((a, b) => b[1] - a[1]);
-    
-    // go over each sorted item and create string
-    var arrOfValues = []
-    sorted.forEach((item) => {
-      arrOfValues.push(item[0] + " (" + item[1] + ")")
-    });
-    this.summary = arrOfValues;
-    console.log(this.summary)
-  }
-
-  getSymbol(input:string) {
-    return input.split(" ")[0];
   }
   
 }

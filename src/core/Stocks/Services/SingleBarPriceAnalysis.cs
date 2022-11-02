@@ -78,26 +78,6 @@ namespace core.Stocks.Services
                 value: range,
                 message: $"Closing range is {range}.");
 
-            // today's change from high to low
-            var change = Math.Round((currentBar.High - currentBar.Low) / currentBar.Low * 100, 2);
-
-            // add change as outcome
-            yield return new AnalysisOutcome(
-                key: SingleBarOutcomeKeys.HighToLowChangeDay,
-                type: OutcomeType.Neutral,
-                value: change,
-                message: $"Day change from high to low is {change}.");
-
-            // today's change from open to close
-            change = Math.Round((currentBar.Close - currentBar.Open) / currentBar.Open * 100, 2);
-
-            // add change as outcome
-            yield return new AnalysisOutcome(
-                key: SingleBarOutcomeKeys.OpenToCloseChangeDay,
-                type: change >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
-                value: change,
-                message: $"Day change from open to close is {change}.");
-
             // use yesterday's close as reference
             var yesterday = prices[prices.Length - 2];
 
@@ -115,29 +95,17 @@ namespace core.Stocks.Services
             var trueHigh = Math.Max(currentBar.High, yesterday.Close);
             var trueLow = Math.Min(currentBar.Low, yesterday.Close);
 
-            // today's true range
-            var trueRange = Math.Round((currentBar.Close - trueLow) / (trueHigh - trueLow) * 100, 2);
-
-            // add true range as outcome
-            yield return new AnalysisOutcome(
-                key: SingleBarOutcomeKeys.TrueRange,
-                type: trueRange >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
-                value: trueRange,
-                message: $"True range is {trueRange}.");
-
             // see if there was a gap down or gap up
-            var gap = 0m;
+            var gap = GapAnalysis.Generate(prices, 60).FirstOrDefault(
+                x => x.bar.Equals(currentBar)
+            );
 
-            if (currentBar.Low > yesterday.High)
-            {
-                gap = Math.Round( (currentBar.Low - yesterday.High)/yesterday.High * 100, 2);
-            }
-            else if (currentBar.High < yesterday.Low)
-            {
-                gap = -1 * Math.Round( (yesterday.Low - currentBar.High)/yesterday.Low * 100, 2);
-            }
+            var gapPct = gap.bar.Date switch {
+                not null => gap.gapSizePct,
+                _ => 0m
+            };
 
-            var gapType = gap switch {
+            var gapType = gapPct switch {
                 > 0m => OutcomeType.Positive,
                 < 0m => OutcomeType.Negative,
                 _ => OutcomeType.Neutral
@@ -147,8 +115,8 @@ namespace core.Stocks.Services
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.GapPercentage,
                 type: gapType,
-                value: gap,
-                message: $"Gap is {gap}%.");
+                value: gapPct,
+                message: $"Gap is {gapPct}%.");
 
             // see if the latest bar is a new high or new low
             var newHigh = prices.Take(prices.Length - 1).All(x => x.High < currentBar.High);
@@ -237,10 +205,7 @@ namespace core.Stocks.Services
     {
         public static string RelativeVolume = "RelativeVolume";
         public static string Volume = "Volume";
-        public static string TrueRange = "TrueRange";
         public static string PercentChange = "PercentChange";
-        public static string OpenToCloseChangeDay = "OpenToCloseChangeDay";
-        public static string HighToLowChangeDay = "HighToLowChangeDay";
         public static string ClosingRange = "ClosingRange";
         public static string Open = "Open";
         public static string Close = "Close";
