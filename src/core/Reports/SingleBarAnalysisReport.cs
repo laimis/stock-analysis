@@ -188,16 +188,6 @@ namespace core.Reports
                 );
 
                 yield return new Views.AnalysisCategoryGrouping(
-                    "Positive Closes",
-                    OutcomeType.Positive,
-                    SingleBarOutcomeKeys.PercentChange,
-                    tickerOutcomes
-                        .Where(t => t.Outcomes.Any(o =>
-                            o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0))
-                        .ToList()
-                );
-
-                yield return new Views.AnalysisCategoryGrouping(
                     "Excellent Closing Range and High Percent Change",
                     OutcomeType.Positive,
                     SingleBarOutcomeKeys.ClosingRange,
