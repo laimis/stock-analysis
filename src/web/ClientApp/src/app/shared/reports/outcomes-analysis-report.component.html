@@ -2,6 +2,12 @@
   <div *ngIf="!report">Loading {{title}}...</div>
   <div *ngIf="report" class="mb-3">
     <h3 class="bg-secondary" *ngIf="title">{{title}}</h3>
+    <div *ngIf="showSummary" class="mb-3">
+        <span *ngFor="let s of report.summary"
+            class="badge rounded-pill bg-secondary me-2">
+            <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{s.ticker}}" target="_blank">{{s.ticker}}: {{s.count}}</a>
+        </span>
+    </div>
     <div *ngFor="let c of report.categories">
       <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}">{{c.name}}</h5>
       <app-outcomes *ngIf="c.outcomes.length > 0" [category]="c"></app-outcomes>

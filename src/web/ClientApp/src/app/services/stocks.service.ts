@@ -677,8 +677,14 @@ export interface OutcomesReport {
   gaps: StockGaps[]
 }
 
+export interface TickerCountPair {
+  ticker: string
+  count: number
+}
+
 export interface OutcomesAnalysisReport {
   categories: AnalysisCategoryGrouping[]
+  summary: TickerCountPair[]
 }
 
 export interface AnalysisCategoryGrouping {

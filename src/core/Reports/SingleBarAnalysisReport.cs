@@ -136,7 +136,32 @@ namespace core.Reports
 
                 var categories = GenerateReportCategories(tickerOutcomes);
 
-                return new AnalysisReportView(categories);
+                var counts = new Dictionary<string, int>();
+                foreach (var category in categories)
+                {
+                    var toAdd = category.type switch {
+                        OutcomeType.Positive => 1,
+                        OutcomeType.Negative => -1,
+                        _ => 0
+                    };
+
+                    foreach(var o in category.outcomes)
+                    {
+                        if (!counts.ContainsKey(o.Ticker))
+                        {
+                            counts[o.Ticker] = 0;
+                        }
+
+                        counts[o.Ticker] += toAdd;
+                    }
+                }
+
+                var tickersWithCounts = counts
+                    .OrderByDescending(x => x.Value)
+                    .Select(x => new {ticker = x.Key, count = x.Value})
+                    .ToArray();
+
+                return new AnalysisReportView(categories, tickersWithCounts);
             }
 
             private async Task<List<string>> GetTickers(UserState user)

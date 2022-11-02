@@ -1,10 +1,25 @@
 <div>
   <app-outcomes *ngIf="multipleBarOutcomes" [title]="'Mutliple bar outcomes'" [outcomes]="multipleBarOutcomes"></app-outcomes>
 
-  <app-outcomes-analysis-report *ngIf="portfolioDailyReport" [title]="'Daily report'" [report]="portfolioDailyReport"></app-outcomes-analysis-report>
-  <app-outcomes-analysis-report *ngIf="portfolioWeeklyReport" [title]="'Weekly report'" [report]="portfolioWeeklyReport"></app-outcomes-analysis-report>  
+  <app-outcomes-analysis-report
+    *ngIf="portfolioDailyReport"
+    [title]="'Daily report'"
+    [report]="portfolioDailyReport"
+    [showSummary]="true">
+  </app-outcomes-analysis-report>
+
+  <app-outcomes-analysis-report
+    *ngIf="portfolioWeeklyReport"
+    [title]="'Weekly report'"
+    [report]="portfolioWeeklyReport"
+    [showSummary]="true">
+  </app-outcomes-analysis-report>  
   
-  <app-outcomes *ngIf="dailyOutcomes" [title]="'Daily outcomes'" [outcomes]="dailyOutcomes"></app-outcomes>
+  <app-outcomes
+    *ngIf="dailyOutcomes"
+    [title]="'Daily outcomes'"
+    [outcomes]="dailyOutcomes">
+  </app-outcomes>
 
   <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
   

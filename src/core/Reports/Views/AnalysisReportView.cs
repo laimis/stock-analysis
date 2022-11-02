@@ -28,6 +28,7 @@ namespace core.Reports.Views
     );
 
     public record struct AnalysisReportView(
-        IEnumerable<AnalysisCategoryGrouping> categories
+        IEnumerable<AnalysisCategoryGrouping> categories,
+        object summary
     );
 }

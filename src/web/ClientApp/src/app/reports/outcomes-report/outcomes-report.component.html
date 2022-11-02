@@ -5,15 +5,10 @@
         </div>
     </div>
 
-    <div class="mb-3" *ngIf="summary">
-        Summary
-        <span *ngFor="let s of summary"
-            class="badge rounded-pill bg-secondary me-2">
-            <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{getSymbol(s)}}" target="_blank">{{s}}</a>
-        </span>
-    </div>
-
-    <app-outcomes-analysis-report [report]="dailyAnalysis" title="Daily Report"></app-outcomes-analysis-report>
+    <app-outcomes-analysis-report
+        [report]="dailyAnalysis"
+        [showSummary]="true"
+        title="Daily Report"></app-outcomes-analysis-report>
 
     <app-outcomes [outcomes]="dayOutcomes" title="Day Outcomes"></app-outcomes>
 
