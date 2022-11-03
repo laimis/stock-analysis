@@ -64,10 +64,16 @@
     </div>
 
     <h3>Daily Analysis Report</h3>
-    <app-outcomes-analysis-report [report]="dailyAnalysis"></app-outcomes-analysis-report>
+    <app-outcomes-analysis-report
+        [report]="dailyAnalysis"
+        [showSummary]="true">
+    </app-outcomes-analysis-report>
 
     <h3>Weekly Analysis Report</h3>
-    <app-outcomes-analysis-report [report]="weeklyAnalysis"></app-outcomes-analysis-report>
+    <app-outcomes-analysis-report
+        [report]="weeklyAnalysis"
+        [showSummary]="true">
+    </app-outcomes-analysis-report>
 
     <h3>Gaps</h3>
     <app-gaps [gaps]="gaps"></app-gaps>

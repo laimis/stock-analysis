@@ -35,6 +35,10 @@ namespace core.Stocks.Services
             foreach(var change in percentChanges)
             {
                 var bucket = (int)Math.Floor(change);
+                if (!buckets.ContainsKey(bucket))
+                {
+                    buckets.Add(bucket, 0);
+                }
                 buckets[bucket]++;
             }
 

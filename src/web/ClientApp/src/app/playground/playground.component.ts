@@ -11,9 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 export class PlaygroundComponent implements OnInit {
   data: StockPercentChangeResponse;
   
-
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
-
 
   ngOnInit() {
     console.log('PlaygroundComponent.ngOnInit()');
