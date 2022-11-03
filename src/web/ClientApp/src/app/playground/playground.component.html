@@ -1,36 +1,3 @@
 <div>
-
-
-  <table class="table table-hover" *ngIf="data">
-    <tbody>
-      <tr>
-        <td>Ticker</td><td>{{data.ticker}}</td>
-      </tr>
-      <tr>
-        <td>Average</td><td>{{data.recent.average}} ({{data.allTime.average}})</td>
-      </tr>
-      <tr>
-        <td>Max</td><td>{{data.recent.max}} ({{data.allTime.max}})</td>
-      </tr>
-      <tr>
-        <td>Min</td><td>{{data.recent.min}} ({{data.allTime.min}})</td>
-      </tr>
-      <tr>
-        <td>StD</td><td>{{data.recent.standardDeviation}} ({{data.allTime.standardDeviation}})</td>
-      </tr>
-      <!-- <tr><td colspan="2"><hr></td></tr>
-      <tr *ngFor="let b of data.buckets">
-        <td>{{b.percentChange}}</td><td>{{b.frequency}}</td>
-      </tr> -->
-    </tbody>
-  </table>
-
-  <canvas *ngIf="bucketData && bucketData.length > 0"
-    baseChart
-    [datasets]="bucketData"
-    [labels]="bucketLabels"
-    [options]="chartOptions"
-    [type]="chartType">
-  </canvas>
-
+  <app-percent-change-distribution [percentChangeDistribution]="data"></app-percent-change-distribution>
 </div>

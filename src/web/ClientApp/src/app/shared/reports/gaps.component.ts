@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { StockGap, StockGaps } from '../../services/stocks.service';
+import { Component, Input } from '@angular/core';
+import { StockGaps } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-gaps',

@@ -1,8 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { StockGaps, StockPercentChangeResponse, StocksService } from '../services/stocks.service';
+import { Component, OnInit } from '@angular/core';
+import { StockPercentChangeResponse, StocksService } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-playground',
@@ -16,21 +14,6 @@ export class PlaygroundComponent implements OnInit {
 
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-  
-  public lineChartPlugins = [];
-  public chartType : ChartType = 'bar';
-  public lineChartLegend = true;
-  public bucketData: ChartDataset[] = [];
-  public bucketLabels: string[] = [];
-  public chartOptions: ChartOptions = {
-    responsive: true,
-    plugins: {
-      annotation: {
-        annotations: []
-      }
-    }
-  };
 
   ngOnInit() {
     console.log('PlaygroundComponent.ngOnInit()');
@@ -39,17 +22,7 @@ export class PlaygroundComponent implements OnInit {
     if (ticker){
       this.stocks.reportTickerPercentChangeDistribution(ticker).subscribe(data => {
         this.data = data
-
-        this.bucketLabels = data.recent.buckets.map(b => b.percentChange.toString());
-        this.bucketData = [
-          {
-            data: data.recent.buckets.map(b => b.frequency),
-            label: "Frequency",
-            fill: false
-          }]
       });
-
-      
     }
   }
 }

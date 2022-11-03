@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { OutcomesAnalysisReport, OutcomesReport, StockGap, StockGaps, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { OutcomesAnalysisReport, OutcomesReport, StockGap, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -12,6 +12,7 @@ export class StockAnalysisComponent implements OnInit {
   dailyAnalysis: OutcomesAnalysisReport;
   weeklyAnalysis: OutcomesAnalysisReport;
   gaps: StockGaps;
+  percentChangeDistribution: StockPercentChangeResponse;
 
   constructor(
     private stockService : StocksService
@@ -56,6 +57,15 @@ export class StockAnalysisComponent implements OnInit {
     this.stockService.reportTickerAnalysisWeekly(this.ticker).subscribe(
       data => {
         this.weeklyAnalysis = data;
+        this.percentDistribution();
+      }
+    );
+  }
+
+  private percentDistribution() {
+    this.stockService.reportTickerPercentChangeDistribution(this.ticker).subscribe(
+      data => {
+        this.percentChangeDistribution = data;
       }
     );
   }

@@ -72,6 +72,7 @@ import { AdminDashboardComponent } from './admin/admin-dashboard.component';
 import { OutcomesReportComponent } from './reports/outcomes-report/outcomes-report.component';
 import { GapsReportComponent } from './reports/gaps/gaps-report.component';
 import { GapsComponent } from './shared/reports/gaps.component';
+import { PercentChangeDistributionComponent } from './shared/reports/percent-change-distribution.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -203,6 +204,7 @@ var routes: Routes = [
     OutcomesAnalysisReportComponent,
     GapsReportComponent,
     GapsComponent,
+    PercentChangeDistributionComponent,
 
     AlertsComponent
   ],

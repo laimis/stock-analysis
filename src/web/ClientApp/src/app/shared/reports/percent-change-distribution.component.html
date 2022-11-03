@@ -1,0 +1,49 @@
+<div *ngIf="data">
+    <table class="table table-hover">
+        <tbody>
+            <tr>
+            <th>{{data.ticker}}</th>
+            <th>Recent</th>
+            <th>All-Time</th>
+            </tr>
+            <tr>
+            <td>Average</td>
+            <td>{{data.recent.average}}</td>
+            <td>{{data.allTime.average}}</td>
+            </tr>
+            <tr>
+            <td>Max</td>
+            <td>{{data.recent.max}}</td>
+            <td>{{data.allTime.max}}</td>
+            </tr>
+            <tr>
+            <td>Min</td>
+            <td>{{data.recent.min}}</td>
+            <td>{{data.allTime.min}}</td>
+            </tr>
+            <tr>
+            <td>StD</td>
+            <td>{{data.recent.standardDeviation}}</td>
+            <td>{{data.allTime.standardDeviation}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h5>Recent Distribution</h5>
+    <canvas *ngIf="recentData && recentData.length > 0"
+    baseChart
+    [datasets]="recentData"
+    [labels]="recentDataLabels"
+    [options]="chartOptions"
+    [type]="chartType">
+    </canvas>
+
+    <h5>All-Time Distribution</h5>
+    <canvas *ngIf="allTimeData && allTimeData.length > 0"
+    baseChart
+    [datasets]="allTimeData"
+    [labels]="allTimeDataLabels"
+    [options]="chartOptions"
+    [type]="chartType">
+    </canvas>
+</div>
