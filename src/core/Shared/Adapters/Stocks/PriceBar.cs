@@ -34,5 +34,16 @@ namespace core.Shared.Adapters.Stocks
         {
             return source.Skip(source.Length - numberOfItems).ToArray();
         }
+
+        public static TOutput[] Select<TOutput>(this Span<PriceBar> source, Func<PriceBar, TOutput> selector)
+        {
+            var output = new TOutput[source.Length];
+            for (var i = 0; i < source.Length; i++)
+            {
+                output[i] = selector(source[i]);
+            }
+
+            return output;
+        }
     }
 }

@@ -96,7 +96,7 @@ namespace core.Stocks.Services
             var trueLow = Math.Min(currentBar.Low, yesterday.Close);
 
             // see if there was a gap down or gap up
-            var gap = GapAnalysis.Generate(prices, 60).FirstOrDefault(
+            var gap = GapAnalysis.Generate(prices, SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).FirstOrDefault(
                 x => x.bar.Equals(currentBar)
             );
 
@@ -178,16 +178,15 @@ namespace core.Stocks.Services
                 message: "Volume"));
 
             // calculate the average volume from the last x days
-            var averageVolume = 0m;
-            var interval  = Math.Min(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis, prices.Length);
-            for (var i = prices.Length - interval; i < prices.Length; i++)
-            {
-                averageVolume += prices[i].Volume;
-            }
-            averageVolume /= interval;
+            var volumeStats = NumberAnalysis.Statistics(
+                prices
+                    .Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                    .Select(x => x.Volume)
+                    .ToArray()
+            );
 
             // calculate today's relative volume
-            var relativeVolume = Math.Round(last.Volume / averageVolume, 2);
+            var relativeVolume = Math.Round(last.Volume / volumeStats.mean, 2);
 
             var priceDirection = last.Close > last.Open
                 ? OutcomeType.Positive : OutcomeType.Negative;
@@ -197,7 +196,7 @@ namespace core.Stocks.Services
                 key: SingleBarOutcomeKeys.RelativeVolume,
                 type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
-                message: $"Relative volume is {relativeVolume}x the average volume over the last {interval} days."
+                message: $"Relative volume is {relativeVolume}x the average volume over the last {volumeStats.count} days."
             ));
 
             return outcomes;

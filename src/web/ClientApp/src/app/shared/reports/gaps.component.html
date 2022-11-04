@@ -8,6 +8,8 @@
                 <th>% Change</th>
                 <th>Open</th>
                 <th>Close</th>
+                <th>Vol</th>
+                <th>RelV</th>
                 <th><!-- close quickly icon --></th>
                 <th><!-- open --></th>
             </tr>
@@ -26,6 +28,8 @@
                 <td>{{g.percentChange}}</td>
                 <td>{{g.bar.open | currency}}</td>
                 <td>{{g.bar.close | currency}}</td>
+                <td>{{g.bar.volume | number }}</td>
+                <td>{{g.relativeVolume | number}}</td>
                 <td>
                     <i *ngIf="g.closedQuickly" class="bi bi-stop-circle-fill"></i>
                 </td>

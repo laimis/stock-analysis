@@ -15,10 +15,10 @@ namespace core.Stocks.Services
                 percentChanges[i-1] = percentChange;
             }
 
-            return Distribution(percentChanges);
+            return Statistics(percentChanges);
         }
 
-        public static DistributionStatistics Distribution(decimal[] numbers)
+        public static DistributionStatistics Statistics(decimal[] numbers)
         {
            // calculate stats on the data
             var mean = Math.Round(numbers.Average(), 2);
@@ -33,7 +33,6 @@ namespace core.Stocks.Services
             var kurtosis = Math.Round(
                 (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 4)).Sum() / count / Math.Pow((double)stdDev, 4) - 3),
                 2);
-
 
             var buckets = PercentChangeFrequencies.Calculate(
                 numbers,

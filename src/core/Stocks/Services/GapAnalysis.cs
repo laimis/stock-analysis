@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services
@@ -12,10 +13,25 @@ namespace core.Stocks.Services
             var start = prices.Length > numberOfBarsToAnalyze
                 ? prices.Length - numberOfBarsToAnalyze
                 : 0;
-            return Generate(prices.Slice(start));
+
+            var volumeStart = prices.Length > numberOfBarsToAnalyze * 2
+                ? prices.Length - numberOfBarsToAnalyze * 2
+                : 0;
+
+            Console.WriteLine("gap analysis volume start: " + volumeStart);
+            Console.WriteLine("gap analysis start: " + start);
+            Console.WriteLine("prices " + prices.Length);
+
+            var volumeStats = NumberAnalysis.Statistics(
+                prices
+                    .Slice(volumeStart, Math.Min(numberOfBarsToAnalyze, prices.Length))
+                    .Select(p => p.Volume)
+            );
+
+            return Generate(prices.Slice(start), volumeStats);
         }
 
-        private static List<Gap> Generate(Span<PriceBar> prices)
+        private static List<Gap> Generate(Span<PriceBar> prices, DistributionStatistics volumeStats)
         {
             var gaps = new List<Gap>();
 
@@ -26,13 +42,9 @@ namespace core.Stocks.Services
 
                 var gapSizePct = 0m;
 
-                if (currentBar.Low > yesterday.High)
+                if (currentBar.Low > yesterday.High || currentBar.High < yesterday.Low)
                 {
-                    gapSizePct = Math.Round( (currentBar.Low - yesterday.High)/yesterday.High * 100, 2);
-                }
-                else if (currentBar.High < yesterday.Low)
-                {
-                    gapSizePct = -1 * Math.Round( (yesterday.Low - currentBar.High)/yesterday.Low * 100, 2);
+                    gapSizePct = Math.Round( (currentBar.Open - yesterday.Close)/yesterday.Close * 100, 2);
                 }
 
                 if (gapSizePct != 0)
@@ -52,6 +64,7 @@ namespace core.Stocks.Services
 
                     var closedQuickly = ClosingConditionMet(prices, i + 1, 10, closingCondition);
                     var open = !ClosingConditionMet(prices, i + 1, prices.Length - i, closingCondition);
+                    var relativeVolume = Math.Round( currentBar.Volume / volumeStats.mean, 2);
 
                     var gap = new Gap(
                         type: type,
@@ -59,7 +72,8 @@ namespace core.Stocks.Services
                         percentChange: percentChange,
                         bar: currentBar,
                         closedQuickly: closedQuickly,
-                        open: open
+                        open: open,
+                        relativeVolume: relativeVolume
                     );
                     gaps.Add(gap);
                 }
@@ -90,7 +104,8 @@ namespace core.Stocks.Services
         decimal percentChange,
         PriceBar bar,
         bool closedQuickly,
-        bool open);
+        bool open,
+        decimal relativeVolume);
 
     public enum GapType { Up, Down }
 }

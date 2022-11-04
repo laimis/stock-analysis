@@ -722,6 +722,7 @@ export interface StockGap {
   bar: PriceBar,
   closedQuickly: boolean
   open: boolean
+  relativeVolume: number
 }
 export interface StockGaps {
   ticker: string
