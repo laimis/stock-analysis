@@ -197,7 +197,7 @@ namespace core.Stocks
             };
             PercentToStop = StopPrice switch {
                 not null => (StopPrice.Value - price) / StopPrice.Value,
-                _ => null
+                _ => -1
             };
         }
 
