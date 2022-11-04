@@ -19,25 +19,32 @@ namespace coretests.Stocks
         }
 
         [Fact]
-        public void RR_Accurate() => Assert.Equal(1.5m, _position.RR, 2);
+        public void RR_Accurate() =>
+            Assert.Equal(1.5m, _position.RR, 2);
 
         [Fact]
-        public void GainPct_Accurate() => Assert.Equal(0.185m, _position.GainPct, 3);
+        public void GainPct_Accurate() =>
+            Assert.Equal(0.185m, _position.GainPct, 3);
 
         [Fact]
-        public void RiskedAmount_Accurate() => Assert.Equal(80, _position.RiskedAmount);
+        public void RiskedAmount_Accurate() =>
+            Assert.Equal(80, _position.RiskedAmount);
 
         [Fact]
-        public void AverageCost_Accurate() => Assert.Equal(32.5m, _position.AverageBuyCostPerShare);
+        public void AverageCost_Accurate() =>
+            Assert.Equal(32.5m, _position.AverageBuyCostPerShare);
 
         [Fact]
-        public void DaysHeld() => Assert.True(Math.Abs(57 - _position.DaysHeld) <= 1);
+        public void DaysHeld() =>
+            Assert.True(Math.Abs(57 - _position.DaysHeld) <= 1);
 
         [Fact]
-        public void StopPriceGetsSetAfterSell() => Assert.Equal(28.5m, _position.StopPrice);
+        public void StopPriceGetsSetAfterSell() =>
+            Assert.Equal(28.5m, _position.StopPrice);
 
         [Fact]
-        public void PercentToStop_WithoutPrice_IsNull() => Assert.Null(_position.PercentToStop);
+        public void PercentToStop_WithoutPrice_FullLoss() =>
+            Assert.Equal(-1, _position.PercentToStop);
 
         [Fact]
         public void Cost()
