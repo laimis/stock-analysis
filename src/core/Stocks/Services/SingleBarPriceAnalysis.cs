@@ -137,11 +137,14 @@ namespace core.Stocks.Services
                 message: $"New low reached");
 
             // generate percent change statistical data for recent days
-            var descriptor = PercentChangeAnalysis.Generate(prices.Skip(prices.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).ToArray());
+            var descriptor = NumberAnalysis.PercentChanges(
+                prices.Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                .Select(x => x.Close)
+                .ToArray());
 
             var sigmaRatio = percentChange switch {
-                >=0 => percentChange / (descriptor.mean + descriptor.standardDeviation),
-                <0 => -1m * (percentChange / (descriptor.mean - descriptor.standardDeviation))
+                >=0 => percentChange / (descriptor.mean + descriptor.stdDev),
+                <0 => -1m * (percentChange / (descriptor.mean - descriptor.stdDev))
             };
 
             sigmaRatio = Math.Round(sigmaRatio, 2);

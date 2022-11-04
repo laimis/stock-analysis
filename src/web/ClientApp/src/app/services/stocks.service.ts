@@ -703,7 +703,10 @@ export interface StockPercentChangeDescriptor {
   median: number
   min: number
   max: number
-  standardDeviation: number
+  stdDev: number
+  count: number
+  skewness: number
+  kurtosis: number
   buckets: PercentChangeFrequency[]
 }
 export interface StockPercentChangeResponse {

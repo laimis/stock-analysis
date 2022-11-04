@@ -1,39 +1,55 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services
 {
-    public class PercentChangeAnalysis
+    public class NumberAnalysis
     {
-        public static PercentChangeDescriptor Generate(Span<PriceBar> prices)
+        public static DistributionStatistics PercentChanges(Span<decimal> numbers)
         {
-            var closes = prices.ToArray().Select(x => x.Close);
+            var percentChanges = new decimal[numbers.Length - 1];
+            for(var i = 1; i < numbers.Length; i++)
+            {
+                var percentChange = (numbers[i] - numbers[i-1])/numbers[i-1] * 100;
+                percentChanges[i-1] = percentChange;
+            }
 
-            var percentChanges = closes
-                .Zip(closes.Skip(1), (a, b) => (b - a) / a * 100)
-                .ToArray();
+            return Distribution(percentChanges);
+        }
 
-                // calculate stats on the data
-            var avg = Math.Round(percentChanges.Average(), 2);
-            var stdDev = Math.Round((decimal)Math.Sqrt(percentChanges.Select(x => Math.Pow((double)(x - avg), 2)).Sum() / (percentChanges.Length - 1)), 2);
-            var min = Math.Round(percentChanges.Min(), 2);
-            var max = Math.Round(percentChanges.Max(), 2);
-            var median = Math.Round(percentChanges.OrderBy(x => x).Skip(percentChanges.Length / 2).First(), 2);
+        public static DistributionStatistics Distribution(decimal[] numbers)
+        {
+           // calculate stats on the data
+            var mean = Math.Round(numbers.Average(), 2);
+            var stdDev = Math.Round((decimal)Math.Sqrt(numbers.Select(x => Math.Pow((double)(x - mean), 2)).Sum() / (numbers.Length - 1)), 2);
+            var min = Math.Round(numbers.Min(), 2);
+            var max = Math.Round(numbers.Max(), 2);
+            var median = Math.Round(numbers.OrderBy(x => x).Skip(numbers.Length / 2).First(), 2);
+            var count = numbers.Length;
+            var skewness = Math.Round(
+                (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 3)).Sum() / count / Math.Pow((double)stdDev, 3)),
+                2);
+            var kurtosis = Math.Round(
+                (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 4)).Sum() / count / Math.Pow((double)stdDev, 4) - 3),
+                2);
+
 
             var buckets = PercentChangeFrequencies.Calculate(
-                percentChanges,
+                numbers,
                 min,
                 max
             );
 
-            return new PercentChangeDescriptor(
-                stdDev,
+            return new DistributionStatistics(
+                count: count,
+                kurtosis: kurtosis,
                 min: min,
                 max: max,
-                mean: avg,
+                mean: mean,
                 median: median,
+                skewness: skewness,
+                stdDev: stdDev,
                 buckets
             );
         }        
@@ -74,12 +90,15 @@ namespace core.Stocks.Services
         }
     }
 
-    public record struct PercentChangeDescriptor(
-        decimal standardDeviation,
+    public record struct DistributionStatistics(
+        decimal count,
+        decimal kurtosis,
         decimal min,
         decimal max,
         decimal mean,
         decimal median,
+        decimal skewness,
+        decimal stdDev,
         PercentChangeFrequency[] buckets);
     public record struct PercentChangeFrequency(int percentChange, int frequency);
 }

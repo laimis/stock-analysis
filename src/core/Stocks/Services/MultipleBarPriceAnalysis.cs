@@ -134,8 +134,13 @@ namespace core.Stocks.Services
                 $"Gap downs: {gapDowns}"
             );
 
-            // statistical analysis bits
-            var descriptor = PercentChangeAnalysis.Generate(prices.Skip(prices.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).ToArray());
+            // statistical analysis bits of percent changes
+            var descriptor = NumberAnalysis.PercentChanges(
+                prices
+                .Skip(prices.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                .Select(p => p.Close)
+                .ToArray());
+
             yield return new AnalysisOutcome(
                 MultipleBarOutcomeKeys.PercentChangeAverage,
                 OutcomeType.Neutral,
@@ -146,8 +151,8 @@ namespace core.Stocks.Services
             yield return new AnalysisOutcome(
                 MultipleBarOutcomeKeys.PercentChangeStandardDeviation,
                 OutcomeType.Neutral,
-                descriptor.standardDeviation,
-                $"% Change StD: {descriptor.standardDeviation}"
+                descriptor.stdDev,
+                $"% Change StD: {descriptor.stdDev}"
             );
         }
     }

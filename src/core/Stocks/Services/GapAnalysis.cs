@@ -15,7 +15,7 @@ namespace core.Stocks.Services
             return Generate(prices.Slice(start));
         }
 
-        public static List<Gap> Generate(Span<PriceBar> prices)
+        private static List<Gap> Generate(Span<PriceBar> prices)
         {
             var gaps = new List<Gap>();
 

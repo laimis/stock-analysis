@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace core.Shared.Adapters.Stocks
 {
@@ -24,5 +26,13 @@ namespace core.Shared.Adapters.Stocks
         public override bool Equals(object obj) => obj is PriceBar other && Equals(other);
 
         public override int GetHashCode() => Date.GetHashCode();
+    }
+
+    public static class PriceBarExtensions
+    {
+        public static PriceBar[] Last(this PriceBar[] source, int numberOfItems)
+        {
+            return source.Skip(source.Length - numberOfItems).ToArray();
+        }
     }
 }
