@@ -699,7 +699,8 @@ export interface PercentChangeFrequency {
   frequency: number
 }
 export interface StockPercentChangeDescriptor {
-  average: number
+  mean: number
+  median: number
   min: number
   max: number
   standardDeviation: number

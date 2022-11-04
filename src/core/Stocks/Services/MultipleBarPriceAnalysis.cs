@@ -139,8 +139,8 @@ namespace core.Stocks.Services
             yield return new AnalysisOutcome(
                 MultipleBarOutcomeKeys.PercentChangeAverage,
                 OutcomeType.Neutral,
-                descriptor.average,
-                $"% Change Average: {descriptor.average}"
+                descriptor.mean,
+                $"% Change Average: {descriptor.mean}"
             );
 
             yield return new AnalysisOutcome(

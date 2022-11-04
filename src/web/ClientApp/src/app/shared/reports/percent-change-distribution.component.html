@@ -2,19 +2,24 @@
     <table class="table table-hover">
         <tbody>
             <tr>
-            <th>{{data.ticker}}</th>
-            <th>Recent</th>
-            <th>All-Time</th>
+                <th>{{data.ticker}}</th>
+                <th>Recent</th>
+                <th>All-Time</th>
             </tr>
             <tr>
-            <td>Average</td>
-            <td>{{data.recent.average}}</td>
-            <td>{{data.allTime.average}}</td>
+                <td>Mean</td>
+                <td>{{data.recent.mean}}</td>
+                <td>{{data.allTime.mean}}</td>
             </tr>
             <tr>
-            <td>Max</td>
-            <td>{{data.recent.max}}</td>
-            <td>{{data.allTime.max}}</td>
+                <td>Median</td>
+                <td>{{data.recent.median}}</td>
+                <td>{{data.allTime.median}}</td>
+            </tr>
+            <tr>
+                <td>Max</td>
+                <td>{{data.recent.max}}</td>
+                <td>{{data.allTime.max}}</td>
             </tr>
             <tr>
             <td>Min</td>
