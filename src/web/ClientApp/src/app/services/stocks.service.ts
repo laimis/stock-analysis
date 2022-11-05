@@ -787,6 +787,10 @@ export interface StockTradingPositions {
   violations: StockViolation[]
 }
 
+export interface PriceWithDate {
+  price: number
+  when: string
+}
 export interface PositionTransaction {
   numberOfShares: number,
   price: number,

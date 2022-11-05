@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
-import { PositionTransaction, Prices } from 'src/app/services/stocks.service';
+import { PositionTransaction, Price, Prices, PriceWithDate } from 'src/app/services/stocks.service';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import {CrosshairPlugin} from 'chartjs-plugin-crosshair';
 import { BaseChartDirective } from 'ng2-charts';
@@ -34,8 +34,8 @@ export class StockChartComponent implements OnInit {
     }
   };
   
-  _buys: PositionTransaction[];
-  _sells: PositionTransaction[];
+  _buys: PriceWithDate[];
+  _sells: PriceWithDate[];
   _horizontalLines: number[] = [];
 
   private readonly _color_buy = "#0000FF"
@@ -51,13 +51,13 @@ export class StockChartComponent implements OnInit {
   }
   
   @Input()
-  set buys(transactions: PositionTransaction[]) {
+  set buys(transactions: PriceWithDate[]) {
     this._buys = transactions;
     this.updateAnnotations();
   }
 
   @Input()
-  set sells(transactions: PositionTransaction[]) {
+  set sells(transactions: PriceWithDate[]) {
     this._sells = transactions;
     this.updateAnnotations();
   }
@@ -128,7 +128,7 @@ export class StockChartComponent implements OnInit {
     
   }
 
-  toAnnotation(transaction: PositionTransaction, color: string) : AnnotationOptions {
+  toAnnotation(transaction: PriceWithDate, color: string) : AnnotationOptions {
     return {
       type: 'point',
       xValue: transaction.when.split("T")[0],

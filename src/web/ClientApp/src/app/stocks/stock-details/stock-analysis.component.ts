@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { OutcomesAnalysisReport, OutcomesReport, Prices, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { OutcomesAnalysisReport, OutcomesReport, Prices, PriceWithDate, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -17,6 +17,8 @@ export class StockAnalysisComponent {
   prices: Prices;
   private _ticker: string;
   gapOpens: number[] = [];
+  upGaps: PriceWithDate[] = [];
+  downGaps: PriceWithDate[] = [];
 
   constructor(
     private stockService : StocksService
@@ -47,6 +49,18 @@ export class StockAnalysisComponent {
         this.gaps = data.gaps[0];
         this.dayOutcomes();
         this.gapOpens = this.gaps.gaps.map(g => g.bar.open);
+        this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => {
+          return {
+            when: g.bar.date,
+            price: g.bar.open
+          }
+        })
+        this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => {
+          return {
+            when: g.bar.date,
+            price: g.bar.open
+          }
+        })
       }
     );
   }
