@@ -7,10 +7,10 @@ import { BaseChartDirective } from 'ng2-charts';
 
 
 @Component({
-  selector: 'stock-trading-chart',
-  templateUrl: './stock-trading-chart.component.html',
+  selector: 'app-stock-chart',
+  templateUrl: './stock-chart.component.html',
 })
-export class StockTradingChartComponent implements OnInit {
+export class StockChartComponent implements OnInit {
   
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   

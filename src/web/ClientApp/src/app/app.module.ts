@@ -56,8 +56,8 @@ import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-t
 import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
 import { StockTradingReviewComponent } from './stocks/stock-trading/stock-trading-review.component';
-import { StockTradingChartComponent } from './stocks/stock-trading/stock-trading-chart.component';
-import { StockChartsComponent } from './stocks/stock-trading/stock-position-charts.component';
+import { StockChartComponent } from './shared/stocks/stock-chart.component';
+import { StockPositionChartsComponent } from './stocks/stock-trading/stock-position-charts.component';
 import { BrokerageOrdersComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-trading/stock-violations.component';
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
@@ -170,7 +170,7 @@ var routes: Routes = [
     StockOptionComponent,
     StockTransactionComponent,
     StockOwnershipComponent,
-    StockChartsComponent,
+    StockPositionChartsComponent,
     StockViolationsComponent,
     
     StockTradingComponent,
@@ -180,7 +180,7 @@ var routes: Routes = [
     StockTradingPastComponent,
     StockTradingPerformanceComponent,
     StockTradingReviewComponent,
-    StockTradingChartComponent,
+    StockChartComponent,
     StockTradingSimulatorComponent,
 
     

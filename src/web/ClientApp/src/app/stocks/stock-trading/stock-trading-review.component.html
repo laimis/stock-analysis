@@ -10,11 +10,11 @@
   <div class="container mt-2">
     <div class="row mt-2">
       <div class="col">
-        <stock-trading-chart *ngIf="prices"
+        <app-stock-chart *ngIf="prices"
           [buys]="buys(currentPosition)"
           [sells]="sells(currentPosition)"
           [prices]=prices>
-        </stock-trading-chart>
+        </app-stock-chart>
       </div>
     </div>
     <div class="row">

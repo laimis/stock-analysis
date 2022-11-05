@@ -102,10 +102,11 @@
     </div>
     <div class="row mt-3" *ngIf="prices && showChart">
       <div class="col">
-        <stock-trading-chart
+        <app-stock-chart
           [prices]="prices"
           [horizontalLines]="stopAndExitPoints"
-          [maxPrice]="oneR"></stock-trading-chart>
+          [maxPrice]="oneR">
+        </app-stock-chart>
       </div>
     </div>
   </div>

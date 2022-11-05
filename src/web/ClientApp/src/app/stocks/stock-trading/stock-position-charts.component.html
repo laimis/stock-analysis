@@ -10,12 +10,12 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col">
-          <stock-trading-chart *ngIf="prices"
+          <app-stock-chart *ngIf="prices"
             [buys]="buys(currentPosition)"
             [sells]="sells(currentPosition)"
             [prices]=prices
-            [horizontalLines]="[currentPosition.averageCostPerShare, currentPosition.stopPrice]">
-          </stock-trading-chart>
+            [horizontalLines]="linesOfInterest(currentPosition)">
+          </app-stock-chart>
         </div>
       </div>
       <div class="row">

@@ -7,7 +7,7 @@ import { Prices, StocksService, PositionInstance, TickerOutcomes } from 'src/app
   templateUrl: './stock-position-charts.component.html',
   styleUrls: ['./stock-position-charts.component.css']
 })
-export class StockChartsComponent {
+export class StockPositionChartsComponent {
 
   private _positions: PositionInstance[]
   private _index: number = 0
@@ -78,6 +78,14 @@ export class StockChartsComponent {
 
   sells(positionInstance:PositionInstance) {
     return positionInstance.transactions.filter(t => t.type == 'sell')
+  }
+
+  linesOfInterest(positionInstance:PositionInstance) : number[] {
+    var arr = [positionInstance.averageCostPerShare]
+    if (positionInstance.stopPrice) {
+      arr.push(positionInstance.stopPrice)
+    }
+    return arr
   }
 
   interestingOutcomes(a: TickerOutcomes): any {
