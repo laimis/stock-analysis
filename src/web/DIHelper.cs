@@ -65,7 +65,8 @@ namespace web
 
             services.AddSingleton<IEmailService>(s => 
                 new sendgridclient.SendGridClientImpl(
-                    configuration.GetValue<string>("SENDGRID_API_KEY")
+                    configuration.GetValue<string>("SENDGRID_API_KEY"),
+                    s.GetService<ILogger<sendgridclient.SendGridClientImpl>>()
                 )
             );
 
@@ -74,6 +75,7 @@ namespace web
                     configuration.GetValue<string>("TWILIO_ACCOUNT_SID"),
                     configuration.GetValue<string>("TWILIO_AUTH_TOKEN"),
                     configuration.GetValue<string>("TWILIO_FROM_NUMBER"),
+                    s.GetService<ILogger<twilioclient.TwilioClientWrapper>>(),
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
             services.AddSingleton<IBrokerage>(s =>

@@ -1,4 +1,5 @@
 ﻿using core.Shared.Adapters.SMS;
+using Microsoft.Extensions.Logging;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
@@ -9,11 +10,19 @@ public class TwilioClientWrapper : ISMSClient
     private PhoneNumber? _fromPhoneNumber = null;
     private PhoneNumber? _toPhoneNumber = null;
     private bool _configured;
+    private ILogger<TwilioClientWrapper> _logger;
 
     public bool IsOn { get; private set; }
 
-    public TwilioClientWrapper(string accountSid, string authToken, string fromPhoneNumber, string toPhoneNumber)
+    public TwilioClientWrapper(
+        string accountSid,
+        string authToken,
+        string fromPhoneNumber,
+        ILogger<TwilioClientWrapper> logger,
+        string toPhoneNumber)
     {
+        _logger = logger;
+        
         // check for all params to be not null
         if (string.IsNullOrEmpty(accountSid) || string.IsNullOrEmpty(authToken) || string.IsNullOrEmpty(fromPhoneNumber) || string.IsNullOrEmpty(toPhoneNumber))
         {
@@ -32,20 +41,20 @@ public class TwilioClientWrapper : ISMSClient
     {
         return (_configured && IsOn) switch {
             true => SendViaTwilio(message),
-            false => ToConsole(message)
+            false => ToLogger(message)
         };
     }
 
-    private Task ToConsole(string message)
+    private Task ToLogger(string message)
     {
-        Console.WriteLine($"Sending SMS: {message}");
+        _logger?.LogInformation($"Sending SMS: {message}");
         return Task.CompletedTask;
     }
 
     private Task SendViaTwilio(string message)
     {
         // Send SMS
-        Console.WriteLine($"Sending SMS to {_toPhoneNumber}: {message}");
+        _logger?.LogInformation($"Sending SMS to {_toPhoneNumber}: {message}");
         
         var response = MessageResource.Create(
             body: message,
@@ -53,7 +62,7 @@ public class TwilioClientWrapper : ISMSClient
             to: _toPhoneNumber
         );
 
-        Console.WriteLine("Response from twilio: " + response.ToString());
+        _logger?.LogInformation("Response from twilio: " + response.ToString());
 
         return Task.CompletedTask;
     }

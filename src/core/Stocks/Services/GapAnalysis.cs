@@ -18,10 +18,6 @@ namespace core.Stocks.Services
                 ? prices.Length - numberOfBarsToAnalyze * 2
                 : 0;
 
-            Console.WriteLine("gap analysis volume start: " + volumeStart);
-            Console.WriteLine("gap analysis start: " + start);
-            Console.WriteLine("prices " + prices.Length);
-
             var volumeStats = NumberAnalysis.Statistics(
                 prices
                     .Slice(volumeStart, Math.Min(numberOfBarsToAnalyze, prices.Length))

@@ -1,28 +1,43 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { OutcomesAnalysisReport, OutcomesReport, StockGap, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { DecimalPipe } from '@angular/common';
+import { Component, Input } from '@angular/core';
+import { OutcomesAnalysisReport, OutcomesReport, Prices, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
   templateUrl: './stock-analysis.component.html',
   styleUrls: ['./stock-analysis.component.css']
 })
-export class StockAnalysisComponent implements OnInit {
+export class StockAnalysisComponent {
   multipleBarOutcomes: TickerOutcomes;
   dailyOutcomes : TickerOutcomes;
   dailyAnalysis: OutcomesAnalysisReport;
   weeklyAnalysis: OutcomesAnalysisReport;
   gaps: StockGaps;
   percentChangeDistribution: StockPercentChangeResponse;
+  prices: Prices;
+  private _ticker: string;
+  openGapOpens: number[] = [];
 
   constructor(
     private stockService : StocksService
   ) { }
 
   @Input()
-  ticker: string;
+  set ticker(value:string) {
+    this._ticker = value;
+    this.getPrices();
+  }
+  get ticker() {
+    return this._ticker;
+  }
 
-  ngOnInit(): void {
-    this.allTimeOutcomes();
+  private getPrices() {
+    this.stockService.getStockPrices(this.ticker, 365).subscribe(
+      data => {
+        this.prices = data;
+        this.allTimeOutcomes();
+      }
+    );
   }
 
   private allTimeOutcomes() {
@@ -31,6 +46,7 @@ export class StockAnalysisComponent implements OnInit {
         this.multipleBarOutcomes = data.outcomes[0];
         this.gaps = data.gaps[0];
         this.dayOutcomes();
+        this.openGapOpens = this.gaps.gaps.filter(g => g.open).map(g => g.bar.open);
       }
     );
   }

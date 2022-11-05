@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using core.Adapters.Emails;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -10,14 +11,19 @@ namespace sendgridclient
     public class SendGridClientImpl : IEmailService
     {
         private SendGridClient _sendGridClient;
+        private ILogger<SendGridClientImpl> _logger;
         private const string NO_REPLY = "noreply@nightingaletrading.com";
 
-        public SendGridClientImpl(string apiKey)
+        public SendGridClientImpl(
+            string apiKey,
+            ILogger<SendGridClientImpl> logger)
         {
             if (apiKey != null)
             {
                 _sendGridClient = new SendGridClient(apiKey);
             }
+
+            _logger = logger;
         }
 
         public Task Send(Recipient recipient, Sender sender, string subject, string body)
@@ -30,8 +36,8 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, string subject, string body)
         {
-            // TODO: replace with logging
-            // Console.WriteLine($"Sending email to {recipient.Email} with subject {subject} and body {body}");
+            _logger?.LogInformation($"Sending email to {recipient.Email} with subject {subject} and body {body}");
+            
             return Task.CompletedTask;
         }
 
@@ -43,11 +49,11 @@ namespace sendgridclient
             
             var response = await _sendGridClient.SendEmailAsync(msg);
 
-            Console.WriteLine("Sendgrid response: " + response.StatusCode);
+            _logger?.LogInformation("Sendgrid response: " + response.StatusCode);
             
             var responseBody = await response.Body.ReadAsStringAsync();
 
-            Console.WriteLine("Sendgrid response: " + responseBody);
+            _logger?.LogInformation("Sendgrid response: " + responseBody);
         }
 
         public Task Send(
@@ -64,7 +70,7 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, EmailTemplate template, object properties)
         {
-            Console.WriteLine($"Sending email to {recipient} with template {template.Id} and body {JsonConvert.SerializeObject(properties)}");
+            _logger?.LogInformation($"Sending email to {recipient} with template {template.Id} and body {JsonConvert.SerializeObject(properties)}");
             return Task.CompletedTask;
         }
 
@@ -81,7 +87,7 @@ namespace sendgridclient
 
             var responseBody = await response.Body.ReadAsStringAsync();
 
-            Console.WriteLine($"Sendgrid status {response.StatusCode} with body: {responseBody}");
+            _logger.LogInformation($"Sendgrid status {response.StatusCode} with body: {responseBody}");
         }
     }
 }
