@@ -1,17 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Prices, StocksService, PositionInstance, TickerOutcomes } from 'src/app/services/stocks.service';
 
 
 @Component({
-  selector: 'stock-charts',
-  templateUrl: './stock-charts.component.html',
-  styleUrls: ['./stock-charts.component.css']
+  selector: 'app-stock-position-charts',
+  templateUrl: './stock-position-charts.component.html',
+  styleUrls: ['./stock-position-charts.component.css']
 })
-export class StockChartsComponent implements OnInit {
-
-
-  ngOnInit() {
-  }
+export class StockChartsComponent {
 
   private _positions: PositionInstance[]
   private _index: number = 0
@@ -27,11 +23,12 @@ export class StockChartsComponent implements OnInit {
     this._index = 0
     this.updateCurrentPosition()
   }
-
-  metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.unrealizedRR;
+  get positions() {
+    return this._positions
+  }
 
   updateCurrentPosition() {
-    this.currentPosition = this._positions[this._index]
+    this.currentPosition = this.positions[this._index]
     // get price data and pass it to chart
     this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
       (r: Prices) => {
@@ -50,7 +47,7 @@ export class StockChartsComponent implements OnInit {
 
   next() {
     this._index++
-    if (this._index >= this._positions.length) {
+    if (this._index >= this.positions.length) {
       this._index = 0
     }
     this.updateCurrentPosition()
@@ -70,7 +67,7 @@ export class StockChartsComponent implements OnInit {
   previous() {
     this._index--
     if (this._index < 0) {
-      this._index = this._positions.length - 1
+      this._index = this.positions.length - 1
     }
     this.updateCurrentPosition()
   }

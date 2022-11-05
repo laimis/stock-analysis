@@ -16,7 +16,7 @@ export class StockAnalysisComponent {
   percentChangeDistribution: StockPercentChangeResponse;
   prices: Prices;
   private _ticker: string;
-  openGapOpens: number[] = [];
+  gapOpens: number[] = [];
 
   constructor(
     private stockService : StocksService
@@ -46,7 +46,7 @@ export class StockAnalysisComponent {
         this.multipleBarOutcomes = data.outcomes[0];
         this.gaps = data.gaps[0];
         this.dayOutcomes();
-        this.openGapOpens = this.gaps.gaps.filter(g => g.open).map(g => g.bar.open);
+        this.gapOpens = this.gaps.gaps.map(g => g.bar.open);
       }
     );
   }
