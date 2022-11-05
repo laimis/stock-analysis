@@ -3,9 +3,10 @@
     <h3>Chart</h3>
     <app-stock-chart
         [prices]="prices"
-        [horizontalLines]="gapOpens"
-        [buys]="upGaps"
-        [sells]="downGaps">
+        [positiveLines]="upGapsOpens"
+        [negativeLines]="downGapsOpens"
+        [positivePricePoints]="upGaps"
+        [negativePricePoints]="downGaps">
     </app-stock-chart>
 
     <h3>Gaps</h3>

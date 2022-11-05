@@ -48,7 +48,6 @@ export class StockTradingNewPositionComponent {
   notes: string | null = null
 
   prices: Prices | null = null
-  stopAndExitPoints: number[] = []
 
   outcomes: TickerOutcomes
   gaps: StockGaps
@@ -171,7 +170,6 @@ export class StockTradingNewPositionComponent {
     this.oneR = this.costToBuy + singleShareLoss
     this.potentialLoss = this.stopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
     this.stopPct = Math.round((this.stopPrice - this.costToBuy) / this.costToBuy * 100) / 100
-    this.stopAndExitPoints = [this.stopPrice, this.oneR]
   }
 
   record() {

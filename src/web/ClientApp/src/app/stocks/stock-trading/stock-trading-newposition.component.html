@@ -104,7 +104,8 @@
       <div class="col">
         <app-stock-chart
           [prices]="prices"
-          [horizontalLines]="stopAndExitPoints"
+          [positiveLines]="[oneR]"
+          [negativeLines]="[stopPrice]"
           [maxPrice]="oneR">
         </app-stock-chart>
       </div>

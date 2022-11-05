@@ -11,10 +11,11 @@
       <div class="row">
         <div class="col">
           <app-stock-chart *ngIf="prices"
-            [buys]="buys(currentPosition)"
-            [sells]="sells(currentPosition)"
+            [positivePricePoints]="buys(currentPosition)"
+            [negativePricePoints]="sells(currentPosition)"
             [prices]=prices
-            [horizontalLines]="linesOfInterest(currentPosition)">
+            [positiveLines]="[currentPosition.averageCostPerShare]"
+            [negativeLines]="currentPosition.stopPrice ? [currentPosition.stopPrice] : []">
           </app-stock-chart>
         </div>
       </div>

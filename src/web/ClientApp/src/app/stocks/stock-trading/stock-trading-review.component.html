@@ -11,8 +11,8 @@
     <div class="row mt-2">
       <div class="col">
         <app-stock-chart *ngIf="prices"
-          [buys]="buys(currentPosition)"
-          [sells]="sells(currentPosition)"
+          [positivePricePoints]="buys(currentPosition)"
+          [negativePricePoints]="sells(currentPosition)"
           [prices]=prices>
         </app-stock-chart>
       </div>

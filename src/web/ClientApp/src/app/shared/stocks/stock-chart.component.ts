@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
-import { PositionTransaction, Price, Prices, PriceWithDate } from 'src/app/services/stocks.service';
+import { Prices, PriceWithDate } from 'src/app/services/stocks.service';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import {CrosshairPlugin} from 'chartjs-plugin-crosshair';
 import { BaseChartDirective } from 'ng2-charts';
@@ -34,14 +34,12 @@ export class StockChartComponent implements OnInit {
     }
   };
   
-  _buys: PriceWithDate[];
-  _sells: PriceWithDate[];
-  _horizontalLines: number[] = [];
-
-  private readonly _color_buy = "#0000FF"
-  private readonly _color_sell = "#ff0000"
+  _positivePricePoints: PriceWithDate[] = [];
+  _negativePricePoints: PriceWithDate[] = [];
+  
+  private readonly _color_positive = "#0000FF"
+  private readonly _color_negative = "#ff0000"
   private readonly _color_close = 'rgb(75, 192, 192)'
-  private readonly _color_horizontal_line = '#2962FF' // blue
 
   private readonly _sma_colors = {
     20: '#ff0000',
@@ -51,24 +49,41 @@ export class StockChartComponent implements OnInit {
   }
   
   @Input()
-  set buys(transactions: PriceWithDate[]) {
-    this._buys = transactions;
+  set positivePricePoints(transactions: PriceWithDate[]) {
+    this._positivePricePoints = transactions;
     this.updateAnnotations();
+  }
+  get positivePricePoints() {
+    return this._positivePricePoints
   }
 
   @Input()
-  set sells(transactions: PriceWithDate[]) {
-    this._sells = transactions;
+  set negativePricePoints(transactions: PriceWithDate[]) {
+    this._negativePricePoints = transactions;
     this.updateAnnotations();
   }
+  get negativePricePoints() {
+    return this._negativePricePoints
+  }
 
+  private _positiveLines: number[] = [];
   @Input()
-  set horizontalLines(lines: number[]) {
-    // take out null values
-    lines = lines.filter(x => !isNaN(x))
-    console.log('horizontalLines: ' + lines)
-    this._horizontalLines = lines
+  set positiveLines(lines: number[]) {
+    this._positiveLines = lines
     this.updateAnnotations();
+  }
+  get positiveLines() {
+    return this._positiveLines
+  }
+
+  private _negativeLines: number[] = [];
+  @Input()
+  set negativeLines(lines: number[]) {
+    this._negativeLines = lines
+    this.updateAnnotations();
+  }
+  get negativeLines() {
+    return this._negativeLines
   }
 
   _maxPrice: number
@@ -148,20 +163,21 @@ export class StockChartComponent implements OnInit {
   }
 
   updateAnnotations() {
-    var buys = this._buys != undefined ? this._buys : [];
-    var sells = this._sells != undefined ? this._sells : [];
-    var lines = this._horizontalLines != undefined ? this._horizontalLines : [];
-
+    
     var annotations : AnnotationOptions[] = 
-      buys
-        .map(x => this.toAnnotation(x, this._color_buy))
+      this.positivePricePoints
+        .map(x => this.toAnnotation(x, this._color_positive))
         .concat(
-          sells
-            .map(x => this.toAnnotation(x, this._color_sell))
+          this.negativePricePoints
+            .map(x => this.toAnnotation(x, this._color_negative))
         )
         .concat(
-          lines
-            .map(x => this.toAnnotationLine(x, this._color_horizontal_line))
+          this.positiveLines
+            .map(x => this.toAnnotationLine(x, this._color_positive))
+        )
+        .concat(
+          this.negativeLines
+            .map(x => this.toAnnotationLine(x, this._color_negative))
         )
 
     this.lineChartOptions.plugins.annotation.annotations = annotations

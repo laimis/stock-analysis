@@ -19,6 +19,8 @@ export class StockAnalysisComponent {
   gapOpens: number[] = [];
   upGaps: PriceWithDate[] = [];
   downGaps: PriceWithDate[] = [];
+  upGapsOpens: number[] = [];
+  downGapsOpens: number[] = [];
 
   constructor(
     private stockService : StocksService
@@ -48,19 +50,20 @@ export class StockAnalysisComponent {
         this.multipleBarOutcomes = data.outcomes[0];
         this.gaps = data.gaps[0];
         this.dayOutcomes();
-        this.gapOpens = this.gaps.gaps.map(g => g.bar.open);
         this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => {
           return {
             when: g.bar.date,
             price: g.bar.open
           }
         })
+        this.upGapsOpens = this.upGaps.map(g => g.price);
         this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => {
           return {
             when: g.bar.date,
             price: g.bar.open
           }
         })
+        this.downGapsOpens = this.downGaps.map(g => g.price);
       }
     );
   }
