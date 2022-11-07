@@ -73,7 +73,7 @@ export class StockTradingPositionsComponent {
 
         switch (value) {
             case "pl":
-                this.metricFunc = (p:PositionInstance) => p.unrealizedProfit
+                this.metricFunc = (p:PositionInstance) => p.profit
                 break;
             case "plPercent":
                 this.metricFunc = (p:PositionInstance) => p.unrealizedGainPct * 100
@@ -90,6 +90,8 @@ export class StockTradingPositionsComponent {
             case "percentToStop":
                 this.metricFunc = (p:PositionInstance) => p.percentToStop * 100
                 break
+            case "riskedAmount":
+                this.metricFunc = (p:PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
             default:
                 this.metricFunc = (p:PositionInstance) => p.rr
         }
