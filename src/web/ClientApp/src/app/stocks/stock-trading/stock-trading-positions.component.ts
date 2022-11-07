@@ -66,6 +66,15 @@ export class StockTradingPositionsComponent {
             .filter(o => o.status != "FILLED" && o.status != "REPLACED")
     }
 
+    renderStyle: string = "card" // other style is "table"
+    toggleRenderStyle() {
+        if (this.renderStyle == "card") {
+            this.renderStyle = "table"
+        } else {
+            this.renderStyle = "card"
+        }
+    }
+
     metricChanged(elem: EventTarget) {
         var value = (elem as HTMLInputElement).value
         
