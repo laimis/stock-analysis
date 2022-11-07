@@ -112,11 +112,13 @@ namespace coretests.Stocks
             position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
 
+            position.SetRiskAmount(100m, DateTimeOffset.UtcNow);
+
             Assert.Equal(4, position.RRLevels.Count);
-            Assert.Equal(34.125m, position.RRLevels[0]);
-            Assert.Equal(35.75m, position.RRLevels[1]);
-            Assert.Equal(37.375m, position.RRLevels[2]);
-            Assert.Equal(39m, position.RRLevels[3]);
+            Assert.Equal(37.5m, position.RRLevels[0]);
+            Assert.Equal(42.5m, position.RRLevels[1]);
+            Assert.Equal(47.5m, position.RRLevels[2]);
+            Assert.Equal(52.5m, position.RRLevels[3]);
         }
     }
 }

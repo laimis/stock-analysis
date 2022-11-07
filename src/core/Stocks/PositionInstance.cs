@@ -58,30 +58,7 @@ namespace core.Stocks
 
         private List<decimal> _slots = new List<decimal>();
 
-        // RRLevels is a concept that I am thinking about right now (09/2022). It's taking
-        // the risked amount and creating internvals to the upside by a risked amount per share,
-        // based on the initial purchase price
-        public List<decimal> RRLevels
-        {
-            get
-            {
-                if (NumberOfShares == 0)
-                {
-                    return new List<decimal>();
-                }
-
-                var firstStopPrice = FirstStop switch {
-                    not null => FirstStop.Value,
-                    _ => AverageBuyCostPerShare * 0.95m
-                };
-
-                var riskPerShare = AverageBuyCostPerShare - firstStopPrice;
-
-                return new [] {1m,2m,3m,4m}
-                    .Select(x => AverageBuyCostPerShare + x * riskPerShare)
-                    .ToList();
-            }
-        }
+        public List<decimal> RRLevels { get; private set; } = new List<decimal>();
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
@@ -184,6 +161,20 @@ namespace core.Stocks
             RiskedAmount = riskAmount;
 
             Events.Add(new PositionEvent("Set risk amount", "risk", riskAmount, when));
+
+            // setting risk, should calculate the RR levels for selling to accomodate this risk
+            if (NumberOfShares == 0)
+            {
+                return;
+            }
+
+            var riskPerShare = riskAmount / NumberOfShares;
+
+            this.RRLevels.Clear();
+            this.RRLevels.AddRange(
+                new [] {1m,2m,3m,4m}
+                .Select(x => AverageBuyCostPerShare + x * riskPerShare)
+            );
         }
 
         public void SetPrice(decimal price)
