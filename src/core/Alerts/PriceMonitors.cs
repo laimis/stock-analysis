@@ -89,12 +89,13 @@ namespace core.Alerts
 
     public class ProfitPriceMonitor : PriceMonitor
     {
-        public ProfitPriceMonitor(decimal thresholdValue, decimal numberOfShares, string ticker, Guid userId, string description)
-            : base(thresholdValue, numberOfShares, ticker, userId, description)
+        public ProfitPriceMonitor(decimal minPrice, decimal maxPrice, decimal numberOfShares, string ticker, Guid userId, string description)
+            : base(minPrice, numberOfShares, ticker, userId, description)
         {
+            MaxPrice = maxPrice;
         }
 
-        public static ProfitPriceMonitor CreateIfApplicable(OwnedStockState state)
+        public static ProfitPriceMonitor CreateIfApplicable(OwnedStockState state, int profitLevel)
         {
             if (state.OpenPosition == null)
             {
@@ -107,15 +108,18 @@ namespace core.Alerts
             }
 
             return new ProfitPriceMonitor(
-                state.OpenPosition.RRLevels[0],
+                state.OpenPosition.RRLevels[profitLevel],
+                state.OpenPosition.RRLevels[profitLevel + 1],
                 state.OpenPosition.NumberOfShares,
                 state.Ticker,
                 state.UserId,
-                "RR1 Profit Target"
+                $"RR{profitLevel + 1} Profit Target"
             );
         }
 
         public override AlertType AlertType => AlertType.Positive;
+
+        public decimal MaxPrice { get; }
 
         protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
         {
@@ -140,7 +144,7 @@ namespace core.Alerts
 
         private bool CheckTrigger(decimal price, DateTimeOffset time)
         {
-            if (price >= ThresholdValue && !IsTriggered)
+            if (price >= ThresholdValue && price < MaxPrice && !IsTriggered)
             {
                 SetAlert(price, time);
 
@@ -157,7 +161,7 @@ namespace core.Alerts
                 ThresholdValue,
                 time,
                 Ticker,
-                $"Profit target hit for {Ticker} at {price}",
+                $"Profit target hit for {Ticker} at {price} [{ThresholdValue} : {MaxPrice}]",
                 NumberOfShares,
                 UserId,
                 AlertType.Positive,
