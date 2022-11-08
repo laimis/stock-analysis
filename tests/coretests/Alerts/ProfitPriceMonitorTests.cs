@@ -11,11 +11,7 @@ namespace coretests.Alerts
         [Fact]
         public void Behavior()
         {
-            var a = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
-            
-            a.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
-
-            var m = ProfitPriceMonitor.CreateIfApplicable(a.State);
+            var m = CreateMonitorUnderTest();
 
             // check for a different ticker
             var triggered = m.RunCheck("BING", 7, DateTimeOffset.UtcNow);
@@ -45,6 +41,30 @@ namespace coretests.Alerts
             triggered = m.RunCheck("AMD", 9.1m, DateTimeOffset.UtcNow);
             Assert.False(triggered);
             Assert.Null(m.TriggeredAlert);
+        }
+
+        private static ProfitPriceMonitor CreateMonitorUnderTest(int level = 0)
+        {
+            var a = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
+
+            a.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
+
+            return ProfitPriceMonitor.CreateIfApplicable(a.State, level);
+        }
+
+        [Fact]
+        public void Level2()
+        {
+            var m = CreateMonitorUnderTest(1);
+
+            var triggered = m.RunCheck("AMD", 11m, DateTimeOffset.UtcNow);
+            Assert.False(triggered);
+
+            triggered = m.RunCheck("AMD", 12m, DateTimeOffset.UtcNow);
+            Assert.True(triggered);
+            
+            Assert.Equal("AMD", m.TriggeredAlert.Value.ticker);
+            Assert.Equal(12m, m.TriggeredAlert.Value.triggeredValue);
         }
     }
 }
