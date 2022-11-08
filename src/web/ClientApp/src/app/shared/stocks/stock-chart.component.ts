@@ -96,6 +96,10 @@ export class StockChartComponent implements OnInit {
   @Input()
   set prices(prices: Prices) {
 
+    if (!prices) {
+      return
+    }
+    
     var closes = prices.prices.map(p => p.close)
 
     var cutoff = 300 // take the last 300 days, this will be changed later

@@ -14,6 +14,10 @@ export class PercentChangeDistributionComponent {
 
   @Input()
   set percentChangeDistribution(value: StockPercentChangeResponse) {
+    if (!value) {
+      return
+    }
+    
     this.data = value
 
     this.recentDataLabels = value.recent.buckets.map(b => b.percentChange.toString());
