@@ -8,7 +8,8 @@ namespace core.Alerts
 {
     public class StockMonitorContainer
     {
-        private ConcurrentDictionary<string, IStockPositionMonitor> _monitors = new ConcurrentDictionary<string, IStockPositionMonitor>();
+        private record struct StockPositionMonitorKey(string MonitorIdentifier, string Ticker, Guid UserId);
+        private ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor> _monitors = new ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
         private const int MAX_RECENT_ALERTS = 20;
 
@@ -17,25 +18,24 @@ namespace core.Alerts
         public void Register(OwnedStock stock)
         {
             
-            void AddIfNotNull(string key, IStockPositionMonitor monitor)
+            void AddIfNotNull(IStockPositionMonitor monitor)
             {
                 if (monitor != null)
                 {
-                    _monitors[key + monitor.GetType().Name] = monitor;
+                    _monitors[new StockPositionMonitorKey(monitor.MonitorIdentifer, monitor.Ticker, monitor.UserId)] = monitor;
                 }
             }
 
             _tickers.Add(stock.State.Ticker);
             
-            var key = ToKey(stock);
             var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock.State);
-            AddIfNotNull(key, stopMonitor);
+            AddIfNotNull(stopMonitor);
 
             var profitMonitorR1 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 0);
-            AddIfNotNull(key, profitMonitorR1);
+            AddIfNotNull(profitMonitorR1);
 
             var profitMonitorR2 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 1);
-            AddIfNotNull(key, profitMonitorR2);
+            AddIfNotNull(profitMonitorR2);
         }
 
         private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts = new Dictionary<Guid, List<TriggeredAlert>>();
@@ -49,14 +49,16 @@ namespace core.Alerts
         internal List<IStockPositionMonitor> GetMonitors(Guid userId) => 
             _monitors.Values.Where(m => m.UserId == userId).ToList();
 
-        private static string ToKey(OwnedStock stock) => ToKey(stock.State.Ticker, stock.State.UserId);
         private static string ToKey(string ticker, Guid userId) => userId.ToString() + ticker;
 
         internal void Deregister(OwnedStock stock)
         {
-            var key = ToKey(stock);
-            _monitors.TryRemove(key + nameof(StopPriceMonitor), out _);
-            _monitors.TryRemove(key + nameof(ProfitPriceMonitor), out _);
+            var keysToRemove = _monitors.Keys.Where(k => k.Ticker == stock.State.Ticker && k.UserId == stock.State.UserId).ToList();
+            
+            foreach(var key in keysToRemove)
+            {
+                _monitors.TryRemove(key, out _);
+            }
         }
 
         public IEnumerable<string> GetTickers() => _tickers;

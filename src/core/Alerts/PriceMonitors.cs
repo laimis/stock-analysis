@@ -29,6 +29,7 @@ namespace core.Alerts
         bool IsTriggered { get; }
         AlertType AlertType { get; }
         Guid UserId { get; }
+        string MonitorIdentifer { get; }
     }
 
     public enum AlertType
@@ -71,6 +72,8 @@ namespace core.Alerts
         public Guid UserId { get; }
 
         public abstract AlertType AlertType { get; }
+
+        public abstract string MonitorIdentifer { get; }
 
         public bool RunCheck(string ticker, decimal price, DateTimeOffset time)
         {
@@ -120,6 +123,8 @@ namespace core.Alerts
         public override AlertType AlertType => AlertType.Positive;
 
         public decimal MaxPrice { get; }
+
+        public override string MonitorIdentifer => $"Profit{ThresholdValue}";
 
         protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
         {
@@ -230,6 +235,8 @@ namespace core.Alerts
 
             return false;
         }
+
+        public override string MonitorIdentifer => $"Stop";
 
         private void SetTriggeredAlert(decimal price, DateTimeOffset time)
         {
