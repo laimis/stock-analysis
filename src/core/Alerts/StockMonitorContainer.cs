@@ -36,6 +36,9 @@ namespace core.Alerts
 
             var profitMonitorR2 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 1);
             AddIfNotNull(profitMonitorR2);
+
+            var profitMonitorR3 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 2);
+            AddIfNotNull(profitMonitorR3);
         }
 
         private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts = new Dictionary<Guid, List<TriggeredAlert>>();
