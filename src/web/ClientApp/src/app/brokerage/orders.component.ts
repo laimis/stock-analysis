@@ -8,13 +8,20 @@ import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/
   styleUrls: ['./orders.component.css']
 })
 export class BrokerageOrdersComponent {
+  groupedOrders: BrokerageOrder[][];
 
   constructor(
     private stockService: StocksService
   ) { }
 
   @Input()
-  orders: BrokerageOrder[]
+  set orders (value: BrokerageOrder[]) {
+    var buys = value.filter(o => o.type == 'BUY' && o.status !== 'FILLED');
+    var sells = value.filter(o => o.type == 'SELL' && o.status !== 'FILLED');
+    var filled = value.filter(o => o.status == 'FILLED');
+
+    this.groupedOrders = [buys, sells, filled]
+  }
 
   @Output()
   orderCancelled: EventEmitter<string> = new EventEmitter<string>()
@@ -54,10 +61,8 @@ export class BrokerageOrdersComponent {
     }
   }
 
-  getTotalForBuys() {
-    return this.orders
-      .filter(o => o.isActive)
-      .filter(o => o.type == 'BUY')
+  getTotal(orders:BrokerageOrder[]) {
+    return orders
       .reduce((total, order) => total + order.price, 0)
   }
 }
