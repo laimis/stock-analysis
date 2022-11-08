@@ -89,8 +89,8 @@ namespace core.Alerts
 
     public class ProfitPriceMonitor : PriceMonitor
     {
-        public ProfitPriceMonitor(decimal minPrice, decimal maxPrice, decimal numberOfShares, string ticker, Guid userId, string description)
-            : base(minPrice, numberOfShares, ticker, userId, description)
+        public ProfitPriceMonitor(decimal minPrice, decimal maxPrice, int profitLevel, decimal numberOfShares, string ticker, Guid userId)
+            : base(minPrice, numberOfShares, ticker, userId, $"RR{profitLevel + 1} Profit Target")
         {
             MaxPrice = maxPrice;
         }
@@ -108,12 +108,12 @@ namespace core.Alerts
             }
 
             return new ProfitPriceMonitor(
-                state.OpenPosition.RRLevels[profitLevel],
-                state.OpenPosition.RRLevels[profitLevel + 1],
-                state.OpenPosition.NumberOfShares,
+                minPrice: state.OpenPosition.RRLevels[profitLevel],
+                maxPrice: state.OpenPosition.RRLevels[profitLevel + 1],
+                profitLevel: profitLevel,
+                numberOfShares: state.OpenPosition.NumberOfShares,
                 state.Ticker,
-                state.UserId,
-                $"RR{profitLevel + 1} Profit Target"
+                state.UserId
             );
         }
 
@@ -161,7 +161,7 @@ namespace core.Alerts
                 ThresholdValue,
                 time,
                 Ticker,
-                $"Profit target hit for {Ticker} at {price} [{ThresholdValue} : {MaxPrice}]",
+                $"{Description} hit for {Ticker} at {price} [{ThresholdValue.ToString("0.00")} : {MaxPrice.ToString("0.00")}]",
                 NumberOfShares,
                 UserId,
                 AlertType.Positive,
@@ -183,8 +183,7 @@ namespace core.Alerts
                 state.OpenPosition.StopPrice.Value,
                 state.OpenPosition.NumberOfShares,
                 state.Ticker,
-                state.UserId,
-                "Stop Loss"
+                state.UserId
             );
         }
 
@@ -192,9 +191,8 @@ namespace core.Alerts
             decimal thresholdValue,
             decimal numberOfShares,
             string ticker,
-            Guid userId,
-            string description)
-            : base(thresholdValue, numberOfShares, ticker, userId, description)
+            Guid userId)
+            : base(thresholdValue, numberOfShares, ticker, userId, $"Stop loss @ {thresholdValue.ToString("0.00")}")
         {
         }
 
@@ -240,7 +238,7 @@ namespace core.Alerts
                 ThresholdValue,
                 time,
                 Ticker,
-                $"Stop price {ThresholdValue} for {Ticker} was triggered at {price}",
+                $"{Description} hit for {Ticker} at {price}",
                 NumberOfShares,
                 UserId,
                 AlertType.Negative,
