@@ -41,7 +41,7 @@ namespace coretests.Alerts
         public void TickersMatch() => Assert.Equal(2, _uat.GetTickers().Count());
 
         [Fact]
-        public void MonitorCountMatches() => Assert.Equal(4, _uat.Monitors.Count());
+        public void MonitorCountMatches() => Assert.Equal(6, _uat.Monitors.Count());
 
         [Fact]
         public void InitialUpdateNoTriggers() => Assert.Empty(_initialTriggers);
