@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Adapters.Stocks;
 using core.Shared;
 using core.Stocks.View;
 
@@ -22,10 +23,16 @@ namespace core.Stocks
         public class Handler : HandlerWithStorage<Query, StockOwnershipView>
         {
             private IAccountStorage _accounts;
+            private IStocksService2 _stocksService;
 
-            public Handler(IPortfolioStorage storage, IAccountStorage accounts) : base(storage)
+            public Handler(
+                IAccountStorage accounts,
+                IStocksService2 stockService,
+                IPortfolioStorage storage
+                ) : base(storage)
             {
                 _accounts = accounts;
+                _stocksService = stockService;
             }
 
             public override async Task<StockOwnershipView> Handle(Query query, CancellationToken cancellationToken)
@@ -40,26 +47,16 @@ namespace core.Stocks
                     .OrderByDescending(t => t.Date)
                     .ToList();
 
-                var openPosition = stock.State.OpenPosition;
-                if (openPosition == null)
+                var priceResponse = await _stocksService.GetPrice(query.Ticker);
+
+                if (stock.State.OpenPosition != null && priceResponse.IsOk)
                 {
-                    return new StockOwnershipView {
-                        Id = stock.State.Id,
-                        Owned = 0,
-                        Ticker = stock.State.Ticker,
-                        Transactions = transactions
-                    };
+                    stock.State.OpenPosition.SetPrice(priceResponse.Success.Amount);
                 }
 
-                return new StockOwnershipView
-                {
-                    Id = stock.State.Id,
-                    AverageCost = openPosition.AverageCostPerShare,
-                    Cost = openPosition.Cost,
-                    Owned = openPosition.NumberOfShares,
-                    Ticker = openPosition.Ticker,
-                    Category = openPosition.Category,
-                    Transactions = transactions
+                return stock.State.OpenPosition switch {
+                    null => new StockOwnershipView(id: stock.State.Id, position: null, ticker: stock.State.Ticker, transactions: transactions), 
+                    not null => new StockOwnershipView(id: stock.State.Id, position: stock.State.OpenPosition, ticker: stock.State.Ticker, transactions: transactions)
                 };
             }
         }

@@ -60,12 +60,6 @@ export class StockTradingPositionsComponent {
         )
     }
 
-    getPendingOrders(p:PositionInstance) {
-        return this.pendingOrders
-            .filter(o => o.ticker == p.ticker)
-            .filter(o => o.status != "FILLED" && o.status != "REPLACED")
-    }
-
     renderStyle: string = "card" // other style is "table"
     toggleRenderStyle() {
         if (this.renderStyle == "card") {

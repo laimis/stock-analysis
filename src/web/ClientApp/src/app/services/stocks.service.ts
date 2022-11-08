@@ -490,24 +490,6 @@ export interface Price {
   amount: number
 }
 
-export class OwnedStock {
-  id:string
-  price: number
-  ticker: string
-  owned: number
-  invested: number
-  cost: number
-  equity: number
-  profits: number
-  profitsPct: number
-  daysHeld: number
-  daysSinceLastTransaction: number
-  description: string
-  averageCost: number
-  transactions: TransactionList
-  category: string;
-}
-
 export interface CryptoDetails {
   token: string
   price: Price
@@ -660,10 +642,8 @@ export interface StockProfile {
 export interface StockOwnership {
   id: string
   ticker: string
-  cost: number
-  averageCost: number
-  owned: number
-  category: string
+  price: number
+  position: PositionInstance,
   transactions: Transaction[]
 }
 

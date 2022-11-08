@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { ThemeService } from 'ng2-charts';
 import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallHidden } from '../../services/stocks.service';
 
 @Component({
@@ -62,9 +63,12 @@ export class StockTradingPositionComponent {
     }
 
     getPendingOrders(p:PositionInstance) {
-        return this.pendingOrders
-            .filter(o => o.ticker == p.ticker)
-            .filter(o => o.status != "FILLED" && o.status != "REPLACED")
+
+        if (this.pendingOrders) {
+            return  this.pendingOrders
+                .filter(o => o.ticker == p.ticker)
+                .filter(o => o.status != "FILLED" && o.status != "REPLACED")
+        }
     }
 }
 

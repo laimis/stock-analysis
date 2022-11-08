@@ -28,7 +28,7 @@
 
   <div class="tab-container mt-2">
     <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
-      Shares <span *ngIf="ownership && ownership.owned > 0" class="badge rounded-pill bg-info">{{ownership.owned}}</span>
+      Shares <span *ngIf="ownership && ownership.position" class="badge rounded-pill bg-info">{{ownership.position.numberOfShares}}</span>
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
       Options <span *ngIf="options && options.length > 0" class="badge rounded-pill bg-info">{{options.length}}</span>
