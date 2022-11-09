@@ -1,27 +1,4 @@
 <div *ngIf="container">
-  <h3>Recent Triggers</h3>
-  <table *ngIf="container.recentlyTriggered" class="table table-hover">
-    <thead>
-      <tr>
-        <th>ticker</th>
-        <th>description</th>
-        <th>date</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
-        <td>{{alert.ticker}}</td>
-        <td>{{alert.description}}</td>
-        <td>{{alert.when | date:'short'}}</td>
-        <td>
-          <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
-        </td>
-      </tr>
-  </table>
-  <div *ngIf="!container.recentlyTriggered">
-    No recent triggers
-  </div>
   <h3 class="mt-3">Price monitors</h3>
   <table class="table table-hover" *ngIf="container.monitors">
     <thead>
@@ -50,5 +27,29 @@
   </table>
   <div *ngIf="!container.monitors">
     No price monitors are present
+  </div>
+
+  <h3>Recent Triggers</h3>
+  <table *ngIf="container.recentlyTriggered" class="table table-hover">
+    <thead>
+      <tr>
+        <th>ticker</th>
+        <th>description</th>
+        <th>date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
+        <td>{{alert.ticker}}</td>
+        <td>{{alert.description}}</td>
+        <td>{{alert.when | date:'short'}}</td>
+        <td>
+          <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+        </td>
+      </tr>
+  </table>
+  <div *ngIf="!container.recentlyTriggered">
+    No recent triggers
   </div>
 </div>
