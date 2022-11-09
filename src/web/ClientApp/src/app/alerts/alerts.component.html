@@ -13,7 +13,7 @@
       <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
         <td>{{alert.ticker}}</td>
         <td>{{alert.description}}</td>
-        <td>{{alert.when | date}}</td>
+        <td>{{alert.when | date:'short'}}</td>
         <td>
           <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
         </td>
