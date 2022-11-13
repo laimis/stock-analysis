@@ -24,6 +24,7 @@
         <th>Symbol</th>
         <th>P/L</th>
         <th>R:R</th>
+        <th>%</th>
         <th>Buys</th>
         <th>Sells</th>
         <th>Grade</th>
@@ -34,8 +35,11 @@
         <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
         <td width="140">{{p.profit  | number:'1.0-2'}}</td>
         <td width="140">{{p.rr | number:'1.0-2'}}</td>
+        <td width="140">{{p.gainPct | percent:'1.0-2'}}%</td>
         <td width="140">
-          <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">{{buy.price | currency}} on {{buy.when | date: 'MM/dd/yyyy'}}</div>
+          <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
+            {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.when | date: 'MM/dd/yyyy'}}
+          </div>
         </td>
         <td width="140">
           <div class="badge bg-danger me-1" *ngFor="let sell of sells(p)">{{sell.price | currency}} on {{sell.when | date: 'MM/dd/yyyy'}}</div>

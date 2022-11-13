@@ -424,7 +424,7 @@ public class TDAmeritradeClient : IBrokerage
                 }
                 else
                 {
-                    _logger?.LogError($"Rate limit hit for {function}, retrying");
+                    _logger?.LogError($"Rate limit hit for {function}, retrying {retryCount}");
                     await Task.Delay(1000);
                 }
             }
