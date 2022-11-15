@@ -33,6 +33,10 @@ export class StockTradingPerformanceComponent {
     return c.data.map(x => x.label)
   }
 
+  getChartType(c:DataPointContainer) {
+    return c.label.indexOf("Gains") >= 0 ? 'bar' : 'line'
+  }
+
   public lineChartPlugins = [];
   public lineChartType : ChartType = 'line';
   public lineChartLegend = true;
