@@ -12,7 +12,7 @@ export class StockPositionReportsComponent {
   dailyOutcomes: TickerOutcomes[]
   portfolioDailyReport: OutcomesAnalysisReport;
   portfolioWeeklyReport: OutcomesAnalysisReport;
-  portfolioReport: OutcomesAnalysisReport;
+  positionReport: OutcomesAnalysisReport;
   gaps: StockGaps[];
 
   sortColumn: string
@@ -49,12 +49,12 @@ export class StockPositionReportsComponent {
   }
 
   loadDailyData() {
-    this.loadPortfolioReport()
+    this.loadPositionReport()
   }
 
-  loadPortfolioReport() {
-    this.service.reportPortfolio().subscribe(result => {
-      this.portfolioReport = result;
+  loadPositionReport() {
+    this.service.reportPositions().subscribe(result => {
+      this.positionReport = result;
       this.loadDailyOutcomes()
     }, error => {
       console.error(error);

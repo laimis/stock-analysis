@@ -365,8 +365,8 @@ export class StocksService {
     return this.http.get<StockGaps>('/api/reports/gaps/tickers/' + ticker)
   }
 
-  reportPortfolio(): Observable<OutcomesAnalysisReport> {
-    return this.http.get<OutcomesAnalysisReport>('/api/reports/portfolio')
+  reportPositions(): Observable<OutcomesAnalysisReport> {
+    return this.http.get<OutcomesAnalysisReport>('/api/reports/positions')
   }
 }
 

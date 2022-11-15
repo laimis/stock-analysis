@@ -13,7 +13,7 @@ using core.Stocks.Services;
 
 namespace core.Reports
 {
-    public class PortfolioReport
+    public class PositionReport
     {
         public class Query : RequestWithUserId<AnalysisReportView>
         {

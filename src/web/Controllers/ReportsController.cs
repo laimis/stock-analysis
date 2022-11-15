@@ -81,8 +81,8 @@ namespace web.Controllers
         public Task<GapsView> TickerGaps(string ticker, [FromQuery] PriceFrequency frequency)
             => _mediator.Send(new GapReport.ForTickerQuery(frequency, ticker, User.Identifier()));
 
-        [HttpGet("portfolio")]
+        [HttpGet("positions")]
         public Task<AnalysisReportView> Portfolio() =>
-            _mediator.Send(new PortfolioReport.Query(User.Identifier()));
+            _mediator.Send(new PositionReport.Query(User.Identifier()));
     }
 }

@@ -10,7 +10,7 @@ namespace core.Stocks.Services
         public static IEnumerable<AnalysisOutcome> Generate(PositionInstance position, StockQuote quote)
         {
             // distance from stop loss to current price
-            var currentPrice = quote.bidPrice;
+            var currentPrice = Math.Max(quote.bidPrice, quote.lastPrice);
             
             var stopLoss = position.StopPrice ?? 0;
             
