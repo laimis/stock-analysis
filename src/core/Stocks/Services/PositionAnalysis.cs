@@ -12,14 +12,14 @@ namespace core.Stocks.Services
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.AverageCost,
                 OutcomeType.Neutral,
-                position.AverageCostPerShare,
+                Math.Round(position.AverageCostPerShare, 2),
                 $"Average cost per share is {position.AverageCostPerShare:C2}");
 
             // gain in position
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.GainPct,
                 position.GainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                position.GainPct,
+                Math.Round(position.GainPct * 100, 2),
                 $"{position.GainPct:P}"
             );
 
@@ -27,11 +27,11 @@ namespace core.Stocks.Services
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.RR,
                 position.RR >= 1 ? OutcomeType.Positive : OutcomeType.Negative,
-                position.RR,
+                Math.Round(position.RR, 2),
                 $"{position.RR:N2}"
             );
             
-            var stopLoss = position.StopPrice ?? 0;
+            var stopLoss = Math.Round(position.StopPrice ?? 0, 2);
 
             // add stop loss as outcome
             yield return new AnalysisOutcome(
