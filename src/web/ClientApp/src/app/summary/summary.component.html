@@ -35,7 +35,7 @@
         <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
         <td width="100">{{p.profit  | number:'1.0-2'}}</td>
         <td width="100">{{p.rr | number:'1.0-2'}}</td>
-        <td width="100">{{p.gainPct | percent:'1.0-2'}}%</td>
+        <td width="100">{{p.gainPct | percent:'1.0-2'}}</td>
         <td width="140">
           <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
             {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.when | date: 'MM/dd/yyyy'}}
