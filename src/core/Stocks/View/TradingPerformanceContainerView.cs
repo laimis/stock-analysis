@@ -11,9 +11,9 @@ namespace core.Stocks.View
         {
             var recentStart = 0;
             var recentLengthToTake = closedTransactions.Length > recentCount ? recentCount : closedTransactions.Length;
-            var recent = closedTransactions.Slice(recentStart, recentLengthToTake);
+            var recentClosedTransactions = closedTransactions.Slice(recentStart, recentLengthToTake);
 
-            Recent = TradingPerformanceView.Create(recent);
+            Recent = TradingPerformanceView.Create(recentClosedTransactions);
             Overall = TradingPerformanceView.Create(closedTransactions);
 
             // go over each closed transaction and calculate number of wins for 20 trades rolling window
@@ -32,7 +32,7 @@ namespace core.Stocks.View
 
             closedTransactions.Reverse();
 
-            for(var i=0; i<closedTransactions.Length; i++)
+            for (var i = 0; i < closedTransactions.Length; i++)
             {
                 var window = closedTransactions.Slice(i, Math.Min(20, closedTransactions.Length));
                 var perfView = TradingPerformanceView.Create(window);
@@ -66,11 +66,22 @@ namespace core.Stocks.View
             Trends.Add(maxWin);
             Trends.Add(maxLoss);
 
-            // histogram of gains
-            var gains = new DataPointContainer<decimal>("Gains");
+            Trends.Add(GenerateOutcomeHistogram(Recent, "Recent Gains", recentClosedTransactions));
+            Trends.Add(GenerateOutcomeHistogram(Overall, "Gains", closedTransactions));
 
-            var min = Overall.MaxLossAmount * -1 - 100;
-            var max = Overall.MaxWinAmount + 100;
+            // unreversed
+            closedTransactions.Reverse();
+        }
+
+        private static DataPointContainer<decimal> GenerateOutcomeHistogram(
+            TradingPerformanceView performanceDataPoints,
+            string histogramLabel,
+            Span<PositionInstance> transactionsToUse)
+        {
+            var gains = new DataPointContainer<decimal>(histogramLabel);
+
+            var min = performanceDataPoints.MaxLossAmount * -1 - 100;
+            var max = performanceDataPoints.MaxWinAmount + 100;
 
             var buckets = 100;
             var step = (max - min) / buckets;
@@ -80,18 +91,15 @@ namespace core.Stocks.View
                 var lower = min + (step * i);
                 var upper = min + (step * (i + 1));
                 var count = 0;
-                for (var j = 0; j < closedTransactions.Length; j++)
+                for (var j = 0; j < transactionsToUse.Length; j++)
                 {
-                    if (closedTransactions[j].Profit >= lower && closedTransactions[j].Profit < upper)
+                    if (transactionsToUse[j].Profit >= lower && transactionsToUse[j].Profit < upper)
                         count++;
                 }
                 gains.Add(lower.ToString(), count);
             }
 
-            Trends.Add(gains);
-
-            // unreversed
-            closedTransactions.Reverse();
+            return gains;
         }
 
         public TradingPerformanceView Recent { get; set; }
