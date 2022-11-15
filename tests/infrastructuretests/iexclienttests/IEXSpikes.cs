@@ -33,13 +33,5 @@ namespace iexclienttests
 
             _helper.WriteLine("Country " + stats.Success.Country);
         }
-
-        [Fact]
-        public async Task Quote()
-        {
-            var stats = await _client.Quote("VIOT");
-
-            _helper.WriteLine("Country " + stats);
-        }
     }
 }
