@@ -11,6 +11,15 @@ namespace core.Stocks.Services
         {
             // distance from stop loss to current price
             var currentPrice = Math.Max(quote.bidPrice, quote.lastPrice);
+
+            // gain in position
+            var gainPct = Math.Round((currentPrice - position.AverageCostPerShare) / position.AverageCostPerShare * 100, 2);
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.GainPct,
+                gainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                gainPct,
+                $"{gainPct:P}"
+            );
             
             var stopLoss = position.StopPrice ?? 0;
             
@@ -73,6 +82,7 @@ namespace core.Stocks.Services
         public static string R2Achieved = "R2Achieved";
         public static string R3Achieved = "R3Achieved";
         public static string R4Achieved = "R4Achieved";
+        public static string GainPct = "GainPct";
     }
 }
 #nullable restore
