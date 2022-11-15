@@ -95,10 +95,10 @@ namespace core.Reports
                 yield return new Views.AnalysisCategoryGrouping(
                     "Stop loss at risk",
                     OutcomeType.Negative,
-                    PortfolioAnalysisKeys.StopLossAtRisk,
+                    PortfolioAnalysisKeys.PercentToStopLoss,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.StopLossAtRisk && o.value >= PercentToStopThreshold))
+                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.PercentToStopLoss && o.value >= PercentToStopThreshold))
                         .ToList()
                 );
 
