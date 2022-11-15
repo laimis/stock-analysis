@@ -104,7 +104,8 @@ namespace core.Reports
                     PortfolioAnalysisKeys.R1Achieved,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R1Achieved && o.value > 0)
+                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R1Achieved && o.value > 0) &&
+                            !t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0)
                         ).ToList()
                 );
 
@@ -114,7 +115,8 @@ namespace core.Reports
                     PortfolioAnalysisKeys.R2Achieved,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0)
+                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0) &&
+                            !t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0)
                         ).ToList()
                 );
 
@@ -124,7 +126,8 @@ namespace core.Reports
                     PortfolioAnalysisKeys.R3Achieved,
                     tickerOutcomes
                         .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0)
+                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0) &&
+                            !t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R4Achieved && o.value > 0)
                         ).ToList()
                 );
 
