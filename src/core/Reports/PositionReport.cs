@@ -72,7 +72,11 @@ namespace core.Reports
                         continue;
                     }
 
-                    var outcomes = PositionAnalysis.Generate(position, quoteResponse.Success).ToList();
+                    var currentPrice = Math.Max(quoteResponse.Success.bidPrice, quoteResponse.Success.lastPrice);
+
+                    position.SetPrice(currentPrice);
+
+                    var outcomes = PositionAnalysis.Generate(position).ToList();
 
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
                 }

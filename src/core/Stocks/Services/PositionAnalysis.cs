@@ -1,40 +1,57 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using core.Shared.Adapters.Brokerage;
 
 namespace core.Stocks.Services
 {
     public class PositionAnalysis
     {
-        public static IEnumerable<AnalysisOutcome> Generate(PositionInstance position, StockQuote quote)
+        public static IEnumerable<AnalysisOutcome> Generate(PositionInstance position)
         {
-            // distance from stop loss to current price
-            var currentPrice = Math.Max(quote.bidPrice, quote.lastPrice);
+            // add average cost per share as outcome
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.AverageCost,
+                OutcomeType.Neutral,
+                position.AverageCostPerShare,
+                $"Average cost per share is {position.AverageCostPerShare:C2}");
 
             // gain in position
-            var gainPct = Math.Round((currentPrice - position.AverageCostPerShare) / position.AverageCostPerShare * 100, 2);
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.GainPct,
-                gainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                gainPct,
-                $"{gainPct:P}"
+                position.GainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                position.GainPct,
+                $"{position.GainPct:P}"
+            );
+
+            // rr in position
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.RR,
+                position.RR >= 1 ? OutcomeType.Positive : OutcomeType.Negative,
+                position.RR,
+                $"{position.RR:N2}"
             );
             
             var stopLoss = position.StopPrice ?? 0;
-            
-            var percentDiff = Math.Round((stopLoss - currentPrice) / currentPrice * 100, 2);
+
+            // add stop loss as outcome
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.StopLoss,
+                OutcomeType.Neutral,
+                stopLoss,
+                $"Stop loss is {stopLoss:C2}");
+
+            var pctToStop = Math.Round(position.PercentToStop ?? -1 * 100, 2);
                 
             yield return new AnalysisOutcome(
                     PortfolioAnalysisKeys.StopLossAtRisk,
-                    percentDiff < 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                    percentDiff,
-                    $"% difference to stop loss {stopLoss} is {percentDiff}"
+                    position.PercentToStop < 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                    pctToStop,
+                    $"% difference to stop loss {stopLoss} is {pctToStop}"
                 );
             
             // achieved r1
             var r1 = position.GetRRLevel(0);
-            var r1Achieved = currentPrice >= r1;
+            var r1Achieved = position.Price >= r1;
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.R1Achieved,
                 r1Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
@@ -44,7 +61,7 @@ namespace core.Stocks.Services
 
             // achieved r2
             var r2 = position.GetRRLevel(1);
-            var r2Achieved = currentPrice >= r2;
+            var r2Achieved = position.Price >= r2;
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.R2Achieved,
                 r2Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
@@ -54,7 +71,7 @@ namespace core.Stocks.Services
 
             // achieved r3
             var r3 = position.GetRRLevel(2);
-            var r3Achieved = currentPrice >= r3;
+            var r3Achieved = position.Price >= r3;
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.R3Achieved,
                 r3Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
@@ -64,7 +81,7 @@ namespace core.Stocks.Services
 
             // achieved r4
             var r4 = position.GetRRLevel(3);
-            var r4Achieved = currentPrice >= r4;
+            var r4Achieved = position.Price >= r4;
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.R4Achieved,
                 r4Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
@@ -83,6 +100,9 @@ namespace core.Stocks.Services
         public static string R3Achieved = "R3Achieved";
         public static string R4Achieved = "R4Achieved";
         public static string GainPct = "GainPct";
+        public static string AverageCost = "AverageCost";
+        public static string StopLoss = "StopLoss";
+        public static string RR = "RR";
     }
 }
 #nullable restore
