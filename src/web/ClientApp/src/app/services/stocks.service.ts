@@ -38,11 +38,6 @@ export class StocksService {
   constructor(private http: HttpClient) { }
 
   // ----------------- misc ---------------------
-
-  registerForTracking(ticker:string): Observable<TrackingPreview> {
-    return this.http.get<any>('/api/tracking/' + ticker + '/register')
-  }
-
   getEvents(type:string): Observable<object[]> {
     return this.http.get<object[]>('/api/events?entity=' + type)
   }
@@ -368,6 +363,10 @@ export class StocksService {
 
   reportTickerGaps(ticker:string): Observable<StockGaps> {
     return this.http.get<StockGaps>('/api/reports/gaps/tickers/' + ticker)
+  }
+
+  reportPortfolio(): Observable<OutcomesAnalysisReport> {
+    return this.http.get<OutcomesAnalysisReport>('/api/reports/portfolio')
   }
 }
 

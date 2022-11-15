@@ -11,6 +11,5 @@ namespace core.Adapters.Stocks
         Task<ServiceResponse<Price>> GetPrice(string ticker);
         Task<ServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers);
         Task<ServiceResponse<List<SearchResult>>> Search(string fragment, int maxResults);
-        Task<ServiceResponse<Quote>> Quote(string ticker);
     }
 }

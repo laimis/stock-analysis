@@ -88,12 +88,6 @@ namespace iexclient
                 CacheKeyMonthly(ticker)
             );
 
-        public Task<ServiceResponse<Quote>> Quote(string ticker) =>
-            GetCachedResponse<Quote>(
-                MakeUrl($"stock/{ticker}/quote"),
-                CacheKeyMinute(ticker + "quote")
-            );
-
         public Task<ServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker) =>
             GetCachedResponse<StockAdvancedStats>(
                 MakeUrl($"stock/{ticker}/advanced-stats"),

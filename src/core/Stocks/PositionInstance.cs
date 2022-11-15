@@ -59,6 +59,7 @@ namespace core.Stocks
         private List<decimal> _slots = new List<decimal>();
 
         public List<decimal> RRLevels { get; private set; } = new List<decimal>();
+        public decimal? GetRRLevel(int index) => index < RRLevels.Count ? RRLevels[index] : null;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
