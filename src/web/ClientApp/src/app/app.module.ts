@@ -37,7 +37,7 @@ import { StockFundamentalsComponent } from './stocks/stock-details/stock-fundame
 import { StockNotesComponent } from './stocks/stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
-import { StockPositionReportsComponent } from './stocks/stock-trading/stock-position-reports.component';
+import { StockPositionReportsComponent } from './stocks/stock-trading/stock-trading-outcomes-reports.component';
 import { AdminUsersComponent } from './admin/users/admin-users.component';
 import { OptionsComponent } from './options/option-dashboard/option-dashboard.component';
 import { OptionStatsComponent } from './options/option-dashboard/option-stats.component';
