@@ -73,6 +73,7 @@ import { OutcomesReportComponent } from './reports/outcomes-report/outcomes-repo
 import { GapsReportComponent } from './reports/gaps/gaps-report.component';
 import { GapsComponent } from './shared/reports/gaps.component';
 import { PercentChangeDistributionComponent } from './shared/reports/percent-change-distribution.component';
+import { StockNewPositionComponent } from './stocks/stock-buy/app-stock-new-position/app-stock-new-position.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -112,6 +113,7 @@ var routes: Routes = [
   { path: 'trading/simulator', component: StockTradingSimulatorComponent},
   { path: 'trading/:tab', component: StockTradingComponent},
 
+  { path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard]},
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard] },
 
@@ -206,7 +208,8 @@ var routes: Routes = [
     GapsComponent,
     PercentChangeDistributionComponent,
 
-    AlertsComponent
+    AlertsComponent,
+    StockNewPositionComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

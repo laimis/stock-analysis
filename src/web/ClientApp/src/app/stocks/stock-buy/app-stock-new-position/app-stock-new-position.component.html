@@ -1,0 +1,13 @@
+<div>
+    <div class="alert alert-success" role="alert" *ngIf="feedbackMessage">
+        {{feedbackMessage}}
+      </div>
+
+    <app-brokerage-neworder
+      (brokerageOrderEntered)="brokerageOrderEntered()">
+    </app-brokerage-neworder>
+
+    <app-stock-newposition
+        (stockPurchased)="stockPurchased()">
+    </app-stock-newposition>
+</div>

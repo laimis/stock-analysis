@@ -32,9 +32,6 @@
     <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]="" (click)="activateTab('openreview')">
       Open Review
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('newposition')}" [routerLink]="" (click)="activateTab('newposition')">
-      New Position
-    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]="" (click)="activateTab('brokerage')">
       Brokerage
     </a>
@@ -65,14 +62,11 @@
     </a>
   </div>
   
-  <app-brokerage-neworder     *ngIf="isActive('newposition')" (brokerageOrderEntered)="brokerageOrderEntered()" [positions]="positions" ></app-brokerage-neworder>
-  <app-stock-newposition  *ngIf="isActive('newposition')" (brokerageOrderEntered)="brokerageOrderEntered()" (stockPurchased)="stockPurchased()"></app-stock-newposition>
-  
-
   <stock-trading-positions    *ngIf="isActive('positions')" [pendingOrders]="brokerageOrders" [positions]=positions></stock-trading-positions>
   <app-stock-trading-past     *ngIf="isActive('past')" [positions]=closed></app-stock-trading-past>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>
+  <app-brokerage-neworder     *ngIf="isActive('brokerage')" (brokerageOrderEntered)="brokerageOrderEntered()" [positions]="positions" ></app-brokerage-neworder>
   <app-brokerage-orders       *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
   <app-stock-position-charts  *ngIf="isActive('openreview')" [positions]=positions></app-stock-position-charts>
   <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
