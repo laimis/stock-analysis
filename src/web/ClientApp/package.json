@@ -12,7 +12,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-devkit/schematics": "^14.1.0",
+    "@angular-devkit/schematics": "^14.2.9",
     "@angular/animations": "^14.1.0",
     "@angular/common": "^14.1.0",
     "@angular/compiler": "^14.1.0",
@@ -36,13 +36,13 @@
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^14.1.0",
+    "@angular-devkit/build-angular": "^14.2.9",
     "@angular-eslint/builder": "14.2.0",
     "@angular-eslint/eslint-plugin": "14.2.0",
     "@angular-eslint/eslint-plugin-template": "14.2.0",
     "@angular-eslint/schematics": "14.2.0",
     "@angular-eslint/template-parser": "14.2.0",
-    "@angular/cli": "^14.1.0",
+    "@angular/cli": "^14.2.9",
     "@angular/compiler-cli": "^14.1.0",
     "@angular/language-service": "^14.1.0",
     "@fortawesome/fontawesome-free": "^5.15.4",
