@@ -1,0 +1,135 @@
+using System.Collections.Generic;
+using System.Linq;
+
+namespace core.Stocks.Services
+{
+    public class SingleBarAnalysisOutcomeEvaluation
+    {
+        private const decimal RelativeVolumeThresholdPositive = 0.9m;
+        private const decimal SigmaRatioThreshold = 1m;
+        private const decimal SmallPercentChange = 2m;
+        private const decimal ExcellentClosingRange = 80m;
+        private const decimal LowClosingRange = 20m;
+
+        internal static IEnumerable<OutcomeAnalysisEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
+        {
+            // stocks that had above average volume grouping
+            yield return new OutcomeAnalysisEvaluation(
+                "Above Average Volume and High Percent Change",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.RelativeVolume,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "Excellent Closing Range and High Percent Change",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.ClosingRange,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
+                    ).ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "High Volume with Excellent Closing Range and High Percent Change",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.RelativeVolume,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
+                    ).ToList()
+            );
+
+            // negative outcome types
+            yield return new OutcomeAnalysisEvaluation(
+                "Above Average Volume and Negative Percent Change",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.RelativeVolume,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value < -1 * SigmaRatioThreshold))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "Low Closing Range",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.ClosingRange,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value < LowClosingRange))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "Above Average Volume but Small Positive Percent Change",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.RelativeVolume,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0 && o.value < SmallPercentChange))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "SMA20 Below SMA50 Recent",
+                OutcomeType.Neutral,
+                SingleBarOutcomeKeys.SMA20Above50Days,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "Positive gap ups",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.GapPercentage,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value > 0))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "Negative gap downs",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.GapPercentage,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value < 0))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "New Highs",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.NewHigh,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh && o.value > 0))
+                    .ToList()
+            );
+
+            yield return new OutcomeAnalysisEvaluation(
+                "New Lows",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.NewLow,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewLow && o.value < 0))
+                    .ToList()
+            );
+        }
+    }
+}

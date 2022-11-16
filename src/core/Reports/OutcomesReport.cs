@@ -84,13 +84,12 @@ namespace core.Reports
                     throw new Exception("User not found");
                 }
 
-                var func = GetOutcomesFunction(request.Duration);
-
                 return await RunAnalysis(
                     request.Frequency,
                     new[] {request.Ticker},
                     user.State,
-                    func,
+                    GetOutcomesFunction(request.Duration),
+                    GetEvaluationFunction(request.Duration),
                     includeGapAnalysis: request.IncludeGapAnalysis
                 );         
             }
@@ -103,13 +102,12 @@ namespace core.Reports
                     throw new Exception("User not found");
                 }
 
-                var func = GetOutcomesFunction(request.Duration);
-
                 return await RunAnalysis(
                     request.Frequency,
                     request.Tickers,
                     user.State,
-                    func,
+                    GetOutcomesFunction(request.Duration),
+                    GetEvaluationFunction(request.Duration),
                     includeGapAnalysis: request.IncludeGapAnalysis
                 );         
             }
@@ -126,13 +124,15 @@ namespace core.Reports
 
                 var tickers = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.Ticker).ToList();
 
-                var func = GetOutcomesFunction(request.Duration);
+                var outcomesFunc = GetOutcomesFunction(request.Duration);
+                var evaluationFunc = GetEvaluationFunction(request.Duration);
 
                 return await RunAnalysis(
                     request.Frequency,
                     tickers,
                     user.State,
-                    func,
+                    outcomesFunc,
+                    evaluationFunc,
                     includeGapAnalysis: request.IncludeGapAnalysis
                 );
             }
@@ -148,11 +148,20 @@ namespace core.Reports
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
+            private static Func<List<TickerOutcomes>, IEnumerable<OutcomeAnalysisEvaluation>> GetEvaluationFunction(Duration duration) => 
+                duration switch
+                {
+                    Duration.AllBars => (Func<List<TickerOutcomes>, IEnumerable<OutcomeAnalysisEvaluation>>)MultipleBarAnalysisOutcomeEvaluation.Evaluate,
+                    Duration.SingleBar => SingleBarAnalysisOutcomeEvaluation.Evaluate,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
             private async Task<OutcomesReportView> RunAnalysis(
                 PriceFrequency frequency,
                 IEnumerable<string> tickers,
                 UserState user,
                 Func<PriceBar[], List<AnalysisOutcome>> priceAnalysisFunc,
+                Func<List<TickerOutcomes>, IEnumerable<OutcomeAnalysisEvaluation>> evaluationFunc,
                 bool includeGapAnalysis)
             {
                 var ticketOutcomes = new List<TickerOutcomes>();
@@ -177,7 +186,13 @@ namespace core.Reports
                     }
                 }
 
-                return new OutcomesReportView(ticketOutcomes, tickerGapViews);
+                return new OutcomesReportView(
+                    new AnalysisReportView(
+                        evaluationFunc(ticketOutcomes)
+                    ),
+                    ticketOutcomes,
+                    tickerGapViews
+                );
             }
         }
     }

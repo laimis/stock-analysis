@@ -81,69 +81,9 @@ namespace core.Reports
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
                 }
 
-                var categories = GenerateReportCategories(tickerOutcomes);
+                var categories = PositionAnalysisOutcomeEvaluation.Evaluate(tickerOutcomes);
 
                 return new AnalysisReportView(categories);
-            }
-
-
-            private const decimal PercentToStopThreshold = -0.02m;
-
-            private IEnumerable<AnalysisCategoryGrouping> GenerateReportCategories(List<TickerOutcomes> tickerOutcomes)
-            {
-                // stocks whose stops are close
-                yield return new Views.AnalysisCategoryGrouping(
-                    "Stop loss at risk",
-                    OutcomeType.Negative,
-                    PortfolioAnalysisKeys.PercentToStopLoss,
-                    tickerOutcomes
-                        .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.PercentToStopLoss && o.value >= PercentToStopThreshold))
-                        .ToList()
-                );
-
-                yield return new Views.AnalysisCategoryGrouping(
-                    "R1 achieved",
-                    OutcomeType.Positive,
-                    PortfolioAnalysisKeys.R1Achieved,
-                    tickerOutcomes
-                        .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R1Achieved && o.value > 0) &&
-                            !t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0)
-                        ).ToList()
-                );
-
-                yield return new Views.AnalysisCategoryGrouping(
-                    "R2 achieved",
-                    OutcomeType.Positive,
-                    PortfolioAnalysisKeys.R2Achieved,
-                    tickerOutcomes
-                        .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0) &&
-                            !t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0)
-                        ).ToList()
-                );
-
-                yield return new Views.AnalysisCategoryGrouping(
-                    "R3 achieved",
-                    OutcomeType.Positive,
-                    PortfolioAnalysisKeys.R3Achieved,
-                    tickerOutcomes
-                        .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0) &&
-                            !t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R4Achieved && o.value > 0)
-                        ).ToList()
-                );
-
-                yield return new Views.AnalysisCategoryGrouping(
-                    "R4 achieved",
-                    OutcomeType.Positive,
-                    PortfolioAnalysisKeys.R4Achieved,
-                    tickerOutcomes
-                        .Where(t =>
-                            t.Outcomes.Any(o => o.key == PortfolioAnalysisKeys.R4Achieved && o.value > 0)
-                        ).ToList()
-                );
             }
         }
     }

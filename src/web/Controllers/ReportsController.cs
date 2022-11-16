@@ -61,18 +61,6 @@ namespace web.Controllers
             [FromQuery] bool includeGapAnalysis) =>
             _mediator.Send(new OutcomesReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
 
-        [HttpGet("analysis/ticker/{ticker}")]
-        public Task<AnalysisReportView> TickerAnalysis(string ticker, [FromQuery]PriceFrequency frequency)
-            => _mediator.Send(new SingleBarAnalysisReport.ForTickerQuery(frequency, ticker, User.Identifier()));
-
-        [HttpGet("analysis/portfolio")]
-        public Task<AnalysisReportView> PortfolioAnalysis([FromQuery]PriceFrequency frequency)
-            => _mediator.Send(new SingleBarAnalysisReport.ForPortfolioQuery(frequency, User.Identifier()));
-
-        [HttpPost("analysis/tickers")]
-        public Task<AnalysisReportView> TickersAnalysis([FromBody]string[] tickers, [FromQuery] PriceFrequency frequency) =>
-            _mediator.Send(new SingleBarAnalysisReport.ForTickersQuery(frequency, tickers, User.Identifier()));
-
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
             => _mediator.Send(new PercentChangeStatistics.ForTickerQuery(frequency, ticker, User.Identifier()));
