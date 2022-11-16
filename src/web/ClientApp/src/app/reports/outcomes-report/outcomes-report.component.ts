@@ -8,12 +8,10 @@ import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../
   styleUrls: ['./outcomes-report.component.css']
 })
 export class OutcomesReportComponent implements OnInit {
-  dayOutcomes: TickerOutcomes[];
-  allTimeOutcomes: TickerOutcomes[];
-  dailyReport: OutcomesReport;
-  gaps: StockGaps[]
-
+  gaps: StockGaps[] = []
   error: string = null;
+  allBarsReport: OutcomesReport;
+  singleBarReportDaily: OutcomesReport;
 
   constructor (
     private stocksService: StocksService,
@@ -25,10 +23,31 @@ export class OutcomesReportComponent implements OnInit {
     if (tickerParam) {
       var tickers = tickerParam.split(",");
       
+      if (tickers.length > 0) {
+        this.loadSingleBarReport(tickers);
+      }
+
     } else {
       this.error = "No tickers were provided";
     }
 
   }
   
+  private loadSingleBarReport(tickers: string[]) {
+    return this.stocksService.reportOutcomesSingleBarDaily(tickers).subscribe(report => {
+      this.singleBarReportDaily = report;
+      this.loadAllBarsReport(tickers);
+    }, error => {
+      this.error = error;
+    });
+  }
+
+  private loadAllBarsReport(tickers: string[]) {
+    return this.stocksService.reportOutcomesAllBars(tickers).subscribe(report => {
+      this.allBarsReport = report;
+      this.gaps = report.gaps;
+    }, error => {
+      this.error = error;
+    });
+  }
 }
