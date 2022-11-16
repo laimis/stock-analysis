@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { OutcomesAnalysisReport, TickerOutcomes } from '../../services/stocks.service';
+import { Evaluations, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-outcomes-analysis-report',
@@ -9,7 +9,7 @@ import { OutcomesAnalysisReport, TickerOutcomes } from '../../services/stocks.se
 export class OutcomesAnalysisReportComponent {
 
   @Input()
-  report: OutcomesAnalysisReport
+  report: Evaluations
 
   @Input()
   title: string

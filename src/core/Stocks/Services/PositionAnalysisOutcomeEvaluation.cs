@@ -7,10 +7,10 @@ namespace core.Stocks.Services
     {
         private const decimal PercentToStopThreshold = -0.02m;
         
-        internal static IEnumerable<OutcomeAnalysisEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
+        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
         {
             // stocks whose stops are close
-                yield return new OutcomeAnalysisEvaluation(
+                yield return new AnalysisOutcomeEvaluation(
                     "Stop loss at risk",
                     OutcomeType.Negative,
                     PortfolioAnalysisKeys.PercentToStopLoss,
@@ -20,7 +20,7 @@ namespace core.Stocks.Services
                         .ToList()
                 );
 
-                yield return new OutcomeAnalysisEvaluation(
+                yield return new AnalysisOutcomeEvaluation(
                     "R1 achieved",
                     OutcomeType.Positive,
                     PortfolioAnalysisKeys.R1Achieved,
@@ -31,7 +31,7 @@ namespace core.Stocks.Services
                         ).ToList()
                 );
 
-                yield return new OutcomeAnalysisEvaluation(
+                yield return new AnalysisOutcomeEvaluation(
                     "R2 achieved",
                     OutcomeType.Positive,
                     PortfolioAnalysisKeys.R2Achieved,
@@ -42,7 +42,7 @@ namespace core.Stocks.Services
                         ).ToList()
                 );
 
-                yield return new OutcomeAnalysisEvaluation(
+                yield return new AnalysisOutcomeEvaluation(
                     "R3 achieved",
                     OutcomeType.Positive,
                     PortfolioAnalysisKeys.R3Achieved,
@@ -53,7 +53,7 @@ namespace core.Stocks.Services
                         ).ToList()
                 );
 
-                yield return new OutcomeAnalysisEvaluation(
+                yield return new AnalysisOutcomeEvaluation(
                     "R4 achieved",
                     OutcomeType.Positive,
                     PortfolioAnalysisKeys.R4Achieved,

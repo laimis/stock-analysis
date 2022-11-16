@@ -37,12 +37,6 @@ export class StockPositionChartsComponent {
       }
     )
 
-    this.outcomes = null
-    this.stockService.reportTickerOutcomesAllTime(this.currentPosition.ticker, false).subscribe(
-      data => {
-        this.outcomes = data[0]
-      }
-    )
   }
 
   next() {

@@ -11,10 +11,10 @@ namespace core.Stocks.Services
         private const decimal ExcellentClosingRange = 80m;
         private const decimal LowClosingRange = 20m;
 
-        internal static IEnumerable<OutcomeAnalysisEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
+        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
         {
             // stocks that had above average volume grouping
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Above Average Volume and High Percent Change",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.RelativeVolume,
@@ -25,7 +25,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Excellent Closing Range and High Percent Change",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.ClosingRange,
@@ -36,7 +36,7 @@ namespace core.Stocks.Services
                     ).ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "High Volume with Excellent Closing Range and High Percent Change",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.RelativeVolume,
@@ -49,7 +49,7 @@ namespace core.Stocks.Services
             );
 
             // negative outcome types
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Above Average Volume and Negative Percent Change",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.RelativeVolume,
@@ -60,7 +60,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Low Closing Range",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.ClosingRange,
@@ -70,7 +70,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Above Average Volume but Small Positive Percent Change",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.RelativeVolume,
@@ -81,7 +81,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "SMA20 Below SMA50 Recent",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.SMA20Above50Days,
@@ -91,7 +91,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Positive gap ups",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.GapPercentage,
@@ -101,7 +101,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "Negative gap downs",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.GapPercentage,
@@ -111,7 +111,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "New Highs",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.NewHigh,
@@ -121,7 +121,7 @@ namespace core.Stocks.Services
                     .ToList()
             );
 
-            yield return new OutcomeAnalysisEvaluation(
+            yield return new AnalysisOutcomeEvaluation(
                 "New Lows",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.NewLow,

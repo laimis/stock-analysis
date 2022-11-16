@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { OutcomesAnalysisReport, OutcomesReport, Prices, PriceWithDate, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { Evaluations, Prices, PriceWithDate, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -10,8 +10,8 @@ import { OutcomesAnalysisReport, OutcomesReport, Prices, PriceWithDate, StockGap
 export class StockAnalysisComponent {
   multipleBarOutcomes: TickerOutcomes;
   dailyOutcomes : TickerOutcomes;
-  dailyAnalysis: OutcomesAnalysisReport;
-  weeklyAnalysis: OutcomesAnalysisReport;
+  dailyAnalysis: Evaluations;
+  weeklyAnalysis: Evaluations;
   gaps: StockGaps;
   percentChangeDistribution: StockPercentChangeResponse;
   prices: Prices;
@@ -45,54 +45,19 @@ export class StockAnalysisComponent {
   }
 
   private allTimeOutcomes() {
-    this.stockService.reportTickerOutcomesAllTime(this.ticker, true).subscribe(
-      (data:OutcomesReport) => {
-        this.multipleBarOutcomes = data.outcomes[0];
-        this.gaps = data.gaps[0];
-        this.dayOutcomes();
-        this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => {
-          return {
-            when: g.bar.date,
-            price: g.bar.open
-          }
-        })
-        this.upGapsOpens = this.upGaps.map(g => g.price);
-        this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => {
-          return {
-            when: g.bar.date,
-            price: g.bar.open
-          }
-        })
-        this.downGapsOpens = this.downGaps.map(g => g.price);
-      }
-    );
+    
   }
 
   private dayOutcomes() {
-    this.stockService.reportTickerOutcomesDay(this.ticker, false).subscribe(
-      (data:OutcomesReport) => {
-        this.dailyOutcomes = data.outcomes[0];
-        this.dailyAnalysisReport();
-      }
-    );
+    
   }
 
   private dailyAnalysisReport() {
-    this.stockService.reportTickerAnalysisDaily(this.ticker).subscribe(
-      data => {
-        this.dailyAnalysis = data;
-        this.weeklyAnalysisReport();
-      }
-    );
+    
   }
 
   private weeklyAnalysisReport() {
-    this.stockService.reportTickerAnalysisWeekly(this.ticker).subscribe(
-      data => {
-        this.weeklyAnalysis = data;
-        this.percentDistribution();
-      }
-    );
+    
   }
 
   private percentDistribution() {

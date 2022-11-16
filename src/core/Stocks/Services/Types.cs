@@ -8,7 +8,7 @@ namespace core.Stocks.Services
 
     public record struct TickerOutcomes(List<AnalysisOutcome> outcomes, string ticker);
 
-    public record struct OutcomeAnalysisEvaluation(
+    public record struct AnalysisOutcomeEvaluation(
         string name,
         OutcomeType type,
         string sortColumn,

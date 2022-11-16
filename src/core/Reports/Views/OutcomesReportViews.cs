@@ -13,10 +13,10 @@ namespace core.Reports.Views
 
     public record struct AnalysisReportView
     {
-        public IEnumerable<OutcomeAnalysisEvaluation> Evaluations { get; set; }
+        public IEnumerable<AnalysisOutcomeEvaluation> Evaluations { get; set; }
         public object Summary { get; set; }
 
-        public AnalysisReportView(IEnumerable<OutcomeAnalysisEvaluation> evaluations)
+        public AnalysisReportView(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
         {
             Evaluations = evaluations;
 

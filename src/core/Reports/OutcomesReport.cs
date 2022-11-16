@@ -148,10 +148,10 @@ namespace core.Reports
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-            private static Func<List<TickerOutcomes>, IEnumerable<OutcomeAnalysisEvaluation>> GetEvaluationFunction(Duration duration) => 
+            private static Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>> GetEvaluationFunction(Duration duration) => 
                 duration switch
                 {
-                    Duration.AllBars => (Func<List<TickerOutcomes>, IEnumerable<OutcomeAnalysisEvaluation>>)MultipleBarAnalysisOutcomeEvaluation.Evaluate,
+                    Duration.AllBars => (Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>>)MultipleBarAnalysisOutcomeEvaluation.Evaluate,
                     Duration.SingleBar => SingleBarAnalysisOutcomeEvaluation.Evaluate,
                     _ => throw new ArgumentOutOfRangeException()
                 };
@@ -161,7 +161,7 @@ namespace core.Reports
                 IEnumerable<string> tickers,
                 UserState user,
                 Func<PriceBar[], List<AnalysisOutcome>> priceAnalysisFunc,
-                Func<List<TickerOutcomes>, IEnumerable<OutcomeAnalysisEvaluation>> evaluationFunc,
+                Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>> evaluationFunc,
                 bool includeGapAnalysis)
             {
                 var ticketOutcomes = new List<TickerOutcomes>();

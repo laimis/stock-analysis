@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StocksService, TickerOutcomes, OutcomesAnalysisReport, StockGaps } from '../../services/stocks.service';
+import { StocksService, StockGaps, Evaluations } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-position-reports',
@@ -8,13 +8,7 @@ import { StocksService, TickerOutcomes, OutcomesAnalysisReport, StockGaps } from
 })
 export class StockPositionReportsComponent {
 
-  multipleBarOutcomes: TickerOutcomes[]
-  dailyOutcomes: TickerOutcomes[]
-  portfolioDailyReport: OutcomesAnalysisReport;
-  portfolioWeeklyReport: OutcomesAnalysisReport;
-  positionReport: OutcomesAnalysisReport;
-  gaps: StockGaps[];
-
+  
   sortColumn: string
   sortDirection: number = -1
   
@@ -31,59 +25,11 @@ export class StockPositionReportsComponent {
 	ngOnInit(): void {
     
     if (this.allTimeMode) {
-      this.loadAllTimeData()
+      // this.loadAllTimeData()
     }
 
     if (this.dailyMode) {
-      this.loadDailyData()
+      // this.loadDailyData()
     }
-  }
-
-  loadAllTimeData() {
-    this.service.reportPortfolioOutcomesAllTime(true).subscribe(result => {
-      this.multipleBarOutcomes = result.outcomes;
-      this.gaps = result.gaps;
-    }, error => {
-      console.error(error);
-    });
-  }
-
-  loadDailyData() {
-    this.loadPositionReport()
-  }
-
-  loadPositionReport() {
-    this.service.reportPositions().subscribe(result => {
-      this.positionReport = result;
-      this.loadDailyOutcomes()
-    }, error => {
-      console.error(error);
-    });
-  }
-
-  loadDailyOutcomes(){
-    this.service.reportPortfolioOutcomesDay(false).subscribe(result => {
-      this.dailyOutcomes = result.outcomes;
-      this.loadDailyAnalaysisReport()
-    }, error => {
-      console.error(error);
-    });
-  }
-  
-  loadDailyAnalaysisReport() {
-    this.service.reportPorfolioAnalysisDaily().subscribe(result => {
-      this.portfolioDailyReport = result;
-      this.loadWeeklyAnalaysisReport()
-    }, error => {
-      console.error(error);
-    });
-  }
-
-  loadWeeklyAnalaysisReport() {
-    this.service.reportPortfolioAnalysisWeekly().subscribe(result => {
-      this.portfolioWeeklyReport = result;
-    }, error => {
-      console.error(error);
-    });
   }
 }
