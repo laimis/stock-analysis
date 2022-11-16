@@ -309,6 +309,14 @@ export class StocksService {
     return this.http.get<Sells>('/api/reports/sells')
   }
 
+  reportOutcomesAllBars(tickers:string[]) : Observable<OutcomesReport> {
+    return this.http.post<OutcomesReport>('/api/reports/outcomes?duration=allbars&includeGapAnalysis=true', tickers)
+  }
+
+  reportOutcomesSingleBarDaily(tickers:string[]) : Observable<OutcomesReport> {
+    return this.http.post<OutcomesReport>('/api/reports/outcomes?duration=singlebar&frequency=daily', tickers)
+  }
+
   reportTickerPercentChangeDistribution(ticker:string): Observable<StockPercentChangeResponse> {
     return this.http.get<StockPercentChangeResponse>('/api/reports/percentChangeDistribution/tickers/' + ticker)
   }
@@ -317,8 +325,8 @@ export class StocksService {
     return this.http.get<StockGaps>('/api/reports/gaps/tickers/' + ticker)
   }
 
-  reportPositions(): Observable<Evaluations> {
-    return this.http.get<Evaluations>('/api/reports/positions')
+  reportPositions(): Observable<OutcomesReport> {
+    return this.http.get<OutcomesReport>('/api/reports/positions')
   }
 }
 
@@ -604,9 +612,10 @@ export interface TickerOutcomes {
 }
 
 export interface OutcomesReport {
-  evaluations: Evaluations,
+  evaluations: AnalysisOutcomeEvaluation[],
   outcomes: TickerOutcomes[],
-  gaps: StockGaps[]
+  gaps: StockGaps[],
+  summary: TickerCountPair[]
 }
 
 export interface TickerCountPair {
@@ -614,16 +623,11 @@ export interface TickerCountPair {
   count: number
 }
 
-export interface Evaluations {
-  evaluations: AnalysisOutcomeEvaluation[]
-  summary: TickerCountPair[]
-}
-
 export interface AnalysisOutcomeEvaluation {
   name: string
   type: string
   sortColumn: string
-  outcomes: TickerOutcomes[]
+  matchingTickers: TickerOutcomes[]
 }
 
 export interface PercentChangeFrequency {

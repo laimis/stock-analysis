@@ -5,14 +5,14 @@ using core.Stocks.Services;
 namespace core.Reports.Views
 {   
     public record struct TickerCountPair(string ticker, int count);
-    public struct AnalysisReportView
+    public struct OutcomesReportView
     {
         public IEnumerable<AnalysisOutcomeEvaluation> Evaluations { get; set; }
         public List<TickerOutcomes> Outcomes { get; }
         public List<GapsView> Gaps { get; }
         public List<TickerCountPair> Summary { get; set; }
 
-        public AnalysisReportView(IEnumerable<AnalysisOutcomeEvaluation> evaluations, List<TickerOutcomes> outcomes, List<GapsView> gaps)
+        public OutcomesReportView(IEnumerable<AnalysisOutcomeEvaluation> evaluations, List<TickerOutcomes> outcomes, List<GapsView> gaps)
         {
             Evaluations = evaluations;
             Outcomes = outcomes;

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StocksService, StockGaps, Evaluations } from '../../services/stocks.service';
+import { StocksService, StockGaps } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-position-reports',

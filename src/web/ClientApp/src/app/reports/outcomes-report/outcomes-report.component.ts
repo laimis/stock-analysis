@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Evaluations, OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
+import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-outcomes-report',
@@ -10,7 +10,7 @@ import { Evaluations, OutcomesReport, StockGaps, StocksService, TickerOutcomes }
 export class OutcomesReportComponent implements OnInit {
   dayOutcomes: TickerOutcomes[];
   allTimeOutcomes: TickerOutcomes[];
-  dailyEvaluations: Evaluations;
+  dailyReport: OutcomesReport;
   gaps: StockGaps[]
 
   error: string = null;

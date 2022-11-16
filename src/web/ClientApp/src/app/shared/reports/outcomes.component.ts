@@ -16,7 +16,7 @@ export class OutcomesComponent {
 
   @Input()
   set category(value:AnalysisOutcomeEvaluation) {
-    this.outcomes = value.outcomes
+    this.outcomes = value.matchingTickers
     this.sort(value.sortColumn)
   }
 

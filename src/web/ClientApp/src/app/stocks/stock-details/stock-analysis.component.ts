@@ -1,6 +1,5 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { Evaluations, Prices, PriceWithDate, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { OutcomesReport, Prices, PriceWithDate, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -9,14 +8,14 @@ import { Evaluations, Prices, PriceWithDate, StockGaps, StockPercentChangeRespon
 })
 export class StockAnalysisComponent {
   multipleBarOutcomes: TickerOutcomes;
-  dailyOutcomes : TickerOutcomes;
-  dailyAnalysis: Evaluations;
-  weeklyAnalysis: Evaluations;
+  
+  dailyOutcomesReport : OutcomesReport;
+  dailyOutcomes: TickerOutcomes;
+
   gaps: StockGaps;
   percentChangeDistribution: StockPercentChangeResponse;
   prices: Prices;
   private _ticker: string;
-  gapOpens: number[] = [];
   upGaps: PriceWithDate[] = [];
   downGaps: PriceWithDate[] = [];
   upGapsOpens: number[] = [];
@@ -39,26 +38,43 @@ export class StockAnalysisComponent {
     this.stockService.getStockPrices(this.ticker, 365).subscribe(
       data => {
         this.prices = data;
-        this.allTimeOutcomes();
+        this.getOutcomesReportAllBars();
       }
     );
   }
 
-  private allTimeOutcomes() {
-    
+  private getOutcomesReportAllBars() {
+    this.stockService.reportOutcomesAllBars([this.ticker]).subscribe(report => {
+      this.gaps = report.gaps[0];
+      this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => {
+        return {
+          when: g.bar.date,
+          price: g.bar.open
+        }
+      })
+      this.upGapsOpens = this.upGaps.map(g => g.price);
+      this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => {
+        return {
+          when: g.bar.date,
+          price: g.bar.open
+        }
+      })
+      this.downGapsOpens = this.downGaps.map(g => g.price);
+      this.multipleBarOutcomes = report.outcomes[0]
+      
+      this.getOutcomesReportSingleBarDaily();
+    });
   }
 
-  private dayOutcomes() {
-    
+  private getOutcomesReportSingleBarDaily() {
+
+    this.stockService.reportOutcomesSingleBarDaily([this.ticker]).subscribe(report => {
+      this.dailyOutcomes = report.outcomes[0];
+      this.dailyOutcomesReport = report;
+      this.percentDistribution();
+    });
   }
 
-  private dailyAnalysisReport() {
-    
-  }
-
-  private weeklyAnalysisReport() {
-    
-  }
 
   private percentDistribution() {
     this.stockService.reportTickerPercentChangeDistribution(this.ticker).subscribe(

@@ -11,11 +11,11 @@ using core.Stocks.Services;
 
 namespace core.Reports
 {
-    public class OutcomesReport
+    public class PriceAnalysisReport
     {
         public enum Duration { SingleBar, AllBars }
 
-        public abstract class BaseQuery : RequestWithUserId<AnalysisReportView>
+        public abstract class BaseQuery : RequestWithUserId<OutcomesReportView>
         {
             public BaseQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, Guid userId) : base(userId)
             {
@@ -40,7 +40,7 @@ namespace core.Reports
             public string[] Tickers { get; }
         }
 
-        public class Handler : HandlerWithStorage<ForTickersQuery, AnalysisReportView>
+        public class Handler : HandlerWithStorage<ForTickersQuery, OutcomesReportView>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -54,7 +54,7 @@ namespace core.Reports
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
 
-            public override async Task<AnalysisReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
+            public override async Task<OutcomesReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -91,7 +91,7 @@ namespace core.Reports
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-            private async Task<AnalysisReportView> RunAnalysis(
+            private async Task<OutcomesReportView> RunAnalysis(
                 PriceFrequency frequency,
                 IEnumerable<string> tickers,
                 UserState user,
@@ -121,7 +121,7 @@ namespace core.Reports
                     }
                 }
 
-                return new AnalysisReportView(
+                return new OutcomesReportView(
                     evaluations: evaluationFunc(tickerOutcomes),
                     outcomes: tickerOutcomes,
                     tickerGapViews

@@ -38,13 +38,13 @@ namespace web.Controllers
             return _mediator.Send(query);
         }
 
-        [HttpPost("outcomes/tickers")]
-        public Task<AnalysisReportView> TickersOutcomes(
+        [HttpPost("outcomes")]
+        public Task<OutcomesReportView> TickersOutcomes(
             [FromBody]string[] tickers,
-            [FromQuery] OutcomesReport.Duration duration,
+            [FromQuery] PriceAnalysisReport.Duration duration,
             [FromQuery] PriceFrequency frequency,
             [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new OutcomesReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
+            _mediator.Send(new PriceAnalysisReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
@@ -55,7 +55,7 @@ namespace web.Controllers
             => _mediator.Send(new GapReport.ForTickerQuery(frequency, ticker, User.Identifier()));
 
         [HttpGet("positions")]
-        public Task<AnalysisReportView> Portfolio() =>
+        public Task<OutcomesReportView> Portfolio() =>
             _mediator.Send(new PositionReport.Query(User.Identifier()));
     }
 }

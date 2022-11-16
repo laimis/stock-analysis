@@ -15,14 +15,14 @@ namespace core.Reports
 {
     public class PositionReport
     {
-        public class Query : RequestWithUserId<AnalysisReportView>
+        public class Query : RequestWithUserId<OutcomesReportView>
         {
             public Query(Guid userId) : base(userId)
             {
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, AnalysisReportView>
+        public class Handler : HandlerWithStorage<Query, OutcomesReportView>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -36,7 +36,7 @@ namespace core.Reports
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
         
-            public override async Task<AnalysisReportView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<OutcomesReportView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -57,7 +57,7 @@ namespace core.Reports
                 );
             }
 
-            private async Task<AnalysisReportView> RunAnalysis(
+            private async Task<OutcomesReportView> RunAnalysis(
                 IEnumerable<PositionInstance> positions,
                 UserState user
                 )
@@ -83,7 +83,7 @@ namespace core.Reports
 
                 var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(tickerOutcomes);
 
-                return new AnalysisReportView(
+                return new OutcomesReportView(
                     evaluations: evaluations,
                     tickerOutcomes,
                     new List<GapsView>());
