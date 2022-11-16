@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { ThemeService } from 'ng2-charts';
 import { StocksService, OutcomesReport, PositionInstance, StockGaps } from '../../services/stocks.service';
 
 @Component({
@@ -38,7 +37,7 @@ export class StockPositionReportsComponent {
     }
 
     if (this.dailyMode) {
-      this.loadDailyData()
+      this.loadPositionData()
     }
   }
   loadDailyData() {
@@ -53,13 +52,13 @@ export class StockPositionReportsComponent {
     var tickers = this.positions.map(p => p.ticker)
     this.service.reportOutcomesSingleBarWeekly(tickers).subscribe(report => {
       this.singleBarReportWeekly = report
-      this.loadPositionData()
     })
   }
 
   loadPositionData() {
     this.service.reportPositions().subscribe(report => {
       this.positionsReport = report
+      this.loadDailyData()
     })
   }
 

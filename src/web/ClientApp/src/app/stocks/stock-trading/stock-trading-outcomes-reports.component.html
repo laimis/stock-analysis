@@ -13,12 +13,24 @@
     [showSummary]="false">
   </app-outcomes-analysis-report>
 
+  <app-outcomes
+    *ngIf="positionsReport"
+    [title]="'Positions outcomes'"
+    [outcomes]="positionsReport.outcomes">
+  </app-outcomes>
+
   <app-outcomes-analysis-report
     *ngIf="singleBarReportDaily"
     [title]="'Daily report'"
     [report]="singleBarReportDaily"
     [showSummary]="true">
   </app-outcomes-analysis-report>
+  
+  <app-outcomes
+    *ngIf="singleBarReportDaily"
+    [title]="'Daily outcomes'"
+    [outcomes]="singleBarReportDaily.outcomes">
+  </app-outcomes>
 
   <app-outcomes-analysis-report
     *ngIf="singleBarReportWeekly"
@@ -26,12 +38,6 @@
     [report]="singleBarReportWeekly"
     [showSummary]="true">
   </app-outcomes-analysis-report>  
-  
-  <app-outcomes
-    *ngIf="singleBarReportDaily"
-    [title]="'Daily outcomes'"
-    [outcomes]="singleBarReportDaily.outcomes">
-  </app-outcomes>
 
   <app-outcomes
     *ngIf="singleBarReportWeekly"
