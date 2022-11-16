@@ -7,32 +7,38 @@
   </app-outcomes>
 
   <app-outcomes-analysis-report
-    *ngIf="positionReport"
+    *ngIf="positionsReport"
     [title]="'Position report'"
-    [report]="positionReport"
+    [report]="positionsReport"
     [showSummary]="false">
   </app-outcomes-analysis-report>
 
   <app-outcomes-analysis-report
-    *ngIf="portfolioDailyReport"
+    *ngIf="singleBarReportDaily"
     [title]="'Daily report'"
-    [report]="portfolioDailyReport"
+    [report]="singleBarReportDaily"
     [showSummary]="true">
   </app-outcomes-analysis-report>
 
   <app-outcomes-analysis-report
-    *ngIf="portfolioWeeklyReport"
+    *ngIf="singleBarReportWeekly"
     [title]="'Weekly report'"
-    [report]="portfolioWeeklyReport"
+    [report]="singleBarReportWeekly"
     [showSummary]="true">
   </app-outcomes-analysis-report>  
   
   <app-outcomes
-    *ngIf="dailyOutcomes"
+    *ngIf="singleBarReportDaily"
     [title]="'Daily outcomes'"
-    [outcomes]="dailyOutcomes">
+    [outcomes]="singleBarReportDaily.outcomes">
   </app-outcomes>
 
-  <app-gaps *ngFor="let gap of allBarsReport.gaps" [gaps]="gap"></app-gaps>
+  <app-outcomes
+    *ngIf="singleBarReportWeekly"
+    [title]="'Weekly outcomes'"
+    [outcomes]="singleBarReportWeekly.outcomes">
+  </app-outcomes>
+
+  <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
   
 </div>

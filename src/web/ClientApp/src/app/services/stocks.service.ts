@@ -317,6 +317,10 @@ export class StocksService {
     return this.http.post<OutcomesReport>('/api/reports/outcomes?duration=singlebar&frequency=daily', tickers)
   }
 
+  reportOutcomesSingleBarWeekly(tickers:string[]) : Observable<OutcomesReport> {
+    return this.http.post<OutcomesReport>('/api/reports/outcomes?duration=singlebar&frequency=weekly', tickers)
+  }
+
   reportTickerPercentChangeDistribution(ticker:string): Observable<StockPercentChangeResponse> {
     return this.http.get<StockPercentChangeResponse>('/api/reports/percentChangeDistribution/tickers/' + ticker)
   }
