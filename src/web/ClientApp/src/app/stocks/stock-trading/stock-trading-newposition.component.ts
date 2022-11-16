@@ -49,6 +49,9 @@ export class StockTradingNewPositionComponent {
 
   prices: Prices | null = null
 
+  chartTargets: number[] = [];
+  chartStops: number[] = [];
+
   outcomes: TickerOutcomes
   gaps: StockGaps
 
@@ -71,15 +74,14 @@ export class StockTradingNewPositionComponent {
       }
     );
 
-    // this.stockService.reportTickerOutcomesAllTime(ticker, true)
-    //   .subscribe(data => {
-    //     console.log(data)
-    //     this.outcomes = data.outcomes[0]
-    //     this.gaps = data.gaps[0]
-    //   }, error => {
-    //     console.error(error)
-    //   }
-    // );
+    this.stockService.reportOutcomesAllBars([ticker])
+      .subscribe(data => {
+        this.outcomes = data.outcomes[0]
+        this.gaps = data.gaps[0]
+      }, error => {
+        console.error(error)
+      }
+    );
   }
 
   reset() {
@@ -170,6 +172,8 @@ export class StockTradingNewPositionComponent {
     this.oneR = this.costToBuy + singleShareLoss
     this.potentialLoss = this.stopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
     this.stopPct = Math.round((this.stopPrice - this.costToBuy) / this.costToBuy * 100) / 100
+    this.chartTargets = [this.oneR]
+    this.chartStops = [this.stopPrice]
   }
 
   record() {
