@@ -38,23 +38,8 @@ namespace web.Controllers
             return _mediator.Send(query);
         }
 
-        [HttpGet("outcomes/portfolio")]
-        public Task<OutcomesReportView> PortfolioOutcomes(
-            [FromQuery] OutcomesReport.Duration duration,
-            [FromQuery] PriceFrequency frequency,
-            [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, frequency, includeGapAnalysis, User.Identifier()));
-
-        [HttpGet("outcomes/ticker/{ticker}")]
-        public Task<OutcomesReportView> TickerOutcomes(
-            string ticker,
-            [FromQuery] PriceFrequency priceFrequency,
-            [FromQuery] OutcomesReport.Duration duration,
-            [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, priceFrequency, includeGapAnalysis, ticker, User.Identifier()));
-
         [HttpPost("outcomes/tickers")]
-        public Task<OutcomesReportView> TickersOutcomes(
+        public Task<AnalysisReportView> TickersOutcomes(
             [FromBody]string[] tickers,
             [FromQuery] OutcomesReport.Duration duration,
             [FromQuery] PriceFrequency frequency,

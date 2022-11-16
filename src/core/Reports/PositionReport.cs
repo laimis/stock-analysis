@@ -81,9 +81,12 @@ namespace core.Reports
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
                 }
 
-                var categories = PositionAnalysisOutcomeEvaluation.Evaluate(tickerOutcomes);
+                var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(tickerOutcomes);
 
-                return new AnalysisReportView(categories);
+                return new AnalysisReportView(
+                    evaluations: evaluations,
+                    tickerOutcomes,
+                    new List<GapsView>());
             }
         }
     }

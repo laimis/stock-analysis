@@ -3,22 +3,20 @@ using System.Linq;
 using core.Stocks.Services;
 
 namespace core.Reports.Views
-{
-    
-    public record struct OutcomesReportView(
-        AnalysisReportView analysis,
-        List<TickerOutcomes> outcomes,
-        List<GapsView> gaps
-    );
-
-    public record struct AnalysisReportView
+{   
+    public record struct TickerCountPair(string ticker, int count);
+    public struct AnalysisReportView
     {
         public IEnumerable<AnalysisOutcomeEvaluation> Evaluations { get; set; }
-        public object Summary { get; set; }
+        public List<TickerOutcomes> Outcomes { get; }
+        public List<GapsView> Gaps { get; }
+        public List<TickerCountPair> Summary { get; set; }
 
-        public AnalysisReportView(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
+        public AnalysisReportView(IEnumerable<AnalysisOutcomeEvaluation> evaluations, List<TickerOutcomes> outcomes, List<GapsView> gaps)
         {
             Evaluations = evaluations;
+            Outcomes = outcomes;
+            Gaps = gaps;
 
             var counts = new Dictionary<string, int>();
             foreach (var category in evaluations)
@@ -42,8 +40,8 @@ namespace core.Reports.Views
 
             Summary = counts
                 .OrderByDescending(x => x.Value)
-                .Select(x => new {ticker = x.Key, count = x.Value})
-                .ToArray();
+                .Select(x => new TickerCountPair(ticker: x.Key, count: x.Value))
+                .ToList();
         }
     }
 }
