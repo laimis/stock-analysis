@@ -8,10 +8,10 @@
             <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{s.ticker}}" target="_blank">{{s.ticker}}: {{s.count}}</a>
         </span>
     </div>
-    <div *ngFor="let c of report.categories">
+    <div *ngFor="let c of report.evaluations">
       <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}">{{c.name}}</h5>
-      <app-outcomes *ngIf="c.outcomes.length > 0" [category]="c"></app-outcomes>
-      <span *ngIf="c.outcomes.length === 0">No positions in this category.</span>
+      <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c"></app-outcomes>
+      <span *ngIf="c.matchingTickers.length === 0">No positions in this category.</span>
     </div>
   </div>
   

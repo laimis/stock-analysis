@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -9,11 +8,10 @@ using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services;
-using MediatR;
 
 namespace core.Reports
 {
-    public class OutcomesReport
+    public class PriceAnalysisReport
     {
         public enum Duration { SingleBar, AllBars }
 
@@ -31,24 +29,6 @@ namespace core.Reports
             public bool IncludeGapAnalysis { get; }
         }
 
-        public class ForPortfolioQuery : BaseQuery
-        {
-            public ForPortfolioQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, Guid userId)
-                : base(duration, frequency, includeGapAnalysis, userId)
-            {
-            }
-        }
-
-        public class ForTickerQuery : BaseQuery
-        {
-            public ForTickerQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, string ticker, Guid userId)
-             : base(duration, frequency, includeGapAnalysis, userId)
-            {
-                Ticker = ticker;
-            }
-            public string Ticker { get; }
-        }
-
         public class ForTickersQuery : BaseQuery
         {
             public ForTickersQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, string[] tickers, Guid userId)
@@ -60,9 +40,7 @@ namespace core.Reports
             public string[] Tickers { get; }
         }
 
-        public class Handler : HandlerWithStorage<ForPortfolioQuery, OutcomesReportView>,
-            IRequestHandler<ForTickerQuery, OutcomesReportView>,
-            IRequestHandler<ForTickersQuery, OutcomesReportView>
+        public class Handler : HandlerWithStorage<ForTickersQuery, OutcomesReportView>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -76,65 +54,22 @@ namespace core.Reports
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
 
-            public async Task<OutcomesReportView> Handle(ForTickerQuery request, CancellationToken cancellationToken)
+            public override async Task<OutcomesReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
                 {
                     throw new Exception("User not found");
                 }
-
-                var func = GetOutcomesFunction(request.Duration);
-
-                return await RunAnalysis(
-                    request.Frequency,
-                    new[] {request.Ticker},
-                    user.State,
-                    func,
-                    includeGapAnalysis: request.IncludeGapAnalysis
-                );         
-            }
-
-            public async Task<OutcomesReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
-            {
-                var user = await _accountStorage.GetUser(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
-                var func = GetOutcomesFunction(request.Duration);
 
                 return await RunAnalysis(
                     request.Frequency,
                     request.Tickers,
                     user.State,
-                    func,
+                    GetOutcomesFunction(request.Duration),
+                    GetEvaluationFunction(request.Duration),
                     includeGapAnalysis: request.IncludeGapAnalysis
                 );         
-            }
-        
-            public override async Task<OutcomesReportView> Handle(ForPortfolioQuery request, CancellationToken cancellationToken)
-            {
-                var user = await _accountStorage.GetUser(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
-                var stocks = await _storage.GetStocks(request.UserId);
-
-                var tickers = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.Ticker).ToList();
-
-                var func = GetOutcomesFunction(request.Duration);
-
-                return await RunAnalysis(
-                    request.Frequency,
-                    tickers,
-                    user.State,
-                    func,
-                    includeGapAnalysis: request.IncludeGapAnalysis
-                );
             }
 
             private static Func<PriceBar[], List<AnalysisOutcome>> GetOutcomesFunction(Duration duration) => 
@@ -148,14 +83,23 @@ namespace core.Reports
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
+            private static Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>> GetEvaluationFunction(Duration duration) => 
+                duration switch
+                {
+                    Duration.AllBars => (Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>>)MultipleBarAnalysisOutcomeEvaluation.Evaluate,
+                    Duration.SingleBar => SingleBarAnalysisOutcomeEvaluation.Evaluate,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
             private async Task<OutcomesReportView> RunAnalysis(
                 PriceFrequency frequency,
                 IEnumerable<string> tickers,
                 UserState user,
                 Func<PriceBar[], List<AnalysisOutcome>> priceAnalysisFunc,
+                Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>> evaluationFunc,
                 bool includeGapAnalysis)
             {
-                var ticketOutcomes = new List<TickerOutcomes>();
+                var tickerOutcomes = new List<TickerOutcomes>();
                 var tickerGapViews = new List<GapsView>();
 
                 foreach(var ticker in tickers)
@@ -168,7 +112,7 @@ namespace core.Reports
 
                     var outcomes = priceAnalysisFunc(priceHistoryResponse.Success);
 
-                    ticketOutcomes.Add(new TickerOutcomes(outcomes, ticker));
+                    tickerOutcomes.Add(new TickerOutcomes(outcomes, ticker));
 
                     if (includeGapAnalysis)
                     {
@@ -177,7 +121,11 @@ namespace core.Reports
                     }
                 }
 
-                return new OutcomesReportView(ticketOutcomes, tickerGapViews);
+                return new OutcomesReportView(
+                    evaluations: evaluationFunc(tickerOutcomes),
+                    outcomes: tickerOutcomes,
+                    tickerGapViews
+                );
             }
         }
     }

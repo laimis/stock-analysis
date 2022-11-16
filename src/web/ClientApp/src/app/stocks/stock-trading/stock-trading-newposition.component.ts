@@ -71,15 +71,15 @@ export class StockTradingNewPositionComponent {
       }
     );
 
-    this.stockService.reportTickerOutcomesAllTime(ticker, true)
-      .subscribe(data => {
-        console.log(data)
-        this.outcomes = data.outcomes[0]
-        this.gaps = data.gaps[0]
-      }, error => {
-        console.error(error)
-      }
-    );
+    // this.stockService.reportTickerOutcomesAllTime(ticker, true)
+    //   .subscribe(data => {
+    //     console.log(data)
+    //     this.outcomes = data.outcomes[0]
+    //     this.gaps = data.gaps[0]
+    //   }, error => {
+    //     console.error(error)
+    //   }
+    // );
   }
 
   reset() {

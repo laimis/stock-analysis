@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AnalysisCategoryGrouping, TickerOutcomes } from '../../services/stocks.service';
+import { AnalysisOutcomeEvaluation, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-outcomes',
@@ -15,8 +15,8 @@ export class OutcomesComponent {
   outcomes: TickerOutcomes[]
 
   @Input()
-  set category(value:AnalysisCategoryGrouping) {
-    this.outcomes = value.outcomes
+  set category(value:AnalysisOutcomeEvaluation) {
+    this.outcomes = value.matchingTickers
     this.sort(value.sortColumn)
   }
 

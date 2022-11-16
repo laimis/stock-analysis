@@ -38,40 +38,13 @@ namespace web.Controllers
             return _mediator.Send(query);
         }
 
-        [HttpGet("outcomes/portfolio")]
-        public Task<OutcomesReportView> PortfolioOutcomes(
-            [FromQuery] OutcomesReport.Duration duration,
-            [FromQuery] PriceFrequency frequency,
-            [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new OutcomesReport.ForPortfolioQuery(duration, frequency, includeGapAnalysis, User.Identifier()));
-
-        [HttpGet("outcomes/ticker/{ticker}")]
-        public Task<OutcomesReportView> TickerOutcomes(
-            string ticker,
-            [FromQuery] PriceFrequency priceFrequency,
-            [FromQuery] OutcomesReport.Duration duration,
-            [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new OutcomesReport.ForTickerQuery(duration, priceFrequency, includeGapAnalysis, ticker, User.Identifier()));
-
-        [HttpPost("outcomes/tickers")]
+        [HttpPost("outcomes")]
         public Task<OutcomesReportView> TickersOutcomes(
             [FromBody]string[] tickers,
-            [FromQuery] OutcomesReport.Duration duration,
+            [FromQuery] PriceAnalysisReport.Duration duration,
             [FromQuery] PriceFrequency frequency,
             [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new OutcomesReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
-
-        [HttpGet("analysis/ticker/{ticker}")]
-        public Task<AnalysisReportView> TickerAnalysis(string ticker, [FromQuery]PriceFrequency frequency)
-            => _mediator.Send(new SingleBarAnalysisReport.ForTickerQuery(frequency, ticker, User.Identifier()));
-
-        [HttpGet("analysis/portfolio")]
-        public Task<AnalysisReportView> PortfolioAnalysis([FromQuery]PriceFrequency frequency)
-            => _mediator.Send(new SingleBarAnalysisReport.ForPortfolioQuery(frequency, User.Identifier()));
-
-        [HttpPost("analysis/tickers")]
-        public Task<AnalysisReportView> TickersAnalysis([FromBody]string[] tickers, [FromQuery] PriceFrequency frequency) =>
-            _mediator.Send(new SingleBarAnalysisReport.ForTickersQuery(frequency, tickers, User.Identifier()));
+            _mediator.Send(new PriceAnalysisReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
@@ -82,7 +55,7 @@ namespace web.Controllers
             => _mediator.Send(new GapReport.ForTickerQuery(frequency, ticker, User.Identifier()));
 
         [HttpGet("positions")]
-        public Task<AnalysisReportView> Portfolio() =>
+        public Task<OutcomesReportView> Portfolio() =>
             _mediator.Send(new PositionReport.Query(User.Identifier()));
     }
 }

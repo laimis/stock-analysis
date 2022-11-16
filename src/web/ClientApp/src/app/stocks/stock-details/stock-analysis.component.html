@@ -2,6 +2,7 @@
 
     <h3>Chart</h3>
     <app-stock-chart
+        *ngIf="prices"
         [prices]="prices"
         [positiveLines]="upGapsOpens"
         [negativeLines]="downGapsOpens"
@@ -82,13 +83,7 @@
 
     <h3>Daily Analysis Report</h3>
     <app-outcomes-analysis-report
-        [report]="dailyAnalysis"
-        [showSummary]="true">
-    </app-outcomes-analysis-report>
-
-    <h3>Weekly Analysis Report</h3>
-    <app-outcomes-analysis-report
-        [report]="weeklyAnalysis"
+        [report]="dailyOutcomesReport"
         [showSummary]="true">
     </app-outcomes-analysis-report>
     

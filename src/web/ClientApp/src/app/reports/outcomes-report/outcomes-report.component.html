@@ -6,13 +6,14 @@
     </div>
 
     <app-outcomes-analysis-report
-        [report]="dailyAnalysis"
+        [report]="singleBarReportDaily"
         [showSummary]="true"
-        title="Daily Report"></app-outcomes-analysis-report>
+        title="Daily Report">
+    </app-outcomes-analysis-report>
 
-    <app-outcomes [outcomes]="dayOutcomes" title="Day Outcomes"></app-outcomes>
+    <app-outcomes [outcomes]="singleBarReportDaily.outcomes" title="Single Bar Outcome (daily)"></app-outcomes>
 
-    <app-outcomes [outcomes]="allTimeOutcomes" title="All-Time Outcomes"></app-outcomes>
+    <app-outcomes [outcomes]="allBarsReport.outcomes" title="All Bar Outcomes (daily)"></app-outcomes>
 
     <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
 </div>
