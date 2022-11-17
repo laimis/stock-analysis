@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using core.Stocks.Services;
+using core.Stocks.Services.Analysis;
 
 namespace core.Reports.Views
-{   
+{
     public record struct TickerCountPair(string ticker, int count);
     public struct OutcomesReportView
     {

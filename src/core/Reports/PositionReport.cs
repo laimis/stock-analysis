@@ -9,7 +9,7 @@ using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using core.Stocks;
-using core.Stocks.Services;
+using core.Stocks.Services.Analysis;
 
 namespace core.Reports
 {

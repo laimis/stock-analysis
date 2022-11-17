@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
-using core.Stocks.Services;
+using core.Stocks.Services.Analysis;
 using Xunit;
 
 namespace coretests.Services

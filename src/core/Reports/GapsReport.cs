@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -8,7 +7,7 @@ using core.Reports.Views;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
-using core.Stocks.Services;
+using core.Stocks.Services.Analysis;
 
 namespace core.Reports
 {
@@ -70,8 +69,6 @@ namespace core.Reports
                 var prices = pricesResponse.Success;
 
                 var gaps = GapAnalysis.Generate(prices, 60);
-
-                // gaps.Reverse();
 
                 return new GapsView(gaps, ticker);
             }

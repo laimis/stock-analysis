@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using core.Stocks.Services;
+using core.Stocks.Services.Analysis;
 
 namespace core.Reports.Views
 {
