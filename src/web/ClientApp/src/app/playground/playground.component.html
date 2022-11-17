@@ -1,3 +1,30 @@
 <div>
-  <app-percent-change-distribution [percentChangeDistribution]="data"></app-percent-change-distribution>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Open</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Close</th>
+        <th>sma20</th>
+        <th>sma50</th>
+        <th>sma150</th>
+        <th>sma200</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of prices.prices; let i = index">
+        <td>{{p.date}}</td>
+        <td>{{p.open}}</td>
+        <td>{{p.high}}</td>
+        <td>{{p.low}}</td>
+        <td>{{p.close}}</td>
+        <td class="table-success" >{{prices.sma.sma20.values[i]}}</td>
+        <td>{{prices.sma.sma50.values[i]}}</td>
+        <td>{{prices.sma.sma150.values[i]}}</td>
+        <td>{{prices.sma.sma200.values[i]}}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

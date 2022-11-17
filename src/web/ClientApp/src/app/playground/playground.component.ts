@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StockPercentChangeResponse, StocksService } from '../services/stocks.service';
+import { Prices, StocksService } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 export class PlaygroundComponent implements OnInit {
-  data: StockPercentChangeResponse;
+  prices: Prices;
   
   constructor(private stocks:StocksService, private route: ActivatedRoute) { }
 
@@ -18,8 +18,8 @@ export class PlaygroundComponent implements OnInit {
     var ticker = this.route.snapshot.queryParamMap.get('ticker');
     console.log('ticker: ' + ticker);
     if (ticker){
-      this.stocks.reportTickerPercentChangeDistribution(ticker).subscribe(data => {
-        this.data = data
+      this.stocks.getStockPrices(ticker, 720).subscribe( prices => {
+        this.prices = prices
       });
     }
   }
