@@ -66,7 +66,7 @@
   <app-stock-trading-past     *ngIf="isActive('past')" [positions]=closed></app-stock-trading-past>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>
-  <app-brokerage-neworder     *ngIf="isActive('brokerage')" (brokerageOrderEntered)="brokerageOrderEntered()" [positions]="positions" ></app-brokerage-neworder>
+  <app-brokerage-neworder     *ngIf="isActive('brokerage')" (brokerageOrderEntered)="brokerageOrderEntered()"></app-brokerage-neworder>
   <app-brokerage-orders       *ngIf="isActive('brokerage')" [orders]=brokerageOrders (orderCancelled)="orderCancelled()"></app-brokerage-orders>
   <app-stock-position-charts  *ngIf="isActive('openreview')" [positions]=positions></app-stock-position-charts>
   <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
