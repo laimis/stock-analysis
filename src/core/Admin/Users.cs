@@ -7,7 +7,6 @@ using core.Account;
 using core.Adapters.Emails;
 using core.Shared.Adapters.CSV;
 using MediatR;
-using Newtonsoft.Json;
 
 namespace core.Admin
 {

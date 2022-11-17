@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 
 namespace core.Shared.Adapters.Cryptos
 {
@@ -11,10 +10,10 @@ namespace core.Shared.Adapters.Cryptos
         {
             price = null;
             
-            var data = listings.Data.SingleOrDefault(d => d.Symbol == token);
+            var data = listings.data.SingleOrDefault(d => d.symbol == token);
             if (data != null)
             {
-                price = new Price(data.Quote.Usd.Price);
+                price = new Price(data.quote.usd.price);
                 return true;
             }
 
@@ -23,142 +22,101 @@ namespace core.Shared.Adapters.Cryptos
     }
     public class Listings
     {
-        [JsonPropertyName("status")]
-        public Status Status { get; set; }
+        public Status status { get; set; }
 
-        [JsonPropertyName("data")]
-        public List<Datum> Data { get; set; }
+        public List<Datum> data { get; set; }
     }
 
     public partial class Datum
     {
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long id { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string name { get; set; }
 
-        [JsonPropertyName("symbol")]
-        public string Symbol { get; set; }
+        public string symbol { get; set; }
 
-        [JsonPropertyName("slug")]
-        public string Slug { get; set; }
+        public string slug { get; set; }
 
-        [JsonPropertyName("num_market_pairs")]
-        public long NumMarketPairs { get; set; }
+        public long num_market_pairs { get; set; }
 
-        [JsonPropertyName("date_added")]
-        public DateTimeOffset DateAdded { get; set; }
+        public DateTimeOffset date_added { get; set; }
 
-        [JsonPropertyName("tags")]
-        public List<string> Tags { get; set; }
+        public List<string> tags { get; set; }
 
-        [JsonPropertyName("max_supply")]
-        public long? MaxSupply { get; set; }
+        public long? max_supply { get; set; }
 
-        [JsonPropertyName("circulating_supply")]
-        public double CirculatingSupply { get; set; }
+        public double circulating_supply { get; set; }
 
-        [JsonPropertyName("total_supply")]
-        public double TotalSupply { get; set; }
+        public double total_supply { get; set; }
 
-        [JsonPropertyName("platform")]
-        public Platform Platform { get; set; }
+        public Platform platform { get; set; }
 
-        [JsonPropertyName("cmc_rank")]
-        public long CmcRank { get; set; }
+        public long cmc_rank { get; set; }
 
-        [JsonPropertyName("last_updated")]
-        public DateTimeOffset LastUpdated { get; set; }
+        public DateTimeOffset last_updated { get; set; }
 
-        [JsonPropertyName("quote")]
-        public Quote Quote { get; set; }
+        public Quote quote { get; set; }
     }
 
     public partial class Platform
     {
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long id { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string name { get; set; }
 
-        [JsonPropertyName("symbol")]
-        public string Symbol { get; set; }
+        public string symbol { get; set; }
 
-        [JsonPropertyName("slug")]
-        public string Slug { get; set; }
+        public string slug { get; set; }
 
-        [JsonPropertyName("token_address")]
-        public string TokenAddress { get; set; }
+        public string token_address { get; set; }
     }
 
     public partial class Quote
     {
-        [JsonPropertyName("USD")]
-        public Usd Usd { get; set; }
+        public Usd usd { get; set; }
     }
 
     public partial class Usd
     {
-        [JsonPropertyName("price")]
-        public decimal Price { get; set; }
+        public decimal price { get; set; }
 
-        [JsonPropertyName("volume_24h")]
-        public double Volume24H { get; set; }
+        public double volume_24h { get; set; }
 
-        [JsonPropertyName("percent_change_1h")]
-        public double PercentChange1H { get; set; }
+        public double percent_change_1h { get; set; }
 
-        [JsonPropertyName("percent_change_24h")]
-        public double PercentChange24H { get; set; }
+        public double percent_change_24h { get; set; }
 
-        [JsonPropertyName("percent_change_7d")]
-        public double PercentChange7D { get; set; }
+        public double percent_change_7d { get; set; }
 
-        [JsonPropertyName("percent_change_30d")]
-        public double PercentChange30D { get; set; }
+        public double percent_change_30d { get; set; }
 
-        [JsonPropertyName("percent_change_60d")]
-        public double PercentChange60D { get; set; }
+        public double percent_change_60d { get; set; }
 
-        [JsonPropertyName("percent_change_90d")]
-        public double PercentChange90D { get; set; }
+        public double percent_change_90d { get; set; }
 
-        [JsonPropertyName("market_cap")]
-        public double MarketCap { get; set; }
+        public double market_cap { get; set; }
 
-        [JsonPropertyName("market_cap_dominance")]
-        public double MarketCapDominance { get; set; }
+        public double market_cap_dominance { get; set; }
 
-        [JsonPropertyName("fully_diluted_market_cap")]
-        public double FullyDilutedMarketCap { get; set; }
+        public double fully_diluted_market_cap { get; set; }
 
-        [JsonPropertyName("last_updated")]
-        public DateTimeOffset LastUpdated { get; set; }
+        public DateTimeOffset last_updated { get; set; }
     }
 
     public partial class Status
     {
-        [JsonPropertyName("timestamp")]
-        public DateTimeOffset Timestamp { get; set; }
+        public DateTimeOffset timestamp { get; set; }
 
-        [JsonPropertyName("error_code")]
-        public long ErrorCode { get; set; }
+        public long error_code { get; set; }
 
-        [JsonPropertyName("error_message")]
-        public object ErrorMessage { get; set; }
+        public object error_message { get; set; }
 
-        [JsonPropertyName("elapsed")]
-        public long Elapsed { get; set; }
+        public long elapsed { get; set; }
 
-        [JsonPropertyName("credit_count")]
-        public long CreditCount { get; set; }
+        public long credit_count { get; set; }
 
-        [JsonPropertyName("notice")]
-        public object Notice { get; set; }
+        public object notice { get; set; }
 
-        [JsonPropertyName("total_count")]
-        public long TotalCount { get; set; }
+        public long total_count { get; set; }
     }
 }
