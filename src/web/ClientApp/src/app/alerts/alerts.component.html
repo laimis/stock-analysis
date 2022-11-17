@@ -20,7 +20,7 @@
         <td>{{monitor.lastSeenValue | currency}}</td>
         <td *ngIf="monitor.triggeredAlert">
           Triggered on {{monitor.triggeredAlert.when | date:'short'}}!
-          <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+          <a [routerLink]="[ '/stocks', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
         </td>
         <td *ngIf="!monitor.triggeredAlert"></td>
       </tr>
@@ -45,7 +45,7 @@
         <td>{{alert.description}}</td>
         <td>{{alert.when | date:'short'}}</td>
         <td>
-          <a [routerLink]="[ '/trading', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+          <a [routerLink]="[ '/stocks', 'newposition' ]" [queryParams]="{'ticker': alert.ticker, 'numberOfShares': alert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
         </td>
       </tr>
   </table>
