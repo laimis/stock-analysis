@@ -39,10 +39,16 @@ namespace core.Stocks.Services.Analysis
                 $"{position.UnrealizedGainPct:P}"
             );
 
+            var rrOutcomeType = position.RR switch {
+                >= 1 => OutcomeType.Positive,
+                < 0 => OutcomeType.Negative,
+                _ => OutcomeType.Neutral
+            };
+
             // rr in position
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.RR,
-                position.RR >= 1 ? OutcomeType.Positive : OutcomeType.Negative,
+                rrOutcomeType,
                 Math.Round(position.RR, 2),
                 $"{position.RR:N2}"
             );
