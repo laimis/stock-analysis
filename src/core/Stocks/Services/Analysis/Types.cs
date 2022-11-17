@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace core.Stocks.Services
+namespace core.Stocks.Services.Analysis
 {
     public enum OutcomeType { Positive, Negative, Neutral };
 

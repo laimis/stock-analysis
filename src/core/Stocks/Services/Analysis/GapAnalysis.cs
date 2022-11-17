@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 
-namespace core.Stocks.Services
+namespace core.Stocks.Services.Analysis
 {
     public class GapAnalysis
     {

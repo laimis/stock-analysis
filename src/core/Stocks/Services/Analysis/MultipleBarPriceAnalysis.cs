@@ -9,7 +9,7 @@ namespace System.Runtime.CompilerServices
     internal static class IsExternalInit {}
 }
 
-namespace core.Stocks.Services
+namespace core.Stocks.Services.Analysis
 {
     internal interface IMultipleBarPriceAnalysis
     {

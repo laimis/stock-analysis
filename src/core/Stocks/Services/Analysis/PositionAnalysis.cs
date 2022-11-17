@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace core.Stocks.Services
+namespace core.Stocks.Services.Analysis
 {
     public class PositionAnalysis
     {

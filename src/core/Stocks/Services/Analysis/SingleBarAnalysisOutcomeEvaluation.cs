@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace core.Stocks.Services
+namespace core.Stocks.Services.Analysis
 {
     public class SingleBarAnalysisOutcomeEvaluation
     {
