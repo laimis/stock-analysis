@@ -114,7 +114,7 @@ namespace iexclienttests
         {
             Assert.NotEmpty(_priceHistory);
             Assert.True(_priceHistory[0].Close > 0);
-            Assert.NotEmpty(_priceHistory[0].Date);
+            Assert.NotEmpty(_priceHistory[0].DateStr);
         }
     }
 }

@@ -278,15 +278,14 @@ public class TDAmeritradeClient : IBrokerage
             throw new Exception($"Null candles for historcal prices for {ticker} {start} {end}");
         }
 
-        var payload = prices.candles.Select(c => new PriceBar
-        {
-            Close = c.close,
-            High = c.high,
-            Low = c.low,
-            Open = c.open,
-            Date = DateTimeOffset.FromUnixTimeMilliseconds(c.datetime).ToString("yyyy-MM-dd"),
-            Volume = c.volume
-        }).ToArray();
+        var payload = prices.candles.Select(c => new PriceBar(
+            close: c.close,
+            high: c.high,
+            low: c.low,
+            open: c.open,
+            date: DateTimeOffset.FromUnixTimeMilliseconds(c.datetime),
+            volume: c.volume
+        )).ToArray();
 
         if (payload.Length == 0)
         {

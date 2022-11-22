@@ -25,7 +25,10 @@ namespace core.Stocks
         public int DaysHeld => Opened != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value)).TotalDays : 0;
         public decimal Cost { get; private set; } = 0;
         public decimal Profit { get; private set; } = 0;
-        public decimal GainPct => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare;
+        public decimal GainPct => Math.Round(
+            (AverageSaleCostPerShare - AverageBuyCostPerShare) * 100 / AverageBuyCostPerShare,
+            2);
+            
         public decimal RR => RiskedAmount switch {
             not null => Profit / RiskedAmount.Value + (UnrealizedRR.HasValue ? UnrealizedRR.Value : 0),
             _ => 0

@@ -64,7 +64,7 @@ namespace core.Stocks.Services.Analysis
             );
 
              // if low is within 30 days, theb add negative outcome
-            var lowestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(lowest.DateParsed).TotalDays, 0);
+            var lowestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(lowest.Date).TotalDays, 0);
             var lowestPriceDaysAgoOutcomeType = lowestPriceDaysAgo <= 30 ? OutcomeType.Negative : OutcomeType.Neutral;
             
             yield return new AnalysisOutcome(
@@ -92,7 +92,7 @@ namespace core.Stocks.Services.Analysis
             );
 
             // if high is within 30 days, theb add negative outcome
-            var highestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(highest.DateParsed).TotalDays, 0);
+            var highestPriceDaysAgo =  (decimal)Math.Round(DateTimeOffset.Now.Subtract(highest.Date).TotalDays, 0);
             var highestPriceDaysAgoOutcomeType = highestPriceDaysAgo <= 30 ? OutcomeType.Positive : OutcomeType.Neutral;
             
             yield return new AnalysisOutcome(

@@ -13,12 +13,13 @@ namespace coretests.Stocks
             var prices = new PriceBar[504];
             for (var i = 0; i < 504; i++)
             {
-                prices[i] = new PriceBar
-                {
-                    Date = $"2020-01-{i + 1}",
-                    Close = i + 1,
-                    Volume = i + 1
-                };
+                prices[i] = new PriceBar(
+                    date: System.DateTimeOffset.Parse($"2020-01-{i + 1}"),
+                    open: i + 1,
+                    high: i + 1,
+                    low: i + 1,
+                    close: i + 1,
+                    volume: 1000);
             }
 
             var view = new PricesView(prices);

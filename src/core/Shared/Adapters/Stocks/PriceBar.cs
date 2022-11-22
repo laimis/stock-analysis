@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace core.Shared.Adapters.Stocks
@@ -13,15 +12,26 @@ namespace core.Shared.Adapters.Stocks
     
     public struct PriceBar : IEquatable<PriceBar>
     {
-        public string Date { get; set; }
-        public DateTimeOffset DateParsed => DateTimeOffset.Parse(Date);
-        public decimal Close { get; set; }
-        public decimal High { get; set; }
-        public decimal Low { get; set; }
-        public decimal Open { get; set; }
-        public decimal Volume { get; set; }
+        public PriceBar(DateTimeOffset date, decimal open, decimal high, decimal low, decimal close, long volume)
+        {
+            Date = date;
+            DateStr = date.ToString("yyyy-MM-dd");
+            Open = open;
+            High = high;
+            Low = low;
+            Close = close;
+            Volume = volume;
+        }
 
-        public bool Equals(PriceBar other) => Date == other.Date;
+        public string DateStr { get; }
+        public DateTimeOffset Date { get; }
+        public decimal Close { get; }
+        public decimal High { get; }
+        public decimal Low { get; }
+        public decimal Open { get; }
+        public decimal Volume { get; }
+
+        public bool Equals(PriceBar other) => DateStr == other.DateStr;
 
         public override bool Equals(object obj) => obj is PriceBar other && Equals(other);
 

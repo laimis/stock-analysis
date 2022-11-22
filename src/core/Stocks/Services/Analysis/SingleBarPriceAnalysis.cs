@@ -100,12 +100,7 @@ namespace core.Stocks.Services.Analysis
                 x => x.bar.Equals(currentBar)
             );
 
-            var gapPct = gap.bar.Date switch {
-                not null => gap.gapSizePct,
-                _ => 0m
-            };
-
-            var gapType = gapPct switch {
+            var gapType = gap.gapSizePct switch {
                 > 0m => OutcomeType.Positive,
                 < 0m => OutcomeType.Negative,
                 _ => OutcomeType.Neutral
@@ -115,8 +110,8 @@ namespace core.Stocks.Services.Analysis
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.GapPercentage,
                 type: gapType,
-                value: gapPct,
-                message: $"Gap is {gapPct}%.");
+                value: gap.gapSizePct,
+                message: $"Gap is {gap.gapSizePct}%.");
 
             // see if the latest bar is a new high or new low
             var newHigh = prices.Take(prices.Length - 1).All(x => x.High < currentBar.High);

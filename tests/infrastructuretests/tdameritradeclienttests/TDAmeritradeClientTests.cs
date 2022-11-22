@@ -42,7 +42,7 @@ namespace tdameritradeclienttests
             Assert.True(orders[0].Low > 0);
             Assert.True(orders[0].Open > 0);
             Assert.True(orders[0].Volume > 0);
-            Assert.Equal(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"), orders[orders.Length - 1].Date);
+            Assert.Equal(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"), orders[orders.Length - 1].DateStr);
         }
     }
 }
