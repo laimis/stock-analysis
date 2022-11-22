@@ -11,10 +11,11 @@ namespace coretests.Stocks
         {
             // generate a set of 504 prices from o to 504 increasing by one each day
             var prices = new PriceBar[504];
+            var baseDate = new System.DateTimeOffset(2020, 1, 1, 0, 0, 0, System.TimeSpan.Zero);
             for (var i = 0; i < 504; i++)
             {
                 prices[i] = new PriceBar(
-                    date: System.DateTimeOffset.Parse($"2020-01-{i + 1}"),
+                    date: baseDate.AddDays(i),
                     open: i + 1,
                     high: i + 1,
                     low: i + 1,

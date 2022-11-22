@@ -32,10 +32,10 @@ namespace coretests.Stocks
         public void MaxWinAmountCorrect() => Assert.Equal(10m, _performance.MaxWinAmount);
 
         [Fact]
-        public void WinAvgReturnPctCorrect() => Assert.Equal(0.1m, _performance.WinAvgReturnPct);
+        public void WinAvgReturnPctCorrect() => Assert.Equal(10m, _performance.WinAvgReturnPct);
 
         [Fact]
-        public void WinMaxReturnPctCorrect() => Assert.Equal(0.1m, _performance.WinMaxReturnPct);
+        public void WinMaxReturnPctCorrect() => Assert.Equal(10m, _performance.WinMaxReturnPct);
 
         [Fact]
         public void WinAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.WinAvgDaysHeld);
@@ -47,10 +47,10 @@ namespace coretests.Stocks
         public void LossMaxAmountCorrect() => Assert.Equal(10m, _performance.MaxLossAmount);
 
         [Fact]
-        public void LossAvgReturnPctCorrect() => Assert.Equal(0.1m, _performance.LossAvgReturnPct);
+        public void LossAvgReturnPctCorrect() => Assert.Equal(10m, _performance.LossAvgReturnPct);
         
         [Fact]
-        public void LossMaxReturnPctCorrect() => Assert.Equal(0.1m, _performance.LossMaxReturnPct);
+        public void LossMaxReturnPctCorrect() => Assert.Equal(10m, _performance.LossMaxReturnPct);
 
         [Fact]
         public void LossAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.LossAvgDaysHeld);
