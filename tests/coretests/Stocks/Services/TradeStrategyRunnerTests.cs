@@ -4,7 +4,7 @@ using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
-using core.Stocks.Services;
+using core.Stocks.Services.Trading;
 using Moq;
 using Xunit;
 
@@ -32,14 +32,17 @@ namespace coretests.Stocks.Services
             mock.Setup(x => x.GetPriceHistory(It.IsAny<UserState>(), It.IsAny<string>(), It.IsAny<PriceFrequency>(), It.IsAny<System.DateTimeOffset>(), It.IsAny<System.DateTimeOffset>()))
                 .ReturnsAsync(new ServiceResponse<PriceBar[]>(prices.ToArray()));
 
-            var runner = new TradeStrategyRunner(mock.Object);
+            var runner = new TradingStrategyRunner(mock.Object);
+            var func = TradingStrategyFactory.Create();
+
             var result = await runner.RunAsync(
                 new UserState(),
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
                 ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow);
+                when: System.DateTimeOffset.UtcNow,
+                func);
 
             Assert.True(result.IsClosed);
             Assert.Equal(1005, result.Profit);
