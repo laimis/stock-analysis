@@ -216,7 +216,7 @@ var routes: Routes = [
     HttpClientModule,
     FormsModule,
     NgChartsModule,
-    RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })
+    RouterModule.forRoot(routes, { })
   ],
   providers: [
     { provide: "windowObject", useValue: window},
