@@ -6,6 +6,18 @@ if ([System.String]::IsNullOrEmpty($message))
     exit
 }
 
+# ensure that the project can build by invoking npm run build:production
+# in src/web/ClientApp directory
+
+push-location "src/web/ClientApp"
+invoke-expression "npm run build:production"
+$exitCode = $LASTEXITCODE
+pop-location
+if ($exitCode -ne 0) {
+    write-host "Release prep failed"
+    exit
+}
+
 # make sure garbage collection is not in progress
 $garbageCollection = $true
 while ($garbageCollection) {

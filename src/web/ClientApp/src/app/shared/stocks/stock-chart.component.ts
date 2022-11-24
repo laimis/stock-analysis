@@ -150,7 +150,7 @@ export class StockChartComponent implements OnInit {
   toAnnotation(transaction: PriceWithDate, color: string) : AnnotationOptions {
     return {
       type: 'point',
-      xValue: transaction.when.split("T")[0],
+      xValue: transaction.date,
       yValue: transaction.price,
       backgroundColor: color,
       radius: 3

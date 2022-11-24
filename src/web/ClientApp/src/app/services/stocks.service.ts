@@ -734,18 +734,18 @@ export interface StockTradingPositions {
 }
 
 export interface PriceWithDate {
-  price: number
-  when: string
+  price: number,
+  date: string
 }
 export interface PositionTransaction {
   numberOfShares: number,
   price: number,
   type: string,
-  when: string,
+  date: string,
 }
 
 export interface PositionEvent {
-  when: string,
+  date: string,
   value: number | null,
   type: string,
   description: string,

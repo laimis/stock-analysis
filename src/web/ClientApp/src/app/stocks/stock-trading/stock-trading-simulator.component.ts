@@ -176,7 +176,7 @@ export class StockTradingSimulatorComponent implements OnInit {
           stopPrice: p.stopPrice,
           price: t.price,
           numberOfShares: t.numberOfShares,
-          date: t.when,
+          date: t.date,
           notes: null
         }
         this.initialPosition(cmd)
@@ -185,7 +185,7 @@ export class StockTradingSimulatorComponent implements OnInit {
       else {
         this.price = t.price
         this.quantity = t.numberOfShares
-        this.date = t.when
+        this.date = t.date
         this.addTransaction(t.type)
       }
     })

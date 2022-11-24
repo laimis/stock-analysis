@@ -4,8 +4,14 @@ using System.Linq;
 
 namespace core.Stocks
 {
-    public record struct PositionEvent (string description, string type, decimal? value, DateTimeOffset when);
-    public record struct PositionTransaction(decimal numberOfShares, decimal price, Guid transactionId, string type, DateTimeOffset when);
+    public record struct PositionEvent (string description, string type, decimal? value, DateTimeOffset when)
+    {
+        public string Date => when.ToString("yyyy-MM-dd");
+    }
+    public record struct PositionTransaction(decimal numberOfShares, decimal price, Guid transactionId, string type, DateTimeOffset when)
+    {
+        public string Date => when.ToString("yyyy-MM-dd");
+    }
 
     // PositionInstance models a stock position from the time the first share is opened
     // to the time when the last share is sold.
