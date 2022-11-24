@@ -7,22 +7,22 @@
       <div class="col"><div class="stat-label">Losses</div><div>{{performance.recent.losses}}</div></div>
       <div class="col"><div class="stat-label">Win %</div><div>{{performance.recent.wins / performance.recent.total | percent:'1.2'}}</div></div>
       <div class="col"><div class="stat-label">Avg Days Held</div><div>{{performance.recent.avgDaysHeld | number:'1.0-0'}}</div></div>
-      <div class="col"><div class="stat-label">Return %</div><div>{{performance.recent.avgReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Return %</div><div>{{performance.recent.avgReturnPct | number:'1.0-0'}}</div></div>
     </div>
 
     <div class="row mb-2">
       <div class="col"><div class="stat-label">Avg Win</div><div>{{performance.recent.avgWinAmount | currency}}</div></div>
       <div class="col"><div class="stat-label">Max Win</div><div>{{performance.recent.maxWinAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Avg % Return Wins</div><div>{{performance.recent.winAvgReturnPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Max % Return Wins</div><div>{{performance.recent.winMaxReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Avg % Return Wins</div><div>{{performance.recent.winAvgReturnPct | number:'1.0-2'}}</div></div>
+      <div class="col"><div class="stat-label">Max % Return Wins</div><div>{{performance.recent.winMaxReturnPct | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">Avg Win Days Held</div><div>{{performance.recent.winAvgDaysHeld | number:'1.0-0'}}</div></div>
     </div>
 
     <div class="row mb-2">
       <div class="col"><div class="stat-label">Avg Loss</div><div>{{performance.recent.avgLossAmount | currency}}</div></div>
       <div class="col"><div class="stat-label">Max Loss</div><div>{{performance.recent.maxLossAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Avg % Return Losses</div><div>{{performance.recent.lossAvgReturnPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Max % Return Losses</div><div>{{performance.recent.lossMaxReturnPct | percent}}</div></div>
+      <div class="col"><div class="stat-label">Avg % Return Losses</div><div>{{performance.recent.lossAvgReturnPct | number:'1.0-0'}}</div></div>
+      <div class="col"><div class="stat-label">Max % Return Losses</div><div>{{performance.recent.lossMaxReturnPct | number:'1.0-0'}}</div></div>
       <div class="col"><div class="stat-label">Avg Loss Days Held</div><div>{{performance.recent.lossAvgDaysHeld | number:'1.0-0'}}</div></div>
     </div>
 
