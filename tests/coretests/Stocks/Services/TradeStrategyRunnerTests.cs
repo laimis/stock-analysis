@@ -10,10 +10,12 @@ using Xunit;
 
 namespace coretests.Stocks.Services
 {
-    public class TradeStrategyRunnerTests
+    public class TradingStrategyRunnerTests
     {
-        [Fact]
-        public async Task RunAsync()
+        private TradingStrategyRunner _runner;
+        private ITradingStrategy _func;
+
+        public TradingStrategyRunnerTests()
         {
             var prices = new List<PriceBar>();
             for(var i = 0; i < 100; i++)
@@ -32,21 +34,44 @@ namespace coretests.Stocks.Services
             mock.Setup(x => x.GetPriceHistory(It.IsAny<UserState>(), It.IsAny<string>(), It.IsAny<PriceFrequency>(), It.IsAny<System.DateTimeOffset>(), It.IsAny<System.DateTimeOffset>()))
                 .ReturnsAsync(new ServiceResponse<PriceBar[]>(prices.ToArray()));
 
-            var runner = new TradingStrategyRunner(mock.Object);
-            var func = TradingStrategyFactory.Create("strategy");
+            _runner = new TradingStrategyRunner(mock.Object);
+            _func = TradingStrategyFactory.Create("strategy");
+        }
 
-            var result = await runner.RunAsync(
+        [Fact]
+        public async Task BasicTest()
+        {
+            var result = await _runner.RunAsync(
                 new UserState(),
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
                 ticker: "tsla",
                 when: System.DateTimeOffset.UtcNow,
-                func);
+                _func);
 
             Assert.True(result.IsClosed);
             Assert.Equal(1005, result.Profit);
             Assert.Equal(100.50m, result.GainPct);
+            Assert.Equal(2.01m, result.RR);
+        }
+
+        [Fact]
+        public async Task WithPortionSizeTooSmall_StillSellsAtRRLevels()
+        {
+            var result = await _runner.RunAsync(
+                new UserState(),
+                numberOfShares: 2,
+                price: 10,
+                stopPrice: 5,
+                ticker: "tsla",
+                when: System.DateTimeOffset.UtcNow,
+                _func);
+
+            Assert.True(result.IsClosed);
+            Assert.Equal(15, result.Profit);
+            Assert.Equal(75.0m, result.GainPct);
+            Assert.Equal(1.5m, result.RR);
         }
     }
 }

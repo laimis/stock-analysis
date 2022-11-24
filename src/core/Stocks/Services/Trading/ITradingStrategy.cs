@@ -45,9 +45,20 @@ namespace core.Stocks.Services.Trading
 
             bool r1SellHappened = false, r2SellHappened = false;
             var sellPortion = (int)position.NumberOfShares / 3;
+            // for positions with less than 3 shares, selling portion
+            // is a minimum that can be sold, ie 1
+            if (sellPortion == 0)
+            {
+                sellPortion = 1;
+            }
 
             foreach(var bar in prices)
             {
+                if (position.IsClosed)
+                {
+                    break;
+                }
+                
                 // if stop is reached, sell at the close price
                 if (bar.Close <= position.StopPrice.Value)
                 {
