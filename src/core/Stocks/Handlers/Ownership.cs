@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,10 +44,6 @@ namespace core.Stocks
                     return null;
                 }
 
-                var transactions = stock.State.Transactions.Where(t => !t.IsPL)
-                    .OrderByDescending(t => t.Date)
-                    .ToList();
-
                 var priceResponse = await _stocksService.GetPrice(query.Ticker);
 
                 if (stock.State.OpenPosition != null && priceResponse.IsOk)
@@ -55,8 +52,8 @@ namespace core.Stocks
                 }
 
                 return stock.State.OpenPosition switch {
-                    null => new StockOwnershipView(id: stock.State.Id, position: null, ticker: stock.State.Ticker, transactions: transactions), 
-                    not null => new StockOwnershipView(id: stock.State.Id, position: stock.State.OpenPosition, ticker: stock.State.Ticker, transactions: transactions)
+                    null => new StockOwnershipView(id: stock.State.Id, currentPosition: null, ticker: stock.State.Ticker, positions: stock.State.Positions), 
+                    not null => new StockOwnershipView(id: stock.State.Id, currentPosition: stock.State.OpenPosition, ticker: stock.State.Ticker, positions: stock.State.Positions)
                 };
             }
         }

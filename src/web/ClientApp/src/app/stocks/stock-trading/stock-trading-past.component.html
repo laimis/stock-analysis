@@ -23,7 +23,7 @@
         <td>
           <span *ngIf="p.profit >= 0" class="badge bg-success me-1">win</span>
           <span *ngIf="p.profit < 0" class="badge bg-warning me-1">loss</span>
-          {{p.gainPct | percent}}
+          {{p.gainPct | number:'1.0-2' }}%
         </td>
         <td>{{p.daysHeld}}</td>
       </tr>

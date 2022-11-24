@@ -110,10 +110,10 @@ namespace coretests.Stocks
 
             Assert.Null(stock.State.OpenPosition);
 
-            Assert.Single(stock.State.ClosedPositions);
-            Assert.Equal(0, stock.State.ClosedPositions[0].DaysHeld);
-            Assert.Equal(1, stock.State.ClosedPositions[0].Profit);
-            Assert.Equal(4m, stock.State.ClosedPositions[0].GainPct, 2);
+            Assert.Single(stock.State.Positions);
+            Assert.Equal(0, stock.State.Positions[0].DaysHeld);
+            Assert.Equal(1, stock.State.Positions[0].Profit);
+            Assert.Equal(4m, stock.State.Positions[0].GainPct, 2);
         }
 
         [Fact]

@@ -85,7 +85,7 @@ namespace core.Portfolio
                     .SelectMany(g => g)
                     .ToList();
 
-                var closedPositions = stocks.SelectMany(s => s.State.ClosedPositions)
+                var closedPositions = stocks.SelectMany(s => s.State.Positions)
                     .Where(p => p.Closed >= request.Start && p.Closed <= request.End)
                     .ToList();
 

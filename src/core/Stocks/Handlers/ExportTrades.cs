@@ -46,7 +46,7 @@ namespace core.Stocks
 
                 var trades = request.ExportType switch {
                     ExportType.Open => stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition),
-                    ExportType.Closed => stocks.SelectMany(s => s.State.ClosedPositions),
+                    ExportType.Closed => stocks.SelectMany(s => s.State.Positions).Where(p => p.IsClosed),
                     _ => throw new NotImplementedException()
                 };
 

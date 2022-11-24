@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -54,7 +55,12 @@ namespace core.Portfolio
                     throw new Exception($"Stock {request.Ticker} not found");
                 }
 
-                var position = stock.State.ClosedPositions[request.PositionId];
+                var position = stock.State.Positions.Where(p => p.PositionId == request.PositionId).FirstOrDefault();
+                if (position == null)
+                {
+                    throw new Exception($"Position {request.PositionId} not found");
+                }
+                
                 if (position.FirstStop == null)
                 {
                     throw new Exception("Position has no stop");

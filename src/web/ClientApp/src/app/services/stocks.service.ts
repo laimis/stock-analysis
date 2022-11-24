@@ -612,8 +612,8 @@ export interface StockOwnership {
   id: string
   ticker: string
   price: number
-  position: PositionInstance,
-  transactions: Transaction[]
+  currentPosition: PositionInstance
+  positions: PositionInstance[]
 }
 
 export interface TickerOutcomes {
@@ -742,6 +742,8 @@ export interface PositionTransaction {
   price: number,
   type: string,
   date: string,
+  ageInDays: number
+  transactionId: string
 }
 
 export interface PositionEvent {

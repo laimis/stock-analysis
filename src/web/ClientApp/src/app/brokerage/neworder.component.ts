@@ -42,8 +42,8 @@ export class BrokerageNewOrderComponent {
 
         this.stockService.getStockOwnership(ticker).subscribe(
           ownership => {
-            if (ownership.position) {
-              this.numberOfShares = ownership.position.numberOfShares
+            if (ownership.currentPosition) {
+              this.numberOfShares = ownership.currentPosition.numberOfShares
             }
           }
         )

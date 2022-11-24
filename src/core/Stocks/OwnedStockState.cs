@@ -14,7 +14,7 @@ namespace core.Stocks
         public List<Transaction> Transactions { get; } = new List<Transaction>();
         internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
         
-        public List<PositionInstance> ClosedPositions { get; } = new List<PositionInstance>();
+        public List<PositionInstance> Positions { get; } = new List<PositionInstance>();
         public PositionInstance OpenPosition { get; private set;}
 
         internal void ApplyInternal(TickerObtained o)
@@ -54,7 +54,8 @@ namespace core.Stocks
 
             if (OpenPosition == null)
             {
-                OpenPosition = new PositionInstance(ClosedPositions.Count, purchased.Ticker);
+                OpenPosition = new PositionInstance(Positions.Count, purchased.Ticker);
+                Positions.Add(OpenPosition);
             }
 
             OpenPosition.Buy(numberOfShares: purchased.NumberOfShares, price: purchased.Price, transactionId: purchased.Id, when: purchased.When, notes: purchased.Notes);
@@ -82,7 +83,7 @@ namespace core.Stocks
         {
             OpenPosition = null;
             BuyOrSell.Clear();
-            ClosedPositions.Clear();
+            Positions.Clear();
             Transactions.Clear();
         }
 
@@ -173,7 +174,6 @@ namespace core.Stocks
 
             if (OpenPosition.NumberOfShares == 0)
             {
-                ClosedPositions.Add(OpenPosition);
                 OpenPosition = null;
             }
         }

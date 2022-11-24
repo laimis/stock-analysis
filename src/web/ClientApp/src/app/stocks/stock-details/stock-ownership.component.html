@@ -2,20 +2,20 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-  <div *ngIf="ownership && !ownership.position">
+  <div *ngIf="ownership && !ownership.currentPosition">
     Current price: <b>{{stock.price | currency}}</b>
   </div>
 
-  <div *ngIf="ownership && ownership.position" class="mt-4">
+  <div *ngIf="ownership && ownership.currentPosition" class="mt-4">
     <div class="row">
       <div class="col">
-        Ownership: <b>{{ownership.position.numberOfShares}}</b> @ <b>{{ownership.position.averageCostPerShare | currency}}</b> ({{(stock.price - ownership.position.averageCostPerShare) / stock.price | percent}})
+        Ownership: <b>{{ownership.currentPosition.numberOfShares}}</b> @ <b>{{ownership.currentPosition.averageCostPerShare | currency}}</b> ({{(stock.price - ownership.currentPosition.averageCostPerShare) / stock.price | percent}})
       </div>
       <div class="col">
         Current price: <b>{{stock.price | currency}}</b>
       </div>
       <div class="col">
-        <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target)" value="{{ownership.position.category}}">
+        <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target)" value="{{ownership.currentPosition.category}}">
           <option value="">Select Category</option>
           <option value="longterm">Long-Term</option>
           <option value="shortterm">Short-Term</option>
@@ -25,28 +25,30 @@
     </div>
   </div>
 
-  <app-stock-trading-position *ngIf="ownership && ownership.position" [position]="ownership.position"></app-stock-trading-position>
+  <app-stock-trading-position *ngIf="ownership && ownership.currentPosition" [position]="ownership.currentPosition"></app-stock-trading-position>
 
-	<div *ngIf="ownership && ownership.transactions.length > 0">
-    <div class="mt-4">
-      <div class="text-muted">Past Transactions</div>
+	<div *ngIf="ownership && ownership.positions.length > 0">
+    <div class="mt-4" *ngFor="let p of ownership.positions">
+      <!-- <div class="text-muted">Past Transactions</div> -->
       <table class="table table-striped border">
         <thead class="thead-light">
           <tr>
             <th>Date</th>
-            <th>Description</th>
+            <th>Price</th>
+            <th>Number of Shares</th>
             <th>Amount</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr
-            [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount == 0}"
-            *ngFor="let t of ownership.transactions">
+            [ngClass]="{'table-success': t.type === 'buy', 'table-warning': t.type === 'sell'}"
+            *ngFor="let t of p.transactions">
             <td>{{ t.date | date:'shortDate'}} - {{ t.ageInDays }} days ago</td>
-            <td>{{ t.description }}</td>
-            <td>{{ t.amount | currency }}</td>
-            <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.eventId)"></i></td>
+            <td>{{ t.price | currency }}</td>
+            <td>{{ t.numberOfShares }}</td>
+            <td>{{ t.numberOfShares * t.price | currency }}</td>
+            <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.transactionId)"></i></td>
           </tr>
         </tbody>
       </table>
