@@ -7,6 +7,7 @@ using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks;
 using core.Stocks.Services.Trading;
+using MediatR;
 
 namespace core.Portfolio
 {
@@ -27,7 +28,37 @@ namespace core.Portfolio
             public string Ticker { get; }
         }
 
-        public class Handler : HandlerWithStorage<Command, PositionInstance>
+        public class ForTicker : RequestWithUserId<PositionInstance>
+        {
+            public ForTicker(
+                DateTimeOffset date,
+                decimal numberOfShares,
+                decimal price,
+                decimal stopPrice,
+                string strategyName,
+                string ticker,
+                Guid userId)
+            {
+                Date = date;
+                NumberOfShares = numberOfShares;
+                Price = price;
+                StopPrice = stopPrice;
+                StrategyName = strategyName;
+                Ticker = ticker;
+                UserId = userId;
+            }
+
+            public DateTimeOffset Date { get; }
+            public decimal NumberOfShares { get; }
+            public decimal Price { get; }
+            public decimal StopPrice { get; }
+            public string StrategyName { get; }
+            public string Ticker { get; }
+        }
+
+        public class Handler
+            : HandlerWithStorage<Command, PositionInstance>,
+            IRequestHandler<ForTicker, PositionInstance>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
@@ -39,6 +70,28 @@ namespace core.Portfolio
             {
                 _accounts = accounts;
                 _brokerage = brokerage;
+            }
+
+            public async Task<PositionInstance> Handle(ForTicker request, CancellationToken cancellationToken)
+            {
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                var runner = new TradingStrategyRunner(_brokerage);
+                var strategy = TradingStrategyFactory.Create(request.StrategyName);
+
+                return await runner.RunAsync(
+                    user.State,
+                    numberOfShares: request.NumberOfShares,
+                    price: request.Price,
+                    stopPrice: request.StopPrice,
+                    ticker: request.Ticker,
+                    when: request.Date,
+                    strategy: strategy
+                );
             }
 
             public override async Task<PositionInstance> Handle(Command request, CancellationToken cancellationToken)

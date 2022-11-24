@@ -28,7 +28,13 @@ namespace core.Stocks.Services.Trading
             positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
             positionInstance.SetStopPrice(stopPrice, when);
 
-            var prices = await _brokerage.GetPriceHistory(user, ticker, Shared.Adapters.Stocks.PriceFrequency.Daily, when, when.AddDays(365));
+            var prices = await _brokerage.GetPriceHistory(
+                user,
+                ticker,
+                Shared.Adapters.Stocks.PriceFrequency.Daily,
+                when,
+                when.AddDays(365));
+            
             if (!prices.IsOk)
             {
                 throw new Exception("Failed to get price history");

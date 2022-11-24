@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
@@ -55,6 +56,26 @@ namespace web.Controllers
             
             _mediator.Send(
                 new SimulateTrade.Command(positionId, strategyName, ticker, User.Identifier())
+            );
+
+        [HttpGet("{ticker}/trading/{stategyName}")]
+        public Task<PositionInstance> Trade(
+            string strategyName,
+            string ticker,
+            decimal numberOfShares,
+            decimal price,
+            decimal stopPrice,
+            string when) =>
+            
+            _mediator.Send(
+                new SimulateTrade.ForTicker(
+                    DateTimeOffset.Parse(when),
+                    numberOfShares,
+                    price,
+                    stopPrice,
+                    strategyName,
+                    ticker,
+                    User.Identifier())
             );
     }
 }
