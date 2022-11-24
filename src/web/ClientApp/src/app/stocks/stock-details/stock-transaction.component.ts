@@ -3,7 +3,7 @@ import { StocksService, GetErrors, stocktransactioncommand } from '../../service
 import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'stock-transaction',
+  selector: 'app-stock-transaction',
   templateUrl: './stock-transaction.component.html',
   styleUrls: ['./stock-transaction.component.css'],
   providers: [DatePipe]

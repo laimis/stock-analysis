@@ -6,16 +6,16 @@
         <button type="button" class="btn btn-secondary" (click)="openPosition(violation.ticker)">Open Position</button>
 
         <div>
-          <stock-transaction
-            *ngIf="activeTicker == violation.ticker && fixType ==='transaction'"
+          <app-stock-transaction
+            *ngIf="activeTicker === violation.ticker && fixType === 'transaction'"
             [ticker]="activeTicker"
             [numberOfShares]="violation.numberOfShares"
             [pricePerShare]="violation.pricePerShare"
             (transactionFailed)="transactionFailed($event)"
             (transactionRecorded)="transactionRecorded($event)">
-          </stock-transaction>
+          </app-stock-transaction>
           <app-stock-newposition
-            *ngIf="activeTicker == violation.ticker && fixType ==='position'"
+            *ngIf="activeTicker === violation.ticker && fixType === 'position'"
             [setTicker]="violation.ticker"
             (stockPurchased)="transactionRecorded($event)">
           </app-stock-newposition>
@@ -23,7 +23,7 @@
       </li>
     </ul>
 
-    <span *ngIf="violations.length==0">
+    <span *ngIf="violations.length === 0">
       You have no violations.
     </span>
 </div>
