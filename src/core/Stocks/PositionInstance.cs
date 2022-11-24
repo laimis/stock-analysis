@@ -166,6 +166,7 @@ namespace core.Stocks
         {
             StopPrice = null;
             RiskedAmount = null;
+            RRLevels.Clear();
 
             Events.Add(new PositionEvent("Stop price deleted", "stop", null, when));
         }
