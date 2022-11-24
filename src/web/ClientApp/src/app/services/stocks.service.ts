@@ -57,6 +57,12 @@ export class StocksService {
     return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
   }
 
+  simulatePosition(ticker: string, positionId: number): Observable<PositionInstance> {
+    return this.http.get<PositionInstance>(
+      `/api/portfolio/${ticker}/positions/${positionId}/simulate/default`
+    )
+  }
+
   smsOff(): Observable<any> {
     return this.http.post<any>('/api/alerts/sms/off', {})
   }
@@ -502,7 +508,7 @@ export class OwnedOption {
 }
 
 export interface PriceBar {
-  date: string
+  dateStr: string
   close: number
   open: number
   high: number
@@ -746,6 +752,7 @@ export interface PositionEvent {
 }
 
 export interface PositionInstance {
+  positionId: number,
   averageBuyCostPerShare: number,
   averageCostPerShare: number,
   averageSaleCostPerShare: number,

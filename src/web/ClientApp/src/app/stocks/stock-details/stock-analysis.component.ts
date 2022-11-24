@@ -48,14 +48,14 @@ export class StockAnalysisComponent {
       this.gaps = report.gaps[0];
       this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => {
         return {
-          when: g.bar.date,
+          when: g.bar.dateStr,
           price: g.bar.open
         }
       })
       this.upGapsOpens = this.upGaps.map(g => g.price);
       this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => {
         return {
-          when: g.bar.date,
+          when: g.bar.dateStr,
           price: g.bar.open
         }
       })

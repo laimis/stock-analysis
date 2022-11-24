@@ -135,7 +135,7 @@ export class StockChartComponent implements OnInit {
 
     this.lineChartData = data.concat(sma_data)
 
-    this.lineChartLabels = prices.prices.map(x => x.date).slice(-cutoff)
+    this.lineChartLabels = prices.prices.map(x => x.dateStr).slice(-cutoff)
 
     var minPrice = Math.min.apply(null, closes)
     this.lineChartOptions.scales.y.min = minPrice - minPrice * 0.1

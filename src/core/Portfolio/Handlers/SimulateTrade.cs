@@ -51,7 +51,7 @@ namespace core.Portfolio
                 var stock = await _storage.GetStock(ticker: request.Ticker, userId: request.UserId);
                 if (stock == null)
                 {
-                    throw new Exception("Stock not found");
+                    throw new Exception($"Stock {request.Ticker} not found");
                 }
 
                 var position = stock.State.ClosedPositions[request.PositionId];

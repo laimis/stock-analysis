@@ -65,6 +65,7 @@ namespace core.Stocks.Services.Trading
                 if (!r2SellHappened && bar.High > position.GetRRLevel(1))
                 {
                     position.Sell(sellPortion, position.GetRRLevel(1).Value, Guid.NewGuid(), bar.Date);
+                    position.SetStopPrice(position.GetRRLevel(0).Value, bar.Date);
                     r2SellHappened = true;
                 }
 

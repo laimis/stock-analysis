@@ -47,11 +47,11 @@ namespace web.Controllers
             return await _mediator.Send(cmd);
         }
 
-        [HttpGet("positions/{ticker}/{positionId}/simulate/{stategyName}")]
+        [HttpGet("{ticker}/positions/{positionId}/simulate/{stategyName}")]
         public Task<PositionInstance> Trade(
-            [FromQuery]int positionId,
-            [FromQuery]string strategyName,
-            [FromQuery]string ticker) =>
+            int positionId,
+            string strategyName,
+            string ticker) =>
             
             _mediator.Send(
                 new SimulateTrade.Command(positionId, strategyName, ticker, User.Identifier())
