@@ -23,7 +23,7 @@ namespace core.Stocks.Services.Trading
             DateTimeOffset when,
             ITradingStrategy strategy)
         {
-            var positionInstance = new PositionInstance(ticker);
+            var positionInstance = new PositionInstance(0, ticker);
 
             positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
             positionInstance.SetStopPrice(stopPrice, when);

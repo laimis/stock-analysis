@@ -10,7 +10,7 @@ namespace coretests.Stocks
 
         public PositionInstanceWithExplicitStopPriceTests()
         {
-            _position = new PositionInstance("TSLA");
+            _position = new PositionInstance(0, "TSLA");
 
             _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             _position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());

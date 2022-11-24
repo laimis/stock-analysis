@@ -33,7 +33,7 @@ namespace coretests.Stocks.Services
                 .ReturnsAsync(new ServiceResponse<PriceBar[]>(prices.ToArray()));
 
             var runner = new TradingStrategyRunner(mock.Object);
-            var func = TradingStrategyFactory.Create();
+            var func = TradingStrategyFactory.Create("strategy");
 
             var result = await runner.RunAsync(
                 new UserState(),

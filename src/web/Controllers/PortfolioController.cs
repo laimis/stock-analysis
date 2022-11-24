@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
+using core.Stocks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,5 +46,15 @@ namespace web.Controllers
 
             return await _mediator.Send(cmd);
         }
+
+        [HttpGet("positions/{ticker}/{positionId}/simulate/{stategyName}")]
+        public Task<PositionInstance> Trade(
+            [FromQuery]int positionId,
+            [FromQuery]string strategyName,
+            [FromQuery]string ticker) =>
+            
+            _mediator.Send(
+                new SimulateTrade.Command(positionId, strategyName, ticker, User.Identifier())
+            );
     }
 }

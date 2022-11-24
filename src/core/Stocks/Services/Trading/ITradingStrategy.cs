@@ -27,8 +27,9 @@ namespace core.Stocks.Services.Trading
 
     public class TradingStrategyFactory
     {
-        public static ITradingStrategy Create()
+        public static ITradingStrategy Create(string name)
         {
+            // TODO: use name to look up strategy
             return new TradingStrategy("1/3 on each RR level", OneThirdOnEachRRLevel.Run);
         }
     }
@@ -41,7 +42,7 @@ namespace core.Stocks.Services.Trading
             {
                 throw new InvalidOperationException("Stop price is not set");
             }
-            
+
             bool r1SellHappened = false, r2SellHappened = false;
             var sellPortion = (int)position.NumberOfShares / 3;
 

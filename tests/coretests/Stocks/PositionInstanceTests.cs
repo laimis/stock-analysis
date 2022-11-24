@@ -10,7 +10,7 @@ namespace coretests.Stocks
 
         public PositionInstanceTests()
         {
-            _position = new PositionInstance("TSLA");
+            _position = new PositionInstance(0, "TSLA");
 
             _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             _position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
@@ -49,7 +49,7 @@ namespace coretests.Stocks
         [Fact]
         public void Cost()
         {
-            var position = new PositionInstance("TSLA");
+            var position = new PositionInstance(0, "TSLA");
 
             position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
@@ -60,7 +60,7 @@ namespace coretests.Stocks
         [Fact]
         public void SetPrice_SetsVariousMetricsThatDependOnIt()
         {
-            var position = new PositionInstance("TSLA");
+            var position = new PositionInstance(0, "TSLA");
 
             position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
@@ -86,7 +86,7 @@ namespace coretests.Stocks
         [Fact]
         public void PercentToStop_WithPriceButNoStop_SetToMax()
         {
-            var position = new PositionInstance("TSLA");
+            var position = new PositionInstance(0, "TSLA");
 
             position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
 
@@ -107,7 +107,7 @@ namespace coretests.Stocks
         [Fact]
         public void RRLevels()
         {
-            var position = new PositionInstance("TSLA");
+            var position = new PositionInstance(0, "TSLA");
 
             position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());

@@ -54,7 +54,7 @@ namespace core.Stocks
 
             if (OpenPosition == null)
             {
-                OpenPosition = new PositionInstance(purchased.Ticker);
+                OpenPosition = new PositionInstance(ClosedPositions.Count, purchased.Ticker);
             }
 
             OpenPosition.Buy(numberOfShares: purchased.NumberOfShares, price: purchased.Price, transactionId: purchased.Id, when: purchased.When, notes: purchased.Notes);
