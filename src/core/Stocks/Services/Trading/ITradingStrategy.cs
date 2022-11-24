@@ -1,55 +1,55 @@
 using System;
-using System.Threading.Tasks;
-using core.Account;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 
-namespace core.Stocks.Services
+namespace core.Stocks.Services.Trading
 {
-    public class TradeStrategyRunner
+    public interface ITradingStrategy
     {
-        private IBrokerage _brokerage;
+        PositionInstance Run(PositionInstance positionInstance, PriceBar[] success);
+    }
 
-        public TradeStrategyRunner(IBrokerage brokerage)
+    public class TradingStrategy : ITradingStrategy
+    {
+        public TradingStrategy(string name, Func<PositionInstance, PriceBar[], PositionInstance> runFunc)
         {
-            _brokerage = brokerage;
+            Name = name;
+            RunFunc = runFunc;
         }
 
-        public async Task<PositionInstance> RunAsync(
-            UserState user,
-            decimal numberOfShares,
-            decimal price,
-            decimal stopPrice,
-            string ticker,
-            DateTimeOffset when)
+        public string Name { get; }
+        public Func<PositionInstance, PriceBar[], PositionInstance> RunFunc { get; }
+
+        public PositionInstance Run(PositionInstance positionInstance, PriceBar[] success)
         {
-            var positionInstance = new PositionInstance(ticker);
+            return RunFunc(positionInstance, success);
+        }
+    }
 
-            positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
-            positionInstance.SetStopPrice(stopPrice, when);
+    public class TradingStrategyFactory
+    {
+        public static ITradingStrategy Create(string name)
+        {
+            // TODO: use name to look up strategy
+            return new TradingStrategy("1/3 on each RR level", OneThirdOnEachRRLevel.Run);
+        }
+    }
 
-            var prices = await _brokerage.GetPriceHistory(user, ticker, Shared.Adapters.Stocks.PriceFrequency.Daily, when, when.AddDays(365));
-            if (!prices.IsOk)
+    internal class OneThirdOnEachRRLevel
+    {
+        public static PositionInstance Run(PositionInstance position, PriceBar[] prices)
+        {
+            if (position.StopPrice == null)
             {
-                throw new Exception("Failed to get price history");
+                throw new InvalidOperationException("Stop price is not set");
             }
 
-            return RunWithStopInternal(
-                positionInstance,
-                prices.Success,
-                positionInstance.StopPrice.Value
-            );
-        }
-
-        private PositionInstance RunWithStopInternal(PositionInstance position, PriceBar[] prices, decimal stopPrice)
-        {
             bool r1SellHappened = false, r2SellHappened = false;
             var sellPortion = (int)position.NumberOfShares / 3;
 
             foreach(var bar in prices)
             {
                 // if stop is reached, sell at the close price
-                if (bar.Close <= stopPrice)
+                if (bar.Close <= position.StopPrice.Value)
                 {
                     position.Sell(position.NumberOfShares, bar.Close, Guid.NewGuid(), bar.Date);
                     break;
@@ -65,6 +65,7 @@ namespace core.Stocks.Services
                 if (!r2SellHappened && bar.High > position.GetRRLevel(1))
                 {
                     position.Sell(sellPortion, position.GetRRLevel(1).Value, Guid.NewGuid(), bar.Date);
+                    position.SetStopPrice(position.GetRRLevel(0).Value, bar.Date);
                     r2SellHappened = true;
                 }
 

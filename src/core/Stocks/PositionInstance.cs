@@ -11,8 +11,9 @@ namespace core.Stocks
     // to the time when the last share is sold.
     public class PositionInstance
     {
-        public PositionInstance(string ticker)
+        public PositionInstance(int positionId, string ticker)
         {
+            PositionId = positionId;
             Ticker = ticker;
             Category = StockCategory.ShortTerm;
         }
@@ -41,6 +42,8 @@ namespace core.Stocks
         public decimal? UnrealizedRR { get; private set; } = null;
         public decimal? PercentToStop { get; private set; } = null;
         public bool IsClosed => Closed != null;
+
+        public int PositionId { get; }
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
         public decimal? FirstBuyCost { get; private set; }

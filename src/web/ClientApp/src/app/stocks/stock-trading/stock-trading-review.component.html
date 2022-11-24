@@ -20,5 +20,8 @@
     <div class="row">
       <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
     </div>
+    <div class="row" *ngIf="simulatedPosition">
+      <app-stock-trading-position [position]="simulatedPosition" [pendingOrders]="[]"></app-stock-trading-position>
+    </div>
   </div>
 </div>
