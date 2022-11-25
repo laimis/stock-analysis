@@ -50,10 +50,17 @@ namespace coretests.Stocks.Services
                 when: System.DateTimeOffset.UtcNow,
                 _func);
 
-            Assert.True(result.IsClosed);
-            Assert.Equal(1005, result.Profit);
-            Assert.Equal(100.50m, result.GainPct);
-            Assert.Equal(2.01m, result.RR);
+            var maxDrawdown = result.maxDrawdownPct;
+            var maxGain = result.maxGainPct;
+            var position = result.position;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(1005, position.Profit);
+            Assert.Equal(100.50m, position.GainPct);
+            Assert.Equal(2.01m, position.RR);
+            Assert.Equal(0.0m, maxDrawdown);
+            Assert.Equal(160.0m, maxGain);
+            Assert.Equal(15, position.DaysHeld);
         }
 
         [Fact]
@@ -68,10 +75,24 @@ namespace coretests.Stocks.Services
                 when: System.DateTimeOffset.UtcNow,
                 _func);
 
-            Assert.True(result.IsClosed);
-            Assert.Equal(15, result.Profit);
-            Assert.Equal(75.0m, result.GainPct);
-            Assert.Equal(1.5m, result.RR);
+            var maxDrawdown = result.maxDrawdownPct;
+            var maxGain = result.maxGainPct;
+            var position = result.position;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(15, position.Profit);
+            Assert.Equal(75.0m, position.GainPct);
+            Assert.Equal(1.5m, position.RR);
+            Assert.Equal(0.0m, maxDrawdown);
+            Assert.Equal(110m, maxGain);
+            Assert.Equal(10, position.DaysHeld);
+        }
+
+        [Fact]
+        public async Task WithPositionNotFullySold_IsOpen()
+        {
+            // TODO: implement
+            Assert.True(false);
         }
     }
 }

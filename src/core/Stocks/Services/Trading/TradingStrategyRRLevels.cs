@@ -35,13 +35,13 @@ namespace core.Stocks.Services.Trading
                 }
 
                 // check if it's the max gain
-                var gain = (bar.High - position.AverageCostPerShare) / position.AverageCostPerShare;
+                var gain = (bar.High - position.AverageBuyCostPerShare) / position.AverageBuyCostPerShare;
                 if (gain > maxGain)
                 {
                     maxGain = gain;
                 }
 
-                var loss = (bar.Low - position.AverageCostPerShare) / position.AverageCostPerShare;
+                var loss = (bar.Low - position.AverageBuyCostPerShare) / position.AverageBuyCostPerShare;
                 if (loss < maxDrawdown)
                 {
                     maxDrawdown = loss;
