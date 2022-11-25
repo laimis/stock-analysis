@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ThemeService } from 'ng2-charts';
-import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallHidden } from '../../services/stocks.service';
+import { BrokerageOrder, PositionInstance, StocksService } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-position',

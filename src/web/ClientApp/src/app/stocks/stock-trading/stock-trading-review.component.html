@@ -29,12 +29,26 @@
           <td>{{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</td>
         </tr>
         <tr>
+          <td colspan="6">
+            <div class="p-2 text-white" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of currentPosition.transactions">
+              {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
+            </div>
+          </td>
+        </tr>
+        <tr>
           <td>{{simulationResult.strategyName}}</td>
           <td>{{simulationResult.position.profit | currency}}</td>
           <td>{{simulationResult.position.rr | number}}</td>
           <td>{{simulationResult.position.gainPct | number}}%</td>
           <td></td>
           <td></td>
+        </tr>
+        <tr>
+          <td colspan="6">
+            <div class="p-2 text-white" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of simulationResult.position.transactions">
+              {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>

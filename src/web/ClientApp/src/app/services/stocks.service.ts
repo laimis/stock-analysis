@@ -23,7 +23,7 @@ export function HideIfHidden(value, hidden) {
   return hidden ? 0 : value;
 }
 
-export function toggleVisuallHidden(element:HTMLElement) {
+export function toggleVisuallyHidden(element:HTMLElement) {
   const className = 'visually-hidden';
   if (element.classList.contains(className)) {
     element.classList.remove(className);

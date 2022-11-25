@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallHidden } from '../../services/stocks.service';
+import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallyHidden } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -30,7 +30,7 @@ export class StockTradingPositionsComponent {
     
     toggleVisibility(elem:HTMLElement) {
         console.log(elem)
-        toggleVisuallHidden(elem)
+        toggleVisuallyHidden(elem)
     }
 
     setCandidateValues(p:PositionInstance) {
