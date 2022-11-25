@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
@@ -123,7 +124,7 @@ namespace coretests.Stocks.Services
                 ticker: "tsla",
                 when: System.DateTimeOffset.UtcNow);
 
-            foreach(var r in result.Results)
+            foreach(var r in result.Results.Take(2))
             {
                 Assert.False(r.position.IsClosed);
             }
