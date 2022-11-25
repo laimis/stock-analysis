@@ -27,6 +27,12 @@ namespace core.Stocks.Services.Trading
             var levelSells = new bool[rrLevels];
             var currentLevel = 0;
             var multiplier = (int)position.NumberOfShares / rrLevels;
+            if (multiplier == 0)
+            {
+                // position size too small to split into portions, so just sell 1 share
+                // at a time
+                multiplier = 1;
+            }
             var sellPortions = new int[rrLevels];
             for(var i = 0; i < sellPortions.Length; i++)
             {
@@ -64,7 +70,12 @@ namespace core.Stocks.Services.Trading
                 if (!levelSells[currentLevel] && bar.High >= position.GetRRLevel(currentLevel))
                 {
                     position.Sell(sellPortions[currentLevel], position.GetRRLevel(currentLevel).Value, Guid.NewGuid(), bar.Date);
-                    position.SetStopPrice(position.AverageCostPerShare, bar.Date);
+                    
+                    var stopPrice = currentLevel switch {
+                        0 => position.AverageCostPerShare,
+                        _ => position.GetRRLevel(currentLevel - 1).Value
+                    };
+                    position.SetStopPrice(stopPrice, bar.Date);
                     levelSells[currentLevel] = true;
                     currentLevel++;
                 }
