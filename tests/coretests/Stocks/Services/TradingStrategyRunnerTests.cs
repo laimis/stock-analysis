@@ -59,8 +59,8 @@ namespace coretests.Stocks.Services
             Assert.Equal(100.50m, position.GainPct);
             Assert.Equal(2.01m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(160.0m, maxGain);
-            Assert.Equal(15, position.DaysHeld);
+            Assert.Equal(150.0m, maxGain);
+            Assert.Equal(14, position.DaysHeld);
         }
 
         [Fact]
@@ -84,15 +84,23 @@ namespace coretests.Stocks.Services
             Assert.Equal(75.0m, position.GainPct);
             Assert.Equal(1.5m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(110m, maxGain);
-            Assert.Equal(10, position.DaysHeld);
+            Assert.Equal(100m, maxGain);
+            Assert.Equal(9, position.DaysHeld);
         }
 
         [Fact]
         public async Task WithPositionNotFullySold_IsOpen()
         {
-            // TODO: implement
-            Assert.True(false);
+            var result = await _runner.RunAsync(
+                new UserState(),
+                numberOfShares: 2,
+                price: 50,
+                stopPrice: 0.01m,
+                ticker: "tsla",
+                when: System.DateTimeOffset.UtcNow,
+                _func);
+
+            Assert.False(result.position.IsClosed);
         }
     }
 }

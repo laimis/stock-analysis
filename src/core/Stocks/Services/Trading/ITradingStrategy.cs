@@ -1,14 +1,20 @@
 using System;
+using System.Collections.Generic;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
     public interface ITradingStrategy
     {
-        TradingStrategyRunResult Run(PositionInstance positionInstance, PriceBar[] success);
+        TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success);
     }
 
-    public record struct TradingStrategyRunResult(
+    public record struct TradingStrategyResults
+    {
+        public List<TradingStrategyResult> Results { get; init; }
+    }
+
+    public record struct TradingStrategyResult(
         decimal maxDrawdownPct,
         decimal maxGainPct,
         PositionInstance position,
@@ -17,16 +23,16 @@ namespace core.Stocks.Services.Trading
 
     public class TradingStrategy : ITradingStrategy
     {
-        public TradingStrategy(string name, Func<PositionInstance, PriceBar[], TradingStrategyRunResult> runFunc)
+        public TradingStrategy(string name, Func<PositionInstance, PriceBar[], TradingStrategyResult> runFunc)
         {
             Name = name;
             RunFunc = runFunc;
         }
 
         public string Name { get; }
-        public Func<PositionInstance, PriceBar[], TradingStrategyRunResult> RunFunc { get; }
+        public Func<PositionInstance, PriceBar[], TradingStrategyResult> RunFunc { get; }
 
-        public TradingStrategyRunResult Run(PositionInstance positionInstance, PriceBar[] success)
+        public TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success)
         {
             return RunFunc(positionInstance, success);
         }
@@ -37,7 +43,10 @@ namespace core.Stocks.Services.Trading
         public static ITradingStrategy Create(string name)
         {
             // TODO: use name to look up strategy
-            return new TradingStrategy("1/3 on each RR level", TradingStrategyRRLevels.Run);
+            return new TradingStrategy(
+                TradingStrategyRRLevels.StrategyNameOneThirdRR,
+                TradingStrategyRRLevels.RunOneThirdRR
+            );
         }
     }
 }

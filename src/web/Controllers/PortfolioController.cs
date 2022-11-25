@@ -50,7 +50,7 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/positions/{positionId}/simulate/{stategyName}")]
-        public Task<TradingStrategyRunResult> Trade(
+        public Task<TradingStrategyResult> Trade(
             int positionId,
             string strategyName,
             string ticker) =>
@@ -62,7 +62,7 @@ namespace web.Controllers
             );
 
         [HttpGet("{ticker}/trading/{stategyName}")]
-        public Task<TradingStrategyRunResult> Trade(
+        public Task<TradingStrategyResult> Trade(
             string strategyName,
             string ticker,
             decimal numberOfShares,

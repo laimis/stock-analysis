@@ -14,7 +14,7 @@ namespace core.Stocks.Services.Trading
             _brokerage = brokerage;
         }
 
-        public async Task<TradingStrategyRunResult> RunAsync(
+        public async Task<TradingStrategyResult> RunAsync(
             UserState user,
             decimal numberOfShares,
             decimal price,

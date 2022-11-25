@@ -5,9 +5,16 @@ namespace core.Stocks.Services.Trading
 {
     internal class TradingStrategyRRLevels
     {
-        public const string StategyName = "1/3 on each RR level";
+        public const string StrategyNameOneThirdRR = "1/3 on each RR level";
+        public const string StrategyNameOneFourthRR = "1/4 on each RR level";
 
-        public static TradingStrategyRunResult Run(PositionInstance position, PriceBar[] prices)
+        public static TradingStrategyResult RunOneThirdRR(PositionInstance positionInstance, PriceBar[] success)
+            => Run(positionInstance, success, 3);
+
+        public static TradingStrategyResult RunOneFourthRR(PositionInstance positionInstance, PriceBar[] success)
+            => Run(positionInstance, success, 4);
+
+        public static TradingStrategyResult Run(PositionInstance position, PriceBar[] prices, int rrLevels)
         {
             if (position.StopPrice == null)
             {
@@ -17,16 +24,16 @@ namespace core.Stocks.Services.Trading
             var maxGain = 0m;
             var maxDrawdown = 0m;
 
-            bool r1SellHappened = false, r2SellHappened = false;
-            var sellPortion = (int)position.NumberOfShares / 3;
-            
-            // for positions with less than 3 shares, selling portion
-            // is a minimum that can be sold, ie 1
-            if (sellPortion == 0)
+            var levelSells = new bool[rrLevels];
+            var currentLevel = 0;
+            var multiplier = (int)position.NumberOfShares / rrLevels;
+            var sellPortions = new int[rrLevels];
+            for(var i = 0; i < sellPortions.Length; i++)
             {
-                sellPortion = 1;
+                sellPortions[i] = multiplier;
             }
-
+            sellPortions[^1] += (int)position.NumberOfShares % rrLevels;
+            
             foreach(var bar in prices)
             {
                 if (position.IsClosed)
@@ -54,24 +61,12 @@ namespace core.Stocks.Services.Trading
                     break;
                 }
 
-                if (!r1SellHappened && bar.High > position.GetRRLevel(0))
+                if (!levelSells[currentLevel] && bar.High >= position.GetRRLevel(currentLevel))
                 {
-                    position.Sell(sellPortion, position.GetRRLevel(0).Value, Guid.NewGuid(), bar.Date);
+                    position.Sell(sellPortions[currentLevel], position.GetRRLevel(currentLevel).Value, Guid.NewGuid(), bar.Date);
                     position.SetStopPrice(position.AverageCostPerShare, bar.Date);
-                    r1SellHappened = true;
-                }
-
-                if (!r2SellHappened && bar.High > position.GetRRLevel(1))
-                {
-                    position.Sell(sellPortion, position.GetRRLevel(1).Value, Guid.NewGuid(), bar.Date);
-                    position.SetStopPrice(position.GetRRLevel(0).Value, bar.Date);
-                    r2SellHappened = true;
-                }
-
-                if (r1SellHappened && r2SellHappened && bar.High > position.GetRRLevel(2))
-                {
-                    position.Sell(position.NumberOfShares, position.GetRRLevel(2).Value, Guid.NewGuid(), bar.Date);
-                    break;
+                    levelSells[currentLevel] = true;
+                    currentLevel++;
                 }
             }
 
@@ -82,11 +77,11 @@ namespace core.Stocks.Services.Trading
                 position.SetPrice(prices[^1].Close);
             }
 
-            return new TradingStrategyRunResult(
+            return new TradingStrategyResult(
                 maxGainPct: Math.Round(maxGain * 100, 2),
                 maxDrawdownPct: Math.Round(maxDrawdown * 100, 2),
                 position: position,
-                strategyName: TradingStrategyRRLevels.StategyName
+                strategyName: TradingStrategyRRLevels.StrategyNameOneThirdRR
             );
         }
     }
