@@ -13,7 +13,6 @@ namespace coretests.Stocks.Services
     public class TradingStrategyRunnerTests
     {
         private TradingStrategyRunner _runner;
-        private ITradingStrategy _func;
 
         public TradingStrategyRunnerTests()
         {
@@ -35,20 +34,20 @@ namespace coretests.Stocks.Services
                 .ReturnsAsync(new ServiceResponse<PriceBar[]>(prices.ToArray()));
 
             _runner = new TradingStrategyRunner(mock.Object);
-            _func = TradingStrategyFactory.Create("strategy");
         }
 
         [Fact]
         public async Task BasicTest()
         {
-            var result = await _runner.RunAsync(
+            var results = await _runner.RunAsync(
                 new UserState(),
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
                 ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow,
-                _func);
+                when: System.DateTimeOffset.UtcNow);
+
+            var result = results.Results[0];
 
             var maxDrawdown = result.maxDrawdownPct;
             var maxGain = result.maxGainPct;
@@ -66,14 +65,15 @@ namespace coretests.Stocks.Services
         [Fact]
         public async Task WithPortionSizeTooSmall_StillSellsAtRRLevels()
         {
-            var result = await _runner.RunAsync(
+            var results = await _runner.RunAsync(
                 new UserState(),
                 numberOfShares: 2,
                 price: 10,
                 stopPrice: 5,
                 ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow,
-                _func);
+                when: System.DateTimeOffset.UtcNow);
+
+            var result = results.Results[0];
 
             var maxDrawdown = result.maxDrawdownPct;
             var maxGain = result.maxGainPct;
@@ -97,10 +97,12 @@ namespace coretests.Stocks.Services
                 price: 50,
                 stopPrice: 0.01m,
                 ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow,
-                _func);
+                when: System.DateTimeOffset.UtcNow);
 
-            Assert.False(result.position.IsClosed);
+            foreach(var r in result.Results)
+            {
+                Assert.False(r.position.IsClosed);
+            }
         }
     }
 }
