@@ -27,7 +27,7 @@
               <tr>
                 <td>Actual trade</td>
                 <td><span *ngIf="currentPosition.isClosed" class="badge bg-success p-2">closed</span></td>
-                <td>{{currentPosition.profit | currency}}</td>
+                <td>{{currentPosition.profit + currentPosition.unrealizedProfit | currency}}</td>
                 <td>{{currentPosition.rr | number}}</td>
                 <td>{{currentPosition.gainPct | number}}%</td>
                 <td>
