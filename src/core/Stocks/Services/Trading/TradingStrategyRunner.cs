@@ -20,11 +20,6 @@ namespace core.Stocks.Services.Trading
             string ticker,
             DateTimeOffset when)
         {
-            var positionInstance = new PositionInstance(0, ticker);
-
-            positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
-            positionInstance.SetStopPrice(stopPrice, when);
-
             var prices = await _brokerage.GetPriceHistory(
                 user,
                 ticker,
@@ -41,6 +36,11 @@ namespace core.Stocks.Services.Trading
 
             foreach(var strategy in TradingStrategyFactory.GetStrategies())
             {
+                var positionInstance = new PositionInstance(0, ticker);
+
+                positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
+                positionInstance.SetStopPrice(stopPrice, when);
+
                 var result = strategy.Run(positionInstance, prices.Success);
                 results.Results.Add(result);
             }

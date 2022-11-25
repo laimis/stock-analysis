@@ -30,8 +30,19 @@ namespace coretests.Stocks.Services
             }
 
             var mock = new Mock<IBrokerage>();
-            mock.Setup(x => x.GetPriceHistory(It.IsAny<UserState>(), It.IsAny<string>(), It.IsAny<PriceFrequency>(), It.IsAny<System.DateTimeOffset>(), It.IsAny<System.DateTimeOffset>()))
-                .ReturnsAsync(new ServiceResponse<PriceBar[]>(prices.ToArray()));
+            mock.Setup(
+                x => 
+                    x.GetPriceHistory(
+                        It.IsAny<UserState>(),
+                        It.IsAny<string>(),
+                        It.IsAny<PriceFrequency>(),
+                        It.IsAny<System.DateTimeOffset>(),
+                        It.IsAny<System.DateTimeOffset>()
+                    )
+                )
+                .ReturnsAsync(
+                    new ServiceResponse<PriceBar[]>(prices.ToArray())
+                );
 
             _runner = new TradingStrategyRunner(mock.Object);
         }
@@ -47,11 +58,11 @@ namespace coretests.Stocks.Services
                 ticker: "tsla",
                 when: System.DateTimeOffset.UtcNow);
 
-            var result = results.Results[0];
+            var oneThirdResult = results.Results[0];
 
-            var maxDrawdown = result.maxDrawdownPct;
-            var maxGain = result.maxGainPct;
-            var position = result.position;
+            var maxDrawdown = oneThirdResult.maxDrawdownPct;
+            var maxGain = oneThirdResult.maxGainPct;
+            var position = oneThirdResult.position;
 
             Assert.True(position.IsClosed);
             Assert.Equal(1005, position.Profit);
@@ -60,6 +71,19 @@ namespace coretests.Stocks.Services
             Assert.Equal(0.0m, maxDrawdown);
             Assert.Equal(150.0m, maxGain);
             Assert.Equal(14, position.DaysHeld);
+
+            var oneFourthResult = results.Results[1];
+            maxDrawdown = oneFourthResult.maxDrawdownPct;
+            maxGain = oneFourthResult.maxGainPct;
+            position = oneFourthResult.position;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(1250m, position.Profit);
+            Assert.Equal(125.0m, position.GainPct);
+            Assert.Equal(2.5m, position.RR);
+            Assert.Equal(0.0m, maxDrawdown);
+            Assert.Equal(200.0m, maxGain);
+            Assert.Equal(19, position.DaysHeld);
         }
 
         [Fact]
