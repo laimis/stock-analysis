@@ -12,21 +12,19 @@
       <thead>
         <tr>
           <th>Outcome type</th>
+          <th>Status</th>
           <th>Profit</th>
           <th>R/R</th>
           <th>%</th>
-          <th>Max Gain</th>
-          <th>Max Drawdown</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Actual trade</td>
+          <td><span *ngIf="currentPosition.isClosed" class="badge bg-success p-2">closed</span></td>
           <td>{{currentPosition.profit | currency}}</td>
           <td>{{currentPosition.rr | number}}</td>
           <td>{{currentPosition.gainPct | number}}%</td>
-          <td>{{simulationResult.maxGainPct | number:'1.0-2'}}%</td>
-          <td>{{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</td>
         </tr>
         <tr>
           <td colspan="6">
@@ -37,11 +35,13 @@
         </tr>
         <tr>
           <td>{{simulationResult.strategyName}}</td>
+          <td>
+            <span *ngIf="simulationResult.position.isClosed" class="badge bg-success p-2">closed</span>
+            <span *ngIf="!simulationResult.position.isClosed" class="badge bg-warning p-2">open</span>
+          </td>
           <td>{{simulationResult.position.profit | currency}}</td>
           <td>{{simulationResult.position.rr | number}}</td>
           <td>{{simulationResult.position.gainPct | number}}%</td>
-          <td></td>
-          <td></td>
         </tr>
         <tr>
           <td colspan="6">
@@ -51,6 +51,20 @@
           </td>
         </tr>
       </tbody>
+    </table>
+    <table class="table mt-3">
+      <thead>
+        <tr>
+          <th>Trade Gain</th>
+          <th>Max Gain</th>
+          <th>Max Drawdown</th>
+        </tr>
+        <tr>
+          <td>{{currentPosition.gainPct | number}}%</td>
+          <td>{{simulationResult.maxGainPct | number:'1.0-2'}}%</td>
+          <td>{{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</td>
+        </tr>
+      </thead>
     </table>
     <div class="row mt-2">
       <div class="col">

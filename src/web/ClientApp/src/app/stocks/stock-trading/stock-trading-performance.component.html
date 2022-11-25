@@ -3,11 +3,26 @@
   <div class="mt-3">
     <b>Recent</b>
     <div class="row mb-2">
-      <div class="col"><div class="stat-label">Wins</div><div>{{performance.recent.wins}}</div></div>
-      <div class="col"><div class="stat-label">Losses</div><div>{{performance.recent.losses}}</div></div>
-      <div class="col"><div class="stat-label">Win %</div><div>{{performance.recent.wins / performance.recent.total | percent:'1.2'}}</div></div>
-      <div class="col"><div class="stat-label">Avg Days Held</div><div>{{performance.recent.avgDaysHeld | number:'1.0-0'}}</div></div>
-      <div class="col"><div class="stat-label">Return %</div><div>{{performance.recent.avgReturnPct | number:'1.0-0'}}</div></div>
+      <div class="col">
+        <div class="stat-label">Wins</div>
+        <div>{{performance.recent.wins}}</div>
+      </div>
+      <div class="col">
+        <div class="stat-label">Losses</div>
+        <div>{{performance.recent.losses}}</div>
+      </div>
+      <div class="col">
+        <div class="stat-label">Win %</div>
+        <div>{{performance.recent.wins / performance.recent.total | percent:'1.2'}}</div>
+      </div>
+      <div class="col">
+        <div class="stat-label">Avg Days Held</div>
+        <div>{{performance.recent.avgDaysHeld | number:'1.0-0'}}</div>
+      </div>
+      <div class="col">
+        <div class="stat-label">Return %</div>
+        <div>{{performance.recent.avgReturnPct | number:'1.0-0'}}</div>
+      </div>
     </div>
 
     <div class="row mb-2">
