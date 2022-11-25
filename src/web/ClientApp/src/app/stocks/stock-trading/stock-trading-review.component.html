@@ -39,9 +39,9 @@
             <span *ngIf="simulationResult.position.isClosed" class="badge bg-success p-2">closed</span>
             <span *ngIf="!simulationResult.position.isClosed" class="badge bg-warning p-2">open</span>
           </td>
-          <td>{{simulationResult.position.profit | currency}}</td>
+          <td>{{simulationResult.position.profit + simulationResult.position.unrealizedProfit | currency}}</td>
           <td>{{simulationResult.position.rr | number}}</td>
-          <td>{{simulationResult.position.gainPct | number}}%</td>
+          <td>{{simulationResult.position.isClosed ? simulationResult.position.gainPct : simulationResult.position.unrealizedGainPct | number}}%</td>
         </tr>
         <tr>
           <td colspan="6">
