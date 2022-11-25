@@ -8,7 +8,7 @@
   </div>
 
   <div class="container mt-2">
-    <table class="table table-hover mt-2" *ngIf="currentPosition && simulationResult">
+    <table class="table table-hover mt-2" *ngIf="currentPosition && simulationResults">
       <thead>
         <tr>
           <th>Outcome type</th>
@@ -16,6 +16,9 @@
           <th>Profit</th>
           <th>R/R</th>
           <th>%</th>
+          <th>Transactions</th>
+          <th>Max Gain</th>
+          <th>Max Drawdown</th>
         </tr>
       </thead>
       <tbody>
@@ -25,47 +28,33 @@
           <td>{{currentPosition.profit | currency}}</td>
           <td>{{currentPosition.rr | number}}</td>
           <td>{{currentPosition.gainPct | number}}%</td>
-        </tr>
-        <tr>
-          <td colspan="6">
-            <div class="p-2 text-white" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of currentPosition.transactions">
-              {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>{{simulationResult.strategyName}}</td>
           <td>
-            <span *ngIf="simulationResult.position.isClosed" class="badge bg-success p-2">closed</span>
-            <span *ngIf="!simulationResult.position.isClosed" class="badge bg-warning p-2">open</span>
-          </td>
-          <td>{{simulationResult.position.profit + simulationResult.position.unrealizedProfit | currency}}</td>
-          <td>{{simulationResult.position.rr | number}}</td>
-          <td>{{simulationResult.position.isClosed ? simulationResult.position.gainPct : simulationResult.position.unrealizedGainPct | number}}%</td>
-        </tr>
-        <tr>
-          <td colspan="6">
-            <div class="p-2 text-white" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of simulationResult.position.transactions">
+            <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of currentPosition.transactions">
               {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
             </div>
           </td>
+          <td colspan="2"></td>
+        </tr>
+        <tr *ngFor="let r of simulationResults.results">
+          <td>{{r.strategyName}}</td>
+          <td>
+            <span *ngIf="r.position.isClosed" class="badge bg-success p-2">closed</span>
+            <span *ngIf="!r.position.isClosed" class="badge bg-warning p-2">open</span>
+          </td>
+          <td>{{r.position.profit + r.position.unrealizedProfit | currency}}</td>
+          <td>{{r.position.rr | number}}</td>
+          <td>{{r.position.isClosed ? r.position.gainPct : r.position.unrealizedGainPct | number}}%</td>
+          <td>
+            <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of r.position.transactions">
+              {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
+            </div>
+          </td>
+          <td>{{r.maxGainPct | number:'1.0-2'}}%</td>
+          <td>{{r.maxDrawdownPct | number:'1.0-2'}}%</td>
         </tr>
       </tbody>
     </table>
-    <table class="table mt-3">
-      <thead>
-        <tr>
-          <th>Trade Gain</th>
-          <th>Max Gain</th>
-          <th>Max Drawdown</th>
-        </tr>
-        <tr>
-          <td>{{currentPosition.gainPct | number}}%</td>
-          <td>{{simulationResult.maxGainPct | number:'1.0-2'}}%</td>
-          <td>{{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</td>
-        </tr>
-      </thead>
-    </table>
+    
     <div class="row mt-2">
       <div class="col">
         <app-stock-chart *ngIf="prices"

@@ -13,7 +13,7 @@ namespace core.Portfolio
 {
     public class SimulateTrade
     {
-        public class Command : RequestWithUserId<TradingStrategyResult>
+        public class Command : RequestWithUserId<TradingStrategyResults>
         {
             public Command(int positionId, string strategyName, string ticker, Guid userId)
             {
@@ -28,7 +28,7 @@ namespace core.Portfolio
             public string Ticker { get; }
         }
 
-        public class ForTicker : RequestWithUserId<TradingStrategyResult>
+        public class ForTicker : RequestWithUserId<TradingStrategyResults>
         {
             public ForTicker(
                 DateTimeOffset date,
@@ -57,8 +57,8 @@ namespace core.Portfolio
         }
 
         public class Handler
-            : HandlerWithStorage<Command, TradingStrategyResult>,
-            IRequestHandler<ForTicker, TradingStrategyResult>
+            : HandlerWithStorage<Command, TradingStrategyResults>,
+            IRequestHandler<ForTicker, TradingStrategyResults>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
@@ -72,7 +72,7 @@ namespace core.Portfolio
                 _brokerage = brokerage;
             }
 
-            public async Task<TradingStrategyResult> Handle(ForTicker request, CancellationToken cancellationToken)
+            public async Task<TradingStrategyResults> Handle(ForTicker request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
@@ -81,20 +81,18 @@ namespace core.Portfolio
                 }
 
                 var runner = new TradingStrategyRunner(_brokerage);
-                var strategy = TradingStrategyFactory.Create(request.StrategyName);
-
+                
                 return await runner.RunAsync(
                     user.State,
                     numberOfShares: request.NumberOfShares,
                     price: request.Price,
                     stopPrice: request.StopPrice,
                     ticker: request.Ticker,
-                    when: request.Date,
-                    strategy: strategy
+                    when: request.Date
                 );
             }
 
-            public override async Task<TradingStrategyResult> Handle(Command request, CancellationToken cancellationToken)
+            public override async Task<TradingStrategyResults> Handle(Command request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
@@ -120,16 +118,14 @@ namespace core.Portfolio
                 }
                 
                 var runner = new TradingStrategyRunner(_brokerage);
-                var strategy = TradingStrategyFactory.Create(request.StrategyName);
-
+                
                 return await runner.RunAsync(
                     user.State,
                     numberOfShares: position.FirstBuyNumberOfShares.Value,
                     price: position.FirstBuyCost.Value,
                     position.FirstStop.Value,
                     request.Ticker,
-                    position.Opened.Value,
-                    strategy
+                    position.Opened.Value
                 );
             }
         }

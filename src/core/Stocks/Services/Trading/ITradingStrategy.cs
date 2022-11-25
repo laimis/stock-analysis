@@ -9,9 +9,9 @@ namespace core.Stocks.Services.Trading
         TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success);
     }
 
-    public record struct TradingStrategyResults
+    public class TradingStrategyResults
     {
-        public List<TradingStrategyResult> Results { get; init; }
+        public List<TradingStrategyResult> Results { get; } = new List<TradingStrategyResult>();
     }
 
     public record struct TradingStrategyResult(
@@ -23,29 +23,33 @@ namespace core.Stocks.Services.Trading
 
     public class TradingStrategy : ITradingStrategy
     {
-        public TradingStrategy(string name, Func<PositionInstance, PriceBar[], TradingStrategyResult> runFunc)
+        public TradingStrategy(string name, Func<string, PositionInstance, PriceBar[], TradingStrategyResult> runFunc)
         {
             Name = name;
             RunFunc = runFunc;
         }
 
         public string Name { get; }
-        public Func<PositionInstance, PriceBar[], TradingStrategyResult> RunFunc { get; }
+        public Func<string, PositionInstance, PriceBar[], TradingStrategyResult> RunFunc { get; }
 
         public TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success)
         {
-            return RunFunc(positionInstance, success);
+            return RunFunc(Name, positionInstance, success);
         }
     }
 
     public class TradingStrategyFactory
     {
-        public static ITradingStrategy Create(string name)
+        public static IEnumerable<ITradingStrategy> GetStrategies()
         {
-            // TODO: use name to look up strategy
-            return new TradingStrategy(
+            yield return new TradingStrategy(
                 TradingStrategyRRLevels.StrategyNameOneThirdRR,
                 TradingStrategyRRLevels.RunOneThirdRR
+            );
+
+            yield return new TradingStrategy(
+                TradingStrategyRRLevels.StrategyNameOneFourthRR,
+                TradingStrategyRRLevels.RunOneFourthRR
             );
         }
     }

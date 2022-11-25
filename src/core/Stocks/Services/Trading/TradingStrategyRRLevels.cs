@@ -8,13 +8,13 @@ namespace core.Stocks.Services.Trading
         public const string StrategyNameOneThirdRR = "1/3 on each RR level";
         public const string StrategyNameOneFourthRR = "1/4 on each RR level";
 
-        public static TradingStrategyResult RunOneThirdRR(PositionInstance positionInstance, PriceBar[] success)
-            => Run(positionInstance, success, 3);
+        public static TradingStrategyResult RunOneThirdRR(string name, PositionInstance positionInstance, PriceBar[] success)
+            => Run(name, positionInstance, success, 3);
 
-        public static TradingStrategyResult RunOneFourthRR(PositionInstance positionInstance, PriceBar[] success)
-            => Run(positionInstance, success, 4);
+        public static TradingStrategyResult RunOneFourthRR(string name, PositionInstance positionInstance, PriceBar[] success)
+            => Run(name, positionInstance, success, 4);
 
-        public static TradingStrategyResult Run(PositionInstance position, PriceBar[] prices, int rrLevels)
+        public static TradingStrategyResult Run(string name, PositionInstance position, PriceBar[] prices, int rrLevels)
         {
             if (position.StopPrice == null)
             {
@@ -92,7 +92,7 @@ namespace core.Stocks.Services.Trading
                 maxGainPct: Math.Round(maxGain * 100, 2),
                 maxDrawdownPct: Math.Round(maxDrawdown * 100, 2),
                 position: position,
-                strategyName: TradingStrategyRRLevels.StrategyNameOneThirdRR
+                strategyName: name
             );
         }
     }

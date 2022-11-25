@@ -10,18 +10,15 @@ namespace core.Stocks.Services.Trading
         private IBrokerage _brokerage;
 
         public TradingStrategyRunner(IBrokerage brokerage)
-        {
-            _brokerage = brokerage;
-        }
+            => _brokerage = brokerage;
 
-        public async Task<TradingStrategyResult> RunAsync(
+        public async Task<TradingStrategyResults> RunAsync(
             UserState user,
             decimal numberOfShares,
             decimal price,
             decimal stopPrice,
             string ticker,
-            DateTimeOffset when,
-            ITradingStrategy strategy)
+            DateTimeOffset when)
         {
             var positionInstance = new PositionInstance(0, ticker);
 
@@ -40,7 +37,15 @@ namespace core.Stocks.Services.Trading
                 throw new Exception("Failed to get price history");
             }
 
-            return strategy.Run(positionInstance, prices.Success);
+            var results = new TradingStrategyResults();
+
+            foreach(var strategy in TradingStrategyFactory.GetStrategies())
+            {
+                var result = strategy.Run(positionInstance, prices.Success);
+                results.Results.Add(result);
+            }
+
+            return results;
         }
     }
 }
