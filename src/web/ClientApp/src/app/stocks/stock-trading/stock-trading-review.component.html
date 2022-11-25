@@ -8,6 +8,36 @@
   </div>
 
   <div class="container mt-2">
+    <table class="table table-hover mt-2" *ngIf="currentPosition && simulationResult">
+      <thead>
+        <tr>
+          <th>Outcome type</th>
+          <th>Profit</th>
+          <th>R/R</th>
+          <th>%</th>
+          <th>Max Gain</th>
+          <th>Max Drawdown</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Actual trade</td>
+          <td>{{currentPosition.profit | currency}}</td>
+          <td>{{currentPosition.rr | number}}</td>
+          <td>{{currentPosition.gainPct | number}}%</td>
+          <td>{{simulationResult.maxGainPct | number:'1.0-2'}}%</td>
+          <td>{{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</td>
+        </tr>
+        <tr>
+          <td>{{simulationResult.strategyName}}</td>
+          <td>{{simulationResult.position.profit | currency}}</td>
+          <td>{{simulationResult.position.rr | number}}</td>
+          <td>{{simulationResult.position.gainPct | number}}%</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
     <div class="row mt-2">
       <div class="col">
         <app-stock-chart *ngIf="prices"
@@ -16,17 +46,6 @@
           [prices]=prices>
         </app-stock-chart>
       </div>
-    </div>
-    <div class="row">
-      <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
-    </div>
-    <div class="row">
-      <div class="col">Strategy {{simulationResult.strategyName}}</div>
-      <div class="col">Max gain: {{simulationResult.maxGainPct | number:'1.0-2'}}%</div>
-      <div class="col">Max drawdown: {{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</div>
-    </div>
-    <div class="row" *ngIf="simulationResult">
-      <app-stock-trading-position [position]="simulationResult.position" [pendingOrders]="[]"></app-stock-trading-position>
     </div>
   </div>
 </div>
