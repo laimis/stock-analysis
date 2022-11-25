@@ -51,6 +51,16 @@ namespace core.Stocks.Services.Trading
                 TradingStrategyRRLevels.StrategyNameOneFourthRR,
                 TradingStrategyRRLevels.RunOneFourthRR
             );
+
+            yield return new TradingStrategy(
+                TradingStrategyRRLevels.StrategyNameOneThirdPercentBased,
+                TradingStrategyRRLevels.RunOneThirdPercentBased
+            );
+
+            yield return new TradingStrategy(
+                TradingStrategyRRLevels.StrategyNameOneFourthPercentBased,
+                TradingStrategyRRLevels.RunOneFourthPercentBased
+            );
         }
     }
 }

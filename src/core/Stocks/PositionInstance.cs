@@ -73,6 +73,17 @@ namespace core.Stocks
 
         public List<decimal> RRLevels { get; private set; } = new List<decimal>();
         public decimal? GetRRLevel(int index) => index < RRLevels.Count ? RRLevels[index] : null;
+        public decimal? GetRRLevelPercentBased(int index, decimal percentGain)
+        {
+            var singleLevel = this.AverageCostPerShare * percentGain;
+
+            return index switch {
+                0 => this.AverageCostPerShare + singleLevel,
+                1 => this.AverageCostPerShare + singleLevel * 2,
+                2 => this.AverageCostPerShare + singleLevel * 3,
+                _ => this.AverageCostPerShare + singleLevel * 4,
+            };
+        }
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {

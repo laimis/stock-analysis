@@ -7,14 +7,31 @@ namespace core.Stocks.Services.Trading
     {
         public const string StrategyNameOneThirdRR = "1/3 on each RR level";
         public const string StrategyNameOneFourthRR = "1/4 on each RR level";
+        public const string StrategyNameOneThirdPercentBased = "1/3 on each RR level (percent based)";
+        public const string StrategyNameOneFourthPercentBased = "1/4 on each RR level (percent based)";
+        private const decimal AVG_PERCENT_GAIN = 0.07m;
 
-        public static TradingStrategyResult RunOneThirdRR(string name, PositionInstance positionInstance, PriceBar[] success)
-            => Run(name, positionInstance, success, 3);
+        public static TradingStrategyResult RunOneThirdRR(
+            string name,
+            PositionInstance positionInstance,
+            PriceBar[] success)
+            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevel(level).Value);
 
         public static TradingStrategyResult RunOneFourthRR(string name, PositionInstance positionInstance, PriceBar[] success)
-            => Run(name, positionInstance, success, 4);
+            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevel(level).Value);
 
-        public static TradingStrategyResult Run(string name, PositionInstance position, PriceBar[] prices, int rrLevels)
+        public static TradingStrategyResult RunOneThirdPercentBased(string name, PositionInstance positionInstance, PriceBar[] success)
+            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value);
+
+        public static TradingStrategyResult RunOneFourthPercentBased(string name, PositionInstance positionInstance, PriceBar[] success)
+            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value);
+
+        public static TradingStrategyResult Run(
+            string name,
+            PositionInstance position,
+            PriceBar[] prices,
+            int rrLevels,
+            Func<int, decimal> getRRLevelFunc)
         {
             if (position.StopPrice == null)
             {
@@ -67,13 +84,13 @@ namespace core.Stocks.Services.Trading
                     break;
                 }
 
-                if (!levelSells[currentLevel] && bar.High >= position.GetRRLevel(currentLevel))
+                if (!levelSells[currentLevel] && bar.High >= getRRLevelFunc(currentLevel))
                 {
-                    position.Sell(sellPortions[currentLevel], position.GetRRLevel(currentLevel).Value, Guid.NewGuid(), bar.Date);
+                    position.Sell(sellPortions[currentLevel], getRRLevelFunc(currentLevel), Guid.NewGuid(), bar.Date);
                     
                     var stopPrice = currentLevel switch {
                         0 => position.AverageCostPerShare,
-                        _ => position.GetRRLevel(currentLevel - 1).Value
+                        _ => getRRLevelFunc(currentLevel - 1)
                     };
                     position.SetStopPrice(stopPrice, bar.Date);
                     levelSells[currentLevel] = true;
