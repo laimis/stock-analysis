@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
 using core.Stocks;
+using core.Stocks.Services.Trading;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,17 +50,19 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/positions/{positionId}/simulate/{stategyName}")]
-        public Task<PositionInstance> Trade(
+        public Task<TradingStrategyRunResult> Trade(
             int positionId,
             string strategyName,
             string ticker) =>
             
             _mediator.Send(
-                new SimulateTrade.Command(positionId, strategyName, ticker, User.Identifier())
+                new SimulateTrade.Command(
+                    positionId, strategyName, ticker, User.Identifier()
+                )
             );
 
         [HttpGet("{ticker}/trading/{stategyName}")]
-        public Task<PositionInstance> Trade(
+        public Task<TradingStrategyRunResult> Trade(
             string strategyName,
             string ticker,
             decimal numberOfShares,
@@ -75,7 +78,8 @@ namespace web.Controllers
                     stopPrice,
                     strategyName,
                     ticker,
-                    User.Identifier())
+                    User.Identifier()
+                )
             );
     }
 }

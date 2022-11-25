@@ -5,21 +5,28 @@ namespace core.Stocks.Services.Trading
 {
     public interface ITradingStrategy
     {
-        PositionInstance Run(PositionInstance positionInstance, PriceBar[] success);
+        TradingStrategyRunResult Run(PositionInstance positionInstance, PriceBar[] success);
     }
+
+    public record struct TradingStrategyRunResult(
+        decimal maxDrawdownPct,
+        decimal maxGainPct,
+        PositionInstance position,
+        string strategyName
+    );
 
     public class TradingStrategy : ITradingStrategy
     {
-        public TradingStrategy(string name, Func<PositionInstance, PriceBar[], PositionInstance> runFunc)
+        public TradingStrategy(string name, Func<PositionInstance, PriceBar[], TradingStrategyRunResult> runFunc)
         {
             Name = name;
             RunFunc = runFunc;
         }
 
         public string Name { get; }
-        public Func<PositionInstance, PriceBar[], PositionInstance> RunFunc { get; }
+        public Func<PositionInstance, PriceBar[], TradingStrategyRunResult> RunFunc { get; }
 
-        public PositionInstance Run(PositionInstance positionInstance, PriceBar[] success)
+        public TradingStrategyRunResult Run(PositionInstance positionInstance, PriceBar[] success)
         {
             return RunFunc(positionInstance, success);
         }

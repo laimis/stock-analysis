@@ -20,8 +20,13 @@
     <div class="row">
       <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
     </div>
-    <div class="row" *ngIf="simulatedPosition">
-      <app-stock-trading-position [position]="simulatedPosition" [pendingOrders]="[]"></app-stock-trading-position>
+    <div class="row">
+      <div class="col">Strategy {{simulationResult.strategyName}}</div>
+      <div class="col">Max gain: {{simulationResult.maxGainPct | number:'1.0-2'}}%</div>
+      <div class="col">Max drawdown: {{simulationResult.maxDrawdownPct | number:'1.0-2'}}%</div>
+    </div>
+    <div class="row" *ngIf="simulationResult">
+      <app-stock-trading-position [position]="simulationResult.position" [pendingOrders]="[]"></app-stock-trading-position>
     </div>
   </div>
 </div>

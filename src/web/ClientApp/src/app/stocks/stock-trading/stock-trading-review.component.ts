@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TradingStrategyRunResult } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -14,7 +14,7 @@ export class StockTradingReviewComponent implements OnInit {
   private _positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
-  simulatedPosition: PositionInstance
+  simulationResult: TradingStrategyRunResult
   prices: Prices
 
   constructor (private stockService: StocksService) { }
@@ -35,8 +35,8 @@ export class StockTradingReviewComponent implements OnInit {
       }
     )
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
-      (r: PositionInstance) => {
-        this.simulatedPosition = r
+      (r: TradingStrategyRunResult) => {
+        this.simulationResult = r
       }
     )
   }

@@ -57,8 +57,8 @@ export class StocksService {
     return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
   }
 
-  simulatePosition(ticker: string, positionId: number): Observable<PositionInstance> {
-    return this.http.get<PositionInstance>(
+  simulatePosition(ticker: string, positionId: number): Observable<TradingStrategyRunResult> {
+    return this.http.get<TradingStrategyRunResult>(
       `/api/portfolio/${ticker}/positions/${positionId}/simulate/default`
     )
   }
@@ -786,6 +786,13 @@ export interface PositionInstance {
   unrealizedProfit: number,
   unrealizedRR: number,
   percentToStop: number
+}
+
+export interface TradingStrategyRunResult {
+  maxDrawdownPct: number
+  maxGainPct: number
+  position: PositionInstance
+  strategyName: string
 }
 
 export class OptionDefinition {

@@ -13,7 +13,7 @@ namespace core.Portfolio
 {
     public class SimulateTrade
     {
-        public class Command : RequestWithUserId<PositionInstance>
+        public class Command : RequestWithUserId<TradingStrategyRunResult>
         {
             public Command(int positionId, string strategyName, string ticker, Guid userId)
             {
@@ -28,7 +28,7 @@ namespace core.Portfolio
             public string Ticker { get; }
         }
 
-        public class ForTicker : RequestWithUserId<PositionInstance>
+        public class ForTicker : RequestWithUserId<TradingStrategyRunResult>
         {
             public ForTicker(
                 DateTimeOffset date,
@@ -57,8 +57,8 @@ namespace core.Portfolio
         }
 
         public class Handler
-            : HandlerWithStorage<Command, PositionInstance>,
-            IRequestHandler<ForTicker, PositionInstance>
+            : HandlerWithStorage<Command, TradingStrategyRunResult>,
+            IRequestHandler<ForTicker, TradingStrategyRunResult>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
@@ -72,7 +72,7 @@ namespace core.Portfolio
                 _brokerage = brokerage;
             }
 
-            public async Task<PositionInstance> Handle(ForTicker request, CancellationToken cancellationToken)
+            public async Task<TradingStrategyRunResult> Handle(ForTicker request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
@@ -94,7 +94,7 @@ namespace core.Portfolio
                 );
             }
 
-            public override async Task<PositionInstance> Handle(Command request, CancellationToken cancellationToken)
+            public override async Task<TradingStrategyRunResult> Handle(Command request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)

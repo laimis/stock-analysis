@@ -6,91 +6,94 @@
     </ul>
   </div>
 
-  <div>
-
-    <div class="row mt-3" *ngIf="_position.isClosed">
-      <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
-      <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
-      <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
-      <div class="col"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
-    </div>
-
-    <div class="row" *ngIf="!_position.isClosed">
-      <div class="col"><div class="stat-label">Cost/Share</div><div>{{ _position.averageCostPerShare | currency}}</div></div>
-      <div class="col"><div class="stat-label">Cost</div><div>{{ _position.cost | currency}}</div></div>
-      <div class="col"><div class="stat-label">Stop</div><div>{{ _position.stopPrice | currency }} ({{ (_position.stopPrice - _position.averageCostPerShare) / _position.averageCostPerShare | percent }})</div></div>
-      <div class="col"><div class="stat-label">Number of Shares</div><div>{{ _position.numberOfShares }}</div></div>
-    </div>
-
-    <div class="row mt-3" *ngIf="!_position.isClosed">
-      <div class="col"><div class="stat-label">Unrealized Profit</div><div>{{ _position.unrealizedProfit | currency }}</div></div>
-      <div class="col"><div class="stat-label">Unrealized Gain</div><div>{{_position.unrealizedGainPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Unrealized R/R</div><div>{{ _position.unrealizedRR | number }}</div></div>
-      <div class="col"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
-    </div>
+  <div class="card">
     
-    <div class="row mt-3" *ngIf="!_position.isClosed">
-      <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
-      <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
-      <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
-      <div class="col">
-        <div class="stat-label">Levels</div>
-        <div>
-          <span *ngFor="let l of _position.rrLevels">{{l | currency}} </span>
-        </div>
-      </div>
-    </div>
+    <div class="card-body">
 
-    <div class="row mt-3" *ngIf="!_position.isClosed">
-      <div class="col">
-        <label class="form-label" for="candidateRiskAmount">Risk Amount</label>
-        <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
+      <div class="row mt-3" *ngIf="_position.isClosed">
+        <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
+        <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
+        <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }} ({{_position.gainPct | number:'1.0-2'}}%)</div></div>
+        <div class="col"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
       </div>
-      <div class="col">
-        <button class="btn btn-link" (click)="setRiskAmount()">Set Risk Amount</button>
-      </div>
-      <div class="col">
-        <label class="form-label" for="candidateStopPrice">Stop Price</label>
-        <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
-      </div>
-      <div class="col">
-        <div>
-          <button class="btn btn-link" (click)="recalculateRiskAmount()">Recalculate Risk</button>
-        </div>
-        <div>
-          <button class="btn btn-link" (click)="setStopPrice()">Set Stop Price</button>
-        </div>
-        <div>
-          <button class="btn btn-link" (click)="deleteStopPrice()">Delete Stop Price</button>
-        </div>
-      </div>
-    </div>
 
-    <div class="row mt-3">
-      <div class="col">
-        <div class="stat-label">Notes</div>
-        <div>
-          <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
+      <div class="row" *ngIf="!_position.isClosed">
+        <div class="col"><div class="stat-label">Cost/Share</div><div>{{ _position.averageCostPerShare | currency}}</div></div>
+        <div class="col"><div class="stat-label">Cost</div><div>{{ _position.cost | currency}}</div></div>
+        <div class="col"><div class="stat-label">Stop</div><div>{{ _position.stopPrice | currency }} ({{ (_position.stopPrice - _position.averageCostPerShare) / _position.averageCostPerShare | percent }})</div></div>
+        <div class="col"><div class="stat-label">Number of Shares</div><div>{{ _position.numberOfShares }}</div></div>
+      </div>
+
+      <div class="row mt-3" *ngIf="!_position.isClosed">
+        <div class="col"><div class="stat-label">Unrealized Profit</div><div>{{ _position.unrealizedProfit | currency }}</div></div>
+        <div class="col"><div class="stat-label">Unrealized Gain</div><div>{{_position.unrealizedGainPct | percent}}</div></div>
+        <div class="col"><div class="stat-label">Unrealized R/R</div><div>{{ _position.unrealizedRR | number }}</div></div>
+        <div class="col"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
+      </div>
+      
+      <div class="row mt-3" *ngIf="!_position.isClosed">
+        <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
+        <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
+        <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
+        <div class="col">
+          <div class="stat-label">Levels</div>
+          <div>
+            <span *ngFor="let l of _position.rrLevels">{{l | currency}} </span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="mt-3">
-      <div class="row" *ngFor="let t of _position.transactions">
-        <div class="col">{{t.date | date }}</div>
-        <div class="col">{{t.type}}</div>
-        <div class="col">{{t.numberOfShares}}</div>
-        <div class="col">{{t.price | currency}}</div>
+      <div class="row mt-3" *ngIf="!_position.isClosed">
+        <div class="col">
+          <label class="form-label" for="candidateRiskAmount">Risk Amount</label>
+          <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
+        </div>
+        <div class="col">
+          <button class="btn btn-link" (click)="setRiskAmount()">Set Risk Amount</button>
+        </div>
+        <div class="col">
+          <label class="form-label" for="candidateStopPrice">Stop Price</label>
+          <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
+        </div>
+        <div class="col">
+          <div>
+            <button class="btn btn-link" (click)="recalculateRiskAmount()">Recalculate Risk</button>
+          </div>
+          <div>
+            <button class="btn btn-link" (click)="setStopPrice()">Set Stop Price</button>
+          </div>
+          <div>
+            <button class="btn btn-link" (click)="deleteStopPrice()">Delete Stop Price</button>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="mt-3">
-      <div class="stat-label">Events</div>
-      <div class="row" *ngFor="let t of _position.events">
-        <div class="col">{{t.date | date }}</div>
-        <div class="col">{{t.type}}</div>
-        <div class="col">{{t.value | number }}</div>
-        <div class="col">{{t.description}}</div>
+      <div class="row mt-3">
+        <div class="col">
+          <div class="stat-label">Notes</div>
+          <div>
+            <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="row" *ngFor="let t of _position.transactions">
+          <div class="col">{{t.date | date }}</div>
+          <div class="col">{{t.type}}</div>
+          <div class="col">{{t.numberOfShares}}</div>
+          <div class="col">{{t.price | currency}}</div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="stat-label">Events</div>
+        <div class="row" *ngFor="let t of _position.events">
+          <div class="col">{{t.date | date }}</div>
+          <div class="col">{{t.type}}</div>
+          <div class="col">{{t.value | number }}</div>
+          <div class="col">{{t.description}}</div>
+      </div>
     </div>
 
   </div>
