@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TickerOutcomes } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -12,6 +12,7 @@ export class StockPositionChartsComponent {
   private _positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
+  simulationResults: TradingStrategyResults
   prices: Prices
   outcomes: TickerOutcomes;
 
@@ -30,13 +31,25 @@ export class StockPositionChartsComponent {
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
     // get price data and pass it to chart
+    this.getSimulatedTrades();
+  }
+
+  private getSimulatedTrades() {
+    this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
+      (results: TradingStrategyResults) => {
+        this.simulationResults = results
+        this.getPricesForCurrentPosition()
+      }
+    )
+  }
+
+  private getPricesForCurrentPosition() {
     this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
       (r: Prices) => {
         // only take the last 365 of prices
-        this.prices = r
+        this.prices = r;
       }
-    )
-
+    );
   }
 
   next() {
