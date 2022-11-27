@@ -82,6 +82,19 @@ namespace core.Stocks.Services.Analysis
             );
 
             yield return new AnalysisOutcomeEvaluation(
+                "High Volume with Low Closing Range and Small Percent Change",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.RelativeVolume,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value <= LowClosingRange)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && System.Math.Abs(o.value) < SigmaRatioThreshold)
+                    ).ToList()
+            );
+
+
+            yield return new AnalysisOutcomeEvaluation(
                 "SMA20 Below SMA50 Recent",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.SMA20Above50Days,
