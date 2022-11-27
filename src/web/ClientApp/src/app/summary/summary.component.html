@@ -18,54 +18,44 @@
   <div>Options: {{ result.optionProfit | currency }}</div>
   
   <h5 class="mt-5">Closed Positions</h5>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Symbol</th>
-        <th>P/L</th>
-        <th>R:R</th>
-        <th>%</th>
-        <th>Buys</th>
-        <th>Sells</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let p of result.closedPositions">
-        <tr>
-          <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
-          <td width="100">{{p.profit  | number:'1.0-2'}}</td>
-          <td width="100">{{p.rr | number:'1.0-2'}}</td>
-          <td width="100">{{p.gainPct | number:'1.0-2'}}</td>
-          <td width="140">
-            <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
-              {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
-            </div>
-          </td>
-          <td width="140">
-            <div class="badge bg-danger me-1" *ngFor="let sell of sells(p)">{{sell.price | currency}} on {{sell.date | date: 'MM/dd/yyyy'}}</div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="6">
-            <ul class="list-unstyled" *ngIf="p.notes.length > 0">
-              <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
-            </ul>
-            <span *ngIf="p.notes.length === 0"> no notes </span>
-          </td>
-        </tr>
-      </ng-container>
-      
-      <tr *ngIf="result.closedPositions.length === 0">
-        <td colspan="6">No stock positions closed</td>
-      </tr>
-    </tbody>
-    <tfoot *ngIf="result.closedPositions.length > 0">
-      <td class="text-end"></td>
-      <td>{{ closedPositionProfit() | number:'1.0-2' }}</td>
-      <td>{{ closedPositionRR() | number:'1.0-2' }}</td>
-      <td colspan="3"></td>
-    </tfoot>
-  </table>
+
+  <ng-container *ngFor="let p of result.closedPositions">
+    <div class="row">
+      <div class="col"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></div>
+      <div class="col">{{p.profit  | currency}}</div>
+      <div class="col">{{p.rr | number:'1.0-2'}}</div>
+      <div class="col">{{p.gainPct | number:'1.0-2'}}%</div>
+      <div class="col">
+        <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
+          {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
+        </div>
+      </div>
+      <div class="col">
+        <div class="badge bg-danger me-1" *ngFor="let sell of sells(p)">
+          {{sell.price | currency}} x {{sell.numberOfShares}} ({{sell.price * sell.numberOfShares | currency}}) on {{sell.date | date: 'MM/dd/yyyy'}}
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div colspan="col">
+        <ul class="list-unstyled" *ngIf="p.notes.length > 0">
+          <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
+        </ul>
+        <span *ngIf="p.notes.length === 0"> no notes </span>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="row" *ngIf="result.closedPositions.length === 0">
+    <div class="col">No stock positions closed</div>
+  </div>
+  
+  <div *ngIf="result.closedPositions.length > 0" class="row">
+    <div class="col">Totals</div>
+    <div class="col">{{ closedPositionProfit() | currency }}</div>
+    <div class="col">{{ closedPositionRR() | number:'1.0-2' }}</div>
+    <div class="col"></div>
+  </div>
 
   <h5 class="mt-5">Opened Positions</h5>
   <table class="table">
