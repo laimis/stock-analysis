@@ -30,7 +30,7 @@
       </tr>
     </thead>
     <tbody>
-      <template *ngFor="let p of result.closedPositions">
+      <ng-container *ngFor="let p of result.closedPositions">
         <tr>
           <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
           <td width="100">{{p.profit  | number:'1.0-2'}}</td>
@@ -53,8 +53,8 @@
             <span *ngIf="p.notes.length === 0"> no notes </span>
           </td>
         </tr>
-        
-      </template>
+      </ng-container>
+      
       <tr *ngIf="result.closedPositions.length === 0">
         <td colspan="6">No stock positions closed</td>
       </tr>
