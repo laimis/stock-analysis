@@ -31,26 +31,32 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of result.closedPositions">
-        <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
-        <td width="100">{{p.profit  | number:'1.0-2'}}</td>
-        <td width="100">{{p.rr | number:'1.0-2'}}</td>
-        <td width="100">{{p.gainPct | percent:'1.0-2'}}</td>
-        <td width="140">
-          <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
-            {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
-          </div>
-        </td>
-        <td width="140">
-          <div class="badge bg-danger me-1" *ngFor="let sell of sells(p)">{{sell.price | currency}} on {{sell.date | date: 'MM/dd/yyyy'}}</div>
-        </td>
-        <td>
-          <ul class="list-unstyled" *ngIf="p.notes.length > 0">
-            <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
-          </ul>
-          <span *ngIf="p.notes.length === 0"> no notes </span>
-        </td>
-      </tr>
+      <template *ngFor="let p of result.closedPositions">
+        <tr>
+          <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+          <td width="100">{{p.profit  | number:'1.0-2'}}</td>
+          <td width="100">{{p.rr | number:'1.0-2'}}</td>
+          <td width="100">{{p.gainPct | number:'1.0-2'}}</td>
+          <td width="140">
+            <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
+              {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
+            </div>
+          </td>
+          <td width="140">
+            <div class="badge bg-danger me-1" *ngFor="let sell of sells(p)">{{sell.price | currency}} on {{sell.date | date: 'MM/dd/yyyy'}}</div>
+          </td>
+          <td>
+            <ul class="list-unstyled" *ngIf="p.notes.length > 0">
+              <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
+            </ul>
+            <span *ngIf="p.notes.length === 0"> no notes </span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7">Notes</td>
+        </tr>
+        
+      </template>
       <tr *ngIf="result.closedPositions.length === 0">
         <td colspan="6">No stock positions closed</td>
       </tr>
