@@ -2,7 +2,17 @@
     <div class="container">
       <div class="row">
         <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-        <div class="col text-center">{{currentPosition.ticker}} ({{currentPosition.price | currency}})</div>
+        <div class="col text-center">
+          <select (change)="dropdownClick($event.target)">
+            <option
+              *ngFor="let position of positions; let i = index;"
+              [value]="i"
+              [selected]="position.ticker === currentPosition.ticker">
+              {{position.ticker}}
+            </option>
+          </select>
+           ({{currentPosition.price | currency}})
+        </div>
         <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
       </div>
     </div>
@@ -26,10 +36,13 @@
             <tbody>
               <tr>
                 <td>Actual trade</td>
-                <td><span *ngIf="currentPosition.isClosed" class="badge bg-success p-2">closed</span></td>
+                <td>
+                  <span *ngIf="currentPosition.isClosed" class="badge bg-success p-2">closed</span>
+                  <span *ngIf="!currentPosition.isClosed" class="badge bg-warning p-2">open</span>
+                </td>
                 <td>{{currentPosition.profit + currentPosition.unrealizedProfit | currency}}</td>
                 <td>{{currentPosition.rr | number}}</td>
-                <td>{{currentPosition.gainPct | number}}%</td>
+                <td>{{currentPosition.isClosed ? currentPosition.gainPct : currentPosition.unrealizedGainPct | number}}%</td>
                 <td>
                   <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of currentPosition.transactions">
                     {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}

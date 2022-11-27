@@ -53,11 +53,11 @@ import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
 import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-trading-positions.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
-import { StockTradingPastComponent } from './stocks/stock-trading/stock-trading-past.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
 import { StockTradingReviewComponent } from './stocks/stock-trading/stock-trading-review.component';
 import { StockChartComponent } from './shared/stocks/stock-chart.component';
-import { StockPositionChartsComponent } from './stocks/stock-trading/stock-position-charts.component';
+import { StockTradingOpenPositionsComponent } from './stocks/stock-trading/stock-trading-open-positions.component';
+import { StockTradingClosedPositionsComponent } from './stocks/stock-trading/stock-trading-closed-positions.component';
 import { BrokerageOrdersComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-trading/stock-violations.component';
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
@@ -172,14 +172,14 @@ var routes: Routes = [
     StockOptionComponent,
     StockTransactionComponent,
     StockOwnershipComponent,
-    StockPositionChartsComponent,
+    StockTradingOpenPositionsComponent,
     StockViolationsComponent,
     
     StockTradingComponent,
     StockTradingPositionComponent,
     StockTradingPositionsComponent,
     StockTradingNewPositionComponent,
-    StockTradingPastComponent,
+    StockTradingClosedPositionsComponent,
     StockTradingPerformanceComponent,
     StockTradingReviewComponent,
     StockChartComponent,

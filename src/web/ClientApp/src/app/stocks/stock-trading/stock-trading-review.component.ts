@@ -25,6 +25,9 @@ export class StockTradingReviewComponent implements OnInit {
     this._index = 0
     this.updateCurrentPosition()
   }
+  get positions() {
+    return this._positions
+  }
 
   updateCurrentPosition() {
     this.currentPosition = this._positions[this._index]
@@ -47,6 +50,12 @@ export class StockTradingReviewComponent implements OnInit {
         this.prices = r;
       }
     );
+  }
+
+  dropdownClick(elem: EventTarget) {
+    var index = Number.parseInt((elem as HTMLInputElement).value)
+    this._index = index
+    this.updateCurrentPosition()
   }
 
   next() {

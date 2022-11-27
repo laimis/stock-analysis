@@ -2,7 +2,17 @@
   <div class="container">
     <div class="row">
       <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-      <div class="col text-center">{{currentPosition.ticker}} ({{currentPosition.profit | currency}})</div>
+      <div class="col text-center">
+        <select (change)="dropdownClick($event.target)">
+          <option
+            *ngFor="let position of positions; let i = index;"
+            [value]="i"
+            [selected]="position.ticker === currentPosition.ticker">
+            {{position.ticker}}
+          </option>
+        </select>
+        ({{currentPosition.profit | currency}})
+      </div>
       <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
     </div>
   </div>

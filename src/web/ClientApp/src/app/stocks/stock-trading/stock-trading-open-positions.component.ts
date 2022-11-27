@@ -3,11 +3,11 @@ import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrateg
 
 
 @Component({
-  selector: 'app-stock-position-charts',
-  templateUrl: './stock-position-charts.component.html',
-  styleUrls: ['./stock-position-charts.component.css']
+  selector: 'app-stock-trading-open-positions',
+  templateUrl: './stock-trading-open-positions.component.html',
+  styleUrls: ['./stock-trading-open-positions.component.css']
 })
-export class StockPositionChartsComponent {
+export class StockTradingOpenPositionsComponent {
 
   private _positions: PositionInstance[]
   private _index: number = 0
@@ -50,6 +50,13 @@ export class StockPositionChartsComponent {
         this.prices = r;
       }
     );
+  }
+
+  dropdownClick(elem: EventTarget) {
+    var index = Number.parseInt((elem as HTMLInputElement).value)
+    console.log("dropdown click " + index)
+    this._index = index
+    this.updateCurrentPosition()
   }
 
   next() {
