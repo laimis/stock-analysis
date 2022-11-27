@@ -45,7 +45,7 @@ namespace coretests.Stocks.Services
                     new ServiceResponse<PriceBar[]>(prices.ToArray())
                 );
 
-            _runner = new TradingStrategyRunner(mock.Object);
+            _runner = new TradingStrategyRunner(mock.Object, Mock.Of<IMarketHours>());
         }
 
         [Fact]

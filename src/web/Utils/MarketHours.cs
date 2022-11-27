@@ -1,18 +1,12 @@
 using System;
+using core.Shared.Adapters.Brokerage;
 using TimeZoneConverter;
 
 namespace web.Utils
 {
-    public interface IMarketHours
+    public class MarketHoursAlwaysOn : MarketHours
     {
-        bool IsOn(DateTimeOffset time);
-        DateTimeOffset ToMarketTime(DateTimeOffset when);
-    }
-
-    public class MarketHoursAlwaysOn : IMarketHours
-    {
-        public bool IsOn(DateTimeOffset time) => true;
-        public DateTimeOffset ToMarketTime(DateTimeOffset when) => MarketHours.ConvertToEastern(when);
+        public new bool IsMarketOpen(DateTimeOffset time) => true;
     }
 
     public class MarketHours : IMarketHours
@@ -21,7 +15,7 @@ namespace web.Utils
         private TimeSpan _start = new TimeSpan(9, 40, 0);
         private TimeSpan _end = new TimeSpan(16, 0, 0);
 
-        public bool IsOn(DateTimeOffset now)
+        public bool IsMarketOpen(DateTimeOffset now)
         {
             if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
             {
@@ -40,6 +34,13 @@ namespace web.Utils
         }
 
         public DateTimeOffset ToMarketTime(DateTimeOffset when) => ConvertToEastern(when);
+        public DateTimeOffset GetMarketEndOfDayTimeInUtc(DateTimeOffset when)
+        {
+            return TimeZoneInfo.ConvertTimeToUtc(
+                new DateTime(when.Year, when.Month, when.Day, 16, 0, 0),
+                _easternZoneId
+            );
+        }
 
         public static DateTimeOffset ConvertToEastern(DateTimeOffset when)
         {

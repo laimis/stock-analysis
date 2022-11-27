@@ -9,9 +9,13 @@ namespace core.Stocks.Services.Trading
     public class TradingStrategyRunner
     {
         private IBrokerage _brokerage;
+        private IMarketHours _hours;
 
-        public TradingStrategyRunner(IBrokerage brokerage)
-            => _brokerage = brokerage;
+        public TradingStrategyRunner(IBrokerage brokerage, IMarketHours hours)
+        {
+            _brokerage = brokerage;
+            _hours = hours;
+        }
 
         public async Task<TradingStrategyResults> RunAsync(
             UserState user,
@@ -21,12 +25,16 @@ namespace core.Stocks.Services.Trading
             string ticker,
             DateTimeOffset when)
         {
+            // when we simulate a purchase for that day, assume it's end of the day
+            // so that the price feed will return data from that day and not the previous one
+            var convertedWhen = _hours.GetMarketEndOfDayTimeInUtc(when);
+
             var prices = await _brokerage.GetPriceHistory(
                 user,
                 ticker,
                 Shared.Adapters.Stocks.PriceFrequency.Daily,
-                when,
-                when.AddDays(365));
+                convertedWhen,
+                convertedWhen.AddDays(365));
             
             if (!prices.IsOk)
             {

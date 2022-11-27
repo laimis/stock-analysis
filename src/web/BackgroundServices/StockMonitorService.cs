@@ -8,6 +8,7 @@ using core.Account;
 using core.Adapters.Emails;
 using core.Adapters.Stocks;
 using core.Alerts;
+using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.SMS;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -81,7 +82,7 @@ namespace web.BackgroundServices
         private async Task Loop(bool firstRun, CancellationToken stoppingToken)
         {
             var time = DateTimeOffset.UtcNow;
-            if (_marketHours.IsOn(time))
+            if (_marketHours.IsMarketOpen(time))
             {
                 await ScanAlerts(sendAlerts:!firstRun);
 

@@ -62,14 +62,17 @@ namespace core.Portfolio
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
-            
+            private IMarketHours _marketHours;
+
             public Handler(
                 IAccountStorage accounts,
                 IBrokerage brokerage,
+                IMarketHours marketHours,
                 IPortfolioStorage storage) : base(storage)
             {
                 _accounts = accounts;
                 _brokerage = brokerage;
+                _marketHours = marketHours;
             }
 
             public async Task<TradingStrategyResults> Handle(ForTicker request, CancellationToken cancellationToken)
@@ -80,7 +83,7 @@ namespace core.Portfolio
                     throw new Exception("User not found");
                 }
 
-                var runner = new TradingStrategyRunner(_brokerage);
+                var runner = new TradingStrategyRunner(_brokerage, _marketHours);
                 
                 return await runner.RunAsync(
                     user.State,
@@ -117,7 +120,7 @@ namespace core.Portfolio
                     throw new Exception("Position has no stop");
                 }
                 
-                var runner = new TradingStrategyRunner(_brokerage);
+                var runner = new TradingStrategyRunner(_brokerage, _marketHours);
                 
                 return await runner.RunAsync(
                     user.State,
