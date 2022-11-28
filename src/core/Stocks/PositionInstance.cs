@@ -131,7 +131,7 @@ namespace core.Stocks
             }
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
-            if (StopPrice == null)
+            if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
             {
                 SetStopPrice(FirstBuyCost.Value * 0.95m, when);
             }
@@ -152,6 +152,8 @@ namespace core.Stocks
                 Closed = when;
             }
         }
+
+        private bool HasEventWithDescription(string testDescription) => Events.Any(e => e.description == testDescription);
 
         public void SetStopPrice(decimal? stopPrice, DateTimeOffset when)
         {
