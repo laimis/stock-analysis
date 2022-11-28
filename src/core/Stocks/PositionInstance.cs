@@ -157,7 +157,7 @@ namespace core.Stocks
 
         public void SetStopPrice(decimal? stopPrice, DateTimeOffset when)
         {
-            if (stopPrice != null)
+            if (stopPrice != null && stopPrice != this.StopPrice)
             {
                 StopPrice = stopPrice;
 

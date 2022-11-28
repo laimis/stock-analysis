@@ -5,46 +5,92 @@ namespace core.Stocks.Services.Trading
 {
     internal class TradingStrategyRRLevels
     {
-        public const string StrategyNameOneThirdRR = "1/3 on each RR level";
-        public const string StrategyNameOneFourthRR = "1/4 on each RR level";
-        public const string StrategyNameOneThirdPercentBased = "1/3 on each RR level (percent based)";
-        public const string StrategyNameOneFourthPercentBased = "1/4 on each RR level (percent based)";
         private const decimal AVG_PERCENT_GAIN = 0.07m;
 
+        private static Func<int, PositionInstance, decimal> _alwaysPositionStop = (_, position) => position.StopPrice.Value;
+        private static Func<int, PositionInstance, Func<int, decimal>, decimal> _advancingStop = (level, position, rrLevelFunc) => level switch {
+                        0 => position.AverageCostPerShare,
+                        _ => rrLevelFunc(level - 1)
+                    };
+
+        private static Func<int, PositionInstance, Func<int, decimal>, decimal> _delayedAdvancingStop = (level, position, rrLevelFunc) => level switch {
+                        0 => position.AverageCostPerShare,
+                        1 => position.AverageCostPerShare,
+                        _ => rrLevelFunc(level - 2)
+                    };
+        
         public static TradingStrategyResult RunOneThirdRR(
-            string name,
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevel(level).Value, closeIfOpenAtTheEnd);
+            => Run(
+                "1/3 on each RR level",
+                positionInstance,
+                success,
+                3,
+                level => positionInstance.GetRRLevel(level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => position.GetRRLevel(l).Value),
+                closeIfOpenAtTheEnd);
+
+        public static TradingStrategyResult RunOneThirdRRDelayedStop(
+            PositionInstance positionInstance,
+            PriceBar[] success,
+            bool closeIfOpenAtTheEnd)
+            => Run(
+                "1/3 on each RR level (delayed stop)",
+                positionInstance,
+                success,
+                3,
+                level => positionInstance.GetRRLevel(level).Value,
+                (level, position) => _delayedAdvancingStop(level, position, ( l ) => position.GetRRLevel(l).Value),
+                closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthRR(
-            string name,
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevel(level).Value, closeIfOpenAtTheEnd);
+            => Run(
+                "1/4 on each RR level",
+                positionInstance,
+                success,
+                4,
+                level => positionInstance.GetRRLevel(level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => position.GetRRLevel(l).Value),
+                closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdPercentBased(
-            string name,
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value, closeIfOpenAtTheEnd);
+            => Run(
+                "1/3 on each RR level (percent based)",
+                positionInstance,
+                success,
+                3,
+                level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => position.GetRRLevelPercentBased(l, AVG_PERCENT_GAIN).Value),
+                closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthPercentBased(
-            string name,
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value, closeIfOpenAtTheEnd);
+            => Run(
+                "1/4 on each RR level (percent based)",
+                positionInstance,
+                success,
+                4,
+                level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => position.GetRRLevelPercentBased(l, AVG_PERCENT_GAIN).Value),
+                closeIfOpenAtTheEnd);
 
-        public static TradingStrategyResult Run(
+        private static TradingStrategyResult Run(
             string name,
             PositionInstance position,
             PriceBar[] prices,
             int rrLevels,
             Func<int, decimal> getRRLevelFunc,
+            Func<int, PositionInstance, decimal> getStopPriceFunc,
             bool closeIfOpenAtTheEnd)
         {
             if (position.StopPrice == null)
@@ -102,10 +148,8 @@ namespace core.Stocks.Services.Trading
                 {
                     position.Sell(sellPortions[currentLevel], getRRLevelFunc(currentLevel), Guid.NewGuid(), bar.Date);
                     
-                    var stopPrice = currentLevel switch {
-                        0 => position.AverageCostPerShare,
-                        _ => getRRLevelFunc(currentLevel - 1)
-                    };
+                    var stopPrice = getStopPriceFunc(currentLevel, position);
+                    
                     position.SetStopPrice(stopPrice, bar.Date);
                     levelSells[currentLevel] = true;
                     currentLevel++;
