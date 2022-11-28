@@ -43,8 +43,8 @@
 
     <div class="row mb-2">
       <div class="col"><div class="stat-label">Expected Value</div><div>{{performance.recent.ev | currency}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.recent.avgWinAmount / performance.recent.avgLossAmount | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.recent.winAvgReturnPct / performance.recent.lossAvgReturnPct | number:'1.0-2'}}</div></div>
+      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.recent.profitRatio | number:'1.0-2'}}</div></div>
+      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.recent.returnPctRatio | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R sum</div><div>{{performance.recent.rrSum | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R sum Weighted</div><div>{{performance.recent.rrSumWeighted | number:'1.0-2'}}</div></div>
     </div>  
@@ -78,8 +78,8 @@
 
     <div class="row mb-2">
       <div class="col"><div class="stat-label">Expected Value</div><div>{{performance.overall.ev | currency}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.overall.avgWinAmount / performance.overall.avgLossAmount | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.overall.winAvgReturnPct / performance.overall.lossAvgReturnPct | number:'1.0-2'}}</div></div>
+      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.overall.profitRatio | number:'1.0-2'}}</div></div>
+      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.overall.returnPctRatio | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R sum</div><div>{{performance.overall.rrSum | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R sum Weighted</div><div>{{performance.overall.rrSumWeighted | number:'1.0-2'}}</div></div>
     </div>  
