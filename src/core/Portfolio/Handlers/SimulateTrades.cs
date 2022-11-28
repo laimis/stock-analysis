@@ -71,7 +71,7 @@ namespace core.Portfolio
                         stopPrice: position.FirstStop.Value,
                         ticker: position.Ticker,
                         when: position.Opened.Value,
-                        closeIfOpenAtTheEnd: true
+                        closeIfOpenAtTheEnd: false
                     );
 
                     results.Add(new TradingStrategyResult(0, 0, position, "Actual trading"));
