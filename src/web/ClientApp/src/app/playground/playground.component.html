@@ -7,8 +7,8 @@
         <th>R/R</th>
         <th>Avg Win Pct</th>
         <th>Avg Loss Pct</th>
-        <td>Max Win</td>
-        <td>Max Loss</td>
+        <th>Max Win</th>
+        <th>Max Loss</th>
         <th>E/V</th>
         <th>Win %</th>
         <th>Profit /</th>
@@ -20,14 +20,14 @@
         <td>{{r.strategyName}}</td>
         <td>{{r.performance.profit | currency}}</td>
         <td>{{r.performance.rrSum | number:'1.0-2'}}</td>
-        <td>{{r.performance.winAvgReturnPct | number:'1.0-2'}}%</td>
-        <td>{{r.performance.lossAvgReturnPct | number:'1.0-2'}}%</td>
+        <td>{{r.performance.winAvgReturnPct | percent}}</td>
+        <td>{{r.performance.lossAvgReturnPct | percent}}</td>
         <td>{{r.performance.maxWinAmount | currency}}</td>
         <td>{{r.performance.maxLossAmount | currency}}</td>
         <td>{{r.performance.ev | currency}}</td>
-        <td>{{r.performance.winPct | percent}}%</td>
-        <td>{{r.performance.profitRatio | percent}}%</td>
-        <td>{{r.performance.returnPctRatio | percent}}%</td>
+        <td>{{r.performance.winPct | percent}}</td>
+        <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
+        <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
       </tr>
     </tbody>
   </table>
