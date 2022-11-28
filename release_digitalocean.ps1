@@ -9,16 +9,6 @@ if ([System.String]::IsNullOrEmpty($message))
 # ensure that the project can build by invoking npm run build:production
 # in src/web/ClientApp directory
 
-invoke-expression "./test.bat"
-$exitCode = $LASTEXITCODE
-if ($exitCode -ne 0)
-{
-    write-host "Build failed"
-    exit
-}
-
-exit
-
 push-location "src/web/ClientApp"
 invoke-expression "npm run build:production"
 $exitCode = $LASTEXITCODE

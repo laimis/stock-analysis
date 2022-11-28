@@ -66,7 +66,7 @@ export class StockTradingComponent implements OnInit {
   }
 
   totalRiskedAmount() {
-    return this.positions.filter(p => p.isShortTerm).reduce((acc, cur) => acc + cur.riskedAmount, 0)
+    return this.positions.reduce((acc, cur) => acc + cur.riskedAmount, 0)
   }
 
   private loadEntries() {
