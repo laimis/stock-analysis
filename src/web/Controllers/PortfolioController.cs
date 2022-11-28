@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Output;
@@ -58,6 +59,16 @@ namespace web.Controllers
             _mediator.Send(
                 new SimulateTrade.Command(
                     positionId, strategyName, ticker, User.Identifier()
+                )
+            );
+
+        [HttpGet("simulate/trades")]
+        public Task<List<TradingStrategyPerformance>> Trade(
+            [FromQuery]int numberOfPositions) =>
+            
+            _mediator.Send(
+                new SimulateTrades.Query(
+                    numberOfPositions, User.Identifier()
                 )
             );
 

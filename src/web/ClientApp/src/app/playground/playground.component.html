@@ -2,28 +2,22 @@
   <table class="table table-hover">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Open</th>
-        <th>High</th>
-        <th>Low</th>
-        <th>Close</th>
-        <th>sma20</th>
-        <th>sma50</th>
-        <th>sma150</th>
-        <th>sma200</th>
+        <th>Strategy</th>
+        <th>P/L</th>
+        <th>R/R</th>
+        <th>Avg Win Pct</th>
+        <th>Avg Loss Pct</th>
+        <th>E/V</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of prices.prices; let i = index">
-        <td>{{p.dateStr}}</td>
-        <td>{{p.open}}</td>
-        <td>{{p.high}}</td>
-        <td>{{p.low}}</td>
-        <td>{{p.close}}</td>
-        <td class="table-success" >{{prices.sma.sma20.values[i]}}</td>
-        <td>{{prices.sma.sma50.values[i]}}</td>
-        <td>{{prices.sma.sma150.values[i]}}</td>
-        <td>{{prices.sma.sma200.values[i]}}</td>
+      <tr *ngFor="let r of results">
+        <td>{{r.strategyName}}</td>
+        <td>{{r.performance.profit | currency}}</td>
+        <td>{{r.performance.rrSum | number:'1.0-2'}}</td>
+        <td>{{r.performance.winAvgReturnPct | number:'1.0-2'}}%</td>
+        <td>{{r.performance.lossAvgReturnPct | number:'1.0-2'}}%</td>
+        <td>{{r.performance.ev | currency}}</td>
       </tr>
     </tbody>
   </table>

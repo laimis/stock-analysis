@@ -28,14 +28,14 @@ namespace core.Stocks
 
             var totalDaysHeld = 0;
             var totalCost = 0m;
-            var totalProfit = 0m;
+            var profit = 0m;
             var rrSum = 0m;
             var rrSumWeighted = 0m;
             
             foreach(var e in closedPositions)
             {
                 totalDaysHeld += e.DaysHeld;
-                totalProfit += e.Profit;
+                profit += e.Profit;
                 totalCost += e.Cost;
                 rrSum += e.RR;
                 rrSumWeighted += e.RRWeighted;
@@ -68,7 +68,7 @@ namespace core.Stocks
             return new TradingPerformanceView {
                 AvgDaysHeld = totalDaysHeld / total,
                 AvgLossAmount = losses > 0 ? totalLossAmount / losses : 0,
-                AvgReturnPct = totalCost > 0 ? totalProfit / totalCost : 0,
+                AvgReturnPct = totalCost > 0 ? profit / totalCost : 0,
                 AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
                 EV = adjustedWinningAmount - adjustedLossingAmount,
                 MaxLossAmount = maxLossAmount,
@@ -77,6 +77,7 @@ namespace core.Stocks
                 LossAvgReturnPct = totalLossReturnPct > 0 ? totalLossReturnPct / losses : 0,
                 Losses = losses,
                 MaxWinAmount = maxWinAmount,
+                Profit = profit,
                 rrSum = rrSum,
                 rrSumWeighted = rrSumWeighted,
                 Total = total,
@@ -92,6 +93,7 @@ namespace core.Stocks
         public int Wins { get; set; }
         public decimal AvgWinAmount { get; set; }
         public decimal MaxWinAmount { get; set; }
+        public decimal Profit { get; set; }
         public decimal WinAvgReturnPct { get; set; }
         public decimal WinMaxReturnPct { get; set; }
         public double WinAvgDaysHeld { get; set; }

@@ -6,13 +6,19 @@ namespace core.Stocks.Services.Trading
 {
     public interface ITradingStrategy
     {
-        TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success);
+        TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success, bool closeIfOpenAtTheEnd);
     }
 
     public class TradingStrategyResults
     {
         public List<TradingStrategyResult> Results { get; } = new List<TradingStrategyResult>();
     }
+
+    public record struct TradingStrategyPerformance(
+        string strategyName,
+        TradingPerformanceView performance,
+        PositionInstance[] positions
+    );
 
     public record struct TradingStrategyResult(
         decimal maxDrawdownPct,
@@ -23,18 +29,18 @@ namespace core.Stocks.Services.Trading
 
     public class TradingStrategy : ITradingStrategy
     {
-        public TradingStrategy(string name, Func<string, PositionInstance, PriceBar[], TradingStrategyResult> runFunc)
+        public TradingStrategy(string name, Func<string, PositionInstance, PriceBar[], bool, TradingStrategyResult> runFunc)
         {
             Name = name;
             RunFunc = runFunc;
         }
 
         public string Name { get; }
-        public Func<string, PositionInstance, PriceBar[], TradingStrategyResult> RunFunc { get; }
+        public Func<string, PositionInstance, PriceBar[], bool, TradingStrategyResult> RunFunc { get; }
 
-        public TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success)
+        public TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success, bool closeIfOpenAtTheEnd)
         {
-            return RunFunc(Name, positionInstance, success);
+            return RunFunc(Name, positionInstance, success, closeIfOpenAtTheEnd);
         }
     }
 

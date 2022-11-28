@@ -63,6 +63,12 @@ export class StocksService {
     )
   }
 
+  simulatePositions(numberOfPositions: number): Observable<TradingStrategyPerformance[]> {
+    return this.http.get<TradingStrategyPerformance[]>(
+      `/api/portfolio/simulate/trades?numberOfPositions=${numberOfPositions}`
+    )
+  }
+
   smsOff(): Observable<any> {
     return this.http.post<any>('/api/alerts/sms/off', {})
   }
@@ -679,6 +685,7 @@ export interface StockTradingPerformance {
   wins: number,
   losses: number,
   total: number,
+  profit: number,
   avgDaysHeld: number,
   avgWinAmount: number,
   maxWinAmount: number,
@@ -797,6 +804,12 @@ export interface TradingStrategyResult {
 
 export interface TradingStrategyResults {
   results: TradingStrategyResult[]
+}
+
+export interface TradingStrategyPerformance {
+  performance: StockTradingPerformance
+  positions: PositionInstance[]
+  strategyName: string
 }
 
 export class OptionDefinition {

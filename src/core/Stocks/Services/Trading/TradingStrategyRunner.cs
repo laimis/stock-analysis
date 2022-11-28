@@ -23,7 +23,8 @@ namespace core.Stocks.Services.Trading
             decimal price,
             decimal stopPrice,
             string ticker,
-            DateTimeOffset when)
+            DateTimeOffset when,
+            bool closeIfOpenAtTheEnd = false)
         {
             // when we simulate a purchase for that day, assume it's end of the day
             // so that the price feed will return data from that day and not the previous one
@@ -45,8 +46,8 @@ namespace core.Stocks.Services.Trading
 
             var bars = prices.Success;
 
-            Console.WriteLine($"price vs first bar {price} vs {bars[0].High}");
-            // HACK: sometimes stock is purchased in after hours at a much higher or lower price than what the day's high/close was, we need to move the prices to the next day
+            // HACK: sometimes stock is purchased in after hours at a much higher or lower price
+            // than what the day's high/close was, we need to move the prices to the next day
             if (price > bars[0].High)
             {
                 bars = bars.Skip(1).ToArray();
@@ -59,7 +60,7 @@ namespace core.Stocks.Services.Trading
                 positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
                 positionInstance.SetStopPrice(stopPrice, when);
 
-                var result = strategy.Run(positionInstance, bars);
+                var result = strategy.Run(positionInstance, bars, closeIfOpenAtTheEnd);
                 results.Results.Add(result);
             }
 

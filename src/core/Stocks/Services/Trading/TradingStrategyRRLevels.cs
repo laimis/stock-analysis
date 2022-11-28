@@ -14,24 +14,38 @@ namespace core.Stocks.Services.Trading
         public static TradingStrategyResult RunOneThirdRR(
             string name,
             PositionInstance positionInstance,
-            PriceBar[] success)
-            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevel(level).Value);
+            PriceBar[] success,
+            bool closeIfOpenAtTheEnd)
+            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevel(level).Value, closeIfOpenAtTheEnd);
 
-        public static TradingStrategyResult RunOneFourthRR(string name, PositionInstance positionInstance, PriceBar[] success)
-            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevel(level).Value);
+        public static TradingStrategyResult RunOneFourthRR(
+            string name,
+            PositionInstance positionInstance,
+            PriceBar[] success,
+            bool closeIfOpenAtTheEnd)
+            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevel(level).Value, closeIfOpenAtTheEnd);
 
-        public static TradingStrategyResult RunOneThirdPercentBased(string name, PositionInstance positionInstance, PriceBar[] success)
-            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value);
+        public static TradingStrategyResult RunOneThirdPercentBased(
+            string name,
+            PositionInstance positionInstance,
+            PriceBar[] success,
+            bool closeIfOpenAtTheEnd)
+            => Run(name, positionInstance, success, 3, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value, closeIfOpenAtTheEnd);
 
-        public static TradingStrategyResult RunOneFourthPercentBased(string name, PositionInstance positionInstance, PriceBar[] success)
-            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value);
+        public static TradingStrategyResult RunOneFourthPercentBased(
+            string name,
+            PositionInstance positionInstance,
+            PriceBar[] success,
+            bool closeIfOpenAtTheEnd)
+            => Run(name, positionInstance, success, 4, level => positionInstance.GetRRLevelPercentBased(level, AVG_PERCENT_GAIN).Value, closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult Run(
             string name,
             PositionInstance position,
             PriceBar[] prices,
             int rrLevels,
-            Func<int, decimal> getRRLevelFunc)
+            Func<int, decimal> getRRLevelFunc,
+            bool closeIfOpenAtTheEnd)
         {
             if (position.StopPrice == null)
             {
@@ -103,6 +117,11 @@ namespace core.Stocks.Services.Trading
                 // if the position is still open, let's set the latest price we had for it
                 // so that we can render unrealized stats
                 position.SetPrice(prices[^1].Close);
+
+                if (closeIfOpenAtTheEnd)
+                {
+                    position.Sell(position.NumberOfShares, prices[^1].Close, Guid.NewGuid(), prices[^1].Date);
+                }
             }
 
             return new TradingStrategyResult(
