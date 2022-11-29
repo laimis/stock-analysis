@@ -90,7 +90,7 @@ namespace core.Stocks
                         {
                             violations.Add(
                                 new StockViolationView(
-                                    message: $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} but NGTrading says {localPosition.NumberOfShares}",
+                                    message: $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare}",
                                     numberOfShares: brokeragePosition.Quantity,
                                     pricePerShare: brokeragePosition.AverageCost,
                                     ticker: brokeragePosition.Ticker
