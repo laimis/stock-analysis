@@ -16,6 +16,13 @@ namespace core.Alerts
     )
     {
         public Guid id { get; } = Guid.NewGuid();
+
+        internal bool MatchesTickerAndSource(TriggeredAlert a)
+        {
+            return this.source == a.source && this.ticker == a.ticker && a.id != this.id;
+        }
+
+        internal double AgeInHours => (DateTimeOffset.UtcNow - when).TotalHours;
     }
 
     public interface IStockPositionMonitor

@@ -12,6 +12,7 @@ namespace core.Alerts
         private ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor> _monitors = new ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor>();
         private HashSet<string> _tickers = new HashSet<string>();
         private const int MAX_RECENT_ALERTS = 20;
+        private const int RECENT_ALERT_HOUR_THRESHOLD = 8; // alerts within eight hour are considered to be recent
 
         public IEnumerable<IStockPositionMonitor> Monitors => _monitors.Values;
 
@@ -101,9 +102,13 @@ namespace core.Alerts
 
         public bool HasRecentlyTriggered(TriggeredAlert a)
         {
-            if (_recentlyTriggeredAlerts.TryGetValue(a.userId, out var list))
+            if (_recentlyTriggeredAlerts.TryGetValue(a.userId, out var triggeredAlerts))
             {
-                return list.Any(r => r.source == a.source && r.ticker == a.ticker && a.id != r.id);
+                return triggeredAlerts.Any(
+                    triggeredAlert => 
+                        triggeredAlert.MatchesTickerAndSource(a)
+                        && triggeredAlert.AgeInHours < RECENT_ALERT_HOUR_THRESHOLD
+                    );
             }
 
             return false;

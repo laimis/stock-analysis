@@ -12,7 +12,6 @@ using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.SMS;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using web.Utils;
 
 namespace web.BackgroundServices
 {
@@ -59,13 +58,13 @@ namespace web.BackgroundServices
             await BuildUpAlerts();
 
             var firstRun = true;
-
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
                     await Loop(firstRun, stoppingToken);
-
+                    
                     firstRun = false;
                 }
                 catch(Exception ex)
