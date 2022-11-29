@@ -51,10 +51,6 @@ namespace core.Stocks.Services.Trading
             );
 
             yield return new TradingStrategy(
-                TradingStrategyRRLevels.RunOneThirdRRDelayedStop
-            );
-
-            yield return new TradingStrategy(
                 TradingStrategyRRLevels.RunOneFourthRR
             );
 
@@ -66,7 +62,9 @@ namespace core.Stocks.Services.Trading
                 TradingStrategyRRLevels.RunOneFourthPercentBased
             );
 
-
+            yield return new TradingStrategy(
+                TradingStrategyRRLevels.RunOneThirdRRDelayedStop
+            );
         }
     }
 }
