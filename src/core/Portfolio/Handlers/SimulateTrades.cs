@@ -74,13 +74,6 @@ namespace core.Portfolio
                         closeIfOpenAtTheEnd: false
                     );
 
-                    // make sure to set the current position price, if applicable
-                    var quote = await _brokerage.GetQuote(user.State, position.Ticker);
-                    if (quote.IsOk)
-                    {
-                        position.SetPrice(quote.Success.lastPrice);
-                    }
-
                     results.Add(new TradingStrategyResult(0, 0, position, "Actual trading"));
                     results.AddRange(simulatedResults.Results);
                 }
