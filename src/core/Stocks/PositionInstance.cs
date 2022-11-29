@@ -4,7 +4,8 @@ using System.Linq;
 
 namespace core.Stocks
 {
-    public record struct PositionEvent (string description, string type, decimal? value, DateTimeOffset when)
+    public enum PositionEventType { buy, stop, sell, risk }
+    public record struct PositionEvent (string description, PositionEventType type, decimal? value, DateTimeOffset when)
     {
         public string Date => when.ToString("yyyy-MM-dd");
     }
@@ -93,6 +94,7 @@ namespace core.Stocks
             }
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
+            Events.Add(new PositionEvent($"buy ${price}x{numberOfShares}", PositionEventType.buy, price, when));
 
             if (FirstBuyCost == null)
             {
@@ -130,13 +132,14 @@ namespace core.Stocks
                 throw new InvalidOperationException("Transaction would make amount owned invalid");
             }
 
+            Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
+            Events.Add(new PositionEvent($"sell ${price}x{numberOfShares}", PositionEventType.sell, price, when));
+
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
             {
                 SetStopPrice(FirstBuyCost.Value * 0.95m, when);
-            }
-
-            Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
+            }            
 
             if (notes != null)
             {
@@ -166,7 +169,7 @@ namespace core.Stocks
                     FirstStop = stopPrice;
                 }
 
-                Events.Add(new PositionEvent($"Stop price set to {stopPrice}", "stop", stopPrice, when));
+                Events.Add(new PositionEvent($"Stop price set to {stopPrice}", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -181,14 +184,14 @@ namespace core.Stocks
             RiskedAmount = null;
             RRLevels.Clear();
 
-            Events.Add(new PositionEvent("Stop price deleted", "stop", null, when));
+            Events.Add(new PositionEvent("Stop price deleted", PositionEventType.stop, null, when));
         }
 
         public void SetRiskAmount(decimal riskAmount, DateTimeOffset when)
         {
             RiskedAmount = riskAmount;
 
-            Events.Add(new PositionEvent("Set risk amount", "risk", riskAmount, when));
+            Events.Add(new PositionEvent("Set risk amount", PositionEventType.risk, riskAmount, when));
 
             // setting risk, should calculate the RR levels for selling to accomodate this risk
             if (NumberOfShares == 0)
