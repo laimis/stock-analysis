@@ -13,6 +13,8 @@
         <th>Win %</th>
         <th>Profit /</th>
         <th>Pct /</th>
+        <th>Trades</th>
+        <th>Open Trades</th>
       </tr>
     </thead>
     <tbody>
@@ -28,6 +30,8 @@
         <td>{{r.performance.winPct | percent}}</td>
         <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
         <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
+        <td>{{r.performance.total}}</td>
+        <td>{{openPositions(r.positions)}}</td>
       </tr>
     </tbody>
   </table>

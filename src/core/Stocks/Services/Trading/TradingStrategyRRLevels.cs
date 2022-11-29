@@ -14,7 +14,7 @@ namespace core.Stocks.Services.Trading
                     };
 
         private static Func<int, PositionInstance, Func<int, decimal>, decimal> _delayedAdvancingStop = (level, position, rrLevelFunc) => level switch {
-                        0 => position.AverageCostPerShare,
+                        0 => position.StopPrice.Value,
                         1 => position.AverageCostPerShare,
                         _ => rrLevelFunc(level - 2)
                     };

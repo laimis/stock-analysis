@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, TradingStrategyPerformance } from '../services/stocks.service';
+import { ActivatedRoute } from '@angular/router';
+import { PositionInstance, StocksService, TradingStrategyPerformance } from '../services/stocks.service';
 
 @Component({
   selector: 'app-playground',
@@ -10,12 +11,24 @@ import { StocksService, TradingStrategyPerformance } from '../services/stocks.se
 export class PlaygroundComponent implements OnInit {
   results: TradingStrategyPerformance[];
   
-  constructor(private stocks:StocksService) { }
+  constructor(
+    private stocks:StocksService,
+    private route:ActivatedRoute) { }
 
   ngOnInit() {
-    this.stocks.simulatePositions(20).subscribe( results => {
+    var n = this.route.snapshot.queryParamMap.get('n');
+    var number = 20;
+    if (n) {
+      number = parseInt(n);
+    }
+
+    this.stocks.simulatePositions(number).subscribe( results => {
         this.results = results
       });
+  }
+
+  openPositions(positions:PositionInstance[]) {
+    return positions.filter(p => !p.isClosed).length;
   }
 }
 
