@@ -75,6 +75,7 @@ import { GapsComponent } from './shared/reports/gaps.component';
 import { PercentChangeDistributionComponent } from './shared/reports/percent-change-distribution.component';
 import { StockNewPositionComponent } from './stocks/stock-buy/app-stock-new-position/app-stock-new-position.component';
 import { TradingPerformanceSummaryComponent } from './shared/stocks/trading-performance-summary.component';
+import { TradingActualVsSimulatedPositionComponent } from './shared/stocks/trading-actual-vs-simulated.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -186,6 +187,7 @@ var routes: Routes = [
     StockChartComponent,
     StockTradingSimulatorComponent,
     TradingPerformanceSummaryComponent,
+    TradingActualVsSimulatedPositionComponent,
     
     BrokerageOrdersComponent,
     BrokerageNewOrderComponent,

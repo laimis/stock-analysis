@@ -94,7 +94,7 @@ namespace core.Stocks
             }
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
-            Events.Add(new PositionEvent($"buy ${price}x{numberOfShares}", PositionEventType.buy, price, when));
+            Events.Add(new PositionEvent($"buy {numberOfShares} @ ${price}", PositionEventType.buy, price, when));
 
             if (FirstBuyCost == null)
             {
@@ -133,7 +133,7 @@ namespace core.Stocks
             }
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
-            Events.Add(new PositionEvent($"sell ${price}x{numberOfShares}", PositionEventType.sell, price, when));
+            Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price}", PositionEventType.sell, price, when));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))

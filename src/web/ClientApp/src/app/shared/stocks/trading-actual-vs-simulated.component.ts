@@ -1,0 +1,23 @@
+import { Component, Input } from '@angular/core';
+import { PositionInstance, TradingStrategyResults } from 'src/app/services/stocks.service';
+
+
+@Component({
+  selector: 'app-trading-actual-vs-simulated',
+  templateUrl: './trading-actual-vs-simulated.component.html',
+})
+export class TradingActualVsSimulatedPositionComponent {
+
+  showDetails: boolean = false;
+
+  @Input()
+  public actual: PositionInstance;
+
+  @Input()
+  public simulations: TradingStrategyResults
+
+  toggleShowDetails() {
+    this.showDetails = !this.showDetails;
+  }
+}
+
