@@ -1,92 +1,10 @@
 <div>
 
-  <div class="mt-3">
-    <b>Recent</b>
-    <div class="row mb-2">
-      <div class="col">
-        <div class="stat-label">Wins</div>
-        <div>{{performance.recent.wins}}</div>
-      </div>
-      <div class="col">
-        <div class="stat-label">Losses</div>
-        <div>{{performance.recent.losses}}</div>
-      </div>
-      <div class="col">
-        <div class="stat-label">Win %</div>
-        <div>{{performance.recent.wins / performance.recent.total | percent:'1.2'}}</div>
-      </div>
-      <div class="col">
-        <div class="stat-label">Avg Days Held</div>
-        <div>{{performance.recent.avgDaysHeld | number:'1.0-0'}}</div>
-      </div>
-      <div class="col">
-        <div class="stat-label">Return %</div>
-        <div>{{performance.recent.avgReturnPct | number:'1.0-0'}}</div>
-      </div>
-    </div>
+  <app-trading-performance-summary [performance]="performance.recent" title="Recent"></app-trading-performance-summary>
 
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Avg Win</div><div>{{performance.recent.avgWinAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Max Win</div><div>{{performance.recent.maxWinAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Avg % Return Wins</div><div>{{performance.recent.winAvgReturnPct | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">Max % Return Wins</div><div>{{performance.recent.winMaxReturnPct | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">Avg Win Days Held</div><div>{{performance.recent.winAvgDaysHeld | number:'1.0-0'}}</div></div>
-    </div>
+  <app-trading-performance-summary [performance]="performance.overall" title="Overall"></app-trading-performance-summary>
 
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Avg Loss</div><div>{{performance.recent.avgLossAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Max Loss</div><div>{{performance.recent.maxLossAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Avg % Return Losses</div><div>{{performance.recent.lossAvgReturnPct | number:'1.0-0'}}</div></div>
-      <div class="col"><div class="stat-label">Max % Return Losses</div><div>{{performance.recent.lossMaxReturnPct | number:'1.0-0'}}</div></div>
-      <div class="col"><div class="stat-label">Avg Loss Days Held</div><div>{{performance.recent.lossAvgDaysHeld | number:'1.0-0'}}</div></div>
-    </div>
-
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Expected Value</div><div>{{performance.recent.ev | currency}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.recent.profitRatio | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.recent.returnPctRatio | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">R/R sum</div><div>{{performance.recent.rrSum | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">R/R sum Weighted</div><div>{{performance.recent.rrSumWeighted | number:'1.0-2'}}</div></div>
-    </div>  
-  </div>
-
-  <div class="mt-3">
-    <b>Overall</b>
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Wins</div><div>{{performance.overall.wins}}</div></div>
-      <div class="col"><div class="stat-label">Losses</div><div>{{performance.overall.losses}}</div></div>
-      <div class="col"><div class="stat-label">Win %</div><div>{{performance.overall.wins / performance.overall.total | percent:'1.2'}}</div></div>
-      <div class="col"><div class="stat-label">Avg Days Held</div><div>{{performance.overall.avgDaysHeld | number:'1.0-0'}}</div></div>
-      <div class="col"><div class="stat-label">Return %</div><div>{{performance.overall.avgReturnPct | percent}}</div></div>
-    </div>
-
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Avg Win</div><div>{{performance.overall.avgWinAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Max Win</div><div>{{performance.overall.maxWinAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Avg % Return Wins</div><div>{{performance.overall.winAvgReturnPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Max % Return Wins</div><div>{{performance.overall.winMaxReturnPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Avg Win Days Held</div><div>{{performance.overall.winAvgDaysHeld | number:'1.0-0'}}</div></div>
-    </div>
-
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Avg Loss</div><div>{{performance.overall.avgLossAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Max Loss</div><div>{{performance.overall.maxLossAmount | currency}}</div></div>
-      <div class="col"><div class="stat-label">Avg % Return Losses</div><div>{{performance.overall.lossAvgReturnPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Max % Return Losses</div><div>{{performance.overall.lossMaxReturnPct | percent}}</div></div>
-      <div class="col"><div class="stat-label">Avg Loss Days Held</div><div>{{performance.overall.lossAvgDaysHeld | number:'1.0-0'}}</div></div>
-    </div>
-
-    <div class="row mb-2">
-      <div class="col"><div class="stat-label">Expected Value</div><div>{{performance.overall.ev | currency}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss $</div><div>{{performance.overall.profitRatio | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.overall.returnPctRatio | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">R/R sum</div><div>{{performance.overall.rrSum | number:'1.0-2'}}</div></div>
-      <div class="col"><div class="stat-label">R/R sum Weighted</div><div>{{performance.overall.rrSumWeighted | number:'1.0-2'}}</div></div>
-    </div>  
-  </div>
-
-  <div class="row mt-2">
-    
+  <div class="row mt-2">  
     <canvas
       class="mb-2"
       style="height: 400px"

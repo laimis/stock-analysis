@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { PositionInstance } from 'src/app/services/stocks.service';
+import { PositionInstance, StocksService, TradingStrategyPerformance } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -8,8 +8,17 @@ import { PositionInstance } from 'src/app/services/stocks.service';
   styleUrls: ['./stock-trading-closed-positions.component.css']
 })
 export class StockTradingClosedPositionsComponent implements OnInit {
+  performances: TradingStrategyPerformance[];
+
+  // constructor with services
+  constructor(
+    private stocksService: StocksService
+  ) { }
 
 	ngOnInit() {
+    this.stocksService.simulatePositions(20).subscribe(performance => {
+      this.performances = performance;
+      });
   }
 
   @Input()
