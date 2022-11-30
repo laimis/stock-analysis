@@ -69,12 +69,12 @@ namespace core.Stocks.Services.Analysis
                 "Close price");
 
             // calculate closing range
-            var range = Math.Round((currentBar.Close - currentBar.Low) / (currentBar.High - currentBar.Low) * 100, 2);
+            var range = (currentBar.Close - currentBar.Low) / (currentBar.High - currentBar.Low);
 
             // add range as outcome
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.ClosingRange,
-                type: range >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
+                type: range >= 0.80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: range,
                 message: $"Closing range is {range}.");
 
@@ -82,7 +82,7 @@ namespace core.Stocks.Services.Analysis
             var yesterday = prices[prices.Length - 2];
 
             // today's change from yesterday's close
-            var percentChange = Math.Round((currentBar.Close - yesterday.Close) / yesterday.Close * 100, 2);
+            var percentChange = (currentBar.Close - yesterday.Close) / yesterday.Close;
 
             // add change as outcome
             yield return new AnalysisOutcome(

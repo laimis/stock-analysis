@@ -7,7 +7,7 @@
         <th>Status</th>
         <th>Profit</th>
         <th>R/R</th>
-        <th>%</th>
+        <th>% Gain</th>
         <th>Transactions</th>
         <th>Max Gain</th>
         <th>Max Drawdown</th>
@@ -22,7 +22,7 @@
         </td>
         <td>{{actual.profit + actual.unrealizedProfit | currency}}</td>
         <td>{{actual.rr | number}}</td>
-        <td>{{actual.isClosed ? actual.gainPct : actual.unrealizedGainPct | number}}%</td>
+        <td>{{actual.gainPct | percent}}</td>
         <td>
           <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of actual.transactions">
             {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
@@ -54,14 +54,14 @@
           </td>
           <td>{{r.position.profit + r.position.unrealizedProfit | currency}}</td>
           <td>{{r.position.rr | number}}</td>
-          <td>{{r.position.isClosed ? r.position.gainPct : r.position.unrealizedGainPct | number}}%</td>
+          <td>{{r.position.gainPct | percent}}</td>
           <td>
             <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of r.position.transactions">
               {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
             </div>
           </td>
-          <td>{{r.maxGainPct | number:'1.0-2'}}%</td>
-          <td>{{r.maxDrawdownPct | number:'1.0-2'}}%</td>
+          <td>{{r.maxGainPct | percent:'1.0-2'}}</td>
+          <td>{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
         </tr>
         <tr *ngIf="showDetails">
           <td></td>

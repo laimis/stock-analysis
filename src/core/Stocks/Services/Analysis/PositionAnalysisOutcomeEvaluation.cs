@@ -5,7 +5,7 @@ namespace core.Stocks.Services.Analysis
 {
     public class PositionAnalysisOutcomeEvaluation
     {
-        private const decimal PercentToStopThreshold = -2m;
+        private const decimal PercentToStopThreshold = -0.02m;
         
         internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
         {

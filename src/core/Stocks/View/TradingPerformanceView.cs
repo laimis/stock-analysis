@@ -82,7 +82,7 @@ namespace core.Stocks
                 rrSumWeighted = rrSumWeighted,
                 Total = total,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
-                WinAvgReturnPct = totalWinReturnPct > 0 ? totalWinReturnPct / wins : 0,
+                WinAvgReturnPct = wins > 0 ? totalWinReturnPct / wins : 0,
                 WinMaxReturnPct = winMaxReturnPct,
                 WinPct = winningPct,
                 Wins = wins

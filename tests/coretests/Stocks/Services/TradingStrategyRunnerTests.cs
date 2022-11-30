@@ -67,10 +67,10 @@ namespace coretests.Stocks.Services
 
             Assert.True(position.IsClosed);
             Assert.Equal(1005, position.Profit);
-            Assert.Equal(100.50m, position.GainPct);
+            Assert.Equal(1.005m, position.GainPct);
             Assert.Equal(2.01m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(150.0m, maxGain);
+            Assert.Equal(1.5m, maxGain);
             Assert.Equal(14, position.DaysHeld);
 
             var oneFourthResult = results.Results[1];
@@ -80,10 +80,10 @@ namespace coretests.Stocks.Services
 
             Assert.True(position.IsClosed);
             Assert.Equal(1250m, position.Profit);
-            Assert.Equal(125.0m, position.GainPct);
+            Assert.Equal(1.250m, position.GainPct);
             Assert.Equal(2.5m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(200.0m, maxGain);
+            Assert.Equal(2.0m, maxGain);
             Assert.Equal(19, position.DaysHeld);
         }
 
@@ -106,10 +106,10 @@ namespace coretests.Stocks.Services
 
             Assert.True(position.IsClosed);
             Assert.Equal(15, position.Profit);
-            Assert.Equal(75.0m, position.GainPct);
+            Assert.Equal(0.75m, position.GainPct);
             Assert.Equal(1.5m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(100m, maxGain);
+            Assert.Equal(1m, maxGain);
             Assert.Equal(9, position.DaysHeld);
         }
 

@@ -7,9 +7,9 @@ namespace core.Stocks.Services.Analysis
     {
         private const decimal RelativeVolumeThresholdPositive = 0.9m;
         private const decimal SigmaRatioThreshold = 1m;
-        private const decimal SmallPercentChange = 2m;
-        private const decimal ExcellentClosingRange = 80m;
-        private const decimal LowClosingRange = 20m;
+        private const decimal SmallPercentChange = 0.02m;
+        private const decimal ExcellentClosingRange = 0.80m;
+        private const decimal LowClosingRange = 0.20m;
 
         internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
         {

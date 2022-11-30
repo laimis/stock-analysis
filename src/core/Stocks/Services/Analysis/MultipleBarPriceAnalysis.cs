@@ -74,7 +74,7 @@ namespace core.Stocks.Services.Analysis
                 $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
             );
 
-            var percentAboveLow = (decimal)Math.Round((currentPrice - lowest.Close) / lowest.Close * 100, 2);
+            var percentAboveLow = (currentPrice - lowest.Close) / lowest.Close;
             var percentAboveLowOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
@@ -102,7 +102,7 @@ namespace core.Stocks.Services.Analysis
                 $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
             );
 
-            var percentBelowHigh = (decimal)Math.Round((highest.Close - currentPrice) / highest.Close * 100, 2);
+            var percentBelowHigh = (highest.Close - currentPrice) / highest.Close;
             var percentBelowHighOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(

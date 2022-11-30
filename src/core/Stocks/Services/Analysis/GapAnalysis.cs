@@ -40,7 +40,7 @@ namespace core.Stocks.Services.Analysis
 
                 if (currentBar.Low > yesterday.High || currentBar.High < yesterday.Low)
                 {
-                    gapSizePct = Math.Round( (currentBar.Open - yesterday.Close)/yesterday.Close * 100, 2);
+                    gapSizePct = (currentBar.Open - yesterday.Close)/yesterday.Close;
                 }
 
                 if (gapSizePct != 0)
@@ -50,7 +50,7 @@ namespace core.Stocks.Services.Analysis
                         < 0 => GapType.Down,
                         _ => throw new Exception("Invalid gap type")
                     };
-                    var percentChange = Math.Round( (currentBar.Close - yesterday.Close)/yesterday.Close * 100, 2);
+                    var percentChange = (currentBar.Close - yesterday.Close)/yesterday.Close;
 
                     Func<PriceBar, bool> closingCondition = gapSizePct switch {
                         > 0 => bar => bar.Close <= yesterday.Close,

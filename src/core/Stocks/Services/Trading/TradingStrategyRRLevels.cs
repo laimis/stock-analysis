@@ -169,8 +169,8 @@ namespace core.Stocks.Services.Trading
             }
 
             return new TradingStrategyResult(
-                maxGainPct: Math.Round(maxGain * 100, 2),
-                maxDrawdownPct: Math.Round(maxDrawdown * 100, 2),
+                maxGainPct: maxGain,
+                maxDrawdownPct: maxDrawdown,
                 position: position,
                 strategyName: name
             );
