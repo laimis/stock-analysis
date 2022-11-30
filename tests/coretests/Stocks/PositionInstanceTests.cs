@@ -77,7 +77,7 @@ namespace coretests.Stocks
 
             Assert.Equal(40, position.Price);
             Assert.Equal(100, position.UnrealizedProfit);
-            Assert.Equal(0.23m, position.UnrealizedGainPct.Value, 2);
+            Assert.Equal(0.2m, position.UnrealizedGainPct.Value, 2);
             Assert.Equal(10.77m, position.GainPct, 2);
             Assert.Equal(1.25m, position.UnrealizedRR);
             Assert.Equal(-0.43m, position.PercentToStop.Value, 2);

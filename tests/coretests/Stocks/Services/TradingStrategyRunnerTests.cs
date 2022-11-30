@@ -70,7 +70,7 @@ namespace coretests.Stocks.Services
             Assert.Equal(1.005m, position.GainPct);
             Assert.Equal(2.01m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(150.0m, maxGain);
+            Assert.Equal(1.5m, maxGain);
             Assert.Equal(14, position.DaysHeld);
 
             var oneFourthResult = results.Results[1];
@@ -109,7 +109,7 @@ namespace coretests.Stocks.Services
             Assert.Equal(0.75m, position.GainPct);
             Assert.Equal(1.5m, position.RR);
             Assert.Equal(0.0m, maxDrawdown);
-            Assert.Equal(100m, maxGain);
+            Assert.Equal(1m, maxGain);
             Assert.Equal(9, position.DaysHeld);
         }
 
