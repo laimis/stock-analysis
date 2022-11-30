@@ -35,7 +35,7 @@ namespace core.Stocks.Services.Analysis
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.GainPct,
                 position.UnrealizedGainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                Math.Round( (position.UnrealizedGainPct ?? 0) * 100, 2),
+                (position.UnrealizedGainPct ?? 0),
                 $"{position.UnrealizedGainPct:P}"
             );
 
@@ -53,7 +53,7 @@ namespace core.Stocks.Services.Analysis
                 $"{position.RR:N2}"
             );
             
-            var stopLoss = Math.Round(position.StopPrice ?? 0 * 100, 2);
+            var stopLoss = position.StopPrice ?? 0;
 
             // add stop loss as outcome
             yield return new AnalysisOutcome(
@@ -62,7 +62,7 @@ namespace core.Stocks.Services.Analysis
                 stopLoss,
                 $"Stop loss is {stopLoss:C2}");
 
-            var pctToStop = Math.Round( (position.PercentToStop ?? -1) * 100, 2);
+            var pctToStop = (position.PercentToStop ?? -1);
                 
             yield return new AnalysisOutcome(
                     PortfolioAnalysisKeys.PercentToStopLoss,

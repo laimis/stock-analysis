@@ -34,9 +34,10 @@ namespace core.Stocks
         public int DaysHeld => Opened != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value)).TotalDays : 0;
         public decimal Cost { get; private set; } = 0;
         public decimal Profit { get; private set; } = 0;
-        public decimal GainPct => Math.Round(
-            (AverageSaleCostPerShare - AverageBuyCostPerShare) * 100 / AverageBuyCostPerShare,
-            2);
+        public decimal GainPct => IsClosed switch {
+            true => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare,
+            false => UnrealizedGainPct.HasValue ? UnrealizedGainPct.Value : 0
+        };
             
         public decimal RR => RiskedAmount switch {
             not null => Profit / RiskedAmount.Value + (UnrealizedRR.HasValue ? UnrealizedRR.Value : 0),
@@ -212,9 +213,7 @@ namespace core.Stocks
         {
             Price = price;
             UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
-            UnrealizedGainPct = Math.Round(
-                (price - AverageBuyCostPerShare) / AverageBuyCostPerShare * 100,
-                2);
+            UnrealizedGainPct = (price - AverageCostPerShare) / AverageCostPerShare;
             UnrealizedRR = RiskedAmount switch {
                 not null => UnrealizedProfit / RiskedAmount.Value,
                 _ => 0
