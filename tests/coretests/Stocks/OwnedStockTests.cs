@@ -113,7 +113,7 @@ namespace coretests.Stocks
             Assert.Single(stock.State.Positions);
             Assert.Equal(0, stock.State.Positions[0].DaysHeld);
             Assert.Equal(1, stock.State.Positions[0].Profit);
-            Assert.Equal(4m, stock.State.Positions[0].GainPct, 2);
+            Assert.Equal(0.04m, stock.State.Positions[0].GainPct, 2);
         }
 
         [Fact]

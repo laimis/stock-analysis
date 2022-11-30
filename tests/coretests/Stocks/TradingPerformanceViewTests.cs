@@ -50,7 +50,7 @@ namespace coretests.Stocks
         public void LossAvgReturnPctCorrect() => Assert.Equal(0.10m, _performance.LossAvgReturnPct);
         
         [Fact]
-        public void LossMaxReturnPctCorrect() => Assert.Equal(10m, _performance.LossMaxReturnPct);
+        public void LossMaxReturnPctCorrect() => Assert.Equal(0.10m, _performance.LossMaxReturnPct);
 
         [Fact]
         public void LossAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.LossAvgDaysHeld);
