@@ -74,7 +74,7 @@ namespace core.Stocks.Services.Analysis
             // add range as outcome
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.ClosingRange,
-                type: range >= 80m ? OutcomeType.Positive : OutcomeType.Neutral,
+                type: range >= 0.80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: range,
                 message: $"Closing range is {range}.");
 
