@@ -13,6 +13,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.Price,
                 OutcomeType.Neutral,
                 position.Price!.Value,
+                OutcomeValueType.Currency,
                 $"Price: {position.Price.Value:C2}"
             );
 
@@ -21,6 +22,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.AverageCost,
                 OutcomeType.Neutral,
                 Math.Round(position.AverageCostPerShare, 2),
+                OutcomeValueType.Currency,
                 $"Average cost per share is {position.AverageCostPerShare:C2}");
 
             // add number of shares as outcome
@@ -28,6 +30,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.NumberOfShares,
                 OutcomeType.Neutral,
                 position.NumberOfShares,
+                OutcomeValueType.Number,
                 $"Number of shares: {position.NumberOfShares}"
             );
 
@@ -36,6 +39,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.GainPct,
                 position.UnrealizedGainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
                 (position.UnrealizedGainPct ?? 0),
+                OutcomeValueType.Percentage,
                 $"{position.UnrealizedGainPct:P}"
             );
 
@@ -50,6 +54,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.RR,
                 rrOutcomeType,
                 Math.Round(position.RR, 2),
+                OutcomeValueType.Number,
                 $"{position.RR:N2}"
             );
             
@@ -60,6 +65,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.StopLoss,
                 OutcomeType.Neutral,
                 stopLoss,
+                OutcomeValueType.Currency,
                 $"Stop loss is {stopLoss:C2}");
 
             var pctToStop = (position.PercentToStop ?? -1);
@@ -68,6 +74,7 @@ namespace core.Stocks.Services.Analysis
                     PortfolioAnalysisKeys.PercentToStopLoss,
                     pctToStop < 0 ? OutcomeType.Positive : OutcomeType.Negative,
                     pctToStop,
+                    OutcomeValueType.Percentage,
                     $"% difference to stop loss {stopLoss} is {pctToStop}"
                 );
 
@@ -76,6 +83,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.RiskAmount,
                 OutcomeType.Neutral,
                 position.RiskedAmount ?? 0,
+                OutcomeValueType.Currency,
                 $"Risk amount is {position.RiskedAmount:C2}");
 
             // add last transaction age
@@ -83,6 +91,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.DaysSinceLastTransaction,
                 OutcomeType.Neutral,
                 position.DaysSinceLastTransaction,
+                OutcomeValueType.Number,
                 $"Last transaction was {position.DaysSinceLastTransaction} days ago"
             );
             
@@ -93,6 +102,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.R1Achieved,
                 r1Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
                 r1Achieved ? 1 : 0,
+                OutcomeValueType.Boolean,
                 $"R1 achieved: {r1}"
             );
 
@@ -103,6 +113,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.R2Achieved,
                 r2Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
                 r2Achieved ? 1 : 0,
+                OutcomeValueType.Boolean,
                 $"R2 achieved: {r2}"
             );
 
@@ -113,6 +124,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.R3Achieved,
                 r3Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
                 r3Achieved ? 1 : 0,
+                OutcomeValueType.Boolean,
                 $"R3 achieved: {r3}"
             );
 
@@ -123,6 +135,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.R4Achieved,
                 r4Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
                 r4Achieved ? 1 : 0,
+                OutcomeValueType.Boolean,
                 $"R4 achieved: {r4}"
             );
         }

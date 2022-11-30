@@ -1,12 +1,18 @@
+import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { AnalysisOutcomeEvaluation, TickerOutcomes } from '../../services/stocks.service';
+import { AnalysisOutcomeEvaluation, OutcomeValueTypeEnum, StockAnalysisOutcome, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-outcomes',
   templateUrl: './outcomes.component.html',
-  styleUrls: ['./outcomes.component.css']
+  styleUrls: ['./outcomes.component.css'],
+  providers: [PercentPipe, CurrencyPipe]
 })
 export class OutcomesComponent {
+
+  constructor(
+    private percentPipe:PercentPipe,
+    private currencyPipe:CurrencyPipe) { }
 
   @Input()
   title: string
@@ -56,6 +62,16 @@ export class OutcomesComponent {
       var bVal = b.outcomes.find(o => o.key === column).value
 
       return aVal - bVal
+    }
+  }
+
+  getValue(o:StockAnalysisOutcome) {
+    if (o.valueType === OutcomeValueTypeEnum.Percentage) {
+      return this.percentPipe.transform(o.value)
+    } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
+      return this.currencyPipe.transform(o.value)
+    } else {
+      return o.value
     }
   }
 }

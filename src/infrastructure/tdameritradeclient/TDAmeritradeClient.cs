@@ -26,6 +26,7 @@ public class TDAmeritradeClient : IBrokerage
 
     private HttpClient _httpClient;
     private readonly AsyncTimeoutPolicy _timeoutPolicy;
+    private readonly AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(10, TimeSpan.FromSeconds(1));
 
     public TDAmeritradeClient(ILogger<TDAmeritradeClient>? logger, string callbackUrl, string clientId)
     {
@@ -372,8 +373,6 @@ public class TDAmeritradeClient : IBrokerage
         }
     }
 
-    private AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(10, TimeSpan.FromSeconds(1));
-    private AsyncTimeoutPolicy _timeOutPolicy = Policy.TimeoutAsync(30);
 
     private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
@@ -394,7 +393,7 @@ public class TDAmeritradeClient : IBrokerage
             try
             {
                 var response = await _rateLimit.ExecuteAsync(
-                    async ct => await _timeOutPolicy.ExecuteAsync(
+                    async ct => await _timeoutPolicy.ExecuteAsync(
                         ct2 => _httpClient.SendAsync(request, ct2),
                         ct
                     ),

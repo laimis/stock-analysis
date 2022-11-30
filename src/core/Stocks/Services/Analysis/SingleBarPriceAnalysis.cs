@@ -43,6 +43,7 @@ namespace core.Stocks.Services.Analysis
                 SingleBarOutcomeKeys.SMA20Above50Days,
                 outcome.type,
                 outcome.value,
+                outcome.valueType,
                 outcome.message
             );
         }
@@ -59,6 +60,7 @@ namespace core.Stocks.Services.Analysis
                 SingleBarOutcomeKeys.Open,
                 OutcomeType.Neutral,
                 currentBar.Open,
+                OutcomeValueType.Currency,
                 "Open price");
 
             // return close as the neutral outcome
@@ -66,6 +68,7 @@ namespace core.Stocks.Services.Analysis
                 SingleBarOutcomeKeys.Close,
                 OutcomeType.Neutral,
                 currentBar.Close,
+                OutcomeValueType.Currency,
                 "Close price");
 
             // calculate closing range
@@ -76,6 +79,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.ClosingRange,
                 type: range >= 0.80m ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: range,
+                valueType: OutcomeValueType.Percentage,
                 message: $"Closing range is {range}.");
 
             // use yesterday's close as reference
@@ -89,6 +93,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.PercentChange,
                 type: percentChange >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
                 value: percentChange,
+                valueType: OutcomeValueType.Percentage,
                 message: $"% change from close is {percentChange}.");
 
             // true range uses the previous close as reference
@@ -111,6 +116,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.GapPercentage,
                 type: gapType,
                 value: gap.gapSizePct,
+                valueType: OutcomeValueType.Percentage,
                 message: $"Gap is {gap.gapSizePct}%.");
 
             // see if the latest bar is a new high or new low
@@ -122,6 +128,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.NewHigh,
                 type: newHigh ? OutcomeType.Positive : OutcomeType.Neutral,
                 value: newHigh ? 1m : 0m,
+                valueType: OutcomeValueType.Boolean,
                 message: $"New high reached");
 
             // add new low as outcome
@@ -129,6 +136,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.NewLow,
                 type: newLow ? OutcomeType.Negative : OutcomeType.Neutral,
                 value: newLow ? -1m : 0m,
+                valueType: OutcomeValueType.Boolean,
                 message: $"New low reached");
 
             // generate percent change statistical data for recent days
@@ -153,6 +161,7 @@ namespace core.Stocks.Services.Analysis
                     _ => OutcomeType.Neutral
                 },
                 value: sigmaRatio,
+                valueType: OutcomeValueType.Number,
                 message: $"Sigma ratio is {sigmaRatio}.");
         }
     }
@@ -170,6 +179,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.Volume,
                 type: OutcomeType.Neutral,
                 value: last.Volume,
+                valueType: OutcomeValueType.Number,
                 message: "Volume"));
 
             // calculate the average volume from the last x days
@@ -191,6 +201,7 @@ namespace core.Stocks.Services.Analysis
                 key: SingleBarOutcomeKeys.RelativeVolume,
                 type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
+                valueType: OutcomeValueType.Number,
                 message: $"Relative volume is {relativeVolume}x the average volume over the last {volumeStats.count} days."
             ));
 

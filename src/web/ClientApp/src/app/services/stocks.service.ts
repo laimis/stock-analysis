@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { UpdateModeEnum } from 'chart.js';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors
@@ -368,11 +369,19 @@ export interface AlertsContainer {
   recentlyTriggered: StockAlert[]
 }
 
+export enum OutcomeValueTypeEnum {
+  Percentage = 'Percentage',
+  Currency = 'Currency',
+  Number = 'Number',
+  Boolean = 'Boolean'
+}
+
 export interface StockAnalysisOutcome {
   type: string
   message: string
   key: string
   value: number
+  valueType: OutcomeValueTypeEnum
 }
 
 export interface Sells {
