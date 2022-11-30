@@ -11,7 +11,7 @@ namespace core.Stocks.Services.Analysis
             var percentChanges = new decimal[numbers.Length - 1];
             for(var i = 1; i < numbers.Length; i++)
             {
-                var percentChange = (numbers[i] - numbers[i-1])/numbers[i-1] * 100;
+                var percentChange = (numbers[i] - numbers[i-1])/numbers[i-1];
                 percentChanges[i-1] = percentChange;
             }
 
@@ -75,7 +75,7 @@ namespace core.Stocks.Services.Analysis
 
             foreach(var change in percentChanges)
             {
-                var bucket = (int)Math.Floor(change);
+                var bucket = (int)Math.Floor(change * 100);
                 if (bucket < -10) bucket = -10;
                 if (bucket > 10) bucket = 10;
 
