@@ -78,6 +78,7 @@ namespace core.Portfolio
                 var plStockTransactions = transactions.Where(t => !t.IsOption && t.IsPL)
                     .GroupBy(t => t.Ticker)
                     .SelectMany(g => g)
+                    .OrderBy(t => t.DateAsDate)
                     .ToList();
 
                 var plOptionTransactions = transactions.Where(t => t.IsOption && t.IsPL)
@@ -92,6 +93,7 @@ namespace core.Portfolio
                 var openPositions = stocks.Select(s => s.State.OpenPosition)
                     .Where(p => p != null)
                     .Where(p => p.Opened >= request.Start && p.Opened <= request.End)
+                    .OrderBy(p => p.Opened)
                     .ToList();
 
                 return new TransactionSummaryView(
