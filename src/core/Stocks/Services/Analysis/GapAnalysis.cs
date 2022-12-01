@@ -22,7 +22,6 @@ namespace core.Stocks.Services.Analysis
                 numbers: prices
                     .Slice(volumeStart, Math.Min(numberOfBarsToAnalyze, prices.Length))
                     .Select(p => p.Volume),
-
                 generateBuckets: false
             );
 
