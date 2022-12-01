@@ -18,7 +18,10 @@ namespace core.Stocks.Services.Analysis
             return Statistics(percentChanges);
         }
 
-        public static DistributionStatistics Statistics(decimal[] numbers)
+        // TODO: get rid of generate buckets option after fixing a bug where
+        // numbers input is not percent change but this code assume it is
+        // (the volume numbers for example that are called from the gap code)
+        public static DistributionStatistics Statistics(decimal[] numbers, bool generateBuckets = true)
         {
            // calculate stats on the data
             var mean = Math.Round(numbers.Average(), 2);
@@ -34,11 +37,15 @@ namespace core.Stocks.Services.Analysis
                 (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 4)).Sum() / count / Math.Pow((double)stdDev, 4) - 3),
                 2);
 
-            var buckets = PercentChangeFrequencies.Calculate(
-                numbers,
-                min,
-                max
-            );
+            var buckets = generateBuckets switch
+            {
+                true => PercentChangeFrequencies.Calculate(
+                    numbers,
+                    min,
+                    max
+                ),
+                false => new PercentChangeFrequency[0]
+            };
 
             return new DistributionStatistics(
                 count: count,

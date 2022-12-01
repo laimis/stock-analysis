@@ -36,6 +36,23 @@ namespace core.Shared.Adapters.Stocks
         public override bool Equals(object obj) => obj is PriceBar other && Equals(other);
 
         public override int GetHashCode() => Date.GetHashCode();
+
+        public override string ToString()
+        {
+            return $"{DateStr},{Open},{High},{Low},{Close},{Volume}";
+        }
+        public static PriceBar Parse(string value)
+        {
+            var parts = value.Split(',');
+            return new PriceBar(
+                DateTimeOffset.Parse(parts[0]),
+                decimal.Parse(parts[1]),
+                decimal.Parse(parts[2]),
+                decimal.Parse(parts[3]),
+                decimal.Parse(parts[4]),
+                long.Parse(parts[5])
+            );
+        }
     }
 
     public static class PriceBarExtensions

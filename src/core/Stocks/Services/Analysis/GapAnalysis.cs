@@ -19,9 +19,11 @@ namespace core.Stocks.Services.Analysis
                 : 0;
 
             var volumeStats = NumberAnalysis.Statistics(
-                prices
+                numbers: prices
                     .Slice(volumeStart, Math.Min(numberOfBarsToAnalyze, prices.Length))
-                    .Select(p => p.Volume)
+                    .Select(p => p.Volume),
+
+                generateBuckets: false
             );
 
             return Generate(prices.Slice(start), volumeStats);

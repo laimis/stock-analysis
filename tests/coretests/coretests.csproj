@@ -24,4 +24,10 @@
     <ProjectReference Include="..\..\src\core\core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="testdata\*">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
