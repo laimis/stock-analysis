@@ -47,7 +47,7 @@ namespace coretests.Stocks.Services
             Assert.Equal(4, _percentChangeStatistics.buckets.Count(x => x.frequency != 0));
             
             // last bucket should be max
-            Assert.True(_percentChangeStatistics.max > _percentChangeStatistics.buckets[^1].value);
+            Assert.True(_percentChangeStatistics.max >= _percentChangeStatistics.buckets[^1].value);
             Assert.Equal(1, _percentChangeStatistics.buckets[^1].frequency);
         }
 

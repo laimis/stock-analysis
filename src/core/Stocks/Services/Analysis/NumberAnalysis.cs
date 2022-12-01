@@ -75,7 +75,7 @@ namespace core.Stocks.Services.Analysis
             // otherwise use 0 decimal places
             if (bucketSize < 1)
             {
-                bucketSize = Math.Round(bucketSize, 2);
+                bucketSize = Math.Round(bucketSize, 4);
             }
             else
             {
