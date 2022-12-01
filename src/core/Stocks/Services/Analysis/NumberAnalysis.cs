@@ -1,27 +1,29 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace core.Stocks.Services.Analysis
 {
     public class NumberAnalysis
     {
-        public static DistributionStatistics PercentChanges(Span<decimal> numbers)
+        public static DistributionStatistics PercentChanges(Span<decimal> numbers, bool multipleByHundred = false)
         {
             var percentChanges = new decimal[numbers.Length - 1];
             for(var i = 1; i < numbers.Length; i++)
             {
                 var percentChange = (numbers[i] - numbers[i-1])/numbers[i-1];
+                if (multipleByHundred)
+                {
+                    percentChange *= 100;
+                    Math.Round(percentChange, 2);
+                }
+
                 percentChanges[i-1] = percentChange;
             }
 
             return Statistics(percentChanges);
         }
 
-        // TODO: get rid of generate buckets option after fixing a bug where
-        // numbers input is not percent change but this code assume it is
-        // (the volume numbers for example that are called from the gap code)
-        public static DistributionStatistics Statistics(decimal[] numbers, bool generateBuckets = true)
+        public static DistributionStatistics Statistics(decimal[] numbers)
         {
            // calculate stats on the data
             var mean = Math.Round(numbers.Average(), 2);
@@ -37,15 +39,11 @@ namespace core.Stocks.Services.Analysis
                 (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 4)).Sum() / count / Math.Pow((double)stdDev, 4) - 3),
                 2);
 
-            var buckets = generateBuckets switch
-            {
-                true => PercentChangeFrequencies.Calculate(
+            var buckets = Histogram.Calculate(
                     numbers,
                     min,
                     max
-                ),
-                false => new PercentChangeFrequency[0]
-            };
+                );
 
             return new DistributionStatistics(
                 count: count,
@@ -61,38 +59,54 @@ namespace core.Stocks.Services.Analysis
         }        
     }
 
-    internal class PercentChangeFrequencies
+    internal class Histogram
     {
-        internal static PercentChangeFrequency[] Calculate(
-            decimal[] percentChanges,
+        internal static ValueWithFrequency[] Calculate(
+            decimal[] numbers,
             decimal min,
-            decimal max)
+            decimal max,
+            int numberOfBuckets = 21)
         {
-            var buckets = new Dictionary<int, int>();
-            
-            var boundaries = new int[] {
-                -10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
-                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-            };
-            
-            foreach(var range in boundaries)
+            // calculate boundaries as 21 buckets from min to max
+            var result = new ValueWithFrequency[numberOfBuckets];
+            var bucketSize = (max - min) / numberOfBuckets;
+
+            // if the bucket size is really small, use just two decimal places
+            // otherwise use 0 decimal places
+            if (bucketSize < 1)
             {
-                buckets.Add(range, 0);
+                bucketSize = Math.Round(bucketSize, 2);
+            }
+            else
+            {
+                bucketSize = Math.Floor(bucketSize);
+                min = Math.Floor(min);
+            }
+            
+            for(var i = 0; i < numberOfBuckets; i++)
+            {
+                result[i] = new ValueWithFrequency{ value = min + (i * bucketSize), frequency = 0 };
             }
 
-            foreach(var change in percentChanges)
+            foreach(var percentChange in numbers)
             {
-                var bucket = (int)Math.Floor(change * 100);
-                if (bucket < -10) bucket = -10;
-                if (bucket > 10) bucket = 10;
+                if (percentChange > result[^1].value)
+                {
+                    result[^1] = result[^1] with { frequency = result[^1].frequency + 1 };
+                    continue;
+                }
 
-                buckets[bucket]++;
+                for(var i = 0; i < numberOfBuckets; i++)
+                {
+                    if(percentChange <= result[i].value)
+                    {
+                        result[i] = result[i] with { frequency = result[i].frequency + 1 };
+                        break;
+                    }
+                }
             }
-
-            return buckets
-                .Select(kp => new PercentChangeFrequency(kp.Key, kp.Value))
-                .OrderBy(f => f.percentChange)
-                .ToArray();
+            
+            return result;
         }
     }
 
@@ -105,6 +119,6 @@ namespace core.Stocks.Services.Analysis
         decimal median,
         decimal skewness,
         decimal stdDev,
-        PercentChangeFrequency[] buckets);
-    public record struct PercentChangeFrequency(int percentChange, int frequency);
+        ValueWithFrequency[] buckets);
+    public record struct ValueWithFrequency(decimal value, int frequency);
 }

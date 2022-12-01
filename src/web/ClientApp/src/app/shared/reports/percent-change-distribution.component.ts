@@ -20,7 +20,7 @@ export class PercentChangeDistributionComponent {
     
     this.data = value
 
-    this.recentDataLabels = value.recent.buckets.map(b => b.percentChange.toString());
+    this.recentDataLabels = value.recent.buckets.map(b => b.value.toString());
     this.recentData = [
       {
         data: value.recent.buckets.map(b => b.frequency),
@@ -28,7 +28,7 @@ export class PercentChangeDistributionComponent {
         fill: false
       }]
 
-    this.allTimeDataLabels = value.allTime.buckets.map(b => b.percentChange.toString());
+    this.allTimeDataLabels = value.allTime.buckets.map(b => b.value.toString());
     this.allTimeData = [
       {
         data: value.allTime.buckets.map(b => b.frequency),

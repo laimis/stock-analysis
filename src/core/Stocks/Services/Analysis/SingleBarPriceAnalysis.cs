@@ -187,8 +187,7 @@ namespace core.Stocks.Services.Analysis
                 prices
                     .Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                     .Select(x => x.Volume)
-                    .ToArray(),
-                generateBuckets: false
+                    .ToArray()
             );
 
             // calculate today's relative volume

@@ -1,10 +1,14 @@
+import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { OutcomesReport, Prices, PriceWithDate, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { OutcomesReport, OutcomeValueTypeEnum, Prices, PriceWithDate, StockAnalysisOutcome, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
   templateUrl: './stock-analysis.component.html',
-  styleUrls: ['./stock-analysis.component.css']
+  styleUrls: ['./stock-analysis.component.css'],
+  providers: [
+    PercentPipe, CurrencyPipe
+  ]
 })
 export class StockAnalysisComponent {
   multipleBarOutcomes: TickerOutcomes;
@@ -22,7 +26,9 @@ export class StockAnalysisComponent {
   downGapsOpens: number[] = [];
 
   constructor(
-    private stockService : StocksService
+    private stockService : StocksService,
+    private percentPipe: PercentPipe,
+    private currencyPipe: CurrencyPipe
   ) { }
 
   @Input()
@@ -41,6 +47,16 @@ export class StockAnalysisComponent {
         this.getOutcomesReportAllBars();
       }
     );
+  }
+
+  getValue(o:StockAnalysisOutcome) {
+    if (o.valueType === OutcomeValueTypeEnum.Percentage) {
+      return this.percentPipe.transform(o.value)
+    } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
+      return this.currencyPipe.transform(o.value)
+    } else {
+      return o.value
+    }
   }
 
   private getOutcomesReportAllBars() {

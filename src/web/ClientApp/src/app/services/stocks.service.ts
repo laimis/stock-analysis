@@ -655,8 +655,8 @@ export interface AnalysisOutcomeEvaluation {
   matchingTickers: TickerOutcomes[]
 }
 
-export interface PercentChangeFrequency {
-  percentChange: number
+export interface ValueWithFrequency {
+  value: number
   frequency: number
 }
 export interface StockPercentChangeDescriptor {
@@ -668,7 +668,7 @@ export interface StockPercentChangeDescriptor {
   count: number
   skewness: number
   kurtosis: number
-  buckets: PercentChangeFrequency[]
+  buckets: ValueWithFrequency[]
 }
 export interface StockPercentChangeResponse {
   ticker: string

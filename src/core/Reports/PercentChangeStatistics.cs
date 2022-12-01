@@ -71,8 +71,14 @@ namespace core.Reports
 
                 return new PercentChangeStatisticsView(
                     ticker,
-                    recent: NumberAnalysis.PercentChanges(prices.Last(60).Select(p => p.Close).ToArray()),
-                    allTime: NumberAnalysis.PercentChanges(prices.Select(p => p.Close).ToArray())
+                    recent: NumberAnalysis.PercentChanges(
+                        prices.Last(60).Select(p => p.Close).ToArray(),
+                        multipleByHundred: true
+                    ),
+                    allTime: NumberAnalysis.PercentChanges(
+                        prices.Select(p => p.Close).ToArray(),
+                        multipleByHundred: true
+                    )
                 );
             }
         }

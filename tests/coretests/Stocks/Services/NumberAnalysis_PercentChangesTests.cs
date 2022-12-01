@@ -1,3 +1,4 @@
+using System.Linq;
 using core.Stocks.Services.Analysis;
 using Xunit;
 
@@ -5,47 +6,52 @@ namespace coretests.Stocks.Services
 {
     public class NumberAnalysis_PercentChangesTests
     {
-        private DistributionStatistics _result;
+        private DistributionStatistics _percentChangeStatistics;
 
         public NumberAnalysis_PercentChangesTests()
         {
-            _result = NumberAnalysis.PercentChanges(new decimal[] { 1, 2, 3, 4, 5 });
+            _percentChangeStatistics = NumberAnalysis.PercentChanges(new decimal[] { 1, 2, 3, 4, 5 });
         }
 
         [Fact]
-        public void MeanIsCorrect() => Assert.Equal(0.52m, _result.mean);
+        public void MeanIsCorrect() => Assert.Equal(0.52m, _percentChangeStatistics.mean);
 
         [Fact]
-        public void StdDevIsCorrect() => Assert.Equal(0.34m, _result.stdDev);
+        public void StdDevIsCorrect() => Assert.Equal(0.34m, _percentChangeStatistics.stdDev);
 
         [Fact]
-        public void MinIsCorrect() => Assert.Equal(0.25m, _result.min);
+        public void MinIsCorrect() => Assert.Equal(0.25m, _percentChangeStatistics.min);
 
         [Fact]
-        public void MaxIsCorrect() => Assert.Equal(1m, _result.max);
+        public void MaxIsCorrect() => Assert.Equal(1m, _percentChangeStatistics.max);
 
         [Fact]
-        public void MedianIsCorrect() => Assert.Equal(0.50m, _result.median);
+        public void MedianIsCorrect() => Assert.Equal(0.50m, _percentChangeStatistics.median);
 
         [Fact]
-        public void SkewnessIsCorrect() => Assert.Equal(0.54m, _result.skewness);
+        public void SkewnessIsCorrect() => Assert.Equal(0.54m, _percentChangeStatistics.skewness);
 
         [Fact]
-        public void KurtosisIsCorrect() => Assert.Equal(-1.88m, _result.kurtosis);
+        public void KurtosisIsCorrect() => Assert.Equal(-1.88m, _percentChangeStatistics.kurtosis);
 
         [Fact]
         public void BucketsAreCorrect()
         {
-            Assert.Equal(21, _result.buckets.Length);
-            Assert.Equal(-10, _result.buckets[0].percentChange);
-            Assert.Equal(0, _result.buckets[0].frequency);
-            Assert.Equal(-9, _result.buckets[1].percentChange);
-            Assert.Equal(0, _result.buckets[1].frequency);
-            Assert.Equal(10, _result.buckets[^1].percentChange);
-            Assert.Equal(4, _result.buckets[^1].frequency);
+            Assert.Equal(21, _percentChangeStatistics.buckets.Length);
+            
+            // first bucket should be min
+            Assert.Equal(_percentChangeStatistics.min, _percentChangeStatistics.buckets[0].value);
+            Assert.Equal(1, _percentChangeStatistics.buckets[0].frequency);
+            
+            // make sure there are four buckets with values assigned
+            Assert.Equal(4, _percentChangeStatistics.buckets.Count(x => x.frequency != 0));
+            
+            // last bucket should be max
+            Assert.True(_percentChangeStatistics.max > _percentChangeStatistics.buckets[^1].value);
+            Assert.Equal(1, _percentChangeStatistics.buckets[^1].frequency);
         }
 
         [Fact]
-        public void CountIsCorrect() => Assert.Equal(4, _result.count);
+        public void CountIsCorrect() => Assert.Equal(4, _percentChangeStatistics.count);
     }
 }

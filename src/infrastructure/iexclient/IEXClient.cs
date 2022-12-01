@@ -16,7 +16,10 @@ namespace iexclient
 {
     public class IEXClient : IOptionsService, IStocksService2
     {
-        private static HttpClient _client = new HttpClient();
+        private static HttpClient _client = new HttpClient {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
+        
         private static string _endpoint = "https://cloud.iexapis.com/stable";
         private ILogger<IEXClient> _logger;
         private string _token;
