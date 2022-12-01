@@ -13,7 +13,7 @@ namespace coretests.Stocks.Services
 
         public NumberAnalysis_RealPriceBars()
         {
-            var content = File.ReadAllText("testdata\\pricefeed_NET.txt");
+            var content = File.ReadAllText("testdata/pricefeed_NET.txt");
 
             var bars = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => PriceBar.Parse(x))
