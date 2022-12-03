@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services.Analysis;
@@ -50,7 +48,7 @@ namespace coretests.Stocks.Services
             Assert.Equal(1, _percentChanges.buckets[0].frequency);
 
             // make sure there are four buckets with values assigned
-            Assert.Equal(20, _percentChanges.buckets.Count(x => x.frequency != 0));
+            Assert.Equal(19, _percentChanges.buckets.Count(x => x.frequency != 0));
 
             // last bucket should include max
             Assert.True(_percentChanges.max > _percentChanges.buckets[^1].value);
