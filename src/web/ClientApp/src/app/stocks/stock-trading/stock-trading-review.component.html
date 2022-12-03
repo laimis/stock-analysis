@@ -17,17 +17,20 @@
     </div>
   </div>
 
-  <div class="container mt-2">
+  <div class="mt-2">
     <app-trading-actual-vs-simulated [actual]="currentPosition" [simulations]="simulationResults"></app-trading-actual-vs-simulated>
-    
-    <div class="row mt-2">
-      <div class="col">
-        <app-stock-chart *ngIf="prices"
-          [positivePricePoints]="buys(currentPosition)"
-          [negativePricePoints]="sells(currentPosition)"
-          [prices]=prices>
-        </app-stock-chart>
-      </div>
-    </div>
   </div>
+
+  <div class="mt-2">
+    <app-stock-chart *ngIf="prices"
+      [positivePricePoints]="buys(currentPosition)"
+      [negativePricePoints]="sells(currentPosition)"
+      [prices]=prices>
+    </app-stock-chart>
+  </div>
+
+  <div class="mt-2">
+    <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
+  </div>
+  
 </div>

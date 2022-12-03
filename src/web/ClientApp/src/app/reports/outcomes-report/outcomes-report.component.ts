@@ -21,7 +21,15 @@ export class OutcomesReportComponent implements OnInit {
   ngOnInit(): void {
     var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
     if (tickerParam) {
-      var tickers = tickerParam.split(",");
+      var tickers = tickerParam
+        .split(",")
+        .map(t => {
+          var parts = t.split(":");
+          if (parts.length == 2) {
+            return parts[1]
+          }
+          return t;
+        });
       
       if (tickers.length > 0) {
         this.loadSingleBarReport(tickers);
