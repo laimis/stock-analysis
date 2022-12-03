@@ -59,6 +59,7 @@ namespace core.Stocks
         public decimal? FirstBuyNumberOfShares { get; private set; }
         public decimal? FirstStop { get; private set; }
         public decimal? RiskedAmount { get; private set; }
+        public decimal? CostAtRiskedBasedOnStopPrice { get; private set; }
         
         public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
         public List<PositionEvent> Events { get; private set; } = new List<PositionEvent>();
@@ -222,6 +223,15 @@ namespace core.Stocks
                 not null => (StopPrice.Value - price) / StopPrice.Value,
                 _ => -1
             };
+
+            if (StopPrice != null)
+            {
+                CostAtRiskedBasedOnStopPrice = (Price.Value < AverageCostPerShare) switch
+                {
+                    true => (AverageCostPerShare - StopPrice.Value) * NumberOfShares,
+                    false => 0
+                };
+            }
         }
 
         private void RunCalculations()

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services.Analysis;
+using coretests.TestData;
 using Xunit;
 
 namespace coretests.Stocks.Services
@@ -13,11 +14,7 @@ namespace coretests.Stocks.Services
 
         public NumberAnalysis_RealPriceBars()
         {
-            var content = File.ReadAllText("testdata/pricefeed_NET.txt");
-
-            var bars = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => PriceBar.Parse(x))
-                .ToArray();
+            var bars = TestDataGenerator.PriceBars();
 
             _percentChanges = NumberAnalysis.PercentChanges(bars.Select(x => x.Close).ToArray());
         }

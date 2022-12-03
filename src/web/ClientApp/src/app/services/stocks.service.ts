@@ -805,6 +805,7 @@ export interface PositionInstance {
   unrealizedProfit: number,
   unrealizedRR: number,
   percentToStop: number
+  costAtRiskedBasedOnStopPrice: number
 }
 
 export interface TradingStrategyResult {

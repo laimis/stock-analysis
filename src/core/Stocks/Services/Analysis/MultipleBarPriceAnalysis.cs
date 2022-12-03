@@ -81,7 +81,7 @@ namespace core.Stocks.Services.Analysis
             var percentAboveLowOutcomeType = OutcomeType.Neutral;
             yield return
                 new AnalysisOutcome(
-                    MultipleBarOutcomeKeys.PercentAbovLow,
+                    MultipleBarOutcomeKeys.PercentAboveLow,
                     percentAboveLowOutcomeType,
                     percentAboveLow,
                     OutcomeValueType.Percentage,
@@ -328,7 +328,7 @@ namespace core.Stocks.Services.Analysis
         internal static int NumberOfDaysForRecentAnalysis = 60;
     }
 
-    internal class MultipleBarOutcomeKeys
+    public class MultipleBarOutcomeKeys
     {
         public static string LowestPrice = "LowestPrice";
         public static string LowestPriceDaysAgo = "LowestPriceDaysAgo";
@@ -339,7 +339,7 @@ namespace core.Stocks.Services.Analysis
         public static string SMA20Above50 = "SMA20Above50";
         public static string SMA50Above150 = "SMA50Above150";
         public static string PercentBelowHigh = "PercentBelowHigh";
-        public static string PercentAbovLow = "PercentAboveLow";
+        public static string PercentAboveLow = "PercentAboveLow";
         public static string SMA20Above50Days = "SMA20Above50Days";
         public static string CurrentPrice = "CurrentPrice";
         public static string GapUps = "OpenGapUps";

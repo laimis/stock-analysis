@@ -81,6 +81,11 @@ namespace coretests.Stocks
             Assert.Equal(0.2m, position.GainPct, 2);
             Assert.Equal(1.25m, position.UnrealizedRR);
             Assert.Equal(-0.43m, position.PercentToStop.Value, 2);
+            Assert.Equal(0m, position.CostAtRiskedBasedOnStopPrice);
+
+            position.SetPrice(32);
+
+            Assert.Equal(80, position.CostAtRiskedBasedOnStopPrice);
         }
 
         [Fact]
