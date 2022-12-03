@@ -63,17 +63,9 @@ namespace core.Stocks
                     {
                         view.SetViolations(GetViolations(brokeragePositions.Success, view.Positions));
                     }
-
-                    var brokerageOrders = await TradingEntries.Handler.GetBrokerageOrders(_brokerage, user);
-                    EnrichWithBrokerageOrders(view, brokerageOrders);
                 }
 
                 return view;
-            }
-
-            private void EnrichWithBrokerageOrders(StockDashboardView view, Order[] brokerageOrders)
-            {
-                view.SetOrders(brokerageOrders);
             }
 
             public static List<StockViolationView> GetViolations(IEnumerable<Position> brokeragePositions, IEnumerable<PositionInstance> localPositions)

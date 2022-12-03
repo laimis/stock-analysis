@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, PositionInstance, StocksService, toggleVisuallyHidden } from '../../services/stocks.service';
+import { PositionInstance, StocksService, toggleVisuallyHidden } from '../../services/stocks.service';
 
 @Component({
   selector: 'stock-trading-positions',
@@ -19,9 +19,6 @@ export class StockTradingPositionsComponent {
         this._positions = input
         this.updatePositions()
     }
-
-    @Input()
-    pendingOrders: BrokerageOrder[]
 
     // constructor that takes stock service
     constructor(

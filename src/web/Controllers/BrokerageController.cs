@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using core.Brokerage;
+using core.Shared.Adapters.Brokerage;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,5 +50,8 @@ namespace web.Controllers
 
             return this.OkOrError(r);
         }
+
+        [HttpGet("orders")]
+        public Task<Order[]> GetOrders() => _mediator.Send(new Orders.Query(User.Identifier()));
     }
 }

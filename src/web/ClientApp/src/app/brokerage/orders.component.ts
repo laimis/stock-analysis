@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 
@@ -7,28 +7,34 @@ import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css']
 })
-export class BrokerageOrdersComponent {
+export class BrokerageOrdersComponent implements OnInit {
   groupedOrders: BrokerageOrder[][];
 
   constructor(
     private stockService: StocksService
   ) { }
 
-  @Input()
-  set orders (value: BrokerageOrder[]) {
-    var buys = value.filter(o => o.type == 'BUY' && o.status !== 'FILLED');
-    var sells = value.filter(o => o.type == 'SELL' && o.status !== 'FILLED');
-    var filled = value.filter(o => o.status == 'FILLED');
 
-    this.groupedOrders = [buys, sells, filled]
+  ngOnInit(): void {
+    this.refreshOrders()
+  }
+
+  refreshOrders() {
+    this.stockService.brokerageOrders().subscribe(orders => {
+      var buys = orders.filter(o => o.type == 'BUY' && o.status !== 'FILLED');
+      var sells = orders.filter(o => o.type == 'SELL' && o.status !== 'FILLED');
+      var filled = orders.filter(o => o.status == 'FILLED');
+
+      this.groupedOrders = [buys, sells, filled]
+    });
   }
 
   @Output()
-  orderCancelled: EventEmitter<string> = new EventEmitter<string>()
+  orderExecuted: EventEmitter<string> = new EventEmitter<string>()
 
   cancelOrder(orderId: string) {
     this.stockService.brokerageCancelOrder(orderId).subscribe(() => {
-      this.orderCancelled.emit("cancelled")
+      this.refreshOrders()
     }, (err) => {
       console.log(err)
     }
@@ -47,14 +53,14 @@ export class BrokerageOrdersComponent {
 
     if (order.type === 'BUY') {
       this.stockService.purchase(obj).subscribe(() => {
-        this.orderCancelled.emit("recorded buy")
+        this.orderExecuted.emit("recorded buy")
       }, (err) => {
         console.log(err)
       })
     }
     else if (order.type === 'SELL') {
       this.stockService.sell(obj).subscribe(() => {
-        this.orderCancelled.emit("recorded sell")
+        this.orderExecuted.emit("recorded sell")
       }, (err) => {
         console.log(err)
       })
@@ -63,6 +69,6 @@ export class BrokerageOrdersComponent {
 
   getTotal(orders:BrokerageOrder[]) {
     return orders
-      .reduce((total, order) => total + order.price, 0)
+      .reduce((total, order) => total + order.price * order.quantity, 0)
   }
 }

@@ -210,6 +210,10 @@ export class StocksService {
     return this.http.delete('/api/brokerage/orders/' + orderId)
   }
 
+  brokerageOrders() : Observable<BrokerageOrder[]> {
+    return this.http.get<BrokerageOrder[]>('/api/brokerage/orders')
+  }
+
   settings(ticker:string,category:string) : Observable<any> {
     var obj = {ticker, category}
 		return this.http.post('/api/stocks/settings', obj)
@@ -748,7 +752,6 @@ export interface StockTradingPositions {
   current: PositionInstance[]
   past: PositionInstance[]
   performance: StockTradingPerformanceCollection
-  brokerageOrders: BrokerageOrder[]
   violations: StockViolation[]
 }
 

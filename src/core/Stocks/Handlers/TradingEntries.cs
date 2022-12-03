@@ -48,11 +48,6 @@ namespace core.Stocks
 
                 var user = await _accounts.GetUser(request.UserId);
 
-                var brokerageOrders = await (user.State.ConnectedToBrokerage switch {
-                    true => GetBrokerageOrders(_brokerage, user),
-                    false => Task.FromResult(new Order[0])
-                });
-
                 var brokeragePositions = await (user.State.ConnectedToBrokerage switch {
                     true => GetBrokeragePositions(_brokerage, user),
                     false => Task.FromResult<IEnumerable<Position>>(new Position[0])
@@ -92,7 +87,6 @@ namespace core.Stocks
                 return new TradingEntriesView(
                     current: current,
                     past: past,
-                    brokerageOrders: brokerageOrders,
                     performance: performance,
                     violations: violations
                 );
@@ -106,21 +100,6 @@ namespace core.Stocks
                     true => positions.Success,
                     false => new Position[0]
                 };
-            }   
-            
-            internal static async Task<Order[]> GetBrokerageOrders(IBrokerage brokerage, User user)
-            {
-                var orders = await brokerage.GetOrders(user.State);
-                if (!orders.IsOk)
-                {
-                    return new Order[0];
-                }
-
-                return 
-                    orders.Success
-                        .Where(o => o.IncludeInResponses)
-                        .OrderBy(o => o.StatusOrder)
-                        .ToArray();
             }
         }
     }

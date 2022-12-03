@@ -11,7 +11,6 @@ import { StocksService, PositionInstance, StockTradingPositions, StockTradingPer
 export class StockTradingComponent implements OnInit {
   positions: PositionInstance[]
   closed: PositionInstance[]
-  brokerageOrders: BrokerageOrder[]
   loaded: boolean = false
   loading: boolean = true
   activeTab:string = 'positions'
@@ -49,7 +48,7 @@ export class StockTradingComponent implements OnInit {
     this.activateTab('brokerage')
   }
 
-  orderCancelled() {
+  orderExecuted() {
     this.loadEntries()
   }
 
@@ -75,7 +74,6 @@ export class StockTradingComponent implements OnInit {
       this.positions = r.current
       this.closed = r.past
       this.performance = r.performance
-      this.brokerageOrders = r.brokerageOrders
       this.violations = r.violations
       this.loading = false
       this.loaded = true

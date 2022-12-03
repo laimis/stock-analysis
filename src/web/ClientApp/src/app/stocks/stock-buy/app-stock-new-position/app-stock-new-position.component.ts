@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 
 @Component({
   selector: 'app-app-stock-new-position',
@@ -13,12 +14,18 @@ export class StockNewPositionComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  @ViewChild(BrokerageOrdersComponent)
+  private brokerageOrders!: BrokerageOrdersComponent;
+
   brokerageOrderEntered() {
     this.feedbackMessage = "Brokerage order entered";
+
+    this.brokerageOrders.refreshOrders();
   }
 
   stockPurchased() {
     this.feedbackMessage = "Position open recorded";
   }
+
 
 }
