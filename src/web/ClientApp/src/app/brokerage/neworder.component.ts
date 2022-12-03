@@ -28,8 +28,6 @@ export class BrokerageNewOrderComponent {
     this.numberOfShares = null
     this.price = null
     this.ticker = null
-    this.brokerageOrderDuration = null
-    this.brokerageOrderType = null
   }
 
   onTickerSelected(ticker: string) {

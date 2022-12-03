@@ -25,5 +25,23 @@ namespace coretests.Stocks
 
         [Fact]
         public void RiskedAmount_Accurate() => Assert.Equal(250m, _position.RiskedAmount.Value, 1);
+
+        [Fact]
+        public void CostAtRiskedBasedOnStopPrice()
+        {
+            var position = new PositionInstance(0, "TSLA");
+
+            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
+            position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
+            position.SetStopPrice(20, DateTime.Parse("2020-01-26"));
+
+            Assert.Equal(250m, position.CostAtRiskedBasedOnStopPrice.Value);
+            
+            // sell some shares
+            position.Sell(numberOfShares: 10, price: 40, when: DateTime.Parse("2020-02-25"), transactionId: Guid.NewGuid());
+
+            // cost at risk decreases because half of the position was sold
+            Assert.Equal(150m, position.CostAtRiskedBasedOnStopPrice.Value);
+        }
     }
 }
