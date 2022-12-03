@@ -51,11 +51,9 @@ namespace coretests.Stocks.Services
             => Assert.Equal(217.25m, _outcomes.FirstOutcome(MultipleBarOutcomeKeys.HighestPrice).value, 2);
 
         [Fact]
-        public void LowestPriceDaysAgo()
-            => Assert.Equal(24, _outcomes.FirstOutcome(MultipleBarOutcomeKeys.LowestPriceDaysAgo).value, 2);
-
-        [Fact]
-        public void HighestPriceDaysAgo()
-            => Assert.Equal(380, _outcomes.FirstOutcome(MultipleBarOutcomeKeys.HighestPriceDaysAgo).value, 2);
+        public void DaysAgo()
+            => Assert.True(
+                _outcomes.FirstOutcome(MultipleBarOutcomeKeys.HighestPriceDaysAgo).value > _outcomes.FirstOutcome(MultipleBarOutcomeKeys.LowestPriceDaysAgo).value
+            );
     }
 }
