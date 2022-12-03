@@ -18,6 +18,12 @@
     </div>
   
     <div class="container mt-5">
+      <div class="row" *ngIf="currentPositionOrders && currentPositionOrders.length > 0">
+        Brokerage Orders:
+        <div *ngFor="let order of currentPositionOrders">
+          {{order.type}} {{order.quantity}} shares at {{order.price | currency}}
+        </div>
+      </div>
       <div class="row">
         <div class="col">
           <app-trading-actual-vs-simulated [actual]="currentPosition" [simulations]="simulationResults"></app-trading-actual-vs-simulated>

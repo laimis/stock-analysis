@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults, BrokerageOrder } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -12,6 +12,7 @@ export class StockTradingOpenPositionsComponent {
   private _positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
+  currentPositionOrders: BrokerageOrder[]
   simulationResults: TradingStrategyResults
   prices: Prices
   outcomes: TickerOutcomes;
@@ -28,8 +29,12 @@ export class StockTradingOpenPositionsComponent {
     return this._positions
   }
 
+  @Input()
+  orders:BrokerageOrder[]
+
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
+    this.currentPositionOrders = this.orders.filter(o => o.ticker == this.currentPosition.ticker)
     // get price data and pass it to chart
     this.getSimulatedTrades();
   }

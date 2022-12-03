@@ -16,6 +16,7 @@ export class StockTradingComponent implements OnInit {
   activeTab:string = 'positions'
   performance: StockTradingPerformanceCollection;
   violations: StockViolation[]
+  brokerageOrders: BrokerageOrder[];
 
   constructor(
     private stockService:StocksService,
@@ -77,9 +78,16 @@ export class StockTradingComponent implements OnInit {
       this.violations = r.violations
       this.loading = false
       this.loaded = true
+
+      this.loadBrokerageOrders()
     }, _ => {
       this.loading = false
       this.loaded = true
+    })
+  }
+  loadBrokerageOrders() {
+    this.stockService.brokerageOrders().subscribe((r: BrokerageOrder[]) => {
+      this.brokerageOrders = r
     })
   }
 
