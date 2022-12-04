@@ -44,6 +44,10 @@ export class StockTradingOpenPositionsComponent {
       (results: TradingStrategyResults) => {
         this.simulationResults = results
         this.getPricesForCurrentPosition()
+      },
+      (error) => {
+        console.log("error fetching simulations: " + error)
+        this.getPricesForCurrentPosition()
       }
     )
   }
