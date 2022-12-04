@@ -35,4 +35,23 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- detailed breakdown -->
+  <table class="table striped">
+    <thead>
+      <tr>
+        <th>ticker</th>
+        <th *ngFor="let r of results" colspan="2">{{r.strategyName}}</th>
+      </tr>
+    </thead>
+    <tbody>  
+      <tr *ngFor="let t of results[0].positions; let i = index">
+        <td>{{t.ticker}}</td>
+        <ng-container *ngFor="let r of results">
+          <td [className]="getClassBasedOnProfit(r.positions[i])">{{r.positions[i].isClosed ? 'closed' : 'open'}}</td>
+          <td [className]="getClassBasedOnProfit(r.positions[i])">{{ r.positions[i].profit + r.positions[i].unrealizedProfit | currency }}</td>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
 </div>

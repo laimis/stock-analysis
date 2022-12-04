@@ -30,5 +30,9 @@ export class PlaygroundComponent implements OnInit {
   openPositions(positions:PositionInstance[]) {
     return positions.filter(p => !p.isClosed).length;
   }
+
+  getClassBasedOnProfit(position:PositionInstance) {
+    return (position.profit + position.unrealizedProfit) > 0 ? 'table-success' : 'table-danger';
+  }
 }
 
