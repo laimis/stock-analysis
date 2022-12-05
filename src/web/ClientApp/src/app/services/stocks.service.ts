@@ -64,9 +64,9 @@ export class StocksService {
     )
   }
 
-  simulatePositions(numberOfPositions: number): Observable<TradingStrategyPerformance[]> {
+  simulatePositions(closePositionIfOpenAtTheEnd:boolean, numberOfTrades: number): Observable<TradingStrategyPerformance[]> {
     return this.http.get<TradingStrategyPerformance[]>(
-      `/api/portfolio/simulate/trades?numberOfPositions=${numberOfPositions}`
+      `/api/portfolio/simulate/trades?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
     )
   }
 

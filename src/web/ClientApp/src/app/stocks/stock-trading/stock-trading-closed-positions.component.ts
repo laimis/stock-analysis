@@ -16,7 +16,7 @@ export class StockTradingClosedPositionsComponent implements OnInit {
   ) { }
 
 	ngOnInit() {
-    this.stocksService.simulatePositions(20).subscribe(performance => {
+    this.stocksService.simulatePositions(true, 20).subscribe(performance => {
       this.performances = performance;
       });
   }

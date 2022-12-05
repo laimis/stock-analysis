@@ -15,12 +15,14 @@ namespace core.Portfolio
     {
         public class Query : RequestWithUserId<List<TradingStrategyPerformance>>
         {
-            public Query(int numberOfTrades, Guid userId)
+            public Query(bool closePositionIfOpenAtTheEnd, int numberOfTrades, Guid userId)
             {
+                ClosePositionIfOpenAtTheEnd = closePositionIfOpenAtTheEnd;
                 NumberOfPositions = numberOfTrades;
                 UserId = userId;
             }
 
+            public bool ClosePositionIfOpenAtTheEnd { get; }
             public int NumberOfPositions { get; }
         }
 
@@ -71,7 +73,7 @@ namespace core.Portfolio
                         stopPrice: position.FirstStop.Value,
                         ticker: position.Ticker,
                         when: position.Opened.Value,
-                        closeIfOpenAtTheEnd: false
+                        closeIfOpenAtTheEnd: request.ClosePositionIfOpenAtTheEnd
                     );
 
                     results.Add(new TradingStrategyResult(0, 0, position, "Actual trading"));

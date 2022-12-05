@@ -64,11 +64,14 @@ namespace web.Controllers
 
         [HttpGet("simulate/trades")]
         public Task<List<TradingStrategyPerformance>> Trade(
-            [FromQuery]int numberOfPositions) =>
+            [FromQuery]bool closePositionIfOpenAtTheEnd,
+            [FromQuery]int numberOfTrades) =>
             
             _mediator.Send(
                 new SimulateTrades.Query(
-                    numberOfPositions, User.Identifier()
+                    closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
+                    numberOfTrades: numberOfTrades,
+                    userId: User.Identifier()
                 )
             );
 

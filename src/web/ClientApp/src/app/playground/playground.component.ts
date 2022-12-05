@@ -17,12 +17,12 @@ export class PlaygroundComponent implements OnInit {
 
   ngOnInit() {
     var n = this.route.snapshot.queryParamMap.get('n');
-    var number = 20;
+    var numberOfTrades = 20;
     if (n) {
-      number = parseInt(n);
+      numberOfTrades = parseInt(n);
     }
 
-    this.stocks.simulatePositions(number).subscribe( results => {
+    this.stocks.simulatePositions(true, numberOfTrades).subscribe( results => {
         this.results = results
       });
   }
