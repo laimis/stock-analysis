@@ -5,16 +5,16 @@
         <th>Strategy</th>
         <th>P/L</th>
         <th>R/R</th>
+        <th>Win %</th>
         <th>Avg Win Pct</th>
         <th>Avg Loss Pct</th>
         <th>Max Win</th>
         <th>Max Loss</th>
         <th>E/V</th>
-        <th>Win %</th>
         <th>Profit /</th>
         <th>Pct /</th>
         <th>Trades</th>
-        <th>Open Trades</th>
+        <th>Open Positions</th>
       </tr>
     </thead>
     <tbody>
@@ -30,28 +30,29 @@
         <td>{{r.performance.ev | currency}}</td>
         <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
         <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.total}}</td>
+        <td>{{r.performance.numberOfTrades }}</td>
         <td>{{openPositions(r.positions)}}</td>
       </tr>
     </tbody>
   </table>
 
   <!-- detailed breakdown -->
-  <table class="table striped">
-    <thead>
-      <tr>
-        <th>ticker</th>
-        <th *ngFor="let r of results" colspan="2">{{r.strategyName}}</th>
-      </tr>
-    </thead>
-    <tbody>  
-      <tr *ngFor="let t of results[0].positions; let i = index">
-        <td>{{t.ticker}}</td>
-        <ng-container *ngFor="let r of results">
-          <td [className]="getClassBasedOnProfit(r.positions[i])">{{r.positions[i].isClosed ? 'closed' : 'open'}}</td>
-          <td [className]="getClassBasedOnProfit(r.positions[i])">{{ r.positions[i].profit + r.positions[i].unrealizedProfit | currency }}</td>
-        </ng-container>
-      </tr>
-    </tbody>
-  </table>
+  <div class="card mb-3" *ngFor="let r of results; let strategyIndex = index">
+    <div class="card-body">
+      <h5 class="card-title">
+        {{results[0].strategyName}} vs {{results[strategyIndex].strategyName}}
+      </h5>
+      <div class="row" *ngFor="let p of results[strategyIndex].positions; let positionIndex = index">
+        <div [className]="'col ' + backgroundCssClassForActual(results, strategyIndex, positionIndex)">   </div>
+        <div class="col">{{results[0].positions[positionIndex].ticker}}</div>
+        <div class="col">{{results[0].positions[positionIndex].profit + results[0].positions[positionIndex].unrealizedProfit | currency}}</div>
+        <div class="col">{{results[strategyIndex].positions[positionIndex].profit + results[strategyIndex].positions[positionIndex].unrealizedProfit | currency}}</div>
+        <div class="col">{{results[0].positions[positionIndex].daysHeld}}</div>
+        <div class="col">{{results[strategyIndex].positions[positionIndex].daysHeld}}
+          <span *ngIf="!results[strategyIndex].positions[positionIndex].isClosed">(open)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

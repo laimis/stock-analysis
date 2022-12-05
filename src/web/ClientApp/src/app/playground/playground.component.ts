@@ -22,7 +22,7 @@ export class PlaygroundComponent implements OnInit {
       numberOfTrades = parseInt(n);
     }
 
-    this.stocks.simulatePositions(true, numberOfTrades).subscribe( results => {
+    this.stocks.simulatePositions(false, numberOfTrades).subscribe( results => {
         this.results = results
       });
   }
@@ -31,8 +31,14 @@ export class PlaygroundComponent implements OnInit {
     return positions.filter(p => !p.isClosed).length;
   }
 
-  getClassBasedOnProfit(position:PositionInstance) {
-    return (position.profit + position.unrealizedProfit) > 0 ? 'table-success' : 'table-danger';
+  backgroundCssClassForActual(results:TradingStrategyPerformance[], strategyIndex: number, positionIndex: number) {
+    var simulatedPosition = results[strategyIndex].positions[positionIndex];
+    var actualPosition = results[0].positions[positionIndex];
+
+    var simulatedProfit = simulatedPosition.profit + simulatedPosition.unrealizedProfit;
+    var actualProfit = actualPosition.profit + actualPosition.unrealizedProfit;
+
+    return actualProfit >= simulatedProfit ? 'bg-success' : '';
   }
 }
 

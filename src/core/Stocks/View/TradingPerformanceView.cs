@@ -4,9 +4,9 @@ namespace core.Stocks
 {
     public struct TradingPerformanceView
     {
-        public static TradingPerformanceView Create(Span<PositionInstance> closedPositions)
+        public static TradingPerformanceView Create(Span<PositionInstance> positions)
         {
-            if (closedPositions.Length == 0)
+            if (positions.Length == 0)
             {
                 return new TradingPerformanceView();
             }
@@ -14,7 +14,7 @@ namespace core.Stocks
             var wins = 0;
             var maxWinAmount = 0m;
             var winMaxReturnPct = 0m;
-            var total = closedPositions.Length;
+            var numberOfTrades = positions.Length;
             var totalWinAmount = 0m;
             var totalWinReturnPct = 0m;
             var totalWinDaysHeld = 0;
@@ -25,19 +25,19 @@ namespace core.Stocks
             var totalLossAmount = 0m;
             var totalLossReturnPct = 0m;
             var totalLossDaysHeld = 0;
+            var totalPercentReturn = 0m;
 
             var totalDaysHeld = 0;
-            var totalCost = 0m;
             var profit = 0m;
             var rrSum = 0m;
             var rrSumWeighted = 0m;
             
-            foreach(var e in closedPositions)
+            foreach(var e in positions)
             {
                 totalDaysHeld += e.DaysHeld;
-                profit += e.Profit;
-                totalCost += e.Cost;
+                profit += e.Profit + (e.UnrealizedProfit.HasValue ? e.UnrealizedProfit.Value : 0);
                 rrSum += e.RR;
+                totalPercentReturn += e.GainPct;
                 rrSumWeighted += e.RRWeighted;
 
                 if (e.Profit >= 0)
@@ -60,15 +60,15 @@ namespace core.Stocks
                 }
             }
             
-            var winningPct = wins * 1.0m / total;
+            var winningPct = wins * 1.0m / numberOfTrades;
 
             var adjustedWinningAmount = wins > 0 ? winningPct * totalWinAmount / wins : 0m;
             var adjustedLossingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 1000m;
 
             return new TradingPerformanceView {
-                AvgDaysHeld = totalDaysHeld / total,
+                AvgDaysHeld = totalDaysHeld / numberOfTrades,
                 AvgLossAmount = losses > 0 ? totalLossAmount / losses : 0,
-                AvgReturnPct = totalCost > 0 ? profit / totalCost : 0,
+                AvgReturnPct = totalPercentReturn / numberOfTrades,
                 AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
                 EV = adjustedWinningAmount - adjustedLossingAmount,
                 MaxLossAmount = maxLossAmount,
@@ -80,7 +80,7 @@ namespace core.Stocks
                 Profit = profit,
                 rrSum = rrSum,
                 rrSumWeighted = rrSumWeighted,
-                Total = total,
+                NumberOfTrades = numberOfTrades,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
                 WinAvgReturnPct = wins > 0 ? totalWinReturnPct / wins : 0,
                 WinMaxReturnPct = winMaxReturnPct,
@@ -89,7 +89,7 @@ namespace core.Stocks
             };
         }
 
-        public int Total { get; set; }
+        public int NumberOfTrades { get; set; }
         public int Wins { get; set; }
         public decimal AvgWinAmount { get; set; }
         public decimal MaxWinAmount { get; set; }

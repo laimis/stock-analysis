@@ -14,7 +14,7 @@ namespace coretests.Stocks
         }
 
         [Fact]
-        public void TestTotal() => Assert.Equal(3, _performance.Total);
+        public void TestTotal() => Assert.Equal(3, _performance.NumberOfTrades);
 
         [Fact]
         public void WinsCorrect() => Assert.Equal(2, _performance.Wins);

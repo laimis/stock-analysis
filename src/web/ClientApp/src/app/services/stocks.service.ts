@@ -697,7 +697,7 @@ export interface StockGaps {
 export interface StockTradingPerformance {
   wins: number,
   losses: number,
-  total: number,
+  numberOfTrades: number,
   profit: number,
   profitRatio: number,
   returnPctRatio: number,
