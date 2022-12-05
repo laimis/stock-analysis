@@ -25,6 +25,8 @@
     </div>
   </div>
 
+  <app-brokerage-neworder *ngIf="ownership && ownership.currentPosition"></app-brokerage-neworder>
+
   <app-stock-trading-position *ngIf="ownership && ownership.currentPosition" [position]="ownership.currentPosition"></app-stock-trading-position>
 
 	<div *ngIf="ownership && ownership.positions.length > 0">
