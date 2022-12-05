@@ -136,13 +136,6 @@ namespace core.Stocks.Services.Trading
                 {
                     maxDrawdown = loss;
                 }
-                
-                // if stop is reached, sell at the close price
-                if (bar.Close <= position.StopPrice.Value)
-                {
-                    position.Sell(position.NumberOfShares, bar.Close, Guid.NewGuid(), bar.Date);
-                    break;
-                }
 
                 if (!levelSells[currentLevel] && bar.High >= getRRLevelFunc(currentLevel))
                 {
@@ -153,6 +146,13 @@ namespace core.Stocks.Services.Trading
                     position.SetStopPrice(stopPrice, bar.Date);
                     levelSells[currentLevel] = true;
                     currentLevel++;
+                }
+
+                // if stop is reached, sell at the close price
+                if (bar.Close <= position.StopPrice.Value)
+                {
+                    position.Sell(position.NumberOfShares, bar.Close, Guid.NewGuid(), bar.Date);
+                    break;
                 }
             }
 
