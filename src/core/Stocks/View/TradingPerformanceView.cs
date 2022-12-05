@@ -40,11 +40,11 @@ namespace core.Stocks
                 totalPercentReturn += e.GainPct;
                 rrSumWeighted += e.RRWeighted;
 
-                if (e.Profit >= 0)
+                if (profit >= 0)
                 {
                     wins++;
-                    totalWinAmount += e.Profit;
-                    maxWinAmount = Math.Max(maxWinAmount, e.Profit);
+                    totalWinAmount += profit;
+                    maxWinAmount = Math.Max(maxWinAmount,profit);
                     totalWinReturnPct += e.GainPct;
                     winMaxReturnPct = Math.Max(winMaxReturnPct, e.GainPct);
                     totalWinDaysHeld += e.DaysHeld;
@@ -52,8 +52,8 @@ namespace core.Stocks
                 else
                 {
                     losses++;
-                    totalLossAmount += Math.Abs(e.Profit);
-                    maxLossAmount = Math.Max(maxLossAmount, Math.Abs(e.Profit));
+                    totalLossAmount += Math.Abs(profit);
+                    maxLossAmount = Math.Max(maxLossAmount, Math.Abs(profit));
                     totalLossReturnPct += Math.Abs(e.GainPct);
                     lossMaxReturnPct = Math.Max(lossMaxReturnPct, Math.Abs(e.GainPct));
                     totalLossDaysHeld += e.DaysHeld;
