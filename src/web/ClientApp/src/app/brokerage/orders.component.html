@@ -1,5 +1,5 @@
 <table class="table" *ngFor="let groupedOrder of groupedOrders">
-  <thead>
+  <thead *ngIf="groupedOrder.length > 0">
     <tr>
       <th width="100"></th>
       <th>Stock</th>
@@ -24,7 +24,7 @@
       </td>
     </tr>
   </tbody>
-  <tfoot>
+  <tfoot  *ngIf="groupedOrder.length > 0">
     <tr>
       <td></td>
       <td></td>

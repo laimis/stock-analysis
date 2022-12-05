@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 
@@ -9,6 +9,8 @@ import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/
 })
 export class BrokerageOrdersComponent implements OnInit {
   groupedOrders: BrokerageOrder[][];
+  private _orders: BrokerageOrder[] = [];
+  private _ticker: string;
 
   constructor(
     private stockService: StocksService
@@ -19,14 +21,28 @@ export class BrokerageOrdersComponent implements OnInit {
     this.refreshOrders()
   }
 
+  @Input()
+  set ticker(val:string) {
+    this._ticker = val
+    this.groupAndRenderOrders()
+  }
+  get ticker():string {
+    return this._ticker
+  }
+
   refreshOrders() {
     this.stockService.brokerageOrders().subscribe(orders => {
-      var buys = orders.filter(o => o.type == 'BUY' && o.status !== 'FILLED');
-      var sells = orders.filter(o => o.type == 'SELL' && o.status !== 'FILLED');
-      var filled = orders.filter(o => o.status == 'FILLED');
-
-      this.groupedOrders = [buys, sells, filled]
+      this._orders = orders
+      
+      this.groupAndRenderOrders()
     });
+  }
+  groupAndRenderOrders() {
+    var buys = this._orders.filter(o => o.type == 'BUY' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
+    var sells = this._orders.filter(o => o.type == 'SELL' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
+    var filled = this._orders.filter(o => o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
+
+    this.groupedOrders = [buys, sells, filled]
   }
 
   @Output()

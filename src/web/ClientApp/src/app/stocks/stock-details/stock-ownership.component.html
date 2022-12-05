@@ -2,19 +2,15 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-  <div *ngIf="ownership && !ownership.currentPosition">
-    Current price: <b>{{stock.price | currency}}</b>
-  </div>
-
-  <div *ngIf="ownership && ownership.currentPosition" class="mt-4">
+  <div class="mt-4">
     <div class="row">
-      <div class="col">
+      <div class="col" *ngIf="ownership && ownership.currentPosition">
         Ownership: <b>{{ownership.currentPosition.numberOfShares}}</b> @ <b>{{ownership.currentPosition.averageCostPerShare | currency}}</b> ({{(stock.price - ownership.currentPosition.averageCostPerShare) / stock.price | percent}})
       </div>
-      <div class="col">
+      <div class="col" *ngIf="stock">
         Current price: <b>{{stock.price | currency}}</b>
       </div>
-      <div class="col">
+      <div class="col" *ngIf="ownership && ownership.currentPosition">
         <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target)" value="{{ownership.currentPosition.category}}">
           <option value="">Select Category</option>
           <option value="longterm">Long-Term</option>
@@ -26,6 +22,8 @@
   </div>
 
   <app-brokerage-neworder *ngIf="ownership && ownership.currentPosition"></app-brokerage-neworder>
+
+  <app-brokerage-orders *ngIf="stock" [ticker]="stock.ticker"></app-brokerage-orders>
 
   <app-stock-trading-position *ngIf="ownership && ownership.currentPosition" [position]="ownership.currentPosition"></app-stock-trading-position>
 
