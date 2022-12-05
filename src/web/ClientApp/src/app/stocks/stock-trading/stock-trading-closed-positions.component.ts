@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { PositionInstance, StocksService, TradingStrategyPerformance } from 'src/app/services/stocks.service';
+import { Component, Input } from '@angular/core';
+import { PositionInstance, TradingStrategyPerformance } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -7,19 +7,8 @@ import { PositionInstance, StocksService, TradingStrategyPerformance } from 'src
   templateUrl: './stock-trading-closed-positions.component.html',
   styleUrls: ['./stock-trading-closed-positions.component.css']
 })
-export class StockTradingClosedPositionsComponent implements OnInit {
+export class StockTradingClosedPositionsComponent {
   performances: TradingStrategyPerformance[];
-
-  // constructor with services
-  constructor(
-    private stocksService: StocksService
-  ) { }
-
-	ngOnInit() {
-    this.stocksService.simulatePositions(true, 20).subscribe(performance => {
-      this.performances = performance;
-      });
-  }
 
   @Input()
   positions: PositionInstance[]

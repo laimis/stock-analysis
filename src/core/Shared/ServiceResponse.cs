@@ -7,8 +7,6 @@ namespace core.Shared
         public TSuccess? Success { get; }
         public ServiceError? Error { get; }
         public bool IsOk => Error == null;
-
-        public ServiceResponse(){}
         
         public ServiceResponse(TSuccess success) =>
             Success = success;

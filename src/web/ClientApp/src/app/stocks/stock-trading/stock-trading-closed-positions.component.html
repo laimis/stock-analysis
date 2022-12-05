@@ -1,46 +1,6 @@
 <div>
   <a href="/api/stocks/export/closed" class="btn btn-link">Export trades</a>
 
-  <!-- bootstrap loading circle -->
-  <div *ngIf="!performances">
-    <div class="spinner-border text-primary" role="status">
-      <span>Sim</span>
-    </div>ulating trading strategies...
-  </div>
-
-  <table *ngIf="performances" class="table table-hover">
-    <thead>
-      <tr>
-        <th>Strategy</th>
-        <th>P/L</th>
-        <th>R/R</th>
-        <th>Win %</th>
-        <th>E/V</th>
-        <th>Avg Win Pct</th>
-        <th>Avg Loss Pct</th>
-        <th>Max Win</th>
-        <th>Max Loss</th>
-        <th>Win/Loss $ Ratio</th>
-        <th>Win/Loss % Ratio</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let r of performances">
-        <td>{{r.strategyName}}</td>
-        <td>{{r.performance.profit | currency}}</td>
-        <td>{{r.performance.rrSum | number:'1.0-2'}}</td>
-        <td>{{r.performance.winPct | percent}}</td>
-        <td>{{r.performance.ev | currency}}</td>
-        <td>{{r.performance.winAvgReturnPct | percent}}</td>
-        <td>{{r.performance.lossAvgReturnPct | percent}}</td>
-        <td>{{r.performance.maxWinAmount | currency}}</td>
-        <td>{{r.performance.maxLossAmount | currency}}</td>
-        <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
-      </tr>
-    </tbody>
-  </table>
-
   <table *ngIf="positions" class="table mt-3">
     <thead>
       <tr>
