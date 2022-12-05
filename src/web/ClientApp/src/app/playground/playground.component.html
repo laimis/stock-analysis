@@ -37,22 +37,20 @@
   </table>
 
   <!-- detailed breakdown -->
-  <div class="card mb-3" *ngFor="let r of results; let strategyIndex = index">
-    <div class="card-body">
-      <h5 class="card-title">
-        {{results[0].strategyName}} vs {{results[strategyIndex].strategyName}}
-      </h5>
-      <div class="row" *ngFor="let p of results[strategyIndex].positions; let positionIndex = index">
-        <div [className]="'col ' + backgroundCssClassForActual(results, strategyIndex, positionIndex)">   </div>
-        <div class="col">{{results[0].positions[positionIndex].ticker}}</div>
-        <div class="col">{{results[0].positions[positionIndex].profit + results[0].positions[positionIndex].unrealizedProfit | currency}}</div>
-        <div class="col">{{results[strategyIndex].positions[positionIndex].profit + results[strategyIndex].positions[positionIndex].unrealizedProfit | currency}}</div>
-        <div class="col">{{results[0].positions[positionIndex].daysHeld}}</div>
-        <div class="col">{{results[strategyIndex].positions[positionIndex].daysHeld}}
-          <span *ngIf="!results[strategyIndex].positions[positionIndex].isClosed">(open)</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <table class="table table-hover border" *ngFor="let r of results; let strategyIndex = index">
+    <tbody>
+      <tr>
+        <td colspan="6">{{results[0].strategyName}} vs {{results[strategyIndex].strategyName}}</td>
+      </tr>
+      <tr *ngFor="let p of results[strategyIndex].positions; let positionIndex = index">
+        <td width="20" [className]="'col ' + backgroundCssClassForActual(results, strategyIndex, positionIndex)"> &nbsp;&nbsp; </td>
+        <td width="50">{{results[0].positions[positionIndex].ticker}}</td>
+        <td width="100">{{results[0].positions[positionIndex].profit + results[0].positions[positionIndex].unrealizedProfit | currency}}</td>
+        <td width="100">{{results[strategyIndex].positions[positionIndex].profit + results[strategyIndex].positions[positionIndex].unrealizedProfit | currency}}</td>
+        <td width="100">{{results[0].positions[positionIndex].daysHeld}} vs {{results[strategyIndex].positions[positionIndex].daysHeld}} days held</td>
+        <td width="100"><span *ngIf="!results[strategyIndex].positions[positionIndex].isClosed">(open)</span></td>
+      </tr>
+    </tbody>
+  </table>
 
 </div>
