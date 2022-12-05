@@ -81,7 +81,13 @@ namespace core.Reports
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
                 }
 
-                var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(tickerOutcomes);
+                var orderResponse = await _brokerage.GetOrders(user);
+                var orders = orderResponse.IsOk ? orderResponse.Success : new List<Order>();
+
+                var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(
+                    tickerOutcomes,
+                    orders
+                );
 
                 return new OutcomesReportView(
                     evaluations: evaluations,
