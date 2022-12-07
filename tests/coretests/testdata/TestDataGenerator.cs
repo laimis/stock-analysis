@@ -7,9 +7,9 @@ namespace coretests.TestData
 {
     public class TestDataGenerator
     {
-        public static PriceBar[] PriceBars()
+        public static PriceBar[] PriceBars(string ticker = "NET")
         {
-            var content = File.ReadAllText("testdata/pricefeed_NET.txt");
+            var content = File.ReadAllText($"testdata/pricefeed_{ticker}.txt");
 
             return content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => PriceBar.Parse(x))

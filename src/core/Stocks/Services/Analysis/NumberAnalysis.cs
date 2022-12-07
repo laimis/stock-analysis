@@ -32,12 +32,24 @@ namespace core.Stocks.Services.Analysis
             var max = Math.Round(numbers.Max(), 2);
             var median = Math.Round(numbers.OrderBy(x => x).Skip(numbers.Length / 2).First(), 2);
             var count = numbers.Length;
-            var skewness = Math.Round(
-                (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 3)).Sum() / count / Math.Pow((double)stdDev, 3)),
+
+            // check for infinity when calculating skewness and kurtosis
+            // it happens if the set of numbers do not change (percent changes where
+            // the price is flat - company has been acquired for instance)
+            var skewnessDouble = Math.Round(
+                (numbers.Select(x => Math.Pow((double)(x - mean), 3)).Sum() / count / Math.Pow((double)stdDev, 3)),
                 2);
-            var kurtosis = Math.Round(
-                (decimal)(numbers.Select(x => Math.Pow((double)(x - mean), 4)).Sum() / count / Math.Pow((double)stdDev, 4) - 3),
+            var skewness = skewnessDouble switch {
+                double.PositiveInfinity => 0,
+                _ => (decimal)skewnessDouble
+            };
+            var kurtosisDouble = Math.Round(
+                (numbers.Select(x => Math.Pow((double)(x - mean), 4)).Sum() / count / Math.Pow((double)stdDev, 4) - 3),
                 2);
+            var kurtosis = kurtosisDouble switch {
+                double.PositiveInfinity => 0,
+                _ => (decimal)kurtosisDouble
+            };
 
             var buckets = Histogram.Calculate(
                     numbers,

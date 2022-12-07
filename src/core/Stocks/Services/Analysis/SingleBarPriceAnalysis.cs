@@ -145,9 +145,15 @@ namespace core.Stocks.Services.Analysis
                 .Select(x => x.Close)
                 .ToArray());
 
-            var sigmaRatio = percentChange switch {
-                >=0 => percentChange / (descriptor.mean + descriptor.stdDev),
-                <0 => -1m * (percentChange / (descriptor.mean - descriptor.stdDev))
+            // for some price feeds, price has finished changing, so mean and
+            // stdev will be 0, we need to check for that so that we don't divide by 0
+            var sigmaRatioDenominotor = percentChange switch {
+                >=0 => descriptor.mean + descriptor.stdDev,
+                <0 => descriptor.mean - descriptor.stdDev
+            };    
+            var sigmaRatio = sigmaRatioDenominotor == 0 ? 0 :  percentChange switch {
+                >=0 => percentChange / sigmaRatioDenominotor,
+                <0 => -1m * (percentChange / sigmaRatioDenominotor)
             };
 
             sigmaRatio = Math.Round(sigmaRatio, 2);
