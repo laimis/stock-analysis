@@ -57,6 +57,15 @@ namespace core.Stocks.Services.Analysis
                 OutcomeValueType.Number,
                 $"{position.RR:N2}"
             );
+
+            // profit in position
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.Profit,
+                position.CombinedProfit >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                position.CombinedProfit,
+                OutcomeValueType.Currency,
+                $"{position.CombinedProfit}"
+            );
             
             var stopLoss = position.StopPrice ?? 0;
 
@@ -153,6 +162,7 @@ namespace core.Stocks.Services.Analysis
         public static string AverageCost = "AverageCost";
         public static string StopLoss = "StopLoss";
         public static string RR = "RR";
+        public static string Profit = "Profit";
         public static string Price = "Price";
         public static string NumberOfShares = "NumberOfShares";
         public static string RiskAmount = "RiskedAmount";

@@ -50,6 +50,7 @@ namespace core.Stocks
         public decimal? UnrealizedGainPct { get; private set; } = null;
         public decimal? UnrealizedRR { get; private set; } = null;
         public decimal? PercentToStop { get; private set; } = null;
+        public decimal CombinedProfit => Profit + (UnrealizedProfit ?? 0);
         public bool IsClosed => Closed != null;
 
         public int PositionId { get; }
