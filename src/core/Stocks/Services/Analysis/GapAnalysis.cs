@@ -40,7 +40,12 @@ namespace core.Stocks.Services.Analysis
 
                 if (currentBar.Low > yesterday.High || currentBar.High < yesterday.Low)
                 {
-                    gapSizePct = (currentBar.Open - yesterday.Close)/yesterday.Close;
+                    // we take the lowest "significant" price of the day to calculate
+                    // what the gap is.
+                    // if it was a green day, then we care where it opened
+                    // if it was a red day, we care where it closed
+                    var referencePrice = Math.Min(currentBar.Open, currentBar.Close);
+                    gapSizePct = (referencePrice - yesterday.Close)/yesterday.Close;
                 }
 
                 if (gapSizePct != 0)
