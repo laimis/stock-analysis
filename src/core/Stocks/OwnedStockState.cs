@@ -117,11 +117,16 @@ namespace core.Stocks
             var transaction = Transactions.Single(t => t.EventId == deleted.TransactionId);
             Transactions.Remove(transaction);
 
-            Positions.Last().RemoveTransaction(deleted.TransactionId);
+            var lastPosition = Positions.Last();
+            lastPosition.RemoveTransaction(deleted.TransactionId);
 
-            if (OpenPosition != null && OpenPosition.NumberOfShares == 0)
+            if (lastPosition.NumberOfShares == 0)
             {
                 OpenPosition = null;
+            }
+            else
+            {
+                OpenPosition = lastPosition;
             }
         }
 

@@ -178,7 +178,9 @@ namespace coretests.Stocks
 
             var last = stock.State.Transactions.Where(t => !t.IsPL).Last();
 
-            Assert.Throws<InvalidOperationException>(() => stock.DeleteTransaction(last.EventId));
+            stock.DeleteTransaction(last.EventId);
+
+            Assert.NotNull(stock.State.OpenPosition);
         }
 
         [Fact]
