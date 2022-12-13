@@ -123,6 +123,7 @@ namespace core.Stocks
             if (lastPosition.NumberOfShares == 0)
             {
                 OpenPosition = null;
+                Positions.Remove(lastPosition);
             }
             else
             {
