@@ -183,7 +183,8 @@ public class TDAmeritradeClient : IBrokerage
             orderType = GetBuyOrderType(type),
             session = GetSession(duration),
             duration = GetBuyOrderDuration(duration),
-            price = price,
+            price = GetPrice(type, price),
+            stopPrice = GetActivationPrice(type, price),
             orderStrategyType = "SINGLE",
             orderLegCollection = new [] {legCollection}
         };
@@ -325,6 +326,22 @@ public class TDAmeritradeClient : IBrokerage
             BrokerageOrderType.Limit => "LIMIT",
             BrokerageOrderType.Market => "MARKET",
             BrokerageOrderType.StopMarket => "STOP",
+            _ => throw new ArgumentException("Unknown order type: " + type)
+        };
+
+    private decimal? GetPrice(BrokerageOrderType type, decimal? price) =>
+        type switch {
+            BrokerageOrderType.Limit => price,
+            BrokerageOrderType.Market => null,
+            BrokerageOrderType.StopMarket => null,
+            _ => throw new ArgumentException("Unknown order type: " + type)
+        };
+
+    private decimal? GetActivationPrice(BrokerageOrderType type, decimal? price) =>
+        type switch {
+            BrokerageOrderType.Limit => null,
+            BrokerageOrderType.Market => null,
+            BrokerageOrderType.StopMarket => price,
             _ => throw new ArgumentException("Unknown order type: " + type)
         };
 

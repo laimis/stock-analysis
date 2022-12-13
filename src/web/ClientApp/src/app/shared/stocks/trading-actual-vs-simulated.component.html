@@ -9,6 +9,7 @@
         <th>R/R</th>
         <th>% Gain</th>
         <th>Transactions</th>
+        <th>Stop</th>
         <th>Max Gain</th>
         <th>Max Drawdown</th>
       </tr>
@@ -28,6 +29,7 @@
             {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
           </div>
         </td>
+        <td>{{actual.stopPrice | currency }}/td>
         <td colspan="2"></td>
       </tr>
       <tr *ngIf="showDetails">
@@ -60,6 +62,7 @@
               {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
             </div>
           </td>
+          <td>{{r.position.stopPrice | currency }}/td>
           <td>{{r.maxGainPct | percent:'1.0-2'}}</td>
           <td>{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
         </tr>
