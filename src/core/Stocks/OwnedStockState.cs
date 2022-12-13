@@ -119,7 +119,7 @@ namespace core.Stocks
 
             Positions.Last().RemoveTransaction(deleted.TransactionId);
 
-            if (OpenPosition.NumberOfShares == 0)
+            if (OpenPosition != null && OpenPosition.NumberOfShares == 0)
             {
                 OpenPosition = null;
             }
