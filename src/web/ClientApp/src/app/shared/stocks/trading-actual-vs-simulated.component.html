@@ -62,7 +62,7 @@
               {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
             </div>
           </td>
-          <td>{{r.position.stopPrice | currency }}/td>
+          <td>{{r.position.stopPrice | currency }}</td>
           <td>{{r.maxGainPct | percent:'1.0-2'}}</td>
           <td>{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
         </tr>
