@@ -132,11 +132,6 @@ namespace core.Stocks
 
         public void DeleteTransaction(Guid transactionId)
         {
-            if (State.OpenPosition == null)
-            {
-                throw new InvalidOperationException("Unable to delete transaction, no open position");
-            }
-
             if (!State.BuyOrSell.Any(t => t.Id == transactionId))
             {
                 throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);

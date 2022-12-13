@@ -89,11 +89,10 @@ namespace core.Stocks
 
         internal void ApplyInternal(StockTransactionDeleted deleted)
         {
-            if (OpenPosition == null)
+            if (Positions.Count == 0)
             {
-                throw new InvalidOperationException("Cannot delete a transaction from a stock that has no open position");
+                throw new InvalidOperationException("Cannot delete a transaction from a stock that has no position");
             }
-
 
             // only last one should be allowed to be deleted?
             // var last = BuyOrSell.LastOrDefault();
@@ -118,7 +117,7 @@ namespace core.Stocks
             var transaction = Transactions.Single(t => t.EventId == deleted.TransactionId);
             Transactions.Remove(transaction);
 
-            OpenPosition.RemoveTransaction(deleted.TransactionId);
+            Positions.Last().RemoveTransaction(deleted.TransactionId);
 
             if (OpenPosition.NumberOfShares == 0)
             {
