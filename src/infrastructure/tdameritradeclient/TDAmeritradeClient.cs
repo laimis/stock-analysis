@@ -9,6 +9,7 @@ using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.RateLimit;
+using Polly.Retry;
 using Polly.Timeout;
 
 namespace tdameritradeclient;
@@ -25,8 +26,25 @@ public class TDAmeritradeClient : IBrokerage
     private const string _authUrl = "https://auth.tdameritrade.com";
 
     private HttpClient _httpClient;
-    private readonly AsyncTimeoutPolicy _timeoutPolicy;
-    private readonly AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(10, TimeSpan.FromSeconds(1));
+    private static readonly AsyncRetryPolicy _retryPolicy = Policy
+        .Handle<RateLimitRejectedException>()
+        .WaitAndRetryAsync(
+            retryCount: 3,
+            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(1)
+        );
+
+    private static readonly AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(
+        numberOfExecutions: 20,
+        perTimeSpan: TimeSpan.FromSeconds(1),
+        maxBurst: 10);
+
+    private static readonly AsyncTimeoutPolicy _timeoutPolicy = Policy.TimeoutAsync(
+        seconds: (int)TimeSpan.FromSeconds(15).TotalSeconds
+    );
+
+    private readonly AsyncPolicy _wrappedPolicy = Policy.WrapAsync(
+        _retryPolicy, _rateLimit, _timeoutPolicy
+    );
 
     public TDAmeritradeClient(ILogger<TDAmeritradeClient>? logger, string callbackUrl, string clientId)
     {
@@ -34,7 +52,6 @@ public class TDAmeritradeClient : IBrokerage
         _callbackUrl = callbackUrl;
         _clientId = clientId;
         _httpClient = new HttpClient();
-        _timeoutPolicy = Policy.TimeoutAsync((int)TimeSpan.FromSeconds(15).TotalSeconds);
     }
 
     public async Task<OAuthResponse?> ConnectCallback(string code)
@@ -402,48 +419,13 @@ public class TDAmeritradeClient : IBrokerage
         {
             request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
         }
-        
-        var retryCount = 0;
 
-        while(true)
-        {
-            try
-            {
-                var response = await _rateLimit.ExecuteAsync(
-                    async ct => await _timeoutPolicy.ExecuteAsync(
-                        ct2 => _httpClient.SendAsync(request, ct2),
-                        ct
-                    ),
-                    CancellationToken.None
-                );
+        var response = await _wrappedPolicy.ExecuteAsync(
+            async ct => await _httpClient.SendAsync(request, ct),
+            CancellationToken.None
+        );
 
-                LogIfFailed(response, function);
-
-                // HACK: I still get these too many requests exceptions from TDAmeritrade
-                // APIs even though I have an above rate limit that prevents the API from
-                // being called too often
-                if (response.StatusCode == HttpStatusCode.TooManyRequests)
-                {
-                    throw new RateLimitRejectedException(TimeSpan.FromSeconds(1));
-                }
-
-                return await response.Content.ReadAsStringAsync();
-            }
-            catch (RateLimitRejectedException)
-            {
-                retryCount++;
-
-                if (retryCount > 3)
-                {
-                    throw new TimeoutRejectedException("Rate limit exceeded after retries");
-                }
-                else
-                {
-                    _logger?.LogError($"Rate limit hit for {function}, retrying {retryCount}");
-                    await Task.Delay(1000);
-                }
-            }
-        }
+        return await response.Content.ReadAsStringAsync();
     }
 
     public async Task<OAuthResponse> GetAccessToken(UserState user)
