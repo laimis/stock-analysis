@@ -20,6 +20,17 @@ public class OAuthResponse
     public bool IsExpired => _created.AddSeconds(expires_in) < DateTimeOffset.UtcNow;
 }
 
+public class MarketHours
+{
+    public string category { get; set; }
+    public string date { get; set; }
+    public string exchange { get; set; }
+    public bool isOpen { get; set; }
+    public string marketType { get; set; }
+    public string product { get; set; }
+    public string productName { get; set; }
+}
+
 public class StockQuote
 {
     public string symbol { get; set; }

@@ -88,6 +88,7 @@ namespace web
             services.AddHostedService<StockMonitorService>();
             services.AddHostedService<ThirtyDaySellService>();
             services.AddHostedService<UserChangedScheduler>();
+            services.AddHostedService<GapUpMonitor>();
             
             StorageRegistrations(configuration, services, logger);
         }

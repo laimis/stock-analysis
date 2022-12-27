@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using core.Account;
@@ -259,6 +258,30 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<StockQuote>(quote);
     }
 
+    public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)
+    {
+        var dateStr = date.ToString("yyyy-MM-dd");
+        var function = $"marketdata/EQUITY/hours?date={dateStr}";
+
+        var wrapper = await CallApi<MarketHoursWrapper>(state, function, HttpMethod.Get, jsonData: null, debug: true);
+        if (!wrapper.IsOk)
+        {
+            return new ServiceResponse<MarketHours>(wrapper.Error!);
+        }
+
+        if (wrapper.Success!.equity == null)
+        {
+            return new ServiceResponse<MarketHours>(new ServiceError("Could not find market hours for date"));
+        }
+
+        if (wrapper.Success.equity.EQ == null)
+        {
+            return new ServiceResponse<MarketHours>(new ServiceError("Could not find market hours for date (EQ)"));
+        }
+
+        return new ServiceResponse<MarketHours>(wrapper.Success.equity.EQ);
+    }
+
 
     public async Task<ServiceResponse<PriceBar[]>> GetPriceHistory(
         UserState state,
@@ -388,7 +411,8 @@ public class TDAmeritradeClient : IBrokerage
 
             if (debug)
             {
-                _logger?.LogError(responseString);
+                _logger?.LogError("debug function: " + function);
+                _logger?.LogError("debug response output: " + responseString);
             }
 
             var deserialized = JsonSerializer.Deserialize<T>(responseString);

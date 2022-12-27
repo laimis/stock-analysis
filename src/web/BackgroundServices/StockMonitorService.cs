@@ -46,8 +46,6 @@ namespace web.BackgroundServices
             _container = container;
         }
 
-        
-
         private const int LONG_INTERVAL = 60_000; // one minute
         private const int SHORT_INTERVAL = 10_000; // 10 seconds
 
