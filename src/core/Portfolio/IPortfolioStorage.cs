@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
+using core.Portfolio;
 using core.Stocks;
 
 namespace core
@@ -17,6 +18,12 @@ namespace core
         Task<OwnedStock> GetStock(Guid id, Guid userId);
         Task<IEnumerable<OwnedStock>> GetStocks(Guid userId);
         Task Save(OwnedStock stock, Guid userId);
+
+        
+        Task<IEnumerable<StockList>> GetStockLists(Guid userId);
+        Task<StockList> GetStockList(string name, Guid userId);
+        Task Save(StockList list, Guid userId);
+
 
         Task<IEnumerable<OwnedOption>> GetOwnedOptions(Guid userId);
         Task<OwnedOption> GetOwnedOption(Guid optionId, Guid userId);
