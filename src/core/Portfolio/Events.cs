@@ -30,4 +30,28 @@ namespace core.Portfolio
         public string Description { get; }
         public string Name { get; }
     }
+
+    internal class StockListTickerAdded : AggregateEvent
+    {
+        public StockListTickerAdded(Guid id, Guid aggregateId, DateTimeOffset when, string note, Ticker ticker)
+            : base(id, aggregateId, when)
+        {
+            Note = note;
+            Ticker = ticker;
+        }
+
+        public string Note { get; }
+        public Ticker Ticker { get; }
+    }
+
+    internal class StockListTickerRemoved : AggregateEvent
+    {
+        public StockListTickerRemoved(Guid id, Guid aggregateId, DateTimeOffset when, Ticker ticker)
+            : base(id, aggregateId, when)
+        {
+            Ticker = ticker;
+        }
+
+        public Ticker Ticker { get; }
+    }
 }

@@ -51,5 +51,49 @@ namespace coretests.Stocks
 
             Assert.NotNull(list);
         }
+
+        [Fact]
+        public void AddingTickerWorks()
+        {
+            var list = Create("name", "description");
+
+            list.AddStock("aapl", "note");
+
+            Assert.Single(list.State.Tickers);
+            Assert.Equal(new core.Shared.Ticker("aapl"), list.State.Tickers[0].Ticker);
+        }
+
+        [Fact]
+        public void AddingTickerWithNoNoteWorks()
+        {
+            var list = Create("name", "description");
+
+            list.AddStock("aapl", null);
+
+            Assert.Single(list.State.Tickers);
+            Assert.Equal(new core.Shared.Ticker("aapl"), list.State.Tickers[0].Ticker);
+        }
+
+        [Fact]
+        public void RemovingTickerWorks()
+        {
+            var list = Create("name", "description");
+
+            list.AddStock("aapl", "note");
+
+            Assert.Single(list.State.Tickers);
+
+            list.RemoveStock("aapl");
+
+            Assert.Empty(list.State.Tickers);
+        }
+        
+        [Fact]
+        public void RemovingTickerThatDoesNotExistFails()
+        {
+            var list = Create("name", "description");
+
+            Assert.Throws<InvalidOperationException>(() => list.RemoveStock("aapl"));
+        }
     }
 }
