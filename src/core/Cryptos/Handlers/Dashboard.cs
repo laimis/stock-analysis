@@ -30,19 +30,14 @@ namespace core.Cryptos.Handlers
             {
                 var dashboardView = await LoadFromDb(query.UserId);
 
-                var prices = await _prices.Get();
+                var prices = await _prices.Get(dashboardView.Owned.Select(o => o.Token));
 
                 foreach(var owned in dashboardView.Owned)
                 {
-                    if (prices.TryGet(owned.Token, out var price))
+                    if (prices.TryGetValue(owned.Token, out var price))
                     {
-                        owned.ApplyPrice(price.Value);
+                        owned.ApplyPrice(price);
                     }
-                    // TODO: replace with logging
-                    // else
-                    // {
-                    //     Console.WriteLine("Did not find price for " + owned.Token);
-                    // }
                 }
 
                 return dashboardView;

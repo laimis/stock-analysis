@@ -6,18 +6,6 @@ namespace coretests.Account
 {
     public class LoginTests
     {
-        // TODO: comment back in once ready to implement loging in tracking
-        // [Fact]
-        // public async Task Login_RecordsEntryAsync()
-        // {
-        //     var cmd = CreateCommand();
-
-        //     var storage = new FakeAccountStorage();
-
-        //     var handler = new Login.Handler(storage);
-        //     await handler.Handle(cmd, CancellationToken.None);
-        // }
-
         [Fact]
         public void LoginCommand_SetsDate()
         {
