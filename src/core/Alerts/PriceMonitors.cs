@@ -130,10 +130,10 @@ namespace core.Alerts
 
         bool IStockPositionMonitor.RunCheck(decimal price, DateTimeOffset time)
         {
-            if (TriggeredAlert.HasValue)
-            {
-                return false;
-            }
+            // if (TriggeredAlert.HasValue)
+            // {
+            //     return false;
+            // }
 
             TriggeredAlert = new TriggeredAlert(
                 triggeredValue: price,
@@ -147,7 +147,8 @@ namespace core.Alerts
                 source: nameof(GapUpMonitor)
             );
 
-            return true;
+            // TODO: temporary hardcode false until we observe how it works out
+            return false;
         }
     }
 
