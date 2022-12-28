@@ -14,7 +14,9 @@ namespace coinmarketcaptests
         {
             var creds = CredsHelper.GetCoinMarketCapToken();
             
-            var client = new coinmarketcap.CoinMarketCapClient(creds);
+            var client = new coinmarketcap.CoinMarketCapClient(
+                null,
+                creds);
 
             core.Shared.Adapters.Cryptos.Listings listings = await client.Get();
 

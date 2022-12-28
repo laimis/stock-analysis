@@ -40,6 +40,7 @@ namespace web
             
             services.AddSingleton<coinmarketcap.CoinMarketCapClient>(s =>
                 new coinmarketcap.CoinMarketCapClient(
+                    s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
                     configuration.GetValue<string>("COINMARKETCAPToken")
                 )
             );

@@ -11,9 +11,9 @@ namespace coinmarketcap
     public class CoinMarketCapClient : ICryptoService
     {
         private static HttpClient _httpClient = new HttpClient();
-        private ILogger<CoinMarketCapClient> _logger;
+        private ILogger<CoinMarketCapClient>? _logger;
 
-        public CoinMarketCapClient(ILogger<CoinMarketCapClient> logger, string accessToken)
+        public CoinMarketCapClient(ILogger<CoinMarketCapClient>? logger, string accessToken)
         {
             _httpClient.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", accessToken);
             _logger = logger;
@@ -30,6 +30,10 @@ namespace coinmarketcap
             var content = await response.Content.ReadAsStreamAsync();
 
             var value = await JsonSerializer.DeserializeAsync<Listings>(content);
+            if (value == null)
+            {
+                throw new System.Exception("Could not deserialize response: " + content);
+            }
 
             return value;
         }
@@ -43,7 +47,7 @@ namespace coinmarketcap
                 return price;
             }
 
-            _logger.LogError("Did not find price for " + token);
+            _logger?.LogError("Did not find price for " + token);
 
             return null;
         }
@@ -58,11 +62,11 @@ namespace coinmarketcap
             {
                 if (prices.TryGet(token, out var price))
                 {
-                    result.Add(token, price.Value);
+                    result.Add(token, price!.Value);
                 }
                 else
                 {
-                    _logger.LogError("Did not find price for " + token);
+                    _logger?.LogError("Did not find price for " + token);
                 }
             }
 
