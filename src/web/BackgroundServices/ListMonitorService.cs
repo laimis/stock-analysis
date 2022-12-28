@@ -107,7 +107,6 @@ namespace web.BackgroundServices
 
                     var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
                     _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
-                    _logger.LogCritical(description);
                 }
             }
             catch (Exception ex)
