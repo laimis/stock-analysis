@@ -5,8 +5,8 @@
 
     <form>
         <div class="form-group">
-            <label for="ticker">Ticker</label>
-            <input type="text" class="form-control" id="ticker" #ticker placeholder="Ticker">
+            <label for="ticker">Tickers</label>
+            <textarea class="form-control" id="tickers" #ticker placeholder="Tickers" rows="5"></textarea>
         </div>
         <button type="submit" class="btn btn-primary" (click)="add(ticker.value)">Add</button>
     </form>

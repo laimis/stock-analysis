@@ -20,12 +20,15 @@ export class StockListComponent implements OnInit {
     
     var name = this.route.snapshot.paramMap.get('name');
 
+    this.loadList(name);
+  }
+
+  private loadList(name: string) {
     this.stockService.getStockList(name).subscribe(list => {
-      this.list = list
+      this.list = list;
     }, e => {
       console.error(e);
-    }
-    );
+    });
   }
 
   remove(ticker:StockListTicker) {
@@ -37,13 +40,18 @@ export class StockListComponent implements OnInit {
     );
   }
 
-  add(ticker: string) {
-    this.stockService.addToStockList(this.list.name, ticker).subscribe(list => {
-      this.list = list
-    }, e => {
-      console.error(e);
-    }
-    );
+  add(tickers: string) {
+    tickers.split('\n').forEach(element => {
+      var ticker = element.trim();
+      if (ticker) {
+        this.stockService.addToStockList(this.list.name, ticker).subscribe(_ => {
+        }, e => {
+          console.error(e);
+        });
+      }
+    });
+
+    this.loadList(this.list.name)
   }
 
 }
