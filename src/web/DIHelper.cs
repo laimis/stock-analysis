@@ -85,10 +85,10 @@ namespace web
                     configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID")
                 ));
 
-            services.AddHostedService<StockMonitorService>();
+            services.AddHostedService<StockPositionMonitorService>();
             services.AddHostedService<ThirtyDaySellService>();
             services.AddHostedService<UserChangedScheduler>();
-            services.AddHostedService<GapUpMonitor>();
+            services.AddHostedService<ListMonitorService>();
             
             StorageRegistrations(configuration, services, logger);
         }

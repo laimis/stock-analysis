@@ -15,10 +15,10 @@ using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    public class StockMonitorService : BackgroundService
+    public class StockPositionMonitorService : BackgroundService
     {
         private IAccountStorage _accounts;
-        private ILogger<StockMonitorService> _logger;
+        private ILogger<StockPositionMonitorService> _logger;
         private ISMSClient _smsClient;
         private IEmailService _emails;
         private IStocksService2 _stocks;
@@ -26,8 +26,8 @@ namespace web.BackgroundServices
         private IMarketHours _marketHours;
         public StockMonitorContainer _container;
 
-        public StockMonitorService(
-            ILogger<StockMonitorService> logger,
+        public StockPositionMonitorService(
+            ILogger<StockPositionMonitorService> logger,
             IAccountStorage accounts,
             IPortfolioStorage stockStorage,
             IStocksService2 stocks,
