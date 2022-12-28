@@ -46,6 +46,12 @@ namespace core.Portfolio
 
         public void AddStock(Ticker ticker, string note)
         {
+            var exists = State.Tickers.Exists(x => x.Ticker == ticker);
+            if (exists)
+            {
+                return;
+            }
+            
             Apply(new StockListTickerAdded(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, note, ticker));
         }
 

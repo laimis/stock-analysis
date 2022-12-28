@@ -95,5 +95,22 @@ namespace coretests.Stocks
 
             Assert.Throws<InvalidOperationException>(() => list.RemoveStock("aapl"));
         }
+
+        [Fact]
+        public void AddingTickerThatAlreadyExistsIsNoOp()
+        {
+            var list = Create("name", "description");
+
+            list.AddStock("aapl", "note");
+
+            var events = list.Events.Count;
+
+            list.AddStock("aapl", "note");
+            list.AddStock("aapl", "note");
+
+
+            Assert.Single(list.State.Tickers);
+            Assert.Equal(events, list.Events.Count);
+        }
     }
 }
