@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core;
 using core.Account;
+using core.Alerts;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Hosting;
@@ -11,23 +12,26 @@ using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    public class GapUpMonitor : BackgroundService
+    public class ListMonitorService : BackgroundService
     {
         private IAccountStorage _accounts;
         private IBrokerage _brokerage;
-        private ILogger<GapUpMonitor> _logger;
+        private StockMonitorContainer _container;
+        private ILogger<ListMonitorService> _logger;
         private IMarketHours _marketHours;
         private IPortfolioStorage _portfolio;
 
-        public GapUpMonitor(
+        public ListMonitorService(
             IAccountStorage accounts,
             IBrokerage brokerage,
-            ILogger<GapUpMonitor> logger,
+            StockMonitorContainer container,
+            ILogger<ListMonitorService> logger,
             IMarketHours marketHours,
             IPortfolioStorage portfolio)
         {
             _accounts = accounts;
             _brokerage = brokerage;
+            _container = container;
             _logger = logger;
             _marketHours = marketHours;
             _portfolio = portfolio;
@@ -59,7 +63,7 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task MonitorForGaps(string[] stocks, User user, CancellationToken ct)
+        private async Task MonitorForGaps(string[] tickers, User user, CancellationToken ct)
         {
             var start = DateTime.UtcNow.AddDays(-1);
             var daysToCheck = 4;
@@ -84,7 +88,7 @@ namespace web.BackgroundServices
 
             try
             {
-                foreach (var stock in stocks)
+                foreach (var ticker in tickers)
                 {
                     if (ct.IsCancellationRequested)
                     {
@@ -93,7 +97,7 @@ namespace web.BackgroundServices
 
                     var prices = await _brokerage.GetPriceHistory(
                         state: user.State,
-                        ticker: stock,
+                        ticker: ticker,
                         frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
                         start: start,
                         end: end
@@ -101,7 +105,7 @@ namespace web.BackgroundServices
 
                     if (!prices.IsOk)
                     {
-                        _logger.LogCritical($"Failed to get price history for {stock}: {prices.Error.Message}");
+                        _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
                         continue;
                     }
 
@@ -109,7 +113,7 @@ namespace web.BackgroundServices
                     if (gaps.Count == 0)
                     {
                         // TODO: change to information
-                        _logger.LogCritical($"No gaps found for {stock}");
+                        _logger.LogInformation($"No gaps found for {ticker}");
                         continue;
                     }
 
@@ -117,13 +121,12 @@ namespace web.BackgroundServices
                     if (gap.type != GapType.Up)
                     {
                         // TODO: change to information
-                        _logger.LogCritical($"Gap down for {stock}: {gap}");
+                        _logger.LogInformation($"Gap down for {ticker}: {gap}");
                         continue;
                     }
 
-                    var description = $"Gap up for {stock}: {Math.Round(gap.gapSizePct * 100, 2)}%";
-                    // TODO: change to information
-                    _logger.LogCritical(description);
+                    var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
+                    _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
                 }
             }
             catch (Exception ex)

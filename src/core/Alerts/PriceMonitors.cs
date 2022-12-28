@@ -97,6 +97,70 @@ namespace core.Alerts
         protected abstract bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time);
     }
 
+    public class GapUpMonitor : IStockPositionMonitor
+    {
+        public GapUpMonitor (string ticker, decimal price, DateTimeOffset when, Guid userId, string description)
+        {
+            Ticker = ticker;
+            Price = price;
+            When = when;
+            UserId = userId;
+            Description = description;
+        }
+
+        public string Ticker { get; }
+        public decimal Price { get; }
+        public DateTimeOffset When { get; }
+        public Guid UserId { get; }
+        public string Description { get; }
+        public TriggeredAlert? TriggeredAlert { get; private set; }
+
+        TriggeredAlert? IStockPositionMonitor.TriggeredAlert => TriggeredAlert;
+
+        string IStockPositionMonitor.Ticker => Ticker;
+
+        string IStockPositionMonitor.Description => Description;
+
+        decimal IStockPositionMonitor.ThresholdValue => Price;
+
+        decimal IStockPositionMonitor.LastSeenValue => Price;
+
+        bool IStockPositionMonitor.IsTriggered => TriggeredAlert.HasValue;
+
+        AlertType IStockPositionMonitor.AlertType => TriggeredAlert.HasValue ? TriggeredAlert.Value.alertType : AlertType.Neutral;
+
+        Guid IStockPositionMonitor.UserId => UserId;
+
+        string IStockPositionMonitor.MonitorIdentifer => "GapUp";
+
+        bool IStockPositionMonitor.RunCheck(string ticker, decimal price, DateTimeOffset time)
+        {
+            if (ticker != Ticker)
+            {
+                return false;
+            }
+
+            if (TriggeredAlert.HasValue)
+            {
+                return false;
+            }
+
+            TriggeredAlert = new TriggeredAlert(
+                triggeredValue: price,
+                watchedValue: price,
+                when: time,
+                ticker: ticker,
+                description: Description,
+                numberOfShares: 0,
+                userId: UserId,
+                alertType: AlertType.Positive,
+                source: nameof(GapUpMonitor)
+            );
+
+            return true;
+        }
+    }
+
     public class ProfitPriceMonitor : PriceMonitor
     {
         public ProfitPriceMonitor(decimal minPrice, decimal maxPrice, int profitLevel, decimal numberOfShares, string ticker, Guid userId)

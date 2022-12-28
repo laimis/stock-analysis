@@ -23,7 +23,7 @@ namespace core.Alerts
             {
                 if (monitor != null)
                 {
-                    _monitors[new StockPositionMonitorKey(monitor.MonitorIdentifer, monitor.Ticker, monitor.UserId)] = monitor;
+                    Register(monitor);
                 }
             }
 
@@ -40,6 +40,11 @@ namespace core.Alerts
 
             var profitMonitorR3 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 2);
             AddIfNotNull(profitMonitorR3);
+        }
+
+        public void Register(IStockPositionMonitor monitor)
+        {
+            _monitors[new StockPositionMonitorKey(monitor.MonitorIdentifer, monitor.Ticker, monitor.UserId)] = monitor;
         }
 
         private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts = new Dictionary<Guid, List<TriggeredAlert>>();

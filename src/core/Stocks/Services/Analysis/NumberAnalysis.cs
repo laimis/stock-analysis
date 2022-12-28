@@ -25,6 +25,11 @@ namespace core.Stocks.Services.Analysis
 
         public static DistributionStatistics Statistics(decimal[] numbers)
         {
+            if (numbers.Length == 0)
+            {
+                return new DistributionStatistics();
+            }
+            
            // calculate stats on the data
             var mean = Math.Round(numbers.Average(), 2);
             var stdDev = Math.Round((decimal)Math.Sqrt(numbers.Select(x => Math.Pow((double)(x - mean), 2)).Sum() / (numbers.Length - 1)), 2);
