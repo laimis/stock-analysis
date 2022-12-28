@@ -27,7 +27,7 @@ namespace core.Alerts
 
     public interface IStockPositionMonitor
     {
-        bool RunCheck(string ticker, decimal price, DateTimeOffset time);
+        bool RunCheck(decimal price, DateTimeOffset time);
         TriggeredAlert? TriggeredAlert { get; }
         string Ticker { get; }
         string Description { get; }
@@ -82,19 +82,14 @@ namespace core.Alerts
 
         public abstract string MonitorIdentifer { get; }
 
-        public bool RunCheck(string ticker, decimal price, DateTimeOffset time)
+        public bool RunCheck(decimal price, DateTimeOffset time)
         {
-            if (ticker != Ticker)
-            {
-                return false;
-            }
-            
             LastSeenValue = price;
 
-            return RunCheckInternal(ticker, price, time);
+            return RunCheckInternal(price, time);
         }
 
-        protected abstract bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time);
+        protected abstract bool RunCheckInternal(decimal price, DateTimeOffset time);
     }
 
     public class GapUpMonitor : IStockPositionMonitor
@@ -133,13 +128,8 @@ namespace core.Alerts
 
         string IStockPositionMonitor.MonitorIdentifer => "GapUp";
 
-        bool IStockPositionMonitor.RunCheck(string ticker, decimal price, DateTimeOffset time)
+        bool IStockPositionMonitor.RunCheck(decimal price, DateTimeOffset time)
         {
-            if (ticker != Ticker)
-            {
-                return false;
-            }
-
             if (TriggeredAlert.HasValue)
             {
                 return false;
@@ -149,7 +139,7 @@ namespace core.Alerts
                 triggeredValue: price,
                 watchedValue: price,
                 when: time,
-                ticker: ticker,
+                ticker: Ticker,
                 description: Description,
                 numberOfShares: 0,
                 userId: UserId,
@@ -197,7 +187,7 @@ namespace core.Alerts
 
         public override string MonitorIdentifer => $"Profit{ThresholdValue}";
 
-        protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
+        protected override bool RunCheckInternal(decimal price, DateTimeOffset time)
         {
             return IsTriggered switch {
                 true => UpdateTriggeredAlert(price, time),
@@ -274,7 +264,7 @@ namespace core.Alerts
 
         public override AlertType AlertType => AlertType.Negative;
 
-        protected override bool RunCheckInternal(string ticker, decimal price, DateTimeOffset time)
+        protected override bool RunCheckInternal(decimal price, DateTimeOffset time)
         {
             return IsTriggered switch {
                 true => UpdateTriggeredAlert(price, time),

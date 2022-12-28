@@ -18,25 +18,15 @@ namespace coretests.Alerts
         {
             var m = CreateMonitorUnderTest();
 
-            var firstTrigger = m.RunCheck("ticker", 7, DateTimeOffset.UtcNow);
+            var firstTrigger = m.RunCheck(7, DateTimeOffset.UtcNow);
 
             // no matter what, first run returns that it's triggered
             // existance of this monitor means the gap up was discovered
             Assert.True(firstTrigger);
 
             // subsequet fail
-            var secondTrigger = m.RunCheck("ticker", 7, DateTimeOffset.UtcNow);
+            var secondTrigger = m.RunCheck(7, DateTimeOffset.UtcNow);
             Assert.False(secondTrigger);
-        }
-
-        [Fact]
-        public void DifferentTickerIsAlways()
-        {
-            var m = CreateMonitorUnderTest();
-
-            var firstTrigger = m.RunCheck("someotherticker", 11, DateTimeOffset.UtcNow);
-
-            Assert.False(firstTrigger);
         }
     }
 }
