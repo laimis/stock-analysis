@@ -76,6 +76,8 @@ import { PercentChangeDistributionComponent } from './shared/reports/percent-cha
 import { StockNewPositionComponent } from './stocks/stock-buy/app-stock-new-position/app-stock-new-position.component';
 import { TradingPerformanceSummaryComponent } from './shared/stocks/trading-performance-summary.component';
 import { TradingActualVsSimulatedPositionComponent } from './shared/stocks/trading-actual-vs-simulated.component';
+import { StockListsDashboardComponent } from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
+import { StockListComponent } from './stocks/stock-lists/stock-list/stock-list.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -115,6 +117,8 @@ var routes: Routes = [
   { path: 'trading/simulator', component: StockTradingSimulatorComponent},
   { path: 'trading/:tab', component: StockTradingComponent},
 
+  { path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard]},
+  { path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard]},
   { path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard]},
   { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
   { path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard] },
@@ -212,7 +216,9 @@ var routes: Routes = [
     PercentChangeDistributionComponent,
 
     AlertsComponent,
-    StockNewPositionComponent
+    StockNewPositionComponent,
+    StockListsDashboardComponent,
+    StockListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

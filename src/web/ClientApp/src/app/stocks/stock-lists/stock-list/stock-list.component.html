@@ -1,0 +1,30 @@
+<div *ngIf="list">
+    <h2>{{list.name}} ({{list.tickers.length}})</h2>
+    <p>{{list.description}}</p>
+
+
+    <form>
+        <div class="form-group">
+            <label for="ticker">Tickers</label>
+            <textarea class="form-control" id="tickers" #ticker placeholder="Tickers" rows="5"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" (click)="add(ticker.value)">Add</button>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let t of list.tickers">
+                <td>{{t.ticker}}</td>
+                <td>
+                    <button class="btn btn-danger" (click)="remove(t)">Remove</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>  

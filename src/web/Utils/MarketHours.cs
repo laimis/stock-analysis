@@ -34,10 +34,19 @@ namespace web.Utils
         }
 
         public DateTimeOffset ToMarketTime(DateTimeOffset when) => ConvertToEastern(when);
+
+        public DateTimeOffset GetMarketStartOfDayTimeInUtc(DateTimeOffset when)
+        {
+            return TimeZoneInfo.ConvertTimeToUtc(
+                when.Date.Add(_start),
+                _easternZoneId
+            );
+        }
+
         public DateTimeOffset GetMarketEndOfDayTimeInUtc(DateTimeOffset when)
         {
             return TimeZoneInfo.ConvertTimeToUtc(
-                new DateTime(when.Year, when.Month, when.Day, 16, 0, 0),
+                when.Date.Add(_end),
                 _easternZoneId
             );
         }

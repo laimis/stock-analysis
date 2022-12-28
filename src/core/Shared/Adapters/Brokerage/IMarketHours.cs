@@ -7,5 +7,6 @@ namespace core.Shared.Adapters.Brokerage
         bool IsMarketOpen(DateTimeOffset time);
         DateTimeOffset ToMarketTime(DateTimeOffset when);
         DateTimeOffset GetMarketEndOfDayTimeInUtc(DateTimeOffset when);
+        DateTimeOffset GetMarketStartOfDayTimeInUtc(DateTimeOffset when);
     }
 }

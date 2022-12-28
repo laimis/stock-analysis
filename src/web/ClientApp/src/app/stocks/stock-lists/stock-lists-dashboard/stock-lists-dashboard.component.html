@@ -1,0 +1,35 @@
+<div>
+    <!-- UI for adding new list -->
+    <form>
+        <label for="newName">Name</label>
+        <input type="text" id="newName" name="newName" [(ngModel)]="newName" class="form-control">
+
+        <label for="newDescription">Description</label>
+        <textarea class="form-control" id="newDescription" name="newDescription" rows="5" [(ngModel)]="newDescription"></textarea>
+
+        <button type="button" class="btn btn-primary btn-small" (click)="createList()">Create</button>
+    </form>
+
+    <table *ngIf="lists" class="table table-stripped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Tickers</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let l of lists">
+                <td>{{l.name}}</td>
+                <td>{{l.description}}</td>
+                <td>{{l.tickers.length}}</td>
+                <td>
+                    <a class="btn btn-link btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
+                    <button type="button" class="btn btn-link btn-danger" (click)="deleteList(l)">delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

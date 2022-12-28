@@ -23,6 +23,7 @@ namespace core.Shared.Adapters.Brokerage
             DateTimeOffset end = default);
         Task<OAuthResponse> GetAccessToken(UserState state);
         Task<ServiceResponse<StockQuote>> GetQuote(UserState state, string ticker);
+        Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset start);
     }
 
     public enum BrokerageOrderDuration

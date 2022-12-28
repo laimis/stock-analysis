@@ -12,7 +12,7 @@ namespace core.Portfolio
     {
         public class Generate : RequestWithUserId<TransactionSummaryView>
         {
-            public Generate(string period)
+            public Generate(string period, Guid userId) : base(userId)
             {
                 var dt = GetDateForPeriod(period);
 

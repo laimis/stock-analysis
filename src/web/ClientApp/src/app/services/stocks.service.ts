@@ -90,6 +90,27 @@ export class StocksService {
     return this.http.get<object[]>('/api/admin/users')
   }
 
+  // ----------------- stock lists ---------------------
+  getStockLists(): Observable<StockList[]> {
+    return this.http.get<StockList[]>('/api/portfolio/stocklists')
+  }
+  getStockList(name: string): Observable<StockList> {
+    return this.http.get<StockList>('/api/portfolio/stocklists/' + name)
+  }
+  addToStockList(name: string, ticker: string): Observable<StockList> {
+    return this.http.put<StockList>('/api/portfolio/stocklists/' + name, { name: name, ticker: ticker })
+  }
+  removeFromStockList(name: string, ticker: string): Observable<StockList> {
+    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name + '/' + ticker)
+  }
+  createStockList(input): Observable<StockList> {
+    return this.http.post<StockList>('/api/portfolio/stocklists', input)
+  }
+  deleteStockList(name: string): Observable<StockList> {
+    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name)
+  }
+  // 
+
   // ----------------- alerts ---------------------
   getAlerts(): Observable<AlertsContainer> {
     return this.http.get<AlertsContainer>('/api/alerts')
@@ -351,6 +372,17 @@ export class StocksService {
   }
 }
 
+export interface StockListTicker {
+  ticker:string
+  note:string
+  when:string
+}
+
+export interface StockList {
+  name:string
+  description:string
+  tickers:StockListTicker[]
+}
 export interface StockAlert {
   when: string
   ticker: string

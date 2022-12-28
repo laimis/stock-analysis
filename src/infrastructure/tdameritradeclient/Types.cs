@@ -1,4 +1,17 @@
+using core.Shared.Adapters.Brokerage;
+
 namespace tdameritradeclient;
+
+
+
+internal class MarketHoursWrapper
+{
+    public MarketHoursEquity? equity { get; set; }
+}
+internal class MarketHoursEquity
+{
+    public MarketHours? EQ { get; set; }
+}
 
 internal class PriceHistoryResponse {
     public Candle[]? candles { get; set; }

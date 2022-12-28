@@ -29,7 +29,7 @@ namespace web.Controllers
         public Task<object> Dashboard() => _mediator.Send(new Dashboard.Query(User.Identifier()));
 
         [HttpGet("{ticker}")]
-        public Task<object> DetailsAsync(string ticker) => _mediator.Send(new Details.Query(ticker));
+        public Task<object> Details(string ticker) => _mediator.Send(new Details.Query(ticker));
 
         [HttpGet("{ticker}/prices")]
         public Task<PricesView> Prices(string ticker, [FromQuery] int numberOfDays) => _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
