@@ -38,9 +38,6 @@ namespace coretests.Alerts
         }
 
         [Fact]
-        public void TickersMatch() => Assert.Equal(2, _uat.GetTickers().Count());
-
-        [Fact]
         public void MonitorsNotEmpty() => Assert.NotEmpty(_uat.Monitors);
 
         [Fact]

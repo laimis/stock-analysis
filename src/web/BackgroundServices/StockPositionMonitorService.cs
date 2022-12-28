@@ -112,19 +112,24 @@ namespace web.BackgroundServices
         {
             var triggered = new List<TriggeredAlert>();
 
-            foreach (var t in _container.GetTickers())
+            foreach (var m in _container.Monitors)
             {
-                var price = await _stocks.GetPrice(t);
+                var priceTask = m switch {
+                    PriceMonitor sm => _stocks.GetPrice(sm.Ticker),
+                    _ => Task.FromResult(new core.Shared.ServiceResponse<Price>(new Price(m.LastSeenValue)))
+                };
 
+                var price = await priceTask;
+                
                 if (!price.IsOk || price.Success.NotFound)
                 {
-                    _logger.LogError($"price not found for {t}");
+                    _logger.LogError($"price not found for {m.Description} monitor");
                     continue;
                 }
 
-                foreach(var trigger in _container.RunCheck(t, price.Success.Amount, DateTimeOffset.UtcNow))
+                if (m.RunCheck(m.Ticker, price.Success.Amount, DateTimeOffset.UtcNow))
                 {
-                    triggered.Add(trigger);
+                    triggered.Add(m.TriggeredAlert.Value);
                 }
             }
 

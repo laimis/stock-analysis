@@ -10,7 +10,6 @@ namespace core.Alerts
     {
         private record struct StockPositionMonitorKey(string MonitorIdentifier, string Ticker, Guid UserId);
         private ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor> _monitors = new ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor>();
-        private HashSet<string> _tickers = new HashSet<string>();
         private const int MAX_RECENT_ALERTS = 20;
         private const int RECENT_ALERT_HOUR_THRESHOLD = 8; // alerts within eight hour are considered to be recent
 
@@ -26,8 +25,6 @@ namespace core.Alerts
                     Register(monitor);
                 }
             }
-
-            _tickers.Add(stock.State.Ticker);
             
             var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock.State);
             AddIfNotNull(stopMonitor);
@@ -69,8 +66,6 @@ namespace core.Alerts
                 _monitors.TryRemove(key, out _);
             }
         }
-
-        public IEnumerable<string> GetTickers() => _tickers;
 
         public IEnumerable<TriggeredAlert> RunCheck(
             string ticker,
