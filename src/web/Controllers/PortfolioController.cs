@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
+using core.Portfolio.Handlers;
 using core.Portfolio.Output;
-using core.Stocks;
 using core.Stocks.Services.Trading;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -24,31 +24,50 @@ namespace web.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
-        public Task<PortfolioResponse> Index()
-        {
-            var query = new Get.Query(User.Identifier());
+        [HttpGet("stocklists")]
+        public Task<StockListState[]> StockLists() =>
+            _mediator.Send(new Lists.Query(User.Identifier()));
 
-            return _mediator.Send(query);
+        [HttpPost("stocklists")]
+        public Task<StockListState> CreateStockList([FromBody]ListsCreate.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
         }
+
+        [HttpPut("stocklists/{name}")]
+        public Task<StockListState> AddStockToList([FromBody]ListsAddStock.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
+
+        [HttpDelete("stocklists/{name}/{ticker}")]
+        public Task<StockListState> RemoveStockFromList(string name, string ticker) =>
+            _mediator.Send(new ListsRemoveStock.Command(name, ticker, User.Identifier()));
+
+        [HttpGet("stocklists/{name}")]
+        public Task<StockListState> GetStockList(string name) =>
+            _mediator.Send(new ListsGet.Query(name, User.Identifier()));
+            
+
+        [HttpGet]
+        public Task<PortfolioResponse> Index() =>
+            _mediator.Send(new Get.Query(User.Identifier()));
 
         [HttpGet("transactions")]
-        public Task<TransactionList> TransactionsAsync(string ticker, string groupBy, string show, string txType)
-        {
-            var query = new Transactions.Query(User.Identifier(), ticker, groupBy, show, txType);
-
-            return _mediator.Send(query);
-        }
+        public Task<TransactionList> TransactionsAsync(string ticker, string groupBy, string show, string txType) =>
+            _mediator.Send(
+                new Transactions.Query(User.Identifier(), ticker, groupBy, show, txType)
+            );
 
         [HttpGet("transactionsummary")]
-        public async Task<TransactionSummaryView> Review(string period)
-        {
-            var cmd = new TransactionSummary.Generate(period);
-
-            cmd.WithUserId(User.Identifier());
-
-            return await _mediator.Send(cmd);
-        }
+        public Task<TransactionSummaryView> Review(string period) =>
+            _mediator.Send(
+                new TransactionSummary.Generate(period, User.Identifier())
+            );
 
         [HttpGet("{ticker}/positions/{positionId}/simulate/{stategyName}")]
         public Task<TradingStrategyResults> Trade(

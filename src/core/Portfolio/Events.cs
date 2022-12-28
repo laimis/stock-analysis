@@ -33,7 +33,7 @@ namespace core.Portfolio
 
     internal class StockListTickerAdded : AggregateEvent
     {
-        public StockListTickerAdded(Guid id, Guid aggregateId, DateTimeOffset when, string note, Ticker ticker)
+        public StockListTickerAdded(Guid id, Guid aggregateId, DateTimeOffset when, string note, string ticker)
             : base(id, aggregateId, when)
         {
             Note = note;
@@ -41,17 +41,17 @@ namespace core.Portfolio
         }
 
         public string Note { get; }
-        public Ticker Ticker { get; }
+        public string Ticker { get; }
     }
 
     internal class StockListTickerRemoved : AggregateEvent
     {
-        public StockListTickerRemoved(Guid id, Guid aggregateId, DateTimeOffset when, Ticker ticker)
+        public StockListTickerRemoved(Guid id, Guid aggregateId, DateTimeOffset when, string ticker)
             : base(id, aggregateId, when)
         {
             Ticker = ticker;
         }
 
-        public Ticker Ticker { get; }
+        public string Ticker { get; }
     }
 }

@@ -6,6 +6,7 @@ using core;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
+using core.Portfolio;
 using core.Shared;
 using core.Stocks;
 
@@ -17,6 +18,7 @@ namespace storage.shared
         private const string _option_entity = "soldoption3";
         private const string _note_entity = "note3";
         private const string _crypto_entity = "ownedcrypto";
+        private const string _stock_list_entity = "stocklist";
 
         private IAggregateStorage _aggregateStorage;
         private IBlobStorage _blobStorage;
@@ -144,6 +146,26 @@ namespace storage.shared
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedCrypto(g));
+        }
+
+        public async Task<IEnumerable<StockList>> GetStockLists(Guid userId)
+        {
+            var list = await _aggregateStorage.GetEventsAsync(_stock_list_entity, userId);
+
+            return list.GroupBy(e => e.AggregateId)
+                .Select(g => new StockList(g));
+        }
+
+        public async Task<StockList> GetStockList(string name, Guid userId)
+        {
+            var list = await GetStockLists(userId);
+            
+            return list.SingleOrDefault(s => s.State.Name == name);
+        }
+
+        public Task Save(StockList list, Guid userId)
+        {
+            return Save(list, _stock_list_entity, userId);
         }
     }
 }

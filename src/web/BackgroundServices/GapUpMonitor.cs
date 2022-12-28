@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.Services.Analysis;
@@ -15,17 +17,20 @@ namespace web.BackgroundServices
         private IBrokerage _brokerage;
         private ILogger<GapUpMonitor> _logger;
         private IMarketHours _marketHours;
+        private IPortfolioStorage _portfolio;
 
         public GapUpMonitor(
             IAccountStorage accounts,
             IBrokerage brokerage,
             ILogger<GapUpMonitor> logger,
-            IMarketHours marketHours)
+            IMarketHours marketHours,
+            IPortfolioStorage portfolio)
         {
             _accounts = accounts;
             _brokerage = brokerage;
             _logger = logger;
             _marketHours = marketHours;
+            _portfolio = portfolio;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -131,7 +136,11 @@ namespace web.BackgroundServices
         {
             var user = await _accounts.GetUserByEmail("laimis@gmail.com");
     
-            return (user, new string[] { "AAPL", "MSFT" });
+            var list = await _portfolio.GetStockLists(user.Id);
+
+            var tickerList = list.SelectMany(x => x.State.Tickers).Select(t => t.Ticker).ToArray();
+
+            return (user, tickerList);
         }
     }
 }
