@@ -30,9 +30,8 @@ namespace core.Stocks.Services.Analysis
                 return new DistributionStatistics();
             }
             
-           // calculate stats on the data
+            // calculate stats on the data
             var mean = Math.Round(numbers.Average(), 2);
-            var stdDev = Math.Round((decimal)Math.Sqrt(numbers.Select(x => Math.Pow((double)(x - mean), 2)).Sum() / (numbers.Length - 1)), 2);
             var min = Math.Round(numbers.Min(), 2);
             var max = Math.Round(numbers.Max(), 2);
             var median = Math.Round(numbers.OrderBy(x => x).Skip(numbers.Length / 2).First(), 2);
@@ -41,11 +40,20 @@ namespace core.Stocks.Services.Analysis
             // check for infinity when calculating skewness and kurtosis
             // it happens if the set of numbers do not change (percent changes where
             // the price is flat - company has been acquired for instance)
+            var stdDevDouble = Math.Round(Math.Sqrt(numbers.Select(x => Math.Pow((double)(x - mean), 2)).Sum() / (numbers.Length - 1)), 2);
+            var stdDev = stdDevDouble switch {
+                double.PositiveInfinity => 0,
+                double.NegativeInfinity => 0,
+                double.NaN => 0,
+                _ => (decimal)stdDevDouble
+            };
             var skewnessDouble = Math.Round(
                 (numbers.Select(x => Math.Pow((double)(x - mean), 3)).Sum() / count / Math.Pow((double)stdDev, 3)),
                 2);
             var skewness = skewnessDouble switch {
                 double.PositiveInfinity => 0,
+                double.NegativeInfinity => 0,
+                double.NaN => 0,
                 _ => (decimal)skewnessDouble
             };
             var kurtosisDouble = Math.Round(
@@ -53,6 +61,8 @@ namespace core.Stocks.Services.Analysis
                 2);
             var kurtosis = kurtosisDouble switch {
                 double.PositiveInfinity => 0,
+                double.NegativeInfinity => 0,
+                double.NaN => 0,
                 _ => (decimal)kurtosisDouble
             };
 

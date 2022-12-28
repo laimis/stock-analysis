@@ -65,26 +65,8 @@ namespace web.BackgroundServices
 
         private async Task MonitorForGaps(string[] tickers, User user, CancellationToken ct)
         {
-            var start = DateTime.UtcNow.AddDays(-1);
-            var daysToCheck = 4;
-            while (daysToCheck > 0)
-            {
-                var marketHours = await _brokerage.GetMarketHours(user.State, start);
-                if (marketHours.IsOk && marketHours.Success.isOpen)
-                {
-                    break;
-                }
-                start = start.AddDays(-1);
-                daysToCheck--;
-            }
-            
-            var end = DateTimeOffset.UtcNow;
-            var endHoursCheck = await _brokerage.GetMarketHours(user.State, end);
-            if (endHoursCheck.IsOk && !endHoursCheck.Success.isOpen)
-            {
-                _logger.LogCritical($"Market is closed for {end}");
-                return;
-            }
+            var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-1));
+            var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
 
             try
             {
@@ -112,7 +94,6 @@ namespace web.BackgroundServices
                     var gaps = GapAnalysis.Generate(prices.Success, 2);
                     if (gaps.Count == 0)
                     {
-                        // TODO: change to information
                         _logger.LogInformation($"No gaps found for {ticker}");
                         continue;
                     }
@@ -120,13 +101,13 @@ namespace web.BackgroundServices
                     var gap = gaps[0];
                     if (gap.type != GapType.Up)
                     {
-                        // TODO: change to information
                         _logger.LogInformation($"Gap down for {ticker}: {gap}");
                         continue;
                     }
 
                     var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
                     _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
+                    _logger.LogInformation(description);
                 }
             }
             catch (Exception ex)
