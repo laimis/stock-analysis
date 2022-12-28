@@ -22,7 +22,8 @@ namespace coretests.Alerts
 
             // no matter what, first run returns that it's triggered
             // existance of this monitor means the gap up was discovered
-            Assert.True(firstTrigger);
+            // TODO: change to true once we care about sms
+            Assert.False(firstTrigger);
 
             // subsequet fail
             var secondTrigger = m.RunCheck(7, DateTimeOffset.UtcNow);
