@@ -67,37 +67,21 @@ namespace core.Alerts
             }
         }
 
-        public IEnumerable<TriggeredAlert> RunCheck(
-            string ticker,
-            decimal newPrice,
-            DateTimeOffset time)
+        public void AddToRecent(TriggeredAlert triggeredAlert)
         {
-            foreach (var m in _monitors.Values)
+            if (!_recentlyTriggeredAlerts.ContainsKey(triggeredAlert.userId))
             {
-                if (m.RunCheck(ticker, newPrice, time))
-                {
-                    AddToRecent(m.TriggeredAlert);
-                    
-                    yield return m.TriggeredAlert.Value;
-                }
-            }
-        }
-
-        private void AddToRecent(TriggeredAlert? triggeredAlert)
-        {
-            if (!_recentlyTriggeredAlerts.ContainsKey(triggeredAlert.Value.userId))
-            {
-                _recentlyTriggeredAlerts[triggeredAlert.Value.userId] = new List<TriggeredAlert>(MAX_RECENT_ALERTS);
+                _recentlyTriggeredAlerts[triggeredAlert.userId] = new List<TriggeredAlert>(MAX_RECENT_ALERTS);
             }
 
-            var list = _recentlyTriggeredAlerts[triggeredAlert.Value.userId];
+            var list = _recentlyTriggeredAlerts[triggeredAlert.userId];
 
             if (list.Count + 1 == MAX_RECENT_ALERTS)
             {
                 list.RemoveAt(0);
             }
 
-            list.Add(triggeredAlert.Value);
+            list.Add(triggeredAlert);
         }
 
         public bool HasRecentlyTriggered(TriggeredAlert a)

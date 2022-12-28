@@ -130,6 +130,7 @@ namespace web.BackgroundServices
                 if (m.RunCheck(m.Ticker, price.Success.Amount, DateTimeOffset.UtcNow))
                 {
                     triggered.Add(m.TriggeredAlert.Value);
+                    _container.AddToRecent(m.TriggeredAlert.Value);
                 }
             }
 
