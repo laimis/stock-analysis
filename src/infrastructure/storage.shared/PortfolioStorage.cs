@@ -119,6 +119,7 @@ namespace storage.shared
             await _aggregateStorage.DeleteAggregates(_option_entity, userId);
             await _aggregateStorage.DeleteAggregates(_stock_entity, userId);
             await _aggregateStorage.DeleteAggregates(_crypto_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_stock_list_entity, userId);
         }
 
         public async Task<OwnedCrypto> GetCrypto(string token, Guid userId)
@@ -167,5 +168,8 @@ namespace storage.shared
         {
             return Save(list, _stock_list_entity, userId);
         }
+
+        public Task DeleteStockList(StockList list, Guid id) =>
+            _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: id);
     }
 }

@@ -36,6 +36,10 @@ namespace web.Controllers
             return _mediator.Send(command);
         }
 
+        [HttpDelete("stocklists/{name}")]
+        public Task DeleteStockList(string name) =>
+            _mediator.Send(new ListsDelete.Command(name, User.Identifier()));
+
         [HttpPut("stocklists/{name}")]
         public Task<StockListState> AddStockToList([FromBody]ListsAddStock.Command command)
         {

@@ -23,6 +23,7 @@ namespace core
         Task<IEnumerable<StockList>> GetStockLists(Guid userId);
         Task<StockList> GetStockList(string name, Guid userId);
         Task Save(StockList list, Guid userId);
+        Task DeleteStockList(StockList list, Guid id);
 
 
         Task<IEnumerable<OwnedOption>> GetOwnedOptions(Guid userId);

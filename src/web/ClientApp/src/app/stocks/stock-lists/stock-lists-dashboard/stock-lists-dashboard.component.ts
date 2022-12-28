@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StockList, StocksService } from 'src/app/services/stocks.service';
+import { StockList, StockListTicker, StocksService } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-lists-dashboard',
@@ -41,6 +41,17 @@ export class StockListsDashboardComponent implements OnInit {
       _ => {
         this.newName = null
         this.newDescription = null
+        this.loadLists()
+      },
+      e => {
+        console.error(e)
+      }
+    )
+  }
+
+  deleteList(list:StockList) {
+    this.stockService.deleteStockList(list.name).subscribe(
+      _ => {
         this.loadLists()
       },
       e => {

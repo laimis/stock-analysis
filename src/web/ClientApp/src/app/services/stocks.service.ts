@@ -106,6 +106,9 @@ export class StocksService {
   createStockList(input): Observable<StockList> {
     return this.http.post<StockList>('/api/portfolio/stocklists', input)
   }
+  deleteStockList(name: string): Observable<StockList> {
+    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name)
+  }
   // 
 
   // ----------------- alerts ---------------------

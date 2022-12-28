@@ -16,9 +16,25 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
     protected IMediator _mediator;
     private static Dictionary<string, object> _blobs = new Dictionary<string, object>();
 
-    public Task DeleteAggregates(string entity, Guid aggregateId)
+    public Task DeleteAggregates(string entity, Guid userId)
     {
-        _aggregates.Remove(MakeKey(entity, aggregateId));
+        _aggregates.Remove(MakeKey(entity, userId));
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAggregate(string entity, Guid aggregateId, Guid userId)
+    {
+        var key = MakeKey(entity, userId);
+
+        var listOfEvents = _aggregates[key];
+
+        var eventsToRemove = listOfEvents.Where(e => e.Event.AggregateId == aggregateId).ToList();
+
+        foreach (var e in eventsToRemove)
+        {
+            listOfEvents.Remove(e);
+        }
+
         return Task.CompletedTask;
     }
 

@@ -42,6 +42,20 @@ namespace storage.postgres
             }
         }
 
+        public async Task DeleteAggregate(string entity, Guid aggregateId, Guid userId)
+        {
+            using (var db = GetConnection())
+            {
+                db.Open();
+
+                // TODO: no aggregate id in the column, huh?
+                // might want to do a migration and add one...
+                var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND eventjson LIKE :aggregateId";
+
+                await db.ExecuteAsync(query, new { userId, entity, aggregateId = $"%{aggregateId}%" });
+            }
+        }
+
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
         {
             using (var db = GetConnection())

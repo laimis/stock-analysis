@@ -24,7 +24,10 @@
                 <td>{{l.name}}</td>
                 <td>{{l.description}}</td>
                 <td>{{l.tickers.length}}</td>
-                <td><a [routerLink]="['/stocks', 'lists', l.name]">view</a></td>
+                <td>
+                    <a class="btn btn-link btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
+                    <button type="button" class="btn btn-link btn-danger" (click)="deleteList(l)">delete</button>
+                </td>
             </tr>
         </tbody>
     </table>
