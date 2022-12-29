@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
 using core.Options;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using Moq;
 using Xunit;
 
@@ -24,21 +26,23 @@ namespace coretests.Options
         {
             var (storage, opt) = _fixture.CreateStorageWithSoldOption();
             
-            var query = new Details.Query {
-                Id = opt.State.Id
-            };
+            var query = new Details.Query(opt.State.Id, opt.State.UserId);
 
-            var mock = new Mock<IStocksService2>();
-            mock.Setup(x => x.GetPrice(opt.State.Ticker))
+            var brokerageMock = new Mock<IBrokerage>();
+            brokerageMock.Setup(x => x.GetQuote(It.IsAny<UserState>(), opt.State.Ticker))
                 .Returns(Task.FromResult(
-                    new ServiceResponse<core.Price>(
-                        new core.Price(100)
+                    new ServiceResponse<StockQuote>(
+                        new StockQuote { lastPrice = 100 }
                     )
                 ));
 
-            query.WithUserId(opt.State.UserId);
+            var accountMock = new Mock<IAccountStorage>();
+            accountMock.Setup(x => x.GetUser(opt.State.UserId))
+                .Returns(Task.FromResult(
+                    new User("email", "f", "l")
+                ));
 
-            var handler = new Details.Handler(storage, mock.Object);
+            var handler = new Details.Handler(accountMock.Object, brokerageMock.Object, storage);
 
             var result = await handler.Handle(query, CancellationToken.None);
 

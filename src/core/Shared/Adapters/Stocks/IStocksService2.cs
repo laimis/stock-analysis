@@ -8,7 +8,6 @@ namespace core.Adapters.Stocks
     {
         Task<ServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker);
         Task<ServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker);
-        Task<ServiceResponse<Price>> GetPrice(string ticker);
         Task<ServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers);
     }
 }

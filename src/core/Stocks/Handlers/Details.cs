@@ -1,6 +1,10 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
+using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
 using MediatR;
 
@@ -8,39 +12,54 @@ namespace core.Stocks
 {
     public class Details
     {
-        public class Query : IRequest<object>
+        public class Query : RequestWithUserId<StockDetailsView>
         {
             public string Ticker { get; }
 
-            public Query(string ticker)
+            public Query(string ticker, Guid userId) : base(userId)
             {
                 Ticker = ticker;
             }
         }
 
-        public class Handler : IRequestHandler<Query, object>
+        public class Handler : IRequestHandler<Query, StockDetailsView>
         {
-            private IStocksService2 _stocksService2;
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
 
-            public Handler(IStocksService2 stockService2)
+            public Handler(IAccountStorage accounts, IBrokerage brokerage)
             {
-                _stocksService2 = stockService2;
+                _accounts = accounts;
+                _brokerage = brokerage;
             }
 
-            public async Task<object> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<StockDetailsView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var profile = _stocksService2.GetCompanyProfile(request.Ticker);
-                var advanced = _stocksService2.GetAdvancedStats(request.Ticker);
-                var price = _stocksService2.GetPrice(request.Ticker);
-                
-                await Task.WhenAll(profile, advanced, price);
-                
+                var profile = new CompanyProfile {
+                    CompanyName = "#not implemented",
+                    Symbol = request.Ticker
+                };
+
+                var advanced = new StockAdvancedStats {
+                    MarketCap = 0,
+                    Week52High = 0,
+                    Week52Low = 0,
+                };
+
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("User not found");
+                }
+
+                var price = await _brokerage.GetQuote(user.State, request.Ticker);
+
                 return new StockDetailsView
                 {
                     Ticker = request.Ticker,
-                    Price = price.Result.Success.Amount,
-                    Profile = profile.Result.Success,
-                    Stats = advanced.Result.Success
+                    Price = price.Success?.lastPrice,
+                    Profile = profile,
+                    Stats = advanced
                 };
             }
         }

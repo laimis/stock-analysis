@@ -18,6 +18,7 @@ namespace web.BackgroundServices
     public class StockPositionMonitorService : BackgroundService
     {
         private IAccountStorage _accounts;
+        private IBrokerage _brokerage;
         private ILogger<StockPositionMonitorService> _logger;
         private ISMSClient _smsClient;
         private IEmailService _emails;
@@ -29,6 +30,7 @@ namespace web.BackgroundServices
         public StockPositionMonitorService(
             ILogger<StockPositionMonitorService> logger,
             IAccountStorage accounts,
+            IBrokerage brokerage,
             IPortfolioStorage stockStorage,
             IStocksService2 stocks,
             IEmailService emails,
@@ -37,6 +39,7 @@ namespace web.BackgroundServices
             StockMonitorContainer container)
         {
             _accounts = accounts;
+            _brokerage = brokerage;
             _emails = emails;
             _logger = logger;
             _smsClient = smsClient;
@@ -111,23 +114,24 @@ namespace web.BackgroundServices
         private async Task ScanAlerts(bool sendAlerts)
         {
             var triggered = new List<TriggeredAlert>();
+            var priceCache = new Dictionary<string, Price>();
 
             foreach (var m in _container.Monitors)
             {
                 var priceTask = m switch {
-                    PriceMonitor sm => _stocks.GetPrice(sm.Ticker),
-                    _ => Task.FromResult(new core.Shared.ServiceResponse<Price>(new Price(m.LastSeenValue)))
+                    PriceMonitor sm => GetPrice(priceCache, sm),
+                    _ => Task.FromResult(new Price(m.LastSeenValue))
                 };
 
                 var price = await priceTask;
                 
-                if (!price.IsOk || price.Success.NotFound)
+                if (!price.NotFound)
                 {
                     _logger.LogError($"price not found for {m.Description} monitor");
                     continue;
                 }
 
-                if (m.RunCheck(price.Success.Amount, DateTimeOffset.UtcNow))
+                if (m.RunCheck(price.Amount, DateTimeOffset.UtcNow))
                 {
                     triggered.Add(m.TriggeredAlert.Value);
                     _container.AddToRecent(m.TriggeredAlert.Value);
@@ -167,6 +171,21 @@ namespace web.BackgroundServices
                     await _smsClient.SendSMS(a.description);
                 }
             }
+        }
+
+        private async Task<Price> GetPrice(Dictionary<string, Price> priceCache, PriceMonitor sm)
+        {
+            if (priceCache.ContainsKey(sm.Ticker))
+            {
+                return priceCache[sm.Ticker];
+            }
+
+            var user = await _accounts.GetUser(sm.UserId);
+            var price = await _brokerage.GetQuote(user.State, sm.Ticker);
+
+            priceCache[sm.Ticker] = new Price(price.Success.lastPrice);
+
+            return priceCache[sm.Ticker];
         }
 
         private object Map(TriggeredAlert trigger)

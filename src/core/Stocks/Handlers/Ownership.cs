@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
 
 namespace core.Stocks
@@ -13,7 +12,7 @@ namespace core.Stocks
     {
         public class Query : RequestWithUserId<StockOwnershipView>
         {
-            public Query(string ticker)
+            public Query(string ticker, Guid userId) : base(userId)
             {
                 Ticker = ticker;
             }
@@ -24,16 +23,16 @@ namespace core.Stocks
         public class Handler : HandlerWithStorage<Query, StockOwnershipView>
         {
             private IAccountStorage _accounts;
-            private IStocksService2 _stocksService;
+            private IBrokerage _brokerage;
 
             public Handler(
                 IAccountStorage accounts,
-                IStocksService2 stockService,
+                IBrokerage brokerage,
                 IPortfolioStorage storage
                 ) : base(storage)
             {
                 _accounts = accounts;
-                _stocksService = stockService;
+                _brokerage = brokerage;
             }
 
             public override async Task<StockOwnershipView> Handle(Query query, CancellationToken cancellationToken)
@@ -44,11 +43,17 @@ namespace core.Stocks
                     return null;
                 }
 
-                var priceResponse = await _stocksService.GetPrice(query.Ticker);
+                var user = await _accounts.GetUser(query.UserId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("User not found");
+                }
+
+                var priceResponse = await _brokerage.GetQuote(user.State, query.Ticker);
 
                 if (stock.State.OpenPosition != null && priceResponse.IsOk)
                 {
-                    stock.State.OpenPosition.SetPrice(priceResponse.Success.Amount);
+                    stock.State.OpenPosition.SetPrice(priceResponse.Success.lastPrice);
                 }
 
                 return stock.State.OpenPosition switch {

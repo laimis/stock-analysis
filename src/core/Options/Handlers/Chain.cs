@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Options;
-using core.Adapters.Stocks;
+using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using MediatR;
 
 namespace core.Options
 {
     public class Chain
     {
-        public class Query : IRequest<OptionDetailsViewModel>
+        public class Query : RequestWithUserId<OptionDetailsViewModel>
         {
-            public Query(string ticker)
+            public Query(string ticker, Guid userId) : base(userId)
             {
                 Ticker = ticker;
             }
@@ -23,22 +25,30 @@ namespace core.Options
 
         public class Handler : IRequestHandler<Query, OptionDetailsViewModel>
         {
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
             private IOptionsService _options;
-            private IStocksService2 _stocks;
-
-            public Handler(IOptionsService options, IStocksService2 stocks)
+            
+            public Handler(IAccountStorage accounts, IBrokerage brokerage, IOptionsService options)
             {
+                _accounts = accounts;
+                _brokerage = brokerage;
                 _options = options;
-                _stocks = stocks;
             }
             
             public async Task<OptionDetailsViewModel> Handle(Query request, CancellationToken cancellationToken)
             {
-                var price = await _stocks.GetPrice(request.Ticker);
-                if (!price.IsOk || price.Success.NotFound)
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
                 {
-                    return null;
+                    throw new InvalidOperationException("User not found");
                 }
+
+                var priceResult = await _brokerage.GetQuote(user.State, request.Ticker);
+                var price = priceResult.IsOk switch {
+                    true => priceResult.Success.lastPrice,
+                    false => (decimal?)null
+                };
 
                 var dates = await _options.GetOptions(request.Ticker);
 
@@ -52,12 +62,12 @@ namespace core.Options
                     options.AddRange(details);
                 }
 
-                return MapOptionDetails(price.Success.Amount, options);
+                return MapOptionDetails(price, options);
             }
         }
 
         public static OptionDetailsViewModel MapOptionDetails(
-            decimal price,
+            decimal? price,
             IEnumerable<OptionDetail> options)
         {
             var optionList = options

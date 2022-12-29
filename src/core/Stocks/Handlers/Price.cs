@@ -1,37 +1,48 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using MediatR;
 
 namespace core.Stocks.Handlers
 {
     public class Price
     {
-        public class Query : IRequest<decimal>
+        public class Query : RequestWithUserId<decimal?>
         {
             public Ticker Ticker { get; }
 
-            public Query(string ticker)
+            public Query(string ticker, Guid userId) : base(userId)
             {
                 Ticker = ticker;
             }
         }
 
-        public class Handler : IRequestHandler<Query, decimal>
+        public class Handler : IRequestHandler<Query, decimal?>
         {
-            private IStocksService2 _stocksService2;
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
 
-            public Handler(IStocksService2 stockService2)
+            public Handler(IAccountStorage accounts, IBrokerage brokerage)
             {
-                _stocksService2 = stockService2;
+                _accounts = accounts;
+                _brokerage = brokerage;
             }
 
-            public async Task<decimal> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<decimal?> Handle(Query request, CancellationToken cancellationToken)
             {
-                var price = await _stocksService2.GetPrice(request.Ticker);
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("User not found");
+                }
 
-                return price.Success.Amount;
+                var price = await _brokerage.GetQuote(user.State, request.Ticker);
+
+                return price.Success?.lastPrice;
             }
         }
     }

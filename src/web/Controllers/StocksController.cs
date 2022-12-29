@@ -30,25 +30,19 @@ namespace web.Controllers
         public Task<object> Dashboard() => _mediator.Send(new Dashboard.Query(User.Identifier()));
 
         [HttpGet("{ticker}")]
-        public Task<object> Details(string ticker) => _mediator.Send(new Details.Query(ticker));
+        public Task<StockDetailsView> Details(string ticker) => _mediator.Send(new Details.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/prices")]
         public Task<PricesView> Prices(string ticker, [FromQuery] int numberOfDays) => _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
 
         [HttpGet("{ticker}/price")]
-        public Task<decimal> Price(string ticker) => _mediator.Send(new Price.Query(ticker));
+        public Task<decimal?> Price(string ticker) => _mediator.Send(new Price.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/quote")]
         public Task<StockQuote> Quote(string ticker) => _mediator.Send(new Quote.Query(ticker, User.Identifier()));
         
         [HttpGet("{ticker}/ownership")]
-        public async Task<object> Ownership(string ticker)
-        {
-            var query = new Ownership.Query(ticker);
-            query.WithUserId(User.Identifier());
-
-            return await _mediator.Send(query);
-        }
+        public Task<StockOwnershipView> Ownership(string ticker) => _mediator.Send(new Ownership.Query(ticker, User.Identifier()));
 
         [HttpDelete("{id}")]
         public async Task<object> Delete(Guid id)

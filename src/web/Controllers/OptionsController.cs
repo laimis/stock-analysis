@@ -23,38 +23,16 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/chain")]
-        public async Task<ActionResult<OptionDetailsViewModel>> DetailsAsync(string ticker)
-        {
-            var details = await _mediator.Send(new Chain.Query(ticker));
-            if (details == null)
-            {
-                return NotFound();
-            }
-            
-            return details;
-        }
+        public Task<OptionDetailsViewModel> DetailsAsync(string ticker) =>
+            _mediator.Send(new Chain.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/active")]
-        public Task<OwnedOptionStatsView> List(string ticker)
-        {
-            return _mediator.Send(new List.Query(ticker, User.Identifier()));
-        }
+        public Task<OwnedOptionStatsView> List(string ticker) =>
+            _mediator.Send(new List.Query(ticker, User.Identifier()));
 
         [HttpGet("{id}")]
-        public async Task<object> Get(Guid id)
-        {
-            var query = new Details.Query { Id = id };
-
-            query.WithUserId(User.Identifier());
-            
-            var option =  await _mediator.Send(query);
-            if (option == null)
-            {
-                return NotFound();
-            }
-
-            return option;
-        }
+        public Task<OwnedOptionView> Get(Guid id) =>
+            _mediator.Send(new Details.Query(id, User.Identifier()));
 
         [HttpPost("sell")]
         public Task<object> Sell(Sell.Command cmd)
