@@ -46,7 +46,6 @@ namespace web
             );
 
             services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
-            services.AddSingleton<IStocksService2>(s => s.GetService<IEXClient>());
             services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>());
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();

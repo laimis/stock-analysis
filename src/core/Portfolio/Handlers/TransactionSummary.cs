@@ -47,13 +47,9 @@ namespace core.Portfolio
 
         public class Handler : HandlerWithStorage<Generate, TransactionSummaryView>
         {
-            public Handler(
-                IPortfolioStorage storage,
-                IStocksService2 stocks) : base(storage)
+            public Handler(IPortfolioStorage storage) : base(storage)
             {
-                _stocks = stocks;
             }
-            private IStocksService2 _stocks;
 
             public override async Task<TransactionSummaryView> Handle(Generate request, CancellationToken cancellationToken)
             {

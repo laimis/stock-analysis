@@ -25,7 +25,7 @@ namespace core.Reports
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
 
-            public Handler(IAccountStorage accounts, IBrokerage brokerage, IPortfolioStorage storage, IStocksService2 stocksService) : base(storage) =>
+            public Handler(IAccountStorage accounts, IBrokerage brokerage, IPortfolioStorage storage) : base(storage) =>
                 (_accounts, _brokerage) = (accounts, brokerage);
 
             public override async Task<SellsView> Handle(Query request, CancellationToken cancellationToken)

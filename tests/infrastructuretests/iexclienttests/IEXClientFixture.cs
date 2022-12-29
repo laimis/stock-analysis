@@ -35,17 +35,6 @@ namespace iexclienttests
             dt.Wait();
 
             OptionDetails = dt.Result;
-
-            var price = Client.GetPrice("AMD");
-
-            price.Wait();
-
-            Price = price.Result.Success;
-
-            var priceHistory = Client.GetPriceHistory("AMD", "2y");
-            priceHistory.Wait();
-
-            PriceHistory = priceHistory.Result.Success;
         }
     }
 }

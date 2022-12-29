@@ -29,17 +29,14 @@ namespace core.Reports
         public class Handler : HandlerWithStorage<ForTickerQuery, PercentChangeStatisticsView>
         {
             private IAccountStorage _accounts;
-            private IStocksService2 _stockService;
             private IBrokerage _brokerage;
 
             public Handler(
                 IBrokerage brokerage,
                 IAccountStorage accounts,
-                IPortfolioStorage storage,
-                IStocksService2 stocksService) : base(storage)
+                IPortfolioStorage storage) : base(storage)
             {
                 _accounts = accounts;
-                _stockService = stocksService;
                 _brokerage = brokerage;
             }
 

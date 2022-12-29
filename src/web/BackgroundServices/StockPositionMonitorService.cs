@@ -22,7 +22,6 @@ namespace web.BackgroundServices
         private ILogger<StockPositionMonitorService> _logger;
         private ISMSClient _smsClient;
         private IEmailService _emails;
-        private IStocksService2 _stocks;
         private IPortfolioStorage _stockStorage;
         private IMarketHours _marketHours;
         public StockMonitorContainer _container;
@@ -32,7 +31,6 @@ namespace web.BackgroundServices
             IAccountStorage accounts,
             IBrokerage brokerage,
             IPortfolioStorage stockStorage,
-            IStocksService2 stocks,
             IEmailService emails,
             ISMSClient smsClient,
             IMarketHours marketHours,
@@ -43,7 +41,6 @@ namespace web.BackgroundServices
             _emails = emails;
             _logger = logger;
             _smsClient = smsClient;
-            _stocks = stocks;
             _stockStorage = stockStorage;
             _marketHours = marketHours;
             _container = container;

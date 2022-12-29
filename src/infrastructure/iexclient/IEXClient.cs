@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using core;
 using core.Adapters.Options;
-using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
@@ -14,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace iexclient
 {
-    public class IEXClient : IOptionsService, IStocksService2
+    public class IEXClient : IOptionsService
     {
         private static HttpClient _client = new HttpClient {
             Timeout = TimeSpan.FromSeconds(5)
@@ -48,12 +47,6 @@ namespace iexclient
         private string CacheKeyDaily(string key) => 
             $"{System.DateTime.UtcNow.ToString("yyyy-MM-dd")}{key}.json";
 
-        private string CacheKeyMonthly(string key) => 
-            $"{System.DateTime.UtcNow.ToString("yyyy-MM")}{key}.json";
-
-        private string CacheKeyMinute(string key) => 
-            $"{System.DateTime.UtcNow.ToString("yyyy-MM-dd-mm")}{key}.json";
-
         public async Task<IEnumerable<OptionDetail>> GetOptionDetails(string ticker, string optionDate)
         {
             var url = MakeUrl($"stock/{ticker}/options/{optionDate}");
@@ -69,28 +62,6 @@ namespace iexclient
                 .OrderByDescending(o => o.StrikePrice)
                 .ThenBy(o => o.Side);
         }
-
-        public async Task<ServiceResponse<Price>> GetPrice(string ticker)
-        {
-            var url = MakeUrl($"stock/{ticker}/price");
-
-            var r = await _client.GetAsync(url);
-
-            if (r.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return new ServiceResponse<Price>(new Price());
-            }
-
-            var response = await r.Content.ReadAsStringAsync();
-
-            return new ServiceResponse<Price>(new Price(JsonConvert.DeserializeObject<decimal>(response)));
-        }
-
-        public Task<ServiceResponse<PriceBar[]>> GetPriceHistory(string ticker, string interval) =>
-            GetCachedResponse<PriceBar[]>(
-                MakeUrl($"stock/{ticker}/chart/{interval}") + $"&chartCloseOnly=true",
-                CacheKeyDaily(ticker + interval)
-            );
 
         private string MakeUrl(string function) =>  $"{_endpoint}/{function}?token={_token}";
 
