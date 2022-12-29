@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using core.Account;
+using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
@@ -93,6 +94,49 @@ public class TDAmeritradeClient : IBrokerage
         var url = $"{_authUrl}/auth?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}";
         
         return Task.FromResult(url);
+    }
+
+    public async Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5)
+    {
+        var function = $"instruments?symbol={query}.*&projection=symbol-regex";
+
+        var results = await CallApi<Dictionary<string, SearchItem>>(state, function, HttpMethod.Get);
+        if (results.Error != null)
+        {
+            return new ServiceResponse<SearchResult[]>(results.Error);
+        }
+
+        var converted = results.Success!.Values.Select(
+            i => new SearchResult
+            {
+                Symbol = i.symbol,
+                SecurityName = i.description,
+                Exchange = i.exchange,
+                SecurityType = i.assetType
+            }
+            ).OrderBy(r =>
+                r.Exchange switch {
+                    "Pink Sheet" => 1,
+                    _ => 0
+                }
+            )
+            .ThenBy(r =>
+                r.SecurityType switch {
+                    "EQUITY" => 0,
+                    "OPTION" => 1,
+                    "MUTUAL_FUND" => 2,
+                    "ETF" => 3,
+                    "INDEX" => 4,
+                    "CASH_EQUIVALENT" => 5,
+                    "FIXED_INCOME" => 6,
+                    "CURRENCY" => 7,
+                    _ => 8
+                }
+            )
+            .Take(limit)
+            .ToArray();
+
+        return new ServiceResponse<SearchResult[]>(converted);
     }
 
     public async Task<ServiceResponse<IEnumerable<Order>>> GetOrders(UserState user)
@@ -263,7 +307,7 @@ public class TDAmeritradeClient : IBrokerage
         var dateStr = date.ToString("yyyy-MM-dd");
         var function = $"marketdata/EQUITY/hours?date={dateStr}";
 
-        var wrapper = await CallApi<MarketHoursWrapper>(state, function, HttpMethod.Get, jsonData: null, debug: true);
+        var wrapper = await CallApi<MarketHoursWrapper>(state, function, HttpMethod.Get, jsonData: null);
         if (!wrapper.IsOk)
         {
             return new ServiceResponse<MarketHours>(wrapper.Error!);

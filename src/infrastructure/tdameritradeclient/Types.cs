@@ -180,3 +180,12 @@ internal class AccountsResponse
 {
     public SecuritiesAccount? securitiesAccount { get; set; }
 }
+
+internal class SearchItem
+{
+    public string? cusip { get; set; }
+    public string? symbol { get; set; }
+    public string? description { get; set; }
+    public string? exchange { get; set; }
+    public string? assetType { get; set; }
+}

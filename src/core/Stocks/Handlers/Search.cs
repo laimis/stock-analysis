@@ -1,34 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
+using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using MediatR;
 
 namespace core.Stocks
 {
     public class Search
     {
-        public class Query : IRequest<List<SearchResult>>
+        public class Query : RequestWithUserId<SearchResult[]>
         {
             public string Term { get; private set; }
 
-            public Query(string term)
+            public Query(string term, Guid userId) : base(userId)
             {
                 Term = term;
             }
         }
 
-        public class Handler : IRequestHandler<Query, List<SearchResult>>
+        public class Handler : IRequestHandler<Query, SearchResult[]>
         {
-            private IStocksService2 _stocksService;
+            private IAccountStorage _accountStorage;
+            private IBrokerage _brokerage;
 
-            public Handler(IStocksService2 stockService2)
+            public Handler(IAccountStorage accountStorage, IBrokerage brokerage)
             {
-                _stocksService = stockService2;
+                _accountStorage = accountStorage;
+                _brokerage = brokerage;
             }
 
-            public async Task<List<SearchResult>> Handle(Query request, CancellationToken cancellationToken) =>
-                (await _stocksService.Search(request.Term, 5)).Success;
+            public async Task<SearchResult[]> Handle(Query request, CancellationToken cancellationToken)
+            {
+                var user = await _accountStorage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("User not found");
+                }
+
+                var results = await _brokerage.Search(user.State, request.Term);
+                if (!results.IsOk)
+                {
+                    throw new InvalidOperationException(results.Error.Message);
+                }
+
+                return results.Success;
+            }
         }
     }
 }

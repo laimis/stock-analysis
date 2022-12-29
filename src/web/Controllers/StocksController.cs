@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using core.Adapters.Stocks;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks;
 using core.Stocks.Handlers;
@@ -66,10 +67,7 @@ namespace web.Controllers
         }
 
         [HttpGet("search/{term}")]
-        public async Task<object> Search(string term)
-        {
-            return await _mediator.Send(new Search.Query(term));
-        }
+        public Task<SearchResult[]> Search(string term) => _mediator.Send(new Search.Query(term, User.Identifier()));
 
         [HttpPost("settings")]
         public async Task<ActionResult> Settings(Settings.Command model)

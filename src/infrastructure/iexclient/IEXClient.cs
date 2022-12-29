@@ -70,21 +70,6 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        public async Task<ServiceResponse<List<SearchResult>>> Search(string fragment, int maxResults)
-        {
-            var url = MakeUrl($"search/{fragment}");
-
-            var response = await GetCachedResponse<List<SearchResult>>(url, CacheKeyDaily(fragment));
-
-            return response.IsOk switch {
-                true => 
-                    new ServiceResponse<List<SearchResult>>(
-                        response.Success.Where(r => r.IsSupportedType).Take(5).ToList()
-                    ),
-                false => throw new Exception(response.Error.Message)
-            };
-        }
-
         public Task<ServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker) =>
             GetCachedResponse<CompanyProfile>(
                 MakeUrl($"stock/{ticker}/company"),
