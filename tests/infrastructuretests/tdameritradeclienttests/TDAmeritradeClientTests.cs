@@ -32,17 +32,11 @@ namespace tdameritradeclienttests
                 1
             );
 
-            var ordersResponse = await client.GetPriceHistory(user.State, "AAPL");
+            var ordersResponse = await client.GetOptions(user.State, "RELL");
 
             var orders = ordersResponse.Success!;
 
             Assert.NotEmpty(orders);
-            Assert.True(orders[0].Close > 0);
-            Assert.True(orders[0].High > 0);
-            Assert.True(orders[0].Low > 0);
-            Assert.True(orders[0].Open > 0);
-            Assert.True(orders[0].Volume > 0);
-            Assert.Equal(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"), orders[orders.Length - 1].DateStr);
         }
     }
 }

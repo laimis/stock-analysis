@@ -4,9 +4,9 @@ namespace core.Options
     {
         public long PutVolume { get; set; }
         public long CallVolume { get; set; }
-        public double PutSpend { get; set; }
-        public double CallSpend { get; set; }
-        public double PriceBasedOnCalls { get; set; }
-        public double PriceBasedOnPuts { get; set; }
+        public decimal PutSpend { get; set; }
+        public decimal CallSpend { get; set; }
+        public decimal PriceBasedOnCalls { get; set; }
+        public decimal PriceBasedOnPuts { get; set; }
     }
 }

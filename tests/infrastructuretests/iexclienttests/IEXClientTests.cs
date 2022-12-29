@@ -80,8 +80,8 @@ namespace iexclienttests
 
             var strike = _optionDetails.Single(o => o.Spread == maxSpread);
 
-            Assert.Equal(2.2, maxSpread, 1);
-            Assert.Equal(7.5, strike.StrikePrice);
+            Assert.Equal(2.2m, maxSpread, 1);
+            Assert.Equal(7.5m, strike.StrikePrice);
         }
         
         [Fact]

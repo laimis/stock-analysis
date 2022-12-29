@@ -12,9 +12,7 @@ namespace core.Adapters.Options
 
         public long ContractSize { get; set; }
 
-        public double StrikePrice { get; set; }
-
-        public double ClosingPrice { get; set; }
+        public decimal StrikePrice { get; set; }
 
         public string Side { get; set; }
 
@@ -22,17 +20,17 @@ namespace core.Adapters.Options
 
         public long OpenInterest { get; set; }
 
-        public double Bid { get; set; }
+        public decimal Bid { get; set; }
 
-        public double Ask { get; set; }
+        public decimal Ask { get; set; }
 
         public DateTimeOffset LastUpdated { get; set; }
         public string OptionType => Side;
         public bool IsCall => Side == "call";
         public bool IsPut => Side == "put";
-        public double Spread => (Ask - Bid);
+        public decimal Spread => (Ask - Bid);
 
-        public double PerDayPrice
+        public decimal PerDayPrice
         {
             get
             {
@@ -46,7 +44,7 @@ namespace core.Adapters.Options
             }
         }
 
-        public double BreakEven
+        public decimal BreakEven
         {
             get
             {
@@ -56,7 +54,7 @@ namespace core.Adapters.Options
             }
         }
 
-        public double Risk => Bid / StrikePrice;
+        public decimal Risk => Bid / StrikePrice;
 
         public DateTime ParsedExpirationDate => DateTime.ParseExact(ExpirationDate, "yyyyMMdd", null).Date;
     }
