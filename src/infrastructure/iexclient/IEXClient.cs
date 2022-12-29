@@ -70,18 +70,6 @@ namespace iexclient
                 .ThenBy(o => o.Side);
         }
 
-        public Task<ServiceResponse<CompanyProfile>> GetCompanyProfile(string ticker) =>
-            GetCachedResponse<CompanyProfile>(
-                MakeUrl($"stock/{ticker}/company"),
-                CacheKeyMonthly(ticker)
-            );
-
-        public Task<ServiceResponse<StockAdvancedStats>> GetAdvancedStats(string ticker) =>
-            GetCachedResponse<StockAdvancedStats>(
-                MakeUrl($"stock/{ticker}/advanced-stats"),
-                CacheKeyDaily(ticker + "advanced")
-            );
-
         public async Task<ServiceResponse<Price>> GetPrice(string ticker)
         {
             var url = MakeUrl($"stock/{ticker}/price");

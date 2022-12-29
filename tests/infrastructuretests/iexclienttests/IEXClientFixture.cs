@@ -42,12 +42,6 @@ namespace iexclienttests
 
             Price = price.Result.Success;
 
-            var advancedStats = Client.GetAdvancedStats("GOOGL");
-
-            advancedStats.Wait();
-
-            AdvancedStats = advancedStats.Result.Success;
-
             var priceHistory = Client.GetPriceHistory("AMD", "2y");
             priceHistory.Wait();
 
