@@ -26,21 +26,24 @@ namespace core.Stocks
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
-            private IStocksService2 _stocksService;
             
             public Handler(
                 IAccountStorage accounts,
                 IBrokerage brokerage,
-                IPortfolioStorage storage,
-                IStocksService2 stockService) : base(storage)
+                IPortfolioStorage storage) : base(storage)
             {
                 _accounts = accounts;
                 _brokerage = brokerage;
-                _stocksService = stockService;
             }
 
             public override async Task<object> Handle(Query query, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(query.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
                 var view = await _storage.ViewModel<StockDashboardView>(query.UserId);
                 if (view == null)
                 {
@@ -49,13 +52,12 @@ namespace core.Stocks
 
                 var tickers = view.Positions.Select(o => o.Ticker).Distinct();
 
-                var tickerPrices = await _stocksService.GetPrices(tickers);
-                if (tickerPrices.IsOk)
+                var prices = await _brokerage.GetQuotes(user.State, tickers);
+                if (prices.IsOk)
                 {
-                    EnrichWithStockPrice(view, tickerPrices.Success);
+                    EnrichWithStockPrice(view, prices.Success!);
                 }
 
-                var user = await _accounts.GetUser(query.UserId);
                 if (user.State.ConnectedToBrokerage)
                 {
                     var brokeragePositions = await _brokerage.GetPositions(user.State);
@@ -137,12 +139,12 @@ namespace core.Stocks
                 return violations.OrderBy(v => v.Ticker).ToList();
             }
 
-            private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, BatchStockPrice> prices)
+            private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, StockQuote> prices)
             {
                 foreach(var o in view.Positions)
                 {
                     prices.TryGetValue(o.Ticker, out var price);
-                    o.SetPrice(price?.Price ?? 0);
+                    o.SetPrice(price?.lastPrice ?? 0);
                 }
 
                 return view;

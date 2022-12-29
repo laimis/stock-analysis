@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
 
 namespace core.Stocks
@@ -28,20 +30,29 @@ namespace core.Stocks
 
         public class Handler : HandlerWithStorage<Query, ExportResponse>
         {
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
             private ICSVWriter _csvWriter;
-            private IStocksService2 _stockService;
-
+            
             public Handler(
+                IAccountStorage accounts,
+                IBrokerage brokerage,
                 ICSVWriter csvWriter,
-                IStocksService2 stocksService,
                 IPortfolioStorage storage) : base(storage)
             {
+                _accounts = accounts;
+                _brokerage = brokerage;
                 _csvWriter = csvWriter;
-                _stockService = stocksService;
             }
 
             public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
                 var stocks = await _storage.GetStocks(request.UserId);
 
                 var trades = request.ExportType switch {
@@ -55,9 +66,10 @@ namespace core.Stocks
                     .ToList();
 
                 var prices = request.ExportType switch {
-                    ExportType.Open => await _stockService.GetPrices(final.Select(p => p.Ticker)),
-                    _ => new ServiceResponse<System.Collections.Generic.Dictionary<string, BatchStockPrice>>(
-                        new System.Collections.Generic.Dictionary<string, BatchStockPrice>()
+                    ExportType.Open => 
+                        await _brokerage.GetQuotes(user.State, final.Select(p => p.Ticker)),
+                    _ => new ServiceResponse<System.Collections.Generic.Dictionary<string, StockQuote>>(
+                        new System.Collections.Generic.Dictionary<string, StockQuote>()
                     )
                 };
 
@@ -65,7 +77,7 @@ namespace core.Stocks
                 {
                     if (prices.Success.TryGetValue(p.Ticker, out var price))
                     {
-                        p.SetPrice(price.Price);
+                        p.SetPrice(price.lastPrice);
                     }
                 }
 

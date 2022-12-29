@@ -24,6 +24,7 @@ namespace core.Shared.Adapters.Brokerage
             DateTimeOffset end = default);
         Task<OAuthResponse> GetAccessToken(UserState state);
         Task<ServiceResponse<StockQuote>> GetQuote(UserState state, string ticker);
+        Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState state, IEnumerable<string> tickers);
         Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset start);
         Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5);
     }

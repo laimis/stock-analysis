@@ -302,6 +302,13 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<StockQuote>(quote);
     }
 
+    public Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState user, IEnumerable<string> tickers)
+    {
+        var function = $"marketdata/quotes?symbol={string.Join(",", tickers)}";
+
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
+    }
+
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)
     {
         var dateStr = date.ToString("yyyy-MM-dd");

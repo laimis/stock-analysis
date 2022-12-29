@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Stocks;
+using core.Account;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using MediatR;
 
 namespace core.Options
@@ -21,24 +22,35 @@ namespace core.Options
         public class Handler : HandlerWithStorage<Query, OptionDashboardView>,
             INotificationHandler<UserChanged>
         {
-            private IStocksService2 _stockService;
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
 
             public Handler(
-                IPortfolioStorage storage,
-                IStocksService2 stockService) : base(storage)
+                IAccountStorage accounts,
+                IBrokerage brokerage,
+                IPortfolioStorage storage
+                ) : base(storage)
             {
-                _stockService = stockService;
+                _accounts = accounts;
+                _brokerage = brokerage;    
             }
 
             public override async Task<OptionDashboardView> Handle(Query request, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
                 var view = await _storage.ViewModel<OptionDashboardView>(request.UserId);
                 if (view == null)
                 {
                     view = await FromDb(request.UserId);
                 }
 
-                var prices = await _stockService.GetPrices(
+                var prices = await _brokerage.GetQuotes(
+                    user.State,
                     view.OpenOptions.Select(o => o.Ticker).ToList()
                 );
 
@@ -48,12 +60,12 @@ namespace core.Options
                 };
             }
 
-            private OptionDashboardView EnrichWithStockPrice(OptionDashboardView view, Dictionary<string, BatchStockPrice> prices)
+            private OptionDashboardView EnrichWithStockPrice(OptionDashboardView view, Dictionary<string, StockQuote> prices)
             {
                 foreach (var op in view.OpenOptions)
                 {
                     prices.TryGetValue(op.Ticker, out var val);
-                    if (val != null) op.ApplyPrice(val.Price);
+                    if (val != null) op.ApplyPrice(val.lastPrice);
                 }
                 return view;
             }

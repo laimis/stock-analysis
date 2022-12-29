@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
 using core.Reports.Views;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 
 namespace core.Reports
 {
@@ -19,16 +22,34 @@ namespace core.Reports
 
         public class Handler : HandlerWithStorage<Query, SellsView>
         {
-            private IStocksService2 _stockService;
+            private IAccountStorage _accounts;
+            private IBrokerage _brokerage;
 
-            public Handler(IPortfolioStorage storage, IStocksService2 stocksService) : base(storage) =>
-                _stockService = stocksService;
+            public Handler(IAccountStorage accounts, IBrokerage brokerage, IPortfolioStorage storage, IStocksService2 stocksService) : base(storage) =>
+                (_accounts, _brokerage) = (accounts, brokerage);
 
             public override async Task<SellsView> Handle(Query request, CancellationToken cancellationToken)
             {
+                var user = await _accounts.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
                 var stocks = await _storage.GetStocks(request.UserId);
 
-                return await SellsView.Create(stocks, _stockService);
+                var pricesResult = await _brokerage.GetQuotes(
+                    user.State,
+                    stocks.Select(s => s.State.Ticker)
+                );
+
+                var prices = pricesResult.IsOk switch
+                {
+                    false => new Dictionary<string, StockQuote>(),
+                    true => pricesResult.Success!
+                };
+
+                return SellsView.Create(stocks, prices);
             }
         }
     }

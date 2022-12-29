@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using core.Adapters.Stocks;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks;
 
 namespace core.Reports.Views
@@ -13,7 +12,7 @@ namespace core.Reports.Views
 
         public List<SellView> Sells { get; }
 
-        public static async Task<SellsView> Create(IEnumerable<OwnedStock> stocks, IStocksService2 priceFeed)
+        public static SellsView Create(IEnumerable<OwnedStock> stocks, Dictionary<string, StockQuote> prices)
         {
             var filteredData = stocks
                     .SelectMany(s => s.State.BuyOrSell.Select(t => new { stock = s, buyOrSell = t}))
@@ -22,15 +21,13 @@ namespace core.Reports.Views
                     .GroupBy(s => s.stock.State.Ticker)
                     .Select(g => new {ticker = g.Key, latest = g.OrderByDescending(s => s.buyOrSell.When).First()});
 
-            var prices = (await priceFeed.GetPrices(filteredData.Select(s => s.ticker))).Success;
-
             var sells = filteredData.Select(t => new SellView
                 {
                     Ticker = t.ticker,
                     Date = t.latest.buyOrSell.When,
                     NumberOfShares = t.latest.buyOrSell.NumberOfShares,
                     Price = t.latest.buyOrSell.Price,
-                    CurrentPrice = prices.ContainsKey(t.ticker) ? prices[t.ticker].Price : null,
+                    CurrentPrice = prices.ContainsKey(t.ticker) ? prices[t.ticker].lastPrice : null,
                     OlderThan30Days = t.latest.buyOrSell.When < DateTimeOffset.UtcNow.AddDays(-30)
                 })
                 .OrderByDescending(a => a.Date)

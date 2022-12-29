@@ -28,18 +28,15 @@ namespace core.Stocks
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
             private IPortfolioStorage _portfolio;
-            private IStocksService2 _stocks;
 
             public Handler(
                 IAccountStorage accounts,
                 IBrokerage brokerage,
-                IPortfolioStorage portfolio,
-                IStocksService2 stocks)
+                IPortfolioStorage portfolio)
             {
                 _accounts = accounts;
                 _brokerage = brokerage;
                 _portfolio = portfolio;
-                _stocks = stocks;
             }
 
             public async Task<TradingEntriesView> Handle(Query request, CancellationToken cancellationToken)
@@ -57,13 +54,13 @@ namespace core.Stocks
                     .Select(s => s.State.OpenPosition)
                     .ToArray();
 
-                var prices = await _stocks.GetPrices(positions.Select(s => s.Ticker).Distinct());
+                var prices = await _brokerage.GetQuotes(user.State, positions.Select(p => p.Ticker)); 
                 if (prices.IsOk)
                 {
                     foreach (var entry in positions)
                     {
                         prices.Success.TryGetValue(entry.Ticker, out var price);
-                        entry.SetPrice(price?.Price ?? 0);    
+                        entry.SetPrice(price?.lastPrice ?? 0);    
                     }   
                 }
 

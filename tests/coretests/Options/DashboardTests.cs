@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Adapters.Stocks;
 using core.Options;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 using Moq;
 using Xunit;
 
@@ -26,15 +28,21 @@ namespace coretests.Options
             
             var query = new Dashboard.Query(Guid.NewGuid());
 
-            var mock = new Mock<IStocksService2>();
-            mock.Setup(x => x.GetPrices(It.IsAny<IEnumerable<string>>()))
+            var accounts = new Mock<IAccountStorage>();
+            accounts.Setup(x => x.GetUser(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(
-                    new ServiceResponse<Dictionary<string, BatchStockPrice>>(
-                        new Dictionary<string, BatchStockPrice>()
+                    new User("e", "f", "l"))
+                );
+
+            var brokerage = new Mock<IBrokerage>();
+            brokerage.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<string>>()))
+                .Returns(Task.FromResult(
+                    new ServiceResponse<Dictionary<string, StockQuote>>(
+                        new Dictionary<string, StockQuote>()
                     )
                 ));
             
-            var handler = new Dashboard.Handler(storage, mock.Object);
+            var handler = new Dashboard.Handler(accounts.Object, brokerage.Object, storage);
 
             var result = await handler.Handle(query, CancellationToken.None);
 

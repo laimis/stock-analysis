@@ -86,37 +86,6 @@ namespace iexclient
             return new ServiceResponse<Price>(new Price(JsonConvert.DeserializeObject<decimal>(response)));
         }
 
-        public async Task<ServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers)
-        {
-            var symbols = string.Join(",", tickers);
-            if (symbols == "")
-            {
-                return new ServiceResponse<Dictionary<string, BatchStockPrice>>(
-                    new Dictionary<string, BatchStockPrice>()
-                );
-            }
-            
-            var url = MakeUrl($"stock/market/batch");
-
-            url += $"&symbols={symbols}&types=price";
-
-            var r = await _client.GetAsync(url);
-
-            var response = await r.Content.ReadAsStringAsync();
-
-            if (!r.IsSuccessStatusCode)
-            {
-                _logger?.LogError($"Failed to get stocks with url {url}: " + response);
-                return new ServiceResponse<Dictionary<string, BatchStockPrice>>(
-                    new Dictionary<string, BatchStockPrice>()
-                );
-            }
-
-            return new ServiceResponse<Dictionary<string, BatchStockPrice>>(
-                JsonConvert.DeserializeObject<Dictionary<string, BatchStockPrice>>(response)
-            );
-        }
-
         public Task<ServiceResponse<PriceBar[]>> GetPriceHistory(string ticker, string interval) =>
             GetCachedResponse<PriceBar[]>(
                 MakeUrl($"stock/{ticker}/chart/{interval}") + $"&chartCloseOnly=true",

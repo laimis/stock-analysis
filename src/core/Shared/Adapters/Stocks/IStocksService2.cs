@@ -6,6 +6,5 @@ namespace core.Adapters.Stocks
 {
     public interface IStocksService2
     {
-        Task<ServiceResponse<Dictionary<string, BatchStockPrice>>> GetPrices(IEnumerable<string> tickers);
     }
 }
