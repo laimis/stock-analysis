@@ -13,7 +13,6 @@ using core.Shared.Adapters.Cryptos;
 using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.SMS;
 using csvparser;
-using iexclient;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,12 +30,6 @@ namespace web
             IServiceCollection services,
             ILogger logger)
         {
-            services.AddSingleton<IEXClient>(s =>
-                new IEXClient(
-                    configuration.GetValue<string>("IEXClientToken"),
-                    s.GetService<ILogger<IEXClient>>()
-                )
-            );
             
             services.AddSingleton<coinmarketcap.CoinMarketCapClient>(s =>
                 new coinmarketcap.CoinMarketCapClient(
@@ -45,12 +38,10 @@ namespace web
                 )
             );
 
-            services.AddSingleton<IOptionsService>(s => s.GetService<IEXClient>());
             services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>());
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
-            // services.AddSingleton<IMarketHours, MarketHours>();
-            services.AddSingleton<IMarketHours, MarketHoursAlwaysOn>();
+            services.AddSingleton<IMarketHours, Utils.MarketHours>();
             services.AddSingleton<StockMonitorContainer>();
             services.AddMediatR(typeof(Sell).Assembly, typeof(DIHelper).Assembly);
             services.AddSingleton<CookieEvents>();
