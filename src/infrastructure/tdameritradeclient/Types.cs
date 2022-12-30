@@ -3,6 +3,10 @@ using core.Shared.Adapters.Brokerage;
 namespace tdameritradeclient;
 
 
+internal class ErrorResponse
+{
+    public string? error { get; set; }
+}
 
 internal class MarketHoursWrapper
 {
@@ -188,4 +192,54 @@ internal class SearchItem
     public string? description { get; set; }
     public string? exchange { get; set; }
     public string? assetType { get; set; }
+}
+
+internal class OptionDescriptor
+{
+    public string? putCall { get; set; }
+    public string? symbol { get; set; }
+    public string? description { get; set; }
+    public string? exchangeName { get; set; }
+    public decimal bid { get; set; }
+    public decimal ask { get; set; }
+    public decimal last { get; set; }
+    public decimal mark { get; set; }
+    public int bidSize { get; set; }
+    public int askSize { get; set; }
+    public decimal highPrice { get; set; }
+    public decimal lowPrice { get; set; }
+    public int totalVolume { get; set; }
+    public decimal volatility { get; set; }
+    public decimal delta { get; set; }
+    public decimal gamma { get; set; }
+    public decimal theta { get; set; }
+    public decimal vega { get; set; }
+    public decimal rho { get; set; }
+    public long openInterest { get; set; }
+    public decimal timeValue { get; set; }
+    public long expirationDate { get; set; }
+    public DateTimeOffset ExpirationDate => DateTimeOffset.FromUnixTimeMilliseconds(expirationDate);
+    public int daysToExpiration { get; set; }
+    public decimal percentChange { get; set; }
+    public decimal markChange { get; set; }
+    public decimal markPercentChange { get; set; }
+    public decimal intrinsicValue { get; set; }
+    public bool inTheMoney { get; set; }
+    public decimal strikePrice { get; set; }
+}
+
+internal class OptionDescriptorMap : Dictionary<string, OptionDescriptor[]>
+{
+    public OptionDescriptor First(string key) => this[key].First();
+}
+
+
+internal class OptionChain
+{
+    public string? symbol { get; set; }
+    public string? status { get; set; }
+    public decimal volatility { get; set; }
+    public int numberOfContracts { get; set; }
+    public Dictionary<string, OptionDescriptorMap>? putExpDateMap { get; set; }
+    public Dictionary<string, OptionDescriptorMap>? callExpDateMap { get; set; }
 }

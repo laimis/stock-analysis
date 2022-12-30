@@ -8,7 +8,7 @@ namespace core.Options
         public decimal? StockPrice { get; set; }
         public OptionDetail[] Options { get; set; }
         public string[] Expirations { get; set; }
-        public OptionBreakdownViewModel Breakdown { get; set; }
-        public DateTimeOffset LastUpdated { get; set; }
+        public decimal Volatility { get; set; }
+        public decimal NumberOfContracts { get; set; }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
+using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Shared.Adapters.Stocks;
 
@@ -27,6 +28,7 @@ namespace core.Shared.Adapters.Brokerage
         Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState state, IEnumerable<string> tickers);
         Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset start);
         Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5);
+        Task<ServiceResponse<OptionChain>> GetOptions(UserState state, string ticker);
     }
 
     public enum BrokerageOrderDuration

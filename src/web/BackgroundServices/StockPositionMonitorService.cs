@@ -121,8 +121,7 @@ namespace web.BackgroundServices
                 };
 
                 var price = await priceTask;
-                
-                if (!price.NotFound)
+                if (price.NotFound)
                 {
                     _logger.LogError($"price not found for {m.Description} monitor");
                     continue;

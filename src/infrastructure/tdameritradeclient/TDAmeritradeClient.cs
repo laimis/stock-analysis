@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using core.Account;
+using core.Adapters.Options;
 using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
@@ -216,9 +217,12 @@ public class TDAmeritradeClient : IBrokerage
 
         var url = $"/accounts/{accountId}/orders/{orderId}";
 
-        await CallApiWithoutSerialization(user, url, HttpMethod.Delete);
-
-        return new ServiceResponse<bool>(true);
+        var (cancelResponse, content) = await CallApiWithoutSerialization(user, url, HttpMethod.Delete);
+        return cancelResponse.IsSuccessStatusCode switch
+        {
+            true => new ServiceResponse<bool>(true),
+            false => new ServiceResponse<bool>(new ServiceError(content))
+        };
     }
 
     public Task BuyOrder(
@@ -306,7 +310,57 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers)}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+    }
+
+    public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker)
+    {
+        var function = $"marketdata/chains?symbol={ticker}";
+
+        var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get);
+
+        if (!chainResponse.IsOk)
+        {
+            return new ServiceResponse<core.Adapters.Options.OptionChain>(chainResponse.Error!);
+        }
+
+        IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map) =>
+            map.SelectMany(kp => kp.Value.Values).SelectMany(v => v)
+            .Select(d => new OptionDetail {
+                Ask = d.ask,
+                Bid = d.bid,
+                Side = d.putCall?.ToLower(),
+                StrikePrice = d.strikePrice,
+                Symbol = d.symbol,
+                Volume = d.totalVolume,
+                OpenInterest = d.openInterest,
+                ParsedExpirationDate = d.ExpirationDate,
+                Description = d.description,
+                DaysToExpiration = d.daysToExpiration,
+                Delta = d.delta,
+                Gamma = d.gamma,
+                Theta = d.theta,
+                Vega = d.vega,
+                Rho = d.rho,
+                ExchangeName = d.exchangeName,
+                InTheMoney = d.inTheMoney,
+                IntrinsicValue = d.intrinsicValue,
+                TimeValue = d.timeValue,
+                Volatility = d.volatility,
+                MarkChange = d.markChange,
+                MarkPercentChange = d.markPercentChange
+            });
+
+        var chain = chainResponse.Success!;
+
+        var response = new core.Adapters.Options.OptionChain {
+            Symbol = chain.symbol,
+            Volatility = chain.volatility,
+            NumberOfContracts = chain.numberOfContracts,
+            Options = ToOptionDetails(chain.callExpDateMap!).Union(ToOptionDetails(chain.putExpDateMap!)).ToArray()
+        };
+
+        return new ServiceResponse<core.Adapters.Options.OptionChain>(response);
     }
 
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)
@@ -405,11 +459,12 @@ public class TDAmeritradeClient : IBrokerage
 
         var data = JsonSerializer.Serialize(postData);
 
-        _logger?.LogError("Posting to " + url + ": " + data);
-
-        await CallApiWithoutSerialization(user, url, HttpMethod.Post, data);
-
-        return new ServiceResponse<bool>(true);
+        var (enterResponse, content) = await CallApiWithoutSerialization(user, url, HttpMethod.Post, data);
+        return enterResponse.IsSuccessStatusCode switch
+        {
+            true => new ServiceResponse<bool>(true),
+            false => new ServiceResponse<bool>(new ServiceError(content))
+        };
     }
 
     private string GetBuyOrderType(BrokerageOrderType type) =>
@@ -458,18 +513,30 @@ public class TDAmeritradeClient : IBrokerage
     {
         try
         {
-            var responseString = await CallApiWithoutSerialization(user, function, method, jsonData);
+            var (response, content) = await CallApiWithoutSerialization(user, function, method, jsonData);
 
             if (debug)
             {
                 _logger?.LogError("debug function: " + function);
-                _logger?.LogError("debug response output: " + responseString);
+                _logger?.LogError("debug response code: " + response.StatusCode);
+                _logger?.LogError("debug response output: " + content);
             }
 
-            var deserialized = JsonSerializer.Deserialize<T>(responseString);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = JsonSerializer.Deserialize<ErrorResponse>(content);
+                if (error?.error == null)
+                {
+                    return new ServiceResponse<T>(new ServiceError(content));
+                }
+
+                return new ServiceResponse<T>(new ServiceError(error.error));
+            }
+
+            var deserialized = JsonSerializer.Deserialize<T>(content);
             if (deserialized == null)
             {
-                throw new Exception($"Could not deserialize response for {function}: {responseString}");
+                throw new Exception($"Could not deserialize response for {function}: {content}");
             }
 
             return new ServiceResponse<T>(deserialized);
@@ -483,7 +550,7 @@ public class TDAmeritradeClient : IBrokerage
     }
 
 
-    private async Task<string> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
+    private async Task<(HttpResponseMessage response, string content)> CallApiWithoutSerialization(UserState user, string function, HttpMethod method, string? jsonData = null)
     {
         var oauth = await GetAccessToken(user);
 
@@ -500,7 +567,9 @@ public class TDAmeritradeClient : IBrokerage
             CancellationToken.None
         );
 
-        return await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync();
+
+        return (response, content);
     }
 
     public async Task<OAuthResponse> GetAccessToken(UserState user)

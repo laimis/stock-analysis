@@ -27,13 +27,11 @@ namespace core.Options
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
-            private IOptionsService _options;
             
-            public Handler(IAccountStorage accounts, IBrokerage brokerage, IOptionsService options)
+            public Handler(IAccountStorage accounts, IBrokerage brokerage)
             {
                 _accounts = accounts;
                 _brokerage = brokerage;
-                _options = options;
             }
             
             public async Task<OptionDetailsViewModel> Handle(Query request, CancellationToken cancellationToken)
@@ -50,56 +48,44 @@ namespace core.Options
                     false => (decimal?)null
                 };
 
-                var dates = await _options.GetOptions(request.Ticker);
-
-                var upToFour = dates.Take(4);
-
-                var options = new List<OptionDetail>();
-
-                foreach (var d in upToFour)
+                var detailsResponse = await _brokerage.GetOptions(user.State, request.Ticker);
+                if (!detailsResponse.IsOk)
                 {
-                    var details = await _options.GetOptionDetails(request.Ticker, d);
-                    options.AddRange(details);
+                    throw new InvalidOperationException("Failed to get options: " + detailsResponse.Error.Message);
                 }
 
-                return MapOptionDetails(price, options);
+                return MapOptionDetails(price, detailsResponse.Success!);
             }
         }
 
         public static OptionDetailsViewModel MapOptionDetails(
             decimal? price,
-            IEnumerable<OptionDetail> options)
+            OptionChain chain)
         {
-            var optionList = options
-                .Where(o => o.Volume > 0 || o.OpenInterest > 0)
-                .Where(o => o.ParsedExpirationDate > DateTime.UtcNow)
-                .OrderBy(o => o.ExpirationDate)
-                .ToArray();
-
-            var expirations = optionList.Select(o => o.ExpirationDate)
-                .Distinct()
-                .OrderBy(s => s)
-                .ToArray();
+            var optionList = chain.Options;
 
             var puts = optionList.Where(o => o.IsPut);
             var calls = optionList.Where(o => o.IsCall);
 
+            var callAverageVolume = calls.Average(o => o.Volume);
+            var priceBasedOnCalls = callAverageVolume switch {
+                0 => 0,
+                _ => calls.Average(o => o.Volume * o.StrikePrice) / (decimal)callAverageVolume
+            };
+
+            var putAverageVolume = puts.Average(o => o.Volume);
+            var priceBasedOnPuts = putAverageVolume switch {
+                0 => 0,
+                _ => puts.Average(o => o.Volume * o.StrikePrice) / (decimal)putAverageVolume
+            };
+
             return new OptionDetailsViewModel
             {
                 StockPrice = price,
-                Options = optionList,
-                Expirations = expirations,
-                LastUpdated = optionList.Max(o => o.LastUpdated),
-                Breakdown = new OptionBreakdownViewModel
-                {
-                    CallVolume = calls.Sum(o => o.Volume),
-                    CallSpend = calls.Sum(o => o.Volume * o.Bid),
-                    PriceBasedOnCalls = calls.Average(o => o.Volume * o.StrikePrice) / calls.Average(o => o.Volume),
-
-                    PutVolume = puts.Sum(o => o.Volume),
-                    PutSpend = puts.Sum(o => o.Volume * o.Bid),
-                    PriceBasedOnPuts = puts.Average(o => o.Volume * o.StrikePrice) / puts.Average(o => o.Volume),
-                }
+                Options = chain.Options,
+                Expirations = chain.Options.Select(o => o.ExpirationDate).Distinct().ToArray(),
+                Volatility = chain.Volatility,
+                NumberOfContracts = chain.NumberOfContracts,
             };
         }
     }
