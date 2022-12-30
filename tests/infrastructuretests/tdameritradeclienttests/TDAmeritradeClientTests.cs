@@ -32,11 +32,11 @@ namespace tdameritradeclienttests
                 1
             );
 
-            var ordersResponse = await client.GetOptions(user.State, "RELL");
+            var chainResponse = await client.GetOptions(user.State, "RELL");
 
-            var orders = ordersResponse.Success!;
+            var chain = chainResponse.Success!;
 
-            Assert.NotEmpty(orders);
+            Assert.NotNull(chain);
         }
     }
 }

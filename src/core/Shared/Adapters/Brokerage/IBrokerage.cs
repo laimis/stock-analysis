@@ -28,7 +28,7 @@ namespace core.Shared.Adapters.Brokerage
         Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState state, IEnumerable<string> tickers);
         Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset start);
         Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5);
-        Task<ServiceResponse<OptionDetail[]>> GetOptions(UserState state, string ticker);
+        Task<ServiceResponse<OptionChain>> GetOptions(UserState state, string ticker);
     }
 
     public enum BrokerageOrderDuration

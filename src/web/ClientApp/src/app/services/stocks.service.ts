@@ -283,8 +283,8 @@ export class StocksService {
     return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/active')
   }
 
-  getOptionChain(ticker:string): Observable<OptionDetail> {
-    return this.http.get<OptionDetail>('/api/options/' + ticker + '/chain')
+  getOptionChain(ticker:string): Observable<OptionChain> {
+    return this.http.get<OptionChain>('/api/options/' + ticker + '/chain')
   }
 
   importOptions(formData: FormData) {
@@ -862,6 +862,8 @@ export interface TradingStrategyPerformance {
 
 export class OptionDefinition {
   id: string
+  description: string
+  symbol: string
   ticker: string
   side: string
   openInterest: number
@@ -902,12 +904,13 @@ export class OptionBreakdown {
   priceBasedOnPuts : number
 }
 
-export interface OptionDetail {
+export interface OptionChain {
   stockPrice: number
-  lastUpdated: string
+  volatility: number
+  numberOfContracts: number
   expirations: string[]
-  options: OptionDefinition[]
   breakdown : OptionBreakdown
+  options: OptionDefinition[]
 }
 
 export interface AccountStatus {

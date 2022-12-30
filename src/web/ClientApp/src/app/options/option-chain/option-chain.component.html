@@ -12,22 +12,19 @@
         <thead class="thead-light">
           <tr>
             <th>Stock Price</th>
-            <th>Put vs Call (ratio)</th>
-            <th>Put Spend</th>
-            <th>Call Spend</th>
-            <th>Put Price</th>
-            <th>Call Price</th>
+            <th>Volatility</th>
+            <th>NumberOfContracts</th>
+            <th>Put vs Call</th>
+            <th>Put vs Call Ratio</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><a [routerLink]="[ '/stocks', ticker ]">{{ stockPrice | currency }}</a></td>
-            <td>{{breakdown.putVolume}} vs {{breakdown.callVolume}}
-              ({{(breakdown.putVolume / breakdown.callVolume) | number }})</td>
-            <td>{{breakdown.putSpend | currency }}</td>
-            <td>{{breakdown.callSpend | currency }}</td>
-            <td>{{breakdown.priceBasedOnPuts | currency }}</td>
-            <td>{{breakdown.priceBasedOnCalls | currency }}</td>
+            <td>{{volatility}}</td>
+            <td>{{numberOfContracts}}</td>
+            <td>{{putOpenInterest()}} vs {{callOpenInterest()}}</td>
+            <td>{{putOpenInterest() / callOpenInterest() | number }}</td>
           </tr>
         </tbody>
       </table>
@@ -65,23 +62,23 @@
       <table class="table table-hover border">
         <thead class="thead-light">
           <tr>
-            <th>Expiration</th>
-            <th>Strike price</th>
-            <th>Side</th>
+            <th>Option</th>
+            <th>Strike Price</th>
             <th>Open interest</th>
             <th>Volume</th>
             <th>Bid vs Ask</th>
             <th>Spread</th>
             <th>PDP</th>
             <th>Risk</th>
-            <th>Last Update</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let option of expiration">
-            <td>{{option.expirationDate}}</td>
-            <td>{{option.strikePrice | currency}} <small>{{option.breakEven | currency }}</small></td>
-            <td>{{option.side}}</td>
+            <!-- <td>{{option.expirationDate}}</td>
+            <td>{{option.strikePrice | currency}} <small>{{option.breakEven | currency }}</small></td> -->
+            <!-- <td>{{option.side}}</td> -->
+            <td>{{option.strikePrice | currency}}</td>
+            <td>{{option.description}}</td>
             <td>{{option.openInterest}}</td>
             <td>{{option.volume}}</td>
             <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>

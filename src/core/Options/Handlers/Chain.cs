@@ -60,18 +60,9 @@ namespace core.Options
 
         public static OptionDetailsViewModel MapOptionDetails(
             decimal? price,
-            IEnumerable<OptionDetail> options)
+            OptionChain chain)
         {
-            var optionList = options
-                .Where(o => o.Volume > 0 || o.OpenInterest > 0)
-                .Where(o => o.ParsedExpirationDate > DateTime.UtcNow)
-                .OrderBy(o => o.ExpirationDate)
-                .ToArray();
-
-            var expirations = optionList.Select(o => o.ExpirationDate)
-                .Distinct()
-                .OrderBy(s => s)
-                .ToArray();
+            var optionList = chain.Options;
 
             var puts = optionList.Where(o => o.IsPut);
             var calls = optionList.Where(o => o.IsCall);
@@ -91,19 +82,10 @@ namespace core.Options
             return new OptionDetailsViewModel
             {
                 StockPrice = price,
-                Options = optionList,
-                Expirations = expirations,
-                LastUpdated = optionList.Max(o => o.LastUpdated),
-                Breakdown = new OptionBreakdownViewModel
-                {
-                    CallVolume = calls.Sum(o => o.Volume),
-                    CallSpend = calls.Sum(o => o.Volume * o.Bid),
-                    PriceBasedOnCalls = priceBasedOnCalls,
-
-                    PutVolume = puts.Sum(o => o.Volume),
-                    PutSpend = puts.Sum(o => o.Volume * o.Bid),
-                    PriceBasedOnPuts = priceBasedOnPuts,
-                }
+                Options = chain.Options,
+                Expirations = chain.Options.Select(o => o.ExpirationDate).Distinct().ToArray(),
+                Volatility = chain.Volatility,
+                NumberOfContracts = chain.NumberOfContracts,
             };
         }
     }

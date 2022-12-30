@@ -16,7 +16,7 @@ namespace coretests.Adapters.Options
             _put.Side = "put";
             _put.Bid = 1;
             _put.Ask = 2;
-            _put.ExpirationDate = DateTime.UtcNow.AddDays(20).ToString("yyyyMMdd");
+            _put.ParsedExpirationDate = DateTime.UtcNow.AddDays(20);
             _put.StrikePrice = 22;
             _put.OpenInterest = 1;
             _put.Volume = 2;
@@ -26,7 +26,7 @@ namespace coretests.Adapters.Options
             _call.Side = "call";
             _call.Bid = 1;
             _call.Ask = 2;
-            _call.ExpirationDate = DateTime.UtcNow.AddDays(20).ToString("yyyyMMdd");
+            _call.ParsedExpirationDate = DateTime.UtcNow.AddDays(20);
             _call.StrikePrice = 22;
             _call.OpenInterest = 1;
             _call.Volume = 2;

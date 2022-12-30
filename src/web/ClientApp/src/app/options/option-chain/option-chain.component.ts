@@ -13,9 +13,7 @@ export class OptionChainComponent implements OnInit {
   public options : OptionDefinition[]
   public filteredOptions : OptionDefinition[]
   public expirationMap : Array<OptionDefinition[]>
-  public breakdown : OptionBreakdown
   public stockPrice : number
-  public lastUpdated : string
   public expirations: string[]
   public loading : boolean = true
 
@@ -26,6 +24,8 @@ export class OptionChainComponent implements OnInit {
   public maxStrikePrice : number = 0
 
   public failure;
+  volatility: number;
+  numberOfContracts: number;
 
   constructor(
     private service: StocksService,
@@ -38,11 +38,11 @@ export class OptionChainComponent implements OnInit {
     }
 
     this.service.getOptionChain(this.ticker).subscribe( result => {
+      this.volatility = result.volatility
+      this.numberOfContracts = result.numberOfContracts
       this.options = result.options
       this.expirations = result.expirations
-      this.breakdown = result.breakdown
       this.stockPrice = result.stockPrice
-      this.lastUpdated = result.lastUpdated
       this.sideSelection = "put"
       this.minBid = 0.1
       this.runFilter()
@@ -50,6 +50,14 @@ export class OptionChainComponent implements OnInit {
       this.failure = "Failed to load option chain, either data  is not available or entered symbol is incorrect."
 			console.log("failed: " + error);
 		})
+  }
+
+  putOpenInterest() {
+    return this.options.filter(x => x.optionType == "put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+  }
+
+  callOpenInterest() {
+    return this.options.filter(x => x.optionType == "call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
   }
 
   runFilter() {

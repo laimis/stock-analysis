@@ -230,6 +230,7 @@ internal class OptionDescriptor
 
 internal class OptionDescriptorMap : Dictionary<string, OptionDescriptor[]>
 {
+    public OptionDescriptor First(string key) => this[key].First();
 }
 
 
@@ -239,6 +240,6 @@ internal class OptionChain
     public string? status { get; set; }
     public decimal volatility { get; set; }
     public int numberOfContracts { get; set; }
-    public Dictionary<string, OptionDescriptor>? putExpDateMap { get; set; }
-    public Dictionary<string, OptionDescriptor>? callExpDateMap { get; set; }
+    public Dictionary<string, OptionDescriptorMap>? putExpDateMap { get; set; }
+    public Dictionary<string, OptionDescriptorMap>? callExpDateMap { get; set; }
 }

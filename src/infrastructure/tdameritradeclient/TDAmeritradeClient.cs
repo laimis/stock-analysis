@@ -313,38 +313,54 @@ public class TDAmeritradeClient : IBrokerage
         return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
     }
 
-    public async Task<ServiceResponse<OptionDetail[]>> GetOptions(UserState state, string ticker)
+    public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker)
     {
-        var function = $"marketdata/chains?symbol={ticker}&range=ITM";
+        var function = $"marketdata/chains?symbol={ticker}";
 
-        var chain = await CallApi<OptionChain>(state, function, HttpMethod.Get, debug: true);
+        var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get);
 
-        if (!chain.IsOk)
+        if (!chainResponse.IsOk)
         {
-            return new ServiceResponse<OptionDetail[]>(chain.Error!);
+            return new ServiceResponse<core.Adapters.Options.OptionChain>(chainResponse.Error!);
         }
 
-        OptionDetail ToDetail(OptionDescriptor d)
-        {
-            return new OptionDetail
-            {
-                Symbol = d.symbol,
-                ExpirationDate = d.ExpirationDate.ToString("yyyy-MM-dd"),
-                StrikePrice = d.strikePrice,
-                Side = d.putCall?.ToLower(),
+        IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map) =>
+            map.SelectMany(kp => kp.Value.Values).SelectMany(v => v)
+            .Select(d => new OptionDetail {
                 Ask = d.ask,
                 Bid = d.bid,
+                Side = d.putCall?.ToLower(),
+                StrikePrice = d.strikePrice,
+                Symbol = d.symbol,
                 Volume = d.totalVolume,
-                OpenInterest = d.openInterest
-            };
-        }
+                OpenInterest = d.openInterest,
+                ParsedExpirationDate = d.ExpirationDate,
+                Description = d.description,
+                DaysToExpiration = d.daysToExpiration,
+                Delta = d.delta,
+                Gamma = d.gamma,
+                Theta = d.theta,
+                Vega = d.vega,
+                Rho = d.rho,
+                ExchangeName = d.exchangeName,
+                InTheMoney = d.inTheMoney,
+                IntrinsicValue = d.intrinsicValue,
+                TimeValue = d.timeValue,
+                Volatility = d.volatility,
+                MarkChange = d.markChange,
+                MarkPercentChange = d.markPercentChange
+            });
 
-        var options = 
-            chain.Success!.callExpDateMap!.Values.Select(x => ToDetail(x))
-            .Union(chain.Success!.putExpDateMap!.Values.Select(ToDetail))
-            .ToArray();
+        var chain = chainResponse.Success!;
 
-        return new ServiceResponse<OptionDetail[]>(options);
+        var response = new core.Adapters.Options.OptionChain {
+            Symbol = chain.symbol,
+            Volatility = chain.volatility,
+            NumberOfContracts = chain.numberOfContracts,
+            Options = ToOptionDetails(chain.callExpDateMap!).Union(ToOptionDetails(chain.putExpDateMap!)).ToArray()
+        };
+
+        return new ServiceResponse<core.Adapters.Options.OptionChain>(response);
     }
 
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)
