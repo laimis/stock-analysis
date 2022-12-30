@@ -297,8 +297,7 @@ public class TDAmeritradeClient : IBrokerage
             return new ServiceResponse<StockQuote>(response.Error!);
         }
 
-        var quote = response.Success![ticker];
-        if (quote == null)
+        if (!response.Success!.TryGetValue(ticker, out var quote))
         {
             return new ServiceResponse<StockQuote>(new ServiceError("Could not find quote for ticker"));
         }
