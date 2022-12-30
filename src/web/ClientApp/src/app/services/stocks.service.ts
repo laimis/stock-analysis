@@ -891,6 +891,7 @@ export class OptionDefinition {
   isFavorable: boolean
   itmOtmLabel: string
   days: number
+  daysToExpiration: number
   daysHeld: number
   transactions: Transaction[]
 }
