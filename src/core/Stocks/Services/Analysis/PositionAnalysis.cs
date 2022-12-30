@@ -103,50 +103,6 @@ namespace core.Stocks.Services.Analysis
                 OutcomeValueType.Number,
                 $"Last transaction was {position.DaysSinceLastTransaction} days ago"
             );
-            
-            // achieved r1
-            var r1 = position.GetRRLevel(0);
-            var r1Achieved = position.Price >= r1;
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.R1Achieved,
-                r1Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
-                r1Achieved ? 1 : 0,
-                OutcomeValueType.Boolean,
-                $"R1 achieved: {r1}"
-            );
-
-            // achieved r2
-            var r2 = position.GetRRLevel(1);
-            var r2Achieved = position.Price >= r2;
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.R2Achieved,
-                r2Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
-                r2Achieved ? 1 : 0,
-                OutcomeValueType.Boolean,
-                $"R2 achieved: {r2}"
-            );
-
-            // achieved r3
-            var r3 = position.GetRRLevel(2);
-            var r3Achieved = position.Price >= r3;
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.R3Achieved,
-                r3Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
-                r3Achieved ? 1 : 0,
-                OutcomeValueType.Boolean,
-                $"R3 achieved: {r3}"
-            );
-
-            // achieved r4
-            var r4 = position.GetRRLevel(3);
-            var r4Achieved = position.Price >= r4;
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.R4Achieved,
-                r4Achieved ? OutcomeType.Positive : OutcomeType.Neutral,
-                r4Achieved ? 1 : 0,
-                OutcomeValueType.Boolean,
-                $"R4 achieved: {r4}"
-            );
         }
 
     }
@@ -154,10 +110,6 @@ namespace core.Stocks.Services.Analysis
     internal class PortfolioAnalysisKeys
     {
         public static string PercentToStopLoss = "PercentToStopLoss";
-        public static string R1Achieved = "R1Achieved";
-        public static string R2Achieved = "R2Achieved";
-        public static string R3Achieved = "R3Achieved";
-        public static string R4Achieved = "R4Achieved";
         public static string GainPct = "GainPct";
         public static string AverageCost = "AverageCost";
         public static string StopLoss = "StopLoss";

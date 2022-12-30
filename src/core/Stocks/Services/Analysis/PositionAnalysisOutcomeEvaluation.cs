@@ -33,49 +33,6 @@ namespace core.Stocks.Services.Analysis
                         && orders.Any(o => o.Ticker == t.ticker && o.Type == "SELL" && o.Status != "FILLED") == false)
                     .ToList()
             );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "R1 achieved",
-                OutcomeType.Positive,
-                PortfolioAnalysisKeys.R1Achieved,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R1Achieved && o.value > 0) &&
-                        !t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0)
-                    ).ToList()
-            );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "R2 achieved",
-                OutcomeType.Positive,
-                PortfolioAnalysisKeys.R2Achieved,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R2Achieved && o.value > 0) &&
-                        !t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0)
-                    ).ToList()
-            );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "R3 achieved",
-                OutcomeType.Positive,
-                PortfolioAnalysisKeys.R3Achieved,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R3Achieved && o.value > 0) &&
-                        !t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R4Achieved && o.value > 0)
-                    ).ToList()
-            );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "R4 achieved",
-                OutcomeType.Positive,
-                PortfolioAnalysisKeys.R4Achieved,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.R4Achieved && o.value > 0)
-                    ).ToList()
-            );
         }
     }
 }
