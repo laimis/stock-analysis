@@ -15,18 +15,18 @@ namespace web.Utils
         private TimeSpan _start = new TimeSpan(9, 40, 0);
         private TimeSpan _end = new TimeSpan(16, 0, 0);
 
-        public bool IsMarketOpen(DateTimeOffset now)
+        public bool IsMarketOpen(DateTimeOffset utcNow)
         {
-            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
+            // 930-1600
+            var eastern = TimeZoneInfo.ConvertTimeFromUtc(
+                utcNow.DateTime,
+                _easternZoneId
+            );
+
+            if (eastern.DayOfWeek == DayOfWeek.Saturday || eastern.DayOfWeek == DayOfWeek.Sunday)
             {
                 return false;
             }
-            
-            // 930-1600
-            var eastern = TimeZoneInfo.ConvertTimeFromUtc(
-                now.DateTime,
-                _easternZoneId
-            );
 
             var timeOfDay = eastern.TimeOfDay;
 

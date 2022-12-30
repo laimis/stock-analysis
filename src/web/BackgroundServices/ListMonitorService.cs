@@ -49,18 +49,42 @@ namespace web.BackgroundServices
             while (!stoppingToken.IsCancellationRequested)
             {
                 await MonitorForGaps(stocks, user, stoppingToken);
-
-                var nextScanTime = _marketHours.IsMarketOpen(DateTimeOffset.UtcNow) switch {
-                    true => _marketHours.GetMarketStartOfDayTimeInUtc(DateTimeOffset.UtcNow.AddDays(1)),
-                    false => _marketHours.GetMarketStartOfDayTimeInUtc(DateTimeOffset.UtcNow)
-                };
-
-                var delay = nextScanTime - DateTimeOffset.UtcNow;
+                
+                var delay = GetDelayTime();
 
                 _logger.LogInformation("Next scan in {delay}", delay);
 
                 await Task.Delay(delay, stoppingToken);
             }
+        }
+
+        private TimeSpan GetDelayTime()
+        {
+            TimeSpan OpenMarketLogic()
+            {
+                var closeTime = _marketHours.GetMarketEndOfDayTimeInUtc(DateTimeOffset.UtcNow).AddMinutes(-15);
+                return closeTime - DateTimeOffset.UtcNow;
+            }
+
+            TimeSpan ClosedMarketLogic()
+            {
+                var currentTime = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
+                var marketCloseTime = _marketHours.GetMarketEndOfDayTimeInUtc(currentTime);
+
+                var openTime = (currentTime > marketCloseTime) switch {
+                    true => _marketHours.GetMarketStartOfDayTimeInUtc(currentTime.AddDays(-1)),
+                    false => _marketHours.GetMarketStartOfDayTimeInUtc(currentTime)
+                };
+
+                return openTime - currentTime;
+            }
+
+            var delay = _marketHours.IsMarketOpen(DateTimeOffset.UtcNow) switch {
+                true => OpenMarketLogic(),
+                false => ClosedMarketLogic()
+            };
+
+            return delay;
         }
 
         private async Task MonitorForGaps(string[] tickers, User user, CancellationToken ct)
@@ -90,6 +114,8 @@ namespace web.BackgroundServices
                         _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
                         continue;
                     }
+
+                    _logger.LogInformation($"Found {prices.Success.Length} bars for {ticker} between {start} and {end}");
 
                     var gaps = GapAnalysis.Generate(prices.Success, 2);
                     if (gaps.Count == 0)
