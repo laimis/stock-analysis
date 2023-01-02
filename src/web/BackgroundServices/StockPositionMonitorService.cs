@@ -177,7 +177,18 @@ namespace web.BackgroundServices
             }
 
             var user = await _accounts.GetUser(sm.UserId);
+            if (user == null)
+            {
+                _logger.LogError($"user not found for {sm.UserId} while getting price for {sm.Ticker}");
+                return Price.Failed;
+            }
+            
             var price = await _brokerage.GetQuote(user.State, sm.Ticker);
+            if (!price.IsOk)
+            {
+                _logger.LogError($"failed to get price for {sm.Ticker} for {sm.UserId}: {price.Error}");
+                return Price.Failed;
+            }
 
             priceCache[sm.Ticker] = new Price(price.Success.lastPrice);
 

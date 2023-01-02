@@ -2,7 +2,7 @@ namespace core
 {
     public struct Price
     {
-        public static readonly Price Zero = new Price(0);
+        public static readonly Price Failed = new Price(0);
         
         public decimal Amount { get; }
 
