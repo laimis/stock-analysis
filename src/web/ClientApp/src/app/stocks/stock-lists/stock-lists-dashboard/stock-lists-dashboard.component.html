@@ -25,8 +25,9 @@
                 <td>{{l.description}}</td>
                 <td>{{l.tickers.length}}</td>
                 <td>
-                    <a class="btn btn-link btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
-                    <button type="button" class="btn btn-link btn-danger" (click)="deleteList(l)">delete</button>
+                    <a class="btn btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
+                    <a class="btn btn-secondary me-3" href="{{getAnalysisLink(l)}}">analysis</a>
+                    <button type="button" class="btn btn-danger" (click)="deleteList(l)">delete</button>
                 </td>
             </tr>
         </tbody>

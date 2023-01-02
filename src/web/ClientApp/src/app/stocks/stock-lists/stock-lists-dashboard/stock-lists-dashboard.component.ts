@@ -50,14 +50,21 @@ export class StockListsDashboardComponent implements OnInit {
   }
 
   deleteList(list:StockList) {
-    this.stockService.deleteStockList(list.name).subscribe(
-      _ => {
-        this.loadLists()
-      },
-      e => {
-        console.error(e)
-      }
-    )
+    if (confirm(`Are you sure you want to delete ${list.name}?`)) {
+      this.stockService.deleteStockList(list.name).subscribe(
+        _ => {
+          this.loadLists()
+        },
+        e => {
+          console.error(e)
+        }
+      )
+    }
+  }
+
+  getAnalysisLink(list:StockList) {
+    var paramList = list.tickers.map(t => t.ticker).join(',')
+    return `/reports/outcomes?tickers=${paramList}`
   }
 
 }
