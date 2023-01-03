@@ -71,13 +71,8 @@ namespace core.Stocks.Services.Analysis
                 OutcomeValueType.Currency,
                 "Close price");
 
-            // calculate closing range
-            var rangeDenominator = currentBar.High - currentBar.Low;
-            var range = rangeDenominator switch {
-                0 => 0,
-                _ => (currentBar.Close - currentBar.Low) / rangeDenominator
-            };
-
+            var range = currentBar.ClosingRange();
+            
             // add range as outcome
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.ClosingRange,

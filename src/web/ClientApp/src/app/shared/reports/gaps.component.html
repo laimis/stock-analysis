@@ -10,6 +10,7 @@
                 <th>Close</th>
                 <th>Vol</th>
                 <th>RelV</th>
+                <th>Closing Range</th>
                 <th><!-- close quickly icon --></th>
                 <th><!-- open --></th>
             </tr>
@@ -30,6 +31,7 @@
                 <td>{{g.bar.close | currency}}</td>
                 <td>{{g.bar.volume | number }}</td>
                 <td>{{g.relativeVolume | number}}</td>
+                <td>{{g.closingRange | percent}}</td>
                 <td>
                     <i *ngIf="g.closedQuickly" class="bi bi-stop-circle-fill"></i>
                 </td>

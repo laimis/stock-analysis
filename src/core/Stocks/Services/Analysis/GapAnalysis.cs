@@ -66,6 +66,7 @@ namespace core.Stocks.Services.Analysis
                     var closedQuickly = ClosingConditionMet(prices, i + 1, 10, closingCondition);
                     var open = !ClosingConditionMet(prices, i + 1, prices.Length - i, closingCondition);
                     var relativeVolume = Math.Round( currentBar.Volume / volumeStats.mean, 2);
+                    var closingRange = currentBar.ClosingRange();
 
                     var gap = new Gap(
                         type: type,
@@ -74,7 +75,8 @@ namespace core.Stocks.Services.Analysis
                         bar: currentBar,
                         closedQuickly: closedQuickly,
                         open: open,
-                        relativeVolume: relativeVolume
+                        relativeVolume: relativeVolume,
+                        closingRange: closingRange
                     );
                     gaps.Add(gap);
                 }
@@ -106,7 +108,8 @@ namespace core.Stocks.Services.Analysis
         PriceBar bar,
         bool closedQuickly,
         bool open,
-        decimal relativeVolume);
+        decimal relativeVolume,
+        decimal closingRange);
 
     public enum GapType { Up, Down }
 }

@@ -57,6 +57,15 @@ namespace core.Shared.Adapters.Stocks
 
     public static class PriceBarExtensions
     {
+        public static decimal ClosingRange(this PriceBar currentBar)
+        {
+            var rangeDenominator = currentBar.High - currentBar.Low;
+            return rangeDenominator switch {
+                0 => 0,
+                _ => (currentBar.Close - currentBar.Low) / rangeDenominator
+            };
+        }
+
         public static PriceBar[] Last(this PriceBar[] source, int numberOfItems)
         {
             return source.Skip(source.Length - numberOfItems).ToArray();
