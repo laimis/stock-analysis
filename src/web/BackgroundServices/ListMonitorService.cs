@@ -89,7 +89,7 @@ namespace web.BackgroundServices
 
         private async Task MonitorForGaps(string[] tickers, User user, CancellationToken ct)
         {
-            var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-1));
+            var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-7));
             var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
 
             try
