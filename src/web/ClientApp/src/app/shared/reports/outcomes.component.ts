@@ -67,7 +67,7 @@ export class OutcomesComponent {
 
   getValue(o:StockAnalysisOutcome) {
     if (o.valueType === OutcomeValueTypeEnum.Percentage) {
-      return this.percentPipe.transform(o.value)
+      return this.percentPipe.transform(o.value, '1.0-2')
     } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
       return this.currencyPipe.transform(o.value)
     } else {
