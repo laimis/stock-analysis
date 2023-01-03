@@ -119,30 +119,6 @@ namespace core.Stocks.Services.Analysis
                     $"Percent below recent high: {percentBelowHigh}%"
                 );
 
-            // count gap ups and gap downs
-            var gapResults = GapAnalysis.Generate(
-                prices,
-                MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis);
-
-            var gapUps = gapResults.Count(g => g.type == GapType.Up && g.open);
-            var gapDowns = gapResults.Count(g => g.type == GapType.Down && g.open);
-
-            yield return new AnalysisOutcome(
-                MultipleBarOutcomeKeys.GapUps,
-                OutcomeType.Neutral,
-                gapUps,
-                OutcomeValueType.Number,
-                $"Open gap ups: {gapUps}"
-            );
-
-            yield return new AnalysisOutcome(
-                MultipleBarOutcomeKeys.GapDowns,
-                OutcomeType.Neutral,
-                gapDowns,
-                OutcomeValueType.Number,
-                $"open gap downs: {gapDowns}"
-            );
-
             // statistical analysis bits of percent changes
             var descriptor = NumberAnalysis.PercentChanges(
                 prices
@@ -342,8 +318,6 @@ namespace core.Stocks.Services.Analysis
         public static string PercentAboveLow = "PercentAboveLow";
         public static string SMA20Above50Days = "SMA20Above50Days";
         public static string CurrentPrice = "CurrentPrice";
-        public static string GapUps = "OpenGapUps";
-        public static string GapDowns = "OpenGapDowns";
         public static string PercentChangeAverage = "PercentChangeAverage";
         public static string PercentChangeStandardDeviation = "PercentChangeStandardDeviation";
 
