@@ -17,6 +17,26 @@ namespace core.Stocks.Services.Analysis
                 $"Price: {position.Price.Value:C2}"
             );
 
+            var stopLoss = position.StopPrice ?? 0;
+
+            // add stop loss as outcome
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.StopLoss,
+                OutcomeType.Neutral,
+                stopLoss,
+                OutcomeValueType.Currency,
+                $"Stop loss is {stopLoss:C2}");
+
+            var pctToStop = (position.PercentToStop ?? -1);
+                
+            yield return new AnalysisOutcome(
+                    PortfolioAnalysisKeys.PercentToStopLoss,
+                    pctToStop < 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                    pctToStop,
+                    OutcomeValueType.Percentage,
+                    $"% difference to stop loss {stopLoss} is {pctToStop}"
+                );
+
             // add average cost per share as outcome
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.AverageCost,
@@ -24,15 +44,6 @@ namespace core.Stocks.Services.Analysis
                 Math.Round(position.AverageCostPerShare, 2),
                 OutcomeValueType.Currency,
                 $"Average cost per share is {position.AverageCostPerShare:C2}");
-
-            // add number of shares as outcome
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.NumberOfShares,
-                OutcomeType.Neutral,
-                position.NumberOfShares,
-                OutcomeValueType.Number,
-                $"Number of shares: {position.NumberOfShares}"
-            );
 
             // gain in position
             yield return new AnalysisOutcome(
@@ -66,26 +77,6 @@ namespace core.Stocks.Services.Analysis
                 OutcomeValueType.Currency,
                 $"{position.CombinedProfit}"
             );
-            
-            var stopLoss = position.StopPrice ?? 0;
-
-            // add stop loss as outcome
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.StopLoss,
-                OutcomeType.Neutral,
-                stopLoss,
-                OutcomeValueType.Currency,
-                $"Stop loss is {stopLoss:C2}");
-
-            var pctToStop = (position.PercentToStop ?? -1);
-                
-            yield return new AnalysisOutcome(
-                    PortfolioAnalysisKeys.PercentToStopLoss,
-                    pctToStop < 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                    pctToStop,
-                    OutcomeValueType.Percentage,
-                    $"% difference to stop loss {stopLoss} is {pctToStop}"
-                );
 
             // add risk amount as outcome
             yield return new AnalysisOutcome(
@@ -94,6 +85,15 @@ namespace core.Stocks.Services.Analysis
                 position.RiskedAmount ?? 0,
                 OutcomeValueType.Currency,
                 $"Risk amount is {position.RiskedAmount:C2}");
+            
+            // add number of shares as outcome
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.NumberOfShares,
+                OutcomeType.Neutral,
+                position.NumberOfShares,
+                OutcomeValueType.Number,
+                $"Number of shares: {position.NumberOfShares}"
+            );
 
             // add last transaction age
             yield return new AnalysisOutcome(
@@ -102,6 +102,15 @@ namespace core.Stocks.Services.Analysis
                 position.DaysSinceLastTransaction,
                 OutcomeValueType.Number,
                 $"Last transaction was {position.DaysSinceLastTransaction} days ago"
+            );
+
+            // add positin size as outcome
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.PositionSize,
+                OutcomeType.Neutral,
+                position.Cost,
+                OutcomeValueType.Number,
+                $"Position size is {position.Cost}"
             );
         }
 
@@ -119,6 +128,7 @@ namespace core.Stocks.Services.Analysis
         public static string NumberOfShares = "NumberOfShares";
         public static string RiskAmount = "RiskedAmount";
         public static string DaysSinceLastTransaction = "DaysSinceLastTransaction";
+        public static string PositionSize = "PositionSize";
     }
 }
 #nullable restore
