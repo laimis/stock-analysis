@@ -15,6 +15,7 @@ export class StockListsDashboardComponent implements OnInit {
   newDescription:string
 
   lists:StockList[]
+  filteredLists:StockList[] = []
 
   ngOnInit(): void {
     this.loadLists();
@@ -24,6 +25,7 @@ export class StockListsDashboardComponent implements OnInit {
     this.stockService.getStockLists().subscribe(
       s => {
         this.lists = s;
+        this.filteredLists = s;
       },
       e => {
         console.error(e);
@@ -62,6 +64,13 @@ export class StockListsDashboardComponent implements OnInit {
     }
   }
 
+  filterListByTicker(ticker: string) {
+    console.log("filtering by ticker: " + ticker)
+    var filteredList = this.lists.filter(l => l.tickers.some(t => t.ticker.toLowerCase() === ticker.toLowerCase()))
+    console.log(filteredList)
+    this.filteredLists = filteredList
+  }
+  
   getAnalysisLink(list:StockList) {
     var paramList = list.tickers.map(t => t.ticker).join(',')
     return `/reports/outcomes?tickers=${paramList}`
