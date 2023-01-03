@@ -17,7 +17,7 @@ export class StockDetailsComponent {
   notes: NoteList
   ownership: StockOwnership
   options: OwnedOption[]
-  activeTab: string = 'stocks'
+  activeTab: string = ''
 
 	constructor(
 		private stocks : StocksService,
@@ -65,6 +65,15 @@ export class StockDetailsComponent {
   loadStockOwnership() {
     this.stocks.getStockOwnership(this.ticker).subscribe(result => {
       this.ownership = result
+
+      if (this.ownership != null)
+      {
+        this.activeTab = 'stocks'
+      }
+      else
+      {
+        this.activeTab = 'analysis'
+      }
     })
   }
 
