@@ -67,6 +67,12 @@ namespace core.Alerts
             }
         }
 
+        public void Deregister(string identifier, string ticker, Guid userId)
+        {
+            var key = new StockPositionMonitorKey(identifier, ticker, userId);
+            _monitors.TryRemove(key, out _);
+        }
+
         public void AddToRecent(TriggeredAlert triggeredAlert)
         {
             if (!_recentlyTriggeredAlerts.ContainsKey(triggeredAlert.userId))

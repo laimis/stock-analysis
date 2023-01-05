@@ -118,19 +118,15 @@ namespace web.BackgroundServices
                     _logger.LogInformation($"Found {prices.Success.Length} bars for {ticker} between {start} and {end}");
 
                     var gaps = GapAnalysis.Generate(prices.Success, 2);
-                    if (gaps.Count == 0)
+                    if (gaps.Count == 0 || gaps[0].type != GapType.Up)
                     {
                         _logger.LogInformation($"No gaps found for {ticker}");
+                        _container.Deregister(GapUpMonitor.MonitorIdentifer, ticker, user.Id);
                         continue;
                     }
 
                     var gap = gaps[0];
-                    if (gap.type != GapType.Up)
-                    {
-                        _logger.LogInformation($"Gap down for {ticker}: {gap}");
-                        continue;
-                    }
-
+                    
                     var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
                     _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
                 }

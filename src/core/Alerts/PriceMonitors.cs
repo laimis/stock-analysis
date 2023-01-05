@@ -126,7 +126,8 @@ namespace core.Alerts
 
         Guid IStockPositionMonitor.UserId => UserId;
 
-        string IStockPositionMonitor.MonitorIdentifer => "GapUp";
+        public static string MonitorIdentifer => "GapUp";
+        string IStockPositionMonitor.MonitorIdentifer => MonitorIdentifer;
 
         bool IStockPositionMonitor.RunCheck(decimal price, DateTimeOffset time)
         {

@@ -65,9 +65,11 @@ export class StockListsDashboardComponent implements OnInit {
   }
 
   filterListByTicker(ticker: string) {
-    console.log("filtering by ticker: " + ticker)
-    var filteredList = this.lists.filter(l => l.tickers.some(t => t.ticker.toLowerCase() === ticker.toLowerCase()))
-    console.log(filteredList)
+    var filteredList = this.lists.filter(
+      l => l.tickers.some(
+        t => t.ticker.toLowerCase() === ticker.toLowerCase() || ticker === ''
+      )
+    )
     this.filteredLists = filteredList
   }
   
