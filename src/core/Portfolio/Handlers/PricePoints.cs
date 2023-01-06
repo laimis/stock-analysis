@@ -54,7 +54,9 @@ namespace core.Portfolio
 
                 var stopBasedPricePoints =
                     Enumerable.Range(1, 4)
-                    .Select(n => ProfitLevels.GetPricePointForProfitLevel(position, n).Value)
+                    .Select(n => ProfitLevels.GetPricePointForProfitLevel(position, n))
+                    .Where(p => p.HasValue)
+                    .Select(p => p.Value)
                     .ToArray();
 
                 var percentBasePricePoints =
