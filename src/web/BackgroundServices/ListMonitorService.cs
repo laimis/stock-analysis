@@ -47,28 +47,39 @@ namespace web.BackgroundServices
             }
 
             while (!stoppingToken.IsCancellationRequested)
-            {
-                await MonitorForGaps(stocks, user, stoppingToken);
-                
-                var delay = GetDelayTime();
+            {    
+                try
+                {
+                    await MonitorForGaps(stocks, user, stoppingToken);
 
-                _logger.LogInformation("Next scan in {delay}", delay);
-
-                await Task.Delay(delay, stoppingToken);
+                    await DelayUntilNextScan(stoppingToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex, "Failed to run gap up monitor");
+                }
             }
+        }
+
+        private static readonly TimeSpan _minimumDelay = TimeSpan.FromMinutes(10);
+        private async Task DelayUntilNextScan(CancellationToken stoppingToken)
+        {
+            var delay = GetDelayTime();
+            if (delay < _minimumDelay)
+            {
+                delay = _minimumDelay;
+            }
+
+            _logger.LogInformation("Next scan in {delay}", delay);
+
+            await Task.Delay(delay, stoppingToken);
         }
 
         private TimeSpan GetDelayTime()
         {
-            TimeSpan OpenMarketLogic()
+            TimeSpan ClosedMarketLogic(DateTimeOffset utcReferenceTime)
             {
-                var closeTime = _marketHours.GetMarketEndOfDayTimeInUtc(DateTimeOffset.UtcNow).AddMinutes(-15);
-                return closeTime - DateTimeOffset.UtcNow;
-            }
-
-            TimeSpan ClosedMarketLogic()
-            {
-                var currentTime = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
+                var currentTime = _marketHours.ToMarketTime(utcReferenceTime);
                 var marketCloseTime = _marketHours.GetMarketEndOfDayTimeInUtc(currentTime);
 
                 var openTime = (currentTime > marketCloseTime) switch {
@@ -79,9 +90,17 @@ namespace web.BackgroundServices
                 return openTime - currentTime;
             }
 
-            var delay = _marketHours.IsMarketOpen(DateTimeOffset.UtcNow) switch {
-                true => OpenMarketLogic(),
-                false => ClosedMarketLogic()
+            TimeSpan OpenMarketLogic(DateTimeOffset utcReferenceTime)
+            {
+                var endOfMarket = _marketHours.GetMarketEndOfDayTimeInUtc(utcReferenceTime);
+                var closeTime = endOfMarket.AddMinutes(-15);
+                return closeTime - utcReferenceTime;
+            }
+
+            var nowUtc = DateTimeOffset.UtcNow;
+            var delay = _marketHours.IsMarketOpen(nowUtc) switch {
+                true => OpenMarketLogic(nowUtc),
+                false => ClosedMarketLogic(nowUtc)
             };
 
             return delay;
@@ -91,49 +110,42 @@ namespace web.BackgroundServices
         {
             var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-7));
             var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
-
-            try
+            
+            foreach (var ticker in tickers)
             {
-                foreach (var ticker in tickers)
+                if (ct.IsCancellationRequested)
                 {
-                    if (ct.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    var prices = await _brokerage.GetPriceHistory(
-                        state: user.State,
-                        ticker: ticker,
-                        frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
-                        start: start,
-                        end: end
-                    );
-
-                    if (!prices.IsOk)
-                    {
-                        _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
-                        continue;
-                    }
-
-                    _logger.LogInformation($"Found {prices.Success.Length} bars for {ticker} between {start} and {end}");
-
-                    var gaps = GapAnalysis.Generate(prices.Success, 2);
-                    if (gaps.Count == 0 || gaps[0].type != GapType.Up)
-                    {
-                        _logger.LogInformation($"No gaps found for {ticker}");
-                        _container.Deregister(GapUpMonitor.MonitorIdentifer, ticker, user.Id);
-                        continue;
-                    }
-
-                    var gap = gaps[0];
-                    
-                    var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
-                    _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical(ex, "Failed to run gap up monitor");
+
+                var prices = await _brokerage.GetPriceHistory(
+                    state: user.State,
+                    ticker: ticker,
+                    frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
+                    start: start,
+                    end: end
+                );
+
+                if (!prices.IsOk)
+                {
+                    _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
+                    continue;
+                }
+
+                _logger.LogInformation($"Found {prices.Success.Length} bars for {ticker} between {start} and {end}");
+
+                var gaps = GapAnalysis.Generate(prices.Success, 2);
+                if (gaps.Count == 0 || gaps[0].type != GapType.Up)
+                {
+                    _logger.LogInformation($"No gaps found for {ticker}");
+                    _container.Deregister(GapUpMonitor.MonitorIdentifer, ticker, user.Id);
+                    continue;
+                }
+
+                var gap = gaps[0];
+                
+                var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
+                _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
             }
         }
 
