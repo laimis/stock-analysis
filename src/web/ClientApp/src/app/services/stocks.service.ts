@@ -831,7 +831,6 @@ export interface PositionInstance {
   profit: number,
   riskedAmount: number,
   rr: number,
-  rrLevels: number[],
   rrWeighted: number,
   stopPrice: number,
   ticker: string,
