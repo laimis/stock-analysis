@@ -27,18 +27,19 @@ namespace storage.postgres
 
         protected IDbConnection GetConnection()
         {
-            return new NpgsqlConnection(_cnn);
+            var cnn = new NpgsqlConnection(_cnn);
+            cnn.Open();
+            return cnn; 
         }
 
         public async Task DeleteAggregates(string entity, Guid userId)
         {
             using (var db = GetConnection())
             {
-                db.Open();
-
-                var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId";
-
-                await db.ExecuteAsync(query, new { userId, entity });
+                await db.ExecuteAsync(
+                    @"DELETE FROM events WHERE entity = :entity AND userId = :userId",
+                    new { userId, entity }
+                );
             }
         }
 
@@ -46,13 +47,12 @@ namespace storage.postgres
         {
             using (var db = GetConnection())
             {
-                db.Open();
-
                 // TODO: no aggregate id in the column, huh?
                 // might want to do a migration and add one...
-                var query = @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND eventjson LIKE :aggregateId";
-
-                await db.ExecuteAsync(query, new { userId, entity, aggregateId = $"%{aggregateId}%" });
+                await db.ExecuteAsync(
+                    @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND eventjson LIKE :aggregateId",
+                    new { userId, entity, aggregateId = $"%{aggregateId}%" }
+                );
             }
         }
 
@@ -60,11 +60,10 @@ namespace storage.postgres
         {
             using (var db = GetConnection())
             {
-                db.Open();
-
-                var query = @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY version";
-
-                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, userId });
+                var list = await db.QueryAsync<StoredAggregateEvent>(
+                    @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY version",
+                    new { entity, userId }
+                );
 
                 return list.Select(e => e.Event);
             }
@@ -74,8 +73,6 @@ namespace storage.postgres
         {
             using (var db = GetConnection())
             {
-                db.Open();
-
                 int version = agg.Version;
 
                 var eventsToBlast = new List<AggregateEvent>();
@@ -115,11 +112,7 @@ namespace storage.postgres
         {
             using (var db = GetConnection())
             {
-                db.Open();
-
-                var query = @"select 1";
-
-                await db.QueryAsync<int>(query);
+                await db.QueryAsync<int>(@"select 1");
             }
         }
 
@@ -127,11 +120,10 @@ namespace storage.postgres
         {
             using (var db = GetConnection())
             {
-                db.Open();
-
-                var query = @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version";
-
-                var list = await db.QueryAsync<StoredAggregateEvent>(query, new { entity, userId });
+                var list = await db.QueryAsync<StoredAggregateEvent>(
+                    @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version",
+                    new { entity, userId }
+                );
 
                 return list;
             }
@@ -141,9 +133,10 @@ namespace storage.postgres
         {
             using var db = GetConnection();
 
-            var query = @"select blob FROM blobs WHERE key = :key";
-
-            var blob = await db.QuerySingleOrDefaultAsync<string>(query, new { key });
+            var blob = await db.QuerySingleOrDefaultAsync<string>(
+                @"select blob FROM blobs WHERE key = :key",
+                new { key }
+            );
 
             if (string.IsNullOrEmpty(blob))
                 return default;
@@ -157,9 +150,10 @@ namespace storage.postgres
 
             using var db = GetConnection();
 
-            var query = @"INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp)";
-
-            return db.ExecuteAsync(query, new { key, blob });
+            return db.ExecuteAsync(
+                @"INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp)",
+                new { key, blob }
+            );
         }
     }
 }

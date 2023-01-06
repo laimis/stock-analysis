@@ -31,11 +31,14 @@ namespace storage.postgres
         {
             emailAddress = emailAddress.ToLowerInvariant();
 
-            using var db = GetConnection();
-            db.Open();
-            var query = @"SELECT id FROM users WHERE email = :emailAddress";
+            string identifier = null;
+            using(var db = GetConnection())
+            {
+                var query = @"SELECT id FROM users WHERE email = :emailAddress";
 
-            var identifier = await db.QuerySingleOrDefaultAsync<string>(query, new {emailAddress});
+                identifier = await db.QuerySingleOrDefaultAsync<string>(query, new {emailAddress});
+            }
+
             if (identifier == null)
             {
                 return null;
@@ -46,22 +49,23 @@ namespace storage.postgres
 
         public async Task Save(User u)
         {
-            using var db = GetConnection();
-            db.Open();
-            var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
+            using(var db = GetConnection())
+            {
+                var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
 
-            await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
+                await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
+            }
 
             await SaveEventsAsync(u, _user_entity, u.State.Id);
         }
 
         public async Task Delete(User user)
         {
-            using var db = GetConnection();
-            db.Open();
-            var query = @"DELETE FROM users WHERE id = :id";
-
-            await db.ExecuteAsync(query, new {id = user.Id.ToString()});
+            using(var db = GetConnection())
+            {
+                var query = @"DELETE FROM users WHERE id = :id";
+                await db.ExecuteAsync(query, new {id = user.Id.ToString()});
+            }
 
             await DeleteAggregates(_user_entity, user.Id);
         }
@@ -69,7 +73,7 @@ namespace storage.postgres
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)
         {
             using var db = GetConnection();
-            db.Open();
+            
             var query = @"INSERT INTO processidtouserassociations (id, userId, timestamp) VALUES (:id, :userId, :timestamp)";
 
             await db.ExecuteAsync(query, new {r.Id, userId = r.UserId, timestamp = r.Timestamp});
@@ -78,7 +82,7 @@ namespace storage.postgres
         public async Task<ProcessIdToUserAssociation> GetUserAssociation(Guid id)
         {
             using var db = GetConnection();
-            db.Open();
+            
             var query = @"SELECT * FROM processidtouserassociations WHERE id = :id";
 
             return await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
@@ -88,10 +92,9 @@ namespace storage.postgres
         {
             using var db = GetConnection();
             
-            db.Open();
-            var query = @"SELECT email,id FROM users";
-
-            return await db.QueryAsync<(string, string)>(query);
+            return await db.QueryAsync<(string, string)>(
+                @"SELECT email,id FROM users"
+            );
         }
 
         public Task<T> ViewModel<T>(Guid userId) =>
