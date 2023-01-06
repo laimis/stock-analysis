@@ -97,13 +97,13 @@ namespace web.Controllers
                 )
             );
 
-        [HttpGet("pricepoints/{ticker}/positions/{positionId}")]
-        public Task<ProfitLevels.StrategyPricePoint[]> PricePoints(
+        [HttpGet("profitpoints/{ticker}/positions/{positionId}")]
+        public Task<ProfitLevels.ProfitPoints[]> ProfitPoints(
             int positionId,
             string ticker) =>
             
             _mediator.Send(
-                new PricePoints.Query(
+                new ProfitPoints.Query(
                     positionId, ticker, User.Identifier()
                 )
             );

@@ -5,6 +5,7 @@ namespace core.Stocks.Services.Trading
 {
     internal class TradingStrategyRRLevels
     {
+        // TODO: this needs to come from the environment or user settings
         public const decimal AVG_PERCENT_GAIN = 0.07m;
 
         private static Func<int, PositionInstance, decimal> _alwaysPositionStop = (_, position) => position.StopPrice.Value;
@@ -28,8 +29,8 @@ namespace core.Stocks.Services.Trading
                 positionInstance,
                 success,
                 3,
-                level => ProfitLevels.GetPricePointForProfitLevel(positionInstance, level).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetPricePointForProfitLevel(position, l).Value),
+                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdRRDelayedStop(
@@ -41,8 +42,8 @@ namespace core.Stocks.Services.Trading
                 positionInstance,
                 success,
                 3,
-                level => ProfitLevels.GetPricePointForProfitLevel(positionInstance, level).Value,
-                (level, position) => _delayedAdvancingStop(level, position, ( l ) => ProfitLevels.GetPricePointForProfitLevel(position, l).Value),
+                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
+                (level, position) => _delayedAdvancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthRR(
@@ -54,8 +55,8 @@ namespace core.Stocks.Services.Trading
                 positionInstance,
                 success,
                 4,
-                level => ProfitLevels.GetPricePointForProfitLevel(positionInstance, level).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetPricePointForProfitLevel(position, l).Value),
+                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdPercentBased(
@@ -67,8 +68,8 @@ namespace core.Stocks.Services.Trading
                 positionInstance,
                 success,
                 3,
-                level => ProfitLevels.GetPricePointForPercentLevels(positionInstance, level, AVG_PERCENT_GAIN).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetPricePointForPercentLevels(position, l, AVG_PERCENT_GAIN).Value),
+                level => ProfitLevels.GetProfitPointForPercentGain(positionInstance, level, AVG_PERCENT_GAIN).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPointForPercentGain(position, l, AVG_PERCENT_GAIN).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthPercentBased(
@@ -80,8 +81,8 @@ namespace core.Stocks.Services.Trading
                 positionInstance,
                 success,
                 4,
-                level => ProfitLevels.GetPricePointForPercentLevels(positionInstance, level, AVG_PERCENT_GAIN).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetPricePointForPercentLevels(position, l, AVG_PERCENT_GAIN).Value),
+                level => ProfitLevels.GetProfitPointForPercentGain(positionInstance, level, AVG_PERCENT_GAIN).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPointForPercentGain(position, l, AVG_PERCENT_GAIN).Value),
                 closeIfOpenAtTheEnd);
 
         private static TradingStrategyResult Run(

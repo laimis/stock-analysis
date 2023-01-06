@@ -70,9 +70,9 @@ export class StocksService {
     )
   }
 
-  getStrategyPricePoints(ticker: string, positionId: number): Observable<StrategyPricePoint[]> {
-    return this.http.get<StrategyPricePoint[]>(
-      `/api/portfolio/pricepoints/${ticker}/positions/${positionId}`
+  getStrategyProfitPoints(ticker: string, positionId: number): Observable<StrategyProfitPoint[]> {
+    return this.http.get<StrategyProfitPoint[]>(
+      `/api/portfolio/profitpoints/${ticker}/positions/${positionId}`
     )
   }
 
@@ -856,7 +856,7 @@ export interface TradingStrategyResult {
   strategyName: string
 }
 
-export interface StrategyPricePoint {
+export interface StrategyProfitPoint {
   name: string
   prices: number[]
 }

@@ -4,13 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
+using core.Stocks;
 using core.Stocks.Services.Trading;
 
 namespace core.Portfolio
 {
-    public class PricePoints
+    public class ProfitPoints
     {
-        public class Query : RequestWithUserId<Stocks.Services.Trading.ProfitLevels.StrategyPricePoint[]>
+        public class Query : RequestWithUserId<Stocks.Services.Trading.ProfitLevels.ProfitPoints[]>
         {
             public Query(int positionId, string ticker, Guid userId)
             {
@@ -23,7 +24,7 @@ namespace core.Portfolio
             public string Ticker { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, Stocks.Services.Trading.ProfitLevels.StrategyPricePoint[]>
+        public class Handler : HandlerWithStorage<Query, Stocks.Services.Trading.ProfitLevels.ProfitPoints[]>
         {
             private IAccountStorage _accounts;
 
@@ -32,7 +33,7 @@ namespace core.Portfolio
                 _accounts = accounts;
             }
 
-            public override async Task<Stocks.Services.Trading.ProfitLevels.StrategyPricePoint[]> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<Stocks.Services.Trading.ProfitLevels.ProfitPoints[]> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
@@ -52,21 +53,16 @@ namespace core.Portfolio
                     throw new Exception("Position not found");
                 }
 
-                var stopBasedPricePoints =
-                    Enumerable.Range(1, 4)
-                    .Select(n => ProfitLevels.GetPricePointForProfitLevel(position, n))
-                    .Where(p => p.HasValue)
-                    .Select(p => p.Value)
-                    .ToArray();
+                var stopBasedProfitPoints = ProfitLevels.GetProfitPoints(ProfitLevels.GetProfitPoint, position, 4);
 
-                var percentBasePricePoints =
-                    Enumerable.Range(1, 4)
-                    .Select(n => ProfitLevels.GetPricePointForPercentLevels(position, n, percentGain: TradingStrategyRRLevels.AVG_PERCENT_GAIN).Value)
-                    .ToArray();
+                Func<PositionInstance, int, decimal?> getPercentGain = (p, i) => 
+                    ProfitLevels.GetProfitPointForPercentGain(p, i, TradingStrategyRRLevels.AVG_PERCENT_GAIN);
+                
+                var percentBaseProfitPoints = ProfitLevels.GetProfitPoints(getPercentGain, position, 4);
 
                 return new [] {
-                    new ProfitLevels.StrategyPricePoint("Stop based", prices: stopBasedPricePoints),
-                    new ProfitLevels.StrategyPricePoint($"{TradingStrategyRRLevels.AVG_PERCENT_GAIN}% intervals", prices: percentBasePricePoints)
+                    new ProfitLevels.ProfitPoints("Stop based", prices: stopBasedProfitPoints),
+                    new ProfitLevels.ProfitPoints($"{TradingStrategyRRLevels.AVG_PERCENT_GAIN}% intervals", prices: percentBaseProfitPoints)
                 };
             }
         }

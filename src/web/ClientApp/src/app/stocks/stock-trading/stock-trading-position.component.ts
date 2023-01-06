@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, PositionInstance, StocksService, StrategyPricePoint } from '../../services/stocks.service';
+import { BrokerageOrder, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -11,13 +11,13 @@ export class StockTradingPositionComponent {
     candidateStopPrice: number = 0
     _position: PositionInstance;
 
-    strategyPricePoints : StrategyPricePoint[] = []
+    positionProfitPoints : StrategyProfitPoint[] = []
 
     @Input()
     set position(v:PositionInstance) {
         this._position = v
         this.setCandidateValues()
-        this.fetchPricePoints()
+        this.fetchProfitPoints()
     }
 
     @Input()
@@ -28,10 +28,10 @@ export class StockTradingPositionComponent {
         private stockService:StocksService
     ) {}
 
-    fetchPricePoints() {
-        this.stockService.getStrategyPricePoints(this._position.ticker, this._position.positionId).subscribe(
-            (pricePoints) => {
-                this.strategyPricePoints = pricePoints
+    fetchProfitPoints() {
+        this.stockService.getStrategyProfitPoints(this._position.ticker, this._position.positionId).subscribe(
+            (profitPoints) => {
+                this.positionProfitPoints = profitPoints
             }
         )
     }
