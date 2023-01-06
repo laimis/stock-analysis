@@ -56,8 +56,6 @@ namespace core.Stocks
         public int PositionId { get; }
         public string Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
-        public decimal? FirstBuyCost { get; private set; }
-        public decimal? FirstBuyNumberOfShares { get; private set; }
         public decimal? FirstStop { get; private set; }
         public decimal? RiskedAmount { get; private set; }
         public decimal? CostAtRiskedBasedOnStopPrice => StopPrice switch {
@@ -78,19 +76,10 @@ namespace core.Stocks
 
         private List<decimal> _slots = new List<decimal>();
 
-        public List<decimal> RRLevels { get; private set; } = new List<decimal>();
-        public decimal? GetRRLevel(int index) => index < RRLevels.Count ? RRLevels[index] : null;
-        public decimal? GetRRLevelPercentBased(int index, decimal percentGain)
-        {
-            var singleLevel = this.AverageCostPerShare * percentGain;
-
-            return index switch {
-                0 => this.AverageCostPerShare + singleLevel,
-                1 => this.AverageCostPerShare + singleLevel * 2,
-                2 => this.AverageCostPerShare + singleLevel * 3,
-                _ => this.AverageCostPerShare + singleLevel * 4,
-            };
-        }
+        private bool PositionCompleted = false;
+        private decimal CompletedPositionCost = 0;
+        public decimal CompletedPositionShares = 0;
+        public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
@@ -102,10 +91,10 @@ namespace core.Stocks
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
             Events.Add(new PositionEvent($"buy {numberOfShares} @ ${price}", PositionEventType.buy, price, when));
 
-            if (FirstBuyCost == null)
+            if (PositionCompleted == false)
             {
-                FirstBuyCost = price;
-                FirstBuyNumberOfShares = numberOfShares;
+                CompletedPositionCost += price * numberOfShares;
+                CompletedPositionShares += numberOfShares;
             }
 
             if (notes != null)
@@ -138,13 +127,15 @@ namespace core.Stocks
                 throw new InvalidOperationException("Transaction would make amount owned invalid");
             }
 
+            PositionCompleted = true;
+
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
             Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price}", PositionEventType.sell, price, when));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
             {
-                SetStopPrice(FirstBuyCost.Value * 0.95m, when);
+                SetStopPrice(CompletedPositionCostPerShare * 0.95m, when);
             }            
 
             if (notes != null)
@@ -175,7 +166,11 @@ namespace core.Stocks
                     FirstStop = stopPrice;
                 }
 
-                Events.Add(new PositionEvent($"Stop price set to {stopPrice}", PositionEventType.stop, stopPrice, when));
+                PositionCompleted = true;
+
+                var stopPercentage = Math.Round((AverageCostPerShare - stopPrice.Value) / AverageCostPerShare * 100, 2);
+
+                Events.Add(new PositionEvent($"Stop price set to {stopPrice} ({stopPercentage}%)", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -188,8 +183,7 @@ namespace core.Stocks
         {
             StopPrice = null;
             RiskedAmount = null;
-            RRLevels.Clear();
-
+            
             Events.Add(new PositionEvent("Stop price deleted", PositionEventType.stop, null, when));
         }
 
@@ -198,20 +192,6 @@ namespace core.Stocks
             RiskedAmount = riskAmount;
 
             Events.Add(new PositionEvent("Set risk amount", PositionEventType.risk, riskAmount, when));
-
-            // setting risk, should calculate the RR levels for selling to accomodate this risk
-            if (NumberOfShares == 0)
-            {
-                return;
-            }
-
-            var riskPerShare = riskAmount / NumberOfShares;
-
-            this.RRLevels.Clear();
-            this.RRLevels.AddRange(
-                new [] {1m,2m,3m,4m}
-                .Select(x => AverageBuyCostPerShare + x * riskPerShare)
-            );
         }
 
         public void SetPrice(decimal price)

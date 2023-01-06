@@ -124,8 +124,8 @@ namespace core.Portfolio
                 
                 return await runner.RunAsync(
                     user.State,
-                    numberOfShares: position.FirstBuyNumberOfShares.Value,
-                    price: position.FirstBuyCost.Value,
+                    numberOfShares: position.CompletedPositionShares,
+                    price: position.CompletedPositionCostPerShare,
                     position.FirstStop.Value,
                     request.Ticker,
                     position.Opened.Value

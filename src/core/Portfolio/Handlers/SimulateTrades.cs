@@ -68,8 +68,8 @@ namespace core.Portfolio
                 {
                     var simulatedResults = await runner.RunAsync(
                         user.State,
-                        numberOfShares: position.FirstBuyNumberOfShares.Value,
-                        price: position.FirstBuyCost.Value,
+                        numberOfShares: position.CompletedPositionShares,
+                        price: position.CompletedPositionCostPerShare,
                         stopPrice: position.FirstStop.Value,
                         ticker: position.Ticker,
                         when: position.Opened.Value,

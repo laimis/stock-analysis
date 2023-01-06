@@ -25,7 +25,7 @@ namespace core
         {
             var rows = trades.Select(t =>
                 new TradesRecord(t.Ticker, t.Opened?.ToString(DATE_FORMAT), t.Closed?.ToString(DATE_FORMAT), t.DaysHeld,
-                t.FirstBuyCost.Value, t.Cost,
+                t.CompletedPositionCostPerShare, t.Cost,
                 t.Profit, t.IsClosed ? t.GainPct : t.UnrealizedGainPct.Value,t.RR, t.RiskedAmount)
             );
 

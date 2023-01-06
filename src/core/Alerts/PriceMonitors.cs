@@ -1,5 +1,6 @@
 using System;
 using core.Stocks;
+using core.Stocks.Services.Trading;
 
 namespace core.Alerts
 {
@@ -155,7 +156,7 @@ namespace core.Alerts
     public class ProfitPriceMonitor : PriceMonitor
     {
         public ProfitPriceMonitor(decimal minPrice, decimal maxPrice, int profitLevel, decimal numberOfShares, string ticker, Guid userId)
-            : base(minPrice, numberOfShares, ticker, userId, $"RR{profitLevel + 1} Profit Target")
+            : base(minPrice, numberOfShares, ticker, userId, $"RR{profitLevel} Profit Target")
         {
             MaxPrice = maxPrice;
         }
@@ -167,14 +168,17 @@ namespace core.Alerts
                 return null;
             }
 
-            if (state.OpenPosition.RRLevels.Count == 0)
+            if (state.OpenPosition.RiskedAmount == 0)
             {
                 return null;
             }
 
+            var minPriceLevel = ProfitLevels.GetPricePointForProfitLevel(state.OpenPosition, profitLevel);
+            var maxPriceLevel = ProfitLevels.GetPricePointForProfitLevel(state.OpenPosition, profitLevel + 1);
+
             return new ProfitPriceMonitor(
-                minPrice: state.OpenPosition.RRLevels[profitLevel],
-                maxPrice: state.OpenPosition.RRLevels[profitLevel + 1],
+                minPrice: minPriceLevel.Value,
+                maxPrice: maxPriceLevel.Value,
                 profitLevel: profitLevel,
                 numberOfShares: state.OpenPosition.NumberOfShares,
                 state.Ticker,

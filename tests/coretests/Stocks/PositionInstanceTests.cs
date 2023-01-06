@@ -20,15 +20,27 @@ namespace coretests.Stocks
 
         [Fact]
         public void RR_Accurate() =>
-            Assert.Equal(1.5m, _position.RR, 2);
+            Assert.Equal(3.69m, _position.RR, 2);
 
         [Fact]
         public void GainPct_Accurate() =>
             Assert.Equal(0.185m, _position.GainPct, 2);
 
         [Fact]
+        public void FirstBuyCost_Accurate() =>
+            Assert.Equal(32.5m, _position.CompletedPositionCostPerShare);
+
+        [Fact]
+        public void FirstBuyNumberOfShares_Accurate() =>
+            Assert.Equal(20, _position.CompletedPositionShares);
+
+        [Fact]
+        public void FirstStop_Accurate() =>
+            Assert.Equal(30.875m, _position.FirstStop);
+
+        [Fact]
         public void RiskedAmount_Accurate() =>
-            Assert.Equal(80, _position.RiskedAmount);
+            Assert.Equal(32.5m, _position.RiskedAmount);
 
         [Fact]
         public void AverageCost_Accurate() =>
@@ -40,7 +52,7 @@ namespace coretests.Stocks
 
         [Fact]
         public void StopPriceGetsSetAfterSell() =>
-            Assert.Equal(28.5m, _position.StopPrice);
+            Assert.Equal(30.875m, _position.StopPrice);
 
         [Fact]
         public void PercentToStop_WithoutPrice_FullLoss() =>
@@ -79,7 +91,7 @@ namespace coretests.Stocks
             Assert.Equal(100, position.UnrealizedProfit);
             Assert.Equal(0.2m, position.UnrealizedGainPct.Value, 2);
             Assert.Equal(0.2m, position.GainPct, 2);
-            Assert.Equal(1.25m, position.UnrealizedRR);
+            Assert.Equal(3.08m, position.UnrealizedRR.Value, 2);
             Assert.Equal(-0.43m, position.PercentToStop.Value, 2);
         }
 
@@ -96,6 +108,17 @@ namespace coretests.Stocks
         }
 
         [Fact]
+        public void SetStop_SetsFirstStop()
+        {
+            var position = new PositionInstance(0, "TSLA");
+
+            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
+            position.SetStopPrice(28, DateTimeOffset.UtcNow);
+            position.SetStopPrice(29, DateTimeOffset.UtcNow);
+            Assert.Equal(28, position.FirstStop);
+        }
+
+        [Fact]
         public void Profit() => Assert.Equal(120, _position.Profit);
 
         [Fact]
@@ -103,22 +126,5 @@ namespace coretests.Stocks
 
         [Fact]
         public void Ticker() => Assert.Equal("TSLA", _position.Ticker);
-
-        [Fact]
-        public void RRLevels()
-        {
-            var position = new PositionInstance(0, "TSLA");
-
-            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
-            position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
-
-            position.SetRiskAmount(100m, DateTimeOffset.UtcNow);
-
-            Assert.Equal(4, position.RRLevels.Count);
-            Assert.Equal(37.5m, position.RRLevels[0]);
-            Assert.Equal(42.5m, position.RRLevels[1]);
-            Assert.Equal(47.5m, position.RRLevels[2]);
-            Assert.Equal(52.5m, position.RRLevels[3]);
-        }
     }
 }
