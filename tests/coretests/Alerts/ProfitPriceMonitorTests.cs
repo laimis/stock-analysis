@@ -39,7 +39,7 @@ namespace coretests.Alerts
             Assert.Null(m.TriggeredAlert);
         }
 
-        private static ProfitPriceMonitor CreateMonitorUnderTest(int level = 0)
+        private static ProfitPriceMonitor CreateMonitorUnderTest(int level = 1)
         {
             var a = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
 
@@ -51,7 +51,7 @@ namespace coretests.Alerts
         [Fact]
         public void Level2()
         {
-            var m = CreateMonitorUnderTest(1);
+            var m = CreateMonitorUnderTest(2);
 
             var triggered = m.RunCheck(11m, DateTimeOffset.UtcNow);
             Assert.False(triggered);

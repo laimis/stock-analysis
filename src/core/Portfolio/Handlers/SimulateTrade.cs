@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
-using core.Stocks;
 using core.Stocks.Services.Trading;
 using MediatR;
 
@@ -15,16 +14,14 @@ namespace core.Portfolio
     {
         public class Command : RequestWithUserId<TradingStrategyResults>
         {
-            public Command(int positionId, string strategyName, string ticker, Guid userId)
+            public Command(int positionId, string ticker, Guid userId)
             {
                 PositionId = positionId;
-                StrategyName = strategyName;
                 Ticker = ticker;
                 UserId = userId;
             }
 
             public int PositionId { get; }
-            public string StrategyName { get; }
             public string Ticker { get; }
         }
 
@@ -35,7 +32,6 @@ namespace core.Portfolio
                 decimal numberOfShares,
                 decimal price,
                 decimal stopPrice,
-                string strategyName,
                 string ticker,
                 Guid userId)
             {
@@ -43,7 +39,6 @@ namespace core.Portfolio
                 NumberOfShares = numberOfShares;
                 Price = price;
                 StopPrice = stopPrice;
-                StrategyName = strategyName;
                 Ticker = ticker;
                 UserId = userId;
             }
@@ -52,7 +47,6 @@ namespace core.Portfolio
             public decimal NumberOfShares { get; }
             public decimal Price { get; }
             public decimal StopPrice { get; }
-            public string StrategyName { get; }
             public string Ticker { get; }
         }
 
@@ -124,8 +118,8 @@ namespace core.Portfolio
                 
                 return await runner.RunAsync(
                     user.State,
-                    numberOfShares: position.FirstBuyNumberOfShares.Value,
-                    price: position.FirstBuyCost.Value,
+                    numberOfShares: position.CompletedPositionShares,
+                    price: position.CompletedPositionCostPerShare,
                     position.FirstStop.Value,
                     request.Ticker,
                     position.Opened.Value

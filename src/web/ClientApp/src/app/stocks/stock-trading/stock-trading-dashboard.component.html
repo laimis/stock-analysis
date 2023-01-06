@@ -62,7 +62,7 @@
     </a>
   </div>
   
-  <stock-trading-positions    *ngIf="isActive('positions')" [positions]=positions></stock-trading-positions>
+  <app-stock-trading-positions    *ngIf="isActive('positions')" [positions]=positions></app-stock-trading-positions>
   <app-stock-trading-closed-positions     *ngIf="isActive('past')" [positions]=closed></app-stock-trading-closed-positions>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>

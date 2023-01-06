@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using core.Account;
@@ -21,7 +22,7 @@ public class TDAmeritradeClient : IBrokerage
     private string _clientId;
 
     // in memory dictionary of access tokens (they expire every 30 mins)
-    private Dictionary<Guid, OAuthResponse> _accessTokens = new Dictionary<Guid, OAuthResponse>();
+    private ConcurrentDictionary<Guid, OAuthResponse> _accessTokens = new ConcurrentDictionary<Guid, OAuthResponse>();
 
     private const string _apiUrl = "https://api.tdameritrade.com/v1";
     private const string _authUrl = "https://auth.tdameritrade.com";

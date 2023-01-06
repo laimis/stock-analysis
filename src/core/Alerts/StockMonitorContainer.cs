@@ -29,14 +29,11 @@ namespace core.Alerts
             var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock.State);
             AddIfNotNull(stopMonitor);
 
-            var profitMonitorR1 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 0);
-            AddIfNotNull(profitMonitorR1);
-
-            var profitMonitorR2 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 1);
-            AddIfNotNull(profitMonitorR2);
-
-            var profitMonitorR3 = ProfitPriceMonitor.CreateIfApplicable(stock.State, 2);
-            AddIfNotNull(profitMonitorR3);
+            foreach(var level in Enumerable.Range(1, 3))
+            {
+                var profitMonitor = ProfitPriceMonitor.CreateIfApplicable(stock.State, level);
+                AddIfNotNull(profitMonitor);
+            }
         }
 
         public void Register(IStockPositionMonitor monitor)

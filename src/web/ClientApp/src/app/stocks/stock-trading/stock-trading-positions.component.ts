@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { PositionInstance, StocksService, toggleVisuallyHidden } from '../../services/stocks.service';
 
 @Component({
-  selector: 'stock-trading-positions',
+  selector: 'app-stock-trading-positions',
   templateUrl: './stock-trading-positions.component.html',
   styleUrls: ['./stock-trading-positions.component.css']
 })
@@ -16,7 +16,7 @@ export class StockTradingPositionsComponent {
 
     @Input()
     set positions(input: PositionInstance[]) {
-        this._positions = input
+        this._positions = input.filter(p => p.isShortTerm)
         this.updatePositions()
     }
 

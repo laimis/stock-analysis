@@ -60,13 +60,19 @@ export class StocksService {
 
   simulatePosition(ticker: string, positionId: number): Observable<TradingStrategyResults> {
     return this.http.get<TradingStrategyResults>(
-      `/api/portfolio/${ticker}/positions/${positionId}/simulate/default`
+      `/api/portfolio/simulate/trades/${ticker}/positions/${positionId}`
     )
   }
 
   simulatePositions(closePositionIfOpenAtTheEnd:boolean, numberOfTrades: number): Observable<TradingStrategyPerformance[]> {
     return this.http.get<TradingStrategyPerformance[]>(
       `/api/portfolio/simulate/trades?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
+    )
+  }
+
+  getStrategyProfitPoints(ticker: string, positionId: number): Observable<StrategyProfitPoint[]> {
+    return this.http.get<StrategyProfitPoint[]>(
+      `/api/portfolio/profitpoints/${ticker}/positions/${positionId}`
     )
   }
 
@@ -831,7 +837,6 @@ export interface PositionInstance {
   profit: number,
   riskedAmount: number,
   rr: number,
-  rrLevels: number[],
   rrWeighted: number,
   stopPrice: number,
   ticker: string,
@@ -849,6 +854,11 @@ export interface TradingStrategyResult {
   maxGainPct: number
   position: PositionInstance
   strategyName: string
+}
+
+export interface StrategyProfitPoint {
+  name: string
+  prices: number[]
 }
 
 export interface TradingStrategyResults {
