@@ -45,6 +45,14 @@
 
       <div class="row mt-3" *ngIf="!_position.isClosed">
         <div class="col">
+          <div class="row" *ngFor="let spp of strategyPricePoints">
+            <div class="col-3">{{spp.name}}</div><div class="col" *ngFor="let p of spp.prices">{{p | currency}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-3" *ngIf="!_position.isClosed">
+        <div class="col">
           <label class="form-label" for="candidateRiskAmount">Risk Amount</label>
           <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
         </div>

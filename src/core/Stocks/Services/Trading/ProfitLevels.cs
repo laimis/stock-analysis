@@ -19,6 +19,8 @@ namespace core.Stocks.Services.Trading
             var singleLevel = instance.CompletedPositionCostPerShare * percentGain;
 
             return instance.CompletedPositionCostPerShare + singleLevel * level;
-        }        
+        }
+
+        public record struct StrategyPricePoint(string name, decimal[] prices);
     }
 }

@@ -73,18 +73,6 @@ namespace web.Controllers
                 new TransactionSummary.Generate(period, User.Identifier())
             );
 
-        [HttpGet("{ticker}/positions/{positionId}/simulate/{stategyName}")]
-        public Task<TradingStrategyResults> Trade(
-            int positionId,
-            string strategyName,
-            string ticker) =>
-            
-            _mediator.Send(
-                new SimulateTrade.Command(
-                    positionId, strategyName, ticker, User.Identifier()
-                )
-            );
-
         [HttpGet("simulate/trades")]
         public Task<List<TradingStrategyPerformance>> Trade(
             [FromQuery]bool closePositionIfOpenAtTheEnd,
@@ -98,14 +86,35 @@ namespace web.Controllers
                 )
             );
 
-        [HttpGet("{ticker}/trading/{stategyName}")]
+        [HttpGet("simulate/trades/{ticker}/positions/{positionId}")]
         public Task<TradingStrategyResults> Trade(
-            string strategyName,
+            int positionId,
+            string ticker) =>
+            
+            _mediator.Send(
+                new SimulateTrade.Command(
+                    positionId, ticker, User.Identifier()
+                )
+            );
+
+        [HttpGet("pricepoints/{ticker}/positions/{positionId}")]
+        public Task<ProfitLevels.StrategyPricePoint[]> PricePoints(
+            int positionId,
+            string ticker) =>
+            
+            _mediator.Send(
+                new PricePoints.Query(
+                    positionId, ticker, User.Identifier()
+                )
+            );
+
+        [HttpGet("simulate/trades/{ticker}")]
+        public Task<TradingStrategyResults> Trade(
             string ticker,
-            decimal numberOfShares,
-            decimal price,
-            decimal stopPrice,
-            string when) =>
+            [FromQuery]decimal numberOfShares,
+            [FromQuery]decimal price,
+            [FromQuery]decimal stopPrice,
+            [FromQuery]string when) =>
             
             _mediator.Send(
                 new SimulateTrade.ForTicker(
@@ -113,7 +122,6 @@ namespace web.Controllers
                     numberOfShares,
                     price,
                     stopPrice,
-                    strategyName,
                     ticker,
                     User.Identifier()
                 )

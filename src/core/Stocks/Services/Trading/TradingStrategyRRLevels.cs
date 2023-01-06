@@ -5,7 +5,7 @@ namespace core.Stocks.Services.Trading
 {
     internal class TradingStrategyRRLevels
     {
-        private const decimal AVG_PERCENT_GAIN = 0.07m;
+        public const decimal AVG_PERCENT_GAIN = 0.07m;
 
         private static Func<int, PositionInstance, decimal> _alwaysPositionStop = (_, position) => position.StopPrice.Value;
         private static Func<int, PositionInstance, Func<int, decimal>, decimal> _advancingStop = (level, position, rrLevelFunc) => level switch {
