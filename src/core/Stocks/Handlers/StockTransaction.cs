@@ -18,5 +18,6 @@ namespace core.Stocks
         public decimal? StopPrice { get; set; }
 
         public string Notes { get; set; }
+        public string BrokerageOrderId { get; set; }
     }
 }

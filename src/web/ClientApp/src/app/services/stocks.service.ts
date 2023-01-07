@@ -942,6 +942,7 @@ export class stocktransactioncommand {
   date: string
   notes: string
   stopPrice: number | null
+  brokerageOrderId: string | null
 }
 
 export class brokerageordercommand {
