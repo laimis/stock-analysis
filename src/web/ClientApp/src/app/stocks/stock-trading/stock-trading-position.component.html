@@ -36,21 +36,26 @@
         <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
         <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
         <div class="col">
-          <div class="stat-label">Levels</div>
-          <div>
-            <!-- <span *ngFor="let l of _position.rrLevels">{{l | currency}} </span> -->
-          </div>
+          <div class="stat-label"></div>
+          <div></div>
         </div>
       </div>
 
       <div class="row mt-3" *ngIf="!_position.isClosed">
-        <div class="col">
+        <div class="col" *ngIf="positionProfitPoints.length > 0">
           <div class="row" *ngFor="let ppp of positionProfitPoints">
             <div class="col-3">{{ppp.name}}</div><div class="col" *ngFor="let p of ppp.prices">{{p | currency}}</div>
           </div>
         </div>
+        <div class="col" *ngIf="positionProfitPoints.length === 0">
+          <div class="row">
+            <div class="col-3">
+              <button class="btn btn-secondary btn-sm" (click)="fetchProfitPoints()">fetch profit points</button>
+            </div>
+          </div>
+        </div>
       </div>
-
+      
       <div class="row mt-3" *ngIf="!_position.isClosed">
         <div class="col">
           <label class="form-label" for="candidateRiskAmount">Risk Amount</label>

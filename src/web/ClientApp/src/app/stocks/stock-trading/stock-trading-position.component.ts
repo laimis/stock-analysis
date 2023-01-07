@@ -17,7 +17,6 @@ export class StockTradingPositionComponent {
     set position(v:PositionInstance) {
         this._position = v
         this.setCandidateValues()
-        this.fetchProfitPoints()
     }
 
     @Input()
