@@ -98,6 +98,39 @@ public class TDAmeritradeClient : IBrokerage
         return Task.FromResult(url);
     }
 
+    public async Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, string ticker)
+    {
+        var function = $"instruments?symbol={ticker}&projection=fundamental";
+
+        var results = await CallApi<Dictionary<string, SearchItemWithFundamental>>(
+            state, function, HttpMethod.Get, debug: true
+        );
+
+        if (results.Error != null)
+        {
+            return new ServiceResponse<StockProfile>(results.Error);
+        }
+
+        var fundamentals = results.Success![ticker].fundamental;
+        var data = results.Success[ticker];
+
+        var mapped = new StockProfile {
+            Symbol = data.symbol,
+            Description = data.description,
+            SecurityName = data.description,
+            Exchange = data.exchange,
+            Cusip = data.cusip,
+            IssueType = data.assetType,
+            Fundamentals = fundamentals.ToDictionary(
+                f => f.Key,
+                f => f.Value.ToString()
+            )
+        };
+
+
+        return new ServiceResponse<StockProfile>(mapped);
+    }
+
     public async Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5)
     {
         var function = $"instruments?symbol={query}.*&projection=symbol-regex";

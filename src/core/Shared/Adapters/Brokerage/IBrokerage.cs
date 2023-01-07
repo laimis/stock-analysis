@@ -29,6 +29,7 @@ namespace core.Shared.Adapters.Brokerage
         Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset start);
         Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5);
         Task<ServiceResponse<OptionChain>> GetOptions(UserState state, string ticker);
+        Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, string ticker);
     }
 
     public enum BrokerageOrderDuration

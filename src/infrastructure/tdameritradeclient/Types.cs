@@ -194,6 +194,110 @@ internal class SearchItem
     public string? assetType { get; set; }
 }
 
+internal class SearchItemWithFundamental : SearchItem
+{
+    // I have a concrete type with all the properties that are returned
+    // but don't have the need for static typing here
+    // and just looking to output all the properties
+    // that the API gives
+    public Dictionary<string, object>? fundamental { get; set; }
+}
+
+internal class Fundamental
+{
+    public string? symbol { get; set; }
+
+    public double high52 { get; set; }
+
+    public double low52 { get; set; }
+
+    public double dividendAmount { get; set; }
+
+    public double dividendYield { get; set; }
+
+    public string? dividendDate { get; set; }
+
+    public double peRatio { get; set; }
+
+    public double pegRatio { get; set; }
+
+    public double pbRatio { get; set; }
+
+    public double prRatio { get; set; }
+
+    public double pcfRatio { get; set; }
+
+    public double grossMarginTtm { get; set; }
+
+    public double grossMarginMrq { get; set; }
+
+    public double netProfitMarginTtm { get; set; }
+
+    public double netProfitMarginMrq { get; set; }
+
+    public double operatingMarginTtm { get; set; }
+
+    public double operatingMarginMrq { get; set; }
+
+    public double returnOnEquity { get; set; }
+
+    public double returnOnAssets { get; set; }
+
+    public double returnOnInvestment { get; set; }
+
+    public double quickRatio { get; set; }
+
+    public double currentRatio { get; set; }
+
+    public double interestCoverage { get; set; }
+
+    public double totalDebtToCapital { get; set; }
+
+    public double ltDebtToEquity { get; set; }
+
+    public double totalDebtToEquity { get; set; }
+
+    public double epsTtm { get; set; }
+
+    public double epsChangePercentTtm { get; set; }
+
+    public double epsChangeYear { get; set; }
+
+    public double epsChange { get; set; }
+
+    public double revChangeYear { get; set; }
+
+    public double revChangeTtm { get; set; }
+
+    public double revChangeIn { get; set; }
+
+    public double sharesOutstanding { get; set; }
+
+    public double marketCapFloat { get; set; }
+
+    public double marketCap { get; set; }
+
+    public double bookValuePerShare { get; set; }
+
+    public double shortIntToFloat { get; set; }
+
+    public double shortIntDayToCover { get; set; }
+
+    public double divGrowthRate3Year { get; set; }
+
+    public double dividendPayAmount { get; set; }
+
+    public string? dividendPayDate { get; set; }
+
+    public double beta { get; set; }
+
+    public double vol1DayAvg { get; set; }
+
+    public double vol10DayAvg { get; set; }
+
+    public double vol3MonthAvg { get; set; }
+}
+
 internal class OptionDescriptor
 {
     public string? putCall { get; set; }

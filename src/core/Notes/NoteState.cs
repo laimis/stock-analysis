@@ -12,7 +12,6 @@ namespace core.Notes
         public string Note { get; internal set; }
         public Guid UserId { get; internal set; }
         public DateTimeOffset StatsApplied { get; private set; }
-        public StockAdvancedStats Stats { get; private set; }
         public Price Price { get; private set; }
 
         public void Apply(AggregateEvent e)
@@ -38,17 +37,16 @@ namespace core.Notes
         {
         }
 
+        [Obsolete]
         internal void ApplyInternal(NoteEnriched enriched)
         {
             StatsApplied = enriched.When;
-            Stats = enriched.Stats;
         }
 
+        [Obsolete]
         internal void ApplyInternal(NoteEnrichedWithPrice enriched)
         {
             StatsApplied = enriched.When;
-            Stats = enriched.Stats;
-            Price = enriched.Price;
         }
 
         internal void ApplyInternal(NoteUpdated updated)

@@ -1,5 +1,4 @@
 using System;
-using core.Adapters.Stocks;
 using core.Shared;
 using MediatR;
 
@@ -28,28 +27,36 @@ namespace core.Notes
         public string Ticker { get; }
     }
 
+    [Obsolete("Do not use this, it was a bad idea to have this event")]
     public class NoteEnriched : AggregateEvent
     {
-        public NoteEnriched(Guid id, Guid aggregateId, DateTimeOffset when, StockAdvancedStats stats)
-            : base(id, aggregateId, when)
-        {
-            Stats = stats;
-        }
+        // public NoteEnriched(Guid id, Guid aggregateId, DateTimeOffset when, StockAdvancedStats stats)
+        //     : base(id, aggregateId, when)
+        // {
+        //     Stats = stats;
+        // }
 
-        public StockAdvancedStats Stats { get; }
+        // public StockAdvancedStats Stats { get; }
+        public NoteEnriched(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
+        {
+        }
     }
 
+    [Obsolete("Do not use this, it was a bad idea to have this event")]
     public class NoteEnrichedWithPrice : AggregateEvent
     {
-        public NoteEnrichedWithPrice(Guid id, Guid aggregateId, DateTimeOffset when, Price price, StockAdvancedStats stats)
-            : base(id, aggregateId, when)
-        {
-            Price = price;
-            Stats = stats;
-        }
+        // public NoteEnrichedWithPrice(Guid id, Guid aggregateId, DateTimeOffset when, Price price, StockAdvancedStats stats)
+        //     : base(id, aggregateId, when)
+        // {
+        //     Price = price;
+        //     Stats = stats;
+        // }
 
-        public Price Price { get; }
-        public StockAdvancedStats Stats { get; }
+        // public Price Price { get; }
+        // public StockAdvancedStats Stats { get; }
+        public NoteEnrichedWithPrice(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
+        {
+        }
     }
 
     // NOTE: not used anymore, was thinking about a follow up concept

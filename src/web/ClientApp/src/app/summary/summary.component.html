@@ -14,11 +14,8 @@
   <h5 class="mt-2">Week of {{ result.start | date }} review</h5>
   
   <div class="mt-2 mb-2">Profit {{ result.stockProfit + result.optionProfit | currency }}</div>
-  <div>Stocks: {{ result.stockProfit | currency }}</div>
-  <div>Options: {{ result.optionProfit | currency }}</div>
   
   <h5 class="mt-5">Closed Positions</h5>
-
   <ng-container *ngFor="let p of result.closedPositions">
     <div class="row">
       <div class="col"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></div>
@@ -37,7 +34,7 @@
       </div>
     </div>
     <div class="row mb-3">
-      <div colspan="col">
+      <div class="col">
         <ul class="list-unstyled" *ngIf="p.notes.length > 0">
           <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
         </ul>

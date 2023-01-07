@@ -509,7 +509,6 @@ export interface Note {
   price: Price
   note: string
   id: string
-  stats: StockAdvancedStats
 }
 
 export interface Price {
@@ -591,30 +590,6 @@ export interface SMAContainer {
   sma200: SMA
 }
 
-export interface StockAdvancedStats {
-  companyName: string
-  peRatio: number
-  avg10Volume: number
-  avg30Volume: number
-  week52High: number
-  week52Low: number
-  week52highDate: number
-  week52lowDate: number
-  marketCap: number
-  debtToEquity: number
-  putCallRatio: number
-  priceToBook: number
-  revenue: number
-  grossProfit: number
-  profitMargin: number
-  totalCash : number
-  year5ChangePercent: number
-  year1ChangePercent: number
-  month3ChangePercent: number
-  month1ChangePercent: number
-  day50MovingAvg: number
-  day200MovingAvg: number
-}
 
 export interface StockQuote {
   symbol: string
@@ -648,21 +623,16 @@ export interface StockQuote {
 export interface StockDetails {
   ticker: string
   price: number
-  stats: StockAdvancedStats
   profile : StockProfile
 }
 
 export interface StockProfile {
   description: string
-  sector: string
-  industry: string
-  companyName: string
-  country: string
-  employees: number
-  website: string
   issueType: string
   securityName: string
   symbol: string
+  exchange: string
+  fundamentals: Map<string, string>
 }
 
 export interface StockOwnership {

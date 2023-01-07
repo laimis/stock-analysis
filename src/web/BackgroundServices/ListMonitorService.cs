@@ -67,6 +67,7 @@ namespace web.BackgroundServices
             var delay = GetDelayTime();
             if (delay < _minimumDelay)
             {
+                _logger.LogInformation($"Delay time {delay} is less than minimum delay {_minimumDelay}, using minimum delay instead");
                 delay = _minimumDelay;
             }
 

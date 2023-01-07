@@ -53,19 +53,6 @@ namespace core.Notes
             return State.RelatedToTicker == filter.Value;
         }
 
-        internal void Enrich(Price p, StockAdvancedStats d)
-        {
-            Apply(
-                new NoteEnrichedWithPrice(
-                    Guid.NewGuid(),
-                    Id,
-                    DateTimeOffset.UtcNow,
-                    p,
-                    d
-                )
-            );
-        }
-
         public void Update(string note)
         {
             if (string.IsNullOrWhiteSpace(note))

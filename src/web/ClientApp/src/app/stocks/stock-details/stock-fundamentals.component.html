@@ -1,39 +1,11 @@
 
 <div *ngIf="summary">
-  <div class="row mb-2">
-    <div class="col"><div class="stat-label">Price</div><div>{{summary.price | currency}}</div></div>
-    <div class="col"><div class="stat-label">PE</div><div>{{stats.peRatio | number:'1.0-2'}}</div></div>
-    <div class="col"><div class="stat-label">10d Volume</div><div>{{stats.avg10Volume / 1000000 | number:'1.0-2'}}M</div></div>
-    <div class="col"><div class="stat-label">30d Volumne</div><div>{{stats.avg30Volume / 1000000 | number:'1.0-2'}}M</div></div>
-  </div>
-  <div class="row mb-2">
-    <div class="col"><div class="stat-label">1 Year High</div><div>{{stats.week52highDate | date}}</div></div>
-    <div class="col"><div class="stat-label">1 Year High</div><div>{{stats.week52High | currency}}</div></div>
-    <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52lowDate | date}}</div></div>
-    <div class="col"><div class="stat-label">1 Year Low</div><div>{{stats.week52Low | currency}}</div></div>
-  </div>
-  <div class="row mb-2">
-    <div class="col"><div class="stat-label">Market Cap</div><div>{{stats.marketCap / 1000000000 | number:'1.0-2'}}B</div></div>
-    <div class="col"><div class="stat-label">Debt-to-Equity</div><div>{{stats.debtToEquity | number:'1.0-2'}}</div></div>
-    <div class="col"><div class="stat-label">Put/Call Ratio</div><div>{{stats.putCallRatio | number:'1.0-2'}}</div></div>
-    <div class="col"><div class="stat-label">Price/Book</div><div>{{stats.priceToBook | number:'1.0-2'}}</div></div>
-  </div>
-  <div class="row mb-2">
-    <div class="col"><div class="stat-label">Revenue</div><div>{{stats.revenue / 1000000 | number:'1.0-0'}}M</div></div>
-    <div class="col"><div class="stat-label">Gross Profit</div><div>{{stats.grossProfit / 1000000 | number:'1.0-0'}}M</div></div>
-    <div class="col"><div class="stat-label">Profit Margin</div><div>{{stats.profitMargin | percent}}</div></div>
-    <div class="col"><div class="stat-label">Total Cash</div><div>{{stats.totalCash / 1000000 | number:'1.0-0'}}M</div></div>
-  </div>
-  <div class="row mb-2">
-    <div class="col"><div class="stat-label">5-year change</div><div>{{stats.year5ChangePercent | percent}}</div></div>
-    <div class="col"><div class="stat-label">1-year change</div><div>{{stats.year1ChangePercent | percent}}</div></div>
-    <div class="col"><div class="stat-label">3-month change</div><div>{{stats.month3ChangePercent | percent}}</div></div>
-    <div class="col"><div class="stat-label">1-month change</div><div>{{stats.month1ChangePercent | percent}}</div></div>
-  </div>
-  <div class="row mb-2">
-    <div class="col"><div class="stat-label">Country</div><div>{{profile.country}}</div></div>
-    <div class="col"><div class="stat-label">Industry</div><div>{{profile.industry}} / {{profile.sector}}</div></div>
-    <div class="col"><div class="stat-label">Employees</div><div>{{profile.employees}}</div></div>
-    <div class="col"></div>
-  </div>
+  <table class="table table-striped table-hover">
+    <tbody>
+      <tr *ngFor="let fundamental of profile.fundamentals | keyvalue">
+        <td>{{fundamental.key}}</td>
+        <td>{{fundamental.value}}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

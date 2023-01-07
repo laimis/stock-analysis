@@ -35,31 +35,27 @@ namespace core.Stocks
 
             public async Task<StockDetailsView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var profile = new CompanyProfile {
-                    CompanyName = "#not implemented",
-                    Symbol = request.Ticker
-                };
-
-                var advanced = new StockAdvancedStats {
-                    MarketCap = 0,
-                    Week52High = 0,
-                    Week52Low = 0,
-                };
-
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
                 {
                     throw new InvalidOperationException("User not found");
                 }
 
+                var profileResponse = await _brokerage.GetStockProfile(user.State, request.Ticker);
+                if (!profileResponse.IsOk)
+                {
+                    throw new InvalidOperationException(
+                        "Failed to get company profile: " + profileResponse.Error.Message
+                    );
+                }
+                
                 var price = await _brokerage.GetQuote(user.State, request.Ticker);
 
                 return new StockDetailsView
                 {
                     Ticker = request.Ticker,
                     Price = price.Success?.lastPrice,
-                    Profile = profile,
-                    Stats = advanced
+                    Profile = profileResponse.Success
                 };
             }
         }
