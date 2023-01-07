@@ -17,7 +17,6 @@
     <div class="card-body">
       <div class="card-title">
         <a class="font-weight-bold" [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
-        <span *ngIf="note.stats" class="text-muted"> - {{note.stats.companyName}}</span>
       </div>
       <h6 class="card-subtitle mb-2 text-muted">
         {{note.created | date}}
@@ -34,7 +33,7 @@
   </div>
 </div>
 
-<div *ngIf="notes && notes.length == 0">
+<div *ngIf="notes && notes.length === 0">
 
   <div class="alert alert-secondary">
     You haven't recorded any notes <span *ngIf="symbolFilter">for {{symbolFilter}}</span> yet
