@@ -64,7 +64,7 @@ export class BrokerageOrdersComponent implements OnInit {
       numberOfShares: order.quantity,
       price: order.price,
       date: order.date,
-      notes: "Brokerage Order " + order.orderId,
+      notes: null,
       stopPrice: null
     }
 
