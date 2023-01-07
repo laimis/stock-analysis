@@ -40,9 +40,10 @@ export class BrokerageOrdersComponent implements OnInit {
   groupAndRenderOrders() {
     var buys = this._orders.filter(o => o.type == 'BUY' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
     var sells = this._orders.filter(o => o.type == 'SELL' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
-    var filled = this._orders.filter(o => o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
+    var filledBuys = this._orders.filter(o => o.type == 'BUY' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
+    var filledSells = this._orders.filter(o => o.type == 'SELL' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
 
-    this.groupedOrders = [buys, sells, filled]
+    this.groupedOrders = [buys, sells, filledBuys, filledSells]
   }
 
   @Output()

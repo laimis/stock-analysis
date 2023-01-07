@@ -52,6 +52,8 @@ namespace core.Brokerage
                     orders.Success
                         .Where(o => o.IncludeInResponses)
                         .OrderBy(o => o.StatusOrder)
+                        .ThenBy(o => o.Ticker)
+                        .ThenBy(o => o.Date)
                         .ToArray();
             }
         }
