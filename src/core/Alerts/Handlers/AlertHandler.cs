@@ -32,7 +32,7 @@ namespace core.Alerts
                 return;
             }
 
-            _container.Register(stock);
+            _container.Register(stock.State);
         }
 
         public async Task Handle(StockSold notification, CancellationToken cancellationToken)
@@ -64,7 +64,7 @@ namespace core.Alerts
                 return;
             }
 
-            _container.Register(stock);
+            _container.Register(stock.State);
         }
 
 

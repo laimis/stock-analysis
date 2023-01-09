@@ -52,14 +52,17 @@ namespace web.BackgroundServices
         {
             _logger.LogInformation("stock position monitoring service started");
 
-            await BuildUpAlerts();
-
             var firstRun = true;
             
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
+                    if (firstRun)
+                    {
+                        await BuildUpAlerts();
+                    }
+
                     await Loop(firstRun, stoppingToken);
                     
                     firstRun = false;

@@ -22,17 +22,17 @@ namespace coretests.Alerts
 
             _amd = new OwnedStock(new Ticker("AMD"), userId);
             _amd.Purchase(100, 50, DateTimeOffset.Now, null, 49);
-            _uat.Register(_amd);
+            _uat.Register(_amd.State);
 
             _bac = new OwnedStock(new Ticker("BAC"), userId);
             _bac.Purchase(100, 50, DateTimeOffset.Now, null, 49);
-            _uat.Register(_bac);
+            _uat.Register(_bac.State);
 
             _initialCount = _uat.Monitors.Count();
 
-            _uat.Register(_amd);
-            _uat.Register(_bac);
-            _uat.Register(_amd);
+            _uat.Register(_amd.State);
+            _uat.Register(_bac.State);
+            _uat.Register(_amd.State);
 
             _finalCount = _uat.Monitors.Count();
         }
