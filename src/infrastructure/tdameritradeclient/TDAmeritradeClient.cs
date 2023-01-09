@@ -103,7 +103,7 @@ public class TDAmeritradeClient : IBrokerage
         var function = $"instruments?symbol={ticker}&projection=fundamental";
 
         var results = await CallApi<Dictionary<string, SearchItemWithFundamental>>(
-            state, function, HttpMethod.Get, debug: true
+            state, function, HttpMethod.Get
         );
 
         if (results.Error != null)
