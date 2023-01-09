@@ -168,12 +168,17 @@ namespace core.Alerts
                 return null;
             }
 
-            if (state.OpenPosition.RiskedAmount == 0)
+            if (state.OpenPosition.RiskedAmount == null || state.OpenPosition.RiskedAmount == 0)
             {
                 return null;
             }
 
             var minPriceLevel = ProfitLevels.GetProfitPoint(state.OpenPosition, profitLevel);
+            if (minPriceLevel == null)
+            {
+                return null;
+            }
+            
             var maxPriceLevel = ProfitLevels.GetProfitPoint(state.OpenPosition, profitLevel + 1);
 
             return new ProfitPriceMonitor(
