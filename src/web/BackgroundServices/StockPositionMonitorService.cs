@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using core;
 using core.Account;
 using core.Adapters.Emails;
-using core.Adapters.Stocks;
 using core.Alerts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.SMS;
@@ -51,7 +50,7 @@ namespace web.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("exec enter");
+            _logger.LogInformation("stock position monitoring service started");
 
             await BuildUpAlerts();
 
@@ -67,13 +66,13 @@ namespace web.BackgroundServices
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogError("Failed:" + ex);
+                    _logger.LogError("Stock position monitoring failed:" + ex);
 
                     await Task.Delay(LONG_INTERVAL, stoppingToken);
                 }
             }
 
-            _logger.LogInformation("exec exit");
+            _logger.LogInformation("stock position monitoring service stopped");
         }
 
         private async Task Loop(bool firstRun, CancellationToken stoppingToken)
@@ -103,7 +102,8 @@ namespace web.BackgroundServices
 
                 foreach(var stock in open)
                 {
-                    _container.Register(stock);
+                    _logger.LogInformation($"adding {stock.State.Ticker} to monitor for {pair.email}");
+                    _container.Register(stock.State);
                 }
             }
         }
