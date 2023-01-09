@@ -177,7 +177,8 @@ export class StockTradingSimulatorComponent implements OnInit {
           price: t.price,
           numberOfShares: t.numberOfShares,
           date: t.date,
-          notes: null
+          notes: null,
+          brokerageOrderId: null
         }
         this.initialPosition(cmd)
         first = false
