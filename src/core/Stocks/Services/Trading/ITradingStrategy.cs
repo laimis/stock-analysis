@@ -4,6 +4,12 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
+    public static class TradingStrategyConstants
+    {
+        // TODO: this needs to come from the environment or user settings
+        public const decimal AVG_PERCENT_GAIN = 0.07m;
+    }
+    
     public interface ITradingStrategy
     {
         TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success, bool closeIfOpenAtTheEnd);

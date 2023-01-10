@@ -5,92 +5,12 @@ namespace core.Stocks.Services.Trading
 {
     internal class TradingStrategyRRLevels
     {
-        // TODO: this needs to come from the environment or user settings
-        public const decimal AVG_PERCENT_GAIN = 0.07m;
-
-        private static Func<int, PositionInstance, decimal> _alwaysPositionStop = (_, position) => position.StopPrice.Value;
-        private static Func<int, PositionInstance, Func<int, decimal>, decimal> _advancingStop = (level, position, rrLevelFunc) => level switch {
-                        1 => position.AverageCostPerShare,
-                        _ => rrLevelFunc(level - 1)
-                    };
-
-        private static Func<int, PositionInstance, Func<int, decimal>, decimal> _delayedAdvancingStop = (level, position, rrLevelFunc) => level switch {
-                        1 => position.StopPrice.Value,
-                        2 => position.AverageCostPerShare,
-                        _ => rrLevelFunc(level - 2)
-                    };
-        
-        public static TradingStrategyResult RunOneThirdRR(
-            PositionInstance positionInstance,
-            PriceBar[] success,
-            bool closeIfOpenAtTheEnd)
-            => Run(
-                "1/3 on each RR level",
-                positionInstance,
-                success,
-                3,
-                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
-                closeIfOpenAtTheEnd);
-
-        public static TradingStrategyResult RunOneThirdRRDelayedStop(
-            PositionInstance positionInstance,
-            PriceBar[] success,
-            bool closeIfOpenAtTheEnd)
-            => Run(
-                "1/3 on each RR level (delayed stop)",
-                positionInstance,
-                success,
-                3,
-                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
-                (level, position) => _delayedAdvancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
-                closeIfOpenAtTheEnd);
-
-        public static TradingStrategyResult RunOneFourthRR(
-            PositionInstance positionInstance,
-            PriceBar[] success,
-            bool closeIfOpenAtTheEnd)
-            => Run(
-                "1/4 on each RR level",
-                positionInstance,
-                success,
-                4,
-                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
-                closeIfOpenAtTheEnd);
-
-        public static TradingStrategyResult RunOneThirdPercentBased(
-            PositionInstance positionInstance,
-            PriceBar[] success,
-            bool closeIfOpenAtTheEnd)
-            => Run(
-                "1/3 on each RR level (percent based)",
-                positionInstance,
-                success,
-                3,
-                level => ProfitLevels.GetProfitPointForPercentGain(positionInstance, level, AVG_PERCENT_GAIN).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPointForPercentGain(position, l, AVG_PERCENT_GAIN).Value),
-                closeIfOpenAtTheEnd);
-
-        public static TradingStrategyResult RunOneFourthPercentBased(
-            PositionInstance positionInstance,
-            PriceBar[] success,
-            bool closeIfOpenAtTheEnd)
-            => Run(
-                "1/4 on each RR level (percent based)",
-                positionInstance,
-                success,
-                4,
-                level => ProfitLevels.GetProfitPointForPercentGain(positionInstance, level, AVG_PERCENT_GAIN).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPointForPercentGain(position, l, AVG_PERCENT_GAIN).Value),
-                closeIfOpenAtTheEnd);
-
-        private static TradingStrategyResult Run(
+        public static TradingStrategyResult Run(
             string name,
             PositionInstance position,
             PriceBar[] prices,
             int rrLevels,
-            Func<int, decimal> getRRLevelFunc,
+            Func<int, decimal> getProfitPointFunc,
             Func<int, PositionInstance, decimal> getStopPriceFunc,
             bool closeIfOpenAtTheEnd)
         {
@@ -103,7 +23,6 @@ namespace core.Stocks.Services.Trading
             var maxDrawdown = 0m;
 
             var currentLevel = 1;
-            var levelSells = new bool[rrLevels+1]; // levels are 1 based
             var portion = (int)position.NumberOfShares / rrLevels;
             if (portion == 0)
             {
@@ -111,12 +30,10 @@ namespace core.Stocks.Services.Trading
                 // at a time
                 portion = 1;
             }
-            var sellPortions = new int[rrLevels + 1]; // levels are 1 based
-            for(var i = 1; i < sellPortions.Length; i++)
-            {
-                sellPortions[i] = portion;
-            }
-            sellPortions[^1] += (int)position.NumberOfShares % rrLevels;
+
+            var currentProfitPoint = getProfitPointFunc(currentLevel);
+
+            var lastPortion = (int)position.NumberOfShares - portion * (rrLevels - 1);
             
             foreach(var bar in prices)
             {
@@ -138,9 +55,9 @@ namespace core.Stocks.Services.Trading
                     maxDrawdown = loss;
                 }
 
-                if (!levelSells[currentLevel] && bar.High >= getRRLevelFunc(currentLevel))
+                if (bar.High >= currentProfitPoint)
                 {
-                    position.Sell(sellPortions[currentLevel], getRRLevelFunc(currentLevel), Guid.NewGuid(), bar.Date);
+                    position.Sell(portion, currentProfitPoint, Guid.NewGuid(), bar.Date);
                     
                     if (position.NumberOfShares > 0)
                     {
@@ -148,8 +65,13 @@ namespace core.Stocks.Services.Trading
                         position.SetStopPrice(stopPrice, bar.Date);
                     }
                     
-                    levelSells[currentLevel] = true;
                     currentLevel++;
+                    currentProfitPoint = getProfitPointFunc(currentLevel);
+
+                    if (currentLevel == rrLevels)
+                    {
+                        portion = lastPortion;
+                    }
                 }
 
                 // if stop is reached, sell at the close price

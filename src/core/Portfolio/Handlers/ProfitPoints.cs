@@ -56,13 +56,13 @@ namespace core.Portfolio
                 var stopBasedProfitPoints = ProfitLevels.GetProfitPoints(ProfitLevels.GetProfitPoint, position, 4);
 
                 Func<PositionInstance, int, decimal?> getPercentGain = (p, i) => 
-                    ProfitLevels.GetProfitPointForPercentGain(p, i, TradingStrategyRRLevels.AVG_PERCENT_GAIN);
+                    ProfitLevels.GetProfitPointForPercentGain(p, i, TradingStrategyConstants.AVG_PERCENT_GAIN);
                 
                 var percentBaseProfitPoints = ProfitLevels.GetProfitPoints(getPercentGain, position, 4);
 
                 return new [] {
                     new ProfitLevels.ProfitPoints("Stop based", prices: stopBasedProfitPoints),
-                    new ProfitLevels.ProfitPoints($"{TradingStrategyRRLevels.AVG_PERCENT_GAIN}% intervals", prices: percentBaseProfitPoints)
+                    new ProfitLevels.ProfitPoints($"{TradingStrategyConstants.AVG_PERCENT_GAIN}% intervals", prices: percentBaseProfitPoints)
                 };
             }
         }
