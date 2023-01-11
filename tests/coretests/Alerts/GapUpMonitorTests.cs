@@ -1,5 +1,7 @@
 using System;
 using core.Alerts;
+using core.Shared.Adapters.Stocks;
+using core.Stocks.Services.Analysis;
 using Xunit;
 
 namespace coretests.Alerts
@@ -8,8 +10,24 @@ namespace coretests.Alerts
     {
         private static IStockPositionMonitor CreateMonitorUnderTest()
         {
+            var bar = new PriceBar(System.DateTimeOffset.UtcNow, 0.1m, 0.12m, 0.1m, 0.12m, 100);
+
+            var gap = new Gap(
+                GapType.Up,
+                0.1m,
+                0.12m,
+                bar,
+                closedQuickly: false,
+                open: true,
+                relativeVolume: 1.2m,
+                closingRange: 0.9m
+            );
+
             return new GapUpMonitor(
-                "ticker", 10, System.DateTimeOffset.Now, System.Guid.NewGuid(), "This is gap up!"
+                "ticker",
+                gap,
+                System.DateTimeOffset.Now,
+                System.Guid.NewGuid()
             );
         }
 
