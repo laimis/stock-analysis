@@ -142,34 +142,54 @@ namespace web.BackgroundServices
                 return;
             }
 
-            var grouped = triggered.GroupBy(t => t.userId);
+            var userAlerts = triggered.GroupBy(t => t.userId);
 
-            foreach (var e in grouped)
+            foreach (var userAlertGroup in userAlerts)
             {
-                var u = await _accounts.GetUser(e.Key);
+                var user = await _accounts.GetUser(userAlertGroup.Key);
+                
+                await SendEmails(userAlertGroup, user.State);
 
-                var alerts = e.ToList();
-
-                var data = new { alerts = alerts.Select(Map) };
-
-                await _emails.Send(
-                    new Recipient(email: u.State.Email, name: u.State.Name),
-                    Sender.NoReply,
-                    EmailTemplate.Alerts,
-                    data
-                );
-
-                foreach(var a in alerts)
-                {
-                    // only send alerts via SMS if they haven't recently been hit
-                    if (_container.HasRecentlyTriggered(a))
-                    {
-                        continue;
-                    }
-
-                    await _smsClient.SendSMS(a.description);
-                }
+                await SendSMS(userAlertGroup, user.State);
             }
+        }
+
+        private async Task SendSMS(IGrouping<Guid, TriggeredAlert> userAlertGroup, UserState state)
+        {
+            var notRecentlyTriggered = userAlertGroup
+                .Where(a => !_container.HasRecentlyTriggered(a));
+                
+            // TODO: we need better way to group this, but right now gap ups can get
+            // crazy
+            Func<TriggeredAlert, bool> gapUpCondition = t => t.description.StartsWith("Gap up");
+
+            var gapUps = notRecentlyTriggered.Where(gapUpCondition).ToList();
+            var otherAlerts = notRecentlyTriggered.Where(a => !gapUpCondition(a)).ToList();
+
+            foreach (var a in otherAlerts)
+            {
+                await _smsClient.SendSMS(a.description);
+            }
+
+            if (gapUps.Count > 0)
+            {
+                var gapUpAlert = $"Found {gapUps.Count} gap ups: {string.Join(", ", gapUps.Select(a => a.ticker))}";
+                await _smsClient.SendSMS(gapUpAlert);
+            }
+        }
+
+        private async Task SendEmails(IGrouping<Guid, TriggeredAlert> userAlertGroup, UserState user)
+        {
+            var data = new {
+                alerts = userAlertGroup.Select(ToEmailData)
+            };
+
+            await _emails.Send(
+                new Recipient(email: user.Email, name: user.Name),
+                Sender.NoReply,
+                EmailTemplate.Alerts,
+                data
+            );
         }
 
         private async Task<Price> GetPrice(Dictionary<string, Price> priceCache, PriceMonitor sm)
@@ -198,7 +218,7 @@ namespace web.BackgroundServices
             return priceCache[sm.Ticker];
         }
 
-        private object Map(TriggeredAlert trigger)
+        private object ToEmailData(TriggeredAlert trigger)
         {
             return new {
                 ticker = (string)trigger.ticker,
