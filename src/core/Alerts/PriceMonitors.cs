@@ -102,7 +102,7 @@ namespace core.Alerts
             Gap = gap;
             When = when;
             UserId = userId;
-            Description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
+            Description = $"Gap up";
         }
 
         public string Ticker { get; }
