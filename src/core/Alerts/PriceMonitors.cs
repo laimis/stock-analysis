@@ -143,7 +143,7 @@ namespace core.Alerts
                 watchedValue: price,
                 when: time,
                 ticker: Ticker,
-                description: Description,
+                description: $"Gap up of {Math.Round(Gap.gapSizePct * 100, 2)}% for {Ticker}",
                 numberOfShares: 0,
                 userId: UserId,
                 alertType: AlertType.Positive,
