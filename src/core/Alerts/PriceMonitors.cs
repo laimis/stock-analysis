@@ -1,5 +1,6 @@
 using System;
 using core.Stocks;
+using core.Stocks.Services.Analysis;
 using core.Stocks.Services.Trading;
 
 namespace core.Alerts
@@ -95,17 +96,17 @@ namespace core.Alerts
 
     public class GapUpMonitor : IStockPositionMonitor
     {
-        public GapUpMonitor (string ticker, decimal price, DateTimeOffset when, Guid userId, string description)
+        public GapUpMonitor (string ticker, Gap gap, DateTimeOffset when, Guid userId)
         {
             Ticker = ticker;
-            Price = price;
+            Gap = gap;
             When = when;
             UserId = userId;
-            Description = description;
+            Description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
         }
 
         public string Ticker { get; }
-        public decimal Price { get; }
+        public Gap Gap { get; }
         public DateTimeOffset When { get; }
         public Guid UserId { get; }
         public string Description { get; }
@@ -117,9 +118,9 @@ namespace core.Alerts
 
         string IStockPositionMonitor.Description => Description;
 
-        decimal IStockPositionMonitor.ThresholdValue => Price;
+        decimal IStockPositionMonitor.ThresholdValue => Gap.gapSizePct;
 
-        decimal IStockPositionMonitor.LastSeenValue => Price;
+        decimal IStockPositionMonitor.LastSeenValue => Gap.gapSizePct;
 
         bool IStockPositionMonitor.IsTriggered => TriggeredAlert.HasValue;
 
@@ -268,7 +269,7 @@ namespace core.Alerts
             decimal numberOfShares,
             string ticker,
             Guid userId)
-            : base(thresholdValue, numberOfShares, ticker, userId, $"Stop loss @ {thresholdValue.ToString("0.00")}")
+            : base(thresholdValue, numberOfShares, ticker, userId, $"Stop loss")
         {
         }
 
@@ -316,7 +317,7 @@ namespace core.Alerts
                 ThresholdValue,
                 time,
                 Ticker,
-                $"{Description} hit for {Ticker} at {price}",
+                $"{Description} price of {ThresholdValue} hit for {Ticker} at {price}",
                 NumberOfShares,
                 UserId,
                 AlertType.Negative,
