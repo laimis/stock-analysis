@@ -118,9 +118,11 @@ namespace core.Alerts
 
         string IStockPositionMonitor.Description => Description;
 
-        decimal IStockPositionMonitor.ThresholdValue => Gap.gapSizePct;
+        decimal IStockPositionMonitor.ThresholdValue => GapSizePctRounded;
 
-        decimal IStockPositionMonitor.LastSeenValue => Gap.gapSizePct;
+        decimal IStockPositionMonitor.LastSeenValue => GapSizePctRounded;
+
+        private decimal GapSizePctRounded => Math.Round(Gap.gapSizePct * 100, 2);
 
         bool IStockPositionMonitor.IsTriggered => TriggeredAlert.HasValue;
 
