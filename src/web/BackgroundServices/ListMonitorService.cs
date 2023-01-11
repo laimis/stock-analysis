@@ -154,8 +154,7 @@ namespace web.BackgroundServices
 
                 var gap = gaps[0];
                 
-                var description = $"Gap up for {ticker}: {Math.Round(gap.gapSizePct * 100, 2)}%";
-                _container.Register(new GapUpMonitor(ticker: ticker, price: gap.bar.Close, when: DateTimeOffset.UtcNow, userId: user.Id, description: description));
+                _container.Register(new GapUpMonitor(ticker: ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: user.Id));
             }
         }
 
