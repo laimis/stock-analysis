@@ -224,7 +224,6 @@ namespace web.BackgroundServices
                 ticker = (string)trigger.ticker,
                 value = trigger.triggeredValue,
                 description = trigger.description,
-                direction = trigger.description,
                 time = _marketHours.ToMarketTime(trigger.when).ToString("HH:mm") + " ET"
             };
         }
