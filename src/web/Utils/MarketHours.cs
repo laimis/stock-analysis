@@ -12,8 +12,9 @@ namespace web.Utils
     public class MarketHours : IMarketHours
     {
         private static TimeZoneInfo _easternZoneId = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
-        private TimeSpan _start = new TimeSpan(9, 40, 0);
-        private TimeSpan _end = new TimeSpan(16, 0, 0);
+        public static TimeSpan StartTime = new TimeSpan(9, 30, 0);
+        public static TimeSpan EndTime = new TimeSpan(16, 0, 0);
+        public static TimeSpan CloseToEndTime = new TimeSpan(15, 45, 0);
 
         public bool IsMarketOpen(DateTimeOffset utcNow)
         {
@@ -30,7 +31,7 @@ namespace web.Utils
 
             var timeOfDay = eastern.TimeOfDay;
 
-            return timeOfDay >= _start && timeOfDay <= _end;
+            return timeOfDay >= StartTime && timeOfDay <= EndTime;
         }
 
         public DateTimeOffset ToMarketTime(DateTimeOffset when) => ConvertToEastern(when);
@@ -38,7 +39,7 @@ namespace web.Utils
         public DateTimeOffset GetMarketStartOfDayTimeInUtc(DateTimeOffset when)
         {
             return TimeZoneInfo.ConvertTimeToUtc(
-                when.Date.Add(_start),
+                when.Date.Add(StartTime),
                 _easternZoneId
             );
         }
@@ -46,7 +47,7 @@ namespace web.Utils
         public DateTimeOffset GetMarketEndOfDayTimeInUtc(DateTimeOffset when)
         {
             return TimeZoneInfo.ConvertTimeToUtc(
-                when.Date.Add(_end),
+                when.Date.Add(EndTime),
                 _easternZoneId
             );
         }

@@ -56,7 +56,8 @@ namespace web.BackgroundServices
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogCritical(ex, "Failed to run gap up monitor");
+                    _logger.LogCritical(ex, "Failed while running gap monitor, will sleep");
+                    await Task.Delay(TimeSpan.FromMinutes(10));
                 }
             }
         }
@@ -78,33 +79,41 @@ namespace web.BackgroundServices
 
         private TimeSpan GetDelayTime()
         {
-            TimeSpan ClosedMarketLogic(DateTimeOffset utcReferenceTime)
+            // I want to calculate the next market open time, and then delay until that time
+
+            var currentTimeInEastern = _marketHours.ToMarketTime(DateTime.UtcNow);
+
+            TimeSpan LogAndReturn(string message, TimeSpan delay)
             {
-                var currentTime = _marketHours.ToMarketTime(utcReferenceTime);
-                var marketCloseTime = _marketHours.GetMarketEndOfDayTimeInUtc(currentTime);
-
-                var openTime = (currentTime > marketCloseTime) switch {
-                    true => _marketHours.GetMarketStartOfDayTimeInUtc(currentTime.AddDays(-1)),
-                    false => _marketHours.GetMarketStartOfDayTimeInUtc(currentTime)
-                };
-
-                return openTime - currentTime;
+                _logger.LogInformation(message);
+                return delay;
             }
 
-            TimeSpan OpenMarketLogic(DateTimeOffset utcReferenceTime)
-            {
-                var endOfMarket = _marketHours.GetMarketEndOfDayTimeInUtc(utcReferenceTime);
-                var closeTime = endOfMarket.AddMinutes(-15);
-                return closeTime - utcReferenceTime;
-            }
-
-            var nowUtc = DateTimeOffset.UtcNow;
-            var delay = _marketHours.IsMarketOpen(nowUtc) switch {
-                true => OpenMarketLogic(nowUtc),
-                false => ClosedMarketLogic(nowUtc)
+            return currentTimeInEastern.TimeOfDay switch {
+                var t when t >= web.Utils.MarketHours.CloseToEndTime => 
+                    LogAndReturn(
+                        "After the end of the market day",
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date.AddDays(1))
+                            .AddMinutes(5)
+                            .Subtract(DateTimeOffset.UtcNow)
+                    ),
+                var t when t < web.Utils.MarketHours.StartTime => 
+                    LogAndReturn(
+                        "Before the start of the market day",
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
+                            .AddMinutes(5)
+                            .Subtract(DateTimeOffset.UtcNow)
+                    ),
+                var t when t < web.Utils.MarketHours.CloseToEndTime =>
+                    LogAndReturn(
+                        "In the middle of the day",
+                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date)
+                        .AddMinutes(-15)
+                        .Subtract(DateTimeOffset.UtcNow)
+                    ),
+                    
+                _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
             };
-
-            return delay;
         }
 
         private async Task MonitorForGaps(string[] tickers, User user, CancellationToken ct)
