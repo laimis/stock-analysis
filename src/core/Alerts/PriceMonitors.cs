@@ -159,7 +159,7 @@ namespace core.Alerts
             MaxPrice = maxPrice;
         }
 
-        public static ProfitPriceMonitor CreateIfApplicable(OwnedStockState state, int profitLevel)
+        public static ProfitPriceMonitor CreateIfApplicable(OwnedStockState state)
         {
             if (state.OpenPosition == null)
             {
@@ -171,18 +171,23 @@ namespace core.Alerts
                 return null;
             }
 
-            var minPriceLevel = ProfitPoints.GetProfitPointWithStopPrice(state.OpenPosition, profitLevel);
-            if (minPriceLevel == null)
+            decimal minPrice = 0;
+            int pricePointLevel = 1;
+            for (; pricePointLevel < 10; pricePointLevel++)
             {
-                return null;
+                minPrice = ProfitPoints.GetProfitPointWithStopPrice(state.OpenPosition, pricePointLevel).Value;
+                if (minPrice > state.OpenPosition.LastSellPrice)
+                {
+                    break;
+                }
             }
-            
-            var maxPriceLevel = ProfitPoints.GetProfitPointWithStopPrice(state.OpenPosition, profitLevel + 1);
+
+            var nextPrice = ProfitPoints.GetProfitPointWithStopPrice(state.OpenPosition, pricePointLevel + 1).Value;
 
             return new ProfitPriceMonitor(
-                minPrice: minPriceLevel.Value,
-                maxPrice: maxPriceLevel.Value,
-                profitLevel: profitLevel,
+                minPrice: minPrice,
+                maxPrice: nextPrice,
+                profitLevel: pricePointLevel,
                 numberOfShares: state.OpenPosition.NumberOfShares,
                 state.Ticker,
                 state.UserId

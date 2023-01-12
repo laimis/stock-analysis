@@ -69,6 +69,7 @@ namespace core.Stocks
         public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
         public DateTimeOffset LastTransaction { get; private set; }
+        public decimal LastSellPrice { get; private set; }
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
         public string Category { get; private set; }
         public void SetCategory(string category) => Category = category;
@@ -142,6 +143,7 @@ namespace core.Stocks
             }
 
             LastTransaction = when;
+            LastSellPrice = price;
 
             RunCalculations();
 

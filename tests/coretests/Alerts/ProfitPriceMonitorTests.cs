@@ -11,7 +11,11 @@ namespace coretests.Alerts
         [Fact]
         public void Behavior()
         {
-            var m = CreateMonitorUnderTest();
+            var stock = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
+
+            stock.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
+
+            var m = ProfitPriceMonitor.CreateIfApplicable(stock.State);
 
             // first  check, the price is not at profit
             var triggered = m.RunCheck(10, DateTimeOffset.UtcNow);
@@ -39,19 +43,16 @@ namespace coretests.Alerts
             Assert.Null(m.TriggeredAlert);
         }
 
-        private static ProfitPriceMonitor CreateMonitorUnderTest(int level = 1)
-        {
-            var a = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
-
-            a.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
-
-            return ProfitPriceMonitor.CreateIfApplicable(a.State, level);
-        }
-
         [Fact]
         public void Level2()
         {
-            var m = CreateMonitorUnderTest(2);
+            var stock = new OwnedStock(new Ticker("AMD"), System.Guid.NewGuid());
+
+            stock.Purchase(10, 10, DateTimeOffset.UtcNow, "notes", 9);
+
+            stock.Sell(1, 11, DateTimeOffset.UtcNow, "notes");
+
+            var m = ProfitPriceMonitor.CreateIfApplicable(stock.State);
 
             var triggered = m.RunCheck(11m, DateTimeOffset.UtcNow);
             Assert.False(triggered);

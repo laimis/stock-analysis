@@ -19,6 +19,10 @@ namespace coretests.Stocks
         }
 
         [Fact]
+        public void LastSellPrice_Accurate() =>
+            Assert.Equal(37, _position.LastSellPrice);
+
+        [Fact]
         public void RR_Accurate() =>
             Assert.Equal(3.69m, _position.RR, 2);
 

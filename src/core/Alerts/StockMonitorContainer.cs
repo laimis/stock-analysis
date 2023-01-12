@@ -28,11 +28,8 @@ namespace core.Alerts
             var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock);
             AddIfNotNull(stopMonitor);
 
-            foreach(var level in Enumerable.Range(1, 3))
-            {
-                var profitMonitor = ProfitPriceMonitor.CreateIfApplicable(stock, level);
-                AddIfNotNull(profitMonitor);
-            }
+            var profitMonitor = ProfitPriceMonitor.CreateIfApplicable(stock);
+            AddIfNotNull(profitMonitor);
         }
 
         public void Register(IStockPositionMonitor monitor)
