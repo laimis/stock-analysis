@@ -3,7 +3,7 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
-    internal class TradingStrategyRRLevels
+    internal class TradingStrategyWithProfitPoints
     {
         public static TradingStrategyResult Run(
             string name,
@@ -56,6 +56,12 @@ namespace core.Stocks.Services.Trading
 
                     if (position.NumberOfShares < portion)
                     {
+                        portion = (int)position.NumberOfShares;
+                    }
+
+                    if (currentLevel == numberOfProfitPoints)
+                    {
+                        // sell all the remaining shares
                         portion = (int)position.NumberOfShares;
                     }
 

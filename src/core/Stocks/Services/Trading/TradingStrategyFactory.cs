@@ -45,7 +45,7 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyRRLevels.Run(
+            => TradingStrategyWithProfitPoints.Run(
                 "1/3 on each RR level",
                 positionInstance,
                 success,
@@ -58,7 +58,7 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyRRLevels.Run(
+            => TradingStrategyWithProfitPoints.Run(
                 "1/3 on each RR level (delayed stop)",
                 positionInstance,
                 success,
@@ -71,7 +71,7 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyRRLevels.Run(
+            => TradingStrategyWithProfitPoints.Run(
                 "1/4 on each RR level",
                 positionInstance,
                 success,
@@ -84,7 +84,7 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyRRLevels.Run(
+            => TradingStrategyWithProfitPoints.Run(
                 "1/3 on each RR level (percent based)",
                 positionInstance,
                 success,
@@ -97,7 +97,7 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] success,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyRRLevels.Run(
+            => TradingStrategyWithProfitPoints.Run(
                 "1/4 on each RR level (percent based)",
                 positionInstance,
                 success,
