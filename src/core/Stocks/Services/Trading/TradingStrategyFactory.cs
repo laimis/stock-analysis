@@ -27,6 +27,10 @@ namespace core.Stocks.Services.Trading
             yield return new TradingStrategy(
                 RunOneThirdRRDelayedStop
             );
+
+            yield return new TradingStrategy(
+                RunOneThirdWithRRWithDownsideProtection
+            );
         }
 
         private static Func<int, PositionInstance, decimal> _alwaysPositionStop = (_, position) => position.StopPrice.Value;
@@ -91,7 +95,8 @@ namespace core.Stocks.Services.Trading
                 3,
                 level => ProfitPoints.GetProfitPointWithPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
-                closeIfOpenAtTheEnd);
+                closeIfOpenAtTheEnd
+            );
 
         public static TradingStrategyResult RunOneFourthPercentBased(
             PositionInstance positionInstance,
@@ -104,6 +109,23 @@ namespace core.Stocks.Services.Trading
                 4,
                 level => ProfitPoints.GetProfitPointWithPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
-                closeIfOpenAtTheEnd);
+                closeIfOpenAtTheEnd
+            );
+
+        public static TradingStrategyResult RunOneThirdWithRRWithDownsideProtection(
+            PositionInstance positionInstance,
+            PriceBar[] prices,
+            bool closeIfOpenAtTheEnd
+        )
+            => TradingStrategyWithProfitPoints.Run(
+                "1/3 on each RR level (with downside protection)",
+                positionInstance,
+                prices,
+                3,
+                level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
+                closeIfOpenAtTheEnd,
+                downsideProtectionEnabled: true
+            );
     }
 }

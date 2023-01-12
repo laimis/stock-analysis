@@ -198,7 +198,10 @@ namespace core.Stocks
         {
             Price = price;
             UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
-            UnrealizedGainPct = (price - AverageCostPerShare) / AverageCostPerShare;
+            UnrealizedGainPct = AverageCostPerShare switch {
+                0 => 0,
+                _ => (price - AverageCostPerShare) / AverageCostPerShare
+            };
             UnrealizedRR = RiskedAmount switch {
                 not null => UnrealizedProfit / RiskedAmount.Value,
                 _ => 0

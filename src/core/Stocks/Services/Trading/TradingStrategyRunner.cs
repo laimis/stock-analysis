@@ -60,7 +60,12 @@ namespace core.Stocks.Services.Trading
                 positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
                 positionInstance.SetStopPrice(stopPrice, when);
 
-                var result = strategy.Run(positionInstance, bars, closeIfOpenAtTheEnd);
+                var result = strategy.Run(
+                    position: positionInstance,
+                    bars: bars,
+                    closeIfOpenAtTheEnd: closeIfOpenAtTheEnd
+                );
+
                 results.Results.Add(result);
             }
 

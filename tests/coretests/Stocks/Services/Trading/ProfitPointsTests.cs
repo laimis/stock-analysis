@@ -5,11 +5,11 @@ using Xunit;
 
 namespace coretests.Stocks.Services.Trading
 {
-    public class ProfitLevelsTests
+    public class ProfitPointsTests
     {
         private PositionInstance _position;
 
-        public ProfitLevelsTests()
+        public ProfitPointsTests()
         {
             _position = new PositionInstance(0, "TSLA");
             _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());

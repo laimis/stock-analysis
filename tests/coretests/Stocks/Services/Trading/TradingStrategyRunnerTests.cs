@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
+using core.Stocks;
 using core.Stocks.Services.Trading;
 using Moq;
 using Xunit;
@@ -13,22 +15,11 @@ namespace coretests.Stocks.Services
 {
     public class TradingStrategyRunnerTests
     {
-        private TradingStrategyRunner _runner;
-
-        public TradingStrategyRunnerTests()
+        private static TradingStrategyRunner CreateRunner(
+            int numberOfBars,
+            Func<int, decimal> priceFunction)
         {
-            var prices = new List<PriceBar>();
-            for(var i = 0; i < 100; i++)
-            {
-                prices.Add(
-                    new PriceBar(
-                        date: System.DateTimeOffset.UtcNow.AddDays(i),
-                        open: 10+i, high: 10+i,
-                        low: 10+i, close: 10+i,
-                        volume: 1000
-                    )
-                );
-            }
+            var prices = GeneratePriceBars(numberOfBars, priceFunction);
 
             var mock = new Mock<IBrokerage>();
             mock.Setup(
@@ -45,13 +36,28 @@ namespace coretests.Stocks.Services
                     new ServiceResponse<PriceBar[]>(prices.ToArray())
                 );
 
-            _runner = new TradingStrategyRunner(mock.Object, Mock.Of<IMarketHours>());
+            return new TradingStrategyRunner(mock.Object, Mock.Of<IMarketHours>());
+        }
+
+        private static List<PriceBar> GeneratePriceBars(int numberOfBars, Func<int, decimal> priceFunction)
+        {
+            return Enumerable.Range(0, numberOfBars)
+                .Select(i =>
+                    new PriceBar(
+                        date: System.DateTimeOffset.UtcNow.AddDays(i),
+                        open: priceFunction(i), high: priceFunction(i),
+                        low: priceFunction(i), close: priceFunction(i),
+                        volume: 1000
+                    )
+                ).ToList();
         }
 
         [Fact]
         public async Task BasicTest()
         {
-            var results = await _runner.RunAsync(
+            var runner = CreateRunner(100, i => 10 + i);
+
+            var results = await runner.RunAsync(
                 new UserState(),
                 numberOfShares: 100,
                 price: 10,
@@ -72,6 +78,7 @@ namespace coretests.Stocks.Services
             Assert.Equal(0.0m, maxDrawdown);
             Assert.Equal(1.5m, maxGain);
             Assert.Equal(14, position.DaysHeld);
+            Assert.Equal(25, position.Price);
 
             var oneFourthResult = results.Results[1];
             maxDrawdown = oneFourthResult.maxDrawdownPct;
@@ -85,12 +92,15 @@ namespace coretests.Stocks.Services
             Assert.Equal(0.0m, maxDrawdown);
             Assert.Equal(2.0m, maxGain);
             Assert.Equal(19, position.DaysHeld);
+            Assert.Equal(30, position.Price);
         }
 
         [Fact]
         public async Task WithPortionSizeTooSmall_StillSellsAtRRLevels()
         {
-            var results = await _runner.RunAsync(
+            var runner = CreateRunner(100, i => 10 + i);
+
+            var results = await runner.RunAsync(
                 new UserState(),
                 numberOfShares: 2,
                 price: 10,
@@ -111,12 +121,15 @@ namespace coretests.Stocks.Services
             Assert.Equal(0.0m, maxDrawdown);
             Assert.Equal(1m, maxGain);
             Assert.Equal(9, position.DaysHeld);
+            Assert.Equal(20, position.Price);
         }
 
         [Fact]
         public async Task WithPositionNotFullySold_IsOpen()
         {
-            var result = await _runner.RunAsync(
+            var runner = CreateRunner(100, i => 10 + i);
+
+            var result = await runner.RunAsync(
                 new UserState(),
                 numberOfShares: 2,
                 price: 50,
@@ -128,6 +141,72 @@ namespace coretests.Stocks.Services
             {
                 Assert.False(r.position.IsClosed);
             }
+        }
+
+        [Fact]
+        public async Task WithPriceFalling_StopPriceExitExecutes()
+        {
+            var runner = CreateRunner(10, i => 50 - i);
+
+            var result = await runner.RunAsync(
+                new UserState(),
+                numberOfShares: 2,
+                price: 50,
+                stopPrice: 45,
+                ticker: "tsla",
+                when: System.DateTimeOffset.UtcNow
+            );
+
+            var position = result.Results[0].position;
+            var maxGain = result.Results[0].maxGainPct;
+            var maxDrawdown = result.Results[0].maxDrawdownPct;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(-10, position.Profit);
+            Assert.Equal(-0.1m, position.GainPct);
+            Assert.Equal(-1m, position.RR);
+            Assert.Equal(4, position.DaysHeld);
+            Assert.Equal(45, position.Price);
+            Assert.Equal(0, maxGain);
+            Assert.Equal(-0.1m, maxDrawdown);
+        }
+
+        [Fact]
+        public void WithPriceFallingAndDownsideProtectionOn_LossesSmaller()
+        {
+            var bars = GeneratePriceBars(10, i => 50 - i);
+
+            var positionInstance = new PositionInstance(0, "tsla");
+            positionInstance.Buy(
+                numberOfShares: 2,
+                price: 50,
+                when: DateTimeOffset.UtcNow,
+                Guid.NewGuid()
+            );
+
+            positionInstance.SetStopPrice(
+                45,
+                DateTimeOffset.UtcNow
+            );
+            
+            var result = TradingStrategyFactory.RunOneThirdWithRRWithDownsideProtection(
+                positionInstance,
+                bars.ToArray(),
+                closeIfOpenAtTheEnd: false
+            );
+
+            var position = result.position;
+            var maxGain = result.maxGainPct;
+            var maxDrawdown = result.maxDrawdownPct;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(-8, position.Profit);
+            Assert.Equal(-0.08m, position.GainPct);
+            Assert.Equal(-0.8m, position.RR);
+            Assert.Equal(4, position.DaysHeld);
+            Assert.Equal(45, position.Price);
+            Assert.Equal(0, maxGain);
+            Assert.Equal(-0.1m, maxDrawdown);
         }
     }
 }

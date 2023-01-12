@@ -12,7 +12,11 @@ namespace core.Stocks.Services.Trading
     
     public interface ITradingStrategy
     {
-        TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success, bool closeIfOpenAtTheEnd);
+        TradingStrategyResult Run(
+            PositionInstance position,
+            PriceBar[] bars,
+            bool closeIfOpenAtTheEnd
+        );
     }
 
     public class TradingStrategyResults
@@ -42,9 +46,12 @@ namespace core.Stocks.Services.Trading
 
         public Func<PositionInstance, PriceBar[], bool, TradingStrategyResult> RunFunc { get; }
 
-        public TradingStrategyResult Run(PositionInstance positionInstance, PriceBar[] success, bool closeIfOpenAtTheEnd)
+        public TradingStrategyResult Run(
+            PositionInstance position,
+            PriceBar[] bars,
+            bool closeIfOpenAtTheEnd)
         {
-            return RunFunc(positionInstance, success, closeIfOpenAtTheEnd);
+            return RunFunc(position, bars, closeIfOpenAtTheEnd);
         }
     }
 }
