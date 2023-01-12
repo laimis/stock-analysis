@@ -159,22 +159,12 @@ namespace web.BackgroundServices
             var notRecentlyTriggered = userAlertGroup
                 .Where(a => !_container.HasRecentlyTriggered(a));
                 
-            // TODO: we need better way to group this, but right now gap ups can get
-            // crazy
-            Func<TriggeredAlert, bool> gapUpCondition = t => t.description.StartsWith("Gap up");
+            var groupedBySource = notRecentlyTriggered.GroupBy(a => a.source);
 
-            var gapUps = notRecentlyTriggered.Where(gapUpCondition).ToList();
-            var otherAlerts = notRecentlyTriggered.Where(a => !gapUpCondition(a)).ToList();
-
-            foreach (var a in otherAlerts)
+            foreach (var group in groupedBySource)
             {
-                await _smsClient.SendSMS(a.description);
-            }
-
-            if (gapUps.Count > 0)
-            {
-                var gapUpAlert = $"Found {gapUps.Count} gap ups: {string.Join(", ", gapUps.Select(a => a.ticker))}";
-                await _smsClient.SendSMS(gapUpAlert);
+                var alert = $"Found {group.Count()} {group.First().source} alerts: {string.Join(", ", group.Select(a => a.ticker))}";
+                await _smsClient.SendSMS(alert);
             }
         }
 

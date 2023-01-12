@@ -37,7 +37,7 @@ namespace core.Alerts
 
         public void Register(IStockPositionMonitor monitor)
         {
-            _monitors[new StockPositionMonitorKey(monitor.MonitorIdentifer, monitor.Ticker, monitor.UserId)] = monitor;
+            _monitors[new StockPositionMonitorKey(monitor.Description, monitor.Ticker, monitor.UserId)] = monitor;
         }
 
         private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts = new Dictionary<Guid, List<TriggeredAlert>>();

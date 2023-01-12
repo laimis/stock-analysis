@@ -145,7 +145,7 @@ namespace web.BackgroundServices
                 var gaps = GapAnalysis.Generate(prices.Success, 2);
                 if (gaps.Count == 0 || gaps[0].type != GapType.Up)
                 {
-                    _container.Deregister(GapUpMonitor.MonitorIdentifer, ticker, user.Id);
+                    _container.Deregister(GapUpMonitor.GapUp, ticker, user.Id);
                     continue;
                 }
 

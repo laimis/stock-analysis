@@ -38,7 +38,6 @@ namespace core.Alerts
         bool IsTriggered { get; }
         AlertType AlertType { get; }
         Guid UserId { get; }
-        string MonitorIdentifer { get; }
     }
 
     public enum AlertType
@@ -82,8 +81,6 @@ namespace core.Alerts
 
         public abstract AlertType AlertType { get; }
 
-        public abstract string MonitorIdentifer { get; }
-
         public bool RunCheck(decimal price, DateTimeOffset time)
         {
             LastSeenValue = price;
@@ -96,13 +93,14 @@ namespace core.Alerts
 
     public class GapUpMonitor : IStockPositionMonitor
     {
+        public const string GapUp = "Gap up";
         public GapUpMonitor (string ticker, Gap gap, DateTimeOffset when, Guid userId)
         {
             Ticker = ticker;
             Gap = gap;
             When = when;
             UserId = userId;
-            Description = $"Gap up";
+            Description = GapUp;
         }
 
         public string Ticker { get; }
@@ -130,9 +128,6 @@ namespace core.Alerts
 
         Guid IStockPositionMonitor.UserId => UserId;
 
-        public static string MonitorIdentifer => "GapUp";
-        string IStockPositionMonitor.MonitorIdentifer => MonitorIdentifer;
-
         bool IStockPositionMonitor.RunCheck(decimal price, DateTimeOffset time)
         {
             if (TriggeredAlert.HasValue)
@@ -149,7 +144,7 @@ namespace core.Alerts
                 numberOfShares: 0,
                 userId: UserId,
                 alertType: AlertType.Positive,
-                source: nameof(GapUpMonitor)
+                source: Description
             );
 
             return true;
@@ -198,8 +193,6 @@ namespace core.Alerts
 
         public decimal MaxPrice { get; }
 
-        public override string MonitorIdentifer => $"Profit{ThresholdValue}";
-
         protected override bool RunCheckInternal(decimal price, DateTimeOffset time)
         {
             return IsTriggered switch {
@@ -244,7 +237,7 @@ namespace core.Alerts
                 NumberOfShares,
                 UserId,
                 AlertType.Positive,
-                nameof(ProfitPriceMonitor)
+                source: Description
             );
         }
     }
@@ -310,8 +303,6 @@ namespace core.Alerts
             return false;
         }
 
-        public override string MonitorIdentifer => $"Stop";
-
         private void SetTriggeredAlert(decimal price, DateTimeOffset time)
         {
             TriggeredAlert = new TriggeredAlert(
@@ -323,7 +314,7 @@ namespace core.Alerts
                 NumberOfShares,
                 UserId,
                 AlertType.Negative,
-                nameof(StopPriceMonitor)
+                source: Description
             );
         }
     }
