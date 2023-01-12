@@ -127,8 +127,6 @@ namespace core.Stocks
                 throw new InvalidOperationException("Transaction would make amount owned invalid");
             }
 
-            PositionCompleted = true;
-
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
             Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price}", PositionEventType.sell, price, when));
 

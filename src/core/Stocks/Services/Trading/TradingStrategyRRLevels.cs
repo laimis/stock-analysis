@@ -9,7 +9,7 @@ namespace core.Stocks.Services.Trading
             string name,
             PositionInstance position,
             PriceBar[] prices,
-            int rrLevels,
+            int numberOfProfitPoints,
             Func<int, decimal> getProfitPointFunc,
             Func<int, PositionInstance, decimal> getStopPriceFunc,
             bool closeIfOpenAtTheEnd)
@@ -21,20 +21,11 @@ namespace core.Stocks.Services.Trading
 
             var maxGain = 0m;
             var maxDrawdown = 0m;
+            var totalShares = position.NumberOfShares;
 
             var currentLevel = 1;
-            var portion = (int)position.NumberOfShares / rrLevels;
-            if (portion == 0)
-            {
-                // position size too small to split into portions, so just sell 1 share
-                // at a time
-                portion = 1;
-            }
-
             var currentProfitPoint = getProfitPointFunc(currentLevel);
 
-            var lastPortion = (int)position.NumberOfShares - portion * (rrLevels - 1);
-            
             foreach(var bar in prices)
             {
                 if (position.IsClosed)
@@ -57,6 +48,17 @@ namespace core.Stocks.Services.Trading
 
                 if (bar.High >= currentProfitPoint)
                 {
+                    var portion = (int)totalShares / numberOfProfitPoints;
+                    if (portion == 0)
+                    {
+                        portion = 1;
+                    }
+
+                    if (position.NumberOfShares < portion)
+                    {
+                        portion = (int)position.NumberOfShares;
+                    }
+
                     position.Sell(portion, currentProfitPoint, Guid.NewGuid(), bar.Date);
                     
                     if (position.NumberOfShares > 0)
@@ -67,11 +69,6 @@ namespace core.Stocks.Services.Trading
                     
                     currentLevel++;
                     currentProfitPoint = getProfitPointFunc(currentLevel);
-
-                    if (currentLevel == rrLevels)
-                    {
-                        portion = lastPortion;
-                    }
                 }
 
                 // if stop is reached, sell at the close price
