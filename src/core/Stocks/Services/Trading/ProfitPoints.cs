@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace core.Stocks.Services.Trading
 {
-    public static class ProfitLevels
+    public static class ProfitPoints
     {
-        public static decimal? GetProfitPoint(PositionInstance instance, int level)
+        public static decimal? GetProfitPointWithStopPrice(PositionInstance instance, int level)
         {
             if (instance.FirstStop == null)
             {
@@ -17,7 +17,7 @@ namespace core.Stocks.Services.Trading
             return instance.CompletedPositionCostPerShare + riskPerShare * level;
         }
 
-        public static decimal? GetProfitPointForPercentGain(PositionInstance instance, int level, decimal percentGain)
+        public static decimal? GetProfitPointWithPercentGain(PositionInstance instance, int level, decimal percentGain)
         {
             var singleLevel = instance.CompletedPositionCostPerShare * percentGain;
 
@@ -33,6 +33,6 @@ namespace core.Stocks.Services.Trading
                 .ToArray();
         }
 
-        public record struct ProfitPoints(string name, decimal[] prices);
+        public record struct ProfitPointContainer(string name, decimal[] prices);
     }
 }

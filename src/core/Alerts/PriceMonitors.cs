@@ -171,13 +171,13 @@ namespace core.Alerts
                 return null;
             }
 
-            var minPriceLevel = ProfitLevels.GetProfitPoint(state.OpenPosition, profitLevel);
+            var minPriceLevel = ProfitPoints.GetProfitPointWithStopPrice(state.OpenPosition, profitLevel);
             if (minPriceLevel == null)
             {
                 return null;
             }
             
-            var maxPriceLevel = ProfitLevels.GetProfitPoint(state.OpenPosition, profitLevel + 1);
+            var maxPriceLevel = ProfitPoints.GetProfitPointWithStopPrice(state.OpenPosition, profitLevel + 1);
 
             return new ProfitPriceMonitor(
                 minPrice: minPriceLevel.Value,

@@ -43,67 +43,67 @@ namespace core.Stocks.Services.Trading
         
         public static TradingStrategyResult RunOneThirdRR(
             PositionInstance positionInstance,
-            PriceBar[] success,
+            PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
             => TradingStrategyWithProfitPoints.Run(
                 "1/3 on each RR level",
                 positionInstance,
-                success,
+                prices,
                 3,
-                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
+                level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdRRDelayedStop(
             PositionInstance positionInstance,
-            PriceBar[] success,
+            PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
             => TradingStrategyWithProfitPoints.Run(
                 "1/3 on each RR level (delayed stop)",
                 positionInstance,
-                success,
+                prices,
                 3,
-                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
-                (level, position) => _delayedAdvancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
+                level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
+                (level, position) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthRR(
             PositionInstance positionInstance,
-            PriceBar[] success,
+            PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
             => TradingStrategyWithProfitPoints.Run(
                 "1/4 on each RR level",
                 positionInstance,
-                success,
+                prices,
                 4,
-                level => ProfitLevels.GetProfitPoint(positionInstance, level).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPoint(position, l).Value),
+                level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdPercentBased(
             PositionInstance positionInstance,
-            PriceBar[] success,
+            PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
             => TradingStrategyWithProfitPoints.Run(
                 "1/3 on each RR level (percent based)",
                 positionInstance,
-                success,
+                prices,
                 3,
-                level => ProfitLevels.GetProfitPointForPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPointForPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
+                level => ProfitPoints.GetProfitPointWithPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthPercentBased(
             PositionInstance positionInstance,
-            PriceBar[] success,
+            PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
             => TradingStrategyWithProfitPoints.Run(
                 "1/4 on each RR level (percent based)",
                 positionInstance,
-                success,
+                prices,
                 4,
-                level => ProfitLevels.GetProfitPointForPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
-                (level, position) => _advancingStop(level, position, ( l ) => ProfitLevels.GetProfitPointForPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
+                level => ProfitPoints.GetProfitPointWithPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
                 closeIfOpenAtTheEnd);
     }
 }

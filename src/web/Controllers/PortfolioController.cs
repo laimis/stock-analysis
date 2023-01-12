@@ -98,12 +98,12 @@ namespace web.Controllers
             );
 
         [HttpGet("profitpoints/{ticker}/positions/{positionId}")]
-        public Task<ProfitLevels.ProfitPoints[]> ProfitPoints(
+        public Task<core.Stocks.Services.Trading.ProfitPoints.ProfitPointContainer[]> ProfitPoints(
             int positionId,
             string ticker) =>
-            
+
             _mediator.Send(
-                new ProfitPoints.Query(
+                new core.Portfolio.ProfitPoints.Query(
                     positionId, ticker, User.Identifier()
                 )
             );

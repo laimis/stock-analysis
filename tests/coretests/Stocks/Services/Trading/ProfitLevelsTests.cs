@@ -21,21 +21,21 @@ namespace coretests.Stocks.Services.Trading
         [Fact]
         public void ProfitLevelsWork()
         {
-            Assert.Equal(37.5m, ProfitLevels.GetProfitPoint(_position, 1));
-            Assert.Equal(42.5m, ProfitLevels.GetProfitPoint(_position, 2));
-            Assert.Equal(47.5m, ProfitLevels.GetProfitPoint(_position, 3));
-            Assert.Equal(52.5m, ProfitLevels.GetProfitPoint(_position, 4));
-            Assert.Equal(57.5m, ProfitLevels.GetProfitPoint(_position, 5));
+            Assert.Equal(37.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 1));
+            Assert.Equal(42.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 2));
+            Assert.Equal(47.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 3));
+            Assert.Equal(52.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 4));
+            Assert.Equal(57.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 5));
         }
 
         [Fact]
         public void PercentLevelsWork()
         {
-            Assert.Equal(34.125m, ProfitLevels.GetProfitPointForPercentGain(_position, 1, 0.05m));
-            Assert.Equal(35.75m, ProfitLevels.GetProfitPointForPercentGain(_position, 2, 0.05m));
-            Assert.Equal(37.375m, ProfitLevels.GetProfitPointForPercentGain(_position, 3, 0.05m));
-            Assert.Equal(39.0m, ProfitLevels.GetProfitPointForPercentGain(_position, 4, 0.05m));
-            Assert.Equal(40.625m, ProfitLevels.GetProfitPointForPercentGain(_position, 5, 0.05m));
+            Assert.Equal(34.125m, ProfitPoints.GetProfitPointWithPercentGain(_position, 1, 0.05m));
+            Assert.Equal(35.75m, ProfitPoints.GetProfitPointWithPercentGain(_position, 2, 0.05m));
+            Assert.Equal(37.375m, ProfitPoints.GetProfitPointWithPercentGain(_position, 3, 0.05m));
+            Assert.Equal(39.0m, ProfitPoints.GetProfitPointWithPercentGain(_position, 4, 0.05m));
+            Assert.Equal(40.625m, ProfitPoints.GetProfitPointWithPercentGain(_position, 5, 0.05m));
         }
     }
 }
