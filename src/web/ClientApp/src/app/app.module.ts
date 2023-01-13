@@ -111,11 +111,11 @@ var routes: Routes = [
 
   { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard] },
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
-  { path: 'playground', component: PlaygroundComponent},
+  { path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
   { path: 'privacy', component: PrivacyComponent},
-  { path: 'trading', component: StockTradingComponent},
-  { path: 'trading/simulator', component: StockTradingSimulatorComponent},
-  { path: 'trading/:tab', component: StockTradingComponent},
+  { path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
+  { path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
+  { path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
 
   { path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard]},
   { path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard]},
