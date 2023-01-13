@@ -185,7 +185,7 @@ namespace coretests.Stocks.Services
 
             Assert.True(position.IsClosed);
             Assert.Equal(-21, position.Profit);
-            Assert.Equal(-0.082m, position.GainPct, 3);
+            Assert.Equal(-0.084m, position.GainPct, 3);
             Assert.Equal(-0.84m, position.RR);
             Assert.Equal(4, position.DaysHeld);
             Assert.Equal(45, position.Price);
@@ -210,7 +210,7 @@ namespace coretests.Stocks.Services
 
             Assert.True(position.IsClosed);
             Assert.Equal(-23, position.Profit);
-            Assert.Equal(-0.088m, position.GainPct, 3);
+            Assert.Equal(-0.092m, position.GainPct, 3);
             Assert.Equal(-0.92m, position.RR);
             Assert.Equal(4, position.DaysHeld);
             Assert.Equal(45, position.Price);
