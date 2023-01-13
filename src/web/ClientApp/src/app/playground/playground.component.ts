@@ -27,7 +27,7 @@ export class PlaygroundComponent implements OnInit {
     }
 
     this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe( results => {
-        this.results = results
+        this.results = results.sort((a,b) => b.performance.profit - a.performance.profit);
       });
   }
 
