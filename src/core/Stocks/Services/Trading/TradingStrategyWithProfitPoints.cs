@@ -70,7 +70,7 @@ namespace core.Stocks.Services.Trading
                 position.SetPrice(bar.Close);
 
                 // if our r/r ratio goes past  -0.5 for the first time, let's sell half of the position
-                if (downsideProtectionEnabled && !downsideProtectionExecuted && position.RR < -0.5m)
+                if (downsideProtectionEnabled && !downsideProtectionExecuted && position.RR < -0.5m && position.NumberOfShares > 0)
                 {
                     var stocksToSell = (int)position.NumberOfShares / 2;
                     position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
