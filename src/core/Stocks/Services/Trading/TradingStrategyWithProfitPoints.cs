@@ -132,7 +132,7 @@ namespace core.Stocks.Services.Trading
             var downsideProtectionExecuted = false;
             if (context.RunDownsideProtection())
             {
-                var stocksToSell = (int)context.Position.NumberOfShares / downsideProtectionSize;
+                var stocksToSell = (int)(context.Position.NumberOfShares / downsideProtectionSize);
                 if (stocksToSell > 0)
                 {
                     context.Position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
