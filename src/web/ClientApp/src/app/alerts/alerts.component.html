@@ -35,8 +35,8 @@
     No price monitors are present
   </div>
 
-  <h3>Recent Triggers</h3>
-  <table *ngIf="container.recentlyTriggered" class="table table-hover">
+  <h3 *ngIf="!hideRecentTriggered">Recent Triggers</h3>
+  <table *ngIf="container.recentlyTriggered && !hideRecentTriggered" class="table table-hover">
     <thead>
       <tr>
         <th>ticker</th>

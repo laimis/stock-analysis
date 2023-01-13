@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AlertsContainer, PriceMonitor, StocksService } from 'src/app/services/stocks.service';
 
 @Component({
@@ -13,6 +13,12 @@ export class AlertsComponent implements OnInit {
 
   constructor(private stockService : StocksService) { }
 
+  @Input()
+  hideUntriggered : boolean = false;
+
+  @Input()
+  hideRecentTriggered : boolean = false;
+
   ngOnInit(): void {
     this.stockService.getAlerts().subscribe(container => {
       this.container = container;
@@ -26,14 +32,16 @@ export class AlertsComponent implements OnInit {
       var triggered = container.monitors.filter(m => m.triggeredAlert).sort(compareTickers);
 
       var descriptions = new Set(triggered.map(m => m.description));
-      console.log(descriptions)
-
+      
       var groups = []
       descriptions.forEach(description => {
         var group = triggered.filter(m => m.description === description).sort(compareTickers);
         groups.push(group);
       })
-      groups.push(notTriggered);
+
+      if (!this.hideUntriggered) {
+        groups.push(notTriggered);
+      }
 
       this.monitorGroups = groups;
     });

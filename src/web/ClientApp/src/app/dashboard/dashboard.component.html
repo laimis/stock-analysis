@@ -39,6 +39,7 @@
             </h5>
             <p class="card-text">You have <b>{{dashboard.openStockCount}}</b> tickers on file</p>
             <a class="card-link" [routerLink]="[ '/trading' ]">Manage Shares</a>
+            <a class="card-link" [routerLink]="[ '/stocks/newposition' ]">New Position</a>
           </div>
         </div>
       </div>
@@ -69,6 +70,21 @@
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-bell"></i>
+              <a [routerLink]="[ '/alerts' ]">Alerts</a>
+            </h5>
+            <app-alerts [hideUntriggered]="true" [hideRecentTriggered]="true"></app-alerts>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col">
         <div class="card mt-4">
@@ -78,9 +94,7 @@
               Tools
             </h5>
             <ul>
-              <li><a [routerLink]="[ '/stocks/newposition' ]">New Position</a></li>
               <li><a [routerLink]="[ '/summary' ]">Weekly Summary</a></li>
-              <li><a [routerLink]="[ '/alerts' ]">Alerts</a></li>
               <li><a [routerLink]="[ '/stocks/lists' ]">Stock lists</a></li>
               <li><a [routerLink]="[ '/trading/simulator' ]">Simulator</a></li>
               <li><a [routerLink]="[ '/reports/recentsells' ]">Sells</a></li>
@@ -88,9 +102,8 @@
               <li><a [routerLink]="[ '/reports/chain' ]">Chain</a></li>
             </ul>
           </div>
-        </div>
+        </div>  
       </div>
-
     </div>
 
   </div>
