@@ -144,25 +144,22 @@ namespace coretests.Stocks.Services
         }
 
         [Fact]
-        public async Task WithPriceFalling_StopPriceExitExecutes()
+        public void WithPriceFalling_StopPriceExitExecutes()
         {
-            var runner = CreateRunner(10, i => 50 - i);
-
-            var result = await runner.RunAsync(
-                new UserState(),
-                numberOfShares: 2,
-                price: 50,
-                stopPrice: 45,
-                ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow
+            var (bars, positionInstance) = CreateDownsideTestData();
+            
+            var result = TradingStrategyFactory.RunOneThirdRR(
+                positionInstance,
+                bars.ToArray(),
+                closeIfOpenAtTheEnd: false
             );
 
-            var position = result.Results[0].position;
-            var maxGain = result.Results[0].maxGainPct;
-            var maxDrawdown = result.Results[0].maxDrawdownPct;
+            var position = result.position;
+            var maxGain = result.maxGainPct;
+            var maxDrawdown = result.maxDrawdownPct;
 
             Assert.True(position.IsClosed);
-            Assert.Equal(-10, position.Profit);
+            Assert.Equal(-25, position.Profit);
             Assert.Equal(-0.1m, position.GainPct);
             Assert.Equal(-1m, position.RR);
             Assert.Equal(4, position.DaysHeld);
@@ -174,22 +171,9 @@ namespace coretests.Stocks.Services
         [Fact]
         public void WithPriceFallingAndDownsideProtectionOn_LossesSmaller()
         {
-            var bars = GeneratePriceBars(10, i => 50 - i);
-
-            var positionInstance = new PositionInstance(0, "tsla");
-            positionInstance.Buy(
-                numberOfShares: 2,
-                price: 50,
-                when: DateTimeOffset.UtcNow,
-                Guid.NewGuid()
-            );
-
-            positionInstance.SetStopPrice(
-                45,
-                DateTimeOffset.UtcNow
-            );
+            var (bars, positionInstance) = CreateDownsideTestData();
             
-            var result = TradingStrategyFactory.RunOneThirdWithRRWithDownsideProtection(
+            var result = TradingStrategyFactory.RunOneThirdWithRRWithDownsideProtectionHalf(
                 positionInstance,
                 bars.ToArray(),
                 closeIfOpenAtTheEnd: false
@@ -200,13 +184,58 @@ namespace coretests.Stocks.Services
             var maxDrawdown = result.maxDrawdownPct;
 
             Assert.True(position.IsClosed);
-            Assert.Equal(-8, position.Profit);
-            Assert.Equal(-0.08m, position.GainPct);
-            Assert.Equal(-0.8m, position.RR);
+            Assert.Equal(-21, position.Profit);
+            Assert.Equal(-0.082m, position.GainPct, 3);
+            Assert.Equal(-0.84m, position.RR);
             Assert.Equal(4, position.DaysHeld);
             Assert.Equal(45, position.Price);
             Assert.Equal(0, maxGain);
             Assert.Equal(-0.1m, maxDrawdown);
+        }
+
+        [Fact]
+        public void WithPriceFallingAndDownsideProtectionOnSmallerSize_LossesSmaller()
+        {
+            var (bars, positionInstance) = CreateDownsideTestData();
+            
+            var result = TradingStrategyFactory.RunOneThirdWithRRWithDownsideProtectionThird(
+                positionInstance,
+                bars.ToArray(),
+                closeIfOpenAtTheEnd: false
+            );
+
+            var position = result.position;
+            var maxGain = result.maxGainPct;
+            var maxDrawdown = result.maxDrawdownPct;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(-23, position.Profit);
+            Assert.Equal(-0.088m, position.GainPct, 3);
+            Assert.Equal(-0.92m, position.RR);
+            Assert.Equal(4, position.DaysHeld);
+            Assert.Equal(45, position.Price);
+            Assert.Equal(0, maxGain);
+            Assert.Equal(-0.1m, maxDrawdown);
+        }
+
+        private (List<PriceBar> bars, PositionInstance position) CreateDownsideTestData()
+        {
+            var bars = GeneratePriceBars(10, i => 50 - i);
+
+            var positionInstance = new PositionInstance(0, "tsla");
+            positionInstance.Buy(
+                numberOfShares: 5,
+                price: 50,
+                when: DateTimeOffset.UtcNow,
+                Guid.NewGuid()
+            );
+
+            positionInstance.SetStopPrice(
+                45,
+                DateTimeOffset.UtcNow
+            );
+
+            return (bars, positionInstance);
         }
     }
 }

@@ -43,7 +43,8 @@ namespace core.Stocks.Services.Trading
             Func<int, decimal> getProfitPointFunc,
             Func<int, PositionInstance, decimal> getStopPriceFunc,
             bool closeIfOpenAtTheEnd,
-            bool downsideProtectionEnabled = false)
+            bool downsideProtectionEnabled = false,
+            decimal downsideProtectionSize = 2)
         {
             if (startPosition.StopPrice == null)
             {
@@ -66,7 +67,10 @@ namespace core.Stocks.Services.Trading
                 CurrentLevel: 1
             );
 
-            var finalContext = prices.Aggregate(context, ApplyBar);
+            var finalContext = downsideProtectionEnabled switch {
+                false => prices.Aggregate(context, ApplyBar),
+                true => prices.Aggregate(context, (c, b) => ApplyBarWithDownsideProtection(c, b, downsideProtectionSize))
+            };
 
             if (!finalContext.Position.IsClosed && closeIfOpenAtTheEnd)
             {
@@ -105,19 +109,7 @@ namespace core.Stocks.Services.Trading
 
             context.Position.SetPrice(bar.Close);
 
-            // if our r/r ratio goes past  -0.5 for the first time, let's sell half of the position
-            var downsideProtectionExecuted = false;
-            if (context.RunDownsideProtection())
-            {
-                var stocksToSell = (int)context.Position.NumberOfShares / 2;
-                if (stocksToSell > 0)
-                {
-                    context.Position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
-                    downsideProtectionExecuted = true;
-                }
-            }
-
-            context = context with
+            return context with
             {
                 MaxGain = Math.Max(
                     bar.PercentDifferenceFromHigh(context.Position.AverageBuyCostPerShare),
@@ -127,10 +119,31 @@ namespace core.Stocks.Services.Trading
                     bar.PercentDifferenceFromLow(context.Position.AverageBuyCostPerShare),
                     context.MaxDrawdown
                 ),
-                DownsideProtectionExecuted = downsideProtectionExecuted,
                 CurrentLevel = level
             };
-            return context;
+        }
+
+        private static SimulationContext ApplyBarWithDownsideProtection(
+            SimulationContext context, PriceBar bar, decimal downsideProtectionSize
+        )
+        {
+            var newContext = ApplyBar(context, bar);
+
+            var downsideProtectionExecuted = false;
+            if (context.RunDownsideProtection())
+            {
+                var stocksToSell = (int)context.Position.NumberOfShares / downsideProtectionSize;
+                if (stocksToSell > 0)
+                {
+                    context.Position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
+                    downsideProtectionExecuted = true;
+                }
+            }
+
+            return newContext with
+            {
+                DownsideProtectionExecuted = downsideProtectionExecuted
+            };
         }
 
         private static void ClosePosition(SimulationContext context, PriceBar bar)

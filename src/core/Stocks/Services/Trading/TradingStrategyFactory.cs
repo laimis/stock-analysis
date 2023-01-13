@@ -29,7 +29,11 @@ namespace core.Stocks.Services.Trading
             );
 
             yield return new TradingStrategy(
-                RunOneThirdWithRRWithDownsideProtection
+                RunOneThirdWithRRWithDownsideProtectionHalf
+            );
+
+            yield return new TradingStrategy(
+                RunOneThirdWithRRWithDownsideProtectionThird
             );
         }
 
@@ -112,13 +116,13 @@ namespace core.Stocks.Services.Trading
                 closeIfOpenAtTheEnd
             );
 
-        public static TradingStrategyResult RunOneThirdWithRRWithDownsideProtection(
+        public static TradingStrategyResult RunOneThirdWithRRWithDownsideProtectionHalf(
             PositionInstance positionInstance,
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd
         )
             => TradingStrategyWithProfitPoints.Run(
-                "1/3 on each RR level (with downside protection)",
+                "1/3 on each RR level (1/2 downside protection)",
                 positionInstance,
                 prices,
                 3,
@@ -126,6 +130,23 @@ namespace core.Stocks.Services.Trading
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
                 closeIfOpenAtTheEnd,
                 downsideProtectionEnabled: true
+            );
+
+        public static TradingStrategyResult RunOneThirdWithRRWithDownsideProtectionThird(
+            PositionInstance positionInstance,
+            PriceBar[] prices,
+            bool closeIfOpenAtTheEnd
+        )
+            => TradingStrategyWithProfitPoints.Run(
+                "1/3 on each RR level (1/3 downside protection)",
+                positionInstance,
+                prices,
+                3,
+                level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
+                (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
+                closeIfOpenAtTheEnd,
+                downsideProtectionEnabled: true,
+                downsideProtectionSize: 3
             );
     }
 }
