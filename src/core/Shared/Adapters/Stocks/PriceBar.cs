@@ -53,6 +53,12 @@ namespace core.Shared.Adapters.Stocks
                 long.Parse(parts[5])
             );
         }
+
+        internal decimal PercentDifferenceFromLow(decimal value) =>
+            (Low - value) / value;
+
+        internal decimal PercentDifferenceFromHigh(decimal value) =>
+            (High - value) / value;
     }
 
     public static class PriceBarExtensions

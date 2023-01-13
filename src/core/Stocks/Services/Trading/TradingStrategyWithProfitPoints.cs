@@ -1,13 +1,43 @@
 using System;
+using System.Linq;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
+    internal record struct SimulationContext(
+        string Name,
+        PositionInstance Position,
+        PriceBar[] Prices,
+        int NumberOfProfitPoints,
+        Func<int, decimal> GetProfitPointFunc,
+        Func<int, PositionInstance, decimal> GetStopPriceFunc,
+        bool CloseIfOpenAtTheEnd,
+        bool DownsideProtectionEnabled,
+        bool DownsideProtectionExecuted,
+        decimal MaxGain,
+        decimal MaxDrawdown,
+        decimal NumberOfSharesAtStart,
+        int CurrentLevel
+    )
+    {
+        internal bool RunDownsideProtection() =>
+            DownsideProtectionEnabled
+            && !DownsideProtectionExecuted
+            && Position.RR < -0.5m
+            && Position.NumberOfShares > 0;
+
+        internal decimal GetCurrentProfitPoint() =>
+            GetProfitPointFunc(CurrentLevel);
+
+        internal decimal? GetStopPrice() =>
+            GetStopPriceFunc(CurrentLevel, Position);
+    }
+
     internal class TradingStrategyWithProfitPoints
     {
         public static TradingStrategyResult Run(
             string name,
-            PositionInstance position,
+            PositionInstance startPosition,
             PriceBar[] prices,
             int numberOfProfitPoints,
             Func<int, decimal> getProfitPointFunc,
@@ -15,127 +45,137 @@ namespace core.Stocks.Services.Trading
             bool closeIfOpenAtTheEnd,
             bool downsideProtectionEnabled = false)
         {
-            if (position.StopPrice == null)
+            if (startPosition.StopPrice == null)
             {
                 throw new InvalidOperationException("Stop price is not set");
             }
 
-            var maxGain = 0m;
-            var maxDrawdown = 0m;
-            var totalShares = position.NumberOfShares;
-            var downsideProtectionExecuted = false;
+            var context = new SimulationContext(
+                Name: name,
+                Position: startPosition,
+                Prices: prices,
+                NumberOfProfitPoints: numberOfProfitPoints,
+                GetProfitPointFunc: getProfitPointFunc,
+                GetStopPriceFunc: getStopPriceFunc,
+                CloseIfOpenAtTheEnd: closeIfOpenAtTheEnd,
+                DownsideProtectionEnabled: downsideProtectionEnabled,
+                DownsideProtectionExecuted: false,
+                MaxGain: 0m,
+                MaxDrawdown: 0m,
+                NumberOfSharesAtStart: startPosition.NumberOfShares,
+                CurrentLevel: 1
+            );
 
-            var currentLevel = 1;
-            var currentProfitPoint = getProfitPointFunc(currentLevel);
+            var finalContext = prices.Aggregate(context, ApplyBar);
 
-            foreach(var bar in prices)
+            if (!finalContext.Position.IsClosed && closeIfOpenAtTheEnd)
             {
-                if (position.IsClosed)
-                {
-                    break;
-                }
-
-                // check if it's the max gain
-                maxGain = AdjustMaxGainIfNecessary(position, maxGain, bar);
-                
-                maxDrawdown = AdjustMaxDrawDownIfNecessary(position, maxDrawdown, bar);
-
-                if (bar.High >= currentProfitPoint)
-                {
-                    ExecuteSell(
-                        position,
-                        numberOfProfitPoints,
-                        totalShares,
-                        currentLevel,
-                        currentProfitPoint,
-                        bar
-                    );
-
-                    if (position.NumberOfShares > 0)
-                    {
-                        var stopPrice = getStopPriceFunc(currentLevel, position);
-                        position.SetStopPrice(stopPrice, bar.Date);
-                    }
-
-                    currentLevel++;
-                    currentProfitPoint = getProfitPointFunc(currentLevel);
-                }
-
-                // if stop is reached, sell at the close price
-                if (bar.Close <= position.StopPrice.Value)
-                {
-                    position.Sell(position.NumberOfShares, bar.Close, Guid.NewGuid(), bar.Date);
-                }
-                
-                position.SetPrice(bar.Close);
-
-                // if our r/r ratio goes past  -0.5 for the first time, let's sell half of the position
-                if (downsideProtectionEnabled && !downsideProtectionExecuted && position.RR < -0.5m && position.NumberOfShares > 0)
-                {
-                    var stocksToSell = (int)position.NumberOfShares / 2;
-                    if (stocksToSell > 0)
-                    {
-                        position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
-                        downsideProtectionExecuted = true;
-                    }
-                }
-            }
-
-            if (!position.IsClosed && closeIfOpenAtTheEnd)
-            {
-                position.Sell(position.NumberOfShares, prices[^1].Close, Guid.NewGuid(), prices[^1].Date);
+                ClosePosition(finalContext, prices[^1]);
             }
 
             return new TradingStrategyResult(
-                maxGainPct: maxGain,
-                maxDrawdownPct: maxDrawdown,
-                position: position,
-                strategyName: name
+                maxGainPct: finalContext.MaxGain,
+                maxDrawdownPct: finalContext.MaxDrawdown,
+                position: finalContext.Position,
+                strategyName: finalContext.Name
             );
         }
 
-        private static void ExecuteSell(PositionInstance position, int numberOfProfitPoints, decimal totalShares, int currentLevel, decimal currentProfitPoint, PriceBar bar)
+        private static SimulationContext ApplyBar(SimulationContext context, PriceBar bar)
         {
-            var portion = (int)totalShares / numberOfProfitPoints;
+            if (context.Position.IsClosed)
+            {
+                return context;
+            }
+
+            var level = context.CurrentLevel;
+            // check if it's the max gain
+            if (bar.High >= context.GetCurrentProfitPoint())
+            {
+                ExecuteProfitSell(context, bar);
+
+                level++;
+            }
+
+            // if stop is reached, sell at the close price
+            if (bar.Close <= context.Position.StopPrice.Value)
+            {
+                ClosePosition(context, bar);
+            }
+
+            context.Position.SetPrice(bar.Close);
+
+            // if our r/r ratio goes past  -0.5 for the first time, let's sell half of the position
+            var downsideProtectionExecuted = false;
+            if (context.RunDownsideProtection())
+            {
+                var stocksToSell = (int)context.Position.NumberOfShares / 2;
+                if (stocksToSell > 0)
+                {
+                    context.Position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
+                    downsideProtectionExecuted = true;
+                }
+            }
+
+            context = context with
+            {
+                MaxGain = Math.Max(
+                    bar.PercentDifferenceFromHigh(context.Position.AverageBuyCostPerShare),
+                    context.MaxGain
+                ),
+                MaxDrawdown = Math.Min(
+                    bar.PercentDifferenceFromLow(context.Position.AverageBuyCostPerShare),
+                    context.MaxDrawdown
+                ),
+                DownsideProtectionExecuted = downsideProtectionExecuted,
+                CurrentLevel = level
+            };
+            return context;
+        }
+
+        private static void ClosePosition(SimulationContext context, PriceBar bar)
+        {
+            context.Position.Sell(
+                context.Position.NumberOfShares,
+                bar.Close,
+                Guid.NewGuid(),
+                bar.Date
+            );
+        }
+
+        private static void ExecuteProfitSell(SimulationContext context, PriceBar bar)
+        {
+            var portion = (int)context.NumberOfSharesAtStart / context.NumberOfProfitPoints;
             if (portion == 0)
             {
                 portion = 1;
             }
 
-            if (position.NumberOfShares < portion)
+            if (context.Position.NumberOfShares < portion)
             {
-                portion = (int)position.NumberOfShares;
+                portion = (int)context.Position.NumberOfShares;
             }
 
-            if (currentLevel == numberOfProfitPoints)
+            if (context.CurrentLevel == context.NumberOfProfitPoints)
             {
                 // sell all the remaining shares
-                portion = (int)position.NumberOfShares;
+                portion = (int)context.Position.NumberOfShares;
             }
 
-            position.Sell(portion, currentProfitPoint, Guid.NewGuid(), bar.Date);
-        }
+            context.Position.Sell(
+                portion, 
+                context.GetCurrentProfitPoint(),
+                Guid.NewGuid(),
+                bar.Date
+            );
 
-        private static decimal AdjustMaxDrawDownIfNecessary(PositionInstance position, decimal maxDrawdown, PriceBar bar)
-        {
-            var loss = (bar.Low - position.AverageBuyCostPerShare) / position.AverageBuyCostPerShare;
-            if (loss < maxDrawdown)
+            if (context.Position.NumberOfShares > 0)
             {
-                maxDrawdown = loss;
+                context.Position.SetStopPrice(
+                    context.GetStopPrice(),
+                    bar.Date
+                );
             }
-
-            return maxDrawdown;
-        }
-
-        private static decimal AdjustMaxGainIfNecessary(PositionInstance position, decimal maxGain, PriceBar bar)
-        {
-            var gain = (bar.High - position.AverageBuyCostPerShare) / position.AverageBuyCostPerShare;
-            if (gain > maxGain)
-            {
-                maxGain = gain;
-            }
-
-            return maxGain;
         }
     }
 }
