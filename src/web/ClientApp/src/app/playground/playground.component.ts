@@ -15,14 +15,18 @@ export class PlaygroundComponent implements OnInit {
     private stocks:StocksService,
     private route:ActivatedRoute) { }
 
+  numberOfTrades:number = 40;
+  closePositions:boolean = false;
+
   ngOnInit() {
     var n = this.route.snapshot.queryParamMap.get('n');
-    var numberOfTrades = 20;
+    this.closePositions = this.route.snapshot.queryParamMap.get('closePositions') === "true";
+    
     if (n) {
-      numberOfTrades = parseInt(n);
+      this.numberOfTrades = parseInt(n);
     }
 
-    this.stocks.simulatePositions(false, numberOfTrades).subscribe( results => {
+    this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe( results => {
         this.results = results
       });
   }
