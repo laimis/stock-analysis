@@ -73,8 +73,11 @@ namespace core.Stocks.Services.Trading
                 if (downsideProtectionEnabled && !downsideProtectionExecuted && position.RR < -0.5m && position.NumberOfShares > 0)
                 {
                     var stocksToSell = (int)position.NumberOfShares / 2;
-                    position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
-                    downsideProtectionExecuted = true;
+                    if (stocksToSell > 0)
+                    {
+                        position.Sell(stocksToSell, bar.Close, Guid.NewGuid(), bar.Date);
+                        downsideProtectionExecuted = true;
+                    }
                 }
             }
 
