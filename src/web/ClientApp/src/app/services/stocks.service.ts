@@ -792,6 +792,8 @@ export interface PositionInstance {
   category: string,
   closed: string,
   cost: number,
+  completedPositionCost: number,
+  completedPositionShares: number,
   daysHeld: number,
   daysSinceLastTransaction: number,
   firstBuyCost: number,

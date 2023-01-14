@@ -67,8 +67,8 @@
     <tbody>
       <tr *ngFor="let p of result.openPositions">
         <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
-        <td width="140">{{p.numberOfShares}}</td>
-        <td width="140">{{p.cost  | number:'1.0-2'}}</td>
+        <td width="140">{{p.completedPositionShares}}</td>
+        <td width="140">{{p.completedPositionCost  | number:'1.0-2'}}</td>
         <td width="140">{{p.opened | date: 'MM/dd/yyyy'}}</td>
       </tr>
       <tr *ngIf="result.openPositions.length === 0">
