@@ -53,52 +53,56 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyWithProfitPoints.Run(
+            => TradingStrategySimulations.Run(
                 "1/3 on each RR level",
                 positionInstance,
                 prices,
                 3,
                 level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
+                TradingStrategySimulations.ApplyBar,
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdRRDelayedStop(
             PositionInstance positionInstance,
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyWithProfitPoints.Run(
+            => TradingStrategySimulations.Run(
                 "1/3 on each RR level (delayed stop)",
                 positionInstance,
                 prices,
                 3,
                 level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
                 (level, position) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
+                TradingStrategySimulations.ApplyBar,
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneFourthRR(
             PositionInstance positionInstance,
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyWithProfitPoints.Run(
+            => TradingStrategySimulations.Run(
                 "1/4 on each RR level",
                 positionInstance,
                 prices,
                 4,
                 level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
+                TradingStrategySimulations.ApplyBar,
                 closeIfOpenAtTheEnd);
 
         public static TradingStrategyResult RunOneThirdPercentBased(
             PositionInstance positionInstance,
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyWithProfitPoints.Run(
+            => TradingStrategySimulations.Run(
                 "1/3 on each RR level (percent based)",
                 positionInstance,
                 prices,
                 3,
                 level => ProfitPoints.GetProfitPointWithPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
+                TradingStrategySimulations.ApplyBar,
                 closeIfOpenAtTheEnd
             );
 
@@ -106,13 +110,14 @@ namespace core.Stocks.Services.Trading
             PositionInstance positionInstance,
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd)
-            => TradingStrategyWithProfitPoints.Run(
+            => TradingStrategySimulations.Run(
                 "1/4 on each RR level (percent based)",
                 positionInstance,
                 prices,
                 4,
                 level => ProfitPoints.GetProfitPointWithPercentGain(positionInstance, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value),
+                TradingStrategySimulations.ApplyBar,
                 closeIfOpenAtTheEnd
             );
 
@@ -121,15 +126,15 @@ namespace core.Stocks.Services.Trading
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd
         )
-            => TradingStrategyWithProfitPoints.Run(
+            => TradingStrategySimulations.Run(
                 "1/3 on each RR level (1/2 downside protection)",
                 positionInstance,
                 prices,
                 3,
                 level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
-                closeIfOpenAtTheEnd,
-                downsideProtectionEnabled: true
+                new TradingStrategySimulations.TradingStrategyExecutorWithDownsideProtection(2).Apply,
+                closeIfOpenAtTheEnd: closeIfOpenAtTheEnd
             );
 
         public static TradingStrategyResult RunOneThirdWithRRWithDownsideProtectionThird(
@@ -137,16 +142,17 @@ namespace core.Stocks.Services.Trading
             PriceBar[] prices,
             bool closeIfOpenAtTheEnd
         )
-            => TradingStrategyWithProfitPoints.Run(
+        {
+            return TradingStrategySimulations.Run(
                 "1/3 on each RR level (1/3 downside protection)",
                 positionInstance,
                 prices,
                 3,
                 level => ProfitPoints.GetProfitPointWithStopPrice(positionInstance, level).Value,
                 (level, position) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
-                closeIfOpenAtTheEnd,
-                downsideProtectionEnabled: true,
-                downsideProtectionSize: 3
+                new TradingStrategySimulations.TradingStrategyExecutorWithDownsideProtection(3).Apply,
+                closeIfOpenAtTheEnd: closeIfOpenAtTheEnd
             );
+        }
     }
 }
