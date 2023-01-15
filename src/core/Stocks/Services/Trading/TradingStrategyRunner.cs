@@ -53,7 +53,7 @@ namespace core.Stocks.Services.Trading
                 bars = bars.Skip(1).ToArray();
             }
 
-            foreach(var strategy in TradingStrategyFactory.GetStrategies())
+            foreach(var strategy in TradingStrategyFactory.GetStrategies(closeIfOpenAtTheEnd))
             {
                 var positionInstance = new PositionInstance(0, ticker);
 
@@ -62,8 +62,7 @@ namespace core.Stocks.Services.Trading
 
                 var result = strategy.Run(
                     position: positionInstance,
-                    bars: bars,
-                    closeIfOpenAtTheEnd: closeIfOpenAtTheEnd
+                    bars: bars
                 );
 
                 results.Results.Add(result);

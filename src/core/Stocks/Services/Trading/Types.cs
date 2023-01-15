@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using core.Shared.Adapters.Stocks;
 
@@ -9,14 +8,10 @@ namespace core.Stocks.Services.Trading
         // TODO: this needs to come from the environment or user settings
         public const decimal AVG_PERCENT_GAIN = 0.07m;
     }
-    
+
     public interface ITradingStrategy
     {
-        TradingStrategyResult Run(
-            PositionInstance position,
-            PriceBar[] bars,
-            bool closeIfOpenAtTheEnd
-        );
+        TradingStrategyResult Run(PositionInstance position, PriceBar[] bars);
     }
 
     public class TradingStrategyResults
@@ -37,21 +32,9 @@ namespace core.Stocks.Services.Trading
         string strategyName
     );
 
-    public class TradingStrategy : ITradingStrategy
-    {
-        public TradingStrategy(Func<PositionInstance, PriceBar[], bool, TradingStrategyResult> runFunc)
-        {
-            RunFunc = runFunc;
-        }
-
-        public Func<PositionInstance, PriceBar[], bool, TradingStrategyResult> RunFunc { get; }
-
-        public TradingStrategyResult Run(
-            PositionInstance position,
-            PriceBar[] bars,
-            bool closeIfOpenAtTheEnd)
-        {
-            return RunFunc(position, bars, closeIfOpenAtTheEnd);
-        }
-    }
+    internal record struct SimulationContext(
+        PositionInstance Position,
+        decimal MaxGain,
+        decimal MaxDrawdown
+    );
 }

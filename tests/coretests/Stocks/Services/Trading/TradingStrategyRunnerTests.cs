@@ -96,19 +96,17 @@ namespace coretests.Stocks.Services
         }
 
         [Fact]
-        public async Task WithPortionSizeTooSmall_StillSellsAtRRLevels()
+        public void WithPortionSizeTooSmall_StillSellsAtRRLevels()
         {
-            var runner = CreateRunner(100, i => 10 + i);
+            var bars = GeneratePriceBars(100, i => 10 + i);
 
-            var results = await runner.RunAsync(
-                new UserState(),
-                numberOfShares: 2,
-                price: 10,
-                stopPrice: 5,
-                ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow);
+            var testPosition = new PositionInstance(0, "tsla");
+            testPosition.Buy(2, 10, System.DateTimeOffset.UtcNow, Guid.NewGuid());
+            testPosition.SetStopPrice(5, System.DateTimeOffset.UtcNow);
 
-            var result = results.Results[0];
+            var runner = TradingStrategyFactory.CreateOneThirdRRStrategy();
+
+            var result = runner.Run(testPosition, bars.ToArray());
 
             var maxDrawdown = result.maxDrawdownPct;
             var maxGain = result.maxGainPct;
@@ -148,10 +146,9 @@ namespace coretests.Stocks.Services
         {
             var (bars, positionInstance) = CreateDownsideTestData();
             
-            var result = TradingStrategyFactory.RunOneThirdRR(
+            var result = TradingStrategyFactory.CreateOneThirdRRStrategy().Run(
                 positionInstance,
-                bars.ToArray(),
-                closeIfOpenAtTheEnd: false
+                bars.ToArray()
             );
 
             var position = result.position;
@@ -173,11 +170,12 @@ namespace coretests.Stocks.Services
         {
             var (bars, positionInstance) = CreateDownsideTestData();
             
-            var result = TradingStrategyFactory.RunOneThirdWithRRWithDownsideProtectionHalf(
-                positionInstance,
-                bars.ToArray(),
-                closeIfOpenAtTheEnd: false
-            );
+            var result = TradingStrategyFactory.CreateOneThirdRRWithDownsideProtection(
+                downsideProtectionSize: 2)
+                .Run(
+                    positionInstance,
+                    bars.ToArray()
+                );
 
             var position = result.position;
             var maxGain = result.maxGainPct;
@@ -198,11 +196,12 @@ namespace coretests.Stocks.Services
         {
             var (bars, positionInstance) = CreateDownsideTestData();
             
-            var result = TradingStrategyFactory.RunOneThirdWithRRWithDownsideProtectionThird(
-                positionInstance,
-                bars.ToArray(),
-                closeIfOpenAtTheEnd: false
-            );
+            var result = TradingStrategyFactory.CreateOneThirdRRWithDownsideProtection(
+                downsideProtectionSize: 3)
+                .Run(
+                    positionInstance,
+                    bars.ToArray()
+                );
 
             var position = result.position;
             var maxGain = result.maxGainPct;
