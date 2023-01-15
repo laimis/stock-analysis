@@ -109,9 +109,6 @@ namespace core.Reports
                 var tickerOutcomes = new List<TickerOutcomes>();
                 var tickerGapViews = new List<GapsView>();
 
-                var highlights = query.HighlightTickers ?? new string[0];
-                Console.WriteLine($"Highlights: {string.Join(", ", highlights)}");
-
                 foreach(var ticker in query.Tickers)
                 {
                     var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency);
