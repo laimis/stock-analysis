@@ -13,6 +13,40 @@ namespace core.Stocks.Services.Analysis
 
         internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
         {
+            if (tickerOutcomes.Any(o => o.outcomes.Any(o => o.key == SingleBarOutcomeKeys.Highlight)))
+            {
+                yield return new AnalysisOutcomeEvaluation(
+                    "Highlights",
+                    OutcomeType.Neutral,
+                    SingleBarOutcomeKeys.Highlight,
+                    tickerOutcomes
+                        .Where(t => t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.Highlight && o.value == 1))
+                        .ToList()
+                );
+            }
+
+            yield return new AnalysisOutcomeEvaluation(
+                "High Volume with Excellent Closing Range and High Percent Change",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.RelativeVolume,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
+                    ).ToList()
+            );
+
+            yield return new AnalysisOutcomeEvaluation(
+                "Positive gap ups",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.GapPercentage,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value > 0))
+                    .ToList()
+            );
+
             // stocks that had above average volume grouping
             yield return new AnalysisOutcomeEvaluation(
                 "Above Average Volume and High Percent Change",
@@ -32,18 +66,6 @@ namespace core.Stocks.Services.Analysis
                 tickerOutcomes
                     .Where(t =>
                         t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
-                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
-                    ).ToList()
-            );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "High Volume with Excellent Closing Range and High Percent Change",
-                OutcomeType.Positive,
-                SingleBarOutcomeKeys.RelativeVolume,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.ClosingRange && o.value >= ExcellentClosingRange)
                         && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value >= SigmaRatioThreshold)
                     ).ToList()
             );
@@ -101,16 +123,6 @@ namespace core.Stocks.Services.Analysis
                 tickerOutcomes
                     .Where(t =>
                         t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
-                    .ToList()
-            );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "Positive gap ups",
-                OutcomeType.Positive,
-                SingleBarOutcomeKeys.GapPercentage,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value > 0))
                     .ToList()
             );
 

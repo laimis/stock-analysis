@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -17,6 +18,7 @@ namespace core.Reports
 
         public abstract class BaseQuery : RequestWithUserId<OutcomesReportView>
         {
+            public BaseQuery(){}
             public BaseQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, Guid userId) : base(userId)
             {
                 Duration = duration;
@@ -24,20 +26,29 @@ namespace core.Reports
                 IncludeGapAnalysis = includeGapAnalysis;
             }
 
-            public Duration Duration { get; }
-            public PriceFrequency Frequency { get; }
-            public bool IncludeGapAnalysis { get; }
+            [Required]
+            public Duration Duration { get; set; }
+
+            [Required]
+            public PriceFrequency Frequency { get; set; }
+
+            public bool IncludeGapAnalysis { get; set; }
         }
 
         public class ForTickersQuery : BaseQuery
         {
-            public ForTickersQuery(Duration duration, PriceFrequency frequency, bool includeGapAnalysis, string[] tickers, Guid userId)
-                : base(duration, frequency, includeGapAnalysis, userId)
-            {
-                Tickers = tickers;
-            }
+            public ForTickersQuery(){}
 
-            public string[] Tickers { get; }
+            [Required]
+            public string[] Tickers { get; set; }
+            public string HighlightTitle { get; set; }
+            public string[] HighlightTickers { get; set; }
+
+            internal bool IsHighlighted(string ticker)
+            {
+                return HighlightTickers != null 
+                && Array.FindIndex(HighlightTickers, t => t == ticker) != -1;
+            }
         }
 
         public class Handler : HandlerWithStorage<ForTickersQuery, OutcomesReportView>
@@ -63,12 +74,10 @@ namespace core.Reports
                 }
 
                 return await RunAnalysis(
-                    request.Frequency,
-                    request.Tickers,
+                    request,
                     user.State,
                     GetOutcomesFunction(request.Duration),
-                    GetEvaluationFunction(request.Duration),
-                    includeGapAnalysis: request.IncludeGapAnalysis
+                    GetEvaluationFunction(request.Duration)
                 );         
             }
 
@@ -92,19 +101,20 @@ namespace core.Reports
                 };
 
             private async Task<OutcomesReportView> RunAnalysis(
-                PriceFrequency frequency,
-                IEnumerable<string> tickers,
+                ForTickersQuery query,
                 UserState user,
                 Func<PriceBar[], List<AnalysisOutcome>> priceAnalysisFunc,
-                Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>> evaluationFunc,
-                bool includeGapAnalysis)
+                Func<List<TickerOutcomes>, IEnumerable<AnalysisOutcomeEvaluation>> evaluationFunc)
             {
                 var tickerOutcomes = new List<TickerOutcomes>();
                 var tickerGapViews = new List<GapsView>();
 
-                foreach(var ticker in tickers)
+                var highlights = query.HighlightTickers ?? new string[0];
+                Console.WriteLine($"Highlights: {string.Join(", ", highlights)}");
+
+                foreach(var ticker in query.Tickers)
                 {
-                    var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, frequency);
+                    var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency);
                     if (!priceHistoryResponse.IsOk || priceHistoryResponse.Success == null || priceHistoryResponse.Success.Length == 0)
                     {
                         continue;
@@ -112,9 +122,22 @@ namespace core.Reports
 
                     var outcomes = priceAnalysisFunc(priceHistoryResponse.Success);
 
+                    if (query.HighlightTickers != null)
+                    {
+                        var highlightOutcome = new AnalysisOutcome(
+                            key: SingleBarOutcomeKeys.Highlight,
+                            type: OutcomeType.Neutral,
+                            value: query.IsHighlighted(ticker) ? 1 : 0,
+                            valueType: OutcomeValueType.Boolean,
+                            message: query.HighlightTitle
+                        );
+
+                        outcomes.Add(highlightOutcome);
+                    }
+
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, ticker));
 
-                    if (includeGapAnalysis)
+                    if (query.IncludeGapAnalysis)
                     {
                         var gapOutcomes = GapAnalysis.Generate(priceHistoryResponse.Success, 60);
                         tickerGapViews.Add(new GapsView(gapOutcomes, ticker));

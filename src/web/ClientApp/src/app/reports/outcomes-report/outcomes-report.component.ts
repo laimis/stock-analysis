@@ -19,6 +19,12 @@ export class OutcomesReportComponent implements OnInit {
   }
   
   ngOnInit(): void {
+    var earningsParam = this.route.snapshot.queryParamMap.get("earnings");
+    var earnings:string[] = null
+    if (earningsParam) {
+      earnings = earningsParam.split(",")
+    }
+
     var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
     if (tickerParam) {
       var tickers = tickerParam
@@ -32,7 +38,7 @@ export class OutcomesReportComponent implements OnInit {
         });
       
       if (tickers.length > 0) {
-        this.loadSingleBarReport(tickers);
+        this.loadSingleBarReport(tickers, earnings);
       }
 
     } else {
@@ -41,8 +47,8 @@ export class OutcomesReportComponent implements OnInit {
 
   }
   
-  private loadSingleBarReport(tickers: string[]) {
-    return this.stocksService.reportOutcomesSingleBarDaily(tickers).subscribe(report => {
+  private loadSingleBarReport(tickers: string[], earnings: string[]) {
+    return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings).subscribe(report => {
       this.singleBarReportDaily = report;
       this.loadAllBarsReport(tickers);
     }, error => {
