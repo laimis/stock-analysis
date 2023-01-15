@@ -40,11 +40,12 @@ namespace web.Controllers
 
         [HttpPost("outcomes")]
         public Task<OutcomesReportView> TickersOutcomes(
-            [FromBody]string[] tickers,
-            [FromQuery] PriceAnalysisReport.Duration duration,
-            [FromQuery] PriceFrequency frequency,
-            [FromQuery] bool includeGapAnalysis) =>
-            _mediator.Send(new PriceAnalysisReport.ForTickersQuery(duration, frequency, includeGapAnalysis, tickers, User.Identifier()));
+            [FromBody]PriceAnalysisReport.ForTickersQuery query)
+        {
+            query.WithUserId(User.Identifier());
+            
+            return _mediator.Send(query);
+        }
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
