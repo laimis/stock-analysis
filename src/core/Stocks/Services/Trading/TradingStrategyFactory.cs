@@ -7,14 +7,15 @@ namespace core.Stocks.Services.Trading
     {
         internal static IEnumerable<ITradingStrategy> GetStrategies(bool closeIfOpenAtTheEnd)
         {
-            yield return CreateOneThirdRRStrategy(closeIfOpenAtTheEnd);
+            yield return CreateProfitTakingStrategy(
+                name: "1/3 on each RR level",
+                closeIfOpenAtTheEnd: closeIfOpenAtTheEnd
+            );
 
-            yield return new TradingStrategyWithProfitPoints(
-                closeIfOpenAtTheEnd,
-                "1/4 on each RR level",
-                4,
-                (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
-                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
+            yield return CreateProfitTakingStrategy(
+                name: "1/4 on each RR level",
+                profitPoints: 4,
+                closeIfOpenAtTheEnd: closeIfOpenAtTheEnd
             );
 
             yield return new TradingStrategyWithProfitPoints(
@@ -44,16 +45,24 @@ namespace core.Stocks.Services.Trading
             yield return CreateOneThirdRRWithDownsideProtection(closeIfOpenAtTheEnd, 2);
 
             yield return CreateOneThirdRRWithDownsideProtection(closeIfOpenAtTheEnd, 3);
+
+            yield return CreateProfitTakingStrategy(
+                "1/3 on each RR level (low as stop)",
+                3,
+                closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,
+                useLowAsStop: true
+            );
         }
 
-        public static ITradingStrategy CreateOneThirdRRStrategy(bool closeIfOpenAtTheEnd = false)
+        public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3, bool closeIfOpenAtTheEnd = false, bool useLowAsStop = false)
         {
             return new TradingStrategyWithProfitPoints(
                 closeIfOpenAtTheEnd,
-                name: "1/3 on each RR level",
-                3,
+                name: name,
+                numberOfProfitPoints: profitPoints,
                 (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
-                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
+                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
+                useLowAsStop: useLowAsStop
             );
         }
 

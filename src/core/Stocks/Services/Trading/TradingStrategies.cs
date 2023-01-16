@@ -45,19 +45,22 @@ namespace core.Stocks.Services.Trading
         private Func<PositionInstance, int, decimal> _profitPointFunc;
         private Func<PositionInstance, int, decimal> _stopPriceFunc;
         private int _level;
+        private bool _useLowAsStop;
 
         internal TradingStrategyWithProfitPoints(
             bool closeIfOpenAtTheEnd,
             string name,
             int numberOfProfitPoints,
             Func<PositionInstance, int, decimal> getProfitPoint,
-            Func<PositionInstance, int, decimal> getStopPoint
+            Func<PositionInstance, int, decimal> getStopPoint,
+            bool useLowAsStop = false
         ) : base(closeIfOpenAtTheEnd, name)
         {
             _numberOfProfitPoints = numberOfProfitPoints;
             _profitPointFunc = getProfitPoint;
             _stopPriceFunc = getStopPoint;
             _level = 1;
+            _useLowAsStop = useLowAsStop;
         }
 
         protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
@@ -70,13 +73,14 @@ namespace core.Stocks.Services.Trading
             }
 
             // if stop is reached, sell at the close price
-            if (bar.Close <= context.Position.StopPrice.Value)
+            var stopThreshold = _useLowAsStop ? bar.Low : bar.Close;
+            if (stopThreshold <= context.Position.StopPrice.Value)
             {
-                ClosePosition(bar, context.Position);
+                ClosePosition(stopThreshold, bar.Date, context.Position);
             }
         }
 
-        protected virtual void ExecuteProfitSell(PositionInstance position, decimal sellPrice, PriceBar bar)
+        private void ExecuteProfitSell(PositionInstance position, decimal sellPrice, PriceBar bar)
         {
             var portion = (int)(_numberOfSharesAtStart / _numberOfProfitPoints);
             if (portion == 0)
@@ -143,7 +147,7 @@ namespace core.Stocks.Services.Trading
 
             if (CloseIfOpenAtTheEnd && !finalPosition.IsClosed)
             {
-                ClosePosition(bars[^1], finalPosition);
+                ClosePosition(bars[^1].Close, bars[^1].Date, finalPosition);
             }
 
             return new TradingStrategyResult(
@@ -154,13 +158,13 @@ namespace core.Stocks.Services.Trading
             );
         }
 
-        protected static void ClosePosition(PriceBar bar, PositionInstance position)
+        protected static void ClosePosition(decimal price, DateTimeOffset date, PositionInstance position)
         {
             position.Sell(
                 numberOfShares: position.NumberOfShares,
-                price: bar.Close,
+                price: price,
                 transactionId: Guid.NewGuid(),
-                when: bar.Date
+                when: date
             );
         }
 
