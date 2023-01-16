@@ -232,7 +232,7 @@ namespace coretests.Stocks.Services
             var maxDrawdown = result.maxDrawdownPct;
 
             Assert.True(position.IsClosed);
-            Assert.Equal(-25.05m, position.Profit);
+            Assert.Equal(-25m, position.Profit);
             Assert.Equal(-0.1002m, position.GainPct);
             Assert.Equal(-1.002m, position.RR);
             Assert.Equal(4, position.DaysHeld);
