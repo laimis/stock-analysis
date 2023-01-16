@@ -72,7 +72,7 @@ namespace core.Stocks.Services.Trading
         {
             return new TradingStrategyWithDownsideProtection(
                 closeIfOpenAtTheEnd,
-                "1/3 on each RR level (1/2 downside protection)",
+                $"1/3 on each RR level (1/{downsideProtectionSize} downside protection)",
                 3,
                 (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
