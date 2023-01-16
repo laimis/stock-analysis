@@ -9,7 +9,7 @@ namespace core.Stocks.Services.Trading
         {
             yield return CreateOneThirdRRStrategy(closeIfOpenAtTheEnd);
 
-            yield return new TradingStrategy(
+            yield return new TradingStrategyWithProfitPoints(
                 closeIfOpenAtTheEnd,
                 "1/4 on each RR level",
                 4,
@@ -17,7 +17,7 @@ namespace core.Stocks.Services.Trading
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
             );
 
-            yield return new TradingStrategy(
+            yield return new TradingStrategyWithProfitPoints(
                 closeIfOpenAtTheEnd,
                 "1/3 on each RR level (percent based)",
                 3,
@@ -25,7 +25,7 @@ namespace core.Stocks.Services.Trading
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
             );
 
-            yield return new TradingStrategy(
+            yield return new TradingStrategyWithProfitPoints(
                 closeIfOpenAtTheEnd,
                 "1/4 on each RR level (percent based)",
                 4,
@@ -33,7 +33,7 @@ namespace core.Stocks.Services.Trading
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
             );
 
-            yield return new TradingStrategy(
+            yield return new TradingStrategyWithProfitPoints(
                 closeIfOpenAtTheEnd,
                 "1/3 on each RR level (delayed stop)",
                 3,
@@ -48,7 +48,7 @@ namespace core.Stocks.Services.Trading
 
         public static ITradingStrategy CreateOneThirdRRStrategy(bool closeIfOpenAtTheEnd = false)
         {
-            return new TradingStrategy(
+            return new TradingStrategyWithProfitPoints(
                 closeIfOpenAtTheEnd,
                 name: "1/3 on each RR level",
                 3,

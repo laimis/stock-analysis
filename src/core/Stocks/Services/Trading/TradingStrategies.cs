@@ -4,7 +4,7 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
-    internal class TradingStrategyWithDownsideProtection : TradingStrategy
+    internal class TradingStrategyWithDownsideProtection : TradingStrategyWithProfitPoints
     {
         private int _downsideProtectionSize;
         private bool _executed;
@@ -39,33 +39,93 @@ namespace core.Stocks.Services.Trading
         }
     }
 
-    internal class TradingStrategy : ITradingStrategy
+    internal class TradingStrategyWithProfitPoints : TradingStrategy
     {
-        internal TradingStrategy(
+        private int _numberOfProfitPoints;
+        private Func<PositionInstance, int, decimal> _profitPointFunc;
+        private Func<PositionInstance, int, decimal> _stopPriceFunc;
+        private int _level;
+
+        internal TradingStrategyWithProfitPoints(
             bool closeIfOpenAtTheEnd,
             string name,
             int numberOfProfitPoints,
             Func<PositionInstance, int, decimal> getProfitPoint,
-            Func<PositionInstance, int, decimal> getStopPrice
+            Func<PositionInstance, int, decimal> getStopPoint
+        ) : base(closeIfOpenAtTheEnd, name)
+        {
+            _numberOfProfitPoints = numberOfProfitPoints;
+            _profitPointFunc = getProfitPoint;
+            _stopPriceFunc = getStopPoint;
+            _level = 1;
+        }
+
+        protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
+        {
+            var sellPrice = _profitPointFunc(context.Position, _level);
+            if (bar.High >= sellPrice)
+            {
+                ExecuteProfitSell(context.Position, sellPrice, bar);
+                _level++;
+            }
+
+            // if stop is reached, sell at the close price
+            if (bar.Close <= context.Position.StopPrice.Value)
+            {
+                ClosePosition(bar, context.Position);
+            }
+        }
+
+        protected virtual void ExecuteProfitSell(PositionInstance position, decimal sellPrice, PriceBar bar)
+        {
+            var portion = (int)(_numberOfSharesAtStart / _numberOfProfitPoints);
+            if (portion == 0)
+            {
+                portion = 1;
+            }
+
+            if (position.NumberOfShares < portion)
+            {
+                portion = (int)position.NumberOfShares;
+            }
+
+            if (_level == _numberOfProfitPoints)
+            {
+                // sell all the remaining shares
+                portion = (int)position.NumberOfShares;
+            }
+
+            position.Sell(
+                numberOfShares: portion, 
+                price: sellPrice,
+                transactionId: Guid.NewGuid(),
+                when: bar.Date
+            );
+
+            if (position.NumberOfShares > 0)
+            {
+                position.SetStopPrice(
+                    _stopPriceFunc(position, _level),
+                    bar.Date
+                );
+            }
+        }
+    }
+    
+    internal class TradingStrategy : ITradingStrategy
+    {
+        internal TradingStrategy(
+            bool closeIfOpenAtTheEnd,
+            string name
         )
         {
             CloseIfOpenAtTheEnd = closeIfOpenAtTheEnd;
             Name = name;
-            NumberOfProfitPoints = numberOfProfitPoints;
-            ProfitPointFunc = getProfitPoint;
-            StopPriceFunc = getStopPrice;
-            
-            _level = 1;
         }
 
         public bool CloseIfOpenAtTheEnd { get; }
         public string Name { get; }
-        public int NumberOfProfitPoints { get; }
-        public Func<PositionInstance, int, decimal> ProfitPointFunc { get; }
-        public Func<PositionInstance, int, decimal> StopPriceFunc { get; }
-
-        private int _level;
-        private decimal _numberOfSharesAtStart;
+        protected decimal _numberOfSharesAtStart;
 
         public TradingStrategyResult Run(PositionInstance position, PriceBar[] bars)
         {
@@ -94,7 +154,7 @@ namespace core.Stocks.Services.Trading
             );
         }
 
-        private static void ClosePosition(PriceBar bar, PositionInstance position)
+        protected static void ClosePosition(PriceBar bar, PositionInstance position)
         {
             position.Sell(
                 numberOfShares: position.NumberOfShares,
@@ -113,19 +173,7 @@ namespace core.Stocks.Services.Trading
                 return context;
             }
 
-            var sellPrice = ProfitPointFunc(position, _level);
-            if (bar.High >= sellPrice)
-            {
-                ExecuteProfitSell(position, sellPrice, bar);
-
-                _level++;
-            }
-
-            // if stop is reached, sell at the close price
-            if (bar.Close <= position.StopPrice.Value)
-            {
-                ClosePosition(bar, position);
-            }
+            ApplyPriceBarToPositionInternal(context, bar);
 
             position.SetPrice(bar.Close);
 
@@ -136,39 +184,8 @@ namespace core.Stocks.Services.Trading
             };
         }
 
-        private void ExecuteProfitSell(PositionInstance position, decimal sellPrice, PriceBar bar)
+        protected virtual void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
         {
-            var portion = (int)(_numberOfSharesAtStart / NumberOfProfitPoints);
-            if (portion == 0)
-            {
-                portion = 1;
-            }
-
-            if (position.NumberOfShares < portion)
-            {
-                portion = (int)position.NumberOfShares;
-            }
-
-            if (_level == NumberOfProfitPoints)
-            {
-                // sell all the remaining shares
-                portion = (int)position.NumberOfShares;
-            }
-
-            position.Sell(
-                numberOfShares: portion, 
-                price: sellPrice,
-                transactionId: Guid.NewGuid(),
-                when: bar.Date
-            );
-
-            if (position.NumberOfShares > 0)
-            {
-                position.SetStopPrice(
-                    StopPriceFunc(position, _level),
-                    bar.Date
-                );
-            }
         }
     }
 }
