@@ -124,7 +124,7 @@ namespace core.Stocks.Services.Trading
         }
     }
     
-    internal class TradingStrategy : ITradingStrategy
+    internal abstract class TradingStrategy : ITradingStrategy
     {
         internal TradingStrategy(
             bool closeIfOpenAtTheEnd,
@@ -196,8 +196,6 @@ namespace core.Stocks.Services.Trading
             };
         }
 
-        protected virtual void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
-        {
-        }
+        protected abstract void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar);
     }
 }
