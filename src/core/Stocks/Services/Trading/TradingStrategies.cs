@@ -76,7 +76,15 @@ namespace core.Stocks.Services.Trading
             var stopThreshold = _useLowAsStop ? bar.Low : bar.Close;
             if (stopThreshold <= context.Position.StopPrice.Value)
             {
-                ClosePosition(stopThreshold, bar.Date, context.Position);
+                // if we are using low as a stop, then our sale price will be
+                // our stop price, or if there is a gap down, a high of that day that's
+                // below the stop price
+                var sellingPrice = _useLowAsStop switch {
+                    true => Math.Min(bar.High, context.Position.StopPrice.Value),
+                    false => bar.Close
+                };
+
+                ClosePosition(context.Position.StopPrice.Value, bar.Date, context.Position);
             }
         }
 
