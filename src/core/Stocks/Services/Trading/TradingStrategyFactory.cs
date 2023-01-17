@@ -50,6 +50,9 @@ namespace core.Stocks.Services.Trading
             yield return CreateCloseAfterFixedNumberOfDays(5);
             yield return CreateCloseAfterFixedNumberOfDays(15);
             yield return CreateCloseAfterFixedNumberOfDays(30);
+            yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
+            yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);
+            yield return CreateCloseAfterFixedNumberOfDaysRespectStop(30);
         }
 
         public static ITradingStrategy CreateCloseAfterFixedNumberOfDays(int days)
