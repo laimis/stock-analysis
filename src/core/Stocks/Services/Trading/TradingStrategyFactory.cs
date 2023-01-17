@@ -60,6 +60,26 @@ namespace core.Stocks.Services.Trading
             );
         }
 
+        public static ITradingStrategy CreateCloseAfterFixedNumberOfDaysRespectStop(int days)
+        {
+            return new TradingStrategyCloseOnCondition(
+                $"Close after {days} days (respect stop)",
+                (ctx, bar) => {
+                    if (bar.Date.Subtract(ctx.Position.Opened.Value).TotalDays >= 30)
+                    {
+                        return true;
+                    }
+
+                    if (ctx.Position.StopPrice.HasValue && bar.Close <= ctx.Position.StopPrice.Value)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            );
+        }
+
         public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3, bool useLowAsStop = false)
         {
             return new TradingStrategyWithProfitPoints(

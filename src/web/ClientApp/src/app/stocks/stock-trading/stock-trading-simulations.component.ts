@@ -16,11 +16,15 @@ export class StockTradingSimulationsComponent implements OnInit {
     private route:ActivatedRoute) { }
 
   numberOfTrades:number = 40;
-  closePositions:boolean = false;
+  closePositions:boolean = true;
 
   ngOnInit() {
     var n = this.route.snapshot.queryParamMap.get('n');
-    this.closePositions = this.route.snapshot.queryParamMap.get('closePositions') === "true";
+    var closePositionsParam = this.route.snapshot.queryParamMap.get('closePositions');
+
+    if (closePositionsParam) {
+      this.closePositions = closePositionsParam == 'true';
+    }
     
     if (n) {
       this.numberOfTrades = parseInt(n);
