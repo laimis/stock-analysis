@@ -241,6 +241,41 @@ namespace coretests.Stocks.Services
             Assert.Equal(-0.1002m, maxDrawdown);
         }
 
+        [Fact]
+        public void CloseAfterFixedNumberOfDays_Works()
+        {
+            var data = GeneratePriceBars(10, i => 50 + i);
+
+            var positionInstance = new PositionInstance(0, "tsla");
+            positionInstance.Buy(
+                numberOfShares: 5,
+                price: 50,
+                when: DateTimeOffset.UtcNow,
+                Guid.NewGuid()
+            );
+            positionInstance.SetStopPrice(45, DateTimeOffset.UtcNow);
+
+            var runner = TradingStrategyFactory.CreateCloseAfterFixedNumberOfDays(5);
+
+            var result = runner.Run(
+                positionInstance,
+                data.ToArray()
+            );
+
+            var position = result.position;
+            var maxGain = result.maxGainPct;
+            var maxDrawdown = result.maxDrawdownPct;
+
+            Assert.True(position.IsClosed);
+            Assert.Equal(30, position.Profit);
+            Assert.Equal(0.12m, position.GainPct);
+            Assert.Equal(1.2m, position.RR);
+            Assert.Equal(5, position.DaysHeld);
+            Assert.Equal(56, position.Price);
+            Assert.Equal(0.1202m, maxGain);
+            Assert.Equal(-0.0002m, maxDrawdown);
+        }
+
         private (List<PriceBar> bars, PositionInstance position) CreateDownsideTestData()
         {
             var bars = GeneratePriceBars(10, i => 50 - i);

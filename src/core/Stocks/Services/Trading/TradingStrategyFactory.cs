@@ -5,6 +5,8 @@ namespace core.Stocks.Services.Trading
 {
     public class TradingStrategyFactory
     {
+        private static Random _random = new Random(Environment.TickCount);
+
         internal static IEnumerable<ITradingStrategy> GetStrategies()
         {
             yield return CreateProfitTakingStrategy(
@@ -47,7 +49,22 @@ namespace core.Stocks.Services.Trading
                 useLowAsStop: true
             );
 
-            yield return new TradingStrategyRandomClose("Random close");
+            yield return new TradingStrategyCloseOnCondition(
+                "Random close",
+                (_, _) => _random.Next(0, 100) < 5
+            );
+
+            yield return CreateCloseAfterFixedNumberOfDays(5);
+            yield return CreateCloseAfterFixedNumberOfDays(15);
+            yield return CreateCloseAfterFixedNumberOfDays(30);
+        }
+
+        public static ITradingStrategy CreateCloseAfterFixedNumberOfDays(int days)
+        {
+            return new TradingStrategyCloseOnCondition(
+                $"Close after {days} days",
+                (ctx, bar) => bar.Date.Subtract(ctx.Position.Opened.Value).TotalDays >= days
+            );
         }
 
         public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3, bool useLowAsStop = false)

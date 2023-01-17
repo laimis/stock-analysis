@@ -4,17 +4,19 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
-    internal class TradingStrategyRandomClose : TradingStrategy
+    internal class TradingStrategyCloseOnCondition : TradingStrategy
     {
-        private Random _random;
-        public TradingStrategyRandomClose(
-            string name) : base(name) =>
+        private Func<SimulationContext, PriceBar, bool> _condition;
 
-            _random = new Random(Environment.TickCount);
+        public TradingStrategyCloseOnCondition(
+            string name,
+            Func<SimulationContext, PriceBar, bool> condition) : base(name) =>
+
+            _condition = condition;
 
         protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
         {
-            if (context.Position.NumberOfShares > 0 && _random.Next(0, 100) < 5)
+            if (context.Position.NumberOfShares > 0 && _condition(context, bar))
             {
                 ClosePosition(bar.Close, bar.Date, context.Position);
             }
