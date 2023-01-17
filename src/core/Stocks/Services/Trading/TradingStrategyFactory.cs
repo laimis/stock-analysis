@@ -5,8 +5,6 @@ namespace core.Stocks.Services.Trading
 {
     public class TradingStrategyFactory
     {
-        private static Random _random = new Random(Environment.TickCount);
-
         internal static IEnumerable<ITradingStrategy> GetStrategies()
         {
             yield return CreateProfitTakingStrategy(
@@ -47,11 +45,6 @@ namespace core.Stocks.Services.Trading
                 "1/3 on each RR level (low as stop)",
                 3,
                 useLowAsStop: true
-            );
-
-            yield return new TradingStrategyCloseOnCondition(
-                "Random close",
-                (_, _) => _random.Next(0, 100) < 5
             );
 
             yield return CreateCloseAfterFixedNumberOfDays(5);
