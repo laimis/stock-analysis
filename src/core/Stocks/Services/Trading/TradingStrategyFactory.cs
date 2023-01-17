@@ -37,10 +37,6 @@ namespace core.Stocks.Services.Trading
                 (position, level) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
             );
 
-            yield return CreateOneThirdRRWithDownsideProtection(2);
-
-            yield return CreateOneThirdRRWithDownsideProtection(3);
-            
             yield return CreateCloseAfterFixedNumberOfDays(5);
             yield return CreateCloseAfterFixedNumberOfDays(15);
             yield return CreateCloseAfterFixedNumberOfDays(30);
