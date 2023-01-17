@@ -68,7 +68,7 @@ namespace core.Stocks.Services.Trading
             return new TradingStrategyCloseOnCondition(
                 $"Close after {days} days (respect stop)",
                 (ctx, bar) => {
-                    if (bar.Date.Subtract(ctx.Position.Opened.Value).TotalDays >= 30)
+                    if (bar.Date.Subtract(ctx.Position.Opened.Value).TotalDays >= days)
                     {
                         return true;
                     }
