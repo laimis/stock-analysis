@@ -4,6 +4,24 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Trading
 {
+    internal class TradingStrategyRandomClose : TradingStrategy
+    {
+        private Random _random;
+        public TradingStrategyRandomClose(
+            bool closeIfOpenAtTheEnd,
+            string name) : base(closeIfOpenAtTheEnd, name) =>
+
+            _random = new Random(Environment.TickCount);
+
+        protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
+        {
+            if (context.Position.NumberOfShares > 0 && _random.Next(0, 100) < 5)
+            {
+                ClosePosition(bar.Close, bar.Date, context.Position);
+            }
+        }
+    }
+
     internal class TradingStrategyWithDownsideProtection : TradingStrategyWithProfitPoints
     {
         private int _downsideProtectionSize;

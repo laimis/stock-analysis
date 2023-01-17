@@ -52,6 +52,11 @@ namespace core.Stocks.Services.Trading
                 closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,
                 useLowAsStop: true
             );
+
+            yield return new TradingStrategyRandomClose(
+                closeIfOpenAtTheEnd,
+                "Random close"
+            );
         }
 
         public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3, bool closeIfOpenAtTheEnd = false, bool useLowAsStop = false)
