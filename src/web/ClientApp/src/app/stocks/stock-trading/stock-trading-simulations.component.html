@@ -1,7 +1,10 @@
 <div>
   <h3>Simulating trades</h3>
   <h5>Parameters: {{numberOfTrades}} trades {{closePositions ? ", closing positions at end of simulations" : ""}}</h5>
-  <h5>Earliest date: {{results[0].performance.earliestDate | date }}, latest date: {{results[0].performance.latestDate | date }}</h5>
+  <h5 *ngIf="results">
+    <span class="text-muted">Earliest date:</span> {{results[0].performance.earliestDate | date }},
+    <span class="text-muted">latest date:</span> {{results[0].performance.latestDate | date }}
+  </h5>
   <table class="table table-hover table-striped">
     <thead>
       <tr>

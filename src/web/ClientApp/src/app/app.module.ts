@@ -78,6 +78,7 @@ import { TradingPerformanceSummaryComponent } from './shared/stocks/trading-perf
 import { TradingActualVsSimulatedPositionComponent } from './shared/stocks/trading-actual-vs-simulated.component';
 import { StockListsDashboardComponent } from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
 import { StockListComponent } from './stocks/stock-lists/stock-list/stock-list.component';
+import { StockTradingSimulationsComponent } from './stocks/stock-trading/stock-trading-simulations.component';
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -114,6 +115,7 @@ var routes: Routes = [
   { path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
+  { path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
   { path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
   { path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
 
@@ -190,6 +192,7 @@ var routes: Routes = [
     StockTradingReviewComponent,
     StockChartComponent,
     StockTradingSimulatorComponent,
+    StockTradingSimulationsComponent,
     TradingPerformanceSummaryComponent,
     TradingActualVsSimulatedPositionComponent,
     

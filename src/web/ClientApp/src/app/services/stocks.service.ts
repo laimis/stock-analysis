@@ -739,6 +739,8 @@ export interface StockTradingPerformance {
   avgReturnPct: number,
   rrSum: number,
   rrSumWeighted: number,
+  earliestDate: string,
+  latestDate: string,
 }
 
 export interface DataPoint {

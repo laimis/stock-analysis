@@ -31,6 +31,8 @@ namespace core.Stocks
             var profit = 0m;
             var rrSum = 0m;
             var rrSumWeighted = 0m;
+            var earliestDate = DateTimeOffset.MaxValue;
+            var latestDate = DateTimeOffset.MinValue;
             
             foreach(var e in closedPositions)
             {
@@ -39,6 +41,8 @@ namespace core.Stocks
                 totalCost += e.Cost;
                 rrSum += e.RR;
                 rrSumWeighted += e.RRWeighted;
+                earliestDate = e.Opened.Value < earliestDate ? e.Opened.Value : earliestDate;
+                latestDate = e.Closed.Value > latestDate ? e.Closed.Value : latestDate;
 
                 if (e.Profit >= 0)
                 {
@@ -71,6 +75,8 @@ namespace core.Stocks
                 AvgReturnPct = totalCost > 0 ? profit / totalCost : 0,
                 AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
                 EV = adjustedWinningAmount - adjustedLossingAmount,
+                EarliestDate = earliestDate,
+                LatestDate = latestDate,
                 MaxLossAmount = maxLossAmount,
                 LossAvgDaysHeld = losses > 0 ? totalLossDaysHeld / losses : 0,
                 LossMaxReturnPct = lossMaxReturnPct,
@@ -118,5 +124,8 @@ namespace core.Stocks
             0m => 0m,
             _ => AvgWinAmount / AvgLossAmount
         };
+
+        public DateTimeOffset EarliestDate { get; private set; }
+        public DateTimeOffset LatestDate { get; private set; }
     }
 }
