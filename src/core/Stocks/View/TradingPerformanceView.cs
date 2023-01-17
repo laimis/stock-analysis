@@ -41,8 +41,8 @@ namespace core.Stocks
                 totalCost += e.Cost;
                 rrSum += e.RR;
                 rrSumWeighted += e.RRWeighted;
-                earliestDate = e.Opened.Value < earliestDate ? e.Opened.Value : earliestDate;
-                latestDate = e.Closed.Value > latestDate ? e.Closed.Value : latestDate;
+                earliestDate = e.Opened.HasValue && e.Opened.Value < earliestDate ? e.Opened.Value : earliestDate;
+                latestDate = e.Closed.HasValue && e.Closed.Value > latestDate ? e.Closed.Value : latestDate;
 
                 if (e.Profit >= 0)
                 {
