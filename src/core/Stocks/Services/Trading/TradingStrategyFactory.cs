@@ -40,13 +40,7 @@ namespace core.Stocks.Services.Trading
             yield return CreateOneThirdRRWithDownsideProtection(2);
 
             yield return CreateOneThirdRRWithDownsideProtection(3);
-
-            yield return CreateProfitTakingStrategy(
-                "1/3 on each RR level (low as stop)",
-                3,
-                useLowAsStop: true
-            );
-
+            
             yield return CreateCloseAfterFixedNumberOfDays(5);
             yield return CreateCloseAfterFixedNumberOfDays(15);
             yield return CreateCloseAfterFixedNumberOfDays(30);
@@ -83,14 +77,13 @@ namespace core.Stocks.Services.Trading
             );
         }
 
-        public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3, bool useLowAsStop = false)
+        public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3)
         {
             return new TradingStrategyWithProfitPoints(
                 name: name,
                 numberOfProfitPoints: profitPoints,
                 (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
-                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
-                useLowAsStop: useLowAsStop
+                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
             );
         }
 

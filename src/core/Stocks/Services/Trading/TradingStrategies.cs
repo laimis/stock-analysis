@@ -64,21 +64,18 @@ namespace core.Stocks.Services.Trading
         private Func<PositionInstance, int, decimal> _profitPointFunc;
         private Func<PositionInstance, int, decimal> _stopPriceFunc;
         private int _level;
-        private bool _useLowAsStop;
 
         internal TradingStrategyWithProfitPoints(
             string name,
             int numberOfProfitPoints,
             Func<PositionInstance, int, decimal> getProfitPoint,
-            Func<PositionInstance, int, decimal> getStopPoint,
-            bool useLowAsStop = false
+            Func<PositionInstance, int, decimal> getStopPoint
         ) : base(name)
         {
             _numberOfProfitPoints = numberOfProfitPoints;
             _profitPointFunc = getProfitPoint;
             _stopPriceFunc = getStopPoint;
             _level = 1;
-            _useLowAsStop = useLowAsStop;
         }
 
         protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
@@ -91,18 +88,9 @@ namespace core.Stocks.Services.Trading
             }
 
             // if stop is reached, sell at the close price
-            var stopThreshold = _useLowAsStop ? bar.Low : bar.Close;
-            if (stopThreshold <= context.Position.StopPrice.Value)
+            if (bar.Close <= context.Position.StopPrice.Value)
             {
-                // if we are using low as a stop, then our sale price will be
-                // our stop price, or if there is a gap down, a high of that day that's
-                // below the stop price
-                var sellingPrice = _useLowAsStop switch {
-                    true => Math.Min(bar.High, context.Position.StopPrice.Value),
-                    false => bar.Close
-                };
-
-                ClosePosition(context.Position.StopPrice.Value, bar.Date, context.Position);
+                ClosePosition(bar.Close, bar.Date, context.Position);
             }
         }
 

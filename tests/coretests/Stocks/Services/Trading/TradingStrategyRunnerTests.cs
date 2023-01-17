@@ -218,30 +218,6 @@ namespace coretests.Stocks.Services
         }
 
         [Fact]
-        public void WithPriceFallingAndLowAsStop_StopPriceExitExecutes()
-        {
-            var (bars, positionInstance) = CreateDownsideTestData();
-            
-            var result = TradingStrategyFactory.CreateProfitTakingStrategy("strat", useLowAsStop: true).Run(
-                positionInstance,
-                bars
-            );
-
-            var position = result.position;
-            var maxGain = result.maxGainPct;
-            var maxDrawdown = result.maxDrawdownPct;
-
-            Assert.True(position.IsClosed);
-            Assert.Equal(-25m, position.Profit);
-            Assert.Equal(-0.1m, position.GainPct);
-            Assert.Equal(-1m, position.RR);
-            Assert.Equal(4, position.DaysHeld);
-            Assert.Equal(45, position.Price);
-            Assert.Equal(0.0002m, maxGain);
-            Assert.Equal(-0.1002m, maxDrawdown);
-        }
-
-        [Fact]
         public void CloseAfterFixedNumberOfDays_Works()
         {
             var data = GeneratePriceBars(10, i => 50 + i);
