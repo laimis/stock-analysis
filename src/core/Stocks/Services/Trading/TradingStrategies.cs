@@ -8,8 +8,7 @@ namespace core.Stocks.Services.Trading
     {
         private Random _random;
         public TradingStrategyRandomClose(
-            bool closeIfOpenAtTheEnd,
-            string name) : base(closeIfOpenAtTheEnd, name) =>
+            string name) : base(name) =>
 
             _random = new Random(Environment.TickCount);
 
@@ -28,12 +27,11 @@ namespace core.Stocks.Services.Trading
         private bool _executed;
 
         internal TradingStrategyWithDownsideProtection(
-            bool closeIfOpenAtTheEnd,
             string name,
             int numberOfProfitPoints,
             Func<PositionInstance, int, decimal> getProfitPoint,
             Func<PositionInstance, int, decimal> getStopPrice,
-            int downsideProtectionSize) : base(closeIfOpenAtTheEnd, name, numberOfProfitPoints, getProfitPoint, getStopPrice)
+            int downsideProtectionSize) : base(name, numberOfProfitPoints, getProfitPoint, getStopPrice)
         {
             _downsideProtectionSize = downsideProtectionSize;
             _executed = false;
@@ -66,13 +64,12 @@ namespace core.Stocks.Services.Trading
         private bool _useLowAsStop;
 
         internal TradingStrategyWithProfitPoints(
-            bool closeIfOpenAtTheEnd,
             string name,
             int numberOfProfitPoints,
             Func<PositionInstance, int, decimal> getProfitPoint,
             Func<PositionInstance, int, decimal> getStopPoint,
             bool useLowAsStop = false
-        ) : base(closeIfOpenAtTheEnd, name)
+        ) : base(name)
         {
             _numberOfProfitPoints = numberOfProfitPoints;
             _profitPointFunc = getProfitPoint;
@@ -144,16 +141,11 @@ namespace core.Stocks.Services.Trading
     
     internal abstract class TradingStrategy : ITradingStrategy
     {
-        internal TradingStrategy(
-            bool closeIfOpenAtTheEnd,
-            string name
-        )
+        internal TradingStrategy(string name)
         {
-            CloseIfOpenAtTheEnd = closeIfOpenAtTheEnd;
             Name = name;
         }
 
-        public bool CloseIfOpenAtTheEnd { get; }
         public string Name { get; }
         protected decimal _numberOfSharesAtStart;
 
@@ -170,11 +162,6 @@ namespace core.Stocks.Services.Trading
             var finalContext = bars.Aggregate(context, ApplyPriceBarToPosition);
 
             var finalPosition = finalContext.Position;
-
-            if (CloseIfOpenAtTheEnd && !finalPosition.IsClosed)
-            {
-                ClosePosition(bars[^1].Close, bars[^1].Date, finalPosition);
-            }
 
             return new TradingStrategyResult(
                 maxDrawdownPct: finalContext.MaxDrawdown,

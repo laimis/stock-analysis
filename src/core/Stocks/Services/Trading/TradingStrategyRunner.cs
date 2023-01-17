@@ -53,7 +53,7 @@ namespace core.Stocks.Services.Trading
                 bars = bars.Skip(1).ToArray();
             }
 
-            foreach(var strategy in TradingStrategyFactory.GetStrategies(closeIfOpenAtTheEnd))
+            foreach(var strategy in TradingStrategyFactory.GetStrategies())
             {
                 var positionInstance = new PositionInstance(0, ticker);
 
@@ -64,6 +64,16 @@ namespace core.Stocks.Services.Trading
                     position: positionInstance,
                     bars: bars
                 );
+
+                if (closeIfOpenAtTheEnd && !result.position.IsClosed)
+                {
+                    result.position.Sell(
+                        numberOfShares: result.position.NumberOfShares,
+                        price: bars.Last().Close,
+                        transactionId: Guid.NewGuid(),
+                        when: bars.Last().Date
+                    );
+                }
 
                 results.Results.Add(result);
             }
