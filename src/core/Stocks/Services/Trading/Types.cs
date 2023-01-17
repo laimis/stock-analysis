@@ -11,7 +11,7 @@ namespace core.Stocks.Services.Trading
 
     public interface ITradingStrategy
     {
-        TradingStrategyResult Run(PositionInstance position, PriceBar[] bars);
+        TradingStrategyResult Run(PositionInstance position, IEnumerable<PriceBar> bars);
     }
 
     public class TradingStrategyResults

@@ -106,7 +106,7 @@ namespace coretests.Stocks.Services
 
             var runner = TradingStrategyFactory.CreateProfitTakingStrategy("strat");
 
-            var result = runner.Run(testPosition, bars.ToArray());
+            var result = runner.Run(testPosition, bars);
 
             var maxDrawdown = result.maxDrawdownPct;
             var maxGain = result.maxGainPct;
@@ -148,7 +148,7 @@ namespace coretests.Stocks.Services
             
             var result = TradingStrategyFactory.CreateProfitTakingStrategy("strat").Run(
                 positionInstance,
-                bars.ToArray()
+                bars
             );
 
             var position = result.position;
@@ -174,7 +174,7 @@ namespace coretests.Stocks.Services
                 downsideProtectionSize: 2)
                 .Run(
                     positionInstance,
-                    bars.ToArray()
+                    bars
                 );
 
             var position = result.position;
@@ -200,7 +200,7 @@ namespace coretests.Stocks.Services
                 downsideProtectionSize: 3)
                 .Run(
                     positionInstance,
-                    bars.ToArray()
+                    bars
                 );
 
             var position = result.position;
@@ -224,7 +224,7 @@ namespace coretests.Stocks.Services
             
             var result = TradingStrategyFactory.CreateProfitTakingStrategy("strat", useLowAsStop: true).Run(
                 positionInstance,
-                bars.ToArray()
+                bars
             );
 
             var position = result.position;
@@ -259,7 +259,7 @@ namespace coretests.Stocks.Services
 
             var result = runner.Run(
                 positionInstance,
-                data.ToArray()
+                data
             );
 
             var position = result.position;
@@ -274,6 +274,41 @@ namespace coretests.Stocks.Services
             Assert.Equal(56, position.Price);
             Assert.Equal(0.1202m, maxGain);
             Assert.Equal(-0.0002m, maxDrawdown);
+        }
+
+        [Fact]
+        public void CloseAfterFixedNumberOfDaysWithStop_RespectsStop()
+        {
+            var bars = GeneratePriceBars(20, i => 50 - i);
+
+            var position = new PositionInstance(0, "tsla");
+            position.Buy(
+                numberOfShares: 5,
+                price: 50,
+                when: DateTimeOffset.UtcNow,
+                Guid.NewGuid()
+            );
+            position.SetStopPrice(45, DateTimeOffset.UtcNow);
+
+            var runner = TradingStrategyFactory.CreateCloseAfterFixedNumberOfDaysRespectStop(10);
+
+            var result = runner.Run(
+                position,
+                bars
+            );
+
+            var positionInstance = result.position;
+            var maxGain = result.maxGainPct;
+            var maxDrawdown = result.maxDrawdownPct;
+
+            Assert.True(positionInstance.IsClosed);
+            Assert.Equal(-25, positionInstance.Profit);
+            Assert.Equal(-0.1m, positionInstance.GainPct);
+            Assert.Equal(-1m, positionInstance.RR);
+            Assert.Equal(4, positionInstance.DaysHeld);
+            Assert.Equal(45, positionInstance.Price);
+            Assert.Equal(0.0002m, maxGain);
+            Assert.Equal(-0.1002m, maxDrawdown);
         }
 
         private (List<PriceBar> bars, PositionInstance position) CreateDownsideTestData()

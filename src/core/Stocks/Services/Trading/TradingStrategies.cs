@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 
@@ -151,7 +152,7 @@ namespace core.Stocks.Services.Trading
         public string Name { get; }
         protected decimal _numberOfSharesAtStart;
 
-        public TradingStrategyResult Run(PositionInstance position, PriceBar[] bars)
+        public TradingStrategyResult Run(PositionInstance position, IEnumerable<PriceBar> bars)
         {
             _numberOfSharesAtStart = position.NumberOfShares;
 
