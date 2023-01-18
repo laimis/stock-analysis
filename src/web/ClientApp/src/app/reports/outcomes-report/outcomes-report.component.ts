@@ -12,6 +12,7 @@ export class OutcomesReportComponent implements OnInit {
   error: string = null;
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
+  startDate: string = null;
 
   constructor (
     private stocksService: StocksService,
@@ -23,6 +24,11 @@ export class OutcomesReportComponent implements OnInit {
     var earnings:string[] = null
     if (earningsParam) {
       earnings = earningsParam.split(",")
+    }
+
+    var startDateParam = this.route.snapshot.queryParamMap.get("startDate");
+    if (startDateParam) {
+      this.startDate = startDateParam;
     }
 
     var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
@@ -57,7 +63,7 @@ export class OutcomesReportComponent implements OnInit {
   }
 
   private loadAllBarsReport(tickers: string[]) {
-    return this.stocksService.reportOutcomesAllBars(tickers).subscribe(report => {
+    return this.stocksService.reportOutcomesAllBars(tickers, this.startDate).subscribe(report => {
       this.allBarsReport = report;
       this.gaps = report.gaps;
     }, error => {

@@ -92,6 +92,10 @@ export class StockTradingPositionsComponent {
                 break
             case "riskedAmount":
                 this.metricFunc = (p:PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
+                break
+            case "daysHeld":
+                this.metricFunc = (p:PositionInstance) => p.daysHeld
+                break
             default:
                 this.metricFunc = (p:PositionInstance) => p.rr
         }

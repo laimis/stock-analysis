@@ -126,7 +126,7 @@ namespace web.BackgroundServices
                 var price = await priceTask;
                 if (price.NotFound)
                 {
-                    _logger.LogError($"price not found for {m.Description} monitor");
+                    _logger.LogError($"price not found for {m.Ticker} {m.Description} monitor");
                     continue;
                 }
 
@@ -199,7 +199,7 @@ namespace web.BackgroundServices
             var price = await _brokerage.GetQuote(user.State, sm.Ticker);
             if (!price.IsOk)
             {
-                _logger.LogError($"failed to get price for {sm.Ticker} for {sm.UserId}: {price.Error}");
+                _logger.LogError($"failed to get price for {sm.Ticker} for {sm.UserId}: {price.Error.Message}");
                 return Price.Failed;
             }
 

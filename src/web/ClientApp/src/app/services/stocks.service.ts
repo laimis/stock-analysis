@@ -353,10 +353,10 @@ export class StocksService {
     return this.http.get<Sells>('/api/reports/sells')
   }
 
-  reportOutcomesAllBars(tickers:string[]) : Observable<OutcomesReport> {
+  reportOutcomesAllBars(tickers:string[],startDate:string = null) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
       '/api/reports/outcomes', 
-      {tickers, duration: "allbars", includeGapAnalysis: true}
+      {tickers, duration: "allbars", includeGapAnalysis: true, startDate}
     )
   }
 

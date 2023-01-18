@@ -33,6 +33,7 @@ namespace core.Reports
             public PriceFrequency Frequency { get; set; }
 
             public bool IncludeGapAnalysis { get; set; }
+            public DateTimeOffset? StartDate { get; set; }
         }
 
         public class ForTickersQuery : BaseQuery
@@ -111,7 +112,10 @@ namespace core.Reports
 
                 foreach(var ticker in query.Tickers)
                 {
-                    var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency);
+                    DateTimeOffset startDate = query.StartDate ?? default;
+
+                    var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency, start: startDate);
+                    
                     if (!priceHistoryResponse.IsOk || priceHistoryResponse.Success == null || priceHistoryResponse.Success.Length == 0)
                     {
                         continue;
