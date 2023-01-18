@@ -355,8 +355,8 @@ export class StocksService {
 
   reportOutcomesAllBars(tickers:string[]) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
-      '/api/reports/outcomes?duration=allbars&includeGapAnalysis=true', 
-      {tickers}
+      '/api/reports/outcomes', 
+      {tickers, duration: "allbars", includeGapAnalysis: true}
     )
   }
 
@@ -365,17 +365,17 @@ export class StocksService {
     highlightTitle:string = null,
     highlightTickers:string[] = null) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
-      '/api/reports/outcomes?duration=singlebar&frequency=daily',
+      '/api/reports/outcomes',
       {
-        tickers,highlightTitle,highlightTickers
+        tickers,highlightTitle,highlightTickers,duration: "singlebar",frequency: "daily"
       }
     )
   }
 
   reportOutcomesSingleBarWeekly(tickers:string[]) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
-      '/api/reports/outcomes?duration=singlebar&frequency=weekly', 
-      {tickers})
+      '/api/reports/outcomes', 
+      {tickers, duration: "singlebar", frequency: "weekly"})
   }
 
   reportTickerPercentChangeDistribution(ticker:string): Observable<StockPercentChangeResponse> {
