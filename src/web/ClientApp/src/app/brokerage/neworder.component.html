@@ -26,7 +26,8 @@
               type="number"
               class="form-control"
               id="stocksToBuy"
-              [(ngModel)]="numberOfShares">
+              [(ngModel)]="numberOfShares"
+              (ngModelChange)="numberOfSharesChanged()">
       </div>
       <div class="col" >
         <label for="brokerageOrderType" class="form-label">Order Type</label>
@@ -51,6 +52,7 @@
       <div class="col"><div class="stat-label">ask</div><div>{{ quote.askPrice | currency }} x {{ quote.askSize }}</div></div>
       <div class="col"><div class="stat-label">last</div><div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div></div>
       <div class="col"><div class="stat-label">exchange</div><div>{{ quote.exchangeName }}</div></div>
+      <div class="col"><div class="stat-label">total</div><div>{{total | currency}}</div></div>
     </div>
     <div class="row mt-3">
       <div class="col" >

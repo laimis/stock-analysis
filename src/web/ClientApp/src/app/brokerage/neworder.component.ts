@@ -16,6 +16,7 @@ export class BrokerageNewOrderComponent {
   price : number | null = null
   ticker : string
   quote : StockQuote
+  total: number | null = null
 
   constructor(
     private stockService: StocksService
@@ -24,10 +25,17 @@ export class BrokerageNewOrderComponent {
   @Output()
   brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
 
+  numberOfSharesChanged() {
+    if (this.numberOfShares && this.price) {
+      this.total = this.numberOfShares * this.price
+    } else {
+      this.total = null
+    }
+  }
+
   reset() {
     this.numberOfShares = null
     this.price = null
-    this.ticker = null
   }
 
   onTickerSelected(ticker: string) {
