@@ -118,7 +118,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.PositionSize,
                 OutcomeType.Neutral,
                 position.Cost,
-                OutcomeValueType.Number,
+                OutcomeValueType.Currency,
                 $"Position size is {position.Cost}"
             );
         }
