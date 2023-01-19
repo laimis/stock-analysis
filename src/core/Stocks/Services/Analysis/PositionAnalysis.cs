@@ -95,6 +95,15 @@ namespace core.Stocks.Services.Analysis
                 $"Number of shares: {position.NumberOfShares}"
             );
 
+            // add days held
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.DaysHeld,
+                OutcomeType.Neutral,
+                position.DaysHeld,
+                OutcomeValueType.Number,
+                $"Days held: {position.DaysHeld}"
+            );
+
             // add last transaction age
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.DaysSinceLastTransaction,
@@ -129,6 +138,7 @@ namespace core.Stocks.Services.Analysis
         public static string RiskAmount = "RiskedAmount";
         public static string DaysSinceLastTransaction = "DaysSinceLastTransaction";
         public static string PositionSize = "PositionSize";
+        public static string DaysHeld = "DaysHeld";
     }
 }
 #nullable restore
