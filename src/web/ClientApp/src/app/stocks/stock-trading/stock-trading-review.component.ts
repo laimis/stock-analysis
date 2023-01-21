@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Prices, StocksService, PositionInstance, TradingStrategyResults } from 'src/app/services/stocks.service';
 
 
@@ -7,13 +7,12 @@ import { Prices, StocksService, PositionInstance, TradingStrategyResults } from 
   templateUrl: './stock-trading-review.component.html',
   styleUrls: ['./stock-trading-review.component.css']
 })
-export class StockTradingReviewComponent implements OnInit {
-  ngOnInit() {
-  }
-
+export class StockTradingReviewComponent {
+  
   private _positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
+  currentPositionPrice: number
   simulationResults: TradingStrategyResults
   prices: Prices
 
@@ -33,6 +32,15 @@ export class StockTradingReviewComponent implements OnInit {
     this.currentPosition = this._positions[this._index]
     // get price data and pass it to chart
     this.runTradingStrategies();
+    this.fetchPrice();
+  }
+
+  private fetchPrice() {
+    this.stockService.getStockPrice(this.currentPosition.ticker).subscribe(
+      (r: number) => {
+        this.currentPositionPrice = r;
+      }
+    );
   }
 
   private runTradingStrategies() {
