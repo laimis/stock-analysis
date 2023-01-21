@@ -7,17 +7,45 @@ namespace core.Stocks.Services.Trading
 {
     internal class TradingStrategyCloseOnCondition : TradingStrategy
     {
-        private Func<SimulationContext, PriceBar, bool> _condition;
+        private Func<SimulationContext, PriceBar, bool> _exitCondition;
 
         public TradingStrategyCloseOnCondition(
             string name,
-            Func<SimulationContext, PriceBar, bool> condition) : base(name) =>
+            Func<SimulationContext, PriceBar, bool> exitCondition) : base(name) =>
 
-            _condition = condition;
+            _exitCondition = exitCondition;
 
         protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
         {
-            if (context.Position.NumberOfShares > 0 && _condition(context, bar))
+            if (context.Position.NumberOfShares > 0 && _exitCondition(context, bar))
+            {
+                ClosePosition(bar.Close, bar.Date, context.Position);
+            }
+        }
+    }
+
+    internal class TradingStrategyWithAdvancingStops : TradingStrategy
+    {
+        private Func<PositionInstance, int, decimal> _stopPriceFunc;
+        private Func<PositionInstance, int, decimal>  _profitPointFunc;
+        private int _level = 1;
+        
+        internal TradingStrategyWithAdvancingStops(
+            string name,
+            Func<PositionInstance, int, decimal> profitPointFunc,
+            Func<PositionInstance, int, decimal> stopPriceFunc) : base(name) =>
+            (_profitPointFunc, _stopPriceFunc) = (profitPointFunc, stopPriceFunc);
+
+        protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
+        {
+            var profitPoint = _profitPointFunc(context.Position, _level);
+            if (bar.High > profitPoint)
+            {
+                context.Position.SetStopPrice(_stopPriceFunc(context.Position, _level), bar.Date);
+                _level++;
+            }
+
+            if (bar.Close <= context.Position.StopPrice.Value)
             {
                 ClosePosition(bar.Close, bar.Date, context.Position);
             }

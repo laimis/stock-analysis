@@ -287,6 +287,45 @@ namespace coretests.Stocks.Services
             Assert.Equal(-0.1002m, maxDrawdown);
         }
 
+        [Fact]
+        public void WithAdvancingStops_Works()
+        {
+            var bars = GeneratePriceBars(50, i => 50 + i);
+
+            var position = new PositionInstance(0, "tsla");
+            position.Buy(
+                numberOfShares: 5,
+                price: 50,
+                when: DateTimeOffset.UtcNow,
+                Guid.NewGuid()
+            );
+            position.SetStopPrice(45, DateTimeOffset.UtcNow);
+
+            var runner = TradingStrategyFactory.CreateWithAdvancingStops();
+
+            var result = runner.Run(
+                position,
+                bars
+            );
+
+            var positionInstance = result.position;
+            var maxGain = result.maxGainPct;
+            var maxDrawdown = result.maxDrawdownPct;
+
+            // the price keeps on increasing, we are not selling as it does not
+            // approach stop
+            Assert.False(positionInstance.IsClosed);
+            Assert.Equal(0, positionInstance.Profit); // no profit yet, no sells
+            Assert.Equal(245, positionInstance.UnrealizedProfit);
+            Assert.Equal(0.98m, positionInstance.GainPct);
+            Assert.Equal(0.98m, positionInstance.UnrealizedGainPct);
+            Assert.Equal(9.8m, positionInstance.RR);
+            Assert.Equal(9.8m, positionInstance.UnrealizedRR);
+            Assert.Equal(99, positionInstance.Price);
+            Assert.Equal(0.9802m, maxGain);
+            Assert.Equal(-0.0002m, maxDrawdown);
+        }
+
         private (List<PriceBar> bars, PositionInstance position) CreateDownsideTestData()
         {
             var bars = GeneratePriceBars(10, i => 50 - i);

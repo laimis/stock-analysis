@@ -43,6 +43,17 @@ namespace core.Stocks.Services.Trading
             yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
             yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);
             yield return CreateCloseAfterFixedNumberOfDaysRespectStop(30);
+
+            yield return CreateWithAdvancingStops();
+        }
+
+        public static ITradingStrategy CreateWithAdvancingStops()
+        {
+            return new TradingStrategyWithAdvancingStops(
+                "Advancing stop",
+                (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
+                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
+            );
         }
 
         public static ITradingStrategy CreateCloseAfterFixedNumberOfDays(int days)
