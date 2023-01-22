@@ -5,6 +5,7 @@ using core.Account;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
+using core.Portfolio;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 using core.Stocks;
@@ -20,6 +21,16 @@ namespace core
         private record struct UserRecord(string email, string first_name, string last_name);
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
         private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
+        private record struct StockListRecord(string ticker, string created, string notes);
+        private record struct StockListRecordJustTicker(string ticker);
+
+        public static string Generate(ICSVWriter writer, StockListState list, bool justTickers)
+        {
+            return justTickers switch {
+                true => writer.Generate(list.Tickers.Select(s => new StockListRecordJustTicker(s.Ticker))),
+                false => writer.Generate(list.Tickers.Select(s => new StockListRecord(s.Ticker, s.When.ToString(DATE_FORMAT), s.Note)))
+            };
+        }
 
         public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
         {
@@ -157,9 +168,9 @@ namespace core
             return writer.Generate(rows);
         }
 
-        public static string GenerateFilename(string exportType)
+        public static string GenerateFilename(string prefix)
         {
-            return exportType + "_" + DateTime.UtcNow.ToString($"yyyyMMdd_hhmss") + ".csv";
+            return prefix + "_" + DateTime.UtcNow.ToString($"yyyyMMdd_hhmss") + ".csv";
         }
     }
 }

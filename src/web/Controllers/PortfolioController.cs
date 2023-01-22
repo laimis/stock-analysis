@@ -55,7 +55,10 @@ namespace web.Controllers
         [HttpGet("stocklists/{name}")]
         public Task<StockListState> GetStockList(string name) =>
             _mediator.Send(new ListsGet.Query(name, User.Identifier()));
-            
+
+        [HttpGet("stocklists/{name}/export")]
+        public Task<ActionResult> ExportStockList(string name, [FromQuery]bool justTickers) =>
+            this.GenerateExport(_mediator, new ListsExport.Query(justTickers, name, User.Identifier()));
 
         [HttpGet]
         public Task<PortfolioResponse> Index() =>

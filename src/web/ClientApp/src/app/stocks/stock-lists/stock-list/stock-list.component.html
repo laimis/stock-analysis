@@ -11,6 +11,11 @@
         <button type="submit" class="btn btn-primary" (click)="add(ticker.value)">Add</button>
     </form>
 
+    <form>
+        <a href="/api/portfolio/stocklists/{{list.name}}/export" type="submit" class="btn btn-info me-2">Export</a>
+        <a href="/api/portfolio/stocklists/{{list.name}}/export?justTickers=true" type="submit" class="btn btn-info">Export (just tickers)</a>
+    </form>
+
     <table class="table table-striped">
         <thead>
             <tr>

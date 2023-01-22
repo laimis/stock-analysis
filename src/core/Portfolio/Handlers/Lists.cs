@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Stocks;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using core.Stocks.View;
 using MediatR;
 
@@ -77,6 +78,55 @@ namespace core.Portfolio.Handlers
 
                 var list = await _portfolioStorage.GetStockList(request.Name, user.State.Id);
                 return list?.State;
+            }
+        }
+    }
+    
+    public class ListsExport
+    {
+        public class Query : RequestWithUserId<ExportResponse>
+        {
+            public Query(bool justTickers, string name, Guid userId) : base(userId)
+            {
+                JustTickers = justTickers;
+                Name = name;
+            }
+
+            public bool JustTickers { get; }
+            public string Name { get; }
+        }
+
+        public class Handler : HandlerWithStorage<Query, ExportResponse>
+        {
+            private IAccountStorage _accountsStorage;
+            private ICSVWriter _csvWriter;
+            
+            public Handler(
+                IAccountStorage accounts,
+                ICSVWriter csvWriter,
+                IPortfolioStorage storage) : base(storage)
+            {
+                _accountsStorage = accounts;
+                _csvWriter = csvWriter;
+            }
+
+            public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
+            {
+                var user = await _accountsStorage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                var list = await _storage.GetStockList(request.Name, user.State.Id);
+                if (list == null)
+                {
+                    throw new Exception("List not found");
+                }
+
+                var filename = CSVExport.GenerateFilename($"Stocks_{request.Name}");
+
+                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, list.State, request.JustTickers));
             }
         }
     }
