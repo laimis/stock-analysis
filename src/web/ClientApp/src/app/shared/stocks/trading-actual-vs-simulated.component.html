@@ -3,34 +3,34 @@
   <table class="table table-hover mt-2" *ngIf="actual && simulations">
     <thead>
       <tr>
-        <th>Outcome type</th>
-        <th>Status</th>
+        <th>Strategy</th>
         <th>Profit</th>
+        <th>Stop</th>
         <th>R/R</th>
         <th>% Gain</th>
-        <th>Transactions</th>
-        <th>Stop</th>
         <th>Max Gain</th>
         <th>Max Drawdown</th>
+        <th>Status</th>
+        <th>Transactions</th>
+        
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>Actual trade</td>
-        <td>
-          <span *ngIf="actual.isClosed" class="badge bg-success p-2">closed</span>
-          <span *ngIf="!actual.isClosed" class="badge bg-warning p-2">open</span>
-        </td>
-        <td>{{actual.profit + actual.unrealizedProfit | currency}}</td>
+      <tr [ngClass]="{'loss-row': actual.combinedProfit < 0}" >
+        <td class="text-muted">Actual trade ⭐</td>
+        <td [ngClass]="{'bg-warning': actual.combinedProfit < 0}" >{{actual.combinedProfit | currency}}</td>
+        <td>{{actual.stopPrice | currency }}</td>
         <td>{{actual.rr | number}}</td>
         <td>{{actual.gainPct | percent}}</td>
+        <td colspan="2"></td>
+        <td>
+          <span *ngIf="actual.isClosed" class="badge bg-secondary rounded-pill">closed</span>
+        </td>
         <td>
           <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of actual.transactions">
             {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
           </div>
         </td>
-        <td>{{actual.stopPrice | currency }}</td>
-        <td colspan="2"></td>
       </tr>
       <tr *ngIf="showDetails">
         <td></td>
@@ -47,24 +47,23 @@
         </td>
       </tr>
 
-      <ng-container *ngFor="let r of simulations.results">
+      <ng-container *ngFor="let r of sortedResults()">
         <tr>
-          <td>{{r.strategyName}}</td>
-          <td>
-            <span *ngIf="r.position.isClosed" class="badge bg-success p-2">closed</span>
-            <span *ngIf="!r.position.isClosed" class="badge bg-warning p-2">open</span>
-          </td>
-          <td>{{r.position.profit + r.position.unrealizedProfit | currency}}</td>
+          <td class="text-muted">{{r.strategyName}}</td>
+          <td [ngClass]="{'bg-warning': r.position.combinedProfit < 0}">{{r.position.combinedProfit | currency}}</td>
+          <td>{{r.position.stopPrice | currency }}</td>
           <td>{{r.position.rr | number}}</td>
           <td>{{r.position.gainPct | percent}}</td>
+          <td>{{r.maxGainPct | percent:'1.0-2'}}</td>
+          <td>{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
+          <td>
+            <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
+          </td>
           <td>
             <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of r.position.transactions">
               {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
             </div>
           </td>
-          <td>{{r.position.stopPrice | currency }}</td>
-          <td>{{r.maxGainPct | percent:'1.0-2'}}</td>
-          <td>{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
         </tr>
         <tr *ngIf="showDetails">
           <td></td>

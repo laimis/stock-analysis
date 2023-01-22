@@ -39,8 +39,8 @@ export class PlaygroundComponent implements OnInit {
     var simulatedPosition = results[strategyIndex].positions[positionIndex];
     var actualPosition = results[0].positions[positionIndex];
 
-    var simulatedProfit = simulatedPosition.profit + simulatedPosition.unrealizedProfit;
-    var actualProfit = actualPosition.profit + actualPosition.unrealizedProfit;
+    var simulatedProfit = simulatedPosition.combinedProfit;
+    var actualProfit = actualPosition.combinedProfit;
 
     return actualProfit >= simulatedProfit ? 'bg-success' : '';
   }

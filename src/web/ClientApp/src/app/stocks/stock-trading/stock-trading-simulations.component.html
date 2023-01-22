@@ -51,8 +51,8 @@
       <tr *ngFor="let p of results[strategyIndex].positions; let positionIndex = index">
         <td width="20" [className]="'col ' + backgroundCssClassForActual(results, strategyIndex, positionIndex)"> &nbsp;&nbsp; </td>
         <td width="50">{{results[0].positions[positionIndex].ticker}}</td>
-        <td width="100">{{results[0].positions[positionIndex].profit + results[0].positions[positionIndex].unrealizedProfit | currency}}</td>
-        <td width="100">{{results[strategyIndex].positions[positionIndex].profit + results[strategyIndex].positions[positionIndex].unrealizedProfit | currency}}</td>
+        <td width="100">{{results[0].positions[positionIndex].combinedProfit | currency}}</td>
+        <td width="100">{{results[strategyIndex].positions[positionIndex].combinedProfit | currency}}</td>
         <td width="100">{{results[0].positions[positionIndex].daysHeld}} vs {{results[strategyIndex].positions[positionIndex].daysHeld}} days held</td>
         <td width="100"><span *ngIf="!results[strategyIndex].positions[positionIndex].isClosed">(open)</span></td>
       </tr>

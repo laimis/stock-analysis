@@ -19,5 +19,9 @@ export class TradingActualVsSimulatedPositionComponent {
   toggleShowDetails() {
     this.showDetails = !this.showDetails;
   }
+
+  sortedResults() {
+    return this.simulations.results.sort((a, b) => b.position.combinedProfit - a.position.combinedProfit);
+  }
 }
 

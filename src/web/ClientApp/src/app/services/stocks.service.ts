@@ -832,6 +832,7 @@ export interface PositionInstance {
   unrealizedGainPct: number,
   unrealizedProfit: number,
   unrealizedRR: number,
+  combinedProfit: number,
   percentToStop: number
   costAtRiskedBasedOnStopPrice: number
 }
