@@ -24,7 +24,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let t of list.tickers">
+            <tr *ngFor="let t of sortedTickers(list)">
                 <td>{{t.ticker}}</td>
                 <td>
                     <button class="btn btn-danger" (click)="remove(t)">Remove</button>

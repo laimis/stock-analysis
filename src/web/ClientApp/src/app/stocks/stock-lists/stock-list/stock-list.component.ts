@@ -55,4 +55,7 @@ export class StockListComponent implements OnInit {
     this.loadList(this.list.name)
   }
 
+  sortedTickers(list: StockList) {
+    return list.tickers.sort((a, b) => a.ticker.localeCompare(b.ticker));
+  }
 }

@@ -13,6 +13,8 @@ export class OutcomesReportComponent implements OnInit {
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
   startDate: string = null;
+  endDate: string = null;
+  earnings: string[] = null;
 
   constructor (
     private stocksService: StocksService,
@@ -21,14 +23,18 @@ export class OutcomesReportComponent implements OnInit {
   
   ngOnInit(): void {
     var earningsParam = this.route.snapshot.queryParamMap.get("earnings");
-    var earnings:string[] = null
     if (earningsParam) {
-      earnings = earningsParam.split(",")
+      this.earnings = earningsParam.split(",")
     }
 
     var startDateParam = this.route.snapshot.queryParamMap.get("startDate");
     if (startDateParam) {
       this.startDate = startDateParam;
+    }
+
+    var endDateParam = this.route.snapshot.queryParamMap.get("endDate");
+    if (endDateParam) {
+      this.endDate = endDateParam;
     }
 
     var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
@@ -44,7 +50,7 @@ export class OutcomesReportComponent implements OnInit {
         });
       
       if (tickers.length > 0) {
-        this.loadSingleBarReport(tickers, earnings);
+        this.loadSingleBarReport(tickers, this.earnings);
       }
 
     } else {
@@ -54,7 +60,7 @@ export class OutcomesReportComponent implements OnInit {
   }
   
   private loadSingleBarReport(tickers: string[], earnings: string[]) {
-    return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings).subscribe(report => {
+    return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings, this.endDate).subscribe(report => {
       this.singleBarReportDaily = report;
       this.loadAllBarsReport(tickers);
     }, error => {
@@ -63,7 +69,7 @@ export class OutcomesReportComponent implements OnInit {
   }
 
   private loadAllBarsReport(tickers: string[]) {
-    return this.stocksService.reportOutcomesAllBars(tickers, this.startDate).subscribe(report => {
+    return this.stocksService.reportOutcomesAllBars(tickers, this.startDate, this.endDate).subscribe(report => {
       this.allBarsReport = report;
       this.gaps = report.gaps;
     }, error => {
