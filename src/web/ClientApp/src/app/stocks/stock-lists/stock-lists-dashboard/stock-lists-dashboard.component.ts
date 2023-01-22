@@ -78,4 +78,8 @@ export class StockListsDashboardComponent implements OnInit {
     return `/reports/outcomes?tickers=${paramList}`
   }
 
+  getExportLink(list:StockList) {
+    return `/api/portfolio/stocklists/${list.name}/export?justTickers=true`
+  }
+
 }

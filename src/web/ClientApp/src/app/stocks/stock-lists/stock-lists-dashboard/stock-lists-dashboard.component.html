@@ -38,6 +38,7 @@
                 <td>
                     <a class="btn btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
                     <a class="btn btn-secondary me-3" href="{{getAnalysisLink(l)}}">analysis</a>
+                    <a class="btn btn-secondary me-3" href="{{getExportLink(l)}}">export</a>
                     <button type="button" class="btn btn-danger" (click)="deleteList(l)">delete</button>
                 </td>
             </tr>
