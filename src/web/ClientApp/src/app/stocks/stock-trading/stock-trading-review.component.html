@@ -7,8 +7,8 @@
           <option
             *ngFor="let position of positions; let i = index;"
             [value]="i"
-            [selected]="position.ticker === currentPosition.ticker">
-            {{position.ticker}}
+            [selected]="position.ticker === currentPosition.ticker && position.positionId === currentPosition.positionId">
+            {{position.ticker}} - {{position.positionId}}
           </option>
         </select>
         ({{currentPositionPrice | currency}})
