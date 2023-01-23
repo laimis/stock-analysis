@@ -19,12 +19,12 @@
       <ng-container *ngFor="let r of sortedResults()">
         <tr>
           <td class="text-muted">{{r.strategyName}}</td>
-          <td [ngClass]="{'bg-warning': r.position.combinedProfit < 0, 'fw-bold': true}">{{r.position.combinedProfit | currency}}</td>
+          <td [ngClass]="{'cell-negative': r.position.combinedProfit < 0, 'fw-bold': true}">{{r.position.combinedProfit | currency}}</td>
           <td>{{r.position.stopPrice | currency }}</td>
           <td>{{r.position.rr | number}}</td>
           <td>{{r.position.gainPct | percent}}</td>
-          <td>{{r.maxGainPct | percent:'1.0-2'}}</td>
-          <td>{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
+          <td [ngClass]="{'cell-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxGainPct | percent:'1.0-2'}}</td>
+          <td [ngClass]="{'cell-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
           <td>
             <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
           </td>

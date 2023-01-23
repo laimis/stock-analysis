@@ -27,7 +27,9 @@ namespace core.Stocks.Services.Trading
                 user: user,
                 numberOfShares: position.CompletedPositionShares,
                 price: position.CompletedPositionCostPerShare,
-                stopPrice: position.FirstStop.Value,
+                stopPrice: position.FirstStop.HasValue ?
+                    position.FirstStop.Value
+                    : position.CompletedPositionCostPerShare * TradingStrategyConstants.DEFAULT_STOP_PRICE_MULTIPLIER,
                 ticker: position.Ticker,
                 when: position.Opened.Value,
                 closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,

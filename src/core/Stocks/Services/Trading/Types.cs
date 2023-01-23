@@ -7,6 +7,7 @@ namespace core.Stocks.Services.Trading
     {
         // TODO: this needs to come from the environment or user settings
         public const decimal AVG_PERCENT_GAIN = 0.07m;
+        public const decimal DEFAULT_STOP_PRICE_MULTIPLIER = 0.95m;
     }
 
     public interface ITradingStrategy

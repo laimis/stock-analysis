@@ -109,11 +109,6 @@ namespace core.Portfolio
                     throw new Exception($"Position {request.PositionId} not found");
                 }
                 
-                if (position.FirstStop == null)
-                {
-                    throw new Exception("Position has no stop");
-                }
-                
                 var runner = new TradingStrategyRunner(_brokerage, _marketHours);
                 
                 return await runner.RunAsync(

@@ -40,6 +40,8 @@ export class StockTradingOpenPositionsComponent {
   }
 
   private getSimulatedTrades() {
+    this.simulationResults = null
+
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
       (results: TradingStrategyResults) => {
         this.simulationResults = results

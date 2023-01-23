@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { PositionInstance, TradingStrategyResults } from 'src/app/services/stocks.service';
+import { TradingStrategyResults } from 'src/app/services/stocks.service';
 
 
 @Component({
   selector: 'app-trading-actual-vs-simulated',
   templateUrl: './trading-actual-vs-simulated.component.html',
+  styleUrls: ['./trading-actual-vs-simulated.component.css']
 })
 export class TradingActualVsSimulatedPositionComponent {
 
