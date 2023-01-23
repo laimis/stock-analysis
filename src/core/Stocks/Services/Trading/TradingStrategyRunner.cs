@@ -17,7 +17,24 @@ namespace core.Stocks.Services.Trading
             _hours = hours;
         }
 
-        public async Task<TradingStrategyResults> RunAsync(
+        public Task<TradingStrategyResults> RunAsync(
+            UserState user,
+            PositionInstance position,
+            bool closeIfOpenAtTheEnd = false
+        )
+        {
+            return RunAsync(
+                user: user,
+                numberOfShares: position.CompletedPositionShares,
+                price: position.CompletedPositionCostPerShare,
+                stopPrice: position.FirstStop.Value,
+                ticker: position.Ticker,
+                when: position.Opened.Value,
+                closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,
+                actualTrade: position);
+        }
+
+        public Task<TradingStrategyResults> RunAsync(
             UserState user,
             decimal numberOfShares,
             decimal price,
@@ -25,6 +42,27 @@ namespace core.Stocks.Services.Trading
             string ticker,
             DateTimeOffset when,
             bool closeIfOpenAtTheEnd = false)
+        {
+            return RunAsync(
+                user,
+                numberOfShares,
+                price,
+                stopPrice,
+                ticker,
+                when,
+                closeIfOpenAtTheEnd,
+                actualTrade: null);
+        }
+
+        private async Task<TradingStrategyResults> RunAsync(
+            UserState user,
+            decimal numberOfShares,
+            decimal price,
+            decimal stopPrice,
+            string ticker,
+            DateTimeOffset when,
+            bool closeIfOpenAtTheEnd = false,
+            PositionInstance actualTrade = null)
         {
             // when we simulate a purchase for that day, assume it's end of the day
             // so that the price feed will return data from that day and not the previous one
@@ -76,6 +114,12 @@ namespace core.Stocks.Services.Trading
                 }
 
                 results.Results.Add(result);
+            }
+
+            if (actualTrade != null)
+            {
+                var actualResult = TradingStrategyFactory.CreateActualTrade().Run(actualTrade, bars);
+                results.Results.Insert(0, actualResult);
             }
 
             return results;

@@ -11,9 +11,6 @@ export class TradingActualVsSimulatedPositionComponent {
   showDetails: boolean = false;
 
   @Input()
-  public actual: PositionInstance;
-
-  @Input()
   public simulations: TradingStrategyResults
 
   toggleShowDetails() {

@@ -24,6 +24,39 @@ namespace core.Stocks.Services.Trading
         }
     }
 
+    internal class TradingStrategyActualTrade : ITradingStrategy
+    {
+        public TradingStrategyActualTrade() { }
+
+        public TradingStrategyResult Run(PositionInstance position, IEnumerable<PriceBar> bars)
+        {
+            var maxDrawdownPct = 0m;
+            var maxGainPct = 0m;
+
+            foreach (var bar in bars)
+            {
+                position.SetPrice(bar.Close);
+                
+                maxDrawdownPct = Math.Min(maxDrawdownPct, bar.PercentDifferenceFromLow(position.AverageBuyCostPerShare));
+                maxGainPct = Math.Max(maxGainPct, bar.PercentDifferenceFromHigh(position.AverageBuyCostPerShare));
+                if (position.IsClosed)
+                {
+                    if (bar.Date == position.Closed.Value)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return new TradingStrategyResult(
+                maxDrawdownPct: maxDrawdownPct,
+                maxGainPct: maxGainPct,
+                position: position,
+                strategyName: "Actual trade ⭐"
+            );
+        }
+    }
+
     internal class TradingStrategyWithAdvancingStops : TradingStrategy
     {
         private Func<PositionInstance, int, decimal> _stopPriceFunc;

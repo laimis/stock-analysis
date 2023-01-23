@@ -105,6 +105,11 @@ namespace core.Stocks.Services.Trading
             );
         }
 
+        internal static ITradingStrategy CreateActualTrade()
+        {
+            return new TradingStrategyActualTrade();
+        }
+
         private static Func<int, PositionInstance, Func<int, decimal>, decimal> _advancingStop = (level, position, rrLevelFunc) => level switch {
                         1 => position.AverageCostPerShare,
                         _ => rrLevelFunc(level - 1)
