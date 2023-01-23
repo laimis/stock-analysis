@@ -9,6 +9,7 @@ using core.Portfolio;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 using core.Stocks;
+using core.Stocks.Services.Trading;
 
 namespace core
 {
@@ -23,6 +24,32 @@ namespace core
         private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
         private record struct StockListRecord(string ticker, string created, string notes);
         private record struct StockListRecordJustTicker(string ticker);
+        private record struct TradingStrategyResultRecord(string strategyName, string ticker, decimal numberOfShares, decimal cost, decimal averageBuyCostPerShare, decimal averageSaleCostPerShare, string opened, string closed, decimal daysHeld, decimal profit, decimal rr, decimal returnPct);
+
+        public static string Generate(ICSVWriter writer, List<TradingStrategyPerformance> strategies)
+        {
+            var rows = strategies
+                .SelectMany(strategy => 
+                    strategy.positions.Select(r =>
+                        new TradingStrategyResultRecord(
+                            strategy.strategyName,
+                            r.Ticker,
+                            r.CompletedPositionShares,
+                            r.CompletedPositionShares * r.CompletedPositionCostPerShare,
+                            r.CompletedPositionCostPerShare,
+                            r.AverageSaleCostPerShare,
+                            r.Opened.Value.ToString(DATE_FORMAT),
+                            r.Closed.Value.ToString(DATE_FORMAT),
+                            r.DaysHeld,
+                            r.Profit,
+                            r.RR,
+                            r.GainPct
+                        )
+                    )
+                );
+
+            return writer.Generate(rows);
+        }
 
         public static string Generate(ICSVWriter writer, StockListState list, bool justTickers)
         {

@@ -89,6 +89,20 @@ namespace web.Controllers
                 )
             );
 
+        [HttpGet("simulate/trades/export")]
+        public Task<ActionResult> SimulateTradesExport(
+            [FromQuery]bool closePositionIfOpenAtTheEnd,
+            [FromQuery]int numberOfTrades) =>
+            
+            this.GenerateExport(
+                _mediator,
+                new SimulateTrades.ExportQuery(
+                    closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
+                    numberOfTrades: numberOfTrades,
+                    userId: User.Identifier()
+                )
+            );
+
         [HttpGet("simulate/trades/{ticker}/positions/{positionId}")]
         public Task<TradingStrategyResults> Trade(
             int positionId,

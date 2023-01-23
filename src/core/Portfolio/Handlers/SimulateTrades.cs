@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.CSV;
 using core.Stocks;
 using core.Stocks.Services.Trading;
+using MediatR;
 
 namespace core.Portfolio
 {
@@ -26,21 +28,38 @@ namespace core.Portfolio
             public int NumberOfPositions { get; }
         }
 
+        public class ExportQuery : RequestWithUserId<ExportResponse>
+        {
+            public ExportQuery(bool closePositionIfOpenAtTheEnd, int numberOfTrades, Guid userId)
+            {
+                ClosePositionIfOpenAtTheEnd = closePositionIfOpenAtTheEnd;
+                NumberOfPositions = numberOfTrades;
+                UserId = userId;
+            }
+
+            public bool ClosePositionIfOpenAtTheEnd { get; }
+            public int NumberOfPositions { get; }
+        }
+
         public class Handler
-            : HandlerWithStorage<Query, List<TradingStrategyPerformance>>
+            : HandlerWithStorage<Query, List<TradingStrategyPerformance>>,
+            IRequestHandler<ExportQuery, ExportResponse>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
+            private ICSVWriter _csvWriter;
             private IMarketHours _marketHours;
 
             public Handler(
                 IAccountStorage accounts,
                 IBrokerage brokerage,
+                ICSVWriter csvWriter,
                 IMarketHours marketHours,
                 IPortfolioStorage storage) : base(storage)
             {
                 _accounts = accounts;
                 _brokerage = brokerage;
+                _csvWriter = csvWriter;
                 _marketHours = marketHours;
             }
 
@@ -93,6 +112,19 @@ namespace core.Portfolio
                     final.Add(new TradingStrategyPerformance(strategyGroup.Key, performance, strategyPositions));
                 }
                 return final;
+            }
+
+            public async Task<ExportResponse> Handle(ExportQuery request, CancellationToken cancellationToken)
+            {
+                var query = new Query(request.ClosePositionIfOpenAtTheEnd, request.NumberOfPositions, request.UserId);
+
+                var results = await Handle(query, cancellationToken);
+
+                var content = CSVExport.Generate(_csvWriter, results);
+
+                var filename = CSVExport.GenerateFilename($"simulated-trades-{request.NumberOfPositions}");
+                
+                return new ExportResponse(filename, content);
             }
         }
     }

@@ -48,5 +48,9 @@ export class StockTradingSimulationsComponent implements OnInit {
 
     return actualProfit >= simulatedProfit ? 'bg-success' : '';
   }
+
+  getExportUrl() {
+    return this.stocks.simulatePositionsExportUrl(this.closePositions, this.numberOfTrades);
+  }
 }
 
