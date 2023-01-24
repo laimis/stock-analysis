@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PositionInstance, StocksService, TradingStrategyPerformance } from '../../services/stocks.service';
+import { PositionInstance, PriceBar, StocksService, TradingStrategyPerformance } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-simulations',
@@ -10,6 +10,7 @@ import { PositionInstance, StocksService, TradingStrategyPerformance } from '../
 
 export class StockTradingSimulationsComponent implements OnInit {
   results: TradingStrategyPerformance[];
+  spyPrices: PriceBar[];
   
   constructor(
     private stocks:StocksService,
@@ -32,7 +33,17 @@ export class StockTradingSimulationsComponent implements OnInit {
 
     this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe( results => {
         this.results = results.sort((a,b) => b.performance.profit - a.performance.profit);
+        this.fetchSpyPrices();
       });
+  }
+  fetchSpyPrices() {
+    var ticker = "SPY"
+    var earliestDate = this.results[0].performance.earliestDate;
+    var latestDate = this.results[0].performance.latestDate;
+
+    this.stocks.getStockPricesForDates(ticker, earliestDate, latestDate).subscribe(prices => {
+      this.spyPrices = prices.prices;
+    });
   }
 
   openPositions(positions:PositionInstance[]) {

@@ -15,10 +15,24 @@ namespace core.Stocks.Handlers
             public int NumberOfDays { get; }
             public string Ticker { get; }
             public Guid UserId { get; }
+            public DateTimeOffset Start { get; }
+            public DateTimeOffset End { get; }
 
             public Query(int numberOfDays, string ticker, Guid userId)
             {
-                NumberOfDays = numberOfDays;
+                Ticker = ticker;
+                UserId = userId;
+
+                var totalDays = numberOfDays + 200; // to make sure we have enough for the moving averages
+
+                Start = DateTimeOffset.UtcNow.AddDays(-totalDays);
+                End = DateTimeOffset.UtcNow;
+            }
+
+            public Query(DateTimeOffset start, DateTimeOffset end, string ticker, Guid userId)
+            {
+                Start = start;
+                End = end;
                 Ticker = ticker;
                 UserId = userId;
             }
@@ -43,12 +57,7 @@ namespace core.Stocks.Handlers
                     throw new Exception("User not found");
                 }
 
-                var totalDays = request.NumberOfDays + 200; // to make sure we have enough for the moving averages
-
-                var start = DateTimeOffset.UtcNow.AddDays(-totalDays);
-                var end = DateTimeOffset.UtcNow;
-
-                var prices = await _brokerage.GetPriceHistory(user.State, request.Ticker, start: start, end: end);
+                var prices = await _brokerage.GetPriceHistory(user.State, request.Ticker, start: request.Start, end: request.End);
                 if (!prices.IsOk)
                 {
                     throw new Exception("Failed to get price history");

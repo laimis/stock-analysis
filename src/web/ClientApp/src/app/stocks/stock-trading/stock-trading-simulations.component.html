@@ -1,9 +1,14 @@
 <div>
   <h3>Simulating trades</h3>
-  <h5>Parameters: {{numberOfTrades}} trades {{closePositions ? ", closing positions at end of simulations" : ""}}</h5>
+  <h5><span class="text-muted">Parameters: </span>{{numberOfTrades}} trades {{closePositions ? ", closing positions at end of simulations" : ""}}</h5>
   <h5 *ngIf="results">
     <span class="text-muted">Earliest date:</span> {{results[0].performance.earliestDate | date }},
     <span class="text-muted">latest date:</span> {{results[0].performance.latestDate | date }}
+  </h5>
+  <h5 *ngIf="spyPrices">
+    <span class="text-muted">SPY during that time advanced from </span>
+    {{spyPrices[0].close| currency}} to {{spyPrices[spyPrices.length - 1].close | currency}}
+    <span class="text-muted">for gain of </span>{{(spyPrices[spyPrices.length - 1].close - spyPrices[0].close) / spyPrices[0].close | percent}}
   </h5>
   <div>
     <a [href]="getExportUrl()" class="btn btn-primary">Export</a>

@@ -189,6 +189,10 @@ export class StocksService {
 		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
   }
 
+  getStockPricesForDates(symbol:string, start:string, end:string): Observable<Prices> {
+    return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}`)
+  }
+
   deleteStocks(id: string): Observable<object> {
     return this.http.delete(`/api/stocks/${id}`)
   }
