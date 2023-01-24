@@ -57,6 +57,8 @@ namespace core.Stocks.Handlers
                     throw new Exception("User not found");
                 }
 
+                System.Console.WriteLine($"Getting price history for {request.Ticker} from {request.Start} to {request.End})");
+
                 var prices = await _brokerage.GetPriceHistory(user.State, request.Ticker, start: request.Start, end: request.End);
                 if (!prices.IsOk)
                 {

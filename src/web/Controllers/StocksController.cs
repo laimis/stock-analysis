@@ -37,7 +37,7 @@ namespace web.Controllers
             _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
 
         [HttpGet("{ticker}/prices/{start}/{end}")]
-        public Task<PricesView> Prices(string ticker, [FromQuery] DateTimeOffset start, DateTimeOffset end) =>
+        public Task<PricesView> Prices(string ticker, DateTimeOffset start, DateTimeOffset end) =>
             _mediator.Send(new Prices.Query(start:start, end:end, ticker, User.Identifier()));
 
         [HttpGet("{ticker}/price")]

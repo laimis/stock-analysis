@@ -11,6 +11,7 @@ import { PositionInstance, PriceBar, StocksService, TradingStrategyPerformance }
 export class StockTradingSimulationsComponent implements OnInit {
   results: TradingStrategyPerformance[];
   spyPrices: PriceBar[];
+  qqqPrices: PriceBar[];
   
   constructor(
     private stocks:StocksService,
@@ -43,6 +44,11 @@ export class StockTradingSimulationsComponent implements OnInit {
 
     this.stocks.getStockPricesForDates(ticker, earliestDate, latestDate).subscribe(prices => {
       this.spyPrices = prices.prices;
+    });
+
+    ticker = "QQQ"
+    this.stocks.getStockPricesForDates(ticker, earliestDate, latestDate).subscribe(prices => {
+      this.qqqPrices = prices.prices;
     });
   }
 

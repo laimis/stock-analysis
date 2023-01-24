@@ -10,6 +10,11 @@
     {{spyPrices[0].close| currency}} to {{spyPrices[spyPrices.length - 1].close | currency}}
     <span class="text-muted">for gain of </span>{{(spyPrices[spyPrices.length - 1].close - spyPrices[0].close) / spyPrices[0].close | percent}}
   </h5>
+  <h5 *ngIf="qqqPrices">
+    <span class="text-muted">QQQ during that time advanced from </span>
+    {{qqqPrices[0].close| currency}} to {{qqqPrices[qqqPrices.length - 1].close | currency}}
+    <span class="text-muted">for gain of </span>{{(qqqPrices[qqqPrices.length - 1].close - qqqPrices[0].close) / qqqPrices[0].close | percent}}
+  </h5>
   <div>
     <a [href]="getExportUrl()" class="btn btn-primary">Export</a>
   </div>
