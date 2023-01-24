@@ -75,7 +75,7 @@ namespace core.Stocks.Services.Trading
                 ticker,
                 Shared.Adapters.Stocks.PriceFrequency.Daily,
                 convertedWhen,
-                convertedWhen.AddDays(365));
+                convertedWhen.AddDays(TradingStrategyConstants.MAX_NUMBER_OF_DAYS_TO_SIMULATE));
             
             if (!prices.IsOk)
             {
@@ -115,13 +115,13 @@ namespace core.Stocks.Services.Trading
                     );
                 }
 
-                results.Results.Add(result);
+                results.Add(result);
             }
 
             if (actualTrade != null)
             {
                 var actualResult = TradingStrategyFactory.CreateActualTrade().Run(actualTrade, bars);
-                results.Results.Insert(0, actualResult);
+                results.Insert(0, actualResult);
             }
 
             return results;
