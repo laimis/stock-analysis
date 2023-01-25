@@ -4,9 +4,9 @@
     <thead>
       <tr>
         <th>Strategy</th>
+        <th>Profit</th>
         <th>Cost/Share</th>
         <th>Stop</th>
-        <th>Profit</th>
         <th>R/R</th>
         <th>% Gain</th>
         <th>Max Gain</th>
@@ -18,9 +18,9 @@
       <ng-container *ngFor="let r of sortedResults()">
         <tr>
           <td class="text-muted">{{r.strategyName}}</td>
+          <td [ngClass]="{'cell-negative': r.position.combinedProfit < 0, 'fw-bold': true}">{{r.position.combinedProfit | currency}}</td>
           <td>{{r.position.averageBuyCostPerShare | currency}}</td>
           <td>{{r.position.stopPrice | currency }}</td>
-          <td [ngClass]="{'cell-negative': r.position.combinedProfit < 0, 'fw-bold': true}">{{r.position.combinedProfit | currency}}</td>
           <td>{{r.position.rr | number}}</td>
           <td>{{r.position.gainPct | percent}}</td>
           <td [ngClass]="{'cell-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxGainPct | percent:'1.0-2'}}</td>
