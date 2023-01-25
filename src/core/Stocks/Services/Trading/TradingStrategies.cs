@@ -41,7 +41,7 @@ namespace core.Stocks.Services.Trading
                 maxGainPct = Math.Max(maxGainPct, bar.PercentDifferenceFromHigh(position.AverageBuyCostPerShare));
                 if (position.IsClosed)
                 {
-                    if (bar.Date == position.Closed.Value)
+                    if (bar.Date.Date == position.Closed.Value.Date)
                     {
                         break;
                     }

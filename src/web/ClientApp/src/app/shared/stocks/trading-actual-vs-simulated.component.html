@@ -1,6 +1,6 @@
 <div>
   <button (click)="toggleShowDetails()" class="btn btn-primary float-end btn-sm">Show Details</button>
-  <table class="table table-hover mt-2" *ngIf="simulations">
+  <table class="table table-hover simulation-table mt-2"  *ngIf="simulations">
     <thead>
       <tr>
         <th>Strategy</th>
@@ -11,8 +11,6 @@
         <th>Max Gain</th>
         <th>Max Drawdown</th>
         <th>Status</th>
-        <th>Transactions</th>
-        
       </tr>
     </thead>
     <tbody>
@@ -28,12 +26,14 @@
           <td>
             <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
           </td>
-          <td>
+        </tr>
+        <!-- <tr>
+          <td colspan="100%" class="border">
             <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of r.position.transactions">
               {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
             </div>
           </td>
-        </tr>
+        </tr> -->
         <tr *ngIf="showDetails">
           <td></td>
           <td colspan="7">
