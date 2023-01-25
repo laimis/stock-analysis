@@ -310,12 +310,13 @@ namespace core.Alerts
 
         private void SetTriggeredAlert(decimal price, DateTimeOffset time)
         {
+            // threshold value as string with two decimal places
             TriggeredAlert = new TriggeredAlert(
                 price,
                 ThresholdValue,
                 time,
                 Ticker,
-                $"{Description} price of {ThresholdValue} hit for {Ticker} at {price}",
+                $"{Description} price of {ThresholdValue.ToString("0.00")} hit for {Ticker} at {price}",
                 NumberOfShares,
                 UserId,
                 AlertType.Negative,

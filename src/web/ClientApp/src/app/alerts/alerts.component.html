@@ -23,8 +23,7 @@
           <td>{{monitor.thresholdValue | currency}}</td>
           <td>{{monitor.lastSeenValue | currency}}</td>
           <td *ngIf="monitor.triggeredAlert">
-            Triggered on {{monitor.triggeredAlert.when | date:'short'}}!
-            <a [routerLink]="[ '/stocks', 'newposition' ]" [queryParams]="{'ticker': monitor.ticker, 'numberOfShares': monitor.triggeredAlert.numberOfShares}" class="btn btn-sm btn-primary">Sell</a>
+            Triggered on {{monitor.triggeredAlert.when | date:'short'}}
           </td>
           <td *ngIf="!monitor.triggeredAlert"></td>
         </tr>
