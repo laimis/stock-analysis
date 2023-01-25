@@ -38,16 +38,14 @@ export class StockTradingSimulationsComponent implements OnInit {
       });
   }
   fetchSpyPrices() {
-    var ticker = "SPY"
     var earliestDate = this.results[0].performance.earliestDate;
     var latestDate = this.results[0].performance.latestDate;
 
-    this.stocks.getStockPricesForDates(ticker, earliestDate, latestDate).subscribe(prices => {
+    this.stocks.getStockPricesForDates("SPY", earliestDate, latestDate).subscribe(prices => {
       this.spyPrices = prices.prices;
     });
 
-    ticker = "QQQ"
-    this.stocks.getStockPricesForDates(ticker, earliestDate, latestDate).subscribe(prices => {
+    this.stocks.getStockPricesForDates("QQQ", earliestDate, latestDate).subscribe(prices => {
       this.qqqPrices = prices.prices;
     });
   }
