@@ -7,14 +7,9 @@ namespace core.Stocks.Services.Trading
     {
         internal static IEnumerable<ITradingStrategy> GetStrategies()
         {
-            yield return CreateProfitTakingStrategy(
-                name: "1/3 on each RR level"
-            );
+            yield return CreateProfitTakingStrategy();
 
-            yield return CreateProfitTakingStrategy(
-                name: "1/4 on each RR level",
-                profitPoints: 4
-            );
+            yield return CreateProfitTakingStrategy(profitPoints: 4);
 
             yield return new TradingStrategyWithProfitPoints(
                 "1/3 on each RR level (percent based)",
@@ -37,14 +32,16 @@ namespace core.Stocks.Services.Trading
                 (position, level) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
             );
 
-            yield return CreateCloseAfterFixedNumberOfDays(5);
             yield return CreateCloseAfterFixedNumberOfDays(15);
             yield return CreateCloseAfterFixedNumberOfDays(30);
-            yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
-            yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);
-            yield return CreateCloseAfterFixedNumberOfDaysRespectStop(30);
 
             yield return CreateWithAdvancingStops();
+
+            // retired strategies
+            // yield return CreateCloseAfterFixedNumberOfDays(5);
+            // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
+            // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);
+            // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(30);
         }
 
         public static ITradingStrategy CreateWithAdvancingStops()
@@ -84,10 +81,10 @@ namespace core.Stocks.Services.Trading
             );
         }
 
-        public static ITradingStrategy CreateProfitTakingStrategy(string name, int profitPoints = 3)
+        public static ITradingStrategy CreateProfitTakingStrategy(int profitPoints = 3)
         {
             return new TradingStrategyWithProfitPoints(
-                name: name,
+                name: $"Profit taking ({profitPoints} RR levels)",
                 numberOfProfitPoints: profitPoints,
                 (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
