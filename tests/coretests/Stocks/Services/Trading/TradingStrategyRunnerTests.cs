@@ -104,7 +104,7 @@ namespace coretests.Stocks.Services
             testPosition.Buy(2, 10, System.DateTimeOffset.UtcNow, Guid.NewGuid());
             testPosition.SetStopPrice(5, System.DateTimeOffset.UtcNow);
 
-            var runner = TradingStrategyFactory.CreateProfitTakingStrategy("strat");
+            var runner = TradingStrategyFactory.CreateProfitTakingStrategy();
 
             var result = runner.Run(testPosition, bars);
 
@@ -146,7 +146,7 @@ namespace coretests.Stocks.Services
         {
             var (bars, positionInstance) = CreateDownsideTestData();
             
-            var result = TradingStrategyFactory.CreateProfitTakingStrategy("strat").Run(
+            var result = TradingStrategyFactory.CreateProfitTakingStrategy().Run(
                 positionInstance,
                 bars
             );
