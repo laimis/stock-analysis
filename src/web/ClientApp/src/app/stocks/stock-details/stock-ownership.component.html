@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <app-brokerage-neworder *ngIf="ownership && ownership.currentPosition"></app-brokerage-neworder>
+  <app-brokerage-neworder *ngIf="ownership && ownership.currentPosition" (brokerageOrderEntered)="brokerageOrderEntered()"></app-brokerage-neworder>
 
   <app-brokerage-orders *ngIf="stock" [ticker]="stock.ticker"></app-brokerage-orders>
 

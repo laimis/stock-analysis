@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 
 @Component({
@@ -6,20 +6,16 @@ import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
   templateUrl: './app-stock-new-position.component.html',
   styleUrls: ['./app-stock-new-position.component.css']
 })
-export class StockNewPositionComponent implements OnInit {
+export class StockNewPositionComponent {
   feedbackMessage: string;
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
   @ViewChild(BrokerageOrdersComponent)
   private brokerageOrders!: BrokerageOrdersComponent;
 
   brokerageOrderEntered() {
     this.feedbackMessage = "Brokerage order entered";
-
     this.brokerageOrders.refreshOrders();
   }
 

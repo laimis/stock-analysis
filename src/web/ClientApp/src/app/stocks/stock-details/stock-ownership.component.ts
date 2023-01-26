@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { StocksService, GetErrors, StockDetails, StockOwnership, stocktransactioncommand } from '../../services/stocks.service';
 import { Router } from '@angular/router';
+import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 
 @Component({
   selector: 'stock-ownership',
@@ -17,6 +18,9 @@ export class StockOwnershipComponent {
 
   @Output()
   ownershipChanged = new EventEmitter();
+
+  @ViewChild(BrokerageOrdersComponent)
+  private brokerageOrders!: BrokerageOrdersComponent;
 
   public errors: string[]
   
@@ -42,6 +46,10 @@ export class StockOwnershipComponent {
     }, err => {
       this.errors = GetErrors(err)
     })
+  }
+
+  brokerageOrderEntered() {
+    this.brokerageOrders.refreshOrders()
   }
 
   transactionRecorded(type:string) {

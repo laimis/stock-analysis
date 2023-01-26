@@ -66,8 +66,10 @@
   <app-stock-trading-closed-positions     *ngIf="isActive('past')" [positions]=closed></app-stock-trading-closed-positions>
   <stock-trading-performance  *ngIf="isActive('performance')" [performance]=performance></stock-trading-performance>
   <stock-trading-review       *ngIf="isActive('review')" [positions]=closed></stock-trading-review>
+  
   <app-brokerage-neworder     *ngIf="isActive('brokerage')" (brokerageOrderEntered)="brokerageOrderEntered()"></app-brokerage-neworder>
   <app-brokerage-orders       *ngIf="isActive('brokerage')" (orderExecuted)="orderExecuted()"></app-brokerage-orders>
+  
   <app-stock-trading-open-positions *ngIf="isActive('openreview')" [orders]="brokerageOrders" [positions]=positions></app-stock-trading-open-positions>
   <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
   

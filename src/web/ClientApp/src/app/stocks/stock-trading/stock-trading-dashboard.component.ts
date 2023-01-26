@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
+import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 import { StocksService, PositionInstance, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder, StockViolation } from '../../services/stocks.service';
 
 @Component({
-  selector: 'stock-trading',
+  selector: 'app-stock-trading-dashboard',
   templateUrl: './stock-trading-dashboard.component.html',
   styleUrls: ['./stock-trading-dashboard.component.css']
 })
@@ -17,6 +18,8 @@ export class StockTradingComponent implements OnInit {
   performance: StockTradingPerformanceCollection;
   violations: StockViolation[]
   brokerageOrders: BrokerageOrder[];
+
+  @ViewChild(BrokerageOrdersComponent) brokerageOrdersComponent:BrokerageOrdersComponent;
 
   constructor(
     private stockService:StocksService,
@@ -45,8 +48,8 @@ export class StockTradingComponent implements OnInit {
   }
 
   brokerageOrderEntered() {
-    this.loadEntries()
     this.activateTab('brokerage')
+    this.brokerageOrdersComponent.refreshOrders()
   }
 
   orderExecuted() {
