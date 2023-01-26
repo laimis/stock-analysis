@@ -15,6 +15,7 @@ export class TradingActualVsSimulatedPositionComponent {
   public simulations: TradingStrategyResults
 
   toggleShowDetails() {
+    console.log("show details toggle")
     this.showDetails = !this.showDetails;
   }
 

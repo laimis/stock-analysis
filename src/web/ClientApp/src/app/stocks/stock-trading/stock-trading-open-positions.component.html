@@ -1,70 +1,58 @@
 <div (keydown)="keydownHandler($event)" tabindex="0">
-    <div class="container">
-      <div class="row">
-        <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-        <div class="col text-center">
-          <select (change)="dropdownClick($event.target)">
-            <option
-              *ngFor="let position of positions; let i = index;"
-              [value]="i"
-              [selected]="position.ticker === currentPosition.ticker">
-              {{position.ticker}}
-            </option>
-          </select>
-           ({{currentPosition.price | currency}})
-        </div>
-        <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
+    
+  <div class="container">
+    <div class="row">
+      <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
+      <div class="col text-center">
+        <select class="form-select"  (change)="dropdownClick($event.target)">
+          <option
+            *ngFor="let position of positions; let i = index;"
+            [value]="i"
+            [selected]="position.ticker === currentPosition.ticker">
+            {{position.ticker}}
+          </option>
+        </select>
       </div>
-    </div>
-  
-    <div class="container mt-5">
-      <div class="row" *ngIf="currentPositionOrders && currentPositionOrders.length > 0">
-        Brokerage Orders:
-        <div *ngFor="let order of currentPositionOrders">
-          {{order.type}} {{order.quantity}} shares at {{order.price | currency}}
-        </div>
+      <div class="col">
+        <span class="text-muted">Price: </span>{{currentPosition.price | currency}}
       </div>
-      <div class="row">
-        <div class="col">
-          <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
-        </div>
+      <div class="col">
+        <span class="text-muted">Stop: </span>{{currentPosition.stopPrice | currency}}
       </div>
-
-      <div class="row">
-        <div class="col">
-          <app-stock-chart *ngIf="prices"
-            [positivePricePoints]="buys(currentPosition)"
-            [negativePricePoints]="sells(currentPosition)"
-            [prices]=prices
-            [positiveLines]="[currentPosition.averageCostPerShare]"
-            [negativeLines]="currentPosition.stopPrice ? [currentPosition.stopPrice] : []">
-          </app-stock-chart>
-        </div>
+      <div class="col">
+        <span class="text-muted">Cost/Share: </span>{{currentPosition.averageBuyCostPerShare | currency}}
       </div>
-      <div class="row">
-        <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
-      </div>
-      <div class="row" *ngIf="outcomes">
-        <div class="col">
-          <table class="table table-hover border">
-            <tbody>
-                <tr *ngFor="let o of interestingOutcomes(outcomes)">
-                    <td>
-                        <span
-                            class="badge"
-                            [ngClass]="{'bg-success': o.type === 'Positive', 'bg-danger': o.type === 'Negative', 'bg-secondary': o.type === 'Neutral'}">
-                            
-                            &nbsp;
-                        </span>
-                    </td>
-                    <td>{{o.key}}</td>
-                    <td>{{o.value}}</td>
-                    <td>{{o.type}}</td>
-                    <td>{{o.message}}</td>
-                </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
     </div>
   </div>
+  
+  <section *ngIf="currentPositionOrders && currentPositionOrders.length > 0">
+    <h5>Brokerage Orders</h5>
+
+      <div *ngFor="let order of currentPositionOrders">
+        {{order.type}} {{order.quantity}} shares at {{order.price | currency}}
+      </div>
+  </section>
+
+  <section>
+    <h5>Actual vs Trading Strategies</h5>
+    <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
+  </section>
+  
+  <section>
+    <h5>Stock chart</h5>
+    <app-stock-chart *ngIf="prices"
+          [positivePricePoints]="buys(currentPosition)"
+          [negativePricePoints]="sells(currentPosition)"
+          [prices]=prices
+          [positiveLines]="[currentPosition.averageCostPerShare]"
+          [negativeLines]="currentPosition.stopPrice ? [currentPosition.stopPrice] : []">
+        </app-stock-chart>
+  </section>
+
+  <section>
+    <h5>Position Information</h5>
+    <app-stock-trading-position [position]="currentPosition" [pendingOrders]="[]"></app-stock-trading-position>
+  </section>
+
+</div>

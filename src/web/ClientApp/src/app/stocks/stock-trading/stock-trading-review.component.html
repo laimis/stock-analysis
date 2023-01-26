@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
       <div class="col text-center">
-        <select (change)="dropdownClick($event.target)">
+        <select class="form-select" (change)="dropdownClick($event.target)">
           <option
             *ngFor="let position of positions; let i = index;"
             [value]="i"
@@ -11,7 +11,15 @@
             {{position.ticker}} - {{position.positionId}}
           </option>
         </select>
-        ({{currentPositionPrice | currency}})
+      </div>
+      <div class="col">
+        <span class="text-muted">Price: </span>{{currentPositionPrice | currency}}
+      </div>
+      <div class="col">
+        <span class="text-muted">Stop: </span>{{currentPosition.stopPrice | currency}}
+      </div>
+      <div class="col">
+        <span class="text-muted">Cost/Share: </span>{{currentPosition.averageBuyCostPerShare | currency}}
       </div>
       <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
     </div>

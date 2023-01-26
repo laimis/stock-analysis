@@ -3,7 +3,7 @@ import { Prices, StocksService, PositionInstance, TradingStrategyResults } from 
 
 
 @Component({
-  selector: 'stock-trading-review',
+  selector: 'app-stock-trading-review',
   templateUrl: './stock-trading-review.component.html',
   styleUrls: ['./stock-trading-review.component.css']
 })
