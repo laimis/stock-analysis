@@ -15,6 +15,7 @@ export class OutcomesReportComponent implements OnInit {
   startDate: string = null;
   endDate: string = null;
   earnings: string[] = null;
+  title: string;
 
   constructor (
     private stocksService: StocksService,
@@ -22,6 +23,11 @@ export class OutcomesReportComponent implements OnInit {
   }
   
   ngOnInit(): void {
+    var titleParam = this.route.snapshot.queryParamMap.get("title");
+    if (titleParam) {
+      this.title = titleParam;
+    }
+
     var earningsParam = this.route.snapshot.queryParamMap.get("earnings");
     if (earningsParam) {
       this.earnings = earningsParam.split(",")

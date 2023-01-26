@@ -5,12 +5,12 @@
         </div>
     </div>
 
-    <h2 *ngIf="startDate || endDate || earnings">
-        Params: 
+    <h3 *ngIf="title">{{title}}</h3>
+    <h4 *ngIf="startDate || endDate || earnings">
         <span class="me-3" *ngIf="startDate">Start date: {{startDate | date}}</span>
         <span class="me-3" *ngIf="endDate">End date: {{endDate | date}}</span>
         <span class="me-3" *ngIf="earnings">Earnings: {{earnings.length}}</span>
-    </h2>
+    </h4>
 
     <app-outcomes-analysis-report
         [report]="singleBarReportDaily"
@@ -19,8 +19,6 @@
     </app-outcomes-analysis-report>
 
     <app-outcomes *ngIf="singleBarReportDaily" [outcomes]="singleBarReportDaily.outcomes" title="Single Bar Outcome (daily)"></app-outcomes>
-
     <app-outcomes *ngIf="allBarsReport" [outcomes]="allBarsReport.outcomes" title="All Bar Outcomes (daily)"></app-outcomes>
-
     <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
 </div>
