@@ -5,7 +5,7 @@
     <table  class="table table-hover striped mb-4">
       <thead>
         <tr>
-          <th>Ticker</th>
+          <th class="sort-header" (click)="sort('ticker')">Ticker</th>
           <th *ngFor="let key of getKeys(outcomes)" class="sort-header" (click)="sort(key)">{{key}}</th>
         </tr>
       </thead>

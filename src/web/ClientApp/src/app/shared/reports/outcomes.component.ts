@@ -57,12 +57,20 @@ export class OutcomesComponent {
   }
 
   private getSortFunc(column:string) {
-    return (a:TickerOutcomes, b:TickerOutcomes) => {
-      var aVal = a.outcomes.find(o => o.key === column).value
-      var bVal = b.outcomes.find(o => o.key === column).value
-
-      return aVal - bVal
+    if (column === 'ticker') {
+      return (a:TickerOutcomes, b:TickerOutcomes) => {
+        return a.ticker.localeCompare(b.ticker)
+      }
     }
+    else {
+      return (a:TickerOutcomes, b:TickerOutcomes) => {
+        var aVal = a.outcomes.find(o => o.key === column).value
+        var bVal = b.outcomes.find(o => o.key === column).value
+  
+        return aVal - bVal
+      }
+    }
+    
   }
 
   getValue(o:StockAnalysisOutcome) {
