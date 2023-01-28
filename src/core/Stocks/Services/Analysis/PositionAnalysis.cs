@@ -116,7 +116,7 @@ namespace core.Stocks.Services.Analysis
             // add max gain in the last 10 bars as outcome
             var last10 = bars.TakeLast(10).ToArray();
             var last10Max = last10.Max(b => b.High);
-            var last10Gain = (last10Max - position.CompletedPositionCostPerShare)/position.CompletedPositionCostPerShare;
+            var last10Gain = (last10Max - last10[0].Close)/last10[0].Close;
 
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.MaxGainLast10,
@@ -127,7 +127,7 @@ namespace core.Stocks.Services.Analysis
 
             // add max drawdown in the last 10 bars as outcome
             var last10Min = last10.Min(b => b.Low);
-            var last10Drawdown = (last10Min - position.CompletedPositionCostPerShare)/position.CompletedPositionCostPerShare;
+            var last10Drawdown = (last10Min - last10[0].Close)/last10[0].Close;
 
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.MaxDrawdownLast10,
