@@ -403,6 +403,10 @@ export class StocksService {
   reportPositions(): Observable<OutcomesReport> {
     return this.http.get<OutcomesReport>('/api/reports/positions')
   }
+
+  reportDailyOutcomesReport(ticker:string,start:string): Observable<DailyOutcomesReport> {
+    return this.http.get<DailyOutcomesReport>('/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start)
+  }
 }
 
 export interface StockListTicker {
@@ -680,6 +684,15 @@ export interface OutcomesReport {
   outcomes: TickerOutcomes[],
   gaps: StockGaps[],
   summary: TickerCountPair[]
+}
+
+export interface DailyScore {
+  date: string
+  score: number
+}
+export interface DailyOutcomesReport {
+  ticker: string
+  dailyScores: DailyScore[]
 }
 
 export interface TickerCountPair {

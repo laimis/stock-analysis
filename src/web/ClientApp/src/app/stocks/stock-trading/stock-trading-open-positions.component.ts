@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults, BrokerageOrder } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults, BrokerageOrder, DailyOutcomesReport } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -16,6 +16,7 @@ export class StockTradingOpenPositionsComponent {
   simulationResults: TradingStrategyResults
   prices: Prices
   outcomes: TickerOutcomes;
+  dailyScores: DailyOutcomesReport;
 
   constructor (private stockService: StocksService) { }
 
@@ -55,10 +56,19 @@ export class StockTradingOpenPositionsComponent {
   }
 
   private getPricesForCurrentPosition() {
+    // only take the last 365 of prices
     this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
       (r: Prices) => {
-        // only take the last 365 of prices
         this.prices = r;
+        this.getScores()
+      }
+    );
+  }
+
+  private getScores() {
+    this.stockService.reportDailyOutcomesReport(this.currentPosition.ticker, this.currentPosition.opened).subscribe(
+      (r: DailyOutcomesReport) => {
+        this.dailyScores = r;
       }
     );
   }

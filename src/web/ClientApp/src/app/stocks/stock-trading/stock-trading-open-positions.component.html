@@ -38,6 +38,17 @@
     <h5>Actual vs Trading Strategies</h5>
     <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
   </section>
+
+  <section *ngIf="dailyScores">
+    <h5>Daily Scores</h5>
+    <table class="table border">
+      <tbody>
+        <tr>
+          <td *ngFor="let score of dailyScores.dailyScores">{{score.score}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
   
   <section>
     <h5>Stock chart</h5>

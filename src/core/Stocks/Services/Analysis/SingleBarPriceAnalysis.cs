@@ -5,11 +5,6 @@ using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Analysis
 {
-    public interface ISingleBarPriceAnalysis
-    {
-        IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices);
-    }
-
     public class SingleBarAnalysisConstants
     {
         public static int NumberOfDaysForRecentAnalysis = 60;
@@ -17,25 +12,25 @@ namespace core.Stocks.Services.Analysis
 
     public class SingleBarAnalysisRunner
     {
-        public static List<AnalysisOutcome> Run(PriceBar[] prices)
+        public static List<AnalysisOutcome> Run(PriceBar currentBar, PriceBar[] previousBars)
         {
             var outcomes = new List<AnalysisOutcome>();
 
-            outcomes.AddRange(new SingleBarVolumeAnalysis().Analyze(prices));
-            outcomes.AddRange(new SingleBarPriceAnalysis().Analyze(prices));
-            outcomes.AddRange(new SMASingleBarAnalysis().Analyze(prices));
+            outcomes.AddRange(new SingleBarVolumeAnalysis().Analyze(currentBar, previousBars));
+            outcomes.AddRange(new SingleBarPriceAnalysis().Analyze(currentBar, previousBars));
+            outcomes.AddRange(new SMASingleBarAnalysis().Analyze(currentBar, previousBars));
 
             return outcomes;
         }
     }
 
-    internal class SMASingleBarAnalysis : ISingleBarPriceAnalysis
+    internal class SMASingleBarAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar currentBar, PriceBar[] previousBars)
         {
-            var price = prices[prices.Length - 1].Close;
+            var price = currentBar.Close;
             
-            var outcomes = new SMAAnalysis().Run(price, prices);
+            var outcomes = new SMAAnalysis().Run(price, previousBars);
 
             var outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
 
@@ -49,12 +44,12 @@ namespace core.Stocks.Services.Analysis
         }
     }
 
-    internal class SingleBarPriceAnalysis : ISingleBarPriceAnalysis
+    internal class SingleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices)
+        public IEnumerable<AnalysisOutcome> Analyze(
+            PriceBar currentBar,
+            PriceBar[] previousBars)
         {
-            var currentBar = prices[prices.Length - 1];
-
             // return open as the neutral outcome
             yield return new AnalysisOutcome(
                 SingleBarOutcomeKeys.Open,
@@ -82,7 +77,7 @@ namespace core.Stocks.Services.Analysis
                 message: $"Closing range is {range}.");
 
             // use yesterday's close as reference
-            var yesterday = prices[prices.Length - 2];
+            var yesterday = previousBars[^1];
 
             // today's change from yesterday's close
             var percentChange = (currentBar.Close - yesterday.Close) / yesterday.Close;
@@ -100,7 +95,8 @@ namespace core.Stocks.Services.Analysis
             var trueLow = Math.Min(currentBar.Low, yesterday.Close);
 
             // see if there was a gap down or gap up
-            var gap = GapAnalysis.Generate(prices, SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis).FirstOrDefault(
+            var gaps = GapAnalysis.Generate(previousBars, SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis);
+            var gap = gaps.FirstOrDefault(
                 x => x.bar.Equals(currentBar)
             );
 
@@ -119,8 +115,8 @@ namespace core.Stocks.Services.Analysis
                 message: $"Gap is {gap.gapSizePct}%.");
 
             // see if the latest bar is a new high or new low
-            var newHigh = prices.Take(prices.Length - 1).All(x => x.High < currentBar.High);
-            var newLow = prices.Take(prices.Length - 1).All(x => x.Low > currentBar.Low);
+            var newHigh = previousBars.All(x => x.High < currentBar.High);
+            var newLow = previousBars.All(x => x.Low > currentBar.Low);
 
             // add new high as outcome
             yield return new AnalysisOutcome(
@@ -140,7 +136,7 @@ namespace core.Stocks.Services.Analysis
 
             // generate percent change statistical data for recent days
             var descriptor = NumberAnalysis.PercentChanges(
-                prices.Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                previousBars.Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                 .Select(x => x.Close)
                 .ToArray());
 
@@ -171,46 +167,38 @@ namespace core.Stocks.Services.Analysis
         }
     }
 
-    internal class SingleBarVolumeAnalysis : ISingleBarPriceAnalysis
+    internal class SingleBarVolumeAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] prices)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar last, PriceBar[] previousBars)
         {
-            var outcomes = new List<AnalysisOutcome>();
-
-            var last = prices[prices.Length - 1];
-
-            // add volume as a neutral outcome
-            outcomes.Add(new AnalysisOutcome(
+            yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.Volume,
                 type: OutcomeType.Neutral,
                 value: last.Volume,
                 valueType: OutcomeValueType.Number,
-                message: "Volume"));
+                message: "Volume");
 
-            // calculate the average volume from the last x days
+            // calculate today's relative volume
             var volumeStats = NumberAnalysis.Statistics(
-                prices
+                previousBars
                     .Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                     .Select(x => x.Volume)
                     .ToArray()
             );
 
-            // calculate today's relative volume
             var relativeVolume = Math.Round(last.Volume / volumeStats.mean, 2);
 
             var priceDirection = last.Close > last.Open
                 ? OutcomeType.Positive : OutcomeType.Negative;
 
             // add relative volume as outcome
-            outcomes.Add(new AnalysisOutcome(
+            yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.RelativeVolume,
                 type: relativeVolume >= 0.9m ? priceDirection : OutcomeType.Neutral,
                 value: relativeVolume,
                 valueType: OutcomeValueType.Number,
                 message: $"Relative volume is {relativeVolume}x the average volume over the last {volumeStats.count} days."
-            ));
-
-            return outcomes;
+            );
         }
     }
 

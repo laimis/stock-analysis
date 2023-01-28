@@ -11,7 +11,7 @@ namespace core.Stocks.Services.Analysis
         private const decimal ExcellentClosingRange = 0.80m;
         private const decimal LowClosingRange = 0.20m;
 
-        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
+        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(IEnumerable<TickerOutcomes> tickerOutcomes)
         {
             if (tickerOutcomes.Any(o => o.outcomes.Any(o => o.key == SingleBarOutcomeKeys.Highlight)))
             {

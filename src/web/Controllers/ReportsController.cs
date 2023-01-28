@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using core.Reports;
 using core.Reports.Views;
@@ -57,5 +58,9 @@ namespace web.Controllers
         [HttpGet("positions")]
         public Task<OutcomesReportView> Portfolio() =>
             _mediator.Send(new PositionReport.Query(User.Identifier()));
+
+        [HttpGet("dailyoutcomesreport/{ticker}")]
+        public Task<DailyOutcomesReportView> DailyOutcomesReport(string ticker, [FromQuery]DateTimeOffset start, [FromQuery]DateTimeOffset? end) =>
+            _mediator.Send(new DailyOutcomesReport.Query(start, end, ticker, User.Identifier()));
     }
 }
