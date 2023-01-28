@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults } from 'src/app/services/stocks.service';
+import { Component, OnInit } from '@angular/core';
+import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -7,9 +7,9 @@ import { Prices, StocksService, PositionInstance, TradingStrategyResults } from 
   templateUrl: './stock-trading-review.component.html',
   styleUrls: ['./stock-trading-review.component.css']
 })
-export class StockTradingReviewComponent {
+export class StockTradingReviewComponent implements OnInit {
   
-  private _positions: PositionInstance[]
+  positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
   currentPositionPrice: number
@@ -18,18 +18,18 @@ export class StockTradingReviewComponent {
 
   constructor (private stockService: StocksService) { }
 
-  @Input()
-  set positions(positions:PositionInstance[]) {
-    this._positions = positions
-    this._index = 0
-    this.updateCurrentPosition()
-  }
-  get positions() {
-    return this._positions
+  ngOnInit(): void {
+    this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
+        this.positions = r.past
+        this.updateCurrentPosition()
+      }, (error) => {
+        console.log("error fetching positions: " + error)
+      }
+    );
   }
 
   updateCurrentPosition() {
-    this.currentPosition = this._positions[this._index]
+    this.currentPosition = this.positions[this._index]
     // get price data and pass it to chart
     this.runTradingStrategies();
     this.fetchPrice();
@@ -68,7 +68,7 @@ export class StockTradingReviewComponent {
 
   next() {
     this._index++
-    if (this._index >= this._positions.length) {
+    if (this._index >= this.positions.length) {
       this._index = 0
     }
     this.updateCurrentPosition()
