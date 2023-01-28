@@ -41,13 +41,13 @@
 
   <section *ngIf="dailyScores">
     <h5>Daily Scores</h5>
-    <table class="table border">
-      <tbody>
-        <tr>
-          <td *ngFor="let score of dailyScores.dailyScores">{{score.score}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <app-chart
+      [yScaleType]="'linear'"
+      [values]="getDailyScores()"
+      [chartLabels]="getDailyScoresDates()"
+      [chartLegend]="false"
+      [chartType]="'bar'">
+    </app-chart>
   </section>
   
   <section>

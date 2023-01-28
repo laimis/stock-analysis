@@ -46,7 +46,7 @@ export class StockTradingOpenPositionsComponent {
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
       (results: TradingStrategyResults) => {
         this.simulationResults = results
-        this.getPricesForCurrentPosition()
+        this.getScores()
       },
       (error) => {
         console.log("error fetching simulations: " + error)
@@ -60,7 +60,6 @@ export class StockTradingOpenPositionsComponent {
     this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
       (r: Prices) => {
         this.prices = r;
-        this.getScores()
       }
     );
   }
@@ -69,6 +68,7 @@ export class StockTradingOpenPositionsComponent {
     this.stockService.reportDailyOutcomesReport(this.currentPosition.ticker, this.currentPosition.opened).subscribe(
       (r: DailyOutcomesReport) => {
         this.dailyScores = r;
+        this.getPricesForCurrentPosition()
       }
     );
   }
@@ -125,6 +125,14 @@ export class StockTradingOpenPositionsComponent {
 
   interestingOutcomes(a: TickerOutcomes): any {
     return a.outcomes.filter(o => o.type == 'Positive' || o.type == 'Negative')
+  }
+
+  getDailyScores() {
+    return this.dailyScores.dailyScores.map(d => d.score)
+  }
+
+  getDailyScoresDates() {
+    return this.dailyScores.dailyScores.map(d => d.date.split('T')[0])
   }
 
 }

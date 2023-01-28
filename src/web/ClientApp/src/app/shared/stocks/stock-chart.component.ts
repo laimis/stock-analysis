@@ -1,8 +1,7 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
 import { Prices, PriceWithDate } from 'src/app/services/stocks.service';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
-import {CrosshairPlugin} from 'chartjs-plugin-crosshair';
 import { BaseChartDirective } from 'ng2-charts';
 
 
@@ -10,20 +9,29 @@ import { BaseChartDirective } from 'ng2-charts';
   selector: 'app-stock-chart',
   templateUrl: './stock-chart.component.html',
 })
-export class StockChartComponent implements OnInit {
+export class StockChartComponent implements OnInit, OnDestroy {
   
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   
-  public lineChartPlugins = [];
-  public lineChartType : ChartType = 'line';
+  public chartPlugins = [];
+
+  @Input()
+  public chartType : ChartType = 'line';
+
   public lineChartLegend = true;
-  public lineChartData: ChartDataset[] = [];
+
+  public chartData: ChartDataset[] = [];
+
   public lineChartLabels: string[] = [];
+
+  @Input()
+  public yScaleType: 'linear' | 'logarithmic' = 'logarithmic';
+
   public lineChartOptions: ChartOptions = {
     responsive: true,
     scales: {
       y: {
-        type: 'logarithmic',
+        type: this.yScaleType,
         display: true,
       }
     },
@@ -133,7 +141,7 @@ export class StockChartComponent implements OnInit {
       }
     })
 
-    this.lineChartData = data.concat(sma_data)
+    this.chartData = data.concat(sma_data)
 
     this.lineChartLabels = prices.prices.map(x => x.dateStr).slice(-cutoff)
 
@@ -197,14 +205,12 @@ export class StockChartComponent implements OnInit {
     console.log("StockTradingChartComponent.ngOnInit()")
     Chart.register(LogarithmicScale)
     Chart.register(annotationPlugin)
-    Chart.register(CrosshairPlugin)
   }
 
   ngOnDestroy() {
     console.log("StockTradingChartComponent.ngOnDestroy()")
     Chart.unregister(LogarithmicScale)
     Chart.unregister(annotationPlugin)
-    Chart.unregister(CrosshairPlugin)
   }
 
 }

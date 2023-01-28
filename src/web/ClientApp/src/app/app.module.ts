@@ -79,6 +79,8 @@ import { TradingActualVsSimulatedPositionComponent } from './shared/stocks/tradi
 import { StockListsDashboardComponent } from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
 import { StockListComponent } from './stocks/stock-lists/stock-list/stock-list.component';
 import { StockTradingSimulationsComponent } from './stocks/stock-trading/stock-trading-simulations.component';
+import { ChartComponent } from './shared/chart/chart.component';
+
 
 var routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -221,7 +223,8 @@ var routes: Routes = [
     AlertsComponent,
     StockNewPositionComponent,
     StockListsDashboardComponent,
-    StockListComponent
+    StockListComponent,
+    ChartComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

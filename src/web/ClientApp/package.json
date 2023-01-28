@@ -26,7 +26,6 @@
     "c": "^1.1.1",
     "chart.js": "^3.6.0",
     "chartjs-plugin-annotation": "^1.4.0",
-    "chartjs-plugin-crosshair": "^1.2.0",
     "kind-of": ">=6.0.3",
     "lodash": "^4.17.21",
     "minimist": ">=1.2.3",
