@@ -1,12 +1,15 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace core.Stocks.Services.Analysis
 {
     public class PositionAnalysis
     {
-        public static IEnumerable<AnalysisOutcome> Generate(PositionInstance position)
+        public static IEnumerable<AnalysisOutcome> Generate(
+            PositionInstance position,
+            Shared.Adapters.Stocks.PriceBar[] bars)
         {
             // add price as outcome
             yield return new AnalysisOutcome(
@@ -48,10 +51,10 @@ namespace core.Stocks.Services.Analysis
             // gain in position
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.GainPct,
-                position.UnrealizedGainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                (position.UnrealizedGainPct ?? 0),
+                position.GainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                position.GainPct,
                 OutcomeValueType.Percentage,
-                $"{position.UnrealizedGainPct:P}"
+                $"{position.GainPct:P}"
             );
 
             var rrOutcomeType = position.RR switch {
@@ -78,6 +81,71 @@ namespace core.Stocks.Services.Analysis
                 $"{position.CombinedProfit}"
             );
 
+            // add max drawdown from bars as outcome
+            var min = bars.Min(b => b.Low);
+            var drawdown = (min - position.CompletedPositionCostPerShare)/position.CompletedPositionCostPerShare;
+            
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.MaxDrawdown,
+                OutcomeType.Neutral,
+                drawdown,
+                OutcomeValueType.Percentage,
+                $"Max drawdown is {drawdown:P}");
+
+            // add max gain from bars as outcome
+            var max = bars.Max(b => b.High);
+            var gain = (max - position.CompletedPositionCostPerShare)/position.CompletedPositionCostPerShare;
+
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.MaxGain,
+                OutcomeType.Neutral,
+                gain,
+                OutcomeValueType.Percentage,
+                $"Max gain is {gain:P}");
+
+            // difference between max gain and max drawdown
+            var maxGainDrawdownDiff = gain - drawdown * -1;
+
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.GainAndDrawdownDiff,
+                maxGainDrawdownDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                maxGainDrawdownDiff,
+                OutcomeValueType.Percentage,
+                $"Max gain drawdown diff is {maxGainDrawdownDiff:P}");
+
+            // add max drawdown in the last 10 bars as outcome
+            var last10 = bars.TakeLast(10).ToArray();
+            var last10Min = last10.Min(b => b.Low);
+            var last10Drawdown = (last10Min - position.CompletedPositionCostPerShare)/position.CompletedPositionCostPerShare;
+
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.MaxDrawdownLast10,
+                OutcomeType.Neutral,
+                last10Drawdown,
+                OutcomeValueType.Percentage,
+                $"Max drawdown in last 10 bars is {last10Drawdown:P}");
+
+            // add max gain in the last 10 bars as outcome
+            var last10Max = last10.Max(b => b.High);
+            var last10Gain = (last10Max - position.CompletedPositionCostPerShare)/position.CompletedPositionCostPerShare;
+
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.MaxGainLast10,
+                OutcomeType.Neutral,
+                last10Gain,
+                OutcomeValueType.Percentage,
+                $"Max gain in last 10 bars is {last10Gain:P}");
+
+            // difference between max gain and max drawdown
+            var last10MaxGainDrawdownDiff = last10Gain - last10Drawdown * -1;
+
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.GainDiffLast10,
+                last10MaxGainDrawdownDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                last10MaxGainDrawdownDiff,
+                OutcomeValueType.Percentage,
+                $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}");
+
             // add risk amount as outcome
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.RiskAmount,
@@ -85,15 +153,6 @@ namespace core.Stocks.Services.Analysis
                 position.RiskedAmount ?? 0,
                 OutcomeValueType.Currency,
                 $"Risk amount is {position.RiskedAmount:C2}");
-            
-            // add number of shares as outcome
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.NumberOfShares,
-                OutcomeType.Neutral,
-                position.NumberOfShares,
-                OutcomeValueType.Number,
-                $"Number of shares: {position.NumberOfShares}"
-            );
 
             // add days held
             yield return new AnalysisOutcome(
@@ -134,11 +193,16 @@ namespace core.Stocks.Services.Analysis
         public static string RR = "RR";
         public static string Profit = "Profit";
         public static string Price = "Price";
-        public static string NumberOfShares = "NumberOfShares";
         public static string RiskAmount = "RiskedAmount";
         public static string DaysSinceLastTransaction = "DaysSinceLastTransaction";
         public static string PositionSize = "PositionSize";
         public static string DaysHeld = "DaysHeld";
+        public static string MaxDrawdown = "MaxDrawdown";
+        public static string MaxGain = "MaxGain";
+        public static string GainAndDrawdownDiff = "GainDiff";
+        public static string MaxDrawdownLast10 = "MaxDrawdownLast10";
+        public static string MaxGainLast10 = "MaxGainLast10";
+        public static string GainDiffLast10 = "GainDiffLast10";
     }
 }
 #nullable restore

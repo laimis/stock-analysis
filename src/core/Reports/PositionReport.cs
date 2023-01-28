@@ -66,17 +66,24 @@ namespace core.Reports
                 
                 foreach(var position in positions)
                 {
-                    var quoteResponse = await _brokerage.GetQuote(user, position.Ticker);
-                    if (!quoteResponse.IsOk)
+                    var priceResponse = await _brokerage.GetPriceHistory(
+                        user,
+                        position.Ticker,
+                        frequency: PriceFrequency.Daily,
+                        start: position.Opened.Value,
+                        end: position.Closed.HasValue ? position.Closed.Value : DateTimeOffset.UtcNow
+                    );
+
+                    if (!priceResponse.IsOk)
                     {
                         continue;
                     }
 
-                    var currentPrice = Math.Max(quoteResponse.Success.bidPrice, quoteResponse.Success.lastPrice);
+                    var bars = priceResponse.Success;
 
-                    position.SetPrice(currentPrice);
+                    position.SetPrice(bars[^1].Close);
 
-                    var outcomes = PositionAnalysis.Generate(position).ToList();
+                    var outcomes = PositionAnalysis.Generate(position, bars).ToList();
 
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
                 }
