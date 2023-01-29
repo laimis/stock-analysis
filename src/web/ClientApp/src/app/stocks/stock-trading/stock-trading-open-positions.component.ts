@@ -34,6 +34,10 @@ export class StockTradingOpenPositionsComponent {
 
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
+    this.dailyScores = null
+    this.prices = null
+    this.simulationResults = null
+    
     // get price data and pass it to chart
     this.getSimulatedTrades();
   }
