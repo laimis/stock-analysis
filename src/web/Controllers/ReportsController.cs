@@ -60,7 +60,7 @@ namespace web.Controllers
             _mediator.Send(new PositionReport.Query(User.Identifier()));
 
         [HttpGet("dailyoutcomesreport/{ticker}")]
-        public Task<DailyOutcomesReportView> DailyOutcomesReport(string ticker, [FromQuery]DateTimeOffset start, [FromQuery]DateTimeOffset? end) =>
+        public Task<DailyOutcomesReportView> DailyOutcomesReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
             _mediator.Send(new DailyOutcomesReport.Query(start, end, ticker, User.Identifier()));
     }
 }

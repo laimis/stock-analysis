@@ -16,15 +16,15 @@ namespace core.Reports
     {
         public class Query : RequestWithUserId<DailyOutcomesReportView>
         {
-            public Query(DateTimeOffset start, DateTimeOffset? end, string ticker, Guid userId) : base(userId)
+            public Query(string start, string end, string ticker, Guid userId) : base(userId)
             {
                 Start = start;
-                End = end ?? default;
+                End = end;
                 Ticker = ticker;
             }
 
-            public DateTimeOffset Start { get; }
-            public DateTimeOffset End { get; }
+            public string Start { get; }
+            public string End { get; }
             public string Ticker { get; }
         }
 
@@ -32,16 +32,19 @@ namespace core.Reports
         {
             public Handler(
                 IAccountStorage accountStorage,
-                IPortfolioStorage storage,
-                IBrokerage brokerage) : base(storage)
+                IBrokerage brokerage,
+                IMarketHours marketHours,
+                IPortfolioStorage storage) : base(storage)
             {
                 _accountStorage = accountStorage;
                 _brokerage = brokerage;
+                _marketHours = marketHours;
             }
 
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
-        
+            private IMarketHours _marketHours;
+
             public override async Task<DailyOutcomesReportView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
@@ -50,14 +53,21 @@ namespace core.Reports
                     throw new Exception("User not found");
                 }
 
-                var start = request.Start.AddDays(-200);
+                var start = _marketHours.GetMarketStartOfDayTimeInUtc(
+                    DateTimeOffset.Parse(request.Start)
+                );
+
+                var end = request.End == null ? default : 
+                    _marketHours.GetMarketEndOfDayTimeInUtc(
+                        DateTimeOffset.Parse(request.End)
+                    );
 
                 var priceResponse = await _brokerage.GetPriceHistory(
                     user.State,
                     request.Ticker,
                     frequency: PriceFrequency.Daily,
-                    start: start,
-                    end: request.End
+                    start: start.AddDays(-200), // go back a bit to have enough data for 'relative' stats
+                    end: end
                 );
                 if (!priceResponse.IsOk)
                 {
@@ -69,7 +79,7 @@ namespace core.Reports
                 var indexOfFirtsBar = 0;
                 foreach(var bar in bars)
                 {
-                    if (bar.Date >= request.Start)
+                    if (bar.Date.Date == start.Date)
                     {
                         break;
                     }
@@ -80,7 +90,9 @@ namespace core.Reports
                 var scoreList = Enumerable.Range(indexOfFirtsBar, bars.Length - indexOfFirtsBar)
                     .Select(index => {
                         var currentBar = bars[index];
-                        var outcomes = SingleBarAnalysisRunner.Run(currentBar, bars[..(index-1)]);
+                        var previousBars = bars[..index];
+                        
+                        var outcomes = SingleBarAnalysisRunner.Run(currentBar, previousBars);
                         var tickerOutcomes = new TickerOutcomes(outcomes, request.Ticker);
                         var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[]{tickerOutcomes});
                         var counts = OutcomesReportView.GenerateEvaluationSummary(evaluations);
