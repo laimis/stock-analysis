@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PositionInstance, StocksService, TradingStrategyPerformance } from '../services/stocks.service';
+import { DailyScore, StocksService, TradingStrategyPerformance } from '../services/stocks.service';
 
 @Component({
   selector: 'app-playground',
@@ -10,7 +10,7 @@ import { PositionInstance, StocksService, TradingStrategyPerformance } from '../
 
 export class PlaygroundComponent implements OnInit {
   results: TradingStrategyPerformance[];
-  dailyScores: import("c:/Users/Laimonas/programming/stock-analysis/src/web/ClientApp/src/app/services/stocks.service").DailyScore[];
+  dailyScores: DailyScore[];
   
   constructor(
     private stocks:StocksService,
