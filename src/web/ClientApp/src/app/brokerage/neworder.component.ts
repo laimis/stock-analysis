@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { brokerageordercommand, StockQuote, StocksService } from 'src/app/services/stocks.service';
+import { brokerageordercommand, GetErrors, StockQuote, StocksService } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -17,6 +17,7 @@ export class BrokerageNewOrderComponent {
   ticker : string
   quote : StockQuote
   total: number | null = null
+  errorMessage: any;
 
   constructor(
     private stockService: StocksService
@@ -80,8 +81,8 @@ export class BrokerageNewOrderComponent {
         this.brokerageOrderEntered.emit("entered")
     },
       err => { 
+        this.errorMessage = GetErrors(err)[0]
         console.error(err)
-        alert('brokerage failed') 
       }
     )
   }

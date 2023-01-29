@@ -290,7 +290,7 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public Task SellOrder(
+    public Task<ServiceResponse<bool>> SellOrder(
         UserState user,
         string ticker,
         decimal numberOfShares,
@@ -312,12 +312,11 @@ public class TDAmeritradeClient : IBrokerage
             orderType = GetBuyOrderType(type),
             session = GetSession(duration),
             duration = GetBuyOrderDuration(duration),
-            price = price,
+            price = GetPrice(type, price),
             orderStrategyType = "SINGLE",
             orderLegCollection = new [] {legCollection}
         };
 
-        // get account first
         return EnterOrder(user, postData);
     }
 
@@ -493,6 +492,7 @@ public class TDAmeritradeClient : IBrokerage
         var data = JsonSerializer.Serialize(postData);
 
         var (enterResponse, content) = await CallApiWithoutSerialization(user, url, HttpMethod.Post, data);
+        
         return enterResponse.IsSuccessStatusCode switch
         {
             true => new ServiceResponse<bool>(true),

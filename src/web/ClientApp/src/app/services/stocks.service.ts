@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { UpdateModeEnum } from 'chart.js';
 
 export function GetErrors(err:any): string[] {
   var objToMap = err.error.errors

@@ -44,9 +44,12 @@ namespace core.Brokerage
                         "Unable to find user account for stock operation");
                 }
 
-                await _brokerage.SellOrder(user.State, cmd.Ticker, cmd.NumberOfShares, cmd.Price, cmd.Type, cmd.Duration);
+                var response = await _brokerage.SellOrder(user.State, cmd.Ticker, cmd.NumberOfShares, cmd.Price, cmd.Type, cmd.Duration);
 
-                return CommandResponse.Success();
+                return response.IsOk switch {
+                    true => CommandResponse.Success(),
+                    false => CommandResponse.Failed(response.Error.Message)
+                };
             }
         }
     }
