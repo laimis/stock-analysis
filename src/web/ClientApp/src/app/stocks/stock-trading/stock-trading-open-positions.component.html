@@ -25,14 +25,6 @@
       <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
     </div>
   </div>
-  
-  <section *ngIf="currentPositionOrders && currentPositionOrders.length > 0">
-    <h5>Brokerage Orders</h5>
-
-      <div *ngFor="let order of currentPositionOrders">
-        {{order.type}} {{order.quantity}} shares at {{order.price | currency}}
-      </div>
-  </section>
 
   <section>
     <h5>Actual vs Trading Strategies</h5>

@@ -109,7 +109,7 @@ namespace web.Controllers
             string ticker) =>
             
             _mediator.Send(
-                new SimulateTrade.Command(
+                new SimulateTrade.ForPosition(
                     positionId, ticker, User.Identifier()
                 )
             );

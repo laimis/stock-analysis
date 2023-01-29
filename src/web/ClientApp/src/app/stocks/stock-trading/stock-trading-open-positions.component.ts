@@ -12,7 +12,6 @@ export class StockTradingOpenPositionsComponent {
   private _positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
-  currentPositionOrders: BrokerageOrder[]
   simulationResults: TradingStrategyResults
   prices: Prices
   outcomes: TickerOutcomes;
@@ -35,7 +34,6 @@ export class StockTradingOpenPositionsComponent {
 
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
-    this.currentPositionOrders = this.orders.filter(o => o.ticker == this.currentPosition.ticker)
     // get price data and pass it to chart
     this.getSimulatedTrades();
   }

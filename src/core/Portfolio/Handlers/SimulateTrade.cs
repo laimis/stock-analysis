@@ -12,9 +12,9 @@ namespace core.Portfolio
 {
     public class SimulateTrade
     {
-        public class Command : RequestWithUserId<TradingStrategyResults>
+        public class ForPosition : RequestWithUserId<TradingStrategyResults>
         {
-            public Command(int positionId, string ticker, Guid userId)
+            public ForPosition(int positionId, string ticker, Guid userId)
             {
                 PositionId = positionId;
                 Ticker = ticker;
@@ -51,7 +51,7 @@ namespace core.Portfolio
         }
 
         public class Handler
-            : HandlerWithStorage<Command, TradingStrategyResults>,
+            : HandlerWithStorage<ForPosition, TradingStrategyResults>,
             IRequestHandler<ForTicker, TradingStrategyResults>
         {
             private IAccountStorage _accounts;
@@ -89,7 +89,7 @@ namespace core.Portfolio
                 );
             }
 
-            public override async Task<TradingStrategyResults> Handle(Command request, CancellationToken cancellationToken)
+            public override async Task<TradingStrategyResults> Handle(ForPosition request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)

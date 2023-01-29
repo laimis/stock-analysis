@@ -33,8 +33,8 @@ namespace core.Reports
             public PriceFrequency Frequency { get; set; }
 
             public bool IncludeGapAnalysis { get; set; }
-            public DateTimeOffset? StartDate { get; set; }
-            public DateTimeOffset? EndDate { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
         }
 
         public class ForTickersQuery : BaseQuery
@@ -57,15 +57,18 @@ namespace core.Reports
         {
             public Handler(
                 IAccountStorage accountStorage,
+                IMarketHours marketHours,
                 IPortfolioStorage storage,
                 IBrokerage brokerage) : base(storage)
             {
                 _accountStorage = accountStorage;
                 _brokerage = brokerage;
+                _marketHours = marketHours;
             }
 
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
+            private IMarketHours _marketHours { get; }
 
             public override async Task<OutcomesReportView> Handle(ForTickersQuery request, CancellationToken cancellationToken)
             {
@@ -113,8 +116,8 @@ namespace core.Reports
 
                 foreach(var ticker in query.Tickers)
                 {
-                    DateTimeOffset startDate = query.StartDate ?? default;
-                    DateTimeOffset endDate = query.EndDate ?? default;
+                    var startDate = query.StartDate == null ? default : _marketHours.GetMarketStartOfDayTimeInUtc(DateTimeOffset.Parse(query.StartDate));
+                    var endDate = query.EndDate == null ? default : _marketHours.GetMarketEndOfDayTimeInUtc(DateTimeOffset.Parse(query.EndDate));
 
                     var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency, start: startDate, end: endDate);
                     
