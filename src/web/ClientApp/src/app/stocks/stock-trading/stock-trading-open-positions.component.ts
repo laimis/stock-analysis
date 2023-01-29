@@ -65,7 +65,7 @@ export class StockTradingOpenPositionsComponent {
   }
 
   private getScores() {
-    this.stockService.reportDailyOutcomesReport(this.currentPosition.ticker, this.currentPosition.opened).subscribe(
+    this.stockService.reportDailyOutcomesReport(this.currentPosition.ticker, this.currentPosition.opened.split('T')[0]).subscribe(
       (r: DailyOutcomesReport) => {
         this.dailyScores = r;
         this.getPricesForCurrentPosition()
