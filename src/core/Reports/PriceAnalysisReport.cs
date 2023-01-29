@@ -93,7 +93,12 @@ namespace core.Reports
                                 currentPrice: prices[prices.Length - 1].Close,
                                 prices
                             )),
-                    Duration.SingleBar => prices => SingleBarAnalysisRunner.Run(prices[prices.Length - 1], prices[..^1]),
+                    Duration.SingleBar => prices => {
+                        var currentBar = prices[prices.Length - 1];
+                        var previousBars = prices[..^1];
+                        
+                        return SingleBarAnalysisRunner.Run(currentBar, previousBars);
+                    },
                     _ => throw new ArgumentOutOfRangeException()
                 };
 

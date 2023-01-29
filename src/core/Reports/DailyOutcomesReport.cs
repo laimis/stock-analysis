@@ -66,7 +66,7 @@ namespace core.Reports
                     user.State,
                     request.Ticker,
                     frequency: PriceFrequency.Daily,
-                    start: start.AddDays(-200), // go back a bit to have enough data for 'relative' stats
+                    start: start.AddDays(-365), // go back a bit to have enough data for 'relative' stats
                     end: end
                 );
                 if (!priceResponse.IsOk)
@@ -91,7 +91,7 @@ namespace core.Reports
                     .Select(index => {
                         var currentBar = bars[index];
                         var previousBars = bars[..index];
-                        
+
                         var outcomes = SingleBarAnalysisRunner.Run(currentBar, previousBars);
                         var tickerOutcomes = new TickerOutcomes(outcomes, request.Ticker);
                         var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[]{tickerOutcomes});

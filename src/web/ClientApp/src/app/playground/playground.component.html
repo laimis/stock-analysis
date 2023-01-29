@@ -1,3 +1,13 @@
 <div>
-  <app-chart [yScaleType]="'linear'" [values]="[1,-2,3]" [chartLabels]="['a','b','c']" [chartLegend]="false" [chartType]="'bar'"></app-chart>
+  
+  <h5>Daily Scores</h5>
+    <app-chart
+      *ngIf="dailyScores"
+      [yScaleType]="'linear'"
+      [values]="getDailyScores()"
+      [chartLabels]="getDailyScoresDates()"
+      [chartLegend]="false"
+      [chartType]="'bar'">
+    </app-chart>
+
 </div>

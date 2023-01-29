@@ -10,39 +10,31 @@ import { PositionInstance, StocksService, TradingStrategyPerformance } from '../
 
 export class PlaygroundComponent implements OnInit {
   results: TradingStrategyPerformance[];
+  dailyScores: import("c:/Users/Laimonas/programming/stock-analysis/src/web/ClientApp/src/app/services/stocks.service").DailyScore[];
   
   constructor(
     private stocks:StocksService,
     private route:ActivatedRoute) { }
 
-  numberOfTrades:number = 40;
-  closePositions:boolean = false;
+  ticker:string;
+  startDate:string;
 
   ngOnInit() {
-    var n = this.route.snapshot.queryParamMap.get('n');
-    this.closePositions = this.route.snapshot.queryParamMap.get('closePositions') === "true";
+    this.ticker = this.route.snapshot.queryParamMap.get('ticker');
+    this.startDate = this.route.snapshot.queryParamMap.get('startDate');
     
-    if (n) {
-      this.numberOfTrades = parseInt(n);
-    }
-
-    this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe( results => {
-        this.results = results.sort((a,b) => b.performance.profit - a.performance.profit);
+    this.stocks.reportDailyOutcomesReport(
+      this.ticker, this.startDate).subscribe( results => {
+        this.dailyScores = results.dailyScores;
       });
   }
 
-  openPositions(positions:PositionInstance[]) {
-    return positions.filter(p => !p.isClosed).length;
+  getDailyScores() {
+    return this.dailyScores.map(d => d.score)
   }
 
-  backgroundCssClassForActual(results:TradingStrategyPerformance[], strategyIndex: number, positionIndex: number) {
-    var simulatedPosition = results[strategyIndex].positions[positionIndex];
-    var actualPosition = results[0].positions[positionIndex];
-
-    var simulatedProfit = simulatedPosition.combinedProfit;
-    var actualProfit = actualPosition.combinedProfit;
-
-    return actualProfit >= simulatedProfit ? 'bg-success' : '';
+  getDailyScoresDates() {
+    return this.dailyScores.map(d => d.date.split('T')[0])
   }
 }
 
