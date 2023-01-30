@@ -403,8 +403,11 @@ export class StocksService {
     return this.http.get<OutcomesReport>('/api/reports/positions')
   }
 
-  reportDailyOutcomesReport(ticker:string,start:string): Observable<DailyOutcomesReport> {
-    return this.http.get<DailyOutcomesReport>('/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start)
+  reportDailyOutcomesReport(
+    ticker:string,
+    start:string,
+    end:string=null): Observable<DailyOutcomesReport> {
+    return this.http.get<DailyOutcomesReport>('/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start + '&end=' + end)
   }
 }
 

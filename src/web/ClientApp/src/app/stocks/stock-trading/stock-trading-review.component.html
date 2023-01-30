@@ -25,20 +25,34 @@
     </div>
   </div>
 
-  <div class="mt-2">
+  <section>
+    <h5>Actual vs Trading Strategies</h5>
     <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
-  </div>
+  </section>
 
-  <div class="mt-2">
+  <section *ngIf="dailyScores">
+    <h5>Daily Scores</h5>
+    <app-chart
+      [yScaleType]="'linear'"
+      [values]="getDailyScores()"
+      [chartLabels]="getDailyScoresDates()"
+      [chartLegend]="false"
+      [chartType]="'bar'">
+    </app-chart>
+  </section>
+
+  <section>
+    <h5>Stock chart</h5>
     <app-stock-chart *ngIf="prices"
       [positivePricePoints]="buys(currentPosition)"
       [negativePricePoints]="sells(currentPosition)"
       [prices]=prices>
     </app-stock-chart>
-  </div>
+  </section>
 
-  <div class="mt-2">
+  <section>
+    <h5>Position Information</h5>
     <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
-  </div>
+  </section>
   
 </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomesReport } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -15,6 +15,7 @@ export class StockTradingReviewComponent implements OnInit {
   currentPositionPrice: number
   simulationResults: TradingStrategyResults
   prices: Prices
+  dailyScores: DailyOutcomesReport;
 
   constructor (private stockService: StocksService) { }
 
@@ -43,11 +44,23 @@ export class StockTradingReviewComponent implements OnInit {
     );
   }
 
+  private getScores() {
+    this.stockService.reportDailyOutcomesReport(
+      this.currentPosition.ticker,
+      this.currentPosition.opened.split('T')[0],
+      this.currentPosition.closed.split('T')[0]).subscribe(
+      (r: DailyOutcomesReport) => {
+        this.dailyScores = r;
+        this.getPrices();
+      }
+    );
+  }
+
   private runTradingStrategies() {
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
       (r: TradingStrategyResults) => {
         this.simulationResults = r;
-        this.getPrices();
+        this.getScores()
       }
     );
   }
@@ -64,6 +77,14 @@ export class StockTradingReviewComponent implements OnInit {
     var index = Number.parseInt((elem as HTMLInputElement).value)
     this._index = index
     this.updateCurrentPosition()
+  }
+
+  getDailyScores() {
+    return this.dailyScores.dailyScores.map(d => d.score)
+  }
+
+  getDailyScoresDates() {
+    return this.dailyScores.dailyScores.map(d => d.date.split('T')[0])
   }
 
   next() {
