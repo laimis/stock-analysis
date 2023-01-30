@@ -407,7 +407,12 @@ export class StocksService {
     ticker:string,
     start:string,
     end:string=null): Observable<DailyOutcomesReport> {
-    return this.http.get<DailyOutcomesReport>('/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start + '&end=' + end)
+      var endpoint = '/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start
+      if (end) {
+        endpoint += '&end=' + end
+      }
+
+      return this.http.get<DailyOutcomesReport>(endpoint)
   }
 }
 
