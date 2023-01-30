@@ -47,3 +47,15 @@ a {
   border-bottom-color: #535353;
   color: #353535;
 }
+
+
+section {
+  margin-top: 20px;
+  padding-right: 10px;
+}
+
+section h5 {
+  margin-top:0;
+  padding:0;
+  border-bottom:1px solid #858484;
+}
