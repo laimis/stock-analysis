@@ -80,6 +80,7 @@ import { StockListsDashboardComponent } from './stocks/stock-lists/stock-lists-d
 import { StockListComponent } from './stocks/stock-lists/stock-list/stock-list.component';
 import { StockTradingSimulationsComponent } from './stocks/stock-trading/stock-trading-simulations.component';
 import { ChartComponent } from './shared/chart/chart.component';
+import { DailyOutcomeScoresComponent } from './shared/reports/daily-outcome-scores.component';
 
 
 var routes: Routes = [
@@ -220,6 +221,7 @@ var routes: Routes = [
     GapsReportComponent,
     GapsComponent,
     PercentChangeDistributionComponent,
+    DailyOutcomeScoresComponent,
 
     AlertsComponent,
     StockNewPositionComponent,

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomesReport } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomeScoresReport } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -15,7 +15,7 @@ export class StockTradingReviewComponent implements OnInit {
   currentPositionPrice: number
   simulationResults: TradingStrategyResults
   prices: Prices
-  dailyScores: DailyOutcomesReport;
+  dailyScores: DailyOutcomeScoresReport;
 
   constructor (private stockService: StocksService) { }
 
@@ -49,7 +49,7 @@ export class StockTradingReviewComponent implements OnInit {
       this.currentPosition.ticker,
       this.currentPosition.opened.split('T')[0],
       this.currentPosition.closed.split('T')[0]).subscribe(
-      (r: DailyOutcomesReport) => {
+      (r: DailyOutcomeScoresReport) => {
         this.dailyScores = r;
         this.getPrices();
       }
@@ -77,14 +77,6 @@ export class StockTradingReviewComponent implements OnInit {
     var index = Number.parseInt((elem as HTMLInputElement).value)
     this._index = index
     this.updateCurrentPosition()
-  }
-
-  getDailyScores() {
-    return this.dailyScores.dailyScores.map(d => d.score)
-  }
-
-  getDailyScoresDates() {
-    return this.dailyScores.dailyScores.map(d => d.date.split('T')[0])
   }
 
   next() {

@@ -33,13 +33,7 @@
 
   <section *ngIf="dailyScores">
     <h5>Daily Scores</h5>
-    <app-chart
-      [yScaleType]="'linear'"
-      [values]="getDailyScores()"
-      [chartLabels]="getDailyScoresDates()"
-      [chartLegend]="false"
-      [chartType]="'bar'">
-    </app-chart>
+    <app-daily-outcome-scores [dailyOutcomeScoresReport]="dailyScores"></app-daily-outcome-scores>
   </section>
   
   <section>

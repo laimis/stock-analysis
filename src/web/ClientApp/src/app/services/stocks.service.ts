@@ -406,13 +406,13 @@ export class StocksService {
   reportDailyOutcomesReport(
     ticker:string,
     start:string,
-    end:string=null): Observable<DailyOutcomesReport> {
+    end:string=null): Observable<DailyOutcomeScoresReport> {
       var endpoint = '/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start
       if (end) {
         endpoint += '&end=' + end
       }
 
-      return this.http.get<DailyOutcomesReport>(endpoint)
+      return this.http.get<DailyOutcomeScoresReport>(endpoint)
   }
 }
 
@@ -697,7 +697,7 @@ export interface DailyScore {
   date: string
   score: number
 }
-export interface DailyOutcomesReport {
+export interface DailyOutcomeScoresReport {
   ticker: string
   dailyScores: DailyScore[]
 }

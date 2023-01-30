@@ -1,6 +1,6 @@
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { OutcomesReport, OutcomeValueTypeEnum, Prices, PriceWithDate, StockAnalysisOutcome, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import { DailyOutcomeScoresReport, OutcomesReport, OutcomeValueTypeEnum, Prices, PriceWithDate, StockAnalysisOutcome, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -15,6 +15,7 @@ export class StockAnalysisComponent {
   
   dailyOutcomesReport : OutcomesReport;
   dailyOutcomes: TickerOutcomes;
+  dailyOutcomeScoresReport: DailyOutcomeScoresReport
 
   gaps: StockGaps;
   percentChangeDistribution: StockPercentChangeResponse;
@@ -44,6 +45,22 @@ export class StockAnalysisComponent {
     this.stockService.getStockPrices(this.ticker, 365).subscribe(
       data => {
         this.prices = data;
+        this.getDailyOutcomeScoresReport();
+      }
+    );
+  }
+  getDailyOutcomeScoresReport() {
+    // set start to be 30 days ago
+    let start = new Date();
+    start.setDate(start.getDate() - 30);
+
+    // get start as string in format yyyy-mm-dd
+    let startStr = start.toISOString().split('T')[0];
+
+    this.stockService.reportDailyOutcomesReport(
+      this.ticker, startStr).subscribe(
+      data => {
+        this.dailyOutcomeScoresReport = data;
         this.getOutcomesReportAllBars();
       }
     );
