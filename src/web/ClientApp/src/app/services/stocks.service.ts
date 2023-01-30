@@ -407,7 +407,7 @@ export class StocksService {
     ticker:string,
     start:string,
     end:string=null): Observable<DailyOutcomeScoresReport> {
-      var endpoint = '/api/reports/dailyoutcomesreport/' + ticker + '?start=' + start
+      var endpoint = '/api/reports/dailyoutcomescoresreport/' + ticker + '?start=' + start
       if (end) {
         endpoint += '&end=' + end
       }

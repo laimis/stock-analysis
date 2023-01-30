@@ -12,9 +12,9 @@ using core.Stocks.Services.Analysis;
 
 namespace core.Reports
 {
-    public class DailyOutcomesReport
+    public class DailyOutcomeScoresReport
     {
-        public class Query : RequestWithUserId<DailyOutcomesReportView>
+        public class Query : RequestWithUserId<DailyOutcomeScoresReportView>
         {
             public Query(string start, string end, string ticker, Guid userId) : base(userId)
             {
@@ -28,7 +28,7 @@ namespace core.Reports
             public string Ticker { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, DailyOutcomesReportView>
+        public class Handler : HandlerWithStorage<Query, DailyOutcomeScoresReportView>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -45,7 +45,7 @@ namespace core.Reports
             private IBrokerage _brokerage { get; }
             private IMarketHours _marketHours;
 
-            public override async Task<DailyOutcomesReportView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<DailyOutcomeScoresReportView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -100,7 +100,7 @@ namespace core.Reports
                     })
                     .ToList();
 
-                return new DailyOutcomesReportView(scoreList, request.Ticker);
+                return new DailyOutcomeScoresReportView(scoreList, request.Ticker);
             }
         }
     }
