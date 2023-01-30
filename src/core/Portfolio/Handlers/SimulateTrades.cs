@@ -95,7 +95,7 @@ namespace core.Portfolio
                         closeIfOpenAtTheEnd: request.ClosePositionIfOpenAtTheEnd
                     );
 
-                    results.Add(new TradingStrategyResult(0, 0, position, "Actual trading"));
+                    results.Add(new TradingStrategyResult(0, 0, 0, 0, position, "Actual trading"));
                     results.AddRange(simulatedResults.Results);
                 }
 

@@ -7,8 +7,10 @@
         <th>Stop</th>
         <th>R/R</th>
         <th>% Gain</th>
-        <th>Max Gain</th>
-        <th>Max Drawdown</th>
+        <th>Gain</th>
+        <th>Drawdown</th>
+        <th>R Gain</th>
+        <th>R Drawdown</th>
         <th>
           <!-- <button (click)="toggleShowDetails()" class="btn btn-primary float-end btn-sm">Show Details</button> -->
           <div class="form-switch">
@@ -28,6 +30,8 @@
           <td>{{r.position.gainPct | percent}}</td>
           <td [ngClass]="{'cell-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxGainPct | percent:'1.0-2'}}</td>
           <td [ngClass]="{'cell-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
+          <td [ngClass]="{'cell-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{r.maxGainPctRecent | percent:'1.0-2'}}</td>
+          <td [ngClass]="{'cell-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{r.maxDrawdownPctRecent | percent:'1.0-2'}}</td>
           <td>
             <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
           </td>

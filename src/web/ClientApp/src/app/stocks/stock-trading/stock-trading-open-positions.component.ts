@@ -90,17 +90,6 @@ export class StockTradingOpenPositionsComponent {
     this.updateCurrentPosition()
   }
 
-  keydownHandler($event: KeyboardEvent) {
-    if ($event.key === 'ArrowRight')
-    {
-      this.next()
-    }
-    else if ($event.key === 'ArrowLeft')
-    {
-      this.previous()
-    }
-  }
-
   previous() {
     this._index--
     if (this._index < 0) {

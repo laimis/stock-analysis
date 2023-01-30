@@ -36,6 +36,8 @@ namespace core.Stocks.Services.Trading
     public record struct TradingStrategyResult(
         decimal maxDrawdownPct,
         decimal maxGainPct,
+        decimal maxDrawdownPctRecent,
+        decimal maxGainPctRecent,
         PositionInstance position,
         string strategyName
     );
@@ -43,6 +45,7 @@ namespace core.Stocks.Services.Trading
     internal record struct SimulationContext(
         PositionInstance Position,
         decimal MaxGain,
-        decimal MaxDrawdown
+        decimal MaxDrawdown,
+        List<PriceBar> Last10Bars
     );
 }

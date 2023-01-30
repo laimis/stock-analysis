@@ -32,13 +32,21 @@ namespace core.Stocks.Services.Trading
         {
             var maxDrawdownPct = 0m;
             var maxGainPct = 0m;
+            var last10Bars = new List<PriceBar>(10);
 
             foreach (var bar in bars)
             {
                 position.SetPrice(bar.Close);
-                
+
                 maxDrawdownPct = Math.Min(maxDrawdownPct, bar.PercentDifferenceFromLow(position.AverageBuyCostPerShare));
                 maxGainPct = Math.Max(maxGainPct, bar.PercentDifferenceFromHigh(position.AverageBuyCostPerShare));
+
+                if (last10Bars.Count == 10)
+                {
+                    last10Bars.RemoveAt(0);
+                }
+                last10Bars.Add(bar);
+
                 if (position.IsClosed)
                 {
                     if (bar.Date.Date == position.Closed.Value.Date)
@@ -48,9 +56,14 @@ namespace core.Stocks.Services.Trading
                 }
             }
 
+            var (maxDrawdownPctRecent, maxGainPctRecent) = 
+                TradingStrategy.CalculateMaxDrawdownAndGain(last10Bars);
+
             return new TradingStrategyResult(
                 maxDrawdownPct: maxDrawdownPct,
                 maxGainPct: maxGainPct,
+                maxDrawdownPctRecent: maxDrawdownPctRecent,
+                maxGainPctRecent: maxGainPctRecent,
                 position: position,
                 strategyName: "Actual trade ⭐"
             );
@@ -208,16 +221,23 @@ namespace core.Stocks.Services.Trading
             var context = new SimulationContext(
                 Position: position,
                 MaxDrawdown: 0,
-                MaxGain: 0
+                MaxGain: 0,
+                Last10Bars: new List<PriceBar>(10)
             );
             
             var finalContext = bars.Aggregate(context, ApplyPriceBarToPosition);
 
             var finalPosition = finalContext.Position;
 
+            var (maxDrawdownPctRecent, maxGainPctRecent) = TradingStrategy.CalculateMaxDrawdownAndGain(
+                finalContext.Last10Bars
+            );
+
             return new TradingStrategyResult(
                 maxDrawdownPct: finalContext.MaxDrawdown,
                 maxGainPct: finalContext.MaxGain,
+                maxDrawdownPctRecent: maxDrawdownPctRecent,
+                maxGainPctRecent: maxGainPctRecent,
                 position: finalPosition,
                 strategyName: Name
             );
@@ -246,11 +266,36 @@ namespace core.Stocks.Services.Trading
 
             position.SetPrice(bar.Close);
 
+            var last10bars = context.Last10Bars;
+            // move the last 10 bars forward
+            if (last10bars.Count == 10)
+            {
+                last10bars.RemoveAt(0);
+            }
+            last10bars.Add(bar);
+
             return context with {
                 Position = position,
                 MaxDrawdown = Math.Min(context.MaxDrawdown, bar.PercentDifferenceFromLow(position.AverageBuyCostPerShare)),
-                MaxGain = Math.Max(context.MaxGain, bar.PercentDifferenceFromHigh(position.AverageBuyCostPerShare))
+                MaxGain = Math.Max(context.MaxGain, bar.PercentDifferenceFromHigh(position.AverageBuyCostPerShare)),
+                Last10Bars = last10bars
             };
+        }
+
+        internal static (decimal, decimal) CalculateMaxDrawdownAndGain(List<PriceBar> last10Bars)
+        {
+            // using the last 10 bars, the first bar serves as a reference, from that closing price
+            // calculate max drawdown and max gain pct seen in those 10 bars
+            var maxDrawdownPctRecent = 0m;
+            var maxGainPctRecent = 0m;
+            var referenceBar = last10Bars.First();
+            foreach (var bar in last10Bars)
+            {
+                maxDrawdownPctRecent = Math.Min(maxDrawdownPctRecent, bar.PercentDifferenceFromLow(referenceBar.Close));
+                maxGainPctRecent = Math.Max(maxGainPctRecent, bar.PercentDifferenceFromHigh(referenceBar.Close));
+            }
+
+            return (maxDrawdownPctRecent, maxGainPctRecent);
         }
 
         protected abstract void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar);
