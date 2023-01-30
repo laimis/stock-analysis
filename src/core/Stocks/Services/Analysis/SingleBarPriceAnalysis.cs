@@ -114,9 +114,14 @@ namespace core.Stocks.Services.Analysis
                 valueType: OutcomeValueType.Percentage,
                 message: $"Gap is {gap.gapSizePct}%.");
 
-            // see if the latest bar is a new high or new low
-            var newHigh = previousBars.All(x => x.High < currentBar.High);
-            var newLow = previousBars.All(x => x.Low > currentBar.Low);
+            // see if the latest bar is a one year high or low
+            var oneYearAgoDate = currentBar.Date.AddYears(-1);
+            var newHigh = previousBars
+                .Where(b => b.Date >= oneYearAgoDate)
+                .All(x => x.High < currentBar.High);
+            var newLow = previousBars
+                .Where(b => b.Date >= oneYearAgoDate)
+                .All(x => x.Low > currentBar.Low);
 
             // add new high as outcome
             yield return new AnalysisOutcome(
