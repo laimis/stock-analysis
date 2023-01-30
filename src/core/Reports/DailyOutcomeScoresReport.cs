@@ -79,7 +79,8 @@ namespace core.Reports
                 var indexOfFirtsBar = 0;
                 foreach(var bar in bars)
                 {
-                    if (bar.Date.Date == start.Date)
+                    // greater check in there in case the start is not a trading date
+                    if (bar.Date.Date >= start.Date)
                     {
                         break;
                     }

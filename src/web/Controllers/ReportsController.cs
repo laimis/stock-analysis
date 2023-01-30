@@ -59,7 +59,7 @@ namespace web.Controllers
         public Task<OutcomesReportView> Portfolio() =>
             _mediator.Send(new PositionReport.Query(User.Identifier()));
 
-        [HttpGet("dailyoutcomesreport/{ticker}")]
+        [HttpGet("dailyoutcomescoresreport/{ticker}")]
         public Task<DailyOutcomeScoresReportView> DailyOutcomeScoresReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
             _mediator.Send(new DailyOutcomeScoresReport.Query(start, end, ticker, User.Identifier()));
     }
