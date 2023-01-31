@@ -22,6 +22,13 @@ export class PlaygroundComponent implements OnInit {
   ngOnInit() {
     this.ticker = this.route.snapshot.queryParamMap.get('ticker');
     this.startDate = this.route.snapshot.queryParamMap.get('startDate');
+
+    // if start date is not set, set it to 30 days ago
+    if (!this.startDate) {
+      var d = new Date();
+      d.setDate(d.getDate() - 30);
+      this.startDate = d.toISOString().split('T')[0];
+    }
     
     this.stocks.reportDailyOutcomesReport(
       this.ticker, this.startDate).subscribe( results => {

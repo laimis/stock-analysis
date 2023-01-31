@@ -1,4 +1,4 @@
-import { CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { StocksService, AccountStatus } from '../services/stocks.service';
 
@@ -10,11 +10,11 @@ export class AuthGuard implements CanActivate {
     private router : Router){
 	}
 
-  async canActivate(): Promise<boolean> {
+  async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     //get user data
     const result = await this.stocks.getProfile().toPromise<AccountStatus>();
     if (!result.loggedIn) {
-      this.router.navigate(['/landing'])
+      this.router.navigate(['/profile/login'], { queryParams: { returnUrl: state.url }})
       return false;
     }
     if (!result.verified) {

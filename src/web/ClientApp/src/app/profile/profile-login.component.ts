@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, GetErrors } from '../services/stocks.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 @Component({
@@ -19,13 +19,17 @@ export class ProfileLoginComponent implements OnInit {
 
   public resetPasswordRequest : boolean
   public passwordRequestSuccess : boolean
+  returnUrl: string;
 
   constructor(
     private stockService  : StocksService,
+    private route         : ActivatedRoute,
     private router        : Router,
     private location      : Location) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+  }
 
   login() {
 
@@ -38,7 +42,7 @@ export class ProfileLoginComponent implements OnInit {
     }
 
     this.stockService.loginAccount(obj).subscribe(_ => {
-      this.router.navigate(['/dashboard'])
+      this.router.navigateByUrl(this.returnUrl)
     }, err => {
       this.inProgress = false
       this.errors = GetErrors(err)
