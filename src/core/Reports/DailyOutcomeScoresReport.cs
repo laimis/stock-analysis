@@ -90,10 +90,11 @@ namespace core.Reports
 
                 var scoreList = Enumerable.Range(indexOfFirtsBar, bars.Length - indexOfFirtsBar)
                     .Select(index => {
-                        var currentBar = bars[index];
-                        var previousBars = bars[..index];
+                        var barsToUse = bars[..(index+1)];
 
-                        var outcomes = SingleBarAnalysisRunner.Run(currentBar, previousBars);
+                        var currentBar = barsToUse[^1];
+
+                        var outcomes = SingleBarAnalysisRunner.Run(barsToUse);
                         var tickerOutcomes = new TickerOutcomes(outcomes, request.Ticker);
                         var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[]{tickerOutcomes});
                         var counts = OutcomesReportView.GenerateEvaluationSummary(evaluations);

@@ -12,13 +12,13 @@ namespace core.Stocks.Services.Analysis
 
     public class SingleBarAnalysisRunner
     {
-        public static List<AnalysisOutcome> Run(PriceBar currentBar, PriceBar[] previousBars)
+        public static List<AnalysisOutcome> Run(PriceBar[] bars)
         {
             var outcomes = new List<AnalysisOutcome>();
 
-            outcomes.AddRange(new SingleBarVolumeAnalysis().Analyze(currentBar, previousBars));
-            outcomes.AddRange(new SingleBarPriceAnalysis().Analyze(currentBar, previousBars));
-            outcomes.AddRange(new SMASingleBarAnalysis().Analyze(currentBar, previousBars));
+            outcomes.AddRange(new SingleBarVolumeAnalysis().Analyze(bars));
+            outcomes.AddRange(new SingleBarPriceAnalysis().Analyze(bars));
+            outcomes.AddRange(new SMASingleBarAnalysis().Analyze(bars));
 
             return outcomes;
         }
@@ -26,11 +26,13 @@ namespace core.Stocks.Services.Analysis
 
     internal class SMASingleBarAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(PriceBar currentBar, PriceBar[] previousBars)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] bars)
         {
+            var currentBar = bars[^1];
+
             var price = currentBar.Close;
             
-            var outcomes = new SMAAnalysis().Run(price, previousBars);
+            var outcomes = new SMAAnalysis().Run(price, bars[..^1]);
 
             var outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
 
@@ -46,10 +48,11 @@ namespace core.Stocks.Services.Analysis
 
     internal class SingleBarPriceAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(
-            PriceBar currentBar,
-            PriceBar[] previousBars)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] bars)
         {
+            var currentBar = bars[^1];
+            var previousBars = bars[..^1];
+
             // return open as the neutral outcome
             yield return new AnalysisOutcome(
                 SingleBarOutcomeKeys.Open,
@@ -95,7 +98,11 @@ namespace core.Stocks.Services.Analysis
             var trueLow = Math.Min(currentBar.Low, yesterday.Close);
 
             // see if there was a gap down or gap up
-            var gaps = GapAnalysis.Generate(previousBars, SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis);
+            var gaps = GapAnalysis.Generate(
+                bars,
+                SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+            );
+            
             var gap = gaps.FirstOrDefault(
                 x => x.bar.Equals(currentBar)
             );
@@ -174,26 +181,28 @@ namespace core.Stocks.Services.Analysis
 
     internal class SingleBarVolumeAnalysis
     {
-        public IEnumerable<AnalysisOutcome> Analyze(PriceBar last, PriceBar[] previousBars)
+        public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] bars)
         {
+            var currentBar = bars[^1];
+
             yield return new AnalysisOutcome(
                 key: SingleBarOutcomeKeys.Volume,
                 type: OutcomeType.Neutral,
-                value: last.Volume,
+                value: currentBar.Volume,
                 valueType: OutcomeValueType.Number,
                 message: "Volume");
 
             // calculate today's relative volume
             var volumeStats = NumberAnalysis.Statistics(
-                previousBars
+                bars[..^1]
                     .Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                     .Select(x => x.Volume)
                     .ToArray()
             );
 
-            var relativeVolume = Math.Round(last.Volume / volumeStats.mean, 2);
+            var relativeVolume = Math.Round(currentBar.Volume / volumeStats.mean, 2);
 
-            var priceDirection = last.Close > last.Open
+            var priceDirection = currentBar.Close > currentBar.Open
                 ? OutcomeType.Positive : OutcomeType.Negative;
 
             // add relative volume as outcome

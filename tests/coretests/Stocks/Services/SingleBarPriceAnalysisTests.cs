@@ -16,7 +16,7 @@ namespace coretests.Stocks.Services
         {
             var bars = TestDataGenerator.PriceBars("SWCH");
 
-            _outcomes = SingleBarAnalysisRunner.Run(bars[^1], bars[..^1]);
+            _outcomes = SingleBarAnalysisRunner.Run(bars);
         }
 
         [Fact]
