@@ -29,6 +29,7 @@ namespace web
                 {
                     options.ClientId = googleClientId;
                     options.ClientSecret = configuration.GetValue<string>("GoogleSecret");
+                    options.ReturnUrlParameter = "returnUrl";
                 });   
             }
 
