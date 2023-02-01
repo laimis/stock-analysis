@@ -128,6 +128,13 @@ namespace core.Stocks
                 throw new InvalidOperationException("Transaction would make amount owned invalid");
             }
 
+            // once we stop adding and do our first sale, that should be our position
+            // completion
+            if (!PositionCompleted)
+            {
+                PositionCompleted = true;
+            }
+
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
             Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price}", PositionEventType.sell, price, when));
 
@@ -165,8 +172,6 @@ namespace core.Stocks
                 {
                     FirstStop = stopPrice;
                 }
-
-                PositionCompleted = true;
 
                 var stopPercentage = Math.Round((AverageCostPerShare - stopPrice.Value) / AverageCostPerShare * 100, 2);
 
