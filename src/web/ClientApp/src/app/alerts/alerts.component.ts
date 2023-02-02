@@ -5,7 +5,8 @@ import { AlertsContainer, OutcomeValueTypeEnum, PriceMonitor, StocksService } fr
 @Component({
   selector: 'app-alerts',
   templateUrl: './alerts.component.html',
-  styleUrls: ['./alerts.component.css']
+  styleUrls: ['./alerts.component.css'],
+  providers: [PercentPipe, CurrencyPipe]
 })
 
 export class AlertsComponent implements OnInit {
