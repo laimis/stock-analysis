@@ -1,5 +1,6 @@
+import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AlertsContainer, PriceMonitor, StocksService } from 'src/app/services/stocks.service';
+import { AlertsContainer, OutcomeValueTypeEnum, PriceMonitor, StocksService } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-alerts',
@@ -11,7 +12,11 @@ export class AlertsComponent implements OnInit {
   container: AlertsContainer;
   monitorGroups: PriceMonitor[][];
 
-  constructor(private stockService : StocksService) { }
+  constructor(
+    private stockService : StocksService,
+    private percentPipe: PercentPipe,
+    private currencyPipe: CurrencyPipe
+  ) { }
 
   @Input()
   hideUntriggered : boolean = false;
@@ -46,5 +51,16 @@ export class AlertsComponent implements OnInit {
       this.monitorGroups = groups;
     });
   }
+
+  getValue(value: number,valueType: string) {
+    if (valueType === OutcomeValueTypeEnum.Percentage) {
+      return this.percentPipe.transform(value, '1.0-2')
+    } else if (valueType === OutcomeValueTypeEnum.Currency) {
+      return this.currencyPipe.transform(value)
+    } else {
+      return value
+    }
+  }
+    
 
 }

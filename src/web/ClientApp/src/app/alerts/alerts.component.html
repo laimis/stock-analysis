@@ -23,8 +23,8 @@
           <td>
             {{monitor.triggeredAlert?.description || monitor.description}}
           </td>
-          <td>{{monitor.thresholdValue | currency}}</td>
-          <td>{{monitor.lastSeenValue | currency}}</td>
+          <td>{{getValue(monitor.thresholdValue, monitor.valueType)}}</td>
+          <td>{{getValue(monitor.lastSeenValue, monitor.valueType)}}</td>
           <td *ngIf="monitor.triggeredAlert">
             Triggered on {{monitor.triggeredAlert.when | date:'short'}}
           </td>

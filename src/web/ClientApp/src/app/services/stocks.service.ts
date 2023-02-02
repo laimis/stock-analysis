@@ -439,6 +439,7 @@ export interface StockAlert {
   numberOfShares: number
   triggeredValue: number
   alertType: string
+  valueType: string
 }
 export interface PriceMonitor {
   description: string
@@ -447,6 +448,7 @@ export interface PriceMonitor {
   ticker: string
   triggeredAlert: StockAlert|null
   alertType: string
+  valueType: string
 }
 
 export interface AlertsContainer {

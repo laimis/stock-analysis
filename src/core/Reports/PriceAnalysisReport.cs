@@ -134,7 +134,7 @@ namespace core.Reports
                             key: SingleBarOutcomeKeys.Highlight,
                             type: OutcomeType.Neutral,
                             value: query.IsHighlighted(ticker) ? 1 : 0,
-                            valueType: OutcomeValueType.Boolean,
+                            valueType: Shared.ValueType.Boolean,
                             message: query.HighlightTitle
                         );
 

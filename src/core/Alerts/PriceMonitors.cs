@@ -14,7 +14,8 @@ namespace core.Alerts
         decimal numberOfShares,
         Guid userId,
         AlertType alertType,
-        string source
+        string source,
+        ValueType valueType
     )
     {
         public Guid id { get; } = Guid.NewGuid();
@@ -37,6 +38,7 @@ namespace core.Alerts
         decimal LastSeenValue { get; }
         bool IsTriggered { get; }
         AlertType AlertType { get; }
+        ValueType ValueType { get; }
         Guid UserId { get; }
     }
 
@@ -80,6 +82,7 @@ namespace core.Alerts
         public Guid UserId { get; }
 
         public abstract AlertType AlertType { get; }
+        public ValueType ValueType => Shared.ValueType.Currency;
 
         public bool RunCheck(decimal price, DateTimeOffset time)
         {
@@ -109,6 +112,7 @@ namespace core.Alerts
         public Guid UserId { get; }
         public string Description { get; }
         public TriggeredAlert? TriggeredAlert { get; private set; }
+        ValueType IStockPositionMonitor.ValueType => Shared.ValueType.Percentage;
 
         TriggeredAlert? IStockPositionMonitor.TriggeredAlert => TriggeredAlert;
 
@@ -144,7 +148,8 @@ namespace core.Alerts
                 numberOfShares: 0,
                 userId: UserId,
                 alertType: AlertType.Positive,
-                source: Description
+                source: Description,
+                valueType: Shared.ValueType.Percentage
             );
 
             return true;
@@ -242,7 +247,8 @@ namespace core.Alerts
                 NumberOfShares,
                 UserId,
                 AlertType.Positive,
-                source: Description
+                source: Description,
+                valueType: Shared.ValueType.Currency
             );
         }
     }
@@ -320,7 +326,8 @@ namespace core.Alerts
                 NumberOfShares,
                 UserId,
                 AlertType.Negative,
-                source: Description
+                source: Description,
+                valueType: Shared.ValueType.Currency
             );
         }
     }

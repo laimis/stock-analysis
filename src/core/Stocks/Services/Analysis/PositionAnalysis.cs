@@ -16,7 +16,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.Price,
                 OutcomeType.Neutral,
                 position.Price!.Value,
-                OutcomeValueType.Currency,
+                Shared.ValueType.Currency,
                 $"Price: {position.Price.Value:C2}"
             );
 
@@ -27,7 +27,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.StopLoss,
                 OutcomeType.Neutral,
                 stopLoss,
-                OutcomeValueType.Currency,
+                Shared.ValueType.Currency,
                 $"Stop loss is {stopLoss:C2}");
 
             var pctToStop = (position.PercentToStop ?? -1);
@@ -36,7 +36,7 @@ namespace core.Stocks.Services.Analysis
                     PortfolioAnalysisKeys.PercentToStopLoss,
                     pctToStop < 0 ? OutcomeType.Positive : OutcomeType.Negative,
                     pctToStop,
-                    OutcomeValueType.Percentage,
+                    Shared.ValueType.Percentage,
                     $"% difference to stop loss {stopLoss} is {pctToStop}"
                 );
 
@@ -45,7 +45,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.AverageCost,
                 OutcomeType.Neutral,
                 Math.Round(position.AverageCostPerShare, 2),
-                OutcomeValueType.Currency,
+                Shared.ValueType.Currency,
                 $"Average cost per share is {position.AverageCostPerShare:C2}");
 
             // gain in position
@@ -53,7 +53,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.GainPct,
                 position.GainPct >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
                 position.GainPct,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"{position.GainPct:P}"
             );
 
@@ -68,7 +68,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.RR,
                 rrOutcomeType,
                 Math.Round(position.RR, 2),
-                OutcomeValueType.Number,
+                Shared.ValueType.Number,
                 $"{position.RR:N2}"
             );
 
@@ -77,7 +77,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.Profit,
                 position.CombinedProfit >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
                 position.CombinedProfit,
-                OutcomeValueType.Currency,
+                Shared.ValueType.Currency,
                 $"{position.CombinedProfit}"
             );
 
@@ -89,7 +89,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.MaxGain,
                 OutcomeType.Neutral,
                 gain,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"Max gain is {gain:P}");
 
             // add max drawdown from bars as outcome
@@ -100,7 +100,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.MaxDrawdown,
                 OutcomeType.Neutral,
                 drawdown,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"Max drawdown is {drawdown:P}");
 
             // difference between max gain and max drawdown
@@ -110,7 +110,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.GainAndDrawdownDiff,
                 maxGainDrawdownDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
                 maxGainDrawdownDiff,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"Max gain drawdown diff is {maxGainDrawdownDiff:P}");
 
             // add max gain in the last 10 bars as outcome
@@ -122,7 +122,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.MaxGainLast10,
                 OutcomeType.Neutral,
                 last10Gain,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"Max gain in last 10 bars is {last10Gain:P}");
 
             // add max drawdown in the last 10 bars as outcome
@@ -133,7 +133,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.MaxDrawdownLast10,
                 OutcomeType.Neutral,
                 last10Drawdown,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"Max drawdown in last 10 bars is {last10Drawdown:P}");
 
             // difference between max gain and max drawdown
@@ -143,7 +143,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.GainDiffLast10,
                 last10MaxGainDrawdownDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
                 last10MaxGainDrawdownDiff,
-                OutcomeValueType.Percentage,
+                Shared.ValueType.Percentage,
                 $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}");
 
             // add risk amount as outcome
@@ -151,7 +151,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.RiskAmount,
                 OutcomeType.Neutral,
                 position.RiskedAmount ?? 0,
-                OutcomeValueType.Currency,
+                Shared.ValueType.Currency,
                 $"Risk amount is {position.RiskedAmount:C2}");
 
             // add days held
@@ -159,7 +159,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.DaysHeld,
                 OutcomeType.Neutral,
                 position.DaysHeld,
-                OutcomeValueType.Number,
+                Shared.ValueType.Number,
                 $"Days held: {position.DaysHeld}"
             );
 
@@ -168,7 +168,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.DaysSinceLastTransaction,
                 OutcomeType.Neutral,
                 position.DaysSinceLastTransaction,
-                OutcomeValueType.Number,
+                Shared.ValueType.Number,
                 $"Last transaction was {position.DaysSinceLastTransaction} days ago"
             );
 
@@ -177,7 +177,7 @@ namespace core.Stocks.Services.Analysis
                 PortfolioAnalysisKeys.PositionSize,
                 OutcomeType.Neutral,
                 position.Cost,
-                OutcomeValueType.Currency,
+                Shared.ValueType.Currency,
                 $"Position size is {position.Cost}"
             );
         }
