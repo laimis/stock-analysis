@@ -38,7 +38,7 @@ namespace core.Alerts
         decimal LastSeenValue { get; }
         bool IsTriggered { get; }
         AlertType AlertType { get; }
-        ValueType ValueType { get; }
+        Shared.ValueType ValueType { get; }
         Guid UserId { get; }
     }
 
@@ -82,7 +82,7 @@ namespace core.Alerts
         public Guid UserId { get; }
 
         public abstract AlertType AlertType { get; }
-        public ValueType ValueType => Shared.ValueType.Currency;
+        public Shared.ValueType ValueType => Shared.ValueType.Currency;
 
         public bool RunCheck(decimal price, DateTimeOffset time)
         {
@@ -112,7 +112,7 @@ namespace core.Alerts
         public Guid UserId { get; }
         public string Description { get; }
         public TriggeredAlert? TriggeredAlert { get; private set; }
-        ValueType IStockPositionMonitor.ValueType => Shared.ValueType.Percentage;
+        Shared.ValueType IStockPositionMonitor.ValueType => Shared.ValueType.Percentage;
 
         TriggeredAlert? IStockPositionMonitor.TriggeredAlert => TriggeredAlert;
 
