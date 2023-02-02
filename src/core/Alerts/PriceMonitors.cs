@@ -120,11 +120,9 @@ namespace core.Alerts
 
         string IStockPositionMonitor.Description => Description;
 
-        decimal IStockPositionMonitor.ThresholdValue => GapSizePctRounded;
+        decimal IStockPositionMonitor.ThresholdValue => Gap.gapSizePct;
 
-        decimal IStockPositionMonitor.LastSeenValue => GapSizePctRounded;
-
-        private decimal GapSizePctRounded => Math.Round(Gap.gapSizePct * 100, 2);
+        decimal IStockPositionMonitor.LastSeenValue => Gap.gapSizePct;
 
         bool IStockPositionMonitor.IsTriggered => TriggeredAlert.HasValue;
 
@@ -140,8 +138,8 @@ namespace core.Alerts
             }
 
             TriggeredAlert = new TriggeredAlert(
-                triggeredValue: price,
-                watchedValue: price,
+                triggeredValue: Gap.gapSizePct,
+                watchedValue: Gap.gapSizePct,
                 when: time,
                 ticker: Ticker,
                 description: $"Gap up of {Math.Round(Gap.gapSizePct * 100, 2)}% for {Ticker}",
