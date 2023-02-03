@@ -49,7 +49,7 @@ export class AlertsComponent implements OnInit {
         groups.push(notTriggered);
       }
 
-      this.monitorGroups = groups;
+      this.monitorGroups = groups.sort((a,b) => a[0].description.localeCompare(b[0].description));
     });
   }
 
