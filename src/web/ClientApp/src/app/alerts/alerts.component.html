@@ -13,7 +13,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let monitor of g" [ngClass]="{'bg-warning': monitor.alertType === 'Negative' && monitor.triggeredAlert, 'bg-success': monitor.alertType === 'Positive' && monitor.triggeredAlert}">
+        <tr *ngFor="let monitor of g" 
+          [ngClass]="{
+            'bg-warning': monitor.alertType === 'Negative' && monitor.triggeredAlert,
+            'bg-success': monitor.alertType === 'Positive' && monitor.triggeredAlert,
+            'text-white': monitor.alertType === 'Positive' && monitor.triggeredAlert
+          }">
           <td>
             <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
             <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{monitor.ticker}}" target="_blank">
