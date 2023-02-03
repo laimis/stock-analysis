@@ -57,9 +57,9 @@
           <th>Ticker</th>
           <th>Price</th>
           <th>Cost/Share</th>
+          <th>Stop</th>
           <th>Cost</th>
           <th>Shares</th>
-          <th>Stop</th>
           <th>P/L (u)</th>
           <th>% Gain (u)</th>
           <th>R/R (u)</th>
@@ -76,9 +76,9 @@
           <td><a [routerLink]="[ '/stocks', position.ticker ]">{{position.ticker}}</a></td>
           <td>{{position.price | currency}}</td>
           <td>{{position.averageCostPerShare | currency}}</td>
+          <td>{{position.stopPrice | currency}}</td>
           <td>{{position.cost | currency}}</td>
           <td>{{position.numberOfShares}}</td>
-          <td>{{position.stopPrice | currency}}</td>
           <td>{{position.unrealizedProfit| currency}}</td>
           <td>{{position.unrealizedGainPct | percent}}</td>
           <td>{{position.unrealizedRR  | number}}</td>

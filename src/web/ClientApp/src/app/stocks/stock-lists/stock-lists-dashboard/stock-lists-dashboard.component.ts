@@ -75,7 +75,7 @@ export class StockListsDashboardComponent implements OnInit {
   
   getAnalysisLink(list:StockList) {
     var paramList = list.tickers.map(t => t.ticker).join(',')
-    return `/reports/outcomes?tickers=${paramList}`
+    return `/reports/outcomes?tickers=${paramList}&title=${list.name}`
   }
 
   getExportLink(list:StockList) {
