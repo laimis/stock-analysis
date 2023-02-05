@@ -15,4 +15,33 @@ namespace core.Stocks.Services.Analysis
         string sortColumn,
         List<TickerOutcomes> matchingTickers
     );
+
+    public record struct DateScorePair(System.DateTimeOffset date, int score);
+
+    public static class AnalysisOutcomeEvaluationScoringHelper
+    {
+        public static Dictionary<string, int> Generate(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
+        {
+            var counts = new Dictionary<string, int>();
+            foreach (var category in evaluations)
+            {
+                var toAdd = category.type switch {
+                    OutcomeType.Positive => 1,
+                    OutcomeType.Negative => -1,
+                    _ => 0
+                };
+
+                foreach(var o in category.matchingTickers)
+                {
+                    if (!counts.ContainsKey(o.ticker))
+                    {
+                        counts[o.ticker] = 0;
+                    }
+
+                    counts[o.ticker] += toAdd;
+                }
+            }
+            return counts;
+        }
+    }
 }

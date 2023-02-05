@@ -18,7 +18,7 @@ namespace core.Reports.Views
             Outcomes = outcomes;
             Gaps = gaps;
 
-            var counts = GenerateEvaluationSummary(
+            var counts = AnalysisOutcomeEvaluationScoringHelper.Generate(
                 evaluations
             );
 
@@ -26,30 +26,6 @@ namespace core.Reports.Views
                 .OrderByDescending(x => x.Value)
                 .Select(x => new TickerCountPair(ticker: x.Key, count: x.Value))
                 .ToList();
-        }
-
-        public static Dictionary<string, int> GenerateEvaluationSummary(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
-        {
-            var counts = new Dictionary<string, int>();
-            foreach (var category in evaluations)
-            {
-                var toAdd = category.type switch {
-                    OutcomeType.Positive => 1,
-                    OutcomeType.Negative => -1,
-                    _ => 0
-                };
-
-                foreach(var o in category.matchingTickers)
-                {
-                    if (!counts.ContainsKey(o.ticker))
-                    {
-                        counts[o.ticker] = 0;
-                    }
-
-                    counts[o.ticker] += toAdd;
-                }
-            }
-            return counts;
         }
     }
 }

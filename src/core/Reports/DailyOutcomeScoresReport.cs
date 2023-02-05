@@ -67,8 +67,8 @@ namespace core.Reports
                     request.Ticker,
                     frequency: PriceFrequency.Daily,
                     start: start.AddDays(-365), // go back a bit to have enough data for 'relative' stats
-                    end: end
-                );
+                    end: end);
+                    
                 if (!priceResponse.IsOk)
                 {
                     throw new Exception("Failed to get price history: " + priceResponse.Error.Message);
@@ -76,33 +76,14 @@ namespace core.Reports
 
                 var bars = priceResponse.Success;
 
-                var indexOfFirtsBar = 0;
-                foreach(var bar in bars)
-                {
-                    // greater check in there in case the start is not a trading date
-                    if (bar.Date.Date >= start.Date)
-                    {
-                        break;
-                    }
+                var scoreList = SingleBarDailyScoring.Generate(
+                    bars,
+                    start,
+                    request.Ticker);
 
-                    indexOfFirtsBar++;
-                }
-
-                var scoreList = Enumerable.Range(indexOfFirtsBar, bars.Length - indexOfFirtsBar)
-                    .Select(index => {
-                        var barsToUse = bars[..(index+1)];
-
-                        var currentBar = barsToUse[^1];
-
-                        var outcomes = SingleBarAnalysisRunner.Run(barsToUse);
-                        var tickerOutcomes = new TickerOutcomes(outcomes, request.Ticker);
-                        var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[]{tickerOutcomes});
-                        var counts = OutcomesReportView.GenerateEvaluationSummary(evaluations);
-                        return new Views.DateScorePair(currentBar.Date, counts.GetValueOrDefault(request.Ticker, 0));
-                    })
-                    .ToList();
-
-                return new DailyOutcomeScoresReportView(scoreList, request.Ticker);
+                return new DailyOutcomeScoresReportView(
+                    scoreList,
+                    request.Ticker);
             }
         }
     }
