@@ -63,6 +63,7 @@ namespace core.Reports
                 )
             {
                 var tickerOutcomes = new List<TickerOutcomes>();
+                var tickerPatterns = new List<TickerPatterns>();
                 
                 foreach(var position in positions)
                 {
@@ -86,6 +87,10 @@ namespace core.Reports
                     var outcomes = PositionAnalysis.Generate(position, bars).ToList();
 
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
+
+                    var patterns = PatternDetection.Generate(bars).ToList();
+                    
+                    tickerPatterns.Add(new TickerPatterns(patterns, position.Ticker));
                 }
 
                 var orderResponse = await _brokerage.GetOrders(user);
@@ -99,7 +104,9 @@ namespace core.Reports
                 return new OutcomesReportView(
                     evaluations: evaluations,
                     tickerOutcomes,
-                    new List<GapsView>());
+                    new List<GapsView>(),
+                    tickerPatterns
+                );
             }
         }
     }

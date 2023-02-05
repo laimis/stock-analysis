@@ -10,13 +10,19 @@ namespace core.Reports.Views
         public IEnumerable<AnalysisOutcomeEvaluation> Evaluations { get; set; }
         public List<TickerOutcomes> Outcomes { get; }
         public List<GapsView> Gaps { get; }
-        public List<TickerCountPair> Summary { get; set; }
+        public List<TickerPatterns> Patterns { get; }
+        public List<TickerCountPair> Summary { get; }
 
-        public OutcomesReportView(IEnumerable<AnalysisOutcomeEvaluation> evaluations, List<TickerOutcomes> outcomes, List<GapsView> gaps)
+        public OutcomesReportView(
+            IEnumerable<AnalysisOutcomeEvaluation> evaluations,
+            List<TickerOutcomes> outcomes,
+            List<GapsView> gaps,
+            List<TickerPatterns> patterns)
         {
             Evaluations = evaluations;
             Outcomes = outcomes;
             Gaps = gaps;
+            Patterns = patterns;
 
             var counts = AnalysisOutcomeEvaluationScoringHelper.Generate(
                 evaluations

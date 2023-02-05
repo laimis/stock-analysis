@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -12,7 +13,7 @@ using core.Stocks.Services.Analysis;
 
 namespace core.Reports
 {
-    public class PriceAnalysisReport
+    public class OutcomesReport
     {
         public enum Duration { SingleBar, AllBars }
 
@@ -113,20 +114,23 @@ namespace core.Reports
             {
                 var tickerOutcomes = new List<TickerOutcomes>();
                 var tickerGapViews = new List<GapsView>();
+                var patterns = new List<TickerPatterns>();
 
                 foreach(var ticker in query.Tickers)
                 {
                     var startDate = query.StartDate == null ? default : _marketHours.GetMarketStartOfDayTimeInUtc(DateTimeOffset.Parse(query.StartDate));
                     var endDate = query.EndDate == null ? default : _marketHours.GetMarketEndOfDayTimeInUtc(DateTimeOffset.Parse(query.EndDate));
 
-                    var priceHistoryResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency, start: startDate, end: endDate);
+                    var pricesResponse = await _brokerage.GetPriceHistory(user, ticker, query.Frequency, start: startDate, end: endDate);
                     
-                    if (!priceHistoryResponse.IsOk || priceHistoryResponse.Success == null || priceHistoryResponse.Success.Length == 0)
+                    if (!pricesResponse.IsOk || pricesResponse.Success == null || pricesResponse.Success.Length == 0)
                     {
                         continue;
                     }
 
-                    var outcomes = priceAnalysisFunc(priceHistoryResponse.Success);
+                    var prices = pricesResponse.Success;
+
+                    var outcomes = priceAnalysisFunc(prices);
 
                     if (query.HighlightTickers != null)
                     {
@@ -145,15 +149,22 @@ namespace core.Reports
 
                     if (query.IncludeGapAnalysis)
                     {
-                        var gapOutcomes = GapAnalysis.Generate(priceHistoryResponse.Success, 60);
+                        var gapOutcomes = GapAnalysis.Generate(prices, 60);
                         tickerGapViews.Add(new GapsView(gapOutcomes, ticker));
                     }
+
+                    var tickerPatterns = new TickerPatterns(
+                        PatternDetection.Generate(prices).ToList(),
+                        ticker);
+
+                    patterns.Add(tickerPatterns);
                 }
 
                 return new OutcomesReportView(
                     evaluations: evaluationFunc(tickerOutcomes),
                     outcomes: tickerOutcomes,
-                    tickerGapViews
+                    gaps: tickerGapViews,
+                    patterns: patterns
                 );
             }
         }

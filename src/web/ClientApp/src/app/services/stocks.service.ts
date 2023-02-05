@@ -693,11 +693,22 @@ export interface TickerOutcomes {
   outcomes: StockAnalysisOutcome[]
 }
 
+export interface TickerPatterns {
+  ticker: string
+  patterns: Pattern[]
+}
+
+export interface Pattern {
+  name: string
+  date: string
+}
+
 export interface OutcomesReport {
   evaluations: AnalysisOutcomeEvaluation[],
   outcomes: TickerOutcomes[],
   gaps: StockGaps[],
-  summary: TickerCountPair[]
+  summary: TickerCountPair[],
+  patterns: TickerPatterns[]
 }
 
 export interface DailyScore {

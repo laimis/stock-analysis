@@ -20,4 +20,8 @@ export class OutcomesAnalysisReportComponent {
 	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)
   }
+
+  hasPatterns(report: OutcomesReport) {
+    return report.patterns.some(t => t.patterns.length > 0)
+  }
 }

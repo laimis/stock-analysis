@@ -40,7 +40,7 @@ namespace web.Controllers
 
         [HttpPost("outcomes")]
         public Task<OutcomesReportView> TickersOutcomes(
-            [FromBody]PriceAnalysisReport.ForTickersQuery query)
+            [FromBody]OutcomesReport.ForTickersQuery query)
         {
             query.WithUserId(User.Identifier());
             
