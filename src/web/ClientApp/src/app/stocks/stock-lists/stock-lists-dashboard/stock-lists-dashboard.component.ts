@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { stockLists_getAnalysisLink, stockLists_getExportLink } from 'src/app/services/links.service';
 import { StockList, StocksService } from 'src/app/services/stocks.service';
+import { toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-lists-dashboard',
@@ -80,6 +81,10 @@ export class StockListsDashboardComponent implements OnInit {
 
   getExportLink(list:StockList) {
     return stockLists_getExportLink(list)
+  }
+
+  toggleVisibility(elem) {
+    toggleVisuallyHidden(elem)
   }
 
 }

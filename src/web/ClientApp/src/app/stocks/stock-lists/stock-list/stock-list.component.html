@@ -8,8 +8,8 @@
         <form>
             <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(addNewSection)">Add</button>
             <a href="{{getAnalysisLink(list)}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
-            <a href="{{getExportLink(list, false)}}" type="submit" class="btn btn-info me-2">Export</a>
-            <a href="{{getExportLink(list, true)}}" type="submit" class="btn btn-info">Export (just tickers)</a>
+            <a href="{{getExportLink(list, false)}}" type="submit" class="btn btn-secondary me-2">Export</a>
+            <a href="{{getExportLink(list, true)}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
         </form>
     </section>
 
@@ -26,7 +26,6 @@
 
 
     <section>
-        <h5>List</h5>
         <table class="table table-striped">
             <thead>
                 <tr>

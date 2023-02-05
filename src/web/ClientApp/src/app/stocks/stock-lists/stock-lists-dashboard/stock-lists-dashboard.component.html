@@ -1,48 +1,62 @@
 <div>
-    <!-- UI for adding new list -->
-    <form>
-        <div class="form-group">
-            <label for="newName">Name</label>
-            <input class="form-control" type="text" id="newName" name="newName" [(ngModel)]="newName">
-        </div>
-        
-        <div class="form-group">
-            <label for="newDescription">Description</label>
-            <textarea class="form-control" id="newDescription" name="newDescription" rows="5" [(ngModel)]="newDescription"></textarea>
-        </div>
+    <section>
+        <form>
+            <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
+            <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(lookupTickerSection)">Look up ticker</button>
+        </form>
+    </section>
+    <section #addNewListSection class="visually-hidden">
+        <h5>Add new list</h5>
+        <form>
+            <div class="form-group">
+                <label for="newName">Name</label>
+                <input class="form-control" type="text" id="newName" name="newName" [(ngModel)]="newName">
+            </div>
+            
+            <div class="form-group">
+                <label for="newDescription">Description</label>
+                <textarea class="form-control" id="newDescription" name="newDescription" rows="5" [(ngModel)]="newDescription"></textarea>
+            </div>
 
-        <button type="button" class="btn btn-primary btn-small" (click)="createList()">Create</button>
-    </form>
+            <button type="button" class="btn btn-primary btn-small" (click)="createList()">Create</button>
+        </form>
+    </section>
 
-    <form>
-        <div class="form-group">
-            <label for="newName">Filter by ticker</label>
-            <input class="form-control" type="text" id="tickerFilter" name="tickerFilter" #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)">
-        </div>
-    </form>
+    <section #lookupTickerSection class="visually-hidden">
+        <h5>Look up ticker in lists</h5>
+        <form>
+            <div class="form-group">
+                <label for="newName">Filter by ticker</label>
+                <input class="form-control" type="text" id="tickerFilter" name="tickerFilter" #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)">
+            </div>
+        </form>    
+    </section>
     
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Tickers</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let l of filteredLists">
-                <td>{{l.name}}</td>
-                <td>{{l.description}}</td>
-                <td>{{l.tickers.length}}</td>
-                <td>
-                    <a class="btn btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
-                    <a class="btn btn-secondary me-3" href="{{getAnalysisLink(l)}}">analysis</a>
-                    <a class="btn btn-secondary me-3" href="{{getExportLink(l)}}">export</a>
-                    <button type="button" class="btn btn-danger" (click)="deleteList(l)">delete</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
+    <section>
+        <h5>Lists</h5>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Tickers</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let l of filteredLists">
+                    <td>{{l.name}}</td>
+                    <td>{{l.description}}</td>
+                    <td>{{l.tickers.length}}</td>
+                    <td>
+                        <a class="btn btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
+                        <a class="btn btn-secondary me-3" href="{{getAnalysisLink(l)}}">analysis</a>
+                        <a class="btn btn-secondary me-3" href="{{getExportLink(l)}}">export</a>
+                        <button type="button" class="btn btn-danger" (click)="deleteList(l)">delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>    
+    </section>
+    
 </div>
