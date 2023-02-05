@@ -71,7 +71,7 @@ export class StockListsDashboardComponent implements OnInit {
       l => l.tickers.some(
         t => t.ticker.toLowerCase() === ticker.toLowerCase() || ticker === ''
       )
-    )
+    ).sort((a,b) => a.name.localeCompare(b.name))
     this.filteredLists = filteredList
   }
   
