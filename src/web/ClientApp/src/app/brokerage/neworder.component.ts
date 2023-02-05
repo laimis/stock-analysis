@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { brokerageordercommand, GetErrors, StockQuote, StocksService } from 'src/app/services/stocks.service';
+import { brokerageordercommand, StockQuote, StocksService } from 'src/app/services/stocks.service';
+import { GetErrors } from '../services/utils';
 
 
 @Component({

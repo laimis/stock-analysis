@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition, GetErrors } from '../../services/stocks.service';
+import { StocksService, OptionDefinition } from '../../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Title } from '@angular/platform-browser';
+import { GetErrors } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-owned-option-detail',

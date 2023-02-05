@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, GetErrors, AccountStatus } from '../services/stocks.service';
+import { StocksService, AccountStatus } from '../services/stocks.service';
 import { Router } from '@angular/router';
+import { GetErrors } from '../services/utils';
 
 @Component({
   selector: 'app-profile',

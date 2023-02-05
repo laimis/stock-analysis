@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { PositionInstance, StocksService, toggleVisuallyHidden } from '../../services/stocks.service';
+import { toggleVisuallyHidden } from 'src/app/services/utils';
+import { PositionInstance, StocksService } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-positions',

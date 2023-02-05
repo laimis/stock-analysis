@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { StocksService, GetErrors, StockDetails, StockOwnership, stocktransactioncommand } from '../../services/stocks.service';
+import { StocksService, StockDetails, StockOwnership } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
+import { GetErrors } from 'src/app/services/utils';
 
 @Component({
   selector: 'stock-ownership',

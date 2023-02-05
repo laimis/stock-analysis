@@ -1,20 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { Component } from '@angular/core';
+import { StocksService } from '../services/stocks.service';
+import { GetErrors } from '../services/utils';
 
 @Component({
   selector: 'app-payments',
   templateUrl: './payments.component.html',
   styleUrls: ['./payments.component.css']
 })
-export class PaymentsComponent implements OnInit {
+export class PaymentsComponent {
 
   success: Boolean = false
   errors: string[]
 
   constructor(private stockService : StocksService) { }
-
-  ngOnInit() {
-  }
 
   payFull() {
     this.pay("plan_GmXCy9dpWKIB4E", "Plan level: Full")

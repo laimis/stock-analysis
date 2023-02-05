@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { StocksService } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { GetErrors } from '../services/utils';
 
 @Component({
   selector: 'app-note',

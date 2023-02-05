@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { StockList, StockListTicker, StocksService } from 'src/app/services/stocks.service';
+import { stockLists_getAnalysisLink, stockLists_getExportLink } from 'src/app/services/links.service';
+import { StockList, StocksService } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-lists-dashboard',
@@ -74,12 +75,11 @@ export class StockListsDashboardComponent implements OnInit {
   }
   
   getAnalysisLink(list:StockList) {
-    var paramList = list.tickers.map(t => t.ticker).join(',')
-    return `/reports/outcomes?tickers=${paramList}&title=${list.name}`
+    return stockLists_getAnalysisLink(list)
   }
 
   getExportLink(list:StockList) {
-    return `/api/portfolio/stocklists/${list.name}/export?justTickers=true`
+    return stockLists_getExportLink(list)
   }
 
 }

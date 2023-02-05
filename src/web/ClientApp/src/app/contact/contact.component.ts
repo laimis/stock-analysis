@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { StocksService } from '../services/stocks.service';
+import { GetErrors } from '../services/utils';
 
 @Component({
   selector: 'app-contact',

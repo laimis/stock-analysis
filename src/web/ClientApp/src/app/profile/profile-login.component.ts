@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, GetErrors } from '../services/stocks.service';
+import { StocksService } from '../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { GetErrors } from '../services/utils';
 
 @Component({
   selector: 'app-profile-login',
