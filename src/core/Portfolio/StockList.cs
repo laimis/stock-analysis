@@ -73,7 +73,7 @@ namespace core.Portfolio
                 throw new InvalidOperationException("Missing tag");
             }
 
-            if (State.Tags.Contains(tag))
+            if (State.ContainsTag(tag))
             {
                 return;
             }
@@ -88,7 +88,7 @@ namespace core.Portfolio
                 throw new InvalidOperationException("Missing tag");
             }
 
-            if (!State.Tags.Contains(tag))
+            if (!State.ContainsTag(tag))
             {
                 return;
             }
@@ -107,6 +107,8 @@ namespace core.Portfolio
         public HashSet<string> Tags { get; } = new HashSet<string>();
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
+
+        public bool ContainsTag(string tag) => Tags.Contains(tag);
 
         protected void ApplyInternal(dynamic obj) => ApplyInternal(obj);
 

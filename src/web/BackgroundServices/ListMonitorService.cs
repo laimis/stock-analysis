@@ -39,7 +39,7 @@ namespace web.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var (user, stocks) = await GetStocksOfInterest();
+            var (user, stocks) = await GetStocksFromListsWithGapUpMonitoring();
             if (user == null)
             {
                 _logger.LogCritical("User not found for gap monitoring");
@@ -155,13 +155,15 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task<(User, string[])> GetStocksOfInterest()
+        private async Task<(User, string[])> GetStocksFromListsWithGapUpMonitoring()
         {
             var user = await _accounts.GetUserByEmail("laimis@gmail.com");
     
             var list = await _portfolio.GetStockLists(user.Id);
 
-            var tickerList = list.SelectMany(x => x.State.Tickers).Select(t => t.Ticker).ToArray();
+            var tickerList = list
+                .Where(l => l.State.ContainsTag("monitoring:gapup"))
+                .SelectMany(x => x.State.Tickers).Select(t => t.Ticker).ToArray();
 
             return (user, tickerList);
         }
