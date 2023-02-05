@@ -8,13 +8,8 @@
             <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{s.ticker}}" target="_blank">{{s.ticker}}: {{s.count}}</a>
         </span>
     </div>
-    <div *ngFor="let c of report.evaluations">
-      <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}" style="border: 0px">{{c.name}}</h5>
-      <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c"></app-outcomes>
-      <span *ngIf="c.matchingTickers.length === 0">No positions in this category.</span>
-    </div>
 
-    <div class="mt-3" *ngIf="report.patterns.length > 0">
+    <div class="mt-3 mb-3" *ngIf="report.patterns.length > 0">
       <h5>Patterns</h5>
       <table class="table striped border table-hover" *ngIf="hasPatterns(report)">
         <thead>
@@ -28,6 +23,13 @@
       </table>
       <div *ngIf="!hasPatterns(report)" >No patterns detected</div>
     </div>
+
+    <div *ngFor="let c of report.evaluations">
+      <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}" style="border: 0px">{{c.name}}</h5>
+      <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c"></app-outcomes>
+      <span *ngIf="c.matchingTickers.length === 0">No positions in this category.</span>
+    </div>
+
   </div>
   
 </div>
