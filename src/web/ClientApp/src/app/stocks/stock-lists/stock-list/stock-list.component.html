@@ -20,7 +20,7 @@
         <button *ngIf="containsTag('monitor:gapup')" (click)="removeTag('monitor:gapup')" class="btn btn-danger me-2">Disable Gap Up</button>
         
         <button *ngIf="!containsTag('monitor:upsidereveral')" (click)="assignTag('monitor:upsidereveral')" class="btn btn-primary">Enable Upside Reversal</button>
-        <button *ngIf="containsTag('monitor:upsidereveral')" (click)="removeTag('monitor:upsidereveral')" class="btn btn-secondary">Disable Upside Reversal</button>
+        <button *ngIf="containsTag('monitor:upsidereveral')" (click)="removeTag('monitor:upsidereveral')" class="btn btn-danger">Disable Upside Reversal</button>
     </section>
 
     <section #addNewSection class="visually-hidden">
