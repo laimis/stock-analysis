@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { stockLists_getExportLink } from 'src/app/services/links.service';
+import { stockLists_getAnalysisLink, stockLists_getExportLink } from 'src/app/services/links.service';
 import { StockList, StockListTicker, StocksService } from 'src/app/services/stocks.service';
 import { toggleVisuallyHidden } from 'src/app/services/utils';
 
@@ -67,5 +67,9 @@ export class StockListComponent implements OnInit {
 
   toggleVisibility(elem: HTMLElement) {
     toggleVisuallyHidden(elem)
+  }
+  
+  getAnalysisLink(list: StockList) {
+    return stockLists_getAnalysisLink(list)
   }
 }
