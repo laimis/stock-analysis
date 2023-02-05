@@ -94,6 +94,53 @@ namespace core.Alerts
         protected abstract bool RunCheckInternal(decimal price, DateTimeOffset time);
     }
 
+    public class AlwaysOnMonitor : IStockPositionMonitor
+    {
+        public AlwaysOnMonitor(string description, string source, string ticker, Guid userId, decimal value)
+        {
+            Description = description;
+            Source = source;
+            Ticker = ticker;
+            UserId = userId;
+            Value = value;
+        }
+
+        public string Ticker { get; }
+        public string Description { get; }
+        public string Source { get; }
+        public Guid UserId { get; }
+        public decimal Value { get; }
+        public TriggeredAlert? TriggeredAlert { get; private set; }
+        public Shared.ValueType ValueType => Shared.ValueType.Currency;
+        public decimal ThresholdValue => Value;
+        public decimal LastSeenValue => Value;
+        public bool IsTriggered => TriggeredAlert.HasValue;
+        public AlertType AlertType => AlertType.Positive;
+
+        public bool RunCheck(decimal price, DateTimeOffset time)
+        {
+            if (TriggeredAlert.HasValue)
+            {
+                return false;
+            }
+            
+            TriggeredAlert = new TriggeredAlert(
+                price,
+                price,
+                time,
+                Ticker,
+                Description,
+                0,
+                UserId,
+                AlertType.Positive,
+                Source,
+                ValueType
+            );
+
+            return true;
+        }
+    }
+
     public class GapUpMonitor : IStockPositionMonitor
     {
         public const string GapUp = "Gap up";

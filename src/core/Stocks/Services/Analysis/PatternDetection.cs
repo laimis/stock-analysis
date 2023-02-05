@@ -5,6 +5,8 @@ namespace core.Stocks.Services.Analysis
 {
     public class PatternDetection
     {
+        public const string UpsideReversal = "Upside Reversal";
+
         public static IEnumerable<Pattern> Generate(PriceBar[] bars)
         {
             var current = bars[^1];
@@ -13,7 +15,7 @@ namespace core.Stocks.Services.Analysis
             // upside reversal pattern detection
             if (current.Close > previous.Close && current.Low < previous.Low)
             {
-                yield return new Pattern(date: current.Date, name: "Upside Reversal");
+                yield return new Pattern(date: current.Date, name: UpsideReversal);
             }
         }
     }
