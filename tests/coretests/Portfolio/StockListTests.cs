@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using core.Portfolio;
 using Xunit;
 
@@ -111,6 +112,47 @@ namespace coretests.Stocks
 
             Assert.Single(list.State.Tickers);
             Assert.Equal(events, list.Events.Count);
+        }
+
+        [Fact]
+        public void AddTagWorks()
+        {
+            var list = Create("name", "description");
+
+            list.AddTag("tag");
+            list.AddTag("tag");
+
+            Assert.Single(list.State.Tags);
+            Assert.Equal("tag", list.State.Tags.First());
+        }
+
+        [Fact]
+        public void AddInvalidTagFails()
+        {
+            var list = Create("name", "description");
+
+            Assert.Throws<InvalidOperationException>(() => list.AddTag(""));
+        }
+
+        [Fact]
+        public void RemoveTagWorks()
+        {
+            var list = Create("name", "description");
+
+            list.AddTag("tag");
+            list.RemoveTag("tag");
+
+            Assert.Empty(list.State.Tags);
+        }
+
+        [Fact]
+        public void RemoveTagThatDoesNotExistIsNoOp()
+        {
+            var list = Create("name", "description");
+
+            list.RemoveTag("tag");
+
+            Assert.Empty(list.State.Tags);
         }
     }
 }

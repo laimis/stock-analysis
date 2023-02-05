@@ -72,4 +72,24 @@ export class StockListComponent implements OnInit {
   getAnalysisLink(list: StockList) {
     return stockLists_getAnalysisLink(list)
   }
+  
+  assignTag(tag:string) {
+    this.stockService.assignTagToStockList(this.list.name, tag).subscribe(_ => {
+      this.loadList(this.list.name)
+    }, e => {
+      console.error(e);
+    });
+  }
+
+  containsTag(tag:string) {
+    return this.list.tags.includes(tag)
+  }
+
+  removeTag(tag:string) {
+    this.stockService.removeTagFromStockList(this.list.name, tag).subscribe(_ => {
+      this.loadList(this.list.name)
+    }, e => {
+      console.error(e);
+    });
+  }
 }

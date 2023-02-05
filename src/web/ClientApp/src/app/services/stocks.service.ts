@@ -88,6 +88,12 @@ export class StocksService {
   deleteStockList(name: string): Observable<StockList> {
     return this.http.delete<StockList>('/api/portfolio/stocklists/' + name)
   }
+  assignTagToStockList(name: string, tag: string): Observable<StockList> {
+    return this.http.put<StockList>('/api/portfolio/stocklists/' + name + '/tags', { name: name, tag: tag })
+  }
+  removeTagFromStockList(name: string, tag: string): Observable<StockList> {
+    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name + '/tags/' + tag)
+  }
   // 
 
   // ----------------- alerts ---------------------
@@ -401,6 +407,7 @@ export interface StockList {
   name:string
   description:string
   tickers:StockListTicker[]
+  tags:string[]
 }
 export interface StockAlert {
   when: string

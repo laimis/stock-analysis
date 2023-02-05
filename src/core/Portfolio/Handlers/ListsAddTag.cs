@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -7,18 +9,17 @@ using MediatR;
 
 namespace core.Portfolio.Handlers
 {
-    public class ListsRemoveStock
+    public class ListsAddTag
     {
         public class Command : RequestWithUserId<StockListState>
         {
-            public Command(string name, string ticker, Guid userId) : base(userId)
-            {
-                Name = name;
-                Ticker = ticker;
-            }
+            [Required]
+            [MinLength(1)]
+            [MaxLength(50)]
+            public string Tag { get; set; }
 
-            public string Name { get; }
-            public string Ticker { get; }
+            [Required]
+            public string Name { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, StockListState>
@@ -46,7 +47,7 @@ namespace core.Portfolio.Handlers
                     throw new InvalidOperationException("List does not exist");
                 }
 
-                list.RemoveStock(cmd.Ticker);
+                list.AddTag(cmd.Tag);
 
                 await _portfolioStorage.Save(list, user.Id);
 

@@ -52,6 +52,18 @@ namespace web.Controllers
         public Task<StockListState> RemoveStockFromList(string name, string ticker) =>
             _mediator.Send(new ListsRemoveStock.Command(name, ticker, User.Identifier()));
 
+        [HttpPut("stocklists/{name}/tags")]
+        public Task<StockListState> AddTagToStockList([FromBody]ListsAddTag.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
+
+        [HttpDelete("stocklists/{name}/tags/{tag}")]
+        public Task<StockListState> RemoveTagFromStockList(string name, string tag) =>
+            _mediator.Send(new ListsRemoveTag.Command(name, tag, User.Identifier()));
+
         [HttpGet("stocklists/{name}")]
         public Task<StockListState> GetStockList(string name) =>
             _mediator.Send(new ListsGet.Query(name, User.Identifier()));

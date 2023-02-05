@@ -65,6 +65,36 @@ namespace core.Portfolio
 
             Apply(new StockListTickerRemoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, ticker));
         }
+
+        public void AddTag(string tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag))
+            {
+                throw new InvalidOperationException("Missing tag");
+            }
+
+            if (State.Tags.Contains(tag))
+            {
+                return;
+            }
+
+            Apply(new StockListTagAdded(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, tag));
+        }
+
+        public void RemoveTag(string tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag))
+            {
+                throw new InvalidOperationException("Missing tag");
+            }
+
+            if (!State.Tags.Contains(tag))
+            {
+                return;
+            }
+
+            Apply(new StockListTagRemoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, tag));
+        }
     }
 
     public class StockListState : IAggregateState
@@ -74,6 +104,7 @@ namespace core.Portfolio
         public string Name { get; private set; }
         public string Description { get; private set; }
         public List<StockListTicker> Tickers { get; } = new List<StockListTicker>();
+        public HashSet<string> Tags { get; } = new HashSet<string>();
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 
@@ -98,6 +129,12 @@ namespace core.Portfolio
 
         private void ApplyInternal(StockListTickerRemoved removed) =>
             Tickers.RemoveAll(x => x.Ticker == removed.Ticker);
+
+        private void ApplyInternal(StockListTagAdded added) =>
+            Tags.Add(added.Tag);
+
+        private void ApplyInternal(StockListTagRemoved removed) =>
+            Tags.Remove(removed.Tag);
     }
 
     public record StockListTicker(string Note, string Ticker, DateTimeOffset When);

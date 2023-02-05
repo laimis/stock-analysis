@@ -54,4 +54,26 @@ namespace core.Portfolio
 
         public string Ticker { get; }
     }
+
+    internal class StockListTagAdded : AggregateEvent
+    {
+        public StockListTagAdded(Guid id, Guid aggregateId, DateTimeOffset when, string tag)
+            : base(id, aggregateId, when)
+        {
+            Tag = tag;
+        }
+
+        public string Tag { get; }
+    }
+
+    internal class StockListTagRemoved : AggregateEvent
+    {
+        public StockListTagRemoved(Guid id, Guid aggregateId, DateTimeOffset when, string tag)
+            : base(id, aggregateId, when)
+        {
+            Tag = tag;
+        }
+
+        public string Tag { get; }
+    }
 }
