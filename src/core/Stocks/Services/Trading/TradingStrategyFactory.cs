@@ -11,28 +11,19 @@ namespace core.Stocks.Services.Trading
 
             yield return CreateProfitTakingStrategy(profitPoints: 4);
 
-            yield return new TradingStrategyWithProfitPoints(
-                "1/3 on each RR level (percent based)",
-                numberOfProfitPoints: 3,
-                (position, level) => ProfitPoints.GetProfitPointWithPercentGain(position, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
-                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
-            );
+            yield return CreateProfitTakingStrategyPercentBased();
+
+            yield return CreateProfitTakingStrategyPercentBased(4);
 
             yield return new TradingStrategyWithProfitPoints(
-                "1/4 on each RR level (percent based)",
-                numberOfProfitPoints: 4,
-                (position, level) => ProfitPoints.GetProfitPointWithPercentGain(position, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
-                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
-            );
-
-            yield return new TradingStrategyWithProfitPoints(
-                "1/3 on each RR level (delayed stop)",
+                "Profit taking (3 RR levels) (delayed stop)",
                 numberOfProfitPoints: 3,
                 (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
                 (position, level) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
             );
 
             yield return CreateCloseAfterFixedNumberOfDays(15);
+            
             yield return CreateCloseAfterFixedNumberOfDays(30);
 
             yield return CreateWithAdvancingStops();
@@ -42,6 +33,16 @@ namespace core.Stocks.Services.Trading
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(30);
+        }
+
+        private static ITradingStrategy CreateProfitTakingStrategyPercentBased(int profitPoints = 3)
+        {
+            return new TradingStrategyWithProfitPoints(
+                $"Profit taking ({profitPoints} RR levels) (percent based)",
+                numberOfProfitPoints: 3,
+                (position, level) => ProfitPoints.GetProfitPointWithPercentGain(position, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
+                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
+            );
         }
 
         public static ITradingStrategy CreateWithAdvancingStops()
@@ -94,7 +95,7 @@ namespace core.Stocks.Services.Trading
         public static ITradingStrategy CreateOneThirdRRWithDownsideProtection(int downsideProtectionSize = 2)
         {
             return new TradingStrategyWithDownsideProtection(
-                $"1/3 on each RR level (1/{downsideProtectionSize} downside protection)",
+                $"Profit taking ({3} RR levels) (1/{downsideProtectionSize} downside protection)",
                 numberOfProfitPoints: 3,
                 (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value),
