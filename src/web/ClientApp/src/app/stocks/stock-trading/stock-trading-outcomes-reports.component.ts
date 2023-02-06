@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { GetErrors } from 'src/app/services/utils';
 import { StocksService, OutcomesReport, PositionInstance, StockGaps } from '../../services/stocks.service';
 
 @Component({
@@ -6,7 +7,7 @@ import { StocksService, OutcomesReport, PositionInstance, StockGaps } from '../.
   templateUrl: './stock-trading-outcomes-reports.component.html',
   styleUrls: ['./stock-trading-outcomes-reports.component.css']
 })
-export class StockPositionReportsComponent {
+export class StockPositionReportsComponent implements OnInit {
 
   
   sortColumn: string
@@ -29,6 +30,8 @@ export class StockPositionReportsComponent {
   @Input()
   positions: PositionInstance[] = []
 
+  errors: string[] = []
+
 
 	ngOnInit(): void {
     
@@ -40,26 +43,45 @@ export class StockPositionReportsComponent {
       this.loadPositionData()
     }
   }
+
   loadDailyData() {
     var tickers = this.positions.map(p => p.ticker)
     this.service.reportOutcomesSingleBarDaily(tickers).subscribe(report => {
       this.singleBarReportDaily = report
+    }, error => {
+      this.handleApiError(error)
+    },
+    () => {
       this.loadWeeklyData()
-    })
+    }
+    )
   }
 
   loadWeeklyData() {
     var tickers = this.positions.map(p => p.ticker)
     this.service.reportOutcomesSingleBarWeekly(tickers).subscribe(report => {
       this.singleBarReportWeekly = report
+    }, error => {
+      this.handleApiError(error)
     })
+
   }
 
   loadPositionData() {
     this.service.reportPositions().subscribe(report => {
       this.positionsReport = report
+    }, error => {
+      this.handleApiError(error)
+    },
+    () => {
       this.loadDailyData()
     })
+  }
+
+  private handleApiError(error: any) {
+    this.errors.push("Unable to load position reports.")
+      var forConsole = GetErrors(error)
+      forConsole.forEach(e => console.log(e))
   }
 
   loadAllTimeData() {
@@ -67,6 +89,8 @@ export class StockPositionReportsComponent {
     this.service.reportOutcomesAllBars(tickers).subscribe(report => {
       this.allBarsReport = report
       this.gaps = report.gaps
+    }, error => {
+      this.handleApiError(error)
     })
   }
 }

@@ -1,5 +1,7 @@
 <div>
 
+  <div class="bg-danger" *ngFor="let err of errors">{{err}}</div>
+  
   <app-outcomes
     *ngIf="allBarsReport"
     [title]="'Mutliple bar outcomes'"
