@@ -99,7 +99,6 @@ namespace core.Alerts
         public AlwaysOnMonitor(string description, string source, string ticker, Guid userId, decimal value)
         {
             Description = description;
-            Source = source;
             Ticker = ticker;
             UserId = userId;
             Value = value;
@@ -107,7 +106,6 @@ namespace core.Alerts
 
         public string Ticker { get; }
         public string Description { get; }
-        public string Source { get; }
         public Guid UserId { get; }
         public decimal Value { get; }
         public TriggeredAlert? TriggeredAlert { get; private set; }
@@ -133,7 +131,7 @@ namespace core.Alerts
                 0,
                 UserId,
                 AlertType.Positive,
-                Source,
+                Description,
                 ValueType
             );
 
