@@ -79,9 +79,9 @@ export class StockPositionReportsComponent implements OnInit {
   }
 
   private handleApiError(errorMessage: string, error: any) {
-    this.errors.push(errorMessage)
     var forConsole = GetErrors(error)
     forConsole.forEach(e => console.log(e))
+    this.errors.push(errorMessage)
   }
 
   loadAllTimeData() {
