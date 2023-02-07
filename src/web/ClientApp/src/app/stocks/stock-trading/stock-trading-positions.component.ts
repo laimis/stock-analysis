@@ -27,7 +27,6 @@ export class StockTradingPositionsComponent {
     ) {}
     
     toggleVisibility(elem:HTMLElement) {
-        console.log(elem)
         toggleVisuallyHidden(elem)
     }
 
@@ -114,7 +113,6 @@ export class StockTradingPositionsComponent {
 
     updatePositions() {
         this.sortedPositions = this._positions.sort((a, b) => {
-            console.log(this.metricFunc(a), this.metricFunc(b))
             if (Number.isFinite(this.metricFunc(a))) {
                 return this.metricFunc(b) - this.metricFunc(a)
             }

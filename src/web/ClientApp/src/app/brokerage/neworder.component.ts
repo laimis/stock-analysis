@@ -45,7 +45,6 @@ export class BrokerageNewOrderComponent {
     this.stockService.getStockQuote(ticker).subscribe(
       prices => {
         this.quote = prices
-        console.log(this.quote)
         this.price = prices.mark
 
         this.stockService.getStockOwnership(ticker).subscribe(

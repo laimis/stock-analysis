@@ -30,13 +30,10 @@ export class NotesComponent implements OnInit {
   loadData() {
     this.loading = true
 
-    console.log("loading")
-
     this.stockService.getNotes(this.symbolFilter).subscribe((r: NoteList) => {
       this.loading = false;
       this.tickers = r.tickers
       this.notes = r.notes
-      console.log("loaded")
     }, _ => {
       console.log("failed to load")
       this.loading = false;
