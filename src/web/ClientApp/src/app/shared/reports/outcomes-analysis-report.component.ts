@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { OutcomesReport, TickerOutcomes } from '../../services/stocks.service';
+import { charts_getTradingViewLink } from '../../services/links.service';
 
 @Component({
   selector: 'app-outcomes-analysis-report',
@@ -23,5 +24,9 @@ export class OutcomesAnalysisReportComponent {
 
   hasPatterns(report: OutcomesReport) {
     return report.patterns.some(t => t.patterns.length > 0)
+  }
+
+  tradingViewLink(ticker:string) {
+    return charts_getTradingViewLink(ticker)
   }
 }

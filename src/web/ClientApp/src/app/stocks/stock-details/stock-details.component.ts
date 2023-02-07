@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { charts_getTradingViewLink } from 'src/app/services/links.service';
 
 @Component({
   selector: 'stock-details',
@@ -91,5 +92,9 @@ export class StockDetailsComponent {
 
   optionOwnershipChanged(e) {
     this.loadOptionOwnership()
+  }
+
+  getTradingViewLink(ticker:string) {
+    return charts_getTradingViewLink(ticker)
   }
 }

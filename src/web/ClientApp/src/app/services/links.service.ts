@@ -14,3 +14,7 @@ export function stockLists_getExportLink(list:StockList, justTickers:boolean = t
 
     return url
 }
+
+export function charts_getTradingViewLink(ticker:string) {
+    return `https://www.tradingview.com/chart/kQn4rgoA/?symbol=${ticker}`
+}

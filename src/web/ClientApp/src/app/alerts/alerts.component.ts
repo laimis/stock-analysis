@@ -1,6 +1,7 @@
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { AlertsContainer, OutcomeValueTypeEnum, PriceMonitor, StocksService } from 'src/app/services/stocks.service';
+import { charts_getTradingViewLink } from '../services/links.service';
 
 @Component({
   selector: 'app-alerts',
@@ -51,6 +52,10 @@ export class AlertsComponent implements OnInit {
 
       this.monitorGroups = groups.sort((a,b) => a[0].description.localeCompare(b[0].description));
     });
+  }
+
+  getTradingViewLink(ticker:string){
+    return charts_getTradingViewLink(ticker)
   }
 
   getValue(value: number,valueType: string) {

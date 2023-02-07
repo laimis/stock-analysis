@@ -5,7 +5,7 @@
     <div *ngIf="showSummary" class="mb-3">
         <span *ngFor="let s of report.summary"
             class="badge rounded-pill bg-secondary me-2">
-            <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{s.ticker}}" target="_blank">{{s.ticker}}: {{s.count}}</a>
+            <a [href]="tradingViewLink(s.ticker)" target="_blank">{{s.ticker}}: {{s.count}}</a>
         </span>
     </div>
 
@@ -16,9 +16,7 @@
           <ng-container *ngFor="let tp of report.patterns">
             <tr *ngFor="let p of tp.patterns">
               <td>
-                <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{tp.ticker}}" target="_blank">
-                  {{tp.ticker}}
-                </a>
+                <a [href]="tradingViewLink(tp.ticker)" target="_blank">{{tp.ticker}}</a>
               </td>
               <td>{{p.name}}</td>
             </tr>

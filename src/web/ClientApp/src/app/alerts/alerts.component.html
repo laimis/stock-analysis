@@ -21,7 +21,7 @@
           }">
           <td>
             <a [routerLink]="[ '/stocks', monitor.ticker ]">{{monitor.ticker}}</a>
-            <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{monitor.ticker}}" target="_blank">
+            <a [href]="getTradingViewLink(monitor.ticker)" target="_blank">
               <img class="p-1" src="tradingview.png" height="20px" />
             </a>
           </td>

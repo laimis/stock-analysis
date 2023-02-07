@@ -1,5 +1,6 @@
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { charts_getTradingViewLink } from 'src/app/services/links.service';
 import { AnalysisOutcomeEvaluation, OutcomeValueTypeEnum, StockAnalysisOutcome, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
@@ -31,6 +32,10 @@ export class OutcomesComponent {
   
 	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)
+  }
+
+  getTradingViewLink(ticker:string) {
+    return charts_getTradingViewLink(ticker)
   }
 
   sort(column:string) {
