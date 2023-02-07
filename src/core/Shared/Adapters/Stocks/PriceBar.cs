@@ -45,12 +45,12 @@ namespace core.Shared.Adapters.Stocks
         {
             var parts = value.Split(',');
             return new PriceBar(
-                DateTimeOffset.Parse(parts[0]),
-                decimal.Parse(parts[1]),
-                decimal.Parse(parts[2]),
-                decimal.Parse(parts[3]),
-                decimal.Parse(parts[4]),
-                long.Parse(parts[5])
+                date: DateTimeOffset.Parse(parts[0]),
+                open: decimal.Parse(parts[1]),
+                high: decimal.Parse(parts[2]),
+                low: decimal.Parse(parts[3]),
+                close: decimal.Parse(parts[4]),
+                volume: long.Parse(parts[5])
             );
         }
 
