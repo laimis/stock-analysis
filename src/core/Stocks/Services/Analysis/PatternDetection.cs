@@ -29,7 +29,7 @@ namespace core.Stocks.Services.Analysis
             // upside reversal pattern detection
             if (current.Close > previous.Close && current.Low < previous.Low)
             {
-                return new Pattern(date: current.Date, name: UpsideReversal);
+                return new Pattern(date: current.Date, name: UpsideReversalName);
             }
 
             return null;
