@@ -214,14 +214,14 @@ namespace web.BackgroundServices
                 var patterns = PatternDetection.Generate(prices.Success).ToList();
                 if (patterns.Count == 0)
                 {
-                    _container.Deregister(PatternDetection.UpsideReversal, ticker, user.Id);
+                    _container.Deregister(PatternDetection.UpsideReversalName, ticker, user.Id);
                     continue;
                 }
 
                 _container.Register(
                     new AlwaysOnMonitor(
                         description: $"Upside reversal for {ticker}",
-                        source: PatternDetection.UpsideReversal,
+                        source: PatternDetection.UpsideReversalName,
                         ticker: ticker,
                         userId: user.Id,
                         value: 0

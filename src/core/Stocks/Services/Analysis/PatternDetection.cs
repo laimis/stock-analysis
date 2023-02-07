@@ -5,7 +5,7 @@ namespace core.Stocks.Services.Analysis
 {
     public class PatternDetection
     {
-        public const string UpsideReversal = "Upside Reversal";
+        public const string UpsideReversalName = "Upside Reversal";
 
         public static IEnumerable<Pattern> Generate(PriceBar[] bars)
         {
@@ -13,15 +13,26 @@ namespace core.Stocks.Services.Analysis
             {
                 yield break;
             }
-            
+
             var current = bars[^1];
             var previous = bars[^2];
 
+            var reversal = UpsideReversal(current, previous);
+            if (reversal != null)
+            {
+                yield return reversal.Value;
+            }
+        }
+
+        private static Pattern? UpsideReversal(PriceBar current, PriceBar previous)
+        {
             // upside reversal pattern detection
             if (current.Close > previous.Close && current.Low < previous.Low)
             {
-                yield return new Pattern(date: current.Date, name: UpsideReversal);
+                return new Pattern(date: current.Date, name: UpsideReversal);
             }
-        }
+
+            return null;
+        }   
     }
 }
