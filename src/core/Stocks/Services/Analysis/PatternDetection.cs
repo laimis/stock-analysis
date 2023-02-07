@@ -9,6 +9,11 @@ namespace core.Stocks.Services.Analysis
 
         public static IEnumerable<Pattern> Generate(PriceBar[] bars)
         {
+            if (bars.Length < 2)
+            {
+                yield break;
+            }
+            
             var current = bars[^1];
             var previous = bars[^2];
 
