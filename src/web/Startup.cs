@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using web.Utils;
 using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace web
 {
@@ -71,7 +73,18 @@ namespace web
             else
             {
                 app.UseForwardedHeaders();
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                
+                app.UseExceptionHandler(exceptionHandlerApp =>
+                {
+                    exceptionHandlerApp.Run(async context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        context.Response.ContentType = Text.Plain;
+                        await context.Response.WriteAsync("An unhandled error occurred.");
+                    });
+                });
+
+
                 app.UseHsts();
             }
 
