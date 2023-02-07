@@ -3,7 +3,7 @@ import { GetErrors } from 'src/app/services/utils';
 import { StocksService, OutcomesReport, PositionInstance, StockGaps } from '../../services/stocks.service';
 
 @Component({
-  selector: 'app-position-reports',
+  selector: 'app-stock-trading-outcomes-reports',
   templateUrl: './stock-trading-outcomes-reports.component.html',
   styleUrls: ['./stock-trading-outcomes-reports.component.css']
 })
@@ -46,14 +46,13 @@ export class StockPositionReportsComponent implements OnInit {
 
   loadDailyData() {
     var tickers = this.positions.map(p => p.ticker)
-    this.service.reportOutcomesSingleBarDaily(tickers).subscribe(report => {
-      this.singleBarReportDaily = report
-    }, error => {
-      this.handleApiError(error)
-    },
-    () => {
-      this.loadWeeklyData()
-    }
+    this.service.reportOutcomesSingleBarDaily(tickers).subscribe(
+      report => {
+        this.singleBarReportDaily = report
+      },
+      error => {
+        this.handleApiError("Unable to load daily data", error)
+      }
     )
   }
 
@@ -62,7 +61,7 @@ export class StockPositionReportsComponent implements OnInit {
     this.service.reportOutcomesSingleBarWeekly(tickers).subscribe(report => {
       this.singleBarReportWeekly = report
     }, error => {
-      this.handleApiError(error)
+      this.handleApiError("Unable to load weekly data", error)
     })
 
   }
@@ -71,15 +70,16 @@ export class StockPositionReportsComponent implements OnInit {
     this.service.reportPositions().subscribe(report => {
       this.positionsReport = report
     }, error => {
-      this.handleApiError(error)
+      this.handleApiError("Unable to load position reports", error)
     },
     () => {
+      console.log("calling load daily data")
       this.loadDailyData()
     })
   }
 
-  private handleApiError(error: any) {
-    this.errors.push("Unable to load position reports.")
+  private handleApiError(errorMessage: string, error: any) {
+    this.errors.push(errorMessage)
       var forConsole = GetErrors(error)
       forConsole.forEach(e => console.log(e))
   }
@@ -90,7 +90,7 @@ export class StockPositionReportsComponent implements OnInit {
       this.allBarsReport = report
       this.gaps = report.gaps
     }, error => {
-      this.handleApiError(error)
+      this.handleApiError("Unable to load all bars", error)
     })
   }
 }
