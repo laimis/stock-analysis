@@ -49,9 +49,11 @@ export class StockPositionReportsComponent implements OnInit {
     this.service.reportOutcomesSingleBarDaily(tickers).subscribe(
       report => {
         this.singleBarReportDaily = report
+        this.loadWeeklyData()
       },
       error => {
         this.handleApiError("Unable to load daily data", error)
+        this.loadWeeklyData()
       }
     )
   }
