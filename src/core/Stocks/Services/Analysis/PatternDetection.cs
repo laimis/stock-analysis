@@ -59,6 +59,12 @@ namespace core.Stocks.Services.Analysis
                 }
             }
 
+            // if the starting index is the first bar, see if that date is too recent
+            if (startIndex == 0 && bars[0].Date > thresholdDate)
+            {
+                return null;
+            }
+
             // now examine all bars from the starting bar to the end
             // and see if the last one has the highest volume
             var highestVolume = 0m;
@@ -84,6 +90,12 @@ namespace core.Stocks.Services.Analysis
         private const int VolumeMultiplier = 5;
         private static Pattern? XVolume(PriceBar[] bars)
         {
+            // if we get too little data, let's not infer that there is a pattern
+            if (bars.Length < SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+            {
+                return null;
+            }
+
             // calculate the average volume of the last 60 bars
             var averageVolume = 0m;
             var numberOfBars = 0;
