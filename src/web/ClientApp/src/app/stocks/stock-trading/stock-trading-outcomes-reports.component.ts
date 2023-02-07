@@ -69,11 +69,9 @@ export class StockPositionReportsComponent implements OnInit {
   loadPositionData() {
     this.service.reportPositions().subscribe(report => {
       this.positionsReport = report
+      this.loadDailyData()
     }, error => {
       this.handleApiError("Unable to load position reports", error)
-    },
-    () => {
-      console.log("calling load daily data")
       this.loadDailyData()
     })
   }
