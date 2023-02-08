@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using core.Alerts;
-using core.Shared;
 using core.Stocks;
 using Xunit;
 
@@ -9,39 +7,31 @@ namespace coretests.Alerts
 {
     public class StockMonitorContainerTests
     {
-        private StockMonitorContainer _uat;
-        private OwnedStock _amd;
-        private OwnedStock _bac;
-        private int _initialCount = 0;
-        private int _finalCount = 0;
+        private StockAlertContainer _uat;
 
         public StockMonitorContainerTests()
         {
             var userId = Guid.NewGuid();
-            _uat = new StockMonitorContainer();
+            
+            _uat = new StockAlertContainer();
 
-            _amd = new OwnedStock(new Ticker("AMD"), userId);
-            _amd.Purchase(100, 50, DateTimeOffset.Now, null, 49);
-            _uat.Register(_amd.State);
+            var alert = StopPriceMonitor.Create(
+                    price: 100,
+                    stopPrice: 105,
+                    ticker: "AMD",
+                    when: DateTimeOffset.Now,
+                    userId: userId
+                );
 
-            _bac = new OwnedStock(new Ticker("BAC"), userId);
-            _bac.Purchase(100, 50, DateTimeOffset.Now, null, 49);
-            _uat.Register(_bac.State);
-
-            _initialCount = _uat.Monitors.Count();
-
-            _uat.Register(_amd.State);
-            _uat.Register(_bac.State);
-            _uat.Register(_amd.State);
-
-            _finalCount = _uat.Monitors.Count();
+            _uat.Register(alert);
+            _uat.Register(alert);
         }
 
         [Fact]
-        public void MonitorsNotEmpty() => Assert.NotEmpty(_uat.Monitors);
+        public void AlertsNotEmpty() => Assert.NotEmpty(_uat.Alerts);
 
         // checks that registering is idempotent
         [Fact]
-        public void MonitorsCountIsCorrect() => Assert.Equal(_initialCount, _finalCount);
+        public void MonitorsCountIsCorrect() => Assert.Single(_uat.Alerts);
     }
 }

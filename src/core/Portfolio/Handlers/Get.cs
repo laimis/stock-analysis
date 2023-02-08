@@ -23,11 +23,11 @@ namespace core.Portfolio
             HandlerWithStorage<Query, PortfolioResponse>,
             INotificationHandler<UserChanged>
         {
-            private StockMonitorContainer _alerts;
+            private StockAlertContainer _alerts;
 
             public Handler(
                 IPortfolioStorage storage,
-                StockMonitorContainer alerts) : base(storage)
+                StockAlertContainer alerts) : base(storage)
             {
                 _alerts = alerts;
             }

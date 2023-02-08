@@ -413,23 +413,14 @@ export interface StockAlert {
   when: string
   ticker: string
   description: string
-  numberOfShares: number
   triggeredValue: number
-  alertType: string
-  valueType: string
-}
-export interface PriceMonitor {
-  description: string
-  thresholdValue: number
-  lastSeenValue: number
-  ticker: string
-  triggeredAlert: StockAlert|null
+  watchedValue: number
   alertType: string
   valueType: string
 }
 
 export interface AlertsContainer {
-  monitors: PriceMonitor[]
+  alerts: StockAlert[]
   recentlyTriggered: StockAlert[]
 }
 

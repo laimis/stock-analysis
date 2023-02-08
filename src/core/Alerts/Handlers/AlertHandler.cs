@@ -4,84 +4,43 @@ using core.Stocks;
 
 namespace core.Alerts
 {
+    // NOTE: implementations are currently empty on purpose. Previously
+    // we would update alerts container immediately, but with some changes
+    // to the monitoring model, there is no need to do so. we might go back
+    // to the model where these updates are needed, so I left the stubs in place
     public class AlertHandler :
         MediatR.INotificationHandler<StockPurchased_v2>,
         MediatR.INotificationHandler<StockSold>,
         MediatR.INotificationHandler<StopPriceSet>,
         MediatR.INotificationHandler<StopDeleted>
     {
-        private StockMonitorContainer _container;
+        private StockAlertContainer _container;
         private IPortfolioStorage _storage;
 
-        public AlertHandler(IPortfolioStorage storage, StockMonitorContainer container)
+        public AlertHandler(IPortfolioStorage storage, StockAlertContainer container)
         {
             _container = container;
             _storage = storage;
         }
 
-        public async Task Handle(StockPurchased_v2 notification, CancellationToken cancellationToken)
+        public Task Handle(StockPurchased_v2 notification, CancellationToken cancellationToken)
         {
-            var stock = await _storage.GetStock(ticker: notification.Ticker, userId: notification.UserId);
-            if (stock == null)
-            {
-                return;
-            }
-
-            if (stock.State.OpenPosition == null)
-            {
-                return;
-            }
-
-            _container.Register(stock.State);
+            return Task.CompletedTask;
         }
 
-        public async Task Handle(StockSold notification, CancellationToken cancellationToken)
+        public Task Handle(StockSold notification, CancellationToken cancellationToken)
         {
-            var stock = await _storage.GetStock(ticker: notification.Ticker, userId: notification.UserId);
-            if (stock == null)
-            {
-                return;
-            }
-
-            if (stock.State.OpenPosition != null)
-            {
-                return;
-            }
-
-            _container.Deregister(stock);
+            return Task.CompletedTask;
         }
 
-        public async Task Handle(StopPriceSet notification, CancellationToken cancellationToken)
+        public Task Handle(StopPriceSet notification, CancellationToken cancellationToken)
         {
-            var stock = await _storage.GetStock(ticker: notification.Ticker, userId: notification.UserId);
-            if (stock == null)
-            {
-                return;
-            }
-
-            if (stock.State.OpenPosition == null)
-            {
-                return;
-            }
-
-            _container.Register(stock.State);
+            return Task.CompletedTask;
         }
 
-
-        public async Task Handle(StopDeleted notification, CancellationToken cancellationToken)
+        public Task Handle(StopDeleted notification, CancellationToken cancellationToken)
         {
-            var stock = await _storage.GetStock(ticker: notification.Ticker, userId: notification.UserId);
-            if (stock == null)
-            {
-                return;
-            }
-
-            if (stock.State.OpenPosition == null)
-            {
-                return;
-            }
-
-            _container.Deregister(stock);
+            return Task.CompletedTask;
         }
     }
 }

@@ -42,7 +42,7 @@ namespace web
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddSingleton<IMarketHours, Utils.MarketHours>();
-            services.AddSingleton<StockMonitorContainer>();
+            services.AddSingleton<StockAlertContainer>();
             services.AddMediatR(typeof(Sell).Assembly, typeof(DIHelper).Assembly);
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
@@ -76,10 +76,9 @@ namespace web
                     configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID")
                 ));
 
-            services.AddHostedService<StockPositionMonitorService>();
+            services.AddHostedService<StockAlertService>();
             services.AddHostedService<ThirtyDaySellService>();
             services.AddHostedService<UserChangedScheduler>();
-            services.AddHostedService<ListMonitorService>();
             
             StorageRegistrations(configuration, services, logger);
         }
