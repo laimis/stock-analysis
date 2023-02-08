@@ -196,7 +196,7 @@ namespace core.Stocks.Services.Analysis
             var volumeStats = NumberAnalysis.Statistics(
                 bars[..^1]
                     .Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
-                    .Select(x => x.Volume)
+                    .Select(x => (decimal)x.Volume)
                     .ToArray()
             );
 

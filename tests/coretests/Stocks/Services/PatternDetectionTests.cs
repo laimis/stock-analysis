@@ -43,5 +43,46 @@ namespace coretests.Stocks.Services
             Assert.Equal(PatternDetection.Highest1YearVolumeName, patterns.First().name);
             Assert.Equal(PatternDetection.XVolumeName(), patterns.Last().name);
         }
+
+        [Fact]
+        public void Generate_WithSmallInput_ReturnsNothing()
+        {
+            var bars = TestDataGenerator.IncreasingPriceBars();
+            var patterns = PatternDetection.Generate(bars);
+            Assert.Empty(patterns);
+        }
+
+        [Fact]
+        public void HighestVolume_OnLatestBarIsDetected()
+        {
+            var bars = TestDataGenerator.IncreasingPriceBars(numOfBars: 100);
+            
+            bars = AppendHighVolumeBar(bars);
+
+            var patterns = PatternDetection.Generate(bars);
+            Assert.Single(patterns);
+            Assert.Equal(PatternDetection.XVolumeName(), patterns.First().name);
+        }
+
+        private static PriceBar[] AppendHighVolumeBar(PriceBar[] bars)
+        {
+            // append a bar with 10x the volume of the last bar
+            var lastBar = bars[^1];
+            var newBar = new PriceBar(lastBar.Date.AddDays(1), lastBar.Open, lastBar.High, lastBar.Low, lastBar.Close, lastBar.Volume * 10);
+            bars = bars.Append(newBar).ToArray();
+            return bars;
+        }
+
+        [Fact]
+        public void HighestVolume_OnSmallAmountOfBars_Ignored()
+        {
+            var bars = TestDataGenerator.IncreasingPriceBars(numOfBars: 10);
+
+            bars = AppendHighVolumeBar(bars);
+
+            var patterns = PatternDetection.Generate(bars);
+
+            Assert.Empty(patterns);
+        }
     }
 }

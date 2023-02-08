@@ -50,7 +50,7 @@ namespace core.Stocks.Services.Analysis
             // find the starting bar, which is higher date than 1 year ago
             var startIndex = bars.Length - 1;
             var thresholdDate = System.DateTime.Now.AddYears(-1);
-            for (var i = bars.Length - 1; i >= 0; i--)
+            for (var i = startIndex; i >= 0; i--)
             {
                 if (bars[i].Date < thresholdDate)
                 {
@@ -60,7 +60,7 @@ namespace core.Stocks.Services.Analysis
             }
 
             // if the starting index is the first bar, see if that date is too recent
-            if (startIndex == 0 && bars[0].Date > thresholdDate)
+            if (bars[startIndex].Date > thresholdDate)
             {
                 return null;
             }

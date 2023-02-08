@@ -15,5 +15,24 @@ namespace coretests.TestData
                 .Select(x => PriceBar.Parse(x))
                 .ToArray();
         }
+
+        public static PriceBar[] IncreasingPriceBars(int numOfBars = 10)
+        {
+            return 
+                Enumerable
+                    .Range(0, numOfBars)
+                    .Select(
+                    x =>
+                        new PriceBar(
+                            date: DateTime.Now.AddDays(-numOfBars).AddDays(x),
+                            open: x,
+                            high: x,
+                            low: x,
+                            close: x,
+                            volume: x
+                        )
+                    )
+                .ToArray();
+        }
     }
 }

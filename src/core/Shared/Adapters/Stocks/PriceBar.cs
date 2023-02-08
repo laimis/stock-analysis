@@ -29,7 +29,7 @@ namespace core.Shared.Adapters.Stocks
         public decimal High { get; }
         public decimal Low { get; }
         public decimal Open { get; }
-        public decimal Volume { get; }
+        public long Volume { get; }
 
         public bool Equals(PriceBar other) => DateStr == other.DateStr;
 
