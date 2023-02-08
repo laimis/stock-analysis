@@ -1,4 +1,5 @@
 using System;
+using core.Shared;
 using core.Stocks.Services.Analysis;
 
 namespace core.Alerts
@@ -11,7 +12,7 @@ namespace core.Alerts
         string description,
         Guid userId,
         AlertType alertType,
-        ValueType valueType
+        ValueFormat valueType
     )
     {
         public Guid id { get; } = Guid.NewGuid();
@@ -39,7 +40,7 @@ namespace core.Alerts
                 description: GapUp,
                 userId: userId,
                 alertType: AlertType.Positive,
-                valueType: Shared.ValueType.Percentage
+                valueType: Shared.ValueFormat.Percentage
             );
         }
     }
@@ -63,7 +64,7 @@ namespace core.Alerts
                 description: Description,
                 userId: userId,
                 alertType: AlertType.Positive,
-                valueType: Shared.ValueType.Currency
+                valueType: Shared.ValueFormat.Currency
             );
         }
     }
@@ -87,7 +88,7 @@ namespace core.Alerts
                 description: Description,
                 userId: userId,
                 alertType: AlertType.Negative,
-                valueType: Shared.ValueType.Currency
+                valueType: Shared.ValueFormat.Currency
             );
         }
     }
@@ -110,7 +111,7 @@ namespace core.Alerts
                 description: Description,
                 userId: userId,
                 alertType: AlertType.Positive,
-                valueType: Shared.ValueType.Currency
+                valueType: Shared.ValueFormat.Currency
             );
         }
     }

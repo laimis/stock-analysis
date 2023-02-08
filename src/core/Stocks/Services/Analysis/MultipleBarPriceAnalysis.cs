@@ -38,7 +38,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.CurrentPrice,
                 OutcomeType.Neutral,
                 currentPrice,
-                Shared.ValueType.Currency,
+                Shared.ValueFormat.Currency,
                 $"Current price is {currentPrice:C2}"
             );
 
@@ -47,7 +47,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.EarliestPrice,
                 OutcomeType.Neutral,
                 prices[0].Close,
-                Shared.ValueType.Currency,
+                Shared.ValueFormat.Currency,
                 $"Earliest price was {prices[0].Close} on {prices[0].Date}"
             );
 
@@ -70,7 +70,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.LowestPrice,
                 OutcomeType.Neutral,
                 lowest.Close,
-                Shared.ValueType.Currency,
+                Shared.ValueFormat.Currency,
                 $"Lowest price was {lowest.Close} on {lowest.Date}"
             );
 
@@ -82,7 +82,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.LowestPriceDaysAgo,
                 lowestPriceDaysAgoOutcomeType,
                 lowestPriceDaysAgo,
-                Shared.ValueType.Number,
+                Shared.ValueFormat.Number,
                 $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
             );
 
@@ -93,7 +93,7 @@ namespace core.Stocks.Services.Analysis
                     MultipleBarOutcomeKeys.PercentAboveLow,
                     percentAboveLowOutcomeType,
                     percentAboveLow,
-                    Shared.ValueType.Percentage,
+                    Shared.ValueFormat.Percentage,
                     $"Percent above recent low: {percentAboveLow}%"
                 );
 
@@ -101,7 +101,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.HighestPrice,
                 OutcomeType.Neutral,
                 highest.Close,
-                Shared.ValueType.Currency,
+                Shared.ValueFormat.Currency,
                 $"Highest price was {highest.Close} on {highest.Date}"
             );
 
@@ -113,7 +113,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.HighestPriceDaysAgo,
                 highestPriceDaysAgoOutcomeType,
                 highestPriceDaysAgo,
-                Shared.ValueType.Number,
+                Shared.ValueFormat.Number,
                 $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
             );
 
@@ -124,7 +124,7 @@ namespace core.Stocks.Services.Analysis
                     MultipleBarOutcomeKeys.PercentBelowHigh,
                     percentBelowHighOutcomeType,
                     percentBelowHigh,
-                    Shared.ValueType.Percentage,
+                    Shared.ValueFormat.Percentage,
                     $"Percent below recent high: {percentBelowHigh}%"
                 );
 
@@ -139,7 +139,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.PercentChangeAverage,
                 OutcomeType.Neutral,
                 descriptor.mean,
-                Shared.ValueType.Number,
+                Shared.ValueFormat.Number,
                 $"% Change Average: {descriptor.mean}"
             );
 
@@ -147,7 +147,7 @@ namespace core.Stocks.Services.Analysis
                 MultipleBarOutcomeKeys.PercentChangeStandardDeviation,
                 OutcomeType.Neutral,
                 descriptor.stdDev,
-                Shared.ValueType.Number,
+                Shared.ValueFormat.Number,
                 $"% Change StD: {descriptor.stdDev}"
             );
         }
@@ -171,7 +171,7 @@ namespace core.Stocks.Services.Analysis
                     MultipleBarOutcomeKeys.AverageVolume,
                     OutcomeType.Neutral,
                     averageVolume,
-                    Shared.ValueType.Number,
+                    Shared.ValueFormat.Number,
                     $"Average volume over the last {interval} days is {averageVolume}"
                 );
         }
@@ -193,7 +193,7 @@ namespace core.Stocks.Services.Analysis
                         MultipleBarOutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
                         Math.Round(value ?? 0, 2),
-                        Shared.ValueType.Currency,
+                        Shared.ValueFormat.Currency,
                         $"SMA {sma.Interval} is {value}"
                     );
             }
@@ -234,7 +234,7 @@ namespace core.Stocks.Services.Analysis
                     MultipleBarOutcomeKeys.SMA20Above50Days,
                     sma20Above50DaysOutcomeType,
                     sma20Above50DaysValue,
-                    Shared.ValueType.Number,
+                    Shared.ValueFormat.Number,
                     "SMA 20 has been " + (sma20Below50Days > 0 ? "below" : "above") + $" SMA 50 for {sma20Above50DaysValue} days"
                 );
         }

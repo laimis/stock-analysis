@@ -1,4 +1,4 @@
 namespace core.Shared
 {
-    public enum ValueType { Percentage, Currency, Number, Boolean };
+    public enum ValueFormat { Percentage, Currency, Number, Boolean };
 }
