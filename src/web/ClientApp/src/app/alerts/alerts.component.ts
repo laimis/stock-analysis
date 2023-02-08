@@ -1,6 +1,6 @@
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AlertsContainer, OutcomeValueTypeEnum, PriceMonitor, StocksService } from 'src/app/services/stocks.service';
+import { AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService } from 'src/app/services/stocks.service';
 import { charts_getTradingViewLink } from '../services/links.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { charts_getTradingViewLink } from '../services/links.service';
 
 export class AlertsComponent implements OnInit {
   container: AlertsContainer;
-  monitorGroups: PriceMonitor[][];
+  alertGroups: StockAlert[][];
 
   constructor(
     private stockService : StocksService,
@@ -21,38 +21,27 @@ export class AlertsComponent implements OnInit {
   ) { }
 
   @Input()
-  hideUntriggered : boolean = false;
-
-  @Input()
   hideRecentTriggered : boolean = false;
 
   ngOnInit(): void {
     this.stockService.getAlerts().subscribe(container => {
       this.container = container;
 
-      // we want to group container.monitors into groups that are triggered/not triggered
-      // and then triggered ones to group further by description, order by ticker
+      var compareTickers = (a:StockAlert, b:StockAlert) => a.ticker.localeCompare(b.ticker)
 
-      var compareTickers = (a:PriceMonitor, b:PriceMonitor) => a.ticker.localeCompare(b.ticker)
+      var sorted = container.alerts.sort(compareTickers);
 
-      var notTriggered = container.monitors.filter(m => !m.triggeredAlert).sort(compareTickers);
-      var triggered = container.monitors.filter(m => m.triggeredAlert).sort(compareTickers);
-
-      var descriptions = new Set(triggered.map(m => m.description));
+      var descriptions = new Set(sorted.map(m => m.description));
       
       var groups = []
       descriptions.forEach(description => {
-        var group = triggered.filter(m => m.description === description).sort(compareTickers);
+        var group = sorted.filter(m => m.description === description).sort(compareTickers);
         groups.push(group);
       })
 
       groups.sort((a,b) => a[0].description.localeCompare(b[0].description));
 
-      if (!this.hideUntriggered) {
-        groups.push(notTriggered);
-      }
-
-      this.monitorGroups = groups
+      this.alertGroups = groups
     });
   }
 

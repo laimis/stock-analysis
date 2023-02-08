@@ -2,42 +2,29 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using core.Stocks;
 
 namespace core.Alerts
 {
-    public class StockMonitorContainer
+    public class StockAlertContainer
     {
-        private record struct StockPositionMonitorKey(string MonitorIdentifier, string Ticker, Guid UserId);
-        private ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor> _monitors = new ConcurrentDictionary<StockPositionMonitorKey, IStockPositionMonitor>();
+        private record struct StockPositionMonitorKey(string description, string ticker, Guid userId);
+        private ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert> _alerts =
+            new ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert>();
         private const int MAX_RECENT_ALERTS = 20;
         private const int RECENT_ALERT_HOUR_THRESHOLD = 8; // alerts within eight hour are considered to be recent
 
-        public IEnumerable<IStockPositionMonitor> Monitors => _monitors.Values;
+        public IEnumerable<TriggeredAlert> Alerts => _alerts.Values;
 
-        public void Register(OwnedStockState stock)
-        {   
-            void AddIfNotNull(IStockPositionMonitor monitor)
-            {
-                if (monitor != null)
-                {
-                    Register(monitor);
-                }
-            }
-            
-            var stopMonitor = StopPriceMonitor.CreateIfApplicable(stock);
-            AddIfNotNull(stopMonitor);
-
-            var profitMonitor = ProfitPriceMonitor.CreateIfApplicable(stock);
-            AddIfNotNull(profitMonitor);
-        }
-
-        public void Register(IStockPositionMonitor monitor)
+        public void Register(TriggeredAlert alert)
         {
-            _monitors[new StockPositionMonitorKey(monitor.Description, monitor.Ticker, monitor.UserId)] = monitor;
-        }
+            _alerts[new StockPositionMonitorKey(alert.description, alert.ticker, alert.userId)] = alert;
 
-        private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts = new Dictionary<Guid, List<TriggeredAlert>>();
+            AddToRecent(alert);
+        }
+            
+
+        private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts =
+            new Dictionary<Guid, List<TriggeredAlert>>();
 
         internal List<TriggeredAlert> GetRecentlyTriggeredAlerts(Guid userId) =>
             (_recentlyTriggeredAlerts.SingleOrDefault(u => u.Key == userId).Value ?? new List<TriggeredAlert>())
@@ -45,28 +32,17 @@ namespace core.Alerts
             .ThenByDescending(a => a.when)
             .ToList();
 
-        internal List<IStockPositionMonitor> GetMonitors(Guid userId) => 
-            _monitors.Values.Where(m => m.UserId == userId).ToList();
+        internal List<TriggeredAlert> GetAlerts(Guid userId) => 
+            _alerts.Values.Where(m => m.userId == userId)
+            .ToList();
 
-        private static string ToKey(string ticker, Guid userId) => userId.ToString() + ticker;
+        public void Deregister(string description, string ticker, Guid userId) =>
+            _alerts.TryRemove(
+                new StockPositionMonitorKey(description, ticker, userId),
+                out _
+            );
 
-        internal void Deregister(OwnedStock stock)
-        {
-            var keysToRemove = _monitors.Keys.Where(k => k.Ticker == stock.State.Ticker && k.UserId == stock.State.UserId).ToList();
-            
-            foreach(var key in keysToRemove)
-            {
-                _monitors.TryRemove(key, out _);
-            }
-        }
-
-        public void Deregister(string identifier, string ticker, Guid userId)
-        {
-            var key = new StockPositionMonitorKey(identifier, ticker, userId);
-            _monitors.TryRemove(key, out _);
-        }
-
-        public void AddToRecent(TriggeredAlert triggeredAlert)
+        private void AddToRecent(TriggeredAlert triggeredAlert)
         {
             if (!_recentlyTriggeredAlerts.ContainsKey(triggeredAlert.userId))
             {
@@ -81,20 +57,6 @@ namespace core.Alerts
             }
 
             list.Add(triggeredAlert);
-        }
-
-        public bool HasRecentlyTriggered(TriggeredAlert a)
-        {
-            if (_recentlyTriggeredAlerts.TryGetValue(a.userId, out var triggeredAlerts))
-            {
-                return triggeredAlerts.Any(
-                    triggeredAlert => 
-                        triggeredAlert.MatchesTickerAndSource(a)
-                        && triggeredAlert.AgeInHours < RECENT_ALERT_HOUR_THRESHOLD
-                    );
-            }
-
-            return false;
         }
     }
 }

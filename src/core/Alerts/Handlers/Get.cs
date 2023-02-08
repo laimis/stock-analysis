@@ -18,24 +18,23 @@ namespace core.Alerts
 
         public class Handler : IRequestHandler<Query, object>
         {
-            private StockMonitorContainer _container;
+            private StockAlertContainer _container;
 
-            public Handler(StockMonitorContainer container) => _container = container;
+            public Handler(StockAlertContainer container) => _container = container;
 
             public Task<object> Handle(Query request, CancellationToken cancellationToken)
             {
-                var monitors = 
-                    _container.GetMonitors(request.UserId)
-                        .OrderByDescending(m => m.IsTriggered)
-                        .ThenBy(p => p.Ticker)
-                        .ThenBy(p => p.Description)
+                var alerts = 
+                    _container.GetAlerts(request.UserId)
+                        .OrderBy(p => p.ticker)
+                        .ThenBy(p => p.description)
                         .ToList();
 
                 var recentlyTriggered = _container.GetRecentlyTriggeredAlerts(request.UserId);
 
                 return Task.FromResult<object>(
                     new {
-                        monitors,
+                        alerts,
                         recentlyTriggered
                     }
                 );

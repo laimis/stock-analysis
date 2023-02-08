@@ -13,11 +13,11 @@ namespace web.Controllers
     public class AlertsController : ControllerBase
     {
         private IMediator _mediator;
-        private StockMonitorContainer _container;
+        private StockAlertContainer _container;
 
         public AlertsController(
             IMediator mediator,
-            StockMonitorContainer container)
+            StockAlertContainer container)
         {
             _mediator = mediator;
             _container = container;

@@ -13,20 +13,20 @@ using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    public class ListMonitorService : BackgroundService
+    public class StockAlertService : BackgroundService
     {
         private IAccountStorage _accounts;
         private IBrokerage _brokerage;
-        private StockMonitorContainer _container;
-        private ILogger<ListMonitorService> _logger;
+        private StockAlertContainer _container;
+        private ILogger<StockAlertService> _logger;
         private IMarketHours _marketHours;
         private IPortfolioStorage _portfolio;
 
-        public ListMonitorService(
+        public StockAlertService(
             IAccountStorage accounts,
             IBrokerage brokerage,
-            StockMonitorContainer container,
-            ILogger<ListMonitorService> logger,
+            StockAlertContainer container,
+            ILogger<StockAlertService> logger,
             IMarketHours marketHours,
             IPortfolioStorage portfolio)
         {
@@ -44,6 +44,8 @@ namespace web.BackgroundServices
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
         private DateTimeOffset _nextUpsideReversalRun = DateTimeOffset.MinValue;
 
+        private DateTimeOffset _nextMonitorForStopsRun = DateTimeOffset.MinValue;
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -60,6 +62,11 @@ namespace web.BackgroundServices
                         await MonitorForUpsideReversals(stoppingToken);
                     }
 
+                    if (DateTimeOffset.UtcNow > _nextMonitorForStopsRun)
+                    {
+                        await MonitorForStops(stoppingToken);
+                    }
+
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
                 catch (Exception ex)
@@ -70,7 +77,55 @@ namespace web.BackgroundServices
             }
         }
 
-        private DateTimeOffset GetNextUpsideReveralMonitorRunTime()
+        private async Task MonitorForStops(CancellationToken stoppingToken)
+        {
+            var user = await _accounts.GetUserByEmail("laimis@gmail.com");
+            if (user == null)
+            {
+                _logger.LogError("Could not find user for stop monitoring");
+                return;
+            }
+
+            var stocks = await _portfolio.GetStocks(user.Id);
+            var positions = stocks
+                .Where(s => s.State.OpenPosition != null)
+                .Select(s => s.State.OpenPosition)
+                .Where(p => p.StopPrice != null);
+
+            foreach (var position in positions)
+            {
+                var priceResponse = await _brokerage.GetQuote(user.State, position.Ticker);
+                if (!priceResponse.IsOk)
+                {
+                    _logger.LogError($"Could not get price for {position.Ticker}: {priceResponse.Error.Message}");
+                    continue;
+                }
+
+                var price = priceResponse.Success.lastPrice;
+
+                if (price <= position.StopPrice.Value)
+                {
+                    _container.Register(
+                        StopPriceMonitor.Create(
+                            price: price,
+                            stopPrice: position.StopPrice.Value,
+                            ticker: position.Ticker,
+                            when: DateTimeOffset.UtcNow,
+                            userId: user.Id
+                        )
+                    );
+                }
+                else
+                {
+                    _container.Deregister(
+                        StopPriceMonitor.Description, position.Ticker, user.Id);
+                }
+            }
+
+            _nextMonitorForStopsRun = GetNextMonitorRunTime();
+        }
+
+        private DateTimeOffset GetNextMonitorRunTime()
         {
             DateTimeOffset LogAndReturn(string message, DateTimeOffset delay)
             {
@@ -78,8 +133,6 @@ namespace web.BackgroundServices
                 return delay;
             }
             
-            // we want it to run an hour before close
-
             var currentTimeInEastern = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
             var nextRunTime = 
                 currentTimeInEastern.TimeOfDay switch {
@@ -87,55 +140,19 @@ namespace web.BackgroundServices
                     LogAndReturn(
                         "After the end of the market day",
                         _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date.AddDays(1))
-                            .AddHours(-1)
+                            .AddMinutes(-30)
                     ),
                 var t when t < web.Utils.MarketHours.StartTime => 
                     LogAndReturn(
                         "Before the start of the market day",
                         _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date)
-                            .AddHours(-1)
+                            .AddMinutes(-30)
                     ),
                 var t when t < web.Utils.MarketHours.CloseToEndTime =>
                     LogAndReturn(
                         "In the middle of the day",
                         _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date)
-                        .AddHours(-1)
-                    ),
-                    
-                _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
-            };
-
-            return nextRunTime;
-        }
-
-        private DateTimeOffset GetNextGapUpMonitorRunTime()
-        {
-            DateTimeOffset LogAndReturn(string message, DateTimeOffset delay)
-            {
-                _logger.LogInformation(message);
-                return delay;
-            }
-            
-            var currentTimeInEastern = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
-            var nextRunTime = 
-                currentTimeInEastern.TimeOfDay switch {
-                var t when t >= web.Utils.MarketHours.CloseToEndTime => 
-                    LogAndReturn(
-                        "After the end of the market day",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date.AddDays(1))
-                            .AddMinutes(5)
-                    ),
-                var t when t < web.Utils.MarketHours.StartTime => 
-                    LogAndReturn(
-                        "Before the start of the market day",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
-                            .AddMinutes(5)
-                    ),
-                var t when t < web.Utils.MarketHours.CloseToEndTime =>
-                    LogAndReturn(
-                        "In the middle of the day",
-                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date)
-                        .AddMinutes(-15)
+                        .AddMinutes(-30)
                     ),
                     
                 _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
@@ -178,13 +195,13 @@ namespace web.BackgroundServices
                 var gap = gaps[0];
 
                 _container.Register(
-                    new GapUpMonitor(ticker: ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: user.Id)
+                    GapUpMonitor.Create(ticker: ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: user.Id)
                 );
             }
         
             _logger.LogInformation($"Finished gap up monitoring for {tickers.Length} tickers");
 
-            _nextGapUpRun = GetNextGapUpMonitorRunTime();
+            _nextGapUpRun = GetNextMonitorRunTime();
         }
 
         private async Task MonitorForUpsideReversals(CancellationToken ct)
@@ -214,23 +231,22 @@ namespace web.BackgroundServices
                 var patterns = PatternDetection.Generate(prices.Success).ToList();
                 if (patterns.Count == 0)
                 {
-                    _container.Deregister(PatternDetection.UpsideReversalName, ticker, user.Id);
+                    _container.Deregister(UpsideReversalAlert.Description, ticker, user.Id);
                     continue;
                 }
 
                 _container.Register(
-                    new AlwaysOnMonitor(
-                        description: $"Upside reversal for {ticker}",
-                        source: PatternDetection.UpsideReversalName,
+                    UpsideReversalAlert.Create(
+                        price: prices.Success.Last().Close,
+                        when: DateTimeOffset.UtcNow,
                         ticker: ticker,
-                        userId: user.Id,
-                        value: 0
+                        userId: user.Id
                 ));
             }
         
             _logger.LogInformation($"Finished {UPSIDE_REVERSAL_TAG} monitoring for {tickers.Length} tickers");
 
-            _nextUpsideReversalRun = GetNextUpsideReveralMonitorRunTime();
+            _nextUpsideReversalRun = GetNextMonitorRunTime();
         }
 
         private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(User user, string ticker)
