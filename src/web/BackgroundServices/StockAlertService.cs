@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core;
 using core.Account;
+using core.Adapters.Emails;
 using core.Alerts;
 using core.Alerts.Services;
 using core.Shared;
@@ -20,6 +21,7 @@ namespace web.BackgroundServices
         private IAccountStorage _accounts;
         private IBrokerage _brokerage;
         private StockAlertContainer _container;
+        private IEmailService _emails;
         private ILogger<StockAlertService> _logger;
         private IMarketHours _marketHours;
         private IPortfolioStorage _portfolio;
@@ -28,6 +30,7 @@ namespace web.BackgroundServices
             IAccountStorage accounts,
             IBrokerage brokerage,
             StockAlertContainer container,
+            IEmailService emails,
             ILogger<StockAlertService> logger,
             IMarketHours marketHours,
             IPortfolioStorage portfolio)
@@ -35,6 +38,7 @@ namespace web.BackgroundServices
             _accounts = accounts;
             _brokerage = brokerage;
             _container = container;
+            _emails = emails;
             _logger = logger;
             _marketHours = marketHours;
             _portfolio = portfolio;
@@ -42,11 +46,13 @@ namespace web.BackgroundServices
 
         private const string GAP_UP_TAG = "monitor:gapup";
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
-        private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
-        private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
         private List<AlertCheck> _gapUpChecks;
         private List<AlertCheck> _upsideReversalChecks;
 
+        private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
+        private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
+        private DateTimeOffset _nextEmailSend = DateTimeOffset.MinValue;
+        
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -55,7 +61,7 @@ namespace web.BackgroundServices
                 {
                     if (DateTimeOffset.UtcNow > _nextAlertUpdateRun || _container.ManualRunRequested())
                     {
-                        var user = await _accounts.GetUserByEmail("laimis@gmail.com");
+                        var user = await GetUser();
                         if (user == null)
                         {
                             _logger.LogCritical("No user found for stock alert service");
@@ -99,7 +105,7 @@ namespace web.BackgroundServices
                             _upsideReversalChecks.Remove(completed);
                         }
                         
-                        _container.AddNotice($"{upsideReversalsCompleted.Count} gap up checks completed, {_upsideReversalChecks.Count} remaining");
+                        _container.AddNotice($"{upsideReversalsCompleted.Count} reversal checks completed, {_upsideReversalChecks.Count} remaining");
                     }
 
                     if (DateTimeOffset.UtcNow > _nextStopLossCheck)
@@ -107,6 +113,13 @@ namespace web.BackgroundServices
                         await MonitorForStops(stoppingToken);
                         _nextStopLossCheck = GetNextStopLossCheckTime();
                         _container.AddNotice("Stop loss monitor complete, next run at " + _nextStopLossCheck);
+                    }
+
+                    if (DateTimeOffset.UtcNow > _nextEmailSend)
+                    {
+                        await SendAlertSummaryEmail();
+                        _nextEmailSend = GetNextEmailSendTime();
+                        _container.AddNotice("Emails sent, next run at " + _nextEmailSend);
                     }
 
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
@@ -118,6 +131,69 @@ namespace web.BackgroundServices
                     await Task.Delay(TimeSpan.FromMinutes(10));
                 }
             }
+        }
+
+        private async Task<User> GetUser()
+        {
+            return await _accounts.GetUserByEmail("laimis@gmail.com");
+        }
+
+        private DateTimeOffset GetNextEmailSendTime()
+        {
+            // we want email to be sent 1 hour before close
+            var currentTime = DateTimeOffset.UtcNow;
+
+            var currentTimeInEastern = _marketHours.ToMarketTime(currentTime);
+            var oneHourBeforeClose = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
+                .AddHours(-1);
+
+            var nextRunTime = 
+                currentTime.TimeOfDay switch {
+                var t when t >= oneHourBeforeClose.TimeOfDay => 
+                    oneHourBeforeClose.AddDays(1),
+                var t when t < web.Utils.MarketHours.StartTime => 
+                    oneHourBeforeClose,
+                var t when t < oneHourBeforeClose.TimeOfDay =>
+                    oneHourBeforeClose,
+                _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
+            };
+
+            return nextRunTime;
+        }
+
+        private async Task SendAlertSummaryEmail()
+        {
+            var user = await GetUser();
+            if (user == null)
+            {
+                _logger.LogError("Could not find user for email sending");
+                return;
+            }
+
+            // get all alerts for that user
+            var alerts = _container.GetAlerts(user.Id);
+
+            var data = new {
+                alerts = alerts.Select(ToEmailData)
+            };
+
+            await _emails.Send(
+                new Recipient(email: user.State.Email, name: user.State.Name),
+                Sender.NoReply,
+                EmailTemplate.Alerts,
+                data
+            );
+
+        }
+
+        private object ToEmailData(TriggeredAlert alert)
+        {
+            return new {
+                ticker = (string)alert.ticker,
+                value = alert.triggeredValue,
+                description = alert.description,
+                time = _marketHours.ToMarketTime(alert.when).ToString("HH:mm") + " ET"
+            };
         }
 
         private async Task MonitorForStops(CancellationToken stoppingToken)

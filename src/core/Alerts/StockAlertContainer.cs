@@ -13,7 +13,7 @@ namespace core.Alerts
         private const int MAX_RECENT_ALERTS = 20;
         private const int RECENT_ALERT_HOUR_THRESHOLD = 8; // alerts within eight hour are considered to be recent
 
-        public IEnumerable<TriggeredAlert> Alerts => _alerts.Values;
+        // internal IEnumerable<TriggeredAlert> Alerts => _alerts.Values;
 
         private bool _manualRun = false;
         public void RequestManualRun() => _manualRun = true;
@@ -50,7 +50,7 @@ namespace core.Alerts
             .ThenByDescending(a => a.when)
             .ToList();
 
-        internal List<TriggeredAlert> GetAlerts(Guid userId) => 
+        public List<TriggeredAlert> GetAlerts(Guid userId) => 
             _alerts.Values.Where(m => m.userId == userId)
             .ToList();
 
