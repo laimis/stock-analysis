@@ -24,7 +24,7 @@ namespace core.Alerts
 
             public Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                _container.EnableManualRun();
+                _container.RequestManualRun();
 
                 return Task.FromResult(Unit.Value);
             }

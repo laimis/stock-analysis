@@ -16,9 +16,9 @@ namespace core.Alerts
         public IEnumerable<TriggeredAlert> Alerts => _alerts.Values;
 
         private bool _manualRun = false;
-        public void EnableManualRun() => _manualRun = true;
+        public void RequestManualRun() => _manualRun = true;
         public bool ManualRunRequested() => _manualRun;
-        public void DisableManualRun() => _manualRun = false;
+        public void ManualRunCompleted() => _manualRun = false;
 
         public void Register(TriggeredAlert alert)
         {

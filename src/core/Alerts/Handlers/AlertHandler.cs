@@ -1,13 +1,10 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using core.Stocks;
 
 namespace core.Alerts
 {
-    // NOTE: implementations are currently empty on purpose. Previously
-    // we would update alerts container immediately, but with some changes
-    // to the monitoring model, there is no need to do so. we might go back
-    // to the model where these updates are needed, so I left the stubs in place
     public class AlertHandler :
         MediatR.INotificationHandler<StockPurchased_v2>,
         MediatR.INotificationHandler<StockSold>,
@@ -25,21 +22,34 @@ namespace core.Alerts
 
         public Task Handle(StockPurchased_v2 notification, CancellationToken cancellationToken)
         {
+            return RequestManualRun();
+        }
+
+        private Task RequestManualRun()
+        {
+            _container.RequestManualRun();
+
             return Task.CompletedTask;
         }
 
         public Task Handle(StockSold notification, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return RemoveStopAlerts(notification.Ticker, notification.UserId);
         }
 
         public Task Handle(StopPriceSet notification, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return RemoveStopAlerts(notification.Ticker, notification.UserId);
         }
 
         public Task Handle(StopDeleted notification, CancellationToken cancellationToken)
         {
+            return RemoveStopAlerts(notification.Ticker, notification.UserId);
+        }
+
+        private Task RemoveStopAlerts(string ticker, Guid userId)
+        {
+            _container.Deregister(StopPriceMonitor.Description, ticker, userId);
             return Task.CompletedTask;
         }
     }

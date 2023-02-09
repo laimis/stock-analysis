@@ -61,7 +61,7 @@ namespace web.BackgroundServices
                         _container.AddNotice("Stock alert monitor complete, next run at " + _nextAlertUpdateRun);
                     }
 
-                    _container.DisableManualRun();
+                    _container.ManualRunCompleted();
 
                     if (DateTimeOffset.UtcNow > _nextStopLossCheck)
                     {
