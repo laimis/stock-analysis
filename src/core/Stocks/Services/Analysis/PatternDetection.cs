@@ -47,6 +47,11 @@ namespace core.Stocks.Services.Analysis
         public const string Highest1YearVolumeName = "Highest 1 year volume";
         private static Pattern? Highest1YearVolume(PriceBar[] bars)
         {
+            if (bars.Length == 0)
+            {
+                return null;
+            }
+            
             // find the starting bar, which is higher date than 1 year ago
             var startIndex = bars.Length - 1;
             var thresholdDate = System.DateTime.Now.AddYears(-1);

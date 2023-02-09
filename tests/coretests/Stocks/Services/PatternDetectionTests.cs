@@ -84,5 +84,13 @@ namespace coretests.Stocks.Services
 
             Assert.Empty(patterns);
         }
+
+        [Fact]
+        public void Generate_WithEmptyBars_DoesNotBlowUp()
+        {
+            var bars = new PriceBar[0];
+            var patterns = PatternDetection.Generate(bars);
+            Assert.Empty(patterns);
+        }
     }
 }
