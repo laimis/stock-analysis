@@ -59,7 +59,7 @@ namespace web.BackgroundServices
                         _nextAlertUpdateRun = GetNextMonitorRunTime();
 
                         _container.AddNotice(
-                            $"Stock alert monitor complete with {gapFailures} gap failures, next run at {_nextAlertUpdateRun}"
+                            $"Stock alert monitor complete with {gapFailures} gap failures and {upsideFailures} upside failures, next run at {_nextAlertUpdateRun}"
                         );
                     }
 
