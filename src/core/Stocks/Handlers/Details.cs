@@ -42,13 +42,6 @@ namespace core.Stocks
                 }
 
                 var profileResponse = await _brokerage.GetStockProfile(user.State, request.Ticker);
-                if (!profileResponse.IsOk)
-                {
-                    throw new InvalidOperationException(
-                        "Failed to get company profile: " + profileResponse.Error.Message
-                    );
-                }
-                
                 var price = await _brokerage.GetQuote(user.State, request.Ticker);
 
                 return new StockDetailsView

@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core;
 using core.Account;
 using core.Alerts;
+using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.Services.Analysis;
@@ -42,6 +44,8 @@ namespace web.BackgroundServices
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
         private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
         private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
+        private List<AlertCheck> _gapUpChecks;
+        private List<AlertCheck> _upsideReversalChecks;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -51,21 +55,52 @@ namespace web.BackgroundServices
                 {
                     if (DateTimeOffset.UtcNow > _nextAlertUpdateRun || _container.ManualRunRequested())
                     {
-                        _container.AddNotice("Running stock alert monitor");
+                        var user = await _accounts.GetUserByEmail("laimis@gmail.com");
+                        if (user == null)
+                        {
+                            _logger.LogCritical("No user found for stock alert service");
+                            _container.AddNotice("No user found for stock alert service");
+                            break;
+                        }
 
-                        var (gapFailures, gapChecks) = await MonitorForGaps(stoppingToken);
-                        var (upsideFailures, upsideChecks) = await MonitorForUpsideReversals(stoppingToken);
-                        
+                        _gapUpChecks = await AlertCheckGenerator.GetStocksFromListsWithTagsAsync(
+                            _portfolio, GAP_UP_TAG, user.State
+                        );
+
+                        _upsideReversalChecks = await AlertCheckGenerator.GetStocksFromListsWithTagsAsync(
+                            _portfolio, UPSIDE_REVERSAL_TAG, user.State
+                        );
+
                         _nextAlertUpdateRun = GetNextMonitorRunTime();
 
-                        var nextRunInET = _marketHours.ToMarketTime(_nextAlertUpdateRun);
+                        _container.ManualRunCompleted();
 
-                        var statsMessage = $"Stock alert monitor complete with {gapFailures} gap failures and {upsideFailures} upside failures, and total checked of {gapChecks + upsideChecks}, next run at {nextRunInET}";
-
-                        _container.AddNotice(statsMessage);
+                        _container.AddNotice(
+                            $"Alert check generator added {_gapUpChecks.Count + _upsideReversalChecks.Count} checks, next run at {_nextAlertUpdateRun}"
+                        );
                     }
 
-                    _container.ManualRunCompleted();
+                    if (_gapUpChecks.Count > 0)
+                    {
+                        var gapUpsCompleted = await MonitorForGaps(_gapUpChecks, stoppingToken);
+                        foreach(var completed in gapUpsCompleted)
+                        {
+                            _gapUpChecks.Remove(completed);
+                        }
+
+                        _container.AddNotice($"{gapUpsCompleted.Count} gap up checks completed, {_gapUpChecks.Count} remaining");
+                    }
+
+                    if (_upsideReversalChecks.Count > 0)
+                    {
+                        var upsideReversalsCompleted = await MonitorForUpsideReversals(_upsideReversalChecks, stoppingToken);
+                        foreach(var completed in upsideReversalsCompleted)
+                        {
+                            _upsideReversalChecks.Remove(completed);
+                        }
+                        
+                        _container.AddNotice($"{upsideReversalsCompleted.Count} gap up checks completed, {_upsideReversalChecks.Count} remaining");
+                    }
 
                     if (DateTimeOffset.UtcNow > _nextStopLossCheck)
                     {
@@ -177,8 +212,8 @@ namespace web.BackgroundServices
                 var t when t < web.Utils.MarketHours.CloseToEndTime =>
                     LogAndReturn(
                         "In the middle of the day",
-                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date)
-                        .AddMinutes(-30)
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
+                        .Add(web.Utils.MarketHours.CloseToEndTime)
                     ),
                     
                 _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
@@ -187,91 +222,68 @@ namespace web.BackgroundServices
             return nextRunTime;
         }
 
-        private async Task<(int, int)> MonitorForGaps(CancellationToken ct)
+        private async Task<List<AlertCheck>> MonitorForGaps(List<AlertCheck> checks, CancellationToken ct)
         {
-            var failures = 0;
-            var tickersChecked = 0;
+            var completed = new List<AlertCheck>();
 
-            var (user, tickers) = await GetStocksFromListsWithTags(GAP_UP_TAG);
-            if (user == null)
-            {
-                _logger.LogCritical("User not found for gap monitoring");
-                failures++;
-                return (failures, tickersChecked);
-            }
-
-            foreach (var ticker in tickers)
+            foreach (var c in checks)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return (failures, tickersChecked);
+                    return completed;
                 }
 
-                tickersChecked++;
-
-                var prices = await GetPricesForTicker(user, ticker);
+                var prices = await GetPricesForTicker(c.user, c.ticker);
 
                 if (!prices.IsOk)
                 {
-                    _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
-                    failures++;
+                    _logger.LogCritical($"Failed to get price history for {c.ticker}: {prices.Error.Message}");
                     continue;
                 }
+
+                completed.Add(c);
 
                 var gaps = GapAnalysis.Generate(prices.Success, 2);
                 if (gaps.Count == 0 || gaps[0].type != GapType.Up)
                 {
-                    _container.Deregister(GapUpMonitor.GapUp, ticker, user.Id);
+                    _container.Deregister(GapUpMonitor.GapUp, c.ticker, c.user.Id);
                     continue;
                 }
 
                 var gap = gaps[0];
 
                 _container.Register(
-                    GapUpMonitor.Create(ticker: ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: user.Id)
+                    GapUpMonitor.Create(ticker: c.ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id)
                 );
             }
         
-            _logger.LogInformation($"Finished gap up monitoring for {tickers.Length} tickers, with {failures} failures");
-
-            return (failures, tickersChecked);
+            return completed;
         }
 
-        private async Task<(int, int)> MonitorForUpsideReversals(CancellationToken ct)
+        private async Task<List<AlertCheck>> MonitorForUpsideReversals(List<AlertCheck> checks, CancellationToken ct)
         {
-            var failures = 0;
-            var tickersChecked = 0;
+            var completed = new List<AlertCheck>();
 
-            var (user, tickers) = await GetStocksFromListsWithTags(UPSIDE_REVERSAL_TAG);
-            if (user == null)
-            {
-                _logger.LogCritical($"User not found for {UPSIDE_REVERSAL_TAG} monitoring");
-                failures++;
-                return (failures, tickersChecked);
-            }
-
-            foreach (var ticker in tickers)
+            foreach (var c in checks)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return (failures, tickersChecked);
+                    return completed;
                 }
 
-                tickersChecked++;
-
-                var prices = await GetPricesForTicker(user, ticker);
-
+                var prices = await GetPricesForTicker(user: c.user, ticker: c.ticker);
                 if (!prices.IsOk)
                 {
-                    _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
-                    failures++;
+                    _logger.LogCritical($"Failed to get price history for {c.ticker}: {prices.Error.Message}");
                     continue;
                 }
+
+                completed.Add(c);
 
                 var patterns = PatternDetection.Generate(prices.Success).ToList();
                 if (patterns.Count == 0)
                 {
-                    _container.Deregister(UpsideReversalAlert.Description, ticker, user.Id);
+                    _container.Deregister(UpsideReversalAlert.Description, c.ticker, c.user.Id);
                     continue;
                 }
 
@@ -279,41 +291,26 @@ namespace web.BackgroundServices
                     UpsideReversalAlert.Create(
                         price: prices.Success.Last().Close,
                         when: DateTimeOffset.UtcNow,
-                        ticker: ticker,
-                        userId: user.Id
+                        ticker: c.ticker,
+                        userId: c.user.Id
                 ));
             }
         
-            _logger.LogInformation($"Finished {UPSIDE_REVERSAL_TAG} monitoring for {tickers.Length} tickers with {failures} failures");
-
-            return (failures, tickersChecked);
+            return completed;
         }
 
-        private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(User user, string ticker)
+        private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(UserState user, string ticker)
         {
             var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-7));
             var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
             var prices = await _brokerage.GetPriceHistory(
-                state: user.State,
+                state: user,
                 ticker: ticker,
                 frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
                 start: start,
                 end: end
             );
             return prices;
-        }
-
-        private async Task<(User, string[])> GetStocksFromListsWithTags(string tag)
-        {
-            var user = await _accounts.GetUserByEmail("laimis@gmail.com");
-    
-            var list = await _portfolio.GetStockLists(user.Id);
-
-            var tickerList = list
-                .Where(l => l.State.ContainsTag(tag))
-                .SelectMany(x => x.State.Tickers).Select(t => t.Ticker).ToArray();
-
-            return (user, tickerList);
         }
     }
 }

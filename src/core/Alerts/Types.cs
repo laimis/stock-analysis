@@ -1,9 +1,15 @@
 using System;
+using core.Account;
 using core.Shared;
 using core.Stocks.Services.Analysis;
 
 namespace core.Alerts
 {
+    public record struct AlertCheck(
+        string ticker,
+        UserState user
+    );
+
     public record struct TriggeredAlert(
         decimal triggeredValue,
         decimal watchedValue,

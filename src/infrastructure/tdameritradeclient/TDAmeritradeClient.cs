@@ -447,6 +447,15 @@ public class TDAmeritradeClient : IBrokerage
 
         if (response.Error != null)
         {
+            // TD Ameritrade has a limit that is not properly enforced,
+            // and the rate limiter I use does not always align with theirs
+            // so adding this to stall a bit when we run into this error
+            if (response.Error.Message.Contains("Individual App's transactions per seconds restriction reached"))
+            {
+                _logger?.LogError("TD Ameritrade rate limit reached, should consider stalling...");
+                // await Task.Delay(1000);
+            }
+
             return new ServiceResponse<PriceBar[]>(response.Error);
         }
 
