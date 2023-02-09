@@ -53,14 +53,16 @@ namespace web.BackgroundServices
                     {
                         _container.AddNotice("Running stock alert monitor");
 
-                        var gapFailures = await MonitorForGaps(stoppingToken);
-                        var upsideFailures = await MonitorForUpsideReversals(stoppingToken);
+                        var (gapFailures, gapChecks) = await MonitorForGaps(stoppingToken);
+                        var (upsideFailures, upsideChecks) = await MonitorForUpsideReversals(stoppingToken);
                         
                         _nextAlertUpdateRun = GetNextMonitorRunTime();
 
-                        _container.AddNotice(
-                            $"Stock alert monitor complete with {gapFailures} gap failures and {upsideFailures} upside failures, next run at {_nextAlertUpdateRun}"
-                        );
+                        var nextRunInET = _marketHours.ToMarketTime(_nextAlertUpdateRun);
+
+                        var statsMessage = $"Stock alert monitor complete with {gapFailures} gap failures and {upsideFailures} upside failures, and total checked of {gapChecks + upsideChecks}, next run at {nextRunInET}";
+
+                        _container.AddNotice(statsMessage);
                     }
 
                     _container.ManualRunCompleted();
@@ -185,23 +187,27 @@ namespace web.BackgroundServices
             return nextRunTime;
         }
 
-        private async Task<int> MonitorForGaps(CancellationToken ct)
+        private async Task<(int, int)> MonitorForGaps(CancellationToken ct)
         {
             var failures = 0;
+            var tickersChecked = 0;
 
             var (user, tickers) = await GetStocksFromListsWithTags(GAP_UP_TAG);
             if (user == null)
             {
                 _logger.LogCritical("User not found for gap monitoring");
-                return 1;
+                failures++;
+                return (failures, tickersChecked);
             }
 
             foreach (var ticker in tickers)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return failures;
+                    return (failures, tickersChecked);
                 }
+
+                tickersChecked++;
 
                 var prices = await GetPricesForTicker(user, ticker);
 
@@ -228,25 +234,30 @@ namespace web.BackgroundServices
         
             _logger.LogInformation($"Finished gap up monitoring for {tickers.Length} tickers, with {failures} failures");
 
-            return failures;
+            return (failures, tickersChecked);
         }
 
-        private async Task<int> MonitorForUpsideReversals(CancellationToken ct)
+        private async Task<(int, int)> MonitorForUpsideReversals(CancellationToken ct)
         {
             var failures = 0;
+            var tickersChecked = 0;
+
             var (user, tickers) = await GetStocksFromListsWithTags(UPSIDE_REVERSAL_TAG);
             if (user == null)
             {
                 _logger.LogCritical($"User not found for {UPSIDE_REVERSAL_TAG} monitoring");
-                return 1;
+                failures++;
+                return (failures, tickersChecked);
             }
 
             foreach (var ticker in tickers)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return failures;
+                    return (failures, tickersChecked);
                 }
+
+                tickersChecked++;
 
                 var prices = await GetPricesForTicker(user, ticker);
 
@@ -275,7 +286,7 @@ namespace web.BackgroundServices
         
             _logger.LogInformation($"Finished {UPSIDE_REVERSAL_TAG} monitoring for {tickers.Length} tickers with {failures} failures");
 
-            return failures;
+            return (failures, tickersChecked);
         }
 
         private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(User user, string ticker)
