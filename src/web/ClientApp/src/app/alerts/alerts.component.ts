@@ -2,6 +2,7 @@ import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService } from 'src/app/services/stocks.service';
 import { charts_getTradingViewLink } from '../services/links.service';
+import { toggleVisuallyHidden } from '../services/utils';
 
 @Component({
   selector: 'app-alerts',
@@ -46,6 +47,20 @@ export class AlertsComponent implements OnInit {
 
       this.alertGroups = groups
     });
+  }
+
+  toggleVisibility(elem){
+    toggleVisuallyHidden(elem);
+  }
+
+  scheduled:boolean = false
+  scheduleRun() {
+    this.stockService.scheduleAlertRun().subscribe(
+      () => {
+      console.log("scheduled")
+      this.scheduled = true
+      },
+    );
   }
 
   getTradingViewLink(ticker:string){

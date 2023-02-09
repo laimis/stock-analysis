@@ -41,6 +41,10 @@ namespace web.Controllers
         [HttpPost("sms/off")]
         public Task SmsOff() => _mediator.Send(new SmsOff.Command());
 
+        [Authorize("admin")]
+        [HttpPost("run")]
+        public Task Run() => _mediator.Send(new Run.Command(User.Identifier()));
+
         [HttpGet]
         public Task<object> Index() =>
             _mediator.Send(new core.Alerts.Get.Query(User.Identifier()));

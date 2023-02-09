@@ -1,5 +1,34 @@
 <div *ngIf="alertGroups">
 
+  <section>
+    <button class="btn btn-primary me-2" (click)="scheduleRun()">
+      Schedule Check
+    </button>
+    <button class="btn btn-primary me-2" (click)="toggleVisibility(messagesSection)" *ngIf="!hideMessages">
+      Toggle Messages ({{container.messages.length}})
+    </button>
+
+    <div class="alert alert-success mt-3" role="alert" *ngIf="scheduled">
+      Scheduled!
+    </div>
+  </section>
+
+  <section #messagesSection class="visually-hidden">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Message</th>
+          <th>date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alert of container.messages">
+          <td>{{alert.message}}</td>
+          <td>{{alert.when | date:'medium'}}</td>
+        </tr>
+    </table>
+  </section>
+
   <ng-container *ngFor="let g of alertGroups">
 
     <section>
@@ -39,23 +68,6 @@
   
   <section *ngIf="!container.alerts">
     No alerts were triggered
-  </section>
-
-  <section *ngIf="!hideMessages && container.messages" >
-    <h5>Messages</h5>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>Message</th>
-          <th>date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let alert of container.messages">
-          <td>{{alert.message}}</td>
-          <td>{{alert.when | date:'medium'}}</td>
-        </tr>
-    </table>
   </section>
 
   <section *ngIf="!hideRecentTriggered">

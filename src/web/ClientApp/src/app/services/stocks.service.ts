@@ -57,6 +57,10 @@ export class StocksService {
     return this.http.post<any>('/api/alerts/sms/on', {})
   }
 
+  scheduleAlertRun(): Observable<any> {
+    return this.http.post<any>('/api/alerts/run', {})
+  }
+
   sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
     return this.http.post<object>('/api/admin/email', obj)
   }
