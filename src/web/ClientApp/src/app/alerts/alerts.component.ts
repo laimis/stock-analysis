@@ -1,5 +1,5 @@
 import { CurrencyPipe, PercentPipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService } from 'src/app/services/stocks.service';
 import { charts_getTradingViewLink } from '../services/links.service';
 import { toggleVisuallyHidden } from '../services/utils';
@@ -11,9 +11,10 @@ import { toggleVisuallyHidden } from '../services/utils';
   providers: [PercentPipe, CurrencyPipe]
 })
 
-export class AlertsComponent implements OnInit {
+export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
   container: AlertsContainer;
   alertGroups: StockAlert[][];
+  intervalId: any;
 
   constructor(
     private stockService : StocksService,
@@ -27,7 +28,27 @@ export class AlertsComponent implements OnInit {
   @Input()
   hideMessages : boolean = false;
 
+  @Input()
+  hideScheduling : boolean = false;
+
+  ngAfterViewInit() {
+    this.intervalId = setInterval(() => {
+      this.fetchData()
+    }, 5000);
+  }
+
   ngOnInit(): void {
+    this.fetchData();
+  }
+
+  ngOnDestroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+  }
+
+  fetchData() {
+    console.log("fetching data")
     this.stockService.getAlerts().subscribe(container => {
       this.container = container;
 

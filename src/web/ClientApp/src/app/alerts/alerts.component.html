@@ -1,7 +1,7 @@
 <div *ngIf="alertGroups">
 
   <section>
-    <button class="btn btn-primary me-2" (click)="scheduleRun()">
+    <button class="btn btn-primary me-2" (click)="scheduleRun()" *ngIf="!hideScheduling">
       Schedule Check
     </button>
     <button class="btn btn-primary me-2" (click)="toggleVisibility(messagesSection)" *ngIf="!hideMessages">

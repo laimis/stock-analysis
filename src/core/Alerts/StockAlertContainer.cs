@@ -22,9 +22,16 @@ namespace core.Alerts
 
         public void Register(TriggeredAlert alert)
         {
-            _alerts[new StockPositionMonitorKey(alert.description, alert.ticker, alert.userId)] = alert;
+            var key = new StockPositionMonitorKey(alert.description, alert.ticker, alert.userId);
 
-            AddToRecent(alert);
+            var firstAdd = !_alerts.ContainsKey(key);
+
+            _alerts[key] = alert;
+
+            if (firstAdd)
+            {
+                AddToRecent(alert);
+            }
         }
 
         public void Deregister(string description, string ticker, Guid userId) =>

@@ -41,6 +41,7 @@ namespace web.BackgroundServices
         private const string GAP_UP_TAG = "monitor:gapup";
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
         private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
+        private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -54,8 +55,7 @@ namespace web.BackgroundServices
 
                         await MonitorForGaps(stoppingToken);
                         await MonitorForUpsideReversals(stoppingToken);
-                        await MonitorForStops(stoppingToken);
-
+                        
                         _nextAlertUpdateRun = GetNextMonitorRunTime();
 
                         _container.AddNotice("Stock alert monitor complete, next run at " + _nextAlertUpdateRun);
@@ -63,11 +63,19 @@ namespace web.BackgroundServices
 
                     _container.DisableManualRun();
 
+                    if (DateTimeOffset.UtcNow > _nextStopLossCheck)
+                    {
+                        await MonitorForStops(stoppingToken);
+                        _nextStopLossCheck = GetNextStopLossCheckTime();
+                        _container.AddNotice("Stop loss monitor complete, next run at " + _nextStopLossCheck);
+                    }
+
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogCritical(ex, "Failed while running gap monitor, will sleep");
+                    _logger.LogCritical(ex, "Failed while running alert monitor, will sleep");
+                    _container.AddNotice("Failed while running alert monitor: " + ex.Message);
                     await Task.Delay(TimeSpan.FromMinutes(10));
                 }
             }
@@ -117,6 +125,26 @@ namespace web.BackgroundServices
                         StopPriceMonitor.Description, position.Ticker, user.Id);
                 }
             }
+        }
+
+        
+
+        private DateTimeOffset GetNextStopLossCheckTime()
+        {
+            if (_marketHours.IsMarketOpen(DateTimeOffset.UtcNow))
+            {
+                return DateTimeOffset.UtcNow.AddMinutes(5);
+            }
+            
+            var marketTimeNow = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
+
+            return marketTimeNow.TimeOfDay switch {
+                var t when t <= web.Utils.MarketHours.StartTime => 
+                    _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date).AddMinutes(10),
+                var t when t >= web.Utils.MarketHours.CloseToEndTime => 
+                    _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10),
+                _ => throw new Exception("Should not get here for scheduling stop loss check")
+            };
         }
 
         private DateTimeOffset GetNextMonitorRunTime()
