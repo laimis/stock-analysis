@@ -53,12 +53,14 @@ namespace web.BackgroundServices
                     {
                         _container.AddNotice("Running stock alert monitor");
 
-                        await MonitorForGaps(stoppingToken);
-                        await MonitorForUpsideReversals(stoppingToken);
+                        var gapFailures = await MonitorForGaps(stoppingToken);
+                        var upsideFailures = await MonitorForUpsideReversals(stoppingToken);
                         
                         _nextAlertUpdateRun = GetNextMonitorRunTime();
 
-                        _container.AddNotice("Stock alert monitor complete, next run at " + _nextAlertUpdateRun);
+                        _container.AddNotice(
+                            $"Stock alert monitor complete with {gapFailures} gap failures, next run at {_nextAlertUpdateRun}"
+                        );
                     }
 
                     _container.ManualRunCompleted();
@@ -183,20 +185,22 @@ namespace web.BackgroundServices
             return nextRunTime;
         }
 
-        private async Task MonitorForGaps(CancellationToken ct)
+        private async Task<int> MonitorForGaps(CancellationToken ct)
         {
+            var failures = 0;
+
             var (user, tickers) = await GetStocksFromListsWithTags(GAP_UP_TAG);
             if (user == null)
             {
                 _logger.LogCritical("User not found for gap monitoring");
-                return;
+                return 1;
             }
 
             foreach (var ticker in tickers)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return;
+                    return failures;
                 }
 
                 var prices = await GetPricesForTicker(user, ticker);
@@ -204,6 +208,7 @@ namespace web.BackgroundServices
                 if (!prices.IsOk)
                 {
                     _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
+                    failures++;
                     continue;
                 }
 
@@ -221,23 +226,26 @@ namespace web.BackgroundServices
                 );
             }
         
-            _logger.LogInformation($"Finished gap up monitoring for {tickers.Length} tickers");
+            _logger.LogInformation($"Finished gap up monitoring for {tickers.Length} tickers, with {failures} failures");
+
+            return failures;
         }
 
-        private async Task MonitorForUpsideReversals(CancellationToken ct)
+        private async Task<int> MonitorForUpsideReversals(CancellationToken ct)
         {
+            var failures = 0;
             var (user, tickers) = await GetStocksFromListsWithTags(UPSIDE_REVERSAL_TAG);
             if (user == null)
             {
                 _logger.LogCritical($"User not found for {UPSIDE_REVERSAL_TAG} monitoring");
-                return;
+                return 1;
             }
 
             foreach (var ticker in tickers)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return;
+                    return failures;
                 }
 
                 var prices = await GetPricesForTicker(user, ticker);
@@ -245,6 +253,7 @@ namespace web.BackgroundServices
                 if (!prices.IsOk)
                 {
                     _logger.LogCritical($"Failed to get price history for {ticker}: {prices.Error.Message}");
+                    failures++;
                     continue;
                 }
 
@@ -264,7 +273,9 @@ namespace web.BackgroundServices
                 ));
             }
         
-            _logger.LogInformation($"Finished {UPSIDE_REVERSAL_TAG} monitoring for {tickers.Length} tickers");
+            _logger.LogInformation($"Finished {UPSIDE_REVERSAL_TAG} monitoring for {tickers.Length} tickers with {failures} failures");
+
+            return failures;
         }
 
         private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(User user, string ticker)
