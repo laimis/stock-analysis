@@ -35,7 +35,8 @@ namespace core.Alerts
                 return Task.FromResult<object>(
                     new {
                         alerts,
-                        recentlyTriggered
+                        recentlyTriggered,
+                        messages = _container.GetMessages()
                     }
                 );
             }

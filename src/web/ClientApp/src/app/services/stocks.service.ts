@@ -419,9 +419,15 @@ export interface StockAlert {
   valueType: string
 }
 
+export interface StockAlertMessage {
+  when: string
+  message: string
+}
+
 export interface AlertsContainer {
   alerts: StockAlert[]
   recentlyTriggered: StockAlert[]
+  messages: StockAlertMessage[]
 }
 
 export enum OutcomeValueTypeEnum {

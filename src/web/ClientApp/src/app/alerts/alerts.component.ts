@@ -23,6 +23,9 @@ export class AlertsComponent implements OnInit {
   @Input()
   hideRecentTriggered : boolean = false;
 
+  @Input()
+  hideMessages : boolean = false;
+
   ngOnInit(): void {
     this.stockService.getAlerts().subscribe(container => {
       this.container = container;

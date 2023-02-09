@@ -1,59 +1,82 @@
 <div *ngIf="alertGroups">
+
   <ng-container *ngFor="let g of alertGroups">
 
-    <h3 class="mt-3">{{g[0].description}} ({{g.length}})</h3>
+    <section>
+      <h5>{{g[0].description}} ({{g.length}})</h5>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Description</th>
+            <th>Watched Value</th>
+            <th>Triggered Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let alert of g" 
+            [ngClass]="{
+              'bg-warning': alert.alertType === 'Negative',
+              'bg-success': alert.alertType === 'Positive',
+              'text-white': alert.alertType === 'Positive'
+            }">
+            <td>
+              <a [routerLink]="[ '/stocks', alert.ticker ]">{{alert.ticker}}</a>
+              <a [href]="getTradingViewLink(alert.ticker)" target="_blank">
+                <img class="p-1" src="tradingview.png" height="20px" />
+              </a>
+            </td>
+            <td>
+              {{alert.description}}
+            </td>
+            <td>{{getValue(alert.watchedValue, alert.valueType)}}</td>
+            <td>{{getValue(alert.triggeredValue, alert.valueType)}}</td>
+            <td>Triggered on {{alert.when | date:'short'}}</td>
+          </tr>
+      </table>
+    </section>
+  </ng-container>
+  
+  <section *ngIf="!container.alerts">
+    No alerts were triggered
+  </section>
+
+  <section *ngIf="!hideMessages && container.messages" >
+    <h5>Messages</h5>
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Ticker</th>
-          <th>Description</th>
-          <th>Watched Value</th>
-          <th>Triggered Value</th>
+          <th>Message</th>
+          <th>date</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let alert of g" 
-          [ngClass]="{
-            'bg-warning': alert.alertType === 'Negative',
-            'bg-success': alert.alertType === 'Positive',
-            'text-white': alert.alertType === 'Positive'
-          }">
-          <td>
-            <a [routerLink]="[ '/stocks', alert.ticker ]">{{alert.ticker}}</a>
-            <a [href]="getTradingViewLink(alert.ticker)" target="_blank">
-              <img class="p-1" src="tradingview.png" height="20px" />
-            </a>
-          </td>
-          <td>
-            {{alert.description}}
-          </td>
-          <td>{{getValue(alert.watchedValue, alert.valueType)}}</td>
-          <td>{{getValue(alert.triggeredValue, alert.valueType)}}</td>
-          <td>Triggered on {{alert.when | date:'short'}}</td>
+        <tr *ngFor="let alert of container.messages">
+          <td>{{alert.message}}</td>
+          <td>{{alert.when | date:'medium'}}</td>
         </tr>
     </table>
-  </ng-container>
-  
-  <div *ngIf="!container.alerts">
-    No alerts were triggered
-  </div>
+  </section>
 
-  <h3 *ngIf="!hideRecentTriggered">Recent Triggers</h3>
-  <table *ngIf="container.recentlyTriggered && !hideRecentTriggered" class="table table-hover">
-    <thead>
-      <tr>
-        <th>ticker</th>
-        <th>description</th>
-        <th>date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
-        <td>{{alert.ticker}}</td>
-        <td>{{alert.description}}</td>
-        <td>{{alert.when | date:'short'}}</td>
-      </tr>
-  </table>
+  <section *ngIf="!hideRecentTriggered">
+    <h5>Recent Triggers</h5>
+    <table *ngIf="container.recentlyTriggered && !hideRecentTriggered" class="table table-hover">
+      <thead>
+        <tr>
+          <th>ticker</th>
+          <th>description</th>
+          <th>date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
+          <td>{{alert.ticker}}</td>
+          <td>{{alert.description}}</td>
+          <td>{{alert.when | date:'short'}}</td>
+        </tr>
+    </table>
+  </section>
+
   <div *ngIf="!container.recentlyTriggered">
     No recent triggers
   </div>

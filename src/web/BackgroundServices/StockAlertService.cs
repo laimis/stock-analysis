@@ -39,12 +39,8 @@ namespace web.BackgroundServices
         }
 
         private const string GAP_UP_TAG = "monitor:gapup";
-        private DateTimeOffset _nextGapUpRun = DateTimeOffset.MinValue;
-        
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
-        private DateTimeOffset _nextUpsideReversalRun = DateTimeOffset.MinValue;
-
-        private DateTimeOffset _nextMonitorForStopsRun = DateTimeOffset.MinValue;
+        private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -52,20 +48,20 @@ namespace web.BackgroundServices
             {    
                 try
                 {
-                    if (DateTimeOffset.UtcNow > _nextGapUpRun)
+                    if (DateTimeOffset.UtcNow > _nextAlertUpdateRun || _container.ManualRunRequested())
                     {
+                        _container.AddNotice("Running stock alert monitor");
+
                         await MonitorForGaps(stoppingToken);
-                    }
-
-                    if (DateTimeOffset.UtcNow > _nextUpsideReversalRun)
-                    {
                         await MonitorForUpsideReversals(stoppingToken);
+                        await MonitorForStops(stoppingToken);
+
+                        _nextAlertUpdateRun = GetNextMonitorRunTime();
+
+                        _container.AddNotice("Stock alert monitor complete, next run at " + _nextAlertUpdateRun);
                     }
 
-                    if (DateTimeOffset.UtcNow > _nextMonitorForStopsRun)
-                    {
-                        await MonitorForStops(stoppingToken);
-                    }
+                    _container.DisableManualRun();
 
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
@@ -121,8 +117,6 @@ namespace web.BackgroundServices
                         StopPriceMonitor.Description, position.Ticker, user.Id);
                 }
             }
-
-            _nextMonitorForStopsRun = GetNextMonitorRunTime();
         }
 
         private DateTimeOffset GetNextMonitorRunTime()
@@ -200,8 +194,6 @@ namespace web.BackgroundServices
             }
         
             _logger.LogInformation($"Finished gap up monitoring for {tickers.Length} tickers");
-
-            _nextGapUpRun = GetNextMonitorRunTime();
         }
 
         private async Task MonitorForUpsideReversals(CancellationToken ct)
@@ -245,8 +237,6 @@ namespace web.BackgroundServices
             }
         
             _logger.LogInformation($"Finished {UPSIDE_REVERSAL_TAG} monitoring for {tickers.Length} tickers");
-
-            _nextUpsideReversalRun = GetNextMonitorRunTime();
         }
 
         private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(User user, string ticker)

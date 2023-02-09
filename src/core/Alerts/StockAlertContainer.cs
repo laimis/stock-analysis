@@ -15,12 +15,23 @@ namespace core.Alerts
 
         public IEnumerable<TriggeredAlert> Alerts => _alerts.Values;
 
+        private bool _manualRun = false;
+        public void EnableManualRun() => _manualRun = true;
+        public bool ManualRunRequested() => _manualRun;
+        public void DisableManualRun() => _manualRun = false;
+
         public void Register(TriggeredAlert alert)
         {
             _alerts[new StockPositionMonitorKey(alert.description, alert.ticker, alert.userId)] = alert;
 
             AddToRecent(alert);
         }
+
+        public void Deregister(string description, string ticker, Guid userId) =>
+            _alerts.TryRemove(
+                new StockPositionMonitorKey(description, ticker, userId),
+                out _
+            );
             
 
         private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts =
@@ -35,12 +46,6 @@ namespace core.Alerts
         internal List<TriggeredAlert> GetAlerts(Guid userId) => 
             _alerts.Values.Where(m => m.userId == userId)
             .ToList();
-
-        public void Deregister(string description, string ticker, Guid userId) =>
-            _alerts.TryRemove(
-                new StockPositionMonitorKey(description, ticker, userId),
-                out _
-            );
 
         private void AddToRecent(TriggeredAlert triggeredAlert)
         {
@@ -58,5 +63,20 @@ namespace core.Alerts
 
             list.Add(triggeredAlert);
         }
+
+        public record struct AlertContainerMessage(string message, DateTimeOffset when);
+        private int _messageLimit = 10;
+        private List<AlertContainerMessage> _messages = new List<AlertContainerMessage>();
+        public void AddNotice(string message)
+        {
+            _messages.Add(new AlertContainerMessage(message, DateTimeOffset.Now));
+            if (_messages.Count > _messageLimit)
+            {
+                _messages.RemoveAt(0);
+            }
+        }
+
+        internal IEnumerable<AlertContainerMessage> GetMessages() =>
+            _messages.OrderByDescending(m => m.when);
     }
 }
