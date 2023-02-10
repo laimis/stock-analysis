@@ -679,6 +679,7 @@ export interface TickerPatterns {
 export interface Pattern {
   name: string
   date: string
+  description: string
 }
 
 export interface OutcomesReport {
