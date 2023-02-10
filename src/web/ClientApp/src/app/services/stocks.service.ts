@@ -365,10 +365,14 @@ export class StocksService {
     )
   }
 
-  reportOutcomesSingleBarWeekly(tickers:string[]) : Observable<OutcomesReport> {
+  reportOutcomesSingleBarWeekly(tickers:string[], endDate:string = null) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
       '/api/reports/outcomes', 
-      {tickers, duration: "singlebar", frequency: "weekly"})
+      {
+        tickers, duration: "singlebar",
+        frequency: "weekly",
+        endDate
+      })
   }
 
   reportTickerPercentChangeDistribution(ticker:string): Observable<StockPercentChangeResponse> {

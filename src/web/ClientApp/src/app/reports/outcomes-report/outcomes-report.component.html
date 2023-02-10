@@ -19,6 +19,14 @@
     </app-outcomes-analysis-report>
 
     <app-outcomes *ngIf="singleBarReportDaily" [outcomes]="singleBarReportDaily.outcomes" title="Single Bar Outcome (daily)"></app-outcomes>
+
+    <app-outcomes-analysis-report
+        [report]="singleBarReportWeekly"
+        [showSummary]="true"
+        title="Weekly Report">
+    </app-outcomes-analysis-report>
+    <app-outcomes *ngIf="singleBarReportWeekly" [outcomes]="singleBarReportWeekly.outcomes" title="Single Bar Outcome (weekly)"></app-outcomes>
+
     <app-outcomes *ngIf="allBarsReport" [outcomes]="allBarsReport.outcomes" title="All Bar Outcomes (daily)"></app-outcomes>
     <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
 </div>

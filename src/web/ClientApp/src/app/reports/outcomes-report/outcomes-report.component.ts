@@ -16,6 +16,7 @@ export class OutcomesReportComponent implements OnInit {
   endDate: string = null;
   earnings: string[] = null;
   title: string;
+  singleBarReportWeekly: OutcomesReport;
 
   constructor (
     private stocksService: StocksService,
@@ -68,9 +69,20 @@ export class OutcomesReportComponent implements OnInit {
   private loadSingleBarReport(tickers: string[], earnings: string[]) {
     return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings, this.endDate).subscribe(report => {
       this.singleBarReportDaily = report;
+      this.loadSingleBarReportWeekly(tickers, earnings);
+    }, error => {
+      this.error = error;
+      this.loadSingleBarReportWeekly(tickers, earnings);
+    });
+  }
+
+  private loadSingleBarReportWeekly(tickers: string[], earnings: string[]) {
+    return this.stocksService.reportOutcomesSingleBarWeekly(tickers, this.endDate).subscribe(report => {
+      this.singleBarReportWeekly = report;
       this.loadAllBarsReport(tickers);
     }, error => {
       this.error = error;
+      this.loadAllBarsReport(tickers);
     });
   }
 
