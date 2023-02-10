@@ -38,7 +38,13 @@ namespace core.Stocks.Services.Analysis
             // upside reversal pattern detection
             if (current.Close > previous.Close && current.Low < previous.Low)
             {
-                return new Pattern(date: current.Date, name: UpsideReversalName);
+                var strength = current.Close > System.Math.Max(previous.Open, previous.Close) ?
+                    "Strong" : "Weak";
+
+                return new Pattern(
+                    date: current.Date,
+                    name: UpsideReversalName,
+                    description: $"{UpsideReversalName}: {strength}");
             }
 
             return null;
@@ -85,13 +91,16 @@ namespace core.Stocks.Services.Analysis
 
             if (highestVolumeIndex == bars.Length - 1)
             {
-                return new Pattern(date: bars[^1].Date, name: Highest1YearVolumeName);
+                return new Pattern(
+                    date: bars[^1].Date,
+                    name: Highest1YearVolumeName,
+                    description: $"{Highest1YearVolumeName}: {bars[^1].Volume.ToString("N0")}");
             }
 
             return null;
         }
 
-        public static string XVolumeName() => $"{VolumeMultiplier}X volume";
+        public static string HighVolumeName => $"High Volume";
         private const int VolumeMultiplier = 5;
         private static Pattern? XVolume(PriceBar[] bars)
         {
@@ -102,23 +111,27 @@ namespace core.Stocks.Services.Analysis
             }
 
             // calculate the average volume of the last 60 bars
-            var averageVolume = 0m;
+            var volumeSum = 0m;
             var numberOfBars = 0;
             for (var i = bars.Length - 1; i >= bars.Length - 60 && i >= 0; i--)
             {
-                averageVolume += bars[i].Volume;
+                volumeSum += bars[i].Volume;
                 numberOfBars++;
             }
 
-            averageVolume /= numberOfBars;
+            var averageVolume = volumeSum / numberOfBars;
 
             // now take the last bar volume
             var lastBarVolume = bars[^1].Volume;
+            var multiplier = lastBarVolume / averageVolume;
 
             // if the last bar volume is 10x the average volume, then we have a pattern
-            if (lastBarVolume > averageVolume * VolumeMultiplier)
+            if (lastBarVolume > volumeSum * VolumeMultiplier)
             {
-                return new Pattern(date: bars[^1].Date, name: XVolumeName());
+                return new Pattern(
+                    date: bars[^1].Date,
+                    name: HighVolumeName,
+                    description: $"{HighVolumeName}: {bars[^1].Volume.ToString("N0")} (x{multiplier.ToString("N1")})");
             }
 
             return null;
