@@ -41,7 +41,7 @@ namespace coretests.Stocks.Services
             var patterns = PatternDetection.Generate(barsToTest);
             Assert.Equal(2, patterns.Count());
             Assert.Equal(PatternDetection.Highest1YearVolumeName, patterns.First().name);
-            Assert.Equal(PatternDetection.XVolumeName(), patterns.Last().name);
+            Assert.Equal(PatternDetection.HighVolumeName, patterns.Last().name);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace coretests.Stocks.Services
 
             var patterns = PatternDetection.Generate(bars);
             Assert.Single(patterns);
-            Assert.Equal(PatternDetection.XVolumeName(), patterns.First().name);
+            Assert.Equal(PatternDetection.HighVolumeName, patterns.First().name);
         }
 
         private static PriceBar[] AppendHighVolumeBar(PriceBar[] bars)

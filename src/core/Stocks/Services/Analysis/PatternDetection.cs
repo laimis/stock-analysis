@@ -126,7 +126,7 @@ namespace core.Stocks.Services.Analysis
             var multiplier = lastBarVolume / averageVolume;
 
             // if the last bar volume is 10x the average volume, then we have a pattern
-            if (lastBarVolume > volumeSum * VolumeMultiplier)
+            if (lastBarVolume > averageVolume * VolumeMultiplier)
             {
                 return new Pattern(
                     date: bars[^1].Date,
