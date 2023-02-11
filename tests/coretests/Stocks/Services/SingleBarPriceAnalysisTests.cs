@@ -22,4 +22,27 @@ namespace coretests.Stocks.Services
         [Fact]
         public void OutcomesMatch() => Assert.NotEmpty(_outcomes);
     }
+
+    public class SingleBarPriceAnalysisTests
+    {
+        [Fact]
+        public void Run_WithNewHigh_IncludesNewHighOutcome()
+        {
+            var bars = TestDataGenerator.PriceBars("SHEL");
+
+            var outcomes = SingleBarAnalysisRunner.Run(bars);
+
+            Assert.Contains(outcomes, o => o.key == SingleBarOutcomeKeys.NewHigh && o.value == 1);
+        }
+
+        [Fact]
+        public void Run_WithoutNewHigh_DoesNotIncludeNewHigh()
+        {
+            var bars = TestDataGenerator.PriceBars("NET");
+
+            var outcomes = SingleBarAnalysisRunner.Run(bars);
+
+            Assert.Contains(outcomes, o => o.key == SingleBarOutcomeKeys.NewHigh && o.value == 0);
+        }
+    }
 }

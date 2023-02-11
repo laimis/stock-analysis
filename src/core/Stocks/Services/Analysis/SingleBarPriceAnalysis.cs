@@ -143,7 +143,17 @@ namespace core.Stocks.Services.Analysis
                 }
             );
             
-            var newHigh = newHighsSequence[^1].Equals(currentBar);
+            // new high will get triggered only if it's at least 2 months ago
+            var newHighSequenceLastBar = newHighsSequence[^1];
+            var dayDifferenceBetweenBars = 0d;
+            if (newHighsSequence.Count >= 2)
+            {
+                var newHighSequenceTwoBarsAgo = newHighsSequence[^2];
+                dayDifferenceBetweenBars = (newHighSequenceLastBar.Date - newHighSequenceTwoBarsAgo.Date).TotalDays;
+            }
+            var newHigh = newHighSequenceLastBar.Equals(currentBar)
+                && dayDifferenceBetweenBars > 60;
+
             var newLow = previousBars
                 .Where(b => b.Date >= oneYearAgoDate)
                 .All(x => x.Low > currentBar.Low);
@@ -234,7 +244,7 @@ namespace core.Stocks.Services.Analysis
         }
     }
 
-    internal class SingleBarOutcomeKeys
+    public class SingleBarOutcomeKeys
     {
         public static string RelativeVolume = "RelativeVolume";
         public static string Volume = "Volume";
