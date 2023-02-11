@@ -49,7 +49,7 @@ namespace core.Alerts
 
         private Task RemoveStopAlerts(string ticker, Guid userId)
         {
-            _container.Deregister(StopPriceMonitor.Description, ticker, userId);
+            StopPriceMonitor.Deregister(_container, ticker, userId);
             return Task.CompletedTask;
         }
     }

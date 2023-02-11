@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using core.Alerts;
-using core.Stocks;
 using Xunit;
 
 namespace coretests.Alerts
@@ -16,16 +16,17 @@ namespace coretests.Alerts
             
             _uat = new StockAlertContainer();
 
-            var alert = StopPriceMonitor.Create(
+            foreach(var _ in Enumerable.Range(0, 2))
+            {
+                StopPriceMonitor.Register(
+                    container: _uat,
                     price: 100,
                     stopPrice: 105,
                     ticker: "AMD",
                     when: DateTimeOffset.Now,
                     userId: _userId
                 );
-
-            _uat.Register(alert);
-            _uat.Register(alert);
+            }
         }
 
         [Fact]

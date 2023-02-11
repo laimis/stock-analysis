@@ -22,7 +22,7 @@ namespace core.Alerts
 
         public void Register(TriggeredAlert alert)
         {
-            var key = new StockPositionMonitorKey(alert.description, alert.ticker, alert.userId);
+            var key = new StockPositionMonitorKey(alert.identifier, alert.ticker, alert.userId);
 
             var firstAdd = !_alerts.ContainsKey(key);
 
@@ -34,9 +34,9 @@ namespace core.Alerts
             }
         }
 
-        public void Deregister(string description, string ticker, Guid userId) =>
+        public void Deregister(string identifier, string ticker, Guid userId) =>
             _alerts.TryRemove(
-                new StockPositionMonitorKey(description, ticker, userId),
+                new StockPositionMonitorKey(identifier, ticker, userId),
                 out _
             );
             

@@ -5,18 +5,19 @@ namespace core.Stocks.Services.Analysis
 {
     public class PatternDetection
     {
-        private static readonly System.Func<PriceBar[], Pattern?>[] _patternGenerators = new System.Func<PriceBar[], Pattern?>[]
+        private static readonly Dictionary<string, System.Func<PriceBar[], Pattern?>> _patternGenerators =
+            new Dictionary<string, System.Func<PriceBar[], Pattern?>>
         {
-            UpsideReversal,
-            Highest1YearVolume,
-            XVolume
+            {UpsideReversalName, UpsideReversal},
+            {Highest1YearVolumeName, Highest1YearVolume},
+            {HighVolumeName, HighVolume}
         };
 
         public static IEnumerable<Pattern> Generate(PriceBar[] bars)
         {
             foreach(var generator in _patternGenerators)
             {
-                var pattern = generator(bars);
+                var pattern = generator.Value(bars);
                 if (pattern != null)
                 {
                     yield return pattern.Value;
@@ -100,9 +101,12 @@ namespace core.Stocks.Services.Analysis
             return null;
         }
 
-        public static string HighVolumeName => $"High Volume";
+        public const string HighVolumeName = $"High Volume";
         private const int VolumeMultiplier = 5;
-        private static Pattern? XVolume(PriceBar[] bars)
+
+        public static IEnumerable<string> AvailablePatterns => _patternGenerators.Keys;
+
+        private static Pattern? HighVolume(PriceBar[] bars)
         {
             // if we get too little data, let's not infer that there is a pattern
             if (bars.Length < SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)

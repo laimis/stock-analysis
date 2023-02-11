@@ -224,20 +224,18 @@ namespace web.BackgroundServices
 
                 if (price <= position.StopPrice.Value)
                 {
-                    _container.Register(
-                        StopPriceMonitor.Create(
-                            price: price,
-                            stopPrice: position.StopPrice.Value,
-                            ticker: position.Ticker,
-                            when: DateTimeOffset.UtcNow,
-                            userId: user.Id
-                        )
+                    StopPriceMonitor.Register(
+                        container: _container,
+                        price: price,
+                        stopPrice: position.StopPrice.Value,
+                        ticker: position.Ticker,
+                        when: DateTimeOffset.UtcNow,
+                        userId: user.Id
                     );
                 }
                 else
                 {
-                    _container.Deregister(
-                        StopPriceMonitor.Description, position.Ticker, user.Id);
+                    StopPriceMonitor.Deregister(_container, position.Ticker, user.Id);
                 }
             }
         }
@@ -322,14 +320,15 @@ namespace web.BackgroundServices
                 var gaps = GapAnalysis.Generate(prices.Success, 2);
                 if (gaps.Count == 0 || gaps[0].type != GapType.Up)
                 {
-                    _container.Deregister(GapUpMonitor.GapUp, c.ticker, c.user.Id);
+                    GapUpMonitor.Deregister(_container, c.ticker, c.user.Id);
                     continue;
                 }
 
                 var gap = gaps[0];
 
-                _container.Register(
-                    GapUpMonitor.Create(ticker: c.ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id)
+                GapUpMonitor.Register(
+                    container: _container,
+                    ticker: c.ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id
                 );
             }
         
@@ -359,17 +358,29 @@ namespace web.BackgroundServices
                 var patterns = PatternDetection.Generate(prices.Success).ToList();
                 if (patterns.Count == 0)
                 {
-                    _container.Deregister(UpsideReversalAlert.Description, c.ticker, c.user.Id);
+                    foreach(var patternName in PatternDetection.AvailablePatterns)
+                    {
+                        PatternAlert.Deregister(
+                            container: _container,
+                            ticker: c.ticker,
+                            patternName: patternName,
+                            userId: c.user.Id
+                        );
+                    }
                     continue;
                 }
 
-                _container.Register(
-                    UpsideReversalAlert.Create(
+                foreach(var pattern in patterns)
+                {
+                    PatternAlert.Register(
+                        container: _container,
+                        ticker: c.ticker,
+                        pattern: pattern,
                         price: prices.Success.Last().Close,
                         when: DateTimeOffset.UtcNow,
-                        ticker: c.ticker,
                         userId: c.user.Id
-                ));
+                    );
+                }
             }
         
             return completed;

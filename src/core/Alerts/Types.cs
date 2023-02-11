@@ -11,6 +11,7 @@ namespace core.Alerts
     );
 
     public record struct TriggeredAlert(
+        string identifier,
         decimal triggeredValue,
         decimal watchedValue,
         DateTimeOffset when,
@@ -34,52 +35,36 @@ namespace core.Alerts
 
     public class GapUpMonitor
     {
-        public const string GapUp = "Gap up";
-        
-        public static TriggeredAlert Create(string ticker, Gap gap, DateTimeOffset when, Guid userId)
+        private const string Identifier = "Gap up";
+        private static TriggeredAlert Create(
+            string ticker,
+            Gap gap, DateTimeOffset when, Guid userId)
         {
             return new TriggeredAlert(
+                identifier: Identifier,
                 triggeredValue: gap.gapSizePct,
                 watchedValue: gap.gapSizePct,
                 when: when,
                 ticker: ticker,
-                description: GapUp,
+                description: Identifier,
                 userId: userId,
                 alertType: AlertType.Positive,
                 valueType: Shared.ValueFormat.Percentage
             );
         }
-    }
 
-    public class ProfitPriceMonitor
-    {
-        public const string Description = "Profit target";
+        public static void Deregister(StockAlertContainer container, string ticker, Guid userId) =>
+            container.Deregister(Identifier, ticker, userId);
 
-        public static TriggeredAlert Create(
-            decimal price,
-            decimal watchedValue,
-            string ticker,
-            DateTimeOffset when,
-            Guid userId)
-        {
-            return new TriggeredAlert(
-                triggeredValue: price,
-                watchedValue: watchedValue,
-                when: when,
-                ticker: ticker,
-                description: Description,
-                userId: userId,
-                alertType: AlertType.Positive,
-                valueType: Shared.ValueFormat.Currency
-            );
-        }
+        public static void Register(StockAlertContainer container,
+            string ticker, Gap gap, DateTimeOffset when, Guid userId) =>
+            container.Register(Create(ticker, gap, when, userId));
     }
 
     public class StopPriceMonitor
     {
-        public const string Description = "Stop loss";
-        
-        public static TriggeredAlert Create(
+        private const string Identifier = "Stop price";
+        private static TriggeredAlert Create(
             decimal price,
             decimal stopPrice,
             string ticker,
@@ -87,38 +72,80 @@ namespace core.Alerts
             Guid userId)
         {
             return new TriggeredAlert(
+                identifier: Identifier,
                 triggeredValue: price,
                 watchedValue: stopPrice,
                 when: when,
                 ticker: ticker,
-                description: Description,
+                description: Identifier,
                 userId: userId,
                 alertType: AlertType.Negative,
                 valueType: Shared.ValueFormat.Currency
             );
         }
+
+        public static void Deregister(StockAlertContainer container, string ticker, Guid userId)
+        {
+            container.Deregister(Identifier, ticker, userId);
+        }
+
+        public static void Register(StockAlertContainer container,
+            decimal price,
+            decimal stopPrice,
+            string ticker,
+            DateTimeOffset when,
+            Guid userId)
+        {
+            container.Register(Create(price, stopPrice, ticker, when, userId));
+        }
     }
 
-    public class UpsideReversalAlert
+    public class PatternAlert
     {
-        public const string Description = "Upside reversal";
-        
-        public static TriggeredAlert Create(
+        private static TriggeredAlert Create(
+            string identifier,
+            string description,
             decimal price,
             string ticker,
             DateTimeOffset when,
             Guid userId)
         {
             return new TriggeredAlert(
+                identifier: identifier,
                 triggeredValue: price,
                 watchedValue: price,
                 when: when,
                 ticker: ticker,
-                description: Description,
+                description: description,
                 userId: userId,
                 alertType: AlertType.Positive,
                 valueType: Shared.ValueFormat.Currency
             );
+        }
+
+        public static void Register(
+            StockAlertContainer container,
+            string ticker,
+            Pattern pattern,
+            decimal price,
+            DateTimeOffset when,
+            Guid userId)
+        {
+            container.Register(
+                Create(
+                    identifier: pattern.name,
+                    description: pattern.description,
+                    price: price,
+                    ticker: ticker,
+                    when: when,
+                    userId: userId
+                )
+            );
+        }
+
+        public static void Deregister(StockAlertContainer container, string patternName, string ticker, Guid userId)
+        {
+            container.Deregister(patternName, ticker, userId);
         }
     }
 }
