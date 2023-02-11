@@ -251,12 +251,22 @@ namespace web.BackgroundServices
             
             var marketTimeNow = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
 
+            if (marketTimeNow.DayOfWeek == DayOfWeek.Saturday)
+            {
+                return _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(2)).AddMinutes(10);
+            }
+
+            if (marketTimeNow.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10);
+            }
+
             return marketTimeNow.TimeOfDay switch {
                 var t when t <= web.Utils.MarketHours.StartTime => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date).AddMinutes(10),
                 var t when t >= web.Utils.MarketHours.CloseToEndTime => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10),
-                _ => throw new Exception("Should not get here for scheduling stop loss check")
+                _ => throw new Exception("Should not be possible to get here but did with time: " + marketTimeNow)
             };
         }
 
