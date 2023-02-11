@@ -123,9 +123,27 @@ namespace core.Stocks.Services.Analysis
 
             // see if the latest bar is a one year high or low
             var oneYearAgoDate = currentBar.Date.AddYears(-1);
-            var newHigh = previousBars
-                .Where(b => b.Date >= oneYearAgoDate)
-                .All(x => x.High < currentBar.High);
+            var oneYearAgoIndex = previousBars
+                .Select((x, i) => new { x, i })
+                .Where(x => x.x.Date <= oneYearAgoDate)
+                .Select(x => x.i)
+                .LastOrDefault();
+            // now create a new high sequence from that bar
+            
+            var oneYearAgoBars = bars[oneYearAgoIndex..];
+
+            var newHighsSequence = oneYearAgoBars.Aggregate(
+                seed: new List<PriceBar>{bars[oneYearAgoIndex]},
+                func: (acc, x) => {
+                    var last = acc[^1];
+                    if (x.High > last.High) {
+                        acc.Add(x);
+                    }
+                    return acc;
+                }
+            );
+            
+            var newHigh = newHighsSequence[^1].Equals(currentBar);
             var newLow = previousBars
                 .Where(b => b.Date >= oneYearAgoDate)
                 .All(x => x.Low > currentBar.Low);
