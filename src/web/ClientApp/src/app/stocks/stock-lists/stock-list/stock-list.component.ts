@@ -43,9 +43,18 @@ export class StockListComponent implements OnInit {
   }
 
   add(tickers: string) {
-    tickers.split('\n').forEach(element => {
+    var separator = '\n';
+    if (tickers.includes(',')) {
+      separator = ',';
+    }
+    tickers.split(separator).forEach(element => {
 
       var ticker = element.trim();
+      if (ticker.includes(':'))
+      {
+        ticker = ticker.split(':')[1].trim();
+      }
+      
       if (ticker) {
         this.stockService.addToStockList(this.list.name, ticker).subscribe(_ => {
         }, e => {
