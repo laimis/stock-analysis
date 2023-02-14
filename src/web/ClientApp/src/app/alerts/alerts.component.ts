@@ -15,6 +15,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
   container: AlertsContainer;
   alertGroups: StockAlert[][];
   intervalId: any;
+  lastRefreshed: string;
 
   constructor(
     private stockService : StocksService,
@@ -48,7 +49,6 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchData() {
-    console.log("fetching data")
     this.stockService.getAlerts().subscribe(container => {
       this.container = container;
 
@@ -67,6 +67,8 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
       groups.sort((a,b) => a[0].description.localeCompare(b[0].description));
 
       this.alertGroups = groups
+      this.lastRefreshed = new Date().toLocaleString();
+      this.scheduled = false
     });
   }
 

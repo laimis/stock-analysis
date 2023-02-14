@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Handlers;
 using core.Portfolio.Output;
+using core.Stocks;
 using core.Stocks.Services.Trading;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -115,7 +116,7 @@ namespace web.Controllers
                 )
             );
 
-        [HttpGet("simulate/trades/{ticker}/positions/{positionId}")]
+        [HttpGet("{ticker}/positions/{positionId}/simulate/trades")]
         public Task<TradingStrategyResults> Trade(
             int positionId,
             string ticker) =>
@@ -126,7 +127,7 @@ namespace web.Controllers
                 )
             );
 
-        [HttpGet("profitpoints/{ticker}/positions/{positionId}")]
+        [HttpGet("{ticker}/positions/{positionId}/profitpoints")]
         public Task<core.Stocks.Services.Trading.ProfitPoints.ProfitPointContainer[]> ProfitPoints(
             int positionId,
             string ticker) =>
@@ -137,7 +138,18 @@ namespace web.Controllers
                 )
             );
 
-        [HttpGet("simulate/trades/{ticker}")]
+        [HttpPost("{ticker}/positions/{positionId}/grade")]
+        public Task Grade(
+            int positionId,
+            string ticker,
+            [FromBody]GradePosition.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
+
+        [HttpGet("{ticker}/simulate/trades")]
         public Task<TradingStrategyResults> Trade(
             string ticker,
             [FromQuery]decimal numberOfShares,

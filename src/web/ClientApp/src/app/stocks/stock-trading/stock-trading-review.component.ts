@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomeScoresReport } from 'src/app/services/stocks.service';
+import { GetErrors } from 'src/app/services/utils';
 
 
 @Component({
@@ -101,6 +102,20 @@ export class StockTradingReviewComponent implements OnInit {
 
   sells(positionInstance:PositionInstance) {
     return positionInstance.transactions.filter(t => t.type == 'sell')
+  }
+
+  gradingError: string = null
+  gradingSuccess: string = null
+  assignGrade(grade:string, note:string) {
+    this.stockService.assignGrade(this.currentPosition.ticker, this.currentPosition.positionId, grade, note).subscribe(
+      (_: any) => {
+        this.gradingSuccess = "Grade assigned successfully"
+      },
+      (error) => {
+        let errors = GetErrors(error)
+        this.gradingError = errors.join(', ')
+      }
+    );
   }
 
 }

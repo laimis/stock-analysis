@@ -36,10 +36,10 @@ namespace web.Utils
 
         public DateTimeOffset ToMarketTime(DateTimeOffset when) => ConvertToEastern(when);
 
-        public DateTimeOffset GetMarketStartOfDayTimeInUtc(DateTimeOffset when)
+        public DateTimeOffset GetMarketStartOfDayTimeInUtc(DateTimeOffset eastern)
         {
             return TimeZoneInfo.ConvertTimeToUtc(
-                when.Date.Add(StartTime),
+                eastern.Date.Add(StartTime),
                 _easternZoneId
             );
         }

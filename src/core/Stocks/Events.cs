@@ -179,4 +179,20 @@ namespace core.Stocks
         public Guid UserId { get; }
         public string Ticker { get; }
     }
+
+    public class TradeGradeAssigned : AggregateEvent, INotification
+    {
+        public TradeGradeAssigned(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string grade, string note, int positionId) : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Grade = grade;
+            Note = note;
+            PositionId = positionId;
+        }
+
+        public Guid UserId { get; }
+        public int PositionId { get; }
+        public string Grade { get; }
+        public string Note { get; }
+    }
 }

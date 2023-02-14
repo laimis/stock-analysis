@@ -29,7 +29,7 @@ export class StocksService {
 
   simulatePosition(ticker: string, positionId: number): Observable<TradingStrategyResults> {
     return this.http.get<TradingStrategyResults>(
-      `/api/portfolio/simulate/trades/${ticker}/positions/${positionId}`
+      `/api/portfolio/${ticker}/positions/${positionId}/simulate/trades`
     )
   }
 
@@ -45,7 +45,14 @@ export class StocksService {
 
   getStrategyProfitPoints(ticker: string, positionId: number): Observable<StrategyProfitPoint[]> {
     return this.http.get<StrategyProfitPoint[]>(
-      `/api/portfolio/profitpoints/${ticker}/positions/${positionId}`
+      `/api/portfolio/${ticker}/positions/${positionId}/profitpoints`
+    )
+  }
+
+  assignGrade(ticker: string, positionId: number, grade: string, note: string): Observable<any> {
+    return this.http.post<any>(
+      `/api/portfolio/${ticker}/positions/${positionId}/grade`,
+      { grade, note, ticker, positionId }
     )
   }
 
@@ -868,8 +875,10 @@ export interface PositionInstance {
   unrealizedProfit: number,
   unrealizedRR: number,
   combinedProfit: number,
-  percentToStop: number
-  costAtRiskedBasedOnStopPrice: number
+  percentToStop: number,
+  costAtRiskedBasedOnStopPrice: number,
+  grade: string,
+  gradeNote: string
 }
 
 export interface TradingStrategyResult {

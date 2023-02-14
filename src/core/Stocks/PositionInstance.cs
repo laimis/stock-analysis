@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using core.Shared;
 
 namespace core.Stocks
 {
@@ -81,6 +82,15 @@ namespace core.Stocks
         private decimal CompletedPositionCost = 0;
         public decimal CompletedPositionShares = 0;
         public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
+
+        public string Grade { get; private set; } = null;
+        public string GradeNote { get; private set; } = null;
+        public void SetGrade(TradeGrade grade, string note = null)
+        {
+            Grade = grade;
+            GradeNote = note;
+            Notes.Add(note);
+        }
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {

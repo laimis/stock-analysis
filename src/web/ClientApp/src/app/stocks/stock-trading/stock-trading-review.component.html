@@ -48,5 +48,26 @@
     <h5>Position Information</h5>
     <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
   </section>
+
+  <section>
+    <div *ngIf="gradingError" class="alert alert-danger" role="alert">
+      {{gradingError }}
+    </div>
+    <div *ngIf="gradingSuccess" class="alert alert-success" role="alert">
+      {{gradingSuccess }}
+    </div>
+    <div class="mb-3">
+      <label for="gradeInput" class="form-label">Grade</label>
+      <input #gradeInput value="{{currentPosition.grade}}" type="text" class="form-control" id="gradeInput" aria-describedby="gradeHelp">
+      <div id="gradeHelp" class="form-text">Grade for trade: A, B, C</div>
+    </div>
+    <div class="mb-3">
+      <label for="notesInput" class="form-label">Notes</label>
+      <textarea #gradeNotes class="form-control" id="notesInput" rows="3">{{currentPosition.gradeNote}}</textarea>
+    </div>
+    <div>
+      <button (click)="assignGrade(gradeInput.value, gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
+    </div>
+  </section>
   
 </div>

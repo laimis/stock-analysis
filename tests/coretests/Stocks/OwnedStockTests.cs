@@ -203,5 +203,92 @@ namespace coretests.Stocks
 
             Assert.Null(stock.State.OpenPosition);
         }
+
+        [Fact]
+        public void PositionId_LogicIsCorrect()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            // first time buying, position should be 0
+            // then, once closed out, open position is null
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+
+            Assert.Equal(0, stock.State.OpenPosition.PositionId);
+
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Null(stock.State.OpenPosition);
+
+            // second buy, the position should be 1
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+
+            Assert.Equal(1, stock.State.OpenPosition.PositionId);
+
+            // now, delete the buy, which will kill position
+            var last = stock.State.Transactions.Where(t => !t.IsPL).Last();
+
+            stock.DeleteTransaction(last.EventId);
+
+            Assert.Null(stock.State.OpenPosition);
+
+            // open a new one, should be fresh new position id
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+
+            Assert.Equal(2, stock.State.OpenPosition.PositionId);
+        }
+
+        [Fact]
+        public void AssignGrade_To_OpenPosition_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.AssignGrade(0, "A", "this trade went perfectly!")
+            );
+        }
+
+        [Fact]
+        public void AssignGrade_To_ClosedPosition_Succeeds()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            stock.AssignGrade(0, "A", "this trade went perfectly!");
+
+            Assert.Equal("A", stock.State.Positions[0].Grade);
+            Assert.Equal("this trade went perfectly!", stock.State.Positions[0].GradeNote);
+        }
+
+        [Fact]
+        public void AssignGrade_To_ClosedPosition_UpdatesExistingGrade()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            stock.AssignGrade(0, "A", "this trade went perfectly!");
+            stock.AssignGrade(0, "B", "this trade went perfectly!");
+
+            Assert.Equal("B", stock.State.Positions[0].Grade);
+            Assert.Equal("this trade went perfectly!", stock.State.Positions[0].GradeNote);
+        }
+
+        [Fact]
+        public void AssignInvalidGrade_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Throws<ArgumentException>(() => 
+                stock.AssignGrade(0, "Z", "this trade went perfectly!")
+            );
+        }
     }
 }

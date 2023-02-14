@@ -82,7 +82,7 @@ namespace web.BackgroundServices
                         _container.ManualRunCompleted();
 
                         _container.AddNotice(
-                            $"Alert check generator added {_gapUpChecks.Count + _upsideReversalChecks.Count} checks, next run at {_nextAlertUpdateRun}"
+                            $"Alert check generator added {_gapUpChecks.Count + _upsideReversalChecks.Count} checks, next run at {_marketHours.ToMarketTime(_nextAlertUpdateRun)}"
                         );
                     }
 
@@ -112,14 +112,14 @@ namespace web.BackgroundServices
                     {
                         await MonitorForStops(stoppingToken);
                         _nextStopLossCheck = GetNextStopLossCheckTime();
-                        _container.AddNotice("Stop loss monitor complete, next run at " + _nextStopLossCheck);
+                        _container.AddNotice("Stop loss monitor complete, next run at " + _marketHours.ToMarketTime(_nextStopLossCheck));
                     }
 
                     if (DateTimeOffset.UtcNow > _nextEmailSend)
                     {
                         await SendAlertSummaryEmail();
                         _nextEmailSend = GetNextEmailSendTime();
-                        _container.AddNotice("Emails sent, next run at " + _nextEmailSend);
+                        _container.AddNotice("Emails sent, next run at " + _marketHours.ToMarketTime(_nextEmailSend));
                     }
 
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
@@ -140,20 +140,21 @@ namespace web.BackgroundServices
 
         private DateTimeOffset GetNextEmailSendTime()
         {
-            // we want email to be sent 1 hour before close
             var currentTime = DateTimeOffset.UtcNow;
 
             var currentTimeInEastern = _marketHours.ToMarketTime(currentTime);
             var oneHourBeforeClose = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
                 .AddHours(-1);
+            var afterOpen = _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
+                .AddMinutes(15);
 
             var nextRunTime = 
                 currentTime.TimeOfDay switch {
-                var t when t >= oneHourBeforeClose.TimeOfDay => 
-                    oneHourBeforeClose.AddDays(1),
-                var t when t < web.Utils.MarketHours.StartTime => 
-                    oneHourBeforeClose,
-                var t when t < oneHourBeforeClose.TimeOfDay =>
+                var t when t >= oneHourBeforeClose.TimeOfDay =>  // after market close
+                    afterOpen.AddDays(1),
+                var t when t < web.Utils.MarketHours.StartTime => // before market open
+                    afterOpen,
+                var t when t < oneHourBeforeClose.TimeOfDay => // during market hours
                     oneHourBeforeClose,
                 _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
             };
@@ -240,8 +241,6 @@ namespace web.BackgroundServices
             }
         }
 
-        
-
         private DateTimeOffset GetNextStopLossCheckTime()
         {
             if (_marketHours.IsMarketOpen(DateTimeOffset.UtcNow))
@@ -284,20 +283,20 @@ namespace web.BackgroundServices
                 var t when t >= web.Utils.MarketHours.FifteenMinutesBeforeClose => 
                     LogAndReturn(
                         "After the end of the market day",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date.AddDays(1))
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.AddDays(1))
                             .AddMinutes(15)
                     ),
                 var t when t < web.Utils.MarketHours.StartTime => 
                     LogAndReturn(
                         "Before the start of the market day",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
                             .AddMinutes(15)
                     ),
                 var t when t < web.Utils.MarketHours.FifteenMinutesBeforeClose =>
                     LogAndReturn(
                         "In the middle of the day",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
-                        .Add(web.Utils.MarketHours.FifteenMinutesBeforeClose)
+                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
+                            .AddMinutes(-30)
                     ),
                     
                 _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)

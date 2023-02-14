@@ -17,6 +17,8 @@ namespace core.Stocks
         public List<PositionInstance> Positions { get; } = new List<PositionInstance>();
         public PositionInstance OpenPosition { get; private set;}
 
+        private int _positionId = 0;
+
         internal void ApplyInternal(TickerObtained o)
         {
             Id = o.AggregateId;
@@ -48,14 +50,21 @@ namespace core.Stocks
             OpenPosition.SetRiskAmount(riskAmountSet.RiskAmount, riskAmountSet.When);
         }
 
+        internal void ApplyInternal(TradeGradeAssigned gradeAssigned)
+        {
+            var position = Positions.Single(x => x.PositionId == gradeAssigned.PositionId);
+            position.SetGrade(gradeAssigned.Grade, gradeAssigned.Note);
+        }
+
         internal void ApplyInternal(StockPurchased_v2 purchased)
         {
             BuyOrSell.Add(purchased);
 
             if (OpenPosition == null)
             {
-                OpenPosition = new PositionInstance(Positions.Count, purchased.Ticker);
+                OpenPosition = new PositionInstance(_positionId, purchased.Ticker);
                 Positions.Add(OpenPosition);
+                _positionId++;
             }
 
             OpenPosition.Buy(numberOfShares: purchased.NumberOfShares, price: purchased.Price, transactionId: purchased.Id, when: purchased.When, notes: purchased.Notes);

@@ -21,7 +21,7 @@ namespace core
         private record struct OptionRecord(string ticker, string type, decimal strike, string optiontype, string expiration, decimal amount, decimal premium, string filled);
         private record struct UserRecord(string email, string first_name, string last_name);
         private record struct CryptosRecord(string symbol, string type, decimal amount, decimal price, string date);
-        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount);
+        private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount, string grade, string gradeNote);
         private record struct StockListRecord(string ticker, string created, string notes);
         private record struct StockListRecordJustTicker(string ticker);
         private record struct TradingStrategyResultRecord(string strategyName, string ticker, decimal numberOfShares, decimal cost, decimal averageBuyCostPerShare, decimal averageSaleCostPerShare, string opened, string closed, decimal daysHeld, decimal profit, decimal rr, decimal returnPct);
@@ -62,9 +62,20 @@ namespace core
         public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
         {
             var rows = trades.Select(t =>
-                new TradesRecord(t.Ticker, t.Opened?.ToString(DATE_FORMAT), t.Closed?.ToString(DATE_FORMAT), t.DaysHeld,
-                t.CompletedPositionCostPerShare, t.Cost,
-                t.Profit, t.IsClosed ? t.GainPct : t.UnrealizedGainPct.Value,t.RR, t.RiskedAmount)
+                new TradesRecord(
+                    symbol: t.Ticker,
+                    opened: t.Opened?.ToString(DATE_FORMAT),
+                    closed: t.Closed?.ToString(DATE_FORMAT),
+                    daysheld: t.DaysHeld,
+                    firstbuycost: t.CompletedPositionCostPerShare,
+                    cost: t.Cost,
+                    profit: t.Profit,
+                    returnpct: t.IsClosed ? t.GainPct : t.UnrealizedGainPct.Value,
+                    rr: t.RR,
+                    riskedAmount: t.RiskedAmount,
+                    grade: t.Grade,
+                    gradeNote: t.GradeNote
+                )
             );
 
             return writer.Generate(rows);
