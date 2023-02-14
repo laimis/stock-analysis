@@ -48,5 +48,20 @@
     <h5>Position Information</h5>
     <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
   </section>
+
+  <section>
+    <div class="mb-3">
+      <label for="gradeInput" class="form-label">Grade</label>
+      <input #gradeInput type="text" class="form-control" id="gradeInput" aria-describedby="gradeHelp">
+      <div id="gradeHelp" class="form-text">Grade for trade: A, B, C</div>
+    </div>
+    <div class="mb-3">
+      <label for="notesInput" class="form-label">Notes</label>
+      <textarea #gradeNotes class="form-control" id="notesInput" rows="3"></textarea>
+    </div>
+    <div>
+      <button (click)="assignGrade(gradeInput.value, gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
+    </div>
+  </section>
   
 </div>

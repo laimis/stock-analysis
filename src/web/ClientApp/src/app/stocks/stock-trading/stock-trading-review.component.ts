@@ -103,4 +103,12 @@ export class StockTradingReviewComponent implements OnInit {
     return positionInstance.transactions.filter(t => t.type == 'sell')
   }
 
+  assignGrade(grade:string, note:string) {
+    this.stockService.assignGrade(this.currentPosition.ticker, this.currentPosition.positionId, grade, note).subscribe(
+      (r: any) => {
+        console.log("grade saved")
+      }
+    );
+  }
+
 }
