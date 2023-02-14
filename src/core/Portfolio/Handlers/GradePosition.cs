@@ -16,12 +16,12 @@ namespace core.Portfolio
         public class Command : RequestWithUserId<Unit>
         {
             [Required]
-            public TradeGrade Grade { get; }
+            public TradeGrade Grade { get; set; }
             [Required]
-            public string Ticker { get; }
+            public string Ticker { get; set; }
             [Required]
-            public int PositionId { get; }
-            public string Note { get; }
+            public int PositionId { get; set; }
+            public string Note { get; set; }
         }
 
         public class Handler : HandlerWithStorage<Command, Unit>
@@ -50,7 +50,7 @@ namespace core.Portfolio
                 stock.AssignGrade(
                     request.PositionId,
                     request.Grade,
-                    request.Note
+                    string.IsNullOrWhiteSpace(request.Note) ? null : request.Note
                 );
 
                 return new Unit();

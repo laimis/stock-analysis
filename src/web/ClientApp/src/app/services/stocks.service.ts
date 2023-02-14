@@ -52,7 +52,7 @@ export class StocksService {
   assignGrade(ticker: string, positionId: number, grade: string, note: string): Observable<any> {
     return this.http.post<any>(
       `/api/portfolio/${ticker}/positions/${positionId}/grade`,
-      { grade, note }
+      { grade, note, ticker, positionId }
     )
   }
 
