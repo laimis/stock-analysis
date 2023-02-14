@@ -264,7 +264,7 @@ namespace web.BackgroundServices
             return marketTimeNow.TimeOfDay switch {
                 var t when t <= web.Utils.MarketHours.StartTime => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date).AddMinutes(10),
-                var t when t >= web.Utils.MarketHours.CloseToEndTime => 
+                var t when t >= web.Utils.MarketHours.FifteenMinutesBeforeClose => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10),
                 _ => throw new Exception("Should not be possible to get here but did with time: " + marketTimeNow)
             };
@@ -281,23 +281,23 @@ namespace web.BackgroundServices
             var currentTimeInEastern = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
             var nextRunTime = 
                 currentTimeInEastern.TimeOfDay switch {
-                var t when t >= web.Utils.MarketHours.CloseToEndTime => 
+                var t when t >= web.Utils.MarketHours.FifteenMinutesBeforeClose => 
                     LogAndReturn(
                         "After the end of the market day",
-                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date.AddDays(1))
-                            .AddMinutes(-30)
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date.AddDays(1))
+                            .AddMinutes(15)
                     ),
                 var t when t < web.Utils.MarketHours.StartTime => 
                     LogAndReturn(
                         "Before the start of the market day",
-                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern.Date)
-                            .AddMinutes(-30)
+                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
+                            .AddMinutes(15)
                     ),
-                var t when t < web.Utils.MarketHours.CloseToEndTime =>
+                var t when t < web.Utils.MarketHours.FifteenMinutesBeforeClose =>
                     LogAndReturn(
                         "In the middle of the day",
                         _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.Date)
-                        .Add(web.Utils.MarketHours.CloseToEndTime)
+                        .Add(web.Utils.MarketHours.FifteenMinutesBeforeClose)
                     ),
                     
                 _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
