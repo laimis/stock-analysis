@@ -161,7 +161,7 @@ namespace web.BackgroundServices
                     afterOpen,
                 var t when t < oneHourBeforeClose.TimeOfDay => // during market hours
                     oneHourBeforeClose,
-                _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
+                _ =>  throw new Exception("Email send: Should not be possible to get here but did with time: " + currentTimeInEastern)
             };
 
             return nextRunTime;
@@ -248,13 +248,13 @@ namespace web.BackgroundServices
 
         private DateTimeOffset GetNextStopLossCheckTime()
         {
-            if (_marketHours.IsMarketOpen(DateTimeOffset.UtcNow))
+            var currentTime = DateTimeOffset.UtcNow;
+            if (_marketHours.IsMarketOpen(currentTime))
             {
-                return DateTimeOffset.UtcNow.AddMinutes(5);
+                return currentTime.AddMinutes(5);
             }
             
-            var marketTimeNow = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
-
+            var marketTimeNow = _marketHours.ToMarketTime(currentTime);
             if (marketTimeNow.DayOfWeek == DayOfWeek.Saturday)
             {
                 return _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(2)).AddMinutes(10);
@@ -268,12 +268,12 @@ namespace web.BackgroundServices
             var openTime = _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date);
             var closeTime = _marketHours.GetMarketEndOfDayTimeInUtc(marketTimeNow.Date);
 
-            return marketTimeNow.TimeOfDay switch {
+            return currentTime.TimeOfDay switch {
                 var t when t <= openTime.TimeOfDay => 
-                    _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date).AddMinutes(10),
+                    openTime.AddMinutes(10),
                 var t when t >= closeTime.TimeOfDay => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10),
-                _ => throw new Exception("Should not be possible to get here but did with time: " + marketTimeNow)
+                _ => throw new Exception("Stop loss check: Should not be possible to get here but did with time: " + marketTimeNow)
             };
         }
 
@@ -311,7 +311,7 @@ namespace web.BackgroundServices
                         lastRunBeforeClose
                     ),
                     
-                _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
+                _ =>  throw new Exception("Monitor: Should not be possible to get here but did with time: " + currentTimeInEastern)
             };
 
             return nextRunTime;
