@@ -83,7 +83,7 @@ namespace core.Stocks
         public decimal CompletedPositionShares = 0;
         public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
 
-        public TradeGrade? Grade { get; private set; } = null;
+        public string Grade { get; private set; } = null;
         public string GradeNote { get; private set; } = null;
         public void SetGrade(TradeGrade grade, string note = null)
         {

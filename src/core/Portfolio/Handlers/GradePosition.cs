@@ -15,8 +15,27 @@ namespace core.Portfolio
     {
         public class Command : RequestWithUserId<Unit>
         {
+            private TradeGrade? _grade;
             [Required]
-            public TradeGrade Grade { get; set; }
+            public string Grade 
+            {
+                get 
+                { 
+                    if (_grade == null) return null;
+                    return _grade;
+                }
+                
+                set 
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        _grade = null;
+                        return;
+                    }
+                    _grade = new TradeGrade(value);
+                }
+            }
+
             [Required]
             public string Ticker { get; set; }
             [Required]
@@ -52,6 +71,8 @@ namespace core.Portfolio
                     request.Grade,
                     string.IsNullOrWhiteSpace(request.Note) ? null : request.Note
                 );
+
+                await _storage.Save(stock, request.UserId);
 
                 return new Unit();
             }
