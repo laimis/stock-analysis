@@ -188,5 +188,36 @@ namespace core.Stocks
                     notes)
             );
         }
+
+        public void AssignGrade(int positionId, TradeGrade grade, string note)
+        {
+            var position = State.Positions.SingleOrDefault(p => p.PositionId == positionId);
+            if (position == null)
+            {
+                throw new InvalidOperationException("Unable to find position with id " + positionId);
+            }
+
+            if (!position.IsClosed)
+            {
+                throw new InvalidOperationException("Cannot assign grade to an open position");
+            }
+
+            if (position.Grade == grade && position.GradeNote == note)
+            {
+                return;
+            }
+
+            Apply(
+                new TradeGradeAssigned(
+                    Guid.NewGuid(),
+                    State.Id,
+                    DateTimeOffset.UtcNow,
+                    userId: State.UserId,
+                    grade: grade,
+                    note: note,
+                    positionId: positionId
+                )
+            );
+        }
     }
 }

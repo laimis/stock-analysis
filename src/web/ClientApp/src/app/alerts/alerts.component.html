@@ -7,6 +7,9 @@
     <button class="btn btn-primary me-2" (click)="toggleVisibility(messagesSection)" *ngIf="!hideMessages">
       Toggle Messages ({{container.messages.length}})
     </button>
+    <div class="float-end text-muted" role="status">
+      last refresh: {{lastRefreshed | date:'medium'}}
+    </div>
 
     <div class="alert alert-success mt-3" role="alert" *ngIf="scheduled">
       Scheduled!

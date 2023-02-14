@@ -172,5 +172,43 @@ namespace storage.tests
 
             Assert.Empty(afterDelete);
         }
+
+        [Fact]
+        public async Task OwnedStock_Grading_Works()
+        {
+            var stock = new OwnedStock(GenerateTestTicker(), _userId);
+
+            stock.Purchase(10, 2.1m, DateTime.UtcNow);
+
+            var storage = CreateStorage();
+
+            await storage.Save(stock, _userId);
+
+            var loaded = await storage.GetStock(stock.State.Ticker, _userId);
+
+            loaded.Sell(10, 2.2m, DateTime.UtcNow, "sell");
+
+            loaded.AssignGrade(0, "A", "test");
+
+            await storage.Save(loaded, _userId);
+
+            loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
+
+            Assert.Equal("A", loaded.State.Positions[0].Grade);
+            Assert.Equal("test", loaded.State.Positions[0].GradeNote);
+
+            var lastTx = loaded.State.Positions[0].Transactions.Last();
+
+            loaded.DeleteTransaction(lastTx.transactionId);
+
+            await storage.Save(loaded, _userId);
+
+            // make sure we can still load it
+            loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
+
+            // clean up
+            await storage.Delete(_userId);    
+        }
+        
     }
 }
