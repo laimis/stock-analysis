@@ -50,6 +50,7 @@
   </section>
 
   <section>
+    <h5>Grade</h5>
     <div *ngIf="gradingError" class="alert alert-danger" role="alert">
       {{gradingError }}
     </div>
@@ -57,17 +58,30 @@
       {{gradingSuccess }}
     </div>
     <div class="mb-3">
-      <label for="gradeInput" class="form-label">Grade</label>
-      <input #gradeInput value="{{currentPosition.grade}}" type="text" class="form-control" id="gradeInput" aria-describedby="gradeHelp">
+      <input #gradeInput [value]="currentPosition.grade" type="text" class="form-control" id="gradeInput" aria-describedby="gradeHelp">
       <div id="gradeHelp" class="form-text">Grade for trade: A, B, C</div>
     </div>
     <div class="mb-3">
       <label for="notesInput" class="form-label">Notes</label>
-      <textarea #gradeNotes class="form-control" id="notesInput" rows="3">{{currentPosition.gradeNote}}</textarea>
+      <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="currentPosition.gradeNote"></textarea>
     </div>
     <div>
       <button (click)="assignGrade(gradeInput.value, gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
     </div>
   </section>
+  <div class="container">
+    <div class="row">
+      <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
+      <div class="col text-center">
+      </div>
+      <div class="col">
+      </div>
+      <div class="col">
+      </div>
+      <div class="col">
+      </div>
+      <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
+    </div>
+  </div>
   
 </div>

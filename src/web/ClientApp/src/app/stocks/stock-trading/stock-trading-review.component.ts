@@ -33,6 +33,8 @@ export class StockTradingReviewComponent implements OnInit {
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
     // get price data and pass it to chart
+    this.gradingError = null
+    this.gradingSuccess = null
     this.runTradingStrategies();
     this.fetchPrice();
   }
