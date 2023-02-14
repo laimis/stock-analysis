@@ -12,9 +12,8 @@ namespace web.Utils
     public class MarketHours : IMarketHours
     {
         private static TimeZoneInfo _easternZoneId = TZConvert.GetTimeZoneInfo("Eastern Standard Time");
-        public static TimeSpan StartTime = new TimeSpan(9, 30, 0);
-        public static TimeSpan EndTime = new TimeSpan(16, 0, 0);
-        public static TimeSpan FifteenMinutesBeforeClose = new TimeSpan(15, 45, 0);
+        private static TimeSpan StartTime = new TimeSpan(9, 30, 0);
+        private static TimeSpan EndTime = new TimeSpan(16, 0, 0);
 
         public bool IsMarketOpen(DateTimeOffset utcNow)
         {

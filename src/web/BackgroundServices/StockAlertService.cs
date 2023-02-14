@@ -152,7 +152,7 @@ namespace web.BackgroundServices
                 currentTime.TimeOfDay switch {
                 var t when t >= oneHourBeforeClose.TimeOfDay =>  // after market close
                     afterOpen.AddDays(1),
-                var t when t < web.Utils.MarketHours.StartTime => // before market open
+                var t when t < afterOpen.TimeOfDay => // before market open
                     afterOpen,
                 var t when t < oneHourBeforeClose.TimeOfDay => // during market hours
                     oneHourBeforeClose,
@@ -260,10 +260,13 @@ namespace web.BackgroundServices
                 return _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10);
             }
 
+            var openTime = _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date);
+            var closeTime = _marketHours.GetMarketEndOfDayTimeInUtc(marketTimeNow.Date);
+
             return marketTimeNow.TimeOfDay switch {
-                var t when t <= web.Utils.MarketHours.StartTime => 
+                var t when t <= openTime.TimeOfDay => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date).AddMinutes(10),
-                var t when t >= web.Utils.MarketHours.FifteenMinutesBeforeClose => 
+                var t when t >= closeTime.TimeOfDay => 
                     _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10),
                 _ => throw new Exception("Should not be possible to get here but did with time: " + marketTimeNow)
             };
@@ -278,25 +281,28 @@ namespace web.BackgroundServices
             }
             
             var currentTimeInEastern = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
+            var currentCloseTime = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern);
+            var currentOpenTime = _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern);
+            var lastRunBeforeClose = currentCloseTime.AddMinutes(-30);
+
             var nextRunTime = 
                 currentTimeInEastern.TimeOfDay switch {
-                var t when t >= web.Utils.MarketHours.FifteenMinutesBeforeClose => 
+                var t when t >= lastRunBeforeClose.TimeOfDay => 
                     LogAndReturn(
                         "After the end of the market day",
                         _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.AddDays(1))
                             .AddMinutes(15)
                     ),
-                var t when t < web.Utils.MarketHours.StartTime => 
+                var t when t < currentOpenTime.TimeOfDay => 
                     LogAndReturn(
                         "Before the start of the market day",
                         _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
                             .AddMinutes(15)
                     ),
-                var t when t < web.Utils.MarketHours.FifteenMinutesBeforeClose =>
+                var t when t < lastRunBeforeClose.TimeOfDay =>
                     LogAndReturn(
                         "In the middle of the day",
-                        _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
-                            .AddMinutes(-30)
+                        lastRunBeforeClose
                     ),
                     
                 _ =>  throw new Exception("Should not be possible to get here but did with time: " + currentTimeInEastern)
