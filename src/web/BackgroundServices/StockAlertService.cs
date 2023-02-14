@@ -16,6 +16,11 @@ using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
+    // TODO: this class is doing too much, need to rethink
+    // how to structure the logic contained here.
+    // 1. it's in charge of scheduling the runs
+    // 2. it's in charge of pulling which tickers to scan, and how those scans should work
+    // 3. it's in charge of notification logic
     public class StockAlertService : BackgroundService
     {
         private IAccountStorage _accounts;
@@ -280,13 +285,14 @@ namespace web.BackgroundServices
                 return delay;
             }
             
-            var currentTimeInEastern = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
+            var currentTime = DateTimeOffset.UtcNow;
+            var currentTimeInEastern = _marketHours.ToMarketTime(currentTime);
             var currentCloseTime = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern);
             var currentOpenTime = _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern);
             var lastRunBeforeClose = currentCloseTime.AddMinutes(-30);
 
             var nextRunTime = 
-                currentTimeInEastern.TimeOfDay switch {
+                currentTime.TimeOfDay switch {
                 var t when t >= lastRunBeforeClose.TimeOfDay => 
                     LogAndReturn(
                         "After the end of the market day",
