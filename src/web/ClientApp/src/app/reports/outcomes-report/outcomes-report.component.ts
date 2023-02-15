@@ -17,6 +17,7 @@ export class OutcomesReportComponent implements OnInit {
   earnings: string[] = null;
   title: string;
   singleBarReportWeekly: OutcomesReport;
+  tickers: string[] = [];
 
   constructor (
     private stocksService: StocksService,
@@ -46,7 +47,7 @@ export class OutcomesReportComponent implements OnInit {
 
     var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
     if (tickerParam) {
-      var tickers = tickerParam
+      this.tickers = tickerParam
         .split(",")
         .map(t => {
           var parts = t.split(":");
@@ -56,8 +57,8 @@ export class OutcomesReportComponent implements OnInit {
           return t;
         });
       
-      if (tickers.length > 0) {
-        this.loadSingleBarReport(tickers, this.earnings);
+      if (this.tickers.length > 0) {
+        this.loadSingleBarReport(this.tickers, this.earnings);
       }
 
     } else {

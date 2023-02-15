@@ -1,15 +1,19 @@
 <div>
   <div *ngIf="!report">Loading {{title}}...</div>
   <div *ngIf="report" class="mb-3">
-    <h3 class="bg-secondary" *ngIf="title">{{title}}</h3>
-    <div *ngIf="showSummary" class="mb-3">
-        <span *ngFor="let s of report.summary"
-            class="badge rounded-pill bg-secondary me-2">
-            <a [href]="tradingViewLink(s.ticker)" target="_blank">{{s.ticker}}: {{s.count}}</a>
-        </span>
-    </div>
+    
+    <section>
+      <h3 *ngIf="title">{{title}}</h3>
+      <div *ngIf="showSummary" class="mb-3">
+          <span *ngFor="let s of report.summary"
+              class="badge rounded-pill bg-secondary me-2">
+              <a [href]="tradingViewLink(s.ticker)" target="_blank">{{s.ticker}}: {{s.count}}</a>
+          </span>
+      </div>
+    </section>
+    
 
-    <div class="mt-3 mb-3" *ngIf="report.patterns.length > 0">
+    <section class="mt-3 mb-3" *ngIf="report.patterns.length > 0">
       <h5>Patterns</h5>
       <table class="table striped border table-hover" *ngIf="hasPatterns(report)">
         <thead>
@@ -24,16 +28,19 @@
         </thead>
       </table>
       <div *ngIf="!hasPatterns(report)" >No patterns detected</div>
-    </div>
+    </section>
 
-    <div *ngFor="let c of report.evaluations">
-      <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}" style="border: 0px">
-        {{c.name}}
-        <span *ngIf="c.matchingTickers.length > 0" > - {{c.matchingTickers.length}}</span>
-      </h5>
-      <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c"></app-outcomes>
-      <span *ngIf="c.matchingTickers.length === 0">No positions in this category.</span>
-    </div>
+    <section>
+      <h5>Evaluations</h5>
+      <div *ngFor="let c of report.evaluations" class="mb-3">
+        <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}" style="border: 0px">
+          {{c.name}}
+          <span *ngIf="c.matchingTickers.length > 0" > - {{c.matchingTickers.length}}</span>
+        </h5>
+        <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c"></app-outcomes>
+        <span *ngIf="c.matchingTickers.length === 0">No positions in this category</span>
+      </div>
+    </section>
 
   </div>
   
