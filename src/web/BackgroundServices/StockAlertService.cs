@@ -120,7 +120,10 @@ namespace web.BackgroundServices
                         _container.AddNotice("Stop loss monitor complete, next run at " + _marketHours.ToMarketTime(_nextStopLossCheck));
                     }
 
-                    if (DateTimeOffset.UtcNow > _nextEmailSend)
+                    // wait to send emails if there are still checks running
+                    if (DateTimeOffset.UtcNow > _nextEmailSend
+                        && _gapUpChecks.Count == 0
+                        && _upsideReversalChecks.Count == 0)
                     {
                         await SendAlertSummaryEmail();
                         _nextEmailSend = GetNextEmailSendTime();
