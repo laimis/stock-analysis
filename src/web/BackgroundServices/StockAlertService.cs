@@ -151,19 +151,19 @@ namespace web.BackgroundServices
             var currentTime = DateTimeOffset.UtcNow;
 
             var currentTimeInEastern = _marketHours.ToMarketTime(currentTime);
-            var oneHourBeforeClose = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
-                .AddHours(-1);
+            var beforeClose = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
+                .AddMinutes(-15);
             var afterOpen = _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
                 .AddMinutes(15);
 
             var nextRunTime = 
                 currentTime.TimeOfDay switch {
-                var t when t >= oneHourBeforeClose.TimeOfDay =>  // after market close
+                var t when t >= beforeClose.TimeOfDay =>  // after market close
                     afterOpen.AddDays(1),
                 var t when t < afterOpen.TimeOfDay => // before market open
                     afterOpen,
-                var t when t < oneHourBeforeClose.TimeOfDay => // during market hours
-                    oneHourBeforeClose,
+                var t when t < beforeClose.TimeOfDay => // during market hours
+                    beforeClose,
                 _ =>  throw new Exception("Email send: Should not be possible to get here but did with time: " + currentTimeInEastern)
             };
 
