@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomeScoresReport } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 
@@ -18,9 +19,12 @@ export class StockTradingReviewComponent implements OnInit {
   prices: Prices
   dailyScores: DailyOutcomeScoresReport;
 
-  constructor (private stockService: StocksService) { }
+  constructor (
+    private stockService: StocksService,
+    private title: Title) { }
 
   ngOnInit(): void {
+    this.title.setTitle("Trading Review - Nightingale Trading")
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
         this.positions = r.past
         this.updateCurrentPosition()
