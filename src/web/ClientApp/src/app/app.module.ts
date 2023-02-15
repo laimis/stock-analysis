@@ -53,11 +53,11 @@ import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
 import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-trading-positions.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
-import { StockTradingPerformanceComponent } from './stocks/stock-trading/stock-trading-performance.component';
-import { StockTradingReviewComponent } from './stocks/stock-trading/stock-trading-review.component';
+import { StockTradingPerformanceComponent } from './stocks/stock-trading-review/stock-trading-performance.component';
+import { StockTradingReviewComponent } from './stocks/stock-trading-review/stock-trading-review.component';
 import { StockChartComponent } from './shared/stocks/stock-chart.component';
 import { StockTradingOpenPositionsComponent } from './stocks/stock-trading/stock-trading-open-positions.component';
-import { StockTradingClosedPositionsComponent } from './stocks/stock-trading/stock-trading-closed-positions.component';
+import { StockTradingClosedPositionsComponent } from './stocks/stock-trading-review/stock-trading-closed-positions.component';
 import { BrokerageOrdersComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-trading/stock-violations.component';
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
@@ -81,6 +81,7 @@ import { StockListComponent } from './stocks/stock-lists/stock-list/stock-list.c
 import { StockTradingSimulationsComponent } from './stocks/stock-trading/stock-trading-simulations.component';
 import { ChartComponent } from './shared/chart/chart.component';
 import { DailyOutcomeScoresComponent } from './shared/reports/daily-outcome-scores.component';
+import { StockTradingReviewDashboardComponent } from './stocks/stock-trading-review/stock-trading-review-dashboard.component';
 
 
 var routes: Routes = [
@@ -120,7 +121,7 @@ var routes: Routes = [
   { path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
   { path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
   { path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
-  { path: 'trading/review', component: StockTradingReviewComponent, canActivate: [AuthGuard]},
+  { path: 'trading/review', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
   { path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
 
   { path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard]},
@@ -227,7 +228,8 @@ var routes: Routes = [
     StockNewPositionComponent,
     StockListsDashboardComponent,
     StockListComponent,
-    ChartComponent
+    ChartComponent,
+    StockTradingReviewDashboardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
