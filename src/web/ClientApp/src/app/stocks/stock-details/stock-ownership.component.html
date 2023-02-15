@@ -5,7 +5,7 @@
   <div class="mt-4">
     <div class="row">
       <div class="col" *ngIf="ownership && ownership.currentPosition">
-        Ownership: <b>{{ownership.currentPosition.numberOfShares}}</b> @ <b>{{ownership.currentPosition.averageCostPerShare | currency}}</b> ({{(stock.price - ownership.currentPosition.averageCostPerShare) / stock.price | percent}})
+        Ownership: <b>{{ownership.currentPosition.numberOfShares}}</b> @ <b>{{ownership.currentPosition.averageCostPerShare | currency}}</b> ({{(stock.price - ownership.currentPosition.averageCostPerShare) / ownership.currentPosition.averageCostPerShare | percent}})
       </div>
       <div class="col" *ngIf="stock">
         Current price: <b>{{stock.price | currency}}</b>
