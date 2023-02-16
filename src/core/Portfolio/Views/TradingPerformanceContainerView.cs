@@ -32,6 +32,8 @@ namespace core.Portfolio.Views
             var maxLoss = new DataPointContainer<decimal>("Max Loss $");
             var rrSum = new DataPointContainer<decimal>("RR Sum");
             var rrSumWeighted = new DataPointContainer<decimal>("RR Sum Weighted");
+            var agrades = new DataPointContainer<decimal>("A Grades");
+            var bgrades = new DataPointContainer<decimal>("B Grades");
             var cgrades = new DataPointContainer<decimal>("C Grades");
 
             closedTransactions.Reverse();
@@ -52,6 +54,8 @@ namespace core.Portfolio.Views
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);
                 rrSumWeighted.Add(window[0].Closed.Value, perfView.rrSumWeighted);
+                agrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "A").frequency);
+                bgrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "B").frequency);
                 cgrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "C").frequency);
 
                 if (i + 20 >= closedTransactions.Length)
@@ -70,6 +74,8 @@ namespace core.Portfolio.Views
             Trends.Add(rrSumWeighted);
             Trends.Add(maxWin);
             Trends.Add(maxLoss);
+            Trends.Add(agrades);
+            Trends.Add(bgrades);
             Trends.Add(cgrades);
 
             Trends.Add(GenerateOutcomeHistogram(Recent, "Recent Gains", recentClosedTransactions));
