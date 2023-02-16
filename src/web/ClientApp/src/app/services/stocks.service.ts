@@ -17,7 +17,7 @@ export class StocksService {
   }
 
   getTradingEntries(): Observable<StockTradingPositions> {
-    return this.http.get<StockTradingPositions>('/api/stocks/tradingentries')
+    return this.http.get<StockTradingPositions>('/api/portfolio/tradingentries')
   }
 
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionList> {
