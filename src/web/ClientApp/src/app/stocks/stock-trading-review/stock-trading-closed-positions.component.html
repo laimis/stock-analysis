@@ -1,21 +1,26 @@
 <div>
   <a href="/api/stocks/export/closed" class="btn btn-link">Export trades</a>
 
-  <table *ngIf="positions" class="table mt-3">
+  <table *ngIf="positions" class="table table-hover mt-3">
     <thead>
       <tr>
         <th width="100"></th>
-        <th>Stock</th>
-        <th>Date</th>
-        <th>R:R</th>
-        <th>Profit/Loss</th>
-        <th>Profit/Loss %</th>
-        <th>Grade</th>
-        <th>Days Held</th>
+        <th class="sort-header" (click)="sort('ticker')">Stock</th>
+        <th class="sort-header" (click)="sort('opened')">Date</th>
+        <th class="sort-header" (click)="sort('rr')">R:R</th>
+        <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
+        <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
+        <th class="sort-header" (click)="sort('grade')">Grade</th>
+        <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of positions; let i = index">
+      <tr *ngFor="let p of positions; let i = index"
+        [ngClass]="{
+          'bg-success':p.grade === 'A',
+          'bg-danger':p.grade === 'C',
+          'text-white': p.grade === 'A' || p.grade === 'C'
+        }">
         <td>{{i + 1}}</td>
         <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
         <td>{{p.closed | date}}</td>
