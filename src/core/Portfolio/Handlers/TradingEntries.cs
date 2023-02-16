@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
+using core.Portfolio.Views;
 using core.Shared.Adapters.Brokerage;
-using core.Stocks.View;
+using core.Stocks;
 using MediatR;
 
-namespace core.Stocks
+namespace core.Portfolio.Handlers
 {
     public class TradingEntries
     {

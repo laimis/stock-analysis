@@ -160,11 +160,5 @@ namespace web.Controllers
 
             return this.OkOrError(await _mediator.Send(cmd));
         }
-
-        [HttpGet("tradingentries")]
-        public Task<TradingEntriesView> TradingEntries() =>
-            _mediator.Send(
-                new TradingEntries.Query(User.Identifier())
-            );
     }
 }

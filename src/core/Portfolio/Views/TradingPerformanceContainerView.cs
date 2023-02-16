@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using core.Shared;
+using core.Stocks;
+using core.Stocks.Services.Trading;
 
-namespace core.Stocks.View
+namespace core.Portfolio.Views
 {
     public class TradingPerformanceContainerView
     {
@@ -13,8 +15,8 @@ namespace core.Stocks.View
             var recentLengthToTake = closedTransactions.Length > recentCount ? recentCount : closedTransactions.Length;
             var recentClosedTransactions = closedTransactions.Slice(recentStart, recentLengthToTake);
 
-            Recent = TradingPerformanceView.Create(recentClosedTransactions);
-            Overall = TradingPerformanceView.Create(closedTransactions);
+            Recent = TradingPerformance.Create(recentClosedTransactions);
+            Overall = TradingPerformance.Create(closedTransactions);
 
             // go over each closed transaction and calculate number of wins for 20 trades rolling window
             var wins = new DataPointContainer<decimal>("Win %");
@@ -35,7 +37,7 @@ namespace core.Stocks.View
             for (var i = 0; i < closedTransactions.Length; i++)
             {
                 var window = closedTransactions.Slice(i, Math.Min(20, closedTransactions.Length));
-                var perfView = TradingPerformanceView.Create(window);
+                var perfView = TradingPerformance.Create(window);
                 wins.Add(window[0].Closed.Value, perfView.WinPct);
                 avgWinPct.Add(window[0].Closed.Value, perfView.WinAvgReturnPct);
                 avgLossPct.Add(window[0].Closed.Value, perfView.LossAvgReturnPct);
@@ -74,7 +76,7 @@ namespace core.Stocks.View
         }
 
         private static DataPointContainer<decimal> GenerateOutcomeHistogram(
-            TradingPerformanceView performanceDataPoints,
+            TradingPerformance performanceDataPoints,
             string histogramLabel,
             Span<PositionInstance> transactionsToUse)
         {
@@ -102,8 +104,8 @@ namespace core.Stocks.View
             return gains;
         }
 
-        public TradingPerformanceView Recent { get; set; }
-        public TradingPerformanceView Overall { get; set; }
+        public TradingPerformance Recent { get; set; }
+        public TradingPerformance Overall { get; set; }
         public List<object> Trends { get; } = new List<object>();
     }
 }

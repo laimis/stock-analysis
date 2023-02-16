@@ -1,4 +1,4 @@
-using core.Stocks.View;
+using core.Portfolio.Views;
 using Xunit;
 
 namespace coretests.Stocks

@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Cryptos;
 using core.Options;
-using core.Portfolio.Output;
+using core.Portfolio.Views;
 using core.Shared;
 using core.Stocks;
 
-namespace core.Portfolio
+namespace core.Portfolio.Handlers
 {
     public class Transactions
     {

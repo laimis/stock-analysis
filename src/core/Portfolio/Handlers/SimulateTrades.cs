@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Portfolio.Views;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
@@ -105,7 +106,7 @@ namespace core.Portfolio
                 {
                     var strategyPositions = strategyGroup.Select(r => r.position).ToArray();
 
-                    var performance = TradingPerformanceView.Create(
+                    var performance = TradingPerformance.Create(
                         new Span<PositionInstance>(strategyPositions)
                     );
 

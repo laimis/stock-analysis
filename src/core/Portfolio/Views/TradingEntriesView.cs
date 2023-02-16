@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using core.Shared.Adapters.Brokerage;
+using core.Stocks;
+using core.Stocks.View;
 
-namespace core.Stocks.View
+namespace core.Portfolio.Views
 {
     public class TradingEntriesView
     {

@@ -1,16 +1,16 @@
 using System;
-using core.Stocks;
+using core.Stocks.Services.Trading;
 using Xunit;
 
 namespace coretests.Stocks
 {
     public class TradingPerformanceViewTests
     {
-        private TradingPerformanceView _performance;
+        private TradingPerformance _performance;
 
         public TradingPerformanceViewTests()
         {
-            _performance = TradingPerformanceView.Create(TradingDataGenerator.GetClosedPositions());
+            _performance = TradingPerformance.Create(TradingDataGenerator.GetClosedPositions());
         }
 
         [Fact]

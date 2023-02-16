@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Handlers;
-using core.Portfolio.Output;
+using core.Portfolio.Views;
 using core.Stocks;
 using core.Stocks.Services.Trading;
 using MediatR;
@@ -74,7 +74,7 @@ namespace web.Controllers
             this.GenerateExport(_mediator, new ListsExport.Query(justTickers, name, User.Identifier()));
 
         [HttpGet]
-        public Task<PortfolioResponse> Index() =>
+        public Task<PortfolioView> Index() =>
             _mediator.Send(new Get.Query(User.Identifier()));
 
         [HttpGet("transactions")]
@@ -166,6 +166,12 @@ namespace web.Controllers
                     ticker,
                     User.Identifier()
                 )
+            );
+
+        [HttpGet("tradingentries")]
+        public Task<TradingEntriesView> TradingEntries() =>
+            _mediator.Send(
+                new TradingEntries.Query(User.Identifier())
             );
     }
 }

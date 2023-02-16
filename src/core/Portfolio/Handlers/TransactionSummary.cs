@@ -2,11 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Stocks;
-using core.Portfolio.Output;
+using core.Portfolio.Views;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Portfolio.Handlers
 {
     public class TransactionSummary
     {

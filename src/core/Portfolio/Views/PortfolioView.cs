@@ -1,9 +1,9 @@
 using System;
 using core.Shared;
 
-namespace core.Portfolio.Output
+namespace core.Portfolio.Views
 {
-    public class PortfolioResponse : IViewModel
+    public class PortfolioView : IViewModel
     {
         public int OpenStockCount { get; set; }
         public int OpenCryptoCount { get; set; }

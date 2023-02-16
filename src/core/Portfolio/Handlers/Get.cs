@@ -2,9 +2,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Stocks;
 using core.Alerts;
-using core.Portfolio.Output;
+using core.Portfolio.Views;
 using core.Shared;
 using MediatR;
 
@@ -12,7 +11,7 @@ namespace core.Portfolio
 {
     public class Get
     {
-        public class Query : RequestWithUserId<PortfolioResponse>
+        public class Query : RequestWithUserId<PortfolioView>
         {
             public Query(Guid userId) : base(userId)
             {
@@ -20,7 +19,7 @@ namespace core.Portfolio
         }
 
         public class Handler :
-            HandlerWithStorage<Query, PortfolioResponse>,
+            HandlerWithStorage<Query, PortfolioView>,
             INotificationHandler<UserChanged>
         {
             private StockAlertContainer _alerts;
@@ -32,9 +31,9 @@ namespace core.Portfolio
                 _alerts = alerts;
             }
 
-            public override async Task<PortfolioResponse> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<PortfolioView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var fromCache = await _storage.ViewModel<PortfolioResponse>(request.UserId);
+                var fromCache = await _storage.ViewModel<PortfolioView>(request.UserId);
                 if (fromCache != null)
                 {
                     return fromCache;
@@ -50,7 +49,7 @@ namespace core.Portfolio
                 await _storage.SaveViewModel(notification.UserId, data);
             }
 
-            private async Task<PortfolioResponse> GetFromDatabase(Guid userId)
+            private async Task<PortfolioView> GetFromDatabase(Guid userId)
             {
                 var stocks = await _storage.GetStocks(userId);
 
@@ -64,7 +63,7 @@ namespace core.Portfolio
 
                 var cryptos = await _storage.GetCryptos(userId);
 
-                var obj = new PortfolioResponse
+                var obj = new PortfolioView
                 {
                     OpenStockCount = openStocks.Count(),
                     OpenOptionCount = openOptions.Count(),
