@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using core.Shared;
 using core.Shared.Adapters.Stocks;
+using core.Stocks.Services.Analysis;
 
 namespace core.Stocks.Services.Trading
 {
@@ -58,7 +61,8 @@ namespace core.Stocks.Services.Trading
             var rrSumWeighted = 0m;
             var earliestDate = DateTimeOffset.MaxValue;
             var latestDate = DateTimeOffset.MinValue;
-            
+            var gradeDistribution = new SortedDictionary<TradeGrade, int>();
+
             foreach(var e in closedPositions)
             {
                 totalDaysHeld += e.DaysHeld;
@@ -87,6 +91,18 @@ namespace core.Stocks.Services.Trading
                     lossMaxReturnPct = Math.Max(lossMaxReturnPct, Math.Abs(e.GainPct));
                     totalLossDaysHeld += e.DaysHeld;
                 }
+                
+                if (e.Grade != null)
+                {
+                    if (gradeDistribution.ContainsKey(e.Grade))
+                    {
+                        gradeDistribution[e.Grade]++;
+                    }
+                    else
+                    {
+                        gradeDistribution.Add(e.Grade, 1);
+                    }
+                }
             }
             
             var winningPct = wins * 1.0m / numberOfTrades;
@@ -101,6 +117,7 @@ namespace core.Stocks.Services.Trading
                 AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
                 EV = adjustedWinningAmount - adjustedLossingAmount,
                 EarliestDate = earliestDate,
+                GradeDistribution = gradeDistribution.Select(kp => new LabelWithFrequency(label: kp.Key.Value, frequency: kp.Value)).ToArray(),
                 LatestDate = latestDate,
                 MaxLossAmount = maxLossAmount,
                 LossAvgDaysHeld = losses > 0 ? totalLossDaysHeld / losses : 0,
@@ -152,6 +169,7 @@ namespace core.Stocks.Services.Trading
 
         public DateTimeOffset EarliestDate { get; private set; }
         public DateTimeOffset LatestDate { get; private set; }
+        public LabelWithFrequency[] GradeDistribution { get; private set; }
     }
 
     public record struct TradingStrategyPerformance(

@@ -148,4 +148,5 @@ namespace core.Stocks.Services.Analysis
         decimal stdDev,
         ValueWithFrequency[] buckets);
     public record struct ValueWithFrequency(decimal value, int frequency);
+    public record struct LabelWithFrequency(string label, int frequency);
 }

@@ -726,6 +726,10 @@ export interface ValueWithFrequency {
   value: number
   frequency: number
 }
+export interface LabelWithFrequency {
+  label: string
+  frequency: number
+}
 export interface StockPercentChangeDescriptor {
   mean: number
   median: number
@@ -783,6 +787,7 @@ export interface StockTradingPerformance {
   rrSumWeighted: number,
   earliestDate: string,
   latestDate: string,
+  gradeDistribution: LabelWithFrequency[]
 }
 
 export interface DataPoint {

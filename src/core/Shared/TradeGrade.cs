@@ -2,7 +2,7 @@ using System;
 
 namespace core.Shared
 {
-    public struct TradeGrade
+    public struct TradeGrade : IComparable
     {
         private readonly string _grade;
 
@@ -28,5 +28,15 @@ namespace core.Shared
         public static implicit operator string(TradeGrade g) => g._grade;
         public static implicit operator TradeGrade(string g) => new TradeGrade(g);
         public string Value => _grade;
+
+        public int CompareTo(object obj)
+        {
+            if (obj is TradeGrade other)
+            {
+                return string.Compare(_grade, other._grade, StringComparison.Ordinal);
+            }
+
+            throw new ArgumentException("Object is not a TradeGrade");
+        }
     }
 }

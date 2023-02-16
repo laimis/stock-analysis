@@ -30,5 +30,12 @@
       <div class="col"><div class="stat-label">Win/Loss %</div><div>{{performance.returnPctRatio | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R sum</div><div>{{performance.rrSum | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R sum Weighted</div><div>{{performance.rrSumWeighted | number:'1.0-2'}}</div></div>
-    </div>  
+    </div>
+    
+    <div class="row mb-2">
+      <div class="col" *ngFor="let labelFrequency of performance.gradeDistribution">
+        <div class="stat-label">{{labelFrequency.label}}</div>
+        <div>{{labelFrequency.frequency}}</div>
+      </div>
+    </div>
   </div>
