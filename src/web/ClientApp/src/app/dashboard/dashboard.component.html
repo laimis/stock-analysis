@@ -12,22 +12,6 @@
       </div>
     </div>
 
-    <div class="row" *ngIf="dashboard.openOptionCount === 0 && dashboard.openStockCount === 0">
-      <div class="col">
-        <div class="alert alert-secondary">
-          <h3>Welcome!</h3>
-          <p>You haven't recorded any option/share transactions. It's easy to get started!</p>
-          <p>Find the stock you own via symbol search above ☝ and enter the share number and price, or the option contract details.</p>
-
-          <h4>Become a better trader</h4>
-          <p>The fastest way to get the most out of Nightingale Trading is by reviewing our Starter Guide and the rest
-            of the help articles.</p>
-          <p>It approximately requires only 2 minutes of your time and you will learn about all of the key capabilities.</p>
-          <a class="btn btn-primary" href="https://docs.nightingaletrading.com" target="_blank">Starter Guide</a>
-        </div>
-      </div>
-    </div>
-
     <div class="row">
       <div class="col">
 
@@ -76,6 +60,32 @@
         <div class="card mt-4">
           <div class="card-body">
             <h5 class="card-title">
+              <i class="fas fa-toolbox"></i>
+              Tools
+            </h5>
+            <div class="row">
+              <div class="col">
+                <a class="card-link" [routerLink]="[ '/stocks/lists' ]">Stock Lists</a>
+                <a class="card-link" [routerLink]="[ '/trading/review' ]">Trading Review</a>
+                <a class="card-link" [routerLink]="[ '/summary' ]">Weekly Summary</a>
+              </div>
+              <div class="col">
+                <a class="card-link" [routerLink]="[ '/trading/simulations' ]">Simulations</a>
+                <a class="card-link" [routerLink]="[ '/reports/recentsells' ]">Sells</a>
+                <a class="card-link" [routerLink]="[ '/transactions' ]">Transactions</a>
+                <a class="card-link" [routerLink]="[ '/reports/chain' ]">Chain</a>
+              </div>
+            </div>
+          </div>
+        </div>  
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">
               <i class="fas fa-bell"></i>
               <a [routerLink]="[ '/alerts' ]">Alerts</a>
             </h5>
@@ -85,27 +95,6 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col">
-        <div class="card mt-4">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="fas fa-toolbox"></i>
-              Tools
-            </h5>
-            <ul>
-              <li><a [routerLink]="[ '/stocks/lists' ]">Stock Lists</a></li>
-              <li><a [routerLink]="[ '/trading/review' ]">Trading Review</a></li>
-              <li><a [routerLink]="[ '/summary' ]">Weekly Summary</a></li>
-              <li><a [routerLink]="[ '/trading/simulations' ]">Simulations</a></li>
-              <li><a [routerLink]="[ '/reports/recentsells' ]">Sells</a></li>
-              <li><a [routerLink]="[ '/transactions' ]">Transactions</a></li>
-              <li><a [routerLink]="[ '/reports/chain' ]">Chain</a></li>
-            </ul>
-          </div>
-        </div>  
-      </div>
-    </div>
 
   </div>
 
