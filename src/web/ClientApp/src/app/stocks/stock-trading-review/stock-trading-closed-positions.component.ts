@@ -15,6 +15,8 @@ export class StockTradingClosedPositionsComponent {
 
   sortColumn : string
   sortDirection : number = -1
+  timeFilter: string
+  gradeFilter: string
 
   sort(column:string) {
     var func = this.getSortFunc(column);

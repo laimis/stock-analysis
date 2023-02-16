@@ -9,15 +9,15 @@
       -->
       <form *ngIf="false"> <!-- hide this for now -->
         <div class="form-group">
-          <label for="filterBy">Filter by</label>
-          <select class="form-select" id="filterBy" [(ngModel)]="filterBy">
+          <label for="filterBy">Time</label>
+          <select class="form-select" id="filterBy" [(ngModel)]="timeFilter">
             <option value="all">All</option>
             <option value="year">Last year</option>
           </select>
         </div>
         <div class="form-group">
           <label for="grade">Grade</label>
-          <select class="form-select" id="grade" [(ngModel)]="grade">
+          <select class="form-select" id="grade" [(ngModel)]="gradeFilter">
             <option value="all">All</option>
             <option value="A">A</option>
             <option value="B">B</option>

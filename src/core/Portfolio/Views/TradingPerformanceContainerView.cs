@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared;
 using core.Stocks;
 using core.Stocks.Services.Trading;
@@ -31,6 +32,7 @@ namespace core.Portfolio.Views
             var maxLoss = new DataPointContainer<decimal>("Max Loss $");
             var rrSum = new DataPointContainer<decimal>("RR Sum");
             var rrSumWeighted = new DataPointContainer<decimal>("RR Sum Weighted");
+            var cgrades = new DataPointContainer<decimal>("C Grades");
 
             closedTransactions.Reverse();
 
@@ -50,6 +52,7 @@ namespace core.Portfolio.Views
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);
                 rrSumWeighted.Add(window[0].Closed.Value, perfView.rrSumWeighted);
+                cgrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "C").frequency);
 
                 if (i + 20 >= closedTransactions.Length)
                     break;
@@ -67,6 +70,7 @@ namespace core.Portfolio.Views
             Trends.Add(rrSumWeighted);
             Trends.Add(maxWin);
             Trends.Add(maxLoss);
+            Trends.Add(cgrades);
 
             Trends.Add(GenerateOutcomeHistogram(Recent, "Recent Gains", recentClosedTransactions));
             Trends.Add(GenerateOutcomeHistogram(Overall, "Gains", closedTransactions));
