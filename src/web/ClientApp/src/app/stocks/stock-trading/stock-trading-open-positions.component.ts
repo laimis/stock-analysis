@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults, BrokerageOrder, DailyOutcomeScoresReport } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TickerOutcomes, TradingStrategyResults, BrokerageOrder, DailyOutcomeScoresReport, PriceWithDate } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -16,6 +16,8 @@ export class StockTradingOpenPositionsComponent {
   prices: Prices
   outcomes: TickerOutcomes;
   dailyScores: DailyOutcomeScoresReport;
+  positionBuys: PriceWithDate[]
+  positionSells: PriceWithDate[]
 
   constructor (private stockService: StocksService) { }
 
@@ -37,6 +39,8 @@ export class StockTradingOpenPositionsComponent {
     this.dailyScores = null
     this.prices = null
     this.simulationResults = null
+    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy')
+    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell')
     
     // get price data and pass it to chart
     this.getSimulatedTrades();
@@ -96,14 +100,6 @@ export class StockTradingOpenPositionsComponent {
       this._index = this.positions.length - 1
     }
     this.updateCurrentPosition()
-  }
-
-  buys(positionInstance:PositionInstance) {
-    return positionInstance.transactions.filter(t => t.type == 'buy')
-  }
-
-  sells(positionInstance:PositionInstance) {
-    return positionInstance.transactions.filter(t => t.type == 'sell')
   }
 
   linesOfInterest(positionInstance:PositionInstance) : number[] {

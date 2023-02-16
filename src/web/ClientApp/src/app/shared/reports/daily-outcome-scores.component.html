@@ -1,8 +1,8 @@
 <app-chart
-  *ngIf="dailyOutcomeScoresReport"
+  *ngIf="dailyScores && dailyScoresDates"
   [yScaleType]="'linear'"
-  [values]="getDailyScores()"
-  [chartLabels]="getDailyScoresDates()"
+  [values]="dailyScores"
+  [chartLabels]="dailyScoresDates"
   [chartLegend]="false"
   [chartType]="'bar'">
 </app-chart>

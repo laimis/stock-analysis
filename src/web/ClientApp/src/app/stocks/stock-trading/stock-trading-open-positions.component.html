@@ -39,8 +39,8 @@
   <section>
     <h5>Stock chart</h5>
     <app-stock-chart *ngIf="prices"
-          [positivePricePoints]="buys(currentPosition)"
-          [negativePricePoints]="sells(currentPosition)"
+          [positivePricePoints]="positionBuys"
+          [negativePricePoints]="positionSells"
           [prices]=prices
           [positiveLines]="[currentPosition.averageCostPerShare]"
           [negativeLines]="currentPosition.stopPrice ? [currentPosition.stopPrice] : []">

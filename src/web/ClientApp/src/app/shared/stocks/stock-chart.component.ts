@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
 import { Prices, PriceWithDate } from 'src/app/services/stocks.service';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
@@ -8,6 +8,7 @@ import { BaseChartDirective } from 'ng2-charts';
 @Component({
   selector: 'app-stock-chart',
   templateUrl: './stock-chart.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StockChartComponent implements OnInit, OnDestroy {
   

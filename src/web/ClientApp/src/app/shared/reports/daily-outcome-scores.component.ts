@@ -7,15 +7,13 @@ import { DailyOutcomeScoresReport } from '../../services/stocks.service';
   styleUrls: ['./daily-outcome-scores.component.css']
 })
 export class DailyOutcomeScoresComponent {
+  dailyScores: number[];
+  dailyScoresDates: string[];
   
   @Input()
-  dailyOutcomeScoresReport: DailyOutcomeScoresReport
-  
-  getDailyScores() {
-    return this.dailyOutcomeScoresReport.dailyScores.map(d => d.score)
-  }
-
-  getDailyScoresDates() {
-    return this.dailyOutcomeScoresReport.dailyScores.map(d => d.date.split('T')[0])
+  set dailyOutcomeScoresReport(report:DailyOutcomeScoresReport) {
+    console.log('report set: ' + report)
+    this.dailyScores = report.dailyScores.map(d => d.score)
+    this.dailyScoresDates = report.dailyScores.map(d => d.date.split('T')[0])
   }
 }

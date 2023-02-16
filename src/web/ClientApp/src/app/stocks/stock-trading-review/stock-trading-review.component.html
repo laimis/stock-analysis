@@ -38,8 +38,8 @@
   <section>
     <h5>Stock chart</h5>
     <app-stock-chart *ngIf="prices"
-      [positivePricePoints]="buys(currentPosition)"
-      [negativePricePoints]="sells(currentPosition)"
+      [positivePricePoints]="positionBuys"
+      [negativePricePoints]="positionSells"
       [prices]=prices>
     </app-stock-chart>
   </section>
@@ -58,30 +58,38 @@
       {{gradingSuccess }}
     </div>
     <div class="mb-3">
-      <input #gradeInput [value]="currentPosition.grade" type="text" class="form-control" id="gradeInput" aria-describedby="gradeHelp">
-      <div id="gradeHelp" class="form-text">Grade for trade: A, B, C</div>
+      <div class="form-check form-check-inline">
+        <input 
+          [checked]="this.assignedGrade === 'A'"
+          value="A"
+          (click)="this.assignedGrade = 'A'"
+          class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1">
+        <label class="form-check-label" for="inlineRadio1">A</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          [checked]="this.assignedGrade === 'B'"
+          value="B"
+          (click)="this.assignedGrade = 'B'"
+          class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2">
+        <label class="form-check-label" for="inlineRadio2">B</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          [checked]="this.assignedGrade === 'C'"
+          value="C"
+          (click)="this.assignedGrade = 'C'"
+          class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3">
+        <label class="form-check-label" for="inlineRadio3">C</label>
+      </div>
     </div>
     <div class="mb-3">
       <label for="notesInput" class="form-label">Notes</label>
-      <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="currentPosition.gradeNote"></textarea>
+      <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
     </div>
     <div>
-      <button (click)="assignGrade(gradeInput.value, gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
+      <button (click)="assignGrade(gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
     </div>
   </section>
-  <div class="container">
-    <div class="row">
-      <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-      <div class="col text-center">
-      </div>
-      <div class="col">
-      </div>
-      <div class="col">
-      </div>
-      <div class="col">
-      </div>
-      <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
-    </div>
-  </div>
   
 </div>

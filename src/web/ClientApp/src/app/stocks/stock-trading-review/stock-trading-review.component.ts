@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomeScoresReport } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomeScoresReport, PriceWithDate } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 
 
@@ -18,6 +18,8 @@ export class StockTradingReviewComponent implements OnInit {
   simulationResults: TradingStrategyResults
   prices: Prices
   dailyScores: DailyOutcomeScoresReport;
+  positionBuys: PriceWithDate[]
+  positionSells: PriceWithDate[]
 
   constructor (
     private stockService: StocksService,
@@ -39,6 +41,11 @@ export class StockTradingReviewComponent implements OnInit {
     // get price data and pass it to chart
     this.gradingError = null
     this.gradingSuccess = null
+    this.assignedGrade = this.currentPosition.grade
+    this.assignedNote = this.currentPosition.gradeNote
+    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy')
+    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell')
+
     this.runTradingStrategies();
     this.fetchPrice();
   }
@@ -102,18 +109,17 @@ export class StockTradingReviewComponent implements OnInit {
     this.updateCurrentPosition()
   }
 
-  buys(positionInstance:PositionInstance) {
-    return positionInstance.transactions.filter(t => t.type == 'buy')
-  }
-
-  sells(positionInstance:PositionInstance) {
-    return positionInstance.transactions.filter(t => t.type == 'sell')
-  }
-
   gradingError: string = null
   gradingSuccess: string = null
-  assignGrade(grade:string, note:string) {
-    this.stockService.assignGrade(this.currentPosition.ticker, this.currentPosition.positionId, grade, note).subscribe(
+  assignedGrade: string = null
+  assignedNote: string = null
+  assignGrade(note:string) {
+    this.assignedNote = note
+    this.stockService.assignGrade(
+      this.currentPosition.ticker,
+      this.currentPosition.positionId,
+      this.assignedGrade,
+      note).subscribe(
       (_: any) => {
         this.gradingSuccess = "Grade assigned successfully"
       },
