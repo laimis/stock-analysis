@@ -158,7 +158,8 @@ namespace web.BackgroundServices
 
             var nextRunTime = 
                 currentTime.TimeOfDay switch {
-                var t when t >= beforeClose.TimeOfDay =>  // after market close
+                var t when t >= beforeClose.TimeOfDay 
+                    || currentTime.Date != currentTimeInEastern.Date =>  // after market close
                     afterOpen.AddDays(1),
                 var t when t < afterOpen.TimeOfDay => // before market open
                     afterOpen,
