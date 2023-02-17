@@ -309,19 +309,19 @@ namespace web.BackgroundServices
                 currentTime.TimeOfDay switch {
                 var t when t >= lastRunBeforeClose.TimeOfDay => 
                     LogAndReturn(
-                        "After the end of the market day",
+                        $"{currentTime} is after the last run before close",
                         _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.AddDays(1))
                             .AddMinutes(15)
                     ),
                 var t when t < currentOpenTime.TimeOfDay => 
                     LogAndReturn(
-                        "Before the start of the market day",
+                        $"{currentTime} is before the start of the market day",
                         _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
                             .AddMinutes(15)
                     ),
                 var t when t < lastRunBeforeClose.TimeOfDay =>
                     LogAndReturn(
-                        "In the middle of the day",
+                        $"{currentTime} is in the middle of the day",
                         lastRunBeforeClose
                     ),
                     
