@@ -307,7 +307,7 @@ namespace web.BackgroundServices
 
             var nextRunTime = 
                 currentTime.TimeOfDay switch {
-                var t when t >= lastRunBeforeClose.TimeOfDay => 
+                var t when t >= lastRunBeforeClose.TimeOfDay || currentTime.Date != currentTimeInEastern.Date => 
                     LogAndReturn(
                         $"{currentTime} is after the last run before close",
                         _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.AddDays(1))
