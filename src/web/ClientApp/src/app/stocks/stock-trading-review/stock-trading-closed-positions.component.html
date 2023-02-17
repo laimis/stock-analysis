@@ -44,7 +44,7 @@
       <tr *ngFor="let p of positions; let i = index"
         [ngClass]="{
           'bg-success':p.grade === 'A',
-          'bg-danger':p.grade === 'C',
+          'bg-negative':p.grade === 'C',
           'text-white': p.grade === 'A' || p.grade === 'C'
         }">
         <td>{{i + 1}}</td>

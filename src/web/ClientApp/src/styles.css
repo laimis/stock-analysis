@@ -65,3 +65,8 @@ section h3 {
   padding:0;
   border-bottom:1px solid #858484;
 }
+
+.bg-negative {
+  background-color: #FFB6C1;    
+}
+
