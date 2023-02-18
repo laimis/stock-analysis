@@ -1,18 +1,21 @@
-.point-label {
-    font-weight: bold;
+.event {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    /* font-size: 0.75rem; */
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0.5rem 0;
 }
-
-.position-price {
-    font-size: larger;
-    padding-left: 10px;
+.event-buy {
+    background-color: #698f3f;
 }
-
-.position-gain {
-    font-size: larger;
-    font-weight: bold;
+.event-sell {
+    background-color: #0A122A;
+    color: white;
 }
-
-.position-ticker {
-    font-size: larger;
-    font-weight: bold;
+.event-stop {
+    background-color: #804e49;
+}
+.event-risk {
+    background-color: #fbfaf8;
 }

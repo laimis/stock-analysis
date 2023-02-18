@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
+import { BrokerageOrder, PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -81,6 +81,10 @@ export class StockTradingPositionComponent {
                 .filter(o => o.ticker == p.ticker)
                 .filter(o => o.status != "FILLED" && o.status != "REPLACED")
         }
+    }
+
+    getCssClassForEvent(e:PositionEvent) {
+        return "event-" + e.type
     }
 }
 

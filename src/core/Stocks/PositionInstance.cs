@@ -145,8 +145,10 @@ namespace core.Stocks
                 PositionCompleted = true;
             }
 
+            var percentGainAtSale = (price - AverageCostPerShare) / AverageCostPerShare;
+
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
-            Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price}", PositionEventType.sell, price, when));
+            Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price} ({percentGainAtSale.ToString("P")})", PositionEventType.sell, price, when));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
@@ -183,9 +185,9 @@ namespace core.Stocks
                     FirstStop = stopPrice;
                 }
 
-                var stopPercentage = Math.Round((AverageCostPerShare - stopPrice.Value) / AverageCostPerShare * 100, 2);
+                var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
-                Events.Add(new PositionEvent($"Stop price set to {stopPrice} ({stopPercentage}%)", PositionEventType.stop, stopPrice, when));
+                Events.Add(new PositionEvent($"Stop price set to {stopPrice} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -206,7 +208,7 @@ namespace core.Stocks
         {
             RiskedAmount = riskAmount;
 
-            Events.Add(new PositionEvent("Set risk amount", PositionEventType.risk, riskAmount, when));
+            Events.Add(new PositionEvent($"Set risk amount to {RiskedAmount}", PositionEventType.risk, riskAmount, when));
         }
 
         public void SetPrice(decimal price)
