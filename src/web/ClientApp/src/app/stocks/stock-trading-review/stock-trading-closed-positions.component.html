@@ -41,7 +41,15 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let p of positions; let i = index">
+      <ng-container *ngFor="let p of positions; let i = index;">
+      <!-- add separator row if p closed date month is different from previous position -->
+      <tr *ngIf="i === 0 || getMonth(p.closed) !== getMonth(positions[i - 1].closed)"
+        style="padding-top: 10px">
+        <td colspan="8" class="text-center fw-bold">
+          {{getMonth(p.closed) | date:'MMMM yyyy'}}
+        </td>
+      </tr>
+
       <tr 
         (click)="toggleShowNotes(i)"
         style="cursor: pointer"

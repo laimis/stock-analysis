@@ -27,6 +27,10 @@ export class StockTradingClosedPositionsComponent {
     }
   }
 
+  getMonth(input:string) {
+    return input.substring(0, 7)
+  }
+
   sort(column:string) {
     var func = this.getSortFunc(column);
 
