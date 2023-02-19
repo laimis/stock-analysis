@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PositionInstance, TradingStrategyPerformance } from 'src/app/services/stocks.service';
+import { PositionInstance } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -8,15 +8,37 @@ import { PositionInstance, TradingStrategyPerformance } from 'src/app/services/s
   styleUrls: ['./stock-trading-closed-positions.component.css']
 })
 export class StockTradingClosedPositionsComponent {
-  performances: TradingStrategyPerformance[];
-
+  private _positions: PositionInstance[];
+  tickers: string[];
+  
   @Input()
-  positions: PositionInstance[]
+  set positions(value: PositionInstance[]) {
+    this._positions = value
+    this.tickers = value
+      .map(p => p.ticker)
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .sort()
+  }
+  get positions(): PositionInstance[] {
+    return this._positions
+  }
+
+  matchesFilter(position:PositionInstance) {
+    if (this.tickerFilter != 'all' && !position.ticker.toLowerCase().includes(this.tickerFilter.toLowerCase())) {
+      return false
+    }
+
+    if (this.gradeFilter != 'all' && position.grade != this.gradeFilter) {
+      return false
+    }
+
+    return true
+  }
 
   sortColumn : string
   sortDirection : number = -1
-  timeFilter: string
-  gradeFilter: string
+  tickerFilter: string = 'all'
+  gradeFilter: string = 'all'
   showNotes: number = -1
 
   toggleShowNotes(index:number) {
@@ -25,6 +47,14 @@ export class StockTradingClosedPositionsComponent {
     } else {
       this.showNotes = index
     }
+  }
+
+  filterByTickerChanged(value:string) {
+    this.tickerFilter = value
+  }
+
+  filterByGradeChanged(value:string) {
+    this.gradeFilter = value
   }
 
   getMonth(input:string) {
