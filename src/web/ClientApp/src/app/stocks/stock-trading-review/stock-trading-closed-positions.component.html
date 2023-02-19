@@ -41,7 +41,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of positions; let i = index"
+      <ng-container *ngFor="let p of positions; let i = index">
+      <tr 
+        (click)="toggleShowNotes(i)"
+        style="cursor: pointer"
         [ngClass]="{
           'bg-success':p.grade === 'A',
           'bg-negative':p.grade === 'C',
@@ -60,6 +63,15 @@
         <td>{{p.grade}}</td>
         <td>{{p.daysHeld}}</td>
       </tr>
+      <tr *ngIf="showNotes === i">
+        <td colspan="8">
+          <div *ngFor="let n of p.notes" class="mb-2">
+            <!-- <span class="badge bg-secondary me-1"></span> -->
+            {{n}}
+          </div>
+        </td>
+      </tr>
+    </ng-container>
     </tbody>
   </table>
 

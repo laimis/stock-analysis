@@ -17,6 +17,15 @@ export class StockTradingClosedPositionsComponent {
   sortDirection : number = -1
   timeFilter: string
   gradeFilter: string
+  showNotes: number = -1
+
+  toggleShowNotes(index:number) {
+    if (this.showNotes == index) {
+      this.showNotes = -1
+    } else {
+      this.showNotes = index
+    }
+  }
 
   sort(column:string) {
     var func = this.getSortFunc(column);
