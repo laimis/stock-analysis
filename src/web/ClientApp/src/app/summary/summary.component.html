@@ -6,6 +6,7 @@
 </div>
 
 <div *ngIf="loaded">
+  
   <select class="form-select" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
     <option value="thisweek" selected>This week</option>
     <option value="last7days">Last 7 days</option>
@@ -42,38 +43,23 @@
       </div>
     </div>
     <div class="mb-3">
-      <div class="mb-3">
-        <div class="form-check form-check-inline">
-          <input 
-            [checked]="p.grade === 'A'"
-            value="A"
-            (click)="p.grade = 'A'"
-            class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1">
-          <label class="form-check-label" for="inlineRadio1">A</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input
-            [checked]="p.grade === 'B'"
-            value="B"
-            (click)="p.grade = 'B'"
-            class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2">
-          <label class="form-check-label" for="inlineRadio2">B</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input
-            [checked]="p.grade === 'C'"
-            value="C"
-            (click)="p.grade = 'C'"
-            class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3">
-          <label class="form-check-label" for="inlineRadio3">C</label>
-        </div>
+      <div class="alert alert-success" role="alert" *ngIf="gradeAssigned === (p.ticker + p.positionId) ">
+        Grade saved
       </div>
-      <div class="mb-3">
-        <label for="notesInput" class="form-label">Notes</label>
-        <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="p.gradeNote"></textarea>
-      </div>
+      <label for="gradeInput" class="form-label">Grade</label>
+      <select #grade class="form-select" id="gradeInput" [(ngModel)]="p.grade">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="notesInput" class="form-label">Note for Grade</label>
+      <textarea #notes class="form-control" id="notesInput" rows="3" [value]="p.gradeNote"></textarea>
+    </div>
+    <div class="mb-3">
       <div>
-        <button (click)="assignGrade(p, gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
+        <button (click)="assignGrade(p, grade.value, notes.value)" class="btn btn-primary">Submit</button>
       </div>
     </div>
   </ng-container>

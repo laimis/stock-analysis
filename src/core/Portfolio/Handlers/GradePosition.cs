@@ -1,12 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
-using core.Stocks;
-using core.Stocks.Services.Trading;
 using MediatR;
 
 namespace core.Portfolio
