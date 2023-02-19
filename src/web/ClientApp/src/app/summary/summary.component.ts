@@ -52,5 +52,11 @@ export class SummaryComponent implements OnInit {
   sells(positionInstance:PositionInstance) {
     return positionInstance.transactions.filter(t => t.type == 'sell')
   }
+
+  assignGrade(position:PositionInstance, note:string) {
+    this.stockService.assignGrade(position.ticker, position.positionId, position.grade, note).subscribe(_ => {
+      position.gradeNote = note
+    })
+  }
 }
 

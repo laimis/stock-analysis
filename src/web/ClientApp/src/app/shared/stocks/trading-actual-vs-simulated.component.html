@@ -48,7 +48,7 @@
           <td colspan="7">
             <table class="table small">
               <tbody>
-                <tr *ngFor="let e of r.position.events">
+                <tr *ngFor="let e of r.position.events" class="event" [ngClass]="'event-' + e.type">
                   <td>{{e.date}}</td>
                   <td>{{e.type}}</td>
                   <td>{{e.value | currency}}</td>

@@ -70,3 +70,24 @@ section h3 {
   background-color: #FFB6C1;    
 }
 
+.event {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  /* font-size: 0.75rem; */
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0.5rem 0;
+}
+.event-buy {
+  background-color: #698f3f;
+}
+.event-sell {
+  background-color: #0A122A;
+  color: white;
+}
+.event-stop {
+  background-color: #804e49;
+}
+.event-risk {
+  background-color: #fbfaf8;
+}
