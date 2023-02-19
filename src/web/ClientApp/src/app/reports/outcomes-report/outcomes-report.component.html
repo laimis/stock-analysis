@@ -12,34 +12,47 @@
         <span class="me-3" *ngIf="endDate">End date: {{endDate | date}}</span>
         <span class="me-3" *ngIf="earnings">Earnings: {{earnings.length}}</span>
     </div>
+    <!-- drop down with all the tickers -->
+    <div class="mb-3 mt-3">
+        <label for="tickerFilter" class="form-label">Ticker filter</label>
+        <select #tickerSelect class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
+            <option value="all">All</option>
+            <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
+        </select>
+    </div>
     </section>
 
     <app-outcomes-analysis-report
         [report]="singleBarReportDaily"
         [showSummary]="true"
+        [tickerFilter]="activeTicker"
         title="Daily Report">
     </app-outcomes-analysis-report>
 
     <app-outcomes
         *ngIf="singleBarReportDaily"
         [outcomes]="singleBarReportDaily.outcomes"
+        [tickerFilter]="activeTicker"
         title="Single Bar Outcome (daily)">
     </app-outcomes>
 
     <app-outcomes-analysis-report
         [report]="singleBarReportWeekly"
         [showSummary]="true"
+        [tickerFilter]="activeTicker"
         title="Weekly Report">
     </app-outcomes-analysis-report>
     <app-outcomes
         *ngIf="singleBarReportWeekly"
         [outcomes]="singleBarReportWeekly.outcomes"
+        [tickerFilter]="activeTicker"
         title="Single Bar Outcome (weekly)">
     </app-outcomes>
 
     <app-outcomes
         *ngIf="allBarsReport"
         [outcomes]="allBarsReport.outcomes"
+        [tickerFilter]="activeTicker"
         title="All Bar Outcomes (daily)">
     </app-outcomes>
 

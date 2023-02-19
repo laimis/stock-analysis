@@ -19,6 +19,8 @@ export class OutcomesReportComponent implements OnInit {
   singleBarReportWeekly: OutcomesReport;
   tickers: string[] = [];
 
+  activeTicker: string = null;
+
   constructor (
     private stocksService: StocksService,
     private route: ActivatedRoute) {
@@ -94,5 +96,9 @@ export class OutcomesReportComponent implements OnInit {
     }, error => {
       this.error = error;
     });
+  }
+
+  onTickerChange(activeTicker:string) {
+    this.activeTicker = activeTicker;
   }
 }

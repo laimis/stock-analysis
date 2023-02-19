@@ -22,6 +22,9 @@ export class OutcomesComponent {
   outcomes: TickerOutcomes[]
 
   @Input()
+  tickerFilter: string
+
+  @Input()
   set category(value:AnalysisOutcomeEvaluation) {
     this.outcomes = value.matchingTickers
     this.sort(value.sortColumn)

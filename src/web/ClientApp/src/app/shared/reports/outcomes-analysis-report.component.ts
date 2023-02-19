@@ -17,6 +17,9 @@ export class OutcomesAnalysisReportComponent {
 
   @Input()
   showSummary: boolean
+
+  @Input()
+  tickerFilter: string
   
 	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)

@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let s of outcomes">
+        <tr *ngFor="let s of outcomes" [ngClass]="{'bg-warning': s.ticker === tickerFilter}">
           <td>
             <!-- <a [routerLink]="['/stocks', s.ticker]">{{s.ticker}}</a> -->
             <a [href]="getTradingViewLink(s.ticker)" target="_blank">{{s.ticker}}</a>

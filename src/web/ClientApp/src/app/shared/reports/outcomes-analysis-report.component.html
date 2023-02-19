@@ -6,8 +6,13 @@
       <h3 *ngIf="title">{{title}}</h3>
       <div *ngIf="showSummary" class="mb-3">
           <span *ngFor="let s of report.summary"
-              class="badge rounded-pill bg-secondary me-2">
-              <a [href]="tradingViewLink(s.ticker)" target="_blank">{{s.ticker}}: {{s.count}}</a>
+            class="badge rounded-pill me-2"
+            [ngClass]="{
+              'bg-success': s.count > 0,
+              'bg-danger': s.count < 0,
+              'bg-secondary': s.count === 0
+            }">
+              <a class="text-white" [href]="tradingViewLink(s.ticker)" target="_blank">{{s.ticker}}: {{s.count}}</a>
           </span>
       </div>
     </section>
@@ -37,7 +42,7 @@
           {{c.name}}
           <span *ngIf="c.matchingTickers.length > 0" > - {{c.matchingTickers.length}}</span>
         </h5>
-        <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c"></app-outcomes>
+        <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c" [tickerFilter]="tickerFilter"></app-outcomes>
         <span *ngIf="c.matchingTickers.length === 0">No positions in this category</span>
       </div>
     </section>
