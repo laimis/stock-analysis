@@ -17,6 +17,7 @@ export class StockPositionReportsComponent implements OnInit {
   singleBarReportWeekly: OutcomesReport;
   positionsReport: OutcomesReport;
   gaps: StockGaps[] = [];
+  tickerFilter: string;
   
 
 	constructor(private service : StocksService){}
@@ -27,8 +28,16 @@ export class StockPositionReportsComponent implements OnInit {
   @Input()
   allTimeMode: boolean = false
 
+  _positions: PositionInstance[] = []
+  tickers: string[] = []
   @Input()
-  positions: PositionInstance[] = []
+  set positions(value: PositionInstance[]) {
+    this._positions = value
+    this.tickers = value.map(p => p.ticker)
+  }
+  get positions(): PositionInstance[] {
+    return this._positions
+  }
 
   errors: string[] = []
 
@@ -92,5 +101,9 @@ export class StockPositionReportsComponent implements OnInit {
     }, error => {
       this.handleApiError("Unable to load all bars", error)
     })
+  }
+
+  onTickerChange(ticker: string) {
+    this.tickerFilter = ticker
   }
 }

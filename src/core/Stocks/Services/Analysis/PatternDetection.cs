@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Analysis
@@ -39,13 +40,26 @@ namespace core.Stocks.Services.Analysis
             // upside reversal pattern detection
             if (current.Close > previous.Close && current.Low < previous.Low)
             {
-                var strength = current.Close > System.Math.Max(previous.Open, previous.Close) ?
+                var additionalInfo = current.Close > System.Math.Max(previous.Open, previous.Close) ?
                     "Strong" : "Weak";
+
+                // see if we can do volume numbers
+                if (bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                {
+                    var stats = NumberAnalysis.Statistics(
+                        bars[(bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)..]
+                        .Select(b => (decimal)b.Volume)
+                        .ToArray()
+                    );
+
+                    var multiplier = current.Volume / stats.median;
+                    additionalInfo += $", volume x{multiplier.ToString("N1")}";
+                }
 
                 return new Pattern(
                     date: current.Date,
                     name: UpsideReversalName,
-                    description: $"{UpsideReversalName}: {strength}");
+                    description: $"{UpsideReversalName}: {additionalInfo}");
             }
 
             return null;
@@ -114,23 +128,18 @@ namespace core.Stocks.Services.Analysis
                 return null;
             }
 
-            // calculate the average volume of the last 60 bars
-            var volumeSum = 0m;
-            var numberOfBars = 0;
-            for (var i = bars.Length - 1; i >= bars.Length - 60 && i >= 0; i--)
-            {
-                volumeSum += bars[i].Volume;
-                numberOfBars++;
-            }
-
-            var averageVolume = volumeSum / numberOfBars;
+            var stats = NumberAnalysis.Statistics(
+                bars[(bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)..]
+                .Select(b => (decimal)b.Volume)
+                .ToArray()
+            );
 
             // now take the last bar volume
             var lastBarVolume = bars[^1].Volume;
-            var multiplier = lastBarVolume / averageVolume;
+            var multiplier = lastBarVolume / stats.median;
 
             // if the last bar volume is 10x the average volume, then we have a pattern
-            if (lastBarVolume > averageVolume * VolumeMultiplier)
+            if (lastBarVolume > stats.median * VolumeMultiplier)
             {
                 return new Pattern(
                     date: bars[^1].Date,

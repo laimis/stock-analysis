@@ -2,9 +2,18 @@
 
   <div class="bg-danger" *ngFor="let err of errors">{{err}}</div>
   
+  <div class="mb-3 mt-3">
+    <label for="tickerFilter" class="form-label">Ticker filter</label>
+    <select #tickerSelect class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
+        <option value="all">All</option>
+        <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
+    </select>
+</div>
+
   <app-outcomes
     *ngIf="allBarsReport"
     [title]="'Mutliple bar outcomes'"
+    [tickerFilter]="tickerFilter"
     [outcomes]="allBarsReport.outcomes">
   </app-outcomes>
 
@@ -12,18 +21,21 @@
     *ngIf="positionsReport"
     [title]="'Position report'"
     [report]="positionsReport"
+    [tickerFilter]="tickerFilter"
     [showSummary]="false">
   </app-outcomes-analysis-report>
 
   <app-outcomes
     *ngIf="positionsReport"
     [title]="'Positions outcomes'"
+    [tickerFilter]="tickerFilter"
     [outcomes]="positionsReport.outcomes">
   </app-outcomes>
 
   <app-outcomes-analysis-report
     *ngIf="singleBarReportDaily"
     [title]="'Daily report'"
+    [tickerFilter]="tickerFilter"
     [report]="singleBarReportDaily"
     [showSummary]="true">
   </app-outcomes-analysis-report>
@@ -31,6 +43,7 @@
   <app-outcomes
     *ngIf="singleBarReportDaily"
     [title]="'Daily outcomes'"
+    [tickerFilter]="tickerFilter"
     [outcomes]="singleBarReportDaily.outcomes">
   </app-outcomes>
 
@@ -38,12 +51,14 @@
     *ngIf="singleBarReportWeekly"
     [title]="'Weekly report'"
     [report]="singleBarReportWeekly"
+    [tickerFilter]="tickerFilter"
     [showSummary]="true">
   </app-outcomes-analysis-report>  
 
   <app-outcomes
     *ngIf="singleBarReportWeekly"
     [title]="'Weekly outcomes'"
+    [tickerFilter]="tickerFilter"
     [outcomes]="singleBarReportWeekly.outcomes">
   </app-outcomes>
 

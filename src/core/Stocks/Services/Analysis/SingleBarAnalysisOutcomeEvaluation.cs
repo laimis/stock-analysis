@@ -115,17 +115,6 @@ namespace core.Stocks.Services.Analysis
                     ).ToList()
             );
 
-
-            yield return new AnalysisOutcomeEvaluation(
-                "SMA20 Below SMA50 Recent",
-                OutcomeType.Neutral,
-                SingleBarOutcomeKeys.SMA20Above50Days,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value <= 0 && o.value > -5))
-                    .ToList()
-            );
-
             yield return new AnalysisOutcomeEvaluation(
                 "Negative gap downs",
                 OutcomeType.Negative,

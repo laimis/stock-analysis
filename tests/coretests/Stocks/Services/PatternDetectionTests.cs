@@ -22,7 +22,11 @@ namespace coretests.Stocks.Services
             var bars = TestDataGenerator.PriceBars("ENPH");
             var patterns = PatternDetection.Generate(bars);
             Assert.Single(patterns);
-            Assert.Equal(PatternDetection.UpsideReversalName, patterns.First().name);
+
+            var pattern = patterns.First();
+            Assert.Equal(PatternDetection.UpsideReversalName, pattern.name);
+            Assert.Contains("Strong", pattern.description);
+            Assert.Contains("volume x0.9", pattern.description);
         }
 
         [Fact]
