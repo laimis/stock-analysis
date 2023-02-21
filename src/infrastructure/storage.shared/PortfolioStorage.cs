@@ -19,6 +19,7 @@ namespace storage.shared
         private const string _note_entity = "note3";
         private const string _crypto_entity = "ownedcrypto";
         private const string _stock_list_entity = "stocklist";
+        private const string _pending_stock_position_entity = "pendingstockposition";
 
         private IAggregateStorage _aggregateStorage;
         private IBlobStorage _blobStorage;
@@ -120,6 +121,7 @@ namespace storage.shared
             await _aggregateStorage.DeleteAggregates(_stock_entity, userId);
             await _aggregateStorage.DeleteAggregates(_crypto_entity, userId);
             await _aggregateStorage.DeleteAggregates(_stock_list_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_pending_stock_position_entity, userId);
         }
 
         public async Task<OwnedCrypto> GetCrypto(string token, Guid userId)
@@ -164,12 +166,21 @@ namespace storage.shared
             return list.SingleOrDefault(s => s.State.Name == name);
         }
 
-        public Task Save(StockList list, Guid userId)
-        {
-            return Save(list, _stock_list_entity, userId);
-        }
+        public Task Save(StockList list, Guid userId) =>
+            Save(list, _stock_list_entity, userId);
 
         public Task DeleteStockList(StockList list, Guid id) =>
             _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: id);
+
+        public Task Save(PendingStockPosition position, Guid userId) =>
+            Save(position, _pending_stock_position_entity, userId);
+
+        public Task<IEnumerable<PendingStockPosition>> GetPendingStockPositions(Guid userId) =>
+            _aggregateStorage.GetEventsAsync(_pending_stock_position_entity, userId)
+                .ContinueWith(t => t.Result.GroupBy(e => e.AggregateId)
+                    .Select(g => new PendingStockPosition(g)));
+
+        public async Task DeletePendingStockPosition(PendingStockPosition position, Guid userId) =>
+            await _aggregateStorage.DeleteAggregate(entity: _pending_stock_position_entity, aggregateId: position.Id, userId: userId);
     }
 }

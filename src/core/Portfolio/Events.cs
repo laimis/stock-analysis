@@ -76,4 +76,42 @@ namespace core.Portfolio
 
         public string Tag { get; }
     }
+
+    internal class PendingStockPositionCreated : AggregateEvent
+    {
+        public PendingStockPositionCreated(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            Guid userId,
+            string ticker,
+            decimal price,
+            decimal numberOfShares,
+            decimal? stopPrice,
+            string notes)
+            : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            Ticker = ticker;
+            Price = price;
+            NumberOfShares = numberOfShares;
+            StopPrice = stopPrice;
+            Notes = notes;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+        public decimal Price { get; }
+        public decimal NumberOfShares { get; }
+        public decimal? StopPrice { get; }
+        public string Notes { get; }
+    }
+
+    public class PendingStockPositionDeleted : AggregateEvent
+    {
+        public PendingStockPositionDeleted(Guid id, Guid aggregateId, DateTimeOffset when)
+            : base(id, aggregateId, when)
+        {
+        }
+    }
 }

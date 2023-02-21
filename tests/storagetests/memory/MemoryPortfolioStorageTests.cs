@@ -2,11 +2,16 @@
 using storage.memory;
 using storage.shared;
 using storage.tests;
+using Xunit.Abstractions;
 
 namespace storagetests.memory
 {
     public class MemoryPortfolioStorageTests : PortfolioStorageTests
     {
+        public MemoryPortfolioStorageTests(ITestOutputHelper output) : base(output)
+        {
+        }
+        
         protected override IPortfolioStorage CreateStorage()
         {
             return new PortfolioStorage(

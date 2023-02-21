@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
 
 @Component({
-  selector: 'app-stock-newposition',
+  selector: 'app-stock-trading-newposition',
   templateUrl: './stock-trading-newposition.component.html',
   styleUrls: ['./stock-trading-newposition.component.css'],
   providers: [DatePipe]
@@ -178,13 +178,7 @@ export class StockTradingNewPositionComponent {
 
   record() {
     console.log("record")
-    var cmd = new stocktransactioncommand()
-    cmd.ticker = this.ticker
-    cmd.numberOfShares = this.numberOfShares
-    cmd.price = this.costToBuy
-    cmd.stopPrice = this.stopPrice
-    cmd.notes = this.notes
-    cmd.date = this.date
+    var cmd = this.createPurchaseCommand();
 
     if (!this.recordPositions) {
       this.stockPurchased.emit(cmd)
@@ -195,6 +189,32 @@ export class StockTradingNewPositionComponent {
       _ => { 
         this.stockPurchased.emit(cmd)
     },
+      _ => { alert('purchase failed') }
+    )
+  }
+
+  private createPurchaseCommand() {
+    var cmd = new stocktransactioncommand();
+    cmd.ticker = this.ticker;
+    cmd.numberOfShares = this.numberOfShares;
+    cmd.price = this.costToBuy;
+    cmd.stopPrice = this.stopPrice;
+    cmd.notes = this.notes;
+    cmd.date = this.date;
+    return cmd;
+  }
+
+  createPendingPosition() {
+    var cmd = this.createPurchaseCommand()
+
+    this.stockService.createPendingStockPosition(cmd).subscribe(
+      _ => {
+        this.ticker = null
+        this.prices = null
+        this.gaps = null
+        this.outcomes = null
+        this.stockPurchased.emit(cmd)
+      },
       _ => { alert('purchase failed') }
     )
   }

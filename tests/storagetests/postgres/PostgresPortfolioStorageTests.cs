@@ -9,6 +9,7 @@ using storage.shared;
 using storage.tests;
 using testutils;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace storagetests.postgres
 {
@@ -17,7 +18,7 @@ namespace storagetests.postgres
     {
         protected string _cnn = null;
 
-        public PostgresPortfolioStorageTests()
+        public PostgresPortfolioStorageTests(ITestOutputHelper output) : base(output)
         {
             _cnn = CredsHelper.GetDbCreds();
         }
