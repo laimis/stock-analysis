@@ -1,8 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 
 namespace core.Portfolio.Handlers
 {
@@ -26,12 +29,43 @@ namespace core.Portfolio.Handlers
 
         public class Handler : HandlerWithStorage<Command, PendingStockPositionState>
         {
-            public Handler(IPortfolioStorage storage) : base(storage)
+            private IAccountStorage _accountStorage;
+            private IBrokerage _brokerage;
+
+            public Handler(
+                IBrokerage brokerage,
+                IAccountStorage accountStorage,
+                IPortfolioStorage storage) : base(storage)
             {
+                _accountStorage = accountStorage;
+                _brokerage = brokerage;
             }
 
             public override async Task<PendingStockPositionState> Handle(Command request, CancellationToken cancellationToken)
             {
+                var user = await _accountStorage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                // check if there is already a pending position for this ticker
+                var existing = await _storage.GetPendingStockPositions(request.UserId);
+                var found = existing.SingleOrDefault(x => x.State.Ticker == new Ticker(request.Ticker));
+                if (found != null)
+                {
+                    throw new Exception("There is already a pending position for this ticker");
+                }
+
+                await _brokerage.BuyOrder(
+                    user: user.State,
+                    ticker: request.Ticker,
+                    numberOfShares: request.NumberOfShares,
+                    price: request.Price,
+                    BrokerageOrderType.Limit,
+                    BrokerageOrderDuration.GtcPlus
+                    );
+
                 var pending = new PendingStockPosition(
                     notes: request.Notes,
                     numberOfShares: request.NumberOfShares,

@@ -1,18 +1,15 @@
-import { DatePipe } from '@angular/common';
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { PendingStockPosition, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-pendingpositions',
   templateUrl: './stock-trading-pendingpositions.component.html',
-  styleUrls: ['./stock-trading-pendingpositions.component.css'],
-  providers: [DatePipe]
+  styleUrls: ['./stock-trading-pendingpositions.component.css']
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
   
   constructor(
-      private stockService:StocksService,
-      private datePipe: DatePipe
+      private stockService:StocksService
       )
   { }
 
@@ -30,7 +27,17 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     this.stockService.getPendingStockPositions().subscribe(
       (data) => {
         this.positions = data;
-        console.log(data)
+      }
+    )
+  }
+
+  closePendingPosition(position: PendingStockPosition) {
+    this.stockService.closePendingPosition(position.id).subscribe(
+      (_) => {
+        this.refreshPendingPositions();
+      },
+      (error) => {
+        console.log(error)
       }
     )
   }

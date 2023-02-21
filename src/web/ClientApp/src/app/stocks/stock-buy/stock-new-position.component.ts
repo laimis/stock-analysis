@@ -25,8 +25,11 @@ export class StockNewPositionComponent {
 
   stockPurchased() {
     this.feedbackMessage = "Position open recorded";
-    this.pendingPositions.refreshPendingPositions();
   }
 
-
+  pendingPositionCreated() {
+    this.feedbackMessage = "Pending position created";
+    this.pendingPositions.refreshPendingPositions();
+    this.brokerageOrders.refreshOrders();
+  }
 }

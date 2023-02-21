@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
+import { GetErrors } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-newposition',
@@ -32,6 +33,9 @@ export class StockTradingNewPositionComponent {
 
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
+
+  @Output()
+  pendingPositionCreated: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
   // variables for new positions
   positionSizeCalculated: number = null
@@ -213,9 +217,13 @@ export class StockTradingNewPositionComponent {
         this.prices = null
         this.gaps = null
         this.outcomes = null
-        this.stockPurchased.emit(cmd)
+        this.pendingPositionCreated.emit(cmd)
       },
-      _ => { alert('purchase failed') }
+      errors => { 
+        var errorMessageArray = GetErrors(errors)
+        var errorMessages = errorMessageArray.join(", ")
+        alert('pending position failed: ' + errorMessages) 
+      }
     )
   }
 

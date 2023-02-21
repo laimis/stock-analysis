@@ -40,9 +40,9 @@
 
   </div>
 
-  <stock-ownership *ngIf="isActive('stocks')"
+  <app-stock-ownership *ngIf="isActive('stocks')"
     [stock]=stock [ownership]=ownership
-    (ownershipChanged)="stockOwnershipChanged($event)"></stock-ownership>
+    (ownershipChanged)="stockOwnershipChanged($event)"></app-stock-ownership>
 
   <stock-option *ngIf="isActive('options')"
     [ticker]=stock.ticker [options]=options

@@ -37,6 +37,10 @@ namespace web.Controllers
             return _mediator.Send(command);
         }
 
+        [HttpDelete("pendingstockpositions/{id}")]
+        public Task DeletePendingStockPosition(Guid id) =>
+            _mediator.Send(new PendingStockPositionClose.Command(id, User.Identifier()));
+
         [HttpGet("stocklists")]
         public Task<StockListState[]> StockLists() =>
             _mediator.Send(new Lists.Query(User.Identifier()));

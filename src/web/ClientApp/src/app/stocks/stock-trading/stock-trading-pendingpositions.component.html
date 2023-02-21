@@ -12,6 +12,7 @@
           <th scope="col">Price</th>
           <th scope="col">Stop</th>
           <th scope="col">Date</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -22,6 +23,9 @@
             <td>{{ position.price | currency }}</td>
             <td>{{ position.stopPrice | currency }}</td>
             <td>{{ position.date | date }}</td>
+            <td class="text-end">
+              <button class="btn btn-warning btn-sm" (click)="closePendingPosition(position)">Close</button>
+            </td>
           </tr>
           <tr>
             <td colspan="5">
