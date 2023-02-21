@@ -17,10 +17,10 @@
   
   <div class="row" *ngIf="!showExisting">
     <div class="col-md-8" *ngIf="!ticker">
-      <app-stock-newposition
+      <app-stock-trading-newposition
         (stockPurchased)="initialPosition($event)"
         [recordPositions]="false">
-      </app-stock-newposition>
+      </app-stock-trading-newposition>
     </div>
     <div class="col-md-8" *ngIf="ticker">
       <div class="row">
