@@ -7,9 +7,12 @@
       (brokerageOrderEntered)="brokerageOrderEntered()">
     </app-brokerage-neworder>
 
-    <app-stock-newposition
-        (stockPurchased)="stockPurchased()">
-    </app-stock-newposition>
+    <app-stock-trading-newposition
+        (stockPurchased)="stockPurchased()"
+        (pendingPositionCreated)="pendingPositionCreated()">
+    </app-stock-trading-newposition>
+
+    <app-stock-trading-pendingpositions></app-stock-trading-pendingpositions>
 
     <app-brokerage-orders></app-brokerage-orders>
 </div>

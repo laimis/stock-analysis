@@ -82,6 +82,7 @@ import { StockTradingSimulationsComponent } from './stocks/stock-trading/stock-t
 import { ChartComponent } from './shared/chart/chart.component';
 import { DailyOutcomeScoresComponent } from './shared/reports/daily-outcome-scores.component';
 import { StockTradingReviewDashboardComponent } from './stocks/stock-trading-review/stock-trading-review-dashboard.component';
+import { StockTradingPendingPositionsComponent } from './stocks/stock-trading/stock-trading-pendingpositions.component';
 
 
 var routes: Routes = [
@@ -229,7 +230,8 @@ var routes: Routes = [
     StockListsDashboardComponent,
     StockListComponent,
     ChartComponent,
-    StockTradingReviewDashboardComponent
+    StockTradingReviewDashboardComponent,
+    StockTradingPendingPositionsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

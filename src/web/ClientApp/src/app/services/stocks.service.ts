@@ -107,6 +107,19 @@ export class StocksService {
   }
   // 
 
+  // ----------------- pending positions ---------------------
+  getPendingStockPositions(): Observable<PendingStockPosition[]> {
+    return this.http.get<PendingStockPosition[]>('/api/portfolio/pendingstockpositions')
+  }
+
+  createPendingStockPosition(cmd: stocktransactioncommand): Observable<PendingStockPosition> {
+    return this.http.post<PendingStockPosition>('/api/portfolio/pendingstockpositions', cmd)
+  }
+
+  closePendingPosition(id: string): Observable<any> {
+    return this.http.delete<any>('/api/portfolio/pendingstockpositions/' + id)
+  }
+
   // ----------------- alerts ---------------------
   getAlerts(): Observable<AlertsContainer> {
     return this.http.get<AlertsContainer>('/api/alerts')
@@ -844,6 +857,16 @@ export interface PositionEvent {
   value: number | null,
   type: string,
   description: string,
+}
+
+export interface PendingStockPosition {
+  id: string,
+  ticker: string,
+  price: number,
+  numberOfShares: number,
+  stopPrice: number,
+  date: string
+  notes: string
 }
 
 export interface PositionInstance {

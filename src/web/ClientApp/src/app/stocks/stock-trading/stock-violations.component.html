@@ -14,11 +14,12 @@
             (transactionFailed)="transactionFailed($event)"
             (transactionRecorded)="transactionRecorded($event)">
           </app-stock-transaction>
-          <app-stock-newposition
+          <app-stock-trading-newposition
             *ngIf="activeTicker === violation.ticker && fixType === 'position'"
             [setTicker]="violation.ticker"
+            [hideCreatePendingPosition]="true"
             (stockPurchased)="transactionRecorded($event)">
-          </app-stock-newposition>
+          </app-stock-trading-newposition>
         </div>
       </li>
     </ul>

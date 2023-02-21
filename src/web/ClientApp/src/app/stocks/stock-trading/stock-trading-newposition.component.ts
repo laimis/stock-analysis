@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
+import { GetErrors } from 'src/app/services/utils';
 
 @Component({
-  selector: 'app-stock-newposition',
+  selector: 'app-stock-trading-newposition',
   templateUrl: './stock-trading-newposition.component.html',
   styleUrls: ['./stock-trading-newposition.component.css'],
   providers: [DatePipe]
@@ -30,8 +31,14 @@ export class StockTradingNewPositionComponent {
     this.onBuyTickerSelected(ticker)
   }
 
+  @Input()
+  hideCreatePendingPosition: boolean = false
+
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
+
+  @Output()
+  pendingPositionCreated: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
   // variables for new positions
   positionSizeCalculated: number = null
@@ -69,6 +76,7 @@ export class StockTradingNewPositionComponent {
         this.ask = quote.askPrice
         this.bid = quote.bidPrice
         this.updateChart(ticker)
+        this.lookupPendingPosition(ticker)
       }, error => {
         console.error(error)
       }
@@ -178,13 +186,7 @@ export class StockTradingNewPositionComponent {
 
   record() {
     console.log("record")
-    var cmd = new stocktransactioncommand()
-    cmd.ticker = this.ticker
-    cmd.numberOfShares = this.numberOfShares
-    cmd.price = this.costToBuy
-    cmd.stopPrice = this.stopPrice
-    cmd.notes = this.notes
-    cmd.date = this.date
+    var cmd = this.createPurchaseCommand();
 
     if (!this.recordPositions) {
       this.stockPurchased.emit(cmd)
@@ -199,11 +201,57 @@ export class StockTradingNewPositionComponent {
     )
   }
 
+  private createPurchaseCommand() {
+    var cmd = new stocktransactioncommand();
+    cmd.ticker = this.ticker;
+    cmd.numberOfShares = this.numberOfShares;
+    cmd.price = this.costToBuy;
+    cmd.stopPrice = this.stopPrice;
+    cmd.notes = this.notes;
+    cmd.date = this.date;
+    return cmd;
+  }
+
+  createPendingPosition() {
+    var cmd = this.createPurchaseCommand()
+
+    this.stockService.createPendingStockPosition(cmd).subscribe(
+      _ => {
+        this.ticker = null
+        this.prices = null
+        this.gaps = null
+        this.outcomes = null
+        this.pendingPositionCreated.emit(cmd)
+      },
+      errors => { 
+        var errorMessageArray = GetErrors(errors)
+        var errorMessages = errorMessageArray.join(", ")
+        alert('pending position failed: ' + errorMessages) 
+      }
+    )
+  }
+
   filteredOutcomes(): StockAnalysisOutcome[] {
     if (!this.outcomes) {
       return []
     }
     return this.outcomes.outcomes.filter(o => o.type !== "Neutral")
+  }
+
+  lookupPendingPosition(ticker: string) {
+    this.stockService.getPendingStockPositions().subscribe(
+      positions => {
+        var position = positions.find(p => p.ticker === ticker)
+        if (position) {
+          this.costToBuy = position.price
+          this.numberOfShares = position.numberOfShares
+          this.stopPrice = position.stopPrice
+          this.notes = position.notes
+          this.date = this.datePipe.transform(position.date, 'yyyy-MM-dd');
+          this.updateBuyingValuesPricesChanged()
+        }
+      }
+    )
   }
 }
 

@@ -25,6 +25,10 @@ namespace core
         Task Save(StockList list, Guid userId);
         Task DeleteStockList(StockList list, Guid id);
 
+        Task Save(PendingStockPosition position, Guid userId);
+        Task<IEnumerable<PendingStockPosition>> GetPendingStockPositions(Guid userId);
+        Task DeletePendingStockPosition(PendingStockPosition position, Guid userId);
+
 
         Task<IEnumerable<OwnedOption>> GetOwnedOptions(Guid userId);
         Task<OwnedOption> GetOwnedOption(Guid optionId, Guid userId);

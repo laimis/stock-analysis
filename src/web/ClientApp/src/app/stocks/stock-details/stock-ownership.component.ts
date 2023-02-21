@@ -5,7 +5,7 @@ import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 import { GetErrors } from 'src/app/services/utils';
 
 @Component({
-  selector: 'stock-ownership',
+  selector: 'app-stock-ownership',
   templateUrl: './stock-ownership.component.html',
   styleUrls: ['./stock-ownership.component.css'],
 })

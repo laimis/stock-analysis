@@ -5,14 +5,23 @@ using core;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
+using core.Portfolio;
+using core.Shared;
 using core.Stocks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace storage.tests
 {
     public abstract class PortfolioStorageTests
     {
         private static Guid _userId = Guid.NewGuid();
+        private ITestOutputHelper _output;
+
+        public PortfolioStorageTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public async Task NonExistingStockReturnsNullAsync()
@@ -112,7 +121,7 @@ namespace storage.tests
         [Fact]
         public async Task NoteStorageWorksAsync()
         {
-            var note = new Note(_userId, "note", "tlsa", DateTimeOffset.UtcNow);
+            var note = new Note(_userId, "note", "tsla", DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
@@ -208,6 +217,79 @@ namespace storage.tests
 
             // clean up
             await storage.Delete(_userId);    
+        }
+
+        [Fact]
+        public async Task StockList_Works()
+        {
+            var storage = CreateStorage();
+
+            var existing = await storage.GetStockLists(_userId);
+
+            Assert.Empty(existing);
+
+            var list = new StockList("description", "name", _userId);
+
+            list.AddStock("tsla", "yeah yeah");
+
+            await storage.Save(list, _userId);
+
+            existing = await storage.GetStockLists(_userId);
+
+            Assert.NotEmpty(existing);
+
+            var loaded = await storage.GetStockList(list.State.Name, _userId);
+
+            Assert.Equal(list.State.Name, loaded.State.Name);
+
+            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker == new Ticker("tsla"));
+
+            Assert.NotNull(ticker);
+
+            await storage.DeleteStockList(loaded, _userId);
+
+            existing = await storage.GetStockLists(_userId);
+
+            Assert.Empty(existing);
+
+            await storage.Delete(_userId);
+        }
+
+        [Fact]
+        public async Task PendingStockPosition_Works()
+        {
+            var storage = CreateStorage();
+
+            var existing = await storage.GetPendingStockPositions(_userId);
+
+            Assert.Empty(existing);
+
+            var position = new PendingStockPosition(
+                notes: "notes",
+                numberOfShares: 10,
+                price: 2.1m,
+                stopPrice: 2m,
+                ticker: "tsla",
+                userId: _userId
+            );
+
+            await storage.Save(position, _userId);
+
+            existing = await storage.GetPendingStockPositions(_userId);
+
+            Assert.Single(existing);
+
+            var loaded = existing.Single(p => p.State.Ticker == "TSLA");
+
+            Assert.Equal(position.State.Id, loaded.State.Id);
+
+            await storage.DeletePendingStockPosition(loaded, _userId);
+
+            existing = await storage.GetPendingStockPositions(_userId);
+
+            Assert.Empty(existing);
+
+            await storage.Delete(_userId);
         }
         
     }

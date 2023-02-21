@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks
   templateUrl: './stock-violations.component.html',
   styleUrls: ['./stock-violations.component.css']
 })
-export class StockViolationsComponent implements OnInit {
+export class StockViolationsComponent {
 
   @Input() violations:StockViolation[] = []
 
@@ -16,9 +16,6 @@ export class StockViolationsComponent implements OnInit {
   fixType : string = null
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
   recordTransaction(ticker:string) {
     this.activeTicker = ticker
