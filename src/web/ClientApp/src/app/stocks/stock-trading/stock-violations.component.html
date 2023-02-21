@@ -17,6 +17,7 @@
           <app-stock-trading-newposition
             *ngIf="activeTicker === violation.ticker && fixType === 'position'"
             [setTicker]="violation.ticker"
+            [hideCreatePendingPosition]="true"
             (stockPurchased)="transactionRecorded($event)">
           </app-stock-trading-newposition>
         </div>

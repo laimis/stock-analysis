@@ -31,6 +31,9 @@ export class StockTradingNewPositionComponent {
     this.onBuyTickerSelected(ticker)
   }
 
+  @Input()
+  hideCreatePendingPosition: boolean = false
+
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
@@ -73,6 +76,7 @@ export class StockTradingNewPositionComponent {
         this.ask = quote.askPrice
         this.bid = quote.bidPrice
         this.updateChart(ticker)
+        this.lookupPendingPosition(ticker)
       }, error => {
         console.error(error)
       }
@@ -232,6 +236,22 @@ export class StockTradingNewPositionComponent {
       return []
     }
     return this.outcomes.outcomes.filter(o => o.type !== "Neutral")
+  }
+
+  lookupPendingPosition(ticker: string) {
+    this.stockService.getPendingStockPositions().subscribe(
+      positions => {
+        var position = positions.find(p => p.ticker === ticker)
+        if (position) {
+          this.costToBuy = position.price
+          this.numberOfShares = position.numberOfShares
+          this.stopPrice = position.stopPrice
+          this.notes = position.notes
+          this.date = this.datePipe.transform(position.date, 'yyyy-MM-dd');
+          this.updateBuyingValuesPricesChanged()
+        }
+      }
+    )
   }
 }
 
