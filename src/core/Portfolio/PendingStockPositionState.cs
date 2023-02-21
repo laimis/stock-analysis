@@ -26,7 +26,7 @@ namespace core.Portfolio
 
         private void ApplyInternal(PendingStockPositionCreated created)
         {
-            Id = created.Id;
+            Id = created.AggregateId;
             Ticker = created.Ticker;
             UserId = created.UserId;
             Price = created.Price;
