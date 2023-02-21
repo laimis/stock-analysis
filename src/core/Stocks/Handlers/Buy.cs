@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -34,15 +35,31 @@ namespace core.Stocks
                 }
 
                 var stock = await _storage.GetStock(cmd.Ticker, cmd.UserId);
-
                 if (stock == null)
                 {
                     stock = new OwnedStock(cmd.Ticker, cmd.UserId);
                 }
 
+                var isNewPosition = false;
+                if (stock.State.OpenPosition == null)
+                {
+                    isNewPosition = true;
+                }
+
                 stock.Purchase(cmd.NumberOfShares, cmd.Price, cmd.Date.Value, cmd.Notes, cmd.StopPrice);
 
                 await _storage.Save(stock, cmd.UserId);
+
+                // see if we had pending position
+                if (isNewPosition)
+                {
+                    var pendingPositions = await _storage.GetPendingStockPositions(cmd.UserId);
+                    var found = pendingPositions.SingleOrDefault(x => x.State.Ticker == new Ticker(cmd.Ticker));
+                    if (found != null)
+                    {
+                        await _storage.DeletePendingStockPosition(found, cmd.UserId);
+                    }
+                }
 
                 return CommandResponse.Success();
             }
