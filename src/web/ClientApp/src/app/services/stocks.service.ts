@@ -797,7 +797,6 @@ export interface StockTradingPerformance {
   ev: number,
   avgReturnPct: number,
   rrSum: number,
-  rrSumWeighted: number,
   earliestDate: string,
   latestDate: string,
   gradeDistribution: LabelWithFrequency[]
@@ -810,13 +809,17 @@ export interface DataPoint {
 
 export interface DataPointContainer {
   label: string
+  chartType: string
   data: DataPoint[]
 }
 
 export interface StockTradingPerformanceCollection {
   overall: StockTradingPerformance,
   recent: StockTradingPerformance,
-  trends: DataPointContainer[]
+  trendsAll: DataPointContainer[]
+  trendsTwoMonths: DataPointContainer[]
+  trendsYTD: DataPointContainer[]
+  trendsOneYear: DataPointContainer[]
 }
 
 export interface BrokerageOrder {

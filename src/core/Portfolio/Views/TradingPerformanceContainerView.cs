@@ -19,29 +19,72 @@ namespace core.Portfolio.Views
             Recent = TradingPerformance.Create(recentClosedTransactions);
             Overall = TradingPerformance.Create(closedTransactions);
 
-            // go over each closed transaction and calculate number of wins for 20 trades rolling window
-            var wins = new DataPointContainer<decimal>("Win %");
-            var avgWinPct = new DataPointContainer<decimal>("Avg Win %");
-            var avgLossPct = new DataPointContainer<decimal>("Avg Loss %");
-            var ev = new DataPointContainer<decimal>("EV");
-            var avgWinAmount = new DataPointContainer<decimal>("Avg Win $");
-            var avgLossAmount = new DataPointContainer<decimal>("Avg Loss $");
-            var rrPct = new DataPointContainer<decimal>("RR %");
-            var rrAmount = new DataPointContainer<decimal>("RR $");
-            var maxWin = new DataPointContainer<decimal>("Max Win $");
-            var maxLoss = new DataPointContainer<decimal>("Max Loss $");
-            var rrSum = new DataPointContainer<decimal>("RR Sum");
-            var rrSumWeighted = new DataPointContainer<decimal>("RR Sum Weighted");
-            var agrades = new DataPointContainer<decimal>("A Grades");
-            var bgrades = new DataPointContainer<decimal>("B Grades");
-            var cgrades = new DataPointContainer<decimal>("C Grades");
-
+            // HACK: the input is with the most recent trade first, and we want to window from the start
+            // so we reverse it here and then reverse it back on exit
             closedTransactions.Reverse();
 
-            for (var i = 0; i < closedTransactions.Length; i++)
+            TrendsAll = GenerateTrends(closedTransactions, windowSize: recentCount);
+            
+            TrendsTwoMonths = GenerateTrends(
+                TimeBasedSlice(closedTransactions, DateTime.Now.AddMonths(-2)),
+                windowSize: recentCount);
+
+            TrendsYTD = GenerateTrends(
+                TimeBasedSlice(closedTransactions, new DateTime(DateTime.Now.Year, 1, 1)),
+                windowSize: recentCount);
+
+            TrendsOneYear = GenerateTrends(
+                TimeBasedSlice(closedTransactions, DateTime.Now.AddYears(-1)),
+                windowSize: recentCount);
+
+            // unreversed
+            closedTransactions.Reverse();
+        }
+
+        private static Span<PositionInstance> TimeBasedSlice(
+            Span<PositionInstance> closedTransactions,
+            DateTime dateThreshold)
+        {
+            var startIndex = 0;
+            for (var i = closedTransactions.Length - 1; i >= 0; i--)
             {
-                var window = closedTransactions.Slice(i, Math.Min(20, closedTransactions.Length));
+                if (closedTransactions[i].Closed.Value < dateThreshold)
+                {
+                    startIndex = i;
+                    break;
+                }
+            }
+            return closedTransactions.Slice(startIndex, closedTransactions.Length - startIndex);
+        }
+
+        private List<object> GenerateTrends(Span<PositionInstance> transactions, int windowSize)
+        {
+            var trends = new List<object>();
+
+            // go over each closed transaction and calculate number of wins for 20 trades rolling window
+            var profits = new DataPointContainer<decimal>("Profits", DataPointChartType.line);
+            var equityCurve = new DataPointContainer<decimal>("Equity Curve", DataPointChartType.line);
+            var equity = 0m;
+            var wins = new DataPointContainer<decimal>("Win %", DataPointChartType.line);
+            var avgWinPct = new DataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
+            var avgLossPct = new DataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
+            var ev = new DataPointContainer<decimal>("EV", DataPointChartType.line);
+            var avgWinAmount = new DataPointContainer<decimal>("Avg Win $", DataPointChartType.line);
+            var avgLossAmount = new DataPointContainer<decimal>("Avg Loss $", DataPointChartType.line);
+            var rrPct = new DataPointContainer<decimal>("RR %", DataPointChartType.line);
+            var rrAmount = new DataPointContainer<decimal>("RR $", DataPointChartType.line);
+            var maxWin = new DataPointContainer<decimal>("Max Win $", DataPointChartType.line);
+            var maxLoss = new DataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
+            var rrSum = new DataPointContainer<decimal>("RR Sum", DataPointChartType.line);
+            var agrades = 0;
+            var bgrades = 0;
+            var cgrades = 0;
+
+            for (var i = 0; i < transactions.Length; i++)
+            {
+                var window = transactions.Slice(i, Math.Min(windowSize, transactions.Length));
                 var perfView = TradingPerformance.Create(window);
+                profits.Add(window[0].Closed.Value, perfView.Profit);
                 wins.Add(window[0].Closed.Value, perfView.WinPct);
                 avgWinPct.Add(window[0].Closed.Value, perfView.WinAvgReturnPct);
                 avgLossPct.Add(window[0].Closed.Value, perfView.LossAvgReturnPct);
@@ -53,50 +96,92 @@ namespace core.Portfolio.Views
                 maxWin.Add(window[0].Closed.Value, perfView.MaxWinAmount);
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);
-                rrSumWeighted.Add(window[0].Closed.Value, perfView.rrSumWeighted);
-                agrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "A").frequency);
-                bgrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "B").frequency);
-                cgrades.Add(window[0].Closed.Value, perfView.GradeDistribution.SingleOrDefault(ld => ld.label == "C").frequency);
-
-                if (i + 20 >= closedTransactions.Length)
+                
+                if (i + 20 >= transactions.Length)
                     break;
             }
 
-            Trends.Add(wins);
-            Trends.Add(avgWinPct);
-            Trends.Add(avgLossPct);
-            Trends.Add(ev);
-            Trends.Add(avgWinAmount);
-            Trends.Add(avgLossAmount);
-            Trends.Add(rrPct);
-            Trends.Add(rrAmount);
-            Trends.Add(rrSum);
-            Trends.Add(rrSumWeighted);
-            Trends.Add(maxWin);
-            Trends.Add(maxLoss);
-            Trends.Add(agrades);
-            Trends.Add(bgrades);
-            Trends.Add(cgrades);
+            // non windowed stats
+            for (var i = 0; i < transactions.Length; i++)
+            {
+                equity += transactions[i].Profit;
+                equityCurve.Add(transactions[i].Closed.Value, equity);
+                if (transactions[i].Grade == "A")
+                    agrades++;
+                if (transactions[i].Grade == "B")
+                    bgrades++;
+                if (transactions[i].Grade == "C")
+                    cgrades++;
+            }
 
-            Trends.Add(GenerateOutcomeHistogram(Recent, "Recent Gains", recentClosedTransactions));
-            Trends.Add(GenerateOutcomeHistogram(Overall, "Gains", closedTransactions));
+            var gradeContainer = new DataPointContainer<decimal>("Grade", DataPointChartType.bar);
+            gradeContainer.Add("A", agrades);
+            gradeContainer.Add("B", bgrades);
+            gradeContainer.Add("C", cgrades);
 
-            // unreversed
-            closedTransactions.Reverse();
+            var gainDistribution = GenerateOutcomeHistogram(
+                "Gain Distribution",
+                transactions,
+                p => p.Profit);
+
+            var rrDistribution = GenerateOutcomeHistogram(
+                "RR Distribution",
+                transactions,
+                p => p.RR,
+                buckets: 10,
+                minAdjustment: 0
+            );
+
+            trends.Add(profits);
+            trends.Add(equityCurve);
+            trends.Add(gradeContainer);
+            trends.Add(gainDistribution);
+            trends.Add(rrDistribution);
+            trends.Add(wins);
+            trends.Add(avgWinPct);
+            trends.Add(avgLossPct);
+            trends.Add(ev);
+            trends.Add(avgWinAmount);
+            trends.Add(avgLossAmount);
+            trends.Add(rrPct);
+            trends.Add(rrAmount);
+            trends.Add(rrSum);
+            trends.Add(maxWin);
+            trends.Add(maxLoss);
+
+            return trends;
         }
 
         private static DataPointContainer<decimal> GenerateOutcomeHistogram(
-            TradingPerformance performanceDataPoints,
             string histogramLabel,
-            Span<PositionInstance> transactionsToUse)
+            Span<PositionInstance> transactionsToUse,
+            Func<PositionInstance, decimal> valueFunc,
+            int buckets = 50,
+            int minAdjustment = 100)
         {
-            var gains = new DataPointContainer<decimal>(histogramLabel);
+            var gains = new DataPointContainer<decimal>(histogramLabel, DataPointChartType.bar);
 
-            var min = performanceDataPoints.MaxLossAmount * -1 - 100;
-            var max = performanceDataPoints.MaxWinAmount + 100;
+            var min = 0m;
+            var max = 0m;
 
-            var buckets = 100;
+            // first, disover min and max
+            foreach(var transaction in transactionsToUse)
+            {
+                var value = valueFunc(transaction);
+                if (value < min)
+                    min = value;
+                if (value > max)
+                    max = value;
+            }
+
+            min = Math.Floor(min);
+            max = Math.Ceiling(max);
+
             var step = (max - min) / buckets;
+            step = step switch {
+                var x when x < 1 => Math.Round(step, 4),
+                _ => Math.Round(step, 0)
+            };
 
             for (var i = 0; i < buckets; i++)
             {
@@ -105,7 +190,8 @@ namespace core.Portfolio.Views
                 var count = 0;
                 for (var j = 0; j < transactionsToUse.Length; j++)
                 {
-                    if (transactionsToUse[j].Profit >= lower && transactionsToUse[j].Profit < upper)
+                    var value = valueFunc(transactionsToUse[j]);
+                    if (value >= lower && value < upper)
                         count++;
                 }
                 gains.Add(lower.ToString(), count);
@@ -114,8 +200,11 @@ namespace core.Portfolio.Views
             return gains;
         }
 
-        public TradingPerformance Recent { get; set; }
-        public TradingPerformance Overall { get; set; }
-        public List<object> Trends { get; } = new List<object>();
+        public TradingPerformance Recent { get; }
+        public TradingPerformance Overall { get; }
+        public List<object> TrendsAll { get; }
+        public List<object> TrendsTwoMonths { get; }
+        public List<object> TrendsYTD { get; }
+        public List<object> TrendsOneYear { get; }
     }
 }

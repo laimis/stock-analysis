@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ChartOptions, ChartType } from 'chart.js';
-import { DataPointContainer, StockTradingPerformance, StockTradingPerformanceCollection } from 'src/app/services/stocks.service';
+import { DataPointContainer, StockTradingPerformanceCollection } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -10,8 +10,38 @@ import { DataPointContainer, StockTradingPerformance, StockTradingPerformanceCol
 })
 export class StockTradingPerformanceComponent {
   
+  private _performance:StockTradingPerformanceCollection
+
   @Input()
-  performance:StockTradingPerformanceCollection
+  set performance(value:StockTradingPerformanceCollection) {
+    this._performance = value
+    this.selectTrendsToRenderBasedOnTimeFilter()
+  }
+  get performance() {
+    return this._performance
+  }
+
+  timeLimit = "2m"
+  trends:DataPointContainer[]
+
+  selectTrendsToRenderBasedOnTimeFilter() {
+    if (this.timeLimit == "1y") {
+      this.trends = this.performance.trendsOneYear
+    } else if (this.timeLimit == "ytd") {
+      this.trends = this.performance.trendsYTD
+    } else if (this.timeLimit == "2m") {
+      this.trends = this.performance.trendsTwoMonths
+    } else if (this.timeLimit == "all") {
+      this.trends = this.performance.trendsAll
+    }
+  }
+
+  timeLimitChanged(value:string) {
+    if (value != this.timeLimit) {
+      this.timeLimit = value
+      this.selectTrendsToRenderBasedOnTimeFilter()
+    }
+  }
 
   getData(c:DataPointContainer) {
     var data = [
@@ -33,7 +63,16 @@ export class StockTradingPerformanceComponent {
   }
 
   getChartType(c:DataPointContainer) {
-    return c.label.indexOf("Gains") >= 0 ? 'bar' : 'line'
+    if (c.chartType == 'bar') {
+      return 'bar'
+    }
+    else if (c.chartType == 'line') {
+      return 'line'
+    }
+    else {
+      return 'line'
+    }
+    
   }
 
   public lineChartPlugins = [];

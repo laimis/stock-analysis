@@ -58,7 +58,6 @@ namespace core.Stocks.Services.Trading
             var totalCost = 0m;
             var profit = 0m;
             var rrSum = 0m;
-            var rrSumWeighted = 0m;
             var earliestDate = DateTimeOffset.MaxValue;
             var latestDate = DateTimeOffset.MinValue;
             var gradeDistribution = new SortedDictionary<TradeGrade, int>();
@@ -69,7 +68,6 @@ namespace core.Stocks.Services.Trading
                 profit += e.Profit;
                 totalCost += e.Cost;
                 rrSum += e.RR;
-                rrSumWeighted += e.RRWeighted;
                 earliestDate = e.Opened.HasValue && e.Opened.Value < earliestDate ? e.Opened.Value : earliestDate;
                 latestDate = e.Closed.HasValue && e.Closed.Value > latestDate ? e.Closed.Value : latestDate;
 
@@ -127,7 +125,6 @@ namespace core.Stocks.Services.Trading
                 MaxWinAmount = maxWinAmount,
                 Profit = profit,
                 rrSum = rrSum,
-                rrSumWeighted = rrSumWeighted,
                 NumberOfTrades = numberOfTrades,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
                 WinAvgReturnPct = wins > 0 ? totalWinReturnPct / wins : 0,
@@ -156,7 +153,6 @@ namespace core.Stocks.Services.Trading
         public decimal AvgReturnPct { get; set; }
         public double AvgDaysHeld { get; set; }
         public decimal rrSum { get; set; }
-        public decimal rrSumWeighted { get; set; }
         public decimal ReturnPctRatio => LossAvgReturnPct switch {
             0m => 0m,
             _ => WinAvgReturnPct / LossAvgReturnPct

@@ -17,11 +17,11 @@
         <div class="row">
           <div class="form-group col">
             <label class="form-label" for="timeLimit">Time limit</label>
-            <select #timeLimit class="form-select" id="timeLimit" (change)="timeLimitChanged(timeLimit.value)">
-              <option val="2m">Last 2 Months</option>
-              <option val="ytd">YTD</option>
-              <option val="1y">1 year</option>
-              <option val="all">Show all time</option>
+            <select #timeLimitDropdown class="form-select" id="timeLimit" (change)="timeLimitChanged(timeLimitDropdown.value)">
+              <option value="2m" [selected]="timeLimit === '2m'">Last 2 Months</option>
+              <option value="ytd" [selected]="timeLimit === 'ytd'">YTD</option>
+              <option value="1y" [selected]="timeLimit === '1y'">1 year</option>
+              <option value="all" [selected]="timeLimit === 'all'">Show all time</option>
             </select>
           </div>
         </div>
@@ -29,8 +29,7 @@
     </div>
     <canvas
       class="mb-2"
-      style="height: 400px"
-      *ngFor="let t of performance.trends"
+      *ngFor="let t of trends"
       baseChart
       [datasets]="getData(t)"
       [labels]="getLabels(t)"
