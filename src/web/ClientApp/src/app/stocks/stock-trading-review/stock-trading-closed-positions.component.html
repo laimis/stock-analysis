@@ -3,14 +3,14 @@
       <form>
         <div class="row">
           <div class="form-group col">
-            <label for="filterByTicker">Ticker</label>
+            <label class="form-label" for="filterByTicker">Ticker</label>
             <select #filterByTicker class="form-select" id="filterByTicker" (change)="filterByTickerChanged(filterByTicker.value)">
               <option value="all">Show all tickers</option>
               <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
             </select>
           </div>
           <div class="form-group col">
-            <label for="filterByGrade">Grade</label>
+            <label class="form-label" for="filterByGrade">Grade</label>
             <select #filterByGrade class="form-select" id="filterByGrade" (change)="filterByGradeChanged(filterByGrade.value)">
               <option value="all">Show all grades</option>
               <option value="A">A</option>

@@ -119,8 +119,7 @@ export class StockChartComponent implements OnInit, OnDestroy {
         label: "Close",
         fill: false,
         tension: 0.1,
-        pointRadius: 1,
-        borderWidth: 1,
+        pointRadius: 0,
         backgroundColor: this._color_close,
         borderColor: this._color_close,
         pointStyle: 'line'
@@ -134,8 +133,7 @@ export class StockChartComponent implements OnInit, OnDestroy {
         label: sma.interval + " SMA",
         fill: false,
         tension: 0.1,
-        pointRadius: 1,
-        borderWidth: 1,
+        pointRadius: 0,
         backgroundColor: this._sma_colors[sma.interval],
         borderColor: this._sma_colors[sma.interval],
         pointStyle: 'line'

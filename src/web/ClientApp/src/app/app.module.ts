@@ -123,6 +123,7 @@ var routes: Routes = [
   { path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
   { path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
   { path: 'trading/review', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
+  { path: 'trading/review/:tab', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
   { path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
 
   { path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard]},

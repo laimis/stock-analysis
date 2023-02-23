@@ -4,7 +4,7 @@ import { DataPointContainer, StockTradingPerformanceCollection } from 'src/app/s
 
 
 @Component({
-  selector: 'stock-trading-performance',
+  selector: 'app-stock-trading-performance',
   templateUrl: './stock-trading-performance.component.html',
   styleUrls: ['./stock-trading-performance.component.css']
 })
@@ -21,8 +21,8 @@ export class StockTradingPerformanceComponent {
         label: c.label,
         fill: false,
         tension: 0.1,
-        pointRadius: 1,
-        borderWidth: 1,
+        pointRadius: 0,
+        // borderWidth: 1,
         pointStyle: 'line'
       }]
 

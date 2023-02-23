@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { PositionInstance, StocksService, StockTradingPerformanceCollection } from 'src/app/services/stocks.service';
 
 @Component({
@@ -13,11 +14,13 @@ export class StockTradingReviewDashboardComponent implements OnInit {
   performance: StockTradingPerformanceCollection;
 
   constructor(
+    private route: ActivatedRoute,
     private stockService: StocksService
   ) { }
 
   ngOnInit() {
     this.loadEntries()
+    this.activeTab = this.route.snapshot.paramMap.get('tab') || 'positions'
   }
 
   loadEntries() {
