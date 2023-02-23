@@ -1,10 +1,32 @@
 <div>
 
-  <app-trading-performance-summary [performance]="performance.recent" title="Recent"></app-trading-performance-summary>
+  <section>
+    <h5>Recent Performance</h5>
+    <app-trading-performance-summary [performance]="performance.recent" title="Recent"></app-trading-performance-summary>
+  </section>
+  
+  <section>
+    <h5>Overall Performance</h5>
+    <app-trading-performance-summary [performance]="performance.overall" title="Overall"></app-trading-performance-summary>
+  </section>
 
-  <app-trading-performance-summary [performance]="performance.overall" title="Overall"></app-trading-performance-summary>
-
-  <div class="row mt-2">  
+  <section>
+    <h5>Performance Trend Charts</h5>
+    <div>
+      <form>
+        <div class="row">
+          <div class="form-group col">
+            <label class="form-label" for="timeLimit">Time limit</label>
+            <select #timeLimit class="form-select" id="timeLimit" (change)="timeLimitChanged(timeLimit.value)">
+              <option val="2m">Last 2 Months</option>
+              <option val="ytd">YTD</option>
+              <option val="1y">1 year</option>
+              <option val="all">Show all time</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
     <canvas
       class="mb-2"
       style="height: 400px"
@@ -17,5 +39,5 @@
       [plugins]="lineChartPlugins"
       [type]="getChartType(t)">
     </canvas>
-  </div>
+  </section>
 </div>

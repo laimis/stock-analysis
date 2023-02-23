@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ChartOptions, ChartType } from 'chart.js';
-import { DataPointContainer, StockTradingPerformanceCollection } from 'src/app/services/stocks.service';
+import { DataPointContainer, StockTradingPerformance, StockTradingPerformanceCollection } from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -9,10 +9,9 @@ import { DataPointContainer, StockTradingPerformanceCollection } from 'src/app/s
   styleUrls: ['./stock-trading-performance.component.css']
 })
 export class StockTradingPerformanceComponent {
-
-
+  
   @Input()
-  performance: StockTradingPerformanceCollection
+  performance:StockTradingPerformanceCollection
 
   getData(c:DataPointContainer) {
     var data = [

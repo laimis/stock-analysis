@@ -34,8 +34,10 @@
     
     <div class="row mb-2">
       <div class="col" *ngFor="let labelFrequency of performance.gradeDistribution">
-        <div class="stat-label">{{labelFrequency.label}}</div>
+        <div class="stat-label"># of {{labelFrequency.label}} trades</div>
         <div>{{labelFrequency.frequency}}</div>
       </div>
+      <div class="col"></div>
+      <div class="col"></div>
     </div>
   </div>
