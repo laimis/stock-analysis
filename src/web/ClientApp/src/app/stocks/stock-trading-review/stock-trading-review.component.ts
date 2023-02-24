@@ -20,6 +20,8 @@ export class StockTradingReviewComponent implements OnInit {
   dailyScores: DailyOutcomeScoresReport;
   positionBuys: PriceWithDate[]
   positionSells: PriceWithDate[]
+  simulationErrors: string[];
+  scoresErrors: string[];
 
   constructor (
     private stockService: StocksService,
@@ -66,6 +68,11 @@ export class StockTradingReviewComponent implements OnInit {
       (r: DailyOutcomeScoresReport) => {
         this.dailyScores = r;
         this.getPrices();
+      },
+      (error) => {
+        this.dailyScores = null
+        this.scoresErrors = GetErrors(error)
+        this.getPrices();
       }
     );
   }
@@ -74,6 +81,10 @@ export class StockTradingReviewComponent implements OnInit {
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
       (r: TradingStrategyResults) => {
         this.simulationResults = r;
+        this.getScores()
+      },
+      (error) => {
+        this.simulationErrors = GetErrors(error)
         this.getScores()
       }
     );

@@ -27,12 +27,18 @@
 
   <section>
     <h5>Actual vs Trading Strategies</h5>
-    <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
+    <app-trading-actual-vs-simulated
+      [simulations]="simulationResults"
+      [simulationErrors]="simulationErrors">
+    </app-trading-actual-vs-simulated>
   </section>
 
   <section *ngIf="dailyScores">
     <h5>Daily Scores</h5>
-    <app-daily-outcome-scores [dailyOutcomeScoresReport]="dailyScores"></app-daily-outcome-scores>
+    <app-daily-outcome-scores
+      [dailyOutcomeScoresReport]="dailyScores"
+      [errors]="scoresErrors">
+    </app-daily-outcome-scores>
   </section>
 
   <section>

@@ -62,4 +62,10 @@
     </tbody>
   </table>
 
+  <div class="placeholder col-12" *ngIf="simulationErrors">
+    <div *ngFor="let e of simulationErrors">
+      <div class="alert alert-danger" role="alert">
+        {{e}}
+      </div>
+  </div>
 </div>

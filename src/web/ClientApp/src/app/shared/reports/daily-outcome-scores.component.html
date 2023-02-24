@@ -1,8 +1,16 @@
-<app-chart
-  *ngIf="dailyScores && dailyScoresDates"
-  [yScaleType]="'linear'"
-  [values]="dailyScores"
-  [chartLabels]="dailyScoresDates"
-  [chartLegend]="false"
-  [chartType]="'bar'">
-</app-chart>
+<div>
+  <app-chart
+    *ngIf="dailyScores && dailyScoresDates"
+    [yScaleType]="'linear'"
+    [values]="dailyScores"
+    [chartLabels]="dailyScoresDates"
+    [chartLegend]="false"
+    [chartType]="'bar'">
+  </app-chart>
+
+  <div class="placeholder col-12" *ngIf="errors">
+    <div *ngFor="let error of errors" class="alert alert-danger">
+      {{error}}
+    </div>
+  </div>
+</div>

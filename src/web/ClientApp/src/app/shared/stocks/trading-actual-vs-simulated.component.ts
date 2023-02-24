@@ -12,7 +12,10 @@ export class TradingActualVsSimulatedPositionComponent {
   showDetails: boolean = false;
 
   @Input()
-  public simulations: TradingStrategyResults
+  simulations: TradingStrategyResults
+
+  @Input()
+  simulationErrors: string[];
 
   toggleShowDetails() {
     this.showDetails = !this.showDetails;

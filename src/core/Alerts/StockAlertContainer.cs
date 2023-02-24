@@ -46,8 +46,7 @@ namespace core.Alerts
 
         internal List<TriggeredAlert> GetRecentlyTriggeredAlerts(Guid userId) =>
             (_recentlyTriggeredAlerts.SingleOrDefault(u => u.Key == userId).Value ?? new List<TriggeredAlert>())
-            .OrderByDescending(a => a.alertType)
-            .ThenByDescending(a => a.when)
+            .OrderByDescending(a => a.when)
             .ToList();
 
         public List<TriggeredAlert> GetAlerts(Guid userId) => 

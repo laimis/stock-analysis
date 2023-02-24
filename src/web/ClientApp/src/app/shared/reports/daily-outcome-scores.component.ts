@@ -16,4 +16,7 @@ export class DailyOutcomeScoresComponent {
     this.dailyScores = report.dailyScores.map(d => d.score)
     this.dailyScoresDates = report.dailyScores.map(d => d.date.split('T')[0])
   }
+
+  @Input()
+  errors: string[];
 }
