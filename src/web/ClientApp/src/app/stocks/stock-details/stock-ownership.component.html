@@ -2,15 +2,12 @@
 
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-  <div class="mt-4">
+  <div class="mt-4" *ngIf="ownership && ownership.currentPosition">
     <div class="row">
       <div class="col" *ngIf="ownership && ownership.currentPosition">
         Ownership: <b>{{ownership.currentPosition.numberOfShares}}</b> @ <b>{{ownership.currentPosition.averageCostPerShare | currency}}</b> ({{(stock.price - ownership.currentPosition.averageCostPerShare) / ownership.currentPosition.averageCostPerShare | percent}})
       </div>
-      <div class="col" *ngIf="stock">
-        Current price: <b>{{stock.price | currency}}</b>
-      </div>
-      <div class="col" *ngIf="ownership && ownership.currentPosition">
+      <div class="col" >
         <select class="form-select btn border rounded" name="category" (change)="categoryChanged($event.target)" value="{{ownership.currentPosition.category}}">
           <option value="">Select Category</option>
           <option value="longterm">Long-Term</option>
@@ -29,39 +26,47 @@
 
   <app-stock-trading-position *ngIf="ownership && ownership.currentPosition" [position]="ownership.currentPosition"></app-stock-trading-position>
 
-	<div *ngIf="ownership && ownership.positions.length > 0">
-    <div class="mt-4" *ngFor="let p of ownership.positions">
-      <!-- <div class="text-muted">Past Transactions</div> -->
-      <table class="table table-striped border">
-        <thead class="thead-light">
-          <tr>
-            <th>Date</th>
-            <th>Price</th>
-            <th>Number of Shares</th>
-            <th>Amount</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            [ngClass]="{'table-success': t.type === 'buy', 'table-warning': t.type === 'sell'}"
-            *ngFor="let t of p.transactions">
-            <td>{{ t.date | date:'shortDate'}} - {{ t.ageInDays }} days ago</td>
-            <td>{{ t.price | currency }}</td>
-            <td>{{ t.numberOfShares }}</td>
-            <td>{{ t.numberOfShares * t.price | currency }}</td>
-            <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.transactionId)"></i></td>
-          </tr>
-        </tbody>
-      </table>
+	<div *ngIf="ownership && ownership.positions.length > 0" class="card border-info mb-3">
+    <div class="card-header">
+      <h5 class="card-title">Positions</h5>
     </div>
-    <div class="mb-3">
-      <label>Delete this stock from your portfolio</label>
-      <div>
-        <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
+    <div class="card-body">
+      <div class="mt-4" *ngFor="let p of ownership.positions">
+        <!-- <div class="text-muted">Past Transactions</div> -->
+        <table class="table table-striped border">
+          <thead class="thead-light">
+            <tr>
+              <th>Date</th>
+              <th>Price</th>
+              <th>Number of Shares</th>
+              <th>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              [ngClass]="{'table-success': t.type === 'buy', 'table-warning': t.type === 'sell'}"
+              *ngFor="let t of p.transactions">
+              <td>{{ t.date | date:'shortDate'}} - {{ t.ageInDays }} days ago</td>
+              <td>{{ t.price | currency }}</td>
+              <td>{{ t.numberOfShares }}</td>
+              <td>{{ t.numberOfShares * t.price | currency }}</td>
+              <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.transactionId)"></i></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-	</div>
+  <div class="card border-danger mb-3">
+    <div class="card-header">
+      <h5 class="card-title">Delete this stock from your portfolio</h5>
+    </div>
+    <div class="card-body">
+      <button type="button" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
+    </div>
+  </div>
+
 </div>
 

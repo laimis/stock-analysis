@@ -37,6 +37,9 @@
     <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
       Analysis
     </a>
+    <span class="float-end">
+      <span class="text-muted">Price:</span> {{stock.price | currency}}
+    </span>
 
   </div>
 

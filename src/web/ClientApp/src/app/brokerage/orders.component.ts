@@ -11,6 +11,7 @@ export class BrokerageOrdersComponent implements OnInit {
   groupedOrders: BrokerageOrder[][];
   private _orders: BrokerageOrder[] = [];
   private _ticker: string;
+  isEmpty: boolean = false;
 
   constructor(
     private stockService: StocksService
@@ -44,6 +45,7 @@ export class BrokerageOrdersComponent implements OnInit {
     var filledSells = this._orders.filter(o => o.type == 'SELL' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
 
     this.groupedOrders = [buys, sells, filledBuys, filledSells]
+    this.isEmpty = this.groupedOrders.every(o => o.length == 0)
   }
 
   @Output()
