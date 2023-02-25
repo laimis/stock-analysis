@@ -13,18 +13,6 @@ namespace core.Stocks.Services.Analysis
 
         internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(IEnumerable<TickerOutcomes> tickerOutcomes)
         {
-            if (tickerOutcomes.Any(o => o.outcomes.Any(o => o.key == SingleBarOutcomeKeys.Highlight)))
-            {
-                yield return new AnalysisOutcomeEvaluation(
-                    "Highlights",
-                    OutcomeType.Neutral,
-                    SingleBarOutcomeKeys.Highlight,
-                    tickerOutcomes
-                        .Where(t => t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.Highlight && o.value == 1))
-                        .ToList()
-                );
-            }
-
             yield return new AnalysisOutcomeEvaluation(
                 "High Volume with Excellent Closing Range and High Percent Change",
                 OutcomeType.Positive,

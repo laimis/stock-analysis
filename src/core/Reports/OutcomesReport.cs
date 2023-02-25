@@ -44,14 +44,6 @@ namespace core.Reports
 
             [Required]
             public string[] Tickers { get; set; }
-            public string HighlightTitle { get; set; }
-            public string[] HighlightTickers { get; set; }
-
-            internal bool IsHighlighted(string ticker)
-            {
-                return HighlightTickers != null 
-                && Array.FindIndex(HighlightTickers, t => t == ticker) != -1;
-            }
         }
 
         public class Handler : HandlerWithStorage<ForTickersQuery, OutcomesReportView>
@@ -131,19 +123,6 @@ namespace core.Reports
                     var prices = pricesResponse.Success;
 
                     var outcomes = priceAnalysisFunc(prices);
-
-                    if (query.HighlightTickers != null)
-                    {
-                        var highlightOutcome = new AnalysisOutcome(
-                            key: SingleBarOutcomeKeys.Highlight,
-                            type: OutcomeType.Neutral,
-                            value: query.IsHighlighted(ticker) ? 1 : 0,
-                            valueType: Shared.ValueFormat.Boolean,
-                            message: query.HighlightTitle
-                        );
-
-                        outcomes.Add(highlightOutcome);
-                    }
 
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, ticker));
 

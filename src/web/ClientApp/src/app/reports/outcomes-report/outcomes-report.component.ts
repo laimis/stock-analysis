@@ -12,12 +12,14 @@ export class OutcomesReportComponent implements OnInit {
   error: string = null;
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
+  earningsOutcomes: TickerOutcomes[];
   startDate: string = null;
   endDate: string = null;
   earnings: string[] = null;
   title: string;
   singleBarReportWeekly: OutcomesReport;
   tickers: string[] = [];
+
 
   activeTicker: string = null;
 
@@ -72,6 +74,9 @@ export class OutcomesReportComponent implements OnInit {
   private loadSingleBarReport(tickers: string[], earnings: string[]) {
     return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings, this.endDate).subscribe(report => {
       this.singleBarReportDaily = report;
+      if (this.earnings.length > 0) {
+        this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
+      }
       this.loadSingleBarReportWeekly(tickers, earnings);
     }, error => {
       this.error = error;

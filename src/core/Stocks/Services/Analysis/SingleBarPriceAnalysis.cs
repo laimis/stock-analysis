@@ -257,6 +257,5 @@ namespace core.Stocks.Services.Analysis
         public static string NewHigh = "NewHigh";
         public static string NewLow = "NewLow";
         public static string SigmaRatio = "SigmaRatio";
-        public static string Highlight = "Highlight";
     }
 }
