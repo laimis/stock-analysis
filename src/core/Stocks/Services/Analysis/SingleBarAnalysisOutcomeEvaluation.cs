@@ -70,6 +70,16 @@ namespace core.Stocks.Services.Analysis
                     ).ToList()
             );
 
+            yield return new AnalysisOutcomeEvaluation(
+                "New Highs",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.NewHigh,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh && o.value > 0))
+                    .ToList()
+            );
+
             // negative outcome types
             yield return new AnalysisOutcomeEvaluation(
                 "Above Average Volume and Negative Percent Change",
@@ -122,16 +132,6 @@ namespace core.Stocks.Services.Analysis
                 tickerOutcomes
                     .Where(t =>
                         t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.GapPercentage && o.value < 0))
-                    .ToList()
-            );
-
-            yield return new AnalysisOutcomeEvaluation(
-                "New Highs",
-                OutcomeType.Positive,
-                SingleBarOutcomeKeys.NewHigh,
-                tickerOutcomes
-                    .Where(t =>
-                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewHigh && o.value > 0))
                     .ToList()
             );
 
