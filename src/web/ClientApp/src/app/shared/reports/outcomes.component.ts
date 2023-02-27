@@ -1,4 +1,4 @@
-import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { charts_getTradingViewLink } from 'src/app/services/links.service';
 import { AnalysisOutcomeEvaluation, OutcomeValueTypeEnum, StockAnalysisOutcome, TickerOutcomes } from '../../services/stocks.service';
@@ -7,13 +7,14 @@ import { AnalysisOutcomeEvaluation, OutcomeValueTypeEnum, StockAnalysisOutcome, 
   selector: 'app-outcomes',
   templateUrl: './outcomes.component.html',
   styleUrls: ['./outcomes.component.css'],
-  providers: [PercentPipe, CurrencyPipe]
+  providers: [PercentPipe, CurrencyPipe, DecimalPipe]
 })
 export class OutcomesComponent {
 
   constructor(
     private percentPipe:PercentPipe,
-    private currencyPipe:CurrencyPipe) { }
+    private currencyPipe:CurrencyPipe,
+    private decimalPipe:DecimalPipe) { }
 
   @Input()
   title: string
@@ -87,7 +88,7 @@ export class OutcomesComponent {
     } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
       return this.currencyPipe.transform(o.value)
     } else {
-      return o.value
+      return this.decimalPipe.transform(o.value)
     }
   }
 }

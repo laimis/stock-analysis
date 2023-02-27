@@ -1,4 +1,4 @@
-import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { AfterViewInit, Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService } from 'src/app/services/stocks.service';
 import { charts_getTradingViewLink } from '../services/links.service';
@@ -8,7 +8,7 @@ import { toggleVisuallyHidden } from '../services/utils';
   selector: 'app-alerts',
   templateUrl: './alerts.component.html',
   styleUrls: ['./alerts.component.css'],
-  providers: [PercentPipe, CurrencyPipe]
+  providers: [PercentPipe, CurrencyPipe, DecimalPipe]
 })
 
 export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -20,7 +20,8 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private stockService : StocksService,
     private percentPipe: PercentPipe,
-    private currencyPipe: CurrencyPipe
+    private currencyPipe: CurrencyPipe,
+    private decimalPipe: CurrencyPipe
   ) { }
 
   @Input()
@@ -96,7 +97,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (valueType === OutcomeValueTypeEnum.Currency) {
       return this.currencyPipe.transform(value)
     } else {
-      return value
+      return this.decimalPipe.transform(value)
     }
   }
     

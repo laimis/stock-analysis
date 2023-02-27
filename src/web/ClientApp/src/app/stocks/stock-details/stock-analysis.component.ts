@@ -1,4 +1,4 @@
-import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { DailyOutcomeScoresReport, OutcomesReport, OutcomeValueTypeEnum, Prices, PriceWithDate, StockAnalysisOutcome, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
 
@@ -6,9 +6,7 @@ import { DailyOutcomeScoresReport, OutcomesReport, OutcomeValueTypeEnum, Prices,
   selector: 'app-stock-analysis',
   templateUrl: './stock-analysis.component.html',
   styleUrls: ['./stock-analysis.component.css'],
-  providers: [
-    PercentPipe, CurrencyPipe
-  ]
+  providers: [ PercentPipe, CurrencyPipe, DecimalPipe ]
 })
 export class StockAnalysisComponent {
   multipleBarOutcomes: TickerOutcomes;
@@ -29,7 +27,8 @@ export class StockAnalysisComponent {
   constructor(
     private stockService : StocksService,
     private percentPipe: PercentPipe,
-    private currencyPipe: CurrencyPipe
+    private currencyPipe: CurrencyPipe,
+    private decimalPipe: DecimalPipe
   ) { }
 
   @Input()
@@ -72,7 +71,7 @@ export class StockAnalysisComponent {
     } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
       return this.currencyPipe.transform(o.value)
     } else {
-      return o.value
+      return this.decimalPipe.transform(o.value)
     }
   }
 
