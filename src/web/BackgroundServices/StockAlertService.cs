@@ -10,7 +10,6 @@ using core.Alerts;
 using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
-using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -49,10 +48,7 @@ namespace web.BackgroundServices
             _portfolio = portfolio;
         }
 
-        private const string GAP_UP_TAG = "monitor:gapup";
-        private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
-        private List<AlertCheck> _gapUpChecks;
-        private List<AlertCheck> _upsideReversalChecks;
+        private Dictionary<string, List<AlertCheck>> _checks = new Dictionary<string, List<AlertCheck>>();
 
         private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
         private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
@@ -74,43 +70,49 @@ namespace web.BackgroundServices
                             break;
                         }
 
-                        _gapUpChecks = await AlertCheckGenerator.GetStocksFromListsWithTagsAsync(
-                            _portfolio, GAP_UP_TAG, user.State
-                        );
+                        _checks.Clear();
 
-                        _upsideReversalChecks = await AlertCheckGenerator.GetStocksFromListsWithTagsAsync(
-                            _portfolio, UPSIDE_REVERSAL_TAG, user.State
-                        );
+                        foreach(var tag in Scanners.GetTags())
+                        {
+                            var checks = await AlertCheckGenerator.GetStocksFromListsWithTags(
+                                _portfolio, tag, user.State
+                            );
+
+                            _checks.Add(tag, checks);
+                        }
 
                         _nextAlertUpdateRun = GetNextMonitorRunTime();
 
                         _container.ManualRunCompleted();
 
+                        var description = string.Join(", ", _checks.Select(kp => $"{kp.Key} {kp.Value.Count} checks"));
+
                         _container.AddNotice(
-                            $"Alert check generator added {_gapUpChecks.Count + _upsideReversalChecks.Count} checks, next run at {_marketHours.ToMarketTime(_nextAlertUpdateRun)}"
+                            $"Alert check generator added {description}, next run at {_marketHours.ToMarketTime(_nextAlertUpdateRun)}"
                         );
                     }
 
-                    if (_gapUpChecks.Count > 0)
+                    foreach(var kp in _checks)
                     {
-                        var gapUpsCompleted = await MonitorForGaps(_gapUpChecks, stoppingToken);
-                        foreach(var completed in gapUpsCompleted)
+                        if (kp.Value.Count > 0)
                         {
-                            _gapUpChecks.Remove(completed);
-                        }
+                            var scanner = Scanners.GetScannerForTag(
+                                kp.Key,
+                                (user, ticker) => GetPricesForTicker(user, ticker),
+                                _container,
+                                kp.Value,
+                                stoppingToken
+                            );
 
-                        _container.AddNotice($"{gapUpsCompleted.Count} gap up checks completed, {_gapUpChecks.Count} remaining");
-                    }
+                            var completed = await scanner();
 
-                    if (_upsideReversalChecks.Count > 0)
-                    {
-                        var upsideReversalsCompleted = await MonitorForUpsideReversals(_upsideReversalChecks, stoppingToken);
-                        foreach(var completed in upsideReversalsCompleted)
-                        {
-                            _upsideReversalChecks.Remove(completed);
+                            foreach(var c in completed)
+                            {
+                                kp.Value.Remove(c);
+                            }
+
+                            _container.AddNotice($"{completed.Count} {kp.Key} checks completed, {kp.Value.Count} remaining");
                         }
-                        
-                        _container.AddNotice($"{upsideReversalsCompleted.Count} reversal checks completed, {_upsideReversalChecks.Count} remaining");
                     }
 
                     if (DateTimeOffset.UtcNow > _nextStopLossCheck)
@@ -122,8 +124,7 @@ namespace web.BackgroundServices
 
                     // wait to send emails if there are still checks running
                     if (DateTimeOffset.UtcNow > _nextEmailSend
-                        && _gapUpChecks.Count == 0
-                        && _upsideReversalChecks.Count == 0)
+                        && _checks.All(kp => kp.Value.Count == 0))
                     {
                         await SendAlertSummaryEmail();
                         _nextEmailSend = GetNextEmailSendTime();
@@ -226,39 +227,16 @@ namespace web.BackgroundServices
                 return;
             }
 
-            var stocks = await _portfolio.GetStocks(user.Id);
-            var positions = stocks
-                .Where(s => s.State.OpenPosition != null)
-                .Select(s => s.State.OpenPosition)
-                .Where(p => p.StopPrice != null);
+            var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user.State);
+            
+            var completed = await Scanners.MonitorForStopLosses(
+                (u, ticker) => GetQuote(u, ticker),
+                _container,
+                checks,
+                stoppingToken
+            );
 
-            foreach (var position in positions)
-            {
-                var priceResponse = await _brokerage.GetQuote(user.State, position.Ticker);
-                if (!priceResponse.IsOk)
-                {
-                    _logger.LogError($"Could not get price for {position.Ticker}: {priceResponse.Error.Message}");
-                    continue;
-                }
 
-                var price = priceResponse.Success.lastPrice;
-
-                if (price <= position.StopPrice.Value)
-                {
-                    StopPriceMonitor.Register(
-                        container: _container,
-                        price: price,
-                        stopPrice: position.StopPrice.Value,
-                        ticker: position.Ticker,
-                        when: DateTimeOffset.UtcNow,
-                        userId: user.Id
-                    );
-                }
-                else
-                {
-                    StopPriceMonitor.Deregister(_container, position.Ticker, user.Id);
-                }
-            }
         }
 
         private DateTimeOffset GetNextStopLossCheckTime()
@@ -332,97 +310,9 @@ namespace web.BackgroundServices
             return nextRunTime;
         }
 
-        private async Task<List<AlertCheck>> MonitorForGaps(List<AlertCheck> checks, CancellationToken ct)
-        {
-            var completed = new List<AlertCheck>();
-
-            foreach (var c in checks)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    return completed;
-                }
-
-                var prices = await GetPricesForTicker(c.user, c.ticker);
-
-                if (!prices.IsOk)
-                {
-                    _logger.LogCritical($"Failed to get price history for {c.ticker}: {prices.Error.Message}");
-                    continue;
-                }
-
-                completed.Add(c);
-
-                var gaps = GapAnalysis.Generate(prices.Success, 2);
-                if (gaps.Count == 0 || gaps[0].type != GapType.Up)
-                {
-                    GapUpMonitor.Deregister(_container, c.ticker, c.user.Id);
-                    continue;
-                }
-
-                var gap = gaps[0];
-
-                GapUpMonitor.Register(
-                    container: _container,
-                    ticker: c.ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id
-                );
-            }
-        
-            return completed;
-        }
-
-        private async Task<List<AlertCheck>> MonitorForUpsideReversals(List<AlertCheck> checks, CancellationToken ct)
-        {
-            var completed = new List<AlertCheck>();
-
-            foreach (var c in checks)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    return completed;
-                }
-
-                var prices = await GetPricesForTicker(user: c.user, ticker: c.ticker);
-                if (!prices.IsOk)
-                {
-                    _logger.LogCritical($"Failed to get price history for {c.ticker}: {prices.Error.Message}");
-                    continue;
-                }
-
-                completed.Add(c);
-
-                var patterns = PatternDetection.Generate(prices.Success).ToList();
-                if (patterns.Count == 0)
-                {
-                    foreach(var patternName in PatternDetection.AvailablePatterns)
-                    {
-                        PatternAlert.Deregister(
-                            container: _container,
-                            ticker: c.ticker,
-                            patternName: patternName,
-                            userId: c.user.Id
-                        );
-                    }
-                    continue;
-                }
-
-                foreach(var pattern in patterns)
-                {
-                    PatternAlert.Register(
-                        container: _container,
-                        ticker: c.ticker,
-                        pattern: pattern,
-                        price: prices.Success.Last().Close,
-                        when: DateTimeOffset.UtcNow,
-                        userId: c.user.Id
-                    );
-                }
-            }
-        
-            return completed;
-        }
-
-        private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(UserState user, string ticker)
+        private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(
+            UserState user,
+            string ticker)
         {
             var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-7));
             var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
@@ -433,7 +323,22 @@ namespace web.BackgroundServices
                 start: start,
                 end: end
             );
+            if (!prices.IsOk)
+            {
+                _logger.LogCritical($"Could not get price history for {ticker}: {prices.Error.Message}");
+            }
             return prices;
+        }
+
+        private async Task<ServiceResponse<StockQuote>> GetQuote(
+            UserState user, string ticker)
+        {
+            var priceResponse = await _brokerage.GetQuote(user, ticker);
+            if (!priceResponse.IsOk)
+            {
+                _logger.LogError($"Could not get price for {ticker}: {priceResponse.Error.Message}");
+            }
+            return priceResponse;
         }
     }
 }

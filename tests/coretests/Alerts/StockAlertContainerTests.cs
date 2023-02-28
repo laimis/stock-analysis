@@ -5,12 +5,12 @@ using Xunit;
 
 namespace coretests.Alerts
 {
-    public class StockMonitorContainerTests
+    public class StockAlertContainerTests
     {
         private Guid _userId;
         private StockAlertContainer _uat;
 
-        public StockMonitorContainerTests()
+        public StockAlertContainerTests()
         {
             _userId = Guid.NewGuid();
             

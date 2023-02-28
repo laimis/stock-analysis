@@ -7,7 +7,8 @@ namespace core.Alerts
 {
     public record struct AlertCheck(
         string ticker,
-        UserState user
+        UserState user,
+        decimal? threshold = null
     );
 
     public record struct TriggeredAlert(

@@ -6,9 +6,9 @@ using core.Account;
 
 namespace core.Alerts.Services
 {
-    public class AlertCheckGenerator
+    public static class AlertCheckGenerator
     {
-        public static async Task<List<AlertCheck>> GetStocksFromListsWithTagsAsync(
+        public static async Task<List<AlertCheck>> GetStocksFromListsWithTags(
             IPortfolioStorage portfolio,
             string tag,
             UserState user)
@@ -20,6 +20,25 @@ namespace core.Alerts.Services
                 .SelectMany(x => x.State.Tickers)
                 .Select(t => new AlertCheck(ticker: t.Ticker, user: user))
                 .ToList();
-        }   
+        }
+
+        public static async Task<List<AlertCheck>> GetStopLossChecks(
+            IPortfolioStorage portfolio,
+            UserState user)
+        {
+            var list = await portfolio.GetStockLists(user.Id);
+
+            var stocks = await portfolio.GetStocks(user.Id);
+            return stocks
+                .Where(s => s.State.OpenPosition != null)
+                .Select(s => s.State.OpenPosition)
+                .Where(p => p.StopPrice != null)
+                .Select(p => new AlertCheck(
+                    ticker: p.Ticker,
+                    user: user,
+                    threshold: p.StopPrice.Value
+                ))
+                .ToList();
+        }
     }
 }
