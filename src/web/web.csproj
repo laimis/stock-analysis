@@ -16,7 +16,6 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.0" />
-    <PackageReference Include="TimeZoneConverter" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +35,7 @@
     <ProjectReference Include="..\infrastructure\storage.memory\storage.memory.csproj" />
     <ProjectReference Include="..\infrastructure\twilioclient\twilioclient.csproj" />
     <ProjectReference Include="..\infrastructure\tdameritradeclient\tdameritradeclient.csproj" />
+    <ProjectReference Include="..\infrastructure\timezonesupport\timezonesupport.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

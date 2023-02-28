@@ -11,10 +11,7 @@ namespace core.Alerts
         private ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert> _alerts =
             new ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert>();
         private const int MAX_RECENT_ALERTS = 20;
-        private const int RECENT_ALERT_HOUR_THRESHOLD = 8; // alerts within eight hour are considered to be recent
-
-        // internal IEnumerable<TriggeredAlert> Alerts => _alerts.Values;
-
+        
         private bool _manualRun = false;
         public void RequestManualRun() => _manualRun = true;
         public bool ManualRunRequested() => _manualRun;

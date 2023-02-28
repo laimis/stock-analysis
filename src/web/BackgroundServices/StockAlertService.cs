@@ -81,7 +81,10 @@ namespace web.BackgroundServices
                             _checks.Add(tag, checks);
                         }
 
-                        _nextAlertUpdateRun = GetNextMonitorRunTime();
+                        _nextAlertUpdateRun = ScanScheduling.GetNextListMonitorRunTime(
+                            DateTimeOffset.UtcNow,
+                            _marketHours
+                        );
 
                         _container.ManualRunCompleted();
 
@@ -117,9 +120,27 @@ namespace web.BackgroundServices
 
                     if (DateTimeOffset.UtcNow > _nextStopLossCheck)
                     {
-                        await MonitorForStops(stoppingToken);
-                        _nextStopLossCheck = GetNextStopLossCheckTime();
-                        _container.AddNotice("Stop loss monitor complete, next run at " + _marketHours.ToMarketTime(_nextStopLossCheck));
+                        var user = await GetUser();
+                        if (user == null)
+                        {
+                            _logger.LogError("Could not find user for stop monitoring");
+                            return;
+                        }
+
+                        var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user.State);
+                        
+                        var completed = await Scanners.MonitorForStopLosses(
+                            (u, ticker) => GetQuote(u, ticker),
+                            _container,
+                            checks,
+                            stoppingToken
+                        );
+
+                        _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
+                            DateTimeOffset.UtcNow,
+                            _marketHours
+                        );
+                        _container.AddNotice($"Completed {completed.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
                     }
 
                     // wait to send emails if there are still checks running
@@ -127,7 +148,10 @@ namespace web.BackgroundServices
                         && _checks.All(kp => kp.Value.Count == 0))
                     {
                         await SendAlertSummaryEmail();
-                        _nextEmailSend = GetNextEmailSendTime();
+                        _nextEmailSend = ScanScheduling.GetNextEmailRunTime(
+                            DateTimeOffset.UtcNow,
+                            _marketHours
+                        );
                         _container.AddNotice("Emails sent, next run at " + _marketHours.ToMarketTime(_nextEmailSend));
                     }
 
@@ -145,31 +169,6 @@ namespace web.BackgroundServices
         private async Task<User> GetUser()
         {
             return await _accounts.GetUserByEmail("laimis@gmail.com");
-        }
-
-        private DateTimeOffset GetNextEmailSendTime()
-        {
-            var currentTime = DateTimeOffset.UtcNow;
-
-            var currentTimeInEastern = _marketHours.ToMarketTime(currentTime);
-            var beforeClose = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern)
-                .AddMinutes(-15);
-            var afterOpen = _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
-                .AddMinutes(15);
-
-            var nextRunTime = 
-                currentTime.TimeOfDay switch {
-                var t when t >= beforeClose.TimeOfDay 
-                    || currentTime.Date != currentTimeInEastern.Date =>  // after market close
-                    afterOpen.AddDays(1),
-                var t when t < afterOpen.TimeOfDay => // before market open
-                    afterOpen,
-                var t when t < beforeClose.TimeOfDay => // during market hours
-                    beforeClose,
-                _ =>  throw new Exception("Email send: Should not be possible to get here but did with time: " + currentTimeInEastern)
-            };
-
-            return nextRunTime;
         }
 
         private async Task SendAlertSummaryEmail()
@@ -216,98 +215,6 @@ namespace web.BackgroundServices
                 description = alert.description,
                 time = _marketHours.ToMarketTime(alert.when).ToString("HH:mm") + " ET"
             };
-        }
-
-        private async Task MonitorForStops(CancellationToken stoppingToken)
-        {
-            var user = await _accounts.GetUserByEmail("laimis@gmail.com");
-            if (user == null)
-            {
-                _logger.LogError("Could not find user for stop monitoring");
-                return;
-            }
-
-            var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user.State);
-            
-            var completed = await Scanners.MonitorForStopLosses(
-                (u, ticker) => GetQuote(u, ticker),
-                _container,
-                checks,
-                stoppingToken
-            );
-
-
-        }
-
-        private DateTimeOffset GetNextStopLossCheckTime()
-        {
-            var currentTime = DateTimeOffset.UtcNow;
-            if (_marketHours.IsMarketOpen(currentTime))
-            {
-                return currentTime.AddMinutes(5);
-            }
-            
-            var marketTimeNow = _marketHours.ToMarketTime(currentTime);
-            if (marketTimeNow.DayOfWeek == DayOfWeek.Saturday)
-            {
-                return _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(2)).AddMinutes(10);
-            }
-
-            if (marketTimeNow.DayOfWeek == DayOfWeek.Sunday)
-            {
-                return _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10);
-            }
-
-            var openTime = _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date);
-            var closeTime = _marketHours.GetMarketEndOfDayTimeInUtc(marketTimeNow.Date);
-
-            return currentTime.TimeOfDay switch {
-                var t when t <= openTime.TimeOfDay => 
-                    openTime.AddMinutes(10),
-                var t when t >= closeTime.TimeOfDay => 
-                    _marketHours.GetMarketStartOfDayTimeInUtc(marketTimeNow.Date.AddDays(1)).AddMinutes(10),
-                _ => throw new Exception("Stop loss check: Should not be possible to get here but did with time: " + marketTimeNow)
-            };
-        }
-
-        private DateTimeOffset GetNextMonitorRunTime()
-        {
-            DateTimeOffset LogAndReturn(string message, DateTimeOffset delay)
-            {
-                _logger.LogInformation(message);
-                return delay;
-            }
-            
-            var currentTime = DateTimeOffset.UtcNow;
-            var currentTimeInEastern = _marketHours.ToMarketTime(currentTime);
-            var currentCloseTime = _marketHours.GetMarketEndOfDayTimeInUtc(currentTimeInEastern);
-            var currentOpenTime = _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern);
-            var lastRunBeforeClose = currentCloseTime.AddMinutes(-30);
-
-            var nextRunTime = 
-                currentTime.TimeOfDay switch {
-                var t when t >= lastRunBeforeClose.TimeOfDay || currentTime.Date != currentTimeInEastern.Date => 
-                    LogAndReturn(
-                        $"{currentTime} is after the last run before close",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern.AddDays(1))
-                            .AddMinutes(15)
-                    ),
-                var t when t < currentOpenTime.TimeOfDay => 
-                    LogAndReturn(
-                        $"{currentTime} is before the start of the market day",
-                        _marketHours.GetMarketStartOfDayTimeInUtc(currentTimeInEastern)
-                            .AddMinutes(15)
-                    ),
-                var t when t < lastRunBeforeClose.TimeOfDay =>
-                    LogAndReturn(
-                        $"{currentTime} is in the middle of the day",
-                        lastRunBeforeClose
-                    ),
-                    
-                _ =>  throw new Exception("Monitor: Should not be possible to get here but did with time: " + currentTimeInEastern)
-            };
-
-            return nextRunTime;
         }
 
         private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(
