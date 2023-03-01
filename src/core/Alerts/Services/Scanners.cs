@@ -27,11 +27,11 @@ namespace core.Alerts.Services
             Func<UserState, string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
             return tag switch {
-                GAP_UP_TAG => () => MonitorForGaps(pricesFunc, container, checks, ct),
-                UPSIDE_REVERSAL_TAG => () => MonitorForUpsideReversals(pricesFunc, container, checks, ct),
+                GAP_UP_TAG => () => MonitorForGaps(pricesFunc, container, checks, cancellationToken),
+                UPSIDE_REVERSAL_TAG => () => MonitorForUpsideReversals(pricesFunc, container, checks, cancellationToken),
                 _ => () => throw new NotImplementedException($"No scanner for tag {tag}")
             };
         }
@@ -40,7 +40,7 @@ namespace core.Alerts.Services
             Func<UserState, string, Task<ServiceResponse<StockQuote>>> quoteFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
             var completed = new List<AlertCheck>();
 

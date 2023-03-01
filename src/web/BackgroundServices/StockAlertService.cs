@@ -48,9 +48,8 @@ namespace web.BackgroundServices
             _portfolio = portfolio;
         }
 
-        private Dictionary<string, List<AlertCheck>> _checks = new Dictionary<string, List<AlertCheck>>();
-
-        private DateTimeOffset _nextAlertUpdateRun = DateTimeOffset.MinValue;
+        private Dictionary<string, List<AlertCheck>> _listChecks = new Dictionary<string, List<AlertCheck>>();
+        private DateTimeOffset _nextListMonitoringRun = DateTimeOffset.MinValue;
         private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
         private DateTimeOffset _nextEmailSend = DateTimeOffset.MinValue;
         
@@ -60,100 +59,11 @@ namespace web.BackgroundServices
             {    
                 try
                 {
-                    if (DateTimeOffset.UtcNow > _nextAlertUpdateRun || _container.ManualRunRequested())
-                    {
-                        var user = await GetUser();
-                        if (user == null)
-                        {
-                            _logger.LogCritical("No user found for stock alert service");
-                            _container.AddNotice("No user found for stock alert service");
-                            break;
-                        }
+                    await RunThroughListMonitoringChecks(stoppingToken);
 
-                        _checks.Clear();
+                    await RunThroughStopLossChecks(stoppingToken);
 
-                        foreach(var tag in Scanners.GetTags())
-                        {
-                            var checks = await AlertCheckGenerator.GetStocksFromListsWithTags(
-                                _portfolio, tag, user.State
-                            );
-
-                            _checks.Add(tag, checks);
-                        }
-
-                        _nextAlertUpdateRun = ScanScheduling.GetNextListMonitorRunTime(
-                            DateTimeOffset.UtcNow,
-                            _marketHours
-                        );
-
-                        _container.ManualRunCompleted();
-
-                        var description = string.Join(", ", _checks.Select(kp => $"{kp.Key} {kp.Value.Count} checks"));
-
-                        _container.AddNotice(
-                            $"Alert check generator added {description}, next run at {_marketHours.ToMarketTime(_nextAlertUpdateRun)}"
-                        );
-                    }
-
-                    foreach(var kp in _checks)
-                    {
-                        if (kp.Value.Count > 0)
-                        {
-                            var scanner = Scanners.GetScannerForTag(
-                                kp.Key,
-                                (user, ticker) => GetPricesForTicker(user, ticker),
-                                _container,
-                                kp.Value,
-                                stoppingToken
-                            );
-
-                            var completed = await scanner();
-
-                            foreach(var c in completed)
-                            {
-                                kp.Value.Remove(c);
-                            }
-
-                            _container.AddNotice($"{completed.Count} {kp.Key} checks completed, {kp.Value.Count} remaining");
-                        }
-                    }
-
-                    if (DateTimeOffset.UtcNow > _nextStopLossCheck)
-                    {
-                        var user = await GetUser();
-                        if (user == null)
-                        {
-                            _logger.LogError("Could not find user for stop monitoring");
-                            return;
-                        }
-
-                        var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user.State);
-                        
-                        var completed = await Scanners.MonitorForStopLosses(
-                            (u, ticker) => GetQuote(u, ticker),
-                            _container,
-                            checks,
-                            stoppingToken
-                        );
-
-                        _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
-                            DateTimeOffset.UtcNow,
-                            _marketHours
-                        );
-                        _container.AddNotice($"Completed {completed.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
-                    }
-
-                    // wait to send emails if there are still checks running
-                    if (DateTimeOffset.UtcNow > _nextEmailSend
-                        && _checks.All(kp => kp.Value.Count == 0))
-                    {
-                        await SendAlertSummaryEmail();
-                        _nextEmailSend = ScanScheduling.GetNextEmailRunTime(
-                            DateTimeOffset.UtcNow,
-                            _marketHours
-                        );
-                        _container.AddNotice("Emails sent, next run at " + _marketHours.ToMarketTime(_nextEmailSend));
-                    }
+                    await SendAlertSummaryEmail();
 
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
@@ -166,34 +76,137 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task<User> GetUser()
+        private async Task RunThroughStopLossChecks(CancellationToken cancellationToken)
         {
-            return await _accounts.GetUserByEmail("laimis@gmail.com");
+            if (DateTimeOffset.UtcNow > _nextStopLossCheck)
+            {
+                var user = await GetUser();
+                if (user == null)
+                {
+                    return;
+                }
+
+                var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user.State);
+
+                var completed = await Scanners.MonitorForStopLosses(
+                    quoteFunc: (u, ticker) => GetQuote(u, ticker),
+                    container: _container,
+                    checks: checks,
+                    cancellationToken: cancellationToken
+                );
+
+                _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
+                    DateTimeOffset.UtcNow,
+                    _marketHours
+                );
+                _container.AddNotice($"Completed {completed.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
+            }
         }
 
-        private async Task SendAlertSummaryEmail()
+        private async Task RunThroughListMonitoringChecks(CancellationToken stoppingToken)
+        {
+            if (DateTimeOffset.UtcNow > _nextListMonitoringRun || _container.ManualRunRequested())
+            {
+                await GenerateListMonitoringChecks();
+            }
+
+            foreach (var kp in _listChecks.Where(kp => kp.Value.Count > 0))
+            {
+                var scanner = Scanners.GetScannerForTag(
+                    tag: kp.Key,
+                    pricesFunc: (user, ticker) => GetPricesForTicker(user, ticker),
+                    container: _container,
+                    checks: kp.Value,
+                    cancellationToken: stoppingToken
+                );
+
+                var completed = await scanner();
+
+                foreach (var c in completed)
+                {
+                    kp.Value.Remove(c);
+                }
+
+                _container.AddNotice($"{completed.Count} {kp.Key} checks completed, {kp.Value.Count} remaining");
+            }
+        }
+
+        private async Task GenerateListMonitoringChecks()
         {
             var user = await GetUser();
             if (user == null)
             {
-                _logger.LogError("Could not find user for email sending");
                 return;
             }
 
-            // get all alerts for that user
-            var alerts = _container.GetAlerts(user.Id);
+            _listChecks.Clear();
 
-            var data = new {
-                alerts = alerts.Select(ToEmailData)
-            };
+            foreach (var tag in Scanners.GetTags())
+            {
+                var list = await AlertCheckGenerator.GetStocksFromListsWithTags(
+                    _portfolio, tag, user.State
+                );
 
-            await _emails.Send(
-                new Recipient(email: user.State.Email, name: user.State.Name),
-                Sender.NoReply,
-                EmailTemplate.Alerts,
-                data
+                _listChecks.Add(tag, list);
+            }
+
+            _nextListMonitoringRun = ScanScheduling.GetNextListMonitorRunTime(
+                DateTimeOffset.UtcNow,
+                _marketHours
             );
 
+            _container.ManualRunCompleted();
+
+            var description = string.Join(", ", _listChecks.Select(kp => $"{kp.Key} {kp.Value.Count} checks"));
+
+            _container.AddNotice(
+                $"Alert check generator added {description}, next run at {_marketHours.ToMarketTime(_nextListMonitoringRun)}"
+            );
+        }
+
+        private async Task<User> GetUser()
+        {
+            var user = await _accounts.GetUserByEmail("laimis@gmail.com");
+            if (user == null)
+            {
+                _logger.LogCritical("No user found for stock alert service");
+                _container.AddNotice("No user found for stock alert service");            
+            }
+            return user;
+        }
+
+        private async Task SendAlertSummaryEmail()
+        {
+            // wait to send emails if there are still checks running
+            if (DateTimeOffset.UtcNow > _nextEmailSend
+                && _listChecks.All(kp => kp.Value.Count == 0))
+            {
+                var user = await GetUser();
+                if (user == null)
+                {
+                    return;
+                }
+
+                // get all alerts for that user
+                var alerts = _container.GetAlerts(user.Id);
+
+                var data = new {
+                    alerts = alerts.Select(ToEmailData)
+                };
+
+                await _emails.Send(
+                    new Recipient(email: user.State.Email, name: user.State.Name),
+                    Sender.NoReply,
+                    EmailTemplate.Alerts,
+                    data
+                );
+
+                _nextEmailSend = ScanScheduling.GetNextEmailRunTime(
+                    DateTimeOffset.UtcNow,
+                    _marketHours
+                );
+                _container.AddNotice("Emails sent, next run at " + _marketHours.ToMarketTime(_nextEmailSend));
+            }
         }
 
         private object ToEmailData(TriggeredAlert alert)
