@@ -59,11 +59,13 @@ namespace web.BackgroundServices
             {    
                 try
                 {
-                    await RunThroughListMonitoringChecks(stoppingToken);
+                    var user = new Lazy<Task<UserState>>(() => GetUser());
 
-                    await RunThroughStopLossChecks(stoppingToken);
+                    await RunThroughListMonitoringChecks(user, stoppingToken);
 
-                    await SendAlertSummaryEmail();
+                    await RunThroughStopLossChecks(user, stoppingToken);
+
+                    await SendAlertSummaryEmail(user);
 
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
@@ -76,17 +78,17 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task RunThroughStopLossChecks(CancellationToken cancellationToken)
+        private async Task RunThroughStopLossChecks(Lazy<Task<UserState>> userFunc, CancellationToken cancellationToken)
         {
             if (DateTimeOffset.UtcNow > _nextStopLossCheck)
             {
-                var user = await GetUser();
+                var user = await userFunc.Value;
                 if (user == null)
                 {
                     return;
                 }
 
-                var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user.State);
+                var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user);
 
                 var completed = await Scanners.MonitorForStopLosses(
                     quoteFunc: (u, ticker) => GetQuote(u, ticker),
@@ -103,11 +105,11 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task RunThroughListMonitoringChecks(CancellationToken stoppingToken)
+        private async Task RunThroughListMonitoringChecks(Lazy<Task<UserState>> user, CancellationToken stoppingToken)
         {
             if (DateTimeOffset.UtcNow > _nextListMonitoringRun || _container.ManualRunRequested())
             {
-                await GenerateListMonitoringChecks();
+                await GenerateListMonitoringChecks(user);
             }
 
             foreach (var kp in _listChecks.Where(kp => kp.Value.Count > 0))
@@ -131,10 +133,10 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task GenerateListMonitoringChecks()
+        private async Task GenerateListMonitoringChecks(Lazy<Task<UserState>> userFunc)
         {
-            var user = await GetUser();
-            if (user == null)
+            var user = await userFunc.Value;
+            if (userFunc == null)
             {
                 return;
             }
@@ -144,7 +146,7 @@ namespace web.BackgroundServices
             foreach (var tag in Scanners.GetTags())
             {
                 var list = await AlertCheckGenerator.GetStocksFromListsWithTags(
-                    _portfolio, tag, user.State
+                    _portfolio, tag, user
                 );
 
                 _listChecks.Add(tag, list);
@@ -164,7 +166,7 @@ namespace web.BackgroundServices
             );
         }
 
-        private async Task<User> GetUser()
+        private async Task<UserState> GetUser()
         {
             var user = await _accounts.GetUserByEmail("laimis@gmail.com");
             if (user == null)
@@ -172,16 +174,16 @@ namespace web.BackgroundServices
                 _logger.LogCritical("No user found for stock alert service");
                 _container.AddNotice("No user found for stock alert service");            
             }
-            return user;
+            return user?.State;
         }
 
-        private async Task SendAlertSummaryEmail()
+        private async Task SendAlertSummaryEmail(Lazy<Task<UserState>> userFunc)
         {
             // wait to send emails if there are still checks running
             if (DateTimeOffset.UtcNow > _nextEmailSend
                 && _listChecks.All(kp => kp.Value.Count == 0))
             {
-                var user = await GetUser();
+                var user = await userFunc.Value;
                 if (user == null)
                 {
                     return;
@@ -195,7 +197,7 @@ namespace web.BackgroundServices
                 };
 
                 await _emails.Send(
-                    new Recipient(email: user.State.Email, name: user.State.Name),
+                    new Recipient(email: user.Email, name: user.Name),
                     Sender.NoReply,
                     EmailTemplate.Alerts,
                     data
