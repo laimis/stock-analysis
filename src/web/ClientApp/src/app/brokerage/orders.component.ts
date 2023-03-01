@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { GetErrors } from '../services/utils';
 
 
 @Component({
@@ -12,6 +13,7 @@ export class BrokerageOrdersComponent implements OnInit {
   private _orders: BrokerageOrder[] = [];
   private _ticker: string;
   isEmpty: boolean = false;
+  error: string;
 
   constructor(
     private stockService: StocksService
@@ -34,9 +36,14 @@ export class BrokerageOrdersComponent implements OnInit {
   refreshOrders() {
     this.stockService.brokerageOrders().subscribe(orders => {
       this._orders = orders
-      
       this.groupAndRenderOrders()
-    });
+    },
+      (err) => {
+        let errors = GetErrors(err)
+        // concat errors with comma separated
+        this.error = errors.join(", ")
+      }
+    )
   }
   groupAndRenderOrders() {
     var buys = this._orders.filter(o => o.type == 'BUY' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));

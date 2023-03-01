@@ -6,6 +6,9 @@
     <div *ngIf="isEmpty && ticker">
       No brokerage orders found for {{ticker}}
     </div>
+    <div *ngIf="error" class="alert alert-danger">
+      {{error}}
+    </div>
     <table class="table" *ngFor="let groupedOrder of groupedOrders">
       <thead *ngIf="groupedOrder.length > 0">
         <tr>
