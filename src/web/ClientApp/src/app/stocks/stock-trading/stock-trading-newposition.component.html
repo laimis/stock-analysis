@@ -25,13 +25,23 @@
         />
       </div>
       <div class="col">
+        <label for="sizeStopPrice" class="form-label">Size Stop</label>
+        <input
+          type="number"
+          id="sizeStopPrice"
+          class="form-control"
+          [(ngModel)]="sizeStopPrice"
+          (ngModelChange)="updateBuyingValuesSizeStopPrice()"
+        />
+      </div>
+      <div class="col">
         <label for="stopPrice" class="form-label">Stop</label>
         <input
           type="number"
           id="stopPrice"
           class="form-control"
-          [(ngModel)]="stopPrice"
-          (ngModelChange)="updateBuyingValuesStopPrice()"
+          [(ngModel)]="positionStopPrice"
+          (ngModelChange)="updateBuyingValuesPositionStopPrice()"
         />
       </div>
       <div class="col">

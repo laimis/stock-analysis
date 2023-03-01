@@ -57,6 +57,27 @@ namespace core.Stocks
                     var found = pendingPositions.SingleOrDefault(x => x.State.Ticker == new Ticker(cmd.Ticker));
                     if (found != null)
                     {
+                        // in case we have open position but we recorded standalone, make sure
+                        // that the properties get transferred over:
+                        var pendingState = found.State;
+                        var opened = stock.State.OpenPosition;
+
+                        var saveStock = false;
+                        if (stock.SetStop(pendingState.StopPrice.Value))
+                        {
+                            saveStock = true;
+                        }
+
+                        if (stock.AddNotes(pendingState.Notes))
+                        {
+                            saveStock = true;
+                        }
+
+                        if (saveStock)
+                        {
+                            await _storage.Save(stock, cmd.UserId);
+                        }
+
                         await _storage.DeletePendingStockPosition(found, cmd.UserId);
                     }
                 }

@@ -154,6 +154,20 @@ namespace core.Stocks
         public decimal StopPrice { get; }
     }
 
+    public class NotesAdded : AggregateEvent
+    {
+        public NotesAdded(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, int positionId, string notes) : base(id, aggregateId, when)
+        {
+            UserId = userId;
+            PositionId = positionId;
+            Notes = notes;
+        }
+
+        public Guid UserId { get; }
+        public int PositionId { get; }
+        public string Notes { get; }
+    }
+
     internal class RiskAmountSet : AggregateEvent
     {
         public RiskAmountSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker, decimal riskAmount) : base(id, aggregateId, when)

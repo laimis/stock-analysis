@@ -140,6 +140,15 @@ namespace core.Stocks
             }
         }
 
+        internal void ApplyInternal(NotesAdded notesAdded)
+        {
+            var position = Positions.SingleOrDefault(x => x.PositionId == notesAdded.PositionId);
+            if (position != null)
+            {
+                position.AddNotes(notesAdded.Notes);
+            }
+        }
+
         internal void ApplyInternal(StockSold sold)
         {
             BuyOrSell.Add(sold);

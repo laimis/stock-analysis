@@ -92,6 +92,11 @@ namespace core.Stocks
             Notes.Add(note);
         }
 
+        public void AddNotes(string notes)
+        {
+            Notes.Add(notes);
+        }
+
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
             if (NumberOfShares == 0)

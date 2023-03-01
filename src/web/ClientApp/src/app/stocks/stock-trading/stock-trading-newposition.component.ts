@@ -46,7 +46,8 @@ export class StockTradingNewPositionComponent {
   ask: number | null = null
   bid: number | null = null
   numberOfShares : number | null = null
-  stopPrice: number | null = null
+  sizeStopPrice: number | null = null
+  positionStopPrice: number | null = null
   oneR: number | null = null
   potentialLoss: number | null = null
   stopPct: number | null = null
@@ -66,7 +67,8 @@ export class StockTradingNewPositionComponent {
     
     this.costToBuy = null
     this.numberOfShares = null
-    this.stopPrice = null
+    this.sizeStopPrice = null
+    this.positionStopPrice = null
     this.ticker = ticker
     this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
     
@@ -95,7 +97,8 @@ export class StockTradingNewPositionComponent {
   reset() {
     this.costToBuy = null
     this.numberOfShares = null
-    this.stopPrice = null
+    this.positionStopPrice = null
+    this.sizeStopPrice = null
     this.ticker = null
     this.prices = null
   }
@@ -145,32 +148,37 @@ export class StockTradingNewPositionComponent {
   }
 
   updateBuyingValuesWithNumberOfShares() {
-    if (!this.costToBuy || !this.stopPrice) {
+    if (!this.costToBuy || !this.positionStopPrice) {
       console.log("not enough info to calculate")
       return
     }
-    var singleShareLoss = this.costToBuy - this.stopPrice
+    var singleShareLoss = this.costToBuy - this.positionStopPrice
     this.updateBuyingValues(singleShareLoss)
   }
 
-  updateBuyingValuesStopPrice() {
-    this.updateBuyingValuesPricesChanged()
-  }
-
-  updateBuyingValuesWithCostToBuy() {
-    this.updateBuyingValuesPricesChanged()
-  }
-
-  updateBuyingValuesPricesChanged() {
-    if (!this.costToBuy || !this.stopPrice) {
-      console.log("not enough info to calculate")
+  updateBuyingValuesSizeStopPrice() {
+    if (!this.costToBuy) {
+      console.log("sizeStopChanged: not enough info to calculate the rest")
       return
     }
 
-    var singleShareLoss = this.costToBuy - this.stopPrice
+    var singleShareLoss = this.costToBuy - this.sizeStopPrice
     this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
     
     this.updateBuyingValues(singleShareLoss)
+  }
+
+  updateBuyingValuesPositionStopPrice() {
+    if (!this.costToBuy) {
+      console.log("positionStopChanged: not enough info to calculate the rest")
+      return
+    }
+    var singleShareLoss = this.costToBuy - this.positionStopPrice
+    this.updateBuyingValues(singleShareLoss)
+  }
+
+  updateBuyingValuesWithCostToBuy() {
+    this.updateBuyingValuesSizeStopPrice()
   }
 
   updateBuyingValues(singleShareLoss:number) {
@@ -178,10 +186,10 @@ export class StockTradingNewPositionComponent {
     // how many shares can we buy to keep the loss under $100
     this.positionSizeCalculated = Math.round(this.numberOfShares * this.costToBuy * 100) / 100
     this.oneR = this.costToBuy + singleShareLoss
-    this.potentialLoss = this.stopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
-    this.stopPct = Math.round((this.stopPrice - this.costToBuy) / this.costToBuy * 100) / 100
+    this.potentialLoss = this.positionStopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
+    this.stopPct = Math.round((this.positionStopPrice - this.costToBuy) / this.costToBuy * 100) / 100
     this.chartTargets = [this.oneR]
-    this.chartStops = [this.stopPrice]
+    this.chartStops = [this.positionStopPrice]
   }
 
   record() {
@@ -206,7 +214,7 @@ export class StockTradingNewPositionComponent {
     cmd.ticker = this.ticker;
     cmd.numberOfShares = this.numberOfShares;
     cmd.price = this.costToBuy;
-    cmd.stopPrice = this.stopPrice;
+    cmd.stopPrice = this.positionStopPrice;
     cmd.notes = this.notes;
     cmd.date = this.date;
     return cmd;
@@ -245,10 +253,10 @@ export class StockTradingNewPositionComponent {
         if (position) {
           this.costToBuy = position.price
           this.numberOfShares = position.numberOfShares
-          this.stopPrice = position.stopPrice
+          this.positionStopPrice = position.stopPrice
           this.notes = position.notes
           this.date = this.datePipe.transform(position.date, 'yyyy-MM-dd');
-          this.updateBuyingValuesPricesChanged()
+          this.updateBuyingValuesPositionStopPrice()
         }
       }
     )

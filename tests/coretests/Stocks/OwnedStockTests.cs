@@ -290,5 +290,69 @@ namespace coretests.Stocks
                 stock.AssignGrade(0, "Z", "this trade went perfectly!")
             );
         }
+
+        [Fact]
+        public void AssigningStop_Works()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+
+            var assigned = stock.SetStop(4);
+
+            Assert.True(assigned);
+            Assert.Equal(4, stock.State.OpenPosition.StopPrice);
+            
+            var secondAssignmentToSameValue = stock.SetStop(4);
+            Assert.False(secondAssignmentToSameValue);
+
+            var thirdAssignmentToDifferentValue = stock.SetStop(3);
+            Assert.True(thirdAssignmentToDifferentValue);
+        }
+
+        [Fact]
+        public void AssigningStop_ToClosedPosition_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.SetStop(4)
+            );
+        }
+
+        [Fact]
+        public void AddingNote_Works()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+
+            var assigned = stock.AddNotes("this is a note");
+
+            Assert.True(assigned);
+            Assert.Contains("this is a note", stock.State.OpenPosition.Notes);
+
+            var secondAssignmentToSameValue = stock.AddNotes("this is a note");
+            Assert.False(secondAssignmentToSameValue);
+
+            var thirdAssignmentToDifferentValue = stock.AddNotes("this is a different note");
+            Assert.True(thirdAssignmentToDifferentValue);
+        }
+
+        [Fact]
+        public void AddingNote_ToClosedPosition_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.AddNotes("this is a note")
+            );
+        }
     }
 }

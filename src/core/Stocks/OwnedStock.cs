@@ -84,7 +84,7 @@ namespace core.Stocks
             Apply(new RiskAmountSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker, riskAmount));
         }
 
-        internal void SetStop(decimal stopPrice)
+        public bool SetStop(decimal stopPrice)
         {
             if (State.OpenPosition == null)
             {
@@ -96,9 +96,47 @@ namespace core.Stocks
                 throw new InvalidOperationException("Stop price cannot be negative");
             }
 
+            if (stopPrice == State.OpenPosition.StopPrice)
+            {
+                return false;
+            }
+
             Apply(
                 new StopPriceSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker, stopPrice)
             );
+
+            return true;
+        }
+
+        public bool AddNotes(string notes)
+        {
+            if (State.OpenPosition == null)
+            {
+                throw new InvalidOperationException("No open position to add notes to");
+            }
+
+            if (string.IsNullOrEmpty(notes))
+            {
+                return false;
+            }
+
+            if (State.OpenPosition.Notes.Contains(notes))
+            {
+                return false;
+            }
+
+            Apply(
+                new NotesAdded(
+                    Guid.NewGuid(),
+                    State.Id,
+                    DateTimeOffset.UtcNow,
+                    State.UserId,
+                    State.OpenPosition.PositionId,
+                    notes
+                )
+            );
+
+            return true;
         }
 
         public void UpdateSettings(string category)
