@@ -15,7 +15,7 @@ export class OutcomesReportComponent implements OnInit {
   earningsOutcomes: TickerOutcomes[];
   startDate: string = null;
   endDate: string = null;
-  earnings: string[] = null;
+  earnings: string[] = [];
   title: string;
   singleBarReportWeekly: OutcomesReport;
   tickers: string[] = [];

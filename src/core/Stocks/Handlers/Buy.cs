@@ -60,6 +60,10 @@ namespace core.Stocks
                         // in case we have open position but we recorded standalone, make sure
                         // that the properties get transferred over:
                         var pendingState = found.State;
+
+                        // reload the state
+                        stock = await _storage.GetStock(cmd.Ticker, cmd.UserId);
+
                         var opened = stock.State.OpenPosition;
 
                         var saveStock = false;
