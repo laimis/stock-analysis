@@ -64,7 +64,7 @@ namespace core.Alerts
 
     public class StopPriceMonitor
     {
-        private const string Identifier = "Stop price";
+        public const string Identifier = "Stop price";
         private static TriggeredAlert Create(
             decimal price,
             decimal stopPrice,

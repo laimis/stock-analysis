@@ -10,6 +10,7 @@ using core.Alerts;
 using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.SMS;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -29,6 +30,7 @@ namespace web.BackgroundServices
         private ILogger<StockAlertService> _logger;
         private IMarketHours _marketHours;
         private IPortfolioStorage _portfolio;
+        private ISMSClient _sms;
 
         public StockAlertService(
             IAccountStorage accounts,
@@ -37,7 +39,8 @@ namespace web.BackgroundServices
             IEmailService emails,
             ILogger<StockAlertService> logger,
             IMarketHours marketHours,
-            IPortfolioStorage portfolio)
+            IPortfolioStorage portfolio,
+            ISMSClient sms)
         {
             _accounts = accounts;
             _brokerage = brokerage;
@@ -46,6 +49,7 @@ namespace web.BackgroundServices
             _logger = logger;
             _marketHours = marketHours;
             _portfolio = portfolio;
+            _sms = sms;
         }
 
         private Dictionary<string, List<AlertCheck>> _listChecks = new Dictionary<string, List<AlertCheck>>();
@@ -55,6 +59,8 @@ namespace web.BackgroundServices
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _container.AddNotice("Stock alert service started");
+            
             while (!stoppingToken.IsCancellationRequested)
             {    
                 try
@@ -202,6 +208,16 @@ namespace web.BackgroundServices
                     EmailTemplate.Alerts,
                     data
                 );
+
+                // if there are any stop alerts, send sms
+                var stopAlerts = alerts.Where(a => a.identifier == StopPriceMonitor.Identifier);
+                if (stopAlerts.Any())
+                {
+                    var tickersAtStop = string.Join(", ", stopAlerts.Select(a => a.ticker));
+                    var message = $"Stop loss triggered for {tickersAtStop}";
+
+                    await _sms.SendSMS(message);
+                }
 
                 _nextEmailSend = ScanScheduling.GetNextEmailRunTime(
                     DateTimeOffset.UtcNow,
