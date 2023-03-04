@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -14,17 +15,19 @@ namespace core.Alerts.Services
     {
         private const string GAP_UP_TAG = "monitor:gapup";
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
+        private const string UNUSUAL_VOLUME_TAG = "monitor:unusualvolume";
 
         public static IEnumerable<string> GetTags()
         {
             yield return GAP_UP_TAG;
             yield return UPSIDE_REVERSAL_TAG;
+            yield return UNUSUAL_VOLUME_TAG;
         }
         
         
         public static Func<Task<List<AlertCheck>>> GetScannerForTag(
             string tag,
-            Func<UserState, string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
+            Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
             CancellationToken cancellationToken)
@@ -32,8 +35,56 @@ namespace core.Alerts.Services
             return tag switch {
                 GAP_UP_TAG => () => MonitorForGaps(pricesFunc, container, checks, cancellationToken),
                 UPSIDE_REVERSAL_TAG => () => MonitorForUpsideReversals(pricesFunc, container, checks, cancellationToken),
+                UNUSUAL_VOLUME_TAG => () => MonitorForUnusualVolume(pricesFunc, container, checks, cancellationToken),
                 _ => () => throw new NotImplementedException($"No scanner for tag {tag}")
             };
+        }
+
+        private static async Task<List<AlertCheck>> MonitorForUnusualVolume(Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc, StockAlertContainer container, List<AlertCheck> checks, CancellationToken cancellationToken)
+        {
+            var completed = new List<AlertCheck>();
+
+            foreach (var c in checks)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return completed;
+                }
+
+                var prices = await pricesFunc(c.ticker);
+                if (!prices.IsOk)
+                {
+                    continue;
+                }
+
+                completed.Add(c);
+
+                var detectedPatterns = PatternDetection.Generate(prices.Success);
+                var volumePatterns = detectedPatterns.Where(
+                    p => p.name == PatternDetection.Highest1YearVolumeName ||
+                         p.name == PatternDetection.HighVolumeName
+                );
+
+                if (volumePatterns.Any())
+                {
+                    var patternsFound = string.Join(",", volumePatterns.Select(p => p.name).ToArray());
+
+                    UnusualVolumeMonitor.Register(
+                        container: container,
+                        ticker: c.ticker,
+                        patternsFound: patternsFound,
+                        volume: prices.Success[^1].Volume,
+                        when: DateTimeOffset.UtcNow,
+                        userId: c.user.Id
+                    );
+                }
+                else
+                {
+                    UnusualVolumeMonitor.Deregister(container, c.ticker, c.user.Id);
+                }
+            }
+
+            return completed;
         }
 
         public static async Task<List<AlertCheck>> MonitorForStopLosses(
@@ -76,7 +127,7 @@ namespace core.Alerts.Services
         }
 
         private static async Task<List<AlertCheck>> MonitorForGaps(
-            Func<UserState, string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
+            Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
             CancellationToken ct)
@@ -90,10 +141,7 @@ namespace core.Alerts.Services
                     return completed;
                 }
 
-                var prices = await pricesFunc(
-                    c.user,
-                    c.ticker
-                );
+                var prices = await pricesFunc(c.ticker);
 
                 if (!prices.IsOk)
                 {
@@ -121,7 +169,7 @@ namespace core.Alerts.Services
         }
 
         private static async Task<List<AlertCheck>> MonitorForUpsideReversals(
-            Func<UserState, string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
+            Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
             CancellationToken ct)
@@ -135,7 +183,7 @@ namespace core.Alerts.Services
                     return completed;
                 }
 
-                var prices = await pricesFunc(c.user, c.ticker);
+                var prices = await pricesFunc(c.ticker);
                 if (!prices.IsOk)
                 {
                     continue;

@@ -62,6 +62,37 @@ namespace core.Alerts
             container.Register(Create(ticker, gap, when, userId));
     }
 
+    public class UnusualVolumeMonitor
+    {
+        private const string Identifier = "Unusual volume";
+        private static TriggeredAlert Create(
+            string ticker,
+            string patternsFound,
+            decimal volume,
+            DateTimeOffset when,
+            Guid userId)
+        {
+            return new TriggeredAlert(
+                identifier: Identifier,
+                triggeredValue: volume,
+                watchedValue: volume,
+                when: when,
+                ticker: ticker,
+                description: Identifier,
+                userId: userId,
+                alertType: AlertType.Neutral,
+                valueType: Shared.ValueFormat.Number
+            );
+        }
+
+        public static void Deregister(StockAlertContainer container, string ticker, Guid userId) =>
+            container.Deregister(Identifier, ticker, userId);
+
+        public static void Register(StockAlertContainer container,
+            string ticker, string patternsFound, decimal volume, DateTimeOffset when, Guid userId) =>
+            container.Register(Create(ticker, patternsFound, volume, when, userId));
+    }
+    
     public class StopPriceMonitor
     {
         public const string Identifier = "Stop price";

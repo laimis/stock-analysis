@@ -11,16 +11,12 @@ using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.SMS;
+using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    // TODO: this class is doing too much, need to rethink
-    // how to structure the logic contained here.
-    // 1. it's in charge of scheduling the runs
-    // 2. it's in charge of pulling which tickers to scan, and how those scans should work
-    // 3. it's in charge of notification logic
     public class StockAlertService : BackgroundService
     {
         private IAccountStorage _accounts;
@@ -118,11 +114,18 @@ namespace web.BackgroundServices
                 await GenerateListMonitoringChecks(user);
             }
 
+            var pricesService = new GetPricesForTickerService(
+                _brokerage,
+                _marketHours,
+                _logger,
+                user
+            );
+
             foreach (var kp in _listChecks.Where(kp => kp.Value.Count > 0))
             {
                 var scanner = Scanners.GetScannerForTag(
                     tag: kp.Key,
-                    pricesFunc: (user, ticker) => GetPricesForTicker(user, ticker),
+                    pricesFunc: pricesService.GetPricesForTicker,
                     container: _container,
                     checks: kp.Value,
                     cancellationToken: stoppingToken
@@ -248,25 +251,59 @@ namespace web.BackgroundServices
             };
         }
 
-        private async Task<ServiceResponse<core.Shared.Adapters.Stocks.PriceBar[]>> GetPricesForTicker(
-            UserState user,
-            string ticker)
+        
+        private class GetPricesForTickerService
         {
-            var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-7));
-            var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
-            var prices = await _brokerage.GetPriceHistory(
-                state: user,
-                ticker: ticker,
-                frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
-                start: start,
-                end: end
-            );
-            if (!prices.IsOk)
+            private IBrokerage _brokerage;
+            private IMarketHours _marketHours;
+            private ILogger _logger;
+            private Lazy<Task<UserState>> _user;
+            private Dictionary<string, ServiceResponse<PriceBar[]>> _cache =
+                new Dictionary<string, ServiceResponse<PriceBar[]>>();
+
+            public GetPricesForTickerService(
+                IBrokerage brokerage,
+                IMarketHours marketHours,
+                ILogger logger,
+                Lazy<Task<UserState>> user)
             {
-                _logger.LogCritical($"Could not get price history for {ticker}: {prices.Error.Message}");
+                _brokerage = brokerage;
+                _marketHours = marketHours;
+                _logger = logger;
+                _user = user;
             }
-            return prices;
+
+            public async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(string ticker)
+            {
+                if (_cache.ContainsKey(ticker))
+                {
+                    return _cache[ticker];
+                }
+
+                var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365));
+                var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
+                var user = await _user.Value;
+                var prices = await _brokerage.GetPriceHistory(
+                    state: user,
+                    ticker: ticker,
+                    frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
+                    start: start,
+                    end: end
+                );
+
+                if (!prices.IsOk)
+                {
+                    _logger.LogCritical($"Could not get price history for {ticker}: {prices.Error.Message}");
+                }
+                else
+                {
+                    _cache.Add(ticker, prices);
+                }
+
+                return prices;
+            }
         }
+        
 
         private async Task<ServiceResponse<StockQuote>> GetQuote(
             UserState user, string ticker)
