@@ -60,7 +60,6 @@ foreach($manifest in $manifests)
 {
     if ($manifest.tags.Length -ne 0)
     {
-        write-host "no manifests found"
         continue
     }
 
