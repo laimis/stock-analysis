@@ -65,7 +65,7 @@ namespace core.Options
                 foreach (var op in view.OpenOptions)
                 {
                     prices.TryGetValue(op.Ticker, out var val);
-                    if (val != null) op.ApplyPrice(val.lastPrice);
+                    if (val != null) op.ApplyPrice(val.Price);
                 }
                 return view;
             }

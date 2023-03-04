@@ -49,7 +49,7 @@ namespace core.Options
                 var price = await _brokerage.GetQuote(user.State, option.State.Ticker);
                 
                 return price.IsOk switch {
-                    true => new OwnedOptionView(option, price.Success.lastPrice),
+                    true => new OwnedOptionView(option, price.Success.Price),
                     false => new OwnedOptionView(option)
                 };
             }

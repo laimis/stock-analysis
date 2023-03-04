@@ -76,7 +76,7 @@ namespace core.Stocks
                 {
                     if (prices.Success.TryGetValue(p.Ticker, out var price))
                     {
-                        p.SetPrice(price.lastPrice);
+                        p.SetPrice(price.Price);
                     }
                 }
 

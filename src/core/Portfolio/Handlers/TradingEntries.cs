@@ -60,7 +60,7 @@ namespace core.Portfolio.Handlers
                     foreach (var entry in positions)
                     {
                         prices.Success.TryGetValue(entry.Ticker, out var price);
-                        entry.SetPrice(price?.lastPrice ?? 0);    
+                        entry.SetPrice(price?.Price ?? 0);    
                     }   
                 }
 

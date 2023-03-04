@@ -39,6 +39,7 @@ public class StockQuote
     public decimal askPrice { get; set; }
     public decimal askSize { get; set; }
     public decimal lastPrice { get; set; }
+    public decimal closePrice { get; set; }
     public decimal lastSize { get; set; }
     public decimal mark { get; set; }
     public string exchange { get; set; }
@@ -46,6 +47,8 @@ public class StockQuote
     public decimal volatility { get; set; }
     public decimal regularMarketLastPrice { get; set; }
     public decimal regularMarketLastSize { get; set; }
+
+    public decimal Price => closePrice;
 }
 
 public class Order

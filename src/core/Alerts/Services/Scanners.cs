@@ -52,7 +52,7 @@ namespace core.Alerts.Services
                     continue;
                 }
 
-                var price = priceResponse.Success.lastPrice;
+                var price = priceResponse.Success.Price;
                 if (price <= c.threshold.Value)
                 {
                     StopPriceMonitor.Register(

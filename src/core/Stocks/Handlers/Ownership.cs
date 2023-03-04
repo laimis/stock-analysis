@@ -53,7 +53,7 @@ namespace core.Stocks
 
                 if (stock.State.OpenPosition != null && priceResponse.IsOk)
                 {
-                    stock.State.OpenPosition.SetPrice(priceResponse.Success.lastPrice);
+                    stock.State.OpenPosition.SetPrice(priceResponse.Success.Price);
                 }
 
                 return stock.State.OpenPosition switch {

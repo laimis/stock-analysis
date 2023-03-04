@@ -42,7 +42,7 @@ namespace core.Stocks.Handlers
 
                 var price = await _brokerage.GetQuote(user.State, request.Ticker);
 
-                return price.Success?.lastPrice;
+                return price.Success?.Price;
             }
         }
     }

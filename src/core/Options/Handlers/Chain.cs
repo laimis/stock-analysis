@@ -44,7 +44,7 @@ namespace core.Options
 
                 var priceResult = await _brokerage.GetQuote(user.State, request.Ticker);
                 var price = priceResult.IsOk switch {
-                    true => priceResult.Success.lastPrice,
+                    true => priceResult.Success.Price,
                     false => (decimal?)null
                 };
 

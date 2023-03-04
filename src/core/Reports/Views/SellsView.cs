@@ -39,7 +39,7 @@ namespace core.Reports.Views
                     Date = t.latest.buyOrSell.When,
                     NumberOfShares = t.latest.buyOrSell.NumberOfShares,
                     Price = t.latest.buyOrSell.Price,
-                    CurrentPrice = prices.ContainsKey(t.ticker) ? prices[t.ticker].lastPrice : null,
+                    CurrentPrice = prices.ContainsKey(t.ticker) ? prices[t.ticker].Price : null,
                     OlderThan30Days = t.latest.buyOrSell.When < DateTimeOffset.UtcNow.AddDays(-30)
                 })
                 .OrderByDescending(a => a.Date)
