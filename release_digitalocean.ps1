@@ -56,21 +56,11 @@ $manifestsJson = invoke-expression 'doctl registry repository list-manifests web
 
 $manifests = ConvertFrom-Json ([System.String]::Join("", $manifestsJson))
 
-$foundErrors = $false
-foreach($error in $manifests.errors)
-{
-    write-host "ERROR: " + $error
-    $foundErrors = $true
-}
-
-if ($foundErrors) {
-    exit
-}
-
 foreach($manifest in $manifests)
 {
     if ($manifest.tags.Length -ne 0)
     {
+        write-host "no manifests found"
         continue
     }
 
