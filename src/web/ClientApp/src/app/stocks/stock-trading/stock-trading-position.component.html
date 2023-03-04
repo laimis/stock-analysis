@@ -44,7 +44,8 @@
       <div class="row" *ngIf="!_position.isClosed">
         <div class="col" *ngIf="positionProfitPoints.length > 0">
           <div class="row mt-3" *ngFor="let ppp of positionProfitPoints">
-            <div class="col" *ngFor="let p of ppp.prices, let i = index">
+            <div *ngFor="let p of ppp.prices, let i = index"
+              [ngClass]="{'col':true, 'bg-positive':p <= _position.price}">
               <div class="stat-label">{{ppp.name}} {{i+1}}</div>
               <div>{{ p | currency }}</div>
             </div>
