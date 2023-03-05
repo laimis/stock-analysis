@@ -92,7 +92,7 @@ namespace web.BackgroundServices
 
                 var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user);
 
-                var completed = await Scanners.MonitorForStopLosses(
+                var completed = await core.Alerts.Services.Monitors.MonitorForStopLosses(
                     quoteFunc: (u, ticker) => GetQuote(u, ticker),
                     container: _container,
                     checks: checks,
@@ -123,7 +123,7 @@ namespace web.BackgroundServices
 
             foreach (var kp in _listChecks.Where(kp => kp.Value.Count > 0))
             {
-                var scanner = Scanners.GetScannerForTag(
+                var scanner = core.Alerts.Services.Monitors.GetScannerForTag(
                     tag: kp.Key,
                     pricesFunc: pricesService.GetPricesForTicker,
                     container: _container,
@@ -152,13 +152,13 @@ namespace web.BackgroundServices
 
             _listChecks.Clear();
 
-            foreach (var tag in Scanners.GetTags())
+            foreach (var m in core.Alerts.Services.Monitors.GetMonitors())
             {
                 var list = await AlertCheckGenerator.GetStocksFromListsWithTags(
-                    _portfolio, tag, user
+                    _portfolio, m.tag, user
                 );
 
-                _listChecks.Add(tag, list);
+                _listChecks.Add(m.tag, list);
             }
 
             _nextListMonitoringRun = ScanScheduling.GetNextListMonitorRunTime(

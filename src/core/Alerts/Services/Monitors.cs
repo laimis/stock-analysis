@@ -11,17 +11,18 @@ using core.Stocks.Services.Analysis;
 
 namespace core.Alerts.Services
 {
-    public static class Scanners
+    public static class Monitors
     {
         private const string GAP_UP_TAG = "monitor:gapup";
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
         private const string UNUSUAL_VOLUME_TAG = "monitor:unusualvolume";
 
-        public static IEnumerable<string> GetTags()
+        public record struct MonitorDescriptor(string tag, string name);
+        public static IEnumerable<MonitorDescriptor> GetMonitors()
         {
-            yield return GAP_UP_TAG;
-            yield return UPSIDE_REVERSAL_TAG;
-            yield return UNUSUAL_VOLUME_TAG;
+            yield return new MonitorDescriptor(GAP_UP_TAG,"Gap Up");
+            yield return new MonitorDescriptor(UPSIDE_REVERSAL_TAG, "Upside Reversal");
+            yield return new MonitorDescriptor(UNUSUAL_VOLUME_TAG, "Unusual Volume");
         }
         
         

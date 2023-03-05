@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { stockLists_getAnalysisLink, stockLists_getExportLink } from 'src/app/services/links.service';
-import { StockList, StockListTicker, StocksService } from 'src/app/services/stocks.service';
+import { Monitor, StockList, StockListTicker, StocksService } from 'src/app/services/stocks.service';
 import { toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
@@ -11,6 +11,10 @@ import { toggleVisuallyHidden } from 'src/app/services/utils';
 })
 export class StockListComponent implements OnInit {
   list: StockList;
+  monitors: Monitor[];
+  analysisLink: string;
+  exportLink: string;
+  exportLinkJustTickers: string;
 
   constructor(
     private stockService: StocksService,
@@ -23,11 +27,23 @@ export class StockListComponent implements OnInit {
     var name = this.route.snapshot.paramMap.get('name');
 
     this.loadList(name);
+    this.loadMonitors()
   }
 
   private loadList(name: string) {
     this.stockService.getStockList(name).subscribe(list => {
       this.list = list;
+      this.analysisLink = this.getAnalysisLink(list)
+      this.exportLink = this.getExportLink(list, false)
+      this.exportLinkJustTickers = this.getExportLink(list, true)
+    }, e => {
+      console.error(e);
+    });
+  }
+
+  private loadMonitors() {
+    this.stockService.getAvailableMonitors().subscribe(monitors => {
+      this.monitors = monitors;
     }, e => {
       console.error(e);
     });

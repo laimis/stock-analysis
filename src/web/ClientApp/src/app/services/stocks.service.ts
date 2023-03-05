@@ -105,7 +105,9 @@ export class StocksService {
   removeTagFromStockList(name: string, tag: string): Observable<StockList> {
     return this.http.delete<StockList>('/api/portfolio/stocklists/' + name + '/tags/' + tag)
   }
-  // 
+  //
+
+  // monit
 
   // ----------------- pending positions ---------------------
   getPendingStockPositions(): Observable<PendingStockPosition[]> {
@@ -123,6 +125,10 @@ export class StocksService {
   // ----------------- alerts ---------------------
   getAlerts(): Observable<AlertsContainer> {
     return this.http.get<AlertsContainer>('/api/alerts')
+  }
+
+  getAvailableMonitors(): Observable<Monitor[]> {
+    return this.http.get<Monitor[]>('/api/alerts/monitors')
   }
 
   // ----------------- notes ---------------------
@@ -456,6 +462,11 @@ export interface AlertsContainer {
   alerts: StockAlert[]
   recentlyTriggered: StockAlert[]
   messages: StockAlertMessage[]
+}
+
+export interface Monitor {
+  name: string
+  tag: string
 }
 
 export enum OutcomeValueTypeEnum {

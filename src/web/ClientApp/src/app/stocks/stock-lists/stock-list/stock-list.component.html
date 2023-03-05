@@ -1,5 +1,7 @@
 <div *ngIf="list">
-    <h2>{{list.name}} ({{list.tickers.length}})</h2>
+    <h2>
+        <a [routerLink]="['/stocks/lists']">Lists</a> / 
+        {{list.name}} ({{list.tickers.length}})</h2>
     <p>{{list.description}}</p>
 
     
@@ -8,19 +10,19 @@
         <form>
             <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(addNewSection)">Add ticker</button>
             <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(monitoringSection)" >Monitoring</button>
-            <a href="{{getAnalysisLink(list)}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
-            <a href="{{getExportLink(list, false)}}" type="submit" class="btn btn-secondary me-2">Export</a>
-            <a href="{{getExportLink(list, true)}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
+            <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
+            <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-2">Export</a>
+            <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
         </form>
     </section>
 
     <section #monitoringSection class="visually-hidden">
         <h5>Monitors</h5>
-        <button *ngIf="!containsTag('monitor:gapup')" (click)="assignTag('monitor:gapup')" class="btn btn-primary me-2">Enable Gap Up</button>
-        <button *ngIf="containsTag('monitor:gapup')" (click)="removeTag('monitor:gapup')" class="btn btn-danger me-2">Disable Gap Up</button>
-        
-        <button *ngIf="!containsTag('monitor:upsidereversal')" (click)="assignTag('monitor:upsidereversal')" class="btn btn-primary">Enable Upside Reversal</button>
-        <button *ngIf="containsTag('monitor:upsidereversal')" (click)="removeTag('monitor:upsidereversal')" class="btn btn-danger">Disable Upside Reversal</button>
+
+        <ng-container *ngFor="let monitor of monitors">
+            <button *ngIf="!containsTag(monitor.tag)" (click)="assignTag(monitor.tag)" class="btn btn-primary me-2">Enable {{monitor.name}}</button>
+            <button *ngIf="containsTag(monitor.tag)" (click)="removeTag(monitor.tag)" class="btn btn-danger me-2">Disable {{monitor.name}}</button>
+        </ng-container>
     </section>
 
     <section #addNewSection class="visually-hidden">
