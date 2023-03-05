@@ -447,6 +447,7 @@ export interface StockAlert {
   when: string
   ticker: string
   description: string
+  identifier: string
   triggeredValue: number
   watchedValue: number
   alertType: string

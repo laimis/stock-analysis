@@ -57,11 +57,11 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
 
       var sorted = container.alerts.sort(compareTickers);
 
-      var descriptions = new Set(sorted.map(m => m.description));
+      var identifiers = new Set(sorted.map(m => m.identifier));
       
       var groups = []
-      descriptions.forEach(description => {
-        var group = sorted.filter(m => m.description === description).sort(compareTickers);
+      identifiers.forEach(identifier => {
+        var group = sorted.filter(m => m.identifier === identifier).sort(compareTickers);
         groups.push(group);
       })
 
