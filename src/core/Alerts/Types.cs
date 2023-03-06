@@ -78,7 +78,7 @@ namespace core.Alerts
                 watchedValue: volume,
                 when: when,
                 ticker: ticker,
-                description: Identifier,
+                description: patternsFound,
                 userId: userId,
                 alertType: AlertType.Neutral,
                 valueType: Shared.ValueFormat.Number
