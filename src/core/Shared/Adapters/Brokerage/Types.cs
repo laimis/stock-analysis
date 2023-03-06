@@ -48,7 +48,7 @@ public class StockQuote
     public decimal regularMarketLastPrice { get; set; }
     public decimal regularMarketLastSize { get; set; }
 
-    public decimal Price => closePrice;
+    public decimal Price => regularMarketLastPrice;
 }
 
 public class Order

@@ -324,7 +324,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/{ticker}/quotes";
 
-        var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+        var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
         if (!response.IsOk)
         {
             return new ServiceResponse<StockQuote>(response.Error!);
