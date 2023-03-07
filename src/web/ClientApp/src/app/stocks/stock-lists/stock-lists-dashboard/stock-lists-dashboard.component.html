@@ -46,13 +46,19 @@
             <tbody>
                 <tr *ngFor="let l of filteredLists">
                     <td>{{l.name}}</td>
-                    <td>{{l.description}}</td>
-                    <td>{{l.tickers.length}}</td>
                     <td>
-                        <a class="btn btn-primary me-3" [routerLink]="['/stocks', 'lists', l.name]">view</a>
-                        <a class="btn btn-secondary me-3" href="{{getAnalysisLink(l)}}" target="_blank">analysis</a>
-                        <a class="btn btn-secondary me-3" href="{{getExportLink(l)}}">export</a>
-                        <button type="button" class="btn btn-danger" (click)="deleteList(l)">delete</button>
+                        {{l.description}}
+                        <span class="badge bg-secondary m-1" *ngFor="let t of l.tags">{{t}}</span>
+                    </td>
+                    <td>
+                        {{l.tickers.length}}
+                    </td>
+                    <td>
+                        <a class="btn btn-primary m-1" [routerLink]="['/stocks', 'lists', l.name]">Edit
+                        </a>
+                        <a class="btn btn-secondary m-1" href="{{getAnalysisLink(l)}}" target="_blank">Analysis</a>
+                        <a class="btn btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
+                        <button type="button" class="btn btn-danger m-1" (click)="deleteList(l)">Delete</button>
                     </td>
                 </tr>
             </tbody>
