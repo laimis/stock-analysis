@@ -192,24 +192,24 @@ namespace core.Alerts.Services
 
                 completed.Add(c);
 
-                foreach(var patternName in PatternDetection.AvailablePatterns)
-                {
-                    PatternAlert.Deregister(
-                        container: container,
-                        ticker: c.ticker,
-                        patternName: patternName,
-                        userId: c.user.Id
-                    );
-                }
+                PatternAlert.Deregister(
+                    container: container,
+                    ticker: c.ticker,
+                    patternName: PatternDetection.UpsideReversalName,
+                    userId: c.user.Id
+                );
 
-                var patterns = PatternDetection.Generate(prices.Success);
+                var upsideReversal = PatternDetection
+                    .Generate(prices.Success)
+                    .Where(p => p.name == PatternDetection.UpsideReversalName)
+                    .SingleOrDefault();
 
-                foreach(var pattern in patterns)
+                if (upsideReversal != null)
                 {
                     PatternAlert.Register(
                         container: container,
                         ticker: c.ticker,
-                        pattern: pattern,
+                        pattern: upsideReversal,
                         price: prices.Success[^1].Close,
                         when: DateTimeOffset.UtcNow,
                         userId: c.user.Id

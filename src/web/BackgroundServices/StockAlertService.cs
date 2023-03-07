@@ -199,11 +199,11 @@ namespace web.BackgroundServices
                 }
 
                 // get all alerts for that user
-                var alerts = _container.GetAlerts(user.Id);
+                var alerts = _container.GetAlerts(user.Id)
+                    .OrderBy(a => a.ticker)
+                    .Select(ToEmailData);
 
-                var data = new {
-                    alerts = alerts.Select(ToEmailData)
-                };
+                var data = new { alerts };
 
                 await _emails.Send(
                     new Recipient(email: user.Email, name: user.Name),
@@ -213,11 +213,15 @@ namespace web.BackgroundServices
                 );
 
                 // if there are any stop alerts, send sms
-                var stopAlerts = alerts.Where(a => a.identifier == StopPriceMonitor.Identifier);
-                if (stopAlerts.Any())
+                var tickersWithStopAlert = _container
+                        .GetAlerts(user.Id)
+                        .Where(a => a.identifier == StopPriceMonitor.Identifier);
+
+                var stopAlertString = string.Join(", ", tickersWithStopAlert);
+
+                if (!string.IsNullOrEmpty(stopAlertString))
                 {
-                    var tickersAtStop = string.Join(", ", stopAlerts.Select(a => a.ticker));
-                    var message = $"Stop loss triggered for {tickersAtStop}";
+                    var message = $"Stop loss triggered for {stopAlertString}";
 
                     await _sms.SendSMS(message);
                 }
