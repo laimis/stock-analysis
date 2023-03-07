@@ -16,7 +16,12 @@ namespace core.Stocks.Services.Analysis
         List<TickerOutcomes> matchingTickers
     );
 
-    public record struct Pattern(System.DateTimeOffset date, string name, string description);
+    public record struct Pattern(
+        System.DateTimeOffset date,
+        string name,
+        string description,
+        decimal value,
+        ValueFormat valueFormat);
     
     public record struct TickerPatterns(List<Pattern> patterns, string ticker);
 

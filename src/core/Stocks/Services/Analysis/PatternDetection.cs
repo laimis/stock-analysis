@@ -59,7 +59,9 @@ namespace core.Stocks.Services.Analysis
                 return new Pattern(
                     date: current.Date,
                     name: UpsideReversalName,
-                    description: $"{UpsideReversalName}: {additionalInfo}");
+                    description: $"{UpsideReversalName}: {additionalInfo}",
+                    value: current.Close,
+                    valueFormat: Shared.ValueFormat.Currency);
             }
 
             return null;
@@ -106,10 +108,15 @@ namespace core.Stocks.Services.Analysis
 
             if (highestVolumeIndex == bars.Length - 1)
             {
+                var bar = bars[^1];
+
                 return new Pattern(
-                    date: bars[^1].Date,
+                    date: bar.Date,
                     name: Highest1YearVolumeName,
-                    description: $"{Highest1YearVolumeName}: {bars[^1].Volume.ToString("N0")}");
+                    description: $"{Highest1YearVolumeName}: {bar.Volume.ToString("N0")}",
+                    value: bar.Volume,
+                    valueFormat: Shared.ValueFormat.Number
+                );
             }
 
             return null;
@@ -141,10 +148,14 @@ namespace core.Stocks.Services.Analysis
             // if the last bar volume is 10x the average volume, then we have a pattern
             if (lastBarVolume > stats.median * VolumeMultiplier)
             {
+                var bar = bars[^1];
                 return new Pattern(
-                    date: bars[^1].Date,
+                    date: bar.Date,
                     name: HighVolumeName,
-                    description: $"{HighVolumeName}: {bars[^1].Volume.ToString("N0")} (x{multiplier.ToString("N1")})");
+                    description: $"{HighVolumeName}: {bar.Volume.ToString("N0")} (x{multiplier.ToString("N1")})",
+                    value: bar.Volume,
+                    valueFormat: Shared.ValueFormat.Number
+                );
             }
 
             return null;

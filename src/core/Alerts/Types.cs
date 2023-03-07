@@ -61,37 +61,6 @@ namespace core.Alerts
             string ticker, Gap gap, DateTimeOffset when, Guid userId) =>
             container.Register(Create(ticker, gap, when, userId));
     }
-
-    public class UnusualVolumeMonitor
-    {
-        private const string Identifier = "Unusual volume";
-        private static TriggeredAlert Create(
-            string ticker,
-            string patternsFound,
-            decimal volume,
-            DateTimeOffset when,
-            Guid userId)
-        {
-            return new TriggeredAlert(
-                identifier: Identifier,
-                triggeredValue: volume,
-                watchedValue: volume,
-                when: when,
-                ticker: ticker,
-                description: patternsFound,
-                userId: userId,
-                alertType: AlertType.Neutral,
-                valueType: Shared.ValueFormat.Number
-            );
-        }
-
-        public static void Deregister(StockAlertContainer container, string ticker, Guid userId) =>
-            container.Deregister(Identifier, ticker, userId);
-
-        public static void Register(StockAlertContainer container,
-            string ticker, string patternsFound, decimal volume, DateTimeOffset when, Guid userId) =>
-            container.Register(Create(ticker, patternsFound, volume, when, userId));
-    }
     
     public class StopPriceMonitor
     {
@@ -137,21 +106,22 @@ namespace core.Alerts
         private static TriggeredAlert Create(
             string identifier,
             string description,
-            decimal price,
+            decimal value,
+            ValueFormat valueFormat,
             string ticker,
             DateTimeOffset when,
             Guid userId)
         {
             return new TriggeredAlert(
                 identifier: identifier,
-                triggeredValue: price,
-                watchedValue: price,
+                triggeredValue: value,
+                watchedValue: value,
                 when: when,
                 ticker: ticker,
                 description: description,
                 userId: userId,
-                alertType: AlertType.Positive,
-                valueType: Shared.ValueFormat.Currency
+                alertType: AlertType.Neutral,
+                valueType: valueFormat
             );
         }
 
@@ -159,7 +129,8 @@ namespace core.Alerts
             StockAlertContainer container,
             string ticker,
             Pattern pattern,
-            decimal price,
+            decimal value,
+            ValueFormat valueFormat,
             DateTimeOffset when,
             Guid userId)
         {
@@ -167,7 +138,8 @@ namespace core.Alerts
                 Create(
                     identifier: pattern.name,
                     description: pattern.description,
-                    price: price,
+                    value: value,
+                    valueFormat: valueFormat,
                     ticker: ticker,
                     when: when,
                     userId: userId

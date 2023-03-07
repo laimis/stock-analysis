@@ -16,6 +16,7 @@ namespace core.Alerts.Services
         private const string GAP_UP_TAG = "monitor:gapup";
         private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
         private const string UNUSUAL_VOLUME_TAG = "monitor:unusualvolume";
+        private const string PATTERN_TAG = "monitor:patterns";
 
         public record struct MonitorDescriptor(string tag, string name);
         public static IEnumerable<MonitorDescriptor> GetMonitors()
@@ -23,6 +24,7 @@ namespace core.Alerts.Services
             yield return new MonitorDescriptor(GAP_UP_TAG,"Gap Up");
             yield return new MonitorDescriptor(UPSIDE_REVERSAL_TAG, "Upside Reversal");
             yield return new MonitorDescriptor(UNUSUAL_VOLUME_TAG, "Unusual Volume");
+            yield return new MonitorDescriptor(PATTERN_TAG, "Patterns");
         }
         
         
@@ -35,57 +37,11 @@ namespace core.Alerts.Services
         {
             return tag switch {
                 GAP_UP_TAG => () => MonitorForGaps(pricesFunc, container, checks, cancellationToken),
-                UPSIDE_REVERSAL_TAG => () => MonitorForUpsideReversals(pricesFunc, container, checks, cancellationToken),
-                UNUSUAL_VOLUME_TAG => () => MonitorForUnusualVolume(pricesFunc, container, checks, cancellationToken),
+                UPSIDE_REVERSAL_TAG => () => Task.FromResult(new List<AlertCheck>()),
+                UNUSUAL_VOLUME_TAG => () => Task.FromResult(new List<AlertCheck>()),
+                PATTERN_TAG => () => MonitorForPatterns(pricesFunc, container, checks, cancellationToken),
                 _ => () => throw new NotImplementedException($"No scanner for tag {tag}")
             };
-        }
-
-        private static async Task<List<AlertCheck>> MonitorForUnusualVolume(Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc, StockAlertContainer container, List<AlertCheck> checks, CancellationToken cancellationToken)
-        {
-            var completed = new List<AlertCheck>();
-
-            foreach (var c in checks)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return completed;
-                }
-
-                var prices = await pricesFunc(c.ticker);
-                if (!prices.IsOk)
-                {
-                    continue;
-                }
-
-                completed.Add(c);
-
-                var detectedPatterns = PatternDetection.Generate(prices.Success);
-                var volumePatterns = detectedPatterns.Where(
-                    p => p.name == PatternDetection.Highest1YearVolumeName ||
-                         p.name == PatternDetection.HighVolumeName
-                );
-
-                if (volumePatterns.Any())
-                {
-                    var patternsFound = string.Join(",", volumePatterns.Select(p => p.name).ToArray());
-
-                    UnusualVolumeMonitor.Register(
-                        container: container,
-                        ticker: c.ticker,
-                        patternsFound: patternsFound,
-                        volume: prices.Success[^1].Volume,
-                        when: DateTimeOffset.UtcNow,
-                        userId: c.user.Id
-                    );
-                }
-                else
-                {
-                    UnusualVolumeMonitor.Deregister(container, c.ticker, c.user.Id);
-                }
-            }
-
-            return completed;
         }
 
         public static async Task<List<AlertCheck>> MonitorForStopLosses(
@@ -169,7 +125,7 @@ namespace core.Alerts.Services
             return completed;
         }
 
-        private static async Task<List<AlertCheck>> MonitorForUpsideReversals(
+        private static async Task<List<AlertCheck>> MonitorForPatterns(
             Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
@@ -192,25 +148,26 @@ namespace core.Alerts.Services
 
                 completed.Add(c);
 
-                PatternAlert.Deregister(
-                    container: container,
-                    ticker: c.ticker,
-                    patternName: PatternDetection.UpsideReversalName,
-                    userId: c.user.Id
-                );
+                foreach(var available in PatternDetection.AvailablePatterns)
+                {
+                    PatternAlert.Deregister(
+                        container: container,
+                        ticker: c.ticker,
+                        patternName: available,
+                        userId: c.user.Id
+                    );
+                }
 
-                var upsideReversal = PatternDetection
-                    .Generate(prices.Success)
-                    .Where(p => p.name == PatternDetection.UpsideReversalName)
-                    .SingleOrDefault();
+                var patterns = PatternDetection.Generate(prices.Success);
 
-                if (upsideReversal != null)
+                foreach(var pattern in patterns)
                 {
                     PatternAlert.Register(
                         container: container,
                         ticker: c.ticker,
-                        pattern: upsideReversal,
-                        price: prices.Success[^1].Close,
+                        pattern: pattern,
+                        value: pattern.value,
+                        valueFormat: pattern.valueFormat,
                         when: DateTimeOffset.UtcNow,
                         userId: c.user.Id
                     );
