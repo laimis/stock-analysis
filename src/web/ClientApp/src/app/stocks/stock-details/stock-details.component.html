@@ -37,6 +37,9 @@
     <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
       Analysis
     </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('secfilings')}" [routerLink]="" (click)="activateTab('secfilings')">
+      SEC Filings
+    </a>
     <span class="float-end">
       <span class="text-muted">Price:</span> {{stock.price | currency}}
     </span>
@@ -56,6 +59,8 @@
   <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
 
   <app-stock-analysis *ngIf="isActive('analysis')" [ticker]=stock.ticker></app-stock-analysis>
+
+  <app-stock-secfilings *ngIf="isActive('secfilings')" [filings]=filings></app-stock-secfilings>
 
 </div>
 

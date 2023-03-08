@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace core.Shared.Adapters.SEC;
 
@@ -17,4 +19,11 @@ public record CompanyFiling
     public string Filing { get; init; }
     public string InteractiveDataUrl { get; init; }
     // public FilingDetails Details { get; init; }
+}
+
+public record struct CompanyFilings(string ticker, List<CompanyFiling> filings);
+
+public interface ISECFilings
+{
+    Task<CompanyFilings> GetFilings(string ticker);
 }

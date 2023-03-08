@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using core.Adapters.Stocks;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.SEC;
 using core.Stocks;
 using core.Stocks.Handlers;
 using core.Stocks.View;
@@ -35,6 +36,10 @@ namespace web.Controllers
         [HttpGet("{ticker}/prices")]
         public Task<PricesView> Prices(string ticker, [FromQuery] int numberOfDays) =>
             _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
+
+        [HttpGet("{ticker}/secfilings")]
+        public Task<CompanyFilings> SECFilings(string ticker) =>
+            _mediator.Send(new SECFilings.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/prices/{start}/{end}")]
         public Task<PricesView> Prices(string ticker, DateTimeOffset start, DateTimeOffset end) =>

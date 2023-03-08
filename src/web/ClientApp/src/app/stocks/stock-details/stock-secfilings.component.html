@@ -1,0 +1,22 @@
+<div>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Filing</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let f of filings">
+                <td>{{ f.filing }}</td>
+                <td>{{ f.filingDate | date:'shortDate' }}</td>
+                <td>{{ f.description }}</td>
+                <td><a [href]="f.documentsUrl" target="_blank">Link</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+

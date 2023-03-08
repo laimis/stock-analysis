@@ -2,12 +2,14 @@
 using SecuritiesExchangeCommission.Edgar;
 
 namespace secedgar;
-public class EdgarClient
+public class EdgarClient : ISECFilings
 {
+    public EdgarClient() : this("NGTD/1.0"){}
+
     public EdgarClient(string userAgent) => 
         SecRequestManager.Instance.UserAgent = userAgent;
 
-    public async Task<List<CompanyFiling>> GetCompanyFilingsAsync(string symbol)
+    public async Task<CompanyFilings> GetFilings(string symbol)
     {
         var results = await EdgarSearch.CreateAsync(
             stock_symbol: symbol
@@ -29,6 +31,6 @@ public class EdgarClient
             filings.Add(filing);
         }
 
-        return filings;
+        return new CompanyFilings(symbol, filings);
     }
 }
