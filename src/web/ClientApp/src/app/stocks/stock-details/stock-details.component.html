@@ -39,6 +39,7 @@
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('secfilings')}" [routerLink]="" (click)="activateTab('secfilings')">
       SEC Filings
+      <span *ngIf="recentFilings && recentFilings.length > 0" class="badge rounded-pill bg-info">{{recentFilings.length}}</span>
     </a>
     <span class="float-end">
       <span class="text-muted">Price:</span> {{stock.price | currency}}

@@ -1,36 +1,57 @@
-﻿using core.Shared.Adapters.SEC;
+﻿using core.Shared;
+using core.Shared.Adapters.SEC;
+using Microsoft.Extensions.Logging;
 using SecuritiesExchangeCommission.Edgar;
 
 namespace secedgar;
 public class EdgarClient : ISECFilings
 {
-    public EdgarClient() : this("NGTD/1.0"){}
+    private ILogger<EdgarClient>? _logger;
 
-    public EdgarClient(string userAgent) => 
-        SecRequestManager.Instance.UserAgent = userAgent;
+    public EdgarClient(ILogger<EdgarClient>? logger) : this(logger, "NGTD/1.0"){}
+    
 
-    public async Task<CompanyFilings> GetFilings(string symbol)
+    public EdgarClient(ILogger<EdgarClient>? logger, string userAgent)
     {
-        var results = await EdgarSearch.CreateAsync(
-            stock_symbol: symbol
-        );
+        _logger = logger;
+        SecRequestManager.Instance.UserAgent = userAgent;
+    }
+        
 
-        var filings = new List<CompanyFiling>();
-
-        foreach(var r in results.Results)
+    public async Task<ServiceResponse<CompanyFilings>> GetFilings(string symbol)
+    {
+        try
         {
-            var filing = new CompanyFiling {
-                Description = r.Description,
-                DocumentsUrl = r.DocumentsUrl,
-                FilingDate = r.FilingDate,
-                Filing = r.Filing,
-                InteractiveDataUrl = r.InteractiveDataUrl,
-                // Details = details
-            };
+            var results = await EdgarSearch.CreateAsync(
+                stock_symbol: symbol
+            );
 
-            filings.Add(filing);
+            var filings = new List<CompanyFiling>();
+
+            foreach(var r in results.Results)
+            {
+                var filing = new CompanyFiling {
+                    Description = r.Description,
+                    DocumentsUrl = r.DocumentsUrl,
+                    FilingDate = r.FilingDate,
+                    Filing = r.Filing,
+                    InteractiveDataUrl = r.InteractiveDataUrl,
+                };
+
+                filings.Add(filing);
+            }
+
+            var result = new CompanyFilings(symbol, filings);
+
+            return new ServiceResponse<CompanyFilings>(result);
         }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error getting SEC filings for {symbol}", symbol);
 
-        return new CompanyFilings(symbol, filings);
+            return new ServiceResponse<CompanyFilings>(
+                new ServiceError(ex.Message)
+            );
+        }
     }
 }

@@ -187,6 +187,7 @@ namespace core.Stocks.Services.Analysis
     internal class PortfolioAnalysisKeys
     {
         public static string PercentToStopLoss = "PercentToStopLoss";
+        public static string RecentFilings = "RecentFilings";
         public static string GainPct = "GainPct";
         public static string AverageCost = "AverageCost";
         public static string StopLoss = "StopLoss";

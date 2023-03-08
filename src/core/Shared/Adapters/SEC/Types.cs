@@ -25,5 +25,5 @@ public record struct CompanyFilings(string ticker, List<CompanyFiling> filings);
 
 public interface ISECFilings
 {
-    Task<CompanyFilings> GetFilings(string ticker);
+    Task<ServiceResponse<CompanyFilings>> GetFilings(string ticker);
 }

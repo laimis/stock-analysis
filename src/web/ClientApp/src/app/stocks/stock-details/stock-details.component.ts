@@ -20,6 +20,7 @@ export class StockDetailsComponent implements OnInit {
   options: OwnedOption[]
   activeTab: string = ''
   filings: SECFiling[]
+  recentFilings: SECFiling[]
 
 	constructor(
 		private stocks : StocksService,
@@ -40,6 +41,9 @@ export class StockDetailsComponent implements OnInit {
   fetchSecFilings() {
     this.stocks.getStockSECFilings(this.ticker).subscribe(result => {
       this.filings = result.filings
+      this.recentFilings = this.filings.filter(
+        f => new Date(f.filingDate) > new Date(new Date().setDate(new Date().getDate() - 7))
+      )
     }, error => {
       console.error(error)
     })

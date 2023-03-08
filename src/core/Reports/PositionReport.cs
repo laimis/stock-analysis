@@ -7,6 +7,7 @@ using core.Account;
 using core.Reports.Views;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.Stocks;
 using core.Stocks;
 using core.Stocks.Services.Analysis;
@@ -27,15 +28,19 @@ namespace core.Reports
             public Handler(
                 IAccountStorage accountStorage,
                 IPortfolioStorage storage,
-                IBrokerage brokerage) : base(storage)
+                IBrokerage brokerage,
+                ISECFilings secFilings) : base(storage)
             {
                 _accountStorage = accountStorage;
                 _brokerage = brokerage;
+                _secFilings = secFilings;
             }
 
             private IAccountStorage _accountStorage;
             private IBrokerage _brokerage { get; }
-        
+
+            private ISECFilings _secFilings;
+
             public override async Task<OutcomesReportView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
@@ -64,6 +69,7 @@ namespace core.Reports
             {
                 var tickerOutcomes = new List<TickerOutcomes>();
                 var tickerPatterns = new List<TickerPatterns>();
+                var filings = new Dictionary<string, Shared.Adapters.SEC.CompanyFilings>();
                 
                 foreach(var position in positions)
                 {
@@ -84,7 +90,15 @@ namespace core.Reports
 
                     position.SetPrice(bars[^1].Close);
 
-                    var outcomes = PositionAnalysis.Generate(position, bars).ToList();
+                    var tickerFilings = await _secFilings.GetFilings(position.Ticker);
+                    if (tickerFilings.IsOk)
+                    {
+                        filings.Add(position.Ticker, tickerFilings.Success);
+                    } 
+
+                    var outcomes = PositionAnalysis.Generate(
+                        position,
+                        bars).ToList();
 
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
 
@@ -93,12 +107,9 @@ namespace core.Reports
                     tickerPatterns.Add(new TickerPatterns(patterns, position.Ticker));
                 }
 
-                var orderResponse = await _brokerage.GetOrders(user);
-                var orders = orderResponse.IsOk ? orderResponse.Success : new List<Order>();
-
                 var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(
                     tickerOutcomes,
-                    orders
+                    filings
                 );
 
                 return new OutcomesReportView(

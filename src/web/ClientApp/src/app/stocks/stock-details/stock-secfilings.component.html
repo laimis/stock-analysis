@@ -6,15 +6,13 @@
                 <th>Filing</th>
                 <th>Date</th>
                 <th>Description</th>
-                <th>Link</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let f of filings">
-                <td>{{ f.filing }}</td>
+                <td><a [href]="f.documentsUrl" target="_blank">{{ f.filing }}</a></td>
                 <td>{{ f.filingDate | date:'shortDate' }}</td>
-                <td>{{ f.description }}</td>
-                <td><a [href]="f.documentsUrl" target="_blank">Link</a></td>
+                <td [innerHTML]="f.description"></td>
             </tr>
         </tbody>
     </table>

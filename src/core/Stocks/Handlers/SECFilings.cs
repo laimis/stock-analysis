@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared.Adapters.SEC;
@@ -29,8 +30,15 @@ namespace core.Stocks.Handlers
                 _filings = filings;
             }
 
-            public Task<CompanyFilings> Handle(Query request, CancellationToken cancellationToken)
-                => _filings.GetFilings(request.Ticker);
+            public async Task<CompanyFilings> Handle(Query request, CancellationToken cancellationToken)
+            {
+                var result = await  _filings.GetFilings(request.Ticker);
+                if (result.IsOk)
+                {
+                    return result.Success;
+                }
+                return new CompanyFilings(request.Ticker, new List<CompanyFiling>());
+            }
         }
     }
 }
