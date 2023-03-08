@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
-import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile } from '../../services/stocks.service';
+import { Component, OnInit } from '@angular/core';
+import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile, SECFiling } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { charts_getTradingViewLink } from 'src/app/services/links.service';
 
 @Component({
-  selector: 'stock-details',
+  selector: 'app-stock-details',
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.css']
 })
-export class StockDetailsComponent {
+export class StockDetailsComponent implements OnInit {
 
   profile: StockProfile
   ticker: string
@@ -19,6 +19,8 @@ export class StockDetailsComponent {
   ownership: StockOwnership
   options: OwnedOption[]
   activeTab: string = ''
+  filings: SECFiling[]
+  recentFilings: SECFiling[]
 
 	constructor(
 		private stocks : StocksService,
@@ -30,10 +32,22 @@ export class StockDetailsComponent {
 		if (ticker){
       this.ticker = ticker;
 			this.fetchStock();
+      this.fetchSecFilings();
 		}
 
     this.activeTab = this.route.snapshot.paramMap.get('tab') || 'stocks'
 	}
+
+  fetchSecFilings() {
+    this.stocks.getStockSECFilings(this.ticker).subscribe(result => {
+      this.filings = result.filings
+      this.recentFilings = this.filings.filter(
+        f => new Date(f.filingDate) > new Date(new Date().setDate(new Date().getDate() - 7))
+      )
+    }, error => {
+      console.error(error)
+    })
+  }
 
 	fetchStock() {
 		this.stocks.getStockDetails(this.ticker).subscribe(result => {

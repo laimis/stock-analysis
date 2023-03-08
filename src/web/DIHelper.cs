@@ -3,20 +3,20 @@ using core;
 using core.Account;
 using core.Adapters.CSV;
 using core.Adapters.Emails;
-using core.Adapters.Options;
-using core.Adapters.Stocks;
 using core.Adapters.Subscriptions;
 using core.Alerts;
 using core.Options;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
 using core.Shared.Adapters.CSV;
+using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.SMS;
 using csvparser;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using secedgar;
 using storage.shared;
 using web.BackgroundServices;
 using web.Utils;
@@ -47,6 +47,7 @@ namespace web
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
+            services.AddSingleton<ISECFilings, EdgarClient>();
             
             services.AddSingleton<ISubscriptions>(s => 
                 new stripe.Subscriptions(
