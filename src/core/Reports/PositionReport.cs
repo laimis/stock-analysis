@@ -90,11 +90,12 @@ namespace core.Reports
 
                     position.SetPrice(bars[^1].Close);
 
-                    var tickerFilings = await _secFilings.GetFilings(position.Ticker);
-                    if (tickerFilings.IsOk)
-                    {
-                        filings.Add(position.Ticker, tickerFilings.Success);
-                    } 
+                    // TODO: for some reason SEC filings from DO are SUPER slow
+                    // var tickerFilings = await _secFilings.GetFilings(position.Ticker);
+                    // if (tickerFilings.IsOk)
+                    // {
+                    //     filings.Add(position.Ticker, tickerFilings.Success);
+                    // } 
 
                     var outcomes = PositionAnalysis.Generate(
                         position,
