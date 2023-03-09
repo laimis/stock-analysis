@@ -43,6 +43,17 @@ namespace core.Stocks.Services.Analysis
                 outcome.valueType,
                 outcome.message
             );
+
+            // add sma 20 as an outcome
+            outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA(20));
+
+            yield return new AnalysisOutcome(
+                MultipleBarOutcomeKeys.SMA(20),
+                outcome.type,
+                outcome.value,
+                outcome.valueType,
+                outcome.message
+            );
         }
     }
 

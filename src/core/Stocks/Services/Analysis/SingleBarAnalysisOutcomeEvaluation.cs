@@ -132,6 +132,30 @@ namespace core.Stocks.Services.Analysis
                         t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.NewLow && o.value < 0))
                     .ToList()
             );
+
+            yield return new AnalysisOutcomeEvaluation(
+                "SMA 20 below SMA 50",
+                OutcomeType.Neutral,
+                SingleBarOutcomeKeys.SMA20Above50Days,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SMA20Above50Days && o.value < 0))
+                    .ToList()
+            );
+
+            yield return new AnalysisOutcomeEvaluation(
+                "Price below SMA 20",
+                OutcomeType.Neutral,
+                MultipleBarOutcomeKeys.SMA(20),
+                tickerOutcomes
+                    .Where(t =>
+                        {
+                            var close = t.outcomes.Single(o => o.key == SingleBarOutcomeKeys.Close).value;
+                            
+                            return t.outcomes.Any(o => o.key == MultipleBarOutcomeKeys.SMA(20) && o.value > close);
+                        })
+                    .ToList()
+            );
         }
     }
 }

@@ -1,10 +1,8 @@
 nav {
   display: flex;
-  /* justify-content: center; */
   align-items: center;
   background-color: #004289;
   height: 50px;
-  /* font-size: 1.2em; */
   position: relative;
   margin-top: 10px;
   border-radius: 2px;
@@ -24,7 +22,8 @@ nav a {
   padding: 10px;
   transition: background-color 0.5s ease;
   border-radius: 5px;
+  font-weight: 500;
 }
 nav a:hover {
-  background-color: #d4d4d4;
+  background-color: #72a8e1;
 }
