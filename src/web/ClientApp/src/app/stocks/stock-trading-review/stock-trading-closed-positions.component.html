@@ -18,6 +18,14 @@
               <option value="C">C</option>
             </select>
           </div>
+          <div class="form-group col">
+            <label class="form-label" for="filterByOutcome">Outcome</label>
+            <select #filterByOutcome class="form-select" id="filterByOutcome" (change)="filterByOutcomeChanged(filterByOutcome.value)">
+              <option value="all">Show all outcomes</option>
+              <option value="win">Wins</option>
+              <option value="loss">Losses</option>
+            </select>
+          </div>
           <div class="col">
             <a href="/api/stocks/export/closed" class="btn btn-link">Export trades</a>
           </div>
@@ -30,7 +38,7 @@
       <tr>
         <th width="100"></th>
         <th class="sort-header" (click)="sort('ticker')">Stock</th>
-        <th class="sort-header" (click)="sort('opened')">Date</th>
+        <th class="sort-header" (click)="sort('opened')">Closed</th>
         <th class="sort-header" (click)="sort('rr')">R:R</th>
         <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
         <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>

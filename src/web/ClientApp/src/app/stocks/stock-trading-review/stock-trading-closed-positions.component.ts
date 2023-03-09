@@ -24,11 +24,20 @@ export class StockTradingClosedPositionsComponent {
   }
 
   matchesFilter(position:PositionInstance) {
+    console.log("matchesFilter", position)
+
     if (this.tickerFilter != 'all' && !position.ticker.toLowerCase().includes(this.tickerFilter.toLowerCase())) {
       return false
     }
 
     if (this.gradeFilter != 'all' && position.grade != this.gradeFilter) {
+      return false
+    }
+
+    var winMasmatch = position.profit >= 0 && this.outcomeFilter == 'loss'
+    var lossMismatch = position.profit < 0 && this.outcomeFilter == 'win'
+
+    if (this.outcomeFilter != 'all' && (winMasmatch || lossMismatch)) {
       return false
     }
 
@@ -39,6 +48,7 @@ export class StockTradingClosedPositionsComponent {
   sortDirection : number = -1
   tickerFilter: string = 'all'
   gradeFilter: string = 'all'
+  outcomeFilter: string = 'all'
   showNotes: number = -1
 
   toggleShowNotes(index:number) {
@@ -55,6 +65,10 @@ export class StockTradingClosedPositionsComponent {
 
   filterByGradeChanged(value:string) {
     this.gradeFilter = value
+  }
+
+  filterByOutcomeChanged(value:string) {
+    this.outcomeFilter = value
   }
 
   getMonth(input:string) {
