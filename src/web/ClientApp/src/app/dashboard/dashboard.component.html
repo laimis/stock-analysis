@@ -23,7 +23,6 @@
             </h5>
             <p class="card-text">You have <b>{{dashboard.openStockCount}}</b> tickers on file</p>
             <a class="card-link" [routerLink]="[ '/trading' ]">Manage Shares</a>
-            <a class="card-link" [routerLink]="[ '/stocks/newposition' ]">New Position</a>
           </div>
         </div>
       </div>
@@ -64,11 +63,6 @@
               Tools
             </h5>
             <div class="row">
-              <div class="col">
-                <a class="card-link" [routerLink]="[ '/stocks/lists' ]">Stock Lists</a>
-                <a class="card-link" [routerLink]="[ '/trading/review' ]">Trading Review</a>
-                <a class="card-link" [routerLink]="[ '/summary' ]">Weekly Summary</a>
-              </div>
               <div class="col">
                 <a class="card-link" [routerLink]="[ '/trading/simulations' ]">Simulations</a>
                 <a class="card-link" [routerLink]="[ '/reports/recentsells' ]">Sells</a>

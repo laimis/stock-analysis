@@ -1,4 +1,30 @@
-<div class="nav-menu clearfix" >
+<!-- <div class="nav-menu clearfix" >
   <a [routerLink]="[ '/dashboard' ]"  class="float-start"><img src="bird6.png" height="61px"></a>
   <a [routerLink]="[ '/profile' ]"      class="small-link float-end me-1">Account</a>
-</div>
+</div> -->
+
+<nav>
+  <ul>
+    <li>
+      <a [routerLink]="[ '/dashboard' ]">Dashboard</a>
+    </li>
+    <li>
+      <a [routerLink]="[ '/trading' ]">Open Positions</a>
+    </li>
+    <li>
+      <a [routerLink]="[ '/stocks/newposition' ]">New Position</a>
+    </li>
+    <li>
+      <a [routerLink]="[ '/trading/review' ]">Trading Review</a>
+    </li>
+    <li>
+      <a [routerLink]="[ '/stocks/lists' ]">Stock Lists</a>
+    </li>
+    <li>
+      <a [routerLink]="[ '/summary' ]">Weekly Summary</a>
+    </li>
+    <li>
+      <a [routerLink]="[ '/profile' ]">Account</a>
+    </li>
+  </ul>
+</nav>
