@@ -2,9 +2,9 @@ nav {
   display: flex;
   /* justify-content: center; */
   align-items: center;
-  /* background-color: #333; */
+  background-color: #004289;
   height: 50px;
-  font-size: 1.2em;
+  /* font-size: 1.2em; */
   position: relative;
   margin-top: 10px;
 }
@@ -18,7 +18,7 @@ nav li {
   margin: 10px;
 }
 nav a {
-  /* color: #fff; */
+  color: #fff;
   text-decoration: none;
   padding: 10px;
   transition: background-color 0.5s ease;
