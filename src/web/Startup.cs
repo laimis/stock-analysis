@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json.Serialization;
 using web.Utils;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace web
 {
@@ -80,7 +81,10 @@ namespace web
                     {
                         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                         context.Response.ContentType = Text.Plain;
-                        await context.Response.WriteAsync("An unhandled error occurred.");
+
+                        var feature = context.Features.Get<IExceptionHandlerFeature>();
+
+                        await context.Response.WriteAsync(feature.Error.Message);
                     });
                 });
 

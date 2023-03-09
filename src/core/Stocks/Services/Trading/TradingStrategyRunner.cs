@@ -79,7 +79,7 @@ namespace core.Stocks.Services.Trading
             
             if (!prices.IsOk)
             {
-                throw new Exception("Failed to get price history");
+                throw new Exception("Failed to get price history: " + prices.Error.Message);
             }
             
             var results = new TradingStrategyResults();
