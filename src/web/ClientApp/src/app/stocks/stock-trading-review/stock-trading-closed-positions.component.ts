@@ -34,8 +34,8 @@ export class StockTradingClosedPositionsComponent {
       return false
     }
 
-    var winMasmatch = position.profit >= 0 && this.outcomeFilter == 'loss'
-    var lossMismatch = position.profit < 0 && this.outcomeFilter == 'win'
+    var winMasmatch = position.profit >= 0 && this.outcomeFilter === 'loss'
+    var lossMismatch = position.profit < 0 && this.outcomeFilter === 'win'
 
     if (this.outcomeFilter != 'all' && (winMasmatch || lossMismatch)) {
       return false
