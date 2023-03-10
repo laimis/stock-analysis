@@ -101,14 +101,23 @@ namespace web.BackgroundServices
                     cancellationToken: cancellationToken
                 );
 
-                _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
-                    DateTimeOffset.UtcNow,
-                    _marketHours
-                );
+                foreach(var c in completed)
+                {
+                    checks.Remove(c);
+                }
+
+                // only update the next run time if we've completed all checks
+                if (checks.Count == 0)
+                {
+                    _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
+                        DateTimeOffset.UtcNow,
+                        _marketHours
+                    );
+
+                    _stopLossCheckFinished = true;
+                }
 
                 _container.AddNotice($"Completed {completed.Count} out of {checks.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
-
-                _stopLossCheckFinished = true;
             }
         }
 
