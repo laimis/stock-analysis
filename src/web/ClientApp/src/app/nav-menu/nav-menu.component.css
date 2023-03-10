@@ -6,6 +6,7 @@ nav {
   position: relative;
   margin-top: 10px;
   border-radius: 2px;
+  overflow: scroll;
 }
 nav ul {
   display: flex;
