@@ -181,7 +181,7 @@ namespace core.Stocks
 
         public void SetStopPrice(decimal? stopPrice, DateTimeOffset when)
         {
-            if (stopPrice != null && stopPrice != this.StopPrice)
+            if (stopPrice != null && stopPrice != StopPrice)
             {
                 StopPrice = stopPrice;
 
@@ -280,20 +280,20 @@ namespace core.Stocks
             });
 
             // calculate average cost per share using slots
-            this.AverageCostPerShare = _slots.Count switch {
+            AverageCostPerShare = _slots.Count switch {
                 0 => 0,
                 _ => _slots.Sum() / _slots.Count
             };
-            this.Cost = cost;
-            this.Profit = profit;
-            this.NumberOfShares = numberOfShares;
+            Cost = cost;
+            Profit = profit;
+            NumberOfShares = numberOfShares;
 
-            this.AverageSaleCostPerShare = totalNumberOfSharesSold switch {
+            AverageSaleCostPerShare = totalNumberOfSharesSold switch {
                 0 => 0,
                 _ => totalSale / totalNumberOfSharesSold
             };
 
-            this.AverageBuyCostPerShare = totalNumberOfSharesBought switch {
+            AverageBuyCostPerShare = totalNumberOfSharesBought switch {
                 0 => 0,
                 _ => totalBuy / totalNumberOfSharesBought
             };

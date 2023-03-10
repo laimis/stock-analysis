@@ -42,7 +42,7 @@ namespace core.Stocks.View
 
         public bool Equals(StockViolationView other) => Ticker == other.Ticker;
 
-        public override bool Equals(object? obj) => obj is StockViolationView other && this.Equals(other);
+        public override bool Equals(object? obj) => obj is StockViolationView other && Equals(other);
 
         public override int GetHashCode() => Ticker.GetHashCode();
 
