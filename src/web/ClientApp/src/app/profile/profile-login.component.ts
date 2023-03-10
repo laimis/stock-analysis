@@ -3,6 +3,7 @@ import { StocksService } from '../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { GetErrors } from '../services/utils';
+import { GlobalService } from '../services/global.service';
 
 @Component({
   selector: 'app-profile-login',
@@ -26,7 +27,8 @@ export class ProfileLoginComponent implements OnInit {
     private stockService  : StocksService,
     private route         : ActivatedRoute,
     private router        : Router,
-    private location      : Location) { }
+    private location      : Location,
+    private globalService : GlobalService) { }
 
   ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
@@ -43,6 +45,8 @@ export class ProfileLoginComponent implements OnInit {
     }
 
     this.stockService.loginAccount(obj).subscribe(_ => {
+      console.log("logged in setting global variable")
+      this.globalService.markLoggedIn()
       this.router.navigateByUrl(this.returnUrl)
     }, err => {
       this.inProgress = false

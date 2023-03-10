@@ -1,11 +1,13 @@
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { StocksService, AccountStatus } from '../services/stocks.service';
+import { GlobalService } from '../services/global.service';
 
 @Injectable({providedIn: 'root'})
 export class AuthGuard implements CanActivate {
 
 	constructor(
+    private globalService : GlobalService,
     private stocks : StocksService,
     private router : Router){
 	}
@@ -21,6 +23,7 @@ export class AuthGuard implements CanActivate {
       this.router.navigate(['/profile/verify'])
       return false;
     }
+    this.globalService.markLoggedIn()
     return true;
   }
 }
