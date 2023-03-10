@@ -106,7 +106,7 @@ namespace web.BackgroundServices
                     _marketHours
                 );
 
-                _container.AddNotice($"Completed {completed.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
+                _container.AddNotice($"Completed {completed.Count} out of {checks.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
 
                 _stopLossCheckFinished = true;
             }
