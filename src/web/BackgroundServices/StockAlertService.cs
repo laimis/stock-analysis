@@ -49,8 +49,10 @@ namespace web.BackgroundServices
         }
 
         private Dictionary<string, List<AlertCheck>> _listChecks = new Dictionary<string, List<AlertCheck>>();
+        private bool _listChecksFinished = false;
         private DateTimeOffset _nextListMonitoringRun = DateTimeOffset.MinValue;
         private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
+        private bool _stopLossCheckFinished = false;
         private DateTimeOffset _nextEmailSend = DateTimeOffset.MinValue;
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -103,7 +105,10 @@ namespace web.BackgroundServices
                     DateTimeOffset.UtcNow,
                     _marketHours
                 );
+
                 _container.AddNotice($"Completed {completed.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
+
+                _stopLossCheckFinished = true;
             }
         }
 
@@ -140,6 +145,8 @@ namespace web.BackgroundServices
 
                 _container.AddNotice($"{completed.Count} {kp.Key} checks completed, {kp.Value.Count} remaining");
             }
+
+            _listChecksFinished = _listChecks.All(kp => kp.Value.Count == 0);
         }
 
         private async Task GenerateListMonitoringChecks(Lazy<Task<UserState>> userFunc)
@@ -188,9 +195,9 @@ namespace web.BackgroundServices
 
         private async Task SendAlertSummaryEmail(Lazy<Task<UserState>> userFunc)
         {
-            // wait to send emails if there are still checks running
+            // wait to send emails if there are still checks running or stop checks haven't run
             if (DateTimeOffset.UtcNow > _nextEmailSend
-                && _listChecks.All(kp => kp.Value.Count == 0))
+                && _listChecksFinished && _stopLossCheckFinished)
             {
                 var user = await userFunc.Value;
                 if (user == null)
