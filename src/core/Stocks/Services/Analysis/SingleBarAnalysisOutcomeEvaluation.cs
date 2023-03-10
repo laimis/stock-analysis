@@ -143,19 +143,32 @@ namespace core.Stocks.Services.Analysis
                     .ToList()
             );
 
-            yield return new AnalysisOutcomeEvaluation(
-                "Price below SMA 20",
-                OutcomeType.Neutral,
-                MultipleBarOutcomeKeys.SMA(20),
-                tickerOutcomes
-                    .Where(t =>
-                        {
-                            var close = t.outcomes.Single(o => o.key == SingleBarOutcomeKeys.Close).value;
-                            
-                            return t.outcomes.Any(o => o.key == MultipleBarOutcomeKeys.SMA(20) && o.value > close);
-                        })
-                    .ToList()
-            );
+            var smaInterval = 20;
+            System.Func<decimal, decimal, bool> priceAbove20 = (a, b) => a > b;
+            System.Func<decimal, decimal, bool> priceBelow20 = (a, b) => a < b;
+
+            var sma20OutcomesChoices = new []
+                {
+                    (priceAbove20, $"Price above SMA {smaInterval}"),
+                    (priceBelow20, $"Price below SMA {smaInterval}")
+                };
+
+            foreach(var choice in sma20OutcomesChoices)
+            {
+                yield return new AnalysisOutcomeEvaluation(
+                    choice.Item2,
+                    OutcomeType.Neutral,
+                    MultipleBarOutcomeKeys.SMA(smaInterval),
+                    tickerOutcomes
+                        .Where(t =>
+                            {
+                                var close = t.outcomes.Single(o => o.key == SingleBarOutcomeKeys.Close).value;
+                                
+                                return t.outcomes.Any(o => o.key == MultipleBarOutcomeKeys.SMA(smaInterval) && choice.Item1(close, o.value));
+                            })
+                        .ToList()
+                );
+            }
         }
     }
 }
