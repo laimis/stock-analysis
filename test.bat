@@ -2,4 +2,4 @@
 @REM /p:CollectCoverage=true^
 @REM /p:CoverletOutputFormat=opencover^
 
-dotnet test /p:CollectCoverage=true --filter "Category!=Integration&Category!=Postgres"
+dotnet test /p:CollectCoverage=false --filter "Category!=Integration&Category!=Postgres" -l:"console;verbosity=normal"
