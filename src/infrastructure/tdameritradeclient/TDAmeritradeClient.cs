@@ -600,6 +600,10 @@ public class TDAmeritradeClient : IBrokerage
                 var response = await _httpClient.SendAsync(request, ct);
                 var content = await response.Content.ReadAsStringAsync();
 
+                // NOTE: even though I have rate limiting set above, and it's throttled to be
+                // under documented TD Ameritrade limits, I still get this error sometimes.
+                // so I am capturing it here and simulating rate limit exception 
+                // so that polly can deal with it (it should wait and retry)
                 if (content.Contains("Individual App's transactions per seconds restriction reached"))
                 {
                     throw new RateLimitRejectedException(
