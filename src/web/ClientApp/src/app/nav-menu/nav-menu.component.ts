@@ -10,11 +10,12 @@ export class NavMenuComponent {
   isLoggedIn = false
 
   links = [
-    { path: '/trading', label: 'Active Trades' },
-    { path: '/stocks/newposition', label: 'New Position' },
-    { path: '/trading/dailyanalysis', label: 'Daily Analysis' },
-    { path: '/stocks/lists', label: 'Stock Lists' },
+    { path: '/trading', label: 'Positions' },
+    { path: '/stocks/newposition', label: 'New' },
+    { path: '/trading/analysis', label: 'Analysis' },
+    { path: '/trading/review', label: 'Review'},
     { path: '/summary', label: 'Weekly Summary' },
+    { path: '/stocks/lists', label: 'Stock Lists' },
     { path: '/profile', label: 'Profile'}
   ];
 

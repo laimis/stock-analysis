@@ -1,6 +1,6 @@
 <div>
 
-  <div class="bg-danger" *ngFor="let err of errors">{{err}}</div>
+  <app-error-display [errors]="errors"></app-error-display>
   
   <div class="mb-3 mt-3">
     <label for="tickerFilter" class="form-label">Ticker filter</label>
@@ -8,7 +8,7 @@
         <option value="all">All</option>
         <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
     </select>
-</div>
+  </div>
 
   <app-outcomes
     *ngIf="allBarsReport"

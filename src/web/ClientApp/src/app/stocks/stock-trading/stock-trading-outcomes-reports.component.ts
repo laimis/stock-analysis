@@ -39,7 +39,7 @@ export class StockPositionReportsComponent implements OnInit {
     return this._positions
   }
 
-  errors: string[] = []
+  errors: string[] = null
 
 
 	ngOnInit(): void {
@@ -90,7 +90,7 @@ export class StockPositionReportsComponent implements OnInit {
   private handleApiError(errorMessage: string, error: any) {
     var forConsole = GetErrors(error)
     forConsole.forEach(e => console.log(e))
-    this.errors.push(errorMessage)
+    this.errors = [errorMessage]
   }
 
   loadAllTimeData() {

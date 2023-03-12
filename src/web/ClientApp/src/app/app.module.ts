@@ -84,6 +84,7 @@ import { DailyOutcomeScoresComponent } from './shared/reports/daily-outcome-scor
 import { StockTradingReviewDashboardComponent } from './stocks/stock-trading-review/stock-trading-review-dashboard.component';
 import { StockTradingPendingPositionsComponent } from './stocks/stock-trading/stock-trading-pendingpositions.component';
 import { StockSECFilingsComponent } from './stocks/stock-details/stock-secfilings.component';
+import { StockTradingAnalysisDashboardComponent } from './stocks/stock-trading-analysis/stock-trading-analysis-dashboard.component';
 
 
 var routes: Routes = [
@@ -121,6 +122,7 @@ var routes: Routes = [
   { path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
   { path: 'privacy', component: PrivacyComponent},
   { path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
+  { path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard]},
   { path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
   { path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
   { path: 'trading/review', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
@@ -234,7 +236,8 @@ var routes: Routes = [
     ChartComponent,
     StockTradingReviewDashboardComponent,
     StockTradingPendingPositionsComponent,
-    StockSECFilingsComponent
+    StockSECFilingsComponent,
+    StockTradingAnalysisDashboardComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

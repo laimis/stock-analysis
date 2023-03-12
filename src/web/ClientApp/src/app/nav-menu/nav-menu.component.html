@@ -1,6 +1,9 @@
 <nav class="navbar navbar-light navbar-color navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-    <a class="nav-link" [routerLink]="[ '/dashboard' ]">Dashboard</a>
+    
+    <a *ngIf="isLoggedIn" class="nav-link" [routerLink]="[ '/dashboard' ]">Dashboard</a>
+
+    <a *ngIf="!isLoggedIn" class="nav-link" [routerLink]="[ '/login' ]">Login</a>
 
     <button
       class="navbar-toggler"
