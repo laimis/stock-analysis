@@ -99,6 +99,8 @@ export class StockTradingClosedPositionsComponent {
         return (a:PositionInstance, b:PositionInstance) => a.daysHeld - b.daysHeld
       case "opened":
         return (a:PositionInstance, b:PositionInstance) => a.opened.localeCompare(b.opened)
+      case "closed":
+        return (a:PositionInstance, b:PositionInstance) => a.closed.localeCompare(b.closed)
       case "rr":
         return (a:PositionInstance, b:PositionInstance) => a.rr - b.rr
       case "profit":

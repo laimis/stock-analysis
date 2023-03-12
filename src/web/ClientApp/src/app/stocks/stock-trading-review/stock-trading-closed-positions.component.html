@@ -38,7 +38,8 @@
       <tr>
         <th width="100"></th>
         <th class="sort-header" (click)="sort('ticker')">Stock</th>
-        <th class="sort-header" (click)="sort('opened')">Closed</th>
+        <th class="sort-header" (click)="sort('opened')">Opened</th>
+        <th class="sort-header" (click)="sort('closed')">Closed</th>
         <th class="sort-header" (click)="sort('rr')">R:R</th>
         <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
         <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
@@ -66,7 +67,13 @@
           'text-white': p.grade === 'A' || p.grade === 'C'
         }">
         <td>{{i + 1}}</td>
-        <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+        <td>
+          <a [routerLink]="[ '/stocks', p.ticker ]"
+            [ngClass]="{
+              'text-white': p.grade === 'A' || p.grade === 'C'
+            }">{{p.ticker}}</a>
+        </td>
+        <td>{{p.opened | date}}</td>
         <td>{{p.closed | date}}</td>
         <td>{{p.rr | number:'1.0-2' }}</td>
         <td>{{p.profit | currency}}</td>
