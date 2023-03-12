@@ -10,6 +10,13 @@
   margin: 10px;
 }
 
-a.navlink:hover {
-  background-color: #72a8e1;
+.nav-item:hover {
+  background-color: #72a8e1 !important;
+  border-radius: 2px;
+}
+.nav-item-active {
+  background-color: #72a8e1 !important;
+  border-radius: 2px;
+  margin-left: 1px;
+  margin-right: 1px;
 }

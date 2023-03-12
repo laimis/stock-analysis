@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { GlobalService } from '../services/global.service';
 
 @Component({
@@ -18,14 +19,21 @@ export class NavMenuComponent {
     { path: '/stocks/lists', label: 'Stock Lists' },
     { path: '/profile', label: 'Profile'}
   ];
+  currentPath: string;
 
   constructor(
-    public globalService: GlobalService
+    public globalService: GlobalService,
+    private router: Router
   ) {
     this.globalService.customVariable.subscribe((value) => {
-      console.log("nav menu got new value: ")
-      console.log(value)
       this.isLoggedIn = value.isLoggedIn;
-    }); 
+    });
+
+    this.router.events.subscribe((val:RouterEvent) => {
+      if (val instanceof NavigationEnd) {
+        // Hide loading indicator
+        this.currentPath = val.url;
+      }
+    })
   }
 }
