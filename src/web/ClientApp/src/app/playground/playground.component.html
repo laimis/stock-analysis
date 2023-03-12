@@ -1,13 +1,8 @@
 <div>
-  
-  <h5>Daily Scores for {{ticker}} from {{startDate}}</h5>
-    <app-chart
-      *ngIf="dailyScores"
-      [yScaleType]="'linear'"
-      [values]="getDailyScores()"
-      [chartLabels]="getDailyScoresDates()"
-      [chartLegend]="false"
-      [chartType]="'bar'">
-    </app-chart>
+  <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
 
-</div>
+  <!-- for each SEC filing, show ticker and then list each filing -->
+  <section *ngFor="let filing of results">
+    <h3>{{filing.ticker}}</h3>
+    <app-stock-secfilings [filings]="filing.filings"></app-stock-secfilings>
+  </section>

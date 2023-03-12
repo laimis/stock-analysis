@@ -10,7 +10,10 @@
         </thead>
         <tbody>
             <tr *ngFor="let f of filings">
-                <td><a [href]="f.documentsUrl" target="_blank">{{ f.filing }}</a></td>
+                <td>
+                    <a [href]="f.documentsUrl" target="_blank">{{ f.filing }}</a>
+                    <span class="badge bg-success text-warning ms-1" *ngIf="f.isNew">New</span>
+                </td>
                 <td>{{ f.filingDate | date:'shortDate' }}</td>
                 <td [innerHTML]="f.description"></td>
             </tr>

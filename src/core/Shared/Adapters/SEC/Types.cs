@@ -18,6 +18,7 @@ public record CompanyFiling
     public DateTime FilingDate { get; init; }
     public string Filing { get; init; }
     public string InteractiveDataUrl { get; init; }
+    public bool IsNew => FilingDate > DateTime.Now.AddDays(-7);
     // public FilingDetails Details { get; init; }
 }
 

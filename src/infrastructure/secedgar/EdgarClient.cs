@@ -23,7 +23,8 @@ public class EdgarClient : ISECFilings
         try
         {
             var results = await EdgarSearch.CreateAsync(
-                stock_symbol: symbol
+                stock_symbol: symbol,
+                results_per_page: EdgarSearchResultsPerPage.Entries10
             );
 
             var filings = new List<CompanyFiling>();

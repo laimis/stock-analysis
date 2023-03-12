@@ -693,6 +693,7 @@ export interface SECFiling {
   description: string
   documentsUrl: string
   filingDate : string
+  isNew : boolean
   filing : string
   interactiveDataUrl : string
 }

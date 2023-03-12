@@ -1,7 +1,10 @@
 <nav class="navbar navbar-light navbar-color navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
     
-    <a *ngIf="isLoggedIn" class="nav-link" [routerLink]="[ '/dashboard' ]">Dashboard</a>
+    <a *ngIf="isLoggedIn"
+      class="nav-link"
+      [ngClass]="{'nav-item': true, 'nav-item-active': '/dashboard' === currentPath}"
+      [routerLink]="[ '/dashboard' ]">Dashboard</a>
 
     <a *ngIf="!isLoggedIn" class="nav-link" [routerLink]="[ '/login' ]">Login</a>
 
@@ -18,9 +21,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul *ngIf="isLoggedIn" class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li *ngFor="let l of links"
-          [ngClass]="{'nav-item': true, 'nav-item-active': l.path === currentPath}">
-          <a class="nav-link" [routerLink]="[ l.path]">{{l.label}}</a>
+        <li *ngFor="let l of links">
+          <a
+            [ngClass]="{'nav-item': true, 'nav-item-active': l.path === currentPath}"
+            class="nav-link" [routerLink]="[ l.path]">{{l.label}}</a>
         </li>
       </ul>
     </div>

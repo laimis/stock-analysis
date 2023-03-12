@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DailyScore, StocksService, TradingStrategyPerformance } from '../services/stocks.service';
+import { DailyScore, SECFilings, StocksService, TradingStrategyPerformance } from '../services/stocks.service';
 
 @Component({
   selector: 'app-playground',
@@ -9,8 +9,9 @@ import { DailyScore, StocksService, TradingStrategyPerformance } from '../servic
 })
 
 export class PlaygroundComponent implements OnInit {
-  results: TradingStrategyPerformance[];
+  results: SECFilings[] = [];
   dailyScores: DailyScore[];
+  tickers: string[];
   
   constructor(
     private stocks:StocksService,
@@ -20,24 +21,31 @@ export class PlaygroundComponent implements OnInit {
   startDate:string;
 
   ngOnInit() {
-    this.ticker = this.route.snapshot.queryParamMap.get('ticker');
-    this.startDate = this.route.snapshot.queryParamMap.get('startDate');
+    var tickerParam = this.route.snapshot.queryParamMap.get('tickers');
+    if (tickerParam) {
+      this.tickers = tickerParam.split(',');
 
-    // if start date is not set, set it to 30 days ago
-    if (!this.startDate) {
-      var d = new Date();
-      d.setDate(d.getDate() - 30);
-      this.startDate = d.toISOString().split('T')[0];
+      this.fetchSecFilings(this.tickers)
     }
-    
-    this.stocks.reportDailyOutcomesReport(
-      this.ticker, this.startDate).subscribe( results => {
-        this.dailyScores = results.dailyScores;
-      });
   }
 
-  getDailyScores() {
-    return this.dailyScores.map(d => d.score)
+  fetchSecFilings(tickers:string[]) {
+    if (tickers.length == 0) {
+      return;
+    }
+
+    // get the filing for the first ticker
+    this.stocks.getStockSECFilings(tickers[0]).subscribe(
+      filings => {
+        console.log("Adding filings for " + filings.ticker)
+        this.results.push(filings);
+        this.fetchSecFilings(tickers.slice(1));
+      },
+      error => {
+        console.log("Error fetching filings for " + tickers[0])
+        this.fetchSecFilings(tickers.slice(1));
+      }
+    );
   }
 
   getDailyScoresDates() {
