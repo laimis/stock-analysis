@@ -32,7 +32,7 @@ public class TDAmeritradeClient : IBrokerage
         .Handle<RateLimitRejectedException>()
         .WaitAndRetryAsync(
             retryCount: 3,
-            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(1)
+            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2)
         );
 
     private static readonly AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(
@@ -587,16 +587,15 @@ public class TDAmeritradeClient : IBrokerage
     {
         var oauth = await GetAccessToken(user);
 
-        var request = new HttpRequestMessage(method, GenerateApiUrl(function));
-
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", oauth.access_token);
-        if (jsonData != null)
-        {
-            request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-        }
-
         var tuple = await _wrappedPolicy.ExecuteAsync(
             async ct => {
+                var request = new HttpRequestMessage(method, GenerateApiUrl(function));
+
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", oauth.access_token);
+                if (jsonData != null)
+                {
+                    request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                }
                 var response = await _httpClient.SendAsync(request, ct);
                 var content = await response.Content.ReadAsStringAsync();
 

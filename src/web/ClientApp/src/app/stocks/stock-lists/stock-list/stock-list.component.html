@@ -1,10 +1,11 @@
 <div *ngIf="list">
     <h2>
-        <a [routerLink]="['/stocks/lists']">Lists</a> / 
-        {{list.name}} ({{list.tickers.length}})</h2>
+        <a [routerLink]="['/stocks/lists']">Lists</a>
+        /  {{list.name}} ({{list.tickers.length}})
+    </h2>
+    
     <p>{{list.description}}</p>
 
-    
     <section>
         <h5>Tools</h5>
         <form>

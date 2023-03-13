@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { GetErrors } from 'src/app/services/utils';
 import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
@@ -9,7 +10,7 @@ import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../
 })
 export class OutcomesReportComponent implements OnInit {
   gaps: StockGaps[] = []
-  error: string = null;
+  errors: string[] = null;
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
   earningsOutcomes: TickerOutcomes[];
@@ -66,7 +67,7 @@ export class OutcomesReportComponent implements OnInit {
       }
 
     } else {
-      this.error = "No tickers were provided";
+      this.errors = ["No tickers were provided"];
     }
 
   }
@@ -79,7 +80,7 @@ export class OutcomesReportComponent implements OnInit {
       }
       this.loadSingleBarReportWeekly(tickers, earnings);
     }, error => {
-      this.error = error;
+      this.errors = GetErrors(error);
       this.loadSingleBarReportWeekly(tickers, earnings);
     });
   }
@@ -89,7 +90,7 @@ export class OutcomesReportComponent implements OnInit {
       this.singleBarReportWeekly = report;
       this.loadAllBarsReport(tickers);
     }, error => {
-      this.error = error;
+      this.errors = GetErrors(error);
       this.loadAllBarsReport(tickers);
     });
   }
@@ -99,7 +100,7 @@ export class OutcomesReportComponent implements OnInit {
       this.allBarsReport = report;
       this.gaps = report.gaps;
     }, error => {
-      this.error = error;
+      this.errors = GetErrors(error);
     });
   }
 

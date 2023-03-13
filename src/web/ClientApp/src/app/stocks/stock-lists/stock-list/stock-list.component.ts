@@ -15,6 +15,7 @@ export class StockListComponent implements OnInit {
   analysisLink: string;
   exportLink: string;
   exportLinkJustTickers: string;
+  importStatus: string
 
   constructor(
     private stockService: StocksService,
@@ -63,23 +64,39 @@ export class StockListComponent implements OnInit {
     if (tickers.includes(',')) {
       separator = ',';
     }
-    tickers.split(separator).forEach(element => {
+    
+    let tickerArray = tickers.split(separator)
 
-      var ticker = element.trim();
-      if (ticker.includes(':'))
-      {
-        ticker = ticker.split(':')[1].trim();
-      }
-      
-      if (ticker) {
-        this.stockService.addToStockList(this.list.name, ticker).subscribe(_ => {
-        }, e => {
+    this.AddTickersToList(tickerArray)
+  }
+
+  private AddTickersToList(tickerArray: string[]) {
+    if (tickerArray.length == 0) {
+      this.loadList(this.list.name)
+      this.importStatus = "Finished"
+      return
+    }
+    
+    var ticker = tickerArray[0].trim();
+    if (ticker.includes(':'))
+    {
+      ticker = ticker.split(':')[1].trim();
+    }
+    
+    if (ticker) {
+      this.importStatus = `Importing ${ticker}...`
+      this.stockService.addToStockList(this.list.name, ticker).subscribe(
+        _ => {
+          this.AddTickersToList(tickerArray.slice(1))
+        },
+        e => {
           console.error(e);
-        });
-      }
-    });
-
-    this.loadList(this.list.name)
+          this.AddTickersToList(tickerArray.slice(1))
+        }
+      );
+    } else {
+      this.AddTickersToList(tickerArray.slice(1))
+    }
   }
 
   sortedTickers(list: StockList) {

@@ -1,9 +1,5 @@
 <div>
-    <div *ngIf="error">
-        <div class="alert alert-danger" role="alert">
-            <p>{{error}}</p>
-        </div>
-    </div>
+    <app-error-display [errors]="errors"></app-error-display>
 
     <section>
     <h3><span *ngIf="title">{{title}} - </span>{{tickers.length}} tickers</h3>

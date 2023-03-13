@@ -3,10 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.CSV;
-using core.Stocks.View;
 using MediatR;
 
 namespace core.Portfolio.Handlers
@@ -40,7 +38,10 @@ namespace core.Portfolio.Handlers
                 }
 
                 var lists = await _portfolioStorage.GetStockLists(user.State.Id);
-                return lists.Select(x => x.State).ToArray();
+                return lists
+                    .Select(x => x.State)
+                    .OrderBy(x => x.Name)
+                    .ToArray();
             }
         }
     }
