@@ -49,8 +49,10 @@
                         <a [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
                     </td>
                     <td>
-                        {{l.description}}
-                        <span class="badge bg-secondary m-1" *ngFor="let t of l.tags">{{t}}</span>
+                        <div class="ms-1">{{l.description}}</div>
+                        <div>
+                            <span class="badge bg-secondary m-1" *ngFor="let t of l.tags">{{t}}</span>
+                        </div>
                     </td>
                     <td>
                         {{l.tickers.length}}
