@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { stockLists_getAnalysisLink, stockLists_getExportLink } from 'src/app/services/links.service';
+import { charts_getTradingViewLink, stockLists_getAnalysisLink, stockLists_getExportLink } from 'src/app/services/links.service';
 import { Monitor, StockList, StockListTicker, StocksService } from 'src/app/services/stocks.service';
 import { toggleVisuallyHidden } from 'src/app/services/utils';
 
@@ -101,6 +101,10 @@ export class StockListComponent implements OnInit {
 
   sortedTickers(list: StockList) {
     return list.tickers.sort((a, b) => a.ticker.localeCompare(b.ticker));
+  }
+
+  chartLink(ticker: string) {
+    return charts_getTradingViewLink(ticker)
   }
 
   getExportLink(list: StockList, justTickers:boolean) {
