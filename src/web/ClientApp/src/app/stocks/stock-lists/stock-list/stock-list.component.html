@@ -1,15 +1,15 @@
 <div *ngIf="list">
-    <h2>
-        <a [routerLink]="['/stocks/lists']">Lists</a>
-        /  {{list.name}} ({{list.tickers.length}})
-    </h2>
+    <h3>
+        {{list.name}} ({{list.tickers.length}})
+    </h3>
+    <small><a [routerLink]="['/stocks/lists']">back to lists</a></small>
     
     <p>{{list.description}}</p>
 
     <section>
         <h5>Tools</h5>
         <form>
-            <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(addNewSection)">Add ticker</button>
+            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewSection)">Add ticker</button>
             <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(monitoringSection)" >Monitoring</button>
             <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
             <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-2">Export</a>
