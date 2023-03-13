@@ -67,10 +67,10 @@ section h3 {
 }
 
 .bg-negative {
-  background-color: #FFB6C1;    
+  background-color: #FFB6C1 !important;    
 }
 .bg-positive {
-  background-color: #698f3f;
+  background-color: #698f3f !important;
 }
 
 .event {
