@@ -1,8 +1,8 @@
 <div>
     <section>
         <form>
-            <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
-            <button type="submit" class="btn btn-primary me-2" (click)="toggleVisibility(lookupTickerSection)">Look up ticker</button>
+            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
+            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(lookupTickerSection)">Look up ticker</button>
         </form>
     </section>
     <section #addNewListSection class="visually-hidden">
@@ -33,7 +33,6 @@
     </section>
     
     <section>
-        <h5>Lists</h5>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -57,8 +56,7 @@
                     <td>
                         {{l.tickers.length}}
                     </td>
-                    <td>
-                        
+                    <td class="text-end">
                         <a class="btn btn-secondary m-1" href="{{getAnalysisLink(l)}}" target="_blank">Analysis</a>
                         <a class="btn btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
                         <button type="button" class="btn btn-danger m-1" (click)="deleteList(l)">Delete</button>
