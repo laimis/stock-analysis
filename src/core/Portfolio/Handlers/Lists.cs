@@ -40,7 +40,7 @@ namespace core.Portfolio.Handlers
                 var lists = await _portfolioStorage.GetStockLists(user.State.Id);
                 return lists
                     .Select(x => x.State)
-                    .OrderBy(x => x.Name)
+                    .OrderBy(x => x.Name.ToLower())
                     .ToArray();
             }
         }
