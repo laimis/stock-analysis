@@ -45,7 +45,7 @@
             <tbody>
                 <tr *ngFor="let l of filteredLists">
                     <td>
-                        <a [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
+                        <a class="text-uppercase fw-bolder" [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
                     </td>
                     <td>
                         <div class="ms-1">{{l.description}}</div>
@@ -59,7 +59,7 @@
                     <td class="text-end">
                         <a class="btn btn-secondary m-1" href="{{getAnalysisLink(l)}}" target="_blank">Analysis</a>
                         <a class="btn btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
-                        <button type="button" class="btn btn-danger m-1" (click)="deleteList(l)">Delete</button>
+                        <button type="button" class="btn btn-outline-danger m-1" (click)="deleteList(l)">Delete</button>
                     </td>
                 </tr>
             </tbody>
