@@ -6,15 +6,18 @@
 }
 
 .nav-link {
-  color: #fff !important;
+  /* color: #fff !important; */
+  color: #95a7c6 !important;
   margin: 10px;
 }
 
 .nav-item:hover {
   background-color: #72a8e1 !important;
+  color: #fff !important;
   border-radius: 2px;
 }
 .nav-item-active {
   background-color: #72a8e1 !important;
+  color: #fff !important;
   border-radius: 2px;
 }

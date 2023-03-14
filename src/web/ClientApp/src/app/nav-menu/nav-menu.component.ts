@@ -31,7 +31,6 @@ export class NavMenuComponent {
 
     this.router.events.subscribe((val:RouterEvent) => {
       if (val instanceof NavigationEnd) {
-        // Hide loading indicator
         this.currentPath = val.url;
       }
     })
