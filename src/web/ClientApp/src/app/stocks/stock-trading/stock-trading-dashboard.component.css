@@ -11,6 +11,10 @@
     font-size: smaller
 }
 
-.bg-primary-light {
-    background-color: #72a8e1;
+.summary-card {
+    /* background-color: #c3c8cd; */
+}
+
+.summary-card-main-info {
+    font-size: 1.5em;
 }
