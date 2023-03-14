@@ -72,9 +72,12 @@ namespace core.Stocks
                             saveStock = true;
                         }
 
-                        if (stock.AddNotes(pendingState.Notes))
+                        if (opened.Notes.Count == 0)
                         {
-                            saveStock = true;
+                            if (stock.AddNotes(pendingState.Notes))
+                            {
+                                saveStock = true;
+                            }
                         }
 
                         if (saveStock)
