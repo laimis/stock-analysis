@@ -12,7 +12,7 @@ export class NavMenuComponent {
 
   links = [
     { path: '/trading', label: 'Positions' },
-    { path: '/stocks/newposition', label: 'New' },
+    { path: '/stocks/newposition', label: 'Trade' },
     { path: '/trading/analysis', label: 'Analysis' },
     { path: '/trading/review', label: 'Review'},
     { path: '/summary', label: 'Weekly Summary' },
