@@ -37,25 +37,24 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th width="400">Description</th>
-                    <th>Tickers</th>
+                    <th>Description</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let l of filteredLists">
                     <td>
-                        <a class="text-uppercase fw-bolder" [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
+                        <a class="fw-bolder" [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
                     </td>
                     <td>
-                        <div class="ms-1">{{l.description}}</div>
+                        <div *ngIf="l.description" class="ms-1 mb-4">{{l.description}}</div>
                         <div>
                             <span class="badge bg-secondary m-1" *ngFor="let t of l.tags">{{t}}</span>
                         </div>
                     </td>
-                    <td>
+                    <!-- <td>
                         {{l.tickers.length}}
-                    </td>
+                    </td> -->
                     <td class="text-end">
                         <a class="btn btn-secondary m-1" href="{{getAnalysisLink(l)}}" target="_blank">Analysis</a>
                         <a class="btn btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
