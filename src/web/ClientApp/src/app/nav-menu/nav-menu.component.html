@@ -23,6 +23,8 @@
       <ul *ngIf="isLoggedIn" class="navbar-nav me-auto mb-2 mb-lg-0">
         <li *ngFor="let l of links">
           <a
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
             [ngClass]="{'nav-item': true, 'nav-item-active': l.path === currentPath}"
             class="nav-link" [routerLink]="[ l.path]">{{l.label}}</a>
         </li>
