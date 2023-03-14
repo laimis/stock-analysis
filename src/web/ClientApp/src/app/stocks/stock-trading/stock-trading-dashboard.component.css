@@ -10,3 +10,7 @@
 .filterLabel {
     font-size: smaller
 }
+
+.bg-primary-light {
+    background-color: #72a8e1;
+}
