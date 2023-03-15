@@ -28,11 +28,6 @@
         <option value="tx">All Transactions</option>
       </select>
     </div>
-    <div class="col">
-      <div *ngIf="loading" class="spinner-border spinner-border-sm text-info" role="status">
-        <span class="sr-only">Loading...</span>
-      </div>
-    </div>
   </div>
 
   <div class="mt-2" *ngIf="!ticker && response.transactions.length === 0">
@@ -48,10 +43,9 @@
         <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails === g.name">[ - ]</button>
         {{g.name}} ({{g.transactions.length}})
       </div>
-      <div class="col-2 font-weight-bold text-end">
+      <div class="col-8 font-weight-bold text-end">
         {{ g.sum | currency }}
       </div>
-      <div class="col-4"></div>
     </div>
     <table class="table table-hover border rounded" *ngIf="showDetails === g.name">
       <thead class="thead-light">
