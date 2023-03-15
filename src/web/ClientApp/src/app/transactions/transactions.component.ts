@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, TransactionList } from '../services/stocks.service';
+import { StocksService, TransactionsView } from '../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
@@ -9,7 +9,7 @@ import { Title } from '@angular/platform-browser';
   styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {
-  response: TransactionList
+  response: TransactionsView
   ticker: string = ""
   groupBy: string = "month"
   filterType: string = ""

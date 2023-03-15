@@ -45,19 +45,20 @@ namespace core.Portfolio.Views
     
     public class TransactionGroup
     {
-        public TransactionGroup(string name, TransactionList transactions)
+        public TransactionGroup(string name, List<Transaction> transactions)
         {
             Name = name;
             Transactions = transactions;
         }
 
-        public string Name { get; set; }
-        public TransactionList Transactions { get; set; }
+        public string Name { get; private set; }
+        public List<Transaction> Transactions { get; private set; }
+        public decimal Sum => Transactions.Sum(t => t.Amount);
     }
 
-    public class TransactionList
+    public class TransactionsView
     {
-        public TransactionList(
+        public TransactionsView(
             IEnumerable<Transaction> transactions,
             string groupBy,
             IEnumerable<string> tickers)
@@ -71,12 +72,12 @@ namespace core.Portfolio.Views
                     .GroupBy(t => GroupByValue(groupBy, t))
                     .Select(g => new TransactionGroup(
                         g.Key,
-                        new TransactionList(g, null, null)
+                        g.ToList()
                     ));
 
                 if (groupBy == "ticker")
                 {
-                    Grouped = Grouped.OrderByDescending(a => a.Transactions.Credit - a.Transactions.Debit);
+                    Grouped = Grouped.OrderByDescending(a => a.Transactions.Sum(t => t.Amount));
                 }
             }
         }

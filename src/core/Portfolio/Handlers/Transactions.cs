@@ -13,7 +13,7 @@ namespace core.Portfolio.Handlers
 {
     public class Transactions
     {
-        public class Query : RequestWithUserId<TransactionList>
+        public class Query : RequestWithUserId<TransactionsView>
         {
             public Query(Guid userId, string ticker, string groupBy, string show, string txType) : base(userId)
             {
@@ -29,13 +29,13 @@ namespace core.Portfolio.Handlers
             public string TxType { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, TransactionList>
+        public class Handler : HandlerWithStorage<Query, TransactionsView>
         {
             public Handler(IPortfolioStorage storage) : base(storage)
             {
             }
 
-            public override async Task<TransactionList> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<TransactionsView> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stocks = _storage.GetStocks(request.UserId);
                 var options = _storage.GetOwnedOptions(request.UserId);
@@ -53,7 +53,7 @@ namespace core.Portfolio.Handlers
                     request.TxType);
             }
 
-            internal static TransactionList ToTransactionLog(
+            internal static TransactionsView ToTransactionLog(
                 IEnumerable<OwnedStock> stocks,
                 IEnumerable<OwnedOption> options,
                 IEnumerable<OwnedCrypto> cryptos,
@@ -94,7 +94,7 @@ namespace core.Portfolio.Handlers
                     );
                 }
 
-                return new TransactionList(log, groupBy, tickers);
+                return new TransactionsView(log, groupBy, tickers);
             }
 
         }

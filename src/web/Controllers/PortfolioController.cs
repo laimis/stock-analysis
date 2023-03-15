@@ -94,7 +94,7 @@ namespace web.Controllers
             _mediator.Send(new Get.Query(User.Identifier()));
 
         [HttpGet("transactions")]
-        public Task<TransactionList> TransactionsAsync(string ticker, string groupBy, string show, string txType) =>
+        public Task<TransactionsView> TransactionsAsync(string ticker, string groupBy, string show, string txType) =>
             _mediator.Send(
                 new Transactions.Query(User.Identifier(), ticker, groupBy, show, txType)
             );

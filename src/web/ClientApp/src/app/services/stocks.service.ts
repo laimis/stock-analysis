@@ -20,11 +20,11 @@ export class StocksService {
     return this.http.get<StockTradingPositions>('/api/portfolio/tradingentries')
   }
 
-  getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionList> {
+  getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionsView> {
     if (ticker === null) {
       ticker = ''
     }
-    return this.http.get<TransactionList>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
+    return this.http.get<TransactionsView>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
   }
 
   simulatePosition(ticker: string, positionId: number): Observable<TradingStrategyResults> {
@@ -535,9 +535,7 @@ export interface StockSummary {
   orders: BrokerageOrder[]
 }
 
-export interface TransactionList {
-  credit: number
-  debit: number
+export interface TransactionsView {
   tickers: string[]
   transactions: Transaction[]
   grouped: TransactionGroup[]
@@ -545,7 +543,8 @@ export interface TransactionList {
 
 export interface TransactionGroup {
   name: string
-  transactions: TransactionList
+  transactions: Transaction[]
+  sum: number
 }
 
 export interface Transaction {
@@ -603,7 +602,7 @@ export class OwnedCrypto {
   daysSinceLastTransaction: number
   description: string
   averageCost: number
-  transactions: TransactionList
+  transactions: Transaction[]
 }
 
 export class Dashboard {
@@ -623,7 +622,7 @@ export class OwnedOption {
   boughtOrSold: string
   premiumReceived: number
   profit: number
-  transactions: TransactionList
+  transactions: Transaction[]
 }
 
 export interface PriceBar {

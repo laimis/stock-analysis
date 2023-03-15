@@ -43,16 +43,16 @@
     <div class="card-body">
       <div class="row">
         <div class="col">
-          <span class="font-weight-bold">{{response.debit | currency}}</span> debit
+          <span class="font-weight-bold">TODO spent</span> debit
         </div>
         <div class="col text-end">
-          <span class="font-weight-bold">{{response.credit | currency}}</span> credit
+          <span class="font-weight-bold">TODO earned</span> credit
         </div>
       </div>
     </div>
 
     <div class="card-footer">
-      Balance: <span class="font-weight-bold">{{ response.credit - response.debit | currency }}</span>
+      Balance: <span class="font-weight-bold">TODO: difference</span>
     </div>
   </div>
 
@@ -69,10 +69,10 @@
       <div class="col-4">
         <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails !== g.name">[ + ]</button>
         <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails === g.name">[ - ]</button>
-        {{g.name}} ({{g.transactions.transactions.length}})
+        {{g.name}} ({{g.transactions.length}})
       </div>
       <div class="col-2 font-weight-bold text-end">
-        {{ g.transactions.credit - g.transactions.debit | currency }}
+        {{ g.sum | currency }}
       </div>
       <div class="col-4"></div>
     </div>
@@ -87,7 +87,7 @@
       </thead>
       <tbody>
         <tr
-          *ngFor="let t of g.transactions.transactions">
+          *ngFor="let t of g.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
           <td>
             <a [routerLink]="[ '/stocks', t.ticker ]" target="_blank" *ngIf="!t.isOption">{{t.ticker}}</a>
