@@ -35,37 +35,14 @@
     </div>
   </div>
 
-  <div class="card mt-2 mb-3">
-    <div class="card-header">
-      <span class="font-weight-bold">Transaction Summary</span>
-      <span class="float-end">({{ response.transactions.length}})</span>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <span class="font-weight-bold">TODO spent</span> debit
-        </div>
-        <div class="col text-end">
-          <span class="font-weight-bold">TODO earned</span> credit
-        </div>
-      </div>
-    </div>
-
-    <div class="card-footer">
-      Balance: <span class="font-weight-bold">TODO: difference</span>
-    </div>
-  </div>
-
-  <div class="mt-2">
-
-    <div class="alert alert-secondary mt-2" *ngIf="!ticker && response.transactions.length === 0">
+  <div class="mt-2" *ngIf="!ticker && response.transactions.length === 0">
+    <div class="alert alert-secondary">
       You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
     </div>
-
   </div>
 
-  <div *ngFor="let g of response.grouped">
-    <div class="text-muted font-size-small row mb-2 mt-3">
+  <div class="mb-2 mt-3" *ngFor="let g of response.grouped">
+    <div class="text-muted font-size-small row">
       <div class="col-4">
         <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails !== g.name">[ + ]</button>
         <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails === g.name">[ - ]</button>
