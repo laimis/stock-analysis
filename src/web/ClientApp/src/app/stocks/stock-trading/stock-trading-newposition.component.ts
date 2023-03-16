@@ -101,6 +101,7 @@ export class StockTradingNewPositionComponent {
     this.sizeStopPrice = null
     this.ticker = null
     this.prices = null
+    this.notes = null
   }
 
   updateChart(ticker:string) {
@@ -240,6 +241,7 @@ export class StockTradingNewPositionComponent {
         this.gaps = null
         this.outcomes = null
         this.pendingPositionCreated.emit(cmd)
+        this.reset()
       },
       errors => { 
         var errorMessageArray = GetErrors(errors)
