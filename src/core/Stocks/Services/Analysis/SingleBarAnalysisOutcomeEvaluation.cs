@@ -143,14 +143,13 @@ namespace core.Stocks.Services.Analysis
                     .ToList()
             );
 
-            var smaInterval = 20;
-            System.Func<decimal, decimal, bool> priceAbove20 = (a, b) => a > b;
-            System.Func<decimal, decimal, bool> priceBelow20 = (a, b) => a < b;
+            System.Func<decimal, bool> priceAbove20 = (a) => a >= 0;
+            System.Func<decimal, bool> priceBelow20 = (a) => a < 0;
 
             var sma20OutcomesChoices = new []
                 {
-                    (priceAbove20, $"Price above SMA {smaInterval}"),
-                    (priceBelow20, $"Price below SMA {smaInterval}")
+                    (priceAbove20, $"Price above 20 SMA"),
+                    (priceBelow20, $"Price below 20 SMA")
                 };
 
             foreach(var choice in sma20OutcomesChoices)
@@ -158,15 +157,12 @@ namespace core.Stocks.Services.Analysis
                 yield return new AnalysisOutcomeEvaluation(
                     choice.Item2,
                     OutcomeType.Neutral,
-                    MultipleBarOutcomeKeys.SMA(smaInterval),
+                    SingleBarOutcomeKeys.PriceAbove20SMA,
                     tickerOutcomes
                         .Where(t =>
-                            {
-                                var close = t.outcomes.Single(o => o.key == SingleBarOutcomeKeys.Close).value;
-                                
-                                return t.outcomes.Any(o => o.key == MultipleBarOutcomeKeys.SMA(smaInterval) && choice.Item1(close, o.value));
-                            })
-                        .ToList()
+                            t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.PriceAbove20SMA && choice.Item1(o.value))
+                        )
+                    .ToList()
                 );
             }
         }

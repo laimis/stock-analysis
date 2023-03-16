@@ -34,25 +34,26 @@ namespace core.Stocks.Services.Analysis
             
             var outcomes = new SMAAnalysis().Run(price, bars[..^1]);
 
-            var outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
+            var sma20above50outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
 
             yield return new AnalysisOutcome(
                 SingleBarOutcomeKeys.SMA20Above50Days,
-                outcome.type,
-                outcome.value,
-                outcome.valueType,
-                outcome.message
+                sma20above50outcome.type,
+                sma20above50outcome.value,
+                sma20above50outcome.valueType,
+                sma20above50outcome.message
             );
 
-            // add sma 20 as an outcome
-            outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA(20));
+            // % difference between sma 20 and price
+            var sma20outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA(20));
+            var pctDiff = (price - sma20outcome.value) / sma20outcome.value;
 
             yield return new AnalysisOutcome(
-                MultipleBarOutcomeKeys.SMA(20),
-                outcome.type,
-                outcome.value,
-                outcome.valueType,
-                outcome.message
+                SingleBarOutcomeKeys.PriceAbove20SMA,
+                pctDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                pctDiff,
+                Shared.ValueFormat.Percentage,
+                "Percentage that price is above 20 day SMA"
             );
         }
     }
@@ -257,6 +258,7 @@ namespace core.Stocks.Services.Analysis
 
     public class SingleBarOutcomeKeys
     {
+        public static string PriceAbove20SMA = "PriceAbove20SMA";
         public static string RelativeVolume = "RelativeVolume";
         public static string Volume = "Volume";
         public static string PercentChange = "PercentChange";
