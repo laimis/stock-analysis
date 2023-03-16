@@ -3,14 +3,14 @@
         {{feedbackMessage}}
       </div>
 
-    <app-brokerage-neworder
-      (brokerageOrderEntered)="brokerageOrderEntered()">
-    </app-brokerage-neworder>
-
     <app-stock-trading-newposition
         (stockPurchased)="stockPurchased()"
         (pendingPositionCreated)="pendingPositionCreated()">
     </app-stock-trading-newposition>
+
+    <app-brokerage-neworder
+      (brokerageOrderEntered)="brokerageOrderEntered()">
+    </app-brokerage-neworder>
 
     <app-stock-trading-pendingpositions></app-stock-trading-pendingpositions>
 

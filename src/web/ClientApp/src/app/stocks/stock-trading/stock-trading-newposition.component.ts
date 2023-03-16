@@ -162,6 +162,11 @@ export class StockTradingNewPositionComponent {
       return
     }
 
+    if (!this.sizeStopPrice) {
+      console.log("sizeStopChanged: no size stop price")
+      return
+    }
+
     var singleShareLoss = this.costToBuy - this.sizeStopPrice
     this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
     
@@ -184,12 +189,17 @@ export class StockTradingNewPositionComponent {
   updateBuyingValues(singleShareLoss:number) {
     console.log("updateBuyingValues")
     // how many shares can we buy to keep the loss under $100
+    let positionStopPrice = this.positionStopPrice
+    if (!positionStopPrice) {
+      positionStopPrice = this.sizeStopPrice
+    }
+
     this.positionSizeCalculated = Math.round(this.numberOfShares * this.costToBuy * 100) / 100
     this.oneR = this.costToBuy + singleShareLoss
-    this.potentialLoss = this.positionStopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
-    this.stopPct = Math.round((this.positionStopPrice - this.costToBuy) / this.costToBuy * 100) / 100
+    this.potentialLoss = positionStopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
+    this.stopPct = Math.round((positionStopPrice - this.costToBuy) / this.costToBuy * 100) / 100
     this.chartTargets = [this.oneR]
-    this.chartStops = [this.positionStopPrice]
+    this.chartStops = [positionStopPrice]
   }
 
   record() {
