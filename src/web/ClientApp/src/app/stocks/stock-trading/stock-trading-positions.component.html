@@ -1,14 +1,12 @@
 <div>
   <div class="row">
     <div class="col">
-      <a class="btn btn-primary" href="/api/stocks/export/open">Export</a>
+      <a class="btn btn-outline-secondary me-2" href="/api/stocks/export/open">Export</a>
+      <button class="btn btn-outline-secondary" (click)="toggleRenderStyle()" >{{renderStyleName}}</button>
     </div>
-    <div class="col">
-      <button class="btn btn-link" (click)="toggleRenderStyle()" >{{renderStyle}}</button>
-    </div>
-    <div class="col text-end">  
-      <select class="form-select" id="metricToRender" (click)="metricChanged($event.target)">
-        <option value="">Sort by:</option>
+    <label for="metricToRender" class="text-end col-sm-2 col-form-label">Sort by</label>
+    <div class="col">  
+      <select class="form-select" name="metricToRender" id="metricToRender" (click)="metricChanged($event.target)">
         <option value="rr">R/R</option>
         <option value="pl">P/L</option>
         <option value="plPercent">P/L %</option>

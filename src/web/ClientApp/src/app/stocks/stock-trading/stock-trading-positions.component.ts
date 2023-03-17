@@ -57,12 +57,15 @@ export class StockTradingPositionsComponent {
         )
     }
 
-    renderStyle: string = "card" // other style is "table"
+    renderStyle: string = "card"  // other style is "table"
+    renderStyleName: string = "switch to table layout"
     toggleRenderStyle() {
         if (this.renderStyle == "card") {
             this.renderStyle = "table"
+            this.renderStyleName = "switch to card layout"
         } else {
             this.renderStyle = "card"
+            this.renderStyleName = "switch to table layout"
         }
     }
 
