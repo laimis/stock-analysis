@@ -1,6 +1,6 @@
 <div>
   <div *ngIf="!outcomes">Loading {{title}}...</div>
-  <section *ngIf="outcomes">
+  <section *ngIf="outcomes" class="overflow-scroll">
     <h5 *ngIf="title">{{title}}</h5>
     <table  class="table table-hover striped table-sm mb-4">
       <thead>
