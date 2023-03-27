@@ -38,11 +38,9 @@ namespace core.Stocks.Services.Analysis
             var previous = bars[^2];
 
             // upside reversal pattern detection
-            if (current.Close > previous.Close && current.Low < previous.Low)
+            if (current.Close > System.Math.Max(previous.Open, previous.Close) && current.Low < previous.Low)
             {
-                var additionalInfo = current.Close > System.Math.Max(previous.Open, previous.Close) ?
-                    "Strong" : "Weak";
-
+                var additionalInfo = "";
                 // see if we can do volume numbers
                 if (bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                 {
@@ -53,13 +51,13 @@ namespace core.Stocks.Services.Analysis
                     );
 
                     var multiplier = current.Volume / stats.median;
-                    additionalInfo += $", volume x{multiplier.ToString("N1")}";
+                    additionalInfo = $", volume x{multiplier.ToString("N1")}";
                 }
 
                 return new Pattern(
                     date: current.Date,
                     name: UpsideReversalName,
-                    description: $"{UpsideReversalName}: {additionalInfo}",
+                    description: $"{UpsideReversalName}{additionalInfo}",
                     value: current.Close,
                     valueFormat: Shared.ValueFormat.Currency);
             }
