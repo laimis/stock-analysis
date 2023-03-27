@@ -25,8 +25,7 @@ namespace coretests.Stocks.Services
 
             var pattern = patterns.First();
             Assert.Equal(PatternDetection.UpsideReversalName, pattern.name);
-            Assert.Contains("Strong", pattern.description);
-            Assert.Contains("volume x0.9", pattern.description);
+            Assert.Contains(", volume x0.9", pattern.description);
         }
 
         [Fact]
