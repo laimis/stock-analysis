@@ -7,7 +7,7 @@ namespace core.Stocks.Services.Analysis
     {
         private const decimal RelativeVolumeThresholdPositive = 0.9m;
         private const decimal SigmaRatioThreshold = 1m;
-        private const decimal SmallPercentChange = 0.02m;
+        private const decimal SmallSigmaThreshold = 0.4m;
         private const decimal ExcellentClosingRange = 0.80m;
         private const decimal LowClosingRange = 0.20m;
 
@@ -97,7 +97,8 @@ namespace core.Stocks.Services.Analysis
                 tickerOutcomes
                     .Where(t =>
                         t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.RelativeVolume && o.value >= RelativeVolumeThresholdPositive)
-                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0 && o.value < SmallPercentChange))
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.PercentChange && o.value >= 0)
+                        && t.outcomes.Any(o => o.key == SingleBarOutcomeKeys.SigmaRatio && o.value <= SmallSigmaThreshold))
                     .ToList()
             );
 
