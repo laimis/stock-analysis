@@ -1,3 +1,10 @@
 .outcomes-section {
-    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.outcomes-section .fixed-side {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 1;
 }
