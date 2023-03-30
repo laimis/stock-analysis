@@ -85,6 +85,7 @@ import { StockTradingReviewDashboardComponent } from './stocks/stock-trading-rev
 import { StockTradingPendingPositionsComponent } from './stocks/stock-trading/stock-trading-pendingpositions.component';
 import { StockSECFilingsComponent } from './stocks/stock-details/stock-secfilings.component';
 import { StockTradingAnalysisDashboardComponent } from './stocks/stock-trading-analysis/stock-trading-analysis-dashboard.component';
+import { RoutineComponent } from './routine/routine.component';
 
 
 var routes: Routes = [
@@ -143,6 +144,8 @@ var routes: Routes = [
   { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
   { path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard]},
   { path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard]},
+
+  { path: 'routines', component: RoutineComponent, canActivate: [AuthGuard]},
 
   { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
@@ -237,7 +240,8 @@ var routes: Routes = [
     StockTradingReviewDashboardComponent,
     StockTradingPendingPositionsComponent,
     StockSECFilingsComponent,
-    StockTradingAnalysisDashboardComponent
+    StockTradingAnalysisDashboardComponent,
+    RoutineComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
