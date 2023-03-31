@@ -77,6 +77,7 @@ namespace web.BackgroundServices
                 {
                     _logger.LogCritical(ex, "Failed while running alert monitor, will sleep");
                     _container.AddNotice("Failed while running alert monitor: " + ex.Message);
+                    _container.ManualRunRequested();
                     await Task.Delay(TimeSpan.FromMinutes(10));
                 }
             }
