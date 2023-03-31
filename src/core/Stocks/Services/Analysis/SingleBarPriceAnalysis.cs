@@ -46,15 +46,18 @@ namespace core.Stocks.Services.Analysis
 
             // % difference between sma 20 and price
             var sma20outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA(20));
-            var pctDiff = (price - sma20outcome.value) / sma20outcome.value;
+            if (sma20outcome.value != 0)
+            {
+                var pctDiff = (price - sma20outcome.value) / sma20outcome.value;
 
-            yield return new AnalysisOutcome(
-                SingleBarOutcomeKeys.PriceAbove20SMA,
-                pctDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
-                pctDiff,
-                Shared.ValueFormat.Percentage,
-                "Percentage that price is above 20 day SMA"
-            );
+                yield return new AnalysisOutcome(
+                    SingleBarOutcomeKeys.PriceAbove20SMA,
+                    pctDiff >= 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                    pctDiff,
+                    Shared.ValueFormat.Percentage,
+                    "Percentage that price is above 20 day SMA"
+                );
+            }
         }
     }
 
