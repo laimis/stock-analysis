@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;

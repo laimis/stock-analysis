@@ -192,7 +192,8 @@ namespace core.Stocks
 
                 var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
-                Events.Add(new PositionEvent($"Stop price set to {stopPrice} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
+                Events.Add(
+                    new PositionEvent($"Stop price set to {stopPrice.Value.ToString("0.##")} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -213,7 +214,7 @@ namespace core.Stocks
         {
             RiskedAmount = riskAmount;
 
-            Events.Add(new PositionEvent($"Set risk amount to {RiskedAmount}", PositionEventType.risk, riskAmount, when));
+            Events.Add(new PositionEvent($"Set risk amount to {RiskedAmount.Value.ToString("0.##")}", PositionEventType.risk, riskAmount, when));
         }
 
         public void SetPrice(decimal price)
