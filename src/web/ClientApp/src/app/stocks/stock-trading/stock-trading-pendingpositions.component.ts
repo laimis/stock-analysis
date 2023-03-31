@@ -1,4 +1,5 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { charts_getTradingViewLink } from 'src/app/services/links.service';
 import { PendingStockPosition, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 
 @Component({
@@ -40,6 +41,10 @@ export class StockTradingPendingPositionsComponent implements OnInit {
         console.log(error)
       }
     )
+  }
+
+  getTradingViewLink(ticker: string) {
+    return charts_getTradingViewLink(ticker)
   }
 }
 

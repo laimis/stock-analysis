@@ -18,7 +18,13 @@
       <tbody>
         <ng-container *ngFor="let position of positions">
           <tr>
-            <td>{{ position.ticker }}</td>
+            <td>
+              <a [routerLink]="[ '/stocks', position.ticker ]" class="position-ticker">{{position.ticker}}</a>
+              <a [href]="getTradingViewLink(position.ticker)" target="_blank">
+                <img class="p-1" src="tradingview.png" height="20px" />
+              </a>
+            </td>
+
             <td>{{ position.numberOfShares }}</td>
             <td>{{ position.price | currency }}</td>
             <td>{{ position.stopPrice | currency }}</td>
