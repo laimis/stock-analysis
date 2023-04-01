@@ -10,6 +10,7 @@ import { PositionInstance, StocksService, StockTradingPerformanceCollection } fr
 export class StockTradingReviewDashboardComponent implements OnInit {
   activeTab: string = 'positions';
   loaded = false;
+  loading = true;
   past: PositionInstance[];
   performance: StockTradingPerformanceCollection;
 
@@ -24,13 +25,26 @@ export class StockTradingReviewDashboardComponent implements OnInit {
   }
 
   loadEntries() {
+    this.loading = true
     this.stockService.getTradingEntries().subscribe(
       response => {
         this.past = response.past
         this.performance = response.performance
+        this.loading = false
+        this.loaded = true
+      }, _ => {
+        this.loading = false
+        this.loaded = true
+      },
+      () => {
+        this.loading = false
         this.loaded = true
       }
     )
+  }
+
+  refresh() {
+    this.loadEntries()
   }
 
   isActive(tabName:string) {

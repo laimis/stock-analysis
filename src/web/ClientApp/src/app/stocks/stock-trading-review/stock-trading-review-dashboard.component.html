@@ -17,6 +17,12 @@
       <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
         Review
       </a>
+      <a class="tab float-end" [routerLink]="" (click)="refresh()">
+        Refresh
+        <div class="spinner-border text-info spinner-border-sm" role="status" *ngIf="loading">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </a>
     </div>
     
     <app-stock-trading-closed-positions *ngIf="isActive('positions')" [positions]=past></app-stock-trading-closed-positions>
