@@ -40,7 +40,9 @@
       <div *ngFor="let c of report.evaluations" class="mb-5">
         <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral', 'evaluation': true}" style="border: 0px">
           <span class="evaluation-name">{{c.name}}</span>
-          <span class="evaluation-count">{{c.matchingTickers.length}}</span>
+          <span class="evaluation-count" *ngIf="c.matchingTickers.length > 0">
+            {{c.matchingTickers.length}}
+          </span>
         </h5>
         <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c" [tickerFilter]="tickerFilter"></app-outcomes>
         <span *ngIf="c.matchingTickers.length === 0">No positions in this category</span>
