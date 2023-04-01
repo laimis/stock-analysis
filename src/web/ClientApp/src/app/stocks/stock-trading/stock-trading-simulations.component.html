@@ -18,41 +18,46 @@
   <div>
     <a [href]="getExportUrl()" class="btn btn-primary">Export</a>
   </div>
-  <table class="table table-hover table-striped">
-    <thead>
-      <tr>
-        <th>Strategy</th>
-        <th>P/L</th>
-        <th>R/R</th>
-        <th>Win %</th>
-        <th>Avg Win Pct</th>
-        <th>Avg Loss Pct</th>
-        <th>Max Win</th>
-        <th>Max Loss</th>
-        <th>E/V</th>
-        <th>Profit Ratio</th>
-        <th>Pct Ratio</th>
-        <th>Trades</th>
-        <th>Open Positions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let r of results">
-        <td>{{r.strategyName}}</td>
-        <td>{{r.performance.profit | currency}}</td>
-        <td>{{r.performance.rrSum | number:'1.0-2'}}</td>
-        <td>{{r.performance.winPct | percent}}</td>
-        <td>{{r.performance.winAvgReturnPct | percent}}</td>
-        <td>{{r.performance.lossAvgReturnPct | percent}}</td>
-        <td>{{r.performance.maxWinAmount | currency}}</td>
-        <td>{{r.performance.maxLossAmount | currency}}</td>
-        <td>{{r.performance.ev | currency}}</td>
-        <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.numberOfTrades }}</td>
-        <td>{{openPositions(r.positions)}}</td>
-      </tr>
-    </tbody>
-  </table>
+  <section>
+    <h5>Results</h5>
+    <app-error-display [errors]="errors"></app-error-display>
+
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>P/L</th>
+          <th>R/R</th>
+          <th>Win %</th>
+          <th>Avg Win Pct</th>
+          <th>Avg Loss Pct</th>
+          <th>Max Win</th>
+          <th>Max Loss</th>
+          <th>E/V</th>
+          <th>Profit Ratio</th>
+          <th>Pct Ratio</th>
+          <th>Trades</th>
+          <th>Open Positions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of results">
+          <td>{{r.strategyName}}</td>
+          <td>{{r.performance.profit | currency}}</td>
+          <td>{{r.performance.rrSum | number:'1.0-2'}}</td>
+          <td>{{r.performance.winPct | percent}}</td>
+          <td>{{r.performance.winAvgReturnPct | percent}}</td>
+          <td>{{r.performance.lossAvgReturnPct | percent}}</td>
+          <td>{{r.performance.maxWinAmount | currency}}</td>
+          <td>{{r.performance.maxLossAmount | currency}}</td>
+          <td>{{r.performance.ev | currency}}</td>
+          <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
+          <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
+          <td>{{r.performance.numberOfTrades }}</td>
+          <td>{{openPositions(r.positions)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
 </div>
