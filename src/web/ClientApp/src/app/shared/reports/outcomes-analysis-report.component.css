@@ -3,3 +3,13 @@
   color: white;
   font-weight: bolder;
 }
+
+.evaluation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.evaluation-count {
+  font-weight: bold;
+}

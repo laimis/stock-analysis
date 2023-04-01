@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { OutcomesReport, TickerOutcomes } from '../../services/stocks.service';
+import { AnalysisOutcomeEvaluation, OutcomesReport, TickerOutcomes } from '../../services/stocks.service';
 import { charts_getTradingViewLink } from '../../services/links.service';
 
 @Component({
@@ -31,5 +31,11 @@ export class OutcomesAnalysisReportComponent {
 
   tradingViewLink(ticker:string) {
     return charts_getTradingViewLink(ticker)
+  }
+
+  copyTickersToClipboard(c:AnalysisOutcomeEvaluation) {
+    var tickers = c.matchingTickers.map(t => t.ticker)
+    var text = tickers.join('\r')
+    navigator.clipboard.writeText(text)
   }
 }

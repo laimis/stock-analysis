@@ -37,13 +37,14 @@
 
     <section>
       <h5>Evaluations</h5>
-      <div *ngFor="let c of report.evaluations" class="mb-3">
-        <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral'}" style="border: 0px">
-          {{c.name}}
-          <span *ngIf="c.matchingTickers.length > 0" > - {{c.matchingTickers.length}}</span>
+      <div *ngFor="let c of report.evaluations" class="mb-5">
+        <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral', 'evaluation': true}" style="border: 0px">
+          <span class="evaluation-name">{{c.name}}</span>
+          <span class="evaluation-count">{{c.matchingTickers.length}}</span>
         </h5>
         <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c" [tickerFilter]="tickerFilter"></app-outcomes>
         <span *ngIf="c.matchingTickers.length === 0">No positions in this category</span>
+        <button *ngIf="c.matchingTickers.length > 0" class="btn btn-sm btn-outline-secondary mt-2" (click)="copyTickersToClipboard(c)">Copy tickers</button>
       </div>
     </section>
 
