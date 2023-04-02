@@ -5,7 +5,13 @@ namespace core.Stocks.Services.Analysis
 {
     public enum OutcomeType { Positive, Negative, Neutral };
 
-    public record AnalysisOutcome(string key, OutcomeType type, decimal value, ValueFormat valueType, string message);
+    public record AnalysisOutcome(
+        string key,
+        OutcomeType type,
+        decimal value,
+        ValueFormat valueType,
+        string message
+    );
 
     public record struct TickerOutcomes(List<AnalysisOutcome> outcomes, string ticker);
 

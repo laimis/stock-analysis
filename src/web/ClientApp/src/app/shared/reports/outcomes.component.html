@@ -15,7 +15,7 @@
             <!-- <a [routerLink]="['/stocks', s.ticker]">{{s.ticker}}</a> -->
             <a [href]="getTradingViewLink(s.ticker)" target="_blank">{{s.ticker}}</a>
           </td>
-          <td *ngFor="let o of s.outcomes"
+          <td *ngFor="let o of outcomesForRendering(s.outcomes)"
             [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">
             {{ getValue(o)}}
           </td>

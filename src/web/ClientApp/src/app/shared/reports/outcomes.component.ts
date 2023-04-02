@@ -35,7 +35,9 @@ export class OutcomesComponent {
   sortDirection: number = -1
   
 	getKeys(entries:TickerOutcomes[]) {
-    return entries[0].outcomes.map(o => o.key)
+    return entries[0].outcomes
+      .filter(o => this.IsRenderableOutcome(o))
+      .map(o => o.key)
   }
 
   getTradingViewLink(ticker:string) {
@@ -59,6 +61,14 @@ export class OutcomesComponent {
     }
 
     this.runSort(this.outcomes, finalFunc)
+  }
+
+  outcomesForRendering(outcomes:StockAnalysisOutcome[]) {
+    return outcomes.filter(o => this.IsRenderableOutcome(o))
+  }
+
+  private IsRenderableOutcome(o: StockAnalysisOutcome): unknown {
+    return o.key !== 'NewHigh' && o.key !== 'NewLow';
   }
 
   private runSort(analysis:TickerOutcomes[], compareFn) {
