@@ -99,6 +99,12 @@ export class StockTradingPositionsComponent {
             case "daysHeld":
                 this.metricFunc = (p:PositionInstance) => p.daysHeld
                 break
+            case "unrealizedPL":
+                this.metricFunc = (p:PositionInstance) => p.unrealizedProfit
+                break
+            case "combinedPL":
+                this.metricFunc = (p:PositionInstance) => p.combinedProfit
+                break
             default:
                 this.metricFunc = (p:PositionInstance) => p.rr
         }
