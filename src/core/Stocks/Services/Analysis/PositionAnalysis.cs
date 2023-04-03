@@ -182,11 +182,15 @@ namespace core.Stocks.Services.Analysis
             );
 
             // add days since opened as outcome
-            var daysSinceOpened = (decimal) DateTimeOffset.UtcNow.Subtract(position.Opened!.Value).TotalDays;
+            var daysSinceOpened =
+                Math.Ceiling(
+                    DateTimeOffset.UtcNow.Subtract(position.Opened!.Value).TotalDays
+                );
+
             yield return new AnalysisOutcome(
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 OutcomeType.Neutral,
-                daysSinceOpened,
+                (decimal) daysSinceOpened,
                 Shared.ValueFormat.Number,
                 $"Days since opened: {daysSinceOpened}"
             );
