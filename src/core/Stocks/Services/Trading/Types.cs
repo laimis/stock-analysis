@@ -13,6 +13,7 @@ namespace core.Stocks.Services.Trading
         public const decimal AVG_PERCENT_GAIN = 0.07m;
         public const decimal DEFAULT_STOP_PRICE_MULTIPLIER = 0.95m;
         public const int MAX_NUMBER_OF_DAYS_TO_SIMULATE = 365;
+        public const string ACTUAL_TRADES_NAME = "Actual trades ⭐";
     }
 
     public interface ITradingStrategy

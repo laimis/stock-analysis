@@ -96,32 +96,39 @@ namespace core.Portfolio
                         closeIfOpenAtTheEnd: request.ClosePositionIfOpenAtTheEnd
                     );
 
-                    results.Add(new TradingStrategyResult(0, 0, 0, 0, position, "Actual trading"));
+                    results.Add(new TradingStrategyResult(0, 0, 0, 0, position, TradingStrategyConstants.ACTUAL_TRADES_NAME));
                     results.AddRange(simulatedResults.Results);
                 }
 
 
-                var final = new List<TradingStrategyPerformance>();
-                foreach(var strategyGroup in results.GroupBy(r => r.strategyName))
-                {
-                    var strategyPositions = strategyGroup.Select(r => r.position).ToArray();
+                return results
+                    .GroupBy(r => r.strategyName)
+                    .Select(MapToStrategyPerformance)
+                    .ToList();
+            }
 
+            private static TradingStrategyPerformance MapToStrategyPerformance(IGrouping<string, TradingStrategyResult> strategyGroup)
+            {
+                TradingPerformance CreatePerformance(PositionInstance[] positions)
+                {
                     try
                     {
-                        var performance = TradingPerformance.Create(
-                            new Span<PositionInstance>(strategyPositions)
-                        );
-
-                        final.Add(new TradingStrategyPerformance(strategyGroup.Key, performance, strategyPositions));
+                        return TradingPerformance.Create(new Span<PositionInstance>(positions));
                     }
-                    catch(OverflowException ex)
+                    catch (OverflowException)
                     {
                         // TODO: something is throwing Value was either too large or too small for a Decimal
                         // for certain simulations.
                         // ignoring it here because I need the results, but need to look at it at some point
+                        return TradingPerformance.Create(Span<PositionInstance>.Empty);
                     }
                 }
-                return final;
+
+                var strategyPositions = strategyGroup.Select(r => r.position).ToArray();
+
+                var performance = CreatePerformance(strategyPositions);
+
+                return new TradingStrategyPerformance(strategyGroup.Key, performance, strategyPositions);
             }
 
             public async Task<ExportResponse> Handle(ExportQuery request, CancellationToken cancellationToken)
