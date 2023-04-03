@@ -102,13 +102,8 @@ namespace web.BackgroundServices
                     cancellationToken: cancellationToken
                 );
 
-                foreach(var c in completed)
-                {
-                    checks.Remove(c);
-                }
-
                 // only update the next run time if we've completed all checks
-                if (checks.Count == 0)
+                if (completed.Count == checks.Count)
                 {
                     _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
                         DateTimeOffset.UtcNow,
