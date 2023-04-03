@@ -120,7 +120,7 @@ namespace core.Stocks.Services.Trading
                 MaxLossAmount = maxLossAmount,
                 LossAvgDaysHeld = losses > 0 ? totalLossDaysHeld / losses : 0,
                 LossMaxReturnPct = lossMaxReturnPct,
-                LossAvgReturnPct = totalLossReturnPct > 0 ? totalLossReturnPct / losses : 0,
+                LossAvgReturnPct = losses > 0  ? totalLossReturnPct / losses : 0,
                 Losses = losses,
                 MaxWinAmount = maxWinAmount,
                 Profit = profit,
