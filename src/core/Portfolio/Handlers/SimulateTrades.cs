@@ -106,11 +106,20 @@ namespace core.Portfolio
                 {
                     var strategyPositions = strategyGroup.Select(r => r.position).ToArray();
 
-                    var performance = TradingPerformance.Create(
-                        new Span<PositionInstance>(strategyPositions)
-                    );
+                    try
+                    {
+                        var performance = TradingPerformance.Create(
+                            new Span<PositionInstance>(strategyPositions)
+                        );
 
-                    final.Add(new TradingStrategyPerformance(strategyGroup.Key, performance, strategyPositions));
+                        final.Add(new TradingStrategyPerformance(strategyGroup.Key, performance, strategyPositions));
+                    }
+                    catch(OverflowException ex)
+                    {
+                        // TODO: something is throwing Value was either too large or too small for a Decimal
+                        // for certain simulations.
+                        // ignoring it here because I need the results, but need to look at it at some point
+                    }
                 }
                 return final;
             }
