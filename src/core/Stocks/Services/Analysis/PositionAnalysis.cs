@@ -180,6 +180,16 @@ namespace core.Stocks.Services.Analysis
                 Shared.ValueFormat.Currency,
                 $"Position size is {position.Cost}"
             );
+
+            // add days since opened as outcome
+            var daysSinceOpened = (decimal) DateTimeOffset.UtcNow.Subtract(position.Opened!.Value).TotalDays;
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.DaysSinceOpened,
+                OutcomeType.Neutral,
+                daysSinceOpened,
+                Shared.ValueFormat.Number,
+                $"Days since opened: {daysSinceOpened}"
+            );
         }
 
     }
@@ -187,6 +197,7 @@ namespace core.Stocks.Services.Analysis
     internal class PortfolioAnalysisKeys
     {
         public static string PercentToStopLoss = "PercentToStopLoss";
+        public static string DaysSinceOpened = "DaysSinceOpened";
         public static string RecentFilings = "RecentFilings";
         public static string GainPct = "GainPct";
         public static string AverageCost = "AverageCost";
