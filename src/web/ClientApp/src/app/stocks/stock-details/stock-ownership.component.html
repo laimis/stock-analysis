@@ -24,9 +24,14 @@
 
   <app-brokerage-orders *ngIf="stock" [ticker]="stock.ticker"></app-brokerage-orders>
 
-	<section *ngIf="ownership">
-    <h5>Positions ({{ownership.positions.length}})</h5>
-    <app-stock-trading-position *ngFor="let position of ownership.positions" [position]="position"></app-stock-trading-position>
+  <section *ngFor="let position of positions">
+    <h5>
+      Position {{position.opened | date:'shortDate' }}
+      <span *ngIf="position.closed" class="float-end">
+        closed {{position.closed | date:'shortDate' }} for profit of {{position.profit | currency}}
+      </span>
+    </h5>
+    <app-stock-trading-position [position]="position"></app-stock-trading-position>  
   </section>
 
   <div class="card border-danger mb-3">
