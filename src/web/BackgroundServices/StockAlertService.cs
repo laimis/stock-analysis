@@ -211,11 +211,11 @@ namespace web.BackgroundServices
                 }
 
                 // get all alerts for that user
-                var alerts = _container.GetAlerts(user.Id)
-                    .OrderBy(a => a.ticker)
-                    .Select(ToEmailData);
+                var alertGroups = _container.GetAlerts(user.Id)
+                    .GroupBy(a => a.identifier)
+                    .Select(ToAlertEmailGroup);
 
-                var data = new { alerts };
+                var data = new { alertGroups };
 
                 await _emails.Send(
                     new Recipient(email: user.Email, name: user.Name),
@@ -245,6 +245,14 @@ namespace web.BackgroundServices
                 );
                 _container.AddNotice("Emails sent, next run at " + _marketHours.ToMarketTime(_nextEmailSend));
             }
+        }
+
+        private object ToAlertEmailGroup(IGrouping<string, TriggeredAlert> group)
+        {
+            return new {
+                identifier = group.Key,
+                alerts = group.Select(ToEmailData)
+            };
         }
 
         private object ToEmailData(TriggeredAlert alert)
