@@ -64,10 +64,11 @@
             </h5>
             <div class="row">
               <div class="col">
-                <a class="card-link" [routerLink]="[ '/trading/simulations' ]">Simulations</a>
-                <a class="card-link" [routerLink]="[ '/reports/recentsells' ]">Sells</a>
-                <a class="card-link" [routerLink]="[ '/transactions' ]">Transactions</a>
-                <a class="card-link" [routerLink]="[ '/reports/chain' ]">Chain</a>
+                <a
+                  *ngFor="let link of toolLinks"
+                  class="card-link"
+                  [routerLink]="[ link.path ]">{{link.label}}
+                </a>
               </div>
             </div>
           </div>

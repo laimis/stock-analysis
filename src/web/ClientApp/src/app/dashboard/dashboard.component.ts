@@ -14,6 +14,16 @@ export class DashboardComponent implements OnInit {
 	dashboard : Dashboard
   loaded : boolean = false
 
+  toolLinks = [
+    { path: '/summary', label: 'Weekly Summary' },
+    { path: '/trading/review', label: 'Trading Review'},
+    { path: '/stocks/lists', label: 'Stock Lists' },
+    { path: '/trading/simulations', label: 'Simulations' },
+    { path: 'reports/recentsells', label: 'Recent Sells' },
+    { path: '/transactions', label: 'Transactions' },
+    { path: '/reports/chain', label: 'Chain' }
+  ];
+
 	constructor(
 		private stocks : StocksService,
     private router : Router,
