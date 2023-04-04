@@ -478,7 +478,8 @@ export enum OutcomeValueTypeEnum {
   Percentage = 'Percentage',
   Currency = 'Currency',
   Number = 'Number',
-  Boolean = 'Boolean'
+  Boolean = 'Boolean',
+  String = 'String'
 }
 
 export interface StockAnalysisOutcome {

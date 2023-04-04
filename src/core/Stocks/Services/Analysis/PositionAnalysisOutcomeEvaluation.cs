@@ -27,7 +27,7 @@ namespace core.Stocks.Services.Analysis
             // stocks that have been recently open
             yield return new AnalysisOutcomeEvaluation(
                 "Recently Opened",
-                OutcomeType.Negative,
+                OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
                     .Where(t =>

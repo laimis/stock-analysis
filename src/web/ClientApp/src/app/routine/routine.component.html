@@ -1,55 +1,18 @@
 <div>
-    <h1>Daily Checklist</h1>
+    <h2>Routines</h2>
     
     <ul>
-        <li>
-            <input type="checkbox" id="check1" name="check1" value="check1">
-            <label for="check1">
-            Review stock market conditions. 
-            Go to <a target="_blank" href="https://www.tradingview.com">TradingView</a> and look at Indexes list
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="check2" name="check2" value="check1">
-            <label for="check2">
-            Review stock positions.
-            Go to <a target="_blank" href="https://ngtrading-xiu9e.ondigitalocean.app/trading/analysis">Analysis</a> and look over the page
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="check3" name="check3" value="check1">
-            <label for="check3">
-            <a target="_blank" href="https://localhost:5001/trends">Review Industry Trends</a>
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="check4" name="check4" value="check1">
-            <label for="check4">
-            <a target="_blank" href="https://localhost:5001/">Review Screeners</a>
-            For each screener, don't forget to click on NGTD analysis
-            </label>
-        </li>
-        <li>
-            <label for="check4">
-                <input type="checkbox" id="check5" name="check5" value="check1">
-                <a target="_blank" href="https://localhost:5001/">Review Alerts</a>
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="check6" name="check6" value="check1">
-            <label for="check5">
-                Review alert emails
-            </label>
-        </li>
-        <li>
-            <input type="checkbox" id="check7" name="check7" value="check1">
-            <label for="check6">
-                <a target="_blank" 
-                    href="https://ngtrading-xiu9e.ondigitalocean.app/stocks/newposition">
-                    Review positions/pending orders
+        <li *ngFor="let step of routineSteps; let i = index">
+            <input type="checkbox" [id]="'check' + i" [name]="'check' + i">
+            <label [htmlFor]="'check' + i">
+                <a
+                    target="_blank"
+                    style="text-decoration:none"
+                    [href]="step.url">{{step.label}}
                 </a>
             </label>
+            
         </li>
-      </ul>
+    </ul>
 
 </div>
