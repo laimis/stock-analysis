@@ -267,7 +267,6 @@ export class StockTradingNewPositionComponent {
           this.numberOfShares = position.numberOfShares
           this.positionStopPrice = position.stopPrice
           this.notes = position.notes
-          this.date = this.datePipe.transform(position.date, 'yyyy-MM-dd');
           this.updateBuyingValuesPositionStopPrice()
         }
       }
