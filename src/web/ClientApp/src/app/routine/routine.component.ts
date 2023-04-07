@@ -26,7 +26,7 @@ export class RoutineComponent {
     },
     {
       label: 'Review Alerts: look gmail',
-      url: ''
+      url: 'https://mail.google.com/mail/u/0/#label/tradeview'
     },
     {
       label: 'Review positions/pending orders',

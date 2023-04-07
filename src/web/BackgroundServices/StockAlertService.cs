@@ -224,21 +224,6 @@ namespace web.BackgroundServices
                     data
                 );
 
-                // if there are any stop alerts, send sms
-                var tickersWithStopAlert = _container
-                        .GetAlerts(user.Id)
-                        .Where(a => a.identifier == StopPriceMonitor.Identifier)
-                        .Select(a => a.ticker);
-
-                var stopAlertString = string.Join(", ", tickersWithStopAlert);
-
-                if (!string.IsNullOrEmpty(stopAlertString))
-                {
-                    var message = $"Stop loss triggered for {stopAlertString}";
-
-                    await _sms.SendSMS(message);
-                }
-
                 _nextEmailSend = ScanScheduling.GetNextEmailRunTime(
                     DateTimeOffset.UtcNow,
                     _marketHours
