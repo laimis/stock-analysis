@@ -1,8 +1,8 @@
 <div>
-    <h2>Routines</h2>
-    
+    <section *ngFor="let routine of routines">
+    <h3>{{routine.label}}</h3>
     <ul>
-        <li *ngFor="let step of routineSteps; let i = index">
+        <li *ngFor="let step of routine.steps; let i = index">
             <input type="checkbox" [id]="'check' + i" [name]="'check' + i">
             <label [htmlFor]="'check' + i">
                 <a
@@ -14,5 +14,6 @@
             
         </li>
     </ul>
+    </section>
 
 </div>
