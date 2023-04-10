@@ -165,6 +165,15 @@ namespace web.Controllers
             return _mediator.Send(command);
         }
 
+        [HttpDelete("{ticker}/positions/{positionId}")]
+        public Task DeletePosition(
+            int positionId,
+            string ticker) => _mediator.Send(
+                new DeletePosition.Command(
+                    positionId, ticker, User.Identifier()
+                )
+            );
+
         [HttpGet("{ticker}/simulate/trades")]
         public Task<TradingStrategyResults> Trade(
             string ticker,

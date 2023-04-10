@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { BrokerageOrder, PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
+import { PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
+import { Output } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -22,8 +24,8 @@ export class StockTradingPositionComponent {
         }
     }
 
-    @Input()
-    pendingOrders: BrokerageOrder[]
+    @Output()
+    positionDeleted = new EventEmitter()
 
     // constructor that takes stock service
     constructor(
@@ -74,17 +76,20 @@ export class StockTradingPositionComponent {
         )
     }
 
-    getPendingOrders(p:PositionInstance) {
-
-        if (this.pendingOrders) {
-            return  this.pendingOrders
-                .filter(o => o.ticker == p.ticker)
-                .filter(o => o.status != "FILLED" && o.status != "REPLACED")
-        }
-    }
-
     getCssClassForEvent(e:PositionEvent) {
         return "event-" + e.type
+    }
+
+    deletePosition() {
+        // prompt user to confirm
+        if (confirm("Are you sure you want to delete this position?")) {
+            this.stockService.deletePosition(this._position.ticker, this._position.positionId)
+                .subscribe(
+                (_) => {
+                    this._position = null
+                    this.positionDeleted.emit()
+                })
+        }
     }
 }
 

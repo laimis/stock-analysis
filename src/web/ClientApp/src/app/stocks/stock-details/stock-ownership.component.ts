@@ -20,7 +20,11 @@ export class StockOwnershipComponent {
     
     // create new array of positions that is 
     // created from value.positions, but reversed in orders
-    this.positions = value.positions.slice().reverse()
+    if (value)
+    {
+      this.positions = value.positions.slice().reverse()
+    }
+    
   }
   public get ownership() {
     return this._ownership

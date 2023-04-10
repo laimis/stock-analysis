@@ -257,5 +257,32 @@ namespace core.Stocks
                 )
             );
         }
+
+        public bool DeletePosition(int positionId)
+        {
+            var position = State.Positions.SingleOrDefault(p => p.PositionId == positionId);
+            if (position == null) // already deleted before, moving on
+            {
+                return false;
+            }
+
+            // we don't want to mess with closed positions, at leats for now
+            if (position.IsClosed)
+            {
+                throw new InvalidOperationException("Cannot delete a closed position");
+            }
+
+            Apply(
+                new PositionDeleted(
+                    Guid.NewGuid(),
+                    State.Id,
+                    DateTimeOffset.UtcNow,
+                    State.UserId,
+                    positionId
+                )
+            );
+
+            return true;
+        }
     }
 }

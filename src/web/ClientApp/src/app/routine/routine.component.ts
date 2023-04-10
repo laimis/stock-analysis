@@ -69,7 +69,7 @@ export class RoutineComponent {
     },
     {
       label: 'Review trends',
-      url: 'https://localhost:5001/screeners/trends'
+      url: 'https://localhost:5001/trends'
     },
     {
       label: 'Review watchlists',

@@ -209,4 +209,15 @@ namespace core.Stocks
         public string Grade { get; }
         public string Note { get; }
     }
+
+    public class PositionDeleted : AggregateEvent, INotification
+    {
+        public PositionDeleted(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, int positionId) : base(id, aggregateId, when)
+        {
+            PositionId = positionId;
+            UserId = userId;
+        }
+        public int PositionId { get; }
+        public Guid UserId { get; }
+    }
 }

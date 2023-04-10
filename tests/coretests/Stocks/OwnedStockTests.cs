@@ -354,5 +354,46 @@ namespace coretests.Stocks
                 stock.AddNotes("this is a note")
             );
         }
+
+        [Fact]
+        public void DeletePosition_OnClosedPosition_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.DeletePosition(positionId)
+            );
+        }
+
+        [Fact]
+        public void DeletePosition_Works()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId2 = stock.State.OpenPosition.PositionId;
+            stock.DeletePosition(positionId2);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId3 = stock.State.OpenPosition.PositionId;
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            Assert.Equal(2, stock.State.Positions.Count);
+            Assert.Equal(positionId, stock.State.Positions[0].PositionId);
+            Assert.Equal(positionId3, stock.State.Positions[1].PositionId);
+            
+            // make sure transactions don't include deleted position
+            Assert.Equal(6, stock.State.Transactions.Count);
+            Assert.Equal(2, stock.State.Transactions.Count(t => t.IsPL));
+            Assert.Equal(4, stock.State.Transactions.Count(t => !t.IsPL));
+        }
     }
 }

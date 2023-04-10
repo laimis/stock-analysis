@@ -140,6 +140,28 @@ namespace core.Stocks
             }
         }
 
+        internal void ApplyInternal(PositionDeleted deleted)
+        {
+            var position = Positions.Single(x => x.PositionId == deleted.PositionId);
+            
+            // remove all transactions for this position
+            var transactionsToRemove = position.Transactions.Select(x => x.transactionId).ToList();
+            foreach (var transactionId in transactionsToRemove)
+            {
+                var transaction = Transactions.Single(x => x.EventId == transactionId);
+                Transactions.Remove(transaction);
+
+                var buyOrSell = BuyOrSell.Single(x => x.Id == transactionId);
+                BuyOrSell.Remove(buyOrSell);
+            }
+
+            Positions.Remove(position);
+            if (position == OpenPosition)
+            {
+                OpenPosition = null;
+            }
+        }
+
         internal void ApplyInternal(NotesAdded notesAdded)
         {
             var position = Positions.SingleOrDefault(x => x.PositionId == notesAdded.PositionId);

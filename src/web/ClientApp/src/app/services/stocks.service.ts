@@ -56,6 +56,10 @@ export class StocksService {
     )
   }
 
+  deletePosition(ticker: string, positionId:number): Observable<object>{
+    return this.http.delete(`/api/portfolio/${ticker}/positions/${positionId}`)
+  }
+
   smsOff(): Observable<any> {
     return this.http.post<any>('/api/alerts/sms/off', {})
   }
