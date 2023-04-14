@@ -21,7 +21,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     private stockService : StocksService,
     private percentPipe: PercentPipe,
     private currencyPipe: CurrencyPipe,
-    private decimalPipe: CurrencyPipe
+    private decimalPipe: DecimalPipe
   ) { }
 
   @Input()
