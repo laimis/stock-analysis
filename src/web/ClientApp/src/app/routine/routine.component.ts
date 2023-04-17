@@ -98,4 +98,28 @@ export class RoutineComponent {
       steps: this.weeklyRoutines
     }
   ]
+
+  activeRoutine = this.routines[1]
+  currentStep = 0
+
+  activate(routine) {
+    this.activeRoutine = routine
+    this.currentStep = 0
+  }
+
+  deactivate() {
+    this.activeRoutine = null
+  }
+
+  nextStep() {
+    this.currentStep++
+  }
+
+  previousStep() {
+    this.currentStep--
+  }
+
+  reset() {
+    this.currentStep = 0
+  }
 }
