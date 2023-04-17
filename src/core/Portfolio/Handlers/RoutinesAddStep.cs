@@ -16,7 +16,6 @@ namespace core.Portfolio.Handlers
             public string RoutineName { get; set; }
             [Required]
             public string Label { get; set; }
-            [Required]
             public string Url { get; set; }
         }
 
