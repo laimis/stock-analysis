@@ -3,10 +3,10 @@
 
     <section>
         <form>
-            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new routine</button>
+            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>
         </form>
     </section>
-    <section #addNewListSection class="visually-hidden">
+    <section #addNewRoutineSection class="visually-hidden">
         <h5>Add new routine</h5>
         <form>
             <div class="form-group">
@@ -43,11 +43,11 @@
                         <input class="form-control" type="text" id="stepUrl" name="stepUrl" #stepUrl>
                     </div>
         
-                    <button type="button" class="btn btn-primary btn-small" (click)="addStep(routine, stepLabel.value, stepUrl.value)">Add</button>
+                    <button type="button" class="btn btn-primary btn-small" (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility(addNewStepSection)">Add</button>
                 </form>
             </div>
         </div>
-        <table class="table table-striped">
+        <table class="table table-striped" *ngIf="routine.steps.length > 0">
             <thead>
                 <tr>
                     <th scope="col">Label</th>
