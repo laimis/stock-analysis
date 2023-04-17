@@ -220,6 +220,40 @@ namespace storage.tests
         }
 
         [Fact]
+        public async Task Routines_Works()
+        {
+            var storage = CreateStorage();
+
+            var existing = await storage.GetRoutines(_userId);
+
+            Assert.Empty(existing);
+
+            var routine = new Routine("description", "name", _userId);
+
+            routine.AddStep("step", "url");
+
+            await storage.Save(routine, _userId);
+
+            existing = await storage.GetRoutines(_userId);
+
+            Assert.NotEmpty(existing);
+
+            var loaded = await storage.GetRoutine(routine.State.Name, _userId);
+
+            Assert.Equal(routine.State.Name, loaded.State.Name);
+
+            var step = loaded.State.Steps.SingleOrDefault(s => s.label == "step");
+
+            Assert.NotNull(step.label);
+
+            await storage.DeleteRoutine(loaded, _userId);
+
+            existing = await storage.GetRoutines(_userId);
+
+            Assert.Empty(existing);
+        }
+
+        [Fact]
         public async Task StockList_Works()
         {
             var storage = CreateStorage();

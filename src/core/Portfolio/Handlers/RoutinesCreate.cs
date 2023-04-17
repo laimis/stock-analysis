@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -8,20 +9,16 @@ using MediatR;
 
 namespace core.Portfolio.Handlers
 {
-    public class ListsAddTag
+    public class RoutinesCreate
     {
-        public class Command : RequestWithUserId<StockListState>
+        public class Command : RequestWithUserId<RoutineState>
         {
             [Required]
-            [MinLength(1)]
-            [MaxLength(50)]
-            public string Tag { get; set; }
-
-            [Required]
             public string Name { get; set; }
+            public string Description { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, StockListState>
+        public class Handler : IRequestHandler<Command, RoutineState>
         {
             private IAccountStorage _accountsStorage;
             private IPortfolioStorage _portfolioStorage;
@@ -32,25 +29,25 @@ namespace core.Portfolio.Handlers
                 _portfolioStorage = storage;
             }
 
-            public async Task<StockListState> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task<RoutineState> Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _accountsStorage.GetUser(cmd.UserId);
                 if (user == null)
                 {
                     throw new InvalidOperationException("User not found");
                 }
-                
-                var list = await _portfolioStorage.GetStockList(cmd.Name, user.State.Id);
-                if (list == null)
+
+                var routine = await _portfolioStorage.GetRoutine(cmd.Name, user.State.Id);
+                if (routine != null)
                 {
-                    throw new InvalidOperationException("List does not exist");
+                    throw new InvalidOperationException("Routine already exists");
                 }
 
-                list.AddTag(cmd.Tag);
+                routine = new Routine(description: cmd.Description, name: cmd.Name, userId: user.State.Id);
 
-                await _portfolioStorage.Save(list, user.Id);
+                await _portfolioStorage.Save(routine, user.State.Id);
 
-                return list.State;
+                return routine.State;
             }
         }
     }

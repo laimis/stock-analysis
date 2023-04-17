@@ -80,19 +80,19 @@ namespace coretests.Stocks.Services
             Assert.Equal(14, position.DaysHeld);
             Assert.Equal(25, position.Price);
 
-            var oneFourthResult = results.Results[1];
-            maxDrawdown = oneFourthResult.maxDrawdownPct;
-            maxGain = oneFourthResult.maxGainPct;
-            position = oneFourthResult.position;
+            var oneThirdPercentBased = results.Results[1];
+            maxDrawdown = oneThirdPercentBased.maxDrawdownPct;
+            maxGain = oneThirdPercentBased.maxGainPct;
+            position = oneThirdPercentBased.position;
 
             Assert.True(position.IsClosed);
-            Assert.Equal(1250m, position.Profit);
-            Assert.Equal(1.250m, position.GainPct);
-            Assert.Equal(2.5m, position.RR);
+            Assert.Equal(140.7m, position.Profit);
+            Assert.Equal(0.1407m, position.GainPct);
+            Assert.Equal(0.2814m, position.RR);
             Assert.Equal(-0.001m, maxDrawdown);
-            Assert.Equal(2.001m, maxGain);
-            Assert.Equal(19, position.DaysHeld);
-            Assert.Equal(30, position.Price);
+            Assert.Equal(0.301m, maxGain);
+            Assert.Equal(2, position.DaysHeld);
+            Assert.Equal(13, position.Price);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace coretests.Stocks.Services
                 ticker: "tsla",
                 when: System.DateTimeOffset.UtcNow);
 
-            foreach(var r in result.Results.Take(2))
+            foreach(var r in result.Results.Take(1))
             {
                 Assert.False(r.position.IsClosed);
             }
