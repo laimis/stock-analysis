@@ -9,11 +9,7 @@ namespace core.Stocks.Services.Trading
         {
             yield return CreateProfitTakingStrategy();
 
-            yield return CreateProfitTakingStrategy(profitPoints: 4);
-
             yield return CreateProfitTakingStrategyPercentBased();
-
-            yield return CreateProfitTakingStrategyPercentBased(4);
 
             yield return new TradingStrategyWithProfitPoints(
                 "Profit taking (3 RR levels) (delayed stop)",
@@ -29,6 +25,8 @@ namespace core.Stocks.Services.Trading
             yield return CreateWithAdvancingStops();
 
             // retired strategies
+            // yield return CreateProfitTakingStrategy(profitPoints: 4);
+            // yield return CreateProfitTakingStrategyPercentBased(4);
             // yield return CreateCloseAfterFixedNumberOfDays(5);
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);

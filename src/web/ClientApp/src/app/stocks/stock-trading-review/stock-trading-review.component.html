@@ -34,28 +34,6 @@
   </section>
 
   <section>
-    <h5>Position Information</h5>
-    <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
-  </section>
-
-  <section>
-    <h5>Stock chart</h5>
-    <app-stock-chart *ngIf="prices"
-      [positivePricePoints]="positionBuys"
-      [negativePricePoints]="positionSells"
-      [prices]=prices>
-    </app-stock-chart>
-  </section>
-
-  <section *ngIf="dailyScores">
-    <h5>Daily Scores</h5>
-    <app-daily-outcome-scores
-      [dailyOutcomeScoresReport]="dailyScores"
-      [errors]="scoresErrors">
-    </app-daily-outcome-scores>
-  </section>
-
-  <section>
     <h5>Grade</h5>
     <div *ngIf="gradingError" class="alert alert-danger" role="alert">
       {{gradingError }}
@@ -96,6 +74,28 @@
     <div>
       <button (click)="assignGrade(gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
     </div>
+  </section>
+
+  <section>
+    <h5>Position Information</h5>
+    <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
+  </section>
+
+  <section>
+    <h5>Stock chart</h5>
+    <app-stock-chart *ngIf="prices"
+      [positivePricePoints]="positionBuys"
+      [negativePricePoints]="positionSells"
+      [prices]=prices>
+    </app-stock-chart>
+  </section>
+
+  <section *ngIf="dailyScores">
+    <h5>Daily Scores</h5>
+    <app-daily-outcome-scores
+      [dailyOutcomeScoresReport]="dailyScores"
+      [errors]="scoresErrors">
+    </app-daily-outcome-scores>
   </section>
   
 </div>
