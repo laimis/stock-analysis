@@ -115,7 +115,7 @@ export class RoutineComponent {
     this.currentStep++
   }
 
-  previousStep() {
+  prevStep() {
     this.currentStep--
   }
 
