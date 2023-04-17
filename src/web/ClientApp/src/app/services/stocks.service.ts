@@ -84,6 +84,20 @@ export class StocksService {
     return this.http.get<object[]>('/api/admin/users')
   }
 
+  // ----------------- routines ---------------------
+  getRoutines(): Observable<Routine[]> {
+    return this.http.get<Routine[]>('/api/portfolio/routines')
+  }
+  createRoutine(name,description): Observable<Routine> {
+    return this.http.post<Routine>('/api/portfolio/routines', {name,description})
+  }
+  addRoutineStep(routineName, label, url): Observable<Routine> {
+    return this.http.put<Routine>('/api/portfolio/routines/' + routineName, {label, url, routineName})
+  }
+  deleteRoutineStep(routineName, stepIndex:number): Observable<Routine> {
+    return this.http.delete<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex)
+  }
+
   // ----------------- stock lists ---------------------
   getStockLists(): Observable<StockList[]> {
     return this.http.get<StockList[]>('/api/portfolio/stocklists')
@@ -443,6 +457,17 @@ export interface StockListTicker {
   ticker:string
   note:string
   when:string
+}
+
+export interface RoutineStep {
+  label:string
+  url?:string
+}
+
+export interface Routine {
+  name:string
+  description?:string
+  steps:RoutineStep[]
 }
 
 export interface StockList {

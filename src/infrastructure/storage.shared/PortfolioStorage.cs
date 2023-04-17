@@ -19,6 +19,7 @@ namespace storage.shared
         private const string _note_entity = "note3";
         private const string _crypto_entity = "ownedcrypto";
         private const string _stock_list_entity = "stocklist";
+        private const string _routine_entity = "routine";
         private const string _pending_stock_position_entity = "pendingstockposition";
 
         private IAggregateStorage _aggregateStorage;
@@ -150,6 +151,27 @@ namespace storage.shared
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedCrypto(g));
         }
+
+        public async Task<IEnumerable<Routine>> GetRoutines(Guid userId)
+        {
+            var list = await _aggregateStorage.GetEventsAsync(_routine_entity, userId);
+
+            return list.GroupBy(e => e.AggregateId)
+                .Select(g => new Routine(g));
+        }
+
+        public Task Save(Routine routine, Guid userId) =>
+            Save(routine, _routine_entity, userId);
+
+        public async Task<Routine> GetRoutine(string name, Guid userId)
+        {
+            var list = await GetRoutines(userId);
+            
+            return list.SingleOrDefault(s => s.State.Name == name);
+        }
+
+        public Task DeleteRoutine(Routine routine, Guid id) =>
+            _aggregateStorage.DeleteAggregate(entity: _routine_entity, aggregateId: routine.Id, userId: id);
 
         public async Task<IEnumerable<StockList>> GetStockLists(Guid userId)
         {

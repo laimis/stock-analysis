@@ -1,0 +1,88 @@
+<div *ngIf="!activeRoutine">
+    <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+
+    <section>
+        <form>
+            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new routine</button>
+        </form>
+    </section>
+    <section #addNewListSection class="visually-hidden">
+        <h5>Add new routine</h5>
+        <form>
+            <div class="form-group">
+                <label for="newName">Name</label>
+                <input class="form-control" type="text" id="newName" name="newName" #newName>
+            </div>
+            
+            <div class="form-group">
+                <label for="newDescription">Description</label>
+                <textarea class="form-control" id="newDescription" name="newDescription" rows="5" #newDescription></textarea>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-small" (click)="create(newName.value, newDescription.value)">Create</button>
+        </form>
+    </section>
+
+    <section *ngFor="let routine of routines">
+        <h3>
+            {{routine.name}}
+        </h3>
+        <div>
+            <button class="btn btn-primary btn-sm me-2" (click)="activate(routine)">Activate</button>
+            <button class="btn btn-primary btn-sm" (click)="toggleVisibility(addNewStepSection)">Add Step</button>
+
+            <div #addNewStepSection class="visually-hidden">
+                <form>
+                    <div class="form-group">
+                        <label for="stepLebal">Label</label>
+                        <input class="form-control" type="text" id="stepLebal" name="stepLebal" #stepLabel>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stepUrl">Url</label>
+                        <input class="form-control" type="text" id="stepUrl" name="stepUrl" #stepUrl>
+                    </div>
+        
+                    <button type="button" class="btn btn-primary btn-small" (click)="addStep(routine, stepLabel.value, stepUrl.value)">Add</button>
+                </form>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Label</th>
+                    <th scope="col">Url</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let step of routine.steps; let stepIndex = index">
+                    <td>{{step.label}}</td>
+                    <td>{{step.url}}</td>
+                    <td><button class="btn btn-sm btn-outline-danger" (click)="deleteStep(routine, stepIndex)">delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<div *ngIf="activeRoutine">
+
+    <h3>
+        {{activeRoutine.label}}
+        <button class="btn btn-primary btn-sm float-end" (click)="deactivate()">Deactivate</button>
+    </h3>
+
+    <h4>
+        <a
+            target="_blank"
+            style="text-decoration:none"
+            [href]="activeRoutine.steps[currentStep].url">{{activeRoutine.steps[currentStep].label}}
+        </a>
+    </h4>
+
+    <button class="btn btn-primary btn-sm" (click)="prevStep()">Prev</button>
+    <button class="btn btn-primary btn-sm float-end" (click)="nextStep()">Next</button>
+
+</div>

@@ -41,6 +41,35 @@ namespace web.Controllers
         public Task DeletePendingStockPosition(Guid id) =>
             _mediator.Send(new PendingStockPositionClose.Command(id, User.Identifier()));
 
+        [HttpGet("routines")]
+        public Task<RoutineState[]> Routines() =>
+            _mediator.Send(new Routines.Query(User.Identifier()));
+
+        [HttpPost("routines")]
+        public Task<RoutineState> CreateRoutine([FromBody]RoutinesCreate.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
+
+        [HttpPut("routines/{routineName}")]
+        public Task<RoutineState> AddRoutineStep([FromBody]RoutinesAddStep.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
+
+        [HttpDelete("routines/{routineName}")]
+        public Task DeleteRoutine(string routineName) =>
+            _mediator.Send(new RoutinesDelete.Command(routineName, User.Identifier()));
+
+        [HttpDelete("routines/{routineName}/{stepIndex}")]
+        public Task<RoutineState> RemoveRoutineStep(string routineName, int stepIndex) =>
+            _mediator.Send(new RoutinesRemoveStep.Command(routineName, stepIndex, User.Identifier()));
+
+
         [HttpGet("stocklists")]
         public Task<StockListState[]> StockLists() =>
             _mediator.Send(new Lists.Query(User.Identifier()));

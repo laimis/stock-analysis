@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Routine, StocksService } from '../services/stocks.service';
+import { GetErrors, toggleVisuallyHidden } from '../services/utils';
 
 @Component({
   selector: 'app-routine',
-  templateUrl: './routine.component.html',
-  styleUrls: ['./routine.component.css']
+  templateUrl: './routines-dashboard.component.html',
+  styleUrls: ['./routines-dashboard.component.css']
 })
 
-export class RoutineComponent {
+export class RoutineDashboardComponent implements OnInit {
   dailyRoutines = [
     {
       label: 'Review stock market conditions by going to TradingView and looking at Indexes list',
@@ -88,19 +90,26 @@ export class RoutineComponent {
     }
   ]
 
-  routines = [
-    {
-      label: 'Daily',
-      steps: this.dailyRoutines
-    },
-    {
-      label: 'Weekly',
-      steps: this.weeklyRoutines
-    }
-  ]
+  routines:Routine[] = []
 
   activeRoutine = null
   currentStep = 0
+
+  errors:string[] = null
+
+  constructor(private service:StocksService) { }
+
+  ngOnInit() {
+    this.fetchRoutines();
+  }
+
+  private fetchRoutines() {
+    this.service.getRoutines().subscribe(
+      data => {
+        this.routines = data;
+      }
+    );
+  }
 
   activate(routine) {
     this.activeRoutine = routine
@@ -121,5 +130,42 @@ export class RoutineComponent {
 
   reset() {
     this.currentStep = 0
+  }
+
+  toggleVisibility(element) {
+    toggleVisuallyHidden(element)
+  }
+
+  create(name:string, description:string) {
+    this.service.createRoutine(name, description).subscribe(
+      _ => {
+        this.fetchRoutines();
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
+  }
+
+  addStep(routine:Routine, label:string, url:string) {
+    this.service.addRoutineStep(routine.name, label, url).subscribe(
+      _ => {
+        this.fetchRoutines();
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
+  }
+
+  deleteStep(routine:Routine, stepIndex:number) {
+    this.service.deleteRoutineStep(routine.name, stepIndex).subscribe(
+      _ => {
+        this.fetchRoutines();
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
   }
 }
