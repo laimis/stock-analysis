@@ -99,7 +99,7 @@ export class RoutineComponent {
     }
   ]
 
-  activeRoutine = this.routines[1]
+  activeRoutine = null
   currentStep = 0
 
   activate(routine) {
