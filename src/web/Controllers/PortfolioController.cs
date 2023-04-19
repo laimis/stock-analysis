@@ -64,6 +64,14 @@ namespace web.Controllers
         [HttpDelete("routines/{routineName}")]
         public Task DeleteRoutine(string routineName) =>
             _mediator.Send(new RoutinesDelete.Command(routineName, User.Identifier()));
+        
+        [HttpPost("routines/{routineName}/{stepIndex}")]
+        public Task<RoutineState> UpdateRoutineStep(RoutinesUpdateStep.Command cmd)
+        {
+            cmd.WithUserId(User.Identifier());
+
+            return _mediator.Send(cmd);
+        }
 
         [HttpDelete("routines/{routineName}/{stepIndex}")]
         public Task<RoutineState> RemoveRoutineStep(string routineName, int stepIndex) =>

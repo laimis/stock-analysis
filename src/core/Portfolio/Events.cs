@@ -54,6 +54,21 @@ namespace core.Portfolio
 
         public int Index { get; }
     }
+
+    internal class RoutineStepUpdated : AggregateEvent
+    {
+        public RoutineStepUpdated(Guid id, Guid aggregateId, DateTimeOffset when, int index, string label, string url)
+            : base(id, aggregateId, when)
+        {
+            Index = index;
+            Label = label;
+            Url = url;
+        }
+
+        public int Index { get; }
+        public string Label { get; }
+        public string Url { get; }
+    }
     
     internal class StockListCreated : AggregateEvent
     {

@@ -89,4 +89,15 @@ export class RoutineDashboardComponent implements OnInit {
       }
     )
   }
+
+  updateStep(routine:Routine, stepIndex:number, label:string, url:string) {
+    this.service.updateRoutineStep(routine.name, stepIndex, label, url).subscribe(
+      _ => {
+        this.fetchRoutines();
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
+  }
 }

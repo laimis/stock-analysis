@@ -58,8 +58,20 @@
             <tbody>
                 <tr *ngFor="let step of routine.steps; let stepIndex = index">
                     <td>{{step.label}}</td>
-                    <td>{{step.url}}</td>
-                    <td><button class="btn btn-sm btn-outline-danger" (click)="deleteStep(routine, stepIndex)">delete</button></td>
+                    <td>
+                        <div #readOnlySection>
+                            {{step.url}}
+                            <button class="btn btn-sm btn-outline-primary float-end" (click)="toggleVisibility(editSection); toggleVisibility(readOnlySection)">edit</button>
+                        </div>
+                        
+                        <div class="visually-hidden" #editSection>
+                            <input type="text" #stepUrl value="{{step.url}}">
+                            <button class="btn btn-sm btn-outline-primary float-end" (click)="toggleVisibility(editSection); updateStep(routine, stepIndex, step.label, stepUrl.value); toggleVisibility(readOnlySection)">save</button>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" (click)="deleteStep(routine, stepIndex)">delete</button>
+                    </td>
                 </tr>
             </tbody>
         </table>

@@ -141,5 +141,63 @@ namespace coretests.Stocks
 
             Assert.Throws<InvalidOperationException>(() => routine.RemoveStep(-1));
         }
+
+        [Fact]
+        public void UpdatingStepWorks()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+
+            Assert.Single(routine.State.Steps);
+
+            routine.UpdateStep(0, "new label", "new url");
+
+            var step = routine.State.Steps.First();
+
+            Assert.Equal("new label", step.label);
+            Assert.Equal("new url", step.url);
+        }
+
+        [Fact]
+        public void UpdatingStepWithNoLabelFails()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+
+            Assert.Single(routine.State.Steps);
+
+            Assert.Throws<InvalidOperationException>(() => routine.UpdateStep(0, "", "new url"));
+        }
+
+        [Fact]
+        public void UpdatingStepWithNoUrlSucceeds()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+
+            Assert.Single(routine.State.Steps);
+
+            routine.UpdateStep(0, "new label", null);
+
+            var step = routine.State.Steps.First();
+
+            Assert.Equal("new label", step.label);
+            Assert.Null(step.url);
+        }
+
+        [Fact]
+        public void UpdatingStepWithInvalidIndexFails()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+
+            Assert.Single(routine.State.Steps);
+
+            Assert.Throws<InvalidOperationException>(() => routine.UpdateStep(1, "new label", "new url"));
+        }
     }
 }

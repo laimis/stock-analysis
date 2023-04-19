@@ -94,6 +94,9 @@ export class StocksService {
   addRoutineStep(routineName, label, url): Observable<Routine> {
     return this.http.put<Routine>('/api/portfolio/routines/' + routineName, {label, url, routineName})
   }
+  updateRoutineStep(routineName, stepIndex:number, label, url): Observable<Routine> {
+    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex, {label, url, routineName})
+  }
   deleteRoutineStep(routineName, stepIndex:number): Observable<Routine> {
     return this.http.delete<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex)
   }

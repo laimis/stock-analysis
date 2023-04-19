@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using core.Shared;
 
 namespace core.Portfolio
@@ -62,6 +61,30 @@ namespace core.Portfolio
             Apply(new RoutineStepAdded(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, label, url));
         }
 
+        public void UpdateStep(int index, string label, string? url)
+        {
+            if (index < 0 || index >= State.Steps.Count)
+            {
+                throw new InvalidOperationException("Invalid step index");
+            }
+
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                throw new InvalidOperationException("Missing step label");
+            }
+
+            label = label.Trim();
+            url = url?.Trim();
+
+            var step = State.Steps[index];
+            if (label == step.label && url == step.url)
+            {
+                return;
+            }
+
+            Apply(new RoutineStepUpdated(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, index, label, url));
+        }
+
         public void RemoveStep(int index)
         {
             if (index < 0 || index >= State.Steps.Count)
@@ -108,6 +131,12 @@ namespace core.Portfolio
         private void ApplyInternal(RoutineStepRemoved e)
         {
             Steps.RemoveAt(e.Index);
+        }
+
+        private void ApplyInternal(RoutineStepUpdated e)
+        {
+            var step = Steps[e.Index];
+            Steps[e.Index] = new RoutineStep(label: e.Label, url: e.Url);
         }
 
         public record struct RoutineStep(string label, string? url);
