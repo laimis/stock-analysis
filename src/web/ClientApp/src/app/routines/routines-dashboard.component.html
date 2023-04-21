@@ -79,22 +79,32 @@
 
 </div>
 
-<div *ngIf="activeRoutine">
-
-    <h3>
-        {{activeRoutine.label}}
-        <button class="btn btn-primary btn-sm float-end" (click)="deactivate()">Deactivate</button>
-    </h3>
+<div *ngIf="activeRoutine && activeStep">
 
     <h4>
-        <a
-            target="_blank"
-            style="text-decoration:none"
-            [href]="activeRoutine.steps[currentStep].url">{{activeRoutine.steps[currentStep].label}}
-        </a>
+        {{activeRoutine.name}}
+        <button class="btn btn-primary btn-sm float-end" (click)="deactivate()">Deactivate</button>
     </h4>
 
-    <button class="btn btn-primary btn-sm" (click)="prevStep()">Prev</button>
-    <button class="btn btn-primary btn-sm float-end" (click)="nextStep()">Next</button>
+    <div class="wrapper text-center">
+        <div class="step-container">
+            <div class="step">
+                <a
+                    target="_blank"
+                    [href]="activeStep.url">{{activeStep.label}}
+                </a>
+            </div>
+            <div class="step-url">
+                {{activeStep.url}}
+            </div>
+            <div class="step-url">
+                {{currentStepIndex + 1}} / {{activeRoutine.steps.length}}
+            </div>
+        </div>
+        
+    </div>
+
+    <button class="btn btn-primary btn-sm" (click)="prevStep()" [disabled]="currentStepIndex === 0">Prev</button>
+    <button class="btn btn-primary btn-sm float-end" (click)="nextStep()" [disabled]="currentStepIndex >= activeRoutine.steps.length - 1">Next</button>
 
 </div>

@@ -14,7 +14,8 @@ export class RoutineDashboardComponent implements OnInit {
   routines:Routine[] = []
 
   activeRoutine = null
-  currentStep = 0
+  activeStep = null
+  currentStepIndex = 0
 
   errors:string[] = null
 
@@ -34,23 +35,35 @@ export class RoutineDashboardComponent implements OnInit {
 
   activate(routine) {
     this.activeRoutine = routine
-    this.currentStep = 0
+    this.updateActiveStep(0);
+  }
+
+  private updateActiveStep(increment) {
+    if (increment !== 0) {
+      this.currentStepIndex += increment
+    } else {
+      this.currentStepIndex = 0
+    }
+
+    this.activeStep = this.activeRoutine.steps[this.currentStepIndex];
   }
 
   deactivate() {
     this.activeRoutine = null
+    this.activeStep = null
+    this.currentStepIndex = 0
   }
 
   nextStep() {
-    this.currentStep++
+    this.updateActiveStep(1)
   }
 
   prevStep() {
-    this.currentStep--
+    this.updateActiveStep(-1)
   }
 
   reset() {
-    this.currentStep = 0
+    this.updateActiveStep(0)
   }
 
   toggleVisibility(element) {
