@@ -48,8 +48,11 @@
   </section>
 
   <section *ngIf="dailyScores">
-    <h5>Daily Scores</h5>
-    <app-daily-outcome-scores [dailyOutcomeScoresReport]="dailyScores"></app-daily-outcome-scores>
+    <h5>Daily Gain %</h5>
+    <app-daily-outcome-scores [setDailyScores]="dailyScores.dailyGainPct" [chartType]="'line'"></app-daily-outcome-scores>
+    
+    <h5>Daily P/L</h5>
+    <app-daily-outcome-scores [setDailyScores]="dailyScores.dailyProfit" [chartType]="'line'"></app-daily-outcome-scores>
   </section>
 
 </div>

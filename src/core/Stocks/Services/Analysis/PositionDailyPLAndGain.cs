@@ -22,12 +22,15 @@ namespace core.Stocks.Services.Analysis
 
             // find the last bar that is before the position was closed
             var lastBar = bars.Length - 1;
-            for (var i = bars.Length - 1; i >= 0; i--)
+            if (position.Closed != null)
             {
-                if (bars[i].Date <= position.Closed.Value)
+                for (var i = bars.Length - 1; i >= 0; i--)
                 {
-                    lastBar = i;
-                    break;
+                    if (bars[i].Date <= position.Closed.Value)
+                    {
+                        lastBar = i;
+                        break;
+                    }
                 }
             }
 

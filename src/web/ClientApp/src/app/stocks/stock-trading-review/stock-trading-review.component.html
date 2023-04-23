@@ -82,16 +82,18 @@
   </section>
 
   <section *ngIf="dailyPositionReport">
-    <h5>Daily Gain % and P/L</h5>
+    <h5>Daily Gain %</h5>
     <app-daily-outcome-scores
       [setDailyScores]="dailyPositionReport.dailyGainPct"
       [errors]="scoresErrors"
       [chartType]="'line'">
     </app-daily-outcome-scores>
 
+    <h5>Daily P/L</h5>
     <app-daily-outcome-scores
       [setDailyScores]="dailyPositionReport.dailyProfit"
-      [errors]="scoresErrors">
+      [errors]="scoresErrors"
+      chartType]="'line'">
     </app-daily-outcome-scores>
     
   </section>

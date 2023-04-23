@@ -66,8 +66,8 @@ namespace core.Reports
                 );
 
                 var end = position.Closed switch {
-                    null => _marketHours.GetMarketEndOfDayTimeInUtc(position.Closed.Value),
-                    not null => default
+                    not null => _marketHours.GetMarketEndOfDayTimeInUtc(position.Closed.Value),
+                    null => default
                 };
 
                 var priceResponse = await _brokerage.GetPriceHistory(
