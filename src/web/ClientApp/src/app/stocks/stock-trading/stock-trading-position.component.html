@@ -25,9 +25,10 @@
     <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
     <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
     <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
-    <div class="col">
-      <div class="stat-label"></div>
-      <div></div>
+    <div class="col"><div class="stat-label"></div>
+      <div>
+        <button class="btn btn-secondary btn-sm" (click)="fetchProfitPoints()">fetch profit points</button>
+      </div>
     </div>
   </div>
 
@@ -43,58 +44,54 @@
         </div>
       </div>
     </div>
-    <div class="col" *ngIf="positionProfitPoints.length === 0">
-      <div class="row mt-3">
-        <div class="col-3">
-          <button class="btn btn-secondary btn-sm" (click)="fetchProfitPoints()">fetch profit points</button>
-        </div>
-      </div>
-    </div>
   </div>
     
   <div class="row mt-3" *ngIf="!_position.isClosed">
     <div class="col">
       <label class="form-label" for="candidateRiskAmount">Risk Amount</label>
-      <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
-    </div>
-    <div class="col">
-      <button class="btn btn-link" (click)="setRiskAmount()">Set Risk Amount</button>
+      <div class="input-group">
+        <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
+        <button class="btn btn-secondary" (click)="setRiskAmount()">Update</button>
+      </div>
+      <div>
+        <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
+      </div>
     </div>
     <div class="col">
       <label class="form-label" for="candidateStopPrice">Stop Price</label>
-      <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
+      <div class="input-group">
+        <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
+        <button class="btn btn-secondary" (click)="setStopPrice()">Update</button>
+      </div>
+      <div>
+        <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
+      </div>
     </div>
+    <div class="col"></div>
+    <div class="col"></div>
+  </div>
+
+  <div class="row mt-3">
     <div class="col">
-      <div>
-        <button class="btn btn-link" (click)="recalculateRiskAmount()">Recalculate Risk</button>
-      </div>
-      <div>
-        <button class="btn btn-link" (click)="setStopPrice()">Set Stop Price</button>
-      </div>
-      <div>
-        <button class="btn btn-link" (click)="deleteStopPrice()">Delete Stop Price</button>
+      <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes ({{_position.notes.length}})</div>
+      <div #notesContainer class="visually-hidden">
+        <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
       </div>
     </div>
   </div>
 
   <div class="row mt-3">
-    <div class="col">
-      <div class="stat-label">Notes</div>
-      <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
-      <div *ngIf="_position.notes.length === 0">No notes</div>
+    <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(eventContainer)">Events</div>
+    <div #eventContainer class="visually-hidden">
+      <div [ngClass]="getCssClassForEvent(t)" class="row event" *ngFor="let t of _position.events">
+        <div class="col">{{t.date | date }}</div>
+        <div class="col">{{t.type}}</div>
+        <div class="col-8">{{t.description}}</div>
+      </div>
     </div>
   </div>
 
   <div class="row mt-3">
-    <div class="stat-label">Events</div>
-    <div [ngClass]="getCssClassForEvent(t)" class="row event" *ngFor="let t of _position.events">
-      <div class="col">{{t.date | date }}</div>
-      <div class="col">{{t.type}}</div>
-      <div class="col-8">{{t.description}}</div>
-    </div>
-  </div>
-
-  <div class="row">
     <div class="col">
       <button class="btn btn-sm btn-outline-danger" (click)="deletePosition()">Delete</button>
     </div>

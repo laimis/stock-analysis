@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
 import { Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
+import { toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -49,6 +50,7 @@ export class StockTradingPositionComponent {
         var newRiskAmount = (this._position.averageCostPerShare - this.candidateStopPrice) * this._position.numberOfShares
         this.candidateRiskAmount = newRiskAmount
         this._position.riskedAmount = newRiskAmount
+        return false
     }
 
     setStopPrice() {
@@ -60,20 +62,27 @@ export class StockTradingPositionComponent {
     }
 
     deleteStopPrice() {
-        this.stockService.deleteStopPrice(this._position.ticker).subscribe(
-            (_) => {
-                this._position.stopPrice = null
-                this._position.riskedAmount = null
-            }
-        )
+        if (confirm("Are you sure you want to delete the stop price?"))
+        {
+            this.stockService.deleteStopPrice(this._position.ticker).subscribe(
+                (_) => {
+                    this._position.stopPrice = null
+                    this._position.riskedAmount = null
+                }
+            )
+        }
+
+        return false
     }
 
     setRiskAmount() {
-        this.stockService.setRiskAmount(this._position.ticker, this.candidateRiskAmount).subscribe(
-            (_) => {
-                this._position.riskedAmount = this.candidateRiskAmount
-            }
-        )
+        if (confirm("Are you sure you want to set the risk amount?")) {
+            this.stockService.setRiskAmount(this._position.ticker, this.candidateRiskAmount).subscribe(
+                (_) => {
+                    this._position.riskedAmount = this.candidateRiskAmount
+                }
+            )
+        }
     }
 
     getCssClassForEvent(e:PositionEvent) {
@@ -90,6 +99,10 @@ export class StockTradingPositionComponent {
                     this.positionDeleted.emit()
                 })
         }
+    }
+
+    toggleVisibility(elem) {
+        toggleVisuallyHidden(elem)
     }
 }
 
