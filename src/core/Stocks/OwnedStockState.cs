@@ -14,8 +14,12 @@ namespace core.Stocks
         public List<Transaction> Transactions { get; } = new List<Transaction>();
         internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
         
-        public List<PositionInstance> Positions { get; } = new List<PositionInstance>();
+        private List<PositionInstance> Positions { get; } = new List<PositionInstance>();
         public PositionInstance OpenPosition { get; private set;}
+        internal PositionInstance GetPosition(int positionId) =>
+            Positions.SingleOrDefault(x => x.PositionId == positionId);
+        internal IEnumerable<PositionInstance> GetClosedPositions() => Positions.Where(x => x.IsClosed);
+        internal IReadOnlyList<PositionInstance> GetAllPositions() => Positions.AsReadOnly();
 
         private int _positionId = 0;
 

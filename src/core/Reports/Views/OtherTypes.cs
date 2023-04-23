@@ -6,4 +6,5 @@ namespace core.Reports.Views
     public record struct PercentChangeStatisticsView(string ticker, DistributionStatistics recent, DistributionStatistics allTime);
     public record struct GapsView(List<Gap> gaps, string ticker);
     public record struct DailyOutcomeScoresReportView(List<DateScorePair> dailyScores, string ticker);
+    public record struct DailyPositionReportView(List<DateScorePair> dailyProfit, List<DateScorePair> dailyGainPct, string ticker);
 }

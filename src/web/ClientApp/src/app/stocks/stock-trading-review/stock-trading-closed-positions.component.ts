@@ -24,8 +24,7 @@ export class StockTradingClosedPositionsComponent {
   }
 
   matchesFilter(position:PositionInstance) {
-    console.log("matchesFilter", position)
-
+    
     if (this.tickerFilter != 'all' && !position.ticker.toLowerCase().includes(this.tickerFilter.toLowerCase())) {
       return false
     }

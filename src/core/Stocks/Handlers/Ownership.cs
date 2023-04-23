@@ -56,9 +56,11 @@ namespace core.Stocks
                     stock.State.OpenPosition.SetPrice(priceResponse.Success.Price);
                 }
 
+                var positions = stock.State.GetAllPositions();
+
                 return stock.State.OpenPosition switch {
-                    null => new StockOwnershipView(id: stock.State.Id, currentPosition: null, ticker: stock.State.Ticker, positions: stock.State.Positions), 
-                    not null => new StockOwnershipView(id: stock.State.Id, currentPosition: stock.State.OpenPosition, ticker: stock.State.Ticker, positions: stock.State.Positions)
+                    null => new StockOwnershipView(id: stock.State.Id, currentPosition: null, ticker: stock.State.Ticker, positions: positions), 
+                    not null => new StockOwnershipView(id: stock.State.Id, currentPosition: stock.State.OpenPosition, ticker: stock.State.Ticker, positions: positions)
                 };
             }
         }

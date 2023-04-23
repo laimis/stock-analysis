@@ -80,7 +80,7 @@ namespace core.Stocks
 
         private bool PositionCompleted = false;
         private decimal CompletedPositionCost = 0;
-        public decimal CompletedPositionShares = 0;
+        public decimal CompletedPositionShares { get; private set; } = 0;
         public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
 
         public string Grade { get; private set; } = null;

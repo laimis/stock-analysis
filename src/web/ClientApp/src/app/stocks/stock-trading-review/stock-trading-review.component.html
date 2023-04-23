@@ -33,7 +33,7 @@
     </app-trading-actual-vs-simulated>
   </section>
 
-  <section>
+  <section *ngIf="currentPosition">
     <h5>Grade</h5>
     <div *ngIf="gradingError" class="alert alert-danger" role="alert">
       {{gradingError }}
@@ -81,6 +81,19 @@
     <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
   </section>
 
+  <section *ngIf="dailyPositionReport">
+    <h5>Daily Scores</h5>
+    <app-daily-outcome-scores
+      [setDailyScores]="dailyPositionReport.dailyProfit"
+      [errors]="scoresErrors">
+    </app-daily-outcome-scores>
+    <app-daily-outcome-scores
+      [setDailyScores]="dailyPositionReport.dailyGainPct"
+      [errors]="scoresErrors"
+      [chartType]="'line'">
+    </app-daily-outcome-scores>
+  </section>
+
   <section>
     <h5>Stock chart</h5>
     <app-stock-chart *ngIf="prices"
@@ -88,14 +101,6 @@
       [negativePricePoints]="positionSells"
       [prices]=prices>
     </app-stock-chart>
-  </section>
-
-  <section *ngIf="dailyScores">
-    <h5>Daily Scores</h5>
-    <app-daily-outcome-scores
-      [dailyOutcomeScoresReport]="dailyScores"
-      [errors]="scoresErrors">
-    </app-daily-outcome-scores>
   </section>
   
 </div>

@@ -438,6 +438,14 @@ export class StocksService {
     return this.http.get<OutcomesReport>('/api/reports/positions')
   }
 
+  reportDailyPositionReport(
+    ticker:string,
+    positionId:number
+  ) {
+    var endpoint = '/api/reports/dailypositionreport/' + ticker + '/' + positionId
+    return this.http.get<DailyPositionReport>(endpoint)
+  }
+
   reportDailyOutcomesReport(
     ticker:string,
     start:string,
@@ -783,6 +791,12 @@ export interface DailyScore {
 export interface DailyOutcomeScoresReport {
   ticker: string
   dailyScores: DailyScore[]
+}
+
+export interface DailyPositionReport {
+  ticker: string
+  dailyProfit: DailyScore[]
+  dailyGainPct: DailyScore[]
 }
 
 export interface TickerCountPair {

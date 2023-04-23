@@ -69,8 +69,7 @@ namespace core.Portfolio.Handlers
                     .ToArray();
 
                 var past = stocks
-                    .SelectMany(s => s.State.Positions)
-                    .Where(s => s.IsClosed)
+                    .SelectMany(s => s.State.GetClosedPositions())
                     .OrderByDescending(p => p.Closed)
                     .ToArray();
 

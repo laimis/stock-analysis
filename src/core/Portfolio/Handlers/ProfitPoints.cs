@@ -47,7 +47,7 @@ namespace core.Portfolio
                     throw new Exception("Stock not found");
                 }
 
-                var position = stock.State.Positions.Where(p => p.PositionId == request.PositionId).FirstOrDefault();
+                var position = stock.State.GetPosition(request.PositionId);
                 if (position == null)
                 {
                     throw new Exception("Position not found");

@@ -59,8 +59,13 @@ namespace web.Controllers
         public Task<OutcomesReportView> Portfolio() =>
             _mediator.Send(new PositionReport.Query(User.Identifier()));
 
+        [Obsolete("Not using this anymore, keeping it around in case I change my mind")]
         [HttpGet("dailyoutcomescoresreport/{ticker}")]
         public Task<DailyOutcomeScoresReportView> DailyOutcomeScoresReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
             _mediator.Send(new DailyOutcomeScoresReport.Query(start, end, ticker, User.Identifier()));
+
+        [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
+        public Task<DailyPositionReportView> DailyPositionReport(string ticker, int positionId) =>
+            _mediator.Send(new DailyPositionReport.Query(ticker, positionId, User.Identifier()));
     }
 }

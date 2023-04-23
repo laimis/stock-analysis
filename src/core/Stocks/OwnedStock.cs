@@ -229,7 +229,7 @@ namespace core.Stocks
 
         public void AssignGrade(int positionId, TradeGrade grade, string note)
         {
-            var position = State.Positions.SingleOrDefault(p => p.PositionId == positionId);
+            var position = State.GetPosition(positionId);
             if (position == null)
             {
                 throw new InvalidOperationException("Unable to find position with id " + positionId);
@@ -260,7 +260,7 @@ namespace core.Stocks
 
         public bool DeletePosition(int positionId)
         {
-            var position = State.Positions.SingleOrDefault(p => p.PositionId == positionId);
+            var position = State.GetPosition(positionId);
             if (position == null) // already deleted before, moving on
             {
                 return false;

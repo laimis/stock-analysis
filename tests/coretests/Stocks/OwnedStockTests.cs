@@ -110,10 +110,11 @@ namespace coretests.Stocks
 
             Assert.Null(stock.State.OpenPosition);
 
-            Assert.Single(stock.State.Positions);
-            Assert.Equal(0, stock.State.Positions[0].DaysHeld);
-            Assert.Equal(1, stock.State.Positions[0].Profit);
-            Assert.Equal(0.04m, stock.State.Positions[0].GainPct, 2);
+            var positions = stock.State.GetAllPositions();
+            Assert.Single(positions);
+            Assert.Equal(0, positions[0].DaysHeld);
+            Assert.Equal(1, positions[0].Profit);
+            Assert.Equal(0.04m, positions[0].GainPct, 2);
         }
 
         [Fact]
@@ -257,10 +258,13 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
-            stock.AssignGrade(0, "A", "this trade went perfectly!");
+            var positionId = 0;
+            stock.AssignGrade(positionId, "A", "this trade went perfectly!");
 
-            Assert.Equal("A", stock.State.Positions[0].Grade);
-            Assert.Equal("this trade went perfectly!", stock.State.Positions[0].GradeNote);
+            var position = stock.State.GetPosition(0);
+
+            Assert.Equal("A", position.Grade);
+            Assert.Equal("this trade went perfectly!", position.GradeNote);
         }
 
         [Fact]
@@ -271,11 +275,13 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
-            stock.AssignGrade(0, "A", "this trade went perfectly!");
-            stock.AssignGrade(0, "B", "this trade went perfectly!");
+            var positionId = 0;
+            stock.AssignGrade(positionId, "A", "this trade went perfectly!");
+            stock.AssignGrade(positionId, "B", "this trade went perfectly!");
 
-            Assert.Equal("B", stock.State.Positions[0].Grade);
-            Assert.Equal("this trade went perfectly!", stock.State.Positions[0].GradeNote);
+            var position = stock.State.GetPosition(0);
+            Assert.Equal("B", position.Grade);
+            Assert.Equal("this trade went perfectly!", position.GradeNote);
         }
 
         [Fact]
@@ -386,9 +392,10 @@ namespace coretests.Stocks
             var positionId3 = stock.State.OpenPosition.PositionId;
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
-            Assert.Equal(2, stock.State.Positions.Count);
-            Assert.Equal(positionId, stock.State.Positions[0].PositionId);
-            Assert.Equal(positionId3, stock.State.Positions[1].PositionId);
+            var positions = stock.State.GetAllPositions();
+            Assert.Equal(2, positions.Count);
+            Assert.Equal(positionId, stock.State.GetAllPositions()[0].PositionId);
+            Assert.Equal(positionId3, stock.State.GetAllPositions()[1].PositionId);
             
             // make sure transactions don't include deleted position
             Assert.Equal(6, stock.State.Transactions.Count);

@@ -203,10 +203,12 @@ namespace storage.tests
 
             loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
 
-            Assert.Equal("A", loaded.State.Positions[0].Grade);
-            Assert.Equal("test", loaded.State.Positions[0].GradeNote);
+            var position = loaded.State.GetAllPositions()[0];
 
-            var lastTx = loaded.State.Positions[0].Transactions.Last();
+            Assert.Equal("A", position.Grade);
+            Assert.Equal("test", position.GradeNote);
+
+            var lastTx = position.Transactions.Last();
 
             loaded.DeleteTransaction(lastTx.transactionId);
 

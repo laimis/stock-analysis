@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, DailyOutcomeScoresReport, PriceWithDate } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, PriceWithDate, DailyPositionReport } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 
 
@@ -17,11 +17,11 @@ export class StockTradingReviewComponent implements OnInit {
   currentPositionPrice: number
   simulationResults: TradingStrategyResults
   prices: Prices
-  dailyScores: DailyOutcomeScoresReport;
   positionBuys: PriceWithDate[]
   positionSells: PriceWithDate[]
   simulationErrors: string[];
   scoresErrors: string[];
+  dailyPositionReport: DailyPositionReport
 
   constructor (
     private stockService: StocksService,
@@ -60,17 +60,16 @@ export class StockTradingReviewComponent implements OnInit {
     );
   }
 
-  private getScores() {
-    this.stockService.reportDailyOutcomesReport(
+  private getPositionReport() {
+    this.stockService.reportDailyPositionReport(
       this.currentPosition.ticker,
-      this.currentPosition.opened.split('T')[0],
-      this.currentPosition.closed.split('T')[0]).subscribe(
-      (r: DailyOutcomeScoresReport) => {
-        this.dailyScores = r;
+      this.currentPosition.positionId).subscribe(
+      (r: DailyPositionReport) => {
+        this.dailyPositionReport = r;
         this.getPrices();
       },
       (error) => {
-        this.dailyScores = null
+        this.dailyPositionReport = null
         this.scoresErrors = GetErrors(error)
         this.getPrices();
       }
@@ -81,11 +80,11 @@ export class StockTradingReviewComponent implements OnInit {
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
       (r: TradingStrategyResults) => {
         this.simulationResults = r;
-        this.getScores()
+        this.getPositionReport()
       },
       (error) => {
         this.simulationErrors = GetErrors(error)
-        this.getScores()
+        this.getPositionReport()
       }
     );
   }

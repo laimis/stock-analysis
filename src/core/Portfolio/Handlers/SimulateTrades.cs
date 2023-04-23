@@ -74,7 +74,7 @@ namespace core.Portfolio
                 var stocks = await _storage.GetStocks(userId: request.UserId);
     
                 var positions = stocks
-                    .SelectMany(s => s.State.Positions)
+                    .SelectMany(s => s.State.GetClosedPositions())
                     .Where(s => s.IsClosed && s.RiskedAmount != null)
                     .OrderByDescending(p => p.Closed)
                     .Take(request.NumberOfPositions);

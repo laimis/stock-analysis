@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { DailyOutcomeScoresReport } from '../../services/stocks.service';
+import { DailyScore } from '../../services/stocks.service';
+import { ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-daily-outcome-scores',
@@ -11,11 +12,13 @@ export class DailyOutcomeScoresComponent {
   dailyScoresDates: string[];
   
   @Input()
-  set dailyOutcomeScoresReport(report:DailyOutcomeScoresReport) {
-    console.log('report set: ' + report)
-    this.dailyScores = report.dailyScores.map(d => d.score)
-    this.dailyScoresDates = report.dailyScores.map(d => d.date.split('T')[0])
+  set setDailyScores(scores:DailyScore[]) {
+    this.dailyScores = scores.map(d => d.score)
+    this.dailyScoresDates = scores.map(d => d.date.split('T')[0])
   }
+
+  @Input()
+  chartType: ChartType = 'bar';
 
   @Input()
   errors: string[];

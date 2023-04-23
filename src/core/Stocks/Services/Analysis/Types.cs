@@ -31,7 +31,7 @@ namespace core.Stocks.Services.Analysis
     
     public record struct TickerPatterns(List<Pattern> patterns, string ticker);
 
-    public record struct DateScorePair(System.DateTimeOffset date, int score);
+    public record struct DateScorePair(System.DateTimeOffset date, decimal score);
 
     public static class AnalysisOutcomeEvaluationScoringHelper
     {

@@ -103,7 +103,7 @@ namespace core.Portfolio
                     throw new Exception($"Stock {request.Ticker} not found");
                 }
 
-                var position = stock.State.Positions.Where(p => p.PositionId == request.PositionId).FirstOrDefault();
+                var position = stock.State.GetPosition(request.PositionId);
                 if (position == null)
                 {
                     throw new Exception($"Position {request.PositionId} not found");
