@@ -227,6 +227,18 @@ namespace core.Stocks
             }
         }
 
+        private void ApplyInternal(PositionLabelSet labelSet)
+        {
+            var position = Positions.Single(x => x.PositionId == labelSet.PositionId);
+            position.SetLabel(labelSet);
+        }
+
+        private void ApplyInternal(PositionLabelDeleted labelDeleted)
+        {
+            var position = Positions.Single(x => x.PositionId == labelDeleted.PositionId);
+            position.DeleteLabel(labelDeleted);
+        }
+
         public void Apply(AggregateEvent e)
         {
             ApplyInternal(e);
