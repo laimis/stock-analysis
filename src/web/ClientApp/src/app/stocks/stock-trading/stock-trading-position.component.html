@@ -48,7 +48,7 @@
     
   <div class="row mt-3" *ngIf="!_position.isClosed">
     <div class="col">
-      <label class="form-label" for="candidateRiskAmount">Risk Amount</label>
+      <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
       <div class="input-group">
         <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
         <button class="btn btn-secondary" (click)="setRiskAmount()">Update</button>
@@ -58,7 +58,7 @@
       </div>
     </div>
     <div class="col">
-      <label class="form-label" for="candidateStopPrice">Stop Price</label>
+      <label class="form-label stat-label" for="candidateStopPrice">Stop Price</label>
       <div class="input-group">
         <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
         <button class="btn btn-secondary" (click)="setStopPrice()">Update</button>
@@ -68,7 +68,7 @@
       </div>
     </div>
     <div class="col">
-      <label class="form-label" for="setStrategy">Strategy</label>
+      <label class="form-label stat-label" for="setStrategy">Strategy</label>
       <div class="input-group">
         <select class="form-select" id="strategyInput" #strategyInput value="{{positionStrategy}}">
           <option value="">Choose...</option>
