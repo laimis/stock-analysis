@@ -265,6 +265,7 @@ namespace coretests.Stocks
 
             Assert.Equal("A", position.Grade);
             Assert.Equal("this trade went perfectly!", position.GradeNote);
+            Assert.Contains(position.GradeNote, position.Notes);
         }
 
         [Fact]
@@ -282,6 +283,25 @@ namespace coretests.Stocks
             var position = stock.State.GetPosition(0);
             Assert.Equal("B", position.Grade);
             Assert.Equal("this trade went perfectly!", position.GradeNote);
+        }
+
+        [Fact]
+        public void AssignGrade_WithUpdatedNote_RemovesPreviousNoteAndAddsNewOne()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+
+            var positionId = 0;
+            stock.AssignGrade(positionId, "A", "this trade went perfectly!");
+            stock.AssignGrade(positionId, "A", "this trade went perfectly! (updated)");
+
+            var position = stock.State.GetPosition(0);
+            Assert.Equal("A", position.Grade);
+            Assert.Equal("this trade went perfectly! (updated)", position.GradeNote);
+            Assert.DoesNotContain("this trade went perfectly!", position.Notes);
+            Assert.Contains("this trade went perfectly! (updated)", position.Notes);
         }
 
         [Fact]

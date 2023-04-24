@@ -87,7 +87,9 @@ namespace core.Stocks
         public void SetGrade(TradeGrade grade, string note = null)
         {
             Grade = grade;
+            var previousNote = GradeNote;
             GradeNote = note;
+            Notes.Remove(previousNote);
             Notes.Add(note);
         }
 
