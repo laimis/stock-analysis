@@ -45,7 +45,7 @@ namespace core.Stocks.Services.Analysis
                 var bar = bars[i];
 
                 var currentPrice = bar.Close;
-                var currentGainPct = (currentPrice - costBasis) / costBasis;
+                var currentGainPct = (currentPrice - costBasis) / costBasis * 100;
                 var currentProfit = shares * (currentPrice - costBasis);
 
                 profit.Add(new DateScorePair(bar.Date, currentProfit));

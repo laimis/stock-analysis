@@ -82,15 +82,13 @@ section h3 {
   margin: 0.5rem 0.5rem;
 }
 .event-buy {
-  background-color: #698f3f;
+  background-color: #a7c687;
 }
 .event-sell {
-  background-color: #0A122A;
-  color: white;
+  background-color: #ea7676;
 }
 .event-stop {
-  background-color: #804e49;
-  color: white
+  background-color: #e2dad9;
 }
 .event-risk {
   background-color: #fbfaf8;

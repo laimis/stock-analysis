@@ -98,7 +98,7 @@
   </div>
 
   <div class="row mt-3">
-    <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(eventContainer)">Events</div>
+    <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(eventContainer)">Events ({{_position.events.length}})</div>
     <div #eventContainer class="visually-hidden">
       <div [ngClass]="getCssClassForEvent(t)" class="row event" *ngFor="let t of _position.events">
         <div class="col">{{t.date | date }}</div>
