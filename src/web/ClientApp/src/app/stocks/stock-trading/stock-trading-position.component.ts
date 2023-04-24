@@ -15,10 +15,12 @@ export class StockTradingPositionComponent {
     _position: PositionInstance;
 
     positionProfitPoints : StrategyProfitPoint[] = []
+    positionStrategy: string = null
 
     @Input()
     set position(v:PositionInstance) {
         this._position = v
+        this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
         this.positionProfitPoints = []
         if (this._position) {
             this.setCandidateValues()
@@ -99,6 +101,38 @@ export class StockTradingPositionComponent {
                     this.positionDeleted.emit()
                 })
         }
+    }
+
+    clearStrategy() {
+        this.stockService.deleteLabel(this._position.ticker, this._position.positionId, "strategy").subscribe(
+            (r) => {
+            },
+            (err) => {
+                alert("Error clearing strategy")
+            }
+        )
+
+        return false
+    }
+
+    setStrategy(strategy:string) {
+        if (!strategy) {
+            alert("Please select strategy")
+            return
+        }
+
+        let label = {
+            key: "strategy",
+            value: strategy
+        }
+
+        this.stockService.setLabel(this._position.ticker, this._position.positionId, label).subscribe(
+            (r) => {
+            },
+            (err) => {
+                alert("Error setting strategy")
+            }
+        )
     }
 
     toggleVisibility(elem) {

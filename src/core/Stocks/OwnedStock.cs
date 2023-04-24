@@ -284,5 +284,75 @@ namespace core.Stocks
 
             return true;
         }
+
+        internal bool SetPositionLabel(int positionId, string key, string value)
+        {
+            var position = State.GetPosition(positionId);
+            if (position == null)
+            {
+                throw new InvalidOperationException("Unable to find position with id " + positionId);
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("Key cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new InvalidOperationException("Value cannot be empty");
+            }
+
+            if (position.ContainsLabel(key, value))
+            {
+                return false;
+            }
+
+            Apply(
+                new PositionLabelSet(
+                    Guid.NewGuid(),
+                    State.Id,
+                    DateTimeOffset.UtcNow,
+                    State.UserId,
+                    positionId,
+                    key,
+                    value
+                )
+            );
+
+            return true;
+        }
+
+        internal bool DeletePositionLabel(int positionId, string key)
+        {
+            var position = State.GetPosition(positionId);
+            if (position == null)
+            {
+                throw new InvalidOperationException("Unable to find position with id " + positionId);
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("Key cannot be empty");
+            }
+
+            if (!position.ContainsLabel(key))
+            {
+                return false;
+            }
+
+            Apply(
+                new PositionLabelDeleted(
+                    Guid.NewGuid(),
+                    State.Id,
+                    DateTimeOffset.UtcNow,
+                    State.UserId,
+                    positionId,
+                    key
+                )
+            );
+
+            return true;
+        }
     }
 }

@@ -211,6 +211,27 @@ namespace web.Controllers
                 )
             );
 
+        [HttpPost("{ticker}/positions/{positionId}/labels")]
+        public Task SetLabel(
+            int positionId,
+            string ticker,
+            [FromBody]PositionLabelsSet.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
+
+        [HttpDelete("{ticker}/positions/{positionId}/labels/{label}")]
+        public Task RemoveLabel(
+            int positionId,
+            string ticker,
+            string label) => _mediator.Send(
+                new PositionLabelsDelete.Command(
+                    ticker, positionId, label, User.Identifier()
+                )
+            );
+
         [HttpGet("{ticker}/simulate/trades")]
         public Task<TradingStrategyResults> Trade(
             string ticker,

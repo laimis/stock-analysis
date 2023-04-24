@@ -402,5 +402,80 @@ namespace coretests.Stocks
             Assert.Equal(2, stock.State.Transactions.Count(t => t.IsPL));
             Assert.Equal(4, stock.State.Transactions.Count(t => !t.IsPL));
         }
+
+        [Fact]
+        public void LabelsWork()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            
+            var set = stock.SetPositionLabel(positionId, "strategy", "newhigh");
+            Assert.True(set);
+
+            var setAgain = stock.SetPositionLabel(positionId, "strategy", "newhigh");
+            Assert.False(setAgain);
+
+            var setDifferent = stock.SetPositionLabel(positionId, "strategy", "newlow");
+            Assert.True(setDifferent);
+        }
+
+        [Fact]
+        public void SetLabel_WithNullValue_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.SetPositionLabel(positionId, "strategy", null)
+            );
+        }
+
+        [Fact]
+        public void SetLabel_WithNullKey_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.SetPositionLabel(positionId, null, "newhigh")
+            );
+        }
+
+        [Fact]
+        public void DeleteLabel_Works()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            
+            var set = stock.SetPositionLabel(positionId, "strategy", "newhigh");
+            Assert.True(set);
+
+            var deleted = stock.DeletePositionLabel(positionId, "strategy");
+            Assert.True(deleted);
+
+            var deletedAgain = stock.DeletePositionLabel(positionId, "strategy");
+            Assert.False(deletedAgain);
+        }
+
+        [Fact]
+        public void DeleteLabel_WithNullKey_Fails()
+        {
+            var stock = new OwnedStock("tsla", _userId);
+
+            stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
+            var positionId = stock.State.OpenPosition.PositionId;
+            
+            Assert.Throws<InvalidOperationException>(() => 
+                stock.DeletePositionLabel(positionId, null)
+            );
+        }
     }
 }

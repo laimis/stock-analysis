@@ -67,7 +67,6 @@ namespace core.Stocks
         public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
         public List<PositionEvent> Events { get; private set; } = new List<PositionEvent>();
 
-        public List<string> Notes { get; private set; } = new List<string>();
         public decimal? StopPrice { get; private set; }
         public DateTimeOffset LastTransaction { get; private set; }
         public decimal LastSellPrice { get; private set; }
@@ -92,6 +91,7 @@ namespace core.Stocks
             Notes.Add(note);
         }
 
+        public List<string> Notes { get; private set; } = new List<string>();
         public void AddNotes(string notes)
         {
             Notes.Add(notes);
@@ -298,6 +298,33 @@ namespace core.Stocks
                 0 => 0,
                 _ => totalBuy / totalNumberOfSharesBought
             };
+        }
+
+        private Dictionary<string, string> _labels { get; set; } = new Dictionary<string, string>();
+        public IEnumerable<KeyValuePair<string, string>> Labels => _labels;
+        internal bool ContainsLabel(string key, string value)
+        {
+            if (!ContainsLabel(key))
+            {
+                return false;
+            }
+
+            return _labels[key] == value;
+        }
+
+        internal void SetLabel(PositionLabelSet labelSet)
+        {
+            _labels[labelSet.Key] = labelSet.Value;
+        }
+
+        internal bool ContainsLabel(string key)
+        {
+            return _labels.ContainsKey(key);
+        }
+
+        internal void DeleteLabel(PositionLabelDeleted labelDeleted)
+        {
+            _labels.Remove(labelDeleted.Key);
         }
     }
 }

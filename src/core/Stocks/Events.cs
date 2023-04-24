@@ -220,4 +220,36 @@ namespace core.Stocks
         public int PositionId { get; }
         public Guid UserId { get; }
     }
+
+    public class PositionLabelSet : AggregateEvent
+    {
+        public PositionLabelSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, int positionId, string key, string value) :
+            base(id, aggregateId, when)
+        {
+            UserId = userId;
+            PositionId = positionId;
+            Key = key;
+            Value = value;
+        }
+
+        public Guid UserId { get; }
+        public int PositionId { get; }
+        public string Key { get; }
+        public string Value { get; }
+    }
+
+    public class PositionLabelDeleted : AggregateEvent
+    {
+        public PositionLabelDeleted(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, int positionId, string key) :
+            base(id, aggregateId, when)
+        {
+            UserId = userId;
+            PositionId = positionId;
+            Key = key;
+        }
+
+        public Guid UserId { get; }
+        public int PositionId { get; }
+        public string Key { get; }
+    }
 }

@@ -60,6 +60,20 @@ export class StocksService {
     return this.http.delete(`/api/portfolio/${ticker}/positions/${positionId}`)
   }
 
+  setLabel(ticker: string, positionId: number, label: PositionInstanceLabel): Observable<object> {
+    return this.http.post(`/api/portfolio/${ticker}/positions/${positionId}/labels`, {
+      key: label.key,
+      value: label.value,
+      ticker: ticker,
+      positionId: positionId
+    })
+  }
+
+  deleteLabel(ticker: string, positionId: number, labelKey: string): Observable<object> {
+    return this.http.delete(`/api/portfolio/${ticker}/positions/${positionId}/labels/${labelKey}`)
+  }
+
+  // ----------------- alerts ---------------------
   smsOff(): Observable<any> {
     return this.http.post<any>('/api/alerts/sms/off', {})
   }
@@ -948,6 +962,11 @@ export interface PendingStockPosition {
   notes: string
 }
 
+export interface PositionInstanceLabel {
+  key: string,
+  value: string
+}
+
 export interface PositionInstance {
   positionId: number,
   averageBuyCostPerShare: number,
@@ -967,6 +986,7 @@ export interface PositionInstance {
   isShortTerm: boolean,
   lastTransaction: string,
   notes: string[],
+  labels: PositionInstanceLabel[],
   numberOfShares: number,
   opened: string,
   price: number,

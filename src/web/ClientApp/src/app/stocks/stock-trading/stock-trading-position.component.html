@@ -67,7 +67,24 @@
         <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
       </div>
     </div>
-    <div class="col"></div>
+    <div class="col">
+      <label class="form-label" for="setStrategy">Strategy</label>
+      <div class="input-group">
+        <select class="form-select" id="strategyInput" #strategyInput value="{{positionStrategy}}">
+          <option value="">Choose...</option>
+          <option value="newhigh">New High</option>
+          <option value="resistancebreakthrough">Resistance Breakthrough</option>
+          <option value="newhighpullback">New High Pullback</option>
+          <option value="recovery">Recovery</option>
+          <option value="postearnings">Post Earnings</option>
+          <option value="postearningsnewhigh">Post Earnings New High</option>
+        </select>
+        <button class="btn btn-secondary" (click)="setStrategy(strategyInput.value)">Update</button>
+      </div>
+      <div>
+        <a href="#" (click)="strategyInput.value = ''; clearStrategy();">Clear Strategy</a>
+      </div>
+    </div>
     <div class="col"></div>
   </div>
 
