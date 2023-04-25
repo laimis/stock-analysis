@@ -109,6 +109,10 @@ export class StockTradingPositionsComponent {
                 this.metricFunc = (p:PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break
+            case "riskedAmountFromStop":
+                this.metricFunc = (p:PositionInstance) => (p.stopPrice - p.averageCostPerShare) * p.numberOfShares
+                this.metricType = OutcomeValueTypeEnum.Currency
+                break
             case "daysHeld":
                 this.metricFunc = (p:PositionInstance) => p.daysHeld
                 this.metricType = OutcomeValueTypeEnum.Number
