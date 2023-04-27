@@ -95,7 +95,10 @@
                 </a>
             </div>
             <div class="step-url">
-                {{activeStep.url}}
+                <a
+                    target="_blank"
+                    [href]="activeStep.url">{{activeStep.url}}
+                </a>
             </div>
             <div class="step-url">
                 {{currentStepIndex + 1}} / {{activeRoutine.steps.length}}

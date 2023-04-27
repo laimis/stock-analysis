@@ -25,6 +25,10 @@ input {
     text-decoration: none;
 }
 
+.step-url a {
+    text-decoration: none;
+}
+
 .step-url {
     font-size: 12px;
     font-weight: bold;
