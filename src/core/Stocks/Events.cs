@@ -252,4 +252,19 @@ namespace core.Stocks
         public int PositionId { get; }
         public string Key { get; }
     }
+
+    public class PositionRiskAmountSet : AggregateEvent
+    {
+        public PositionRiskAmountSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, int positionId, decimal riskAmount) :
+            base(id, aggregateId, when)
+        {
+            UserId = userId;
+            PositionId = positionId;
+            RiskAmount = riskAmount;
+        }
+
+        public Guid UserId { get; }
+        public int PositionId { get; }
+        public decimal RiskAmount { get; }
+    }
 }

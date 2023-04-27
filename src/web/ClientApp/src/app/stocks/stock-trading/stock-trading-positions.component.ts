@@ -56,7 +56,7 @@ export class StockTradingPositionsComponent {
     }
 
     setRiskAmount(p:PositionInstance) {
-        this.stockService.setRiskAmount(p.ticker, this.candidateRiskAmount).subscribe(
+        this.stockService.setRiskAmount(p.ticker, p.positionId, this.candidateRiskAmount).subscribe(
             (_) => {
                 p.riskedAmount = this.candidateRiskAmount
             }

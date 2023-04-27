@@ -69,11 +69,12 @@ namespace core.Stocks
             );
         }
 
-        internal void SetRiskAmount(decimal riskAmount)
+        internal void SetRiskAmount(decimal riskAmount, int positionId)
         {
-            if (State.OpenPosition == null)
+            var position = State.GetPosition(positionId);
+            if (position == null)
             {
-                throw new InvalidOperationException("Cannot set risk amount on a stock that has no open position");
+                throw new InvalidOperationException("Unable to find position with id " + positionId);
             }
 
             if (riskAmount < 0)
@@ -81,7 +82,7 @@ namespace core.Stocks
                 throw new InvalidOperationException("Risk amount cannot be negative");
             }
 
-            Apply(new RiskAmountSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker, riskAmount));
+            Apply(new PositionRiskAmountSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, positionId, riskAmount));
         }
 
         public bool SetStop(decimal stopPrice)

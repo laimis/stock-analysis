@@ -232,6 +232,18 @@ namespace web.Controllers
                 )
             );
 
+        [HttpPost("{ticker}/positions/{positionId}/risk")]
+        public async Task<ActionResult> Risk(SetRisk.Command model)
+        {
+            model.WithUserId(User.Identifier());
+
+            var r = await _mediator.Send(model);
+
+            return this.OkOrError(r);
+        }
+
+        
+
         [HttpGet("{ticker}/simulate/trades")]
         public Task<TradingStrategyResults> Trade(
             string ticker,

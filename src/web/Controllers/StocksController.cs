@@ -104,16 +104,6 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
-        [HttpPost("{ticker}/risk")]
-        public async Task<ActionResult> Risk(SetRisk.Command model)
-        {
-            model.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(model);
-
-            return this.OkOrError(r);
-        }
-
         [HttpPost("sell")]
         public async Task<ActionResult> Sell(Sell.Command model)
         {

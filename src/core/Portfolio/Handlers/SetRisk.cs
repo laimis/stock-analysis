@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
 
-namespace core.Stocks
+namespace core.Portfolio
 {
     public class SetRisk
     {
@@ -12,6 +12,9 @@ namespace core.Stocks
         {
             [Required]
             public decimal? RiskAmount { get; set; }
+
+            [Required]
+            public int? PositionId { get; set; }
         }
 
         public class Handler : HandlerWithStorage<Command, CommandResponse>
@@ -40,7 +43,7 @@ namespace core.Stocks
                     );
                 }
 
-                stock.SetRiskAmount(cmd.RiskAmount.Value);
+                stock.SetRiskAmount(cmd.RiskAmount.Value, positionId: cmd.PositionId.Value);
 
                 await _storage.Save(stock, cmd.UserId);
 

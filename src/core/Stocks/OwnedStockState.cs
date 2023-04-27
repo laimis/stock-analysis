@@ -60,6 +60,12 @@ namespace core.Stocks
             position.SetGrade(gradeAssigned.Grade, gradeAssigned.Note);
         }
 
+        internal void ApplyInternal(PositionRiskAmountSet riskAmountSet)
+        {
+            var position = Positions.Single(x => x.PositionId == riskAmountSet.PositionId);
+            position.SetRiskAmount(riskAmountSet.RiskAmount, riskAmountSet.When);
+        }
+
         internal void ApplyInternal(StockPurchased_v2 purchased)
         {
             BuyOrSell.Add(purchased);

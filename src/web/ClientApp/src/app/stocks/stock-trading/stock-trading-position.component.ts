@@ -79,7 +79,7 @@ export class StockTradingPositionComponent {
 
     setRiskAmount() {
         if (confirm("Are you sure you want to set the risk amount?")) {
-            this.stockService.setRiskAmount(this._position.ticker, this.candidateRiskAmount).subscribe(
+            this.stockService.setRiskAmount(this._position.ticker, this._position.positionId, this.candidateRiskAmount).subscribe(
                 (_) => {
                     this._position.riskedAmount = this.candidateRiskAmount
                 }
