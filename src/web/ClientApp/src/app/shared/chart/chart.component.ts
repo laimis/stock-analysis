@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
-
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 @Component({
   selector: 'app-chart',
@@ -62,12 +62,14 @@ export class ChartComponent implements OnInit, OnDestroy {
     console.log("ChartComponent.ngOnInit()")
     Chart.register(LogarithmicScale)
     Chart.register(annotationPlugin)
+    // Chart.register(ChartDataLabels) // commented out, too noisy by default
   }
 
   ngOnDestroy() {
     console.log("ChartComponent.ngOnDestroy()")
     Chart.unregister(LogarithmicScale)
     Chart.unregister(annotationPlugin)
+    // Chart.unregister(ChartDataLabels)
   }
 
 }

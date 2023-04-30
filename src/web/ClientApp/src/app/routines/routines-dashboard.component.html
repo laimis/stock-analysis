@@ -50,23 +50,35 @@
         <table class="table table-striped" *ngIf="routine.steps.length > 0">
             <thead>
                 <tr>
-                    <th scope="col">Label</th>
-                    <th scope="col">Url</th>
+                    <th></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let step of routine.steps; let stepIndex = index">
-                    <td>{{step.label}}</td>
                     <td>
-                        <div #readOnlySection>
-                            {{step.url}}
-                            <button class="btn btn-sm btn-outline-primary float-end" (click)="toggleVisibility(editSection); toggleVisibility(readOnlySection)">edit</button>
+                        <div class="row" #readOnlySection>
+                            <div class="col-5">
+                                {{step.label}}
+                            </div>
+                            <div class="col-5">
+                                {{step.url}}
+                            </div>
+                            <div class="col">
+                                <button (click)="toggleVisibility(readOnlySection); toggleVisibility(editSection)">edit</button>
+                            </div>
                         </div>
-                        
-                        <div class="visually-hidden" #editSection>
-                            <input type="text" #stepUrl value="{{step.url}}">
-                            <button class="btn btn-sm btn-outline-primary float-end" (click)="toggleVisibility(editSection); updateStep(routine, stepIndex, step.label, stepUrl.value); toggleVisibility(readOnlySection)">save</button>
+                        <div class="row" class="visually-hidden" #editSection>
+                            <div class="col-5">
+                                <input type="text" #stepLabel value="{{step.label}}">
+                            </div>
+                            <div class="col-5">
+                                <input type="text" #stepUrl value="{{step.url}}">
+                            </div>
+                            <div class="col">
+                                <button (click)="toggleVisibility(editSection); updateStep(routine, stepIndex, stepLabel.value, stepUrl.value); toggleVisibility(readOnlySection); ">save</button>
+                                <button (click)="toggleVisibility(editSection); toggleVisibility(readOnlySection);">cancel</button>
+                            </div>
                         </div>
                     </td>
                     <td>

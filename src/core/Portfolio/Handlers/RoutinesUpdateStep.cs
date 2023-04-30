@@ -17,7 +17,7 @@ namespace core.Portfolio.Handlers
             [Required]
             public string Label { get; set; }
             [Required]
-            public int StepIndex { get; set; }
+            public int? StepIndex { get; set; }
             public string Url { get; set; }
         }
 
@@ -46,7 +46,7 @@ namespace core.Portfolio.Handlers
                     throw new InvalidOperationException("Routine does not exist");
                 }
 
-                routine.UpdateStep(cmd.StepIndex, label: cmd.Label, url: cmd.Url);
+                routine.UpdateStep(cmd.StepIndex.Value, label: cmd.Label, url: cmd.Url);
 
                 await _portfolioStorage.Save(routine, user.State.Id);
 
