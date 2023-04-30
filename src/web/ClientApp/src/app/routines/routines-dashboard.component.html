@@ -65,7 +65,9 @@
                                 {{step.url}}
                             </div>
                             <div class="col">
-                                <button (click)="toggleVisibility(readOnlySection); toggleVisibility(editSection)">edit</button>
+                                <button
+                                    class="btn btn-sm btn-outline-primary me-2"
+                                    (click)="toggleVisibility(readOnlySection); toggleVisibility(editSection)">edit</button>
                             </div>
                         </div>
                         <div class="row" class="visually-hidden" #editSection>
