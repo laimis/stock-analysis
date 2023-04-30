@@ -199,5 +199,64 @@ namespace coretests.Stocks
 
             Assert.Throws<InvalidOperationException>(() => routine.UpdateStep(1, "new label", "new url"));
         }
+
+        [Fact]
+        public void MoveStepWorks()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+            routine.AddStep("label2", "url2");
+
+            Assert.Equal(2, routine.State.Steps.Count());
+
+            routine.MoveStep(0, 1);
+
+            var steps = routine.State.Steps.ToArray();
+
+            Assert.Equal("label2", steps[0].label);
+            Assert.Equal("url2", steps[0].url);
+            Assert.Equal("label", steps[1].label);
+            Assert.Equal("url", steps[1].url);
+        }
+
+        [Fact]
+        public void MoveStepWithDirectionGreaterThanOneFails()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+            routine.AddStep("label2", "url2");
+
+            Assert.Equal(2, routine.State.Steps.Count());
+
+            Assert.Throws<InvalidOperationException>(() => routine.MoveStep(0, 2));
+        }
+
+        [Fact]
+        public void MoveStepWithDirectionLessThanNegativeOneFails()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+            routine.AddStep("label2", "url2");
+
+            Assert.Equal(2, routine.State.Steps.Count());
+
+            Assert.Throws<InvalidOperationException>(() => routine.MoveStep(0, -2));
+        }
+
+        [Fact]
+        public void MoveStepWithInvalidIndexFails()
+        {
+            var routine = Create("name", "description");
+
+            routine.AddStep("label", "url");
+            routine.AddStep("label2", "url2");
+
+            Assert.Equal(2, routine.State.Steps.Count());
+
+            Assert.Throws<InvalidOperationException>(() => routine.MoveStep(2, 1));
+        }
     }
 }

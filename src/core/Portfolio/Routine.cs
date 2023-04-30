@@ -85,6 +85,31 @@ namespace core.Portfolio
             Apply(new RoutineStepUpdated(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, index, label, url));
         }
 
+        public void MoveStep(int stepIndex, int direction)
+        {
+            if (stepIndex < 0 || stepIndex >= State.Steps.Count)
+            {
+                throw new InvalidOperationException("Invalid step index");
+            }
+
+            if (direction != 1 && direction != -1)
+            {
+                throw new InvalidOperationException("Invalid direction");
+            }
+
+            if (stepIndex == 0 && direction == -1)
+            {
+                return;
+            }
+
+            if (stepIndex == State.Steps.Count - 1 && direction == 1)
+            {
+                return;
+            }
+
+            Apply(new RoutineStepMoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, direction: direction, stepIndex: stepIndex));
+        }
+
         public void RemoveStep(int index)
         {
             if (index < 0 || index >= State.Steps.Count)
@@ -137,6 +162,13 @@ namespace core.Portfolio
         {
             var step = Steps[e.Index];
             Steps[e.Index] = new RoutineStep(label: e.Label, url: e.Url);
+        }
+
+        private void ApplyInternal(RoutineStepMoved e)
+        {
+            var step = Steps[e.StepIndex];
+            Steps.RemoveAt(e.StepIndex);
+            Steps.Insert(e.StepIndex + e.Direction, step);
         }
 
         public record struct RoutineStep(string label, string? url);

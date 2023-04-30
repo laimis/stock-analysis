@@ -72,11 +72,17 @@ namespace web.Controllers
 
             return _mediator.Send(cmd);
         }
-
         [HttpDelete("routines/{routineName}/{stepIndex}")]
         public Task<RoutineState> RemoveRoutineStep(string routineName, int stepIndex) =>
             _mediator.Send(new RoutinesRemoveStep.Command(routineName, stepIndex, User.Identifier()));
 
+        [HttpPost("routines/{routineName}/{stepIndex}/position")]
+        public Task<RoutineState> MoveRoutineStep([FromBody]RoutinesMoveStep.Command cmd)
+        {
+            cmd.WithUserId(User.Identifier());
+
+            return _mediator.Send(cmd);
+        }
 
         [HttpGet("stocklists")]
         public Task<StockListState[]> StockLists() =>

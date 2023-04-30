@@ -55,6 +55,19 @@ namespace core.Portfolio
         public int Index { get; }
     }
 
+    internal class RoutineStepMoved : AggregateEvent
+    {
+        public RoutineStepMoved(Guid id, Guid aggregateId, DateTimeOffset when, int direction, int stepIndex)
+            : base(id, aggregateId, when)
+        {
+            Direction = direction;
+            StepIndex = stepIndex;
+        }
+
+        public int Direction { get; }
+        public int StepIndex { get; }
+    }
+
     internal class RoutineStepUpdated : AggregateEvent
     {
         public RoutineStepUpdated(Guid id, Guid aggregateId, DateTimeOffset when, int index, string label, string url)

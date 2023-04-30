@@ -67,7 +67,21 @@
                             <div class="col">
                                 <button
                                     class="btn btn-sm btn-outline-primary me-2"
-                                    (click)="toggleVisibility(readOnlySection); toggleVisibility(editSection)">edit</button>
+                                    (click)="toggleVisibility(readOnlySection); toggleVisibility(editSection)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button
+                                    [ngClass]="{'disabled': stepIndex === 0}"
+                                    class="btn btn-sm btn-outline-secondary me-2"
+                                    (click)="moveUp(routine, stepIndex)">
+                                    <i class="bi bi-arrow-up-circle"></i>
+                                </button>
+                                <button
+                                    [ngClass]="{'disabled': stepIndex === routine.steps.length - 1}"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    (click)="moveDown(routine, stepIndex)">
+                                    <i class="bi bi-arrow-down-circle"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="row" class="visually-hidden" #editSection>

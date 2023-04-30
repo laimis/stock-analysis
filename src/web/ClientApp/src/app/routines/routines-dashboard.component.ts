@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Routine, StocksService } from '../services/stocks.service';
+import { Routine, RoutineStep, StocksService } from '../services/stocks.service';
 import { GetErrors, toggleVisuallyHidden } from '../services/utils';
 
 @Component({
@@ -79,6 +79,27 @@ export class RoutineDashboardComponent implements OnInit {
         this.errors = GetErrors(error)
       }
     )
+  }
+
+  moveUp(routine:Routine, stepIndex:number) {
+    var direction = -1;
+    this.moveStep(routine, stepIndex, direction);
+  }
+
+  moveDown(routine:Routine, stepIndex:number) {
+    var direction = 1;
+    this.moveStep(routine, stepIndex, direction);
+  }
+
+  private moveStep(routine: Routine, stepIndex: number, direction: number) {
+    this.service.moveRoutineStep(routine.name, stepIndex, direction).subscribe(
+      _ => {
+        this.fetchRoutines();
+      },
+      error => {
+        this.errors = GetErrors(error);
+      }
+    );
   }
 
   addStep(routine:Routine, label:string, url:string) {

@@ -114,6 +114,9 @@ export class StocksService {
   deleteRoutineStep(routineName, stepIndex:number): Observable<Routine> {
     return this.http.delete<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex)
   }
+  moveRoutineStep(routineName, stepIndex:number, direction:number) {
+    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex + '/position', {direction, routineName, stepIndex})
+  }
 
   // ----------------- stock lists ---------------------
   getStockLists(): Observable<StockList[]> {
