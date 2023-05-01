@@ -34,6 +34,17 @@ namespace core.Stocks.Services.Analysis
                         t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.DaysSinceOpened && o.value <= RecentlyOpenThreshold))
                     .ToList()
             );
+
+            // positions that don't have strategy label assigned
+            yield return new AnalysisOutcomeEvaluation(
+                "No Strategy",
+                OutcomeType.Neutral,
+                PortfolioAnalysisKeys.StrategyLabel,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.StrategyLabel && o.value == 0))
+                    .ToList()
+            );
         }
     }
 }

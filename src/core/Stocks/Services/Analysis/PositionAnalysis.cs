@@ -194,6 +194,14 @@ namespace core.Stocks.Services.Analysis
                 Shared.ValueFormat.Number,
                 $"Days since opened: {daysSinceOpened}"
             );
+
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.StrategyLabel,
+                OutcomeType.Negative,
+                position.ContainsLabel("strategy") ? 1 : 0,
+                Shared.ValueFormat.Boolean,
+                $"Missing strategy label"
+            );
         }
 
     }
@@ -219,6 +227,7 @@ namespace core.Stocks.Services.Analysis
         public static string MaxDrawdownLast10 = "MaxDrawdownLast10";
         public static string MaxGainLast10 = "MaxGainLast10";
         public static string GainDiffLast10 = "GainDiffLast10";
+        public static string StrategyLabel = "StrategyLabel";
     }
 }
 #nullable restore

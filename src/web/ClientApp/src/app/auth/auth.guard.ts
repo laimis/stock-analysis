@@ -32,6 +32,7 @@ export class AuthGuard implements CanActivate {
 export class AuthGuardUnverifiedAllowed implements CanActivate {
 
   constructor(
+    private globalService : GlobalService,
     private stocks : StocksService,
     private router : Router){}
 
@@ -42,6 +43,7 @@ export class AuthGuardUnverifiedAllowed implements CanActivate {
      this.router.navigate(['/landing'])
      return false;
    }
+   this.globalService.markLoggedIn()
    return true;
  }
 }
@@ -50,6 +52,7 @@ export class AuthGuardUnverifiedAllowed implements CanActivate {
 export class AuthGuardAdminOnly implements CanActivate {
 
   constructor(
+    private globalService : GlobalService,
     private stocks : StocksService,
     private router : Router){}
 
@@ -60,6 +63,7 @@ export class AuthGuardAdminOnly implements CanActivate {
      this.router.navigate(['/unauthorized'])
      return false;
    }
+   this.globalService.markLoggedIn()
    return true;
  }
 }
