@@ -21,7 +21,6 @@ export class StockTradingPositionsComponent {
     @Input()
     set positions(input: PositionInstance[]) {
         this._positions = input // input.filter(p => p.isShortTerm)
-        this.toggleExcludeLongTerm()
         this.updatePositions()
     }
 
@@ -76,15 +75,12 @@ export class StockTradingPositionsComponent {
         }
     }
 
-    excludeLongTerm: boolean = false
-    excludeLongTermName: string = ""
+    excludeLongTerm: boolean = true
+    excludeLongTermLabels = {true: "Include long term", false: "Exclude long term"}
+    excludeLongTermName: string = this.excludeLongTermLabels[this.excludeLongTerm.toString().toLowerCase()]
     toggleExcludeLongTerm() {
         this.excludeLongTerm = !this.excludeLongTerm
-        if (this.excludeLongTerm) {
-            this.excludeLongTermName = "Include long term"
-        } else {
-            this.excludeLongTermName = "Exclude long term"
-        }
+        this.excludeLongTermName = this.excludeLongTermLabels[this.excludeLongTerm.toString().toLowerCase()]
         this.updatePositions()
     }
 
