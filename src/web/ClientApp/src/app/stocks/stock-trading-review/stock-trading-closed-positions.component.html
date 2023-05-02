@@ -52,9 +52,14 @@
       <!-- add separator row if p closed date month is different from previous position -->
       <tr *ngIf="i === 0 || getMonth(p.closed) !== getMonth(positions[i - 1].closed)"
         style="padding-top: 10px">
-        <td colspan="8" class="text-center fw-bold">
+        <td colspan="3" class="text-center fw-bold">
           {{getMonth(p.closed) | date:'MMMM yyyy'}}
         </td>
+        <td>R:R Sum <span class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
+        <td>Profit/Loss <span class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
+        <td>A trades: <span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }}</span></td>
+        <td>B trades: <span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }}</span></td>
+        <td>C trades: <span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }}</span></td>
       </tr>
 
       <tr 

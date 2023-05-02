@@ -74,6 +74,25 @@ export class StockTradingClosedPositionsComponent {
     return input.substring(0, 7)
   }
 
+  getPositionsForMonth(month:string) {
+    return this.positions.filter(p => this.getMonth(p.closed) == month)
+  }
+
+  getRRSumForMonth(position:PositionInstance) {
+    var positions = this.getPositionsForMonth(this.getMonth(position.closed))
+    return positions.reduce((a, b) => a + b.rr, 0)
+  }
+
+  getProfitSumForMonth(position:PositionInstance) {
+    var positions = this.getPositionsForMonth(this.getMonth(position.closed))
+    return positions.reduce((a, b) => a + b.profit, 0)
+  }
+
+  getTradeCountByGradeForMonth(position:PositionInstance, grade:string) {
+    var positions = this.getPositionsForMonth(this.getMonth(position.closed))
+    return positions.filter(p => p.grade === grade).length
+  }
+
   sort(column:string) {
     var func = this.getSortFunc(column);
 
