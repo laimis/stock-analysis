@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { toggleVisuallyHidden } from 'src/app/services/utils';
-import { OutcomeValueTypeEnum, PositionInstance, StocksService } from '../../services/stocks.service';
+import { BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StocksService } from '../../services/stocks.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 
 @Component({
@@ -23,6 +23,9 @@ export class StockTradingPositionsComponent {
         this._positions = input // input.filter(p => p.isShortTerm)
         this.updatePositions()
     }
+
+    @Input()
+    orders:BrokerageOrder[];
 
     // constructor that takes stock service
     constructor(
@@ -157,6 +160,10 @@ export class StockTradingPositionsComponent {
           } else {
             return this.decimalPipe.transform(val)
           }
+    }
+
+    brokerageOrdersForPosition(p:PositionInstance) {
+        return this.orders.filter(o => o.ticker === p.ticker)
     }
 
     updatePositions() {

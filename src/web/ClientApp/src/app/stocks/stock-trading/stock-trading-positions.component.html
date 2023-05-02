@@ -25,7 +25,7 @@
   </div>
 
   <div *ngIf="renderStyle === 'card'">
-    <div class="card border-info mt-4" *ngFor="let position of sortedPositions">  
+    <div class="card border-info mt-4" *ngFor="let position of sortedPositions;">  
       <div class="card-body" *ngIf="position">
         <div class="card-title">
           <div class="container">
@@ -46,7 +46,7 @@
           </div>
         </div>
         <div class="card-text" class="visually-hidden" #detailDiv>
-          <app-stock-trading-position [position]="position" ></app-stock-trading-position>
+          <app-stock-trading-position [position]="position" [orders]="brokerageOrdersForPosition(position)" ></app-stock-trading-position>
         </div>      
       </div>
     </div>

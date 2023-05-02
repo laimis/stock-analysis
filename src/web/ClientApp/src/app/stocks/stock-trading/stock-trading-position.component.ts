@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
+import { BrokerageOrder, PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
 import { Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import { toggleVisuallyHidden } from 'src/app/services/utils';
@@ -26,6 +26,9 @@ export class StockTradingPositionComponent {
             this.setCandidateValues()
         }
     }
+
+    @Input()
+    orders:BrokerageOrder[];
 
     @Output()
     positionDeleted = new EventEmitter()

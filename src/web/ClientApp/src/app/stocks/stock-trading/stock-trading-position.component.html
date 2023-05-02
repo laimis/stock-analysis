@@ -93,6 +93,19 @@
 
   <div class="row mt-3">
     <div class="col">
+      <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(ordersContainer)">Orders ({{orders.length}})</div>
+      <div #ordersContainer class="visually-hidden">
+        <div class="row" *ngFor="let order of orders">
+          <div class="col">
+            {{ order.type }} {{ order.quantity }} @ {{ order.price | currency }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col">
       <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes ({{_position.notes.length}})</div>
       <div #notesContainer class="visually-hidden">
         <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
