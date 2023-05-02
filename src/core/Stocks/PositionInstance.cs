@@ -24,7 +24,6 @@ namespace core.Stocks
         {
             PositionId = positionId;
             Ticker = ticker;
-            Category = StockCategory.ShortTerm;
         }
 
         public decimal NumberOfShares { get; private set; } = 0;
@@ -71,10 +70,6 @@ namespace core.Stocks
         public DateTimeOffset LastTransaction { get; private set; }
         public decimal LastSellPrice { get; private set; }
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
-        public string Category { get; private set; }
-        public void SetCategory(string category) => Category = category;
-        public bool IsShortTerm => Category == null ||  Category == StockCategory.ShortTerm;
-
         private List<decimal> _slots = new List<decimal>();
 
         private bool PositionCompleted = false;

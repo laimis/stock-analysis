@@ -56,15 +56,6 @@ export class StockOwnershipComponent {
     this.errors = errors
   }
 
-  categoryChanged(elem: EventTarget) {
-    var value = (elem as HTMLInputElement).value
-    this.service.settings(this.ownership.ticker, value).subscribe( _ => {
-      
-    }, err => {
-      this.errors = GetErrors(err)
-    })
-  }
-
   brokerageOrderEntered() {
     this.brokerageOrders.refreshOrders()
   }

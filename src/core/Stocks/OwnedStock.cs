@@ -140,35 +140,6 @@ namespace core.Stocks
             return true;
         }
 
-        public void UpdateSettings(string category)
-        {
-            if (string.IsNullOrEmpty(category))
-            {
-                return;
-            }
-            
-            if (State.OpenPosition.Category == category)
-            {
-                return;
-            }
-
-            if (!StockCategory.IsValid(category))
-            {
-                throw new InvalidOperationException(
-                    $"Invalid stock category: {category}, only {string.Join(", ", StockCategory.All)} are valid"
-                );
-            }
-
-            Apply(
-                new StockCategoryChanged(
-                    Guid.NewGuid(),
-                    State.Id,
-                    category,
-                    DateTimeOffset.UtcNow
-                )
-            );
-        }
-
         public void DeleteTransaction(Guid transactionId)
         {
             if (!State.BuyOrSell.Any(t => t.Id == transactionId))
