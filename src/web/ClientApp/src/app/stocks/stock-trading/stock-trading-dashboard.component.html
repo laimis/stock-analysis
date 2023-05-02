@@ -73,7 +73,7 @@
           Profit
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{profit(positions)}}
+          {{profit(positions) | currency}}
         </div>
       </div>
     </div>
@@ -98,7 +98,7 @@
           
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{positions.length}}
+          {{labelGroup.value.length}}
         </div>
       </div>
       <div class="col mb-4 mt-2 text-center">
