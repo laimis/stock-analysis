@@ -162,10 +162,6 @@ export class StockTradingPositionsComponent {
           }
     }
 
-    brokerageOrdersForPosition(p:PositionInstance) {
-        return this.orders.filter(o => o.ticker === p.ticker)
-    }
-
     updatePositions() {
         var positions = this._positions.sort((a, b) => {
             if (Number.isFinite(this.metricFunc(a))) {

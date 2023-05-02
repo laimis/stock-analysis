@@ -16,6 +16,7 @@ export class StockTradingPositionComponent {
 
     positionProfitPoints : StrategyProfitPoint[] = []
     positionStrategy: string = null
+    positionOrders: BrokerageOrder[] = [];
 
     @Input()
     set position(v:PositionInstance) {
@@ -28,7 +29,13 @@ export class StockTradingPositionComponent {
     }
 
     @Input()
-    orders:BrokerageOrder[];
+    set orders(allOrders:BrokerageOrder[]) {
+        if (!this._position) {
+            return
+        }
+
+        this.positionOrders = allOrders.filter(o => o.ticker === this._position.ticker)
+    }
 
     @Output()
     positionDeleted = new EventEmitter()
