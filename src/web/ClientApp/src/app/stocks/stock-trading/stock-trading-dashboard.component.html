@@ -46,10 +46,18 @@
     <div class="row">
       <div class="col mb-4 mt-2 text-center">
         <div class="text-muted">
-          Total Invested
+          Strategy
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{ totalCost() | currency }}
+          Total
+        </div>
+      </div>
+      <div class="col mb-4 mt-2 text-center">
+        <div class="text-muted">
+          Invested
+        </div>
+        <div class="fs-4 summary-card-main-info">
+          {{ totalCost(positions) | currency }}
         </div>
       </div>
       <div class="col mb-4 mt-2 text-center">
@@ -80,31 +88,33 @@
 
     <div class="row" *ngFor="let labelGroup of positionGroups | keyvalue">
       <div class="col mb-4 mt-2 text-center">
-        <div class="text-muted"></div>
+        <div class="text-muted">
+        </div>
         <div class="fs-4 summary-card-main-info">
           {{labelGroup.key}}
         </div>
       </div>
       <div class="col mb-4 mt-2 text-center">
         <div class="text-muted">
-            
         </div>
+        <div class="fs-4 summary-card-main-info">
+          {{ totalCost(labelGroup.value) | currency }}
+        </div>
+      </div>
+      <div class="col mb-4 mt-2 text-center">
+        <div class="text-muted"></div>
         <div class="fs-4 summary-card-main-info">
           {{ totalRiskedAmount(labelGroup.value) | currency }}
         </div>
       </div>
       <div class="col mb-4 mt-2 text-center">
-        <div class="text-muted">
-          
-        </div>
+        <div class="text-muted"></div>
         <div class="fs-4 summary-card-main-info">
           {{labelGroup.value.length}}
         </div>
       </div>
       <div class="col mb-4 mt-2 text-center">
-        <div class="text-muted">
-          
-        </div>
+        <div class="text-muted"></div>
         <div class="fs-4 summary-card-main-info">
           {{profit(labelGroup.value) | currency}}
         </div>
