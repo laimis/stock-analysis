@@ -20,7 +20,7 @@ export class StockTradingPositionsComponent {
 
     @Input()
     set positions(input: PositionInstance[]) {
-        this._positions = input.filter(p => p.isShortTerm)
+        this._positions = input // input.filter(p => p.isShortTerm)
         this.updatePositions()
     }
 
