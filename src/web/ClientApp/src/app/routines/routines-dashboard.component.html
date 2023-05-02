@@ -62,7 +62,10 @@
                                 {{step.label}}
                             </div>
                             <div class="col-5">
-                                {{step.url}}
+                                <a
+                                    target="_blank"
+                                    [href]="step.url">{{step.url}}
+                                </a>
                             </div>
                             <div class="col">
                                 <button
