@@ -21,6 +21,7 @@ export class StockTradingPositionsComponent {
     @Input()
     set positions(input: PositionInstance[]) {
         this._positions = input // input.filter(p => p.isShortTerm)
+        this.toggleExcludeLongTerm()
         this.updatePositions()
     }
 
@@ -73,6 +74,18 @@ export class StockTradingPositionsComponent {
             this.renderStyle = "card"
             this.renderStyleName = "Switch to table layout"
         }
+    }
+
+    excludeLongTerm: boolean = false
+    excludeLongTermName: string = ""
+    toggleExcludeLongTerm() {
+        this.excludeLongTerm = !this.excludeLongTerm
+        if (this.excludeLongTerm) {
+            this.excludeLongTermName = "Include long term"
+        } else {
+            this.excludeLongTermName = "Exclude long term"
+        }
+        this.updatePositions()
     }
 
     metricChanged(elem: EventTarget) {
@@ -151,12 +164,18 @@ export class StockTradingPositionsComponent {
     }
 
     updatePositions() {
-        this.sortedPositions = this._positions.sort((a, b) => {
+        var positions = this._positions.sort((a, b) => {
             if (Number.isFinite(this.metricFunc(a))) {
                 return this.metricFunc(b) - this.metricFunc(a)
             }
             return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
         })
+
+        if (this.excludeLongTerm) {
+            positions = positions.filter(p => p.labels.findIndex(l => l.key === "strategy" && l.value === "longterm") === -1)
+        }
+
+        this.sortedPositions = positions
     }
 }
 

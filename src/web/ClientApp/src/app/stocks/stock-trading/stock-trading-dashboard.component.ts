@@ -77,7 +77,6 @@ export class StockTradingComponent implements OnInit {
       
       if (!acc[strategyKey]) {
         acc[strategyKey] = []
-          
       }
       
       acc[strategyKey].push(cur)
@@ -85,29 +84,7 @@ export class StockTradingComponent implements OnInit {
       return acc
     }, {})
 
-    console.log(uniqueStrategies)
     return uniqueStrategies
-    // // position has labels with key and value. We want group positions based on label key 'strategy'
-    // let labels = this.positions.reduce((acc, cur) => {
-    //   let strategy = cur.labels.find(l => l.key == 'strategy')
-    //   console.log("strategy is " + (strategy ? strategy.value : "null"))
-    //   if (strategy) {
-    //     if (!acc[strategy.value]) {
-    //       acc[strategy.value] = []
-    //     }
-    //     acc[strategy.value].push(cur)
-    //   }
-    //   return acc
-    // }, new Map<string, PositionInstance[]>());
-
-    // console.log("labels are " + labels.size)
-
-    // let result = []
-    // labels.forEach((v, k) => {
-    //   console.log("pushing " + k)
-    //   result.push({label: k, positions: v})
-    // })
-    // return result
   }
 
   totalRiskedAmount(positions) {

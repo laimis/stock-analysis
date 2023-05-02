@@ -2,7 +2,8 @@
   <div class="row">
     <div class="col">
       <a class="btn btn-link me-2" href="/api/stocks/export/open">Export</a>
-      <button class="btn btn-link" (click)="toggleRenderStyle()" >{{renderStyleName}}</button>
+      <button class="btn btn-link me-2" (click)="toggleRenderStyle()">{{renderStyleName}}</button>
+      <button class="btn btn-link me-2" (click)="toggleExcludeLongTerm()">{{excludeLongTermName}}</button>
     </div>
     <label for="metricToRender" class="text-end col-sm-2 col-form-label">Sort by</label>
     <div class="col">  
