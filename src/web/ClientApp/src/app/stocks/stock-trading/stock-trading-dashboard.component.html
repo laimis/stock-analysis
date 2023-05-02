@@ -57,7 +57,7 @@
           Risked  
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{ totalRiskedAmount() | currency }}
+          {{ totalRiskedAmount(positions) | currency }}
         </div>
       </div>
       <div class="col mb-4 mt-2 text-center">
@@ -70,10 +70,43 @@
       </div>
       <div class="col mb-4 mt-2 text-center">
         <div class="text-muted">
-          Short Term
+          Profit
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{shortTermCount()}}
+          {{profit(positions)}}
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngFor="let labelGroup of positionGroups | keyvalue">
+      <div class="col mb-4 mt-2 text-center">
+        <div class="text-muted"></div>
+        <div class="fs-4 summary-card-main-info">
+          {{labelGroup.key}}
+        </div>
+      </div>
+      <div class="col mb-4 mt-2 text-center">
+        <div class="text-muted">
+            
+        </div>
+        <div class="fs-4 summary-card-main-info">
+          {{ totalRiskedAmount(labelGroup.value) | currency }}
+        </div>
+      </div>
+      <div class="col mb-4 mt-2 text-center">
+        <div class="text-muted">
+          
+        </div>
+        <div class="fs-4 summary-card-main-info">
+          {{positions.length}}
+        </div>
+      </div>
+      <div class="col mb-4 mt-2 text-center">
+        <div class="text-muted">
+          
+        </div>
+        <div class="fs-4 summary-card-main-info">
+          {{profit(labelGroup.value) | currency}}
         </div>
       </div>
     </div>

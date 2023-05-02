@@ -33,7 +33,7 @@ export class StockTradingOpenPositionsComponent {
 
   @Input()
   set positions(positions:PositionInstance[]) {
-    this._positions = positions.filter(p => p.isShortTerm)
+    this._positions = positions // positions.filter(p => p.isShortTerm)
     this._index = 0
     this.updateCurrentPosition()
   }

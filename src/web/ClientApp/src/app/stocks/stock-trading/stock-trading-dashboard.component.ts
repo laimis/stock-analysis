@@ -20,6 +20,7 @@ export class StockTradingComponent implements OnInit {
   brokerageOrders: BrokerageOrder[];
 
   @ViewChild(BrokerageOrdersComponent) brokerageOrdersComponent:BrokerageOrdersComponent;
+  positionGroups: any[];
 
   constructor(
     private stockService:StocksService,
@@ -64,12 +65,57 @@ export class StockTradingComponent implements OnInit {
     return this.positions.reduce((acc, cur) => acc + (cur.averageCostPerShare * cur.numberOfShares), 0)
   }
 
-  shortTermCount() {
-    return this.positions.filter(p => p.isShortTerm).length
+  breakdownByLabel(positions) : {label:string, positions:PositionInstance[]}[] {
+    console.log("breaking down positions")
+
+    if (!positions) return []
+
+    // get unique "strategy" labels
+    let uniqueStrategies = positions.reduce((acc, cur) => {
+      let strategy = cur.labels.find(l => l.key == 'strategy')
+      let strategyKey = strategy ? strategy.value : "none"
+      
+      if (!acc[strategyKey]) {
+        acc[strategyKey] = []
+          
+      }
+      
+      acc[strategyKey].push(cur)
+      
+      return acc
+    }, {})
+
+    console.log(uniqueStrategies)
+    return uniqueStrategies
+    // // position has labels with key and value. We want group positions based on label key 'strategy'
+    // let labels = this.positions.reduce((acc, cur) => {
+    //   let strategy = cur.labels.find(l => l.key == 'strategy')
+    //   console.log("strategy is " + (strategy ? strategy.value : "null"))
+    //   if (strategy) {
+    //     if (!acc[strategy.value]) {
+    //       acc[strategy.value] = []
+    //     }
+    //     acc[strategy.value].push(cur)
+    //   }
+    //   return acc
+    // }, new Map<string, PositionInstance[]>());
+
+    // console.log("labels are " + labels.size)
+
+    // let result = []
+    // labels.forEach((v, k) => {
+    //   console.log("pushing " + k)
+    //   result.push({label: k, positions: v})
+    // })
+    // return result
   }
 
-  totalRiskedAmount() {
-    return this.positions.reduce((acc, cur) => acc + cur.costAtRiskedBasedOnStopPrice, 0)
+  totalRiskedAmount(positions) {
+    return positions.reduce((acc, cur) => acc + cur.costAtRiskedBasedOnStopPrice, 0)
+  }
+
+  profit(positions) {
+    return positions.reduce((acc, cur) => acc + cur.combinedProfit, 0)
   }
 
   private loadEntries() {
@@ -81,6 +127,7 @@ export class StockTradingComponent implements OnInit {
       this.violations = r.violations
       this.loading = false
       this.loaded = true
+      this.positionGroups = this.breakdownByLabel(this.positions)
 
       this.loadBrokerageOrders()
     }, _ => {
