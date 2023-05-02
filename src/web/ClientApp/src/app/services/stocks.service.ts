@@ -970,7 +970,6 @@ export interface PositionInstance {
   averageBuyCostPerShare: number,
   averageCostPerShare: number,
   averageSaleCostPerShare: number,
-  category: string,
   closed: string,
   cost: number,
   completedPositionCost: number,
