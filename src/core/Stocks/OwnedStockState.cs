@@ -30,7 +30,9 @@ namespace core.Stocks
             UserId = o.UserId;
         }
 
-        internal void ApplyInternal(StockCategoryChanged c) => OpenPosition.SetCategory(c.Category);
+        // ignore obsolete method, we need to support old events
+        [Obsolete]
+        internal void ApplyInternal(StockCategoryChanged c) {}
 
         internal void ApplyInternal(StockPurchased purchased)
         {

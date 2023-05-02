@@ -1,41 +1,44 @@
-<section>
-  <h5>Record trades for {{ticker}}</h5>
+<div>
+  <section>
+    <h5>Record trades for {{ticker}}</h5>
+    
+    <form>
+      <div class="row">
+        <div class="col">
+          <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
+          <select class="form-select btn border rounded" name="positionType" [(ngModel)]="positionType">
+            <option value="buy">Bought</option>
+            <option value="sell">Sold</option>
+          </select>
+        </div>
   
-  <form>
-    <div class="row">
-      <div class="col">
-        <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
-        <select class="form-select btn border rounded" name="positionType" [(ngModel)]="positionType">
-          <option value="buy">Bought</option>
-          <option value="sell">Sold</option>
-        </select>
+        <div class="col">
+          <label for="numberOfShares">Number of Shares</label>
+          <input type="number" class="form-control" id="numberOfShares" name="numberOfShares"
+            [(ngModel)]="numberOfShares">
+        </div>
+  
+        <div class="col">
+          <label for="pricePerShare">Price per Share</label>
+          <input type="number" class="form-control" id="pricePerShare" name="pricePerShare" [(ngModel)]="pricePerShare">
+        </div>
+  
+        <div class="col">
+          <label for="filled">Filled</label>
+          <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
+        </div>
       </div>
-
-      <div class="col">
-        <label for="numberOfShares">Number of Shares</label>
-        <input type="number" class="form-control" id="numberOfShares" name="numberOfShares"
-          [(ngModel)]="numberOfShares">
+      <div class="row mt-2">
+        <div class="col">
+          <label for="notes">Notes and your thoughts around this transaction</label>
+          <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="3"></textarea>
+        </div>
       </div>
-
-      <div class="col">
-        <label for="pricePerShare">Price per Share</label>
-        <input type="number" class="form-control" id="pricePerShare" name="pricePerShare" [(ngModel)]="pricePerShare">
+  
+      <div>
+        <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
       </div>
-
-      <div class="col">
-        <label for="filled">Filled</label>
-        <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
-      </div>
-    </div>
-    <div class="row mt-2">
-      <div class="col">
-        <label for="notes">Notes and your thoughts around this transaction</label>
-        <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="3"></textarea>
-      </div>
-    </div>
-
-    <div>
-      <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
-    </div>
-  </form>
-</section>
+    </form>
+  </section>
+  
+</div>

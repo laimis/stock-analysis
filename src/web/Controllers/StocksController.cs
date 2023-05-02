@@ -73,16 +73,6 @@ namespace web.Controllers
         [HttpGet("search/{term}")]
         public Task<SearchResult[]> Search(string term) => _mediator.Send(new Search.Query(term, User.Identifier()));
 
-        [HttpPost("settings")]
-        public async Task<ActionResult> Settings(Settings.Command model)
-        {
-            model.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(model);
-
-            return this.OkOrError(r);
-        }
-
         [HttpPost("{ticker}/stop")]
         public async Task<ActionResult> Stop(SetStop.Command command)
         {

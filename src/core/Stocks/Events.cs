@@ -118,6 +118,7 @@ namespace core.Stocks
         public Guid TransactionId { get; }
     }
 
+    [Obsolete("Use position labels instead")]
     internal class StockCategoryChanged : AggregateEvent
     {
         public StockCategoryChanged(Guid id, Guid aggregateId, string category, DateTimeOffset when) : base(id, aggregateId, when)

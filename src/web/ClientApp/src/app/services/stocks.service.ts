@@ -296,11 +296,6 @@ export class StocksService {
     return this.http.get<BrokerageOrder[]>('/api/brokerage/orders')
   }
 
-  settings(ticker:string,category:string) : Observable<any> {
-    var obj = {ticker, category}
-		return this.http.post('/api/stocks/settings', obj)
-  }
-
   search(term: string): Observable<StockSearchResult[]> {
     if (!term.trim()) {
       return of([])
@@ -975,7 +970,6 @@ export interface PositionInstance {
   averageBuyCostPerShare: number,
   averageCostPerShare: number,
   averageSaleCostPerShare: number,
-  category: string,
   closed: string,
   cost: number,
   completedPositionCost: number,
