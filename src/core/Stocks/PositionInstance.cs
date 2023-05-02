@@ -52,6 +52,7 @@ namespace core.Stocks
         public decimal? PercentToStop { get; private set; } = null;
         public decimal CombinedProfit => Profit + (UnrealizedProfit ?? 0);
         public bool IsClosed => Closed != null;
+        public bool IsShortTerm => Labels.FirstOrDefault(l => l.Key == "strategy").Value != "longterm";
 
         public int PositionId { get; }
         public string Ticker { get; }
