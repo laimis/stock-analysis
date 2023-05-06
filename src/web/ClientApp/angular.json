@@ -92,7 +92,8 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.server.json",
             "sourceMap": true,
-            "optimization": false
+            "optimization": false,
+            "buildOptimizer": false
           },
           "configurations": {
             "dev": {
@@ -101,7 +102,8 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": true
+              "vendorChunk": true,
+              "buildOptimizer": true
             },
             "production": {
               "optimization": true,
@@ -109,7 +111,8 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false
+              "vendorChunk": false,
+              "buildOptimizer": true
             }
           },
           "defaultConfiguration": ""

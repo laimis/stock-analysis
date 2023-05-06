@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { GlobalService } from '../services/global.service';
 
 @Component({
@@ -27,7 +27,7 @@ export class NavMenuComponent {
       this.isLoggedIn = value.isLoggedIn;
     });
 
-    this.router.events.subscribe((val:RouterEvent) => {
+    this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         this.currentPath = val.url;
       }

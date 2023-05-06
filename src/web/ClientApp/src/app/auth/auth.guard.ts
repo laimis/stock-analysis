@@ -1,10 +1,10 @@
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { StocksService, AccountStatus } from '../services/stocks.service';
 import { GlobalService } from '../services/global.service';
 
 @Injectable({providedIn: 'root'})
-export class AuthGuard implements CanActivate {
+export class AuthGuard  {
 
 	constructor(
     private globalService : GlobalService,
@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
 }
 
 @Injectable({providedIn: 'root'})
-export class AuthGuardUnverifiedAllowed implements CanActivate {
+export class AuthGuardUnverifiedAllowed  {
 
   constructor(
     private globalService : GlobalService,
@@ -49,7 +49,7 @@ export class AuthGuardUnverifiedAllowed implements CanActivate {
 }
 
 @Injectable({providedIn: 'root'})
-export class AuthGuardAdminOnly implements CanActivate {
+export class AuthGuardAdminOnly  {
 
   constructor(
     private globalService : GlobalService,
