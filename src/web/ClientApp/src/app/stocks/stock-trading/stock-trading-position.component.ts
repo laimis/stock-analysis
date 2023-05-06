@@ -34,6 +34,10 @@ export class StockTradingPositionComponent {
             return
         }
 
+        if (!allOrders) {
+            return
+        }
+
         this.positionOrders = allOrders.filter(o => o.ticker === this._position.ticker)
     }
 
