@@ -782,6 +782,12 @@ export interface TickerPatterns {
   patterns: Pattern[]
 }
 
+export interface EvaluationCountPair {
+  evaluation: string
+  count: number
+  type: string
+}
+
 export interface Pattern {
   name: string
   date: string
@@ -792,7 +798,8 @@ export interface OutcomesReport {
   evaluations: AnalysisOutcomeEvaluation[],
   outcomes: TickerOutcomes[],
   gaps: StockGaps[],
-  summary: TickerCountPair[],
+  tickerSummary: TickerCountPair[],
+  evaluationSummary: EvaluationCountPair[],
   patterns: TickerPatterns[]
 }
 

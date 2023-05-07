@@ -33,7 +33,7 @@ namespace core.Stocks.Services.Analysis
                     var outcomes = SingleBarAnalysisRunner.Run(barsToUse);
                     var tickerOutcomes = new TickerOutcomes(outcomes, ticker);
                     var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[]{tickerOutcomes});
-                    var counts = AnalysisOutcomeEvaluationScoringHelper.Generate(evaluations);
+                    var counts = AnalysisOutcomeEvaluationScoringHelper.GenerateTickerCounts(evaluations);
                     return new DateScorePair(currentBar.Date, counts.GetValueOrDefault(ticker, 0));
                 })
                 .ToList();

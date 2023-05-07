@@ -33,7 +33,9 @@ export class StockPositionReportsComponent implements OnInit {
   @Input()
   set positions(value: PositionInstance[]) {
     this._positions = value
-    this.tickers = value.map(p => p.ticker)
+    if (value) {
+      this.tickers = value.map(p => p.ticker)
+    }
   }
   get positions(): PositionInstance[] {
     return this._positions

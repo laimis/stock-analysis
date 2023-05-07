@@ -5,7 +5,7 @@
     <section>
       <h3 *ngIf="title">{{title}}</h3>
       <div *ngIf="showSummary" class="mb-3">
-          <span *ngFor="let s of report.summary"
+          <span *ngFor="let s of report.tickerSummary"
             class="badge rounded-pill me-2"
             [ngClass]="{
               'bg-success': s.count > 0,
@@ -37,6 +37,17 @@
 
     <section>
       <h5>Evaluations</h5>
+      <div class="mb-3">
+        <span *ngFor="let s of report.evaluationSummary"
+          class="badge rounded-pill me-2"
+          [ngClass]="{
+            'bg-success': s.type === 'Positive',
+            'bg-danger': s.type === 'Negative',
+            'bg-secondary': s.type === 'Neutral'
+          }">
+            <a class="text-white" href="#{{s.evaluation}}" target="_blank">{{s.evaluation}}: {{s.count}}</a>
+        </span>
+      </div>
       <div *ngFor="let c of report.evaluations" class="mb-5">
         <h5 [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral', 'evaluation': true}" style="border: 0px">
           <span class="evaluation-name">{{c.name}}</span>

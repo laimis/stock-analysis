@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using core.Shared;
 
@@ -35,7 +36,7 @@ namespace core.Stocks.Services.Analysis
 
     public static class AnalysisOutcomeEvaluationScoringHelper
     {
-        public static Dictionary<string, int> Generate(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
+        public static Dictionary<string, int> GenerateTickerCounts(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
         {
             var counts = new Dictionary<string, int>();
             foreach (var category in evaluations)
@@ -55,6 +56,24 @@ namespace core.Stocks.Services.Analysis
 
                     counts[o.ticker] += toAdd;
                 }
+            }
+            return counts;
+        }
+
+        internal static Dictionary<string, int> GenerateEvaluationCounts(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
+        {
+            var counts = new Dictionary<string, int>();
+            foreach (var category in evaluations)
+            {
+                var key = category.name;
+
+                if (!counts.ContainsKey(key))
+                {
+                    counts[key] = 0;
+                }
+
+                counts[key] += category.matchingTickers.Count;
+
             }
             return counts;
         }
