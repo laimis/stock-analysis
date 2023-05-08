@@ -107,7 +107,7 @@ namespace core.Stocks.Services.Trading
             var winningPct = wins * 1.0m / numberOfTrades;
 
             var adjustedWinningAmount = wins > 0 ? winningPct * totalWinAmount / wins : 0m;
-            var adjustedLossingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 1000m;
+            var adjustedLossingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 0m;
 
             return new TradingPerformance {
                 AvgDaysHeld = totalDaysHeld / numberOfTrades,
