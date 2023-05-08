@@ -107,14 +107,14 @@ namespace core.Stocks.Services.Trading
             var winningPct = wins * 1.0m / numberOfTrades;
 
             var adjustedWinningAmount = wins > 0 ? winningPct * totalWinAmount / wins : 0m;
-            var adjustedLossingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 0m;
+            var adjustedLosingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 0m;
 
             return new TradingPerformance {
                 AvgDaysHeld = totalDaysHeld / numberOfTrades,
                 AvgLossAmount = losses > 0 ? totalLossAmount / losses : 0,
                 AvgReturnPct = totalCost > 0 ? profit / totalCost : 0,
                 AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
-                EV = adjustedWinningAmount - adjustedLossingAmount,
+                EV = adjustedWinningAmount - adjustedLosingAmount,
                 EarliestDate = earliestDate,
                 GradeDistribution = gradeDistribution.Select(kp => new LabelWithFrequency(label: kp.Key.Value, frequency: kp.Value)).ToArray(),
                 LatestDate = latestDate,
