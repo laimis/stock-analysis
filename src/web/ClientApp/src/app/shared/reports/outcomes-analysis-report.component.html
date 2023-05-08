@@ -38,7 +38,7 @@
     <section>
       <h5>Evaluations</h5>
       <div class="mb-3">
-            <button class="btn btn-sm" *ngFor="let s of report.evaluationSummary">
+            <button [ngClass]="{'btn-outline-primary': isSelected(s.evaluation)}" class="btn btn-sm" *ngFor="let s of report.evaluationSummary" (click)="toggleEvaluation(s.evaluation)">
               {{s.evaluation}} 
               <span
                 class="badge rounded-pill me-2"
@@ -50,18 +50,20 @@
             </button>
       </div>
       <div *ngFor="let c of report.evaluations" class="mb-5">
-        <h5 
-          [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral', 'evaluation': true}"
-          style="border: 0px"
-          id="{{c.name}}">
-          <span class="evaluation-name">{{c.name}}</span>
-          <span class="evaluation-count" *ngIf="c.matchingTickers.length > 0">
-            {{c.matchingTickers.length}}
-          </span>
-        </h5>
-        <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c" [tickerFilter]="tickerFilter"></app-outcomes>
-        <span *ngIf="c.matchingTickers.length === 0">No positions in this category</span>
-        <button *ngIf="c.matchingTickers.length > 0" class="btn btn-sm btn-outline-secondary mt-2" (click)="copyTickersToClipboard(c)">Copy tickers</button>
+        <div *ngIf="isSelected(c.name)">
+          <h5 
+            [ngClass]="{'text-success': c.type === 'Positive', 'text-danger': c.type === 'Negative' , 'text-secondary': c.type === 'Neutral', 'evaluation': true}"
+            style="border: 0px"
+            id="{{c.name}}">
+            <span class="evaluation-name">{{c.name}}</span>
+            <span class="evaluation-count" *ngIf="c.matchingTickers.length > 0">
+              {{c.matchingTickers.length}}
+            </span>
+          </h5>
+          <app-outcomes *ngIf="c.matchingTickers.length > 0" [category]="c" [tickerFilter]="tickerFilter"></app-outcomes>
+          <span *ngIf="c.matchingTickers.length === 0">No positions in this category</span>
+          <button *ngIf="c.matchingTickers.length > 0" class="btn btn-sm btn-outline-secondary mt-2" (click)="copyTickersToClipboard(c)">Copy tickers</button>
+        </div>
       </div>
     </section>
 

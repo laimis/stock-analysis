@@ -8,9 +8,16 @@ import { charts_getTradingViewLink } from '../../services/links.service';
   styleUrls: ['./outcomes-analysis-report.component.css']
 })
 export class OutcomesAnalysisReportComponent {
+  private _report: OutcomesReport;
 
   @Input()
-  report: OutcomesReport
+  set report(value: OutcomesReport) {
+    this.selectedEvaluationName = value.evaluations.length > 0 ? value.evaluations[0].name : null
+    this._report = value
+  }
+  get report(): OutcomesReport {
+    return this._report
+  }
 
   @Input()
   title: string
@@ -20,6 +27,16 @@ export class OutcomesAnalysisReportComponent {
 
   @Input()
   tickerFilter: string
+
+  private selectedEvaluationName: string = null
+
+  toggleEvaluation(evaluation:string) {
+    if (this.selectedEvaluationName === evaluation) {
+      this.selectedEvaluationName = null
+    } else {
+      this.selectedEvaluationName = evaluation
+    }
+  }
   
 	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)
@@ -37,5 +54,10 @@ export class OutcomesAnalysisReportComponent {
     var tickers = c.matchingTickers.map(t => t.ticker)
     var text = tickers.join('\r')
     navigator.clipboard.writeText(text)
+  }
+
+  isSelected(evaluation:string) {
+    return this.selectedEvaluationName === null ||
+      this.selectedEvaluationName === evaluation
   }
 }
