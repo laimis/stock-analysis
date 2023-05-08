@@ -11,7 +11,7 @@
     placeholder="{{placeholder}}"
     autocomplete="off" />
 
-    <div class="search-results">
+    <div class="search-results" *ngIf="showSuggestions">
 
       <div class="row" *ngFor="let r of searchResults$ | async" (click)="clicked(r.symbol)">
         <div class="col ms-2 mb-2">{{r.symbol}}</div>

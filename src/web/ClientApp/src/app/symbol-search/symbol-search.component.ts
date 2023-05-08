@@ -20,6 +20,7 @@ export class SymbolSearchComponent implements OnInit {
 
   public searchResults$: Observable<StockSearchResult[]>;
   private searchTerms = new Subject<string>();
+  showSuggestions: boolean;
 
   constructor(
     private stocks : StocksService
@@ -50,6 +51,7 @@ export class SymbolSearchComponent implements OnInit {
 
   search(term:string) {
     console.log("search: " + term)
+    this.showSuggestions = true
     this.searchTerms.next(term);
   }
 
@@ -57,12 +59,13 @@ export class SymbolSearchComponent implements OnInit {
     this.searchTerms.next('')
     if (!this.selectedValue)
     {
-
     }
   }
 
   clicked(ticker:string) {
+    console.log("clicked: " + ticker)
     this.selectedValue = ticker
     this.tickerSelected.emit(ticker)
+    this.showSuggestions = false
   }
 }
