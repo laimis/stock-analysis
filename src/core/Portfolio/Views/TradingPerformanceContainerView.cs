@@ -122,7 +122,8 @@ namespace core.Portfolio.Views
             var gainDistribution = GenerateOutcomeHistogram(
                 "Gain Distribution",
                 transactions,
-                p => p.Profit);
+                p => p.Profit,
+                buckets: 20);
 
             var rrDistribution = GenerateOutcomeHistogram(
                 "RR Distribution",
