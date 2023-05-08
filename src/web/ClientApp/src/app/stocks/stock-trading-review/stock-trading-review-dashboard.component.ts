@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PositionInstance, StocksService, StockTradingPerformanceCollection } from 'src/app/services/stocks.service';
+import { PositionInstance, StocksService, StockTradingPerformanceCollection, TradingStrategyPerformance } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-review-dashboard',
@@ -13,6 +13,7 @@ export class StockTradingReviewDashboardComponent implements OnInit {
   loading = true;
   past: PositionInstance[];
   performance: StockTradingPerformanceCollection;
+  strategies: TradingStrategyPerformance[]
 
   constructor(
     private route: ActivatedRoute,
@@ -30,6 +31,7 @@ export class StockTradingReviewDashboardComponent implements OnInit {
       response => {
         this.past = response.past
         this.performance = response.performance
+        this.strategies = response.strategyPerformance
         this.loading = false
         this.loaded = true
       }, _ => {

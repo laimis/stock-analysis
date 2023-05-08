@@ -54,10 +54,6 @@ export class StockTradingSimulationsComponent implements OnInit {
     });
   }
 
-  openPositions(positions:PositionInstance[]) {
-    return positions.filter(p => !p.isClosed).length;
-  }
-
   backgroundCssClassForActual(results:TradingStrategyPerformance[], strategyIndex: number, positionIndex: number) {
     var simulatedPosition = results[strategyIndex].positions[positionIndex];
     var actualPosition = results[0].positions[positionIndex];

@@ -7,6 +7,7 @@ using core.Account;
 using core.Portfolio.Views;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks;
+using core.Stocks.Services.Trading;
 using MediatR;
 
 namespace core.Portfolio.Handlers
@@ -78,13 +79,27 @@ namespace core.Portfolio.Handlers
                     20
                 );
 
+                var strategyPerformance = past.Where(p => p.ContainsLabel(key: "strategy"))
+                    .GroupBy(p => p.GetLabelValue(key: "strategy"))
+                    .Select(g => {
+                        var trades = g.ToArray(); 
+                        return new TradingStrategyPerformance(
+                            strategyName: g.Key,
+                            performance: TradingPerformance.Create(trades),
+                            positions: trades
+                        );
+                    })
+                    .ToArray();
+
+            
                 var violations = Dashboard.Handler.GetViolations(brokeragePositions, positions);
 
                 return new TradingEntriesView(
                     current: current,
                     past: past,
                     performance: performance,
-                    violations: violations
+                    violations: violations,
+                    strategyPerformance: strategyPerformance
                 );
             }
 

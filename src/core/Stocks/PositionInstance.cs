@@ -322,5 +322,7 @@ namespace core.Stocks
         {
             _labels.Remove(labelDeleted.Key);
         }
+
+        internal string GetLabelValue(string key) => _labels[key];
     }
 }

@@ -14,6 +14,9 @@
       <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
         Performance
       </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('strategies')}" [routerLink]="" (click)="activateTab('strategies')">
+        Strategies
+      </a>
       <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
         Review
       </a>
@@ -28,5 +31,6 @@
     <app-stock-trading-closed-positions *ngIf="isActive('positions')" [positions]=past></app-stock-trading-closed-positions>
     <app-stock-trading-performance *ngIf="isActive('performance')" [performance]=performance></app-stock-trading-performance>
     <app-stock-trading-review *ngIf="isActive('review')"></app-stock-trading-review>
+    <app-stock-trading-strategies *ngIf="isActive('strategies')" [results]=strategies></app-stock-trading-strategies>
   </div>
   
