@@ -257,6 +257,7 @@ namespace web.BackgroundServices
                 ticker = (string)alert.ticker,
                 value = FormattedValue(),
                 description = alert.description,
+                sourceList = alert.sourceList,
                 time = _marketHours.ToMarketTime(alert.when).ToString("HH:mm") + " ET"
             };
         }
