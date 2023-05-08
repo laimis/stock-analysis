@@ -7,6 +7,7 @@ namespace core.Alerts
 {
     public record struct AlertCheck(
         string ticker,
+        string listName,
         UserState user,
         decimal? threshold = null
     );
@@ -18,6 +19,7 @@ namespace core.Alerts
         DateTimeOffset when,
         string ticker,
         string description,
+        string sourceList,
         Guid userId,
         AlertType alertType,
         ValueFormat valueType
@@ -38,7 +40,7 @@ namespace core.Alerts
     {
         private const string Identifier = "Gap up";
         private static TriggeredAlert Create(
-            string ticker,
+            string ticker, string sourceList,
             Gap gap, DateTimeOffset when, Guid userId)
         {
             return new TriggeredAlert(
@@ -48,6 +50,7 @@ namespace core.Alerts
                 when: when,
                 ticker: ticker,
                 description: Identifier,
+                sourceList: sourceList,
                 userId: userId,
                 alertType: AlertType.Positive,
                 valueType: Shared.ValueFormat.Percentage
@@ -58,8 +61,8 @@ namespace core.Alerts
             container.Deregister(Identifier, ticker, userId);
 
         public static void Register(StockAlertContainer container,
-            string ticker, Gap gap, DateTimeOffset when, Guid userId) =>
-            container.Register(Create(ticker, gap, when, userId));
+            string ticker, string sourceList, Gap gap, DateTimeOffset when, Guid userId) =>
+            container.Register(Create(ticker, sourceList, gap, when, userId));
     }
     
     public class StopPriceMonitor
@@ -78,6 +81,7 @@ namespace core.Alerts
                 watchedValue: stopPrice,
                 when: when,
                 ticker: ticker,
+                sourceList: Identifier,
                 description: Identifier,
                 userId: userId,
                 alertType: AlertType.Negative,
@@ -109,6 +113,7 @@ namespace core.Alerts
             decimal value,
             ValueFormat valueFormat,
             string ticker,
+            string sourceList,
             DateTimeOffset when,
             Guid userId)
         {
@@ -119,6 +124,7 @@ namespace core.Alerts
                 when: when,
                 ticker: ticker,
                 description: description,
+                sourceList: sourceList,
                 userId: userId,
                 alertType: AlertType.Neutral,
                 valueType: valueFormat
@@ -128,6 +134,7 @@ namespace core.Alerts
         public static void Register(
             StockAlertContainer container,
             string ticker,
+            string sourceList,
             Pattern pattern,
             decimal value,
             ValueFormat valueFormat,
@@ -141,6 +148,7 @@ namespace core.Alerts
                     value: value,
                     valueFormat: valueFormat,
                     ticker: ticker,
+                    sourceList: sourceList,
                     when: when,
                     userId: userId
                 )

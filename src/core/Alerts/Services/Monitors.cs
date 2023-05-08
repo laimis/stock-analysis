@@ -112,7 +112,9 @@ namespace core.Alerts.Services
 
                 GapUpMonitor.Register(
                     container: container,
-                    ticker: c.ticker, gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id
+                    ticker: c.ticker, 
+                    sourceList: c.listName,
+                    gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id
                 );
             }
         
@@ -159,6 +161,7 @@ namespace core.Alerts.Services
                     PatternAlert.Register(
                         container: container,
                         ticker: c.ticker,
+                        sourceList: c.listName,
                         pattern: pattern,
                         value: pattern.value,
                         valueFormat: pattern.valueFormat,

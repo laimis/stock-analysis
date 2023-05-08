@@ -43,6 +43,7 @@
             <th>Description</th>
             <th>Watched Value</th>
             <th>Triggered Value</th>
+            <th>Source</th>
           </tr>
         </thead>
         <tbody>
@@ -64,6 +65,7 @@
             <td>{{getValue(alert.watchedValue, alert.valueType)}}</td>
             <td>{{getValue(alert.triggeredValue, alert.valueType)}}</td>
             <td>Triggered on {{alert.when | date:'short'}}</td>
+            <td>{{alert.sourceList}}</td>
           </tr>
       </table>
     </section>

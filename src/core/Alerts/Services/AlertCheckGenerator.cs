@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
+using core.Portfolio;
 
 namespace core.Alerts.Services
 {
@@ -17,8 +18,8 @@ namespace core.Alerts.Services
 
             return list
                 .Where(l => l.State.ContainsTag(tag))
-                .SelectMany(x => x.State.Tickers)
-                .Select(t => new AlertCheck(ticker: t.Ticker, user: user))
+                .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
+                .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user))
                 .ToList();
         }
 
@@ -27,7 +28,7 @@ namespace core.Alerts.Services
             UserState user)
         {
             var list = await portfolio.GetStockLists(user.Id);
-
+            
             var stocks = await portfolio.GetStocks(user.Id);
             return stocks
                 .Where(s => s.State.OpenPosition != null)
@@ -35,6 +36,7 @@ namespace core.Alerts.Services
                 .Where(p => p.StopPrice != null)
                 .Select(p => new AlertCheck(
                     ticker: p.Ticker,
+                    listName: "Stop Loss",
                     user: user,
                     threshold: p.StopPrice.Value
                 ))
