@@ -14,16 +14,12 @@ namespace core.Alerts.Services
     public static class Monitors
     {
         private const string GAP_UP_TAG = "monitor:gapup";
-        private const string UPSIDE_REVERSAL_TAG = "monitor:upsidereversal";
-        private const string UNUSUAL_VOLUME_TAG = "monitor:unusualvolume";
         private const string PATTERN_TAG = "monitor:patterns";
 
         public record struct MonitorDescriptor(string tag, string name);
         public static IEnumerable<MonitorDescriptor> GetMonitors()
         {
             yield return new MonitorDescriptor(GAP_UP_TAG,"Gap Up");
-            yield return new MonitorDescriptor(UPSIDE_REVERSAL_TAG, "Upside Reversal");
-            yield return new MonitorDescriptor(UNUSUAL_VOLUME_TAG, "Unusual Volume");
             yield return new MonitorDescriptor(PATTERN_TAG, "Patterns");
         }
         
@@ -37,8 +33,6 @@ namespace core.Alerts.Services
         {
             return tag switch {
                 GAP_UP_TAG => () => MonitorForGaps(pricesFunc, container, checks, cancellationToken),
-                UPSIDE_REVERSAL_TAG => () => Task.FromResult(new List<AlertCheck>()),
-                UNUSUAL_VOLUME_TAG => () => Task.FromResult(new List<AlertCheck>()),
                 PATTERN_TAG => () => MonitorForPatterns(pricesFunc, container, checks, cancellationToken),
                 _ => () => throw new NotImplementedException($"No scanner for tag {tag}")
             };
