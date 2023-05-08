@@ -40,9 +40,11 @@ namespace core.Reports.Views
                 .ToList();
 
             EvaluationSummary = evaluationCounts
-                .OrderByDescending(x => x.Value)
-                .Select(x => {
-                        var category = evaluations.Single(e => e.name == x.Key);
+                .Select(x => (x, evaluations.Single(e => e.name == x.Key)))
+                .OrderBy(pair => pair.Item2.type)
+                .ThenByDescending(pair => pair.Item1.Value)
+                .Select(pair => {
+                        var (x,category) = pair;
                         return new EvaluationCountPair(evaluation: x.Key, type: category.type, count: x.Value);
                     }
                 )
