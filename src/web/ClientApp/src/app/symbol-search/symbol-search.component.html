@@ -11,9 +11,7 @@
     placeholder="{{placeholder}}"
     autocomplete="off" />
 
-    <div
-      [ngClass]="{'border': resultCount > 0, 'rounded': resultCount > 0}"
-      class="search-results">
+    <div class="search-results">
 
       <div class="row" *ngFor="let r of searchResults$ | async" (click)="clicked(r.symbol)">
         <div class="col ms-2 mb-2">{{r.symbol}}</div>

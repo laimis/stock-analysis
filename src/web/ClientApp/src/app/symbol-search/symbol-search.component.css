@@ -2,3 +2,12 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+.search-results {
+  position: absolute;
+  z-index: 100;
+  background-color: white;
+  border: 1px solid black;
+  padding: 5px;
+  overflow: hidden;
+}

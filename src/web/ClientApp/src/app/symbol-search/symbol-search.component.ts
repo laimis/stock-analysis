@@ -18,7 +18,6 @@ export class SymbolSearchComponent implements OnInit {
 
   selectedValue: string = null
 
-  public resultCount: number = 0
   public searchResults$: Observable<StockSearchResult[]>;
   private searchTerms = new Subject<string>();
 
@@ -46,11 +45,11 @@ export class SymbolSearchComponent implements OnInit {
   }
 
   reportResults(arr:object[]) {
-    this.resultCount = arr.length
+    console.log("reportResults: " + arr.length)
   }
 
   search(term:string) {
-    console.log("search: " + term + ", prev result count " + this.resultCount)
+    console.log("search: " + term)
     this.searchTerms.next(term);
   }
 
