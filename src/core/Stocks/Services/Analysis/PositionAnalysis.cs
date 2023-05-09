@@ -9,7 +9,8 @@ namespace core.Stocks.Services.Analysis
     {
         public static IEnumerable<AnalysisOutcome> Generate(
             PositionInstance position,
-            Shared.Adapters.Stocks.PriceBar[] bars)
+            Shared.Adapters.Stocks.PriceBar[] bars,
+            core.Shared.Adapters.Brokerage.Order[] orders)
         {
             // add price as outcome
             yield return new AnalysisOutcome(
@@ -202,6 +203,16 @@ namespace core.Stocks.Services.Analysis
                 Shared.ValueFormat.Boolean,
                 $"Missing strategy label"
             );
+
+            // has sell order
+            var hasSellOrderInOrders = orders.Any(o => o.IsSellOrder && o.Ticker == position.Ticker);
+            yield return new AnalysisOutcome(
+                PortfolioAnalysisKeys.HasSellOrder,
+                OutcomeType.Neutral,
+                hasSellOrderInOrders ? 1 : 0,
+                Shared.ValueFormat.Boolean,
+                $"Has sell order"
+            );
         }
 
     }
@@ -228,6 +239,7 @@ namespace core.Stocks.Services.Analysis
         public static string MaxGainLast10 = "MaxGainLast10";
         public static string GainDiffLast10 = "GainDiffLast10";
         public static string StrategyLabel = "StrategyLabel";
+        public static string HasSellOrder = "HasSellOrder";
     }
 }
 #nullable restore

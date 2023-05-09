@@ -174,7 +174,7 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<SearchResult[]>(converted);
     }
 
-    public async Task<ServiceResponse<IEnumerable<Order>>> GetOrders(UserState user)
+    public async Task<ServiceResponse<Order[]>> GetOrders(UserState user)
     {
         var response = await CallApi<AccountsResponse[]>(
             user,
@@ -183,7 +183,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (response.Error != null)
         {
-            return new ServiceResponse<IEnumerable<Order>>(response.Error);
+            return new ServiceResponse<Order[]>(response.Error);
         }
 
         var accounts = response.Success!;
@@ -204,9 +204,10 @@ public class TDAmeritradeClient : IBrokerage
                 Quantity = Convert.ToInt32(o.quantity),
                 Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
                 Type = o.orderLegCollection?[0]?.instruction
-            });
+            })
+            .ToArray();
 
-        return new ServiceResponse<IEnumerable<Order>>(payload);
+        return new ServiceResponse<Order[]>(payload);
     }
 
     public async Task<ServiceResponse<IEnumerable<Position>>> GetPositions(UserState user)

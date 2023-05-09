@@ -84,6 +84,7 @@ public class Order
 
     public bool CanBeRecorded => Status == "FILLED";
     public bool IncludeInResponses => Status != "CANCELED" && Status != "REJECTED" && Status != "EXPIRED";
+    public bool IsSellOrder => Type == "SELL";
 }
 
 public class Position

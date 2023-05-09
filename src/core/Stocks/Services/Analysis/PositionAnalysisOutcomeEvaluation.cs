@@ -45,6 +45,17 @@ namespace core.Stocks.Services.Analysis
                         t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.StrategyLabel && o.value == 0))
                     .ToList()
             );
+
+            // positions that don't have sell orders
+            yield return new AnalysisOutcomeEvaluation(
+                "No Sell Orders",
+                OutcomeType.Neutral,
+                PortfolioAnalysisKeys.HasSellOrder,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.HasSellOrder && o.value == 0))
+                    .ToList()
+            );
         }
     }
 }
