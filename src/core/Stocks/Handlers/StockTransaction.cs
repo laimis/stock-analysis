@@ -19,5 +19,6 @@ namespace core.Stocks
 
         public string Notes { get; set; }
         public string BrokerageOrderId { get; set; }
+        public string Strategy { get; set; }
     }
 }

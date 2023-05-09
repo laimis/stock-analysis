@@ -104,8 +104,8 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
-        [HttpPost("purchase")]
-        public async Task<ActionResult> Purchase(Buy.Command model)
+        [HttpPost("buy")]
+        public async Task<ActionResult> Buy(Buy.Command model)
         {
             model.WithUserId(User.Identifier());
 

@@ -48,6 +48,11 @@ namespace core.Stocks
 
                 stock.Purchase(cmd.NumberOfShares, cmd.Price, cmd.Date.Value, cmd.Notes, cmd.StopPrice);
 
+                if (!string.IsNullOrEmpty(cmd.Strategy) && isNewPosition)
+                {
+                    stock.SetPositionLabel(stock.State.OpenPosition.PositionId, "strategy", cmd.Strategy);
+                }
+
                 await _storage.Save(stock, cmd.UserId);
 
                 // see if we had pending position

@@ -273,7 +273,7 @@ export class StocksService {
   }
 
 	purchase(obj:stocktransactioncommand) : Observable<any> {
-		return this.http.post('/api/stocks/purchase', obj)
+		return this.http.post('/api/stocks/buy', obj)
 	}
 
 	sell(obj:stocktransactioncommand) : Observable<any> {
