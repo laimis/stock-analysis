@@ -54,6 +54,7 @@ export class StockTradingNewPositionComponent {
   date: string | null = null
   ticker: string | null = null
   notes: string | null = null
+  strategy: string = ""
 
   prices: Prices | null = null
 
@@ -102,6 +103,7 @@ export class StockTradingNewPositionComponent {
     this.ticker = null
     this.prices = null
     this.notes = null
+    this.strategy = ""
   }
 
   updateChart(ticker:string) {
@@ -228,6 +230,7 @@ export class StockTradingNewPositionComponent {
     cmd.stopPrice = this.positionStopPrice;
     cmd.notes = this.notes;
     cmd.date = this.date;
+    cmd.strategy = this.strategy;
     return cmd;
   }
 
@@ -267,6 +270,7 @@ export class StockTradingNewPositionComponent {
           this.numberOfShares = position.numberOfShares
           this.positionStopPrice = position.stopPrice
           this.notes = position.notes
+          this.strategy = position.strategy
           this.updateBuyingValuesPositionStopPrice()
         }
       }

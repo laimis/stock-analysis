@@ -80,6 +80,14 @@ namespace core.Stocks
                             }
                         }
 
+                        if (pendingState.Strategy != null)
+                        {
+                            if (stock.SetPositionLabel(positionId: opened.PositionId, key: "strategy", value: pendingState.Strategy))
+                            {
+                                saveStock = true;
+                            }
+                        }
+
                         if (saveStock)
                         {
                             await _storage.Save(stock, cmd.UserId);

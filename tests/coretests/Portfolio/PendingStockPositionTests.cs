@@ -14,6 +14,7 @@ namespace coretests.Portfolio
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                strategy: "alltimehigh",
                 ticker: "AAPL",
                 userId: Guid.NewGuid());
             
@@ -21,6 +22,7 @@ namespace coretests.Portfolio
             Assert.Equal(100, pending.State.NumberOfShares);
             Assert.Equal(10, pending.State.Price);
             Assert.Equal(5, pending.State.StopPrice);
+            Assert.Equal("alltimehigh", pending.State.Strategy);
             Assert.Equal("AAPL", pending.State.Ticker);
             Assert.NotEqual(Guid.Empty, pending.State.UserId);
         }
@@ -33,6 +35,7 @@ namespace coretests.Portfolio
                 numberOfShares: 100,
                 price: 0,
                 stopPrice: 5,
+                strategy: "alltimehigh",
                 ticker: "AAPL",
                 userId: Guid.NewGuid()));
         }
@@ -45,6 +48,7 @@ namespace coretests.Portfolio
                 numberOfShares: 0,
                 price: 10,
                 stopPrice: 5,
+                strategy: "alltimehigh",
                 ticker: "AAPL",
                 userId: Guid.NewGuid()));
         }
@@ -57,6 +61,7 @@ namespace coretests.Portfolio
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: -1,
+                strategy: "alltimehigh",
                 ticker: "AAPL",
                 userId: Guid.NewGuid()));
         }
@@ -69,6 +74,7 @@ namespace coretests.Portfolio
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                strategy: "alltimehigh",
                 ticker: "AAPL",
                 userId: Guid.NewGuid()));
         }
@@ -81,6 +87,7 @@ namespace coretests.Portfolio
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                strategy: "alltimehigh",
                 ticker: "AAPL",
                 userId: Guid.Empty));
         }
@@ -93,7 +100,21 @@ namespace coretests.Portfolio
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                strategy: "alltimehigh",
                 ticker: "",
+                userId: Guid.NewGuid()));
+        }
+
+        [Fact]
+        public void Create_WithInvalidStrategy_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => new PendingStockPosition(
+                notes: "this is a note",
+                numberOfShares: 100,
+                price: 10,
+                stopPrice: 5,
+                strategy: "",
+                ticker: "AAPL",
                 userId: Guid.NewGuid()));
         }
     }

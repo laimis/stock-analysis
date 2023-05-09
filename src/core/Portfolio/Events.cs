@@ -186,6 +186,39 @@ namespace core.Portfolio
         public decimal? StopPrice { get; }
         public string Notes { get; }
     }
+    
+    internal class PendingStockPositionCreatedWithStrategy : AggregateEvent
+    {
+        public PendingStockPositionCreatedWithStrategy(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string notes,
+            decimal numberOfShares,
+            decimal price,
+            decimal? stopPrice,
+            string strategy,
+            string ticker,
+            Guid userId)
+            : base(id, aggregateId, when)
+        {
+            Notes = notes;
+            NumberOfShares = numberOfShares;
+            Price = price;
+            StopPrice = stopPrice;
+            Strategy = strategy;
+            Ticker = ticker;
+            UserId = userId;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+        public decimal Price { get; }
+        public decimal NumberOfShares { get; }
+        public decimal? StopPrice { get; }
+        public string Notes { get; }
+        public string Strategy { get; }
+    }
 
     public class PendingStockPositionDeleted : AggregateEvent
     {

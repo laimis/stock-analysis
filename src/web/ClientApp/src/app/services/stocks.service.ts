@@ -967,6 +967,7 @@ export interface PendingStockPosition {
   stopPrice: number,
   date: string
   notes: string
+  strategy: string
 }
 
 export interface PositionInstanceLabel {
@@ -1139,6 +1140,7 @@ export class stocktransactioncommand {
   notes: string
   stopPrice: number | null
   brokerageOrderId: string | null
+  strategy: string | null
 }
 
 export class brokerageordercommand {

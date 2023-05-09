@@ -305,6 +305,7 @@ namespace storage.tests
                 numberOfShares: 10,
                 price: 2.1m,
                 stopPrice: 2m,
+                strategy: "strategy",
                 ticker: "tsla",
                 userId: _userId
             );

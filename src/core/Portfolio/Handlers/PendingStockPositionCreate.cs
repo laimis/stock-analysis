@@ -25,6 +25,8 @@ namespace core.Portfolio.Handlers
             public decimal? StopPrice { get; set; }
             [Required]
             public string Ticker { get; set; }
+            [Required(AllowEmptyStrings = false)]
+            public string Strategy { get; set; }
         }
 
         public class Handler : HandlerWithStorage<Command, PendingStockPositionState>
@@ -71,6 +73,7 @@ namespace core.Portfolio.Handlers
                     numberOfShares: request.NumberOfShares,
                     price: request.Price,
                     stopPrice: request.StopPrice,
+                    strategy: request.Strategy,
                     ticker: request.Ticker,
                     userId: request.UserId);
 

@@ -12,6 +12,7 @@ namespace core.Portfolio
         public decimal NumberOfShares { get; private set; }
         public decimal? StopPrice { get; private set; }
         public string Notes { get; private set; }
+        public string Strategy { get; private set; }
         public DateTimeOffset Date { get; private set; }
 
         public void Apply(AggregateEvent e)
@@ -26,14 +27,33 @@ namespace core.Portfolio
 
         private void ApplyInternal(PendingStockPositionCreated created)
         {
+            ApplyInternal(
+                new PendingStockPositionCreatedWithStrategy(
+                    id: created.Id,
+                    aggregateId: created.AggregateId,
+                    when: created.When,
+                    notes: created.Notes,
+                    numberOfShares: created.NumberOfShares,
+                    price: created.Price,
+                    stopPrice: created.StopPrice,
+                    strategy: null,
+                    ticker: created.Ticker,
+                    userId: created.UserId
+                )
+            );
+        }
+
+        private void ApplyInternal(PendingStockPositionCreatedWithStrategy created)
+        {
+            Date = created.When;
             Id = created.AggregateId;
+            Notes = created.Notes;
+            NumberOfShares = created.NumberOfShares;
+            Price = created.Price;
+            StopPrice = created.StopPrice;
+            Strategy = created.Strategy;
             Ticker = created.Ticker;
             UserId = created.UserId;
-            Price = created.Price;
-            NumberOfShares = created.NumberOfShares;
-            StopPrice = created.StopPrice;
-            Notes = created.Notes;
-            Date = created.When;
         }
     }
 }

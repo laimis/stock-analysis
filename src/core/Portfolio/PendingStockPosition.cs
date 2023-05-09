@@ -18,6 +18,7 @@ namespace core.Portfolio
             decimal numberOfShares,
             decimal price,
             decimal? stopPrice,
+            string strategy,
             Ticker ticker,
             Guid userId)
         {
@@ -46,7 +47,12 @@ namespace core.Portfolio
                 throw new InvalidOperationException("Notes cannot be blank");
             }
 
-            Apply(new PendingStockPositionCreated(
+            if (string.IsNullOrWhiteSpace(strategy))
+            {
+                throw new InvalidOperationException("Strategy cannot be blank");
+            }
+
+            Apply(new PendingStockPositionCreatedWithStrategy(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 when: DateTimeOffset.UtcNow,
@@ -55,7 +61,8 @@ namespace core.Portfolio
                 price: price,
                 numberOfShares: numberOfShares,
                 stopPrice: stopPrice,
-                notes: notes)
+                notes: notes,
+                strategy: strategy)
             );
         }
 

@@ -82,6 +82,22 @@
       </div>
     </div>
     <div class="row mt-3" *ngIf="prices">
+      <div class="col">
+        <select class="form-select" id="strategyInput" [(ngModel)]="strategy" placeholder="Strategy...">
+          <option value="" selected>Select strategy...</option>
+          <option value="newhigh">New High</option>
+          <option value="resistancebreakthrough">Resistance Breakthrough</option>
+          <option value="newhighpullback">New High Pullback</option>
+          <option value="recovery">Recovery</option>
+          <option value="postearnings">Post Earnings</option>
+          <option value="postearningsnewhigh">Post Earnings New High</option>
+          <option value="longterm">Long Term</option>
+          <option value="leadingindustry">Leading Industry</option>
+          <option value="channelbottom">Channel Bottom</option>
+        </select>
+      </div>
+    </div>
+    <div class="row mt-3" *ngIf="prices">
       <div class="col" *ngIf="!hideCreatePendingPosition">
         <button class="btn btn-primary w-100" (click)="createPendingPosition()">Create Pending Position</button>
       </div>
