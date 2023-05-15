@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AnalysisOutcomeEvaluation, OutcomesReport, TickerOutcomes } from '../../services/stocks.service';
+import { AnalysisOutcomeEvaluation, OutcomesReport, TickerCountPair, TickerOutcomes, TickerPatterns } from '../../services/stocks.service';
 import { charts_getTradingViewLink } from '../../services/links.service';
 
 @Component({
@@ -9,10 +9,14 @@ import { charts_getTradingViewLink } from '../../services/links.service';
 })
 export class OutcomesAnalysisReportComponent {
   private _report: OutcomesReport;
+  tickersForSummary: TickerCountPair[] = []
+  patterns: TickerPatterns[] = []
 
   @Input()
   set report(value: OutcomesReport) {
     this.selectedEvaluationName = value.evaluations.length > 0 ? value.evaluations[0].name : null
+    this.tickersForSummary = value.tickerSummary
+    this.patterns = value.patterns
     this._report = value
   }
   get report(): OutcomesReport {
@@ -28,6 +32,12 @@ export class OutcomesAnalysisReportComponent {
   @Input()
   tickerFilter: string
 
+  @Input()
+  set excludeTickers(value:string[]) {
+    this.tickersForSummary = this._report.tickerSummary.filter(t => !value.includes(t.ticker))
+    this.patterns = this._report.patterns.filter(t => !value.includes(t.ticker))
+  }
+
   private selectedEvaluationName: string = null
 
   toggleEvaluation(evaluation:string) {
@@ -42,8 +52,8 @@ export class OutcomesAnalysisReportComponent {
     return entries[0].outcomes.map(o => o.key)
   }
 
-  hasPatterns(report: OutcomesReport) {
-    return report.patterns.some(t => t.patterns.length > 0)
+  hasPatterns(patterns: TickerPatterns[]) {
+    return patterns.some(t => t.patterns.length > 0)
   }
 
   tradingViewLink(ticker:string) {

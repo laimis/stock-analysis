@@ -20,7 +20,7 @@ export class OutcomesReportComponent implements OnInit {
   title: string;
   singleBarReportWeekly: OutcomesReport;
   tickers: string[] = [];
-
+  excludedTickers: string[] = [];
 
   activeTicker: string = null;
 
@@ -106,5 +106,16 @@ export class OutcomesReportComponent implements OnInit {
 
   onTickerChange(activeTicker:string) {
     this.activeTicker = activeTicker;
+  }
+
+  excludeEarningsTitle:string = "Exclude Earnings";
+  toggleExcludeEarnings() {
+    if (this.excludedTickers.length > 0) {
+      this.excludedTickers = [];
+      this.excludeEarningsTitle = "Exclude Earnings";
+    } else {
+      this.excludedTickers = this.earnings;
+      this.excludeEarningsTitle = "Include Earnings";
+    }
   }
 }

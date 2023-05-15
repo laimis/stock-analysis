@@ -11,6 +11,7 @@
     <!-- drop down with all the tickers -->
     <div class="mb-3 mt-3">
         <label for="tickerFilter" class="form-label">Ticker filter</label>
+        <button *ngIf="earnings.length > 0" class="btn btn-link float-end" (click)="toggleExcludeEarnings()">{{excludeEarningsTitle}}</button>
         <select #tickerSelect class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
             <option value="all">All</option>
             <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
@@ -29,6 +30,7 @@
         [report]="singleBarReportDaily"
         [showSummary]="true"
         [tickerFilter]="activeTicker"
+        [excludeTickers]="excludedTickers"
         title="Daily Report">
     </app-outcomes-analysis-report>
 
