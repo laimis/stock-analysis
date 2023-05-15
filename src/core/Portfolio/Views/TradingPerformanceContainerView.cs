@@ -104,8 +104,10 @@ namespace core.Portfolio.Views
             var equity = 0m;
             var minCloseDate = DateTimeOffset.MaxValue;
             var maxCloseDate = DateTimeOffset.MinValue;
-            var positionsByDate = new Dictionary<DateTimeOffset, int>();
-            var positionsByDateContainer = new DataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
+            var positionsClosedByDate = new Dictionary<DateTimeOffset, int>();
+            var positionsClosedByDateContainer = new DataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
+            var positionsOpenedByDate = new Dictionary<DateTimeOffset, int>();
+            var positionsOpenedByDateContainer = new DataPointContainer<decimal>("Positions Opened", DataPointChartType.bar);
             
             for (var i = 0; i < positions.Length; i++)
             {
@@ -123,16 +125,22 @@ namespace core.Portfolio.Views
                 if (positions[i].Closed.Value > maxCloseDate)
                     maxCloseDate = positions[i].Closed.Value;
 
-                if (positionsByDate.ContainsKey(positions[i].Closed.Value.Date))
-                    positionsByDate[positions[i].Closed.Value.Date]++;
+                if (positionsClosedByDate.ContainsKey(positions[i].Closed.Value.Date))
+                    positionsClosedByDate[positions[i].Closed.Value.Date]++;
                 else
-                    positionsByDate[positions[i].Closed.Value.Date] = 1;
+                    positionsClosedByDate[positions[i].Closed.Value.Date] = 1;
+
+                if (positionsOpenedByDate.ContainsKey(positions[i].Opened.Value.Date))
+                    positionsOpenedByDate[positions[i].Opened.Value.Date]++;
+                else
+                    positionsOpenedByDate[positions[i].Opened.Value.Date] = 1;
             }
 
             // for the range that the positions are in, calculate the number of buys for each date
             for(var d = minCloseDate; d < maxCloseDate; d = d.AddDays(1))
             {
-                positionsByDateContainer.Add(d, positionsByDate.ContainsKey(d.Date) ? positionsByDate[d.Date] : 0);
+                positionsClosedByDateContainer.Add(d, positionsClosedByDate.ContainsKey(d.Date) ? positionsClosedByDate[d.Date] : 0);
+                positionsOpenedByDateContainer.Add(d, positionsOpenedByDate.ContainsKey(d.Date) ? positionsOpenedByDate[d.Date] : 0);
             }
 
             var gradeContainer = new DataPointContainer<decimal>("Grade", DataPointChartType.bar);
@@ -170,7 +178,8 @@ namespace core.Portfolio.Views
             trends.Add(rrSum);
             trends.Add(maxWin);
             trends.Add(maxLoss);
-            trends.Add(positionsByDateContainer);
+            trends.Add(positionsOpenedByDateContainer);
+            trends.Add(positionsClosedByDateContainer);
 
             return trends;
         }
