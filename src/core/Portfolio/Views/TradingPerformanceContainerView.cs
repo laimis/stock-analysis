@@ -57,14 +57,12 @@ namespace core.Portfolio.Views
             return closedTransactions.Slice(startIndex, closedTransactions.Length - startIndex);
         }
 
-        private List<object> GenerateTrends(Span<PositionInstance> transactions, int windowSize)
+        private List<object> GenerateTrends(Span<PositionInstance> positions, int windowSize)
         {
             var trends = new List<object>();
 
             // go over each closed transaction and calculate number of wins for 20 trades rolling window
             var profits = new DataPointContainer<decimal>("Profits", DataPointChartType.line);
-            var equityCurve = new DataPointContainer<decimal>("Equity Curve", DataPointChartType.line);
-            var equity = 0m;
             var wins = new DataPointContainer<decimal>("Win %", DataPointChartType.line);
             var avgWinPct = new DataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
             var avgLossPct = new DataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
@@ -76,13 +74,10 @@ namespace core.Portfolio.Views
             var maxWin = new DataPointContainer<decimal>("Max Win $", DataPointChartType.line);
             var maxLoss = new DataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
             var rrSum = new DataPointContainer<decimal>("RR Sum", DataPointChartType.line);
-            var agrades = 0;
-            var bgrades = 0;
-            var cgrades = 0;
 
-            for (var i = 0; i < transactions.Length; i++)
+            for (var i = 0; i < positions.Length; i++)
             {
-                var window = transactions.Slice(i, Math.Min(windowSize, transactions.Length));
+                var window = positions.Slice(i, Math.Min(windowSize, positions.Length));
                 var perfView = TradingPerformance.Create(window);
                 profits.Add(window[0].Closed.Value, perfView.Profit);
                 wins.Add(window[0].Closed.Value, perfView.WinPct);
@@ -97,21 +92,47 @@ namespace core.Portfolio.Views
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);
                 
-                if (i + 20 >= transactions.Length)
+                if (i + 20 >= positions.Length)
                     break;
             }
 
             // non windowed stats
-            for (var i = 0; i < transactions.Length; i++)
+            var agrades = 0;
+            var bgrades = 0;
+            var cgrades = 0;
+            var equityCurve = new DataPointContainer<decimal>("Equity Curve", DataPointChartType.line);
+            var equity = 0m;
+            var minCloseDate = DateTimeOffset.MaxValue;
+            var maxCloseDate = DateTimeOffset.MinValue;
+            var positionsByDate = new Dictionary<DateTimeOffset, int>();
+            var positionsByDateContainer = new DataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
+            
+            for (var i = 0; i < positions.Length; i++)
             {
-                equity += transactions[i].Profit;
-                equityCurve.Add(transactions[i].Closed.Value, equity);
-                if (transactions[i].Grade == "A")
+                equity += positions[i].Profit;
+                equityCurve.Add(positions[i].Closed.Value, equity);
+                if (positions[i].Grade == "A")
                     agrades++;
-                if (transactions[i].Grade == "B")
+                if (positions[i].Grade == "B")
                     bgrades++;
-                if (transactions[i].Grade == "C")
+                if (positions[i].Grade == "C")
                     cgrades++;
+
+                if (positions[i].Closed.Value < minCloseDate)
+                    minCloseDate = positions[i].Closed.Value;
+                if (positions[i].Closed.Value > maxCloseDate)
+                    maxCloseDate = positions[i].Closed.Value;
+
+                if (positionsByDate.ContainsKey(positions[i].Closed.Value.Date))
+                    positionsByDate[positions[i].Closed.Value.Date]++;
+                else
+                    positionsByDate[positions[i].Closed.Value.Date] = 1;
+            }
+
+            // for the range that the positions are in, calculate the number of buys for each date
+            for(var d = minCloseDate; d < maxCloseDate; d = d.AddDays(1))
+            {
+                positionsByDateContainer.Add(d, positionsByDate.ContainsKey(d.Date) ? positionsByDate[d.Date] : 0);
             }
 
             var gradeContainer = new DataPointContainer<decimal>("Grade", DataPointChartType.bar);
@@ -121,13 +142,13 @@ namespace core.Portfolio.Views
 
             var gainDistribution = GenerateOutcomeHistogram(
                 "Gain Distribution",
-                transactions,
+                positions,
                 p => p.Profit,
                 buckets: 20);
 
             var rrDistribution = GenerateOutcomeHistogram(
                 "RR Distribution",
-                transactions,
+                positions,
                 p => p.RR,
                 buckets: 10,
                 minAdjustment: 0
@@ -149,6 +170,7 @@ namespace core.Portfolio.Views
             trends.Add(rrSum);
             trends.Add(maxWin);
             trends.Add(maxLoss);
+            trends.Add(positionsByDateContainer);
 
             return trends;
         }
