@@ -75,7 +75,7 @@ namespace core.Stocks
                 var violations = new HashSet<StockViolationView>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
-                foreach (var brokeragePosition in brokeragePositions)
+                foreach (var brokeragePosition in brokeragePositions.Where(p => p.IsEquity))
                 {
                     var localPosition = localPositions.SingleOrDefault(o => o.Ticker == brokeragePosition.Ticker);
                     if (localPosition != null)

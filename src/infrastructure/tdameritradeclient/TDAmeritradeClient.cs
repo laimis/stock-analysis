@@ -229,6 +229,7 @@ public class TDAmeritradeClient : IBrokerage
         var payload = positions.Select(p => new Position
         {
             Ticker = p.instrument?.symbol,
+            AssetType = p.instrument?.assetType,
             Quantity = p.longQuantity,
             AverageCost = p.averagePrice
         });

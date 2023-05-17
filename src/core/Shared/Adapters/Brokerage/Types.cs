@@ -92,4 +92,6 @@ public class Position
     public string Ticker { get; set; }
     public decimal AverageCost { get; set; }
     public decimal Quantity { get; set; }
+    public string AssetType { get; set; }
+    public bool IsEquity => AssetType == "EQUITY";
 }
