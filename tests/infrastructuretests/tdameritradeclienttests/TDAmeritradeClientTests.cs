@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
@@ -7,6 +6,25 @@ using Xunit;
 
 namespace tdameritradeclienttests
 {
+
+    public class TDAmeritradeSerializationTests
+    {
+        [Fact]
+        public void NaNSerialization_Works()
+        {
+            var jsonWithNan = @"{""volatility"": ""NaN""}";
+            var jsonWithoutNan = @"{""volatility"": 1.0}";
+
+            var deserializedWithNan = System.Text.Json.JsonSerializer.Deserialize<OptionDescriptor>(jsonWithNan);
+
+            Assert.Equal(0, deserializedWithNan!.volatility);
+
+            var deserializedWithoutNan = System.Text.Json.JsonSerializer.Deserialize<OptionDescriptor>(jsonWithoutNan);
+            
+            Assert.Equal(1.0m, deserializedWithoutNan!.volatility);
+        }
+    }
+
     [Trait("Category", "Integration")]
     public class TDAmeritradeClientTests
     {

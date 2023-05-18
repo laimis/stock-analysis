@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using core.Shared.Adapters.Brokerage;
 
 namespace tdameritradeclient;
@@ -313,6 +315,7 @@ internal class OptionDescriptor
     public decimal highPrice { get; set; }
     public decimal lowPrice { get; set; }
     public int totalVolume { get; set; }
+    [JsonConverter(typeof(NanConverter))]
     public decimal volatility { get; set; }
     public decimal delta { get; set; }
     public decimal gamma { get; set; }
@@ -346,4 +349,27 @@ internal class OptionChain
     public int numberOfContracts { get; set; }
     public Dictionary<string, OptionDescriptorMap>? putExpDateMap { get; set; }
     public Dictionary<string, OptionDescriptorMap>? callExpDateMap { get; set; }
+}
+
+// TDAPI returns "NaN" for some of the decimals that we need to handle gracefully
+internal class NanConverter : JsonConverter<decimal>
+{
+    public override decimal Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var stringValue = reader.GetString();
+            if (stringValue == "NaN")
+            {
+                return 0;
+            }
+        }
+
+        return reader.GetDecimal();
+    }
+
+    public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value);
+    }
 }

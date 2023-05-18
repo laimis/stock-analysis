@@ -17,4 +17,10 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>tdameritradeclienttests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
