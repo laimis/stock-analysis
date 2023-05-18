@@ -9,7 +9,7 @@ import { TradingStrategyResults } from 'src/app/services/stocks.service';
 })
 export class TradingActualVsSimulatedPositionComponent {
 
-  showDetails: boolean = false;
+  showDetails: number | null = null;
 
   @Input()
   simulations: TradingStrategyResults
@@ -17,8 +17,12 @@ export class TradingActualVsSimulatedPositionComponent {
   @Input()
   simulationErrors: string[];
 
-  toggleShowDetails() {
-    this.showDetails = !this.showDetails;
+  toggleShowDetails(index: number) {
+    if (this.showDetails == index) {
+      this.showDetails = null;
+    } else {
+      this.showDetails = index;
+    }
   }
 
   sortedResults() {

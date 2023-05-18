@@ -6,7 +6,7 @@ using core.Shared;
 namespace core.Stocks
 {
     public enum PositionEventType { buy, stop, sell, risk }
-    public record struct PositionEvent (string description, PositionEventType type, decimal? value, DateTimeOffset when)
+    public record struct PositionEvent (string description, PositionEventType type, decimal? value, DateTimeOffset when, decimal? quantity = null)
     {
         public string Date => when.ToString("yyyy-MM-dd");
     }
@@ -101,7 +101,7 @@ namespace core.Stocks
             }
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
-            Events.Add(new PositionEvent($"buy {numberOfShares} @ ${price}", PositionEventType.buy, price, when));
+            Events.Add(new PositionEvent($"buy {numberOfShares} @ ${price}", type: PositionEventType.buy, value: price, when: when, quantity: numberOfShares));
 
             if (PositionCompleted == false)
             {
@@ -149,7 +149,7 @@ namespace core.Stocks
             var percentGainAtSale = (price - AverageCostPerShare) / AverageCostPerShare;
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
-            Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price} ({percentGainAtSale.ToString("P")})", PositionEventType.sell, price, when));
+            Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price} ({percentGainAtSale.ToString("P")})", PositionEventType.sell, price, when, quantity: numberOfShares));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))

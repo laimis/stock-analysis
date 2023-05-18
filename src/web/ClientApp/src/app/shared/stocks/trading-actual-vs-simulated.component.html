@@ -11,18 +11,12 @@
         <th>Drawdown</th>
         <th>R Gain</th>
         <th>R Drawdown</th>
-        <th>
-          <!-- <button (click)="toggleShowDetails()" class="btn btn-primary float-end btn-sm">Show Details</button> -->
-          <div class="form-switch">
-            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" (click)="toggleShowDetails()">
-            <label class="form-check-label" for="flexSwitchCheckDefault"> &nbsp;&nbsp;&nbsp;&nbsp;Show Details</label>
-          </div>
-        </th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let r of sortedResults()">
-        <tr>
+      <ng-container *ngFor="let r of sortedResults(); let i = index">
+        <tr (click)="toggleShowDetails(i)">
           <td class="text-muted">{{r.strategyName}}</td>
           <td [ngClass]="{'bg-negative': r.position.combinedProfit < 0, 'fw-bold': true}">{{r.position.combinedProfit | currency}}</td>
           <td>{{r.position.stopPrice | currency }}</td>
@@ -36,21 +30,16 @@
             <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
           </td>
         </tr>
-        <!-- <tr>
-          <td colspan="100%" class="border">
-            <div class="badge" [ngClass]="{'bg-info': t.type === 'buy', 'bg-warning': t.type === 'sell'}" *ngFor="let t of r.position.transactions">
-              {{t.date | date:'shortDate'}} {{t.type}} {{t.numberOfShares}} {{t.price | currency}}
-            </div>
-          </td>
-        </tr> -->
-        <tr *ngIf="showDetails">
+        
+        <tr *ngIf="showDetails === i">
           <td></td>
-          <td colspan="7">
+          <td colspan="9">
             <table class="table small">
               <tbody>
                 <tr *ngFor="let e of r.position.events" class="event" [ngClass]="'event-' + e.type">
                   <td>{{e.date}}</td>
                   <td>{{e.type}}</td>
+                  <td>{{e.quantity}}</td>
                   <td>{{e.value | currency}}</td>
                 </tr>
               </tbody>

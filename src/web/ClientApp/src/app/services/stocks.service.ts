@@ -957,6 +957,7 @@ export interface PositionEvent {
   value: number | null,
   type: string,
   description: string,
+  quantity: number | null
 }
 
 export interface PendingStockPosition {
