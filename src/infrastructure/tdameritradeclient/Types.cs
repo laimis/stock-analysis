@@ -317,10 +317,15 @@ internal class OptionDescriptor
     public int totalVolume { get; set; }
     [JsonConverter(typeof(NanConverter))]
     public decimal volatility { get; set; }
+    [JsonConverter(typeof(NanConverter))]
     public decimal delta { get; set; }
+    [JsonConverter(typeof(NanConverter))]
     public decimal gamma { get; set; }
+    [JsonConverter(typeof(NanConverter))]
     public decimal theta { get; set; }
+    [JsonConverter(typeof(NanConverter))]
     public decimal vega { get; set; }
+    [JsonConverter(typeof(NanConverter))]
     public decimal rho { get; set; }
     public long openInterest { get; set; }
     public decimal timeValue { get; set; }

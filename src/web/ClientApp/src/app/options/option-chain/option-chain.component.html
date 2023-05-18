@@ -31,64 +31,73 @@
     </div>
 
 
-    <div>
-      <label for="expirationSelect">Expiration</label>&nbsp;&nbsp;
-      <select class="btn border rounded" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
-        <option value=""></option>
-        <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
-      </select>
-
-      &nbsp;&nbsp;<label for="sideSelect">Side</label>&nbsp;&nbsp;
-      <select class="btn border rounded" [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
-        <option value=""></option>
-        <option value="call">call</option>
-        <option value="put">put</option>
-      </select>
-
-      &nbsp;&nbsp;<label for="minBid">Min Bid Price</label>&nbsp;&nbsp;
-      <input type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
+    <div class="row">
+      <div class="col">
+        <label class="form-label" for="expirationSelect">Expiration</label>
+        <select class="form-select" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
+          <option value=""></option>
+          <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
+        </select>
+      </div>
+      <div class="col">  
+        <label class="form-label" for="sideSelect">Side</label>
+        <select class="form-select" [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
+          <option value=""></option>
+          <option value="call">call</option>
+          <option value="put">put</option>
+        </select>
+      </div>
+      <div class="col">
+        <label class="form-label" for="minBid">Min Bid Price</label>
+        <input class="form-control" type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
+      </div>
     </div>
 
-    <div>
-      <label for="minStrikePrice">Min Strike Price</label>&nbsp;&nbsp;
-      <input type="number" id="minStrikePrice" name="minStrikePrice" [(ngModel)]="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()" />
-
-      &nbsp;&nbsp;<label for="maxStrikePrice">Max Strike Price</label>&nbsp;&nbsp;
-      <input type="number" id="maxStrikePrice" name="maxStrikePrice" [(ngModel)]="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()" />
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label" for="minStrikePrice">Min Strike Price</label>
+        <input class="form-control" type="number" id="minStrikePrice" name="minStrikePrice" [(ngModel)]="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()" />
+      </div>
+      <div class="col">
+        <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
+        <input class="form-control" type="number" id="maxStrikePrice" name="maxStrikePrice" [(ngModel)]="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()" />
+      </div>
+      <div class="col"></div>
     </div>
 
     <div *ngFor="let expiration of expirationMap">
 
-      <table class="table table-hover border">
-        <thead class="thead-light">
-          <tr>
-            <th>Option ({{expiration[0].daysToExpiration}})</th>
-            <th>Strike Price</th>
-            <th>Open interest</th>
-            <th>Volume</th>
-            <th>Bid vs Ask</th>
-            <th>Spread</th>
-            <th>PDP</th>
-            <th>Risk</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let option of expiration">
-            <!-- <td>{{option.expirationDate}}</td>
-            <td>{{option.strikePrice | currency}} <small>{{option.breakEven | currency }}</small></td> -->
-            <!-- <td>{{option.side}}</td> -->
-            <td>{{option.strikePrice | currency}}</td>
-            <td>{{option.description}}</td>
-            <td>{{option.openInterest}}</td>
-            <td>{{option.volume}}</td>
-            <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
-            <td>{{option.spread | currency}}</td>
-            <td>{{option.perDayPrice | currency}}</td>
-            <td>{{option.risk | percent}}</td>
-            <td>{{option.lastUpdated | date}}</td>
-          </tr>
-        </tbody>
-      </table>
+      <section>
+        <h4>
+          {{expiration[0].expirationDate}}
+          <span class="float-end">Expires in {{expiration[0].daysToExpiration}} day(s)</span>
+        </h4>
+        <table class="table table-hover border">
+          <thead class="thead-light">
+            <tr>
+              <th>Strike Price</th>
+              <th>Open interest</th>
+              <th>Volume</th>
+              <th>Bid vs Ask</th>
+              <th>Spread</th>
+              <th>PDP</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let option of expiration">
+              <td>{{option.strikePrice | currency}}</td>
+              <td>{{option.openInterest}}</td>
+              <td>{{option.volume}}</td>
+              <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
+              <td>{{option.spread | currency}}</td>
+              <td>{{option.perDayPrice | currency}}</td>
+              <td>{{option.risk | percent}}</td>
+              <td>{{option.lastUpdated | date}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
     </div>
 </div>

@@ -44,7 +44,7 @@ export class OptionChainComponent implements OnInit {
       this.expirations = result.expirations
       this.stockPrice = result.stockPrice
       this.sideSelection = "put"
-      this.minBid = 0.1
+      this.minBid = 0
       this.runFilter()
     }, error => {
       this.failure = "Failed to load option chain, either data  is not available or entered symbol is incorrect."
