@@ -31,7 +31,7 @@
     </div>
 
 
-    <div class="row">
+    <div class="row mb-3">
       <div class="col">
         <label class="form-label" for="expirationSelect">Expiration</label>
         <select class="form-select" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
@@ -53,25 +53,28 @@
       </div>
     </div>
 
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="minStrikePrice">Min Strike Price</label>
-        <input class="form-control" type="number" id="minStrikePrice" name="minStrikePrice" [(ngModel)]="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()" />
-      </div>
-      <div class="col">
-        <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
-        <input class="form-control" type="number" id="maxStrikePrice" name="maxStrikePrice" [(ngModel)]="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()" />
-      </div>
-      <div class="col"></div>
-    </div>
 
     <div *ngFor="let expiration of expirationMap">
-
       <section>
         <h4>
           {{expiration[0].expirationDate}}
           <span class="float-end">Expires in {{expiration[0].daysToExpiration}} day(s)</span>
         </h4>
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label" for="minStrikePrice">Min Strike Price</label>
+            <select class="form-select" [(ngModel)]="minStrikePrice" id="minStrikePrice" name="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()">
+              <option *ngFor="let option of expiration" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
+            </select>
+          </div>
+          <div class="col">
+            <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
+            <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
+              <option *ngFor="let option of expiration" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
+            </select>
+          </div>
+          <div class="col"></div>
+        </div>
         <table class="table table-hover border">
           <thead class="thead-light">
             <tr>
