@@ -87,6 +87,7 @@ import { StockSECFilingsComponent } from './stocks/stock-details/stock-secfiling
 import { StockTradingAnalysisDashboardComponent } from './stocks/stock-trading-analysis/stock-trading-analysis-dashboard.component';
 import { RoutineDashboardComponent } from './routines/routines-dashboard.component';
 import { StockTradingStrategiesComponent } from './shared/stocks/stock-trading-strategies.component';
+import { StockTradingSummaryComponent } from './stocks/stock-trading/stock-trading-summary.component';
 
 
 var routes: Routes = [
@@ -204,6 +205,7 @@ var routes: Routes = [
     StockTradingClosedPositionsComponent,
     StockTradingPerformanceComponent,
     StockTradingReviewComponent,
+    StockTradingSummaryComponent,
     StockChartComponent,
     StockTradingSimulatorComponent,
     StockTradingSimulationsComponent,

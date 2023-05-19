@@ -1,0 +1,79 @@
+<div class="summary-card rounded" *ngIf="positions">
+  <div class="row">
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted sort-header" (click)="sort('strategy')">
+        Strategy
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        Total
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted sort-header" (click)="sort('cost')">
+        Invested
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        {{ totalCost | currency }}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted sort-header"  (click)="sort('risk')">
+        Risked  
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        {{ totalRiskedAmount | currency }}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted sort-header" (click)="sort('numberOfPositions')">
+        Positions
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        {{positions.length}}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted sort-header" (click)="sort('profit')">
+        Profit
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        {{ totalProfit | currency}}
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngFor="let positionGroup of positionGroups">
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted">
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        {{positionGroup.strategy}}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted">
+      </div>
+      <div class="fs-4 summary-card-main-info">
+        {{ positionGroup.cost | currency }}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted"></div>
+      <div class="fs-4 summary-card-main-info">
+        {{ positionGroup.risk | currency }}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted"></div>
+      <div class="fs-4 summary-card-main-info">
+        {{positionGroup.length}}
+      </div>
+    </div>
+    <div class="col mb-4 mt-2 text-center">
+      <div class="text-muted"></div>
+      <div class="fs-4 summary-card-main-info">
+        {{positionGroup.profit | currency}}
+      </div>
+    </div>
+  </div>
+</div>

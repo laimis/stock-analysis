@@ -20,8 +20,7 @@ export class StockTradingComponent implements OnInit {
   brokerageOrders: BrokerageOrder[];
 
   @ViewChild(BrokerageOrdersComponent) brokerageOrdersComponent:BrokerageOrdersComponent;
-  positionGroups: any[];
-
+  
   constructor(
     private stockService:StocksService,
     private title: Title,
@@ -61,40 +60,6 @@ export class StockTradingComponent implements OnInit {
     this.loadEntries()
   }
 
-  totalCost(positions) {
-    return positions.reduce((acc, cur) => acc + (cur.averageCostPerShare * cur.numberOfShares), 0)
-  }
-
-  breakdownByLabel(positions) : {label:string, positions:PositionInstance[]}[] {
-    console.log("breaking down positions")
-
-    if (!positions) return []
-
-    // get unique "strategy" labels
-    let uniqueStrategies = positions.reduce((acc, cur) => {
-      let strategy = cur.labels.find(l => l.key == 'strategy')
-      let strategyKey = strategy ? strategy.value : "none"
-      
-      if (!acc[strategyKey]) {
-        acc[strategyKey] = []
-      }
-      
-      acc[strategyKey].push(cur)
-      
-      return acc
-    }, {})
-
-    return uniqueStrategies
-  }
-
-  totalRiskedAmount(positions) {
-    return positions.reduce((acc, cur) => acc + cur.costAtRiskedBasedOnStopPrice, 0)
-  }
-
-  profit(positions) {
-    return positions.reduce((acc, cur) => acc + cur.combinedProfit, 0)
-  }
-
   private loadEntries() {
     this.loading = true
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
@@ -104,7 +69,6 @@ export class StockTradingComponent implements OnInit {
       this.violations = r.violations
       this.loading = false
       this.loaded = true
-      this.positionGroups = this.breakdownByLabel(this.positions)
 
       this.loadBrokerageOrders()
     }, _ => {
