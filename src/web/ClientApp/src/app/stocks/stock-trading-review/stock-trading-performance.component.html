@@ -27,13 +27,14 @@
         </div>
       </form>
     </div>
+
     <canvas
       class="mb-2"
       *ngFor="let t of trends"
       baseChart
       [datasets]="getData(t)"
       [labels]="getLabels(t)"
-      [options]="lineChartOptions"
+      [options]="getOptions(t)"
       [legend]="lineChartLegend"
       [plugins]="lineChartPlugins"
       [type]="getChartType(t)">

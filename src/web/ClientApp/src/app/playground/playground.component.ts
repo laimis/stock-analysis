@@ -20,6 +20,12 @@ export class PlaygroundComponent implements OnInit {
   ticker:string;
   startDate:string;
 
+  annotationLine = {
+    value: 1,
+    label: 'Zero',
+    chartAnnotationLineType: 'horizontal'
+  }
+
   ngOnInit() {
     var tickerParam = this.route.snapshot.queryParamMap.get('tickers');
     if (tickerParam) {

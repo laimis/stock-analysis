@@ -903,10 +903,17 @@ export interface DataPoint {
   label: string
 }
 
+export interface ChartAnnotationLine {
+  value: number
+  label: string
+  chartAnnotationLineType: string
+}
+
 export interface DataPointContainer {
   label: string
   chartType: string
-  data: DataPoint[]
+  data: DataPoint[],
+  annotationLine: ChartAnnotationLine
 }
 
 export interface StockTradingPerformanceCollection {

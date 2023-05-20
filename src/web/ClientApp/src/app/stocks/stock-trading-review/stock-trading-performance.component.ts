@@ -20,8 +20,8 @@ export class StockTradingPerformanceComponent {
   get performance() {
     return this._performance
   }
-
-  timeLimit = "2m"
+  
+  timeLimit = "ytd"
   trends:DataPointContainer[]
 
   selectTrendsToRenderBasedOnTimeFilter() {
@@ -78,18 +78,41 @@ export class StockTradingPerformanceComponent {
   public lineChartPlugins = [];
   public lineChartType : ChartType = 'line';
   public lineChartLegend = true;
-  public lineChartOptions: ChartOptions = {
-    responsive: true,
-    scales: {
-      y: {
-        display: true,
-      }
-    },
-    plugins: {
-      annotation: {
-        annotations: []
+  getOptions(c:DataPointContainer) : ChartOptions {
+    let mappedAnnotationArray = []
+    if (c.annotationLine) {
+      let scaleID = c.annotationLine.chartAnnotationLineType == 'horizontal' ? 'y' : 'x'
+      
+      mappedAnnotationArray = [
+        {
+          type: 'line',
+          scaleID: scaleID,
+          value: c.annotationLine.value,
+          borderColor: 'rgb(75, 192, 192)',
+          borderWidth: 4,
+          label: {
+            enabled: true,
+            content: c.annotationLine.label
+          }
+        }
+      ]
+    }
+
+    var options = {
+      responsive: true,
+      scales: {
+        y: {
+          display: true,
+        }
+      },
+      plugins: {
+        annotation: {
+          annotations: mappedAnnotationArray
+        }
       }
     }
-  };
+
+    return options
+  }
 
 }

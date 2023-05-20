@@ -3,14 +3,28 @@ using System.Collections.Generic;
 
 namespace core.Shared
 {
-    public class DataPointContainer<T> : DataPointContainerBase
+    public enum ChartAnnotationLineType { vertical, horizontal}
+    
+    public record ChartAnnotationLine(decimal value, string label, ChartAnnotationLineType chartAnnotationLineType);
+
+    public class ChartDataPointContainer<T> : ChartDataPointContainerBase
     {
-        public DataPointContainer(string label, DataPointChartType chartType) : base(label, chartType)
+        public ChartDataPointContainer(
+            string label,
+            DataPointChartType chartType) : base(label, chartType)
         {
         }
-        
+
+        public ChartDataPointContainer(
+            string label,
+            DataPointChartType chartType,
+            ChartAnnotationLine annotationLine) : base(label, chartType)
+        {
+            AnnotationLine = annotationLine;
+        }
+
         public List<DataPoint<T>> Data { get; private set; } = new List<DataPoint<T>>();
-        
+        public ChartAnnotationLine AnnotationLine { get; }
 
         public void Add(DateTimeOffset label, T value)
         {
@@ -26,9 +40,9 @@ namespace core.Shared
     public enum DataPointChartType { line, bar }
 
 
-    public class DataPointContainerBase
+    public class ChartDataPointContainerBase
     {
-        public DataPointContainerBase(string label, DataPointChartType chartType)
+        public ChartDataPointContainerBase(string label, DataPointChartType chartType)
         {
             Label = label;
             ChartType = chartType;

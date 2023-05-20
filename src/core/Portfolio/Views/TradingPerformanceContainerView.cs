@@ -61,19 +61,23 @@ namespace core.Portfolio.Views
         {
             var trends = new List<object>();
 
+            var zeroLineAnnotationHorizontal = new ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.horizontal);
+            var zeroLineAnnotationVertical = new ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.vertical);
+            var oneLineAnnotationHorizontal = new ChartAnnotationLine(1, "One", ChartAnnotationLineType.horizontal);
+
             // go over each closed transaction and calculate number of wins for 20 trades rolling window
-            var profits = new DataPointContainer<decimal>("Profits", DataPointChartType.line);
-            var wins = new DataPointContainer<decimal>("Win %", DataPointChartType.line);
-            var avgWinPct = new DataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
-            var avgLossPct = new DataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
-            var ev = new DataPointContainer<decimal>("EV", DataPointChartType.line);
-            var avgWinAmount = new DataPointContainer<decimal>("Avg Win $", DataPointChartType.line);
-            var avgLossAmount = new DataPointContainer<decimal>("Avg Loss $", DataPointChartType.line);
-            var rrPct = new DataPointContainer<decimal>("RR %", DataPointChartType.line);
-            var rrAmount = new DataPointContainer<decimal>("RR $", DataPointChartType.line);
-            var maxWin = new DataPointContainer<decimal>("Max Win $", DataPointChartType.line);
-            var maxLoss = new DataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
-            var rrSum = new DataPointContainer<decimal>("RR Sum", DataPointChartType.line);
+            var profits = new ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal);
+            var wins = new ChartDataPointContainer<decimal>("Win %", DataPointChartType.line);
+            var avgWinPct = new ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
+            var avgLossPct = new ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
+            var ev = new ChartDataPointContainer<decimal>("EV", DataPointChartType.line, zeroLineAnnotationHorizontal);
+            var avgWinAmount = new ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.line);
+            var avgLossAmount = new ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.line);
+            var rrPct = new ChartDataPointContainer<decimal>("RR %", DataPointChartType.line, oneLineAnnotationHorizontal);
+            var rrAmount = new ChartDataPointContainer<decimal>("RR $", DataPointChartType.line, oneLineAnnotationHorizontal);
+            var maxWin = new ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.line);
+            var maxLoss = new ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
+            var rrSum = new ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.line);
 
             for (var i = 0; i < positions.Length; i++)
             {
@@ -100,14 +104,14 @@ namespace core.Portfolio.Views
             var agrades = 0;
             var bgrades = 0;
             var cgrades = 0;
-            var equityCurve = new DataPointContainer<decimal>("Equity Curve", DataPointChartType.line);
+            var equityCurve = new ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.line, zeroLineAnnotationHorizontal);
             var equity = 0m;
             var minCloseDate = DateTimeOffset.MaxValue;
             var maxCloseDate = DateTimeOffset.MinValue;
             var positionsClosedByDate = new Dictionary<DateTimeOffset, int>();
-            var positionsClosedByDateContainer = new DataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
+            var positionsClosedByDateContainer = new ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
             var positionsOpenedByDate = new Dictionary<DateTimeOffset, int>();
-            var positionsOpenedByDateContainer = new DataPointContainer<decimal>("Positions Opened", DataPointChartType.bar);
+            var positionsOpenedByDateContainer = new ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.bar);
             
             for (var i = 0; i < positions.Length; i++)
             {
@@ -143,7 +147,7 @@ namespace core.Portfolio.Views
                 positionsOpenedByDateContainer.Add(d, positionsOpenedByDate.ContainsKey(d.Date) ? positionsOpenedByDate[d.Date] : 0);
             }
 
-            var gradeContainer = new DataPointContainer<decimal>("Grade", DataPointChartType.bar);
+            var gradeContainer = new ChartDataPointContainer<decimal>("Grade", DataPointChartType.bar);
             gradeContainer.Add("A", agrades);
             gradeContainer.Add("B", bgrades);
             gradeContainer.Add("C", cgrades);
@@ -153,14 +157,16 @@ namespace core.Portfolio.Views
                 positions,
                 p => p.Profit,
                 buckets: 20,
-                symmetric: true);
+                symmetric: true,
+                annotation: zeroLineAnnotationVertical);
 
             var rrDistribution = GenerateOutcomeHistogram(
                 "RR Distribution",
                 positions,
                 p => p.RR,
                 buckets: 10,
-                symmetric: true);
+                symmetric: true,
+                annotation: zeroLineAnnotationVertical);
 
             trends.Add(profits);
             trends.Add(equityCurve);
@@ -184,14 +190,15 @@ namespace core.Portfolio.Views
             return trends;
         }
 
-        private static DataPointContainer<decimal> GenerateOutcomeHistogram(
+        private static ChartDataPointContainer<decimal> GenerateOutcomeHistogram(
             string histogramLabel,
             Span<PositionInstance> transactionsToUse,
             Func<PositionInstance, decimal> valueFunc,
             int buckets = 50,
-            bool symmetric = false)
+            bool symmetric = false,
+            ChartAnnotationLine annotation = null)
         {
-            var gains = new DataPointContainer<decimal>(histogramLabel, DataPointChartType.bar);
+            var gains = new ChartDataPointContainer<decimal>(histogramLabel, DataPointChartType.bar, annotation);
 
             var min = Decimal.MaxValue;
             var max = Decimal.MinValue;

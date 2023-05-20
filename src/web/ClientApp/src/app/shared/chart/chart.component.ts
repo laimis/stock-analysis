@@ -3,6 +3,7 @@ import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from '
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { ChartAnnotationLine } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-chart',
@@ -29,6 +30,26 @@ export class ChartComponent implements OnInit, OnDestroy {
   public set yScaleType(value: 'linear' | 'logarithmic') {
     this.chartOptions.scales.y.type = value
   };
+
+  @Input()
+  public set chartAnnotationLine(value: ChartAnnotationLine) {
+
+    let scaleID = value.chartAnnotationLineType == 'vertical' ? 'y' : 'x'
+
+    this.chartOptions.plugins.annotation.annotations = [
+      {
+        type: 'line',
+        scaleID: scaleID,
+        value: value.value,
+        borderColor: 'rgb(75, 192, 192)',
+        borderWidth: 4,
+        label: {
+          enabled: true,
+          content: value.label
+        }
+      }
+    ]
+  }
 
   public chartOptions: ChartOptions = {
     responsive: true,
