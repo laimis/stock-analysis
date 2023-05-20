@@ -42,6 +42,7 @@
           <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
         </ul>
         <span *ngIf="p.notes.length === 0"> no notes </span>
+        <span class="badge bg-light text-secondary m-1">{{getStrategy(p)}}</span>
       </div>
     </div>
     <div class="mb-3">
