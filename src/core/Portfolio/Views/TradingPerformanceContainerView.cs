@@ -152,15 +152,15 @@ namespace core.Portfolio.Views
                 "Gain Distribution",
                 positions,
                 p => p.Profit,
-                buckets: 20);
+                buckets: 20,
+                symmetric: true);
 
             var rrDistribution = GenerateOutcomeHistogram(
                 "RR Distribution",
                 positions,
                 p => p.RR,
                 buckets: 10,
-                minAdjustment: 0
-            );
+                symmetric: true);
 
             trends.Add(profits);
             trends.Add(equityCurve);
@@ -189,12 +189,12 @@ namespace core.Portfolio.Views
             Span<PositionInstance> transactionsToUse,
             Func<PositionInstance, decimal> valueFunc,
             int buckets = 50,
-            int minAdjustment = 100)
+            bool symmetric = false)
         {
             var gains = new DataPointContainer<decimal>(histogramLabel, DataPointChartType.bar);
 
-            var min = 0m;
-            var max = 0m;
+            var min = Decimal.MaxValue;
+            var max = Decimal.MinValue;
 
             // first, disover min and max
             foreach(var transaction in transactionsToUse)
@@ -208,6 +208,13 @@ namespace core.Portfolio.Views
 
             min = Math.Floor(min);
             max = Math.Ceiling(max);
+            
+            if (symmetric)
+            {
+                var absMax = Math.Max(Math.Abs(min), Math.Abs(max));
+                min = -absMax;
+                max = absMax;
+            }
 
             var step = (max - min) / buckets;
             step = step switch {
