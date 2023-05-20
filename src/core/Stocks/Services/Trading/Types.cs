@@ -173,7 +173,9 @@ namespace core.Stocks.Services.Trading
         string strategyName,
         TradingPerformance performance,
         PositionInstance[] positions
-    );
+    ) {
+        public int NumberOfOpenPositions => positions.Count(p => p.Closed == null);
+    }
 
     public record struct TradingStrategyResult(
         decimal maxDrawdownPct,

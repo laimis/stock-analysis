@@ -1044,6 +1044,7 @@ export interface TradingStrategyPerformance {
   performance: StockTradingPerformance
   positions: PositionInstance[]
   strategyName: string
+  numberOfOpenPositions: number
 }
 
 export class OptionDefinition {

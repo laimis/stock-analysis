@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PositionInstance, TradingStrategyPerformance } from 'src/app/services/stocks.service';
+import { TradingStrategyPerformance } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-strategies',
@@ -8,9 +8,48 @@ import { PositionInstance, TradingStrategyPerformance } from 'src/app/services/s
 })
 export class StockTradingStrategiesComponent {
 
-  @Input() results : TradingStrategyPerformance[]
-
-  openPositions(positions:PositionInstance[]) {
-    return positions.filter(p => !p.isClosed).length;
+  @Input()
+  set results(value : TradingStrategyPerformance[]) {
+    this._results = value
+    this.sortedResults = value
   }
+
+  sort(propertyName) {
+    if (this._sortProperty == propertyName) {
+      this._sortDirection *= -1
+    } else {
+      this._sortDirection = 1
+    }
+
+    this._sortProperty = propertyName
+
+    this.doSort()
+  }
+
+  doSort() {
+    this.sortedResults = this._results.sort((a, b) => {
+      let aVal = a[this._sortProperty]
+      if (!aVal) {
+        aVal = a.performance[this._sortProperty]
+      }
+      let bVal = b[this._sortProperty]
+      if (!bVal) {
+        bVal = b.performance[this._sortProperty]
+      }
+      
+      if (aVal < bVal) {
+        return -1 * this._sortDirection
+      }
+      if (aVal > bVal) {
+        return 1 * this._sortDirection
+      }
+      return 0
+    })
+  }
+
+  private _results:TradingStrategyPerformance[]
+  sortedResults:TradingStrategyPerformance[]
+  private _sortDirection = 1
+  private _sortProperty = "strategyName"
+  
 }
