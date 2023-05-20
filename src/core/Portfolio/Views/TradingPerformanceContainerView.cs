@@ -222,7 +222,7 @@ namespace core.Portfolio.Views
                 _ => Math.Round(step, 0)
             };
 
-            for (var i = 0; i < buckets; i++)
+            for (var i = 0; i <= buckets; i++)
             {
                 var lower = min + (step * i);
                 var upper = min + (step * (i + 1));
