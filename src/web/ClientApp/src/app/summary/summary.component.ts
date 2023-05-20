@@ -23,6 +23,10 @@ export class SummaryComponent implements OnInit {
     this.loadEntries()
   }
 
+  getStrategy(p:PositionInstance) {
+    return p.labels.find(l => l.key === 'strategy')?.value
+  }
+
   private loadEntries() {
     this.stockService.getTransactionSummary(this.timePeriod).subscribe((r: ReviewList) => {
       this.loaded = true
