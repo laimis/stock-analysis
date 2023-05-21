@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +43,30 @@ namespace core.Portfolio.Handlers
                 if (found == null)
                 {
                     throw new Exception("Position not found");
+                }
+
+                var user = await _accountStorage.GetUser(request.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                // get orders for this position
+                var ordersResponse = await _brokerage.GetOrders(user.State);
+                if (!ordersResponse.IsOk)
+                {
+                    throw new Exception("Unable to get orders");
+                }
+
+                // orders for ticker
+                var tickerOrders = ordersResponse.Success.Where(x => x.Ticker == found.State.Ticker && x.IsBuyOrder);
+                foreach(var tickerOrder in tickerOrders)
+                {
+                    var cancelResponse = await _brokerage.CancelOrder(user.State, tickerOrder.OrderId);
+                    if (!cancelResponse.IsOk)
+                    {
+                        throw new Exception("Unable to cancel order");
+                    }
                 }
 
                 await _storage.DeletePendingStockPosition(found, request.UserId);

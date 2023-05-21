@@ -12,7 +12,9 @@
       (brokerageOrderEntered)="brokerageOrderEntered()">
     </app-brokerage-neworder>
 
-    <app-stock-trading-pendingpositions></app-stock-trading-pendingpositions>
+    <app-stock-trading-pendingpositions
+      (pendingPositionClosed)="pendingPositionClosed()">
+    </app-stock-trading-pendingpositions>
 
     <app-brokerage-orders></app-brokerage-orders>
 </div>

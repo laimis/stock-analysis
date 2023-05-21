@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { charts_getTradingViewLink } from 'src/app/services/links.service';
-import { PendingStockPosition, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { PendingStockPosition, StocksService } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-trading-pendingpositions',
@@ -16,9 +16,8 @@ export class StockTradingPendingPositionsComponent implements OnInit {
 
   positions: PendingStockPosition[] = [];
 
-  
   @Output()
-  stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
+  pendingPositionClosed: EventEmitter<PendingStockPosition> = new EventEmitter<PendingStockPosition>()
 
   ngOnInit(): void {
     this.refreshPendingPositions()
@@ -35,7 +34,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
   closePendingPosition(position: PendingStockPosition) {
     this.stockService.closePendingPosition(position.id).subscribe(
       (_) => {
-        this.refreshPendingPositions();
+        this.pendingPositionClosed.emit(position);
       },
       (error) => {
         console.log(error)

@@ -32,4 +32,10 @@ export class StockNewPositionComponent {
     this.pendingPositions.refreshPendingPositions();
     this.brokerageOrders.refreshOrders();
   }
+
+  pendingPositionClosed() {
+    this.feedbackMessage = "Pending position closed";
+    this.pendingPositions.refreshPendingPositions();
+    this.brokerageOrders.refreshOrders();
+  }
 }
