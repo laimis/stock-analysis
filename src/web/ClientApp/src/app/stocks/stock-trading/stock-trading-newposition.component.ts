@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
-import { GetErrors } from 'src/app/services/utils';
+import { GetErrors, GetStrategies } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-newposition',
@@ -10,12 +10,15 @@ import { GetErrors } from 'src/app/services/utils';
   providers: [DatePipe]
 })
 export class StockTradingNewPositionComponent {
+  strategies: { key: string; value: string; }[];
   
   constructor(
       private stockService:StocksService,
       private datePipe: DatePipe
       )
-  { }
+  {
+    this.strategies = GetStrategies()
+  }
 
   @Input()
   maxLoss: number = 100

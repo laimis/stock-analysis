@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { BrokerageOrder, PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
 import { Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
-import { toggleVisuallyHidden } from 'src/app/services/utils';
+import { GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -17,6 +17,7 @@ export class StockTradingPositionComponent {
     positionProfitPoints : StrategyProfitPoint[] = []
     positionStrategy: string = null
     positionOrders: BrokerageOrder[] = [];
+    strategies: { key: string; value: string; }[];
 
     @Input()
     set position(v:PositionInstance) {
@@ -47,7 +48,9 @@ export class StockTradingPositionComponent {
     // constructor that takes stock service
     constructor(
         private stockService:StocksService
-    ) {}
+    ) {
+        this.strategies = GetStrategies()
+    }
 
     fetchProfitPoints() {
         this.stockService.getStrategyProfitPoints(this._position.ticker, this._position.positionId).subscribe(

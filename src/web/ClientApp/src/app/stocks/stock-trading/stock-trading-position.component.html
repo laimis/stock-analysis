@@ -60,15 +60,7 @@
       <div class="input-group">
         <select class="form-select" id="strategyInput" #strategyInput value="{{positionStrategy}}">
           <option value="">Choose...</option>
-          <option value="newhigh">New High</option>
-          <option value="resistancebreakthrough">Resistance Breakthrough</option>
-          <option value="newhighpullback">New High Pullback</option>
-          <option value="recovery">Recovery</option>
-          <option value="postearnings">Post Earnings</option>
-          <option value="postearningsnewhigh">Post Earnings New High</option>
-          <option value="longterm">Long Term</option>
-          <option value="leadingindustry">Leading Industry</option>
-          <option value="channelbottom">Channel Bottom</option>
+          <option *ngFor="let s of strategies" value="{{s.key}}" value="newhigh">{{s.value}}</option>
         </select>
         <button class="btn btn-outline-secondary" (click)="setStrategy(strategyInput.value)">Update</button>
       </div>
@@ -98,7 +90,7 @@
       <div #ordersContainer class="visually-hidden">
         <div class="row" *ngFor="let order of positionOrders">
           <div class="col">
-            {{ order.type }} {{ order.quantity }} @ {{ order.price | currency }}
+            {{ order.status }} {{ order.type }} {{ order.quantity }} @ {{ order.price | currency }}
           </div>
         </div>
       </div>
