@@ -128,6 +128,18 @@ namespace core.Stocks.Services.Analysis
                     $"Percent below recent high: {percentBelowHigh}%"
                 );
 
+            // gain from earliest to latest
+            var gain = (currentPrice - prices[0].Close) / prices[0].Close;
+            var gainOutcomeType = gain > 0 ? OutcomeType.Positive : OutcomeType.Negative;
+            yield return
+                new AnalysisOutcome(
+                    MultipleBarOutcomeKeys.Gain,
+                    gainOutcomeType,
+                    gain,
+                    Shared.ValueFormat.Percentage,
+                    $"Gain from earliest to latest: {gain}%"
+                );
+
             // statistical analysis bits of percent changes
             var descriptor = NumberAnalysis.PercentChanges(
                 prices
@@ -259,6 +271,7 @@ namespace core.Stocks.Services.Analysis
         public static string PercentChangeAverage = "PercentChangeAverage";
         public static string PercentChangeStandardDeviation = "PercentChangeStandardDeviation";
         public static string EarliestPrice = "EarliestPrice";
+        public static string Gain = "Gain";
 
         internal static string SMA(int interval) => $"sma_{interval}";
     }
