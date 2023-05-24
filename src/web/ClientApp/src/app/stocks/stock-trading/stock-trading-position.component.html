@@ -58,9 +58,10 @@
     <div class="col">
       <label class="form-label stat-label" for="setStrategy">Strategy</label>
       <div class="input-group">
-        <select class="form-select" id="strategyInput" #strategyInput value="{{positionStrategy}}">
+        <select class="form-select" id="strategyInput" #strategyInput>
           <option value="">Choose...</option>
-          <option *ngFor="let s of strategies" value="{{s.key}}" value="newhigh">{{s.value}}</option>
+          <option
+            *ngFor="let s of strategies" value="{{s.key}}" [selected]="positionStrategy === s.key">{{s.value}}</option>
         </select>
         <button class="btn btn-outline-secondary" (click)="setStrategy(strategyInput.value)">Update</button>
       </div>

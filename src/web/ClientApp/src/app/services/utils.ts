@@ -37,6 +37,7 @@ export function GetErrors(err:any): string[] {
 // export an array of key value pairs representing strategies
 export function GetStrategies(): { key: string, value: string }[] {
     return [
+        { key: "newhigh", value: "New High" },
         { key: "resistancebreakthrough", value: "Resistance Breakthrough" },
         { key: "newhighpullback", value: "New High Pullback" },
         { key: "recovery", value: "Recovery" },
