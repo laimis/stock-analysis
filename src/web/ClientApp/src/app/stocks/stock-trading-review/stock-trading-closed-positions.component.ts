@@ -43,7 +43,7 @@ export class StockTradingClosedPositionsComponent {
     return true
   }
 
-  sortColumn : string
+  sortColumn : string = 'closed'
   sortDirection : number = -1
   tickerFilter: string = 'all'
   gradeFilter: string = 'all'
@@ -70,26 +70,41 @@ export class StockTradingClosedPositionsComponent {
     this.outcomeFilter = value
   }
 
-  getMonth(input:string) {
-    return input.substring(0, 7)
+  // ugly name, but essentially this returns a property for grouping
+  // trades, and it's either closed date or open date of a position right now, otherwise, no grouping is
+  // returned as we want no separator in that case (ie, if sorted by gain, grouping those by month makes no sense)
+  getPropertyForSeperatorGrouping(position:PositionInstance) {
+    var groupingInput = ""
+    if (this.sortColumn === 'opened') {
+      groupingInput = position.opened
+    }
+    if (this.sortColumn === 'closed') {
+      groupingInput = position.closed
+    }
+
+    if (groupingInput === "") {
+      return ""
+    }
+
+    return groupingInput.substring(0, 7)
   }
 
   getPositionsForMonth(month:string) {
-    return this.positions.filter(p => this.getMonth(p.closed) == month)
+    return this.positions.filter(p => this.getPropertyForSeperatorGrouping(p) == month)
   }
 
   getRRSumForMonth(position:PositionInstance) {
-    var positions = this.getPositionsForMonth(this.getMonth(position.closed))
+    var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
     return positions.reduce((a, b) => a + b.rr, 0)
   }
 
   getProfitSumForMonth(position:PositionInstance) {
-    var positions = this.getPositionsForMonth(this.getMonth(position.closed))
+    var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
     return positions.reduce((a, b) => a + b.profit, 0)
   }
 
   getTradeCountByGradeForMonth(position:PositionInstance, grade:string) {
-    var positions = this.getPositionsForMonth(this.getMonth(position.closed))
+    var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
     return positions.filter(p => p.grade === grade).length
   }
 

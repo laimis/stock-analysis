@@ -40,19 +40,19 @@
         <th class="sort-header" (click)="sort('ticker')">Stock</th>
         <th class="sort-header" (click)="sort('opened')">Opened</th>
         <th class="sort-header" (click)="sort('closed')">Closed</th>
+        <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
         <th class="sort-header" (click)="sort('rr')">R:R</th>
         <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
         <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
         <th class="sort-header" (click)="sort('grade')">Grade</th>
-        <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
       </tr>
     </thead>
     <tbody>
       <ng-container *ngFor="let p of positions; let i = index;">
       <!-- add separator row if p closed date month is different from previous position -->
-      <tr *ngIf="i === 0 || getMonth(p.closed) !== getMonth(positions[i - 1].closed)">
+      <tr *ngIf="i === 0 || getPropertyForSeperatorGrouping(p) !== getPropertyForSeperatorGrouping(positions[i - 1])">
         <td colspan="3" class="text-center fw-bold pt-3">
-          {{getMonth(p.closed) | date:'MMMM yyyy'}}
+          {{getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy'}}
         </td>
         <td class="pt-3 pb-3">R:R Sum <span class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
         <td class="pt-3">Profit/Loss <span class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
@@ -80,6 +80,7 @@
         </td>
         <td>{{p.opened | date}}</td>
         <td>{{p.closed | date}}</td>
+        <td>{{p.daysHeld}}</td>
         <td>{{p.rr | number:'1.0-2' }}</td>
         <td>{{p.profit | currency}}</td>
         <td>
@@ -88,7 +89,6 @@
           {{p.gainPct | percent:'1.0-2' }}
         </td>
         <td>{{p.grade}}</td>
-        <td>{{p.daysHeld}}</td>
       </tr>
       <tr *ngIf="showNotes === i">
         <td colspan="8">

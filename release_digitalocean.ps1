@@ -2,8 +2,18 @@ param($message)
 
 if ([System.String]::IsNullOrEmpty($message))
 {
-    write-host "Provide message"
-    exit
+    $lastCommit = Invoke-Expression 'git log -1 --pretty=format:%s'
+    write-host "Message is missing, would you like to use the last commit message: $lastCommit"
+    $response = Read-Host "y/n"
+    if ($response -eq "y")
+    {
+        $message = $lastCommit
+    }
+    else
+    {
+        write-host "Please provide a message"
+        exit
+    }
 }
 
 # ensure that the project can build by invoking npm run build:production
