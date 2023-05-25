@@ -108,6 +108,11 @@ export class StockTradingClosedPositionsComponent {
     return positions.filter(p => p.grade === grade).length
   }
 
+  getTradeCountForMonth(position:PositionInstance) {
+    var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
+    return positions.length
+  }
+
   sort(column:string) {
     var func = this.getSortFunc(column);
 
