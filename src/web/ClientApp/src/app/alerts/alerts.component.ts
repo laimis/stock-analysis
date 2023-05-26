@@ -101,5 +101,26 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
     
+  sortColumn = ''
+  sortDirection = 'asc'
+  sort(column:string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc'
+    } else {
+      this.sortColumn = column
+      this.sortDirection = 'asc'
+    }
 
+    var compare = (a:StockAlert, b:StockAlert) => {
+      if (this.sortDirection === 'asc') {
+        return a[column] > b[column] ? 1 : -1
+      } else {
+        return a[column] < b[column] ? 1 : -1
+      }
+    }
+
+    this.alertGroups.forEach(group => {
+      group.sort(compare)
+    })
+  }
 }

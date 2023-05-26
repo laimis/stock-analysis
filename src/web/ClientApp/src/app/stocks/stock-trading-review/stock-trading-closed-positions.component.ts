@@ -90,7 +90,7 @@ export class StockTradingClosedPositionsComponent {
   }
 
   getPositionsForMonth(month:string) {
-    return this.positions.filter(p => this.getPropertyForSeperatorGrouping(p) == month)
+    return this.positions.filter(p => this.getPropertyForSeperatorGrouping(p) === month)
   }
 
   getRRSumForMonth(position:PositionInstance) {

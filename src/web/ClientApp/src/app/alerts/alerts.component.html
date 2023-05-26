@@ -39,12 +39,12 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Ticker</th>
-            <th>Description</th>
-            <th>Watched Value</th>
-            <th>Triggered Value</th>
-            <th></th>
-            <th>Source</th>
+            <th class="sort-header" (click)="sort('ticker')">Ticker</th>
+            <th class="sort-header" (click)="sort('description')">Description</th>
+            <th class="sort-header" (click)="sort('watchedValue')">Watched Value</th>
+            <th class="sort-header" (click)="sort('triggeredValue')">Triggered Value</th>
+            <th class="sort-header" (click)="sort('when')"></th>
+            <th class="sort-header" (click)="sort('sourceList')">Source</th>
           </tr>
         </thead>
         <tbody>
