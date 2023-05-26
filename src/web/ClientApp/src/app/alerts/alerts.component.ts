@@ -65,7 +65,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         groups.push(group);
       })
 
-      groups.sort((a,b) => a[0].description.localeCompare(b[0].description));
+      this.applySort(groups)
 
       this.alertGroups = groups
       this.lastRefreshed = new Date().toLocaleString();
@@ -101,9 +101,9 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
     
-  sortColumn = ''
+  sortColumn = 'description'
   sortDirection = 'asc'
-  sort(column:string) {
+  sort(column:string, alertGroups:StockAlert[][]|null = null) {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc'
     } else {
@@ -111,6 +111,15 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.sortDirection = 'asc'
     }
 
+    if (!alertGroups) {
+      alertGroups = this.alertGroups
+    }
+
+    this.applySort(alertGroups)
+  }
+
+  applySort(alertGroups:StockAlert[][]){
+    var column = this.sortColumn
     var compare = (a:StockAlert, b:StockAlert) => {
       if (this.sortDirection === 'asc') {
         return a[column] > b[column] ? 1 : -1
@@ -118,8 +127,8 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         return a[column] < b[column] ? 1 : -1
       }
     }
-
-    this.alertGroups.forEach(group => {
+    
+    alertGroups.forEach(group => {
       group.sort(compare)
     })
   }
