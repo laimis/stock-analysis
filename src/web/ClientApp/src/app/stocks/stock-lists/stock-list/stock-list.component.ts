@@ -138,4 +138,12 @@ export class StockListComponent implements OnInit {
       console.error(e);
     });
   }
+
+  update(name, description) {
+    this.stockService.updateStockList(name, description).subscribe(_ => {
+      this.loadList(this.list.name)
+    }, e => {
+      console.error(e);
+    });
+  }
 }

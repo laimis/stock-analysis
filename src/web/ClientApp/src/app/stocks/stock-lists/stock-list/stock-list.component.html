@@ -1,6 +1,8 @@
 <div *ngIf="list">
     <h3>
-        {{list.name}} ({{list.tickers.length}})
+        {{list.name}}
+        ({{list.tickers.length}})
+        <button class="btn btn-link" (click)="toggleVisibility(editSection)"><i class="bi bi-pencil"></i></button>
     </h3>
     <small><a [routerLink]="['/stocks/lists']">back to lists</a></small>
     
@@ -14,6 +16,21 @@
             <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
             <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-2">Export</a>
             <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
+        </form>
+    </section>
+
+    <section #editSection class="visually-hidden">
+        <h5>Edit</h5>
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input class="form-control" id="name" #name placeholder="Name" value="{{list.name}}">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" id="description" #description placeholder="Description" rows="5">{{list.description}}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" (click)="update(name.value, description.value); toggleVisibility(editSection)">Update</button>
         </form>
     </section>
 
