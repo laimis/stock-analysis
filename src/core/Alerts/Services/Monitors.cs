@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -22,8 +21,7 @@ namespace core.Alerts.Services
             yield return new MonitorDescriptor(GAP_UP_TAG,"Gap Up");
             yield return new MonitorDescriptor(PATTERN_TAG, "Patterns");
         }
-        
-        
+                
         public static Func<Task<List<AlertCheck>>> GetScannerForTag(
             string tag,
             Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
@@ -32,8 +30,8 @@ namespace core.Alerts.Services
             CancellationToken cancellationToken)
         {
             return tag switch {
-                GAP_UP_TAG => () => MonitorForGaps(pricesFunc, container, checks, cancellationToken),
                 PATTERN_TAG => () => MonitorForPatterns(pricesFunc, container, checks, cancellationToken),
+                GAP_UP_TAG => () => Task.FromResult(new List<AlertCheck>()),
                 _ => () => throw new NotImplementedException($"No scanner for tag {tag}")
             };
         }
@@ -74,50 +72,6 @@ namespace core.Alerts.Services
                 completed.Add(c);
             }
 
-            return completed;
-        }
-
-        private static async Task<List<AlertCheck>> MonitorForGaps(
-            Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
-            StockAlertContainer container,
-            List<AlertCheck> checks,
-            CancellationToken ct)
-        {
-            var completed = new List<AlertCheck>();
-
-            foreach (var c in checks)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    return completed;
-                }
-
-                var prices = await pricesFunc(c.ticker);
-
-                if (!prices.IsOk)
-                {
-                    continue;
-                }
-
-                completed.Add(c);
-
-                var gaps = GapAnalysis.Generate(prices.Success, 2);
-                if (gaps.Count == 0 || gaps[0].type != GapType.Up)
-                {
-                    GapUpMonitor.Deregister(container, c.ticker, c.user.Id);
-                    continue;
-                }
-
-                var gap = gaps[0];
-
-                GapUpMonitor.Register(
-                    container: container,
-                    ticker: c.ticker, 
-                    sourceList: c.listName,
-                    gap: gap, when: DateTimeOffset.UtcNow, userId: c.user.Id
-                );
-            }
-        
             return completed;
         }
 

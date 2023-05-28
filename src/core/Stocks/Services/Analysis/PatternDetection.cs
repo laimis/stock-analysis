@@ -26,6 +26,33 @@ namespace core.Stocks.Services.Analysis
             }
         }
 
+        public const string GapUpName = "Gap Up";
+        private static Pattern? GapUp(PriceBar[] bars)
+        {
+            if (bars.Length < 2)
+            {
+                return null;
+            }
+
+            var current = bars[^1];
+            
+            var gaps = GapAnalysis.Generate(bars, 2);
+            if (gaps.Count == 0 || gaps[0].type != GapType.Up)
+            {
+                return null;
+            }
+
+            var gap = gaps[0];
+
+            return new Pattern(
+                date: current.Date,
+                name: GapUpName,
+                description: $"{GapUpName} {gap.gapSizePct.ToString("N2")}",
+                value: gap.gapSizePct,
+                valueFormat: Shared.ValueFormat.Percentage
+            );
+        }
+
         public const string UpsideReversalName = "Upside Reversal";
         private static Pattern? UpsideReversal(PriceBar[] bars)
         {

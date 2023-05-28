@@ -236,7 +236,10 @@ namespace web.BackgroundServices
         {
             return new {
                 identifier = group.Key,
-                alerts = group.Select(ToEmailData)
+                alerts = group
+                    .OrderBy(a => a.sourceList)
+                    .ThenBy(a => a.ticker)
+                    .Select(ToEmailData)
             };
         }
 
