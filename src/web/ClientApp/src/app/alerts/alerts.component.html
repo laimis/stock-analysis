@@ -66,7 +66,9 @@
             <td>{{getValue(alert.watchedValue, alert.valueType)}}</td>
             <td>{{getValue(alert.triggeredValue, alert.valueType)}}</td>
             <td>Triggered on {{alert.when | date:'short'}}</td>
-            <td>{{alert.sourceList}}</td>
+            <td>
+              <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{alert.sourceList}}</a>
+            </td>
           </tr>
       </table>
     </section>

@@ -6,7 +6,7 @@ export function stockLists_getAnalysisLink(list:StockList) {
 }
 
 export function stockLists_getExportLink(list:StockList, justTickers:boolean = true) {
-    var url = `api/portfolio/stocklists/${list.name}/export`
+    var url = `/api/portfolio/stocklists/${list.name}/export`
 
     if (justTickers) {
         url += '?justTickers=true'

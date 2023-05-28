@@ -16,6 +16,9 @@ if ([System.String]::IsNullOrEmpty($message))
     }
 }
 
+# ensure that $messsage has "'" escaped
+$message = $message -replace "'", "''"
+
 # ensure that the project can build by invoking npm run build:production
 # in src/web/ClientApp directory
 
