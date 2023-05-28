@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AnalysisOutcomeEvaluation, OutcomesReport, TickerCountPair, TickerOutcomes, TickerPatterns } from '../../services/stocks.service';
-import { charts_getTradingViewLink } from '../../services/links.service';
+import { charts_getTradingViewLink } from 'src/app/services/links.service';
 
 @Component({
   selector: 'app-outcomes-analysis-report',

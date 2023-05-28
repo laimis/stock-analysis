@@ -13,9 +13,7 @@
         <tr *ngFor="let s of outcomes" [ngClass]="{'bg-warning': s.ticker === tickerFilter}">
           <td class="fixed-side">
             <a [routerLink]="[ '/stocks', s.ticker ]" target="_blank">{{s.ticker}}</a>
-            <a [href]="getTradingViewLink(s.ticker)" target="_blank">
-              <img class="p-1" src="tradingview.png" height="20px" />
-            </a>
+            <app-trading-view-link [ticker]="s.ticker"></app-trading-view-link>
           </td>
           <td *ngFor="let o of outcomesForRendering(s.outcomes)"
             [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">

@@ -88,6 +88,7 @@ import { StockTradingAnalysisDashboardComponent } from './stocks/stock-trading-a
 import { RoutineDashboardComponent } from './routines/routines-dashboard.component';
 import { StockTradingStrategiesComponent } from './shared/stocks/stock-trading-strategies.component';
 import { StockTradingSummaryComponent } from './stocks/stock-trading/stock-trading-summary.component';
+import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.component';
 
 
 var routes: Routes = [
@@ -245,7 +246,8 @@ var routes: Routes = [
     StockSECFilingsComponent,
     StockTradingAnalysisDashboardComponent,
     RoutineDashboardComponent,
-    StockTradingStrategiesComponent
+    StockTradingStrategiesComponent,
+    TradingViewLinkComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

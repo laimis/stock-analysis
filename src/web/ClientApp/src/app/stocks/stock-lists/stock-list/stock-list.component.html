@@ -70,7 +70,7 @@
                         <a [routerLink]="['/stocks', t.ticker]">{{t.ticker}}</a>
                     </td>
                     <td>
-                        <a target="_blank" href="{{chartLink(t.ticker)}}">Chart</a>
+                        <app-trading-view-link [ticker]="t.ticker"></app-trading-view-link>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-danger" (click)="remove(t)">Remove</button>

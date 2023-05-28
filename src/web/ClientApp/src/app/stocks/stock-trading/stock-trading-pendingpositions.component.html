@@ -20,9 +20,7 @@
           <tr>
             <td>
               <a [routerLink]="[ '/stocks', position.ticker ]">{{position.ticker}}</a>
-              <a [href]="getTradingViewLink(position.ticker)" target="_blank">
-                <img class="p-1" src="tradingview.png" height="20px" />
-              </a>
+              <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
             </td>
 
             <td>{{ position.numberOfShares }}</td>

@@ -9,9 +9,9 @@
         <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
           <img src="finviz.png" height="25px" />
         </a>
-        <a class="float-end ms-3" [href]="getTradingViewLink(stock.ticker)" target="_blank">
-          <img src="tradingview.png" height="25px" />
-        </a>
+        <span class="float-end ms-3">
+          <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
+        </span>
       </h3>
     </div>
   </div>

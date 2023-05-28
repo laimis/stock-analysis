@@ -1,6 +1,5 @@
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { charts_getTradingViewLink } from 'src/app/services/links.service';
 import { AnalysisOutcomeEvaluation, OutcomeValueTypeEnum, StockAnalysisOutcome, TickerOutcomes } from '../../services/stocks.service';
 
 @Component({
@@ -38,10 +37,6 @@ export class OutcomesComponent {
     return entries[0].outcomes
       .filter(o => this.IsRenderableOutcome(o))
       .map(o => o.key)
-  }
-
-  getTradingViewLink(ticker:string) {
-    return charts_getTradingViewLink(ticker)
   }
 
   sort(column:string) {

@@ -25,7 +25,7 @@
           <ng-container *ngFor="let tp of report.patterns">
             <tr *ngFor="let p of tp.patterns">
               <td>
-                <a [href]="tradingViewLink(tp.ticker)" target="_blank">{{tp.ticker}}</a>
+                <app-trading-view-link [ticker]="tp.ticker"></app-trading-view-link>
               </td>
               <td>{{p.description}}</td>
             </tr>

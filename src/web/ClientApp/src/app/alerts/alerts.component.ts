@@ -1,7 +1,6 @@
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { AfterViewInit, Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService } from 'src/app/services/stocks.service';
-import { charts_getTradingViewLink } from '../services/links.service';
 import { toggleVisuallyHidden } from '../services/utils';
 
 @Component({
@@ -85,10 +84,6 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.scheduled = true
       },
     );
-  }
-
-  getTradingViewLink(ticker:string){
-    return charts_getTradingViewLink(ticker)
   }
 
   getValue(value: number,valueType: string) {
