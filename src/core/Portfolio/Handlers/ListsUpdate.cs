@@ -15,6 +15,8 @@ namespace core.Portfolio.Handlers
         {
             [Required]
             public string Name { get; set; }
+            [Required]
+            public string NewName { get; set; }
 
             public string Description { get; set; }
         }
@@ -44,7 +46,7 @@ namespace core.Portfolio.Handlers
                     throw new InvalidOperationException("List does not exist");
                 }
 
-                list.Update(cmd.Name, cmd.Description);
+                list.Update(cmd.NewName, cmd.Description);
 
                 await _portfolioStorage.Save(list, user.Id);
 

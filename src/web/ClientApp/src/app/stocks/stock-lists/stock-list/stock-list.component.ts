@@ -140,8 +140,8 @@ export class StockListComponent implements OnInit {
   }
 
   update(name, description) {
-    this.stockService.updateStockList(name, description).subscribe(_ => {
-      this.loadList(this.list.name)
+    this.stockService.updateStockList(this.list.name, name, description).subscribe(_ => {
+      this.loadList(name)
     }, e => {
       console.error(e);
     });
