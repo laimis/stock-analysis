@@ -78,7 +78,10 @@
 
   <section>
     <h5>Position Information</h5>
-    <app-stock-trading-position [position]="currentPosition"></app-stock-trading-position>
+    <app-stock-trading-position
+      [position]="currentPosition"
+      [orders]="orders">
+    </app-stock-trading-position>
   </section>
 
   <section *ngIf="dailyPositionReport">

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, PriceWithDate, DailyPositionReport } from 'src/app/services/stocks.service';
+import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, PriceWithDate, DailyPositionReport, BrokerageOrder } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 
 
@@ -22,6 +22,7 @@ export class StockTradingReviewComponent implements OnInit {
   simulationErrors: string[];
   scoresErrors: string[];
   dailyPositionReport: DailyPositionReport
+  orders: BrokerageOrder[];
 
   constructor (
     private stockService: StocksService,
@@ -36,6 +37,12 @@ export class StockTradingReviewComponent implements OnInit {
         console.log("error fetching positions: " + error)
       }
     );
+
+    this.stockService.brokerageOrders().subscribe(
+      (r: BrokerageOrder[]) => {
+        this.orders = r
+      }
+    )
   }
 
   updateCurrentPosition() {

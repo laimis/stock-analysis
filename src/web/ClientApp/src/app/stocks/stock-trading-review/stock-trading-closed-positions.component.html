@@ -56,10 +56,10 @@
         </td>
         <td class="pt-3 pb-3">R:R Sum <span class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
         <td class="pt-3">Profit/Loss <span class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
-        <td class="pt-3">A trades: <span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }}</span></td>
-        <td class="pt-3">B trades: <span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'B') }}</span></td>
-        <td class="pt-3">C trades: <span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span></td>
-        <td class="pt-3">Total: <span class="fw-bold">{{ getTradeCountForMonth(p) }}</span></td>
+        <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }} A trades</span></td>
+        <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'B') }}</span> B trades</td>
+        <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span> C trades</td>
+        <td class="pt-3"><span class="fw-bold">{{ getTradeCountForMonth(p) }}</span> Total</td>
       </tr>
 
       <tr 

@@ -17,6 +17,7 @@ export class StockTradingPositionComponent {
     positionProfitPoints : StrategyProfitPoint[] = []
     positionStrategy: string = null
     positionOrders: BrokerageOrder[] = [];
+    allOrders: BrokerageOrder[] = [];
     strategies: { key: string; value: string; }[];
 
     @Input()
@@ -26,20 +27,26 @@ export class StockTradingPositionComponent {
         this.positionProfitPoints = []
         if (this._position) {
             this.setCandidateValues()
+            this.updatePositionOrders()
         }
     }
 
     @Input()
-    set orders(allOrders:BrokerageOrder[]) {
+    set orders(value:BrokerageOrder[]) {
+        this.allOrders = value;
+        this.updatePositionOrders();
+    }
+
+    updatePositionOrders() {
         if (!this._position) {
             return
         }
 
-        if (!allOrders) {
+        if (!this.allOrders) {
             return
         }
 
-        this.positionOrders = allOrders.filter(o => o.ticker === this._position.ticker)
+        this.positionOrders = this.allOrders.filter(o => o.ticker == this._position.ticker)
     }
 
     @Output()
