@@ -56,6 +56,8 @@ export class StockChartComponent implements OnInit, OnDestroy {
     150: '#00BCD4',
     200: '#2962FF',
   }
+  earliestDate: string;
+  latestDate: string;
   
   @Input()
   set positivePricePoints(transactions: PriceWithDate[]) {
@@ -151,7 +153,9 @@ export class StockChartComponent implements OnInit, OnDestroy {
       var maxPrice = Math.max.apply(null, closes)
       this.lineChartOptions.scales.y.max = maxPrice + maxPrice * 0.1
     }
-    
+
+    this.earliestDate = prices.prices[0].dateStr
+    this.latestDate = prices.prices[prices.prices.length - 1].dateStr
   }
 
   toAnnotation(transaction: PriceWithDate, color: string) : AnnotationOptions {
@@ -177,9 +181,11 @@ export class StockChartComponent implements OnInit, OnDestroy {
     
     var annotations : AnnotationOptions[] = 
       this.positivePricePoints
+        .filter(x => x.date >= this.earliestDate && x.date <= this.latestDate)
         .map(x => this.toAnnotation(x, this._color_positive))
         .concat(
           this.negativePricePoints
+            .filter(x => x.date >= this.earliestDate && x.date <= this.latestDate)
             .map(x => this.toAnnotation(x, this._color_negative))
         )
         .concat(
