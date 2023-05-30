@@ -59,7 +59,7 @@ namespace core.Portfolio.Handlers
                 }
 
                 // orders for ticker
-                var tickerOrders = ordersResponse.Success.Where(x => x.Ticker == found.State.Ticker && x.IsBuyOrder);
+                var tickerOrders = ordersResponse.Success.Where(x => x.Ticker == found.State.Ticker && x.IsBuyOrder && x.IsActive);
                 foreach(var tickerOrder in tickerOrders)
                 {
                     var cancelResponse = await _brokerage.CancelOrder(user.State, tickerOrder.OrderId);
