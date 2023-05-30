@@ -11,7 +11,8 @@ namespace core.Stocks.Services.Analysis
         {
             {UpsideReversalName, UpsideReversal},
             {Highest1YearVolumeName, Highest1YearVolume},
-            {HighVolumeName, HighVolume}
+            {HighVolumeName, HighVolume},
+            {GapUpName, GapUp}
         };
 
         public static IEnumerable<Pattern> Generate(PriceBar[] bars)
