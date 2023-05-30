@@ -95,5 +95,23 @@ namespace coretests.Stocks.Services
             var patterns = PatternDetection.Generate(bars);
             Assert.Empty(patterns);
         }
+
+        [Fact]
+        public void Generate_WithGaps_FindsGapPattern()
+        {
+            var bars = TestDataGenerator.IncreasingPriceBars(numOfBars: 10);
+
+            // append a bar with a gap up
+            var lastBar = bars[^1];
+            var newBar = new PriceBar(lastBar.Date.AddDays(1), lastBar.Open * 1.1m, lastBar.High * 1.1m, lastBar.Close * 1.1m, lastBar.Close * 1.1m, lastBar.Volume);
+            bars = bars.Append(newBar).ToArray();
+
+            var patterns = PatternDetection.Generate(bars);
+            Assert.Single(patterns);
+
+            var pattern = patterns.First();
+            Assert.Equal(PatternDetection.GapUpName, pattern.name);
+            Assert.Contains("Gap Up 0.1", pattern.description);
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace coretests.TestData
                             date: DateTime.Now.AddDays(-numOfBars).AddDays(x),
                             open: x,
                             high: x,
-                            low: x,
+                            low: x == 0 ? x : x - 1,
                             close: x,
                             volume: x
                         )
