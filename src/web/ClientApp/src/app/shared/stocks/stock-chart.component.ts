@@ -179,13 +179,15 @@ export class StockChartComponent implements OnInit, OnDestroy {
 
   updateAnnotations() {
     
+    var filterFunc = (x: PriceWithDate) => x.date >= this.earliestDate && x.date <= this.latestDate
+    
     var annotations : AnnotationOptions[] = 
       this.positivePricePoints
-        .filter(x => x.date >= this.earliestDate && x.date <= this.latestDate)
+        .filter(filterFunc)
         .map(x => this.toAnnotation(x, this._color_positive))
         .concat(
           this.negativePricePoints
-            .filter(x => x.date >= this.earliestDate && x.date <= this.latestDate)
+            .filter(filterFunc)
             .map(x => this.toAnnotation(x, this._color_negative))
         )
         .concat(
