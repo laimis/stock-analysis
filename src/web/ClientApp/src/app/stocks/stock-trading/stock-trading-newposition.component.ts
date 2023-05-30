@@ -27,6 +27,9 @@ export class StockTradingNewPositionComponent {
   showChart: boolean = true
 
   @Input()
+  showAnalysis: boolean = true
+
+  @Input()
   recordPositions: boolean = true
 
   @Input()

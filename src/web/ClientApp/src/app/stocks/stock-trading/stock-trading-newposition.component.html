@@ -107,7 +107,7 @@
         </app-stock-chart>
       </div>
     </div>
-    <div class="row mt-3" *ngIf="outcomes">
+    <div class="row mt-3" *ngIf="outcomes && showAnalysis">
       <div class="col">
         <table class="table table-hover border">
           <tbody>
@@ -128,7 +128,7 @@
         </table>
     </div>
     </div>
-    <div class="row mt-3" *ngIf="gaps">
+    <div class="row mt-3" *ngIf="gaps && showAnalysis">
       <app-gaps [gaps]="gaps"></app-gaps>
     </div>
   </div>
