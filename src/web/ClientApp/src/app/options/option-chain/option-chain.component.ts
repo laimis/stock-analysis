@@ -20,6 +20,7 @@ export class OptionChainComponent implements OnInit {
   public expirationSelection : string = ""
   public sideSelection : string = ""
   public minBid : number = 0
+  public maxAsk : number = 0
   public minStrikePrice : number = 0
   public maxStrikePrice : number = 0
 
@@ -45,6 +46,7 @@ export class OptionChainComponent implements OnInit {
       this.stockPrice = result.stockPrice
       this.sideSelection = "put"
       this.minBid = 0
+      this.maxAsk = 0
       this.runFilter()
     }, error => {
       this.failure = "Failed to load option chain, either data  is not available or entered symbol is incorrect."
@@ -65,6 +67,7 @@ export class OptionChainComponent implements OnInit {
     console.log("expiration: " + this.expirationSelection)
     console.log("side: " + this.sideSelection)
     console.log("min bid: " + this.minBid)
+    console.log("max ask: " + this.maxAsk)
     console.log("min strike price: " + this.minStrikePrice)
     console.log("max strike price: " + this.maxStrikePrice)
 
@@ -72,7 +75,7 @@ export class OptionChainComponent implements OnInit {
     this.loading = false;
 
     let expirationMap = new Map<string, OptionDefinition[]>();
-    this.filteredOptions.forEach(function(value, index, arr) {
+    this.options.forEach(function(value, index, arr) {
       if (!expirationMap.has(value.expirationDate))
       {
         expirationMap.set(value.expirationDate, [value])
@@ -108,6 +111,11 @@ export class OptionChainComponent implements OnInit {
       return false
     }
 
+    if (element.ask > this.maxAsk) {
+      console.log("filtering out max price " + element.ask)
+      return false
+    }
+
     if (this.minStrikePrice > 0) {
       if (element.strikePrice < this.minStrikePrice) {
         return false
@@ -137,6 +145,11 @@ export class OptionChainComponent implements OnInit {
 
   onMinBidChange() {
     console.log(this.minBid)
+    this.runFilter()
+  }
+
+  onMaxAskChange() {
+    console.log(this.maxAsk)
     this.runFilter()
   }
 
