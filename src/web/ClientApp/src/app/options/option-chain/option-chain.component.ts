@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition, OptionBreakdown } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
+import { ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-option-chain',
@@ -23,6 +24,8 @@ export class OptionChainComponent implements OnInit {
   public maxAsk : number = 0
   public minStrikePrice : number = 0
   public maxStrikePrice : number = 0
+
+  chartType: ChartType = 'bar';
 
   public failure;
   volatility: number;
@@ -75,7 +78,7 @@ export class OptionChainComponent implements OnInit {
     this.loading = false;
 
     let expirationMap = new Map<string, OptionDefinition[]>();
-    this.options.forEach(function(value, index, arr) {
+    this.filteredOptions.forEach(function(value, index, arr) {
       if (!expirationMap.has(value.expirationDate))
       {
         expirationMap.set(value.expirationDate, [value])
@@ -111,7 +114,7 @@ export class OptionChainComponent implements OnInit {
       return false
     }
 
-    if (element.ask > this.maxAsk) {
+    if (element.ask > this.maxAsk && this.maxAsk != 0) {
       console.log("filtering out max price " + element.ask)
       return false
     }
@@ -161,5 +164,21 @@ export class OptionChainComponent implements OnInit {
   onMaxStrikePriceChange() {
     console.log(this.maxStrikePrice)
     this.runFilter()
+  }
+
+  getStrikePrices(options: OptionDefinition[]) {
+    return options.map(x => x.strikePrice.toString())
+  }
+
+  getOpenInterest(options: OptionDefinition[]) {
+    return options.map(x => x.openInterest)
+  }
+
+  getVolume(options: OptionDefinition[]) {
+    return options.map(x => x.volume)
+  }
+
+  getOptionsForExpiration(expiration: string) {
+    return this.options.filter(x => x.expirationDate == expiration)
   }
 }

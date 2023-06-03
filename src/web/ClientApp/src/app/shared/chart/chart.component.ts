@@ -69,11 +69,12 @@ export class ChartComponent implements OnInit, OnDestroy {
   
 
   @Input()
-  set values(valueArray: number[]) {
+  set values(obj:{values: number[], label: string}) {
 
     var data = [
       {
-        data: valueArray
+        label: obj.label,
+        data: obj.values
       }]
 
     this.chartData = data

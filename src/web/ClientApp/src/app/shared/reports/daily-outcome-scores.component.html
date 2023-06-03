@@ -2,7 +2,7 @@
   <app-chart
     *ngIf="dailyScores && dailyScoresDates"
     [yScaleType]="'linear'"
-    [values]="dailyScores"
+    [values]="{values:dailyScores,label:''}"
     [chartLabels]="dailyScoresDates"
     [chartLegend]="false"
     [chartType]="chartType">

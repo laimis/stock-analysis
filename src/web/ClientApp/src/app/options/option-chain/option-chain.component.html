@@ -68,16 +68,30 @@
           <div class="col">
             <label class="form-label" for="minStrikePrice">Min Strike Price</label>
             <select class="form-select" [(ngModel)]="minStrikePrice" id="minStrikePrice" name="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()">
-              <option *ngFor="let option of expiration" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
+              <option></option>
+              <option *ngFor="let option of getOptionsForExpiration(expiration[0].expirationDate)" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
             </select>
           </div>
           <div class="col">
             <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
             <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
+              <option></option>
               <option *ngFor="let option of expiration" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
             </select>
           </div>
           <div class="col"></div>
+        </div>
+        <div class="row mb-3">
+          <!-- chart sections that show open interest vs strike price -->
+          <app-chart
+            [chartLabels]="getStrikePrices(expiration)"
+            [values]="{values:getOpenInterest(expiration),label:'Open Interest'}"
+            [chartType]="chartType"></app-chart>
+
+          <app-chart
+            [chartLabels]="getStrikePrices(expiration)"
+            [values]="{values:getVolume(expiration),label:'Volume'}"
+            [chartType]="chartType"></app-chart>
         </div>
         <table class="table table-hover border">
           <thead class="thead-light">
@@ -93,7 +107,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let option of expiration">
-              <td>{{option.strikePrice | currency}}</td>
+              <td>{{option.strikePrice | currency}} {{option.side}}</td>
               <td>{{option.openInterest}}</td>
               <td>{{option.volume}}</td>
               <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
