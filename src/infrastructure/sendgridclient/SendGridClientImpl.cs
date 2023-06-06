@@ -36,7 +36,7 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, string subject, string body)
         {
-            _logger?.LogInformation($"Sending email to {recipient.Email} with subject {subject} and body {body}");
+            _logger?.LogInformation($"Dummy send");
             
             return Task.CompletedTask;
         }
@@ -70,7 +70,8 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, EmailTemplate template, object properties)
         {
-            _logger?.LogInformation($"Sending email to {recipient} with template {template.Id} and body {JsonConvert.SerializeObject(properties)}");
+            _logger?.LogInformation($"Dummy send with template");
+
             return Task.CompletedTask;
         }
 
