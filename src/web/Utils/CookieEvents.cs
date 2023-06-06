@@ -39,7 +39,7 @@ namespace web.Utils
             var id = await _mediator.Send(new SignInViaGoogle.Command(email));
             if (id == null)
             {
-                _logger.LogInformation($"Failed to validate principal {email}");
+                _logger.LogInformation($"Failed to validate principal");
 
                 context.RejectPrincipal();
                 await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
