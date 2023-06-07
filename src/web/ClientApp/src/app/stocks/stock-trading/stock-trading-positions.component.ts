@@ -18,6 +18,9 @@ export class StockTradingPositionsComponent {
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
     strategies: { key: string; value: string }[] = []
+    
+    private NO_LONG_TERM_STRATEGY = "nolongterm"
+    strategyToFilter = this.NO_LONG_TERM_STRATEGY
 
     @Input()
     set positions(input: PositionInstance[]) {
@@ -32,6 +35,9 @@ export class StockTradingPositionsComponent {
             }
         )
         this.strategies.push({key: "all", value: "All - " + input.length})
+
+        let longTermPositions = input.filter(i => this.matchesStrategyCheck(i, "longterm"))
+        this.strategies.push({key: this.NO_LONG_TERM_STRATEGY, value: "All minus long term - " + (input.length - longTermPositions.length)})
         this.strategies = this.strategies.concat(
             stratsWithCounts
         )
@@ -107,16 +113,6 @@ export class StockTradingPositionsComponent {
         }
     }
 
-    excludeLongTerm: boolean = true
-    excludeLongTermLabels = {true: "No long term", false: "With long term"}
-    excludeLongTermName: string = this.excludeLongTermLabels[this.excludeLongTerm.toString().toLowerCase()]
-    toggleExcludeLongTerm() {
-        this.excludeLongTerm = !this.excludeLongTerm
-        this.excludeLongTermName = this.excludeLongTermLabels[this.excludeLongTerm.toString().toLowerCase()]
-        this.updatePositions()
-    }
-
-    strategyToFilter = "all"
     strategyToFilterChanged = (elem: EventTarget) => {
         var value = (elem as HTMLInputElement).value
         this.strategyToFilter = value
@@ -217,12 +213,12 @@ export class StockTradingPositionsComponent {
             return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
         })
 
-        if (this.excludeLongTerm) {
-            positions = positions.filter(p => this.matchesStrategyCheck(p, "longterm") === false)
-        }
-
         if (this.strategyToFilter !== "all") {
-            positions = positions.filter(this.matchesStrategy)
+            if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
+                positions = positions.filter(p => !this.matchesStrategyCheck(p, "longterm"))
+            } else {
+                positions = positions.filter(this.matchesStrategy)
+            }
         }
 
         this.sortedPositions = positions

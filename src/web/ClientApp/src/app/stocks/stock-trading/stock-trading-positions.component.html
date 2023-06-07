@@ -4,7 +4,6 @@
       <div class="row">
         <div class="col"><a class="btn btn-link me-1" href="/api/stocks/export/open">Export</a></div>
         <div class="col"><button class="btn btn-link me-1" (click)="toggleRenderStyle()">{{renderStyleName}}</button></div>
-        <div class="col"><button class="btn btn-link me-1" (click)="toggleExcludeLongTerm()">{{excludeLongTermName}}</button></div>
       </div>
     </div>
     <div class="col">
@@ -12,7 +11,7 @@
         <label for="strategyToFilter" class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
         <div class="col-sm-10">
           <select class="form-select" name="strategyToFilter" id="strategyToFilter" (click)="strategyToFilterChanged($event.target)">
-            <option *ngFor="let so of strategies" value="{{so.key}}">{{so.value}}</option>
+            <option *ngFor="let so of strategies" value="{{so.key}}" [selected]="so.key === strategyToFilter">{{so.value}}</option>
           </select>
         </div>
       </div>
