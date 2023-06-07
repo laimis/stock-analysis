@@ -30,7 +30,7 @@
         </div>
         <div class="col">
           <label for="price" class="form-label">Price</label>
-          <input type="number" class="form-control" id="price" [(ngModel)]="price" placeholder="Price">
+          <input type="number" step="0.01" class="form-control" id="price" [(ngModel)]="price" placeholder="Price">
         </div>
         <div class="col">
           <label for="quantity" class="form-label">Quantity</label>
@@ -68,13 +68,13 @@
     <div class="col-md-4">
       <div *ngIf="transactions.length > 0">
         <label for="currentCost" class="form-label">Current Cost</label>
-        <input type="number" id="currentCost" [(ngModel)]="currentCost" (ngModelChange)="update()" class="form-control">
+        <input type="number" step="0.01" id="currentCost" [(ngModel)]="currentCost" (ngModelChange)="update()" class="form-control">
 
         <label for="stopPrice" class="form-label">Stop</label>
-        <input type="number" id="stopPrice" [(ngModel)]="stopPrice" (ngModelChange)="update()" class="form-control">
+        <input type="number" step="0.01" id="stopPrice" [(ngModel)]="stopPrice" (ngModelChange)="update()" class="form-control">
 
         <label for="riskedAmount" class="form-label">Risked Amount (<a (click)="calculateRiskedAmount()" class="link-primary">calculate based on stop</a>)</label>
-        <input type="number" id="riskedAmount" [(ngModel)]="riskedAmount" (ngModelChange)="update()" class="form-control">
+        <input type="number" step="0.01" id="riskedAmount" [(ngModel)]="riskedAmount" (ngModelChange)="update()" class="form-control">
 
         <label class="form-label me-3">{{ r1 | currency }}</label>
         <label class="form-label me-3">{{ r2 | currency }}</label>

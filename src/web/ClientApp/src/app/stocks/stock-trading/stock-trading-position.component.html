@@ -38,7 +38,7 @@
     <div class="col">
       <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
       <div class="input-group">
-        <input class="form-control" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
+        <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
         <button class="btn btn-outline-secondary" (click)="setRiskAmount()">Update</button>
       </div>
       <div>
@@ -48,7 +48,7 @@
     <div class="col">
       <label class="form-label stat-label" for="candidateStopPrice">Stop Price</label>
       <div class="input-group">
-        <input class="form-control" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
+        <input class="form-control" step="0.01" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
         <button class="btn btn-outline-secondary" (click)="setStopPrice()">Update</button>
       </div>
       <div>

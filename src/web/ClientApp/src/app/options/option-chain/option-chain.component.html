@@ -49,11 +49,11 @@
       </div>
       <div class="col">
         <label class="form-label" for="minBid">Min Bid Price</label>
-        <input class="form-control" type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
+        <input class="form-control" step="0.01" type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
       </div>
       <div class="col">
         <label class="form-label" for="minBid">Max Ask Price</label>
-        <input class="form-control" type="number" id="maxAsk" name="maxAsk" [(ngModel)]="maxAsk" (ngModelChange)="onMaxAskChange()" />
+        <input class="form-control" step="0.01" type="number" id="maxAsk" name="maxAsk" [(ngModel)]="maxAsk" (ngModelChange)="onMaxAskChange()" />
       </div>
     </div>
 

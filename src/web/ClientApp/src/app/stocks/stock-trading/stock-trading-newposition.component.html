@@ -18,6 +18,7 @@
         <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }} x {{ this.ask | currency }} )</label>
         <input
           type="number"
+          step="0.01"
           id="costToBuy"
           class="form-control"
           [(ngModel)]="costToBuy"
@@ -28,6 +29,7 @@
         <label for="sizeStopPrice" class="form-label">Size Stop</label>
         <input
           type="number"
+          step="0.01"
           id="sizeStopPrice"
           class="form-control"
           [(ngModel)]="sizeStopPrice"
@@ -38,6 +40,7 @@
         <label for="stopPrice" class="form-label">Stop</label>
         <input
           type="number"
+          step="0.01"
           id="stopPrice"
           class="form-control"
           [(ngModel)]="positionStopPrice"
