@@ -69,6 +69,18 @@ namespace coretests.Options
         }
 
         [Fact]
+        public void Buying_Options_Creates_NegativeAmountTransaction()
+        {
+            var option = GetTestOption(_expiration);
+
+            option.Buy(1, 10, DateTimeOffset.UtcNow.AddDays(-3), "some notes");
+
+            Assert.Single(option.State.Transactions);
+            Assert.False(option.State.Transactions[0].IsPL);
+            Assert.Equal(-10, option.State.Transactions[0].Amount);
+        }
+
+        [Fact]
         public void Expire_CountsAsPLTransaction()
         {
             var option = GetTestOption(DateTimeOffset.UtcNow.AddDays(-1));

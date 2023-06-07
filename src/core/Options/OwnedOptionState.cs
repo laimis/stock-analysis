@@ -213,7 +213,7 @@ namespace core.Options
                     Ticker,
                     description,
                     purchased.Premium,
-                    debit,
+                    -1 * debit,
                     purchased.When,
                     true
                 )
