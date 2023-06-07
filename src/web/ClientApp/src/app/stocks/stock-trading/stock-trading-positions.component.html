@@ -1,26 +1,31 @@
 <div>
   <div class="row">
     <div class="col">
-      <a class="btn btn-link me-2" href="/api/stocks/export/open">Export</a>
-      <button class="btn btn-link me-2" (click)="toggleRenderStyle()">{{renderStyleName}}</button>
-      <button class="btn btn-link me-2" (click)="toggleExcludeLongTerm()">{{excludeLongTermName}}</button>
+      <div class="row">
+        <div class="col"><a class="btn btn-link me-1" href="/api/stocks/export/open">Export</a></div>
+        <div class="col"><button class="btn btn-link me-1" (click)="toggleRenderStyle()">{{renderStyleName}}</button></div>
+        <div class="col"><button class="btn btn-link me-1" (click)="toggleExcludeLongTerm()">{{excludeLongTermName}}</button></div>
+      </div>
     </div>
-    <label for="metricToRender" class="text-end col-sm-2 col-form-label">Sort by</label>
-    <div class="col">  
-      <select class="form-select" name="metricToRender" id="metricToRender" (click)="metricChanged($event.target)">
-        <option value="rr">R/R</option>
-        <option value="pl">P/L</option>
-        <option value="unrealizedPL">Unrealized P/L</option>
-        <option value="combinedPL">Combined P/L</option>
-        <option value="plPercent">P/L %</option>
-        <option value="cost">Cost</option>
-        <option value="ticker">Ticker</option>
-        <option value="percentToStop">% to Stop</option>
-        <option value="daysSinceLastTransaction">Days Since Last Transaction</option>
-        <option value="riskedAmount">Risked Amount</option>
-        <option value="riskedAmountFromStop">Risked Amount from Stop</option>
-        <option value="daysHeld">Days Held</option>
-      </select>
+    <div class="col">
+      <div class="row">
+        <label for="strategyToFilter" class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
+        <div class="col-sm-10">
+          <select class="form-select" name="strategyToFilter" id="strategyToFilter" (click)="strategyToFilterChanged($event.target)">
+            <option *ngFor="let so of strategies" value="{{so.key}}">{{so.value}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="row">
+        <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
+        <div class="col-sm-10">
+          <select class="form-select" name="metricToRender" id="metricToRender" (click)="metricChanged($event.target)">
+            <option *ngFor="let so of sortOptions" value="{{so.value}}">{{so.name}}</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 

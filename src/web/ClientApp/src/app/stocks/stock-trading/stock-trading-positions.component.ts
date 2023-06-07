@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { toggleVisuallyHidden } from 'src/app/services/utils';
+import { GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
 import { BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StocksService } from '../../services/stocks.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 
@@ -17,10 +17,24 @@ export class StockTradingPositionsComponent {
     metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
+    strategies: { key: string; value: string }[] = []
 
     @Input()
     set positions(input: PositionInstance[]) {
-        this._positions = input // input.filter(p => p.isShortTerm)
+        this._positions = input
+
+        // create an array of strategies where value is the stratey name and count of positions that match
+        
+        let stratsWithCounts = GetStrategies().map(
+            (s) => {
+                var count = input.filter(i => this.matchesStrategyCheck(i, s.key)).length
+                return {key: s.key, value: s.value + " - " + count}
+            }
+        )
+        this.strategies.push({key: "all", value: "All - " + input.length})
+        this.strategies = this.strategies.concat(
+            stratsWithCounts
+        )
         this.updatePositions()
     }
 
@@ -66,24 +80,46 @@ export class StockTradingPositionsComponent {
         )
     }
 
+    sortOptions: { name: string; value: string }[] = [
+        { value: "rr", name: "R/R" },
+        { value: "pl", name: "P/L" },
+        { value: "unrealizedPL", name: "Unrealized P/L" },
+        { value: "combinedPL", name: "Combined P/L" },
+        { value: "plPercent", name: "P/L %" },
+        { value: "cost", name: "Cost" },
+        { value: "ticker", name: "Ticker" },
+        { value: "percentToStop", name: "% to Stop" },
+        { value: "daysSinceLastTransaction", name: "Days Since Last Transaction" },
+        { value: "riskedAmount", name: "Risked Amount" },
+        { value: "riskedAmountFromStop", name: "Risked Amount from Stop" },
+        { value: "daysHeld", name: "Days Held" },
+    ]
+
     renderStyle: string = "card"  // other style is "table"
-    renderStyleName: string = "Switch to table layout"
+    renderStyleName: string = "Card layout"
     toggleRenderStyle() {
         if (this.renderStyle == "card") {
             this.renderStyle = "table"
-            this.renderStyleName = "Switch to card layout"
+            this.renderStyleName = "Card layout"
         } else {
             this.renderStyle = "card"
-            this.renderStyleName = "Switch to table layout"
+            this.renderStyleName = "Table layout"
         }
     }
 
     excludeLongTerm: boolean = true
-    excludeLongTermLabels = {true: "Include long term", false: "Exclude long term"}
+    excludeLongTermLabels = {true: "No long term", false: "With long term"}
     excludeLongTermName: string = this.excludeLongTermLabels[this.excludeLongTerm.toString().toLowerCase()]
     toggleExcludeLongTerm() {
         this.excludeLongTerm = !this.excludeLongTerm
         this.excludeLongTermName = this.excludeLongTermLabels[this.excludeLongTerm.toString().toLowerCase()]
+        this.updatePositions()
+    }
+
+    strategyToFilter = "all"
+    strategyToFilterChanged = (elem: EventTarget) => {
+        var value = (elem as HTMLInputElement).value
+        this.strategyToFilter = value
         this.updatePositions()
     }
 
@@ -162,6 +198,17 @@ export class StockTradingPositionsComponent {
           }
     }
 
+    matchesStrategyCheck(p:PositionInstance, strategy:string) {
+        if (strategy === "all") {
+            return true
+        }
+        return p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
+    }
+
+    matchesStrategy = (p:PositionInstance) => {
+        return this.matchesStrategyCheck(p, this.strategyToFilter)
+    }
+
     updatePositions() {
         var positions = this._positions.sort((a, b) => {
             if (Number.isFinite(this.metricFunc(a))) {
@@ -171,7 +218,11 @@ export class StockTradingPositionsComponent {
         })
 
         if (this.excludeLongTerm) {
-            positions = positions.filter(p => p.labels.findIndex(l => l.key === "strategy" && l.value === "longterm") === -1)
+            positions = positions.filter(p => this.matchesStrategyCheck(p, "longterm") === false)
+        }
+
+        if (this.strategyToFilter !== "all") {
+            positions = positions.filter(this.matchesStrategy)
         }
 
         this.sortedPositions = positions
