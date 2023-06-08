@@ -33,6 +33,9 @@ export class BrokerageOrdersComponent implements OnInit {
     return this._ticker
   }
 
+  @Input()
+  filledOnly: boolean = false
+
   refreshOrders() {
     this.stockService.brokerageOrders().subscribe(orders => {
       this._orders = orders
@@ -50,8 +53,7 @@ export class BrokerageOrdersComponent implements OnInit {
     var sells = this._orders.filter(o => o.type == 'SELL' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
     var filledBuys = this._orders.filter(o => o.type == 'BUY' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
     var filledSells = this._orders.filter(o => o.type == 'SELL' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
-
-    this.groupedOrders = [buys, sells, filledBuys, filledSells]
+    this.groupedOrders = this.filledOnly ? [filledBuys, filledSells] : [buys, sells, filledBuys, filledSells]
     this.isEmpty = this.groupedOrders.every(o => o.length == 0)
   }
 

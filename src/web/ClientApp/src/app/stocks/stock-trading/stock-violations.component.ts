@@ -34,4 +34,8 @@ export class StockViolationsComponent {
   transactionRecorded(val:stocktransactioncommand) {
     this.refreshRequested.emit(val.ticker)
   }
+
+  orderExecuted() {
+    this.refreshRequested.emit("")
+  }
 }
