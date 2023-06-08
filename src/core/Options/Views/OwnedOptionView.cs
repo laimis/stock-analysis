@@ -31,7 +31,7 @@ namespace core.Options
             var debits = o.State.Transactions.Where(t => !t.IsPL && t.Amount < 0);
 
             if (credits.Any()) PremiumReceived = credits.Sum(t => t.Amount);
-            if (debits.Any()) PremiumPaid = debits.Sum(t => t.Amount);
+            if (debits.Any()) PremiumPaid = Math.Abs(debits.Sum(t => t.Amount));
         }
 
         public OwnedOptionView(OwnedOption option, decimal currentPrice)
@@ -98,7 +98,7 @@ namespace core.Options
                 return (PremiumReceived - PremiumPaid) / PremiumReceived;
             }
         }
-        public decimal Profit => PremiumReceived + PremiumPaid;
+        public decimal Profit => PremiumReceived - PremiumPaid;
         public string ExpirationDate { get; set; }
         public int NumberOfContracts { get; set; }
         public string BoughtOrSold { get; set; }
