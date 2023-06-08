@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'option-open',
+  selector: 'app-option-open',
   templateUrl: './option-open.component.html',
   styleUrls: ['./option-open.component.css']
 })

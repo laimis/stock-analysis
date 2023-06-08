@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'option-performance',
+  selector: 'app-option-performance',
   templateUrl: './option-performance.component.html',
   styleUrls: ['./option-performance.component.css']
 })

@@ -24,18 +24,23 @@
         <th>OTM/ITM</th>
         <th>Premium</th>
         <th>Days Left</th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let option of openOptions">
         <td>
-          <span class="badge bg-primary" [ngClass]="{'bg-info': option.boughtOrSold === 'Bought', 'bg-secondary': option.boughtOrSold !== 'Bought'}">{{option.boughtOrSold}}</span>
+            <span
+              class="badge bg-primary"
+              [ngClass]="{'bg-info': option.boughtOrSold === 'Bought', 'bg-secondary': option.boughtOrSold !== 'Bought'}">
+                {{option.boughtOrSold}}
+            </span>
         </td>
         <td>
-          <span class="font-weight-bold">
-            {{option.ticker}} {{option.strikePrice | currency}} {{option.optionType}}
-          </span>
+          <a [routerLink]="[ '/optiondetails', option.id ]">
+            <span class="font-weight-bold">
+              {{option.ticker}} {{option.strikePrice | currency}} {{option.optionType}}
+            </span>
+          </a>
         </td>
         <td>{{option.expirationDate | date:'MM/dd'}}</td>
         <td>{{option.currentPrice | currency}}</td>
@@ -50,9 +55,6 @@
           {{(option.days - option.daysHeld) | number}}
           <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
           <span *ngIf="option.isExpired" class="ml-1 badge bg-danger">expired</span>
-        </td>
-        <td>
-          <a class="btn btn-primary btn-sm" [routerLink]="[ '/optiondetails', option.id ]">Edit</a>
         </td>
       </tr>
     </tbody>

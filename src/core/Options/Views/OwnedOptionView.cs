@@ -98,7 +98,7 @@ namespace core.Options
                 return (PremiumReceived - PremiumPaid) / PremiumReceived;
             }
         }
-        public decimal Profit => PremiumReceived - PremiumPaid;
+        public decimal Profit => PremiumReceived + PremiumPaid;
         public string ExpirationDate { get; set; }
         public int NumberOfContracts { get; set; }
         public string BoughtOrSold { get; set; }

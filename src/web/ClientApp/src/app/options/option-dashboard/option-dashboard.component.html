@@ -15,8 +15,6 @@
 </div>
 
 
-<option-open *ngIf="loaded && isActive('open')" [statsContainer]=statsContainer></option-open>
-
-<option-closed *ngIf="loaded && isActive('closed')" [statsContainer]=statsContainer></option-closed>
-
-<option-performance *ngIf="loaded && isActive('performance')" [statsContainer]=statsContainer></option-performance>
+<app-option-open *ngIf="loaded && isActive('open')" [statsContainer]=statsContainer></app-option-open>
+<app-option-closed *ngIf="loaded && isActive('closed')" [statsContainer]=statsContainer></app-option-closed>
+<app-option-performance *ngIf="loaded && isActive('performance')" [statsContainer]=statsContainer></app-option-performance>
