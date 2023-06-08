@@ -101,7 +101,7 @@
   <div class="row mt-3">
     <div class="col">
       <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes ({{_position.notes.length}})</div>
-      <div #notesContainer class="visually-hidden">
+      <div #notesContainer>
         <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
       </div>
     </div>

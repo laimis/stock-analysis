@@ -1,8 +1,14 @@
 param($message)
 
+# create a function to get the last commit message
+function Get-LastCommitMessage {
+    $lastCommit = Invoke-Expression 'git log -1 --pretty=format:%s'
+    return $lastCommit
+}
+
 if ([System.String]::IsNullOrEmpty($message))
 {
-    $lastCommit = Invoke-Expression 'git log -1 --pretty=format:%s'
+    $lastCommit = Get-LastCommitMessage
     write-host "Message is missing, would you like to use the last commit message: $lastCommit"
     $response = Read-Host "y/n"
     if ($response -eq "y")
@@ -14,6 +20,12 @@ if ([System.String]::IsNullOrEmpty($message))
         write-host "Please provide a message"
         exit
     }
+}
+
+# short hand to use the last commit message, don't ask why 'y' is used
+if ($message -eq "y")
+{
+    $message = Get-LastCommitMessage
 }
 
 # ensure that $messsage has "'" escaped

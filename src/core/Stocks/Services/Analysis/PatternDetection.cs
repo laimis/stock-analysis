@@ -48,7 +48,7 @@ namespace core.Stocks.Services.Analysis
             return new Pattern(
                 date: current.Date,
                 name: GapUpName,
-                description: $"{GapUpName} {(gap.gapSizePct * 100).ToString("N2")}",
+                description: $"{GapUpName} {(gap.gapSizePct).ToString("P2")}",
                 value: gap.gapSizePct,
                 valueFormat: Shared.ValueFormat.Percentage
             );
