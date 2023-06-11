@@ -17,7 +17,7 @@ namespace core.Stocks.Services.Trading
 
         protected override void ApplyPriceBarToPositionInternal(SimulationContext context, PriceBar bar)
         {
-            if (context.Position.NumberOfShares > 0 && _exitCondition(context, bar))
+            if (_exitCondition(context, bar))
             {
                 ClosePosition(bar.Close, bar.Date, context.Position);
             }
@@ -91,7 +91,7 @@ namespace core.Stocks.Services.Trading
                 _level++;
             }
 
-            if (bar.Close <= context.Position.StopPrice.Value && context.Position.NumberOfShares > 0)
+            if (bar.Close <= context.Position.StopPrice.Value)
             {
                 ClosePosition(bar.Close, bar.Date, context.Position);
             }
@@ -245,12 +245,15 @@ namespace core.Stocks.Services.Trading
 
         protected static void ClosePosition(decimal price, DateTimeOffset date, PositionInstance position)
         {
-            position.Sell(
-                numberOfShares: position.NumberOfShares,
-                price: price,
-                transactionId: Guid.NewGuid(),
-                when: date
-            );
+            if (position.NumberOfShares > 0)
+            {
+                position.Sell(
+                    numberOfShares: position.NumberOfShares,
+                    price: price,
+                    transactionId: Guid.NewGuid(),
+                    when: date
+                );
+            }
         }
 
         protected virtual SimulationContext ApplyPriceBarToPosition(SimulationContext context, PriceBar bar)
