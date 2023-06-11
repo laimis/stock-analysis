@@ -136,7 +136,8 @@ namespace core.Stocks
         {
             if (NumberOfShares <= 0)
             {
-                throw new InvalidOperationException("Transaction would make amount owned invalid");
+                var details = $"Sell {numberOfShares} @ ${price} on {when} for {Ticker}";
+                throw new InvalidOperationException("Transaction would make amount owned invalid: " + details);
             }
 
             // once we stop adding and do our first sale, that should be our position
