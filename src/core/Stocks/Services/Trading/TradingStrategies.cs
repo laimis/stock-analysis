@@ -91,7 +91,7 @@ namespace core.Stocks.Services.Trading
                 _level++;
             }
 
-            if (bar.Close <= context.Position.StopPrice.Value)
+            if (bar.Close <= context.Position.StopPrice.Value && context.Position.NumberOfShares > 0)
             {
                 ClosePosition(bar.Close, bar.Date, context.Position);
             }
