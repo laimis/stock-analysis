@@ -105,17 +105,20 @@ export class StocksService {
   createRoutine(name,description): Observable<Routine> {
     return this.http.post<Routine>('/api/portfolio/routines', {name,description})
   }
+  updateRoutine(name,newName): Observable<Routine> {
+    return this.http.put<Routine>('/api/portfolio/routines/' + name, {name, newName})
+  }
   addRoutineStep(routineName, label, url): Observable<Routine> {
-    return this.http.put<Routine>('/api/portfolio/routines/' + routineName, {label, url, routineName})
+    return this.http.put<Routine>('/api/portfolio/routines/' + routineName + "/steps", {label, url, routineName})
   }
   updateRoutineStep(routineName, stepIndex:number, label, url): Observable<Routine> {
-    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex, {label, url, routineName, stepIndex})
+    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/steps/' + stepIndex, {label, url, routineName, stepIndex})
   }
   deleteRoutineStep(routineName, stepIndex:number): Observable<Routine> {
-    return this.http.delete<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex)
+    return this.http.delete<Routine>('/api/portfolio/routines/' + routineName + '/steps/' + stepIndex)
   }
   moveRoutineStep(routineName, stepIndex:number, direction:number) {
-    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/' + stepIndex + '/position', {direction, routineName, stepIndex})
+    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/steps/' + stepIndex + '/position', {direction, routineName, stepIndex})
   }
 
   // ----------------- stock lists ---------------------

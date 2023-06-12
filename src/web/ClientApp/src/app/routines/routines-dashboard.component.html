@@ -24,8 +24,17 @@
     </section>
 
     <section *ngFor="let routine of routines">
-        <h3>
+        <h3 #routineReadonlySection>
             {{routine.name}}
+            <button
+                class="btn btn-sm mb-2"
+                (click)="toggleVisibility(routineEditSection); toggleVisibility(routineReadonlySection)">
+                <i class="bi bi-pencil"></i>
+            </button>
+        </h3>
+        <h3 #routineEditSection class="visually-hidden">
+            <input type="text" #routineName value="{{routine.name}}">
+            <button (click)="toggleVisibility(routineEditSection); updateRoutine(routine, routineName.value); toggleVisibility(routineReadonlySection);">save</button>
         </h3>
         <div>
             <button class="btn btn-primary btn-sm me-2" (click)="activate(routine)">Activate</button>

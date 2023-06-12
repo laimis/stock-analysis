@@ -134,4 +134,15 @@ export class RoutineDashboardComponent implements OnInit {
       }
     )
   }
+
+  updateRoutine(routine:Routine, newName:string) {
+    this.service.updateRoutine(routine.name, newName).subscribe(
+      _ => {
+        this.fetchRoutines();
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
+  }
 }

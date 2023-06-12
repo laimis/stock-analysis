@@ -28,7 +28,7 @@
           <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
           <td>{{p.type }}</td>
           <td>{{p.quantity}}</td>
-          <td class="text-end">{{p.price | currency}}</td>
+          <td class="text-end">{{p.price === 0 ? 'MARKET' : p.price | currency}}</td>
           <td class="text-end">
             <button *ngIf="p.canBeCancelled" class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
             <button *ngIf="p.canBeRecorded" class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>

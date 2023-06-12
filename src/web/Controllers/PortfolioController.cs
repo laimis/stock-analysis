@@ -51,32 +51,39 @@ namespace web.Controllers
             command.WithUserId(User.Identifier());
 
             return _mediator.Send(command);
-        }
+        }        
 
         [HttpPut("routines/{routineName}")]
-        public Task<RoutineState> AddRoutineStep([FromBody]RoutinesAddStep.Command command)
+        public Task UpdateRoutine([FromBody]RoutinesUpdate.Command command)
         {
             command.WithUserId(User.Identifier());
-
             return _mediator.Send(command);
         }
 
         [HttpDelete("routines/{routineName}")]
         public Task DeleteRoutine(string routineName) =>
             _mediator.Send(new RoutinesDelete.Command(routineName, User.Identifier()));
+
+        [HttpPut("routines/{routineName}/steps")]
+        public Task<RoutineState> AddRoutineStep([FromBody]RoutinesAddStep.Command command)
+        {
+            command.WithUserId(User.Identifier());
+
+            return _mediator.Send(command);
+        }
         
-        [HttpPost("routines/{routineName}/{stepIndex}")]
+        [HttpPost("routines/{routineName}/steps/{stepIndex}")]
         public Task<RoutineState> UpdateRoutineStep(RoutinesUpdateStep.Command cmd)
         {
             cmd.WithUserId(User.Identifier());
 
             return _mediator.Send(cmd);
         }
-        [HttpDelete("routines/{routineName}/{stepIndex}")]
+        [HttpDelete("routines/{routineName}/steps/{stepIndex}")]
         public Task<RoutineState> RemoveRoutineStep(string routineName, int stepIndex) =>
             _mediator.Send(new RoutinesRemoveStep.Command(routineName, stepIndex, User.Identifier()));
 
-        [HttpPost("routines/{routineName}/{stepIndex}/position")]
+        [HttpPost("routines/{routineName}/steps/{stepIndex}/position")]
         public Task<RoutineState> MoveRoutineStep([FromBody]RoutinesMoveStep.Command cmd)
         {
             cmd.WithUserId(User.Identifier());
