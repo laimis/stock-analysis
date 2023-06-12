@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Routine, RoutineStep, StocksService } from '../services/stocks.service';
 import { GetErrors, toggleVisuallyHidden } from '../services/utils';
 
@@ -39,12 +39,20 @@ export class RoutineDashboardComponent implements OnInit {
   }
 
   private updateActiveStep(increment) {
+    var index = this.currentStepIndex
     if (increment !== 0) {
-      this.currentStepIndex += increment
+      index += increment
     } else {
-      this.currentStepIndex = 0
+      index = 0
     }
 
+    if (index < 0) {
+      return
+    } else if (index >= this.activeRoutine.steps.length) {
+      return
+    }
+
+    this.currentStepIndex = index
     this.activeStep = this.activeRoutine.steps[this.currentStepIndex];
   }
 
@@ -144,5 +152,24 @@ export class RoutineDashboardComponent implements OnInit {
         this.errors = GetErrors(error)
       }
     )
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) { 
+    console.log(event.key)
+    if (event.key === "ArrowRight") {
+      this.nextStep();
+      event.preventDefault();
+    } else if (event.key === "ArrowLeft") {
+      this.prevStep();
+      event.preventDefault();
+    } else if (event.key === "Escape") {
+      this.deactivate();
+      event.preventDefault();
+    } else if (event.key === "Enter") {
+      // open the url in the active step in a new tab
+      window.open(this.activeStep.url, "_blank");
+      event.preventDefault();
+    }
   }
 }
