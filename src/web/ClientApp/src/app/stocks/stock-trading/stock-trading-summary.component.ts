@@ -88,6 +88,9 @@ export class StockTradingSummaryComponent {
       return acc
     }, {})
 
+    // all all positions whose strategy is "shortterm"
+    strategyGroups["allbutlongterm"] = positions.filter(p => this.getStrategy(p) !== "longterm")
+
     let groupsArray = []
 
     for (const key in strategyGroups) {
