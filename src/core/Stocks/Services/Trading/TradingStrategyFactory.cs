@@ -36,7 +36,7 @@ namespace core.Stocks.Services.Trading
         private static ITradingStrategy CreateProfitTakingStrategyPercentBased(int profitPoints = 3)
         {
             return new TradingStrategyWithProfitPoints(
-                $"Profit taking ({profitPoints} RR levels) (percent based)",
+                $"Profit taking ({profitPoints} % levels)",
                 numberOfProfitPoints: 3,
                 (position, level) => ProfitPoints.GetProfitPointWithPercentGain(position, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
                 (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
