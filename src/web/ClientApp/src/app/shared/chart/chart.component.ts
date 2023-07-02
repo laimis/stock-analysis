@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartDataset, ChartOptions, ChartType, LogarithmicScale } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ChartAnnotationLine } from 'src/app/services/stocks.service';
 
 @Component({
