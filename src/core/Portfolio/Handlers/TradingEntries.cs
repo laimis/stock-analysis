@@ -89,6 +89,7 @@ namespace core.Portfolio.Handlers
                             positions: trades
                         );
                     })
+                    .OrderByDescending(p => p.performance.Profit)
                     .ToArray();
 
             
