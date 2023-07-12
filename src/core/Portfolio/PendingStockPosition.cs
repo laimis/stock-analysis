@@ -76,5 +76,10 @@ namespace core.Portfolio
                 )
             );
         }
+
+        internal void SetPrice(decimal price)
+        {
+            State.SetPrice(price);
+        }
     }
 }

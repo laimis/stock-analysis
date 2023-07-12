@@ -976,9 +976,11 @@ export interface PositionEvent {
 export interface PendingStockPosition {
   id: string,
   ticker: string,
+  bid: number,
   price: number,
   numberOfShares: number,
   stopPrice: number,
+  PercentDiffBetweenBidAndPrice: number,
   date: string
   notes: string
   strategy: string

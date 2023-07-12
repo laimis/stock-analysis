@@ -9,7 +9,9 @@
         <tr>
           <th scope="col">Ticker</th>
           <th scope="col">Shares</th>
+          <th scope="col">Bid</th>
           <th scope="col">Price</th>
+          <th scope="col">% diff</th>
           <th scope="col">Stop</th>
           <th scope="col">Date</th>
           <th></th>
@@ -24,7 +26,9 @@
             </td>
 
             <td>{{ position.numberOfShares }}</td>
+            <td>{{ position.bid | currency }}</td>
             <td>{{ position.price | currency }}</td>
+            <td>{{ position.PercentDiffBetweenBidAndPrice | percent }}</td>
             <td>{{ position.stopPrice | currency }}</td>
             <td>{{ position.date | date }}</td>
             <td class="text-end">

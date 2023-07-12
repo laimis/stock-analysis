@@ -20,7 +20,7 @@ namespace coretests.Portfolio
             
             Assert.Equal("this is a note", pending.State.Notes);
             Assert.Equal(100, pending.State.NumberOfShares);
-            Assert.Equal(10, pending.State.Price);
+            Assert.Equal(10, pending.State.Bid);
             Assert.Equal(5, pending.State.StopPrice);
             Assert.Equal("alltimehigh", pending.State.Strategy);
             Assert.Equal("AAPL", pending.State.Ticker);
