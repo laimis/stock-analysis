@@ -47,12 +47,14 @@ namespace core.Portfolio.Handlers
                 var tickers = positions.Select(x => x.State.Ticker).Distinct();
 
                 var prices = await _brokerage.GetQuotes(user.State, tickers);
-
-                foreach (var p in positions)
+                if (prices.IsOk)
                 {
-                    if (prices.Success.TryGetValue(p.State.Ticker, out var quote))
+                    foreach (var p in positions)
                     {
-                        p.SetPrice(quote.Price);
+                        if (prices.Success.TryGetValue(p.State.Ticker, out var quote))
+                        {
+                            p.SetPrice(quote.Price);
+                        }
                     }
                 }
 
