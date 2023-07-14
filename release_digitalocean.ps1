@@ -50,7 +50,7 @@ while ($garbageCollection) {
     
     $gcCollections = ConvertFrom-Json ([System.String]::Join("", $collectionJson))
 
-    if ($gcCollections.Count -eq 0 -or $gcCollections.errors -ne $null)
+    if ($gcCollections.Count -eq 0 -or $null -ne $gcCollections.errors)
     {
         $garbageCollection = $false
     }
