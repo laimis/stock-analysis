@@ -272,7 +272,7 @@ export class StockTradingNewPositionComponent {
       positions => {
         var position = positions.find(p => p.ticker === ticker)
         if (position) {
-          this.costToBuy = position.price
+          this.costToBuy = position.bid
           this.numberOfShares = position.numberOfShares
           this.positionStopPrice = position.stopPrice
           this.notes = position.notes
