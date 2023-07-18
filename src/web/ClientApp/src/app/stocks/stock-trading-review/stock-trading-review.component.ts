@@ -32,17 +32,12 @@ export class StockTradingReviewComponent implements OnInit {
     this.title.setTitle("Trading Review - Nightingale Trading")
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
         this.positions = r.past
+        this.orders = r.brokerageOrders
         this.updateCurrentPosition()
       }, (error) => {
         console.log("error fetching positions: " + error)
       }
     );
-
-    this.stockService.brokerageOrders().subscribe(
-      (r: BrokerageOrder[]) => {
-        this.orders = r
-      }
-    )
   }
 
   updateCurrentPosition() {

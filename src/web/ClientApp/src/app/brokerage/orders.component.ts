@@ -37,8 +37,8 @@ export class BrokerageOrdersComponent implements OnInit {
   filledOnly: boolean = false
 
   refreshOrders() {
-    this.stockService.brokerageOrders().subscribe(orders => {
-      this._orders = orders
+    this.stockService.brokerageAccount().subscribe(account => {
+      this._orders = account.orders
       this.groupAndRenderOrders()
     },
       (err) => {

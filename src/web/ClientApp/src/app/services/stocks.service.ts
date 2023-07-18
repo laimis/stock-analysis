@@ -298,8 +298,8 @@ export class StocksService {
     return this.http.delete('/api/brokerage/orders/' + orderId)
   }
 
-  brokerageOrders() : Observable<BrokerageOrder[]> {
-    return this.http.get<BrokerageOrder[]>('/api/brokerage/orders')
+  brokerageAccount() : Observable<BrokerageAccount> {
+    return this.http.get<BrokerageAccount>('/api/brokerage/account')
   }
 
   search(term: string): Observable<StockSearchResult[]> {
@@ -944,12 +944,19 @@ export interface BrokerageOrder {
   isActive: boolean
 }
 
+export interface BrokerageAccount {
+  orders: BrokerageOrder[]
+  cashBalance: number
+}
+
 export interface StockTradingPositions {
   current: PositionInstance[]
   past: PositionInstance[]
   performance: StockTradingPerformanceCollection
   strategyPerformance: TradingStrategyPerformance[]
   violations: StockViolation[]
+  cashBalance: number
+  brokerageOrders: BrokerageOrder[]
 }
 
 export interface PriceWithDate {

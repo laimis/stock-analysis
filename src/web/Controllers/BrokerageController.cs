@@ -51,7 +51,7 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
-        [HttpGet("orders")]
-        public Task<Order[]> GetOrders() => _mediator.Send(new Orders.Query(User.Identifier()));
+        [HttpGet("account")]
+        public Task<TradingAccount> GetAccount() => _mediator.Send(new GetAccount.Query(User.Identifier()));
     }
 }

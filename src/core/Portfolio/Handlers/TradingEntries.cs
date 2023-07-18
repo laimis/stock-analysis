@@ -46,10 +46,7 @@ namespace core.Portfolio.Handlers
 
                 var user = await _accounts.GetUser(request.UserId);
 
-                var brokeragePositions = await (user.State.ConnectedToBrokerage switch {
-                    true => GetBrokeragePositions(_brokerage, user),
-                    false => Task.FromResult<IEnumerable<Position>>(new Position[0])
-                });
+                var account = await GetAccount(user);
 
                 var positions = stocks.Where(s => s.State.OpenPosition != null)
                     .Select(s => s.State.OpenPosition)
@@ -93,24 +90,36 @@ namespace core.Portfolio.Handlers
                     .ToArray();
 
             
-                var violations = Dashboard.Handler.GetViolations(brokeragePositions, positions);
+                var violations = Dashboard.Handler.GetViolations(account.Positions, positions);
 
                 return new TradingEntriesView(
                     current: current,
                     past: past,
                     performance: performance,
                     violations: violations,
-                    strategyPerformance: strategyPerformance
+                    strategyPerformance: strategyPerformance,
+                    cashBalance: account.CashBalance,
+                    brokerageOrders: account.Orders
                 );
             }
 
-            private static async Task<IEnumerable<Position>> GetBrokeragePositions(IBrokerage brokerage, User user)
+            private async Task<TradingAccount> GetAccount(User user)
             {
-                var positions = await brokerage.GetPositions(user.State);
+                TradingAccount EmptyAccount() => new TradingAccount {
+                        Positions = new Position[0],
+                        Orders = new Order[0]
+                    };
 
-                return positions.IsOk switch {
-                    true => positions.Success,
-                    false => new Position[0]
+                if (user.State.ConnectedToBrokerage == false)
+                {
+                    return EmptyAccount();
+                }
+
+                var account = await _brokerage.GetAccount(user.State);
+
+                return account.IsOk switch {
+                    true => account.Success,
+                    false => EmptyAccount()
                 };
             }
         }

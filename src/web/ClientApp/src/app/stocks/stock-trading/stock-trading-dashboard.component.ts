@@ -18,6 +18,7 @@ export class StockTradingComponent implements OnInit {
   performance: StockTradingPerformanceCollection;
   violations: StockViolation[]
   brokerageOrders: BrokerageOrder[];
+  cashBalance: number;
 
   @ViewChild(BrokerageOrdersComponent) brokerageOrdersComponent:BrokerageOrdersComponent;
   
@@ -67,21 +68,16 @@ export class StockTradingComponent implements OnInit {
       this.closed = r.past
       this.performance = r.performance
       this.violations = r.violations
+      this.brokerageOrders = r.brokerageOrders
+      this.cashBalance = r.cashBalance
       this.loading = false
       this.loaded = true
-
-      this.loadBrokerageOrders()
     }, _ => {
       this.loading = false
       this.loaded = true
     })
   }
-  loadBrokerageOrders() {
-    this.stockService.brokerageOrders().subscribe((r: BrokerageOrder[]) => {
-      this.brokerageOrders = r
-    })
-  }
-
+  
   numberOfPositions: number = 0
   invested: number = 0
 }

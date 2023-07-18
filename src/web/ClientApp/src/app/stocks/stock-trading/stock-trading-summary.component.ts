@@ -37,6 +37,9 @@ export class StockTradingSummaryComponent {
     return this._positions
   }
 
+  @Input()
+  cashBalance: number
+
   getStrategy(position:PositionInstance) : string {
     let strategy = position.labels.find(l => l.key == 'strategy')
     return strategy ? strategy.value : "none"

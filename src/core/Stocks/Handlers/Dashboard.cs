@@ -60,10 +60,10 @@ namespace core.Stocks
 
                 if (user.State.ConnectedToBrokerage)
                 {
-                    var brokeragePositions = await _brokerage.GetPositions(user.State);
+                    var brokeragePositions = await _brokerage.GetAccount(user.State);
                     if (brokeragePositions.IsOk)
                     {
-                        view.SetViolations(GetViolations(brokeragePositions.Success, view.Positions));
+                        view.SetViolations(GetViolations(brokeragePositions.Success.Positions, view.Positions));
                     }
                 }
 

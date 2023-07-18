@@ -1,15 +1,7 @@
 <div class="summary-card rounded" *ngIf="positions">
   <div class="row">
     <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted sort-header" (click)="sort('strategy')">
-        Strategy
-      </div>
-      <div class="fs-4 summary-card-main-info">
-        Total
-      </div>
-    </div>
-    <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted sort-header" (click)="sort('cost')">
+      <div class="text-muted sort-header" >
         Invested
       </div>
       <div class="fs-4 summary-card-main-info">
@@ -17,7 +9,7 @@
       </div>
     </div>
     <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted sort-header"  (click)="sort('risk')">
+      <div class="text-muted">
         Risked  
       </div>
       <div class="fs-4 summary-card-main-info">
@@ -25,7 +17,7 @@
       </div>
     </div>
     <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted sort-header" (click)="sort('numberOfPositions')">
+      <div class="text-muted">
         Positions
       </div>
       <div class="fs-4 summary-card-main-info">
@@ -33,47 +25,41 @@
       </div>
     </div>
     <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted sort-header" (click)="sort('profit')">
+      <div class="text-muted">
         Profit
       </div>
       <div class="fs-4 summary-card-main-info">
         {{ totalProfit | currency}}
       </div>
     </div>
-  </div>
-
-  <div class="row" *ngFor="let positionGroup of positionGroups">
     <div class="col mb-4 mt-2 text-center">
       <div class="text-muted">
+        Cash
       </div>
       <div class="fs-4 summary-card-main-info">
-        {{positionGroup.strategy}}
-      </div>
-    </div>
-    <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted">
-      </div>
-      <div class="fs-4 summary-card-main-info">
-        {{ positionGroup.cost | currency }}
-      </div>
-    </div>
-    <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted"></div>
-      <div class="fs-4 summary-card-main-info">
-        {{ positionGroup.risk | currency }}
-      </div>
-    </div>
-    <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted"></div>
-      <div class="fs-4 summary-card-main-info">
-        {{positionGroup.length}}
-      </div>
-    </div>
-    <div class="col mb-4 mt-2 text-center">
-      <div class="text-muted"></div>
-      <div class="fs-4 summary-card-main-info">
-        {{positionGroup.profit | currency}}
+        {{ cashBalance | currency}}
       </div>
     </div>
   </div>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th class="sort-header" (click)="sort('strategy')">Strategy</th>
+        <th class="sort-header" (click)="sort('profit')">Profit</th>
+        <th class="sort-header" (click)="sort('cost')">Invested</th>
+        <th class="sort-header" (click)="sort('risk')">Risked</th>
+        <th class="sort-header" (click)="sort('numberOfPositions')">Positions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let positionGroup of positionGroups">
+        <td>{{positionGroup.strategy}}</td>
+        <td>{{positionGroup.profit | currency}}</td>
+        <td>{{ positionGroup.cost | currency }}</td>
+        <td>{{ positionGroup.risk | currency }}</td>
+        <td>{{positionGroup.length}}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

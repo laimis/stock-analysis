@@ -173,6 +173,12 @@ internal class SecuritiesAccount
 
     public OrderStrategy[]? orderStrategies { get; set; }
     public TDPosition[]? positions { get; set; }
+    public TDBalances? currentBalances { get; set; }
+}
+
+internal class TDBalances
+{
+    public decimal cashBalance { get; set; }
 }
 
 internal class TDPosition

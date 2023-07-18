@@ -52,14 +52,14 @@ namespace core.Portfolio.Handlers
                 }
 
                 // get orders for this position
-                var ordersResponse = await _brokerage.GetOrders(user.State);
-                if (!ordersResponse.IsOk)
+                var accountResponse = await _brokerage.GetAccount(user.State);
+                if (!accountResponse.IsOk)
                 {
                     throw new Exception("Unable to get orders");
                 }
 
                 // orders for ticker
-                var tickerOrders = ordersResponse.Success.Where(x => x.Ticker == found.State.Ticker && x.IsBuyOrder && x.IsActive);
+                var tickerOrders = accountResponse.Success.Orders.Where(x => x.Ticker == found.State.Ticker && x.IsBuyOrder && x.IsActive);
                 foreach(var tickerOrder in tickerOrders)
                 {
                     var cancelResponse = await _brokerage.CancelOrder(user.State, tickerOrder.OrderId);

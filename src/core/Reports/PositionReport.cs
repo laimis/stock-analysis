@@ -90,12 +90,12 @@ namespace core.Reports
 
                     position.SetPrice(bars[^1].Close);
 
-                    var orders = await _brokerage.GetOrders(user); 
+                    var orders = await _brokerage.GetAccount(user); 
 
                     var outcomes = PositionAnalysis.Generate(
                         position,
                         bars,
-                        orders.IsOk ? orders.Success : new Order[0]).ToList();
+                        orders.IsOk ? orders.Success.Orders : new Order[0]).ToList();
 
                     tickerOutcomes.Add(new TickerOutcomes(outcomes, position.Ticker));
 

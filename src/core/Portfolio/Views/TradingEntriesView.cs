@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using core.Shared.Adapters.Brokerage;
 using core.Stocks;
 using core.Stocks.Services.Trading;
 using core.Stocks.View;
@@ -10,5 +11,7 @@ namespace core.Portfolio.Views
             PositionInstance[] past,
             TradingPerformanceContainerView performance,
             List<StockViolationView> violations,
-            TradingStrategyPerformance[] strategyPerformance);
+            TradingStrategyPerformance[] strategyPerformance,
+            decimal? cashBalance,
+            Order[] brokerageOrders);
 }

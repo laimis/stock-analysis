@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
@@ -8,9 +7,9 @@ using core.Shared.Adapters.Brokerage;
 
 namespace core.Brokerage
 {
-    public class Orders
+    public class GetAccount
     {
-        public class Query : RequestWithUserId<Order[]>
+        public class Query : RequestWithUserId<TradingAccount>
         {
             public Query(Guid userId)
             {
@@ -18,7 +17,7 @@ namespace core.Brokerage
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, Order[]>
+        public class Handler : HandlerWithStorage<Query, TradingAccount>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
@@ -29,7 +28,7 @@ namespace core.Brokerage
                 _brokerage = brokerage;
             }
 
-            public override async Task<Order[]> Handle(Query cmd, CancellationToken cancellationToken)
+            public override async Task<TradingAccount> Handle(Query cmd, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(cmd.UserId);
                 if (user == null)
@@ -42,19 +41,19 @@ namespace core.Brokerage
                     throw new System.Exception("User not connected to brokerage");
                 }
 
-                var orders = await _brokerage.GetOrders(user.State);
-                if (!orders.IsOk)
+                var account = await _brokerage.GetAccount(user.State);
+                if (!account.IsOk)
                 {
-                    throw new System.Exception(orders.Error.Message);
+                    throw new System.Exception(account.Error.Message);
                 }
 
-                return 
-                    orders.Success
-                        .Where(o => o.IncludeInResponses)
-                        .OrderBy(o => o.StatusOrder)
-                        .ThenBy(o => o.Ticker)
-                        .ThenBy(o => o.Date)
-                        .ToArray();
+                return account.Success; 
+                    // orders.Success
+                    //     .Where(o => o.IncludeInResponses)
+                    //     .OrderBy(o => o.StatusOrder)
+                    //     .ThenBy(o => o.Ticker)
+                    //     .ThenBy(o => o.Date)
+                    //     .ToArray();
             }
         }
     }

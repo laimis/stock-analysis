@@ -174,19 +174,21 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<SearchResult[]>(converted);
     }
 
-    public async Task<ServiceResponse<Order[]>> GetOrders(UserState user)
+    public async Task<ServiceResponse<TradingAccount>> GetAccount(UserState user)
     {
-        var response = await CallApi<AccountsResponse[]>(
-            user,
-            "/accounts?fields=orders",
-            HttpMethod.Get);
-
+        var response = await CallApi<AccountsResponse[]>(user, "/accounts?fields=positions,orders", HttpMethod.Get);
         if (response.Error != null)
         {
-            return new ServiceResponse<Order[]>(response.Error);
+            return new ServiceResponse<TradingAccount>(response.Error);
         }
 
         var accounts = response.Success!;
+
+        var tdPositions = accounts[0].securitiesAccount?.positions;
+        if (tdPositions == null)
+        {
+            throw new Exception("Could not find positions in response");
+        }
 
         var strategies = accounts[0].securitiesAccount?.orderStrategies;
         if (strategies == null)
@@ -194,47 +196,34 @@ public class TDAmeritradeClient : IBrokerage
             throw new Exception("Could not find order strategies in response");
         }
 
-        var payload = strategies
-            .Select(o => new Order
-            {
-                Date = o.closeTime == null ? null : DateTimeOffset.Parse(o.closeTime),
-                Status = o.status,
-                OrderId = o.orderId.ToString(),
-                Price = o.ResolvePrice(),
-                Quantity = Convert.ToInt32(o.quantity),
-                Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
-                Type = o.orderLegCollection?[0]?.instruction
-            })
-            .ToArray();
-
-        return new ServiceResponse<Order[]>(payload);
-    }
-
-    public async Task<ServiceResponse<IEnumerable<Position>>> GetPositions(UserState user)
-    {
-        var response = await CallApi<AccountsResponse[]>(user, "/accounts?fields=positions", HttpMethod.Get);
-        if (response.Error != null)
+        var orders = strategies.Select(o => new Order
         {
-            return new ServiceResponse<IEnumerable<Position>>(response.Error);
-        }
+            Date = o.closeTime == null ? null : DateTimeOffset.Parse(o.closeTime),
+            Status = o.status,
+            OrderId = o.orderId.ToString(),
+            Price = o.ResolvePrice(),
+            Quantity = Convert.ToInt32(o.quantity),
+            Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
+            Type = o.orderLegCollection?[0]?.instruction
+        })
+        .ToArray();
 
-        var accounts = response.Success!;
-
-        var positions = accounts[0].securitiesAccount?.positions;
-        if (positions == null)
-        {
-            throw new Exception("Could not find positions in response");
-        }
-
-        var payload = positions.Select(p => new Position
+        var positions = tdPositions.Select(p => new Position
         {
             Ticker = p.instrument?.symbol,
             AssetType = p.instrument?.assetType,
             Quantity = p.longQuantity,
             AverageCost = p.averagePrice
-        });
+        }).ToArray();
 
-        return new ServiceResponse<IEnumerable<Position>>(payload);
+        var account = new TradingAccount
+        {
+            Orders = orders,
+            Positions = positions,
+            CashBalance = accounts[0].securitiesAccount?.currentBalances?.cashBalance
+        };
+
+        return new ServiceResponse<TradingAccount>(account);
     }
 
     public async Task<ServiceResponse<bool>> CancelOrder(UserState user, string orderId)

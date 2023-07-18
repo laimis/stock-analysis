@@ -12,8 +12,7 @@ namespace core.Shared.Adapters.Brokerage
     {
         Task<string> GetOAuthUrl();
         Task<OAuthResponse> ConnectCallback(string code);
-        Task<ServiceResponse<Order[]>> GetOrders(UserState state);
-        Task<ServiceResponse<IEnumerable<Position>>> GetPositions(UserState state);
+        Task<ServiceResponse<TradingAccount>> GetAccount(UserState state);
         Task BuyOrder(UserState user, string ticker, decimal numberOfShares, decimal price, BrokerageOrderType type, BrokerageOrderDuration duration);
         Task<ServiceResponse<bool>> SellOrder(UserState user, string ticker, decimal numberOfShares, decimal price, BrokerageOrderType type, BrokerageOrderDuration duration);
         Task<ServiceResponse<bool>> CancelOrder(UserState state, string orderId);

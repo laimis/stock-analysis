@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace core.Shared.Adapters.Brokerage;
 
@@ -95,4 +96,11 @@ public class Position
     public decimal Quantity { get; set; }
     public string AssetType { get; set; }
     public bool IsEquity => AssetType == "EQUITY";
+}
+
+public class TradingAccount
+{
+    public Position[] Positions { get; set; }
+    public Order[] Orders { get; set; }
+    public decimal? CashBalance { get; set; }
 }
