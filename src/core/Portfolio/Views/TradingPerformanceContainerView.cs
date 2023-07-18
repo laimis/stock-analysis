@@ -168,10 +168,19 @@ namespace core.Portfolio.Views
                 symmetric: true,
                 annotation: zeroLineAnnotationVertical);
 
+            var gainPctDistribution = GenerateOutcomeHistogram(
+                "Gain % Distribution",
+                positions,
+                p => p.GainPct,
+                buckets: 20,
+                symmetric: true,
+                annotation: zeroLineAnnotationVertical);
+
             trends.Add(profits);
             trends.Add(equityCurve);
             trends.Add(gradeContainer);
             trends.Add(gainDistribution);
+            trends.Add(gainPctDistribution);
             trends.Add(rrDistribution);
             trends.Add(wins);
             trends.Add(avgWinPct);
