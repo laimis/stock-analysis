@@ -172,7 +172,7 @@ namespace core.Portfolio.Views
                 "Gain % Distribution",
                 positions,
                 p => p.GainPct,
-                buckets: 20,
+                buckets: 40,
                 symmetric: true,
                 annotation: zeroLineAnnotationVertical);
 
