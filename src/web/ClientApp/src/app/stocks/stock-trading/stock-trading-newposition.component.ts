@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
-import { GetErrors, GetStrategies } from 'src/app/services/utils';
+import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-newposition',
@@ -281,6 +281,15 @@ export class StockTradingNewPositionComponent {
         }
       }
     )
+  }
+
+  toggleVisibility(elem:HTMLElement) {
+    toggleVisuallyHidden(elem)
+  }
+
+  assignSizeStopPrice(value) {
+    this.sizeStopPrice = value
+    this.updateBuyingValuesSizeStopPrice()
   }
 }
 

@@ -700,9 +700,21 @@ export interface SMA {
   description: string
 }
 
+export interface DistributionStatistics {
+  count : number
+  kurtosis : number
+  min : number
+  max : number
+  mean : number
+  median : number
+  skewness : number
+  stdDev : number
+}
+
 export interface Prices {
   prices: PriceBar[]
   sma: SMAContainer
+  percentChanges: DistributionStatistics
 }
 
 export interface SMAContainer {

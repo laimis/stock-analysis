@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Analysis
 {
@@ -22,6 +23,9 @@ namespace core.Stocks.Services.Analysis
 
             return Statistics(percentChanges);
         }
+
+        public static DistributionStatistics PercentChanges(PriceBar[] prices) =>
+            PercentChanges(prices.Select(p => p.Close).ToArray());
 
         public static DistributionStatistics Statistics(decimal[] numbers)
         {

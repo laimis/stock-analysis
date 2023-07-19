@@ -68,15 +68,17 @@
     </div>
     <div class="row mt-3" *ngIf="prices">
       <div class="col fs-6">
-        <span class="me-2">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
+        <span class="me-2 visually-hidden" #sizeSpan (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
+        <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
         <span class="me-2">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
         <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
       </div>
       <div class="col text-end">
-        <span class="me-2">20: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
-        <span class="me-2">50: <strong [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
-        <span class="me-2">150: <strong [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
-        <span class="me-2">200: <strong [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
+        <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev | percent }}</strong> </span>
+        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get20sma())">20: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
+        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get50sma())">50: <strong [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
+        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get150sma())">150: <strong [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
+        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get200sma())">200: <strong [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
       </div>
     </div>
     <div class="row mt-3" *ngIf="prices">
