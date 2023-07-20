@@ -157,6 +157,10 @@ export class RoutineDashboardComponent implements OnInit {
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
     console.log(event.key)
+    if (this.activeRoutine === null) {
+      return
+    }
+    
     if (event.key === "ArrowRight") {
       this.nextStep();
       event.preventDefault();
