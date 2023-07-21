@@ -41,6 +41,16 @@ namespace coretests.Options
                         new Dictionary<string, StockQuote>()
                     )
                 ));
+
+            brokerage.Setup(x => x.GetAccount(It.IsAny<UserState>()))
+                .Returns(Task.FromResult(
+                    new ServiceResponse<TradingAccount>(
+                        new TradingAccount {
+                            OptionPositions = new OptionPosition[0],
+                            StockPositions = new StockPosition[0],
+                        }
+                    )
+                ));
             
             var handler = new Dashboard.Handler(accounts.Object, brokerage.Object, storage);
 
