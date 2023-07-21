@@ -12,6 +12,7 @@
         <th>Quantity</th>
         <th>Market Price</th>
         <th>Expiration</th>
+        <th>Purchase Date</th>
         <th></th>
       </tr>
     </thead>
@@ -26,7 +27,10 @@
         <td>{{option.quantity | number}}</td>
         <td>{{option.marketValue | currency }}</td>
         <td>{{option.expirationDate | date}}</td>
-        <td><button class="btn btn-primary" (click)="turnIntoPosition(option)">Turn into Position</button></td>
+        <td>
+          <input type="date" #purchaseDate class="form-control" />
+        </td>
+        <td><button class="btn btn-primary" (click)="turnIntoPosition(option, purchaseDate.value)">Turn into Position</button></td>
       </tr>
     </tbody>
   </table>

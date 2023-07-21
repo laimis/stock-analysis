@@ -19,7 +19,7 @@ export class OptionBrokeragePositionsComponent {
   @Input()
   positions : BrokerageOptionPosition[]
 
-  turnIntoPosition(position:BrokerageOptionPosition){
+  turnIntoPosition(position:BrokerageOptionPosition, purchased:string){
       var opt = {
         ticker: position.ticker,
         strikePrice: position.strikePrice,
@@ -27,7 +27,7 @@ export class OptionBrokeragePositionsComponent {
         expirationDate: new Date(position.expirationDate),
         numberOfContracts: position.quantity,
         premium: position.averageCost * 100,
-        filled: new Date(),
+        filled: purchased,
         notes: null
       }
   
