@@ -1,0 +1,33 @@
+<div class="mt-4" *ngIf="positions && positions.length == 0">
+  No option positions present in brokerage account
+</div>
+
+<div class="mt-4" *ngIf="positions && positions.length > 0">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Type</th>
+        <th>Cost</th>
+        <th>Quantity</th>
+        <th>Market Price</th>
+        <th>Expiration</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let option of positions">
+        <td>
+          {{option.ticker}}
+          <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
+        </td>
+        <td>{{option.optionType}}</td>
+        <td>{{option.averageCost | currency}}</td>
+        <td>{{option.quantity | number}}</td>
+        <td>{{option.marketValue | currency }}</td>
+        <td>{{option.expirationDate | date}}</td>
+        <td><button class="btn btn-primary" (click)="turnIntoPosition(option)">Turn into Position</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

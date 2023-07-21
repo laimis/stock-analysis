@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { OwnedOption } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-option-closed',
@@ -8,12 +9,8 @@ import { Component, Input } from '@angular/core';
 
 export class OptionClosedComponent {
 
-  options:any
-
   @Input()
-  set statsContainer(container:any) {
-    this.options = container.closedOptions
-  }
+  closedOptions: OwnedOption[]
 
 	constructor(){}
 

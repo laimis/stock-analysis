@@ -44,7 +44,7 @@ namespace core.Stocks
                     throw new Exception("User not found");
                 }
 
-                var view = await _storage.ViewModel<StockDashboardView>(query.UserId);
+                var view = await _storage.ViewModel<StockDashboardView>(query.UserId, StockDashboardView.Version);
                 if (view == null)
                 {
                     view = await LoadFromDb(query.UserId);
@@ -63,19 +63,19 @@ namespace core.Stocks
                     var brokeragePositions = await _brokerage.GetAccount(user.State);
                     if (brokeragePositions.IsOk)
                     {
-                        view.SetViolations(GetViolations(brokeragePositions.Success.Positions, view.Positions));
+                        view.SetViolations(GetViolations(brokeragePositions.Success.StockPositions, view.Positions));
                     }
                 }
 
                 return view;
             }
 
-            public static List<StockViolationView> GetViolations(IEnumerable<Position> brokeragePositions, IEnumerable<PositionInstance> localPositions)
+            public static List<StockViolationView> GetViolations(IEnumerable<StockPosition> brokeragePositions, IEnumerable<PositionInstance> localPositions)
             {
                 var violations = new HashSet<StockViolationView>();
 
                 // go through each position and see if it's recorded in portfolio, and quantity matches
-                foreach (var brokeragePosition in brokeragePositions.Where(p => p.IsEquity))
+                foreach (var brokeragePosition in brokeragePositions)
                 {
                     var localPosition = localPositions.SingleOrDefault(o => o.Ticker == brokeragePosition.Ticker);
                     if (localPosition != null)
@@ -154,7 +154,7 @@ namespace core.Stocks
             {
                 var fromDb = await LoadFromDb(notification.UserId);
 
-                await _storage.SaveViewModel(notification.UserId, fromDb);
+                await _storage.SaveViewModel(notification.UserId, fromDb, StockDashboardView.Version);
             }
 
             private async Task<StockDashboardView> LoadFromDb(Guid userId)

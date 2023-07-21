@@ -46,7 +46,7 @@ namespace coretests.Options
 
             var result = await handler.Handle(query, CancellationToken.None);
 
-            Assert.Equal(0, result.Buy.Count);
+            Assert.Equal(0, result.BuyStats.Count);
         }
     }
 }

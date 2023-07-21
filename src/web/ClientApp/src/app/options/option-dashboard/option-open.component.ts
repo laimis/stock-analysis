@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { OwnedOption } from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-option-open',
@@ -9,12 +10,8 @@ import { Router } from '@angular/router';
 
 export class OptionOpenComponent {
 
-  openOptions : any
-
   @Input()
-  set statsContainer(container:any) {
-    this.openOptions = container.openOptions
-  }
+  openOptions : OwnedOption[]
 
 	constructor(private router: Router){}
 

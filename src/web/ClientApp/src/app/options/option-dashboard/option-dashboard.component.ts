@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { StocksService } from '../../services/stocks.service';
+import { OptionsContainer, StocksService } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-options',
@@ -9,7 +9,7 @@ import { StocksService } from '../../services/stocks.service';
 })
 export class OptionsComponent implements OnInit {
 
-  statsContainer: any
+  optionsContainer: OptionsContainer
 
   loaded: boolean = false;
 
@@ -27,7 +27,7 @@ export class OptionsComponent implements OnInit {
 
   getOptions(){
     this.service.getOptions().subscribe( result => {
-      this.statsContainer = result
+      this.optionsContainer = result
       this.loaded = true
     })
   }

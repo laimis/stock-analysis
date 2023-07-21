@@ -33,7 +33,7 @@ namespace core.Portfolio
 
             public override async Task<PortfolioView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var fromCache = await _storage.ViewModel<PortfolioView>(request.UserId);
+                var fromCache = await _storage.ViewModel<PortfolioView>(request.UserId, PortfolioView.Version);
                 if (fromCache != null)
                 {
                     return fromCache;
@@ -46,7 +46,7 @@ namespace core.Portfolio
             {
                 var data = await GetFromDatabase(notification.UserId);
 
-                await _storage.SaveViewModel(notification.UserId, data);
+                await _storage.SaveViewModel(notification.UserId, data, PortfolioView.Version);
             }
 
             private async Task<PortfolioView> GetFromDatabase(Guid userId)

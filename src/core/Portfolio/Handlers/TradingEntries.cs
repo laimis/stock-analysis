@@ -90,7 +90,7 @@ namespace core.Portfolio.Handlers
                     .ToArray();
 
             
-                var violations = Dashboard.Handler.GetViolations(account.Positions, positions);
+                var violations = Dashboard.Handler.GetViolations(account.StockPositions, positions);
 
                 return new TradingEntriesView(
                     current: current,
@@ -106,7 +106,7 @@ namespace core.Portfolio.Handlers
             private async Task<TradingAccount> GetAccount(User user)
             {
                 TradingAccount EmptyAccount() => new TradingAccount {
-                        Positions = new Position[0],
+                        StockPositions = new StockPosition[0],
                         Orders = new Order[0]
                     };
 

@@ -2,29 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using core.Shared;
+using core.Shared.Adapters.Brokerage;
 
 namespace core.Options
 {
     public class OptionDashboardView : IViewModel
     {
+        public static string Version = "1";
         public OptionDashboardView(){}
-        public OptionDashboardView(IEnumerable<OwnedOptionView> closed, IEnumerable<OwnedOptionView> open)
+        public OptionDashboardView(IEnumerable<OwnedOptionView> closed, IEnumerable<OwnedOptionView> open, IEnumerable<OptionPosition> brokeragePositions)
         {
-            ClosedOptions = closed;
-            OpenOptions = open;
+            Closed = closed;
+            Open = open;
+            BrokeragePositions = brokeragePositions;
             
-            Overall = new OwnedOptionStats(closed);
-            Buy = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Bought"));
-            Sell = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Sold"));
+            OverallStats = new OwnedOptionStats(closed);
+            BuyStats = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Bought"));
+            SellStats = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Sold"));
 
             Calculated = DateTimeOffset.UtcNow;
         }
 
-        public IEnumerable<OwnedOptionView> ClosedOptions { get; set; }
-        public IEnumerable<OwnedOptionView> OpenOptions { get; set; }
-        public OwnedOptionStats Overall { get; set; }
-        public OwnedOptionStats Buy { get; set; }
-        public OwnedOptionStats Sell { get; set; }
+        public IEnumerable<OwnedOptionView> Closed { get; set; }
+        public IEnumerable<OwnedOptionView> Open { get; set; }
+        public IEnumerable<OptionPosition> BrokeragePositions { get; set; }
+        public OwnedOptionStats OverallStats { get; set; }
+        public OwnedOptionStats BuyStats { get; set; }
+        public OwnedOptionStats SellStats { get; set; }
         public DateTimeOffset Calculated { get; set; }
     }
 }

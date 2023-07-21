@@ -1,14 +1,14 @@
-<div *ngIf="overall" class="mb-5 container">
+<div *ngIf="overallStats" class="mb-5 container">
   <div class="row mb-2"><h5>Overall stats</h5></div>
-  <option-stats [stats]=overall></option-stats>
+  <option-stats [stats]=overallStats></option-stats>
 </div>
 
-<div *ngIf="sell" class="mb-5 container">
+<div *ngIf="sellStats" class="mb-5 container">
   <div class="row mb-2"><h5>Sell stats</h5></div>
-  <option-stats [stats]=sell></option-stats>
+  <option-stats [stats]=sellStats></option-stats>
 </div>
 
-<div *ngIf="buy" class="mb-5 container">
+<div *ngIf="buyStats" class="mb-5 container">
   <div class="row mb-2"><h5>Buy stats</h5></div>
-  <option-stats [stats]=buy></option-stats>
+  <option-stats [stats]=buyStats></option-stats>
 </div>

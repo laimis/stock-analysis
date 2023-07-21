@@ -8,33 +8,33 @@ namespace core.Options
     public class OwnedOptionView
     {
         public OwnedOptionView(){}
-        public OwnedOptionView(OwnedOption o)
+        public OwnedOptionView(OwnedOptionState o)
         {
-            Id = o.State.Id;
-            Ticker = o.State.Ticker;
-            OptionType = o.State.OptionType.ToString();
-            StrikePrice = o.State.StrikePrice;
-            ExpirationDate = o.State.Expiration.ToString("yyyy-MM-dd");
-            NumberOfContracts = Math.Abs(o.State.NumberOfContracts);
-            BoughtOrSold = o.State.SoldToOpen.Value ? "Sold" : "Bought";
-            Filled = o.State.FirstFill.Value;
-            Days = o.State.Days;
-            DaysHeld = o.State.DaysHeld;
-            Transactions = o.State.Transactions.Where(t => !t.IsPL).ToList();
-            ExpiresSoon = o.State.ExpiresSoon;
-            IsExpired = o.State.IsExpired;
-            Closed = o.State.Closed;
-            Assigned = o.State.Assigned;
-            Notes = o.State.Notes;
+            Id = o.Id;
+            Ticker = o.Ticker;
+            OptionType = o.OptionType.ToString();
+            StrikePrice = o.StrikePrice;
+            ExpirationDate = o.Expiration.ToString("yyyy-MM-dd");
+            NumberOfContracts = Math.Abs(o.NumberOfContracts);
+            BoughtOrSold = o.SoldToOpen.Value ? "Sold" : "Bought";
+            Filled = o.FirstFill.Value;
+            Days = o.Days;
+            DaysHeld = o.DaysHeld;
+            Transactions = o.Transactions.Where(t => !t.IsPL).ToList();
+            ExpiresSoon = o.ExpiresSoon;
+            IsExpired = o.IsExpired;
+            Closed = o.Closed;
+            Assigned = o.Assigned;
+            Notes = o.Notes;
 
-            var credits = o.State.Transactions.Where(t => !t.IsPL && t.Amount >= 0);
-            var debits = o.State.Transactions.Where(t => !t.IsPL && t.Amount < 0);
+            var credits = o.Transactions.Where(t => !t.IsPL && t.Amount >= 0);
+            var debits = o.Transactions.Where(t => !t.IsPL && t.Amount < 0);
 
             if (credits.Any()) PremiumReceived = credits.Sum(t => t.Amount);
             if (debits.Any()) PremiumPaid = Math.Abs(debits.Sum(t => t.Amount));
         }
 
-        public OwnedOptionView(OwnedOption option, decimal currentPrice)
+        public OwnedOptionView(OwnedOptionState option, decimal currentPrice)
             : this(option)
         {
             ApplyPrice(currentPrice);

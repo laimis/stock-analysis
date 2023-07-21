@@ -8,18 +8,12 @@ import { Component, Input } from '@angular/core';
 
 export class OptionPerformanceComponent {
 
-  overall: any
-  buy: any
-  sell: any
-
   @Input()
-  set statsContainer(container:any) {
-    this.overall = container.overall
-    this.buy = container.buy
-    this.sell = container.sell
-  }
-
-	constructor(){}
-
-	ngOnInit(): void {}
+  overallStats: any
+  
+  @Input()
+  buyStats: any
+  
+  @Input()
+  sellStats: any
 }

@@ -43,15 +43,15 @@ namespace core.Options
                     throw new Exception("User not found");
                 }
 
-                var view = await _storage.ViewModel<OptionDashboardView>(request.UserId);
+                var view = await _storage.ViewModel<OptionDashboardView>(request.UserId, OptionDashboardView.Version);
                 if (view == null)
                 {
-                    view = await FromDb(request.UserId);
+                    view = await FromDb(user.State);
                 }
 
                 var prices = await _brokerage.GetQuotes(
                     user.State,
-                    view.OpenOptions.Select(o => o.Ticker).ToList()
+                    view.Open.Select(o => o.Ticker).ToList()
                 );
 
                 return prices.IsOk switch {
@@ -62,7 +62,7 @@ namespace core.Options
 
             private OptionDashboardView EnrichWithStockPrice(OptionDashboardView view, Dictionary<string, StockQuote> prices)
             {
-                foreach (var op in view.OpenOptions)
+                foreach (var op in view.Open)
                 {
                     prices.TryGetValue(op.Ticker, out var val);
                     if (val != null) op.ApplyPrice(val.Price);
@@ -72,28 +72,42 @@ namespace core.Options
 
             public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
             {
-                var view = await FromDb(notification.UserId);
+                var user = await _accounts.GetUser(notification.UserId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
 
-                await _storage.SaveViewModel(notification.UserId, view);
+                var view = await FromDb(user.State);
+
+                await _storage.SaveViewModel(notification.UserId, view, OptionDashboardView.Version);
             }
 
-            private async Task<OptionDashboardView> FromDb(Guid userId)
+            private async Task<OptionDashboardView> FromDb(UserState user)
             {
-                var options = await _storage.GetOwnedOptions(userId);
+                var options = await _storage.GetOwnedOptions(user.Id);
                 options = options.Where(o => !o.State.Deleted);
 
                 var openOptions = options
                     .Where(o => o.State.NumberOfContracts != 0 && o.State.DaysUntilExpiration > -5)
-                    .OrderBy(o => o.State.Expiration)
+                    .Select(o => o.State)
+                    .OrderBy(o => o.Expiration)
                     .ToList();
 
                 var closedOptions = options
                     .Where(o => o.State.Closed != null)
-                    .OrderByDescending(o => o.State.FirstFill);
+                    .Select(o => o.State)
+                    .OrderByDescending(o => o.FirstFill);
+
+                var brokeragePositions = await _brokerage.GetAccount(user);
+                var positions = brokeragePositions.IsOk ?
+                    brokeragePositions.Success.OptionPositions
+                    .Where(p => !openOptions.Any(oo => oo.Ticker == p.Ticker)) : new List<OptionPosition>();
 
                 var view = new OptionDashboardView(
                     closedOptions.Select(o => new OwnedOptionView(o)),
-                    openOptions.Select(o => new Options.OwnedOptionView(o))
+                    openOptions.Select(o => new Options.OwnedOptionView(o)),
+                    positions
                 );
                 return view;
             }

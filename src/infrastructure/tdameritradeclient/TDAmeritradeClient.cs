@@ -176,7 +176,12 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<TradingAccount>> GetAccount(UserState user)
     {
-        var response = await CallApi<AccountsResponse[]>(user, "/accounts?fields=positions,orders", HttpMethod.Get);
+        var response = await CallApi<AccountsResponse[]>(
+            user,
+            "/accounts?fields=positions,orders",
+            HttpMethod.Get,
+            debug: true);
+            
         if (response.Error != null)
         {
             return new ServiceResponse<TradingAccount>(response.Error);
@@ -208,18 +213,51 @@ public class TDAmeritradeClient : IBrokerage
         })
         .ToArray();
 
-        var positions = tdPositions.Select(p => new Position
-        {
-            Ticker = p.instrument?.symbol,
-            AssetType = p.instrument?.assetType,
-            Quantity = p.longQuantity,
-            AverageCost = p.averagePrice
-        }).ToArray();
+        var stockPositions = tdPositions
+            .Where(p => p.instrument?.assetType == "EQUITY")
+            .Select(p => new StockPosition
+            {
+                Ticker = p.instrument?.underlyingSymbol ?? p.instrument?.symbol,
+                Quantity = p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1,
+                AverageCost = p.averagePrice
+            }).ToArray();
+
+        var optionPositions = tdPositions
+            .Where(p => p.instrument?.assetType == "OPTION")
+            .Select(p => {
+                var desription = p.instrument?.description;
+                // description looks like this: AGI Jul 21 2023 13.0 Call
+                // AGI is ticker, Jul 21 2023 is expiration date, 13.0 is strike price
+                // and Call is CALL type, parse all of these values from the description
+
+                var parts = desription?.Split(" ");
+                if (parts == null || parts.Length != 6)
+                {
+                    throw new Exception("Could not parse option description: " + desription);
+                }
+
+                var ticker = parts[0];
+                var expiration = parts[1] + " " + parts[2] + " " + parts[3];
+                var strike = Convert.ToDecimal(parts[4]);
+                var type = parts[5];
+
+                return new OptionPosition
+                {
+                    Ticker = ticker,
+                    Quantity = p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1,
+                    AverageCost = p.averagePrice,
+                    StrikePrice = strike,
+                    ExpirationDate = expiration,
+                    MarketValue = p.marketValue,
+                    OptionType = type.ToUpperInvariant()
+                };
+            }).ToArray();
 
         var account = new TradingAccount
         {
             Orders = orders,
-            Positions = positions,
+            StockPositions = stockPositions,
+            OptionPositions = optionPositions,
             CashBalance = accounts[0].securitiesAccount?.currentBalances?.cashBalance
         };
 

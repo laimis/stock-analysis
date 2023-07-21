@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 
 namespace core.Stocks.View
 {
     public class StockDashboardView : IViewModel
     {
+        public static string Version = "1";
+        
         public StockDashboardView() {}
         public StockDashboardView(List<PositionInstance> positions)
         {

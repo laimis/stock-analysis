@@ -89,6 +89,7 @@ import { RoutineDashboardComponent } from './routines/routines-dashboard.compone
 import { StockTradingStrategiesComponent } from './shared/stocks/stock-trading-strategies.component';
 import { StockTradingSummaryComponent } from './stocks/stock-trading/stock-trading-summary.component';
 import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.component';
+import { OptionBrokeragePositionsComponent } from './options/option-dashboard/option-brokerage-positions.component';
 
 
 var routes: Routes = [
@@ -247,7 +248,9 @@ var routes: Routes = [
     StockTradingAnalysisDashboardComponent,
     RoutineDashboardComponent,
     StockTradingStrategiesComponent,
-    TradingViewLinkComponent
+    TradingViewLinkComponent,
+
+    OptionBrokeragePositionsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

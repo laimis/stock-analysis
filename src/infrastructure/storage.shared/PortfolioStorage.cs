@@ -33,14 +33,14 @@ namespace storage.shared
             _blobStorage = blobStorage;
         }
 
-        public Task<T> ViewModel<T>(Guid userId)
+        public Task<T> ViewModel<T>(Guid userId, string version)
         {
-            return _blobStorage.Get<T>(typeof(T).Name + "#" + userId);
+            return _blobStorage.Get<T>(typeof(T).Name + "#" + version + "#" + userId);
         }
 
-        public Task SaveViewModel<T>(Guid userId, T t)
+        public Task SaveViewModel<T>(Guid userId, T t, string version)
         {
-            return _blobStorage.Save<T>(typeof(T).Name + "#" + userId, t);
+            return _blobStorage.Save<T>(typeof(T).Name + "#" + version + "#" + userId, t);
         }
 
         public async Task<OwnedStock> GetStock(string ticker, Guid userId)

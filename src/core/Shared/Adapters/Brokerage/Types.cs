@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace core.Shared.Adapters.Brokerage;
 
@@ -89,18 +88,29 @@ public class Order
     public bool IsBuyOrder => Type == "BUY";
 }
 
-public class Position
+public class StockPosition
 {
     public string Ticker { get; set; }
     public decimal AverageCost { get; set; }
     public decimal Quantity { get; set; }
-    public string AssetType { get; set; }
-    public bool IsEquity => AssetType == "EQUITY";
+}
+
+public class OptionPosition
+{
+    public string Ticker { get; set; }
+    public string OptionType { get; set; }
+    public string IsCall => OptionType == "CALL" ? "true" : "false";
+    public decimal StrikePrice { get; set; }
+    public decimal Quantity { get; set; }
+    public decimal AverageCost { get; set; }
+    public decimal? MarketValue { get; set; }
+    public string ExpirationDate { get; set; }
 }
 
 public class TradingAccount
 {
-    public Position[] Positions { get; set; }
+    public StockPosition[] StockPositions { get; set; }
+    public OptionPosition[] OptionPositions { get; set; }
     public Order[] Orders { get; set; }
     public decimal? CashBalance { get; set; }
 }

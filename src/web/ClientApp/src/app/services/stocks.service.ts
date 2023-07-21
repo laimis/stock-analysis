@@ -317,8 +317,8 @@ export class StocksService {
 
   // ------- options ----------------
 
-  getOptions() : Observable<any> {
-    return this.http.get('/api/options')
+  getOptions() : Observable<OptionsContainer> {
+    return this.http.get<OptionsContainer>('/api/options')
   }
 
   deleteOption(id: string) {
@@ -673,7 +673,7 @@ export class Dashboard {
 
 export class OwnedOption {
   id:string
-  currentPrice: Number
+  currentPrice: number
   ticker: string
   optionType: string
   expirationDate: string
@@ -683,6 +683,56 @@ export class OwnedOption {
   premiumReceived: number
   profit: number
   transactions: Transaction[]
+  isFavorable: boolean
+  itmOtmLabel: string
+  strikePriceDiff: number
+  days: number
+  daysHeld: number
+  isExpired: boolean
+  expiresSoon: boolean
+  assigned: boolean
+  closed: string
+  premiumPaid: number
+  premiumCapture: number
+}
+
+export class OptionStats {
+  count : number
+  wins : number
+  assigned : number
+  averagePremiumCapture : number
+
+  avgWinAmount : number
+  losses : number
+  averageLossAmount : number
+  maxWinAmount : number
+  maxLossAmount : number
+
+  ev : number
+  averageProfitPerDay : number
+  averageDays : number
+  averageDaysHeld : number
+  averageDaysHeldPercentage : number
+}
+
+export interface BrokerageOptionPosition {
+  ticker : string
+  averageCost : number
+  quantity : number
+  description : string
+  optionType : string
+  strikePrice : number
+  marketValue : number
+  expirationDate : number
+}
+
+export interface OptionsContainer {
+  open: OwnedOption[]
+  closed: OwnedOption[]
+  brokeragePositions: BrokerageOptionPosition[]
+  overallStats: OptionStats
+  buyStats: OptionStats
+  sellStats: OptionStats
 }
 
 export interface PriceBar {

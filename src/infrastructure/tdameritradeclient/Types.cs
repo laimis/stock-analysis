@@ -185,7 +185,9 @@ internal class TDPosition
 {
     public decimal averagePrice { get; set; }
     public decimal longQuantity { get; set; }
+    public decimal shortQuantity { get; set; }
     public Instrument? instrument { get; set; }
+    public decimal? marketValue { get; set; }
 }
 
 internal class AccountsResponse
