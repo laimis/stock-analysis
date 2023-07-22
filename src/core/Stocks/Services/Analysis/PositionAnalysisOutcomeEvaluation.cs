@@ -38,7 +38,7 @@ namespace core.Stocks.Services.Analysis
             // positions that don't have strategy label assigned
             yield return new AnalysisOutcomeEvaluation(
                 "No Strategy",
-                OutcomeType.Neutral,
+                OutcomeType.Negative,
                 PortfolioAnalysisKeys.StrategyLabel,
                 tickerOutcomes
                     .Where(t =>
