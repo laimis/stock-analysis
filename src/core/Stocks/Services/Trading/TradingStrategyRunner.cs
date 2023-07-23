@@ -77,14 +77,20 @@ namespace core.Stocks.Services.Trading
                 convertedWhen,
                 convertedWhen.AddDays(TradingStrategyConstants.MAX_NUMBER_OF_DAYS_TO_SIMULATE));
             
-            if (!prices.IsOk)
-            {
-                throw new Exception("Failed to get price history: " + prices.Error.Message);
-            }
-            
             var results = new TradingStrategyResults();
 
+            if (!prices.IsOk)
+            {
+                results.MarkAsFailed("Failed to get price history: " + prices.Error.Message);
+                return results;
+            }
+
             var bars = prices.Success;
+            if (bars.Length == 0)
+            {
+                results.MarkAsFailed("No price history found");
+                return results;
+            }
 
             // HACK: sometimes stock is purchased in after hours at a much higher or lower price
             // than what the day's high/close was, we need to move the prices to the next day

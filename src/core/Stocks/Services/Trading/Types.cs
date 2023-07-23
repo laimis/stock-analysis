@@ -29,6 +29,9 @@ namespace core.Stocks.Services.Trading
 
         internal void Insert(int index, TradingStrategyResult result) =>
             Results.Insert(index, result);
+
+        public string FailedReason { get; private set; }
+        public void MarkAsFailed(string reason) => FailedReason = reason;
     }
 
     public struct TradingPerformance
