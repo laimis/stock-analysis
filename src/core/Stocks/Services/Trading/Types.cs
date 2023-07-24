@@ -31,6 +31,8 @@ namespace core.Stocks.Services.Trading
             Results.Insert(index, result);
 
         public string FailedReason { get; private set; }
+        public bool Failed => FailedReason != null;
+
         public void MarkAsFailed(string reason) => FailedReason = reason;
     }
 

@@ -97,6 +97,10 @@ namespace core.Portfolio
 
                     results.Add(new TradingStrategyResult(0, 0, 0, 0, position, TradingStrategyConstants.ACTUAL_TRADES_NAME));
                     results.AddRange(simulatedResults.Results);
+                    if (simulatedResults.Failed)
+                    {
+                        results.Add(new TradingStrategyResult(0, 0, 0, 0, position, simulatedResults.FailedReason));
+                    }
                 }
 
 
