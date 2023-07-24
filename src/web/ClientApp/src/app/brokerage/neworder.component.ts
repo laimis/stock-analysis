@@ -18,7 +18,7 @@ export class BrokerageNewOrderComponent {
   ticker : string
   quote : StockQuote
   total: number | null = null
-  errorMessage: any;
+  errorMessage: string | null = null;
 
   constructor(
     private stockService: StocksService
@@ -38,6 +38,7 @@ export class BrokerageNewOrderComponent {
   reset() {
     this.numberOfShares = null
     this.price = null
+    this.errorMessage = null
   }
 
   onTickerSelected(ticker: string) {
@@ -67,6 +68,7 @@ export class BrokerageNewOrderComponent {
   }
 
   execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
+    this.errorMessage = null
     var cmd : brokerageordercommand = {
       ticker: this.ticker,
       numberOfShares: this.numberOfShares,

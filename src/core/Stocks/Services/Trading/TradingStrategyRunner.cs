@@ -81,14 +81,14 @@ namespace core.Stocks.Services.Trading
 
             if (!prices.IsOk)
             {
-                results.MarkAsFailed("Failed to get price history: " + prices.Error.Message);
+                results.MarkAsFailed($"Failed to get price history for {ticker}: " + prices.Error.Message);
                 return results;
             }
 
             var bars = prices.Success;
             if (bars.Length == 0)
             {
-                results.MarkAsFailed("No price history found");
+                results.MarkAsFailed($"No price history found for {ticker}");
                 return results;
             }
 
