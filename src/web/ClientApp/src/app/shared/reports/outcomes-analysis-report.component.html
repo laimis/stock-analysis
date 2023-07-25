@@ -39,16 +39,18 @@
     <section>
       <h5>Evaluations</h5>
       <div class="mb-3">
-            <button [ngClass]="{'btn-outline-primary': isSelected(s.evaluation)}" class="btn btn-sm" *ngFor="let s of report.evaluationSummary" (click)="toggleEvaluation(s.evaluation)">
-              {{s.evaluation}} 
-              <span
-                class="badge rounded-pill me-2"
-                [ngClass]="{
-                  'bg-success': s.type === 'Positive',
-                  'bg-danger': s.type === 'Negative',
-                  'bg-secondary': s.type === 'Neutral'
-                }">{{s.count}}</span>
-            </button>
+            <span *ngFor="let s of report.evaluationSummary">
+              <button *ngIf="s.count > 0" [ngClass]="{'btn-outline-primary': isSelected(s.evaluation)}" class="btn btn-sm" (click)="toggleEvaluation(s.evaluation)">
+                {{s.evaluation}} 
+                <span
+                  class="badge rounded-pill me-2"
+                  [ngClass]="{
+                    'bg-success': s.type === 'Positive',
+                    'bg-danger': s.type === 'Negative',
+                    'bg-secondary': s.type === 'Neutral'
+                  }">{{s.count}}</span>
+              </button>
+            </span>
       </div>
       <div *ngFor="let c of report.evaluations" class="mb-5">
         <div *ngIf="isSelected(c.name)">
