@@ -76,15 +76,4 @@ export class StockOwnershipComponent {
     }
   }
 
-  deleteTransaction(transactionId:string) {
-    if (confirm("are you sure you want to delete the transaction?"))
-    {
-      this.errors = null
-
-      this.service.deleteStockTransaction(this.ownership.id, transactionId).subscribe(_ => {
-        this.ownershipChanged.emit("deletetransaction")
-      })
-    }
-  }
-
 }

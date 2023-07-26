@@ -114,6 +114,9 @@
         <div class="col">{{t.date | date }}</div>
         <div class="col">{{t.type}}</div>
         <div class="col-8">{{t.description}}</div>
+        <div class="col">
+          <button *ngIf="t.type === 'buy' || t.type === 'sell'"  class="btn btn-sm btn-outline-danger" (click)="deleteTransaction(t.id)">Delete {{t.type}}</button>
+        </div>
       </div>
     </div>
   </div>

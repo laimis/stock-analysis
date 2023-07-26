@@ -6,7 +6,7 @@ using core.Shared;
 namespace core.Stocks
 {
     public enum PositionEventType { buy, stop, sell, risk }
-    public record struct PositionEvent (string description, PositionEventType type, decimal? value, DateTimeOffset when, decimal? quantity = null)
+    public record struct PositionEvent (Guid id, string description, PositionEventType type, decimal? value, DateTimeOffset when, decimal? quantity = null)
     {
         public string Date => when.ToString("yyyy-MM-dd");
     }
@@ -101,7 +101,7 @@ namespace core.Stocks
             }
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
-            Events.Add(new PositionEvent($"buy {numberOfShares} @ ${price}", type: PositionEventType.buy, value: price, when: when, quantity: numberOfShares));
+            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", type: PositionEventType.buy, value: price, when: when, quantity: numberOfShares));
 
             if (PositionCompleted == false)
             {
@@ -121,14 +121,20 @@ namespace core.Stocks
 
         internal void RemoveTransaction(Guid transactionId)
         {
-            var tx = Transactions.FirstOrDefault(t => t.transactionId == transactionId);
+            var tx = Transactions.SingleOrDefault(t => t.transactionId == transactionId);
             if (tx.transactionId == null)
             {
                 throw new InvalidOperationException($"Transaction {transactionId} not found");
             }
-
             Transactions.Remove(tx);
 
+            var ev = Events.SingleOrDefault(e => e.id == transactionId);
+            if (ev.id == null)
+            {
+                throw new InvalidOperationException($"Event {transactionId} not found");
+            }
+            Events.Remove(ev);
+            
             RunCalculations();
         }
 
@@ -150,7 +156,7 @@ namespace core.Stocks
             var percentGainAtSale = (price - AverageCostPerShare) / AverageCostPerShare;
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
-            Events.Add(new PositionEvent($"sell {numberOfShares} @ ${price} ({percentGainAtSale.ToString("P")})", PositionEventType.sell, price, when, quantity: numberOfShares));
+            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale.ToString("P")})", PositionEventType.sell, price, when, quantity: numberOfShares));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
@@ -190,7 +196,7 @@ namespace core.Stocks
                 var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
                 Events.Add(
-                    new PositionEvent($"Stop price set to {stopPrice.Value.ToString("0.##")} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
+                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value.ToString("0.##")} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -204,14 +210,14 @@ namespace core.Stocks
             StopPrice = null;
             RiskedAmount = null;
             
-            Events.Add(new PositionEvent("Stop price deleted", PositionEventType.stop, null, when));
+            Events.Add(new PositionEvent(Guid.Empty, "Stop price deleted", PositionEventType.stop, null, when));
         }
 
         public void SetRiskAmount(decimal riskAmount, DateTimeOffset when)
         {
             RiskedAmount = riskAmount;
 
-            Events.Add(new PositionEvent($"Set risk amount to {RiskedAmount.Value.ToString("0.##")}", PositionEventType.risk, riskAmount, when));
+            Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value.ToString("0.##")}", PositionEventType.risk, riskAmount, when));
         }
 
         public void SetPrice(decimal price)

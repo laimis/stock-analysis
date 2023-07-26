@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { BrokerageOrder, PositionEvent, PositionInstance, StocksService, StrategyProfitPoint } from '../../services/stocks.service';
 import { Output } from '@angular/core';
 import { EventEmitter } from '@angular/core';
-import { GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
+import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -124,6 +124,21 @@ export class StockTradingPositionComponent {
                     this._position = null
                     this.positionDeleted.emit()
                 })
+        }
+    }
+
+    
+    deleteTransaction(transactionId:string) 
+    {
+        if (confirm("are you sure you want to delete the transaction?")) {
+            this.stockService.deleteStockTransaction(this._position.ticker, transactionId)
+                .subscribe(
+                    _ => {
+                        // refresh UI somehow here, tbd
+                    }, (err) => {
+                        var errors = GetErrors(err)
+                        alert("Error deleting transaction: " + errors.join(", "))
+                    })
         }
     }
 

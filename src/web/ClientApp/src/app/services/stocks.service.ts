@@ -1035,6 +1035,7 @@ export interface PositionTransaction {
 }
 
 export interface PositionEvent {
+  id: string,
   date: string,
   value: number | null,
   type: string,

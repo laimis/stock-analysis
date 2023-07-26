@@ -10,13 +10,13 @@ namespace core.Stocks
     {
         public class Command : RequestWithUserId<CommandResponse<OwnedStock>>
         {
-            public Command(Guid stockId, Guid transactionId, Guid userId) : base(userId)
+            public Command(string ticker, Guid transactionId, Guid userId) : base(userId)
             {
-                Id = stockId;
+                Ticker = ticker;
                 TransactionId = transactionId;
             }
 
-            public Guid Id { get; }
+            public Ticker Ticker { get; }
             public Guid TransactionId { get; }
         }
 
@@ -33,7 +33,7 @@ namespace core.Stocks
                 Command cmd,
                 CancellationToken cancellationToken)
             {
-                var stock = await _storage.GetStock(cmd.Id, cmd.UserId);
+                var stock = await _storage.GetStock(cmd.Ticker, cmd.UserId);
                 if (stock == null)
                 {
                     return CommandResponse<OwnedStock>.Failed("Trying to delete not owned stock");
