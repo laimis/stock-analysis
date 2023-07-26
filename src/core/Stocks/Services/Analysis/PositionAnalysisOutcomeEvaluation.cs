@@ -8,6 +8,7 @@ namespace core.Stocks.Services.Analysis
     {
         private const decimal PercentToStopThreshold = -0.02m;
         private const decimal RecentlyOpenThreshold = 5;
+        private const decimal WithinTwoWeeksThreshold = 14;
         
         internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(
             List<TickerOutcomes> tickerOutcomes,
@@ -26,12 +27,23 @@ namespace core.Stocks.Services.Analysis
 
             // stocks that have been recently open
             yield return new AnalysisOutcomeEvaluation(
-                "Recently Opened",
+                $"Opened {RecentlyOpenThreshold} days ago",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
                     .Where(t =>
                         t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.DaysSinceOpened && o.value <= RecentlyOpenThreshold))
+                    .ToList()
+            );
+
+            // stocks that have been opened within two weeks but not recently
+            yield return new AnalysisOutcomeEvaluation(
+                $"Opened {WithinTwoWeeksThreshold} days ago",
+                OutcomeType.Neutral,
+                PortfolioAnalysisKeys.DaysSinceOpened,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.DaysSinceOpened && o.value <= WithinTwoWeeksThreshold))
                     .ToList()
             );
 
