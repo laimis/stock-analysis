@@ -211,20 +211,26 @@ export class StockTradingNewPositionComponent {
     this.chartStops = [positionStopPrice]
   }
 
+  recordInProgress : boolean = false
   record() {
-    console.log("record")
+    this.recordInProgress = true
     var cmd = this.createPurchaseCommand();
 
     if (!this.recordPositions) {
       this.stockPurchased.emit(cmd)
+      this.recordInProgress = false
       return
     }
 
     this.stockService.purchase(cmd).subscribe(
       _ => { 
         this.stockPurchased.emit(cmd)
+        this.recordInProgress = false
     },
-      _ => { alert('purchase failed') }
+      _ => {
+        alert('purchase failed')
+        this.recordInProgress = false
+      }
     )
   }
 

@@ -99,7 +99,8 @@
         <button class="btn btn-primary w-100" (click)="createPendingPosition()">Create Pending Position</button>
       </div>
       <div class="col" >
-        <button class="btn btn-primary w-100" (click)="record()">Record</button>
+        <button *ngIf="!recordInProgress" class="btn btn-primary w-100" (click)="record()">Record</button>
+        <button *ngIf="recordInProgress" class="btn btn-primary w-100" disabled>Record</button>
       </div>
     </div>
     <div class="row mt-3" *ngIf="prices && showChart">
