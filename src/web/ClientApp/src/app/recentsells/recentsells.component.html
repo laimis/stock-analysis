@@ -15,7 +15,9 @@
     </thead>
     <tbody>
       <tr ngClass="{{s.diff > 0 ? 'bg-warning' : 'bg-info'}}" *ngFor="let s of sells">
-        <td><a class="text-white" [routerLink]="[ '/stocks', s.ticker ]">{{s.ticker}}</a></td>
+        <td>
+          <app-stock-link class="text-white" [ticker]="s.ticker"></app-stock-link>
+        </td>
         <td>{{s.date | date}}</td>
         <td>{{s.numberOfShares}}</td>
         <td>{{s.price}}</td>

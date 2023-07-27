@@ -16,7 +16,7 @@
 
       <div>
         <label>Created</label>
-        {{note.created | date}} for <a [routerLink]="[ '/stocks', note.relatedToTicker ]">{{note.relatedToTicker}}</a>
+        {{note.created | date}} for <app-stock-link [ticker]=note.relatedToTicker>{{note.relatedToTicker}}</app-stock-link>
       </div>
 
       <div>

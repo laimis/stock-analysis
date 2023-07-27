@@ -61,7 +61,7 @@
           *ngFor="let t of g.transactions">
           <td>{{ t.date | date:'shortDate'}}</td>
           <td>
-            <a [routerLink]="[ '/stocks', t.ticker ]" target="_blank" *ngIf="!t.isOption">{{t.ticker}}</a>
+            <app-stock-link [ticker]="t.ticker" [openInNewTab]=true *ngIf="t.isOption"></app-stock-link>
             <a [routerLink]="[ '/optiondetails', t.aggregateId ]" target="_blank" *ngIf="t.isOption">{{t.ticker}}</a>
           </td>
           <td>

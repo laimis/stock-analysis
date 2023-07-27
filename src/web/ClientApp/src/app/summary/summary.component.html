@@ -21,7 +21,10 @@
   </section>
   <ng-container *ngFor="let p of result.closedPositions">
     <div class="row">
-      <div class="col"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></div>
+      <div class="col">
+        <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
+        <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+      </div>
       <div class="col">{{p.profit  | currency}}</div>
       <div class="col">{{p.rr | number:'1.0-2'}}</div>
       <div class="col">{{p.gainPct | percent:'1.0-2'}}</div>
@@ -92,7 +95,10 @@
     </thead>
     <tbody>
       <tr *ngFor="let p of result.openPositions">
-        <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+        <td width="140">
+          <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
+          <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+        </td>
         <td width="140">{{p.completedPositionShares}}</td>
         <td width="140">{{p.completedPositionCost  | number:'1.0-2'}}</td>
         <td width="140">{{p.opened | date: 'MM/dd/yyyy'}}</td>
@@ -116,7 +122,10 @@
     </thead>
     <tbody>
       <tr *ngFor="let p of result.plStockTransactions">
-        <td width="140"><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+        <td width="140">
+          <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
+          <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+        </td>
         <td width="140">{{p.amount  | number:'1.0-2'}}</td>
         <td width="140">{{p.date | date: 'MM/dd/yyyy'}}</td>
       </tr>
@@ -132,7 +141,9 @@
   <table class="table">
     <tbody>
       <tr *ngFor="let g of result.plOptionTransactions">
-        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+        <td width="140">
+          <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+        </td>
         <td width="140">{{g.amount | currency}}</td>
         <td width="140">{{g.date | date}}</td>
         <td>{{g.description}}</td>
@@ -149,7 +160,9 @@
   <table class="table">
     <tbody>
       <tr *ngFor="let g of result.optionTransactions">
-        <td width="140"><a [routerLink]="[ '/stocks', g.ticker ]">{{g.ticker}}</a></td>
+        <td width="140">
+          <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+        </td>
         <td width="140">{{g.amount | currency}}</td>
         <td width="140">{{g.date | date}}</td>
         <td>{{g.description}}</td>

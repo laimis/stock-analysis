@@ -15,7 +15,7 @@
     <tr *ngFor="let o of closedOptions">
       <td width="100">
         <div>
-          <a [routerLink]="[ '/stocks', o.ticker ]">{{o.ticker}}</a>
+          <app-stock-link [ticker]="o.ticker"></app-stock-link>
           {{o.strikePrice |currency}}</div>
         <div>
           <span *ngIf="o.boughtOrSold==='Sold'" class="badge bg-info me-1">sell</span>

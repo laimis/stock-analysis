@@ -21,7 +21,7 @@
         <ng-container *ngFor="let position of positions">
           <tr>
             <td>
-              <a [routerLink]="[ '/stocks', position.ticker ]">{{position.ticker}}</a>
+              <app-stock-link [ticker]="position.ticker" [openInNewTab]="true"></app-stock-link>
               <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
             </td>
 

@@ -84,7 +84,7 @@ namespace core.Stocks
                         {
                             violations.Add(
                                 new StockViolationView(
-                                    message: $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare}",
+                                    message: $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare}",
                                     numberOfShares: brokeragePosition.Quantity,
                                     pricePerShare: brokeragePosition.AverageCost,
                                     ticker: brokeragePosition.Ticker
@@ -96,7 +96,7 @@ namespace core.Stocks
                     {
                         violations.Add(
                             new StockViolationView(
-                                message: $"{brokeragePosition.Ticker} owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none",
+                                message: $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none",
                                 numberOfShares: brokeragePosition.Quantity,
                                 pricePerShare: brokeragePosition.AverageCost,
                                 ticker: brokeragePosition.Ticker
@@ -113,7 +113,7 @@ namespace core.Stocks
                     {
                         violations.Add(
                             new StockViolationView(
-                                message: $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says none",
+                                message: $"Owned {localPosition.NumberOfShares} but TDAmeritrade says none",
                                 numberOfShares: localPosition.NumberOfShares,
                                 pricePerShare: localPosition.AverageCostPerShare,
                                 ticker: localPosition.Ticker
@@ -126,7 +126,7 @@ namespace core.Stocks
                         {
                             violations.Add(
                                 new StockViolationView(
-                                    message: $"{localPosition.Ticker} owned {localPosition.NumberOfShares} but TDAmeritrade says {brokeragePosition.Quantity}",
+                                    message: $"Owned {localPosition.NumberOfShares} but TDAmeritrade says {brokeragePosition.Quantity}",
                                     numberOfShares: localPosition.NumberOfShares,
                                     pricePerShare: localPosition.AverageCostPerShare,
                                     ticker: localPosition.Ticker

@@ -35,7 +35,7 @@
           <div class="container">
             <div class="row">
               <div class="col">
-                <a [routerLink]="[ '/stocks', position.ticker ]" class="position-ticker">{{position.ticker}}</a>
+                <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
                 <span class="position-price">{{position.price | currency}}</span>
                 <i
                   (click)="toggleVisibility(detailDiv);"
@@ -79,7 +79,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let position of sortedPositions">
-          <td><a [routerLink]="[ '/stocks', position.ticker ]">{{position.ticker}}</a></td>
+          <td>
+            <app-stock-link [ticker]="position.ticker"></app-stock-link>
+            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+          </td>
           <td>{{position.price | currency}}</td>
           <td>{{position.averageCostPerShare | currency}}</td>
           <td>{{position.stopPrice | currency}}</td>

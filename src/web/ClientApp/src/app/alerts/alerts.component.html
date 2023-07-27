@@ -55,7 +55,7 @@
               'text-white': alert.alertType === 'Positive'
             }">
             <td>
-              <a [routerLink]="[ '/stocks', alert.ticker ]">{{alert.ticker}}</a>
+              <app-stock-link [ticker]="alert.ticker"></app-stock-link>
               <app-trading-view-link [ticker]="alert.ticker"></app-trading-view-link>
             </td>
             <td>

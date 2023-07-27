@@ -20,7 +20,8 @@
         </thead>
         <tbody>
           <tr>
-            <td><a [routerLink]="[ '/stocks', ticker ]">{{ stockPrice | currency }}</a></td>
+            <td>
+              <app-stock-link [ticker]="ticker"></app-stock-link> - {{ stockPrice | currency }}</td>
             <td>{{volatility}}</td>
             <td>{{numberOfContracts}}</td>
             <td>{{putOpenInterest()}} vs {{callOpenInterest()}}</td>

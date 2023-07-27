@@ -90,6 +90,7 @@ import { StockTradingStrategiesComponent } from './shared/stocks/stock-trading-s
 import { StockTradingSummaryComponent } from './stocks/stock-trading/stock-trading-summary.component';
 import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.component';
 import { OptionBrokeragePositionsComponent } from './options/option-dashboard/option-brokerage-positions.component';
+import { StockLinkComponent } from './shared/stocks/stock-link.component';
 
 
 var routes: Routes = [
@@ -249,6 +250,7 @@ var routes: Routes = [
     RoutineDashboardComponent,
     StockTradingStrategiesComponent,
     TradingViewLinkComponent,
+    StockLinkComponent,
 
     OptionBrokeragePositionsComponent
   ],

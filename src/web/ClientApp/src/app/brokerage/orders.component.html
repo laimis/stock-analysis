@@ -25,7 +25,10 @@
           <td>
             <div class="small">{{p.status}}</div>
           </td>
-          <td><a [routerLink]="[ '/stocks', p.ticker ]">{{p.ticker}}</a></td>
+          <td>
+            <app-stock-link [ticker]="p.ticker"></app-stock-link>
+            <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+          </td>
           <td>{{p.type }}</td>
           <td>{{p.quantity}}</td>
           <td class="text-end">{{p.price === 0 ? 'MARKET' : p.price | currency}}</td>
