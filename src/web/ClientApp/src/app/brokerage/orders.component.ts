@@ -11,7 +11,7 @@ import { GetErrors } from '../services/utils';
 export class BrokerageOrdersComponent implements OnInit {
   groupedOrders: BrokerageOrder[][];
   private _orders: BrokerageOrder[] = [];
-  private _ticker: string;
+  private _filteredTickers: string[] = [];
   isEmpty: boolean = false;
   error: string;
 
@@ -25,16 +25,13 @@ export class BrokerageOrdersComponent implements OnInit {
   }
 
   @Input()
-  set ticker(val:string) {
-    this._ticker = val
+  set filteredTickers(val:string[]) {
+    this._filteredTickers = val
     this.groupAndRenderOrders()
   }
-  get ticker():string {
-    return this._ticker
+  get filteredTickers():string[] {
+    return this._filteredTickers
   }
-
-  @Input()
-  filledOnly: boolean = false
 
   refreshOrders() {
     this.stockService.brokerageAccount().subscribe(account => {
@@ -48,12 +45,18 @@ export class BrokerageOrdersComponent implements OnInit {
       }
     )
   }
+
   groupAndRenderOrders() {
-    var buys = this._orders.filter(o => o.type == 'BUY' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
-    var sells = this._orders.filter(o => o.type == 'SELL' && o.status !== 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
-    var filledBuys = this._orders.filter(o => o.type == 'BUY' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
-    var filledSells = this._orders.filter(o => o.type == 'SELL' && o.status == 'FILLED' && o.ticker === (this.ticker ? this.ticker : o.ticker));
-    this.groupedOrders = this.filledOnly ? [filledBuys, filledSells] : [buys, sells, filledBuys, filledSells]
+    let isTickerVisible = (ticker) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
+    let isFilled = (o) => o.status === 'FILLED'
+    let isBuy = (o) => o.type === 'BUY'
+    let isSell = (o) => o.type === 'SELL'
+
+    var buys = this._orders.filter(o => isBuy(o) && !isFilled(o) && isTickerVisible(o.ticker));
+    var sells = this._orders.filter(o => isSell(o) && !isFilled(o) && isTickerVisible(o.ticker));
+    var filledBuys = this._orders.filter(o => isBuy(o) && isFilled(o) && isTickerVisible(o.ticker));
+    var filledSells = this._orders.filter(o => isSell(o) && isFilled(o) && isTickerVisible(o.ticker));
+    this.groupedOrders = [buys, sells, filledBuys, filledSells]
     this.isEmpty = this.groupedOrders.every(o => o.length == 0)
   }
 

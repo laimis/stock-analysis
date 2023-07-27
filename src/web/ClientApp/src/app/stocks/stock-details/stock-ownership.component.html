@@ -6,7 +6,7 @@
 
   <app-brokerage-neworder *ngIf="stock" (brokerageOrderEntered)="brokerageOrderEntered()"></app-brokerage-neworder>
 
-  <app-brokerage-orders *ngIf="stock" [ticker]="stock.ticker"></app-brokerage-orders>
+  <app-brokerage-orders *ngIf="stock" [filteredTickers]="[stock.ticker]"></app-brokerage-orders>
 
   <section *ngFor="let position of positions">
     <h5>

@@ -8,7 +8,16 @@ import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks
 })
 export class StockViolationsComponent {
 
-  @Input() violations:StockViolation[] = []
+  tickersInViolations:string[] = []
+  private _violations:StockViolation[] = []
+  @Input()
+  set violations(value:StockViolation[]) {
+    this._violations = value
+    this.tickersInViolations = value.map(v => v.ticker)
+  }
+  get violations() {
+    return this._violations
+  }
 
   @Output() refreshRequested = new EventEmitter<string>()
   

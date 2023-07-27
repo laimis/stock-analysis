@@ -27,7 +27,7 @@
       </li>
     </ul>
 
-    <app-brokerage-orders *ngIf="violations.length > 0" (orderExecuted)="orderExecuted()"[filledOnly]="true" ></app-brokerage-orders>
+    <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
 
     <span *ngIf="violations.length === 0">
       You have no violations.

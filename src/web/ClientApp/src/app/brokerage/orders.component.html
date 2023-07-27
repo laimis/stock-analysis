@@ -3,8 +3,8 @@
     <h5>Brokerage Orders</h5>
   </section>
   <div>
-    <div *ngIf="isEmpty && ticker">
-      No brokerage orders found for {{ticker}}
+    <div *ngIf="isEmpty && filteredTickers.length > 0 ">
+      No brokerage orders found for {{filteredTickers.join(', ')}}
     </div>
     <div *ngIf="error" class="alert alert-danger">
       {{error}}
