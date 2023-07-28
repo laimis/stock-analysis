@@ -68,6 +68,9 @@ namespace core.Stocks.Services.Trading
             var latestDate = DateTimeOffset.MinValue;
             var gradeDistribution = new SortedDictionary<TradeGrade, int>();
 
+            var totalRRWins = 0m;
+            var totalRRLosses = 0m;
+
             foreach(var e in closedPositions)
             {
                 totalDaysHeld += e.DaysHeld;
@@ -85,6 +88,7 @@ namespace core.Stocks.Services.Trading
                     totalWinReturnPct += e.GainPct;
                     winMaxReturnPct = Math.Max(winMaxReturnPct, e.GainPct);
                     totalWinDaysHeld += e.DaysHeld;
+                    totalRRWins += e.RR;
                 }
                 else
                 {
@@ -94,6 +98,7 @@ namespace core.Stocks.Services.Trading
                     totalLossReturnPct += Math.Abs(e.GainPct);
                     lossMaxReturnPct = Math.Max(lossMaxReturnPct, Math.Abs(e.GainPct));
                     totalLossDaysHeld += e.DaysHeld;
+                    totalRRLosses += Math.Abs(e.RR);
                 }
                 
                 if (e.Grade != null)
@@ -114,6 +119,11 @@ namespace core.Stocks.Services.Trading
             var adjustedWinningAmount = wins > 0 ? winningPct * totalWinAmount / wins : 0m;
             var adjustedLosingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 0m;
 
+            var rrRatio = (wins > 0 && losses > 0) switch {
+                true => (totalRRWins / wins) / (totalRRLosses / losses),
+                false => 0m
+            };
+            
             return new TradingPerformance {
                 AvgDaysHeld = totalDaysHeld / numberOfTrades,
                 AvgLossAmount = losses > 0 ? totalLossAmount / losses : 0,
@@ -131,6 +141,7 @@ namespace core.Stocks.Services.Trading
                 MaxWinAmount = maxWinAmount,
                 Profit = profit,
                 rrSum = rrSum,
+                rrRatio = rrRatio,
                 NumberOfTrades = numberOfTrades,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
                 WinAvgReturnPct = wins > 0 ? totalWinReturnPct / wins : 0,
@@ -159,6 +170,7 @@ namespace core.Stocks.Services.Trading
         public decimal AvgReturnPct { get; set; }
         public double AvgDaysHeld { get; set; }
         public decimal rrSum { get; set; }
+        public decimal rrRatio { get; set; }
         public decimal ReturnPctRatio => LossAvgReturnPct switch {
             0m => 0m,
             _ => WinAvgReturnPct / LossAvgReturnPct
