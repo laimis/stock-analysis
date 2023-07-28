@@ -6,19 +6,19 @@ namespace core.Alerts.Services
 {
     public class ScanScheduling
     {
-        private static TimeSpan[] _listMonitorTimes = new TimeSpan[]
+        private static TimeOnly[] _listMonitorTimes = new TimeOnly[]
             {
-                TimeSpan.Parse("09:45"),
-                TimeSpan.Parse("11:15"),
-                TimeSpan.Parse("13:05"),
-                TimeSpan.Parse("14:35"),
-                TimeSpan.Parse("15:30")
+                TimeOnly.Parse("09:45"),
+                TimeOnly.Parse("11:15"),
+                TimeOnly.Parse("13:05"),
+                TimeOnly.Parse("14:35"),
+                TimeOnly.Parse("15:30")
             };
 
-        private static TimeSpan[] _emailTimes = new TimeSpan[]
+        private static TimeOnly[] _emailTimes = new TimeOnly[]
             {
-                TimeSpan.Parse("09:50"),
-                TimeSpan.Parse("15:45")
+                TimeOnly.Parse("09:50"),
+                TimeOnly.Parse("15:45")
             };
 
 
@@ -30,7 +30,7 @@ namespace core.Alerts.Services
             var easternTime = marketHours.ToMarketTime(referenceTimeUtc);
 
             var candidates = _listMonitorTimes
-                .Select(t => easternTime.Date.Add(t))
+                .Select(t => easternTime.Date.Add(t.ToTimeSpan()))
                 .ToArray();
 
             foreach(var candidate in candidates)
@@ -61,14 +61,14 @@ namespace core.Alerts.Services
         // on trading days every 5 minutes from 9:45am to 3:30pm
         // and no monitoring on weekends
 
-        private static readonly TimeSpan _marketStartTime = new TimeSpan(9, 30, 0);
-        private static readonly TimeSpan _marketEndTime = new TimeSpan(16, 0, 0);
+        private static readonly TimeOnly _marketStartTime = new TimeOnly(9, 30, 0);
+        private static readonly TimeOnly _marketEndTime = new TimeOnly(16, 0, 0);
         public static DateTimeOffset GetNextStopLossMonitorRunTime(DateTimeOffset time, IMarketHours marketHours)
         {
             var eastern = marketHours.ToMarketTime(time);
-            var marketStartTimeInEastern = eastern.Date.Add(_marketStartTime);
+            var marketStartTimeInEastern = eastern.Date.Add(_marketStartTime.ToTimeSpan());
 
-            var nextScan = eastern.TimeOfDay switch {
+            var nextScan = TimeOnly.FromTimeSpan(eastern.TimeOfDay) switch {
                 var t when t < _marketStartTime => marketStartTimeInEastern,
                 var t when t > _marketEndTime => marketStartTimeInEastern.AddDays(1),
                 _ => eastern.AddMinutes(5)
@@ -95,7 +95,7 @@ namespace core.Alerts.Services
             var eastern = marketHours.ToMarketTime(time);
             
             var candidates = _emailTimes
-                .Select(t => eastern.Date.Add(t))
+                .Select(t => eastern.Date.Add(t.ToTimeSpan()))
                 .ToArray();
 
             foreach(var candidate in candidates)
