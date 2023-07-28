@@ -122,14 +122,14 @@ namespace core.Stocks
         internal void RemoveTransaction(Guid transactionId)
         {
             var tx = Transactions.SingleOrDefault(t => t.transactionId == transactionId);
-            if (tx.transactionId == null)
+            if (tx.transactionId == default)
             {
                 throw new InvalidOperationException($"Transaction {transactionId} not found");
             }
             Transactions.Remove(tx);
 
             var ev = Events.SingleOrDefault(e => e.id == transactionId);
-            if (ev.id == null)
+            if (ev.id == default)
             {
                 throw new InvalidOperationException($"Event {transactionId} not found");
             }

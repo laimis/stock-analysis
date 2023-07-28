@@ -111,7 +111,7 @@ public class TDAmeritradeClient : IBrokerage
             return new ServiceResponse<StockProfile>(results.Error);
         }
 
-        var fundamentals = results.Success![ticker].fundamental;
+        var fundamentals = results.Success![ticker].fundamental ?? new Dictionary<string, object>();
         var data = results.Success[ticker];
 
         var mapped = new StockProfile {
