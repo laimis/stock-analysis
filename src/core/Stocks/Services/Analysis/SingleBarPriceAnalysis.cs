@@ -243,8 +243,11 @@ namespace core.Stocks.Services.Analysis
                     .ToArray()
             );
 
-            var relativeVolume = Math.Round(currentBar.Volume / volumeStats.mean, 2);
-
+            var relativeVolume = volumeStats.mean switch {
+                0 => 0,
+                _ => Math.Round(currentBar.Volume / volumeStats.mean, 2)
+            };
+            
             var priceDirection = currentBar.Close > currentBar.Open
                 ? OutcomeType.Positive : OutcomeType.Negative;
 
