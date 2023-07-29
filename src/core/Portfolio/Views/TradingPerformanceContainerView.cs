@@ -57,9 +57,9 @@ namespace core.Portfolio.Views
             return closedTransactions.Slice(startIndex, closedTransactions.Length - startIndex);
         }
 
-        private List<object> GenerateTrends(Span<PositionInstance> positions, int windowSize)
+        private List<ChartDataPointContainer<decimal>> GenerateTrends(Span<PositionInstance> positions, int windowSize)
         {
-            var trends = new List<object>();
+            var trends = new List<ChartDataPointContainer<decimal>>();
 
             var zeroLineAnnotationHorizontal = new ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.horizontal);
             var zeroLineAnnotationVertical = new ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.vertical);
@@ -73,8 +73,9 @@ namespace core.Portfolio.Views
             var ev = new ChartDataPointContainer<decimal>("EV", DataPointChartType.line, zeroLineAnnotationHorizontal);
             var avgWinAmount = new ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.line);
             var avgLossAmount = new ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.line);
-            var rrPct = new ChartDataPointContainer<decimal>("RR %", DataPointChartType.line, oneLineAnnotationHorizontal);
-            var rrAmount = new ChartDataPointContainer<decimal>("RR $", DataPointChartType.line, oneLineAnnotationHorizontal);
+            var gainPctRatio = new ChartDataPointContainer<decimal>("% Ratio", DataPointChartType.line, oneLineAnnotationHorizontal);
+            var profitRatio = new ChartDataPointContainer<decimal>("$ Ratio", DataPointChartType.line, oneLineAnnotationHorizontal);
+            var rrRatio = new ChartDataPointContainer<decimal>("RR Ratio", DataPointChartType.line, oneLineAnnotationHorizontal);
             var maxWin = new ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.line);
             var maxLoss = new ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
             var rrSum = new ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.line);
@@ -90,8 +91,9 @@ namespace core.Portfolio.Views
                 ev.Add(window[0].Closed.Value, perfView.EV);
                 avgWinAmount.Add(window[0].Closed.Value, perfView.AvgWinAmount);
                 avgLossAmount.Add(window[0].Closed.Value, perfView.AvgLossAmount);
-                rrPct.Add(window[0].Closed.Value, perfView.ReturnPctRatio);
-                rrAmount.Add(window[0].Closed.Value, perfView.ProfitRatio);
+                gainPctRatio.Add(window[0].Closed.Value, perfView.ReturnPctRatio);
+                profitRatio.Add(window[0].Closed.Value, perfView.ProfitRatio);
+                rrRatio.Add(window[0].Closed.Value, perfView.rrRatio);
                 maxWin.Add(window[0].Closed.Value, perfView.MaxWinAmount);
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);
@@ -188,8 +190,9 @@ namespace core.Portfolio.Views
             trends.Add(ev);
             trends.Add(avgWinAmount);
             trends.Add(avgLossAmount);
-            trends.Add(rrPct);
-            trends.Add(rrAmount);
+            trends.Add(gainPctRatio);
+            trends.Add(profitRatio);
+            trends.Add(rrRatio);
             trends.Add(rrSum);
             trends.Add(maxWin);
             trends.Add(maxLoss);
@@ -257,9 +260,9 @@ namespace core.Portfolio.Views
 
         public TradingPerformance Recent { get; }
         public TradingPerformance Overall { get; }
-        public List<object> TrendsAll { get; }
-        public List<object> TrendsTwoMonths { get; }
-        public List<object> TrendsYTD { get; }
-        public List<object> TrendsOneYear { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsAll { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsTwoMonths { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsYTD { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsOneYear { get; }
     }
 }
