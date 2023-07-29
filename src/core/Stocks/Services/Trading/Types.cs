@@ -119,7 +119,7 @@ namespace core.Stocks.Services.Trading
             var adjustedWinningAmount = wins > 0 ? winningPct * totalWinAmount / wins : 0m;
             var adjustedLosingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 0m;
 
-            var rrRatio = (wins > 0 && losses > 0) switch {
+            var rrRatio = (totalRRWins > 0 && totalRRLosses > 0) switch {
                 true => (totalRRWins / wins) / (totalRRLosses / losses),
                 false => 0m
             };
