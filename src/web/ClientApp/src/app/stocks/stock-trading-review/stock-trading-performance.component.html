@@ -16,12 +16,15 @@
       <form>
         <div class="row">
           <div class="form-group col">
-            <label class="form-label" for="timeLimit">Time limit</label>
-            <select #timeLimitDropdown class="form-select" id="timeLimit" (change)="timeLimitChanged(timeLimitDropdown.value)">
-              <option value="2m" [selected]="timeLimit === '2m'">Last 2 Months</option>
-              <option value="ytd" [selected]="timeLimit === 'ytd'">YTD</option>
-              <option value="1y" [selected]="timeLimit === '1y'">1 year</option>
-              <option value="all" [selected]="timeLimit === 'all'">Show all time</option>
+            <label class="form-label" for="tradePeriod">Trade Period</label>
+            <select #tradePeriodDropdown class="form-select" id="tradePeriod" (change)="tradePeriodChanged(tradePeriodDropdown.value)">
+              <option value="last20" [selected]="tradePeriod === 'last20'">Last 20</option>
+              <option value="last50" [selected]="tradePeriod === 'last50'">Last 50</option>
+              <option value="last100" [selected]="tradePeriod === 'last100'">Last 100</option>
+              <option value="2m" [selected]="tradePeriod === '2m'">Last 2 Months</option>
+              <option value="ytd" [selected]="tradePeriod === 'ytd'">YTD</option>
+              <option value="1y" [selected]="tradePeriod === '1y'">1 year</option>
+              <option value="all" [selected]="tradePeriod === 'all'">Show all time</option>
             </select>
           </div>
         </div>

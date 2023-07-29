@@ -24,6 +24,10 @@ namespace core.Portfolio.Views
             closedTransactions.Reverse();
 
             TrendsAll = GenerateTrends(closedTransactions, windowSize: recentCount);
+
+            TrendsLast20 = GenerateTrends(closedTransactions[^20..], windowSize: 5);
+            TrendsLast50 = GenerateTrends(closedTransactions[^50..], windowSize: 5);
+            TrendsLast100 = GenerateTrends(closedTransactions[^100..], windowSize: 5);
             
             TrendsTwoMonths = GenerateTrends(
                 TimeBasedSlice(closedTransactions, DateTime.Now.AddMonths(-2)),
@@ -264,5 +268,8 @@ namespace core.Portfolio.Views
         public List<ChartDataPointContainer<decimal>> TrendsTwoMonths { get; }
         public List<ChartDataPointContainer<decimal>> TrendsYTD { get; }
         public List<ChartDataPointContainer<decimal>> TrendsOneYear { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsLast20 { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsLast50 { get; }
+        public List<ChartDataPointContainer<decimal>> TrendsLast100 { get; }
     }
 }

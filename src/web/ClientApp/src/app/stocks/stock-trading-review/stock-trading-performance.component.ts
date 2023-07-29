@@ -15,31 +15,37 @@ export class StockTradingPerformanceComponent {
   @Input()
   set performance(value:StockTradingPerformanceCollection) {
     this._performance = value
-    this.selectTrendsToRenderBasedOnTimeFilter()
+    this.selectTrendsToRenderBasedOnTradePeriodFilter()
   }
   get performance() {
     return this._performance
   }
   
-  timeLimit = "ytd"
+  tradePeriod = "ytd"
   trends:DataPointContainer[]
 
-  selectTrendsToRenderBasedOnTimeFilter() {
-    if (this.timeLimit == "1y") {
+  selectTrendsToRenderBasedOnTradePeriodFilter() {
+    if (this.tradePeriod == "1y") {
       this.trends = this.performance.trendsOneYear
-    } else if (this.timeLimit == "ytd") {
+    } else if (this.tradePeriod == "ytd") {
       this.trends = this.performance.trendsYTD
-    } else if (this.timeLimit == "2m") {
+    } else if (this.tradePeriod == "2m") {
       this.trends = this.performance.trendsTwoMonths
-    } else if (this.timeLimit == "all") {
+    } else if (this.tradePeriod == "all") {
       this.trends = this.performance.trendsAll
+    } else if (this.tradePeriod == "last20") {
+      this.trends = this.performance.trendsLast20
+    } else if (this.tradePeriod == "last50") {
+      this.trends = this.performance.trendsLast50
+    } else if (this.tradePeriod == "last100") {
+      this.trends = this.performance.trendsLast100
     }
   }
 
-  timeLimitChanged(value:string) {
-    if (value != this.timeLimit) {
-      this.timeLimit = value
-      this.selectTrendsToRenderBasedOnTimeFilter()
+  tradePeriodChanged(value:string) {
+    if (value != this.tradePeriod) {
+      this.tradePeriod = value
+      this.selectTrendsToRenderBasedOnTradePeriodFilter()
     }
   }
 

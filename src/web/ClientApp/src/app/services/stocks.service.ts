@@ -992,6 +992,9 @@ export interface StockTradingPerformanceCollection {
   trendsTwoMonths: DataPointContainer[]
   trendsYTD: DataPointContainer[]
   trendsOneYear: DataPointContainer[]
+  trendsLast20: DataPointContainer[]
+  trendsLast50: DataPointContainer[]
+  trendsLast100: DataPointContainer[]
 }
 
 export interface BrokerageOrder {
