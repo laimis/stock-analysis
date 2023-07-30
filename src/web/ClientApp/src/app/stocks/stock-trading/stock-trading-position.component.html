@@ -1,8 +1,8 @@
 <div class="mb-3" *ngIf="_position">
   
   <div class="row">
-    <div class="col"><div class="stat-label">Cost/Share</div><div>{{ _position.averageCostPerShare !== 0 ? _position.averageCostPerShare : _position.completedPositionCost | currency}}</div></div>
-    <div class="col"><div class="stat-label">Cost</div><div>{{ _position.cost | currency}}</div></div>
+    <div class="col"><div class="stat-label">Cost/Share</div><div>{{ (!_position.isClosed ? _position.averageCostPerShare : _position.averageBuyCostPerShare) | currency}}</div></div>
+    <div class="col"><div class="stat-label">Cost</div><div>{{ (!_position.isClosed ? _position.cost : _position.completedPositionCost) | currency}}</div></div>
     <div class="col"><div class="stat-label">Stop</div><div>{{ _position.stopPrice | currency }} 
       <span *ngIf="!_position.isClosed">({{ (_position.stopPrice - _position.averageCostPerShare) / _position.averageCostPerShare | percent }})</span>
     </div></div>
