@@ -3,6 +3,8 @@ using core.Account;
 using core.Shared;
 using core.Stocks.Services.Analysis;
 
+// complains about lowercase property names, doing that due to json formatting
+#pragma warning disable IDE1006
 namespace core.Alerts
 {
     public record struct AlertCheck(
@@ -26,7 +28,7 @@ namespace core.Alerts
     )
     {
         public Guid id { get; } = Guid.NewGuid();
-        internal double AgeInHours => (DateTimeOffset.UtcNow - when).TotalHours;
+        internal readonly double AgeInHours => (DateTimeOffset.UtcNow - when).TotalHours;
     }
 
     public enum AlertType
@@ -160,4 +162,5 @@ namespace core.Alerts
             container.Deregister(patternName, ticker, userId);
         }
     }
+    #pragma warning restore IDE1006
 }

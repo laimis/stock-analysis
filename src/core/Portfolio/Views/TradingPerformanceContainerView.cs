@@ -58,10 +58,10 @@ namespace core.Portfolio.Views
                     break;
                 }
             }
-            return closedTransactions.Slice(startIndex, closedTransactions.Length - startIndex);
+            return closedTransactions[startIndex..];
         }
 
-        private List<ChartDataPointContainer<decimal>> GenerateTrends(Span<PositionInstance> positions, int windowSize)
+        private static List<ChartDataPointContainer<decimal>> GenerateTrends(Span<PositionInstance> positions, int windowSize)
         {
             var trends = new List<ChartDataPointContainer<decimal>>();
 
@@ -216,8 +216,8 @@ namespace core.Portfolio.Views
         {
             var gains = new ChartDataPointContainer<decimal>(histogramLabel, DataPointChartType.bar, annotation);
 
-            var min = Decimal.MaxValue;
-            var max = Decimal.MinValue;
+            var min = decimal.MaxValue;
+            var max = decimal.MinValue;
 
             // first, disover min and max
             foreach(var transaction in transactionsToUse)
