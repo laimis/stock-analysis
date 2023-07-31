@@ -25,9 +25,9 @@ namespace core.Portfolio.Views
 
             TrendsAll = GenerateTrends(closedTransactions, windowSize: recentCount);
 
-            TrendsLast20 = GenerateTrends(closedTransactions[^20..], windowSize: 5);
-            TrendsLast50 = GenerateTrends(closedTransactions[^50..], windowSize: 5);
-            TrendsLast100 = GenerateTrends(closedTransactions[^100..], windowSize: 5);
+            TrendsLast20 = closedTransactions.Length >= 20 ? GenerateTrends(closedTransactions[^20..], windowSize: 5) : new List<ChartDataPointContainer<decimal>>();
+            TrendsLast50 = closedTransactions.Length >= 50 ? GenerateTrends(closedTransactions[^50..], windowSize: 5) : new List<ChartDataPointContainer<decimal>>();
+            TrendsLast100 = closedTransactions.Length >= 100 ? GenerateTrends(closedTransactions[^100..], windowSize: 5) : new List<ChartDataPointContainer<decimal>>();
             
             TrendsTwoMonths = GenerateTrends(
                 TimeBasedSlice(closedTransactions, DateTime.Now.AddMonths(-2)),

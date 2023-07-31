@@ -1,5 +1,6 @@
 {
     "eslint.workingDirectories": [
       "src/web/ClientApp"
-    ]
+    ],
+    "dotnet.defaultSolution": "tradewatch.sln"
   }
