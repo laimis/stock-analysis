@@ -10,7 +10,7 @@
       <div class="row">
         <label for="strategyToFilter" class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
         <div class="col-sm-10">
-          <select class="form-select" name="strategyToFilter" id="strategyToFilter" (click)="strategyToFilterChanged($event.target)">
+          <select class="form-select" name="strategyToFilter" id="strategyToFilter" (change)="strategyToFilterChanged($event.target)">
             <option *ngFor="let so of strategies" value="{{so.key}}" [selected]="so.key === strategyToFilter">{{so.value}}</option>
           </select>
         </div>
@@ -20,7 +20,7 @@
       <div class="row">
         <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
         <div class="col-sm-10">
-          <select class="form-select" name="metricToRender" id="metricToRender" (click)="metricChanged($event.target)">
+          <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target)">
             <option *ngFor="let so of sortOptions" value="{{so.value}}">{{so.name}}</option>
           </select>
         </div>

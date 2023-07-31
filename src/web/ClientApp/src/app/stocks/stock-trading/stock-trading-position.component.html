@@ -12,12 +12,12 @@
   <div class="row mt-3">
     <div class="col"><div class="stat-label">Unrealized Profit</div><div>{{ _position.unrealizedProfit | currency }}</div></div>
     <div class="col"><div class="stat-label">Unrealized Gain</div><div>{{_position.unrealizedGainPct | percent}}</div></div>
-    <div class="col"><div class="stat-label">Unrealized R/R</div><div>{{ _position.unrealizedRR | number }}</div></div>
+    <div class="col"><div class="stat-label">Realized Profit</div><div>{{ _position.profit | number }}</div></div>
     <div class="col"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
   </div>
     
   <div class="row mt-3">
-    <div class="col"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
+    <div class="col"><div class="stat-label">Combined Profit</div><div>{{ _position.combinedProfit | currency }}</div></div>
     <div class="col"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
     <div class="col"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
     <div class="col"><div class="stat-label">Chart</div><div><app-trading-view-link [ticker]="_position.ticker"></app-trading-view-link> </div></div>
