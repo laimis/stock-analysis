@@ -23,9 +23,10 @@ export class StockTradingPositionComponent {
     @Input()
     set position(v:PositionInstance) {
         this._position = v
-        this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
-        this.positionProfitPoints = []
+        
         if (this._position) {
+            this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
+            this.positionProfitPoints = []
             this.setCandidateValues()
             this.updatePositionOrders()
         }
