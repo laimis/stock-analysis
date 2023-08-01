@@ -3,17 +3,17 @@
       <tr>
         <th class="sort-header" (click)="sort('strategyName')">Strategy</th>
         <th class="sort-header" (click)="sort('profit')">P/L</th>
-        <th class="sort-header" (click)="sort('rrSum')">R/R</th>
+        <th class="sort-header" (click)="sort('rrSum')">R/R Sum</th>
         <th class="sort-header" (click)="sort('winPct')">Win %</th>
-        <th class="sort-header" (click)="sort('winAvgReturnPct')">Avg Win Pct</th>
-        <th class="sort-header" (click)="sort('lossAvgReturnPct')">Avg Loss Pct</th>
+        <th class="sort-header" (click)="sort('winAvgReturnPct')">Avg Win %</th>
+        <th class="sort-header" (click)="sort('lossAvgReturnPct')">Avg Loss %</th>
         <th class="sort-header" (click)="sort('maxWinAmount')">Max Win</th>
         <th class="sort-header" (click)="sort('maxLossAmount')">Max Loss</th>
         <th class="sort-header" (click)="sort('ev')">E/V</th>
         <th class="sort-header" (click)="sort('profitRatio')">Profit Ratio</th>
         <th class="sort-header" (click)="sort('returnPctRatio')">Pct Ratio</th>
+        <th class="sort-header" (click)="sort('rrRatio')">R/R Ratio</th>
         <th class="sort-header" (click)="sort('numberOfTrades')">Trades</th>
-        <th class="sort-header">Open Positions</th>
       </tr>
     </thead>
     <tbody>
@@ -29,8 +29,8 @@
         <td>{{r.performance.ev | currency}}</td>
         <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
         <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
+        <td>{{r.performance.rrRatio | number:'1.0-2'}}</td>
         <td>{{r.performance.numberOfTrades }}</td>
-        <td>{{r.numberOfOpenPositions}}</td>
       </tr>
     </tbody>
   </table>
