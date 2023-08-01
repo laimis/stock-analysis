@@ -117,5 +117,22 @@ namespace coretests.Portfolio
                 ticker: "AAPL",
                 userId: Guid.NewGuid()));
         }
+
+        [Fact]
+        public void Close_SetClosedDate()
+        {
+            var pending = new PendingStockPosition(
+                notes: "this is a note",
+                numberOfShares: 100,
+                price: 10,
+                stopPrice: 5,
+                strategy: "alltimehigh",
+                ticker: "AAPL",
+                userId: Guid.NewGuid());
+
+            pending.Close(purchased: false);
+
+            Assert.NotNull(pending.State.Closed);
+        }
     }
 }

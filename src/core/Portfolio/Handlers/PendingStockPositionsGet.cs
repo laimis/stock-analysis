@@ -20,8 +20,8 @@ namespace core.Portfolio.Handlers
 
         public class Handler : HandlerWithStorage<Query, IEnumerable<PendingStockPositionState>>
         {
-            private IAccountStorage _accounts;
-            private IBrokerage _brokerage;
+            private readonly IAccountStorage _accounts;
+            private readonly IBrokerage _brokerage;
 
             public Handler(
                 IAccountStorage accounts,
@@ -35,32 +35,25 @@ namespace core.Portfolio.Handlers
 
             public override async Task<IEnumerable<PendingStockPositionState>> Handle(Query query, CancellationToken cancellationToken)
             {
-                var user = await _accounts.GetUser(query.UserId);
-                if (user == null)
-                {
-                    throw new UnauthorizedAccessException("Unable to find user");
-                }
-                
+                var user = await _accounts.GetUser(query.UserId)
+                    ?? throw new UnauthorizedAccessException("Unable to find user");
+
                 var positions = await _storage.GetPendingStockPositions(query.UserId);
 
                 // get prices for each position
                 var tickers = positions.Select(x => x.State.Ticker).Distinct();
 
                 var prices = await _brokerage.GetQuotes(user.State, tickers);
-                if (prices.IsOk)
-                {
-                    foreach (var p in positions)
-                    {
-                        if (prices.Success.TryGetValue(p.State.Ticker, out var quote))
-                        {
-                            p.SetPrice(quote.Price);
-                        }
-                    }
-                }
+                var pricesDict = prices.IsOk ? prices.Success : new Dictionary<string, StockQuote>();
 
                 return positions
+                    .Where(x => !x.State.IsClosed)
                     .OrderByDescending(x => x.State.Date)
-                    .Select(x => x.State);
+                    .Select(x => {
+                        var state = x.State;
+                        state.SetPrice(pricesDict.GetValueOrDefault(state.Ticker)?.Price ?? 0);
+                        return state;
+                    });
             }
         }
     }

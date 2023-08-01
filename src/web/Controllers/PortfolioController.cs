@@ -18,7 +18,7 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class PortfolioController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public PortfolioController(IMediator mediator)
         {
@@ -38,7 +38,7 @@ namespace web.Controllers
         }
 
         [HttpDelete("pendingstockpositions/{id}")]
-        public Task DeletePendingStockPosition(Guid id) =>
+        public Task ClosePendingStockPosition(Guid id) =>
             _mediator.Send(new PendingStockPositionClose.Command(id, User.Identifier()));
 
         [HttpGet("routines")]
@@ -212,10 +212,7 @@ namespace web.Controllers
             );
 
         [HttpPost("{ticker}/positions/{positionId}/grade")]
-        public Task Grade(
-            int positionId,
-            string ticker,
-            [FromBody]GradePosition.Command command)
+        public Task Grade([FromBody]GradePosition.Command command)
         {
             command.WithUserId(User.Identifier());
 
@@ -233,8 +230,6 @@ namespace web.Controllers
 
         [HttpPost("{ticker}/positions/{positionId}/labels")]
         public Task SetLabel(
-            int positionId,
-            string ticker,
             [FromBody]PositionLabelsSet.Command command)
         {
             command.WithUserId(User.Identifier());

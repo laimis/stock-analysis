@@ -26,8 +26,8 @@ namespace core.Brokerage
 
         public class Handler : HandlerWithStorage<Command, CommandResponse>
         {
-            private IAccountStorage _accounts;
-            private IBrokerage _brokerage;
+            private readonly IAccountStorage _accounts;
+            private readonly IBrokerage _brokerage;
 
             public Handler(IAccountStorage accounts, IBrokerage brokerage, IPortfolioStorage storage) : base(storage)
             {

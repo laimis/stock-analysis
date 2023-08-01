@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace core.Stocks
 
         public class Handler : HandlerWithStorage<Command, CommandResponse>
         {
-            private IAccountStorage _accounts;
+            private readonly IAccountStorage _accounts;
 
             public Handler(IPortfolioStorage storage, IAccountStorage accounts) : base(storage)
             {
@@ -35,10 +36,7 @@ namespace core.Stocks
                 }
 
                 var stock = await _storage.GetStock(cmd.Ticker, cmd.UserId);
-                if (stock == null)
-                {
-                    stock = new OwnedStock(cmd.Ticker, cmd.UserId);
-                }
+                stock ??= new OwnedStock(cmd.Ticker, cmd.UserId);
 
                 var isNewPosition = false;
                 if (stock.State.OpenPosition == null)
@@ -98,7 +96,9 @@ namespace core.Stocks
                             await _storage.Save(stock, cmd.UserId);
                         }
 
-                        await _storage.DeletePendingStockPosition(found, cmd.UserId);
+                        found.Close(purchased: true, price: cmd.Price);
+
+                        await _storage.Save(found, cmd.UserId);
                     }
                 }
 

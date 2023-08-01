@@ -220,11 +220,16 @@ namespace core.Portfolio
         public string Strategy { get; }
     }
 
-    public class PendingStockPositionDeleted : AggregateEvent
+    public class PendingStockPositionClosed : AggregateEvent
     {
-        public PendingStockPositionDeleted(Guid id, Guid aggregateId, DateTimeOffset when)
+        public PendingStockPositionClosed(Guid id, Guid aggregateId, DateTimeOffset when, bool purchased, decimal? price)
             : base(id, aggregateId, when)
         {
+            Purchased = purchased;
+            Price = price;
         }
+
+        public bool Purchased { get; }
+        public decimal? Price { get; }
     }
 }
