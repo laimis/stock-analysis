@@ -22,8 +22,8 @@ namespace storage.shared
         private const string _routine_entity = "routine";
         private const string _pending_stock_position_entity = "pendingstockposition";
 
-        private IAggregateStorage _aggregateStorage;
-        private IBlobStorage _blobStorage;
+        private readonly IAggregateStorage _aggregateStorage;
+        private readonly IBlobStorage _blobStorage;
 
         public PortfolioStorage(
             IAggregateStorage aggregateStorage,
@@ -201,8 +201,5 @@ namespace storage.shared
             _aggregateStorage.GetEventsAsync(_pending_stock_position_entity, userId)
                 .ContinueWith(t => t.Result.GroupBy(e => e.AggregateId)
                     .Select(g => new PendingStockPosition(g)));
-
-        public async Task DeletePendingStockPosition(PendingStockPosition position, Guid userId) =>
-            await _aggregateStorage.DeleteAggregate(entity: _pending_stock_position_entity, aggregateId: position.Id, userId: userId);
     }
 }

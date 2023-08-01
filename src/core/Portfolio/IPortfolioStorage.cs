@@ -27,8 +27,7 @@ namespace core
 
         Task Save(PendingStockPosition position, Guid userId);
         Task<IEnumerable<PendingStockPosition>> GetPendingStockPositions(Guid userId);
-        Task DeletePendingStockPosition(PendingStockPosition position, Guid userId);
-
+        
         Task<IEnumerable<Routine>> GetRoutines(Guid userId);
         Task Save(Routine routine, Guid userId);
         Task<Routine> GetRoutine(string name, Guid userId);

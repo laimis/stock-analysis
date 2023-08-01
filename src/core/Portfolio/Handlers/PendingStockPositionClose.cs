@@ -23,8 +23,8 @@ namespace core.Portfolio.Handlers
 
         public class Handler : HandlerWithStorage<Command, Unit>
         {
-            private IAccountStorage _accountStorage;
-            private IBrokerage _brokerage;
+            private readonly IAccountStorage _accountStorage;
+            private readonly IBrokerage _brokerage;
 
             public Handler(
                 IBrokerage brokerage,
@@ -39,17 +39,10 @@ namespace core.Portfolio.Handlers
             {
                 // check if there is already a pending position for this ticker
                 var existing = await _storage.GetPendingStockPositions(request.UserId);
-                var found = existing.SingleOrDefault(x => x.State.Id == request.PositionId);
-                if (found == null)
-                {
-                    throw new Exception("Position not found");
-                }
-
-                var user = await _accountStorage.GetUser(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
+                var found = existing.SingleOrDefault(x => x.State.Id == request.PositionId)
+                    ?? throw new Exception("Position not found");
+                var user = await _accountStorage.GetUser(request.UserId)
+                    ?? throw new Exception("User not found");
 
                 // get orders for this position
                 var accountResponse = await _brokerage.GetAccount(user.State);
@@ -69,7 +62,9 @@ namespace core.Portfolio.Handlers
                     }
                 }
 
-                await _storage.DeletePendingStockPosition(found, request.UserId);
+                found.Close(purchased: false);
+
+                await _storage.Save(found, request.UserId);
 
                 return Unit.Value;
             }

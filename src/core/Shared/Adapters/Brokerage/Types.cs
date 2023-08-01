@@ -4,7 +4,7 @@ namespace core.Shared.Adapters.Brokerage;
 
 public class OAuthResponse
 {
-    private DateTimeOffset _created;
+    private readonly DateTimeOffset _created;
 
     public OAuthResponse()
     {

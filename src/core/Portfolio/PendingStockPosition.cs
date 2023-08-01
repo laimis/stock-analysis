@@ -66,20 +66,17 @@ namespace core.Portfolio
             );
         }
 
-        internal void Delete()
+        internal void Close(bool purchased, decimal? price = null)
         {
             Apply(
-                new PendingStockPositionDeleted(
+                new PendingStockPositionClosed(
                     Guid.NewGuid(),
                     State.Id,
-                    DateTimeOffset.UtcNow
+                    when : DateTimeOffset.UtcNow,
+                    purchased,
+                    price
                 )
             );
-        }
-
-        internal void SetPrice(decimal price)
-        {
-            State.SetPrice(price);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using core.Shared;
+using core.Stocks;
 
 namespace core.Portfolio
 {
@@ -16,22 +17,18 @@ namespace core.Portfolio
         public string Notes { get; private set; }
         public string Strategy { get; private set; }
         public DateTimeOffset Date { get; private set; }
-        
+        public DateTimeOffset? Closed { get; private set; }
+        public bool IsClosed => Closed.HasValue;
+        public bool Purchased { get; private set; }
 
-        public void Apply(AggregateEvent e)
-        {
-             ApplyInternal(e);
-        }
+        public void Apply(AggregateEvent e) => ApplyInternal(e);
 
-        protected void ApplyInternal(dynamic obj)
-        {
-            ApplyInternal(obj);
-        }
+        protected void ApplyInternal(dynamic obj) => ApplyInternal(obj);
 
         internal void SetPrice(decimal price)
         {
-            this.Price = price;
-            this.PercentDiffBetweenBidAndPrice = (price - this.Bid) / this.Bid;
+            Price = price;
+            PercentDiffBetweenBidAndPrice = (price - Bid) / Bid;
         }
 
         private void ApplyInternal(PendingStockPositionCreated created)
@@ -63,6 +60,12 @@ namespace core.Portfolio
             Strategy = created.Strategy;
             Ticker = created.Ticker;
             UserId = created.UserId;
+        }
+
+        private void ApplyInternal(PendingStockPositionClosed closed)
+        {
+            Closed = closed.When;
+            Purchased = closed.Purchased;
         }
     }
 }

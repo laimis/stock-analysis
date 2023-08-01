@@ -15,8 +15,8 @@ namespace storage.tests
 {
     public abstract class PortfolioStorageTests
     {
-        private static Guid _userId = Guid.NewGuid();
-        private ITestOutputHelper _output;
+        private static readonly Guid _userId = Guid.NewGuid();
+        private readonly ITestOutputHelper _output;
 
         public PortfolioStorageTests(ITestOutputHelper output)
         {
@@ -77,7 +77,7 @@ namespace storage.tests
 
         private static string GenerateTestTicker()
         {
-            return $"test-{Guid.NewGuid().ToString("N").Substring(0, 4)}";
+            return $"test-{Guid.NewGuid().ToString("N")[..4]}";
         }
 
         [Fact]
@@ -215,7 +215,7 @@ namespace storage.tests
             await storage.Save(loaded, _userId);
 
             // make sure we can still load it
-            loaded = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
+            _ = await storage.GetStock(loaded.State.Ticker, loaded.State.UserId);
 
             // clean up
             await storage.Delete(_userId);    
@@ -320,11 +320,19 @@ namespace storage.tests
 
             Assert.Equal(position.State.Id, loaded.State.Id);
 
-            await storage.DeletePendingStockPosition(loaded, _userId);
+            loaded.Close(purchased: true, price: 2.2m);
+
+            await storage.Save(loaded, _userId);
 
             existing = await storage.GetPendingStockPositions(_userId);
 
-            Assert.Empty(existing);
+            Assert.NotEmpty(existing);
+
+            loaded = existing.Single(p => p.State.Ticker == "TSLA");
+
+            Assert.True(loaded.State.IsClosed);
+            Assert.NotNull(loaded.State.Closed);
+            Assert.True(loaded.State.Purchased);
 
             await storage.Delete(_userId);
         }
