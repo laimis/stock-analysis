@@ -19,14 +19,14 @@ namespace web.BackgroundServices
 {
     public class StockAlertService : BackgroundService
     {
-        private IAccountStorage _accounts;
-        private IBrokerage _brokerage;
-        private StockAlertContainer _container;
-        private IEmailService _emails;
-        private ILogger<StockAlertService> _logger;
-        private IMarketHours _marketHours;
-        private IPortfolioStorage _portfolio;
-        private ISMSClient _sms;
+        private readonly IAccountStorage _accounts;
+        private readonly IBrokerage _brokerage;
+        private readonly StockAlertContainer _container;
+        private readonly IEmailService _emails;
+        private readonly ILogger<StockAlertService> _logger;
+        private readonly IMarketHours _marketHours;
+        private readonly IPortfolioStorage _portfolio;
+        private readonly ISMSClient _sms;
 
         public StockAlertService(
             IAccountStorage accounts,
@@ -48,8 +48,8 @@ namespace web.BackgroundServices
             _sms = sms;
         }
 
-        private Dictionary<string, List<AlertCheck>> _listChecks = new Dictionary<string, List<AlertCheck>>();
-        private bool _listChecksFinished = false;
+        private readonly Dictionary<string, List<AlertCheck>> _listChecks = new();
+        private bool _listChecksFinished;
         private DateTimeOffset _nextListMonitoringRun = DateTimeOffset.MinValue;
         private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
         private bool _stopLossCheckFinished = false;
@@ -78,7 +78,7 @@ namespace web.BackgroundServices
                     _logger.LogCritical(ex, "Failed while running alert monitor, will sleep");
                     _container.AddNotice("Failed while running alert monitor: " + ex.Message);
                     _container.ManualRunRequested();
-                    await Task.Delay(TimeSpan.FromMinutes(5));
+                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
             }
         }
@@ -259,8 +259,8 @@ namespace web.BackgroundServices
             return new {
                 ticker = (string)alert.ticker,
                 value = FormattedValue(),
-                description = alert.description,
-                sourceList = alert.sourceList,
+                alert.description,
+                alert.sourceList,
                 time = _marketHours.ToMarketTime(alert.when).ToString("HH:mm") + " ET"
             };
         }
@@ -268,12 +268,11 @@ namespace web.BackgroundServices
         
         private class GetPricesForTickerService
         {
-            private IBrokerage _brokerage;
-            private IMarketHours _marketHours;
-            private ILogger _logger;
-            private Lazy<Task<UserState>> _user;
-            private Dictionary<string, ServiceResponse<PriceBar[]>> _cache =
-                new Dictionary<string, ServiceResponse<PriceBar[]>>();
+            private readonly IBrokerage _brokerage;
+            private readonly IMarketHours _marketHours;
+            private readonly ILogger _logger;
+            private readonly Lazy<Task<UserState>> _user;
+            private readonly Dictionary<string, ServiceResponse<PriceBar[]>> _cache = new();
 
             public GetPricesForTickerService(
                 IBrokerage brokerage,
@@ -307,7 +306,7 @@ namespace web.BackgroundServices
 
                 if (!prices.IsOk)
                 {
-                    _logger.LogCritical($"Could not get price history for {ticker}: {prices.Error.Message}");
+                    _logger.LogCritical("Could not get price history for {ticker}: {message}", ticker, prices.Error.Message);
                 }
                 else
                 {
@@ -325,7 +324,7 @@ namespace web.BackgroundServices
             var priceResponse = await _brokerage.GetQuote(user, ticker);
             if (!priceResponse.IsOk)
             {
-                _logger.LogError($"Could not get price for {ticker}: {priceResponse.Error.Message}");
+                _logger.LogError("Could not get price for {ticker}: {message}", ticker, priceResponse.Error.Message);
             }
             return priceResponse;
         }

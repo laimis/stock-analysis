@@ -193,7 +193,7 @@ namespace core.Stocks
                 var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
                 Events.Add(
-                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage:P1)})", PositionEventType.stop, stopPrice, when));
+                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
