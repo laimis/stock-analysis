@@ -964,6 +964,7 @@ export interface StockTradingPerformance {
   rrRatio: number,
   earliestDate: string,
   latestDate: string,
+  totalCost: number,
   gradeDistribution: LabelWithFrequency[]
 }
 

@@ -5,6 +5,10 @@ using core.Shared;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services.Analysis;
 
+// complains about lowercase property names, doing that due to json formatting
+#pragma warning disable IDE1006
+
+
 namespace core.Stocks.Services.Trading
 {
     public static class TradingStrategyConstants
@@ -75,7 +79,7 @@ namespace core.Stocks.Services.Trading
             {
                 totalDaysHeld += e.DaysHeld;
                 profit += e.Profit;
-                totalCost += e.Cost;
+                totalCost += e.Cost != 0 ? e.Cost : e.CompletedPositionCost;
                 rrSum += e.RR;
                 earliestDate = e.Opened.HasValue && e.Opened.Value < earliestDate ? e.Opened.Value : earliestDate;
                 latestDate = e.Closed.HasValue && e.Closed.Value > latestDate ? e.Closed.Value : latestDate;
@@ -120,7 +124,7 @@ namespace core.Stocks.Services.Trading
             var adjustedLosingAmount = losses > 0 ? (1 - winningPct) * totalLossAmount / losses : 0m;
 
             var rrRatio = (totalRRWins > 0 && totalRRLosses > 0) switch {
-                true => (totalRRWins / wins) / (totalRRLosses / losses),
+                true => totalRRWins / wins / (totalRRLosses / losses),
                 false => 0m
             };
             
@@ -143,6 +147,7 @@ namespace core.Stocks.Services.Trading
                 rrSum = rrSum,
                 rrRatio = rrRatio,
                 NumberOfTrades = numberOfTrades,
+                TotalCost = totalCost,
                 WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
                 WinAvgReturnPct = wins > 0 ? totalWinReturnPct / wins : 0,
                 WinMaxReturnPct = winMaxReturnPct,
@@ -171,12 +176,12 @@ namespace core.Stocks.Services.Trading
         public double AvgDaysHeld { get; set; }
         public decimal rrSum { get; set; }
         public decimal rrRatio { get; set; }
-        public decimal ReturnPctRatio => LossAvgReturnPct switch {
+        public readonly decimal ReturnPctRatio => LossAvgReturnPct switch {
             0m => 0m,
             _ => WinAvgReturnPct / LossAvgReturnPct
         };
 
-        public decimal ProfitRatio => AvgLossAmount switch {
+        public readonly decimal ProfitRatio => AvgLossAmount switch {
             0m => 0m,
             _ => AvgWinAmount / AvgLossAmount
         };
@@ -184,6 +189,7 @@ namespace core.Stocks.Services.Trading
         public DateTimeOffset EarliestDate { get; private set; }
         public DateTimeOffset LatestDate { get; private set; }
         public LabelWithFrequency[] GradeDistribution { get; private set; }
+        public decimal TotalCost { get; private set; }
     }
 
     public record struct TradingStrategyPerformance(
@@ -191,7 +197,7 @@ namespace core.Stocks.Services.Trading
         TradingPerformance performance,
         PositionInstance[] positions
     ) {
-        public int NumberOfOpenPositions => positions.Count(p => p.Closed == null);
+        public readonly int NumberOfOpenPositions => positions.Count(p => p.Closed == null);
     }
 
     public record struct TradingStrategyResult(
@@ -210,3 +216,5 @@ namespace core.Stocks.Services.Trading
         List<PriceBar> Last10Bars
     );
 }
+
+#pragma warning restore IDE1006

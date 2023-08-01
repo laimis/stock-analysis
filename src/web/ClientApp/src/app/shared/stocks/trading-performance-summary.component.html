@@ -29,7 +29,7 @@
       <div class="col"><div class="stat-label">$ Ratio</div><div>{{performance.profitRatio | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">% Ratio</div><div>{{performance.returnPctRatio | number:'1.0-2'}}</div></div>
       <div class="col"><div class="stat-label">R/R Ratio</div><div>{{performance.rrRatio | number:'1.0-2'}}</div></div>
-      <div class="col"></div>
+      <div class="col"><div class="stat-label">Avg Return</div><div>{{performance.avgReturnPct | percent:'1.0-0'}}</div> </div>
     </div>
     
     <div class="row mb-2">
@@ -38,6 +38,6 @@
         <div>{{labelFrequency.frequency}}</div>
       </div>
       <div class="col"></div>
-      <div class="col"></div>
+      <div class="col"><div class="stat-label">Invested</div><div>{{performance.totalCost | currency }}</div></div>
     </div>
   </div>

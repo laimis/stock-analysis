@@ -83,6 +83,7 @@ namespace core.Portfolio.Views
             var maxWin = new ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.line);
             var maxLoss = new ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
             var rrSum = new ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.line);
+            var invested = new ChartDataPointContainer<decimal>("Invested", DataPointChartType.line, zeroLineAnnotationHorizontal);
 
             for (var i = 0; i < positions.Length; i++)
             {
@@ -101,6 +102,7 @@ namespace core.Portfolio.Views
                 maxWin.Add(window[0].Closed.Value, perfView.MaxWinAmount);
                 maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount);
                 rrSum.Add(window[0].Closed.Value, perfView.rrSum);
+                invested.Add(window[0].Closed.Value, perfView.TotalCost);
                 
                 if (i + 20 >= positions.Length)
                     break;
@@ -198,6 +200,7 @@ namespace core.Portfolio.Views
             trends.Add(profitRatio);
             trends.Add(rrRatio);
             trends.Add(rrSum);
+            trends.Add(invested);
             trends.Add(maxWin);
             trends.Add(maxLoss);
             trends.Add(positionsOpenedByDateContainer);
