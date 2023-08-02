@@ -88,23 +88,27 @@ namespace web
         {
             var storage = configuration.GetValue<string>("storage");
 
+            logger.LogInformation("Read storage configuration type: {storage}", storage);
+
             if (storage == "postgres")
             {
                 RegisterPostgresImplemenations(configuration, services);
             }
             else if (storage == "memory")
             {
-                RegisterMemoryImplementations(configuration, services);
+                RegisterMemoryImplementations(services);
             }
             else
             {
+                logger.LogCritical("Invalid storage configuration: {storage}", storage);
+
                 throw new InvalidOperationException(
                     $"configuration 'storage' has value '{storage}', only 'postgres' or 'memory' is supported"
                 );
             }
         }
 
-        private static void RegisterMemoryImplementations(IConfiguration configuration, IServiceCollection services)
+        private static void RegisterMemoryImplementations(IServiceCollection services)
         {
             services.AddSingleton<IAccountStorage>(s =>
                 new storage.memory.AccountStorage(s.GetRequiredService<IMediator>())
