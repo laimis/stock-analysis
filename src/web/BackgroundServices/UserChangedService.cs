@@ -10,23 +10,23 @@ using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    public class UserChangedScheduler : BackgroundService
+    public class UserChangedService : BackgroundService
     {
-        private ILogger<UserChangedScheduler> _logger;
-        private IMediator _mediator;
+        private readonly ILogger<UserChangedService> _logger;
+        private readonly IMediator _mediator;
 
-        public static ConcurrentQueue<ScheduleUserChanged> _queue = new ConcurrentQueue<ScheduleUserChanged>();
+        private static readonly ConcurrentQueue<ScheduleUserChanged> _queue = new();
         public static void Schedule(ScheduleUserChanged e) => _queue.Enqueue(e);
 
-        public UserChangedScheduler(
-            ILogger<UserChangedScheduler> logger,
+        public UserChangedService(
+            ILogger<UserChangedService> logger,
             IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
         }
 
-        private const int SHORT_INTERVAL = 1_000;
+        private static readonly TimeSpan _sleepDuration = TimeSpan.FromSeconds(1);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -40,31 +40,36 @@ namespace web.BackgroundServices
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogError("Failed:" + ex);
+                    _logger.LogError("User changed service failed: {exception}", ex);
                 }
 
-                await Task.Delay(SHORT_INTERVAL, stoppingToken);
+                await Task.Delay(_sleepDuration, stoppingToken);
             }
 
             _logger.LogInformation("exec exit");
         }
 
-        private Dictionary<Guid, DateTimeOffset> _userLastIssued = new Dictionary<Guid, DateTimeOffset>();
+        private readonly Dictionary<Guid, DateTimeOffset> _userLastIssued = new();
 
         private Task Loop(CancellationToken stoppingToken)
         {
             while (_queue.TryDequeue(out var r))
             {
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
                 _userLastIssued.TryGetValue(r.UserId, out var lastScheduled);
                 if (r.When > lastScheduled)
                 {
-                    Console.WriteLine("Sending user changed event " + r.UserId);
+                    _logger.LogInformation("Sending user changed event for {userId}", r.UserId);
                     _userLastIssued[r.UserId] = DateTimeOffset.UtcNow;
-                    return _mediator.Publish(new UserChanged(r.UserId));
+                    _mediator.Publish(new UserChanged(r.UserId), stoppingToken);
                 }
                 else
                 {
-                    Console.WriteLine("Skipping scheduling, too old");
+                    _logger.LogInformation("Skipping scheduling for {userId}, too old", r.UserId);
                 }
             }
             

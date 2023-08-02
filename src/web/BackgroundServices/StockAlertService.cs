@@ -10,7 +10,6 @@ using core.Alerts;
 using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
-using core.Shared.Adapters.SMS;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,8 +25,7 @@ namespace web.BackgroundServices
         private readonly ILogger<StockAlertService> _logger;
         private readonly IMarketHours _marketHours;
         private readonly IPortfolioStorage _portfolio;
-        private readonly ISMSClient _sms;
-
+        
         public StockAlertService(
             IAccountStorage accounts,
             IBrokerage brokerage,
@@ -35,8 +33,7 @@ namespace web.BackgroundServices
             IEmailService emails,
             ILogger<StockAlertService> logger,
             IMarketHours marketHours,
-            IPortfolioStorage portfolio,
-            ISMSClient sms)
+            IPortfolioStorage portfolio)
         {
             _accounts = accounts;
             _brokerage = brokerage;
@@ -45,8 +42,10 @@ namespace web.BackgroundServices
             _logger = logger;
             _marketHours = marketHours;
             _portfolio = portfolio;
-            _sms = sms;
         }
+
+        private static readonly TimeSpan _sleepDuration = TimeSpan.FromMinutes(1);
+        private static readonly TimeSpan _sleepDurationFailureMode = TimeSpan.FromMinutes(5);
 
         private readonly Dictionary<string, List<AlertCheck>> _listChecks = new();
         private bool _listChecksFinished;
@@ -63,7 +62,7 @@ namespace web.BackgroundServices
             {    
                 try
                 {
-                    var user = new Lazy<Task<UserState>>(() => GetUser());
+                    var user = new Lazy<Task<UserState>>(GetUser);
 
                     await RunThroughListMonitoringChecks(user, stoppingToken);
 
@@ -71,14 +70,14 @@ namespace web.BackgroundServices
 
                     await SendAlertSummaryEmail(user);
 
-                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                    await Task.Delay(_sleepDuration, stoppingToken);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogCritical(ex, "Failed while running alert monitor, will sleep");
                     _container.AddNotice("Failed while running alert monitor: " + ex.Message);
                     _container.ManualRunRequested();
-                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    await Task.Delay(_sleepDurationFailureMode, stoppingToken);
                 }
             }
         }
@@ -96,7 +95,7 @@ namespace web.BackgroundServices
                 var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user);
 
                 var completed = await core.Alerts.Services.Monitors.MonitorForStopLosses(
-                    quoteFunc: (u, ticker) => GetQuote(u, ticker),
+                    quoteFunc: GetQuote,
                     container: _container,
                     checks: checks,
                     cancellationToken: cancellationToken
@@ -288,9 +287,9 @@ namespace web.BackgroundServices
 
             public async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(string ticker)
             {
-                if (_cache.ContainsKey(ticker))
+                if (_cache.TryGetValue(ticker, out ServiceResponse<PriceBar[]> value))
                 {
-                    return _cache[ticker];
+                    return value;
                 }
 
                 var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365));
@@ -299,7 +298,7 @@ namespace web.BackgroundServices
                 var prices = await _brokerage.GetPriceHistory(
                     state: user,
                     ticker: ticker,
-                    frequency: core.Shared.Adapters.Stocks.PriceFrequency.Daily,
+                    frequency: PriceFrequency.Daily,
                     start: start,
                     end: end
                 );

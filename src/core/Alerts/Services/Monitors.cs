@@ -46,6 +46,11 @@ namespace core.Alerts.Services
 
             foreach(var c in checks)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 var priceResponse = await quoteFunc(c.user, c.ticker);
                 if (!priceResponse.IsOk)
                 {

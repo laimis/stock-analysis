@@ -79,7 +79,7 @@ namespace web
 
             services.AddHostedService<StockAlertService>();
             services.AddHostedService<ThirtyDaySellService>();
-            services.AddHostedService<UserChangedScheduler>();
+            services.AddHostedService<UserChangedService>();
             
             StorageRegistrations(configuration, services, logger);
         }

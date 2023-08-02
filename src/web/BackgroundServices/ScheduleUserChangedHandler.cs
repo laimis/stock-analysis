@@ -9,9 +9,7 @@ namespace web.BackgroundServices
     {
         public Task Handle(ScheduleUserChanged e, CancellationToken cancellationToken)
         {
-            Console.WriteLine("scheduling user changed");
-
-            UserChangedScheduler.Schedule(e);
+            UserChangedService.Schedule(e);
             
             return Task.CompletedTask;
         }

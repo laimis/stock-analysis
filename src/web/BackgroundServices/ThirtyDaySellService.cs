@@ -14,10 +14,10 @@ namespace web.BackgroundServices
 {
     public class ThirtyDaySellService : BackgroundService
     {
-        private IAccountStorage _accounts;
-        private ILogger<ThirtyDaySellService> _logger;
-        private IMediator _mediator;
-        private IEmailService _emails;
+        private readonly IAccountStorage _accounts;
+        private readonly ILogger<ThirtyDaySellService> _logger;
+        private readonly IMediator _mediator;
+        private readonly IEmailService _emails;
 
         public ThirtyDaySellService(
             ILogger<ThirtyDaySellService> logger,
@@ -31,6 +31,8 @@ namespace web.BackgroundServices
             _mediator = mediator;
         }
 
+        private static readonly TimeSpan _sleepDuration = TimeSpan.FromHours(24);
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("thirty day monitor");
@@ -43,8 +45,11 @@ namespace web.BackgroundServices
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogError("Failed:" + ex);
+                    _logger.LogError("Failed: {exception}", ex);
                 }
+
+                
+                await Task.Delay(_sleepDuration, stoppingToken);
             }
 
             _logger.LogInformation("thirty day monitor exit");
@@ -52,26 +57,27 @@ namespace web.BackgroundServices
 
         private async Task Loop(CancellationToken stoppingToken)
         {
-            var time = DateTimeOffset.UtcNow;
-            
-            await ScanSells();
-
-            await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
+            await ScanSells(stoppingToken);
         }
 
-        private async Task ScanSells()
+        private async Task ScanSells(CancellationToken stoppingToken)
         {
             var pairs = await _accounts.GetUserEmailIdPairs();
 
             foreach(var p in pairs)
             {
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 try
                 {
                     await ProcessUser(p);
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogError($"Failed to process 30 day check for {p.email}: {ex}");
+                    _logger.LogError("Failed to process 30 day check for {email}: {exception}", p.email, ex);
                 }
             }
         }
@@ -79,7 +85,7 @@ namespace web.BackgroundServices
         private async Task ProcessUser((string email, string id) p)
         {
             // 30 day crosser
-            _logger.LogInformation($"Scanning {p.email}");
+            _logger.LogInformation("Scanning {email}", p.email);
 
             var sellsOfInterest = new List<SellView>();
             var query = new Sells.Query(new Guid(p.id));
@@ -105,7 +111,7 @@ namespace web.BackgroundServices
             }
             else
             {
-                _logger.LogInformation($"No sells of interest for {p.email}");
+                _logger.LogInformation("No sells of interest for {email}", p.email);
             }
         }
     }
