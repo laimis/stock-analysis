@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using core.Adapters.Emails;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -10,9 +8,8 @@ namespace sendgridclient
 {
     public class SendGridClientImpl : IEmailService
     {
-        private SendGridClient _sendGridClient;
-        private ILogger<SendGridClientImpl> _logger;
-        private const string NO_REPLY = "noreply@nightingaletrading.com";
+        private readonly SendGridClient _sendGridClient;
+        private readonly ILogger<SendGridClientImpl> _logger;
 
         public SendGridClientImpl(
             string apiKey,
@@ -46,14 +43,17 @@ namespace sendgridclient
             var fromAddr = new EmailAddress(email: sender.Email, name: sender.Name);
             var toAddr = new EmailAddress(email: recipient.Email, name: recipient.Name);
             var msg = MailHelper.CreateSingleEmail(fromAddr, toAddr, subject, body, null);
-            
+
+            await SendAndLog(msg);
+        }
+
+        private async Task SendAndLog(SendGridMessage msg)
+        {
             var response = await _sendGridClient.SendEmailAsync(msg);
 
-            _logger?.LogInformation("Sendgrid response: " + response.StatusCode);
-            
             var responseBody = await response.Body.ReadAsStringAsync();
 
-            _logger?.LogInformation("Sendgrid response: " + responseBody);
+            _logger.LogInformation("Sendgrid status {statusCode} with body: {responseBody}", response.StatusCode, responseBody);
         }
 
         public Task Send(
@@ -70,7 +70,7 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, EmailTemplate template, object properties)
         {
-            _logger?.LogInformation($"Dummy send with template");
+            _logger?.LogInformation("Dummy send with template {templateId}", template.Id);
 
             return Task.CompletedTask;
         }
@@ -83,12 +83,8 @@ namespace sendgridclient
             var msg = MailHelper.CreateSingleTemplateEmail(
                 from, to, template.Id, properties
             );
-            
-            var response = await _sendGridClient.SendEmailAsync(msg);
 
-            var responseBody = await response.Body.ReadAsStringAsync();
-
-            _logger.LogInformation($"Sendgrid status {response.StatusCode} with body: {responseBody}");
+            await SendAndLog(msg);
         }
     }
 }

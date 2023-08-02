@@ -20,7 +20,7 @@ namespace core.Account
         public class Handler : MediatR.IRequestHandler<Query, object>,
             INotificationHandler<UserStatusRecalculate>
         {
-            private IAccountStorage _storage;
+            private readonly IAccountStorage _storage;
 
             public Handler(IAccountStorage storage)
             {

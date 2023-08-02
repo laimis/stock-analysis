@@ -77,11 +77,12 @@ namespace web
                     configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID")
                 ));
 
-            services.AddHostedService<StockAlertService>();
+            StorageRegistrations(configuration, services, logger);
+            
             services.AddHostedService<ThirtyDaySellService>();
             services.AddHostedService<UserChangedService>();
-            
-            StorageRegistrations(configuration, services, logger);
+            services.AddHostedService<StockAlertService>();
+            services.AddHostedService<WeeklyUpsideReversalService>();
         }
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)

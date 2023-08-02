@@ -5,53 +5,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
 using MediatR;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    public class UserChangedService : BackgroundService
+    public class UserChangedService : GenericBackgroundServiceHost
     {
-        private readonly ILogger<UserChangedService> _logger;
         private readonly IMediator _mediator;
-
-        private static readonly ConcurrentQueue<ScheduleUserChanged> _queue = new();
-        public static void Schedule(ScheduleUserChanged e) => _queue.Enqueue(e);
+        private readonly ConcurrentQueue<ScheduleUserChanged> _queue = new();
+        public void Schedule(ScheduleUserChanged e) => _queue.Enqueue(e);
 
         public UserChangedService(
             ILogger<UserChangedService> logger,
-            IMediator mediator)
+            IMediator mediator) : base(logger)
         {
-            _logger = logger;
             _mediator = mediator;
-        }
-
-        private static readonly TimeSpan _sleepDuration = TimeSpan.FromSeconds(1);
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation("running user change scheduler");
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await Loop(stoppingToken);            
-                }
-                catch(Exception ex)
-                {
-                    _logger.LogError("User changed service failed: {exception}", ex);
-                }
-
-                await Task.Delay(_sleepDuration, stoppingToken);
-            }
-
-            _logger.LogInformation("exec exit");
         }
 
         private readonly Dictionary<Guid, DateTimeOffset> _userLastIssued = new();
 
-        private Task Loop(CancellationToken stoppingToken)
+        private static readonly TimeSpan _sleepInterval = TimeSpan.FromSeconds(1);
+        protected override TimeSpan SleepDuration { get => _sleepInterval;}
+
+        protected override Task Loop(CancellationToken stoppingToken)
         {
             while (_queue.TryDequeue(out var r))
             {

@@ -244,27 +244,40 @@ namespace web.BackgroundServices
 
         private object ToEmailData(TriggeredAlert alert)
         {
+            var valueType = alert.valueType;
+            var triggeredValue = alert.triggeredValue;
+            var ticker = alert.ticker;
+            var description = alert.description;
+            var sourceList = alert.sourceList;
+            var time = alert.when;
+
+            return ToEmailRow(valueType, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
+        }
+
+        public static object ToEmailRow(ValueFormat valueType, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
+        {
             string FormattedValue()
             {
-                return alert.valueType switch {
-                    ValueFormat.Percentage => alert.triggeredValue.ToString("P1"),
-                    ValueFormat.Currency => alert.triggeredValue.ToString("C2"),
-                    ValueFormat.Number => alert.triggeredValue.ToString("N2"),
-                    ValueFormat.Boolean => alert.triggeredValue.ToString(),
-                    _ => throw new Exception("Unexpected alert value type: " + alert.valueType)
+                return valueType switch
+                {
+                    ValueFormat.Percentage => triggeredValue.ToString("P1"),
+                    ValueFormat.Currency => triggeredValue.ToString("C2"),
+                    ValueFormat.Number => triggeredValue.ToString("N2"),
+                    ValueFormat.Boolean => triggeredValue.ToString(),
+                    _ => throw new Exception("Unexpected alert value type: " + valueType)
                 };
             }
 
-            return new {
-                ticker = (string)alert.ticker,
+            return new
+            {
+                ticker,
                 value = FormattedValue(),
-                alert.description,
-                alert.sourceList,
-                time = _marketHours.ToMarketTime(alert.when).ToString("HH:mm") + " ET"
+                description,
+                sourceList,
+                time = time.ToString("HH:mm") + " ET"
             };
         }
 
-        
         private class GetPricesForTickerService
         {
             private readonly IBrokerage _brokerage;

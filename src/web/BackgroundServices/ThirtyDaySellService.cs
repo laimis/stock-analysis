@@ -7,15 +7,13 @@ using core.Adapters.Emails;
 using core.Reports;
 using core.Reports.Views;
 using MediatR;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
 {
-    public class ThirtyDaySellService : BackgroundService
+    public class ThirtyDaySellService : GenericBackgroundServiceHost
     {
         private readonly IAccountStorage _accounts;
-        private readonly ILogger<ThirtyDaySellService> _logger;
         private readonly IMediator _mediator;
         private readonly IEmailService _emails;
 
@@ -23,44 +21,17 @@ namespace web.BackgroundServices
             ILogger<ThirtyDaySellService> logger,
             IAccountStorage accounts,
             IEmailService emails,
-            IMediator mediator)
+            IMediator mediator) : base(logger)
         {
             _accounts = accounts;
             _emails = emails;
-            _logger = logger;
             _mediator = mediator;
         }
 
-        private static readonly TimeSpan _sleepDuration = TimeSpan.FromHours(24);
+        private static readonly TimeSpan _sleepInterval = TimeSpan.FromHours(24);
+        protected override TimeSpan SleepDuration => _sleepInterval;
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation("thirty day monitor");
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await Loop(stoppingToken);
-                }
-                catch(Exception ex)
-                {
-                    _logger.LogError("Failed: {exception}", ex);
-                }
-
-                
-                await Task.Delay(_sleepDuration, stoppingToken);
-            }
-
-            _logger.LogInformation("thirty day monitor exit");
-        }
-
-        private async Task Loop(CancellationToken stoppingToken)
-        {
-            await ScanSells(stoppingToken);
-        }
-
-        private async Task ScanSells(CancellationToken stoppingToken)
+        protected override async Task Loop(CancellationToken stoppingToken)
         {
             var pairs = await _accounts.GetUserEmailIdPairs();
 

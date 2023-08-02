@@ -6,9 +6,8 @@ namespace core.Stocks.Services.Analysis
 {
     public class PatternDetection
     {
-        private static readonly Dictionary<string, System.Func<PriceBar[], Pattern?>> _patternGenerators =
-            new Dictionary<string, System.Func<PriceBar[], Pattern?>>
-        {
+        private static readonly Dictionary<string, System.Func<PriceBar[], Pattern?>> _patternGenerators = new()
+            {
             {UpsideReversalName, UpsideReversal},
             {Highest1YearVolumeName, Highest1YearVolume},
             {HighVolumeName, HighVolume},
@@ -55,7 +54,7 @@ namespace core.Stocks.Services.Analysis
         }
 
         public const string UpsideReversalName = "Upside Reversal";
-        private static Pattern? UpsideReversal(PriceBar[] bars)
+        public static Pattern? UpsideReversal(PriceBar[] bars)
         {
             if (bars.Length < 2)
             {
