@@ -11,7 +11,7 @@ namespace coretests.Stocks.Services
 {
     public class PositionAnalysisTests
     {
-        private (PositionInstance position, PriceBar[] bars, Order[] orders) CreateTestData()
+        private static (PositionInstance position, PriceBar[] bars, Order[] orders) CreateTestData()
         {
             var position = new PositionInstance(0, "SHEL");
             position.Buy(numberOfShares: 10, price: 100m, when: System.DateTimeOffset.UtcNow, transactionId: System.Guid.NewGuid());
@@ -52,7 +52,7 @@ namespace coretests.Stocks.Services
                 )
             };
 
-            var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(outcomes, filings: null);
+            var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(outcomes);
 
             Assert.Contains(evaluations, e => e.sortColumn == PortfolioAnalysisKeys.StrategyLabel);
         }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using core.Shared.Adapters.SEC;
 
 namespace core.Stocks.Services.Analysis
 {
@@ -10,9 +9,7 @@ namespace core.Stocks.Services.Analysis
         private const decimal RecentlyOpenThreshold = 5;
         private const decimal WithinTwoWeeksThreshold = 14;
         
-        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(
-            List<TickerOutcomes> tickerOutcomes,
-            Dictionary<string, CompanyFilings> filings)
+        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(List<TickerOutcomes> tickerOutcomes)
         {
             // stocks that are below stop loss
             yield return new AnalysisOutcomeEvaluation(

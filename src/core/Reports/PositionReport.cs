@@ -36,19 +36,14 @@ namespace core.Reports
                 _secFilings = secFilings;
             }
 
-            private IAccountStorage _accountStorage;
-            private IBrokerage _brokerage { get; }
-
-            private ISECFilings _secFilings;
+            private readonly IAccountStorage _accountStorage;
+            private readonly IBrokerage _brokerage;
+            private readonly ISECFilings _secFilings;
 
             public override async Task<OutcomesReportView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await _accountStorage.GetUser(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
+                var user = await _accountStorage.GetUser(request.UserId)
+                    ?? throw new Exception("User not found");
                 var stocks = await _storage.GetStocks(request.UserId);
 
                 var positions = stocks
@@ -69,7 +64,6 @@ namespace core.Reports
             {
                 var tickerOutcomes = new List<TickerOutcomes>();
                 var tickerPatterns = new List<TickerPatterns>();
-                var filings = new Dictionary<string, Shared.Adapters.SEC.CompanyFilings>();
                 
                 foreach(var position in positions)
                 {
@@ -104,10 +98,7 @@ namespace core.Reports
                     tickerPatterns.Add(new TickerPatterns(patterns, position.Ticker));
                 }
 
-                var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(
-                    tickerOutcomes,
-                    filings
-                );
+                var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(tickerOutcomes);
 
                 return new OutcomesReportView(
                     evaluations: evaluations,

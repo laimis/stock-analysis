@@ -4,9 +4,8 @@ RUN apk add --no-cache -U \
     nodejs \
     npm
 
-RUN mkdir -p /app
-COPY . /app
 WORKDIR /app
+COPY . /app
 
 RUN dotnet publish ./src/web --self-contained -r linux-musl-x64 -c Release -o /app/out
 
