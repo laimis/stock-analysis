@@ -14,14 +14,25 @@ namespace core.Stocks.Services.Analysis
             List<TickerOutcomes> tickerOutcomes,
             Dictionary<string, CompanyFilings> filings)
         {
-            // stocks whose stops are close
+            // stocks that are below stop loss
             yield return new AnalysisOutcomeEvaluation(
-                "Stop loss at risk",
+                "Below stop loss",
                 OutcomeType.Negative,
                 PortfolioAnalysisKeys.PercentToStopLoss,
                 tickerOutcomes
                     .Where(t =>
-                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.PercentToStopLoss && o.value >= PercentToStopThreshold))
+                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.PercentToStopLoss && o.value > 0m))
+                    .ToList()
+            );
+
+            // stocks whose stops are close
+            yield return new AnalysisOutcomeEvaluation(
+                "Stop loss at risk",
+                OutcomeType.Neutral,
+                PortfolioAnalysisKeys.PercentToStopLoss,
+                tickerOutcomes
+                    .Where(t =>
+                        t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.PercentToStopLoss && o.value >= PercentToStopThreshold && o.value <= 0m))
                     .ToList()
             );
 
@@ -57,18 +68,6 @@ namespace core.Stocks.Services.Analysis
                         t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.StrategyLabel && o.value == 0))
                     .ToList()
             );
-
-            // TODO: still thinking about it if I want to do this...
-            // // positions that don't have sell orders
-            // yield return new AnalysisOutcomeEvaluation(
-            //     "No Sell Orders",
-            //     OutcomeType.Neutral,
-            //     PortfolioAnalysisKeys.HasSellOrder,
-            //     tickerOutcomes
-            //         .Where(t =>
-            //             t.outcomes.Any(o => o.key == PortfolioAnalysisKeys.HasSellOrder && o.value == 0))
-            //         .ToList()
-            // );
         }
     }
 }
