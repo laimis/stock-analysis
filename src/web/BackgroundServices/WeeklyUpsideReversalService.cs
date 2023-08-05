@@ -113,12 +113,11 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     {
         _logger.LogInformation("Running weekly upside check for {count} users", _tickersToCheck.Count);
 
-        _patternsDiscovered.Clear();
-
         foreach(var u in _tickersToCheck)
         {
-            var detected = new List<(string Ticker, Pattern Pattern)>();
-            foreach(var ticker in u.Value)
+            var tickersToCheck = u.Value.ToList();
+
+            foreach(var ticker in tickersToCheck)
             {
                 var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly);
                 if (!priceBars.IsOk)
@@ -134,10 +133,17 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                     continue;
                 }
 
-                detected.Add((ticker, pattern.Value));
-            }
+                // this is important, we need to remove the check from the tickers to check list while adding in to 
+                // upside reversal list because midway through this process broker will throw exception most likely 
+                // due to price throttling and we will never complete this process otherwise
+                u.Value.Remove(ticker);
 
-            _patternsDiscovered.Add(u.Key, detected);
+                if (!_patternsDiscovered.ContainsKey(u.Key))
+                {
+                    _patternsDiscovered[u.Key] = new List<(string, Pattern)>();
+                }
+                _patternsDiscovered[u.Key].Add((ticker, pattern.Value));
+            }
         }
 
         _tickersToCheck.Clear();
