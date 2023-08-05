@@ -15,7 +15,7 @@ namespace web.BackgroundServices
             _logger = logger;            
         }
 
-        protected abstract TimeSpan SleepDuration { get; }
+        protected abstract TimeSpan GetSleepDuration();
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -36,7 +36,7 @@ namespace web.BackgroundServices
                     _logger.LogError("Failed: {exception}", ex);
                 }
 
-                var sleepDuration = SleepDuration;
+                var sleepDuration = GetSleepDuration();
                 if (sleepDuration.TotalMinutes > 1) // only show less frequent sleeps in order not to spam logs
                 {
                     _logger.LogInformation("sleeping for {sleepDuration}", sleepDuration);

@@ -67,8 +67,9 @@ namespace core.Account
             SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
         }
 
-        internal void ApplyInternal(UserPasswordResetRequested r)
+        internal void ApplyInternal(UserPasswordResetRequested _)
         {
+            // no state to modify, this event gets captured via INotification mechanism
         }
 
         internal void ApplyInternal(UserConnectedToBrokerage e)
@@ -79,7 +80,7 @@ namespace core.Account
             BrokerageAccessTokenExpires = e.When.AddSeconds(e.ExpiresInSeconds);
         }
 
-        internal void ApplyInternal(UserDisconnectedFromBrokerage e)
+        internal void ApplyInternal(UserDisconnectedFromBrokerage _)
         {
             ConnectedToBrokerage = false;
             BrokerageAccessToken = null;

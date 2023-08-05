@@ -25,7 +25,7 @@ namespace web.BackgroundServices
         private readonly Dictionary<Guid, DateTimeOffset> _userLastIssued = new();
 
         private static readonly TimeSpan _sleepInterval = TimeSpan.FromSeconds(1);
-        protected override TimeSpan SleepDuration { get => _sleepInterval;}
+        protected override TimeSpan GetSleepDuration() => _sleepInterval;
 
         protected override Task Loop(CancellationToken stoppingToken)
         {

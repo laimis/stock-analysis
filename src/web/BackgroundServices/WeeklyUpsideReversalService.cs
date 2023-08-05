@@ -12,6 +12,13 @@ using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;
 
+/// <summary>
+/// This service operates in three phases:
+/// 1. LoadTickersToCheck - it starts with loading all the users in the system and their portfolios and stock lists
+/// this forms the universe of tickers to check for weekly upside reversals.
+/// 2. CheckTickers - once #1 is finished, it goes through the list of tickers and checks if they have weekly upside reversal
+/// 3. SendEmails - once #2 is finished, it goes through the list of users and sends them emails with tickers that have weekly upside reversal
+/// </summary>
 public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 {
     private readonly IAccountStorage _accounts;
@@ -19,6 +26,12 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     private readonly IPortfolioStorage _portfolioStorage;
     private readonly IEmailService _emails;
     private readonly IMarketHours _marketHours;
+
+    private readonly Dictionary<UserState, HashSet<string>> _tickersToCheck = new();
+    private readonly Dictionary<UserState, List<(string Ticker, Pattern Pattern)>> _patternsDiscovered = new();
+
+    private Func<CancellationToken, Task> _toRun = null;
+    private Func<TimeSpan> _sleepCalculation = null;
 
     public WeeklyUpsideReversalService(
         ILogger<WeeklyUpsideReversalService> logger,
@@ -33,25 +46,31 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
         _emails = emails;
         _portfolioStorage = portfolioStorage;
         _marketHours = marketHours;
+        _toRun = LoadTickersToCheck;
     }
 
-    protected override TimeSpan SleepDuration
-    {
-        get {
-            // this report goes out every Friday at 5:00 PM ET
-            var nowInMarketHours = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
-            var nextFriday = nowInMarketHours.AddDays(5 - (int)nowInMarketHours.DayOfWeek);
-            var nextFriday5pm = nextFriday.Date.AddHours(17);
-            var sleepDuration = nextFriday5pm - nowInMarketHours;
-            return sleepDuration;
-        }
+    protected override TimeSpan GetSleepDuration() => _sleepCalculation();
+    
+    
+    TimeSpan AfterMarketCloseOnFriday() {
+        var nowInMarketHours = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
+        var nextFriday = nowInMarketHours.AddDays(5 - (int)nowInMarketHours.DayOfWeek);
+        var nextFriday5pm = nextFriday.Date.AddHours(17);
+        var sleepDuration = nextFriday5pm - nowInMarketHours;
+        return sleepDuration;
     }
 
-    protected override async Task Loop(CancellationToken stoppingToken)
+    static TimeSpan WhileCheckIsInProgress() => TimeSpan.FromSeconds(30);
+
+    protected override Task Loop(CancellationToken stoppingToken) => _toRun(stoppingToken);
+
+    private async Task LoadTickersToCheck(CancellationToken stoppingToken)
     {
         var pairs = await _accounts.GetUserEmailIdPairs();
 
-        foreach(var p in pairs)
+        _tickersToCheck.Clear();
+
+        foreach(var (email, id) in pairs)
         {
             if (stoppingToken.IsCancellationRequested)
             {
@@ -60,60 +79,89 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             try
             {
-                await ProcessUser(p);
+                var user = await _accounts.GetUserByEmail(email);
+                if (user == null)
+                {
+                    _logger.LogError("User not found for {email}", email);
+                    return;
+                }
+
+                _logger.LogInformation("Processing user {email} upsides", email);
+
+                var stocks = await _portfolioStorage.GetStocks(user.Id);
+                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
+                var tickersFromLists = (await _portfolioStorage.GetStockLists(user.State.Id))
+                    .Where(l => l.State.ContainsTag(core.Alerts.Services.Monitors.PATTERN_TAG))
+                    .SelectMany(l => l.State.Tickers)
+                    .Select(t => t.Ticker);
+
+                var set = new HashSet<string>(tickersFromLists.Union(tickersFromPositions));
+
+                _tickersToCheck[user.State] = set;
             }
             catch(Exception ex)
             {
-                _logger.LogError("Failed to process weekly upsde check {email}: {exception}", p.email, ex);
+                _logger.LogError("Failed to process weekly upsde check {email}: {exception}", email, ex);
             }
         }
+
+        _toRun = RunWeeklyUpsideCheck;
+        _sleepCalculation = WhileCheckIsInProgress;
     }
 
-    private async Task ProcessUser((string email, string id) p)
+    private async Task RunWeeklyUpsideCheck(CancellationToken token)
     {
-        var user = await _accounts.GetUserByEmail(p.email);
-        if (user == null)
+        _logger.LogInformation("Running weekly upside check for {count} users", _tickersToCheck.Count);
+
+        _patternsDiscovered.Clear();
+
+        foreach(var u in _tickersToCheck)
         {
-            _logger.LogError("User not found for {email}", p.email);
-            return;
+            var detected = new List<(string Ticker, Pattern Pattern)>();
+            foreach(var ticker in u.Value)
+            {
+                var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly);
+                if (!priceBars.IsOk)
+                {
+                    _logger.LogError("Unabel to get price bars for {ticker} with error {error}", ticker, priceBars.Error);
+                    continue;
+                }
+
+                var pattern = PatternDetection.UpsideReversal(priceBars.Success);
+                if (pattern == null)
+                {
+                    _logger.LogInformation("No upside reversal found for {ticker}", ticker);
+                    continue;
+                }
+
+                detected.Add((ticker, pattern.Value));
+            }
+
+            _patternsDiscovered.Add(u.Key, detected);
         }
 
-        _logger.LogInformation("Processing user {email} upsides", p.email);
+        _tickersToCheck.Clear();
+        _toRun = SendEmails;
+        _sleepCalculation = WhileCheckIsInProgress;
+    }
 
-        var stocks = await _portfolioStorage.GetStocks(user.Id);
-        var positions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition).ToList();
+    private async Task SendEmails(CancellationToken token)
+    {
+        _logger.LogInformation("Running weekly upside reversal emails for {count} users", _patternsDiscovered.Count);
 
-        var detected = new List<(string Ticker, Pattern Pattern)>(); 
-
-        foreach(var position in positions)
+        foreach(var u in _patternsDiscovered)
         {
-            var priceBars = await _brokerage.GetPriceHistory(user.State, position.Ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly);
-            if (!priceBars.IsOk)
+            _logger.LogInformation("Processing {email} with {count} alerts", u.Key.Email, u.Value.Count);
+
+            if (u.Value.Count == 0)
             {
-                _logger.LogError("Unabel to get price bars for {ticker} with error {error}", position.Ticker, priceBars.Error);
                 continue;
             }
 
-            var pattern = PatternDetection.UpsideReversal(priceBars.Success);
-            if (pattern == null)
-            {
-                _logger.LogInformation("No upside reversal found for {ticker}", position.Ticker);
-                continue;
-            }
-
-            detected.Add((position.Ticker, pattern.Value));
-        }
-
-        if (detected.Count == 0)
-        {
-            _logger.LogInformation("No upside reversals found");
-        }
-        else
-        {
             var alertGroups = new List<object> {
                 new {
                     identifier = "Weekly Upside Reversals",
-                    alerts = detected.Select(d => StockAlertService.ToEmailRow(
+                    alerts = u.Value.Select(d => StockAlertService.ToEmailRow(
                         valueType: d.Pattern.valueFormat,
                         triggeredValue: d.Pattern.value,
                         ticker: d.Ticker,
@@ -126,11 +174,15 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             var data = new { alertGroups };
             await _emails.Send(
-                    recipient: new Recipient(email: p.email, name: null),
+                    recipient: new Recipient(email: u.Key.Email, name: u.Key.Name),
                     Sender.NoReply,
                     template: EmailTemplate.Alerts,
                     data
                 );
         }
+
+        _patternsDiscovered.Clear();
+        _toRun = LoadTickersToCheck;
+        _sleepCalculation = AfterMarketCloseOnFriday;
     }
 }

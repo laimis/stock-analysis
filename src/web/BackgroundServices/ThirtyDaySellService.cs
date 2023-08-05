@@ -29,7 +29,7 @@ namespace web.BackgroundServices
         }
 
         private static readonly TimeSpan _sleepInterval = TimeSpan.FromHours(24);
-        protected override TimeSpan SleepDuration => _sleepInterval;
+        protected override TimeSpan GetSleepDuration() => _sleepInterval;
 
         protected override async Task Loop(CancellationToken stoppingToken)
         {

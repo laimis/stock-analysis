@@ -13,7 +13,7 @@ namespace core.Alerts.Services
     public static class Monitors
     {
         private const string GAP_UP_TAG = "monitor:gapup";
-        private const string PATTERN_TAG = "monitor:patterns";
+        public const string PATTERN_TAG = "monitor:patterns";
 
         public record struct MonitorDescriptor(string tag, string name);
         public static IEnumerable<MonitorDescriptor> GetMonitors()
