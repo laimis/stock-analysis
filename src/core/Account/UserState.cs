@@ -67,7 +67,7 @@ namespace core.Account
             SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
         }
 
-        internal void ApplyInternal(UserPasswordResetRequested _)
+        internal static void ApplyInternal(UserPasswordResetRequested _)
         {
             // no state to modify, this event gets captured via INotification mechanism
         }
