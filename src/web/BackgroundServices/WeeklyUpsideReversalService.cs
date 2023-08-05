@@ -127,16 +127,17 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 }
 
                 var pattern = PatternDetection.UpsideReversal(priceBars.Success);
-                if (pattern == null)
-                {
-                    _logger.LogInformation("No upside reversal found for {ticker}", ticker);
-                    continue;
-                }
 
                 // this is important, we need to remove the check from the tickers to check list while adding in to 
                 // upside reversal list because midway through this process broker will throw exception most likely 
                 // due to price throttling and we will never complete this process otherwise
                 u.Value.Remove(ticker);
+
+                if (pattern == null)
+                {
+                    _logger.LogInformation("No upside reversal found for {ticker}", ticker);
+                    continue;
+                }
 
                 if (!_patternsDiscovered.ContainsKey(u.Key))
                 {
