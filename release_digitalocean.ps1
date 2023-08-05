@@ -31,9 +31,16 @@ if ($message -eq "y")
 # ensure that $messsage has "'" escaped
 $message = $message -replace "'", "''"
 
+#ensure that tests pass
+Invoke-Expression '.\test.bat'
+$exitCode = $LASTEXITCODE
+if ($exitCode -ne 0) {
+    write-host "Basic tests failed"
+    exit
+}
+
 # ensure that the project can build by invoking npm run build:production
 # in src/web/ClientApp directory
-
 push-location "src/web/ClientApp"
 invoke-expression "npm run build:production"
 $exitCode = $LASTEXITCODE
