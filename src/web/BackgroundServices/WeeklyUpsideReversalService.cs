@@ -139,11 +139,13 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                     continue;
                 }
 
-                if (!_patternsDiscovered.ContainsKey(u.Key))
+                if (!_patternsDiscovered.TryGetValue(u.Key, out List<(string Ticker, Pattern Pattern)> value))
                 {
-                    _patternsDiscovered[u.Key] = new List<(string, Pattern)>();
+                    value = new List<(string, Pattern)>();
+                    _patternsDiscovered[u.Key] = value;
                 }
-                _patternsDiscovered[u.Key].Add((ticker, pattern.Value));
+
+                value.Add((ticker, pattern.Value));
             }
         }
 
