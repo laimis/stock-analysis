@@ -30,7 +30,7 @@ namespace core.Shared
             AggregateState.Apply(e);
         }
 
-        protected List<AggregateEvent> _events { get; }
+        protected List<AggregateEvent> _events;
         public IReadOnlyList<AggregateEvent> Events => _events.AsReadOnly();
 
         public int Version { get; }
