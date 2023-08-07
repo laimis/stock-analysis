@@ -694,6 +694,7 @@ export class OwnedOption {
   closed: string
   premiumPaid: number
   premiumCapture: number
+  detail: OptionDefinition
 }
 
 export class OptionStats {

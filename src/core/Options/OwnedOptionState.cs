@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using core.Adapters.Options;
 using core.Shared;
 
 namespace core.Options
@@ -108,7 +109,7 @@ namespace core.Options
 
             Sells.Add(sold);
 
-            var credit = (sold.NumberOfContracts * sold.Premium);
+            var credit = sold.NumberOfContracts * sold.Premium;
 
             PremiumReceived += credit;
 

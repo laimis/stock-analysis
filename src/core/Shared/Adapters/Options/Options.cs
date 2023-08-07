@@ -23,7 +23,7 @@ namespace core.Adapters.Options
         public string OptionType => Side;
         public bool IsCall => Side == "call";
         public bool IsPut => Side == "put";
-        public decimal Spread => (Ask - Bid);
+        public decimal Spread => Ask - Bid;
         public decimal Volatility { get; set; }
         public decimal Delta { get; set; }
         public decimal Gamma { get; set; }
@@ -37,6 +37,7 @@ namespace core.Adapters.Options
         public int DaysToExpiration { get; set; }
         public decimal MarkChange { get; set; }
         public decimal MarkPercentChange { get; set; }
+        public decimal? UnderlyingPrice { get; set; }
 
         public decimal PerDayPrice
         {

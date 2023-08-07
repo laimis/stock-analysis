@@ -4,6 +4,8 @@ using core.Shared.Adapters.Brokerage;
 
 namespace tdameritradeclient;
 
+// complains about lowercase property names, doing that due to json formatting
+#pragma warning disable IDE1006
 
 internal class ErrorResponse
 {
@@ -360,6 +362,7 @@ internal class OptionChain
     public string? status { get; set; }
     public decimal volatility { get; set; }
     public int numberOfContracts { get; set; }
+    public decimal? underlyingPrice { get; set; }
     public Dictionary<string, OptionDescriptorMap>? putExpDateMap { get; set; }
     public Dictionary<string, OptionDescriptorMap>? callExpDateMap { get; set; }
 }
@@ -386,3 +389,4 @@ internal class NanConverter : JsonConverter<decimal>
         writer.WriteNumberValue(value);
     }
 }
+#pragma warning restore IDE1006 // Naming Styles

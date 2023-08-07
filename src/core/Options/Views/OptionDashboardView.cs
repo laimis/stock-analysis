@@ -6,11 +6,14 @@ using core.Shared.Adapters.Brokerage;
 
 namespace core.Options
 {
-    public class OptionDashboardView : IViewModel
+    public class OptionDashboardView
     {
         public const string Version = "1";
         public OptionDashboardView(){}
-        public OptionDashboardView(IEnumerable<OwnedOptionView> closed, IEnumerable<OwnedOptionView> open, IEnumerable<OptionPosition> brokeragePositions)
+        public OptionDashboardView(
+            IEnumerable<OwnedOptionView> closed,
+            IEnumerable<OwnedOptionView> open,
+            IEnumerable<OptionPosition> brokeragePositions)
         {
             Closed = closed;
             Open = open;
@@ -19,16 +22,13 @@ namespace core.Options
             OverallStats = new OwnedOptionStats(closed);
             BuyStats = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Bought"));
             SellStats = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Sold"));
-
-            Calculated = DateTimeOffset.UtcNow;
         }
 
-        public IEnumerable<OwnedOptionView> Closed { get; set; }
-        public IEnumerable<OwnedOptionView> Open { get; set; }
-        public IEnumerable<OptionPosition> BrokeragePositions { get; set; }
-        public OwnedOptionStats OverallStats { get; set; }
-        public OwnedOptionStats BuyStats { get; set; }
-        public OwnedOptionStats SellStats { get; set; }
-        public DateTimeOffset Calculated { get; set; }
+        public IEnumerable<OwnedOptionView> Closed { get; }
+        public IEnumerable<OwnedOptionView> Open { get; }
+        public IEnumerable<OptionPosition> BrokeragePositions { get; }
+        public OwnedOptionStats OverallStats { get; }
+        public OwnedOptionStats BuyStats { get; }
+        public OwnedOptionStats SellStats { get; }
     }
 }

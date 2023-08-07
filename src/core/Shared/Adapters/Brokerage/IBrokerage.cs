@@ -27,7 +27,7 @@ namespace core.Shared.Adapters.Brokerage
         Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState state, IEnumerable<string> tickers);
         Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset start);
         Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 5);
-        Task<ServiceResponse<OptionChain>> GetOptions(UserState state, string ticker);
+        Task<ServiceResponse<OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string contractType = null);
         Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, string ticker);
     }
 

@@ -2,6 +2,7 @@ using System;
 
 namespace core.Shared.Adapters.Brokerage;
 
+#pragma warning disable IDE1006 // Naming Styles
 public class OAuthResponse
 {
     private readonly DateTimeOffset _created;
@@ -114,3 +115,5 @@ public class TradingAccount
     public Order[] Orders { get; set; }
     public decimal? CashBalance { get; set; }
 }
+
+#pragma warning restore IDE1006 // Naming Styles

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
@@ -14,7 +13,7 @@ namespace coretests.Options
 {
     public class ListTests : IClassFixture<OptionsTestsFixture>
     {
-        private OptionsTestsFixture _fixture;
+        private readonly OptionsTestsFixture _fixture;
 
         public ListTests(OptionsTestsFixture fixture)
         {
@@ -46,8 +45,8 @@ namespace coretests.Options
                 .Returns(Task.FromResult(
                     new ServiceResponse<TradingAccount>(
                         new TradingAccount {
-                            OptionPositions = new OptionPosition[0],
-                            StockPositions = new StockPosition[0],
+                            OptionPositions = Array.Empty<OptionPosition>(),
+                            StockPositions = Array.Empty<StockPosition>(),
                         }
                     )
                 ));

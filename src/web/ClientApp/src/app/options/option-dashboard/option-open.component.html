@@ -24,6 +24,7 @@
         <th>OTM/ITM</th>
         <th>Premium</th>
         <th>Days Left</th>
+        <th>Bid/Ask</th>
       </tr>
     </thead>
     <tbody>
@@ -55,6 +56,9 @@
           {{(option.days - option.daysHeld) | number}}
           <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
           <span *ngIf="option.isExpired" class="ml-1 badge bg-danger">expired</span>
+        </td>
+        <td>
+          {{option.detail?.bid | currency}} / {{option.detail?.ask | currency}}
         </td>
       </tr>
     </tbody>

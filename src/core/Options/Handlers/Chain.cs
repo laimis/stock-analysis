@@ -25,8 +25,8 @@ namespace core.Options
 
         public class Handler : IRequestHandler<Query, OptionDetailsViewModel>
         {
-            private IAccountStorage _accounts;
-            private IBrokerage _brokerage;
+            private readonly IAccountStorage _accounts;
+            private readonly IBrokerage _brokerage;
             
             public Handler(IAccountStorage accounts, IBrokerage brokerage)
             {
@@ -36,12 +36,7 @@ namespace core.Options
             
             public async Task<OptionDetailsViewModel> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await _accounts.GetUser(request.UserId);
-                if (user == null)
-                {
-                    throw new InvalidOperationException("User not found");
-                }
-
+                var user = await _accounts.GetUser(request.UserId) ?? throw new InvalidOperationException("User not found");
                 var priceResult = await _brokerage.GetQuote(user.State, request.Ticker);
                 var price = priceResult.IsOk switch {
                     true => priceResult.Success.Price,

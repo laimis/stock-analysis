@@ -363,21 +363,37 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers)}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
     }
 
-    public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker)
+    public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string? contractType = null)
     {
         var function = $"marketdata/chains?symbol={ticker}";
 
-        var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get);
+        if (contractType != null)
+        {
+            function += $"&contractType={contractType}";
+        }
+
+        if (expirationDate != null)
+        {
+            function += $"&fromDate={expirationDate.Value.ToString("yyyy-MM-dd")}";
+            function += $"&toDate={expirationDate.Value.ToString("yyyy-MM-dd")}";
+        }
+
+        if (strikePrice != null)
+        {
+            function += $"&strike={strikePrice.Value}";
+        }
+
+        var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get, debug: true);
 
         if (!chainResponse.IsOk)
         {
             return new ServiceResponse<core.Adapters.Options.OptionChain>(chainResponse.Error!);
         }
 
-        static IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map) =>
+        static IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
             map.SelectMany(kp => kp.Value.Values).SelectMany(v => v)
             .Select(d => new OptionDetail {
                 Ask = d.ask,
@@ -401,7 +417,8 @@ public class TDAmeritradeClient : IBrokerage
                 TimeValue = d.timeValue,
                 Volatility = d.volatility,
                 MarkChange = d.markChange,
-                MarkPercentChange = d.markPercentChange
+                MarkPercentChange = d.markPercentChange,
+                UnderlyingPrice = underlyingPrice
             });
 
         var chain = chainResponse.Success!;
@@ -410,7 +427,7 @@ public class TDAmeritradeClient : IBrokerage
             Symbol = chain.symbol,
             Volatility = chain.volatility,
             NumberOfContracts = chain.numberOfContracts,
-            Options = ToOptionDetails(chain.callExpDateMap!).Union(ToOptionDetails(chain.putExpDateMap!)).ToArray()
+            Options = ToOptionDetails(chain.callExpDateMap!, chain.underlyingPrice).Union(ToOptionDetails(chain.putExpDateMap!, chain.underlyingPrice)).ToArray()
         };
 
         return new ServiceResponse<core.Adapters.Options.OptionChain>(response);

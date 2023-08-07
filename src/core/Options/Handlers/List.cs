@@ -34,7 +34,7 @@ namespace core.Options
                 var open = options
                     .Where(o => o.State.Active && o.State.Ticker == request.Ticker)
                     .OrderByDescending(o => o.State.FirstFill)
-                    .Select(o => new OwnedOptionView(o.State));
+                    .Select(o => new OwnedOptionView(o.State, optionDetail: null));
 
                 return new OwnedOptionStatsView(open);
             }
