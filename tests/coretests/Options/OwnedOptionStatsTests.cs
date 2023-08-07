@@ -6,47 +6,20 @@ namespace coretests.Options
 {
     public class OwnedOptionStatsTests
     {
-        private OwnedOptionStats _stats;
+        private readonly OwnedOptionStats _stats;
 
         public OwnedOptionStatsTests()
         {
-            var o1 = new OwnedOptionView {
-                Assigned = true,
-                BoughtOrSold = "SOLD",
-                Days = 10,
-                DaysHeld = 9,
-                ExpirationDate = "2019-10-10",
-                ExpiresSoon = false,
-                Filled = DateTimeOffset.Parse("2019-10-10"),
-                Id = Guid.NewGuid(),
-                IsExpired = true,
-                NumberOfContracts = 1,
-                OptionType = OptionType.CALL.ToString(),
-                PremiumPaid = 10,
-                PremiumReceived = 10,
-                StrikePrice = 45,
-                Ticker = "AMD",
-                Transactions = null
-            };
+            var userId = Guid.NewGuid();
+            var soldOption1 = new OwnedOption("AMD", 45, OptionType.CALL, new DateTimeOffset(2019, 10, 10, 0, 0, 0, TimeSpan.Zero), userId);
+            soldOption1.Sell(1, 10, DateTimeOffset.Parse("2019-10-10"), null);
+            soldOption1.Expire(assigned: true);
+            var o1 = new OwnedOptionView(soldOption1.State, optionDetail: null);
 
-            var o2 = new OwnedOptionView {
-                Assigned = false,
-                BoughtOrSold = "SOLD",
-                Days = 20,
-                DaysHeld = 10,
-                ExpirationDate = "2019-10-10",
-                ExpiresSoon = false,
-                Filled = DateTimeOffset.Parse("2019-10-10"),
-                Id = Guid.NewGuid(),
-                IsExpired = true,
-                NumberOfContracts = 1,
-                OptionType = OptionType.CALL.ToString(),
-                PremiumPaid = 100,
-                PremiumReceived = 150,
-                StrikePrice = 45,
-                Ticker = "AMD",
-                Transactions = null
-            };
+            var soldOption2 = new OwnedOption("AMD", 45, OptionType.CALL, new DateTimeOffset(2019, 10, 10, 0, 0, 0, TimeSpan.Zero), userId);
+            soldOption2.Sell(1, 150, DateTimeOffset.Parse("2019-10-10"), null);
+            soldOption2.Buy(1, 100, DateTimeOffset.Parse("2019-10-10"), null);
+            var o2 = new OwnedOptionView(soldOption2.State, optionDetail: null);
 
             _stats = new OwnedOptionStats(new [] {o1, o2});
         }
@@ -60,7 +33,7 @@ namespace coretests.Options
         [Fact]
         public void WinningMatches()
         {
-            Assert.Equal(1, _stats.Wins);
+            Assert.Equal(2, _stats.Wins);
         }
 
         [Fact]
