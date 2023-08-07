@@ -363,7 +363,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers)}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
     }
 
     public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string? contractType = null)
@@ -386,7 +386,7 @@ public class TDAmeritradeClient : IBrokerage
             function += $"&strike={strikePrice.Value}";
         }
 
-        var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get, debug: true);
+        var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get);
 
         if (!chainResponse.IsOk)
         {
