@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { BrokerageOptionPosition, StocksService } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
@@ -12,12 +12,14 @@ import { GetErrors } from 'src/app/services/utils';
 export class OptionBrokeragePositionsComponent {
   errors: string[];
   constructor(
-    private service : StocksService,
-    private router : Router
+    private service : StocksService
   ) {}
 
   @Input()
   positions : BrokerageOptionPosition[]
+
+  @Output()
+  positionsUpdated = new EventEmitter()
 
   turnIntoPosition(position:BrokerageOptionPosition, purchased:string){
       var opt = {
@@ -25,7 +27,7 @@ export class OptionBrokeragePositionsComponent {
         strikePrice: position.strikePrice,
         optionType: position.optionType,
         expirationDate: new Date(position.expirationDate),
-        numberOfContracts: position.quantity,
+        numberOfContracts: Math.abs(position.quantity),
         premium: position.averageCost * 100,
         filled: purchased,
         notes: null
@@ -37,7 +39,7 @@ export class OptionBrokeragePositionsComponent {
   
     recordBuy(opt: object) {
       this.service.buyOption(opt).subscribe( r => {
-        this.navigateToOption(r.id)
+        this.positionsUpdated.emit()
       }, err => {
         this.errors = GetErrors(err)
       })
@@ -45,13 +47,9 @@ export class OptionBrokeragePositionsComponent {
   
     recordSell(opt: object) {
       this.service.sellOption(opt).subscribe( r => {
-        this.navigateToOption(r.id)
+        this.positionsUpdated.emit()
       }, err => {
         this.errors = GetErrors(err)
       })
-    }
-
-    navigateToOption(id:string) {
-      this.router.navigate(['/optiondetails', id])
     }
 }

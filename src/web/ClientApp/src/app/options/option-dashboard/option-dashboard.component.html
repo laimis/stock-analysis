@@ -21,7 +21,7 @@
 </div>
 
 <app-option-brokerage-positions *ngIf="loaded && isActive('brokerage')" [positions]="optionsContainer.brokeragePositions"></app-option-brokerage-positions>
-<app-option-open *ngIf="loaded && isActive('open')" [openOptions]=optionsContainer.open></app-option-open>
+<app-option-open *ngIf="loaded && isActive('open')" [openOptions]=optionsContainer.open (positionsUpdated)="refreshPositions()"></app-option-open>
 <app-option-closed *ngIf="loaded && isActive('closed')" [closedOptions]=optionsContainer.closed></app-option-closed>
 <app-option-performance *ngIf="loaded && isActive('performance')"
   [overallStats]="optionsContainer.overallStats"

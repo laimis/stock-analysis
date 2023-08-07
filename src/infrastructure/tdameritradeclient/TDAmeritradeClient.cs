@@ -17,17 +17,17 @@ using Polly.Timeout;
 namespace tdameritradeclient;
 public class TDAmeritradeClient : IBrokerage
 {
-    private ILogger<TDAmeritradeClient>? _logger;
-    private string _callbackUrl;
-    private string _clientId;
+    private readonly ILogger<TDAmeritradeClient>? _logger;
+    private readonly string _callbackUrl;
+    private readonly string _clientId;
 
     // in memory dictionary of access tokens (they expire every 30 mins)
-    private ConcurrentDictionary<Guid, OAuthResponse> _accessTokens = new ConcurrentDictionary<Guid, OAuthResponse>();
+    private readonly ConcurrentDictionary<Guid, OAuthResponse> _accessTokens = new();
 
     private const string _apiUrl = "https://api.tdameritrade.com/v1";
     private const string _authUrl = "https://auth.tdameritrade.com";
 
-    private HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
     private static readonly AsyncRetryPolicy _retryPolicy = Policy
         .Handle<RateLimitRejectedException>()
         .WaitAndRetryAsync(
@@ -75,7 +75,7 @@ public class TDAmeritradeClient : IBrokerage
 
         var responseString = await response.Content.ReadAsStringAsync();
 
-        _logger?.LogDebug("Response from tdameritrade: " + responseString);
+        _logger?.LogDebug("Response from tdameritrade: {ameritraderesponse}", responseString);
 
         return JsonSerializer.Deserialize<OAuthResponse>(responseString);
     }
@@ -85,7 +85,7 @@ public class TDAmeritradeClient : IBrokerage
         if (!response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            _logger?.LogError($"TDAmeritrade client failed with {response.StatusCode} for {message}: {content}");
+            _logger?.LogError("TDAmeritrade client failed with {statusCode} for {message}: {content}", response.StatusCode, message, content);
         }
     }
 
@@ -189,18 +189,10 @@ public class TDAmeritradeClient : IBrokerage
 
         var accounts = response.Success!;
 
-        var tdPositions = accounts[0].securitiesAccount?.positions;
-        if (tdPositions == null)
-        {
-            throw new Exception("Could not find positions in response");
-        }
-
-        var strategies = accounts[0].securitiesAccount?.orderStrategies;
-        if (strategies == null)
-        {
-            throw new Exception("Could not find order strategies in response");
-        }
-
+        var tdPositions = (accounts[0].securitiesAccount?.positions)
+            ?? throw new Exception("Could not find positions in response");
+        var strategies = (accounts[0].securitiesAccount?.orderStrategies)
+            ?? throw new Exception("Could not find order strategies in response");
         var orders = strategies.Select(o => new Order
         {
             Date = o.closeTime == null ? null : DateTimeOffset.Parse(o.closeTime),
@@ -385,7 +377,7 @@ public class TDAmeritradeClient : IBrokerage
             return new ServiceResponse<core.Adapters.Options.OptionChain>(chainResponse.Error!);
         }
 
-        IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map) =>
+        static IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map) =>
             map.SelectMany(kp => kp.Value.Values).SelectMany(v => v)
             .Select(d => new OptionDetail {
                 Ask = d.ask,
@@ -497,7 +489,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (payload.Length == 0)
         {
-            _logger?.LogError($"No candles for historcal prices for {function}");
+            _logger?.LogError("No candles for historcal prices for {function}", function);
         }
 
         return new ServiceResponse<PriceBar[]>(payload);
@@ -529,7 +521,7 @@ public class TDAmeritradeClient : IBrokerage
         };
     }
 
-    private string GetBuyOrderType(BrokerageOrderType type) =>
+    private static string GetBuyOrderType(BrokerageOrderType type) =>
         type switch {
             BrokerageOrderType.Limit => "LIMIT",
             BrokerageOrderType.Market => "MARKET",
@@ -537,7 +529,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + type)
         };
 
-    private decimal? GetPrice(BrokerageOrderType type, decimal? price) =>
+    private static decimal? GetPrice(BrokerageOrderType type, decimal? price) =>
         type switch {
             BrokerageOrderType.Limit => price,
             BrokerageOrderType.Market => null,
@@ -545,7 +537,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + type)
         };
 
-    private decimal? GetActivationPrice(BrokerageOrderType type, decimal? price) =>
+    private static decimal? GetActivationPrice(BrokerageOrderType type, decimal? price) =>
         type switch {
             BrokerageOrderType.Limit => null,
             BrokerageOrderType.Market => null,
@@ -553,7 +545,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + type)
         };
 
-    private string GetBuyOrderDuration(BrokerageOrderDuration duration) =>
+    private static string GetBuyOrderDuration(BrokerageOrderDuration duration) =>
         duration switch {
             BrokerageOrderDuration.Day => "DAY",
             BrokerageOrderDuration.Gtc => "GOOD_TILL_CANCEL",
@@ -562,7 +554,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
-    private string GetSession(BrokerageOrderDuration duration) =>
+    private static string GetSession(BrokerageOrderDuration duration) =>
         duration switch {
             BrokerageOrderDuration.Day => "NORMAL",
             BrokerageOrderDuration.Gtc => "NORMAL",
@@ -579,9 +571,9 @@ public class TDAmeritradeClient : IBrokerage
 
             if (debug)
             {
-                _logger?.LogError("debug function: " + function);
-                _logger?.LogError("debug response code: " + response.StatusCode);
-                _logger?.LogError("debug response output: " + content);
+                _logger?.LogError("debug function: {function}", function);
+                _logger?.LogError("debug response code: {statusCode}", response.StatusCode);
+                _logger?.LogError("debug response output: {content}", content);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -595,17 +587,13 @@ public class TDAmeritradeClient : IBrokerage
                 return new ServiceResponse<T>(new ServiceError(error.error));
             }
 
-            var deserialized = JsonSerializer.Deserialize<T>(content);
-            if (deserialized == null)
-            {
-                throw new Exception($"Could not deserialize response for {function}: {content}");
-            }
-
+            var deserialized = JsonSerializer.Deserialize<T>(content)
+                ?? throw new Exception($"Could not deserialize response for {function}: {content}");
             return new ServiceResponse<T>(deserialized);
         }
         catch (TimeoutRejectedException e)
         {
-            _logger?.LogError(e, $"Failed to call {function}");
+            _logger?.LogError(e, "Failed to call {function}", function);
 
             return new ServiceResponse<T>(new ServiceError(e.Message));
         }
@@ -626,7 +614,7 @@ public class TDAmeritradeClient : IBrokerage
                     request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json");
                 }
                 var response = await _httpClient.SendAsync(request, ct);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync(ct);
 
                 // NOTE: even though I have rate limiting set above, and it's throttled to be
                 // under documented TD Ameritrade limits, I still get this error sometimes.
@@ -652,11 +640,12 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<OAuthResponse> GetAccessToken(UserState user)
     {
-        if (!_accessTokens.ContainsKey(user.Id) || _accessTokens[user.Id].IsExpired)
+        if (!_accessTokens.TryGetValue(user.Id, out OAuthResponse? value) || value.IsExpired)
         {
-            _accessTokens[user.Id] = await RefreshAccessToken(user);
+            value = await RefreshAccessToken(user);
+            _accessTokens[user.Id] = value;
         }
-        return _accessTokens[user.Id];
+        return value;
     }
 
     private async Task<OAuthResponse> RefreshAccessToken(UserState user)
@@ -676,13 +665,10 @@ public class TDAmeritradeClient : IBrokerage
 
         var responseString = await response.Content.ReadAsStringAsync();
 
-        var deserialized = JsonSerializer.Deserialize<OAuthResponse>(responseString);
-        if (deserialized == null)
-        {
+        var deserialized = JsonSerializer.Deserialize<OAuthResponse>(responseString) ??
             throw new Exception("Could not deserialize access token: " + responseString);
-        }
         return deserialized;
     }
 
-    private string GenerateApiUrl(string function) => $"{_apiUrl}/{function}";
+    private static string GenerateApiUrl(string function) => $"{_apiUrl}/{function}";
 }

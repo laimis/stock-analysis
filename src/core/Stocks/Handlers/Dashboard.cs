@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
@@ -24,8 +23,8 @@ namespace core.Stocks
         public class Handler : HandlerWithStorage<Query, object>,
             INotificationHandler<UserChanged>
         {
-            private IAccountStorage _accounts;
-            private IBrokerage _brokerage;
+            private readonly IAccountStorage _accounts;
+            private readonly IBrokerage _brokerage;
             
             public Handler(
                 IAccountStorage accounts,
@@ -38,17 +37,11 @@ namespace core.Stocks
 
             public override async Task<object> Handle(Query query, CancellationToken cancellationToken)
             {
-                var user = await _accounts.GetUser(query.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
+                var user = await _accounts.GetUser(query.UserId)
+                    ?? throw new Exception("User not found");
+                    
                 var view = await _storage.ViewModel<StockDashboardView>(query.UserId, StockDashboardView.Version);
-                if (view == null)
-                {
-                    view = await LoadFromDb(query.UserId);
-                }
+                view ??= await LoadFromDb(query.UserId);
 
                 var tickers = view.Positions.Select(o => o.Ticker).Distinct();
 
@@ -139,7 +132,7 @@ namespace core.Stocks
                 return violations.OrderBy(v => v.Ticker).ToList();
             }
 
-            private StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, StockQuote> prices)
+            private static StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, StockQuote> prices)
             {
                 foreach(var o in view.Positions)
                 {

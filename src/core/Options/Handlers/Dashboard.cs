@@ -22,8 +22,8 @@ namespace core.Options
         public class Handler : HandlerWithStorage<Query, OptionDashboardView>,
             INotificationHandler<UserChanged>
         {
-            private IAccountStorage _accounts;
-            private IBrokerage _brokerage;
+            private readonly IAccountStorage _accounts;
+            private readonly IBrokerage _brokerage;
 
             public Handler(
                 IAccountStorage accounts,
@@ -37,17 +37,10 @@ namespace core.Options
 
             public override async Task<OptionDashboardView> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await _accounts.GetUser(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
+                var user = await _accounts.GetUser(request.UserId)
+                    ?? throw new Exception("User not found");
                 var view = await _storage.ViewModel<OptionDashboardView>(request.UserId, OptionDashboardView.Version);
-                if (view == null)
-                {
-                    view = await FromDb(user.State);
-                }
+                view ??= await FromDb(user.State);
 
                 var prices = await _brokerage.GetQuotes(
                     user.State,
@@ -60,7 +53,7 @@ namespace core.Options
                 };
             }
 
-            private OptionDashboardView EnrichWithStockPrice(OptionDashboardView view, Dictionary<string, StockQuote> prices)
+            private static OptionDashboardView EnrichWithStockPrice(OptionDashboardView view, Dictionary<string, StockQuote> prices)
             {
                 foreach (var op in view.Open)
                 {
@@ -72,12 +65,8 @@ namespace core.Options
 
             public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
             {
-                var user = await _accounts.GetUser(notification.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
-
+                var user = await _accounts.GetUser(notification.UserId)
+                    ?? throw new Exception("User not found");
                 var view = await FromDb(user.State);
 
                 await _storage.SaveViewModel(notification.UserId, view, OptionDashboardView.Version);
@@ -100,9 +89,9 @@ namespace core.Options
                     .OrderByDescending(o => o.FirstFill);
 
                 var brokeragePositions = await _brokerage.GetAccount(user);
-                var positions = brokeragePositions.IsOk ?
-                    brokeragePositions.Success.OptionPositions
-                    .Where(p => !openOptions.Any(oo => oo.Ticker == p.Ticker)) : new List<OptionPosition>();
+                var positions = brokeragePositions.Success?.OptionPositions?.Where(
+                    bp => !openOptions.Any(o => o.Ticker == bp.Ticker && o.StrikePrice == bp.StrikePrice && o.OptionType.ToString() == bp.OptionType)
+                ) ?? Array.Empty<OptionPosition>();
 
                 var view = new OptionDashboardView(
                     closedOptions.Select(o => new OwnedOptionView(o)),

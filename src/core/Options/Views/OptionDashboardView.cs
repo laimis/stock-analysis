@@ -8,7 +8,7 @@ namespace core.Options
 {
     public class OptionDashboardView : IViewModel
     {
-        public static string Version = "1";
+        public const string Version = "1";
         public OptionDashboardView(){}
         public OptionDashboardView(IEnumerable<OwnedOptionView> closed, IEnumerable<OwnedOptionView> open, IEnumerable<OptionPosition> brokeragePositions)
         {

@@ -69,7 +69,7 @@ namespace core.Options
         private decimal PremiumPaid { get; set; }
         public List<string> Notes { get; }
 
-        internal void ApplyInternal(OptionDeleted deleted)
+        internal void ApplyInternal(OptionDeleted _)
         {
             NumberOfContracts = 0;
             Transactions.Clear();

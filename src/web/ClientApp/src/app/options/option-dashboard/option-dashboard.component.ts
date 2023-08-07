@@ -39,4 +39,8 @@ export class OptionsComponent implements OnInit {
   activateTab(tabName:string) {
     this.activeTab = tabName
   }
+
+  refreshPositions() {
+    this.getOptions()
+  }
 }

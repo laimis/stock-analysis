@@ -7,6 +7,7 @@
     <thead>
       <tr>
         <th>Ticker</th>
+        <th>Strike</th>
         <th>Type</th>
         <th>Cost</th>
         <th>Quantity</th>
@@ -22,6 +23,7 @@
           {{option.ticker}}
           <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
         </td>
+        <td>{{option.strikePrice | currency}}</td>
         <td>{{option.optionType}}</td>
         <td>{{option.averageCost | currency}}</td>
         <td>{{option.quantity | number}}</td>

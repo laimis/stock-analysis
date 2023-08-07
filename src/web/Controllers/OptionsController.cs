@@ -15,7 +15,7 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class OptionsController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public OptionsController(IMediator mediator)
         {
