@@ -33,7 +33,7 @@
       </div>
       <div class="col" >
         <label for="brokerageOrderType" class="form-label">Order Type</label>
-        <select class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType">
+        <select class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType" (ngModelChange)="brokerageOrderTypeChanged()">
           <option value="Limit">Limit</option>
           <option value="Market">Market</option>
           <option value="StopMarket">StopMarket</option>
@@ -42,10 +42,7 @@
       <div class="col" >
         <label for="brokerageOrderDuration" class="form-label">Order Duration</label>
         <select class="form-select" [(ngModel)]="brokerageOrderDuration" id="brokerageOrderDuration">
-          <option value="Day">Day</option>
-          <option value="Gtc">GTC</option>
-          <option value="DayPlus">Day+AH</option>
-          <option value="GtcPlus">GTC+AH</option>
+          <option *ngFor="let duration of orderDurations" [value]="duration.key">{{duration.value}}</option>
         </select>
       </div>
     </div>

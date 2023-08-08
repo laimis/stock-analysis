@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { brokerageordercommand, StockQuote, StocksService } from 'src/app/services/stocks.service';
+import { brokerageordercommand, KeyValuePair, StockQuote, StocksService } from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
 
 
@@ -11,8 +11,8 @@ import { GetErrors } from '../services/utils';
 })
 export class BrokerageNewOrderComponent {
 
-  brokerageOrderDuration : string = 'GtcPlus'
-  brokerageOrderType : string = 'Limit'
+  brokerageOrderDuration : string
+  brokerageOrderType : string
   numberOfShares : number | null = null
   price : number | null = null
   ticker : string
@@ -20,9 +20,26 @@ export class BrokerageNewOrderComponent {
   total: number | null = null
   errorMessage: string | null = null;
 
+  private marketOrderTypes: KeyValuePair[] = [
+    { key: 'Day', value: 'Day' },
+    { key: 'Gtc', value: 'GTC' }
+  ]
+  private nonMarketOrderTypes: KeyValuePair[] = [
+    { key: 'Day', value: 'Day' },
+    { key: 'Gtc', value: 'GTC' },
+    { key: 'DayPlus', value: 'Day+AH' },
+    { key: 'GtcPlus', value: 'GTC+AH' }
+  ]
+
+  orderDurations: KeyValuePair[]
+
   constructor(
     private stockService: StocksService
-  ) { }
+  )
+  {
+    this.brokerageOrderType = 'Limit'
+    this.brokerageOrderTypeChanged()
+  }
 
   @Output()
   brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
@@ -32,6 +49,17 @@ export class BrokerageNewOrderComponent {
       this.total = this.numberOfShares * this.price
     } else {
       this.total = null
+    }
+  }
+
+  brokerageOrderTypeChanged() {
+    if (this.brokerageOrderType === 'Market') {
+      this.brokerageOrderDuration = 'GTC'
+      this.orderDurations = this.marketOrderTypes
+    }
+    else {
+      this.brokerageOrderDuration = 'GtcPlus'
+      this.orderDurations = this.nonMarketOrderTypes
     }
   }
 

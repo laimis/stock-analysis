@@ -60,7 +60,7 @@ export class StocksService {
     return this.http.delete(`/api/portfolio/${ticker}/positions/${positionId}`)
   }
 
-  setLabel(ticker: string, positionId: number, label: PositionInstanceLabel): Observable<object> {
+  setLabel(ticker: string, positionId: number, label: KeyValuePair): Observable<object> {
     return this.http.post(`/api/portfolio/${ticker}/positions/${positionId}/labels`, {
       key: label.key,
       value: label.value,
@@ -1062,7 +1062,7 @@ export interface PendingStockPosition {
   strategy: string
 }
 
-export interface PositionInstanceLabel {
+export interface KeyValuePair {
   key: string,
   value: string
 }
@@ -1084,7 +1084,7 @@ export interface PositionInstance {
   isClosed: boolean,
   lastTransaction: string,
   notes: string[],
-  labels: PositionInstanceLabel[],
+  labels: KeyValuePair[],
   numberOfShares: number,
   opened: string,
   price: number,
