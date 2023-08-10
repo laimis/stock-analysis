@@ -11,11 +11,28 @@
     <section>
         <h5>Tools</h5>
         <form>
-            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewSection)">Add ticker</button>
-            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(monitoringSection)" >Monitoring</button>
-            <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
-            <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-2">Export</a>
-            <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
+            <div class="row">
+                <div class="col-6">
+                    <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewSection)">Batch add</button>
+                    <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(monitoringSection)" >Monitoring</button>
+                    <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
+                    <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-2">Export</a>
+                    <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="col-form-label" for="quickAdd">Quick add</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control" id="quickAdd" #quickAdd placeholder="Tickers" type="text">
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-primary" (click)="add(quickAdd.value)">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     </section>
 
