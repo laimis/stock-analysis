@@ -1,6 +1,10 @@
 <div class="mb-3">
   <section>
     <h5>Pending Positions</h5>
+    <!-- export link -->
+    <div class="d-flex justify-content-end">
+      <a class="btn btn-outline-secondary btn-sm" href="/api/portfolio/pendingstockpositions/export">Export</a>
+    </div>
   </section>
   <div>
     <span *ngIf="positions.length === 0">No pending positions found</span>

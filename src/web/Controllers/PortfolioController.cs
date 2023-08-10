@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using core.Portfolio;
 using core.Portfolio.Handlers;
 using core.Portfolio.Views;
-using core.Stocks;
 using core.Stocks.Services.Trading;
+using core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +28,11 @@ namespace web.Controllers
         [HttpGet("pendingstockpositions")]
         public Task<IEnumerable<PendingStockPositionState>> PendingStockPositions() =>
             _mediator.Send(new PendingStockPositionsGet.Query(User.Identifier()));
+
+        
+        [HttpGet("pendingstockpositions/export")]
+        public Task<ActionResult> ExportPendingStockPositions() =>
+            this.GenerateExport(_mediator, new PendingStockPositionsExport.Query(User.Identifier()));
 
         [HttpPost("pendingstockpositions")]
         public Task<PendingStockPositionState> CreatePendingStockPosition([FromBody]PendingStockPositionCreate.Command command)

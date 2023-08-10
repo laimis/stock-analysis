@@ -16,6 +16,7 @@ namespace core
     public class CSVExport
     {
         private const string DATE_FORMAT = "yyyy-MM-dd";
+        private record struct PendingPositionRecord(string ticker, decimal bid, decimal numberOfShares, decimal? stopPrice, string date, string closed, bool purchased, string strategy, string notes);
         private record struct StockRecord(string ticker, string type, decimal amount, decimal price, string date, string notes);
         private record struct NoteRecord(string created, string ticker, string note);
         private record struct OptionRecord(string ticker, string type, decimal strike, string optiontype, string expiration, decimal amount, decimal premium, string filled);
@@ -47,6 +48,23 @@ namespace core
                         )
                     )
                 );
+
+            return writer.Generate(rows);
+        }
+
+        public static string Generate(ICSVWriter writer, IEnumerable<PendingStockPosition> pending)
+        {
+            var rows = pending.Select(p => p.State).Select(p => new PendingPositionRecord(
+                ticker: p.Ticker,
+                bid: p.Bid,
+                numberOfShares: p.NumberOfShares,
+                stopPrice: p.StopPrice,
+                date: p.Date.ToString(DATE_FORMAT),
+                closed: p.Closed?.ToString(DATE_FORMAT),
+                purchased: p.Purchased,
+                strategy: p.Strategy,
+                notes: p.Notes
+            ));
 
             return writer.Generate(rows);
         }
