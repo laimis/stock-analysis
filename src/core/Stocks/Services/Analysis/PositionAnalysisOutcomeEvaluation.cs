@@ -35,7 +35,7 @@ namespace core.Stocks.Services.Analysis
 
             // stocks that have been recently open
             yield return new AnalysisOutcomeEvaluation(
-                $"Opened {RecentlyOpenThreshold} days ago",
+                $"Opened in the last {RecentlyOpenThreshold} days",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
@@ -46,7 +46,7 @@ namespace core.Stocks.Services.Analysis
 
             // stocks that have been opened within two weeks but not recently
             yield return new AnalysisOutcomeEvaluation(
-                $"Opened {WithinTwoWeeksThreshold} days ago",
+                $"Opened in the last {WithinTwoWeeksThreshold} days",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes

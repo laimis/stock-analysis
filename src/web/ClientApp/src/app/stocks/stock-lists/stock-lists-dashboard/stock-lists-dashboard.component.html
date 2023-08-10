@@ -1,8 +1,18 @@
 <div>
     <section>
         <form>
-            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
-            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(lookupTickerSection)">Look up ticker</button>
+            <div class="row">
+                <div class="col-2">
+                    <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
+                </div>
+                <div class="col-2">
+                    <label for="tickerFilter" class="float-end">Filter by ticker</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control" type="text" id="tickerFilter" name="tickerFilter" #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)">
+                </div>
+            </div>
+            
         </form>
     </section>
     <section #addNewListSection class="visually-hidden">
@@ -20,16 +30,6 @@
 
             <button type="button" class="btn btn-primary btn-small" (click)="createList()">Create</button>
         </form>
-    </section>
-
-    <section #lookupTickerSection class="visually-hidden">
-        <h5>Look up ticker in lists</h5>
-        <form>
-            <div class="form-group">
-                <label for="newName">Filter by ticker</label>
-                <input class="form-control" type="text" id="tickerFilter" name="tickerFilter" #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)">
-            </div>
-        </form>    
     </section>
     
     <section>
