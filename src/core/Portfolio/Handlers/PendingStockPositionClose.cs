@@ -37,7 +37,6 @@ namespace core.Portfolio.Handlers
 
             public override async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                // check if there is already a pending position for this ticker
                 var existing = await _storage.GetPendingStockPositions(request.UserId);
                 var found = existing.SingleOrDefault(x => x.State.Id == request.PositionId)
                     ?? throw new Exception("Position not found");

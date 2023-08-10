@@ -53,7 +53,7 @@ namespace core.Portfolio.Handlers
 
                 // check if there is already a pending position for this ticker
                 var existing = await _storage.GetPendingStockPositions(request.UserId);
-                var found = existing.SingleOrDefault(x => x.State.Ticker == new Ticker(request.Ticker));
+                var found = existing.SingleOrDefault(x => x.State.Ticker == new Ticker(request.Ticker) && x.State.IsClosed == false);
                 if (found != null)
                 {
                     throw new Exception("There is already a pending position for this ticker");
