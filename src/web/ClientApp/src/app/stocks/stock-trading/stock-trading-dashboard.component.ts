@@ -20,8 +20,6 @@ export class StockTradingComponent implements OnInit {
   brokerageOrders: BrokerageOrder[];
   cashBalance: number;
 
-  @ViewChild(BrokerageOrdersComponent) brokerageOrdersComponent:BrokerageOrdersComponent;
-  
   constructor(
     private stockService:StocksService,
     private title: Title,
@@ -46,11 +44,6 @@ export class StockTradingComponent implements OnInit {
   stockPurchased() {
     this.loadEntries()
     this.activateTab('positions')
-  }
-
-  brokerageOrderEntered() {
-    this.activateTab('brokerage')
-    this.brokerageOrdersComponent.refreshOrders()
   }
 
   orderExecuted() {

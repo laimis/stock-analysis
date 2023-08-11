@@ -14,9 +14,6 @@
     <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]="" (click)="activateTab('openreview')">
       Open Review
     </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]="" (click)="activateTab('brokerage')">
-      Brokerage
-    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
       Analysis
     </a>
@@ -36,8 +33,6 @@
   </div>
   
   <app-stock-trading-positions    *ngIf="isActive('positions')" [positions]=positions [orders]="brokerageOrders"></app-stock-trading-positions>
-  <app-brokerage-neworder     *ngIf="isActive('brokerage')" (brokerageOrderEntered)="brokerageOrderEntered()"></app-brokerage-neworder>
-  <app-brokerage-orders       *ngIf="isActive('brokerage')" (orderExecuted)="orderExecuted()"></app-brokerage-orders>
   <app-stock-trading-open-positions *ngIf="isActive('openreview')" [orders]="brokerageOrders" [positions]=positions></app-stock-trading-open-positions>
   <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
   <app-stock-trading-outcomes-reports       *ngIf="isActive('analysis')" [allTimeMode]="true" [positions]="positions"></app-stock-trading-outcomes-reports>
