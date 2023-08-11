@@ -2,7 +2,6 @@ import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core
 import { StocksService, StockDetails, StockOwnership, PositionInstance } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
-import { GetErrors } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-ownership',
@@ -58,6 +57,10 @@ export class StockOwnershipComponent {
 
   brokerageOrderEntered() {
     this.brokerageOrders.refreshOrders()
+  }
+
+  brokerageOrderExecuted() {
+    this.ownershipChanged.emit('orders')
   }
 
   transactionRecorded(type:string) {
