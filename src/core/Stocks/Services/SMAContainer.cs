@@ -17,7 +17,7 @@ namespace core.Stocks.Services
         public decimal?[] Values { get; }
         public string Description => $"SMA {Interval}";
 
-        public decimal? LastValue => Values?.Last();
+        public decimal? LastValue => Values?.LastOrDefault();
     }
 
     public class SMAContainer

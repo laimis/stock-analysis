@@ -34,19 +34,22 @@ namespace core.Stocks.Services.Analysis
             
             var outcomes = new SMAAnalysis().Run(price, bars[..^1]);
 
-            var sma20above50outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
+            var sma20above50outcome = outcomes.SingleOrDefault(x => x.key == MultipleBarOutcomeKeys.SMA20Above50Days);
 
-            yield return new AnalysisOutcome(
-                SingleBarOutcomeKeys.SMA20Above50Days,
-                sma20above50outcome.type,
-                sma20above50outcome.value,
-                sma20above50outcome.valueType,
-                sma20above50outcome.message
-            );
+            if (sma20above50outcome != null)
+            {
+                yield return new AnalysisOutcome(
+                    SingleBarOutcomeKeys.SMA20Above50Days,
+                    sma20above50outcome.type,
+                    sma20above50outcome.value,
+                    sma20above50outcome.valueType,
+                    sma20above50outcome.message
+                );
+            }
 
             // % difference between sma 20 and price
-            var sma20outcome = outcomes.Single(x => x.key == MultipleBarOutcomeKeys.SMA(20));
-            if (sma20outcome.value != 0)
+            var sma20outcome = outcomes.SingleOrDefault(x => x.key == MultipleBarOutcomeKeys.SMA(20));
+            if (sma20outcome != null && sma20outcome.value != 0)
             {
                 var pctDiff = (price - sma20outcome.value) / sma20outcome.value;
 
@@ -65,6 +68,7 @@ namespace core.Stocks.Services.Analysis
     {
         public IEnumerable<AnalysisOutcome> Analyze(PriceBar[] bars)
         {
+
             var currentBar = bars[^1];
             var previousBars = bars[..^1];
 
@@ -94,23 +98,53 @@ namespace core.Stocks.Services.Analysis
                 valueType: Shared.ValueFormat.Percentage,
                 message: $"Closing range is {range}.");
 
-            // use yesterday's close as reference
-            var yesterday = previousBars[^1];
+            if (previousBars.Length > 0)
+            {
+                // use yesterday's close as reference
+                var yesterday = previousBars[^1];
 
-            // today's change from yesterday's close
-            var percentChange = (currentBar.Close - yesterday.Close) / yesterday.Close;
+                // today's change from yesterday's close
+                var percentChange = (currentBar.Close - yesterday.Close) / yesterday.Close;
 
-            // add change as outcome
-            yield return new AnalysisOutcome(
-                key: SingleBarOutcomeKeys.PercentChange,
-                type: percentChange >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
-                value: percentChange,
-                valueType: Shared.ValueFormat.Percentage,
-                message: $"% change from close is {percentChange}.");
+                // add change as outcome
+                yield return new AnalysisOutcome(
+                    key: SingleBarOutcomeKeys.PercentChange,
+                    type: percentChange >= 0m ? OutcomeType.Positive : OutcomeType.Negative,
+                    value: percentChange,
+                    valueType: Shared.ValueFormat.Percentage,
+                    message: $"% change from close is {percentChange}.");
 
-            // true range uses the previous close as reference
-            var trueHigh = Math.Max(currentBar.High, yesterday.Close);
-            var trueLow = Math.Min(currentBar.Low, yesterday.Close);
+                // generate percent change statistical data for recent days
+                var descriptor = NumberAnalysis.PercentChanges(
+                    previousBars.Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                    .Select(x => x.Close)
+                    .ToArray());
+
+                // for some price feeds, price has finished changing, so mean and
+                // stdev will be 0, we need to check for that so that we don't divide by 0
+                var sigmaRatioDenominotor = percentChange switch {
+                    >=0 => descriptor.mean + descriptor.stdDev,
+                    <0 => descriptor.mean - descriptor.stdDev
+                };    
+                var sigmaRatio = sigmaRatioDenominotor == 0 ? 0 :  percentChange switch {
+                    >=0 => percentChange / sigmaRatioDenominotor,
+                    <0 => -1m * (percentChange / sigmaRatioDenominotor)
+                };
+
+                sigmaRatio = Math.Round(sigmaRatio, 2);
+
+                // add sigma ratio as outcome
+                yield return new AnalysisOutcome(
+                    key: SingleBarOutcomeKeys.SigmaRatio,
+                    type: sigmaRatio switch {
+                        > 1m => OutcomeType.Positive,
+                        < -1m => OutcomeType.Negative,
+                        _ => OutcomeType.Neutral
+                    },
+                    value: sigmaRatio,
+                    valueType: Shared.ValueFormat.Number,
+                    message: $"Sigma ratio is {sigmaRatio}.");
+            }
 
             // see if there was a gap down or gap up
             var gaps = GapAnalysis.Generate(
@@ -188,37 +222,6 @@ namespace core.Stocks.Services.Analysis
                 value: newLow ? -1m : 0m,
                 valueType: Shared.ValueFormat.Boolean,
                 message: $"New low reached");
-
-            // generate percent change statistical data for recent days
-            var descriptor = NumberAnalysis.PercentChanges(
-                previousBars.Last(SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
-                .Select(x => x.Close)
-                .ToArray());
-
-            // for some price feeds, price has finished changing, so mean and
-            // stdev will be 0, we need to check for that so that we don't divide by 0
-            var sigmaRatioDenominotor = percentChange switch {
-                >=0 => descriptor.mean + descriptor.stdDev,
-                <0 => descriptor.mean - descriptor.stdDev
-            };    
-            var sigmaRatio = sigmaRatioDenominotor == 0 ? 0 :  percentChange switch {
-                >=0 => percentChange / sigmaRatioDenominotor,
-                <0 => -1m * (percentChange / sigmaRatioDenominotor)
-            };
-
-            sigmaRatio = Math.Round(sigmaRatio, 2);
-
-            // add sigma ratio as outcome
-            yield return new AnalysisOutcome(
-                key: SingleBarOutcomeKeys.SigmaRatio,
-                type: sigmaRatio switch {
-                    > 1m => OutcomeType.Positive,
-                    < -1m => OutcomeType.Negative,
-                    _ => OutcomeType.Neutral
-                },
-                value: sigmaRatio,
-                valueType: Shared.ValueFormat.Number,
-                message: $"Sigma ratio is {sigmaRatio}.");
         }
     }
 
