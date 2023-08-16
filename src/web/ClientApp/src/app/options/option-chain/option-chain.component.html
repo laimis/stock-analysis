@@ -13,9 +13,10 @@
           <tr>
             <th>Stock Price</th>
             <th>Volatility</th>
-            <th>NumberOfContracts</th>
-            <th>Put vs Call</th>
-            <th>Put vs Call Ratio</th>
+            <th>Put vs Call OI</th>
+            <th>Put vs Call OI Ratio</th>
+            <th>Put vs Call Vol</th>
+            <th>Put vs Call Vol Ratio</th>
           </tr>
         </thead>
         <tbody>
@@ -23,9 +24,10 @@
             <td>
               <app-stock-link [ticker]="ticker"></app-stock-link> - {{ stockPrice | currency }}</td>
             <td>{{volatility}}</td>
-            <td>{{numberOfContracts}}</td>
-            <td>{{putOpenInterest()}} vs {{callOpenInterest()}}</td>
+            <td>{{putOpenInterest() | number}} vs {{callOpenInterest() | number}}</td>
             <td>{{putOpenInterest() / callOpenInterest() | number }}</td>
+            <td>{{putVolume() | number}} vs {{callVolume() | number}}</td>
+            <td>{{putVolume() / callVolume() | number }}</td>
           </tr>
         </tbody>
       </table>
@@ -112,7 +114,11 @@
               <td>{{option.openInterest}}</td>
               <td>{{option.volume}}</td>
               <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
-              <td>{{option.spread | currency}}</td>
+              <td>
+                <i *ngIf="isSpreadHealthy(option)" class="bi bi-diamond-fill text-success"></i>
+                <i *ngIf="!isSpreadHealthy(option)" class="bi bi-diamond text-muted"></i>
+                {{option.spread | currency}}
+              </td>
               <td>{{option.perDayPrice | currency}}</td>
               <td>{{option.risk | percent}}</td>
               <td>{{option.lastUpdated | date}}</td>

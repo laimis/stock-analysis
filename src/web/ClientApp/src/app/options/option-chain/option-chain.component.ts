@@ -65,6 +65,14 @@ export class OptionChainComponent implements OnInit {
     return this.options.filter(x => x.optionType == "call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
   }
 
+  putVolume() {
+    return this.options.filter(x => x.optionType == "put").map(x => x.volume).reduce((a, b) => a + b, 0)
+  }
+
+  callVolume() {
+    return this.options.filter(x => x.optionType == "call").map(x => x.volume).reduce((a, b) => a + b, 0)
+  }
+
   runFilter() {
     console.log("running filter")
     console.log("expiration: " + this.expirationSelection)
@@ -180,5 +188,9 @@ export class OptionChainComponent implements OnInit {
 
   getOptionsForExpiration(expiration: string) {
     return this.options.filter(x => x.expirationDate == expiration)
+  }
+
+  isSpreadHealthy(option: OptionDefinition) {
+    return option.bid > 0 && option.ask > 0 && ( (option.ask - option.bid)/option.ask <= 0.1 )
   }
 }
