@@ -47,6 +47,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
         _portfolioStorage = portfolioStorage;
         _marketHours = marketHours;
         _toRun = LoadTickersToCheck;
+        _sleepCalculation = AfterMarketCloseOnFriday;
     }
 
     protected override TimeSpan GetSleepDuration() => _sleepCalculation();
@@ -66,6 +67,16 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
     private async Task LoadTickersToCheck(CancellationToken stoppingToken)
     {
+        // if it's not Friday after market close, then we don't need to do anything
+        if (_marketHours.ToMarketTime(DateTimeOffset.UtcNow).DayOfWeek != DayOfWeek.Friday)
+        {
+            _logger.LogInformation("Not Friday, skipping weekly upside check");
+            
+            _toRun = LoadTickersToCheck;
+            _sleepCalculation = AfterMarketCloseOnFriday;
+            return;
+        }
+
         var pairs = await _accounts.GetUserEmailIdPairs();
 
         _tickersToCheck.Clear();
