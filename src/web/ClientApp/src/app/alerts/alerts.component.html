@@ -50,8 +50,8 @@
         <tbody>
           <tr *ngFor="let alert of g" 
             [ngClass]="{
-              'bg-warning': alert.alertType === 'Negative',
-              'bg-success': alert.alertType === 'Positive',
+              'table-warning': alert.alertType === 'Negative',
+              'table-success': alert.alertType === 'Positive',
               'text-white': alert.alertType === 'Positive'
             }">
             <td>

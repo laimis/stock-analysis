@@ -67,16 +67,12 @@
         (click)="toggleShowNotes(i)"
         style="cursor: pointer"
         [ngClass]="{
-          'bg-success':p.grade === 'A',
-          'bg-negative':p.grade === 'C',
-          'text-white': p.grade === 'A' || p.grade === 'C'
+          'table-success':p.grade === 'A',
+          'table-warning':p.grade === 'C',
         }">
         <td>{{i + 1}}</td>
         <td>
-          <a [routerLink]="[ '/stocks', p.ticker ]"
-            [ngClass]="{
-              'text-white': p.grade === 'A' || p.grade === 'C'
-            }">{{p.ticker}}</a>
+          <app-stock-link [ticker]="p.ticker"></app-stock-link>
           <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
         </td>
         <td>{{p.opened | date}}</td>
