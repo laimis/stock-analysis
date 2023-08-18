@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using secedgar;
+using securityutils;
 using storage.shared;
 using web.BackgroundServices;
 using web.Utils;

@@ -37,6 +37,7 @@
     <ProjectReference Include="..\infrastructure\tdameritradeclient\tdameritradeclient.csproj" />
     <ProjectReference Include="..\infrastructure\timezonesupport\timezonesupport.csproj" />
     <ProjectReference Include="..\infrastructure\secedgar\secedgar.csproj" />
+    <ProjectReference Include="..\infrastructure\securityutils\securityutils.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

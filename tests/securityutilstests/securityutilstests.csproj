@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\web\web.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\securityutils\securityutils.csproj" />
   </ItemGroup>
 
 </Project>
