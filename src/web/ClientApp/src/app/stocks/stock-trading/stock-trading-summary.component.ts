@@ -54,6 +54,8 @@ export class StockTradingSummaryComponent {
         return (a, b) => b.risk - a.risk
       case 'profit':
         return (a, b) => b.profit - a.profit
+      case 'gain':
+        return (a, b) => b.profit / b.cost - a.profit / a.cost
       default:
         return (a, b) => b.strategy.localeCompare(a.strategy)
     }

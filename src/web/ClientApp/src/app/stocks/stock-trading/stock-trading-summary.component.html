@@ -50,6 +50,7 @@
         <th class="sort-header" (click)="sort('cost')">Invested</th>
         <th class="sort-header" (click)="sort('risk')">Risked</th>
         <th class="sort-header" (click)="sort('numberOfPositions')">Positions</th>
+        <th class="sort-header" (click)="sort('gain')">Gain %</th>
       </tr>
     </thead>
     <tbody>
@@ -59,6 +60,7 @@
         <td>{{ positionGroup.cost | currency }}</td>
         <td>{{ positionGroup.risk | currency }}</td>
         <td>{{positionGroup.length}}</td>
+        <td>{{ (positionGroup.profit / positionGroup.cost) | percent:'1.0-2' }}</td>
       </tr>
     </tbody>
   </table>
