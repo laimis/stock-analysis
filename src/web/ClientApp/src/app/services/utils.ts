@@ -37,14 +37,19 @@ export function GetErrors(err:any): string[] {
 // export an array of key value pairs representing strategies
 export function GetStrategies(): { key: string, value: string }[] {
     return [
+        { key: "channelbottom", value: "Channel Bottom" },
+        { key: "leadingindustry", value: "Leading Industry" },
+        { key: "longterm", value: "Long Term" },
+        { key: "longterminterest", value: "Long Term Interest" },
         { key: "newhigh", value: "New High" },
-        { key: "resistancebreakthrough", value: "Resistance Breakthrough" },
         { key: "newhighpullback", value: "New High Pullback" },
-        { key: "recovery", value: "Recovery" },
         { key: "postearnings", value: "Post Earnings" },
         { key: "postearningsnewhigh", value: "Post Earnings New High" },
-        { key: "longterm", value: "Long Term" },
-        { key: "leadingindustry", value: "Leading Industry" },
-        { key: "channelbottom", value: "Channel Bottom" }
+        { key: "recovery", value: "Recovery" },
+        { key: "resistancebreakthrough", value: "Resistance Breakthrough" },
     ]
+}
+
+export function isLongTermStrategy(strategy:string) {
+    return strategy === "longterm" || strategy === "longterminterest"
 }

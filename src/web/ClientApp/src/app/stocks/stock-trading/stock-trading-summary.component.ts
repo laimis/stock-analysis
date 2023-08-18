@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { PositionInstance } from 'src/app/services/stocks.service';
+import { isLongTermStrategy } from 'src/app/services/utils';
 
 interface PositionGroup {
   strategy: string;
@@ -92,7 +93,7 @@ export class StockTradingSummaryComponent {
     }, {})
 
     // all all positions whose strategy is "shortterm"
-    strategyGroups["allbutlongterm"] = positions.filter(p => this.getStrategy(p) !== "longterm")
+    strategyGroups["allbutlongterm"] = positions.filter(p => !isLongTermStrategy(this.getStrategy(p)))
 
     let groupsArray = []
 

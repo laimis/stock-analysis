@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
+import { GetStrategies, isLongTermStrategy, toggleVisuallyHidden } from 'src/app/services/utils';
 import { BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StocksService } from '../../services/stocks.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 
@@ -36,7 +36,13 @@ export class StockTradingPositionsComponent {
         )
         this.strategies.push({key: "all", value: "All - " + input.length})
 
-        let longTermPositions = input.filter(i => this.matchesStrategyCheck(i, "longterm"))
+        let longTermPositions = input.filter(
+            (p) => {
+                let strategy = p.labels.find(l => l.key == 'strategy')
+                return strategy && isLongTermStrategy(strategy.value)
+            }
+        )
+        
         this.strategies.push({key: this.NO_LONG_TERM_STRATEGY, value: "All minus long term - " + (input.length - longTermPositions.length)})
         this.strategies = this.strategies.concat(
             stratsWithCounts
@@ -195,9 +201,6 @@ export class StockTradingPositionsComponent {
     }
 
     matchesStrategyCheck(p:PositionInstance, strategy:string) {
-        if (strategy === "all") {
-            return true
-        }
         return p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
     }
 
@@ -212,14 +215,22 @@ export class StockTradingPositionsComponent {
             }
             return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
         })
-
-        if (this.strategyToFilter !== "all") {
-            if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
-                positions = positions.filter(p => !this.matchesStrategyCheck(p, "longterm"))
-            } else {
-                positions = positions.filter(this.matchesStrategy)
+        .filter(p => {
+            if (this.strategyToFilter === "all") {
+                return true
             }
-        }
+            
+            let positionStrategy = p.labels.find(l => l.key === "strategy")
+            if (!positionStrategy) {
+                return false
+            }
+
+            if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
+                return !isLongTermStrategy(positionStrategy.value)
+            }
+
+            return positionStrategy.value === this.strategyToFilter
+        })
 
         this.sortedPositions = positions
     }
