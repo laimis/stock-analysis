@@ -44,7 +44,7 @@ namespace core.Stocks.Services.Analysis
             {
                 var bar = bars[i];
 
-                var currentPrice = bar.Close;
+                var currentPrice = bar.High;
                 var currentGainPct = (currentPrice - costBasis) / costBasis * 100;
                 var currentProfit = shares * (currentPrice - costBasis);
 

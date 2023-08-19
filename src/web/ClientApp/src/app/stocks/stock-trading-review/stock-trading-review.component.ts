@@ -29,7 +29,6 @@ export class StockTradingReviewComponent implements OnInit {
     private title: Title) { }
 
   ngOnInit(): void {
-    this.title.setTitle("Trading Review - Nightingale Trading")
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
         this.positions = r.past
         this.orders = r.brokerageOrders
@@ -52,6 +51,11 @@ export class StockTradingReviewComponent implements OnInit {
 
     this.runTradingStrategies();
     this.fetchPrice();
+    this.setTitle();
+  }
+
+  private setTitle() {
+    this.title.setTitle(`Trading Review - ${this.currentPosition.ticker} - Nightingale Trading`)
   }
 
   private fetchPrice() {
