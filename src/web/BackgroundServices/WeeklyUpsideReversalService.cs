@@ -67,11 +67,21 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
     private async Task LoadTickersToCheck(CancellationToken stoppingToken)
     {
-        // if it's not Friday after market close, then we don't need to do anything
-        if (_marketHours.ToMarketTime(DateTimeOffset.UtcNow).DayOfWeek != DayOfWeek.Friday)
+        bool FridayOrWeekend()
         {
-            _logger.LogInformation("Not Friday, skipping weekly upside check");
-            
+            return _marketHours.ToMarketTime(DateTimeOffset.UtcNow).DayOfWeek switch {
+                DayOfWeek.Friday => true,
+                DayOfWeek.Saturday => true,
+                DayOfWeek.Sunday => true,
+                _ => false
+            };
+        }
+
+        // if it's not Friday or weekend, then we don't need to do anything
+        if (!FridayOrWeekend())
+        {
+            _logger.LogInformation("Not a Friday/Weekend, skipping weekly upside check");
+
             _toRun = LoadTickersToCheck;
             _sleepCalculation = AfterMarketCloseOnFriday;
             return;
@@ -81,7 +91,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
         _tickersToCheck.Clear();
 
-        foreach(var (email, id) in pairs)
+        foreach (var (email, id) in pairs)
         {
             if (stoppingToken.IsCancellationRequested)
             {
@@ -110,7 +120,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
                 _tickersToCheck[user.State] = set;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("Failed to process weekly upsde check {email}: {exception}", email, ex);
             }
