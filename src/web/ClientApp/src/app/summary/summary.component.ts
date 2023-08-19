@@ -11,7 +11,6 @@ export class SummaryComponent implements OnInit {
   result: ReviewList
   loaded: boolean = false
   timePeriod: string = 'thisweek'
-  gradeAssigned: string;
 
   constructor(
     private stockService:StocksService,
@@ -19,7 +18,7 @@ export class SummaryComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.title.setTitle("Review - Nightingale Trading")
+    this.title.setTitle("Weekly Summary - Nightingale Trading")
     this.loadEntries()
   }
 
@@ -56,17 +55,6 @@ export class SummaryComponent implements OnInit {
 
   sells(positionInstance:PositionInstance) {
     return positionInstance.transactions.filter(t => t.type == 'sell')
-  }
-
-  assignGrade(position:PositionInstance, grade:string, note:string) {
-    this.stockService.assignGrade(position.ticker, position.positionId, grade, note).subscribe(_ => {
-      this.gradeAssigned = position.ticker + position.positionId
-
-      // flip gradeAssigned to false in 3 seconds
-      setTimeout(() => {
-        this.gradeAssigned = null
-      }, 3000)
-    })
   }
 }
 

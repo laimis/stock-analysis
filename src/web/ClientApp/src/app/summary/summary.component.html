@@ -49,24 +49,12 @@
       </div>
     </div>
     <div class="mb-3">
-      <div class="alert alert-success" role="alert" *ngIf="gradeAssigned === (p.ticker + p.positionId) ">
-        Grade saved
-      </div>
       <label for="gradeInput" class="form-label">Grade</label>
-      <select #grade class="form-select" id="gradeInput" [(ngModel)]="p.grade">
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-      </select>
+      <div class="h1">{{p.grade}}</div>
     </div>
     <div class="mb-3">
-      <label for="notesInput" class="form-label">Note for Grade</label>
-      <textarea #notes class="form-control" id="notesInput" rows="3" [value]="p.gradeNote"></textarea>
-    </div>
-    <div class="mb-5">
-      <div>
-        <button (click)="assignGrade(p, grade.value, notes.value)" class="btn btn-primary">Submit</button>
-      </div>
+      <label class="form-label">Note for Grade</label>
+      <div>{{p.gradeNote}}</div>
     </div>
   </ng-container>
 
