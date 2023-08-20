@@ -10,8 +10,9 @@
         </button>
     </h3>
     <h3 #routineEditSection class="visually-hidden">
-        <input type="text" #routineName value="{{routine.name}}">
-        <button (click)="toggleVisibility(routineEditSection); updateRoutine(routine, routineName.value); toggleVisibility(routineReadonlySection);">save</button>
+        <input class="form-control" type="text" #routineName value="{{routine.name}}">
+        <button class="me-2 btn btn-primary btn-sm" (click)="toggleVisibility(routineEditSection); updateRoutine(routine, routineName.value); toggleVisibility(routineReadonlySection);">save</button>
+        <button class="me-2 btn btn-secondary btn-sm" (click)="toggleVisibility(routineEditSection); toggleVisibility(routineReadonlySection);">cancel</button>
     </h3>
     <div>
         <button class="btn btn-primary btn-sm me-2" (click)="activate(routine)">Activate</button>
@@ -29,7 +30,8 @@
                     <input class="form-control" type="text" id="stepUrl" name="stepUrl" #stepUrl>
                 </div>
     
-                <button type="button" class="btn btn-primary btn-small" (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility(addNewStepSection)">Add</button>
+                <button type="button" class="btn btn-primary btn-sm me-2" (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility(addNewStepSection)">Add</button>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="toggleVisibility(addNewStepSection)">Cancel</button>
             </form>
         </div>
     </div>
