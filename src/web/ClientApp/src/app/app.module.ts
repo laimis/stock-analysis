@@ -91,6 +91,7 @@ import { StockTradingSummaryComponent } from './stocks/stock-trading/stock-tradi
 import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.component';
 import { OptionBrokeragePositionsComponent } from './options/option-dashboard/option-brokerage-positions.component';
 import { StockLinkComponent } from './shared/stocks/stock-link.component';
+import { RoutineComponent } from './routines/routines-routine.component';
 
 
 var routes: Routes = [
@@ -151,6 +152,7 @@ var routes: Routes = [
   { path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard]},
 
   { path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard]},
+  { path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard]},
 
   { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
@@ -247,12 +249,14 @@ var routes: Routes = [
     StockTradingPendingPositionsComponent,
     StockSECFilingsComponent,
     StockTradingAnalysisDashboardComponent,
-    RoutineDashboardComponent,
     StockTradingStrategiesComponent,
     TradingViewLinkComponent,
     StockLinkComponent,
 
-    OptionBrokeragePositionsComponent
+    OptionBrokeragePositionsComponent,
+
+    RoutineDashboardComponent,
+    RoutineComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

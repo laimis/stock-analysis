@@ -1,4 +1,4 @@
-<div *ngIf="!activeRoutine">
+<div>
     <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
     <section>
@@ -19,135 +19,20 @@
                 <textarea class="form-control" id="newDescription" name="newDescription" rows="5" #newDescription></textarea>
             </div>
 
-            <button type="button" class="btn btn-primary btn-small" (click)="create(newName.value, newDescription.value)">Create</button>
+            <button type="button" class="btn btn-primary btn-small me-2" (click)="create(newName.value, newDescription.value)">Create</button>
+            <button type="button" class="btn btn-secondary btn-small" (click)="toggleVisibility(addNewRoutineSection)">Cancel</button>
         </form>
     </section>
 
     <section *ngFor="let routine of routines">
-        <h3 #routineReadonlySection>
-            {{routine.name}}
-            <button
-                class="btn btn-sm mb-2"
-                (click)="toggleVisibility(routineEditSection); toggleVisibility(routineReadonlySection)">
-                <i class="bi bi-pencil"></i>
-            </button>
+        <h3>{{routine.name}}
+            <a class="btn btn-primary btn-sm me-2" [routerLink]="['/routines', routine.name, 'activate']">
+                <i class="bi bi-caret-right-square-fill"></i>
+            </a>
+            <a class="btn btn-primary btn-sm" [routerLink]="['/routines', routine.name, 'edit']">
+                <i class="bi bi-pencil-fill"></i>
+            </a>
         </h3>
-        <h3 #routineEditSection class="visually-hidden">
-            <input type="text" #routineName value="{{routine.name}}">
-            <button (click)="toggleVisibility(routineEditSection); updateRoutine(routine, routineName.value); toggleVisibility(routineReadonlySection);">save</button>
-        </h3>
-        <div>
-            <button class="btn btn-primary btn-sm me-2" (click)="activate(routine)">Activate</button>
-            <button class="btn btn-primary btn-sm" (click)="toggleVisibility(addNewStepSection)">Add Step</button>
-
-            <div #addNewStepSection class="visually-hidden">
-                <form>
-                    <div class="form-group">
-                        <label for="stepLebal">Label</label>
-                        <input class="form-control" type="text" id="stepLebal" name="stepLebal" #stepLabel>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="stepUrl">Url</label>
-                        <input class="form-control" type="text" id="stepUrl" name="stepUrl" #stepUrl>
-                    </div>
-        
-                    <button type="button" class="btn btn-primary btn-small" (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility(addNewStepSection)">Add</button>
-                </form>
-            </div>
-        </div>
-        <table class="table table-striped" *ngIf="routine.steps.length > 0">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let step of routine.steps; let stepIndex = index">
-                    <td>
-                        <div class="row" #readOnlySection>
-                            <div class="col-5">
-                                {{step.label}}
-                            </div>
-                            <div class="col-5">
-                                <a
-                                    target="_blank"
-                                    [href]="step.url">{{step.url}}
-                                </a>
-                            </div>
-                            <div class="col">
-                                <button
-                                    class="btn btn-sm btn-outline-primary me-2"
-                                    (click)="toggleVisibility(readOnlySection); toggleVisibility(editSection)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button
-                                    [ngClass]="{'disabled': stepIndex === 0}"
-                                    class="btn btn-sm btn-outline-secondary me-2"
-                                    (click)="moveUp(routine, stepIndex)">
-                                    <i class="bi bi-arrow-up-circle"></i>
-                                </button>
-                                <button
-                                    [ngClass]="{'disabled': stepIndex === routine.steps.length - 1}"
-                                    class="btn btn-sm btn-outline-secondary"
-                                    (click)="moveDown(routine, stepIndex)">
-                                    <i class="bi bi-arrow-down-circle"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row" class="visually-hidden" #editSection>
-                            <div class="col-5">
-                                <input type="text" #stepLabel value="{{step.label}}">
-                            </div>
-                            <div class="col-5">
-                                <input type="text" #stepUrl value="{{step.url}}">
-                            </div>
-                            <div class="col">
-                                <button (click)="toggleVisibility(editSection); updateStep(routine, stepIndex, stepLabel.value, stepUrl.value); toggleVisibility(readOnlySection); ">save</button>
-                                <button (click)="toggleVisibility(editSection); toggleVisibility(readOnlySection);">cancel</button>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-danger" (click)="deleteStep(routine, stepIndex)">delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </section>
-
-</div>
-
-<div *ngIf="activeRoutine && activeStep">
-
-    <h4>
-        {{activeRoutine.name}}
-        <button class="btn btn-primary btn-sm float-end" (click)="deactivate()">Deactivate</button>
-    </h4>
-
-    <div class="wrapper text-center">
-        <div class="step-container">
-            <div class="step">
-                <a
-                    target="_blank"
-                    [href]="activeStep.url">{{activeStep.label}}
-                </a>
-            </div>
-            <div class="step-url">
-                <a
-                    target="_blank"
-                    [href]="activeStep.url">{{activeStep.url}}
-                </a>
-            </div>
-            <div class="step-url">
-                {{currentStepIndex + 1}} / {{activeRoutine.steps.length}}
-            </div>
-        </div>
-        
-    </div>
-
-    <button class="btn btn-primary btn-sm" (click)="prevStep()" [disabled]="currentStepIndex === 0">Prev</button>
-    <button class="btn btn-primary btn-sm float-end" (click)="nextStep()" [disabled]="currentStepIndex >= activeRoutine.steps.length - 1">Next</button>
 
 </div>
