@@ -49,7 +49,5 @@ namespace core.Alerts.Services
             
             return marketHours.ToUniversalTime(nextDay);
         }
-
-        
     }
 }

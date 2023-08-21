@@ -40,7 +40,7 @@ namespace core.Alerts.Services
 
             var nextScan = TimeOnly.FromTimeSpan(eastern.TimeOfDay) switch {
                 var t when t < _marketStartTime => marketStartTimeInEastern,
-                var t when t > _marketEndTime => marketStartTimeInEastern.AddDays(1),
+                var t when t > _marketEndTime => marketStartTimeInEastern.AddDays(1).AddMinutes(15),
                 _ => eastern.AddMinutes(5)
             };
 
