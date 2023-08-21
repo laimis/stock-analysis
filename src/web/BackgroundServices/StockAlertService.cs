@@ -123,9 +123,12 @@ namespace web.BackgroundServices
 
             foreach (var m in core.Alerts.Services.Monitors.GetMonitors())
             {
-                var list = await AlertCheckGenerator.GetStocksFromListsWithTags(
-                    _portfolio, m.tag, user
-                );
+                
+                var list = (await _portfolio.GetStockLists(user.Id))
+                    .Where(l => l.State.ContainsTag(m.tag))
+                    .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
+                    .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user))
+                    .ToList();
 
                 _listChecks.Add(m.tag, list);
             }
@@ -204,18 +207,6 @@ namespace web.BackgroundServices
 
                 return prices;
             }
-        }
-        
-
-        private async Task<ServiceResponse<StockQuote>> GetQuote(
-            UserState user, string ticker)
-        {
-            var priceResponse = await _brokerage.GetQuote(user, ticker);
-            if (!priceResponse.IsOk)
-            {
-                _logger.LogError("Could not get price for {ticker}: {message}", ticker, priceResponse.Error.Message);
-            }
-            return priceResponse;
         }
     }
 }

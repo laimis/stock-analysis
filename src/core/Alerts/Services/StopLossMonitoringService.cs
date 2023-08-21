@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -130,23 +129,6 @@ namespace core.Alerts.Services
         private void LogInformation(string message)
         {
             // TODO: pick implementation direction
-        }
-    }
-    
-    public static class AlertCheckGenerator
-    {
-        public static async Task<List<AlertCheck>> GetStocksFromListsWithTags(
-            IPortfolioStorage portfolio,
-            string tag,
-            UserState user)
-        {
-            var list = await portfolio.GetStockLists(user.Id);
-
-            return list
-                .Where(l => l.State.ContainsTag(tag))
-                .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
-                .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user))
-                .ToList();
         }
     }
 }
