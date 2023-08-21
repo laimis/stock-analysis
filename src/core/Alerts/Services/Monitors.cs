@@ -24,7 +24,7 @@ namespace core.Alerts.Services
                 
         public static Func<Task<List<AlertCheck>>> GetScannerForTag(
             string tag,
-            Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
+            Func<UserState, string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
             CancellationToken cancellationToken)
@@ -81,7 +81,7 @@ namespace core.Alerts.Services
         }
 
         private static async Task<List<AlertCheck>> MonitorForPatterns(
-            Func<string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
+            Func<UserState, string, Task<ServiceResponse<PriceBar[]>>> pricesFunc,
             StockAlertContainer container,
             List<AlertCheck> checks,
             CancellationToken ct)
@@ -95,7 +95,7 @@ namespace core.Alerts.Services
                     return completed;
                 }
 
-                var prices = await pricesFunc(c.ticker);
+                var prices = await pricesFunc(c.user, c.ticker);
                 if (!prices.IsOk)
                 {
                     continue;

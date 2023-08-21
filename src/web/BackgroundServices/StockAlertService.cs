@@ -23,6 +23,7 @@ namespace web.BackgroundServices
         private readonly ILogger<StockAlertService> _logger;
         private readonly IMarketHours _marketHours;
         private readonly IPortfolioStorage _portfolio;
+        private readonly Dictionary<string, ServiceResponse<PriceBar[]>> _priceCache = new();
         
         public StockAlertService(
             IAccountStorage accounts,
@@ -53,9 +54,7 @@ namespace web.BackgroundServices
             {    
                 try
                 {
-                    var user = new Lazy<Task<UserState>>(GetUser);
-
-                    await RunThroughListMonitoringChecks(user, stoppingToken);
+                    await RunThroughListMonitoringChecks(stoppingToken);
 
                     await Task.Delay(_sleepDuration, stoppingToken);
                 }
@@ -69,27 +68,22 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task RunThroughListMonitoringChecks(Lazy<Task<UserState>> user, CancellationToken stoppingToken)
+        private async Task RunThroughListMonitoringChecks(CancellationToken stoppingToken)
         {
             if (DateTimeOffset.UtcNow > _nextListMonitoringRun || _container.ManualRunRequested())
             {
                 _container.ToggleListCheckCompleted(false);
 
-                await GenerateListMonitoringChecks(user);
+                await GenerateListMonitoringChecks();
             }
 
-            var pricesService = new GetPricesForTickerService(
-                _brokerage,
-                _marketHours,
-                _logger,
-                user
-            );
+            _priceCache.Clear();
 
             foreach (var kp in _listChecks.Where(kp => kp.Value.Count > 0))
             {
                 var scanner = core.Alerts.Services.Monitors.GetScannerForTag(
                     tag: kp.Key,
-                    pricesFunc: pricesService.GetPricesForTicker,
+                    pricesFunc: GetPricesForTicker,
                     container: _container,
                     checks: kp.Value,
                     cancellationToken: stoppingToken
@@ -111,26 +105,54 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task GenerateListMonitoringChecks(Lazy<Task<UserState>> userFunc)
+        private async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(UserState user, string ticker)
         {
-            var user = await userFunc.Value;
-            if (userFunc == null)
+            if (_priceCache.TryGetValue(ticker, out ServiceResponse<PriceBar[]> value))
             {
-                return;
+                return value;
             }
 
-            _listChecks.Clear();
+            var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365));
+            var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
+            var prices = await _brokerage.GetPriceHistory(
+                state: user,
+                ticker: ticker,
+                frequency: PriceFrequency.Daily,
+                start: start,
+                end: end
+            );
 
+            if (!prices.IsOk)
+            {
+                _logger.LogCritical("Could not get price history for {ticker}: {message}", ticker, prices.Error.Message);
+            }
+            else
+            {
+                _priceCache.Add(ticker, prices);
+            }
+
+            return prices;
+        }
+
+        private async Task GenerateListMonitoringChecks()
+        {
+            _listChecks.Clear();
+            
             foreach (var m in core.Alerts.Services.Monitors.GetMonitors())
             {
-                
-                var list = (await _portfolio.GetStockLists(user.Id))
-                    .Where(l => l.State.ContainsTag(m.tag))
-                    .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
-                    .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user))
-                    .ToList();
+                var users = await _accounts.GetUserEmailIdPairs();
 
-                _listChecks.Add(m.tag, list);
+                foreach(var (_, userId) in users)    
+                {
+                    var user = await _accounts.GetUser(new Guid(userId));
+                    var list = (await _portfolio.GetStockLists(user.Id))
+                        .Where(l => l.State.ContainsTag(m.tag))
+                        .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
+                        .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user.State))
+                        .ToList();
+
+                    _listChecks.Add(m.tag, list);
+                }
             }
 
             _nextListMonitoringRun = ScanScheduling.GetNextListMonitorRunTime(
@@ -145,68 +167,6 @@ namespace web.BackgroundServices
             _container.AddNotice(
                 $"Alert check generator added {description}, next run at {_marketHours.ToMarketTime(_nextListMonitoringRun)}"
             );
-        }
-
-        private async Task<UserState> GetUser()
-        {
-            var user = await _accounts.GetUserByEmail("laimis@gmail.com");
-            if (user == null)
-            {
-                _logger.LogCritical("No user found for stock alert service");
-                _container.AddNotice("No user found for stock alert service");            
-            }
-            return user?.State;
-        }
-
-        private class GetPricesForTickerService
-        {
-            private readonly IBrokerage _brokerage;
-            private readonly IMarketHours _marketHours;
-            private readonly ILogger _logger;
-            private readonly Lazy<Task<UserState>> _user;
-            private readonly Dictionary<string, ServiceResponse<PriceBar[]>> _cache = new();
-
-            public GetPricesForTickerService(
-                IBrokerage brokerage,
-                IMarketHours marketHours,
-                ILogger logger,
-                Lazy<Task<UserState>> user)
-            {
-                _brokerage = brokerage;
-                _marketHours = marketHours;
-                _logger = logger;
-                _user = user;
-            }
-
-            public async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(string ticker)
-            {
-                if (_cache.TryGetValue(ticker, out ServiceResponse<PriceBar[]> value))
-                {
-                    return value;
-                }
-
-                var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365));
-                var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
-                var user = await _user.Value;
-                var prices = await _brokerage.GetPriceHistory(
-                    state: user,
-                    ticker: ticker,
-                    frequency: PriceFrequency.Daily,
-                    start: start,
-                    end: end
-                );
-
-                if (!prices.IsOk)
-                {
-                    _logger.LogCritical("Could not get price history for {ticker}: {message}", ticker, prices.Error.Message);
-                }
-                else
-                {
-                    _cache.Add(ticker, prices);
-                }
-
-                return prices;
-            }
         }
     }
 }
