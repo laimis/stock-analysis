@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core;
 using core.Account;
-using core.Adapters.Emails;
 using core.Alerts;
 using core.Alerts.Services;
 using core.Shared;
@@ -21,7 +20,6 @@ namespace web.BackgroundServices
         private readonly IAccountStorage _accounts;
         private readonly IBrokerage _brokerage;
         private readonly StockAlertContainer _container;
-        private readonly IEmailService _emails;
         private readonly ILogger<StockAlertService> _logger;
         private readonly IMarketHours _marketHours;
         private readonly IPortfolioStorage _portfolio;
@@ -30,7 +28,6 @@ namespace web.BackgroundServices
             IAccountStorage accounts,
             IBrokerage brokerage,
             StockAlertContainer container,
-            IEmailService emails,
             ILogger<StockAlertService> logger,
             IMarketHours marketHours,
             IPortfolioStorage portfolio)
@@ -38,7 +35,6 @@ namespace web.BackgroundServices
             _accounts = accounts;
             _brokerage = brokerage;
             _container = container;
-            _emails = emails;
             _logger = logger;
             _marketHours = marketHours;
             _portfolio = portfolio;
@@ -48,11 +44,8 @@ namespace web.BackgroundServices
         private static readonly TimeSpan _sleepDurationFailureMode = TimeSpan.FromMinutes(5);
 
         private readonly Dictionary<string, List<AlertCheck>> _listChecks = new();
-        private bool _listChecksFinished;
         private DateTimeOffset _nextListMonitoringRun = DateTimeOffset.MinValue;
         private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
-        private bool _stopLossCheckFinished = false;
-        private DateTimeOffset _nextEmailSend = DateTimeOffset.MinValue;
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -67,8 +60,6 @@ namespace web.BackgroundServices
                     await RunThroughListMonitoringChecks(user, stoppingToken);
 
                     await RunThroughStopLossChecks(user, stoppingToken);
-
-                    await SendAlertSummaryEmail(user);
 
                     await Task.Delay(_sleepDuration, stoppingToken);
                 }
@@ -86,6 +77,8 @@ namespace web.BackgroundServices
         {
             if (DateTimeOffset.UtcNow > _nextStopLossCheck)
             {
+                _container.ToggleStopLossCheckCompleted(false);
+
                 var user = await userFunc.Value;
                 if (user == null)
                 {
@@ -109,7 +102,7 @@ namespace web.BackgroundServices
                         _marketHours
                     );
 
-                    _stopLossCheckFinished = true;
+                    _container.ToggleStopLossCheckCompleted(true);
                 }
 
                 _container.AddNotice($"Completed {completed.Count} out of {checks.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
@@ -120,6 +113,8 @@ namespace web.BackgroundServices
         {
             if (DateTimeOffset.UtcNow > _nextListMonitoringRun || _container.ManualRunRequested())
             {
+                _container.ToggleListCheckCompleted(false);
+
                 await GenerateListMonitoringChecks(user);
             }
 
@@ -150,7 +145,10 @@ namespace web.BackgroundServices
                 _container.AddNotice($"{completed.Count} {kp.Key} checks completed, {kp.Value.Count} remaining");
             }
 
-            _listChecksFinished = _listChecks.All(kp => kp.Value.Count == 0);
+            if (_listChecks.All(kp => kp.Value.Count == 0))
+            {
+                _container.ToggleListCheckCompleted(true);
+            }
         }
 
         private async Task GenerateListMonitoringChecks(Lazy<Task<UserState>> userFunc)
@@ -195,87 +193,6 @@ namespace web.BackgroundServices
                 _container.AddNotice("No user found for stock alert service");            
             }
             return user?.State;
-        }
-
-        private async Task SendAlertSummaryEmail(Lazy<Task<UserState>> userFunc)
-        {
-            // wait to send emails if there are still checks running or stop checks haven't run
-            if (DateTimeOffset.UtcNow > _nextEmailSend
-                && _listChecksFinished && _stopLossCheckFinished)
-            {
-                var user = await userFunc.Value;
-                if (user == null)
-                {
-                    return;
-                }
-
-                // get all alerts for that user
-                var alertGroups = _container.GetAlerts(user.Id)
-                    .GroupBy(a => a.identifier)
-                    .Select(ToAlertEmailGroup);
-
-                var data = new { alertGroups };
-
-                await _emails.Send(
-                    new Recipient(email: user.Email, name: user.Name),
-                    Sender.NoReply,
-                    EmailTemplate.Alerts,
-                    data
-                );
-
-                _nextEmailSend = ScanScheduling.GetNextEmailRunTime(
-                    DateTimeOffset.UtcNow,
-                    _marketHours
-                );
-                _container.AddNotice("Emails sent, next run at " + _marketHours.ToMarketTime(_nextEmailSend));
-            }
-        }
-
-        private object ToAlertEmailGroup(IGrouping<string, TriggeredAlert> group)
-        {
-            return new {
-                identifier = group.Key,
-                alerts = group
-                    .OrderBy(a => a.sourceList)
-                    .ThenBy(a => a.ticker)
-                    .Select(ToEmailData)
-            };
-        }
-
-        private object ToEmailData(TriggeredAlert alert)
-        {
-            var valueType = alert.valueType;
-            var triggeredValue = alert.triggeredValue;
-            var ticker = alert.ticker;
-            var description = alert.description;
-            var sourceList = alert.sourceList;
-            var time = alert.when;
-
-            return ToEmailRow(valueType, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
-        }
-
-        public static object ToEmailRow(ValueFormat valueType, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
-        {
-            string FormattedValue()
-            {
-                return valueType switch
-                {
-                    ValueFormat.Percentage => triggeredValue.ToString("P1"),
-                    ValueFormat.Currency => triggeredValue.ToString("C2"),
-                    ValueFormat.Number => triggeredValue.ToString("N2"),
-                    ValueFormat.Boolean => triggeredValue.ToString(),
-                    _ => throw new Exception("Unexpected alert value type: " + valueType)
-                };
-            }
-
-            return new
-            {
-                ticker,
-                value = FormattedValue(),
-                description,
-                sourceList,
-                time = time.ToString("HH:mm") + " ET"
-            };
         }
 
         private class GetPricesForTickerService

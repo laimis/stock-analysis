@@ -191,7 +191,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
             var alertGroups = new List<object> {
                 new {
                     identifier = "Weekly Upside Reversals",
-                    alerts = u.Value.Select(d => StockAlertService.ToEmailRow(
+                    alerts = u.Value.Select(d => EmailNotificationService.ToEmailRow(
                         valueType: d.Pattern.valueFormat,
                         triggeredValue: d.Pattern.value,
                         ticker: d.Ticker,

@@ -15,6 +15,7 @@ using csvparser;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using secedgar;
 using securityutils;
@@ -84,6 +85,7 @@ namespace web
             services.AddHostedService<UserChangedService>();
             services.AddHostedService<StockAlertService>();
             services.AddHostedService<WeeklyUpsideReversalService>();
+            services.AddHostedService<EmailNotificationService>();
         }
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)
