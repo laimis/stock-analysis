@@ -45,8 +45,6 @@ namespace web.BackgroundServices
 
         private readonly Dictionary<string, List<AlertCheck>> _listChecks = new();
         private DateTimeOffset _nextListMonitoringRun = DateTimeOffset.MinValue;
-        private DateTimeOffset _nextStopLossCheck = DateTimeOffset.MinValue;
-        
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _container.AddNotice("Stock alert service started");
@@ -59,8 +57,6 @@ namespace web.BackgroundServices
 
                     await RunThroughListMonitoringChecks(user, stoppingToken);
 
-                    await RunThroughStopLossChecks(user, stoppingToken);
-
                     await Task.Delay(_sleepDuration, stoppingToken);
                 }
                 catch (Exception ex)
@@ -70,42 +66,6 @@ namespace web.BackgroundServices
                     _container.ManualRunRequested();
                     await Task.Delay(_sleepDurationFailureMode, stoppingToken);
                 }
-            }
-        }
-
-        private async Task RunThroughStopLossChecks(Lazy<Task<UserState>> userFunc, CancellationToken cancellationToken)
-        {
-            if (DateTimeOffset.UtcNow > _nextStopLossCheck)
-            {
-                _container.ToggleStopLossCheckCompleted(false);
-
-                var user = await userFunc.Value;
-                if (user == null)
-                {
-                    return;
-                }
-
-                var checks = await AlertCheckGenerator.GetStopLossChecks(_portfolio, user);
-
-                var completed = await core.Alerts.Services.Monitors.MonitorForStopLosses(
-                    quoteFunc: GetQuote,
-                    container: _container,
-                    checks: checks,
-                    cancellationToken: cancellationToken
-                );
-
-                // only update the next run time if we've completed all checks
-                if (completed.Count == checks.Count)
-                {
-                    _nextStopLossCheck = ScanScheduling.GetNextStopLossMonitorRunTime(
-                        DateTimeOffset.UtcNow,
-                        _marketHours
-                    );
-
-                    _container.ToggleStopLossCheckCompleted(true);
-                }
-
-                _container.AddNotice($"Completed {completed.Count} out of {checks.Count} stop loss checks, next run at {_marketHours.ToMarketTime(_nextStopLossCheck)}");
             }
         }
 

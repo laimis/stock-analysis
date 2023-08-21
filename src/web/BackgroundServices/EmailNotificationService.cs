@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Emails;
 using core.Alerts;
-using core.Alerts.Services;
 using core.Shared.Adapters.Brokerage;
 using Microsoft.Extensions.Logging;
 
@@ -34,10 +33,50 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
     protected override TimeSpan GetSleepDuration() => _sleepFunction();
 
+    private static TimeOnly[] _emailTimes = new TimeOnly[]
+            {
+                TimeOnly.Parse("09:50"),
+                TimeOnly.Parse("15:45")
+            };
+
     private TimeSpan NextStopLossCheck()
     {
-        var now = DateTime.UtcNow;
-        var nextRun = ScanScheduling.GetNextEmailRunTime(now, _marketHours);
+        DateTimeOffset NextRun(DateTimeOffset now)
+        {
+            var eastern = _marketHours.ToMarketTime(now);
+            
+            var candidates = _emailTimes
+                .Select(t => eastern.Date.Add(t.ToTimeSpan()))
+                .ToArray();
+
+            foreach(var candidate in candidates)
+            {
+                if (candidate > eastern)
+                {
+                    return _marketHours.ToUniversalTime(candidate);
+                }
+            }
+
+            // if we get here, we need to look at the next day
+            var nextDay = candidates[0].AddDays(1);
+
+            // and if the next day is weekend, let's skip those days
+            if (nextDay.DayOfWeek == DayOfWeek.Saturday)
+            {
+                nextDay = nextDay.AddDays(2);
+            }
+            else if (nextDay.DayOfWeek == DayOfWeek.Sunday)
+            {
+                nextDay = nextDay.AddDays(1);
+            }
+            
+            return _marketHours.ToUniversalTime(nextDay);
+        }
+        
+        var now = DateTimeOffset.UtcNow;
+        
+        var nextRun = NextRun(now);
+
         return nextRun - now;
     }
 
