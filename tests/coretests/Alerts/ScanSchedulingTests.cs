@@ -37,7 +37,7 @@ namespace coretests.Alerts
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = ScanScheduling.GetNextStopLossMonitorRunTime(time, _marketHours);
+            var nextRun = StopLossMonitoringService.CalculateNextRunDateTime(time, _marketHours);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }
@@ -54,7 +54,7 @@ namespace coretests.Alerts
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = ScanScheduling.GetNextEmailRunTime(time, _marketHours);
+            var nextRun = StopLossMonitoringService.CalculateNextRunDateTime(time, _marketHours);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }
