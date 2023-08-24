@@ -20,8 +20,7 @@ namespace core.Stocks
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, object>,
-            INotificationHandler<UserChanged>
+        public class Handler : HandlerWithStorage<Query, object>
         {
             private readonly IAccountStorage _accounts;
             private readonly IBrokerage _brokerage;
@@ -40,8 +39,14 @@ namespace core.Stocks
                 var user = await _accounts.GetUser(query.UserId)
                     ?? throw new Exception("User not found");
                     
-                var view = await _storage.ViewModel<StockDashboardView>(query.UserId, StockDashboardView.Version);
-                view ??= await LoadFromDb(query.UserId);
+                var stocks = await _storage.GetStocks(query.UserId);
+
+                var positions = stocks.Where(s => s.State.OpenPosition != null)
+                    .Select(s => s.State.OpenPosition)
+                    .OrderBy(p => p.Ticker)
+                    .ToList();
+
+                var view = new StockDashboardView(positions);
 
                 var tickers = view.Positions.Select(o => o.Ticker).Distinct();
 
@@ -141,25 +146,6 @@ namespace core.Stocks
                 }
 
                 return view;
-            }
-
-            public async Task Handle(UserChanged notification, CancellationToken cancellationToken)
-            {
-                var fromDb = await LoadFromDb(notification.UserId);
-
-                await _storage.SaveViewModel(notification.UserId, fromDb, StockDashboardView.Version);
-            }
-
-            private async Task<StockDashboardView> LoadFromDb(Guid userId)
-            {
-                var stocks = await _storage.GetStocks(userId);
-
-                var positions = stocks.Where(s => s.State.OpenPosition != null)
-                    .Select(s => s.State.OpenPosition)
-                    .OrderBy(p => p.Ticker)
-                    .ToList();
-
-                return new StockDashboardView(positions);
             }
         }
     }

@@ -74,7 +74,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
 
         foreach (var e in agg.Events.Skip(agg.Version))
         {
-            var se = new storage.shared.StoredAggregateEvent
+            var se = new StoredAggregateEvent
             {
                 Entity = entity,
                 Event = e,
@@ -91,11 +91,6 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
         foreach(var e in eventsToBlast)
             if (e is INotification n)
                 await _mediator.Publish(n);
-
-        if (eventsToBlast.Count > 0)
-        {
-            await _mediator.Publish(new ScheduleUserChanged(userId));
-        }
     }
 
     public Task<T> Get<T>(string key) => Task.FromResult((T)_blobs[key]);

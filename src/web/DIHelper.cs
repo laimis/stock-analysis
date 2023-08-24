@@ -82,7 +82,6 @@ namespace web
             StorageRegistrations(configuration, services, logger);
             
             services.AddHostedService<ThirtyDaySellService>();
-            services.AddHostedService<UserChangedService>();
             services.AddHostedService<StockAlertService>();
             services.AddHostedService<WeeklyUpsideReversalService>();
             services.AddHostedService<EmailNotificationService>();
