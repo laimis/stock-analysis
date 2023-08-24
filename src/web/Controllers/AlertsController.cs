@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Alerts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
-using static core.Alerts.Services.Monitors;
 
 namespace web.Controllers
 {
@@ -15,14 +13,10 @@ namespace web.Controllers
     public class AlertsController : ControllerBase
     {
         private IMediator _mediator;
-        private StockAlertContainer _container;
 
-        public AlertsController(
-            IMediator mediator,
-            StockAlertContainer container)
+        public AlertsController(IMediator mediator)
         {
             _mediator = mediator;
-            _container = container;
         }
 
         [AllowAnonymous]
@@ -49,10 +43,10 @@ namespace web.Controllers
 
         [HttpGet]
         public Task<object> Index() =>
-            _mediator.Send(new core.Alerts.Get.Query(User.Identifier()));
+            _mediator.Send(new Get.Query(User.Identifier()));
 
         [HttpGet("monitors")]
-        public Task<IEnumerable<MonitorDescriptor>> Monitors() =>
-            _mediator.Send(new core.Alerts.Monitors.Query(User.Identifier()));
+        public Task<Monitors.MonitorDescriptor[]> Monitors() =>
+            _mediator.Send(new Monitors.Query(User.Identifier()));
     }
 }

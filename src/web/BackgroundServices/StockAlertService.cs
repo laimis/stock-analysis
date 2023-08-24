@@ -10,6 +10,7 @@ using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
+using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -81,15 +82,49 @@ namespace web.BackgroundServices
 
             foreach (var kp in _listChecks.Where(kp => kp.Value.Count > 0))
             {
-                var scanner = core.Alerts.Services.Monitors.GetScannerForTag(
-                    tag: kp.Key,
-                    pricesFunc: GetPricesForTicker,
-                    container: _container,
-                    checks: kp.Value,
-                    cancellationToken: stoppingToken
-                );
+                var completed = new List<AlertCheck>();
 
-                var completed = await scanner();
+                foreach (var c in kp.Value)
+                {
+                    if (stoppingToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    var prices = await GetPricesForTicker(c.user, c.ticker);
+                    if (!prices.IsOk)
+                    {
+                        continue;
+                    }
+
+                    completed.Add(c);
+
+                    foreach(var available in PatternDetection.AvailablePatterns)
+                    {
+                        PatternAlert.Deregister(
+                            container: _container,
+                            ticker: c.ticker,
+                            patternName: available,
+                            userId: c.user.Id
+                        );
+                    }
+
+                    var patterns = PatternDetection.Generate(prices.Success);
+
+                    foreach(var pattern in patterns)
+                    {
+                        PatternAlert.Register(
+                            container: _container,
+                            ticker: c.ticker,
+                            sourceList: c.listName,
+                            pattern: pattern,
+                            value: pattern.value,
+                            valueFormat: pattern.valueFormat,
+                            when: DateTimeOffset.UtcNow,
+                            userId: c.user.Id
+                        );
+                    }
+                }
 
                 foreach (var c in completed)
                 {
@@ -138,21 +173,18 @@ namespace web.BackgroundServices
         {
             _listChecks.Clear();
             
-            foreach (var m in core.Alerts.Services.Monitors.GetMonitors())
+            var users = await _accounts.GetUserEmailIdPairs();
+
+            foreach(var (_, userId) in users)    
             {
-                var users = await _accounts.GetUserEmailIdPairs();
+                var user = await _accounts.GetUser(new Guid(userId));
+                var list = (await _portfolio.GetStockLists(user.Id))
+                    .Where(l => l.State.ContainsTag(Monitors.PATTERN_TAG))
+                    .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
+                    .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user.State))
+                    .ToList();
 
-                foreach(var (_, userId) in users)    
-                {
-                    var user = await _accounts.GetUser(new Guid(userId));
-                    var list = (await _portfolio.GetStockLists(user.Id))
-                        .Where(l => l.State.ContainsTag(m.tag))
-                        .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
-                        .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user.State))
-                        .ToList();
-
-                    _listChecks.Add(m.tag, list);
-                }
+                _listChecks.Add(Monitors.PATTERN_TAG, list);
             }
 
             _nextListMonitoringRun = ScanScheduling.GetNextListMonitorRunTime(

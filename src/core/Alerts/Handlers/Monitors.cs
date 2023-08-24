@@ -1,29 +1,34 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
 using MediatR;
-using static core.Alerts.Services.Monitors;
 
 namespace core.Alerts
 {
     public class Monitors
     {
-        public class Query : RequestWithUserId<IEnumerable<MonitorDescriptor>>
+        
+        public const string PATTERN_TAG = "monitor:patterns";
+        public const string PATTERN_TAG_NAME = "Patterns";
+        public record struct MonitorDescriptor(string name, string tag);
+
+        public class Query : RequestWithUserId<MonitorDescriptor[]>
         {
             public Query(Guid userId) : base(userId)
             {
             }
         }
 
-        public class Handler : IRequestHandler<Query, IEnumerable<MonitorDescriptor>>
+        public class Handler : IRequestHandler<Query, MonitorDescriptor[]>
         {
-            public Task<IEnumerable<MonitorDescriptor>> Handle(Query request, CancellationToken cancellationToken)
+            public Task<MonitorDescriptor[]> Handle(Query request, CancellationToken cancellationToken)
             {
-                return Task.FromResult(
-                    Services.Monitors.GetMonitors()
-                );
+                var monitors = new [] {
+                    new MonitorDescriptor(PATTERN_TAG_NAME, PATTERN_TAG)
+                };
+
+                return Task.FromResult(monitors);
             }
         }
     }

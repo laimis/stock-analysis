@@ -112,7 +112,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var stocks = await _portfolioStorage.GetStocks(user.Id);
                 var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(user.State.Id))
-                    .Where(l => l.State.ContainsTag(core.Alerts.Services.Monitors.PATTERN_TAG))
+                    .Where(l => l.State.ContainsTag(core.Alerts.Monitors.PATTERN_TAG))
                     .SelectMany(l => l.State.Tickers)
                     .Select(t => t.Ticker);
 

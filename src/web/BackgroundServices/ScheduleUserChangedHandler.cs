@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
@@ -15,6 +16,8 @@ namespace web.BackgroundServices
 
         public Task Handle(ScheduleUserChanged e, CancellationToken cancellationToken)
         {
+            Console.WriteLine("ScheduleUserChangedHandler");
+            
             _userChangedService.Schedule(e);
             
             return Task.CompletedTask;

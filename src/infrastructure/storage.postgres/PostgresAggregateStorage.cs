@@ -101,6 +101,10 @@ namespace storage.postgres
 
                     tx.Commit();
 
+                    // TODO: this is very odd, not sure why I am relying on a mediator here and not
+                    // using something like outbox pattern
+                    // probably to keep things simple but basically these events are not guaranteed to run successfully to the end if
+                    // one throws exception
                     foreach(var e in eventsToBlast)
                         if (e is INotification n)
                             await _mediator.Publish(n);
