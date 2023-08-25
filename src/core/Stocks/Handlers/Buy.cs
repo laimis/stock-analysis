@@ -57,7 +57,10 @@ namespace core.Stocks
                 if (isNewPosition)
                 {
                     var pendingPositions = await _storage.GetPendingStockPositions(cmd.UserId);
-                    var found = pendingPositions.SingleOrDefault(x => x.State.Ticker == new Ticker(cmd.Ticker));
+                    var found = pendingPositions.Where(x => x.State.Ticker == new Ticker(cmd.Ticker))
+                        .OrderByDescending(x => x.State.Date)
+                        .FirstOrDefault();
+                        
                     if (found != null)
                     {
                         // in case we have open position but we recorded standalone, make sure
