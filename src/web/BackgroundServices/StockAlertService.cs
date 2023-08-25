@@ -43,7 +43,6 @@ namespace web.BackgroundServices
         }
 
         private static readonly TimeSpan _sleepDuration = TimeSpan.FromMinutes(1);
-        private static readonly TimeSpan _sleepDurationFailureMode = TimeSpan.FromMinutes(5);
 
         private readonly Dictionary<string, List<AlertCheck>> _listChecks = new();
         private DateTimeOffset _nextListMonitoringRun = DateTimeOffset.MinValue;
@@ -56,16 +55,15 @@ namespace web.BackgroundServices
                 try
                 {
                     await RunThroughListMonitoringChecks(stoppingToken);
-
-                    await Task.Delay(_sleepDuration, stoppingToken);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogCritical(ex, "Failed while running alert monitor, will sleep");
                     _container.AddNotice("Failed while running alert monitor: " + ex.Message);
                     _container.ManualRunRequested();
-                    await Task.Delay(_sleepDurationFailureMode, stoppingToken);
                 }
+
+                await Task.Delay(_sleepDuration, stoppingToken);
             }
         }
 
