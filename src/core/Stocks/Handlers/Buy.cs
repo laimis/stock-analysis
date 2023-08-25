@@ -57,9 +57,8 @@ namespace core.Stocks
                 if (isNewPosition)
                 {
                     var pendingPositions = await _storage.GetPendingStockPositions(cmd.UserId);
-                    var found = pendingPositions.Where(x => x.State.Ticker == new Ticker(cmd.Ticker))
-                        .OrderByDescending(x => x.State.Date)
-                        .FirstOrDefault();
+                    var found = pendingPositions.Where(x => x.State.Ticker == new Ticker(cmd.Ticker) && x.State.IsClosed == false)
+                        .SingleOrDefault();
                         
                     if (found != null)
                     {
