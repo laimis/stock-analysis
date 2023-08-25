@@ -26,9 +26,7 @@
 
     <section *ngFor="let routine of routines">
         <h3>{{routine.name}}
-            <a class="btn btn-primary btn-sm me-2" [routerLink]="['/routines', routine.name, 'activate']">
-                <i class="bi bi-caret-right-square-fill"></i>
-            </a>
+            <a class="btn btn-primary btn-sm me-2" [routerLink]="['/routines', routine.name, 'activate']">Activate</a>
             <a class="btn btn-primary btn-sm" [routerLink]="['/routines', routine.name, 'edit']">
                 <i class="bi bi-pencil-fill"></i>
             </a>
