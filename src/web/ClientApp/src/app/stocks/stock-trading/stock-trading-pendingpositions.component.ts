@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { PendingStockPosition, StocksService } from 'src/app/services/stocks.service';
+import { GetErrors } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-pendingpositions',
@@ -7,6 +8,7 @@ import { PendingStockPosition, StocksService } from 'src/app/services/stocks.ser
   styleUrls: ['./stock-trading-pendingpositions.component.css']
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
+  errors: string[];
   
   constructor(
       private stockService:StocksService
@@ -14,6 +16,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
   { }
 
   positions: PendingStockPosition[] = [];
+  loaded: boolean = false;
 
   @Output()
   pendingPositionClosed: EventEmitter<PendingStockPosition> = new EventEmitter<PendingStockPosition>()
@@ -26,6 +29,11 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     this.stockService.getPendingStockPositions().subscribe(
       (data) => {
         this.positions = data;
+        this.loaded = true;
+      }, err => {
+        console.log(err)
+        this.errors = GetErrors(err);
+        this.loaded = true;
       }
     )
   }
