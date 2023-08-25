@@ -70,7 +70,8 @@
       <div class="col fs-6">
         <span class="me-2 visually-hidden" #sizeSpan (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
         <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
-        <span class="me-2">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
+        <span class="me-2 visually-hidden" #lossSpan (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
+        <span class="me-2" #lossSpanAlt (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
         <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
       </div>
       <div class="col text-end">
