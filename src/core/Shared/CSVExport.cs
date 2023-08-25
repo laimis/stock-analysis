@@ -25,7 +25,7 @@ namespace core
         private record struct TradesRecord(string symbol, string opened, string closed, decimal daysheld, decimal firstbuycost, decimal cost, decimal profit, decimal returnpct, decimal rr, decimal? riskedAmount, string grade, string gradeNote);
         private record struct StockListRecord(string ticker, string created, string notes);
         private record struct StockListRecordJustTicker(string ticker);
-        private record struct TradingStrategyResultRecord(string strategyName, string ticker, decimal numberOfShares, decimal cost, decimal averageBuyCostPerShare, decimal averageSaleCostPerShare, string opened, string closed, decimal daysHeld, decimal profit, decimal rr, decimal returnPct);
+        private record struct TradingStrategyResultRecord(string strategyName, string ticker, decimal profit, decimal rr, decimal returnPct, decimal numberOfShares, decimal cost, decimal averageBuyCostPerShare, decimal averageSaleCostPerShare, string opened, string closed, decimal daysHeld);
 
         public static string Generate(ICSVWriter writer, List<TradingStrategyPerformance> strategies)
         {
@@ -35,16 +35,16 @@ namespace core
                         new TradingStrategyResultRecord(
                             strategy.strategyName,
                             r.Ticker,
+                            Math.Round(r.Profit, 2),
+                            Math.Round(r.RR, 2),
+                            Math.Round(r.GainPct, 2) * 100,
                             r.CompletedPositionShares,
                             r.CompletedPositionShares * r.CompletedPositionCostPerShare,
                             r.CompletedPositionCostPerShare,
                             r.AverageSaleCostPerShare,
                             r.Opened.Value.ToString(DATE_FORMAT),
                             r.Closed.Value.ToString(DATE_FORMAT),
-                            r.DaysHeld,
-                            r.Profit,
-                            r.RR,
-                            r.GainPct
+                            r.DaysHeld
                         )
                     )
                 );

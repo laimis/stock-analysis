@@ -31,7 +31,7 @@ namespace core.Stocks
         public decimal AverageSaleCostPerShare { get; private set; } = 0;
         public decimal AverageBuyCostPerShare { get; private set; } = 0;
         public DateTimeOffset? Opened { get; private set; }
-        public int DaysHeld => Opened != null ? (int)((!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value)).TotalDays : 0;
+        public int DaysHeld => Opened != null ? (int)(!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value).TotalDays : 0;
         public decimal Cost { get; private set; } = 0;
         public decimal Profit { get; private set; } = 0;
         public decimal GainPct => IsClosed switch {

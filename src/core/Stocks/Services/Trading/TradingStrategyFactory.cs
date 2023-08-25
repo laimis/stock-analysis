@@ -11,12 +11,7 @@ namespace core.Stocks.Services.Trading
 
             yield return CreateProfitTakingStrategyPercentBased();
 
-            yield return new TradingStrategyWithProfitPoints(
-                "Profit taking (3 RR levels) (delayed stop)",
-                numberOfProfitPoints: 3,
-                (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
-                (position, level) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
-            );
+            yield return CreateProfitTakingStrategyWithDelayedStop();
 
             yield return CreateCloseAfterFixedNumberOfDays(15);
             
@@ -31,6 +26,18 @@ namespace core.Stocks.Services.Trading
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(5);
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(15);
             // yield return CreateCloseAfterFixedNumberOfDaysRespectStop(30);
+        }
+
+
+
+        private static ITradingStrategy CreateProfitTakingStrategyWithDelayedStop()
+        {
+            return new TradingStrategyWithProfitPoints(
+                "Profit taking (3 RR levels) (delayed stop)",
+                numberOfProfitPoints: 3,
+                (position, level) => ProfitPoints.GetProfitPointWithStopPrice(position, level).Value,
+                (position, level) => _delayedAdvancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithStopPrice(position, l).Value)
+            );
         }
 
         private static ITradingStrategy CreateProfitTakingStrategyPercentBased(int profitPoints = 3)
@@ -101,11 +108,8 @@ namespace core.Stocks.Services.Trading
             );
         }
 
-        internal static ITradingStrategy CreateActualTrade()
-        {
-            return new TradingStrategyActualTrade();
-        }
-
+        internal static ITradingStrategy CreateActualTrade() => new TradingStrategyActualTrade();
+        
         private static Func<int, PositionInstance, Func<int, decimal>, decimal> _advancingStop = (level, position, rrLevelFunc) => level switch {
                         1 => position.AverageCostPerShare,
                         _ => rrLevelFunc(level - 1)
