@@ -29,6 +29,7 @@
       </li>
     </ul>
 
+    <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()"></app-brokerage-neworder>
     <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
 
     <span *ngIf="violations.length === 0">
