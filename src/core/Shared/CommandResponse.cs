@@ -1,6 +1,6 @@
 namespace core.Shared
 {
-    public class CommandResponse<T> : CommandResponse where T : Aggregate
+    public class CommandResponse<T> : CommandResponse
     {
         protected CommandResponse(string error) : base(error)
         {

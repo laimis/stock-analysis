@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
 using MediatR;
@@ -10,7 +11,7 @@ namespace core.Stocks.Handlers
 {
     public class Prices
     {
-        public class Query : IRequest<PricesView>
+        public class Query : IRequest<CommandResponse<PricesView>>
         {
             public int NumberOfDays { get; }
             public string Ticker { get; }
@@ -38,7 +39,7 @@ namespace core.Stocks.Handlers
             }
         }
 
-        public class Handler : IRequestHandler<Query, PricesView>
+        public class Handler : IRequestHandler<Query, CommandResponse<PricesView>>
         {
             private IAccountStorage _storage;
             private IBrokerage _brokerage;
@@ -49,7 +50,7 @@ namespace core.Stocks.Handlers
                 _brokerage = brokerage;
             }
 
-            public async Task<PricesView> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<CommandResponse<PricesView>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _storage.GetUser(request.UserId);
                 if (user == null)
@@ -60,11 +61,13 @@ namespace core.Stocks.Handlers
                 var prices = await _brokerage.GetPriceHistory(user.State, request.Ticker, start: request.Start, end: request.End);
                 if (!prices.IsOk)
                 {
-                    throw new Exception("Failed to get price history");
+                    CommandResponse<PricesView>.Failed(prices.Error.Message);
                 }
 
-                return new PricesView(
-                    prices.Success
+                return CommandResponse<PricesView>.Success(
+                    new PricesView(
+                        prices.Success
+                    )
                 );
             }
         }

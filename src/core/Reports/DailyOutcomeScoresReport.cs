@@ -14,7 +14,7 @@ namespace core.Reports
 {
     public class DailyOutcomeScoresReport
     {
-        public class Query : RequestWithUserId<DailyOutcomeScoresReportView>
+        public class Query : RequestWithUserId<CommandResponse<DailyOutcomeScoresReportView>>
         {
             public Query(string start, string end, string ticker, Guid userId) : base(userId)
             {
@@ -28,7 +28,7 @@ namespace core.Reports
             public string Ticker { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, DailyOutcomeScoresReportView>
+        public class Handler : HandlerWithStorage<Query, CommandResponse<DailyOutcomeScoresReportView>>
         {
             public Handler(
                 IAccountStorage accountStorage,
@@ -45,7 +45,7 @@ namespace core.Reports
             private IBrokerage _brokerage { get; }
             private IMarketHours _marketHours;
 
-            public override async Task<DailyOutcomeScoresReportView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<CommandResponse<DailyOutcomeScoresReportView>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accountStorage.GetUser(request.UserId);
                 if (user == null)
@@ -71,7 +71,7 @@ namespace core.Reports
                     
                 if (!priceResponse.IsOk)
                 {
-                    throw new Exception("Failed to get price history: " + priceResponse.Error.Message);
+                    return CommandResponse<DailyOutcomeScoresReportView>.Failed(priceResponse.Error.Message);
                 }
 
                 var bars = priceResponse.Success;
@@ -81,9 +81,11 @@ namespace core.Reports
                     start,
                     request.Ticker);
 
-                return new DailyOutcomeScoresReportView(
-                    scoreList,
-                    request.Ticker);
+                return CommandResponse<DailyOutcomeScoresReportView>.Success(
+                    new DailyOutcomeScoresReportView(
+                        scoreList,
+                        request.Ticker)
+                );
             }
         }
     }

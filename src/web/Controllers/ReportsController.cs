@@ -61,8 +61,8 @@ namespace web.Controllers
 
         [Obsolete("Not using this anymore, keeping it around in case I change my mind")]
         [HttpGet("dailyoutcomescoresreport/{ticker}")]
-        public Task<DailyOutcomeScoresReportView> DailyOutcomeScoresReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
-            _mediator.Send(new DailyOutcomeScoresReport.Query(start, end, ticker, User.Identifier()));
+        public Task<ActionResult> DailyOutcomeScoresReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
+            this.ExecuteAsync(_mediator, new DailyOutcomeScoresReport.Query(start, end, ticker, User.Identifier()));
 
         [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
         public Task<DailyPositionReportView> DailyPositionReport(string ticker, int positionId) =>

@@ -26,6 +26,16 @@ namespace web.Utils
             };
         }
 
+        public static ActionResult Error(
+            this ControllerBase controller,
+            string error)
+        {
+            
+            var dict = new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary();
+            dict.AddModelError("error", error);
+            return controller.BadRequest(dict);
+        }
+
         public static ActionResult OkOrError(
             this ControllerBase controller,
             CommandResponse r)
@@ -38,14 +48,20 @@ namespace web.Utils
             return controller.Ok();
         }
 
-        public static ActionResult Error(
+        public static ActionResult OkOrError<T>(
             this ControllerBase controller,
-            string error)
+            CommandResponse<T> r)
         {
-            
-            var dict = new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary();
-            dict.AddModelError("error", error);
-            return controller.BadRequest(dict);
+            return r.Error switch {
+                null => controller.Ok(r.Aggregate),
+                _ => controller.Error(r.Error)
+            };
+        }
+
+        public static async Task<ActionResult> ExecuteAsync<T>(this ControllerBase controller, IMediator mediator, IRequest<CommandResponse<T>> request)
+        {
+            var result = await mediator.Send(request);
+            return controller.OkOrError(result);
         }
     }
 }

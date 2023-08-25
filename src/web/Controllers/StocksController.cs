@@ -34,16 +34,16 @@ namespace web.Controllers
         public Task<StockDetailsView> Details(string ticker) => _mediator.Send(new Details.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/prices")]
-        public Task<PricesView> Prices(string ticker, [FromQuery] int numberOfDays) =>
-            _mediator.Send(new Prices.Query(numberOfDays, ticker, User.Identifier()));
+        public Task<ActionResult> Prices(string ticker, [FromQuery] int numberOfDays) =>
+            this.ExecuteAsync(_mediator, new Prices.Query(numberOfDays, ticker, User.Identifier()));
 
         [HttpGet("{ticker}/secfilings")]
         public Task<CompanyFilings> SECFilings(string ticker) =>
             _mediator.Send(new SECFilings.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/prices/{start}/{end}")]
-        public Task<PricesView> Prices(string ticker, DateTimeOffset start, DateTimeOffset end) =>
-            _mediator.Send(new Prices.Query(start:start, end:end, ticker, User.Identifier()));
+        public Task<ActionResult> Prices(string ticker, DateTimeOffset start, DateTimeOffset end) =>
+            this.ExecuteAsync(_mediator, new Prices.Query(start:start, end:end, ticker, User.Identifier()));
 
         [HttpGet("{ticker}/price")]
         public Task<decimal?> Price(string ticker) => _mediator.Send(new Price.Query(ticker, User.Identifier()));

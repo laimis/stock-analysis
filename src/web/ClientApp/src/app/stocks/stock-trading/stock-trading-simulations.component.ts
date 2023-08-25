@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PositionInstance, PriceBar, StocksService, TradingStrategyPerformance } from '../../services/stocks.service';
+import { PriceBar, StocksService, TradingStrategyPerformance } from '../../services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 
 @Component({
