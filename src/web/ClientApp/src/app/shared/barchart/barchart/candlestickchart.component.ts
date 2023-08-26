@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Prices } from 'src/app/services/stocks.service';
-import { PriceLineOptions, createChart } from 'lightweight-charts';
+import { DeepPartial, PriceLineOptions, TimeScaleOptions, createChart } from 'lightweight-charts';
 
 @Component({
   selector: 'app-candlestickchart',
@@ -9,6 +9,11 @@ import { PriceLineOptions, createChart } from 'lightweight-charts';
 })
 export class CandlestickChartComponent {
   renderChart() {
+
+    console.log('rendering chart')
+    console.log(this.buyDates)
+    console.log(this.sellDates)
+
     const chart = createChart(
       document.getElementById('chart'),
       { height: this.chartHeight }
@@ -21,7 +26,10 @@ export class CandlestickChartComponent {
     }
 
     let toCandleStickData = (p) => {
-      return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close }
+      let isBuyPoint = this.buyDates && this.buyDates.includes(p.dateStr)
+      let isSellPoint = this.sellDates && this.sellDates.includes(p.dateStr)
+      let color = isBuyPoint ? 'black' : isSellPoint ? 'orange' : null
+      return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close, color: color }
     }
 
     let addLineSeries = (sma, color, interval, priceBars) => {
@@ -91,4 +99,10 @@ export class CandlestickChartComponent {
 
   @Input()
   stopPrice = null;
+
+  @Input()
+  buyDates = null;
+
+  @Input()
+  sellDates = null;
 }

@@ -41,7 +41,9 @@
     
     <app-candlestickchart [prices]="prices"
       [averageBuyPrice]="currentPosition.averageBuyCostPerShare"
-      [stopPrice]="currentPosition.stopPrice">
+      [stopPrice]="currentPosition.stopPrice"
+      [buyDates]="positionBuys"
+      [sellDates]="positionSells">
     </app-candlestickchart>
   </section>
 

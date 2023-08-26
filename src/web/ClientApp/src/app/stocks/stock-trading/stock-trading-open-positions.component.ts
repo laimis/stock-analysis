@@ -26,8 +26,8 @@ export class StockTradingOpenPositionsComponent {
   prices: Prices
   outcomes: TickerOutcomes;
   dailyScores: DailyPositionReport;
-  positionBuys: PriceWithDate[]
-  positionSells: PriceWithDate[]
+  positionBuys: string[]
+  positionSells: string[]
 
   constructor (private stockService: StocksService) { }
 
@@ -49,8 +49,8 @@ export class StockTradingOpenPositionsComponent {
     this.dailyScores = null
     this.prices = null
     this.simulationResults = null
-    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy')
-    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell')
+    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date)
+    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date)
     
     // get price data and pass it to chart
     this.getSimulatedTrades();
