@@ -17,8 +17,8 @@ export class StockTradingReviewComponent implements OnInit {
   currentPositionPrice: number
   simulationResults: TradingStrategyResults
   prices: Prices
-  positionBuys: PriceWithDate[]
-  positionSells: PriceWithDate[]
+  positionBuys: string[]
+  positionSells: string[]
   simulationErrors: string[];
   scoresErrors: string[];
   dailyPositionReport: DailyPositionReport
@@ -46,8 +46,8 @@ export class StockTradingReviewComponent implements OnInit {
     this.gradingSuccess = null
     this.assignedGrade = this.currentPosition.grade
     this.assignedNote = this.currentPosition.gradeNote
-    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy')
-    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell')
+    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date)
+    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date)
 
     this.runTradingStrategies();
     this.fetchPrice();
