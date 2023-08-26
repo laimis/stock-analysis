@@ -1,9 +1,7 @@
 <div>
   <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
 
-  <div id="chart" style="height: 400px;">
-    this is chart
-  </div>
+  <app-candlestickchart [prices]="prices"></app-candlestickchart>
 
   <app-symbol-search></app-symbol-search>
   this is just a symbol app-symbol-search

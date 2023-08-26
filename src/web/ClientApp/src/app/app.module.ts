@@ -92,6 +92,7 @@ import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.comp
 import { OptionBrokeragePositionsComponent } from './options/option-dashboard/option-brokerage-positions.component';
 import { StockLinkComponent } from './shared/stocks/stock-link.component';
 import { RoutineComponent } from './routines/routines-routine.component';
+import { CandlestickChartComponent } from './shared/barchart/barchart/candlestickchart.component';
 
 
 var routes: Routes = [
@@ -245,6 +246,7 @@ var routes: Routes = [
     StockListsDashboardComponent,
     StockListComponent,
     ChartComponent,
+    CandlestickChartComponent,
     StockTradingReviewDashboardComponent,
     StockTradingPendingPositionsComponent,
     StockSECFilingsComponent,
@@ -256,7 +258,7 @@ var routes: Routes = [
     OptionBrokeragePositionsComponent,
 
     RoutineDashboardComponent,
-    RoutineComponent,
+    RoutineComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
