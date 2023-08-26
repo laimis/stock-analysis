@@ -2,14 +2,11 @@
 
     <section>
         <h5>Chart</h5>
-        <app-stock-chart
-            *ngIf="prices"
+        <app-candlestickchart
             [prices]="prices"
-            [positiveLines]="upGapsOpens"
-            [negativeLines]="downGapsOpens"
-            [positivePricePoints]="upGaps"
-            [negativePricePoints]="downGaps">
-        </app-stock-chart>
+            [buyDates]="upGaps"
+            [sellDates]="downGaps">
+        </app-candlestickchart>
     </section>
     
     <section>

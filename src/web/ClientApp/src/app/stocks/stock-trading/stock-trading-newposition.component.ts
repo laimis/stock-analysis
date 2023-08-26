@@ -64,8 +64,7 @@ export class StockTradingNewPositionComponent {
 
   prices: Prices | null = null
 
-  chartTargets: number[] = [];
-  chartStops: number[] = [];
+  chartStop: number = null;
 
   outcomes: TickerOutcomes
   gaps: StockGaps
@@ -207,8 +206,7 @@ export class StockTradingNewPositionComponent {
     this.oneR = this.costToBuy + singleShareLoss
     this.potentialLoss = positionStopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
     this.stopPct = Math.round((positionStopPrice - this.costToBuy) / this.costToBuy * 100) / 100
-    this.chartTargets = [this.oneR]
-    this.chartStops = [positionStopPrice]
+    this.chartStop = positionStopPrice
   }
 
   recordInProgress : boolean = false

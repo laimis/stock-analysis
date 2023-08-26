@@ -14,6 +14,7 @@ export class OutcomesAnalysisReportComponent {
 
   @Input()
   set report(value: OutcomesReport) {
+    if (!value) return
     this.selectedEvaluationName = value.evaluations.length > 0 ? value.evaluations[0].name : null
     this.tickersForSummary = value.tickerSummary
     this.patterns = value.patterns

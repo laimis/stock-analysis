@@ -18,11 +18,9 @@ export class StockAnalysisComponent {
   percentChangeDistribution: StockPercentChangeResponse;
   prices: Prices;
   private _ticker: string;
-  upGaps: PriceWithDate[] = [];
-  downGaps: PriceWithDate[] = [];
-  upGapsOpens: number[] = [];
-  downGapsOpens: number[] = [];
-
+  upGaps: string[] = [];
+  downGaps: string[] = [];
+  
   constructor(
     private stockService : StocksService,
     private percentPipe: PercentPipe,
@@ -61,20 +59,8 @@ export class StockAnalysisComponent {
   private getOutcomesReportAllBars() {
     this.stockService.reportOutcomesAllBars([this.ticker]).subscribe(report => {
       this.gaps = report.gaps[0];
-      this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => {
-        return {
-          date: g.bar.dateStr,
-          price: g.bar.open
-        }
-      })
-      this.upGapsOpens = this.upGaps.map(g => g.price);
-      this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => {
-        return {
-          date: g.bar.dateStr,
-          price: g.bar.open
-        }
-      })
-      this.downGapsOpens = this.downGaps.map(g => g.price);
+      this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => g.bar.dateStr)
+      this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => g.bar.dateStr)
       this.multipleBarOutcomes = report.outcomes[0]
       
       this.getOutcomesReportSingleBarDaily();
