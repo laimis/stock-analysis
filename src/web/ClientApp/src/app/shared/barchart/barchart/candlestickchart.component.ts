@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Prices } from 'src/app/services/stocks.service';
-import { createChart } from 'lightweight-charts';
+import { PriceLineOptions, createChart } from 'lightweight-charts';
 
 @Component({
   selector: 'app-candlestickchart',
@@ -24,26 +24,53 @@ export class CandlestickChartComponent {
       return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close }
     }
 
+    let addLineSeries = (sma, color, interval, priceBars) => {
+      const smaSeries = chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
+      let smaLineData = createLineData(sma, interval, priceBars)
+      smaSeries.setData(smaLineData);
+    }
+
     const barSeries = chart.addCandlestickSeries();
     let priceBars = this._prices.prices.map(toCandleStickData)
     barSeries.setData(priceBars);
     
-    const sma20 = chart.addLineSeries({ color: 'red', lineWidth: 1 });
-    let sma20LineData = createLineData(this._prices.sma.sma20, 20, priceBars)
-    sma20.setData(sma20LineData);
+    if (this.averageBuyPrice) {
+      var buyPrice : PriceLineOptions = {
+        'title': 'avg cost',
+        price: this.averageBuyPrice,
+        color: 'blue',
+        lineWidth: 1,
+        lineVisible: true,
+        axisLabelColor: 'blue',
+        axisLabelTextColor: 'white',
+        lineStyle: 0,
+        axisLabelVisible: true
+      };
 
-    const sma50 = chart.addLineSeries({ color: 'green', lineWidth: 1 });
-    let sma50LineData = createLineData(this._prices.sma.sma50, 50, priceBars)
-    sma50.setData(sma50LineData);
+      barSeries.createPriceLine(buyPrice);
+    }
 
-    const sma150 = chart.addLineSeries({ color: 'lightblue', lineWidth: 1 });
-    let sma150LineData = createLineData(this._prices.sma.sma150, 150, priceBars)
-    sma150.setData(sma150LineData);
+    if (this.stopPrice) {
+      var stopPrice : PriceLineOptions = {
+        'title': 'stop',
+        price: this.stopPrice,
+        color: 'red',
+        lineWidth: 1,
+        lineVisible: true,
+        axisLabelColor: 'red',
+        axisLabelTextColor: 'white',
+        lineStyle: 0,
+        axisLabelVisible: true
+      };
 
-    const sma200 = chart.addLineSeries({ color: 'blue', lineWidth: 1 });
-    let sma200LineData = createLineData(this._prices.sma.sma200, 200, priceBars)
-    sma200.setData(sma200LineData);
+      barSeries.createPriceLine(stopPrice);
+    }
 
+    addLineSeries(this._prices.sma.sma20, 'red', 20, priceBars);
+    addLineSeries(this._prices.sma.sma50, 'green', 50, priceBars);
+    addLineSeries(this._prices.sma.sma150, 'lightblue', 150, priceBars);
+    addLineSeries(this._prices.sma.sma200, 'blue', 200, priceBars);
+    
     chart.timeScale().fitContent();
   }
 
@@ -58,4 +85,10 @@ export class CandlestickChartComponent {
       this.renderChart();
     }
   }
+
+  @Input()
+  averageBuyPrice = null;
+
+  @Input()
+  stopPrice = null;
 }

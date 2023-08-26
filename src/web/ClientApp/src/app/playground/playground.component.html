@@ -1,7 +1,11 @@
 <div>
   <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
 
-  <app-candlestickchart [prices]="prices"></app-candlestickchart>
+  <app-candlestickchart
+    [averageBuyPrice]=210
+    [prices]="prices"
+    >
+  </app-candlestickchart>
 
   <app-symbol-search></app-symbol-search>
   this is just a symbol app-symbol-search

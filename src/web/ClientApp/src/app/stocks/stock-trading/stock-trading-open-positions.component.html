@@ -38,13 +38,11 @@
   
   <section>
     <h5>Stock chart</h5>
-    <app-stock-chart *ngIf="prices"
-          [positivePricePoints]="positionBuys"
-          [negativePricePoints]="positionSells"
-          [prices]=prices
-          [positiveLines]="[currentPosition.averageCostPerShare]"
-          [negativeLines]="currentPosition.stopPrice ? [currentPosition.stopPrice] : []">
-        </app-stock-chart>
+    
+    <app-candlestickchart [prices]="prices"
+      [averageBuyPrice]="currentPosition.averageBuyCostPerShare"
+      [stopPrice]="currentPosition.stopPrice">
+    </app-candlestickchart>
   </section>
 
   <section *ngIf="dailyScores">
