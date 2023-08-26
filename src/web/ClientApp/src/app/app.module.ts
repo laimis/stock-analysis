@@ -55,7 +55,6 @@ import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-tra
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading-review/stock-trading-performance.component';
 import { StockTradingReviewComponent } from './stocks/stock-trading-review/stock-trading-review.component';
-import { StockChartComponent } from './shared/stocks/stock-chart.component';
 import { StockTradingOpenPositionsComponent } from './stocks/stock-trading/stock-trading-open-positions.component';
 import { StockTradingClosedPositionsComponent } from './stocks/stock-trading-review/stock-trading-closed-positions.component';
 import { BrokerageOrdersComponent } from './brokerage/orders.component';
@@ -212,7 +211,6 @@ var routes: Routes = [
     StockTradingPerformanceComponent,
     StockTradingReviewComponent,
     StockTradingSummaryComponent,
-    StockChartComponent,
     StockTradingSimulatorComponent,
     StockTradingSimulationsComponent,
     TradingPerformanceSummaryComponent,
@@ -261,7 +259,7 @@ var routes: Routes = [
     RoutineComponent
   ],
   imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserModule,
     HttpClientModule,
     FormsModule,
     NgChartsModule,
