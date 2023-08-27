@@ -1,7 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition, OptionBreakdown } from '../../services/stocks.service';
+import { StocksService, OptionDefinition } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { ChartType } from 'chart.js';
+
+
+class OptionLegs {
+  name: string
+  bid: number
+  ask: number
+  legs: OptionDefinition[]
+}
+
+function expirationMatches(option: OptionDefinition, expiration: string) {
+  return expiration == "" || option.expirationDate == expiration
+}
 
 @Component({
   selector: 'app-option-chain',
@@ -13,6 +25,7 @@ export class OptionChainComponent implements OnInit {
 
   public options : OptionDefinition[]
   public filteredOptions : OptionDefinition[]
+  public filteredOptionsWithBothSides : OptionDefinition[]
   public expirationMap : Array<OptionDefinition[]>
   public stockPrice : number
   public expirations: string[]
@@ -30,6 +43,7 @@ export class OptionChainComponent implements OnInit {
   public failure;
   volatility: number;
   numberOfContracts: number;
+  straddles: OptionLegs[] = [];
 
   constructor(
     private service: StocksService,
@@ -82,7 +96,8 @@ export class OptionChainComponent implements OnInit {
     console.log("min strike price: " + this.minStrikePrice)
     console.log("max strike price: " + this.maxStrikePrice)
 
-    this.filteredOptions = this.options.filter(this.includeOption, this);
+    this.filteredOptions = this.options.filter(opt => this.includeOption(opt, true), this);
+    this.filteredOptionsWithBothSides = this.options.filter(opt => this.includeOption(opt, false), this);
     this.loading = false;
 
     let expirationMap = new Map<string, OptionDefinition[]>();
@@ -102,7 +117,7 @@ export class OptionChainComponent implements OnInit {
     console.log("filter running finished")
   }
 
-  includeOption(element:OptionDefinition, index, array) {
+  includeOption(element:OptionDefinition, includeSizeCheck:boolean) {
     if (this.expirationSelection !== "") {
       if (element.expirationDate != this.expirationSelection) {
         console.log("filterig out expiration " + element.expirationDate)
@@ -110,7 +125,7 @@ export class OptionChainComponent implements OnInit {
       }
     }
 
-    if (this.sideSelection !== "") {
+    if (this.sideSelection !== "" && includeSizeCheck) {
       if (element.optionType != this.sideSelection) {
         console.log("filterig out side " + element.optionType)
         return false
@@ -142,13 +157,55 @@ export class OptionChainComponent implements OnInit {
     return true
   }
 
+  findStraddles(event) {
+    // group options by expiration
+    let expirationMap = new Map<string, OptionDefinition[]>();
+    this.filteredOptionsWithBothSides.forEach(function(value, index, arr) {
+      if (!expirationMap.has(value.expirationDate))
+      {
+        expirationMap.set(value.expirationDate, [value])
+      }
+      else
+      {
+          var temp = expirationMap.get(value.expirationDate)
+          temp.push(value)
+      }
+    })
+
+    // find straddles
+    let straddles = new Array<OptionLegs>()
+    expirationMap.forEach(function(value, key, map) {
+      let calls = value.filter(x => x.optionType == "call")
+      let puts = value.filter(x => x.optionType == "put")
+
+      calls.forEach(function(call, index, arr) {
+        puts.forEach(function(put, index, arr) {
+          if (call.strikePrice == put.strikePrice) {
+            // overall bid
+            let bid = call.bid + put.bid
+            // overall ask
+            let ask = call.ask + put.ask
+            
+            let legs = {
+              name: "Straddle " + call.strikePrice,
+              legs: [call, put],
+              bid: bid,
+              ask: ask,
+            }
+            
+            straddles.push(legs)
+          }
+        })
+      })
+    })
+
+    this.straddles = straddles
+    event.preventDefault()
+  }
+
   onExpirationChange(newValue) {
     console.log(newValue)
-    if (newValue === this.expirationSelection) {
-      this.expirationSelection = ""
-    } else {
-      this.expirationSelection = newValue
-    }
+    this.expirationSelection = newValue
     this.runFilter()
   }
 
@@ -175,6 +232,12 @@ export class OptionChainComponent implements OnInit {
 
   onMaxStrikePriceChange() {
     console.log(this.maxStrikePrice)
+    this.runFilter()
+  }
+
+  setStrikePriceFilterNearMoney() {
+    this.minStrikePrice = Math.floor(this.stockPrice - this.stockPrice * 0.1)
+    this.maxStrikePrice = Math.ceil(this.stockPrice + this.stockPrice * 0.1)
     this.runFilter()
   }
 

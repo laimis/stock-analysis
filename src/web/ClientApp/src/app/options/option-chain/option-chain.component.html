@@ -71,12 +71,73 @@
         <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
         <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
           <option></option>
-          <option *ngFor="let option of options" value="{{option.strikePrice}}">{{option.strikePrice}}</option>
+          <option *ngFor="let option of options" [attr.value]="option.strikePrice">{{option.strikePrice}}</option>
         </select>
+      </div>
+      <div class="col">
+        <button class="btn btn-link" id="nearMoneyLink" name="nearMoneyLink" (click)="setStrikePriceFilterNearMoney()">Near money</button>
       </div>
       <div class="col"></div>
     </div>
 
+    <div class="row mb-3">
+      <div class="col">
+        <a href="#" (click)="findStraddles($event)">Straddles</a> - buy or sell put and call at the same strike price
+
+        <table class="table table-striped" *ngIf="straddles.length > 0">
+          <tbody>
+            <tr *ngFor="let s of straddles">
+              <td>
+                <div class="row">
+                  <div class="col">{{s.name}}</div>
+                  <div class="col"></div>
+                  <div class="col"></div>
+                  <div class="col">{{s.bid | currency}}</div>
+                  <div class="col">{{s.ask | currency}}</div>
+                  <div class="col"></div>
+                  <div class="col"></div>
+                </div>
+                <div class="row" *ngFor="let leg of s.legs">
+                  <div class="col">{{leg.side}}</div>
+                  <div class="col">{{leg.strikePrice | currency}}</div>
+                  <div class="col">{{leg.expirationDate}}</div>
+                  <div class="col">{{leg.bid | currency}}</div>
+                  <div class="col">{{leg.ask | currency}}</div>
+                  <div class="col">{{leg.openInterest}}</div>
+                  <div class="col">{{leg.volume}}</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button *ngIf="straddles.length > 0" class="btn btn-link" (click)="straddles = []">Clear</button>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        Strangle - buy or sell put and call at different strike prices but same expiration
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        Bull call spread - buy call at lower strike price and sell call at higher strike price
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        Bear call spread - sell call at lower strike price and buy call at higher strike price
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        Bull put spread - sell put and then buy put at lower strike price
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        Bear put spread - buy put and then sell put at lower strike price
+      </div>
+    </div>
 
     <div *ngFor="let expiration of expirationMap">
       <section>
