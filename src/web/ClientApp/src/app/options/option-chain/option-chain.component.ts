@@ -144,7 +144,11 @@ export class OptionChainComponent implements OnInit {
 
   onExpirationChange(newValue) {
     console.log(newValue)
-    this.expirationSelection = newValue
+    if (newValue === this.expirationSelection) {
+      this.expirationSelection = ""
+    } else {
+      this.expirationSelection = newValue
+    }
     this.runFilter()
   }
 
