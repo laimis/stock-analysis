@@ -59,6 +59,23 @@
         <input class="form-control" step="0.01" type="number" id="maxAsk" name="maxAsk" [(ngModel)]="maxAsk" (ngModelChange)="onMaxAskChange()" />
       </div>
     </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label" for="minStrikePrice">Min Strike Price</label>
+        <select class="form-select" [(ngModel)]="minStrikePrice" id="minStrikePrice" name="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()">
+          <option></option>
+          <option *ngFor="let option of options" value="{{option.strikePrice}}">{{option.strikePrice}}</option>
+        </select>
+      </div>
+      <div class="col">
+        <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
+        <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
+          <option></option>
+          <option *ngFor="let option of options" value="{{option.strikePrice}}">{{option.strikePrice}}</option>
+        </select>
+      </div>
+      <div class="col"></div>
+    </div>
 
 
     <div *ngFor="let expiration of expirationMap">
@@ -67,23 +84,6 @@
           {{expiration[0].expirationDate}}
           <span class="float-end">Expires in {{expiration[0].daysToExpiration}} day(s)</span>
         </h4>
-        <div class="row mb-3">
-          <div class="col">
-            <label class="form-label" for="minStrikePrice">Min Strike Price</label>
-            <select class="form-select" [(ngModel)]="minStrikePrice" id="minStrikePrice" name="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()">
-              <option></option>
-              <option *ngFor="let option of getOptionsForExpiration(expiration[0].expirationDate)" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
-            </select>
-          </div>
-          <div class="col">
-            <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
-            <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
-              <option></option>
-              <option *ngFor="let option of expiration" value="{{option.strikePrice}}">{{option.strikePrice | currency}}</option>
-            </select>
-          </div>
-          <div class="col"></div>
-        </div>
         <div class="row mb-3">
           <!-- chart sections that show open interest vs strike price -->
           <app-chart
@@ -109,7 +109,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let option of expiration">
+            <tr *ngFor="let option of expiration" [ngClass]="{'table-info': itm(option)}">
               <td>{{option.strikePrice | currency}} {{option.side}}</td>
               <td>{{option.openInterest}}</td>
               <td>{{option.volume}}</td>

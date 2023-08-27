@@ -193,4 +193,16 @@ export class OptionChainComponent implements OnInit {
   isSpreadHealthy(option: OptionDefinition) {
     return option.bid > 0 && option.ask > 0 && ( (option.ask - option.bid)/option.ask <= 0.1 )
   }
+
+  itm(option: OptionDefinition) {
+    if (option.optionType == "call") {
+      return this.stockPrice > option.strikePrice
+    }
+    
+    if (option.optionType == "put") {
+      return this.stockPrice < option.strikePrice
+    }
+
+    throw new Error("Invalid option type: " + option.optionType)
+  }
 }
