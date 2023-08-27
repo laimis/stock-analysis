@@ -21,7 +21,7 @@
               <i class="text-muted fas fa-certificate"></i>
               Shares
             </h5>
-            <p class="card-text">You have <b>{{dashboard.openStockCount}}</b> tickers on file</p>
+            <p class="card-text">You have {{dashboard.openStockCount === 0 ? 'no' : ''}} tickers on file</p>
             <a class="card-link" [routerLink]="[ '/trading' ]">Manage Shares</a>
           </div>
         </div>
@@ -34,7 +34,7 @@
               <i class="text-muted fab fa-btc"></i>
               Crypto
             </h5>
-            <p class="card-text">You have <b>{{dashboard.openCryptoCount}}</b> crypto tokens</p>
+            <p class="card-text">You have {{dashboard.openCryptoCount === 0 ? 'no' : ''}} crypto tokens</p>
             <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
           </div>
         </div>
@@ -47,7 +47,7 @@
               <i class="text-muted fas fa-dice-five"></i>
               Options
             </h5>
-            <p class="card-text">You have <b>{{dashboard.openOptionCount}}</b> open contracts</p>
+            <p class="card-text">You have {{dashboard.openOptionCount === 0 ? 'no' : ''}} open contracts</p>
             <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
           </div>
         </div>
