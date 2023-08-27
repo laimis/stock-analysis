@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DailyScore, StocksService } from '../services/stocks.service';
+import { DailyScore, Prices, StocksService } from '../services/stocks.service';
 
 
 @Component({
@@ -12,7 +12,7 @@ import { DailyScore, StocksService } from '../services/stocks.service';
 export class PlaygroundComponent implements OnInit {
   dailyScores: DailyScore[];
   tickers: string[];
-  prices: import("d:/programming/stock-analysis/src/web/ClientApp/src/app/services/stocks.service").Prices;
+  prices: Prices;
   
   constructor(
     private stocks:StocksService,
