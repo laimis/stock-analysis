@@ -1,20 +1,34 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { Prices } from 'src/app/services/stocks.service';
-import { DeepPartial, PriceLineOptions, TimeScaleOptions, createChart } from 'lightweight-charts';
+import { IChartApi, PriceLineOptions, createChart } from 'lightweight-charts';
 
 @Component({
   selector: 'app-candlestickchart',
   templateUrl: './candlestickchart.component.html',
   styleUrls: ['./candlestickchart.component.css']
 })
-export class CandlestickChartComponent {
+export class CandlestickChartComponent implements OnDestroy {
+  chart: IChartApi;
+
+  ngOnDestroy(): void {
+    this.removeChart();
+  }
+
+  private removeChart() {
+    if (this.chart) {
+      this.chart.remove();
+    }
+  }
+
   renderChart() {
 
     console.log('rendering chart')
     console.log(this.buyDates)
     console.log(this.sellDates)
 
-    const chart = createChart(
+    this.removeChart();
+
+    this.chart = createChart(
       document.getElementById('chart'),
       { height: this.chartHeight }
     );
@@ -33,12 +47,12 @@ export class CandlestickChartComponent {
     }
 
     let addLineSeries = (sma, color, interval, priceBars) => {
-      const smaSeries = chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
+      const smaSeries = this.chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
       let smaLineData = createLineData(sma, interval, priceBars)
       smaSeries.setData(smaLineData);
     }
 
-    const barSeries = chart.addCandlestickSeries();
+    const barSeries = this.chart.addCandlestickSeries();
     let priceBars = this._prices.prices.map(toCandleStickData)
     barSeries.setData(priceBars);
     
@@ -79,7 +93,7 @@ export class CandlestickChartComponent {
     addLineSeries(this._prices.sma.sma150, 'lightblue', 150, priceBars);
     addLineSeries(this._prices.sma.sma200, 'blue', 200, priceBars);
     
-    chart.timeScale().fitContent();
+    this.chart.timeScale().fitContent();
   }
 
   @Input()
