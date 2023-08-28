@@ -1,11 +1,8 @@
 <div>
     <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-    <section>
-        <form>
-            <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>
-        </form>
-    </section>
+    <button type="submit" class="btn btn-secondary me-2 mb-2" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>
+    
     <section #addNewRoutineSection class="visually-hidden">
         <h5>Add new routine</h5>
         <form>
@@ -24,13 +21,20 @@
         </form>
     </section>
 
-    <section *ngFor="let routine of routines">
-        <h3>{{routine.name}}
-            <a class="btn btn-primary btn-sm me-2" [routerLink]="['/routines', routine.name, 'activate']">Activate</a>
-            <a class="btn btn-primary btn-sm" [routerLink]="['/routines', routine.name, 'edit']">
-                <i class="bi bi-pencil-fill"></i>
-            </a>
-        </h3>
-    </section>
+    <table>
+        <tbody>
+            <tr *ngFor="let routine of routines">
+                <td>
+                    <a class="fs-4" [routerLink]="['/routines', routine.name, 'activate']">{{routine.name}}</a>
+                </td>
+                <td>
+                    <a class="ms-4" [routerLink]="['/routines', routine.name, 'edit']">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
 
 </div>
