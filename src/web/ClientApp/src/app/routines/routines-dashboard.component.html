@@ -1,4 +1,9 @@
 <div>
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Routines</li>
+    </ol>
+    </nav>
     <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
     <button type="submit" class="btn btn-secondary me-2 mb-2" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>

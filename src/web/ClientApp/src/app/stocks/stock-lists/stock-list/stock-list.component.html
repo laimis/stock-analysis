@@ -1,4 +1,11 @@
 <div *ngIf="list">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/stocks/lists">Lists</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{list.name}}</li>
+        </ol>
+    </nav>
+
     <h3>
         {{list.name}}
         ({{list.tickers.length}})
