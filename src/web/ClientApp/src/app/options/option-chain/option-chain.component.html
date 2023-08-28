@@ -92,9 +92,9 @@
                   <div class="col">{{s.name}}</div>
                   <div class="col"></div>
                   <div class="col"></div>
-                  <div class="col">{{s.bid | currency}}</div>
-                  <div class="col">{{s.ask | currency}}</div>
-                  <div class="col"></div>
+                  <div class="col">{{s.maxCost | currency}}</div>
+                  <div class="col">{{s.maxGain | currency}}</div>
+                  <div class="col">{{s.maxLoss | currency}}</div>
                   <div class="col"></div>
                 </div>
                 <div class="row" *ngFor="let leg of s.legs">
@@ -120,7 +120,35 @@
     </div>
     <div class="row mb-3">
       <div class="col">
-        Bull call spread - buy call at lower strike price and sell call at higher strike price
+        <a href="#" (click)="bindBullCallSpreads($event)">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price
+
+        <table class="table table-striped" *ngIf="bullCallSpreads.length > 0">
+          <tbody>
+            <tr *ngFor="let s of bullCallSpreads">
+              <td>
+                <div class="row">
+                  <div class="col">{{s.name}}</div>
+                  <div class="col"></div>
+                  <div class="col"></div>
+                  <div class="col">{{s.maxCost | currency}}</div>
+                  <div class="col">{{s.maxGain | currency}}</div>
+                  <div class="col">{{s.maxLoss | currency}}</div>
+                  <div class="col"></div>
+                </div>
+                <div class="row" *ngFor="let leg of s.legs">
+                  <div class="col">{{leg.side}}</div>
+                  <div class="col">{{leg.strikePrice | currency}}</div>
+                  <div class="col">{{leg.expirationDate}}</div>
+                  <div class="col">{{leg.bid | currency}}</div>
+                  <div class="col">{{leg.ask | currency}}</div>
+                  <div class="col">{{leg.openInterest}}</div>
+                  <div class="col">{{leg.volume}}</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button *ngIf="bullCallSpreads.length > 0" class="btn btn-link" (click)="bullCallSpreads = []">Clear</button>
       </div>
     </div>
     <div class="row mb-3">

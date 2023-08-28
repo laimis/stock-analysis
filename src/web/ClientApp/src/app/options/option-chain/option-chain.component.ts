@@ -6,14 +6,12 @@ import { ChartType } from 'chart.js';
 
 class OptionLegs {
   name: string
-  bid: number
-  ask: number
+  maxCost: number
+  maxLoss: number
+  maxGain: number
   legs: OptionDefinition[]
 }
 
-function expirationMatches(option: OptionDefinition, expiration: string) {
-  return expiration == "" || option.expirationDate == expiration
-}
 
 @Component({
   selector: 'app-option-chain',
@@ -43,7 +41,9 @@ export class OptionChainComponent implements OnInit {
   public failure;
   volatility: number;
   numberOfContracts: number;
+
   straddles: OptionLegs[] = [];
+  bullCallSpreads: OptionLegs[] = [];
 
   constructor(
     private service: StocksService,
@@ -157,6 +157,48 @@ export class OptionChainComponent implements OnInit {
     return true
   }
 
+  bindBullCallSpreads(event) {
+    // group options by expiration
+    let expirationMap = new Map<string, OptionDefinition[]>();
+    this.filteredOptionsWithBothSides.forEach(function(value, index, arr) {
+      if (!expirationMap.has(value.expirationDate))
+      {
+        expirationMap.set(value.expirationDate, [value])
+      }
+      else
+      {
+          var temp = expirationMap.get(value.expirationDate)
+          temp.push(value)
+      }
+    })
+
+    // find spreads
+    let spreads = new Array<OptionLegs>()
+    expirationMap.forEach(function(value, key, map) {
+      let calls = value.filter(x => x.optionType == "call")
+
+
+      calls.forEach(function(call, index, arr) {
+        // we will buy the call at the index, and sell the next call, if available.
+        if (index + 1 < calls.length) {
+          let nextCall = calls[index + 1]
+
+          let legs : OptionLegs = {
+            name: "Bull Call Spread " + call.strikePrice + "-" + nextCall.strikePrice,
+            legs: [call, nextCall],
+            maxCost: call.ask - nextCall.bid,
+            maxGain: (nextCall.strikePrice - call.strikePrice) - (call.ask - nextCall.bid),
+            maxLoss: (call.ask - nextCall.bid)
+          }
+          
+          spreads.push(legs)
+        }
+      })
+    })
+
+    event.preventDefault()
+  }
+
   findStraddles(event) {
     // group options by expiration
     let expirationMap = new Map<string, OptionDefinition[]>();
@@ -186,11 +228,12 @@ export class OptionChainComponent implements OnInit {
             // overall ask
             let ask = call.ask + put.ask
             
-            let legs = {
+            let legs : OptionLegs = {
               name: "Straddle " + call.strikePrice,
               legs: [call, put],
-              bid: bid,
-              ask: ask,
+              maxCost: ask,
+              maxLoss: Infinity,
+              maxGain: Infinity
             }
             
             straddles.push(legs)
