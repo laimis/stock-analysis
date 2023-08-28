@@ -103,7 +103,8 @@
 
   <section>
     <h5>Stock chart</h5>
-    <app-candlestickchart 
+    <app-candlestickchart
+      *ngIf="currentPosition && prices"
       [prices]="prices"
       [averageBuyPrice]="currentPosition.averageBuyCostPerShare"
       [stopPrice]="currentPosition.stopPrice"
