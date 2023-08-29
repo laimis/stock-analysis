@@ -91,7 +91,7 @@ import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.comp
 import { OptionBrokeragePositionsComponent } from './options/option-dashboard/option-brokerage-positions.component';
 import { StockLinkComponent } from './shared/stocks/stock-link.component';
 import { RoutineComponent } from './routines/routines-routine.component';
-import { CandlestickChartComponent } from './shared/barchart/barchart/candlestickchart.component';
+import { CandlestickChartComponent } from './shared/candlestick-chart/candlestick-chart.component';
 
 
 var routes: Routes = [

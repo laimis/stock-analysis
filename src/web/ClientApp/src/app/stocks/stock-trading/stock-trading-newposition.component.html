@@ -104,10 +104,10 @@
     </div>
     <div class="row mt-3" *ngIf="prices && showChart">
       <div class="col">
-        <app-candlestickchart
+        <app-candlestick-chart
           [prices]="prices"
           [stopPrice]="chartStop">
-        </app-candlestickchart>
+        </app-candlestick-chart>
       </div>
     </div>
     <div class="row mt-3" *ngIf="outcomes && showAnalysis">

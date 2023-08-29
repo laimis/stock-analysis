@@ -279,8 +279,20 @@ export class OptionChainComponent implements OnInit {
   }
 
   setStrikePriceFilterNearMoney() {
-    this.minStrikePrice = Math.floor(this.stockPrice - this.stockPrice * 0.1)
-    this.maxStrikePrice = Math.ceil(this.stockPrice + this.stockPrice * 0.1)
+    let closestPriceFunc = function(target, prev, curr) {
+      return (Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev);
+    }
+
+    let strikePrices = this.options.map(x => x.strikePrice)
+
+    let minStrikePrice = Math.floor(this.stockPrice - this.stockPrice * 0.1)
+    let closestStrikePrice = strikePrices.reduce((prev, curr) => closestPriceFunc(minStrikePrice, prev, curr));
+    this.minStrikePrice = closestStrikePrice
+
+    let maxStrikePrice = Math.ceil(this.stockPrice + this.stockPrice * 0.1)
+    closestStrikePrice = strikePrices.reduce((prev, curr) => closestPriceFunc(maxStrikePrice, prev, curr));
+    this.maxStrikePrice = closestStrikePrice
+
     this.runFilter()
   }
 
