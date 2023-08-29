@@ -31,11 +31,11 @@ namespace core.Stocks.Services.Analysis
                 Shared.ValueFormat.Currency,
                 $"Stop loss is {stopLoss:C2}");
 
-            var pctToStop = (position.PercentToStop ?? -1);
+            var pctToStop = position.PercentToStop ?? -1;
                 
             yield return new AnalysisOutcome(
                     PortfolioAnalysisKeys.PercentToStopLoss,
-                    pctToStop < 0 ? OutcomeType.Positive : OutcomeType.Negative,
+                    pctToStop < 0 ? OutcomeType.Neutral : OutcomeType.Negative,
                     pctToStop,
                     Shared.ValueFormat.Percentage,
                     $"% difference to stop loss {stopLoss} is {pctToStop}"
