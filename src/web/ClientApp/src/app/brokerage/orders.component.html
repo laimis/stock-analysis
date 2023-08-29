@@ -1,7 +1,5 @@
-<div class="mb-3">
-  <section>
-    <h5>Brokerage Orders</h5>
-  </section>
+<section>
+  <h5>Brokerage Orders</h5>
   <div>
     <div *ngIf="isEmpty && filteredTickers.length > 0 ">
       No brokerage orders found for {{filteredTickers.join(', ')}}
@@ -53,4 +51,4 @@
         </tr>
     </table>
   </div>
-</div>
+</section>
