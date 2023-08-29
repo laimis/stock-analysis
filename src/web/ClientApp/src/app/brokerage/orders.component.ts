@@ -51,11 +51,12 @@ export class BrokerageOrdersComponent implements OnInit {
     let isFilled = (o) => o.status === 'FILLED'
     let isBuy = (o) => o.type === 'BUY'
     let isSell = (o) => o.type === 'SELL'
+    let orderBy = (a, b) => a.ticker.localeCompare(b.ticker)
 
-    var buys = this._orders.filter(o => isBuy(o) && !isFilled(o) && isTickerVisible(o.ticker));
-    var sells = this._orders.filter(o => isSell(o) && !isFilled(o) && isTickerVisible(o.ticker));
-    var filledBuys = this._orders.filter(o => isBuy(o) && isFilled(o) && isTickerVisible(o.ticker));
-    var filledSells = this._orders.filter(o => isSell(o) && isFilled(o) && isTickerVisible(o.ticker));
+    var buys = this._orders.filter(o => isBuy(o) && !isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
+    var sells = this._orders.filter(o => isSell(o) && !isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
+    var filledBuys = this._orders.filter(o => isBuy(o) && isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
+    var filledSells = this._orders.filter(o => isSell(o) && isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
     this.groupedOrders = [buys, sells, filledBuys, filledSells]
     this.isEmpty = this.groupedOrders.every(o => o.length == 0)
   }
