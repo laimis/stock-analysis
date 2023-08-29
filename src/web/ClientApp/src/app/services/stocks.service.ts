@@ -1167,6 +1167,14 @@ export class OptionDefinition {
   transactions: Transaction[]
 }
 
+export class OptionSpread {
+  name: string
+  maxCost: number
+  maxLoss: number
+  maxGain: number
+  legs: OptionDefinition[]
+}
+
 export class OptionBreakdown {
   callVolume : number
   putVolume : number

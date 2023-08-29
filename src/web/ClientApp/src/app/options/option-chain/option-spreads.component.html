@@ -1,0 +1,21 @@
+
+<ng-container *ngFor="let s of spreads">
+  <table class="table table-striped mt-3">
+    <tbody>
+      <tr class="table-info">
+        <td colspan="2">{{s.name}}</td>
+        <td colspan="2">max cost: {{s.maxCost | currency}}</td>
+        <td>max gain: {{s.maxGain | currency}}</td>
+        <td>max loss: {{s.maxLoss | currency}}</td>
+      </tr>
+      <tr *ngFor="let leg of s.legs">
+        <td>{{leg.strikePrice | currency}}</td>
+        <td>{{leg.expirationDate}}</td>
+        <td>{{leg.bid | currency}}</td>
+        <td>{{leg.ask | currency}}</td>
+        <td>{{leg.openInterest}}</td>
+        <td>{{leg.volume}}</td>
+      </tr>
+    </tbody>
+  </table>    
+</ng-container>

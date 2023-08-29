@@ -14,3 +14,4 @@ export class GlobalService {
     this.customVariable.next(this.customVariable.value)
   }
 }
+

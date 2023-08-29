@@ -1,17 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition } from '../../services/stocks.service';
+import { StocksService, OptionDefinition, OptionSpread } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { ChartType } from 'chart.js';
-
-
-class OptionLegs {
-  name: string
-  maxCost: number
-  maxLoss: number
-  maxGain: number
-  legs: OptionDefinition[]
-}
-
+import { OptionService } from 'src/app/services/option.service';
 
 @Component({
   selector: 'app-option-chain',
@@ -42,10 +33,12 @@ export class OptionChainComponent implements OnInit {
   volatility: number;
   numberOfContracts: number;
 
-  straddles: OptionLegs[] = [];
-  bullCallSpreads: OptionLegs[] = [];
+  straddles: OptionSpread[] = [];
+  bullCallSpreads: OptionSpread[] = [];
+  bullPutSpreads: OptionSpread[] = [];
 
   constructor(
+    private optionService: OptionService,
     private service: StocksService,
     private route: ActivatedRoute) { }
 
@@ -157,92 +150,20 @@ export class OptionChainComponent implements OnInit {
     return true
   }
 
-  bindBullCallSpreads(event) {
-    // group options by expiration
-    let expirationMap = new Map<string, OptionDefinition[]>();
-    this.filteredOptionsWithBothSides.forEach(function(value, index, arr) {
-      if (!expirationMap.has(value.expirationDate))
-      {
-        expirationMap.set(value.expirationDate, [value])
-      }
-      else
-      {
-          var temp = expirationMap.get(value.expirationDate)
-          temp.push(value)
-      }
-    })
-
-    // find spreads
-    let spreads = new Array<OptionLegs>()
-    expirationMap.forEach(function(value, key, map) {
-      let calls = value.filter(x => x.optionType == "call")
-
-
-      calls.forEach(function(call, index, arr) {
-        // we will buy the call at the index, and sell the next call, if available.
-        if (index + 1 < calls.length) {
-          let nextCall = calls[index + 1]
-
-          let legs : OptionLegs = {
-            name: "Bull Call Spread " + call.strikePrice + "-" + nextCall.strikePrice,
-            legs: [call, nextCall],
-            maxCost: call.ask - nextCall.bid,
-            maxGain: (nextCall.strikePrice - call.strikePrice) - (call.ask - nextCall.bid),
-            maxLoss: (call.ask - nextCall.bid)
-          }
-          
-          spreads.push(legs)
-        }
-      })
-    })
-
+  findBullCallSpreads(event) {
+  
+    this.bullCallSpreads = this.optionService.findBullCallSpreads(this.filteredOptionsWithBothSides)
     event.preventDefault()
   }
 
   findStraddles(event) {
-    // group options by expiration
-    let expirationMap = new Map<string, OptionDefinition[]>();
-    this.filteredOptionsWithBothSides.forEach(function(value, index, arr) {
-      if (!expirationMap.has(value.expirationDate))
-      {
-        expirationMap.set(value.expirationDate, [value])
-      }
-      else
-      {
-          var temp = expirationMap.get(value.expirationDate)
-          temp.push(value)
-      }
-    })
 
-    // find straddles
-    let straddles = new Array<OptionLegs>()
-    expirationMap.forEach(function(value, key, map) {
-      let calls = value.filter(x => x.optionType == "call")
-      let puts = value.filter(x => x.optionType == "put")
+    this.straddles = this.optionService.findStraddles(this.filteredOptionsWithBothSides)
+    event.preventDefault()
+  }
 
-      calls.forEach(function(call, index, arr) {
-        puts.forEach(function(put, index, arr) {
-          if (call.strikePrice == put.strikePrice) {
-            // overall bid
-            let bid = call.bid + put.bid
-            // overall ask
-            let ask = call.ask + put.ask
-            
-            let legs : OptionLegs = {
-              name: "Straddle " + call.strikePrice,
-              legs: [call, put],
-              maxCost: ask,
-              maxLoss: Infinity,
-              maxGain: Infinity
-            }
-            
-            straddles.push(legs)
-          }
-        })
-      })
-    })
-
-    this.straddles = straddles
+  findBullPutSpreads(event) {
+    this.bullPutSpreads = this.optionService.findBullPutSpreads(this.filteredOptionsWithBothSides)
     event.preventDefault()
   }
 
