@@ -31,8 +31,8 @@ export class OptionService {
         if (index + 1 < puts.length) {
           let sellOption = puts[index + 1]
 
-          let maxCost = 0
           let maxGain = sellOption.bid - buyOption.ask
+          let maxCost = maxGain
           let maxLoss = sellOption.strikePrice - buyOption.strikePrice - maxGain
 
           let legs : OptionSpread = {

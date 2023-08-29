@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
-using MediatR;
 
 namespace core.Options
 {
@@ -57,15 +56,18 @@ namespace core.Options
                     openOptions.Add(new OwnedOptionView(o, detail));
                 }
 
-                var brokeragePositions = await _brokerage.GetAccount(user.State);
-                var positions = brokeragePositions.Success?.OptionPositions?.Where(
+                var brokerageAccount = await _brokerage.GetAccount(user.State);
+                var positions = brokerageAccount.Success?.OptionPositions?.Where(
                     bp => !openOptions.Any(o => o.Ticker == bp.Ticker && o.StrikePrice == bp.StrikePrice && o.OptionType.ToString() == bp.OptionType)
                 ) ?? Array.Empty<OptionPosition>();
+
+                var brokerageOrders = (brokerageAccount.Success?.Orders ?? Array.Empty<Order>()).Where(o => o.IsOption);
 
                 return new OptionDashboardView(
                     closed: closedOptions.Select(o => new OwnedOptionView(o, optionDetail: null)),
                     open: openOptions,
-                    brokeragePositions: positions
+                    brokeragePositions: positions,
+                    orders: brokerageOrders
                 );
 
             }

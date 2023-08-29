@@ -55,11 +55,14 @@ public class StockQuote
 public class Order
 {
     public string OrderId { get; set; }
+    public bool Cancelable { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
     public string Status { get; set; }
     public string Ticker { get; set; }
+    public string Description { get; set; }
     public string Type { get; set; }
+    public string AssetType { get; set; }
     public DateTimeOffset? Date { get; set; }
     public int StatusOrder => Status switch
     {
@@ -70,12 +73,7 @@ public class Order
         "CANCELED" => 3,
         _ => 4
     };
-    public bool CanBeCancelled => Status switch
-    {
-        "WORKING" => true,
-        "PENDING_ACTIVATION" => true,
-        _ => false
-    };
+    public bool CanBeCancelled => Cancelable;
     public bool IsActive => Status switch
     {
         "WORKING" => true,
@@ -87,6 +85,7 @@ public class Order
     public bool IncludeInResponses => Status != "CANCELED" && Status != "REJECTED" && Status != "EXPIRED";
     public bool IsSellOrder => Type == "SELL";
     public bool IsBuyOrder => Type == "BUY";
+    public bool IsOption => AssetType == "OPTION";
 }
 
 public class StockPosition

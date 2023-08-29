@@ -1,0 +1,31 @@
+<section>
+  <h3>Brokerage Orders</h3>
+  <div *ngIf="orders && orders.length == 0">
+    No option orders present in brokerage account
+  </div>
+  <table *ngIf="orders && orders.length > 0" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let order of orders">
+        <td>
+          <app-stock-link [ticker]="order.ticker"></app-stock-link>
+          <app-trading-view-link [ticker]="order.ticker"></app-trading-view-link>
+        </td>
+        <td>{{order.description}}</td>
+        <td>{{order.quantity | number}}</td>
+        <td>{{order.price | currency}}</td>
+        <td>{{order.status }}</td>
+        <td><button *ngIf="order.canBeCancelled" class="btn btn-sm btn-warning" (click)="cancelOrder(order)">Cancel</button></td>
+      </tr>
+    </tbody>
+  </table>
+</section>

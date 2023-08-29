@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Router } from '@angular/router';
 import { BrokerageOptionPosition, StocksService } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 

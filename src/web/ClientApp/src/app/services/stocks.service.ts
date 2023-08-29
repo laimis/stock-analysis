@@ -731,6 +731,7 @@ export interface OptionsContainer {
   open: OwnedOption[]
   closed: OwnedOption[]
   brokeragePositions: BrokerageOptionPosition[]
+  orders: BrokerageOrder[] 
   overallStats: OptionStats
   buyStats: OptionStats
   sellStats: OptionStats
@@ -1003,9 +1004,11 @@ export interface BrokerageOrder {
   orderId: string
   price: number
   type: string
+  assetType: string
   quantity: number
   status: string
   ticker: string
+  description: string
   date: string
   canBeCancelled: boolean
   canBeRecorded: boolean

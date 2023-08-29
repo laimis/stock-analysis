@@ -81,6 +81,7 @@ internal class Instrument
     public string? putCall { get; set; }
 
     public string? underlyingSymbol { get; set; }
+    public string? resolvedSymbol => underlyingSymbol ?? symbol;
 }
 
 internal class OrderStrategy

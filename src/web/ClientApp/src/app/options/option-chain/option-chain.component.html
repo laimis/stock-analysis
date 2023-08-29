@@ -97,10 +97,9 @@
     <div class="row mb-3">
       <div class="col">
         <a href="#" (click)="findBullCallSpreads($event)">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price
-
-        <app-option-spreads [spreads]="bullCallSpreads"></app-option-spreads>
-
         <button *ngIf="bullCallSpreads.length > 0" class="btn btn-link" (click)="bullCallSpreads = []">Clear</button>
+        <app-option-spreads [spreads]="bullCallSpreads"></app-option-spreads>
+        
       </div>
     </div>
     <div class="row mb-3">
@@ -111,8 +110,8 @@
     <div class="row mb-3">
       <div class="col">
         <a href="#" (click)="findBullPutSpreads($event)">Bull put spread</a> - sell put and then buy put at lower strike price
-        <app-option-spreads [spreads]="bullPutSpreads"></app-option-spreads>
         <button *ngIf="bullPutSpreads.length > 0" class="btn btn-link" (click)="bullPutSpreads = []">Clear</button>
+        <app-option-spreads [spreads]="bullPutSpreads"></app-option-spreads>
       </div>
     </div>
     <div class="row mb-3">

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { OptionsContainer, StocksService } from '../../services/stocks.service';
+import { BrokerageOptionPosition, OptionsContainer, StocksService } from '../../services/stocks.service';
 
 @Component({
   selector: 'app-options',
@@ -10,7 +10,7 @@ import { OptionsContainer, StocksService } from '../../services/stocks.service';
 export class OptionsComponent implements OnInit {
 
   optionsContainer: OptionsContainer
-
+  
   loaded: boolean = false;
 
   activeTab: string = 'open'
@@ -40,7 +40,7 @@ export class OptionsComponent implements OnInit {
     this.activeTab = tabName
   }
 
-  refreshPositions() {
+  refreshOptions() {
     this.getOptions()
   }
 }

@@ -1,9 +1,9 @@
-<div class="mt-4" *ngIf="positions && positions.length == 0">
-  No option positions present in brokerage account
-</div>
-
-<div class="mt-4" *ngIf="positions && positions.length > 0">
-  <table class="table table-hover">
+<section class="mt-4">
+  <h3>Unresolved Brokerage Positions</h3>
+  <div *ngIf="positions && positions.length === 0">
+    No unresolved option positions found 
+  </div>
+  <table class="table table-hover" *ngIf="positions && positions.length > 0">
     <thead>
       <tr>
         <th>Ticker</th>
@@ -36,4 +36,4 @@
       </tr>
     </tbody>
   </table>
-</div>
+</section>

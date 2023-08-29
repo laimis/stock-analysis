@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using core.Account;
@@ -179,7 +180,8 @@ public class TDAmeritradeClient : IBrokerage
         var response = await CallApi<AccountsResponse[]>(
             user,
             "/accounts?fields=positions,orders",
-            HttpMethod.Get
+            HttpMethod.Get,
+            debug: true
         );
             
         if (response.Error != null)
@@ -193,15 +195,22 @@ public class TDAmeritradeClient : IBrokerage
             ?? throw new Exception("Could not find positions in response");
         var strategies = (accounts[0].securitiesAccount?.orderStrategies)
             ?? throw new Exception("Could not find order strategies in response");
-        var orders = strategies.Select(o => new Order
+
+        var orders = 
+            strategies
+            .SelectMany(o => (o.orderLegCollection ?? Array.Empty<OrderLeg>()).Select(l => (o, l)))
+            .Select( tuple => new Order
         {
-            Date = o.closeTime == null ? null : DateTimeOffset.Parse(o.closeTime),
-            Status = o.status,
-            OrderId = o.orderId.ToString(),
-            Price = o.ResolvePrice(),
-            Quantity = Convert.ToInt32(o.quantity),
-            Ticker = o.orderLegCollection?[0]?.instrument?.symbol,
-            Type = o.orderLegCollection?[0]?.instruction
+            Date = tuple.o.closeTime == null ? null : DateTimeOffset.Parse(tuple.o.closeTime),
+            Status = tuple.o.status,
+            OrderId = tuple.o.orderId.ToString(),
+            Cancelable = tuple.o.cancelable,
+            Price = tuple.o.ResolvePrice(),
+            Quantity = Convert.ToInt32(tuple.o.quantity),
+            Ticker = tuple.l.instrument?.resolvedSymbol,
+            Description = tuple.l.instrument?.description,
+            Type = tuple.l.instruction,
+            AssetType = tuple.l.instrument?.assetType
         })
         .ToArray();
 
@@ -209,7 +218,7 @@ public class TDAmeritradeClient : IBrokerage
             .Where(p => p.instrument?.assetType == "EQUITY")
             .Select(p => new StockPosition
             {
-                Ticker = p.instrument?.underlyingSymbol ?? p.instrument?.symbol,
+                Ticker = p.instrument?.resolvedSymbol,
                 Quantity = p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1,
                 AverageCost = p.averagePrice
             }).ToArray();

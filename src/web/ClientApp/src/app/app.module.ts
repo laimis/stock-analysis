@@ -93,6 +93,7 @@ import { StockLinkComponent } from './shared/stocks/stock-link.component';
 import { RoutineComponent } from './routines/routines-routine.component';
 import { CandlestickChartComponent } from './shared/candlestick-chart/candlestick-chart.component';
 import { OptionSpreadsComponent } from './options/option-chain/option-spreads.component';
+import { OptionBrokerageOrdersComponent } from './options/option-dashboard/option-brokerage-orders.component';
 
 
 var routes: Routes = [
@@ -256,6 +257,7 @@ var routes: Routes = [
     StockLinkComponent,
 
     OptionBrokeragePositionsComponent,
+    OptionBrokerageOrdersComponent,
 
     RoutineDashboardComponent,
     RoutineComponent
