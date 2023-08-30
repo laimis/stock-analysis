@@ -7,6 +7,10 @@
     </div>
   </div>
 
+  <div>
+    See option chain for <a [routerLink]="[ '/options', 'chain', ticker ]">{{ticker}}</a>
+  </div>
+
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
   <h4 class="mt-4">Record option transactions</h4>

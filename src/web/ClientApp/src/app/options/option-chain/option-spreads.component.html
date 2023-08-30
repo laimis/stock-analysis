@@ -4,17 +4,25 @@
     <tbody>
       <tr class="table-info">
         <td colspan="2">{{s.name}}</td>
-        <td colspan="2">max cost: {{s.maxCost | currency}}</td>
-        <td>max gain: {{s.maxGain | currency}}</td>
-        <td>max loss: {{s.maxLoss | currency}}</td>
+        <td colspan="2">
+          <span *ngIf="s.premiumPaid">You will pay {{s.premiumPaid | currency}}.</span>
+          <span *ngIf="s.premiumReceived">You will receive {{s.premiumReceived | currency}}.</span>
+        </td>
+        <td colspan="2">
+          max gain: {{s.maxGain | currency}}
+        </td>
+        <td>
+          Max risk is {{s.risk | currency}}
+        </td>
       </tr>
       <tr *ngFor="let leg of s.legs">
-        <td>{{leg.strikePrice | currency}}</td>
-        <td>{{leg.expirationDate}}</td>
-        <td>{{leg.bid | currency}}</td>
-        <td>{{leg.ask | currency}}</td>
-        <td>{{leg.openInterest}}</td>
-        <td>{{leg.volume}}</td>
+        <td>{{leg.action}}</td>
+        <td>{{leg.option.strikePrice | currency}}</td>
+        <td>{{leg.option.expirationDate}}</td>
+        <td>{{leg.option.bid | currency}}</td>
+        <td>{{leg.option.ask | currency}}</td>
+        <td>{{leg.option.openInterest}}</td>
+        <td>{{leg.option.volume}}</td>
       </tr>
     </tbody>
   </table>    

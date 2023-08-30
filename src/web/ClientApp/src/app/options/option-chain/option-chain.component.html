@@ -91,11 +91,6 @@
     </div>
     <div class="row mb-3">
       <div class="col">
-        Strangle - buy or sell put and call at different strike prices but same expiration
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
         <a href="#" (click)="findBullCallSpreads($event)">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price
         <button *ngIf="bullCallSpreads.length > 0" class="btn btn-link" (click)="bullCallSpreads = []">Clear</button>
         <app-option-spreads [spreads]="bullCallSpreads"></app-option-spreads>
@@ -104,7 +99,9 @@
     </div>
     <div class="row mb-3">
       <div class="col">
-        Bear call spread - sell call at lower strike price and buy call at higher strike price
+        <a href="#" (click)="findBearCallSpreads($event)">Bear call spread</a> - sell call at lower strike price and buy call at higher strike price
+        <button *ngIf="bearCallSpreads.length > 0" class="btn btn-link" (click)="bearCallSpreads = []">Clear</button>
+        <app-option-spreads [spreads]="bearCallSpreads"></app-option-spreads>
       </div>
     </div>
     <div class="row mb-3">
@@ -116,7 +113,9 @@
     </div>
     <div class="row mb-3">
       <div class="col">
-        Bear put spread - buy put and then sell put at lower strike price
+        <a href="#" (click)="findBearPutSpreads($event)">Bear put spread</a> - buy put and then sell put at lower strike Price
+        <button *ngIf="bearPutSpreads.length > 0" class="btn btn-link" (click)="bearPutSpreads = []">Clear</button>
+        <app-option-spreads [spreads]="bearPutSpreads"></app-option-spreads>
       </div>
     </div>
 

@@ -10,12 +10,30 @@ import { OwnedOption } from 'src/app/services/stocks.service';
 
 export class OptionOpenComponent {
 
+  private _openOptions : OwnedOption[] = []
+  premiumSum: number;
+  premiumCloseValue: number;
+
   @Input()
-  openOptions : OwnedOption[]
+  set openOptions(value : OwnedOption[]) {
+    if (value == null) {
+      value = []
+    }
+    this._openOptions = value
+    this.premiumSum = value.reduce((a, b) => a - b.premiumPaid + b.premiumReceived, 0)
+    this.premiumCloseValue = value.reduce((a, b) => {
+      if (b.boughtOrSold == 'Bought') {
+        return a + b.detail.bid
+      } else {
+        return a - b.detail.ask
+      }
+    }, 0) * 100
+  }
+  get openOptions() : OwnedOption[] {
+    return this._openOptions
+  }
 
 	constructor(private router: Router){}
-
-  ngOnInit(): void {}
 
   onTickerSelected(ticker:string) {
     this.router.navigateByUrl('/stocks/' + ticker)

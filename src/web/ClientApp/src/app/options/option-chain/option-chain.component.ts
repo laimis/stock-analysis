@@ -36,6 +36,8 @@ export class OptionChainComponent implements OnInit {
   straddles: OptionSpread[] = [];
   bullCallSpreads: OptionSpread[] = [];
   bullPutSpreads: OptionSpread[] = [];
+  bearCallSpreads: OptionSpread[] = [];
+  bearPutSpreads: OptionSpread[] = [];
 
   constructor(
     private optionService: OptionService,
@@ -156,6 +158,11 @@ export class OptionChainComponent implements OnInit {
     event.preventDefault()
   }
 
+  findBearCallSpreads(event) {
+    this.bearCallSpreads = this.optionService.findBearCallSpreads(this.filteredOptionsWithBothSides)
+    event.preventDefault()
+  }
+
   findStraddles(event) {
 
     this.straddles = this.optionService.findStraddles(this.filteredOptionsWithBothSides)
@@ -164,6 +171,11 @@ export class OptionChainComponent implements OnInit {
 
   findBullPutSpreads(event) {
     this.bullPutSpreads = this.optionService.findBullPutSpreads(this.filteredOptionsWithBothSides)
+    event.preventDefault()
+  }
+
+  findBearPutSpreads(event) {
+    this.bearPutSpreads = this.optionService.findBearPutSpreads(this.filteredOptionsWithBothSides)
     event.preventDefault()
   }
 

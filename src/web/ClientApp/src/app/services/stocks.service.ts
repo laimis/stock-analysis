@@ -1173,10 +1173,16 @@ export class OptionDefinition {
 
 export class OptionSpread {
   name: string
-  maxCost: number
-  maxLoss: number
+  premiumReceived?: number
+  premiumPaid?: number
+  risk: number
   maxGain: number
-  legs: OptionDefinition[]
+  legs: OptionLeg[]
+}
+
+export class OptionLeg {
+  action: string
+  option: OptionDefinition
 }
 
 export class OptionBreakdown {
