@@ -82,40 +82,26 @@
 
     <div class="row mb-3">
       <div class="col">
-        <a href="#" (click)="findStraddles($event)">Straddles</a> - buy or sell put and call at the same strike price
-        
-        <app-option-spreads [spreads]="straddles"></app-option-spreads>
-        
-        <button *ngIf="straddles.length > 0" class="btn btn-link" (click)="straddles = []">Clear</button>
+        <h3>Bearish</h3>
+        <div><a href="#" (click)="selectSpreads($event, 'straddles')">Straddles</a> - buy or sell put and call at the same strike price</div>
+        <div><a href="#" (click)="selectSpreads($event, 'bearCallSpreads')">Bear call spread</a> - sell call at lower strike price and buy call at higher strike price</div>
+        <div><a href="#" (click)="selectSpreads($event, 'bearPutSpreads')">Bear put spread</a> - buy put and then sell put at lower strike price</div>
+      </div>
+      <div class="col">
+        <h3>Bullish</h3>
+        <div><a href="#" (click)="selectSpreads($event, 'straddles')">Straddles</a></div>
+        <div><a href="#" (click)="selectSpreads($event, 'bullCallSpreads')">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price</div>
+        <div><a href="#" (click)="selectSpreads($event, 'bullPutSpreads')">Bull put spread</a> - sell put and then buy put at lower strike price</div>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col">
-        <a href="#" (click)="findBullCallSpreads($event)">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price
-        <button *ngIf="bullCallSpreads.length > 0" class="btn btn-link" (click)="bullCallSpreads = []">Clear</button>
-        <app-option-spreads [spreads]="bullCallSpreads"></app-option-spreads>
-        
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <a href="#" (click)="findBearCallSpreads($event)">Bear call spread</a> - sell call at lower strike price and buy call at higher strike price
-        <button *ngIf="bearCallSpreads.length > 0" class="btn btn-link" (click)="bearCallSpreads = []">Clear</button>
-        <app-option-spreads [spreads]="bearCallSpreads"></app-option-spreads>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <a href="#" (click)="findBullPutSpreads($event)">Bull put spread</a> - sell put and then buy put at lower strike price
-        <button *ngIf="bullPutSpreads.length > 0" class="btn btn-link" (click)="bullPutSpreads = []">Clear</button>
-        <app-option-spreads [spreads]="bullPutSpreads"></app-option-spreads>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <a href="#" (click)="findBearPutSpreads($event)">Bear put spread</a> - buy put and then sell put at lower strike Price
-        <button *ngIf="bearPutSpreads.length > 0" class="btn btn-link" (click)="bearPutSpreads = []">Clear</button>
-        <app-option-spreads [spreads]="bearPutSpreads"></app-option-spreads>
+        <button *ngIf="selectedSpread" class="btn btn-link" (click)="selectedSpread = null">Clear</button>
+        <app-option-spreads *ngIf="selectedSpread === 'straddles'"  [spreads]="straddles"></app-option-spreads>
+        <app-option-spreads *ngIf="selectedSpread === 'bullCallSpreads'" [spreads]="bullCallSpreads"></app-option-spreads>    
+        <app-option-spreads *ngIf="selectedSpread === 'bullPutSpreads'"  [spreads]="bullPutSpreads"></app-option-spreads>
+        <app-option-spreads *ngIf="selectedSpread === 'bearCallSpreads'"  [spreads]="bearCallSpreads"></app-option-spreads>
+        <app-option-spreads *ngIf="selectedSpread === 'bearPutSpreads'"  [spreads]="bearPutSpreads"></app-option-spreads>
       </div>
     </div>
 

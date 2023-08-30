@@ -109,6 +109,12 @@ export class OptionChainComponent implements OnInit {
     })
     this.expirationMap = Array.from(expirationMap.values());
 
+    this.bullCallSpreads = this.optionService.findBullCallSpreads(this.filteredOptionsWithBothSides)
+    this.bearCallSpreads = this.optionService.findBearCallSpreads(this.filteredOptionsWithBothSides)
+    this.straddles = this.optionService.findStraddles(this.filteredOptionsWithBothSides)
+    this.bullPutSpreads = this.optionService.findBullPutSpreads(this.filteredOptionsWithBothSides)
+    this.bearPutSpreads = this.optionService.findBearPutSpreads(this.filteredOptionsWithBothSides)
+
     console.log("filter running finished")
   }
 
@@ -152,30 +158,10 @@ export class OptionChainComponent implements OnInit {
     return true
   }
 
-  findBullCallSpreads(event) {
-  
-    this.bullCallSpreads = this.optionService.findBullCallSpreads(this.filteredOptionsWithBothSides)
-    event.preventDefault()
-  }
-
-  findBearCallSpreads(event) {
-    this.bearCallSpreads = this.optionService.findBearCallSpreads(this.filteredOptionsWithBothSides)
-    event.preventDefault()
-  }
-
-  findStraddles(event) {
-
-    this.straddles = this.optionService.findStraddles(this.filteredOptionsWithBothSides)
-    event.preventDefault()
-  }
-
-  findBullPutSpreads(event) {
-    this.bullPutSpreads = this.optionService.findBullPutSpreads(this.filteredOptionsWithBothSides)
-    event.preventDefault()
-  }
-
-  findBearPutSpreads(event) {
-    this.bearPutSpreads = this.optionService.findBearPutSpreads(this.filteredOptionsWithBothSides)
+  selectedSpread: string = null
+  selectSpreads(event, type) {
+    this.selectedSpread = type
+    console.log("selected spread: " + this.selectedSpread)
     event.preventDefault()
   }
 
