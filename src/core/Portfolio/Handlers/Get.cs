@@ -45,8 +45,7 @@ namespace core.Portfolio
                 {
                     OpenStockCount = openStocks.Count(),
                     OpenOptionCount = openOptions.Count(),
-                    OpenCryptoCount = cryptos.Count(),
-                    Calculated = DateTimeOffset.UtcNow
+                    OpenCryptoCount = cryptos.Count()
                 };
                 return obj;
             }

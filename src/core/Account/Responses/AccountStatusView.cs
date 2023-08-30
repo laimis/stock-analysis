@@ -1,9 +1,8 @@
 using System;
-using core.Shared;
 
 namespace core.Account.Responses
 {
-    public class AccountStatusView : IViewModel
+    public class AccountStatusView
     {
         public bool LoggedIn { get; set; }
         public Guid Username { get; set; }
@@ -14,7 +13,6 @@ namespace core.Account.Responses
         public string Lastname { get; set; }
         public bool IsAdmin { get; set; }
         public string SubscriptionLevel { get; set; }
-        public DateTimeOffset Calculated { get; set; }
         public bool ConnectedToBrokerage { get; set; }
         public bool BrokerageAccessTokenExpired { get; set; }
     }
