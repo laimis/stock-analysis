@@ -1,39 +1,64 @@
 <div class="mt-4" *ngIf="violations">
-    <ul *ngIf="violations.length > 0">
-      <li class="mt-3" *ngFor="let violation of violations">
-        <app-stock-link [ticker]="violation.ticker"></app-stock-link>
-        <app-trading-view-link [ticker]="violation.ticker"></app-trading-view-link>
-        
-        {{violation.message}}
-        <button type="button" class="btn btn-secondary me-2" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
-        <button type="button" class="btn btn-secondary me-2" (click)="openPosition(violation.ticker)">Open Position</button>
+  <span *ngIf="violations.length === 0">
+    You have no violations.
+  </span>
+  <table class="table table-hover border" *ngIf="violations.length > 0">
+    <thead>
+      <tr>
+        <th scope="col">Ticker</th>
+        <th scope="col">Number of Shares</th>
+        <th scope="col">Buy Price</th>
+        <th scope="col">Current Price</th>
+        <th scope="col">% diff</th>
+        <th scope="col">Message</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let violation of violations">
+        <tr>
+          <td>
+            <app-stock-link [ticker]="violation.ticker"></app-stock-link>
+            <app-trading-view-link [ticker]="violation.ticker"></app-trading-view-link>
+          </td>
+          <td>{{violation.numberOfShares}}</td>
+          <td>{{violation.pricePerShare | currency}}</td>
+          <td>{{violation.currentPrice | currency}}</td>
+          <td>{{(violation.currentPrice - violation.pricePerShare) / violation.pricePerShare | percent}}</td>
+          <td>{{violation.message}}</td>
+          <td>
+            <button type="button" class="btn btn-secondary me-2" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
+            <button type="button" class="btn btn-secondary me-2" (click)="openPosition(violation.ticker)">Open Position</button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7" *ngIf="activeTicker === violation.ticker">
+            <div>
+              <app-stock-transaction
+                *ngIf="fixType === 'transaction'"
+                [ticker]="activeTicker"
+                [numberOfShares]="violation.numberOfShares"
+                [pricePerShare]="violation.pricePerShare"
+                (transactionFailed)="transactionFailed($event)"
+                (transactionRecorded)="transactionRecorded($event)">
+              </app-stock-transaction>
+              <app-stock-trading-newposition
+                *ngIf="fixType === 'position'"
+                [setTicker]="violation.ticker"
+                [showChart]="false"
+                [showAnalysis]="false"
+                [hideCreatePendingPosition]="true"
+                (stockPurchased)="transactionRecorded($event)">
+              </app-stock-trading-newposition>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+    
+  <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()"></app-brokerage-neworder>
+  <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
 
-        <div>
-          <app-stock-transaction
-            *ngIf="activeTicker === violation.ticker && fixType === 'transaction'"
-            [ticker]="activeTicker"
-            [numberOfShares]="violation.numberOfShares"
-            [pricePerShare]="violation.pricePerShare"
-            (transactionFailed)="transactionFailed($event)"
-            (transactionRecorded)="transactionRecorded($event)">
-          </app-stock-transaction>
-          <app-stock-trading-newposition
-            *ngIf="activeTicker === violation.ticker && fixType === 'position'"
-            [setTicker]="violation.ticker"
-            [showChart]="false"
-            [showAnalysis]="false"
-            [hideCreatePendingPosition]="true"
-            (stockPurchased)="transactionRecorded($event)">
-          </app-stock-trading-newposition>
-        </div>
-      </li>
-    </ul>
-
-    <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()"></app-brokerage-neworder>
-    <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
-
-    <span *ngIf="violations.length === 0">
-      You have no violations.
-    </span>
 </div>
 

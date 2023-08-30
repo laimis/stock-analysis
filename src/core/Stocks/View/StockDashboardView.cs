@@ -1,41 +1,36 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using core.Shared;
 
 namespace core.Stocks.View
 {
-    public class StockDashboardView : IViewModel
+    public class StockDashboardView
     {
         public static string Version = "1";
         
         public StockDashboardView() {}
-        public StockDashboardView(List<PositionInstance> positions)
+        public StockDashboardView(List<PositionInstance> positions, List<StockViolationView> violations)
         {
             Positions = positions;
-            Calculated = DateTimeOffset.UtcNow;
-        }
-
-        public List<PositionInstance>? Positions { get; set; }
-        public DateTimeOffset Calculated { get; set; }
-        public List<StockViolationView>? Violations { get; private set; }
-
-        internal void SetViolations(List<StockViolationView> violations)
-        {
             Violations = violations;
         }
+
+        public List<PositionInstance>? Positions { get; }
+        public List<StockViolationView>? Violations { get; }
     }
 
     public struct StockViolationView : IEquatable<StockViolationView>
     {
-        public StockViolationView(string message, decimal numberOfShares, decimal pricePerShare, string ticker)
+        public StockViolationView(decimal? currentPrice, string message, decimal numberOfShares, decimal pricePerShare, string ticker)
         {
+            CurrentPrice = currentPrice;
             Message = message;
             NumberOfShares = numberOfShares;
             PricePerShare = pricePerShare;
             Ticker = ticker;
         }
 
+        public decimal? CurrentPrice { get; }
         public string Message { get; }
         public decimal NumberOfShares { get; }
         public decimal PricePerShare { get; }

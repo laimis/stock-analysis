@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 import { StockTradingPendingPositionsComponent } from '../stock-trading/stock-trading-pendingpositions.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-stock-new-position',
@@ -10,7 +11,9 @@ import { StockTradingPendingPositionsComponent } from '../stock-trading/stock-tr
 export class StockNewPositionComponent {
   feedbackMessage: string;
 
-  constructor() { }
+  constructor(title:Title) {
+    title.setTitle("Trade - Nightingale Trading")
+  }
 
   @ViewChild(BrokerageOrdersComponent)
   private brokerageOrders!: BrokerageOrdersComponent;

@@ -52,7 +52,9 @@ namespace core.Portfolio.Handlers
                     .Select(s => s.State.OpenPosition)
                     .ToArray();
 
-                var prices = await _brokerage.GetQuotes(user.State, positions.Select(p => p.Ticker)); 
+                var tickers = positions.Select(p => p.Ticker).Union(account.StockPositions.Select(p => p.Ticker)).Distinct();
+
+                var prices = await _brokerage.GetQuotes(user.State, tickers); 
                 if (prices.IsOk)
                 {
                     foreach (var entry in positions)
@@ -90,7 +92,7 @@ namespace core.Portfolio.Handlers
                     .ToArray();
 
             
-                var violations = Dashboard.Handler.GetViolations(account.StockPositions, positions);
+                var violations = Dashboard.Handler.GetViolations(account.StockPositions, positions, prices.Success);
 
                 return new TradingEntriesView(
                     current: current,

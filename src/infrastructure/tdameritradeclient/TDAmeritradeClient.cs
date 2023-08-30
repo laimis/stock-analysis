@@ -180,8 +180,7 @@ public class TDAmeritradeClient : IBrokerage
         var response = await CallApi<AccountsResponse[]>(
             user,
             "/accounts?fields=positions,orders",
-            HttpMethod.Get,
-            debug: true
+            HttpMethod.Get
         );
             
         if (response.Error != null)
@@ -372,7 +371,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers)}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
     }
 
     public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string? contractType = null)

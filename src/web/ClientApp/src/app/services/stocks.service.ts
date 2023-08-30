@@ -582,11 +582,12 @@ export interface ReviewList {
   optionTransactions: Transaction[]
 }
 
-export interface StockViolation {
+export class StockViolation {
   message: string
   numberOfShares: number
   pricePerShare: number
   ticker: string
+  currentPrice: number
 }
 
 export interface StockSummary {

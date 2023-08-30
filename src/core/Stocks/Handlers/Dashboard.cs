@@ -7,7 +7,6 @@ using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
-using MediatR;
 
 namespace core.Stocks
 {
@@ -46,29 +45,55 @@ namespace core.Stocks
                     .OrderBy(p => p.Ticker)
                     .ToList();
 
-                var view = new StockDashboardView(positions);
-
-                var tickers = view.Positions.Select(o => o.Ticker).Distinct();
-
-                var prices = await _brokerage.GetQuotes(user.State, tickers);
-                if (prices.IsOk)
+                async Task<StockPosition[]> GetBrokeragePositions()
                 {
-                    EnrichWithStockPrice(view, prices.Success!);
+                    var brokeragePositions = await _brokerage.GetAccount(user.State);
+                    return brokeragePositions.IsOk switch {
+                        true => brokeragePositions.Success.StockPositions,
+                        false => Array.Empty<StockPosition>()
+                    };
                 }
 
-                if (user.State.ConnectedToBrokerage)
+                var brokeragePositions = await (user.State.ConnectedToBrokerage switch {
+                    false => Task.FromResult(Array.Empty<StockPosition>()),
+                    true => GetBrokeragePositions()
+                });
+
+                async Task<List<StockViolationView>> GetViolationsAsync(Dictionary<string, StockQuote> priceDictionary)
                 {
                     var brokeragePositions = await _brokerage.GetAccount(user.State);
                     if (brokeragePositions.IsOk)
                     {
-                        view.SetViolations(GetViolations(brokeragePositions.Success.StockPositions, view.Positions));
+                        return GetViolations(brokeragePositions.Success.StockPositions, positions, priceDictionary);
+                    }
+                    return new List<StockViolationView>();
+                }
+
+                var tickers = positions.Select(o => o.Ticker).Union(brokeragePositions.Select(v => v.Ticker)).Distinct();
+                var quotesResult = await _brokerage.GetQuotes(user.State, tickers);
+                var priceDictionary = quotesResult.IsOk switch {
+                    true => quotesResult.Success!,
+                    false => new Dictionary<string, StockQuote>()
+                };
+
+                var violations = await (
+                    user.State.ConnectedToBrokerage switch {
+                        false => Task.FromResult(new List<StockViolationView>()),
+                        true => GetViolationsAsync(priceDictionary)
+                    });
+
+                foreach(var p in positions)
+                {
+                    if (priceDictionary.TryGetValue(p.Ticker, out var quote))
+                    {
+                        p.SetPrice(quote.Price);
                     }
                 }
 
-                return view;
+                return new StockDashboardView(positions, violations);
             }
 
-            public static List<StockViolationView> GetViolations(IEnumerable<StockPosition> brokeragePositions, IEnumerable<PositionInstance> localPositions)
+            public static List<StockViolationView> GetViolations(IEnumerable<StockPosition> brokeragePositions, IEnumerable<PositionInstance> localPositions, Dictionary<string, StockQuote> priceDictionary)
             {
                 var violations = new HashSet<StockViolationView>();
 
@@ -82,6 +107,7 @@ namespace core.Stocks
                         {
                             violations.Add(
                                 new StockViolationView(
+                                    currentPrice: priceDictionary.TryGetValue(brokeragePosition.Ticker, out var quote) ? quote.Price : null,
                                     message: $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare}",
                                     numberOfShares: brokeragePosition.Quantity,
                                     pricePerShare: brokeragePosition.AverageCost,
@@ -94,6 +120,7 @@ namespace core.Stocks
                     {
                         violations.Add(
                             new StockViolationView(
+                                currentPrice: priceDictionary.TryGetValue(brokeragePosition.Ticker, out var quote) ? quote.Price : null,
                                 message: $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none",
                                 numberOfShares: brokeragePosition.Quantity,
                                 pricePerShare: brokeragePosition.AverageCost,
@@ -111,6 +138,7 @@ namespace core.Stocks
                     {
                         violations.Add(
                             new StockViolationView(
+                                currentPrice: priceDictionary.TryGetValue(localPosition.Ticker, out var quote) ? quote.Price : null,
                                 message: $"Owned {localPosition.NumberOfShares} but TDAmeritrade says none",
                                 numberOfShares: localPosition.NumberOfShares,
                                 pricePerShare: localPosition.AverageCostPerShare,
@@ -124,6 +152,7 @@ namespace core.Stocks
                         {
                             violations.Add(
                                 new StockViolationView(
+                                    currentPrice: priceDictionary.TryGetValue(localPosition.Ticker, out var quote) ? quote.Price : null,
                                     message: $"Owned {localPosition.NumberOfShares} but TDAmeritrade says {brokeragePosition.Quantity}",
                                     numberOfShares: localPosition.NumberOfShares,
                                     pricePerShare: localPosition.AverageCostPerShare,
@@ -135,17 +164,6 @@ namespace core.Stocks
                 }
 
                 return violations.OrderBy(v => v.Ticker).ToList();
-            }
-
-            private static StockDashboardView EnrichWithStockPrice(StockDashboardView view, Dictionary<string, StockQuote> prices)
-            {
-                foreach(var o in view.Positions)
-                {
-                    prices.TryGetValue(o.Ticker, out var price);
-                    o.SetPrice(price?.Price ?? 0);
-                }
-
-                return view;
             }
         }
     }
