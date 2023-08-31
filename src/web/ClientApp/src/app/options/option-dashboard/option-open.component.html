@@ -38,6 +38,7 @@
         <th>Premium</th>
         <th>Days Left</th>
         <th>Bid/Ask</th>
+        <th>Value</th>
       </tr>
     </thead>
     <tbody>
@@ -72,6 +73,9 @@
         </td>
         <td>
           {{option.detail?.bid | currency}} / {{option.detail?.ask | currency}}
+        </td>
+        <td>
+          {{intrinsicValue(option) | currency}} / {{extrinsicValue(option) | currency}}
         </td>
       </tr>
     </tbody>

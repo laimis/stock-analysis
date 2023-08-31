@@ -38,4 +38,31 @@ export class OptionOpenComponent {
   onTickerSelected(ticker:string) {
     this.router.navigateByUrl('/stocks/' + ticker)
   }
+
+  intrinsicValue(option:OwnedOption) : number {
+    if (option.optionType == 'CALL') {
+      if (option.currentPrice > option.strikePrice) {
+        return option.currentPrice - option.strikePrice
+      }
+      else {
+        return 0
+      }
+    }
+
+    if (option.optionType == 'PUT') {
+      if (option.currentPrice < option.strikePrice) {
+        return option.strikePrice - option.currentPrice
+      }
+      else {
+        return 0
+      }
+    }
+
+    console.log(option.optionType)
+    return 0
+  }
+
+  extrinsicValue(option:OwnedOption) : number {
+    return (option.detail.ask + option.detail.bid) / 2 - this.intrinsicValue(option)
+  }
 }
