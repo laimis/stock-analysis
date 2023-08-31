@@ -44,7 +44,7 @@ export class StockViolationsComponent {
     this.refreshRequested.emit(val.ticker)
   }
 
-  orderExecuted() {
-    this.refreshRequested.emit("")
+  orderExecuted(ticker:string) {
+    this.refreshRequested.emit(ticker)
   }
 }

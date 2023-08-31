@@ -57,8 +57,8 @@
     </tbody>
   </table>
     
-  <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()"></app-brokerage-neworder>
-  <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted()" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
+  <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-neworder>
+  <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted($event)" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
 
 </div>
 

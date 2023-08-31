@@ -87,7 +87,7 @@ export class BrokerageOrdersComponent implements OnInit {
 
     if (order.type === 'BUY') {
       this.stockService.purchase(obj).subscribe(() => {
-        this.orderExecuted.emit("recorded buy")
+        this.orderExecuted.emit(obj.ticker)
         this.refreshOrders()
       }, (err) => {
         console.log(err)
@@ -95,7 +95,7 @@ export class BrokerageOrdersComponent implements OnInit {
     }
     else if (order.type === 'SELL') {
       this.stockService.sell(obj).subscribe(() => {
-        this.orderExecuted.emit("recorded sell")
+        this.orderExecuted.emit(obj.ticker)
         this.refreshOrders()
       }, (err) => {
         console.log(err)
