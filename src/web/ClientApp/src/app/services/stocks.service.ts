@@ -1169,6 +1169,14 @@ export class OptionDefinition {
   daysToExpiration: number
   daysHeld: number
   transactions: Transaction[]
+  volatility: number
+  delta: number
+  gamma: number
+  theta: number
+  vega: number
+  rho: number
+  timeValue: number
+  intrinsicValue: number
 }
 
 export class OptionSpread {

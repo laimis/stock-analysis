@@ -113,7 +113,7 @@ export class OptionService {
             
             let legs : OptionSpread = {
               name: "Straddle " + call.strikePrice,
-              legs: [toSellLeg(call), toSellLeg(put)],
+              legs: [toBuyLeg(call), toBuyLeg(put)],
               premiumPaid,
               risk: premiumPaid,
               maxGain: Infinity

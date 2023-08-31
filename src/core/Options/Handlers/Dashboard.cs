@@ -52,7 +52,7 @@ namespace core.Options
                 foreach(var o in options.Where(o => o.State.Closed == null).Select(o => o.State).OrderBy(o => o.Expiration))
                 {
                     var chain = await _brokerage.GetOptions(user.State, o.Ticker, expirationDate: o.Expiration, strikePrice: o.StrikePrice, contractType: o.OptionType.ToString());
-                    Adapters.Options.OptionDetail detail = chain.Success?.Options?.FirstOrDefault(o => o.StrikePrice == o.StrikePrice && o.OptionType.ToString() == o.OptionType);
+                    var detail = chain.Success?.Options?.FirstOrDefault(o => o.StrikePrice == o.StrikePrice && o.OptionType.ToString() == o.OptionType);
                     openOptions.Add(new OwnedOptionView(o, detail));
                 }
 

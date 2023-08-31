@@ -38,7 +38,7 @@
         <th>Premium</th>
         <th>Days Left</th>
         <th>Bid/Ask</th>
-        <th>Value</th>
+        <th colspan="2">Value</th>
       </tr>
     </thead>
     <tbody>
@@ -76,6 +76,10 @@
         </td>
         <td>
           {{intrinsicValue(option) | currency}} / {{extrinsicValue(option) | currency}}
+        </td>
+        <td>
+          <div (click)="greeksDiv.style.display = 'block'">inv: {{option.detail.intrinsicValue}}, timev: {{option.detail.timeValue}}</div>
+          <div #greeksDiv style="display: none;" >greeks: delta {{option.detail.delta}}, gamma {{option.detail.gamma}}, theta {{option.detail.theta}}, vega {{option.detail.vega}}, rho {{option.detail.rho}}</div>
         </td>
       </tr>
     </tbody>
