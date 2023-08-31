@@ -38,46 +38,42 @@
       </form>
   </section>
 
+  <ng-template #splitOutcomeTemplate let-positions="positions" let-label="label">
+    <div class="col">
+      <h5>
+        {{label}}: {{positions.length}}
+        <span class="float-end">{{ getProfitSum(positions) | currency }}</span>
+      </h5>
+      <ng-container *ngFor="let position of positions">
+        <div class="row" *ngIf="matchesFilter(position)" [ngClass]="{
+          'bg-success':position.grade === 'A',
+          'bg-warning':position.grade === 'C',
+        }">
+          <div class="col">
+            <app-stock-link [ticker]="position.ticker"></app-stock-link>
+            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+          </div>
+          <div class="col">{{position.opened | date:'shortDate'}}</div>
+          <div class="col">{{position.closed | date:'shortDate'}}</div>
+          <div class="col">{{position.rr | number:'1.0-2' }}</div>
+          <div class="col">{{position.profit | currency}}</div>
+          <div class="col">{{position.grade}}</div>
+        </div>
+      </ng-container>
+    </div>
+  </ng-template>
+
   <div *ngIf="layout === LAYOUT_OPTION_SPLIT_OUTCOME">
     <div class="card mt-3 mb-3" *ngFor="let group of groupedByMonth">
       <div class="card-body">
-        <h3 class="card-title">{{group.month}}</h3>
-        <div class="row">
-          <div class="col">
-            <h5>Wins</h5>
-            <ng-container *ngFor="let win of group.wins">
-              <div class="row" *ngIf="matchesFilter(win)" [ngClass]="{
-                'bg-success':win.grade === 'A',
-                'bg-warning':win.grade === 'C',
-              }">
-                <div class="col">
-                  <app-stock-link [ticker]="win.ticker"></app-stock-link>
-                  <app-trading-view-link [ticker]="win.ticker"></app-trading-view-link>
-                </div>
-                <div class="col">{{win.opened | date}}</div>
-                <div class="col">{{win.closed | date}}</div>
-                <div class="col">{{win.rr | number:'1.0-2' }}</div>
-                <div class="col">{{win.profit | currency}}</div>
-                <div class="col">{{win.grade}}</div>
-              </div>
-            </ng-container>
-          </div>
-          <div class="col">
-            <h5>Losses</h5>
-            <ng-container *ngFor="let loss of group.losses">  
-              <div class="row" *ngIf="matchesFilter(loss)">
-                <div class="col">
-                  <app-stock-link [ticker]="loss.ticker"></app-stock-link>
-                  <app-trading-view-link [ticker]="loss.ticker"></app-trading-view-link>
-                </div>
-                <div class="col">{{loss.opened | date}}</div>
-                <div class="col">{{loss.closed | date}}</div>
-                <div class="col">{{loss.rr | number:'1.0-2' }}</div>
-                <div class="col">{{loss.profit | currency}}</div>
-                <div class="col">{{loss.grade}}</div>
-              </div>
-            </ng-container>
-          </div>
+        <h4 class="card-title">
+          {{group.month}}
+          <span class="float-end">Total: <strong>{{getProfitSum(group.positions) | currency}}</strong></span>
+        </h4>
+        <div class="row mt-2">
+          <ng-template *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.wins, label: 'Wins'}"></ng-template>
+          <ng-template *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.losses, label: 'Losses'}"></ng-template>
+          
         </div>
       </div>
     </div>

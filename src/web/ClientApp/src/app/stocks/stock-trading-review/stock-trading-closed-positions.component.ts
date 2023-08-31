@@ -10,7 +10,7 @@ import { PositionInstance } from 'src/app/services/stocks.service';
 export class StockTradingClosedPositionsComponent {
   private _positions: PositionInstance[];
   tickers: string[];
-  groupedByMonth: {month:string, wins:PositionInstance[], losses:PositionInstance[]}[]
+  groupedByMonth: {month:string, positions:PositionInstance[], wins:PositionInstance[], losses:PositionInstance[]}[]
   
   @Input()
   set positions(value: PositionInstance[]) {
@@ -34,6 +34,7 @@ export class StockTradingClosedPositionsComponent {
       groupedByMonthArray.push(
         {
           month:key,
+          positions: value,
           wins: value.filter(p => p.profit >= 0),
           losses: value.filter(p => p.profit < 0)
         }
@@ -125,6 +126,10 @@ export class StockTradingClosedPositionsComponent {
 
   getProfitSumForMonth(position:PositionInstance) {
     var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
+    return this.getProfitSum(positions)
+  }
+
+  getProfitSum(positions:PositionInstance[]) {
     return positions.reduce((a, b) => a + b.profit, 0)
   }
 
