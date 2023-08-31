@@ -27,76 +27,125 @@
             </select>
           </div>
           <div class="col">
+            
+            <div class="form-check form-switch float-end">
+              <input class="form-check-input" type="checkbox" id="cardLayoutSwitch" (click)="toggleLayout()">
+              <label class="form-check-label" for="cardLayoutSwitch">Split Layout</label>
+            </div>
             <a href="/api/stocks/export/closed" class="btn btn-link">Export trades</a>
           </div>
         </div>
       </form>
   </section>
 
-  <table *ngIf="positions" class="table table-hover mt-3">
-    <thead>
-      <tr>
-        <th width="100"></th>
-        <th class="sort-header" (click)="sort('ticker')">Stock</th>
-        <th class="sort-header" (click)="sort('opened')">Opened</th>
-        <th class="sort-header" (click)="sort('closed')">Closed</th>
-        <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
-        <th class="sort-header" (click)="sort('rr')">R:R</th>
-        <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
-        <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
-        <th class="sort-header" (click)="sort('grade')">Grade</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let p of positions; let i = index;">
-      <!-- add separator row if p closed date month is different from previous position -->
-      <tr *ngIf="i === 0 || getPropertyForSeperatorGrouping(p) !== getPropertyForSeperatorGrouping(positions[i - 1])">
-        <td colspan="3" class="text-center fw-bold pt-3">
-          {{getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy'}}
-        </td>
-        <td class="pt-3 pb-3">R:R Sum <span class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
-        <td class="pt-3">Profit/Loss <span class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
-        <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }} A trades</span></td>
-        <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'B') }}</span> B trades</td>
-        <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span> C trades</td>
-        <td class="pt-3"><span class="fw-bold">{{ getTradeCountForMonth(p) }}</span> Total</td>
-      </tr>
-
-      <tr 
-        *ngIf="matchesFilter(p)"
-        (click)="toggleShowNotes(i)"
-        style="cursor: pointer"
-        [ngClass]="{
-          'table-success':p.grade === 'A',
-          'table-warning':p.grade === 'C',
-        }">
-        <td>{{i + 1}}</td>
-        <td>
-          <app-stock-link [ticker]="p.ticker"></app-stock-link>
-          <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
-        </td>
-        <td>{{p.opened | date}}</td>
-        <td>{{p.closed | date}}</td>
-        <td>{{p.daysHeld}}</td>
-        <td>{{p.rr | number:'1.0-2' }}</td>
-        <td>{{p.profit | currency}}</td>
-        <td>
-          <span *ngIf="p.profit >= 0" class="badge bg-success me-1">win</span>
-          <span *ngIf="p.profit < 0" class="badge bg-warning me-1">loss</span>
-          {{p.gainPct | percent:'1.0-2' }}
-        </td>
-        <td>{{p.grade}}</td>
-      </tr>
-      <tr *ngIf="showNotes === i">
-        <td colspan="8">
-          <div *ngFor="let n of p.notes" class="mb-2">
-            <!-- <span class="badge bg-secondary me-1"></span> -->
-            {{n}}
+  <div *ngIf="layout === LAYOUT_OPTION_SPLIT_OUTCOME">
+    <div class="card mt-3 mb-3" *ngFor="let group of groupedByMonth">
+      <div class="card-body">
+        <h3 class="card-title">{{group.month}}</h3>
+        <div class="row">
+          <div class="col">
+            <h5>Wins</h5>
+            <div class="row" *ngFor="let win of group.wins" [ngClass]="{
+              'bg-success':win.grade === 'A',
+              'bg-warning':win.grade === 'C',
+            }">
+              <div class="col">
+                <app-stock-link [ticker]="win.ticker"></app-stock-link>
+                <app-trading-view-link [ticker]="win.ticker"></app-trading-view-link>
+              </div>
+              <div class="col">{{win.opened | date}}</div>
+              <div class="col">{{win.closed | date}}</div>
+              <div class="col">{{win.rr | number:'1.0-2' }}</div>
+              <div class="col">{{win.profit | currency}}</div>
+              <div class="col">{{win.grade}}</div>
+            </div>
           </div>
-        </td>
-      </tr>
-    </ng-container>
-    </tbody>
-  </table>
+          <div class="col">
+            <h5>Losses</h5>
+            <div class="row" *ngFor="let loss of group.losses">
+              <div class="col">
+                <app-stock-link [ticker]="loss.ticker"></app-stock-link>
+                <app-trading-view-link [ticker]="loss.ticker"></app-trading-view-link>
+              </div>
+              <div class="col">{{loss.opened | date}}</div>
+              <div class="col">{{loss.closed | date}}</div>
+              <div class="col">{{loss.rr | number:'1.0-2' }}</div>
+              <div class="col">{{loss.profit | currency}}</div>
+              <div class="col">{{loss.grade}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="layout === LAYOUT_OPTION_TABLE">
+    <table *ngIf="positions" class="table table-hover mt-3">
+      <thead>
+        <tr>
+          <th width="100"></th>
+          <th class="sort-header" (click)="sort('ticker')">Stock</th>
+          <th class="sort-header" (click)="sort('opened')">Opened</th>
+          <th class="sort-header" (click)="sort('closed')">Closed</th>
+          <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
+          <th class="sort-header" (click)="sort('rr')">R:R</th>
+          <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
+          <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
+          <th class="sort-header" (click)="sort('grade')">Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let p of positions; let i = index;">
+        <!-- add separator row if p closed date month is different from previous position -->
+        <tr *ngIf="i === 0 || getPropertyForSeperatorGrouping(p) !== getPropertyForSeperatorGrouping(positions[i - 1])">
+          <td colspan="3" class="text-center fw-bold pt-3">
+            {{getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy'}}
+          </td>
+          <td class="pt-3 pb-3">R:R Sum <span class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
+          <td class="pt-3">Profit/Loss <span class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
+          <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }} A trades</span></td>
+          <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'B') }}</span> B trades</td>
+          <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span> C trades</td>
+          <td class="pt-3"><span class="fw-bold">{{ getTradeCountForMonth(p) }}</span> Total</td>
+        </tr>
+  
+        <tr 
+          *ngIf="matchesFilter(p)"
+          (click)="toggleShowNotes(i)"
+          style="cursor: pointer"
+          [ngClass]="{
+            'table-success':p.grade === 'A',
+            'table-warning':p.grade === 'C',
+          }">
+          <td>{{i + 1}}</td>
+          <td>
+            <app-stock-link [ticker]="p.ticker"></app-stock-link>
+            <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+          </td>
+          <td>{{p.opened | date}}</td>
+          <td>{{p.closed | date}}</td>
+          <td>{{p.daysHeld}}</td>
+          <td>{{p.rr | number:'1.0-2' }}</td>
+          <td>{{p.profit | currency}}</td>
+          <td>
+            <span *ngIf="p.profit >= 0" class="badge bg-success me-1">win</span>
+            <span *ngIf="p.profit < 0" class="badge bg-warning me-1">loss</span>
+            {{p.gainPct | percent:'1.0-2' }}
+          </td>
+          <td>{{p.grade}}</td>
+        </tr>
+        <tr *ngIf="showNotes === i">
+          <td colspan="8">
+            <div *ngFor="let n of p.notes" class="mb-2">
+              <!-- <span class="badge bg-secondary me-1"></span> -->
+              {{n}}
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
+  </div>
+  
 
 </div>

@@ -10,6 +10,7 @@ import { PositionInstance } from 'src/app/services/stocks.service';
 export class StockTradingClosedPositionsComponent {
   private _positions: PositionInstance[];
   tickers: string[];
+  groupedByMonth: {month:string, wins:PositionInstance[], losses:PositionInstance[]}[]
   
   @Input()
   set positions(value: PositionInstance[]) {
@@ -18,7 +19,31 @@ export class StockTradingClosedPositionsComponent {
       .map(p => p.ticker)
       .filter((v, i, a) => a.indexOf(v) === i)
       .sort()
+    let groupedByMonth = value.reduce((a, b) => {
+      var key = b.closed.substring(0, 7)
+      if (!a.has(key)) {
+        a.set(key, [])
+      }
+      let arr = a.get(key)
+      arr.push(b)
+      return a
+    }, new Map<string, PositionInstance[]>())
+
+    let groupedByMonthArray = []
+    groupedByMonth.forEach((value, key) => {
+      groupedByMonthArray.push(
+        {
+          month:key,
+          wins: value.filter(p => p.profit >= 0),
+          losses: value.filter(p => p.profit < 0)
+        }
+      )
+    })
+    this.groupedByMonth = groupedByMonthArray
+
+    console.log(this.groupedByMonth)
   }
+
   get positions(): PositionInstance[] {
     return this._positions
   }
@@ -153,5 +178,17 @@ export class StockTradingClosedPositionsComponent {
 
     console.log("unrecognized sort column " + column)
     return null;
+  }
+
+  LAYOUT_OPTION_TABLE:string = 'table'
+  LAYOUT_OPTION_SPLIT_OUTCOME:string = 'splitoutcome'
+  layout: string = this.LAYOUT_OPTION_TABLE
+
+  toggleLayout() {
+    if (this.layout === this.LAYOUT_OPTION_TABLE) {
+      this.layout = this.LAYOUT_OPTION_SPLIT_OUTCOME
+    } else {
+      this.layout = this.LAYOUT_OPTION_TABLE
+    }
   }
 }
