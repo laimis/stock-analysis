@@ -105,6 +105,7 @@ export class BrokerageOrdersComponent implements OnInit {
 
   getTotal(orders:BrokerageOrder[]) {
     return orders
+      .filter(o => o.status !== 'CANCELED')
       .reduce((total, order) => total + order.price * order.quantity, 0)
   }
 }
