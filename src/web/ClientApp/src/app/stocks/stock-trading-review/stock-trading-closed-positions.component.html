@@ -45,34 +45,38 @@
         <div class="row">
           <div class="col">
             <h5>Wins</h5>
-            <div class="row" *ngFor="let win of group.wins" [ngClass]="{
-              'bg-success':win.grade === 'A',
-              'bg-warning':win.grade === 'C',
-            }">
-              <div class="col">
-                <app-stock-link [ticker]="win.ticker"></app-stock-link>
-                <app-trading-view-link [ticker]="win.ticker"></app-trading-view-link>
+            <ng-container *ngFor="let win of group.wins">
+              <div class="row" *ngIf="matchesFilter(win)" [ngClass]="{
+                'bg-success':win.grade === 'A',
+                'bg-warning':win.grade === 'C',
+              }">
+                <div class="col">
+                  <app-stock-link [ticker]="win.ticker"></app-stock-link>
+                  <app-trading-view-link [ticker]="win.ticker"></app-trading-view-link>
+                </div>
+                <div class="col">{{win.opened | date}}</div>
+                <div class="col">{{win.closed | date}}</div>
+                <div class="col">{{win.rr | number:'1.0-2' }}</div>
+                <div class="col">{{win.profit | currency}}</div>
+                <div class="col">{{win.grade}}</div>
               </div>
-              <div class="col">{{win.opened | date}}</div>
-              <div class="col">{{win.closed | date}}</div>
-              <div class="col">{{win.rr | number:'1.0-2' }}</div>
-              <div class="col">{{win.profit | currency}}</div>
-              <div class="col">{{win.grade}}</div>
-            </div>
+            </ng-container>
           </div>
           <div class="col">
             <h5>Losses</h5>
-            <div class="row" *ngFor="let loss of group.losses">
-              <div class="col">
-                <app-stock-link [ticker]="loss.ticker"></app-stock-link>
-                <app-trading-view-link [ticker]="loss.ticker"></app-trading-view-link>
+            <ng-container *ngFor="let loss of group.losses">  
+              <div class="row" *ngIf="matchesFilter(loss)">
+                <div class="col">
+                  <app-stock-link [ticker]="loss.ticker"></app-stock-link>
+                  <app-trading-view-link [ticker]="loss.ticker"></app-trading-view-link>
+                </div>
+                <div class="col">{{loss.opened | date}}</div>
+                <div class="col">{{loss.closed | date}}</div>
+                <div class="col">{{loss.rr | number:'1.0-2' }}</div>
+                <div class="col">{{loss.profit | currency}}</div>
+                <div class="col">{{loss.grade}}</div>
               </div>
-              <div class="col">{{loss.opened | date}}</div>
-              <div class="col">{{loss.closed | date}}</div>
-              <div class="col">{{loss.rr | number:'1.0-2' }}</div>
-              <div class="col">{{loss.profit | currency}}</div>
-              <div class="col">{{loss.grade}}</div>
-            </div>
+            </ng-container>
           </div>
         </div>
       </div>
