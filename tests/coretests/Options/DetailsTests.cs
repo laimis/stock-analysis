@@ -31,7 +31,9 @@ namespace coretests.Options
                     new User("email", "f", "l")
                 ));
 
-            var handler = new Details.Handler(accountMock.Object, storage);
+            var brokerage = new Mock<IBrokerage>();
+            
+            var handler = new Details.Handler(accountMock.Object, brokerage.Object, storage);
 
             var result = await handler.Handle(query, CancellationToken.None);
 
