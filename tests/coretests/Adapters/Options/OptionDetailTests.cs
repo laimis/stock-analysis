@@ -11,25 +11,27 @@ namespace coretests.Adapters.Options
 
         public OptionDetailTests()
         {
-            _put = new OptionDetail();
+            _put = new OptionDetail(symbol: "TICKER", side: "put", description: "desc")
+            {
+                Side = "put",
+                Bid = 1,
+                Ask = 2,
+                ParsedExpirationDate = DateTime.UtcNow.AddDays(20),
+                StrikePrice = 22,
+                OpenInterest = 1,
+                Volume = 2
+            };
 
-            _put.Side = "put";
-            _put.Bid = 1;
-            _put.Ask = 2;
-            _put.ParsedExpirationDate = DateTime.UtcNow.AddDays(20);
-            _put.StrikePrice = 22;
-            _put.OpenInterest = 1;
-            _put.Volume = 2;
-
-            _call = new OptionDetail();
-
-            _call.Side = "call";
-            _call.Bid = 1;
-            _call.Ask = 2;
-            _call.ParsedExpirationDate = DateTime.UtcNow.AddDays(20);
-            _call.StrikePrice = 22;
-            _call.OpenInterest = 1;
-            _call.Volume = 2;
+            _call = new OptionDetail(symbol: "TICKER", side: "call", description: "desc")
+            {
+                Side = "call",
+                Bid = 1,
+                Ask = 2,
+                ParsedExpirationDate = DateTime.UtcNow.AddDays(20),
+                StrikePrice = 22,
+                OpenInterest = 1,
+                Volume = 2
+            };
         }
 
         [Fact]
