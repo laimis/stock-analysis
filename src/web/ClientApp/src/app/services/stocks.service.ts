@@ -333,8 +333,8 @@ export class StocksService {
 		return this.http.post<string>('/api/options/sell', obj)
   }
 
-  getOption(id:string) : Observable<OptionDefinition> {
-    return this.http.get<OptionDefinition>('/api/options/' + id)
+  getOption(id:string) : Observable<OwnedOption> {
+    return this.http.get<OwnedOption>('/api/options/' + id)
   }
 
   closeOption(obj:object) : Observable<any> {

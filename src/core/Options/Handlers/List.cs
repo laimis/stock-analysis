@@ -10,24 +10,24 @@ namespace core.Options
 {
     public class List
     {
-        public class Query : RequestWithUserId<OwnedOptionStatsView>
+        public class Query : RequestWithUserId<CommandResponse<IEnumerable<OwnedOptionView>>>
         {
-            public Query(string ticker, Guid userId) :base(userId)
+            public Query(Ticker ticker, Guid userId) :base(userId)
             {
                 Ticker = ticker;
             }
 
             [Required]
-            public string Ticker { get; set; }
+            public Ticker Ticker { get; set; }
         }
 
-        public class Handler : HandlerWithStorage<Query, OwnedOptionStatsView>
+        public class Handler : HandlerWithStorage<Query, CommandResponse<IEnumerable<OwnedOptionView>>>
         {
             public Handler(IPortfolioStorage storage) : base(storage)
             {
             }
 
-            public override async Task<OwnedOptionStatsView> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<CommandResponse<IEnumerable<OwnedOptionView>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var options = await _storage.GetOwnedOptions(request.UserId);
 
@@ -36,7 +36,7 @@ namespace core.Options
                     .OrderByDescending(o => o.State.FirstFill)
                     .Select(o => new OwnedOptionView(o.State, optionDetail: null));
 
-                return new OwnedOptionStatsView(open);
+                return CommandResponse<IEnumerable<OwnedOptionView>>.Success(open);
             }
         }
     }

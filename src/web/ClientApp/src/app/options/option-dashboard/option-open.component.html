@@ -78,7 +78,9 @@
           {{intrinsicValue(option) | currency}} / {{extrinsicValue(option) | currency}}
         </td>
         <td>
-          <div (click)="greeksDiv.style.display = 'block'">inv: {{option.detail.intrinsicValue}}, timev: {{option.detail.timeValue}}</div>
+          <div (click)="greeksDiv.style.display = 'block'"> <!-- this is from the API vs our own calculated intrinsic / extrinsic value, rendering for comparisons -->
+            {{option.detail.intrinsicValue | currency}} / {{option.detail.timeValue | currency}}
+          </div>
           <div #greeksDiv style="display: none;" >greeks: delta {{option.detail.delta}}, gamma {{option.detail.gamma}}, theta {{option.detail.theta}}, vega {{option.detail.vega}}, rho {{option.detail.rho}}</div>
         </td>
       </tr>

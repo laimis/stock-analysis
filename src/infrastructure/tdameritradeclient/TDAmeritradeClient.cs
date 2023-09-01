@@ -403,16 +403,13 @@ public class TDAmeritradeClient : IBrokerage
 
         static IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
             map.SelectMany(kp => kp.Value.Values).SelectMany(v => v)
-            .Select(d => new OptionDetail {
+            .Select(d => new OptionDetail(symbol: d.symbol!, side: d.putCall?.ToLower()!, description: d.description!) {
                 Ask = d.ask,
                 Bid = d.bid,
-                Side = d.putCall?.ToLower(),
                 StrikePrice = d.strikePrice,
-                Symbol = d.symbol,
                 Volume = d.totalVolume,
                 OpenInterest = d.openInterest,
                 ParsedExpirationDate = d.ExpirationDate,
-                Description = d.description,
                 DaysToExpiration = d.daysToExpiration,
                 Delta = d.delta,
                 Gamma = d.gamma,
@@ -431,12 +428,12 @@ public class TDAmeritradeClient : IBrokerage
 
         var chain = chainResponse.Success!;
 
-        var response = new core.Adapters.Options.OptionChain {
-            Symbol = chain.symbol,
-            Volatility = chain.volatility,
-            NumberOfContracts = chain.numberOfContracts,
-            Options = ToOptionDetails(chain.callExpDateMap!, chain.underlyingPrice).Union(ToOptionDetails(chain.putExpDateMap!, chain.underlyingPrice)).ToArray()
-        };
+        var response = new core.Adapters.Options.OptionChain(
+            symbol: chain.symbol!,
+            volatility: chain.volatility,
+            numberOfContracts: chain.numberOfContracts,
+            options: ToOptionDetails(chain.callExpDateMap!, chain.underlyingPrice).Union(ToOptionDetails(chain.putExpDateMap!, chain.underlyingPrice)).ToArray()
+        );
 
         return new ServiceResponse<core.Adapters.Options.OptionChain>(response);
     }

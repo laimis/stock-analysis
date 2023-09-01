@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using core.Adapters.Options;
 using core.Shared;
 
 namespace core.Options
@@ -20,6 +19,7 @@ namespace core.Options
         public string Ticker { get; internal set; }
         public decimal StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; private set; }
+        public string ExpirationDate => Expiration.ToString("yyyy-MM-dd");
         public bool IsExpired => DateTimeOffset.UtcNow.Date > Expiration;
         public OptionType OptionType { get; internal set; }
         public Guid UserId { get; internal set; }

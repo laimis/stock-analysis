@@ -14,7 +14,7 @@ namespace core.Options
             Ticker = o.Ticker;
             OptionType = o.OptionType.ToString();
             StrikePrice = o.StrikePrice;
-            ExpirationDate = o.Expiration.ToString("yyyy-MM-dd");
+            ExpirationDate = o.ExpirationDate;
             NumberOfContracts = Math.Abs(o.NumberOfContracts);
             BoughtOrSold = o.SoldToOpen.Value ? "Sold" : "Bought";
             Filled = o.FirstFill.Value;

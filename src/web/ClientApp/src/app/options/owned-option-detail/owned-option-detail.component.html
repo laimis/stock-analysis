@@ -3,6 +3,12 @@
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
 	<div *ngIf="option">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/options">Options</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{option.detail.description}}</li>
+      </ol>
+    </nav>
 
     <div class="card">
       <div class="card-body">

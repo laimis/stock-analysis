@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition } from '../../services/stocks.service';
+import { StocksService, OptionDefinition, OwnedOption } from '../../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Title } from '@angular/platform-browser';
@@ -12,7 +12,7 @@ import { GetErrors } from 'src/app/services/utils';
   providers: [DatePipe]
 })
 export class OwnedOptionComponent implements OnInit {
-  public option: OptionDefinition;
+  public option: OwnedOption;
 
   public positionType: string
   public premium: number

@@ -31,12 +31,12 @@ namespace web.Controllers
         );
 
         [HttpGet("{ticker}/active")]
-        public Task<OwnedOptionStatsView> List(string ticker) =>
-            _mediator.Send(new List.Query(ticker, User.Identifier()));
+        public Task<ActionResult> List(string ticker) =>
+            this.ExecuteAsync(_mediator, new List.Query(ticker, User.Identifier()));
 
         [HttpGet("{id}")]
-        public Task<OwnedOptionView> Get(Guid id) =>
-            _mediator.Send(new Details.Query(id, User.Identifier()));
+        public Task<ActionResult> Get(Guid id) =>
+            this.ExecuteAsync(_mediator, new Details.Query(id, User.Identifier()));
 
         [HttpPost("sell")]
         public Task<object> Sell(Sell.Command cmd)
