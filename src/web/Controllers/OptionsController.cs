@@ -23,8 +23,12 @@ namespace web.Controllers
         }
 
         [HttpGet("{ticker}/chain")]
-        public Task<OptionDetailsViewModel> DetailsAsync(string ticker) =>
-            _mediator.Send(new Chain.Query(ticker, User.Identifier()));
+        public Task<ActionResult> DetailsAsync(string ticker) =>
+            this.ExecuteAsync(
+                _mediator,
+                new Chain.Query(ticker, User.Identifier()
+            )
+        );
 
         [HttpGet("{ticker}/active")]
         public Task<OwnedOptionStatsView> List(string ticker) =>

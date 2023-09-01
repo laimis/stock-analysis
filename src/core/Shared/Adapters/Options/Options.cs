@@ -47,7 +47,7 @@ namespace core.Adapters.Options
 
                 var today = DateTime.UtcNow.Date;
 
-                var diff = (int)date.Subtract(today).TotalDays;
+                var diff = Math.Max((int)date.Subtract(today).TotalDays, 1);
 
                 return Bid * 100 / diff;
             }

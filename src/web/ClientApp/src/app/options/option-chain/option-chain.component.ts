@@ -3,6 +3,7 @@ import { StocksService, OptionDefinition, OptionSpread } from '../../services/st
 import { ActivatedRoute } from '@angular/router';
 import { ChartType } from 'chart.js';
 import { OptionService } from 'src/app/services/option.service';
+import { GetErrors } from 'src/app/services/utils';
 
 @Component({
   selector: 'app-option-chain',
@@ -29,7 +30,6 @@ export class OptionChainComponent implements OnInit {
 
   chartType: ChartType = 'bar';
 
-  public failure;
   volatility: number;
   numberOfContracts: number;
 
@@ -38,6 +38,8 @@ export class OptionChainComponent implements OnInit {
   bullPutSpreads: OptionSpread[] = [];
   bearCallSpreads: OptionSpread[] = [];
   bearPutSpreads: OptionSpread[] = [];
+  
+  errors: string[] = [];
 
   constructor(
     private optionService: OptionService,
@@ -61,7 +63,8 @@ export class OptionChainComponent implements OnInit {
       this.maxAsk = 0
       this.runFilter()
     }, error => {
-      this.failure = "Failed to load option chain, either data  is not available or entered symbol is incorrect."
+      this.errors = GetErrors(error)
+      this.loading = false
 			console.log("failed: " + error);
 		})
   }

@@ -13,17 +13,17 @@ namespace core.Options
 {
     public class Chain
     {
-        public class Query : RequestWithUserId<OptionDetailsViewModel>
+        public class Query : RequestWithUserId<CommandResponse<OptionDetailsViewModel>>
         {
-            public Query(string ticker, Guid userId) : base(userId)
+            public Query(Ticker ticker, Guid userId) : base(userId)
             {
                 Ticker = ticker;
             }
 
-            public string Ticker { get; }
+            public Ticker Ticker { get; }
         }
 
-        public class Handler : IRequestHandler<Query, OptionDetailsViewModel>
+        public class Handler : IRequestHandler<Query, CommandResponse<OptionDetailsViewModel>>
         {
             private readonly IAccountStorage _accounts;
             private readonly IBrokerage _brokerage;
@@ -34,7 +34,7 @@ namespace core.Options
                 _brokerage = brokerage;
             }
             
-            public async Task<OptionDetailsViewModel> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<CommandResponse<OptionDetailsViewModel>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId) ?? throw new InvalidOperationException("User not found");
                 var priceResult = await _brokerage.GetQuote(user.State, request.Ticker);
@@ -46,10 +46,12 @@ namespace core.Options
                 var detailsResponse = await _brokerage.GetOptions(user.State, request.Ticker);
                 if (!detailsResponse.IsOk)
                 {
-                    throw new InvalidOperationException("Failed to get options: " + detailsResponse.Error.Message);
+                    return CommandResponse<OptionDetailsViewModel>.Failed(detailsResponse.Error.Message);
                 }
 
-                return MapOptionDetails(price, detailsResponse.Success!);
+                var model = MapOptionDetails(price, detailsResponse.Success!);
+
+                return CommandResponse<OptionDetailsViewModel>.Success(model);
             }
         }
 
@@ -57,23 +59,6 @@ namespace core.Options
             decimal? price,
             OptionChain chain)
         {
-            var optionList = chain.Options;
-
-            var puts = optionList.Where(o => o.IsPut);
-            var calls = optionList.Where(o => o.IsCall);
-
-            var callAverageVolume = calls.Average(o => o.Volume);
-            var priceBasedOnCalls = callAverageVolume switch {
-                0 => 0,
-                _ => calls.Average(o => o.Volume * o.StrikePrice) / (decimal)callAverageVolume
-            };
-
-            var putAverageVolume = puts.Average(o => o.Volume);
-            var priceBasedOnPuts = putAverageVolume switch {
-                0 => 0,
-                _ => puts.Average(o => o.Volume * o.StrikePrice) / (decimal)putAverageVolume
-            };
-
             return new OptionDetailsViewModel
             {
                 StockPrice = price,

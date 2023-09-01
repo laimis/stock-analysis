@@ -1,12 +1,12 @@
-<div class="mt-2" *ngIf="failure">
-  {{failure}} <a [routerLink]="[ '/dashboard' ]">return to dashboad</a>
-</div>
+<div>
+  <div class="mt-2" *ngIf="loading">
+    Loading option details...
+  </div>
+  
+  <app-error-display [errors]="errors"></app-error-display>
+    
+  <div class="mt-2" *ngIf="options">
 
-<div class="mt-2" *ngIf="loading && !failure">
-  Loading option details...
-</div>
-
-<div class="mt-2" *ngIf="!loading">
     <div>
       <table class="table border">
         <thead class="thead-light">
@@ -159,4 +159,5 @@
       </section>
 
     </div>
+  </div>
 </div>
