@@ -40,10 +40,7 @@ export class CandlestickChartComponent implements OnDestroy {
     }
 
     let toCandleStickData = (p) => {
-      let isBuyPoint = this.buyDates && this.buyDates.includes(p.dateStr)
-      let isSellPoint = this.sellDates && this.sellDates.includes(p.dateStr)
-      let color = isBuyPoint ? 'black' : isSellPoint ? 'orange' : null
-      return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close, color: color }
+      return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close }
     }
 
     let addLineSeries = (sma, color, interval, priceBars) => {
@@ -92,8 +89,24 @@ export class CandlestickChartComponent implements OnDestroy {
     addLineSeries(this._prices.sma.sma50, 'green', 50, priceBars);
     addLineSeries(this._prices.sma.sma150, 'lightblue', 150, priceBars);
     addLineSeries(this._prices.sma.sma200, 'blue', 200, priceBars);
+
+    let markers = []
+    if (this.buyDates) {
+      this.buyDates.forEach(d => {
+        markers.push({ time: d, position: 'belowBar', color: 'green', shape: 'arrowUp', text: 'buy' })
+      })
+    }
+    if (this.sellDates) {
+      this.sellDates.forEach(d => {
+        markers.push({ time: d, position: 'aboveBar', color: 'red', shape: 'arrowDown', text: 'sell' })
+      })
+    }
+    barSeries.setMarkers(markers)
     
-    this.chart.timeScale().fitContent();
+    this.chart.timeScale().setVisibleRange({
+      from: priceBars[priceBars.length - 60].time,
+      to: priceBars[priceBars.length - 1].time
+    });
   }
 
   @Input()
