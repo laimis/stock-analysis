@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.Adapters.Options;
 using core.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
@@ -32,6 +34,10 @@ namespace coretests.Options
                 ));
 
             var brokerage = new Mock<IBrokerage>();
+            brokerage.Setup(x => x.GetOptions(It.IsAny<UserState>(), It.IsAny<string>(), null, null, null))
+                .Returns(Task.FromResult(
+                    new ServiceResponse<OptionChain>(new OptionChain("TICKER", 0, 0, Array.Empty<OptionDetail>()))
+                ));
             
             var handler = new Details.Handler(accountMock.Object, brokerage.Object, storage);
 
