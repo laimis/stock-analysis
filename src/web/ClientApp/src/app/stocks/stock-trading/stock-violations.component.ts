@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks.service';
 
 @Component({
@@ -20,6 +21,9 @@ export class StockViolationsComponent {
   }
 
   @Output() refreshRequested = new EventEmitter<string>()
+
+  @ViewChild(BrokerageOrdersComponent)
+  private brokerageOrdersComponent!: BrokerageOrdersComponent;
   
   activeTicker: string = null
   fixType : string = null
@@ -42,6 +46,7 @@ export class StockViolationsComponent {
 
   transactionRecorded(val:stocktransactioncommand) {
     this.refreshRequested.emit(val.ticker)
+    this.brokerageOrdersComponent.refreshOrders()
   }
 
   orderExecuted(ticker:string) {
