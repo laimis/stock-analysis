@@ -155,6 +155,7 @@ var routes: Routes = [
 
   { path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard]},
   { path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard]},
+  { path: 'routines/:name', component: RoutineComponent, canActivate: [AuthGuard]},
 
   { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},

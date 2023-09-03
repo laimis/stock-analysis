@@ -71,6 +71,7 @@ export class RoutineComponent implements OnInit {
     this.activeRoutine = null
     this.activeStep = null
     this.currentStepIndex = 0
+    this.mode = null;
   }
 
   nextStep() {
