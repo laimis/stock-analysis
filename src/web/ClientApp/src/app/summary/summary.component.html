@@ -117,13 +117,14 @@
   </table>
   
   <section>
-    <h5>Option P&L</h5>
+    <h5>Options P&L</h5>
   </section>
   <table class="table">
     <tbody>
       <tr *ngFor="let g of result.plOptionTransactions">
         <td width="140">
           <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+          <app-trading-view-link [ticker]="g.ticker"></app-trading-view-link>
         </td>
         <td width="140">{{g.amount | currency}}</td>
         <td width="140">{{g.date | date}}</td>
