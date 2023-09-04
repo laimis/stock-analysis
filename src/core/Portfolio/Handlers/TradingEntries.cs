@@ -54,14 +54,11 @@ namespace core.Portfolio.Handlers
 
                 var tickers = positions.Select(p => p.Ticker).Union(account.StockPositions.Select(p => p.Ticker)).Distinct();
 
-                var prices = await _brokerage.GetQuotes(user.State, tickers); 
-                if (prices.IsOk)
+                var prices = (await _brokerage.GetQuotes(user.State, tickers)).Success ?? new Dictionary<string, StockQuote>(); 
+                foreach (var entry in positions)
                 {
-                    foreach (var entry in positions)
-                    {
-                        prices.Success.TryGetValue(entry.Ticker, out var price);
-                        entry.SetPrice(price?.Price ?? 0);    
-                    }   
+                    prices.TryGetValue(entry.Ticker, out var price);
+                    entry.SetPrice(price?.Price ?? 0);    
                 }
 
                 var current = positions
@@ -92,7 +89,7 @@ namespace core.Portfolio.Handlers
                     .ToArray();
 
             
-                var violations = Dashboard.Handler.GetViolations(account.StockPositions, positions, prices.Success);
+                var violations = Dashboard.Handler.GetViolations(account.StockPositions, positions, prices);
 
                 return new TradingEntriesView(
                     current: current,

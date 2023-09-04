@@ -71,10 +71,7 @@ namespace core.Stocks
 
                 var tickers = positions.Select(o => o.Ticker).Union(brokeragePositions.Select(v => v.Ticker)).Distinct();
                 var quotesResult = await _brokerage.GetQuotes(user.State, tickers);
-                var priceDictionary = quotesResult.IsOk switch {
-                    true => quotesResult.Success!,
-                    false => new Dictionary<string, StockQuote>()
-                };
+                var priceDictionary = quotesResult.Success ?? new Dictionary<string, StockQuote>();
 
                 var violations = await (
                     user.State.ConnectedToBrokerage switch {
