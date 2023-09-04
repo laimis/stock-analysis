@@ -50,8 +50,8 @@
           'bg-warning':position.grade === 'C',
         }">
           <div class="col">
-            <app-stock-link [ticker]="position.ticker"></app-stock-link>
             <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+            <app-stock-link [ticker]="position.ticker"></app-stock-link>
           </div>
           <div class="col">{{position.opened | date:'shortDate'}}</div>
           <div class="col">{{position.closed | date:'shortDate'}}</div>
@@ -119,8 +119,8 @@
           }">
           <td>{{i + 1}}</td>
           <td>
-            <app-stock-link [ticker]="p.ticker"></app-stock-link>
             <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+            <app-stock-link [ticker]="p.ticker"></app-stock-link>
           </td>
           <td>{{p.opened | date}}</td>
           <td>{{p.closed | date}}</td>

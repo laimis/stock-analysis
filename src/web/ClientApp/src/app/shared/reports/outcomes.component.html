@@ -12,8 +12,8 @@
       <tbody>
         <tr *ngFor="let s of outcomes" [ngClass]="{'table-warning': s.ticker === tickerFilter}">
           <td class="fixed-side">
-            <app-stock-link [ticker]="s.ticker" [openInNewTab]="true"></app-stock-link>
             <app-trading-view-link [ticker]="s.ticker"></app-trading-view-link>
+            <app-stock-link [ticker]="s.ticker" [openInNewTab]="true"></app-stock-link>
           </td>
           <td *ngFor="let o of outcomesForRendering(s.outcomes)"
             [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">

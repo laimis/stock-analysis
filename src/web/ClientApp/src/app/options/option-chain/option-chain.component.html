@@ -22,8 +22,8 @@
         <tbody>
           <tr>
             <td>
-              <app-stock-link [ticker]="ticker"></app-stock-link>
-              <app-trading-view-link [ticker]="ticker"></app-trading-view-link> - {{ stockPrice | currency }}</td>
+              <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
+              <app-stock-link [ticker]="ticker"></app-stock-link> - {{ stockPrice | currency }}</td>
             <td>{{volatility}}</td>
             <td>{{putOpenInterest() | number}} vs {{callOpenInterest() | number}}</td>
             <td>{{putOpenInterest() / callOpenInterest() | number }}</td>

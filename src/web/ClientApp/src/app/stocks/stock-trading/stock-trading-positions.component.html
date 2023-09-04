@@ -80,8 +80,8 @@
       <tbody>
         <tr *ngFor="let position of sortedPositions">
           <td>
-            <app-stock-link [ticker]="position.ticker"></app-stock-link>
             <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+            <app-stock-link [ticker]="position.ticker"></app-stock-link>
           </td>
           <td>{{position.price | currency}}</td>
           <td>{{position.averageCostPerShare | currency}}</td>

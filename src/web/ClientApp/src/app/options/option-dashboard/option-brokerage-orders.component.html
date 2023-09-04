@@ -17,8 +17,8 @@
     <tbody>
       <tr *ngFor="let order of orders">
         <td>
-          <app-stock-link [ticker]="order.ticker"></app-stock-link>
           <app-trading-view-link [ticker]="order.ticker"></app-trading-view-link>
+          <app-stock-link [ticker]="order.ticker"></app-stock-link>
         </td>
         <td>{{order.description}}</td>
         <td>{{order.quantity | number}}</td>

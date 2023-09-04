@@ -18,8 +18,8 @@
       <ng-container *ngFor="let violation of violations">
         <tr>
           <td>
-            <app-stock-link [ticker]="violation.ticker"></app-stock-link>
             <app-trading-view-link [ticker]="violation.ticker"></app-trading-view-link>
+            <app-stock-link [ticker]="violation.ticker"></app-stock-link>
           </td>
           <td>{{violation.numberOfShares}}</td>
           <td>{{violation.pricePerShare | currency}}</td>

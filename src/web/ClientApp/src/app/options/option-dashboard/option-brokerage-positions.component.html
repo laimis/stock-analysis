@@ -20,8 +20,8 @@
     <tbody>
       <tr *ngFor="let option of positions">
         <td>
-          {{option.ticker}}
           <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
+          <app-stock-link [ticker]="option.ticker"></app-stock-link>
         </td>
         <td>{{option.strikePrice | currency}}</td>
         <td>{{option.optionType}}</td>

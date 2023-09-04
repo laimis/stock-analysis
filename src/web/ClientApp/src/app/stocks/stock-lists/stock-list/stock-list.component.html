@@ -84,17 +84,14 @@
             <thead>
                 <tr>
                     <th>Ticker</th>
-                    <th>Chart</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let t of sortedTickers(list)">
                     <td>
-                        <a [routerLink]="['/stocks', t.ticker]">{{t.ticker}}</a>
-                    </td>
-                    <td>
                         <app-trading-view-link [ticker]="t.ticker"></app-trading-view-link>
+                        <a [routerLink]="['/stocks', t.ticker]">{{t.ticker}}</a>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-danger" (click)="remove(t)">Remove</button>

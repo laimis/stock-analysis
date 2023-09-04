@@ -55,8 +55,8 @@
               'text-white': alert.alertType === 'Positive'
             }">
             <td>
-              <app-stock-link [ticker]="alert.ticker"></app-stock-link>
               <app-trading-view-link [ticker]="alert.ticker"></app-trading-view-link>
+              <app-stock-link [ticker]="alert.ticker"></app-stock-link>
             </td>
             <td>
               {{alert.description}}
