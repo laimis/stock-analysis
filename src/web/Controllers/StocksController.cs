@@ -49,7 +49,7 @@ namespace web.Controllers
         public Task<decimal?> Price(string ticker) => _mediator.Send(new Price.Query(ticker, User.Identifier()));
 
         [HttpGet("{ticker}/quote")]
-        public Task<StockQuote> Quote(string ticker) => _mediator.Send(new Quote.Query(ticker, User.Identifier()));
+        public Task<ActionResult> Quote(string ticker) => this.ExecuteAsync(_mediator, new Quote.Query(ticker, User.Identifier()));
         
         [HttpGet("{ticker}/ownership")]
         public Task<StockOwnershipView> Ownership(string ticker) => _mediator.Send(new Ownership.Query(ticker, User.Identifier()));

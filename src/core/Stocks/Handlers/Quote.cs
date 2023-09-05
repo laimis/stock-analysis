@@ -10,7 +10,7 @@ namespace core.Stocks.Handlers
 {
     public class Quote
     {
-        public class Query : RequestWithUserId<StockQuote>
+        public class Query : RequestWithUserId<CommandResponse<StockQuote>>
         {
             public Ticker Ticker { get; }
 
@@ -21,7 +21,7 @@ namespace core.Stocks.Handlers
             }
         }
 
-        public class Handler : IRequestHandler<Query, StockQuote>
+        public class Handler : IRequestHandler<Query, CommandResponse<StockQuote>>
         {
             private IAccountStorage _account;
             private IBrokerage _brokerage;
@@ -32,7 +32,7 @@ namespace core.Stocks.Handlers
                 _brokerage = brokerage;
             }
 
-            public async Task<StockQuote> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<CommandResponse<StockQuote>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _account.GetUser(request.UserId);
                 if (user == null)
@@ -43,9 +43,10 @@ namespace core.Stocks.Handlers
                 var quote = await _brokerage.GetQuote(user.State, request.Ticker);
                 if (!quote.IsOk)
                 {
-                    throw new Exception("Failed to get quote");
+                    return CommandResponse<StockQuote>.Failed(quote.Error.Message);
                 }
-                return quote.Success;
+
+                return CommandResponse<StockQuote>.Success(quote.Success);
             }
         }
     }
