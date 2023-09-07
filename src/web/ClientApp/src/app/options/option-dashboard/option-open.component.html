@@ -33,10 +33,10 @@
         <th></th>
         <th>Option</th>
         <th>Expiration</th>
+        <th>Days Left</th>
         <th>Price</th>
         <th>OTM/ITM</th>
         <th>Premium</th>
-        <th>Days Left</th>
         <th>Bid/Ask</th>
         <th colspan="2">Value</th>
       </tr>
@@ -58,6 +58,11 @@
           </a>
         </td>
         <td>{{option.expirationDate | date:'MM/dd'}}</td>
+        <td>
+          {{(option.days - option.daysHeld) | number}}
+          <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
+          <span *ngIf="option.isExpired" class="ml-1 badge bg-danger">expired</span>
+        </td>
         <td>{{option.currentPrice | currency}}</td>
         <td class="text-start">
           <span class="badge bg-primary" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
@@ -65,11 +70,6 @@
         </td>
         <td>
           {{option.profit | currency}}
-        </td>
-        <td>
-          {{(option.days - option.daysHeld) | number}}
-          <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
-          <span *ngIf="option.isExpired" class="ml-1 badge bg-danger">expired</span>
         </td>
         <td>
           {{option.detail?.bid | currency}} / {{option.detail?.ask | currency}}
