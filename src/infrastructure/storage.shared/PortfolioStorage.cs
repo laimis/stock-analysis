@@ -92,7 +92,8 @@ namespace storage.shared
             var events = list.ToList();
 
             return list.GroupBy(e => e.AggregateId)
-                .Select(g => new OwnedOption(g));
+                .Select(g => new OwnedOption(g))
+                .Where(g => g.State.Deleted == false);
         }
 
         public Task Save(Note note, Guid userId)

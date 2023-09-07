@@ -31,6 +31,19 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">
+              <i class="text-muted fas fa-dice-five"></i>
+              Options
+            </h5>
+            <p class="card-text">You have {{dashboard.openOptionCount === 0 ? 'no' : ''}} open contracts</p>
+            <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
               <i class="text-muted fab fa-btc"></i>
               Crypto
             </h5>
@@ -40,18 +53,7 @@
         </div>
       </div>
       
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="text-muted fas fa-dice-five"></i>
-              Options
-            </h5>
-            <p class="card-text">You have {{dashboard.openOptionCount === 0 ? 'no' : ''}} open contracts</p>
-            <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
-          </div>
-        </div>
-      </div>
+      
     </div>
 
     <div class="row">

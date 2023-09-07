@@ -39,8 +39,6 @@ namespace core.Options
                     ?? throw new Exception("User not found");
                 
                 var options = await _storage.GetOwnedOptions(user.Id);
-                options = options.Where(o => !o.State.Deleted);
-
 
                 var closedOptions = options
                     .Where(o => o.State.Closed != null)
@@ -49,7 +47,7 @@ namespace core.Options
                     .ToList();
 
                 var openOptions = new List<OwnedOptionView>();
-                foreach(var o in options.Where(o => o.State.Closed == null).Select(o => o.State).OrderBy(o => o.Expiration))
+                foreach(var o in options.Where(o => o.State.Closed == null).Select(o => o.State).OrderBy(o => o.Ticker).ThenBy(o => o.Expiration))
                 {
                     var chain = await _brokerage.GetOptions(user.State, o.Ticker, expirationDate: o.Expiration, strikePrice: o.StrikePrice, contractType: o.OptionType.ToString());
                     var detail = chain.Success?.FindMatchingOption(strikePrice: o.StrikePrice, expirationDate: o.ExpirationDate, optionType: o.OptionType);
