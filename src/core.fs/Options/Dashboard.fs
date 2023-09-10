@@ -1,5 +1,7 @@
 ﻿namespace core.fs.Options
 
+open core.Shared
+
 module Dashboard =
     open core.Account
     open core.Shared.Adapters.Brokerage
@@ -60,5 +62,7 @@ module Dashboard =
                     | false ->
                         Array.empty
 
-                return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders);
+                let view = OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders)
+                
+                return ServiceResponse<OptionDashboardView>(view)
             }

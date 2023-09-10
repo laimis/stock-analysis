@@ -43,6 +43,27 @@ namespace web.Utils
             return controller.BadRequest(dict);
         }
 
+        public static async Task<ActionResult> OkOrError<T>(
+            this ControllerBase controller,
+            Task<CommandResponse<T>> r)
+        {
+            return controller.OkOrError(await r);
+        }
+        
+        public static async Task<ActionResult> OkOrError(
+            this ControllerBase controller,
+            Task<ServiceResponse> r)
+        {
+            return controller.OkOrError(await r);
+        }
+        
+        public static async Task<ActionResult> OkOrError<T>(
+            this ControllerBase controller,
+            Task<ServiceResponse<T>> r)
+        {
+            return controller.OkOrError(await r);
+        }
+
         public static ActionResult OkOrError(
             this ControllerBase controller,
             CommandResponse r)
@@ -53,6 +74,30 @@ namespace web.Utils
             }
 
             return controller.Ok();
+        }
+        
+        public static ActionResult OkOrError(
+            this ControllerBase controller,
+            ServiceResponse r)
+        {
+            if (r.Error != null)
+            {
+                return controller.Error(r.Error.Message);
+            }
+
+            return controller.Ok();
+        }
+        
+        public static ActionResult OkOrError<T>(
+            this ControllerBase controller,
+            ServiceResponse<T> r)
+        {
+            if (r.IsOk == false)
+            {
+                return controller.Error(r.Error!.Message);
+            }
+
+            return controller.Ok(r.Success);
         }
 
         public static ActionResult OkOrError<T>(

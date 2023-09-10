@@ -237,7 +237,7 @@ export class StocksService {
   getStockQuote(symbol:string): Observable<StockQuote> {
     return this.http.get<StockQuote>(`/api/stocks/${symbol}/quote`)
   }
-  
+
   getStockPrices(symbol:string, numberOfDays:number): Observable<Prices> {
 		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
   }
@@ -353,8 +353,12 @@ export class StocksService {
     return this.http.post('/api/options/import', formData)
   }
 
-  expireOption(obj:object) : Observable<any> {
-    return this.http.post('/api/options/expire', obj)
+  expireOption(optionId:string) : Observable<any> {
+    return this.http.post('/api/options/' + optionId + '/expire', {})
+  }
+
+  assignOption(optionId:string) : Observable<any> {
+    return this.http.post('/api/options/' + optionId + '/assign', {})
   }
 
   // ---------- accounts ---------
@@ -411,7 +415,7 @@ export class StocksService {
 
   reportOutcomesAllBars(tickers:string[],startDate:string = null, endDate:string = null) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
-      '/api/reports/outcomes', 
+      '/api/reports/outcomes',
       {tickers, duration: "allbars", includeGapAnalysis: true, startDate, endDate}
     )
   }
@@ -436,7 +440,7 @@ export class StocksService {
 
   reportOutcomesSingleBarWeekly(tickers:string[], endDate:string = null) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
-      '/api/reports/outcomes', 
+      '/api/reports/outcomes',
       {
         tickers, duration: "singlebar",
         frequency: "weekly",
@@ -469,11 +473,11 @@ export class StocksService {
     start:string,
     end:string=null): Observable<DailyOutcomeScoresReport> {
       var endpoint = '/api/reports/dailyoutcomescoresreport/' + ticker
-      
+
       if (start) {
         endpoint += '?start=' + start
       }
-      
+
       if (end) {
         endpoint += '&end=' + end
       }
@@ -732,7 +736,7 @@ export interface OptionsContainer {
   open: OwnedOption[]
   closed: OwnedOption[]
   brokeragePositions: BrokerageOptionPosition[]
-  orders: BrokerageOrder[] 
+  orders: BrokerageOrder[]
   overallStats: OptionStats
   buyStats: OptionStats
   sellStats: OptionStats

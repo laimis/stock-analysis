@@ -2,10 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using core;
-using core.Account;
 using core.Options;
-using core.Shared.Adapters.Brokerage;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,64 +41,59 @@ namespace web.Controllers
             this.ExecuteAsync(_mediator, new Details.Query(id, User.Identifier()));
 
         [HttpPost("sell")]
-        public Task<object> Sell(Sell.Command cmd)
+        public Task<ActionResult> Sell(Sell.Command cmd)
         {
             cmd.WithUserId(User.Identifier());
 
-            return ExecTransaction(cmd);
+            return this.ExecuteAsync(_mediator, cmd);
         }
 
         [HttpPost("buy")]
-        public Task<object> Buy(Buy.Command cmd)
+        public Task<ActionResult> Buy(Buy.Command cmd)
         {
             cmd.WithUserId(User.Identifier());
             
-            return ExecTransaction(cmd);
+            return this.ExecuteAsync(_mediator, cmd);
         }
 
         [HttpDelete("{id}")]
-        public async Task<object> Delete(Guid id)
-        {
-            var cmd = new core.Options.Delete.Command(id, User.Identifier());
-            
-            await _mediator.Send(cmd);
-
-            return Ok();
-        }
-
-        [HttpPost("expire")]
-        public async Task<object> Expire(Expire.Command cmd)
-        {
-            cmd.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(cmd);
-            
-            return this.OkOrError(r);
-        }
-
-        private async Task<object> ExecTransaction(OptionTransaction cmd)
-        {
-            var r = await _mediator.Send(cmd);
-
-            if (r.Error != null)
-            {
-                return this.Error(r.Error);
-            }
-
-            return r.Aggregate;
-        }
-
-
-        [HttpGet("export")]
-        public async Task<ActionResult> Export([FromServices]core.fs.Options.Export.Handler service)
-        {
-            var response = await service.Handle(
-                new core.fs.Options.Export.Query(
-                    User.Identifier()
+        public Task<ActionResult> Delete([FromServices]core.fs.Options.Delete.Handler service, [FromRoute] Guid id)
+            => this.OkOrError(
+                service.Handle(
+                    new core.fs.Options.Delete.Command(id, User.Identifier())
                 )
             );
 
-            return this.GenerateExport(response);
+        [HttpPost("{optionId}/expire")]
+        public Task<ActionResult> Expire([FromServices]core.fs.Options.Expire.Handler service, [FromRoute] Guid optionId)
+            => this.OkOrError(
+                service.Handle(
+                    core.fs.Options.Expire.Command.NewExpire(
+                        new core.fs.Options.Expire.ExpireData(userId: User.Identifier(), optionId: optionId)
+                    )
+                )
+            );
+        
+        [HttpPost("{optionId}/assign")]
+        public Task<ActionResult> Assign([FromServices]core.fs.Options.Expire.Handler service, [FromRoute] Guid optionId)
+            => this.OkOrError(
+                service.Handle(
+                    core.fs.Options.Expire.Command.NewAssign(
+                        new core.fs.Options.Expire.ExpireData(userId: User.Identifier(), optionId: optionId)
+                    )
+                )
+            );
+        
+        [HttpGet("export")]
+        public async Task<ActionResult> Export([FromServices]core.fs.Options.Export.Handler service)
+        {
+            return this.GenerateExport(
+                await service.Handle(
+                    new core.fs.Options.Export.Query(
+                        User.Identifier()
+                    )
+                )
+            );
         }
 
         [HttpPost("import")]
@@ -111,21 +103,21 @@ namespace web.Controllers
 
             var content = await streamReader.ReadToEndAsync(token);
 
-            var cmd = new core.fs.Options.Import.Command(content, User.Identifier());
-
-            var r = service.Handle(cmd, token);
-
-            return this.OkOrError(r);
-        }
-
-        [HttpGet]
-        public Task<OptionDashboardView> Dashboard([FromServices]core.fs.Options.Dashboard.Handler service)
-        {
-            return service.Handle(
-                new core.fs.Options.Dashboard.Query(
-                    User.Identifier()
+            return await this.OkOrError(
+                service.Handle(
+                    new core.fs.Options.Import.Command(content, User.Identifier()),
+                    token
                 )
             );
         }
+
+        [HttpGet]
+        public Task<ActionResult> Dashboard([FromServices]core.fs.Options.Dashboard.Handler service)
+            => this.OkOrError(
+                service.Handle(
+                    new core.fs.Options.Dashboard.Query(
+                        User.Identifier()
+                    )
+                ));
     }
 }

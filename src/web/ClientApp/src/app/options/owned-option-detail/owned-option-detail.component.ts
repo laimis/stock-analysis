@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, OptionDefinition, OwnedOption } from '../../services/stocks.service';
+import { StocksService, OwnedOption } from '../../services/stocks.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Title } from '@angular/platform-browser';
@@ -33,7 +33,7 @@ export class OwnedOptionComponent implements OnInit {
     this.filled = Date()
     this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
 
-    var id = this.route.snapshot.paramMap.get('id');
+    let id = this.route.snapshot.paramMap.get('id');
 
     this.getOption(id)
   }
@@ -51,7 +51,7 @@ export class OwnedOptionComponent implements OnInit {
 
     this.errors = null;
 
-    var opt = {
+    let opt = {
       ticker: this.option.ticker,
       strikePrice: this.option.strikePrice,
       optionType: this.option.optionType,
@@ -71,8 +71,10 @@ export class OwnedOptionComponent implements OnInit {
     {
       this.errors = null;
 
-      this.service.deleteOption(this.option.id).subscribe(r => {
+      this.service.deleteOption(this.option.id).subscribe(_ => {
         this.router.navigateByUrl('/dashboard')
+      }, err => {
+        this.errors = GetErrors(err)
       })
     }
   }
@@ -94,6 +96,10 @@ export class OwnedOptionComponent implements OnInit {
   }
 
   expire(assigned:boolean) {
+
+    let service = this.service
+    let func = assigned ? optId => service.assignOption(optId) : optId => service.expireOption(optId)
+
     if (assigned)
     {
       if (!confirm("Are you sure you want to mark this as assigned?"))
@@ -109,12 +115,7 @@ export class OwnedOptionComponent implements OnInit {
       }
     }
 
-    var opt = {
-      id: this.option.id,
-      assigned: assigned,
-    }
-
-    this.service.expireOption(opt).subscribe( _ => {
+    func(this.option.id).subscribe( _ => {
       this.router.navigateByUrl('/options')
     }, err => {
       this.errors = GetErrors(err)

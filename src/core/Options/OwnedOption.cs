@@ -121,14 +121,14 @@ namespace core.Options
             );
         }
 
-        public void Expire(bool assigned)
+        public void Expire(bool assign)
         {
             if (State.Expirations.Count > 0)
             {
                 throw new InvalidOperationException("You already marked this option as expired");
             }
 
-            Apply(new OptionExpired(Guid.NewGuid(), State.Id, State.Expiration, assigned));
+            Apply(new OptionExpired(Guid.NewGuid(), State.Id, State.Expiration, assigned: assign));
         }
     }
 

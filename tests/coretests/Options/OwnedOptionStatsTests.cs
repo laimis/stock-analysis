@@ -13,7 +13,7 @@ namespace coretests.Options
             var userId = Guid.NewGuid();
             var soldOption1 = new OwnedOption("AMD", 45, OptionType.CALL, new DateTimeOffset(2019, 10, 10, 0, 0, 0, TimeSpan.Zero), userId);
             soldOption1.Sell(1, 10, DateTimeOffset.Parse("2019-10-10"), null);
-            soldOption1.Expire(assigned: true);
+            soldOption1.Expire(assign: true);
             var o1 = new OwnedOptionView(soldOption1.State, optionDetail: null);
 
             var soldOption2 = new OwnedOption("AMD", 45, OptionType.CALL, new DateTimeOffset(2019, 10, 10, 0, 0, 0, TimeSpan.Zero), userId);

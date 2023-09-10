@@ -9,7 +9,9 @@
     <Compile Include="Shared.fs" />
     <Compile Include="Options\Dashboard.fs" />
     <Compile Include="Options\Export.fs" />
+    <Compile Include="Options\Expire.fs" />
     <Compile Include="Options\Import.fs" />
+    <Compile Include="Options\Delete.fs" />
   </ItemGroup>
 
   <ItemGroup>
