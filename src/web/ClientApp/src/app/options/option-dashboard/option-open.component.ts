@@ -23,9 +23,9 @@ export class OptionOpenComponent {
     this.premiumSum = value.reduce((a, b) => a - b.premiumPaid + b.premiumReceived, 0)
     this.premiumCloseValue = value.reduce((a, b) => {
       if (b.boughtOrSold == 'Bought') {
-        return a + b.detail.bid
+        return a + b.detail?.bid
       } else {
-        return a - b.detail.ask
+        return a - b.detail?.ask
       }
     }, 0) * 100
   }
@@ -63,6 +63,6 @@ export class OptionOpenComponent {
   }
 
   extrinsicValue(option:OwnedOption) : number {
-    return (option.detail.ask + option.detail.bid) / 2 - this.intrinsicValue(option)
+    return (option.detail?.ask + option.detail?.bid) / 2 - this.intrinsicValue(option)
   }
 }

@@ -2,5 +2,6 @@
     "eslint.workingDirectories": [
       "src/web/ClientApp"
     ],
-    "dotnet.defaultSolution": "tradewatch.sln"
+    "dotnet.defaultSolution": "tradewatch.sln",
+    "FSharp.inlayHints.typeAnnotations": false
   }

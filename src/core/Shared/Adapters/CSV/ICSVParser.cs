@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using core.Shared;
 
 namespace core.Adapters.CSV
 {
     public interface ICSVParser
     {
-         (IEnumerable<T>, string error) Parse<T>(string content);
+         ServiceResponse<IEnumerable<T>> Parse<T>(string content);
     }
 }

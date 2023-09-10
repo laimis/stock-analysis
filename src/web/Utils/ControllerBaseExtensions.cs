@@ -15,16 +15,23 @@ namespace web.Utils
         {
             var response = await mediator.Send(query);
 
-            controller.HttpContext.Response.Headers.Add(
-                "content-disposition", 
-                $"attachment; filename={response.Filename}");
-
-            return new ContentResult
-            {
-                Content = response.Content,
-                ContentType = response.ContentType
-            };
+            return controller.GenerateExport(response);
         }
+
+        public static ActionResult GenerateExport(
+            this ControllerBase controller,
+            ExportResponse response)
+            {
+                controller.HttpContext.Response.Headers.Add(
+                    "content-disposition", 
+                    $"attachment; filename={response.Filename}");
+
+                return new ContentResult
+                {
+                    Content = response.Content,
+                    ContentType = response.ContentType
+                };
+            }
 
         public static ActionResult Error(
             this ControllerBase controller,

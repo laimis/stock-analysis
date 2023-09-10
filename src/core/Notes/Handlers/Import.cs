@@ -32,13 +32,13 @@ namespace core.Notes
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var (records, err) = _parser.Parse<NoteRecord>(request.Content);
-                if (err != null)
+                var parseResponse = _parser.Parse<NoteRecord>(request.Content);
+                if (!parseResponse.IsOk)
                 {
-                    return CommandResponse.Failed(err);
+                    return CommandResponse.Failed(parseResponse.Error!.Message);
                 }
 
-                foreach(var r in records)
+                foreach(var r in parseResponse.Success)
                 {
                     var c = new core.Notes.Add.Command{
                         Note = r.note,
@@ -48,7 +48,7 @@ namespace core.Notes
 
                     c.WithUserId(request.UserId);
 
-                    var ar = await _mediator.Send(c);
+                    var ar = await _mediator.Send(c, cancellationToken);
 
                     if (ar.Error != null)
                     {

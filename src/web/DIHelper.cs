@@ -5,6 +5,7 @@ using core.Adapters.CSV;
 using core.Adapters.Emails;
 using core.Adapters.Subscriptions;
 using core.Alerts;
+using core.fs;
 using core.Options;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
@@ -50,6 +51,25 @@ namespace web
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
             services.AddSingleton<ISECFilings, EdgarClient>();
+
+            // go over all types in core.fs assembly, find any innner classes and register any type that implements IApplicationService
+            // interface as a singleton
+            var markerInterface = typeof(IApplicationService);
+            var assembly = typeof(core.fs.Options.Dashboard).Assembly;
+
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface || type.IsAbstract)
+                {
+                    continue;
+                }
+
+                if (markerInterface.IsAssignableFrom(type))
+                {
+                    services.AddSingleton(type);
+                }
+            }
+
             
             services.AddSingleton<ISubscriptions>(s => 
                 new stripe.Subscriptions(

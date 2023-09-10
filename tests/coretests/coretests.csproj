@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\core\core.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\timezonesupport\timezonesupport.csproj" />
+    <ProjectReference Include="..\..\src\core.fs\core.fs.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

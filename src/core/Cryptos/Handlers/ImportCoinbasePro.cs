@@ -34,16 +34,16 @@ namespace core.Cryptos.Handlers
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var (records, err) = _parser.Parse<CoinbaseProRecord>(request.Content);
-                if (err != null)
+                var parseResponse = _parser.Parse<CoinbaseProRecord>(request.Content);
+                if (parseResponse.IsOk == false)
                 {
-                    return CommandResponse.Failed(err);
+                    return CommandResponse.Failed(parseResponse.Error!.Message);
                 }
 
                 try
                 {
                     var coinbaseProContainer = new CoinbaseProContainer();
-                    coinbaseProContainer.AddRecords(records);
+                    coinbaseProContainer.AddRecords(parseResponse.Success);
 
                     foreach(var b in coinbaseProContainer.GetBuys())
                     {
@@ -54,7 +54,7 @@ namespace core.Cryptos.Handlers
                             Token = b.Token
                         };
                         cmd.WithUserId(request.UserId);
-                        await _mediator.Send(cmd);
+                        await _mediator.Send(cmd, cancellationToken);
                     }
 
                     foreach(var b in coinbaseProContainer.GetSells())

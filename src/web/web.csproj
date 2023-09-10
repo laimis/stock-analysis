@@ -38,6 +38,7 @@
     <ProjectReference Include="..\infrastructure\timezonesupport\timezonesupport.csproj" />
     <ProjectReference Include="..\infrastructure\secedgar\secedgar.csproj" />
     <ProjectReference Include="..\infrastructure\securityutils\securityutils.csproj" />
+    <ProjectReference Include="..\core.fs\core.fs.fsproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

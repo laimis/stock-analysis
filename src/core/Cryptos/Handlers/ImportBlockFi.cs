@@ -19,10 +19,10 @@ namespace core.Cryptos.Handlers
             public string Content { get; }
         }
 
-        public partial class Handler : IRequestHandler<Command, CommandResponse>
+        public class Handler : IRequestHandler<Command, CommandResponse>
         {
-            private IMediator _mediator;
-            private ICSVParser _parser;
+            private readonly IMediator _mediator;
+            private readonly ICSVParser _parser;
 
             public Handler(IMediator mediator, ICSVParser parser)
             {
@@ -32,13 +32,13 @@ namespace core.Cryptos.Handlers
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var (records, err) = _parser.Parse<BlockFiRecord>(request.Content);
-                if (err != null)
+                var parseResponse = _parser.Parse<BlockFiRecord>(request.Content);
+                if (parseResponse.IsOk == false)
                 {
-                    return CommandResponse.Failed(err);
+                    return CommandResponse.Failed(parseResponse.Error!.Message);
                 }
 
-                foreach (var r in records)
+                foreach (var r in parseResponse.Success)
                 {
                     var res = await ProcessLine(r, request.UserId);
                     if (res.Error != null)

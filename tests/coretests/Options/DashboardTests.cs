@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Options;
+using core.fs.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using Moq;
@@ -53,7 +53,7 @@ namespace coretests.Options
             
             var handler = new Dashboard.Handler(accounts.Object, brokerage.Object, storage);
 
-            var result = await handler.Handle(query, CancellationToken.None);
+            var result = await handler.Handle(query);
 
             Assert.Equal(0, result.BuyStats.Count);
         }

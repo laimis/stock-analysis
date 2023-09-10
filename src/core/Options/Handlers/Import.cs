@@ -35,13 +35,13 @@ namespace core.Options
 
             public async Task<CommandResponse> Handle(Command request, CancellationToken cancellationToken)
             {
-                var (records, err) = _parser.Parse<OptionRecord>(request.Content);
-                if (err != null)
+                var parseResponse = _parser.Parse<OptionRecord>(request.Content);
+                if (!parseResponse.IsOk)
                 {
-                    return CommandResponse.Failed(err);
+                    return CommandResponse.Failed(parseResponse.Error!.Message);
                 }
                 
-                foreach(var r in records)
+                foreach(var r in parseResponse.Success)
                 {
                     var response = await ProcessLine(r, request.UserId);
                     if (response.Error != null)
@@ -55,28 +55,14 @@ namespace core.Options
 
             private async Task<CommandResponse> ProcessLine(OptionRecord record, Guid userId)
             {
-                RequestWithUserIdBase cmd = null;
-
-                if (record.type == "sell")
+                RequestWithUserIdBase cmd = record.type switch
                 {
-                    cmd = new Sell.Command();
-                }
-                else if (record.type == "buy")
-                {
-                    cmd = new Buy.Command();
-                }
-                else if (record.type == "expired")
-                {
-                    var exp = new Expire.Command();
-                    exp.Assigned = false;
-                    cmd = exp;
-                }
-                else if (record.type == "assigned")
-                {
-                    var exp = new Expire.Command();
-                    exp.Assigned = true;
-                    cmd = exp;
-                }
+                    "sell" => new Sell.Command(),
+                    "buy" => new Buy.Command(),
+                    "expired" => new Expire.UnassignedCommand(),
+                    "assigned" => new Expire.AssignedCommand(),
+                    _ => throw new Exception($"Unexpected record type: {record.type}")
+                };
 
                 if (cmd is OptionTransaction ot)
                 {
