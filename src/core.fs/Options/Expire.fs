@@ -58,10 +58,10 @@ module core.fs.Options.Expire
             | Some(o) ->
                 o.Expire(assign=assigned)
                 let! _ = storage.Save(o, data.UserId)
-                return CommandResponse<OwnedOption>.Success(o)
+                return ServiceResponse<OwnedOption>(o)
                 
             | None ->
-                return CommandResponse<OwnedOption>.Failed($"option for ticker {data.Ticker} strike {data.StrikePrice} expiration {data.Expiration} not found")
+                return ServiceResponse<OwnedOption>(ServiceError($"option for ticker {data.Ticker} strike {data.StrikePrice} expiration {data.Expiration} not found"))
         }
         
         interface IApplicationService

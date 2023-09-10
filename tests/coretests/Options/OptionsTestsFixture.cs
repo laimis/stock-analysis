@@ -1,53 +1,56 @@
 using System;
 using core;
 using core.Account;
+using core.fs.Options;
 using core.Options;
 using core.Shared;
+using core.Stocks;
 using Moq;
 
 namespace coretests.Options
 {
     public class OptionsTestsFixture
     {
-        public static readonly Ticker Ticker = new Ticker("tlsa");
-        public static User User;
+        private static readonly Ticker _ticker = new("tlsa");
+        private static readonly User _user;
 
         static OptionsTestsFixture()
         {
             var u = new User("email", "f", "l");
             u.Confirm();
-            User = u;
+            _user = u;
         }
 
         public (IPortfolioStorage, OwnedOption) CreateStorageWithSoldOption()
         {
-            var cmd = CreateSellCommand();
+            var cmd = CreateSellCommand() as BuyOrSell.Command.Sell;
+            
 
             var opt = new OwnedOption(
-                cmd.Ticker,
-                cmd.StrikePrice,
-                (OptionType)Enum.Parse(typeof(OptionType), cmd.OptionType),
-                cmd.ExpirationDate.Value,
-                cmd.UserId);
+                cmd.Item.Ticker,
+                cmd.Item.StrikePrice,
+                (OptionType)Enum.Parse(typeof(OptionType), cmd.Item.OptionType),
+                cmd.Item.ExpirationDate.Value,
+                cmd.Item.UserId);
 
             opt.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
             var mock = new Mock<IPortfolioStorage>();
 
-            mock.Setup(s => s.GetOwnedOptions(User.Id))
+            mock.Setup(s => s.GetOwnedOptions(_user.Id))
                 .ReturnsAsync(new[] { opt });
 
-            mock.Setup(s => s.GetOwnedOption(opt.Id, User.Id))
+            mock.Setup(s => s.GetOwnedOption(opt.Id, _user.Id))
                 .ReturnsAsync(opt);
 
             return (mock.Object, opt);
         }
 
-        public static Sell.Command CreateSellCommand()
+        public static BuyOrSell.Command CreateSellCommand()
         {
-            var cmd = new Sell.Command
+            var cmd = new OptionTransaction()
             {
-                Ticker = Ticker,
+                Ticker = _ticker,
                 NumberOfContracts = 1,
                 Premium = 10,
                 StrikePrice = 20,
@@ -56,20 +59,20 @@ namespace coretests.Options
                 Filled = DateTimeOffset.UtcNow
             };
 
-            cmd.WithUserId(User.Id);
+            cmd.WithUserId(_user.Id);
 
-            return cmd;
+            return BuyOrSell.Command.NewSell(cmd);
         }
 
         internal IAccountStorage CreateAccountStorageWithUserAsync()
         {
             var mock = new Mock<IAccountStorage>();
 
-            mock.Setup(s => s.GetUserByEmail(User.State.Email))
-                .ReturnsAsync(User);
+            mock.Setup(s => s.GetUserByEmail(_user.State.Email))
+                .ReturnsAsync(_user);
 
-            mock.Setup(s => s.GetUser(User.State.Id))
-                .ReturnsAsync(User);
+            mock.Setup(s => s.GetUser(_user.State.Id))
+                .ReturnsAsync(_user);
 
             return mock.Object;
         }

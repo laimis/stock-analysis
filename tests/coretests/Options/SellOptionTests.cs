@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core;
+using core.fs.Options;
 using core.Options;
 using Moq;
 using Xunit;
@@ -11,7 +12,7 @@ namespace coretests.Options
 {
     public class SellOptionTests : IClassFixture<OptionsTestsFixture>
     {
-        private OptionsTestsFixture _fixture;
+        private readonly OptionsTestsFixture _fixture;
 
         public SellOptionTests(OptionsTestsFixture fixture)
         {
@@ -31,11 +32,10 @@ namespace coretests.Options
 
             var account = _fixture.CreateAccountStorageWithUserAsync();
 
-            var handler = new Sell.Handler(mock.Object, account);
+            var handler = new BuyOrSell.Handler(account, mock.Object);
 
             await handler.Handle(
-                OptionsTestsFixture.CreateSellCommand(),
-                CancellationToken.None);
+                OptionsTestsFixture.CreateSellCommand());
         }
     }
 }

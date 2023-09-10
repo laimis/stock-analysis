@@ -12,6 +12,7 @@ using core.Shared.Adapters.Cryptos;
 using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.SMS;
+using core.Stocks;
 using csvparser;
 using MediatR;
 using Microsoft.Extensions.Configuration;

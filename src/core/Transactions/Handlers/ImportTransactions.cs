@@ -64,9 +64,8 @@ namespace core.Transactions.Handlers
                 var errors = new List<string>();
                 try
                 {
-                    foreach (var cmd in GetCommands(parseResponse.Success))
+                    foreach (var cmd in GetCommands(parseResponse.Success, request.UserId))
                     {
-                        cmd.WithUserId(request.UserId);
                         var response = await _mediator.Send(cmd, cancellationToken);
                         if (response is CommandResponse { Error: not null } r)
                         {
@@ -128,18 +127,22 @@ namespace core.Transactions.Handlers
                     body: body
                 );
 
-            private IEnumerable<RequestWithUserIdBase> GetCommands(IEnumerable<TransactionRecord> records)
+            private IEnumerable<object> GetCommands(IEnumerable<TransactionRecord> records, Guid userId)
             {
                 // transaction records come in sorted by descending date
                 foreach(var record in records.Reverse().Where(t => t.Qualify))
                 {
                     if (record.IsStock())
                     {
-                        yield return CreateStockTransaction(record);
+                        var stockTx = CreateStockTransaction(record);
+                        stockTx.WithUserId(userId);
+                        yield return stockTx;
                     }
                     else if (record.IsOption())
                     {
-                        yield return CreateOptionTransaction(record);
+                        var optionTx = CreateOptionTransaction(record);
+                        optionTx.WithUserId(userId);
+                        yield return optionTx;
                     }
                 }
             }
@@ -152,8 +155,8 @@ namespace core.Transactions.Handlers
 
             private OptionTransaction CreateOptionTransaction(TransactionRecord record) => record.IsBuy() switch
             {
-                true => new core.Options.Buy.Command { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() },
-                false => new core.Options.Sell.Command { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() }
+                true => new OptionTransaction { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() },
+                false => new OptionTransaction { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() }
             };
 
             private class TransactionRecord

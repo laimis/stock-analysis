@@ -24,39 +24,41 @@ module Import =
         member _.UserId = userId
         member _.Content = content
 
-    type Handler(csvParser:ICSVParser, mediator:MediatR.IMediator, expireHandler:Expire.Handler) =
-        
-        let handleOptionTransaction (record:OptionRecord) (opt:OptionTransaction) userId token =
-            opt.ExpirationDate <- record.expiration;
-            opt.Filled <- record.filled;
-            opt.NumberOfContracts <- record.amount;
-            opt.OptionType <- record.optiontype;
-            opt.Premium <- record.premium;
-            opt.StrikePrice <- record.strike;
-            opt.Ticker <- record.ticker;
-            opt.WithUserId(userId);
-
-            mediator.Send(opt, token) |> Async.AwaitTask
-        
-        let handleExpireCommand (ec:Expire.LookupCommand) = expireHandler.Handle ec |> Async.AwaitTask
+    type Handler(csvParser:ICSVParser, buyOrSellHandler:BuyOrSell.Handler, expireHandler:Expire.Handler) =
         
         let processCommand record (command:Object) userId token =
             match command with
-            | :? OptionTransaction as opt ->
-                Console.WriteLine($"processing {opt.GetType()} for {opt.Ticker} {opt.Premium} {opt.ExpirationDate}")
-                handleOptionTransaction record opt userId token
-                
+            
             | :? Expire.LookupCommand as expCommand ->
-                Console.WriteLine($"processing {expCommand.GetType()} for {record.ticker} {record.premium} {record.expiration}")
-                handleExpireCommand expCommand
+                expCommand |> expireHandler.Handle |> Async.AwaitTask
+                
+            | :? BuyOrSell.Command as bsCommand ->
+                buyOrSellHandler.Handle bsCommand |> Async.AwaitTask
                 
             | _ -> Exception($"Handler for command type {record.GetType()} not available") |> raise
         
         let recordToCommand record userId =
+            
+            let toOptionTransaction record =
+                let tx = OptionTransaction()
+                tx.ExpirationDate <- record.expiration;
+                tx.Filled <- record.filled;
+                tx.NumberOfContracts <- record.amount;
+                tx.OptionType <- record.optiontype;
+                tx.Premium <- record.premium;
+                tx.StrikePrice <- record.strike;
+                tx.Ticker <- record.ticker;
+                tx.WithUserId(userId);
+                tx
+                
             let (command:Object) =
                 match record.``type`` with
-                | "sell" -> Sell.Command()
-                | "buy" -> Buy.Command()
+                | "sell" ->
+                    BuyOrSell.Sell(record |> toOptionTransaction)
+                    
+                | "buy" ->
+                    BuyOrSell.Buy(record |> toOptionTransaction)
+                    
                 | "expired" ->
                     Expire.ExpireViaLookup(
                         Expire.ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
@@ -66,7 +68,7 @@ module Import =
                         Expire.ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
                     )
                 | _ -> Exception($"Unexpected command type: {record.``type``}") |> raise
-            Console.WriteLine($"Converted {record.``type``} to {command.GetType()}")
+            
             (record,command)
         
         let runAsAsync token userId records =
@@ -92,7 +94,7 @@ module Import =
                 let finalResult =
                     match failed with
                     | None -> CommandResponse.Success()
-                    | Some f -> CommandResponse.Failed(f.Error)
+                    | Some f -> CommandResponse.Failed(f.Error.Message)
                     
                 return finalResult
         }
