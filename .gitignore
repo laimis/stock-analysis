@@ -239,3 +239,6 @@ coverage/
 # dev secrets
 *_secret*
 .ionide
+
+# idea
+.idea
