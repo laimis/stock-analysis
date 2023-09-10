@@ -13,6 +13,8 @@
     <Compile Include="Options\Delete.fs" />
     <Compile Include="Options\BuyOrSell.fs" />
     <Compile Include="Options\Import.fs" />
+    <Compile Include="Options\Details.fs" />
+    <Compile Include="Options\Chain.fs" />
   </ItemGroup>
 
   <ItemGroup>

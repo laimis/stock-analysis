@@ -1,14 +1,23 @@
 using System;
+using System.Linq;
 using core.Adapters.Options;
 
 namespace core.Options
 {
     public class OptionDetailsViewModel
     {
-        public decimal? StockPrice { get; set; }
-        public OptionDetail[] Options { get; set; }
-        public string[] Expirations { get; set; }
-        public decimal Volatility { get; set; }
-        public decimal NumberOfContracts { get; set; }
+        public OptionDetailsViewModel(decimal? price, OptionChain chain)
+        {
+            StockPrice = price;
+            Options = chain.Options;
+            Expirations = chain.Options.Select(o => o.ExpirationDate).Distinct().ToArray();
+            Volatility = chain.Volatility;
+            NumberOfContracts = chain.NumberOfContracts;
+        }
+        public decimal? StockPrice { get; }
+        public OptionDetail[] Options { get; }
+        public string[] Expirations { get; }
+        public decimal Volatility { get; }
+        public decimal NumberOfContracts { get; }
     }
 }

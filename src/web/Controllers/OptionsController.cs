@@ -18,29 +18,24 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class OptionsController : ControllerBase
     {
-        private readonly IMediator _mediator;
-        
-        public OptionsController(
-            IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpGet("{ticker}/chain")]
-        public Task<ActionResult> DetailsAsync(string ticker) =>
-            this.ExecuteAsync(
-                _mediator,
-                new Chain.Query(ticker, User.Identifier()
-            )
-        );
-
-        [HttpGet("{ticker}/active")]
-        public Task<ActionResult> List(string ticker) =>
-            this.ExecuteAsync(_mediator, new List.Query(ticker, User.Identifier()));
-
-        [HttpGet("{id}")]
-        public Task<ActionResult> Get(Guid id) =>
-            this.ExecuteAsync(_mediator, new Details.Query(id, User.Identifier()));
+        public Task<ActionResult> Chain([FromRoute] string ticker, [FromServices] Chain.Handler service) =>
+            this.OkOrError(
+                service.Handle(
+                    new Chain.Query(
+                        ticker: ticker, userId: User.Identifier()
+                    )
+                )
+            );
+        
+        [HttpGet("{optionId:guid}")]
+        public Task<ActionResult> Get([FromRoute] Guid optionId, [FromServices] Details.Handler service) =>
+            this.OkOrError(
+                service.Handle(
+                    new Details.Query(optionId: optionId, userId: User.Identifier()
+                    )
+                )
+            );
 
         [HttpPost("sell")]
         public Task<ActionResult> Sell([FromBody]OptionTransaction cmd, [FromServices] BuyOrSell.Handler service)
@@ -64,7 +59,7 @@ namespace web.Controllers
                     BuyOrSell.Command.NewSell(cmd)
                 )
             );
-        }   
+        }
 
         [HttpDelete("{id}")]
         public Task<ActionResult> Delete([FromServices]Delete.Handler service, [FromRoute] Guid id)

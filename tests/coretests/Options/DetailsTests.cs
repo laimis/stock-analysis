@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Adapters.Options;
+using core.fs.Options;
 using core.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
@@ -41,7 +42,7 @@ namespace coretests.Options
             
             var handler = new Details.Handler(accountMock.Object, brokerage.Object, storage);
 
-            var result = await handler.Handle(query, CancellationToken.None);
+            var result = await handler.Handle(query);
 
             Assert.NotNull(result);
         }
