@@ -17,9 +17,9 @@ namespace core.Options
             Orders = orders;
             BrokeragePositions = brokeragePositions;
             
-            OverallStats = new OwnedOptionStats(closed);
-            BuyStats = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Bought"));
-            SellStats = new OwnedOptionStats(closed.Where(s => s.BoughtOrSold == "Sold"));
+            OverallStats = new OwnedOptionStats(Closed);
+            BuyStats = new OwnedOptionStats(Closed.Where(s => s.BoughtOrSold == "Bought"));
+            SellStats = new OwnedOptionStats(Closed.Where(s => s.BoughtOrSold == "Sold"));
         }
 
         public IEnumerable<OwnedOptionView> Closed { get; }
