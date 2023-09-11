@@ -1,4 +1,5 @@
 ﻿using System;
+using core.fs.Options;
 using core.Options;
 using Xunit;
 

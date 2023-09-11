@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Shared.fs" />
+    <Compile Include="Options\Views.fs" />
     <Compile Include="Options\Dashboard.fs" />
     <Compile Include="Options\Export.fs" />
     <Compile Include="Options\Expire.fs" />
