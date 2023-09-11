@@ -1,8 +1,5 @@
-using System;
 using System.Threading.Tasks;
 using storage.memory;
-using storage.postgres;
-using storagetests.Fakes;
 using Xunit;
 
 namespace storagetests.memory
@@ -12,7 +9,7 @@ namespace storagetests.memory
         [Fact]
         public async Task HealthCheckWorks()
         {
-            var storage = new MemoryAggregateStorage(new FakeMediator());
+            var storage = new MemoryAggregateStorage(new FakeOutbox());
 
             await storage.DoHealthCheck();
         }

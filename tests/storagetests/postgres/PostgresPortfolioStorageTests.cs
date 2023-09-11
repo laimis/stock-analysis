@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using core;
-using core.Stocks;
-using core.Stocks.View;
+﻿using core;
 using storage.postgres;
 using storage.shared;
 using storage.tests;
@@ -25,7 +20,7 @@ namespace storagetests.postgres
 
         protected override IPortfolioStorage CreateStorage() =>
             new PortfolioStorage(
-                new PostgresAggregateStorage(new Fakes.FakeMediator(), _cnn),
+                new PostgresAggregateStorage(new FakeOutbox(), _cnn),
                 null
             );
     }

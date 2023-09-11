@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Shared;
 using Dapper;
-using MediatR;
 using Newtonsoft.Json;
 using Npgsql;
 using storage.shared;
@@ -14,15 +13,15 @@ namespace storage.postgres
 {
     public class PostgresAggregateStorage : IAggregateStorage, IBlobStorage
     {
-        private IMediator _mediator;
-        protected string _cnn;
+        private readonly string _cnn;
+        private readonly IOutbox _outbox;
 
         public PostgresAggregateStorage(
-            IMediator mediator,
+            IOutbox outbox,
             string cnn)
         {
-            _mediator = mediator;
             _cnn = cnn;
+            _outbox = outbox;
         }
 
         protected IDbConnection GetConnection()
@@ -99,15 +98,9 @@ namespace storage.postgres
                         eventsToBlast.Add(e);
                     }
 
-                    tx.Commit();
+                    await _outbox.AddEvents(eventsToBlast, tx);
 
-                    // TODO: this is very odd, not sure why I am relying on a mediator here and not
-                    // using something like outbox pattern
-                    // probably to keep things simple but basically these events are not guaranteed to run successfully to the end if
-                    // one throws exception
-                    foreach(var e in eventsToBlast)
-                        if (e is INotification n)
-                            await _mediator.Publish(n);
+                    tx.Commit();
                 }
             }
         }

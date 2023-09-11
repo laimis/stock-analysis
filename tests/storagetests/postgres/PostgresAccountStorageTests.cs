@@ -11,7 +11,7 @@ namespace storagetests.postgres
         protected override IAccountStorage GetStorage()
         {
             return new AccountStorage(
-                new Fakes.FakeMediator(),
+                new FakeOutbox(),
                 CredsHelper.GetDbCreds()
             );
         }

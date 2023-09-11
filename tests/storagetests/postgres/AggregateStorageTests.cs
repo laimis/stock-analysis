@@ -1,7 +1,5 @@
-using System;
 using System.Threading.Tasks;
 using storage.postgres;
-using storagetests.Fakes;
 using testutils;
 using Xunit;
 using Xunit.Abstractions;
@@ -13,7 +11,7 @@ namespace storagetests.postgres
     {
         private ITestOutputHelper _output;
 
-        public AggregateStorageTests(Xunit.Abstractions.ITestOutputHelper output)
+        public AggregateStorageTests(ITestOutputHelper output)
         {
             _output = output;
         }
@@ -24,7 +22,7 @@ namespace storagetests.postgres
             var cnn = CredsHelper.GetDbCreds();
             
             var storage = new PostgresAggregateStorage(
-                new FakeMediator(),
+                new FakeOutbox(),
                 cnn);
 
             await storage.DoHealthCheck();

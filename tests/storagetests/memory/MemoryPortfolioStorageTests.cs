@@ -15,7 +15,7 @@ namespace storagetests.memory
         protected override IPortfolioStorage CreateStorage()
         {
             return new PortfolioStorage(
-                new MemoryAggregateStorage(new Fakes.FakeMediator()),
+                new MemoryAggregateStorage(new FakeOutbox()),
                 null
             );
         }

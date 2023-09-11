@@ -1,40 +1,16 @@
 using System.Collections.Generic;
-using System.Threading;
+using System.Data;
 using System.Threading.Tasks;
-using MediatR;
+using core.Shared;
+using storage.shared;
 
-namespace storagetests.Fakes
+namespace storagetests
 {
-    public class FakeMediator : IMediator
+    public class FakeOutbox : IOutbox
     {
-        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = default)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task Publish(object notification, CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(default(TResponse));
-        }
-
-        public Task<object> Send(object request, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(new object());
+            return Task.FromResult(new ServiceResponse());
         }
     }
 }

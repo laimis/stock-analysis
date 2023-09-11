@@ -114,6 +114,8 @@ namespace web
             var storage = configuration.GetValue<string>("storage");
 
             logger.LogInformation("Read storage configuration type: {storage}", storage);
+            
+            services.AddSingleton<IOutbox, MediatRBasedOutbox>();
 
             if (storage == "postgres")
             {
@@ -136,33 +138,24 @@ namespace web
         private static void RegisterMemoryImplementations(IServiceCollection services)
         {
             services.AddSingleton<IAccountStorage>(s =>
-                new storage.memory.AccountStorage(s.GetRequiredService<IMediator>())
+                new storage.memory.AccountStorage(s.GetRequiredService<IOutbox>())
             );
 
             services.AddSingleton<IAggregateStorage>(s =>
-                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IMediator>())
+                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IOutbox>())
             );
 
             services.AddSingleton<IBlobStorage>(s =>
-                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IMediator>())
+                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IOutbox>())
             );
         }
 
         private static void RegisterPostgresImplemenations(IConfiguration configuration, IServiceCollection services)
         {
             var cnn = configuration.GetValue<string>("DB_CNN");
-            services.AddSingleton<IAccountStorage>(s =>
-            {
-                return new storage.postgres.AccountStorage(s.GetRequiredService<IMediator>(), cnn);
-            });
-            services.AddSingleton<IBlobStorage>(s =>
-            {
-                return new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
-            });
-            services.AddSingleton<IAggregateStorage>(s =>
-            {
-                return new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IMediator>(), cnn);
-            });
+            services.AddSingleton<IAccountStorage>(s => new storage.postgres.AccountStorage(s.GetRequiredService<IOutbox>(), cnn));
+            services.AddSingleton<IBlobStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
+            services.AddSingleton<IAggregateStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
         }
     }
 }

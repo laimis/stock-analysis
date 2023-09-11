@@ -9,7 +9,7 @@ namespace storagetests.memory
         protected override IAccountStorage GetStorage()
         {
             return new AccountStorage(
-                new Fakes.FakeMediator()
+                new FakeOutbox()
             );
         }
     }

@@ -1,15 +1,14 @@
 ﻿using core.Account;
-using core.Shared;
-using MediatR;
+using storage.shared;
 
 namespace storage.memory;
 public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 {
-    private static readonly Dictionary<Guid, User?> _users = new Dictionary<Guid, User?>();
-    private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new Dictionary<Guid, ProcessIdToUserAssociation>();
-    private static readonly Dictionary<Guid, object> _viewModels = new Dictionary<Guid, object>();
+    private static readonly Dictionary<Guid, User?> _users = new();
+    private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new();
+    private static readonly Dictionary<Guid, object> _viewModels = new();
 
-    public AccountStorage(IMediator mediator) : base(mediator)
+    public AccountStorage(IOutbox outbox) : base(outbox)
     {
     }
 
@@ -48,8 +47,6 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         _users[u.Id] = u;
 
         await SaveEventsAsync(agg: u, entity: "user", userId: u.Id);
-
-        await _mediator.Publish(new UserStatusRecalculate(u.Id));
     }
 
     public Task SaveUserAssociation(ProcessIdToUserAssociation r)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
 using Dapper;
-using MediatR;
+using storage.shared;
 
 namespace storage.postgres
 {
@@ -11,7 +11,7 @@ namespace storage.postgres
     {
         private const string _user_entity = "users";
 
-        public AccountStorage(IMediator mediator, string cnn) : base(mediator, cnn)
+        public AccountStorage(IOutbox outbox, string cnn) : base(outbox, cnn)
         {
         }
 
@@ -49,6 +49,8 @@ namespace storage.postgres
 
         public async Task Save(User u)
         {
+            // TODO: these should be done as part of the transaction with save events async
+            // or done as part of the outbox processing of the user events
             using(var db = GetConnection())
             {
                 var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
@@ -61,6 +63,8 @@ namespace storage.postgres
 
         public async Task Delete(User user)
         {
+            // TODO: these should be done as part of the transaction with save events async
+            // or done as part of the outbox processing of the user events
             using(var db = GetConnection())
             {
                 var query = @"DELETE FROM users WHERE id = :id";

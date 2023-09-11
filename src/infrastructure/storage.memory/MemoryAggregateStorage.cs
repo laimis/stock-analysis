@@ -1,20 +1,19 @@
 using core.Shared;
-using MediatR;
 using storage.shared;
 
 namespace storage.memory;
 
 public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
 {
-    public MemoryAggregateStorage(IMediator mediator)
+    public MemoryAggregateStorage(IOutbox outbox)
     {
-        _mediator = mediator;
+        _outbox = outbox;
     }
     
-    private static Dictionary<string, List<StoredAggregateEvent>> _aggregates = 
-        new Dictionary<string, List<StoredAggregateEvent>>();
-    protected IMediator _mediator;
-    private static Dictionary<string, object> _blobs = new Dictionary<string, object>();
+    private static readonly Dictionary<string, List<StoredAggregateEvent>> _aggregates = new();
+    
+    private static readonly Dictionary<string, object> _blobs = new();
+    private readonly IOutbox _outbox;
 
     public Task DeleteAggregates(string entity, Guid userId)
     {
@@ -88,9 +87,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
             eventsToBlast.Add(e);
         }
 
-        foreach(var e in eventsToBlast)
-            if (e is INotification n)
-                await _mediator.Publish(n);
+        await _outbox.AddEvents(eventsToBlast, null);
     }
 
     public Task<T> Get<T>(string key) => Task.FromResult((T)_blobs[key]);
