@@ -16,7 +16,7 @@ namespace stripe
         public SubscriptionResult Create(User user, string email, string paymentToken, string planId)
         {
             var paymentMethodCreate = new PaymentMethodCreateOptions {
-                Card = new PaymentMethodCardCreateOptions{
+                Card = new PaymentMethodCardOptions(){
                     Token = paymentToken
                 },
                 Type = "card"
