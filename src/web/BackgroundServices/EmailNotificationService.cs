@@ -6,6 +6,7 @@ using core.Account;
 using core.Alerts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
+using core.Shared.Adapters.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared.Adapters.Storage;
 using Dapper;
 using storage.shared;
 

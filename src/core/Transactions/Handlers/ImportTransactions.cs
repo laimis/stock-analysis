@@ -9,6 +9,7 @@ using core.Options;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Emails;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 using core.Stocks.Handlers;
 using MediatR;

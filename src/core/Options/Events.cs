@@ -1,6 +1,5 @@
 using System;
 using core.Shared;
-using MediatR;
 
 namespace core.Options
 {
@@ -53,7 +52,7 @@ namespace core.Options
         public Guid UserId { get; }
     }
 
-    public class OptionPurchased : AggregateEvent, INotification
+    public class OptionPurchased : AggregateEvent
     {
         public OptionPurchased(
             Guid id,
@@ -77,7 +76,7 @@ namespace core.Options
         public string Notes { get; }
     }
 
-    public class OptionSold : AggregateEvent, INotification
+    public class OptionSold : AggregateEvent
     {
         public OptionSold(
             Guid id,

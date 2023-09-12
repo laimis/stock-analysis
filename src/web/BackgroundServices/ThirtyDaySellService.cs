@@ -6,6 +6,7 @@ using core.Account;
 using core.Reports;
 using core.Reports.Views;
 using core.Shared.Adapters.Emails;
+using core.Shared.Adapters.Storage;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

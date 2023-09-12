@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Storage;
 using MediatR;
 
 namespace core.Stocks.Handlers

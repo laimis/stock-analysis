@@ -7,6 +7,7 @@ using core.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Options;
+using core.Shared.Adapters.Storage;
 using Moq;
 using Xunit;
 

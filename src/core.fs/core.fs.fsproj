@@ -17,7 +17,6 @@
     <Compile Include="Options\Import.fs" />
     <Compile Include="Options\Details.fs" />
     <Compile Include="Options\Chain.fs" />
-    <Compile Include="Options\OptionTransactionHandler.fs" />
   </ItemGroup>
 
   <ItemGroup>

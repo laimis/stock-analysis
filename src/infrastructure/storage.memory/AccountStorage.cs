@@ -1,4 +1,5 @@
 ﻿using core.Account;
+using core.Shared.Adapters.Storage;
 using storage.shared;
 
 namespace storage.memory;

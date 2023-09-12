@@ -6,6 +6,7 @@ using core.Account;
 using core.fs.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Storage;
 using Moq;
 using Xunit;
 

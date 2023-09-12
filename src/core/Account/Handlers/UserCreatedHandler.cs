@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared.Adapters.Emails;
+using core.Shared.Adapters.Storage;
 
 namespace core.Account.Handlers
 {

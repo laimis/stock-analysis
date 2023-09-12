@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Account;
 
-namespace core.Account
+namespace core.Shared.Adapters.Storage
 {
     public interface IAccountStorage
     {
