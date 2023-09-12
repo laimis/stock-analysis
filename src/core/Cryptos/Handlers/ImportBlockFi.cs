@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.CSV;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using MediatR;
 
 namespace core.Cryptos.Handlers

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace core.Utils
+namespace core.Shared
 {
     public class ValidValues : ValidationAttribute
     {
-        private List<string> _values;
+        private readonly List<string> _values;
 
         public ValidValues(params string[] values)
         {

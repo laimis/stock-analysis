@@ -4,7 +4,7 @@ using core.Shared;
 using core.Shared.Adapters.SMS;
 using MediatR;
 
-namespace core.Alerts
+namespace core.Alerts.Handlers
 {
     public class SendSMS
     {

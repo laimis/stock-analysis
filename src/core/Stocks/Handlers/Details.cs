@@ -7,7 +7,7 @@ using core.Shared.Adapters.Brokerage;
 using core.Stocks.View;
 using MediatR;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class Details
     {

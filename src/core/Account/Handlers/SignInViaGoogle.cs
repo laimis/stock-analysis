@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace core.Account
+namespace core.Account.Handlers
 {
     public class SignInViaGoogle
     {

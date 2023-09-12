@@ -1,4 +1,4 @@
-namespace core.Adapters.Subscriptions
+namespace core.Shared.Adapters.Subscriptions
 {
     public static class Plans
     {

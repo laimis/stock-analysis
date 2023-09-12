@@ -1,5 +1,6 @@
 using System;
 using core.Account;
+using core.Account.Handlers;
 using Xunit;
 
 namespace coretests.Account

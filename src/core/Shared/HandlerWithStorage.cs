@@ -1,8 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared.Adapters.Storage;
 using MediatR;
 
-namespace core
+namespace core.Shared
 {
     public abstract class HandlerWithStorage<Input, Output> : IRequestHandler<Input, Output>
         where Input : IRequest<Output>

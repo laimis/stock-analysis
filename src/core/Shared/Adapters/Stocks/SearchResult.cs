@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace core.Adapters.Stocks
+namespace core.Shared.Adapters.Stocks
 {
     public class SearchResult
     {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core;
 using core.fs.Options;
 using core.Options;
+using core.Shared.Adapters.Storage;
 using Moq;
 using Xunit;
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using core.Shared;
 using MediatR;
 
-namespace core.Account
+namespace core.Account.Handlers
 {
     public class Confirm
     {

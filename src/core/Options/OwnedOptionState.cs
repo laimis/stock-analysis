@@ -4,6 +4,8 @@ using core.Shared;
 
 namespace core.Options
 {
+    public enum OptionType { CALL, PUT }
+    
     public class OwnedOptionState : IAggregateState
     {
         public OwnedOptionState()

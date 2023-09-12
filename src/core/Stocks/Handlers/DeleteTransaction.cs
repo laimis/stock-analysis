@@ -2,9 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using MediatR;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class DeleteTransaction
     {

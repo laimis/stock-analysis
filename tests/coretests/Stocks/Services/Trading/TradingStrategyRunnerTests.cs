@@ -11,7 +11,7 @@ using core.Stocks.Services.Trading;
 using Moq;
 using Xunit;
 
-namespace coretests.Stocks.Services
+namespace coretests.Stocks.Services.Trading
 {
     public class TradingStrategyRunnerTests
     {

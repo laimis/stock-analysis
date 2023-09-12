@@ -1,9 +1,9 @@
 namespace core.fs.Options
 
 open System
-open core.Adapters.Options
 open core.Options
 open core.Shared.Adapters.Brokerage
+open core.Shared.Adapters.Options
 
 
 type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail) =

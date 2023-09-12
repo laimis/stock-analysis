@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 
-namespace core.Alerts
+namespace core.Alerts.Handlers
 {
     public class AlertHandler :
         MediatR.INotificationHandler<StockPurchased_v2>,

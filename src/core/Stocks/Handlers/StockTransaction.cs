@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using core.Shared;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class StockTransaction : RequestWithTicker<CommandResponse>
     {

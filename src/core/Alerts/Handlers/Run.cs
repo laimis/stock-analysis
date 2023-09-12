@@ -1,11 +1,10 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
 using MediatR;
 
-namespace core.Alerts
+namespace core.Alerts.Handlers
 {
     public class Run
     {

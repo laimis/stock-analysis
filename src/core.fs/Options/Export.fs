@@ -1,9 +1,10 @@
 namespace core.fs.Options
 
+open core.Shared.Adapters.CSV
+open core.Shared.Adapters.Storage
+open core.fs
+
 module Export =
-    open core.fs
-    open core
-    open core.Shared.Adapters.CSV
 
     type Query(userId:System.Guid) =
         member _.UserId = userId
@@ -18,7 +19,7 @@ module Export =
 
                 let csv = CSVExport.Generate(csvWriter, options);
 
-                return new ExportResponse(
+                return ExportResponse(
                     request.Filename |> CSVExport.GenerateFilename,
                     csv
                 );

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Storage;
 
 namespace core.Alerts.Services
 {

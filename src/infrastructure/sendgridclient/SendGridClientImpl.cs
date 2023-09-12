@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using core.Adapters.Emails;
+using core.Shared.Adapters.Emails;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;

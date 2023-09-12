@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using core.Options;
 
-namespace core.Adapters.Options
+namespace core.Shared.Adapters.Options
 {
     public class OptionChain
     {

@@ -1,5 +1,4 @@
 using System;
-using core.Adapters.Stocks;
 using core.Shared;
 
 namespace core.Notes

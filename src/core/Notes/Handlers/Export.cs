@@ -3,13 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
 using core.Shared.Adapters.CSV;
-using MediatR;
+using core.Shared.Adapters.Storage;
 
-namespace core.Notes
+namespace core.Notes.Handlers
 {
     public class Export
     {
-        public class Query : RequestWithUserId<core.ExportResponse>
+        public class Query : RequestWithUserId<ExportResponse>
         {
             public Query(Guid userId) : base(userId)
             {

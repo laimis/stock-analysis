@@ -1,4 +1,5 @@
 using System;
+using core.Shared;
 
 namespace core.Cryptos.Views
 {

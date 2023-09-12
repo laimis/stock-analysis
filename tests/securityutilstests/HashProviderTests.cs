@@ -1,7 +1,7 @@
 using securityutils;
 using Xunit;
 
-namespace webtests
+namespace securityutilstests
 {
     public class HashProviderTests
     {

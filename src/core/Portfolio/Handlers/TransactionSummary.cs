@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Portfolio.Views;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 
 namespace core.Portfolio.Handlers
 {

@@ -5,6 +5,7 @@ module core.fs.Options.BuyOrSell
     open core.Account
     open core.Options
     open core.Shared
+    open core.Shared.Adapters.Storage
     open core.fs
 
     type Command =

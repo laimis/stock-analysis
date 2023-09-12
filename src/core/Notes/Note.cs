@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using core.Adapters.Stocks;
 using core.Shared;
 
 namespace core.Notes

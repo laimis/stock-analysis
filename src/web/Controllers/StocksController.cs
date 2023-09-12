@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using core.Adapters.Stocks;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.SEC;
+using core.Shared.Adapters.Stocks;
 using core.Stocks;
 using core.Stocks.Handlers;
 using core.Stocks.View;
@@ -123,13 +123,13 @@ namespace web.Controllers
         [HttpGet("export/closed")]
         public Task<ActionResult> ExportClosed()
         {
-            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.ExportTrades.ExportType.Closed));
+            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.Handlers.ExportTrades.ExportType.Closed));
         }
 
         [HttpGet("export/open")]
         public Task<ActionResult> ExportTrades()
         {
-            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.ExportTrades.ExportType.Open));
+            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.Handlers.ExportTrades.ExportType.Open));
         }
 
         [HttpPost("import")]

@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Notes.Output;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 
-namespace core.Notes
+namespace core.Notes.Handlers
 {
     public class List
     {

@@ -4,7 +4,7 @@ using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using core.Stocks;
 using core.Stocks.Services.Analysis;
-using coretests.TestData;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Stocks.Services

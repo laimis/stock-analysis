@@ -1,9 +1,8 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Emails;
+using core.Shared.Adapters.Emails;
 
-namespace core.Account
+namespace core.Account.Handlers
 {
     public class UserCreatedHandler : MediatR.INotificationHandler<UserCreated>
     {

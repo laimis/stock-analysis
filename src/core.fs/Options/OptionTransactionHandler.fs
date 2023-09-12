@@ -1,7 +1,7 @@
 namespace core.fs.Options
 
-    open core
     open core.Options
+    open core.Shared.Adapters.Storage
     open core.fs
 
     type OptionTransactionHandler(storage:IPortfolioStorage) =

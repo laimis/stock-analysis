@@ -1,17 +1,17 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using core;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Portfolio;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace storage.tests
+namespace storagetests
 {
     public abstract class PortfolioStorageTests
     {

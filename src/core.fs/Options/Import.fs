@@ -1,12 +1,10 @@
 namespace core.fs.Options
 
 open System
-open core.Options
+open core.Shared.Adapters.CSV
 
 module Import =
     open core.fs
-    open core
-    open core.Adapters.CSV
     open core.Shared
 
     type OptionRecord = {

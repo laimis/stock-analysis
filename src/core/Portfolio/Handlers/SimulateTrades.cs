@@ -7,11 +7,12 @@ using core.Account;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 using core.Stocks.Services.Trading;
 using MediatR;
 
-namespace core.Portfolio
+namespace core.Portfolio.Handlers
 {
     public class SimulateTrades
     {

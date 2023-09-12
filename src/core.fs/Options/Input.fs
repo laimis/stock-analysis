@@ -2,7 +2,7 @@ namespace core.fs.Options
 
 open System
 open System.ComponentModel.DataAnnotations
-open core.Utils
+open core.Shared
 
 
 type OptionTransaction() =

@@ -3,6 +3,7 @@ module core.fs.Options.Delete
     open System
     open core
     open core.Shared
+    open core.Shared.Adapters.Storage
     open core.fs
 
     type Command(optionId:Guid, userId:Guid) =

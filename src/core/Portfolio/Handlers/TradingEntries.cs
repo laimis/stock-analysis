@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using core.Account;
 using core.Portfolio.Views;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
+using core.Stocks.Handlers;
 using core.Stocks.Services.Trading;
 using MediatR;
 

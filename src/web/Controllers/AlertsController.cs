@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using core.Alerts;
+using core.Alerts.Handlers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

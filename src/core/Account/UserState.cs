@@ -1,6 +1,6 @@
 using System;
-using core.Adapters.Subscriptions;
 using core.Shared;
+using core.Shared.Adapters.Subscriptions;
 
 namespace core.Account
 {

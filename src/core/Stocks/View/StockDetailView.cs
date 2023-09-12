@@ -1,5 +1,5 @@
 #nullable enable
-using core.Adapters.Stocks;
+using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.View
 {

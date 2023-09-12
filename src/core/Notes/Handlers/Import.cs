@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.CSV;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using MediatR;
 
-namespace core.Notes
+namespace core.Notes.Handlers
 {
     public class Import
     {
@@ -40,7 +40,7 @@ namespace core.Notes
 
                 foreach(var r in parseResponse.Success)
                 {
-                    var c = new core.Notes.Add.Command{
+                    var c = new Add.Command{
                         Note = r.note,
                         Ticker = r.ticker,
                         Created = r.created,

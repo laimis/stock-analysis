@@ -4,6 +4,7 @@ using core.Account;
 using core.fs.Options;
 using core.Options;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 using Moq;
 

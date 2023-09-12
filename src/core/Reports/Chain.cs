@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using core.Stocks.View;
 
 namespace core.Reports

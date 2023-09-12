@@ -1,9 +1,9 @@
 module core.fs.Options.Expire
 
     open System
-    open core
     open core.Options
     open core.Shared
+    open core.Shared.Adapters.Storage
     open core.fs
     
     type ExpireData(optionId: Guid, userId: Guid) =

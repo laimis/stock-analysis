@@ -6,7 +6,7 @@ using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using MediatR;
 
-namespace core.Account
+namespace core.Account.Handlers
 {
     public class BrokerageConnect
     {

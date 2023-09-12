@@ -1,14 +1,14 @@
 using System;
-using core;
 using core.Cryptos;
 using core.Notes;
 using core.Options;
+using core.Shared;
 using core.Shared.Adapters.CSV;
 using core.Stocks;
 using csvparser;
 using Xunit;
 
-namespace coretests
+namespace csvparsertests
 {
     public class CSVExportTests
     {

@@ -3,8 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 
-namespace core.Portfolio
+namespace core.Portfolio.Handlers
 {
     public class SetRisk
     {

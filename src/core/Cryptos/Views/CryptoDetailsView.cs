@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using core.Shared;
 
 namespace core.Cryptos.Views
 {

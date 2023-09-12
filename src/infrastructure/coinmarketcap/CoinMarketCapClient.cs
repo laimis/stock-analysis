@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using core;
+using core.Shared;
 using core.Shared.Adapters.Cryptos;
 using Microsoft.Extensions.Logging;
 

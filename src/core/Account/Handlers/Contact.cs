@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.Emails;
 using core.Shared;
+using core.Shared.Adapters.Emails;
 using MediatR;
 
-namespace core.Account
+namespace core.Account.Handlers
 {
     public class Contact
     {

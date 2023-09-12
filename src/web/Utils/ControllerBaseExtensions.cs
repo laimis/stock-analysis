@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using core;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

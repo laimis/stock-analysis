@@ -1,7 +1,7 @@
 ﻿using core;
+using core.Shared.Adapters.Storage;
 using storage.memory;
 using storage.shared;
-using storage.tests;
 using Xunit.Abstractions;
 
 namespace storagetests.memory

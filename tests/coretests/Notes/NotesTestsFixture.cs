@@ -2,6 +2,7 @@ using System;
 using core;
 using core.Notes;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using Moq;
 
 namespace coretests.Notes

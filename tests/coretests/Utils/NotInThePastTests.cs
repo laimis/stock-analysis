@@ -1,5 +1,5 @@
 using System;
-using core.Utils;
+using core.Shared;
 using Xunit;
 
 namespace coretests.Utils

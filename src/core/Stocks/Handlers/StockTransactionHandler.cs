@@ -1,9 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Notes.Handlers;
+using core.Shared.Adapters.Storage;
 using MediatR;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class StockTransactionHandler : 
         MediatR.INotificationHandler<StockSold>,
@@ -71,7 +73,7 @@ namespace core.Stocks
                 return;
             }
 
-            var cmd = new Notes.Add.Command
+            var cmd = new Add.Command
             {
                 Created = when,
                 Note = notes,

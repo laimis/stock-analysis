@@ -1,7 +1,7 @@
 ﻿using core;
+using core.Shared.Adapters.Storage;
 using storage.postgres;
 using storage.shared;
-using storage.tests;
 using testutils;
 using Xunit;
 using Xunit.Abstractions;

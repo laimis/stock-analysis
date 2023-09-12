@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using core.Shared.Adapters.Stocks;
 
-namespace coretests.TestData
+namespace coretests.testdata
 {
     public class TestDataGenerator
     {

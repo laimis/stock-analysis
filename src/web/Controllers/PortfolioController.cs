@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
+using ProfitPoints = core.Portfolio.Handlers.ProfitPoints;
 
 namespace web.Controllers
 {
@@ -211,7 +212,7 @@ namespace web.Controllers
             string ticker) =>
 
             _mediator.Send(
-                new core.Portfolio.ProfitPoints.Query(
+                new ProfitPoints.Query(
                     positionId, ticker, User.Identifier()
                 )
             );

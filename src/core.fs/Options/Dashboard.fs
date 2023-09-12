@@ -1,6 +1,7 @@
 ﻿namespace core.fs.Options
 
 open core.Shared
+open core.Shared.Adapters.Storage
 
 module Dashboard =
     open core.Account

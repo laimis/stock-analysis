@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Reports.Views;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Storage;
 
 namespace core.Reports
 {

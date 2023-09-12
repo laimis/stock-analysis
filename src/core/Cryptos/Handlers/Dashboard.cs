@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Cryptos.Views;
 using core.Shared;
 using core.Shared.Adapters.Cryptos;
+using core.Shared.Adapters.Storage;
 
 namespace core.Cryptos.Handlers
 {

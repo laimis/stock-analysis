@@ -3,7 +3,7 @@ using System.Linq;
 using core.Portfolio;
 using Xunit;
 
-namespace coretests.Stocks
+namespace coretests.Portfolio
 {
     public class StockListTests
     {

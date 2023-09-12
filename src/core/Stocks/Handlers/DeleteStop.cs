@@ -1,10 +1,10 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class DeleteStop
     {

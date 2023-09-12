@@ -4,10 +4,9 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using core.Account;
-using core.Adapters.Options;
-using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Options;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -374,7 +373,7 @@ public class TDAmeritradeClient : IBrokerage
         return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
     }
 
-    public async Task<ServiceResponse<core.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string? contractType = null)
+    public async Task<ServiceResponse<core.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string? contractType = null)
     {
         var function = $"marketdata/chains?symbol={ticker}";
 
@@ -398,7 +397,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (!chainResponse.IsOk)
         {
-            return new ServiceResponse<core.Adapters.Options.OptionChain>(chainResponse.Error!);
+            return new ServiceResponse<core.Shared.Adapters.Options.OptionChain>(chainResponse.Error!);
         }
 
         static IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
@@ -428,14 +427,14 @@ public class TDAmeritradeClient : IBrokerage
 
         var chain = chainResponse.Success!;
 
-        var response = new core.Adapters.Options.OptionChain(
+        var response = new core.Shared.Adapters.Options.OptionChain(
             symbol: chain.symbol!,
             volatility: chain.volatility,
             numberOfContracts: chain.numberOfContracts,
             options: ToOptionDetails(chain.callExpDateMap!, chain.underlyingPrice).Union(ToOptionDetails(chain.putExpDateMap!, chain.underlyingPrice)).ToArray()
         );
 
-        return new ServiceResponse<core.Adapters.Options.OptionChain>(response);
+        return new ServiceResponse<core.Shared.Adapters.Options.OptionChain>(response);
     }
 
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)

@@ -1,5 +1,5 @@
 using System;
-using core.Adapters.Options;
+using core.Shared.Adapters.Options;
 using Xunit;
 
 namespace coretests.Adapters.Options

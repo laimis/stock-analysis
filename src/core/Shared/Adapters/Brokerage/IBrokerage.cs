@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Options;
-using core.Adapters.Stocks;
+using core.Shared.Adapters.Options;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Shared.Adapters.Brokerage

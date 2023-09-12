@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Emails;
 using core.Reports;
 using core.Reports.Views;
+using core.Shared.Adapters.Emails;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

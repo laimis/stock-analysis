@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace core.Adapters.Emails
+namespace core.Shared.Adapters.Emails
 {
     public interface IEmailService
     {

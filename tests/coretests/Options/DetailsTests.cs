@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Options;
 using core.fs.Options;
 using core.Options;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Options;
 using Moq;
 using Xunit;
 

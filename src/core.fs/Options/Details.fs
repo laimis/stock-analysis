@@ -6,6 +6,7 @@ module core.fs.Options.Details
     open core.Options
     open core.Shared
     open core.Shared.Adapters.Brokerage
+    open core.Shared.Adapters.Storage
     open core.fs
 
     type Query(optionId:Guid, userId:Guid) =

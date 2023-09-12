@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.Stocks;
 using MediatR;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class Search
     {

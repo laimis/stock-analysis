@@ -1,12 +1,12 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using MediatR;
 
-namespace core.Portfolio
+namespace core.Portfolio.Handlers
 {
     public class DeletePosition
     {

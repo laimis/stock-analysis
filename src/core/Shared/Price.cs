@@ -1,4 +1,4 @@
-namespace core
+namespace core.Shared
 {
     public struct Price
     {

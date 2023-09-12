@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using core.Shared;
 using MediatR;
 
-namespace core.Alerts
+namespace core.Alerts.Handlers
 {
     public class Get
     {

@@ -1,17 +1,14 @@
 using core;
+using core.Shared;
+using core.Shared.Adapters.CSV;
 using Xunit;
 
 namespace coretests
 {
     public class ExportResponseTests
     {
-        private ExportResponse _response;
+        private readonly ExportResponse _response = new("filename", "content");
 
-        public ExportResponseTests()
-        {
-            _response = new ExportResponse("filename", "content");
-        }
-        
         [Fact]
         public void CorrectContentType()
         {

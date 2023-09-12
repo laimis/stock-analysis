@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Adapters.CSV;
 using core.Shared;
+using core.Shared.Adapters.CSV;
 using MediatR;
 
-namespace core.Stocks
+namespace core.Stocks.Handlers
 {
     public class Import
     {
@@ -54,7 +54,7 @@ namespace core.Stocks
             {
                 RequestWithUserId<CommandResponse> CreateBuy(StockRecord r)
                 {
-                    var b = new core.Stocks.Buy.Command {
+                    var b = new Buy.Command {
                         NumberOfShares = record.amount,
                         Date = record.date,
                         Price = record.price,
@@ -66,7 +66,7 @@ namespace core.Stocks
 
                 RequestWithUserId<CommandResponse> CreateSell(StockRecord r)
                 {
-                    var s = new core.Stocks.Sell.Command
+                    var s = new Sell.Command
                     {
                         NumberOfShares = record.amount,
                         Date = record.date,

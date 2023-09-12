@@ -7,7 +7,7 @@ using core.Options;
 using core.Portfolio;
 using core.Stocks;
 
-namespace core
+namespace core.Shared.Adapters.Storage
 {
     public interface IPortfolioStorage
     {

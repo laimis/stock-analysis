@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using core.Account;
-using core.Adapters.Subscriptions;
+using core.Shared.Adapters.Subscriptions;
 using Stripe;
 
 namespace stripe

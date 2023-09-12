@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using core.Stocks.Services.Analysis;
-using coretests.TestData;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Stocks.Services

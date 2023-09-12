@@ -1,4 +1,4 @@
-namespace core.Adapters.Emails
+namespace core.Shared.Adapters.Emails
 {
     public static class EmailSettings
     {

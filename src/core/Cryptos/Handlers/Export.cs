@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Shared;
 using core.Shared.Adapters.CSV;
+using core.Shared.Adapters.Storage;
 
 namespace core.Cryptos.Handlers
 {

@@ -1,4 +1,4 @@
-﻿namespace core.Adapters.Stocks
+﻿namespace core.Shared.Adapters.Stocks
 {
     public class StockQueryResult
     {

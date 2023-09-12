@@ -2,12 +2,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Alerts;
 using core.Portfolio.Views;
 using core.Shared;
-using MediatR;
+using core.Shared.Adapters.Storage;
 
-namespace core.Portfolio
+namespace core.Portfolio.Handlers
 {
     public class Get
     {

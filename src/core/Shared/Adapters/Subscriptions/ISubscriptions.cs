@@ -1,6 +1,6 @@
 using core.Account;
 
-namespace core.Adapters.Subscriptions
+namespace core.Shared.Adapters.Subscriptions
 {
     public interface ISubscriptions
     {

@@ -7,6 +7,7 @@ using core.Cryptos;
 using core.Options;
 using core.Portfolio.Views;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 
 namespace core.Portfolio.Handlers

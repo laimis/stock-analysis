@@ -8,6 +8,7 @@ using core.Notes;
 using core.Options;
 using core.Portfolio;
 using core.Shared;
+using core.Shared.Adapters.Storage;
 using core.Stocks;
 
 namespace storage.shared

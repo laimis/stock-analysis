@@ -6,12 +6,11 @@ using core.Cryptos;
 using core.Notes;
 using core.Options;
 using core.Portfolio;
-using core.Shared;
-using core.Shared.Adapters.CSV;
 using core.Stocks;
 using core.Stocks.Services.Trading;
+using PositionInstance = core.Stocks.PositionInstance;
 
-namespace core
+namespace core.Shared.Adapters.CSV
 {
     public class CSVExport
     {
@@ -77,7 +76,7 @@ namespace core
             };
         }
 
-        public static string Generate(ICSVWriter writer, IEnumerable<Stocks.PositionInstance> trades)
+        public static string Generate(ICSVWriter writer, IEnumerable<PositionInstance> trades)
         {
             var rows = trades.Select(t =>
                 new TradesRecord(

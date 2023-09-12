@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using core.Account;
-using core.Adapters.Subscriptions;
+using core.Shared.Adapters.Subscriptions;
 using Xunit;
 
 namespace coretests.Account

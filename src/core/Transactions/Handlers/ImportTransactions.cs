@@ -5,11 +5,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Adapters.CSV;
-using core.Adapters.Emails;
 using core.Options;
 using core.Shared;
+using core.Shared.Adapters.CSV;
+using core.Shared.Adapters.Emails;
 using core.Stocks;
+using core.Stocks.Handlers;
 using MediatR;
 
 namespace core.Transactions.Handlers
@@ -150,8 +151,8 @@ namespace core.Transactions.Handlers
 
             private StockTransaction CreateStockTransaction(TransactionRecord record) => record.IsBuy() switch
             {
-                true => new core.Stocks.Buy.Command { Ticker = record.Symbol, Date = record.Date, Notes = record.Description, NumberOfShares = record.Quantity.Value, Price = record.Price.Value },
-                false => new core.Stocks.Sell.Command { Ticker = record.Symbol, Date = record.Date, Notes = record.Description, NumberOfShares = record.Quantity.Value, Price = record.Price.Value }
+                true => new Buy.Command { Ticker = record.Symbol, Date = record.Date, Notes = record.Description, NumberOfShares = record.Quantity.Value, Price = record.Price.Value },
+                false => new Sell.Command { Ticker = record.Symbol, Date = record.Date, Notes = record.Description, NumberOfShares = record.Quantity.Value, Price = record.Price.Value }
             };
 
             // private OptionTransaction CreateOptionTransaction(TransactionRecord record) => record.IsBuy() switch

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using core.Shared;
 
-namespace core.Adapters.CSV
+namespace core.Shared.Adapters.CSV
 {
     public interface ICSVParser
     {
