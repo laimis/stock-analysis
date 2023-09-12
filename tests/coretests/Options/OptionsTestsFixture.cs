@@ -28,7 +28,7 @@ namespace coretests.Options
 
             var opt = new OwnedOption(
                 cmd.Item.Ticker,
-                cmd.Item.StrikePrice,
+                cmd.Item.StrikePrice.Value,
                 (OptionType)Enum.Parse(typeof(OptionType), cmd.Item.OptionType),
                 cmd.Item.ExpirationDate.Value,
                 cmd.Item.UserId);
@@ -56,11 +56,9 @@ namespace coretests.Options
                 StrikePrice = 20,
                 OptionType = OptionType.PUT.ToString(),
                 ExpirationDate = DateTimeOffset.UtcNow.AddDays(10),
-                Filled = DateTimeOffset.UtcNow
+                Filled = DateTimeOffset.UtcNow,
+                UserId = _user.Id
             };
-
-            cmd.WithUserId(_user.Id);
-
             return BuyOrSell.Command.NewSell(cmd);
         }
 
