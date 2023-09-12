@@ -160,21 +160,15 @@ namespace web.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Authenticate(Authenticate.Command cmd)
+        public async Task<ActionResult> Authenticate([FromBody]core.fs.Account.Authenticate.Command cmd, [FromServices]core.fs.Account.Authenticate.Handler service)
         {
-            cmd.WithIPAddress(
-                Request.HttpContext.Connection.RemoteIpAddress.ToString()
-            );
-
-            var r = await _mediator.Send(cmd);
-
-            var error = r.Error;
-            if (error == null)
+            var response = await service.Handle(cmd);
+            if (response.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, r.Aggregate);
+                await EstablishSignedInIdentity(HttpContext, response.Success);
             }
             
-            return this.OkOrError(r);
+            return this.OkOrError(response);
         }
 
         [HttpPost("contact")]

@@ -93,7 +93,7 @@ namespace core.Account
             return PasswordHash == hash;
         }
 
-        internal string GetSalt()
+        public string GetSalt()
         {
             return Salt;
         }

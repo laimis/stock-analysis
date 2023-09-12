@@ -5,6 +5,7 @@ module core.fs.Options.Chain
     open core.Options
     open core.Shared
     open core.Shared.Adapters.Brokerage
+    open core.Shared.Adapters.Storage
     open core.fs
     
     type Query(ticker:string, userId:Guid) =
