@@ -63,7 +63,7 @@ namespace core.Options
         
         public bool Assigned => Expirations.Count > 0 && Expirations[0].Assigned;
         public bool Active => !Deleted && !IsExpired && NumberOfContracts != 0;
-        public bool ExpiresSoon => !IsExpired && DaysUntilExpiration >= 0 && DaysUntilExpiration < 7;
+        public bool ExpiresSoon => !IsExpired && DaysUntilExpiration is >= 0 and < 7;
         public long? DaysLeft => DaysUntilExpiration;
         public bool Deleted { get; private set; }
         private decimal PremiumReceived { get; set; }

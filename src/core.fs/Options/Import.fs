@@ -48,7 +48,7 @@ module Import =
                 tx.Premium <- record.premium;
                 tx.StrikePrice <- record.strike;
                 tx.Ticker <- record.ticker;
-                tx.WithUserId(userId);
+                tx.UserId <- userId;
                 tx
                 
             let (command:Object) =

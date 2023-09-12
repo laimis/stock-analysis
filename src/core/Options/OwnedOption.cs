@@ -77,7 +77,12 @@ namespace core.Options
             {
                 throw new InvalidOperationException("Premium amount cannot be negative");
             }
-
+            
+            if (filled.Date > State.Expiration.Date)
+            {
+                throw new InvalidOperationException("Filled date cannot be past expiration");
+            }
+            
             Apply(
                 new OptionPurchased(
                     Guid.NewGuid(),

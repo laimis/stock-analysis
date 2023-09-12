@@ -140,9 +140,10 @@ namespace core.Transactions.Handlers
                     }
                     else if (record.IsOption())
                     {
-                        var optionTx = CreateOptionTransaction(record);
-                        optionTx.WithUserId(userId);
-                        yield return optionTx;
+                        // TODO: bring this back once f# bits are ready
+                        // var optionTx = CreateOptionTransaction(record);
+                        // optionTx.WithUserId(userId);
+                        // yield return optionTx;
                     }
                 }
             }
@@ -153,11 +154,11 @@ namespace core.Transactions.Handlers
                 false => new core.Stocks.Sell.Command { Ticker = record.Symbol, Date = record.Date, Notes = record.Description, NumberOfShares = record.Quantity.Value, Price = record.Price.Value }
             };
 
-            private OptionTransaction CreateOptionTransaction(TransactionRecord record) => record.IsBuy() switch
-            {
-                true => new OptionTransaction { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() },
-                false => new OptionTransaction { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() }
-            };
+            // private OptionTransaction CreateOptionTransaction(TransactionRecord record) => record.IsBuy() switch
+            // {
+            //     true => new OptionTransaction { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() },
+            //     false => new OptionTransaction { Ticker = record.GetTickerFromOptionDescription(), Filled = record.Date, Notes = record.Description, NumberOfContracts = Decimal.ToInt32(record.Quantity.Value), Premium = record.Price.Value * 100, StrikePrice = record.StrikePrice(), ExpirationDate = record.ExpirationDate(), OptionType = record.OptionType() }
+            // };
 
             private class TransactionRecord
             {

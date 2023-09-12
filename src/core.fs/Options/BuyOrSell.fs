@@ -1,5 +1,6 @@
 module core.fs.Options.BuyOrSell
 
+    open System
     open core
     open core.Account
     open core.Options
@@ -14,21 +15,21 @@ module core.fs.Options.BuyOrSell
         
         let execute (cmd:Command) = task {
             
-            let buy (opt:OwnedOption) (data:OptionTransaction) = opt.Buy(data.NumberOfContracts, data.Premium, data.Filled.Value, data.Notes)
-            let sell (opt:OwnedOption) (data:OptionTransaction) = opt.Sell(data.NumberOfContracts, data.Premium, data.Filled.Value, data.Notes)
+            let buy (opt:OwnedOption) (data:OptionTransaction) = opt.Buy(data.NumberOfContracts, data.Premium.Value, data.Filled.Value, data.Notes)
+            let sell (opt:OwnedOption) (data:OptionTransaction) = opt.Sell(data.NumberOfContracts, data.Premium.Value, data.Filled.Value, data.Notes)
             
             let (data, func) =
                 match cmd with
-                | Buy data -> (data, buy)
-                | Sell data -> (data, sell)
+                | Buy buyData -> (buyData, buy)
+                | Sell sellData -> (sellData, sell)
                 
             let optionType = System.Enum.Parse(typedefof<OptionType>, data.OptionType) :?> OptionType
             
             let! options = storage.GetOwnedOptions(data.UserId)
             let option =
                 options
-                |> Seq.tryFind (fun o -> o.IsMatch(data.Ticker, data.StrikePrice, optionType, data.ExpirationDate.Value))
-                |> Option.defaultWith (fun () -> OwnedOption(data.Ticker, data.StrikePrice, optionType, data.ExpirationDate.Value, data.UserId))
+                |> Seq.tryFind (fun o -> o.IsMatch(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value))
+                |> Option.defaultWith (fun () -> OwnedOption(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value, data.UserId))
                 
             func option data
             
