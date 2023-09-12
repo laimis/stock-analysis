@@ -26,17 +26,15 @@ namespace core.Account.Handlers
                 _portfolio = portfolioStorage;
             }
 
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _storage.GetUser(cmd.UserId);
                 if (user == null)
                 {
-                    return new Unit();
+                    return;
                 }
 
                 await _portfolio.Delete(user.Id);
-                
-                return new Unit();
             }
         }
     }

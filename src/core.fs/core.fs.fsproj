@@ -24,4 +24,8 @@
     <ProjectReference Include="..\core\core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="7.0.400" />
+  </ItemGroup>
+
 </Project>

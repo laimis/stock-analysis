@@ -30,12 +30,12 @@ namespace core.Account.Handlers
                 _emails = emailService;
             }
 
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _storage.GetUser(cmd.UserId);
                 if (user == null)
                 {
-                    return new Unit();
+                    return;
                 }
 
                 user.Delete(cmd.Feedback);
@@ -51,8 +51,6 @@ namespace core.Account.Handlers
                 await _storage.Delete(user);
 
                 await _portfolio.Delete(user.Id);
-                
-                return new Unit();
             }
         }
     }

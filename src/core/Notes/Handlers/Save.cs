@@ -27,19 +27,17 @@ namespace core.Notes.Handlers
                 _storage = storage;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task Handle(Command request, CancellationToken cancellationToken)
             {
                 var note = await _storage.GetNote(request.UserId, request.Id);
                 if (note == null)
                 {
-                    return new Unit();
+                    return;
                 }
 
                 note.Update(request.Note);
 
                 await _storage.Save(note, request.UserId);
-
-                return new Unit();
             }
         }
     }

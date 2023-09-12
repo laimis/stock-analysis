@@ -26,15 +26,13 @@ namespace core.Account.Handlers
                 _emails = emailService;
             }
 
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task Handle(Command cmd, CancellationToken cancellationToken)
             {
                 await _emails.Send(
                     EmailSettings.Admin,
                     Sender.NoReply,
                     EmailTemplate.AdminContact,
                     new {message = cmd.Message, email = cmd.Email});
-
-                return new Unit();
             }
         }
     }

@@ -180,7 +180,7 @@ namespace web.Controllers
         [HttpPost("contact")]
         public async Task<ActionResult> Contact(Contact.Command cmd)
         {
-            var r = await _mediator.Send(cmd);
+            await _mediator.Send(cmd);
 
             return Ok();
         }

@@ -21,7 +21,7 @@ namespace core.Portfolio.Handlers
             public string Name { get; }
         }
 
-        public class Handler : IRequestHandler<Command, Unit>
+        public class Handler : IRequestHandler<Command>
         {
             private IAccountStorage _accountsStorage;
             private IPortfolioStorage _portfolioStorage;
@@ -32,7 +32,7 @@ namespace core.Portfolio.Handlers
                 _portfolioStorage = storage;
             }
 
-            public async Task<Unit> Handle(Command cmd, CancellationToken cancellationToken)
+            public async Task Handle(Command cmd, CancellationToken cancellationToken)
             {
                 var user = await _accountsStorage.GetUser(cmd.UserId);
                 if (user == null)
@@ -47,8 +47,6 @@ namespace core.Portfolio.Handlers
                 }
 
                 await _portfolioStorage.DeleteStockList(list, user.Id);
-
-                return new Unit();
             }
         }
     }

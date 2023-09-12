@@ -22,21 +22,23 @@ namespace core.Portfolio.Handlers
             public Guid PositionId { get; }
         }
 
-        public class Handler : HandlerWithStorage<Command, Unit>
+        public class Handler : IRequestHandler<Command>
         {
             private readonly IAccountStorage _accountStorage;
             private readonly IBrokerage _brokerage;
+            private readonly IPortfolioStorage _storage;
 
             public Handler(
                 IBrokerage brokerage,
                 IAccountStorage accountStorage,
-                IPortfolioStorage storage) : base(storage)
+                IPortfolioStorage storage)
             {
                 _accountStorage = accountStorage;
                 _brokerage = brokerage;
+                _storage = storage;
             }
 
-            public override async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task Handle(Command request, CancellationToken cancellationToken)
             {
                 var existing = await _storage.GetPendingStockPositions(request.UserId);
                 var found = existing.SingleOrDefault(x => x.State.Id == request.PositionId)
@@ -65,8 +67,6 @@ namespace core.Portfolio.Handlers
                 found.Close(purchased: false);
 
                 await _storage.Save(found, request.UserId);
-
-                return Unit.Value;
             }
         }
     }
