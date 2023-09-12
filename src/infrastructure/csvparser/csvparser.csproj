@@ -5,7 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSVHelper" Version="13.0.0" />
+    <PackageReference Include="CSVHelper" Version="30.0.1" />
   </ItemGroup>
 
   <PropertyGroup>

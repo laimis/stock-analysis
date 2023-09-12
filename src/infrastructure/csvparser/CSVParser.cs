@@ -20,15 +20,15 @@ namespace csvparser
                 using var reader = new StringReader(content);
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    PrepareHeaderForMatch = (header, _) =>
+                    PrepareHeaderForMatch = (header) =>
                     {
                         // remove spaces and capitalize the first letter so that
                         // CSVs produced by various services like Coinbase, TD Ameritrade, etc.
                         // can be parsed correctly
-                        var spacesRemoved = Regex.Replace(header, @"\s", string.Empty);
+                        var spacesRemoved = Regex.Replace(header.Header, @"\s", string.Empty);
                         return Char.ToUpper(spacesRemoved[0]) + spacesRemoved.ToLower().Substring(1);
                     },
-                    ShouldSkipRecord = (arr) => arr.Length == 0 || arr[0] == "***END OF FILE***"
+                    ShouldSkipRecord = (arr) => arr.Row.ColumnCount == 0 || arr.Row.GetField(0) == "***END OF FILE***"
                     // TD Ameritrade includes **END OF FILE** at the end
                 };
                     
@@ -40,7 +40,7 @@ namespace csvparser
             }
             catch(HeaderValidationException ex)
             {
-                var error = "Missing header fields: " + string.Join(",", ex.HeaderNames);
+                var error = "Header validation failed: " + ex.Message;
                 return new ServiceResponse<IEnumerable<T>>(new ServiceError(error));
             }
         }
