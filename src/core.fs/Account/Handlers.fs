@@ -4,6 +4,7 @@ namespace core.fs.Account
     open System.ComponentModel.DataAnnotations
     open core.Account
     open core.Shared
+    open core.Shared.Adapters
     open core.Shared.Adapters.Emails
     open core.Shared.Adapters.Storage
     open core.Shared.Adapters.Subscriptions

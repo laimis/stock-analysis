@@ -1,4 +1,4 @@
-namespace core.Account
+namespace core.Shared.Adapters
 {
     public interface IPasswordHashProvider
     {

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using core.Account;
+using core.Shared.Adapters;
 
 namespace securityutils;
 
