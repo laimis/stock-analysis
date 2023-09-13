@@ -1,17 +1,16 @@
 using System;
 using core.Shared;
-using MediatR;
 
 namespace core.Account
 {
-    public class UserConfirmed : AggregateEvent, INotification
+    public class UserConfirmed : AggregateEvent
     {
         public UserConfirmed(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
         {
         }
     }
 
-    public class UserCreated : AggregateEvent, INotification
+    public class UserCreated : AggregateEvent
     {
         public UserCreated(Guid id, Guid aggregateId, DateTimeOffset when, string email, string firstname, string lastname)
             : base(id, aggregateId, when)
@@ -44,7 +43,7 @@ namespace core.Account
         }
     }
 
-    public class UserPasswordResetRequested : AggregateEvent, INotification
+    public class UserPasswordResetRequested : AggregateEvent
     {
         public UserPasswordResetRequested(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
         {
