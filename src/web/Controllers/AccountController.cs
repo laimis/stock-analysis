@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Account;
 using core.Account.Handlers;
+using core.fs.Account;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -106,40 +107,43 @@ namespace web.Controllers
 
         [HttpGet("integrations/tdameritrade/connect")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritrade()
+        public async Task<ActionResult> TdAmeritrade([FromServices]Brokerage.Handler service)
         {
-            var cmd = new BrokerageConnect.Command();
+            var url = await service.HandleConnect(new Brokerage.Connect());
 
-            var result = await _mediator.Send(cmd);
-
-            return Redirect(result);
+            return Redirect(url);
         }
 
         [HttpGet("integrations/tdameritrade")]
         [Authorize]
-        public Task<object> TdAmeritradeInfo() =>
-            _mediator.Send(
-                new BrokerageInfo.Query(User.Identifier())
+        public Task<ActionResult> TdAmeritradeInfo([FromServices] Brokerage.Handler service) =>
+            this.OkOrError(
+                service.HandleInfo(
+                    new Brokerage.Info(User.Identifier()
+                    )
+                )
             );
 
         [HttpGet("integrations/tdameritrade/disconnect")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeDisconnect()
+        public async Task<ActionResult> TdAmeritradeDisconnect([FromServices] Brokerage.Handler service)
         {
-            var result = await _mediator.Send(
-                new BrokerageDisconnect.Command(this.User.Identifier())
+            var result = await service.HandleDisconnect(
+                new Brokerage.Disconnect(User.Identifier())
             );
 
-            return Redirect("~/profile");
+            return result.Error switch {
+                null => Redirect("~/profile"),
+                _ => BadRequest(result.Error)
+            };
         }
 
         [HttpGet("integrations/tdameritrade/callback")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code)
+        public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code, [FromServices] Brokerage.Handler service)
         {
-            var cmd = new BrokerageConnectCallback.Command(code: code, userId: User.Identifier());
-
-            var result = await _mediator.Send(cmd);
+            var result = await service.HandleConnectCallback(
+                new Brokerage.ConnectCallback(code, User.Identifier()));
 
             return result.Error switch {
                 null => Redirect("~/profile"),
@@ -203,11 +207,9 @@ namespace web.Controllers
 
         [HttpPost("clear")]
         [Authorize]
-        public async Task<ActionResult> Clear(Clear.Command cmd)
+        public async Task<ActionResult> Clear([FromServices]ClearAccount.Handler handler)
         {
-            cmd.WithUserId(User.Identifier());
-            
-            await _mediator.Send(cmd);
+            await handler.Handle(new ClearAccount.Command(User.Identifier()));
 
             await HttpContext.SignOutAsync();
 

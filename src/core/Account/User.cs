@@ -76,7 +76,7 @@ namespace core.Account
             );
         }
 
-        internal void DisconnectFromBrokerage()
+        public void DisconnectFromBrokerage()
         {
             Apply(
                 new UserDisconnectedFromBrokerage(Guid.NewGuid(), Id, DateTimeOffset.UtcNow)
