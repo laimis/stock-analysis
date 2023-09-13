@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using core.Admin;
-using core.fs.Account;
+using core.fs.Accounts;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.Storage;
 using MediatR;

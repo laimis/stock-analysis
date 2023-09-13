@@ -17,8 +17,7 @@
     <Compile Include="Options\Import.fs" />
     <Compile Include="Options\Details.fs" />
     <Compile Include="Options\Chain.fs" />
-    <Compile Include="Account\Handlers.fs" />
-    <Compile Include="Account\Brokerage.fs" />
+    <Compile Include="Accounts\Handlers.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
-using core.fs.Account;
+using core.fs.Accounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Logging;
@@ -14,7 +14,7 @@ namespace web.Utils
 
         public CookieEvents(
             ILogger<CookieEvents> logger,
-            core.fs.Account.Status.Handler service)
+            Status.Handler service)
         {
             _logger = logger;
             _service = service;

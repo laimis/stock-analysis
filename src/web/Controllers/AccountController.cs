@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Account;
-using core.fs.Account;
+using core.fs.Accounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using web.Utils;
 
 namespace web.Controllers
@@ -132,7 +131,7 @@ namespace web.Controllers
             this.OkOrError(service.Handle(cmd));
 
         [HttpPost("login")]
-        public async Task<ActionResult> Authenticate([FromBody]core.fs.Account.Authenticate.Command cmd, [FromServices]core.fs.Account.Authenticate.Handler service)
+        public async Task<ActionResult> Authenticate([FromBody]Authenticate.Command cmd, [FromServices]Authenticate.Handler service)
         {
             var response = await service.Handle(cmd);
             if (response.IsOk)
