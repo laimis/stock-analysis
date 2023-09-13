@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Account;
-using core.Account.Handlers;
 using core.fs.Account;
-using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -20,48 +18,37 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
-        private ILogger<AccountController> _logger;
-        private IMediator _mediator;
-
-        public AccountController(ILogger<AccountController> logger, IMediator mediator)
-        {
-            _logger = logger;
-            _mediator = mediator;
-        }
-        
         [HttpGet("status")]
-        public Task<object> IdentityAsync()
-        {
-            return _mediator.Send(new Status.Query(User.Identifier()));
-        }
+        public Task<ActionResult> Identity([FromServices]Status.Handler handler) =>
+            this.OkOrError(handler.Handle(User.Identifier()));
+        
 
         [HttpPost("validate")]
-        public async Task<ActionResult> Validate(Validate.Command cmd)
+        public async Task<ActionResult> Validate([FromBody]Create.UserInfo command, [FromServices]Create.Handler service)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
                 return BadRequest("User already has an account");
             }
 
-            var r = await _mediator.Send(cmd);
+            var result = await service.Validate(command);
 
-            return this.OkOrError(r);
+            return this.OkOrError(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(Create.Command cmd)
+        public async Task<ActionResult> Create([FromBody]Create.Command cmd, [FromServices]Create.Handler service)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
                 return BadRequest("User already has an account");
             }
 
-            var r = await _mediator.Send(cmd);
-
+            var r = await service.Handle(cmd);
             var error = r.Error;
             if (error == null)
             {
-                await EstablishSignedInIdentity(HttpContext, r.Aggregate);
+                await EstablishSignedInIdentity(HttpContext, r.Success);
             }
 
             return this.OkOrError(r);
@@ -85,25 +72,14 @@ namespace web.Controllers
             await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
         }
 
+        // this seemed to have been used to track users logging in on User aggregate
+        // I have changed my mind and won't pollute user aggregate with what looks like
+        // infra concerns. I removed the logic that used to create login command and send it
+        // to a service for processing. If we need such functionality, we can create login
+        // tracking service that's separate from user domain object.
         [HttpGet("login")]
         [Authorize]
-        public async Task<ActionResult> LoginAsync()
-        {
-            var cmd = new Login.Command(
-                User.Identifier(),
-                Request.HttpContext.Connection.RemoteIpAddress.ToString());
-
-            var result = await _mediator.Send(cmd);
-
-            if (result != "")
-            {
-                _logger.LogError("Unable to login: " + result);
-
-                return BadRequest(result);
-            }
-            
-            return Redirect("~/");
-        }
+        public ActionResult Login() => Redirect("~/");
 
         [HttpGet("integrations/tdameritrade/connect")]
         [Authorize]
@@ -152,16 +128,8 @@ namespace web.Controllers
         }
 
         [HttpPost("requestpasswordreset")]
-        public async Task<ActionResult> RequestPasswordReset(PasswordReset.Request cmd)
-        {
-            cmd.WithIPAddress(
-                Request.HttpContext.Connection.RemoteIpAddress.ToString()
-            );
-
-            var r = await _mediator.Send(cmd);
-
-            return Ok();
-        }
+        public Task<ActionResult> RequestPasswordReset([FromBody]PasswordReset.RequestCommand cmd, [FromServices] PasswordReset.Handler service) =>
+            this.OkOrError(service.Handle(cmd));
 
         [HttpPost("login")]
         public async Task<ActionResult> Authenticate([FromBody]core.fs.Account.Authenticate.Command cmd, [FromServices]core.fs.Account.Authenticate.Handler service)
@@ -176,12 +144,8 @@ namespace web.Controllers
         }
 
         [HttpPost("contact")]
-        public async Task<ActionResult> Contact(Contact.Command cmd)
-        {
-            await _mediator.Send(cmd);
-
-            return Ok();
-        }
+        public Task<ActionResult> Contact([FromBody]Contact.Command cmd, [FromServices]Contact.Handler service)
+            => this.OkOrError(service.Handle(cmd));
 
         [HttpGet("logout")]
         [Authorize]
@@ -194,15 +158,21 @@ namespace web.Controllers
 
         [HttpPost("delete")]
         [Authorize]
-        public async Task<ActionResult> Delete(Delete.Command cmd)
+        public async Task<ActionResult> Delete([FromBody]DeleteAccount.Command cmd, [FromServices]DeleteAccount.Handler service)
         {
-            cmd.WithUserId(User.Identifier());
+            cmd = cmd.WithUserId(User.Identifier());
             
-            await _mediator.Send(cmd);
-
-            await HttpContext.SignOutAsync();
-
-            return Ok();
+            var result = await service.Handle(cmd);
+            
+            if (result.Error != null)
+            {
+                return this.Error(result.Error.Message);
+            }
+            else
+            {
+                await HttpContext.SignOutAsync();
+                return Ok();
+            }
         }
 
         [HttpPost("clear")]
@@ -217,33 +187,31 @@ namespace web.Controllers
         }
 
         [HttpPost("resetpassword")]
-        public async Task<ActionResult> ResetPassword(ResetPassword.Command cmd)
+        public async Task<ActionResult> ResetPassword([FromBody] Create.ResetPassword cmd, [FromServices]Create.Handler handler)
         {
-            var r = await _mediator.Send(cmd);
+            var result = await handler.Handle(cmd);
 
-            var error = r.Error;
-            if (error == null)
+            if (result.Error == null)
             {
-                await EstablishSignedInIdentity(HttpContext, r.Aggregate);
+                await EstablishSignedInIdentity(HttpContext, result.Success);
             }
 
-            return this.OkOrError(r);
+            return this.OkOrError(result);
         }
 
         [HttpGet("confirm/{id}")]
-        public async Task<ActionResult> Confirm(Guid id)
+        public async Task<ActionResult> Confirm(Guid id, [FromServices] ConfirmAccount.Handler handler)
         {
-            var cmd = new Confirm.Command(id);
+            var result = await handler.Handle(
+                new ConfirmAccount.Command(id)
+            );
 
-            var r = await _mediator.Send(cmd);
-
-            var error = r.Error;
-            if (error != null)
+            if (result.Error != null)
             {
-                return this.Error(error);
+                return this.Error(result.Error.Message);
             }
 
-            await EstablishSignedInIdentity(HttpContext, r.Aggregate);
+            await EstablishSignedInIdentity(HttpContext, result.Success);
 
             return Redirect("~/");
         }

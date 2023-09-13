@@ -16,7 +16,6 @@ namespace core.Account
         public DateTimeOffset? Deleted { get; private set; }
         public string DeleteFeedback { get; private set; }
         public DateTimeOffset? Verified { get; private set; }
-        public DateTimeOffset? LastLogin { get; private set; }
         public string SubscriptionLevel { get; private set; }
         public bool IsPasswordAvailable => GetSalt() != null;
         public string Name => $"{Firstname} {Lastname}";
@@ -46,9 +45,9 @@ namespace core.Account
             Salt = p.Salt;
         }
 
+        [Obsolete("No longer tracking this")]
         internal void ApplyInternal(UserLoggedIn l)
         {
-            LastLogin = l.When;
         }
 
         internal void ApplyInternal(UserDeleted d)

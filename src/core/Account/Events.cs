@@ -36,6 +36,7 @@ namespace core.Account
         public string Feedback { get; }
     }
 
+    [Obsolete("dropped this functionality from domain")]
     internal class UserLoggedIn : AggregateEvent
     {
         public UserLoggedIn(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)

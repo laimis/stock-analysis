@@ -63,7 +63,7 @@ namespace core.Admin
                     result.Add(u);
                 }
 
-                return result.OrderByDescending(u => u.LastLogin);
+                return result.OrderBy(u => u.Email);
             }
 
             public async Task<ExportResponse> Handle(Users.Export request, CancellationToken cancellationToken)

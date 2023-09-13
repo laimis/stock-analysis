@@ -1,10 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using core;
-using core.Account;
-using core.Account.Handlers;
 using core.Admin;
+using core.fs.Account;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.Storage;
 using MediatR;
@@ -19,20 +17,17 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
-        private IMediator _mediator;
-        private IAccountStorage _storage;
-        private IPortfolioStorage _portfolio;
-        private IEmailService _email;
+        private readonly IMediator _mediator;
+        private readonly IAccountStorage _storage;
+        private readonly IEmailService _email;
 
         public AdminController(
             IMediator mediator,
             IAccountStorage storage,
-            IPortfolioStorage portfolio,
             IEmailService email)
         {
             _mediator = mediator;
             _storage = storage;
-            _portfolio = portfolio;
             _email = email;
         }
 
@@ -50,16 +45,8 @@ namespace web.Controllers
         }
 
         [HttpGet("delete/{userId}")]
-        public async Task<ActionResult> Delete(Guid userId)
-        {
-            var cmd = new Delete.Command();
-            
-            cmd.WithUserId(userId);
-
-            await _mediator.Send(cmd);
-
-            return Ok();
-        }
+        public Task<ActionResult> Delete([FromRoute]Guid userId, DeleteAccount.Handler service) =>
+            this.OkOrError(service.Handle(new DeleteAccount.Command(userId, null)));
 
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)

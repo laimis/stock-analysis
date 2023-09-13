@@ -48,13 +48,6 @@ namespace core.Account
             );
         }
 
-        public void LoggedIn(string ipAddress, DateTimeOffset when)
-        {
-            Apply(
-                new UserLoggedIn(Guid.NewGuid(), Id, when)
-            );
-        }
-
         public void Delete(string feedback)
         {
             Apply(

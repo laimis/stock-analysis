@@ -24,6 +24,6 @@ namespace core.Account
         public Guid Id { get; }
         public Guid UserId { get; }
         public DateTimeOffset Timestamp { get; }
-        public bool IsOlderThan(long minutes) => DateTimeOffset.UtcNow.Subtract(Timestamp).TotalMinutes > minutes;
+        public bool IsOlderThan(TimeSpan duration) => DateTimeOffset.UtcNow.Subtract(Timestamp) > duration;
     }
 }

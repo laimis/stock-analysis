@@ -12,3 +12,6 @@ module ResponseUtils =
         
     let failed (message: string) =
         ServiceResponse(ServiceError(message))
+        
+    let success<'a> (data: 'a) =
+        ServiceResponse<'a>(data)

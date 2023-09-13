@@ -16,7 +16,6 @@ namespace core.Admin
             UserId = user.Id;
             Firstname = user.State.Firstname;
             Lastname = user.State.Lastname;
-            LastLogin = user.State.LastLogin;
             Verified = user.State.Verified != null;
             Stock = stocks.Count();
             Options = options.Count();
@@ -27,7 +26,6 @@ namespace core.Admin
         public Guid UserId { get; }
         public string Firstname { get; }
         public string Lastname { get; }
-        public DateTimeOffset? LastLogin { get; }
         public bool Verified { get; }
         public int Stock { get; }
         public int Options { get; }

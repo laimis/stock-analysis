@@ -57,16 +57,6 @@ namespace coretests.Account
         }
 
         [Fact]
-        public void LastLoginTracked()
-        {
-            var u = new User("laimis@gmail.com", "firstname", "last");
-
-            u.LoggedIn("blablabla", DateTimeOffset.UtcNow);
-
-            Assert.Equal(u.State.LastLogin.Value.DateTime, DateTimeOffset.UtcNow.DateTime, TimeSpan.FromMinutes(1));
-        }
-
-        [Fact]
         public void Subscribe()
         {
             var u = new User("laimis@gmail.com", "firstname", "last");
