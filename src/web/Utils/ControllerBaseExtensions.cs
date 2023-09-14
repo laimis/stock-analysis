@@ -8,20 +8,20 @@ namespace web.Utils
 {
     public static class ControllerBaseExtensions
     {
-        public static async Task<ActionResult> GenerateExport(
+        public static Task<ActionResult> GenerateExport(
             this ControllerBase controller,
             IMediator mediator,
             IRequest<ExportResponse> query)
         {
-            var response = await mediator.Send(query);
-
-            return controller.GenerateExport(response);
+            return controller.GenerateExport(mediator.Send(query));
         }
 
-        public static ActionResult GenerateExport(
+        public static async Task<ActionResult> GenerateExport(
             this ControllerBase controller,
-            ExportResponse response)
+            Task<ExportResponse> responseTask)
             {
+                var response = await responseTask;
+                
                 controller.HttpContext.Response.Headers.Add(
                     "content-disposition", 
                     $"attachment; filename={response.Filename}");

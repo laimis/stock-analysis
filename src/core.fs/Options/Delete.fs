@@ -21,6 +21,6 @@ module core.fs.Options.Delete
                 return ServiceResponse(ServiceError("Unable to find option do delete"))
             | _ ->
                 opt.Delete()
-                let! _ = storage.Save(opt, command.UserId)
+                do! storage.Save(opt, command.UserId)
                 return ServiceResponse()
         }

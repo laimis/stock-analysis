@@ -39,7 +39,7 @@ module core.fs.Options.Expire
                 return CommandResponse<OwnedOption>.Failed($"option for id {data.OptionId} not found")
             | _ ->
                 option.Expire(assign=assign)
-                let! _ = storage.Save(option, data.UserId)
+                do! storage.Save(option, data.UserId)
                 return CommandResponse<OwnedOption>.Success(option)
         }
         
@@ -57,7 +57,7 @@ module core.fs.Options.Expire
             match option with
             | Some(o) ->
                 o.Expire(assign=assigned)
-                let! _ = storage.Save(o, data.UserId)
+                do! storage.Save(o, data.UserId)
                 return ServiceResponse<OwnedOption>(o)
                 
             | None ->

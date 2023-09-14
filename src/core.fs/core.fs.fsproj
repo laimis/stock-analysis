@@ -18,6 +18,8 @@
     <Compile Include="Options\Details.fs" />
     <Compile Include="Options\Chain.fs" />
     <Compile Include="Accounts\Handlers.fs" />
+    <Compile Include="Admin\Handlers.fs" />
+    <Compile Include="Alerts\Handlers.fs" />
   </ItemGroup>
 
   <ItemGroup>

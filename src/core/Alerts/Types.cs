@@ -38,6 +38,12 @@ namespace core.Alerts
         Positive
     }
 
+    public class Constants
+    {
+        public const string MonitorTagPattern = "monitor:patterns";
+        public const string MonitorNamePattern = "Patterns";
+    }
+
     public class GapUpMonitor
     {
         private const string Identifier = "Gap up";

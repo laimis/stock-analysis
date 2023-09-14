@@ -62,7 +62,7 @@ namespace core.fs.Accounts
                 match user with
                 | null -> return "User not found" |> ResponseUtils.failed
                 | _ ->
-                    let! _ = portfolioStorage.Delete(user.Id)
+                    do! portfolioStorage.Delete(user.Id)
                     return ServiceResponse()
             }
             
@@ -128,7 +128,7 @@ namespace core.fs.Accounts
                         | true -> return "Confirmation link is expired. Please request a new one." |> ResponseUtils.failedTyped<User>
                         | false ->
                             user.Confirm()
-                            let! _ = storage.Save(user)
+                            do! storage.Save(user)
                             
                             do! email.Send(
                                 Recipient(email = user.State.Email, name = user.State.Name),
@@ -155,7 +155,7 @@ namespace core.fs.Accounts
             interface IApplicationService
             
             member this.Handle (command:Command) = task {
-                let! _ = emailService.Send(
+                do! emailService.Send(
                     recipient = EmailSettings.Admin,
                     sender = Sender.NoReply,
                     template = EmailTemplate.AdminContact,
@@ -277,7 +277,7 @@ namespace core.fs.Accounts
                     | false ->
                         return paymentResponse.Error.Message |> ResponseUtils.failedTyped<User>
                     | _ ->
-                        let! _ = storage.Save(u)
+                        do! storage.Save(u)
                         return ServiceResponse<User>(u)
             }
             
@@ -425,7 +425,7 @@ namespace core.fs.Accounts
                 
                 user.ConnectToBrokerage(r.access_token, r.refresh_token, r.token_type, r.expires_in, r.scope, r.refresh_token_expires_in)
                 
-                let! _ = accounts.Save(user)
+                do! accounts.Save(user)
                 
                 return ServiceResponse()
             }
@@ -433,7 +433,7 @@ namespace core.fs.Accounts
             member this.HandleDisconnect(cmd:Disconnect) = task {
                 let! user = accounts.GetUser(cmd.UserId)
                 user.DisconnectFromBrokerage()
-                let! _ = accounts.Save(user)
+                do! accounts.Save(user)
                 return ServiceResponse()
             }
             

@@ -41,7 +41,7 @@ namespace core.Alerts
         private Dictionary<Guid, List<TriggeredAlert>> _recentlyTriggeredAlerts =
             new Dictionary<Guid, List<TriggeredAlert>>();
 
-        internal List<TriggeredAlert> GetRecentlyTriggeredAlerts(Guid userId) =>
+        public List<TriggeredAlert> GetRecentlyTriggeredAlerts(Guid userId) =>
             (_recentlyTriggeredAlerts.SingleOrDefault(u => u.Key == userId).Value ?? new List<TriggeredAlert>())
             .OrderByDescending(a => a.when)
             .ToList();
@@ -79,7 +79,7 @@ namespace core.Alerts
             }
         }
 
-        internal IEnumerable<AlertContainerMessage> GetMessages() =>
+        public IEnumerable<AlertContainerMessage> GetMessages() =>
             _messages.OrderByDescending(m => m.when);
 
         private bool _listChecksCompleted;

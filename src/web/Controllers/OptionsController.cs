@@ -89,10 +89,10 @@ namespace web.Controllers
             );
         
         [HttpGet("export")]
-        public async Task<ActionResult> Export([FromServices]Export.Handler service)
+        public Task<ActionResult> Export([FromServices]Export.Handler service)
         {
             return this.GenerateExport(
-                await service.Handle(
+                service.Handle(
                     new Export.Query(
                         User.Identifier()
                     )

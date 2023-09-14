@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core;
 using core.Account;
 using core.Alerts;
-using core.Alerts.Handlers;
-using core.Alerts.Services;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
@@ -179,15 +176,15 @@ namespace web.BackgroundServices
             {
                 var user = await _accounts.GetUser(new Guid(userId));
                 var list = (await _portfolio.GetStockLists(user.Id))
-                    .Where(l => l.State.ContainsTag(Monitors.PATTERN_TAG))
+                    .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
                     .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user.State))
                     .ToList();
 
-                _listChecks.Add(Monitors.PATTERN_TAG, list);
+                _listChecks.Add(Constants.MonitorTagPattern, list);
             }
 
-            _nextListMonitoringRun = ScanScheduling.GetNextListMonitorRunTime(
+            _nextListMonitoringRun = core.fs.Alerts.ScanScheduling.nextRun(
                 DateTimeOffset.UtcNow,
                 _marketHours
             );

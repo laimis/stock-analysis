@@ -1,11 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using core.Admin;
 using core.fs.Accounts;
+using core.fs.Admin;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.Storage;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
@@ -17,16 +16,13 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
-        private readonly IMediator _mediator;
         private readonly IAccountStorage _storage;
         private readonly IEmailService _email;
 
         public AdminController(
-            IMediator mediator,
             IAccountStorage storage,
             IEmailService email)
         {
-            _mediator = mediator;
             _storage = storage;
             _email = email;
         }
@@ -77,15 +73,21 @@ namespace web.Controllers
         }
 
         [HttpGet("users")]
-        public Task<object> ActiveAccountsAsync()
+        public Task<ActionResult> ActiveAccountsAsync([FromServices]Users.Handler service)
         {
-            return _mediator.Send(new Users.Query());
+            return this.OkOrError(
+                service.Handle(
+                    new Users.Query(true)
+                )
+            );
         }
 
         [HttpGet("users/export")]
-        public Task<ActionResult> Export()
+        public Task<ActionResult> Export([FromServices]Users.Handler service)
         {
-            return this.GenerateExport(_mediator, new Users.Export());
+            return this.GenerateExport(
+                service.Handle(new Users.Export())
+            );
         }
     }
 

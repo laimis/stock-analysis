@@ -34,7 +34,7 @@ module core.fs.Options.BuyOrSell
                 
             func option data
             
-            let! _ = storage.Save(option, data.UserId)
+            do! storage.Save(option, data.UserId)
             
             return ServiceResponse<OwnedOption>(option);
         }
