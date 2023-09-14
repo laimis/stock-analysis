@@ -20,6 +20,7 @@
     <Compile Include="Accounts\Handlers.fs" />
     <Compile Include="Admin\Handlers.fs" />
     <Compile Include="Alerts\Handlers.fs" />
+    <Compile Include="Alerts\Scheduling.fs" />
   </ItemGroup>
 
   <ItemGroup>

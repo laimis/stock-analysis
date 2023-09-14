@@ -31,7 +31,7 @@ namespace core.fs.Alerts
                 |> List.filter (fun t -> t > easternTime)
                 |> List.map (fun t -> marketHours.ToUniversalTime(t))
                 
-            match candidates with
+            match candidatesInFuture with
             | head :: _ -> head
             | _ -> 
                 // if we get here, we need to look at the next day
