@@ -1,35 +1,26 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core;
-using core.Account;
-using core.Alerts;
-using core.Alerts.Services;
+using core.fs.Alerts;
 using core.Shared.Adapters.Brokerage;
-using core.Shared.Adapters.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;
 public class StopLossServiceHost : GenericBackgroundServiceHost
 {
-    private IMarketHours _marketHours;
-    private StopLossMonitoringService _service;
+    private readonly IMarketHours _marketHours;
+    private readonly MonitoringServices.StopLossMonitoringService _service;
 
     public StopLossServiceHost(
-        IAccountStorage accounts,
-        IBrokerage brokerage,
-        StockAlertContainer container,
         ILogger<StopLossServiceHost> logger,
         IMarketHours marketHours,
-        IPortfolioStorage portfolioStorage) : base(logger)
+        MonitoringServices.StopLossMonitoringService stopLossMonitoringService) : base(logger)
     {
         _marketHours = marketHours;
-        _service = new StopLossMonitoringService(accounts, brokerage, container, portfolioStorage);
+        _service = stopLossMonitoringService;
     }
 
-    
-
-    protected override TimeSpan GetSleepDuration() => StopLossMonitoringService.CalculateNextRunDateTime(DateTimeOffset.UtcNow, _marketHours) - DateTimeOffset.UtcNow;
+    protected override TimeSpan GetSleepDuration() => MonitoringServices.nextStopLossRun(DateTimeOffset.UtcNow, _marketHours) - DateTimeOffset.UtcNow;
 
     protected override async Task Loop(CancellationToken stoppingToken) => await _service.Execute(stoppingToken);
 }

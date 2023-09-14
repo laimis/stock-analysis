@@ -85,8 +85,8 @@ namespace core.Alerts
         private bool _listChecksCompleted;
         private bool _stopLossCheckCompleted;
 
-        public void ToggleListCheckCompleted(bool completed) => _listChecksCompleted = completed;
-        public void ToggleStopLossCheckCompleted(bool completed) => _stopLossCheckCompleted = completed;
+        public void SetListCheckCompleted(bool completed) => _listChecksCompleted = completed;
+        public void SetStopLossCheckCompleted(bool completed) => _stopLossCheckCompleted = completed;
         public bool ContainerReadyForNotifications() => _listChecksCompleted && _stopLossCheckCompleted;
     }
 }

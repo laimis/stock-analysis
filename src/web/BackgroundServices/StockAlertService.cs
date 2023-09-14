@@ -70,7 +70,7 @@ namespace web.BackgroundServices
         {
             if (DateTimeOffset.UtcNow > _nextListMonitoringRun || _container.ManualRunRequested())
             {
-                _container.ToggleListCheckCompleted(false);
+                _container.SetListCheckCompleted(false);
 
                 await GenerateListMonitoringChecks();
             }
@@ -133,7 +133,7 @@ namespace web.BackgroundServices
 
             if (_listChecks.All(kp => kp.Value.Count == 0))
             {
-                _container.ToggleListCheckCompleted(true);
+                _container.SetListCheckCompleted(true);
             }
         }
 
@@ -184,7 +184,7 @@ namespace web.BackgroundServices
                 _listChecks.Add(Constants.MonitorTagPattern, list);
             }
 
-            _nextListMonitoringRun = core.fs.Alerts.ScanScheduling.nextRun(
+            _nextListMonitoringRun = core.fs.Alerts.MonitoringServices.nextMonitoringRun(
                 DateTimeOffset.UtcNow,
                 _marketHours
             );

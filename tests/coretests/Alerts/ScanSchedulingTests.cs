@@ -1,5 +1,4 @@
 using System;
-using core.Alerts.Services;
 using core.fs.Alerts;
 using core.Shared.Adapters.Brokerage;
 using Xunit;
@@ -21,7 +20,7 @@ namespace coretests.Alerts
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = ScanScheduling.nextRun(time, _marketHours);
+            var nextRun = MonitoringServices.nextMonitoringRun(time, _marketHours);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }
@@ -38,7 +37,7 @@ namespace coretests.Alerts
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = StopLossMonitoringService.CalculateNextRunDateTime(time, _marketHours);
+            var nextRun = MonitoringServices.nextStopLossRun(time, _marketHours);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }
@@ -55,7 +54,7 @@ namespace coretests.Alerts
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = StopLossMonitoringService.CalculateNextRunDateTime(time, _marketHours);
+            var nextRun = MonitoringServices.nextStopLossRun(time, _marketHours);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }
