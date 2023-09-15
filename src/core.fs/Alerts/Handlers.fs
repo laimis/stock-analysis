@@ -18,7 +18,7 @@ namespace core.fs.Alerts
             let deregister userId ticker =
                 StopPriceMonitor.Deregister(container, ticker, userId)
                 
-            // interface IApplicationService
+            interface IApplicationService
             member this.StockPurchased() =
                 container.RequestManualRun()
                 

@@ -374,24 +374,63 @@ namespace core.fs.Accounts
             
     module Status =
         
-        type Handler(storage:IAccountStorage) =
-            
-            interface IApplicationService
-            
-            member this.Handle (userId:Guid) = task {
-                let! user = storage.GetUser(userId)
-                
-                match user with
-                | null -> return "User not found" |> ResponseUtils.failedTyped<UserState>
-                | _ -> return user.State |> ResponseUtils.success<UserState>
+        type LookupByEmail = {
+            Email:string
+        }
+        
+        type LookupById = {
+            UserId:Guid
+        }
+        
+        type AccountStatusView =
+            {
+                LoggedIn: bool
+                Id: Guid
+                Verified: bool
+                Created: DateTimeOffset
+                Email: string
+                Firstname: string
+                Lastname: string
+                IsAdmin: bool
+                SubscriptionLevel : string
+                ConnectedToBrokerage: bool
+                BrokerageAccessTokenExpired: bool
             }
             
-            member this.Handle (email:string) = task {
-                let! user = storage.GetUserByEmail(email)
-                
+            static member fromUserState (state:UserState) =
+                {
+                    LoggedIn = true
+                    Id = state.Id
+                    Verified = state.Verified.HasValue
+                    Created = state.Created
+                    Email = state.Email
+                    Firstname = state.Firstname
+                    Lastname = state.Lastname
+                    IsAdmin = state.Email = EmailSettings.Admin.Email // TODO: there has to be a better way :)
+                    SubscriptionLevel = state.SubscriptionLevel
+                    ConnectedToBrokerage = state.ConnectedToBrokerage
+                    BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
+                }
+        
+        type Handler(storage:IAccountStorage) =
+            
+            let successOrError (user:User) =
                 match user with
-                | null -> return "User not found" |> ResponseUtils.failedTyped<UserState>
-                | _ -> return user.State |> ResponseUtils.success<UserState>
+                | null -> "User not found" |> ResponseUtils.failedTyped<AccountStatusView>
+                | _ -> user.State |> AccountStatusView.fromUserState |> ResponseUtils.success<AccountStatusView>
+                
+            interface IApplicationService
+            
+            member this.Handle (query:LookupById) = task {
+                let! user = storage.GetUser(query.UserId)
+                
+                return user |> successOrError
+            }
+            
+            member this.Handle (query:LookupByEmail) = task {
+                let! user = storage.GetUserByEmail(query.Email)
+                
+                return user |> successOrError
             }
             
     module Brokerage =

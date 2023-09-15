@@ -22,19 +22,19 @@ namespace web.Utils
         
         public override async Task SigningIn(CookieSigningInContext context)
         {
-            var email = context.Principal.Email();
+            var query = new Status.LookupByEmail(context.Principal.Email());
 
-            var response = await _service.Handle(email);
+            var response = await _service.Handle(query);
 
             if (response.IsOk == false)
             {
-                _logger.LogCritical($"Unable to look up user {email} for sign in");
+                _logger.LogCritical($"Unable to look up user {query.Email} for sign in");
                 throw new System.Exception("Failed to sign in via google");
             }
             
             if (context.Principal is not { Identity: ClaimsIdentity identity })
             {
-                _logger.LogCritical("Claims principal is not a claims identity, it's a {principal}", context.Principal == null ? null : context.Principal.GetType().Name);
+                _logger.LogCritical("Claims principal is not a claims identity, it's a {principal}", context.Principal?.GetType().Name);
                 throw new System.Exception("Failed to sign in via google");
             }
 
@@ -45,9 +45,9 @@ namespace web.Utils
 
         public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
         {
-            var email = context.Principal.Email();
+            var query = new Status.LookupByEmail(context.Principal.Email());
 
-            var id = await _service.Handle(email);
+            var id = await _service.Handle(query);
             if (id.IsOk == false)
             {
                 _logger.LogCritical($"Failed to validate principal");

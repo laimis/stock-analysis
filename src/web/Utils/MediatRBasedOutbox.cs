@@ -15,31 +15,27 @@ namespace web.Utils;
 public class MediatRBasedOutbox : IOutbox
 {
     private readonly IMediator _mediator;
-    private readonly Create.Handler _createHandler;
-    // private readonly AlertContainer.Handler _alertsAlertContainerHandler;
-
-    public MediatRBasedOutbox(IMediator mediator, Create.Handler createHandler) //, AlertContainer.Handler alertsAlertContainerHandler)
+    
+    public MediatRBasedOutbox(IMediator mediator)
     {
-        // _alertsAlertContainerHandler = alertsAlertContainerHandler;
-        _createHandler = createHandler;
         _mediator = mediator;
     }
     
     public Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
     {
-        Console.WriteLine("outbox");
         foreach (var @event in e)
         {
             if (@event is INotification notification)
             {
-                if (@event is UserCreated u)
-                {
-                    _createHandler.Handle(
-                        new Create.SendCreateNotifications(
-                            userId: u.AggregateId, email: u.Email,
-                            firstName: u.Firstname, lastName: u.Lastname, created: u.When)
-                    );
-                }
+                // TODO: these need to be brought back vai real outbox
+                // if (@event is UserCreated u)
+                // {
+                //     _createHandler.Handle(
+                //         new Create.SendCreateNotifications(
+                //             userId: u.AggregateId, email: u.Email,
+                //             firstName: u.Firstname, lastName: u.Lastname, created: u.When)
+                //     );
+                // }
                 
                 // if (@event is StockPurchased_v2 sp)
                 // {

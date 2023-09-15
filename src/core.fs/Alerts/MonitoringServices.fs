@@ -123,21 +123,19 @@ module core.fs.Alerts.MonitoringServices
                         logInformation("done")
         }
             
-        // interface IApplicationService
+        interface IApplicationService
         
         member _.Execute cancellationToken = task {
-            Console.WriteLine("EXECUTING STOP LOSS CHECK")
+            
             container.SetStopLossCheckCompleted(false)
             
             let! users = accounts.GetUserEmailIdPairs()
-            Console.WriteLine("LOADED USER EMAIL PAIRS")
+            
             let! _ =
                 users
                 |> Seq.map (fun struct(_, id) -> runStopLossCheckForUser cancellationToken (id |> Guid))
                 |> Async.Sequential
                 |> Async.StartAsTask
-                
-            Console.WriteLine("DONE")
                 
             container.SetStopLossCheckCompleted(true)
         }

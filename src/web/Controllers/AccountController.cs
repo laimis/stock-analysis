@@ -19,7 +19,7 @@ namespace web.Controllers
     {
         [HttpGet("status")]
         public Task<ActionResult> Identity([FromServices]Status.Handler handler) =>
-            this.OkOrError(handler.Handle(User.Identifier()));
+            this.OkOrError(handler.Handle(new Status.LookupById(User.Identifier())));
         
 
         [HttpPost("validate")]

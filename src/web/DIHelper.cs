@@ -70,7 +70,6 @@ namespace web
             
                 if (markerInterface.IsAssignableFrom(type))
                 {
-                    Console.WriteLine("Adding " + type.FullName + " as singleton");
                     services.AddSingleton(type);
                 }
             }
@@ -106,13 +105,11 @@ namespace web
 
             StorageRegistrations(configuration, services, logger);
             
-            Console.WriteLine("Registering background services");
-            // services.AddHostedService<ThirtyDaySellService>();
-            // services.AddHostedService<StockAlertService>();
-            // services.AddHostedService<WeeklyUpsideReversalService>();
-            // services.AddHostedService<EmailNotificationService>();
-            // services.AddHostedService<StopLossServiceHost>();
-            Console.WriteLine("Done registering background services");
+            services.AddHostedService<ThirtyDaySellService>();
+            services.AddHostedService<StockAlertService>();
+            services.AddHostedService<WeeklyUpsideReversalService>();
+            services.AddHostedService<EmailNotificationService>();
+            services.AddHostedService<StopLossServiceHost>();
         }
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)
