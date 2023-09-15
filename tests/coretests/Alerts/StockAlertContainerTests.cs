@@ -1,30 +1,23 @@
 using System;
 using System.Linq;
-using core.Alerts;
+using core.fs.Alerts;
 using Xunit;
 
 namespace coretests.Alerts
 {
     public class StockAlertContainerTests
     {
-        private Guid _userId;
-        private StockAlertContainer _uat;
+        private readonly Guid _userId = Guid.NewGuid();
+        private readonly StockAlertContainer _uat = new();
 
         public StockAlertContainerTests()
         {
-            _userId = Guid.NewGuid();
-            
-            _uat = new StockAlertContainer();
-
             foreach(var _ in Enumerable.Range(0, 2))
             {
-                StopPriceMonitor.Register(
-                    container: _uat,
-                    price: 100,
-                    stopPrice: 105,
-                    ticker: "AMD",
-                    when: DateTimeOffset.Now,
-                    userId: _userId
+                _uat.Register(
+                    TriggeredAlert.StopPriceAlert(
+                        ticker: "AMD", price: 100, stopPrice: 105, DateTimeOffset.Now, userId: _userId
+                    )
                 );
             }
         }
