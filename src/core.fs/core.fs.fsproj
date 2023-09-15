@@ -22,6 +22,7 @@
     <Compile Include="Alerts\StockAlertContainer.fs" />
     <Compile Include="Alerts\Handlers.fs" />
     <Compile Include="Alerts\MonitoringServices.fs" />
+    <Compile Include="Brokerage\Handlers.fs" />
   </ItemGroup>
 
   <ItemGroup>

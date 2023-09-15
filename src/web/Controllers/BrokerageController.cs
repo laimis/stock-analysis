@@ -1,10 +1,7 @@
 using System.Threading.Tasks;
-using core.Brokerage;
-using core.Shared.Adapters.Brokerage;
-using MediatR;
+using core.fs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using web.Utils;
 
 namespace web.Controllers
@@ -14,44 +11,38 @@ namespace web.Controllers
     [Authorize]
     public class BrokerageController : ControllerBase
     {
-        private ILogger<AccountController> _logger;
-        private IMediator _mediator;
-
-        public BrokerageController(ILogger<AccountController> logger, IMediator mediator)
-        {
-            _logger = logger;
-            _mediator = mediator;
-        }
-        
         [HttpPost("buy")]
-        public async Task<ActionResult> Buy(Buy.Command cmd)
-        {
-            cmd.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(cmd);
-
-            return this.OkOrError(r);
-        }
+        public Task<ActionResult> Buy(
+            [FromBody] Brokerage.BuyOrSellData data,
+            [FromServices] Brokerage.Handler handler) =>
+            this.OkOrError(
+                handler.Handle(
+                    Brokerage.BrokerageTransaction.NewBuy(
+                        data,
+                        User.Identifier()
+                    )
+                )
+            );
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(Sell.Command cmd)
-        {
-            cmd.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(cmd);
-
-            return this.OkOrError(r);
-        }
+        public Task<ActionResult> Sell(
+            [FromBody] Brokerage.BuyOrSellData data,
+            [FromServices] Brokerage.Handler handler) =>
+            this.OkOrError(
+                handler.Handle(
+                    Brokerage.BrokerageTransaction.NewSell(
+                        data,
+                        User.Identifier()
+                    )
+                )
+            );
 
         [HttpDelete("orders/{orderId}")]
-        public async Task<ActionResult> Delete(string orderId)
-        {
-            var r = await _mediator.Send(new CancelOrder.Command(orderId, User.Identifier()));
-
-            return this.OkOrError(r);
-        }
+        public Task<ActionResult> Delete([FromRoute] string orderId, [FromServices] Brokerage.Handler service) =>
+            this.OkOrError(service.Handle(new Brokerage.CancelOrder(User.Identifier(), orderId)));
 
         [HttpGet("account")]
-        public Task<TradingAccount> GetAccount() => _mediator.Send(new GetAccount.Query(User.Identifier()));
+        public Task<ActionResult> GetAccount([FromServices] Brokerage.Handler service) =>
+            this.OkOrError(service.Handle(new Brokerage.QueryAccount(User.Identifier())));
     }
 }

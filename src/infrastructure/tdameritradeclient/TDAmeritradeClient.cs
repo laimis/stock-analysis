@@ -287,7 +287,7 @@ public class TDAmeritradeClient : IBrokerage
         };
     }
 
-    public Task BuyOrder(
+    public Task<ServiceResponse<bool>> BuyOrder(
         UserState user,
         string ticker,
         decimal numberOfShares,
