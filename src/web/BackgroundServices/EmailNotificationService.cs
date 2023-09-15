@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Account;
-using core.Alerts;
+using core.fs.Alerts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.Storage;
@@ -12,10 +11,10 @@ using Microsoft.Extensions.Logging;
 namespace web.BackgroundServices;
 public class EmailNotificationService : GenericBackgroundServiceHost
 {
-    private IAccountStorage _accounts;
-    private StockAlertContainer _container;
-    private IEmailService _emails;
-    private IMarketHours _marketHours;
+    private readonly IAccountStorage _accounts;
+    private readonly StockAlertContainer _container;
+    private readonly IEmailService _emails;
+    private readonly IMarketHours _marketHours;
     Func<TimeSpan> _sleepFunction = null;
 
     public EmailNotificationService(
@@ -34,7 +33,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
     protected override TimeSpan GetSleepDuration() => _sleepFunction();
 
-    private static TimeOnly[] _emailTimes = new TimeOnly[]
+    private static readonly TimeOnly[] _emailTimes = new TimeOnly[]
             {
                 TimeOnly.Parse("09:50"),
                 TimeOnly.Parse("15:45")
@@ -146,27 +145,27 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
     private object ToEmailData(TriggeredAlert alert)
     {
-        var valueType = alert.valueType;
+        var valueFormat = alert.valueFormat;
         var triggeredValue = alert.triggeredValue;
         var ticker = alert.ticker;
         var description = alert.description;
         var sourceList = alert.sourceList;
         var time = alert.when;
 
-        return ToEmailRow(valueType, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
+        return ToEmailRow(valueFormat, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
     }
 
-    public static object ToEmailRow(core.Shared.ValueFormat valueType, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
+    public static object ToEmailRow(core.Shared.ValueFormat valueFormat, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
     {
         string FormattedValue()
         {
-            return valueType switch
+            return valueFormat switch
             {
                 core.Shared.ValueFormat.Percentage => triggeredValue.ToString("P1"),
                 core.Shared.ValueFormat.Currency => triggeredValue.ToString("C2"),
                 core.Shared.ValueFormat.Number => triggeredValue.ToString("N2"),
                 core.Shared.ValueFormat.Boolean => triggeredValue.ToString(),
-                _ => throw new Exception("Unexpected alert value type: " + valueType)
+                _ => throw new Exception("Unexpected alert value type: " + valueFormat)
             };
         }
 

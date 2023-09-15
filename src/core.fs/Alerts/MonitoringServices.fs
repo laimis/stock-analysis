@@ -3,7 +3,6 @@ module core.fs.Alerts.MonitoringServices
     open System
     open System.Threading
     open core.Account
-    open core.Alerts
     open core.Shared.Adapters.Brokerage
     open core.Shared.Adapters.Storage
     open core.Stocks
@@ -67,10 +66,10 @@ module core.fs.Alerts.MonitoringServices
     type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, portfolio:IPortfolioStorage) =
         
         // need to decide how I will log these
-        let logInformation message = ()
-        let logError message = ()
+        let logInformation _ = ()
+        let logError _ = ()
         
-        let runStopLossCheck (user:UserState) (cancellationToken:CancellationToken) (position:PositionInstance) = async {
+        let runStopLossCheck (user:UserState) (_:CancellationToken) (position:PositionInstance) = async {
             let! priceResponse = brokerage.GetQuote(user, position.Ticker) |> Async.AwaitTask
             
             match priceResponse.IsOk with
@@ -81,16 +80,10 @@ module core.fs.Alerts.MonitoringServices
                 let price = priceResponse.Success.Price
                 match price <= position.StopPrice.Value with
                 | true ->
-                    StopPriceMonitor.Register(
-                        container = container,
-                        price = price,
-                        stopPrice = position.StopPrice.Value,
-                        ticker = position.Ticker,
-                        ``when`` = DateTimeOffset.UtcNow,
-                        userId = user.Id
-                    )
+                    TriggeredAlert.StopPriceAlert position.Ticker price position.StopPrice.Value DateTimeOffset.UtcNow user.Id
+                    |> container.Register
                 | false ->
-                    StopPriceMonitor.Deregister(container=container, ticker=position.Ticker, userId=user.Id)
+                    container.DeregisterStopPriceAlert position.Ticker user.Id
         }
             
         

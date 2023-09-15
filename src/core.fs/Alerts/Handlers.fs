@@ -1,7 +1,6 @@
 namespace core.fs.Alerts
 
     open System
-    open core.Alerts
     open core.Shared
     open core.Shared.Adapters.SMS
     open core.Stocks
@@ -15,21 +14,21 @@ namespace core.fs.Alerts
         
         type Handler(container:StockAlertContainer) =
         
-            let deregister userId ticker =
-                StopPriceMonitor.Deregister(container, ticker, userId)
+            let deregisterStopPriceMonitoring userId ticker =
+                container.DeregisterStopPriceAlert ticker userId
                 
             interface IApplicationService
             member this.StockPurchased() =
                 container.RequestManualRun()
                 
             member this.Handle(stockSold:StockSold) =
-                stockSold.Ticker |> deregister stockSold.UserId
+                stockSold.Ticker |> deregisterStopPriceMonitoring stockSold.UserId
                 
             member this.Handle(stopPriceSet:StopPriceSet) =
-                stopPriceSet.Ticker |> deregister stopPriceSet.UserId
+                stopPriceSet.Ticker |> deregisterStopPriceMonitoring stopPriceSet.UserId
                 
             member this.Handle(stopDeleted:StopDeleted) =
-                stopDeleted.Ticker |> deregister stopDeleted.UserId
+                stopDeleted.Ticker |> deregisterStopPriceMonitoring stopDeleted.UserId
                 
             member this.Handle(query:Query) =
                 let alerts = 
@@ -37,9 +36,9 @@ namespace core.fs.Alerts
                     |> Seq.sortBy (fun a -> a.ticker, a.description)
                     |> Seq.toList
 
-                let recentlyTriggered = container.GetRecentlyTriggeredAlerts(query.UserId)
+                let recentlyTriggered = container.GetRecentlyTriggered(query.UserId)
                 
-                {| alerts = alerts; recentlyTriggered = recentlyTriggered; messages = container.GetMessages() |}
+                {| alerts = alerts; recentlyTriggered = recentlyTriggered; messages = container.GetNotices() |}
             
             
             member this.Handle (_:QueryAvailableMonitors) =

@@ -1,7 +1,6 @@
 using System;
-using core.Account;
-using core.Alerts;
 using core.fs;
+using core.fs.Alerts;
 using core.Shared.Adapters;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;

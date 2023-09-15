@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Alerts;
+using core.fs.Alerts;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
@@ -96,30 +96,18 @@ namespace web.BackgroundServices
 
                     completed.Add(c);
 
-                    foreach(var available in PatternDetection.AvailablePatterns)
+                    foreach(var patternName in PatternDetection.AvailablePatterns)
                     {
-                        PatternAlert.Deregister(
-                            container: _container,
-                            ticker: c.ticker,
-                            patternName: available,
-                            userId: c.user.Id
-                        );
+                        _container.Deregister(patternName, c.ticker, c.user.Id);
                     }
 
                     var patterns = PatternDetection.Generate(prices.Success);
 
                     foreach(var pattern in patterns)
                     {
-                        PatternAlert.Register(
-                            container: _container,
-                            ticker: c.ticker,
-                            sourceList: c.listName,
-                            pattern: pattern,
-                            value: pattern.value,
-                            valueFormat: pattern.valueFormat,
-                            when: DateTimeOffset.UtcNow,
-                            userId: c.user.Id
-                        );
+                        var alert = TriggeredAlert.PatternAlert(pattern, c.ticker, c.listName, DateTimeOffset.Now,
+                            c.user.Id);
+                        _container.Register(alert);
                     }
                 }
 

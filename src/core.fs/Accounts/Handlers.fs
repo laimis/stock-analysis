@@ -411,13 +411,29 @@ namespace core.fs.Accounts
                     ConnectedToBrokerage = state.ConnectedToBrokerage
                     BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
                 }
+                
+            static member notFound() =
+                {
+                    LoggedIn = false
+                    Id = Guid.Empty
+                    Verified = false
+                    Created = DateTimeOffset.MinValue
+                    Email = null
+                    Firstname = null
+                    Lastname = null
+                    IsAdmin = false
+                    SubscriptionLevel = null
+                    ConnectedToBrokerage = false
+                    BrokerageAccessTokenExpired = true
+                }
         
         type Handler(storage:IAccountStorage) =
             
             let successOrError (user:User) =
                 match user with
-                | null -> "User not found" |> ResponseUtils.failedTyped<AccountStatusView>
-                | _ -> user.State |> AccountStatusView.fromUserState |> ResponseUtils.success<AccountStatusView>
+                    | null -> AccountStatusView.notFound() 
+                    | _ -> user.State |> AccountStatusView.fromUserState
+                |> ResponseUtils.success<AccountStatusView>
                 
             interface IApplicationService
             

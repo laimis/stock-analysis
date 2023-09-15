@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
-using core.Alerts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.Storage;
@@ -31,8 +30,8 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     private readonly Dictionary<UserState, HashSet<string>> _tickersToCheck = new();
     private readonly Dictionary<UserState, List<(string Ticker, Pattern Pattern)>> _patternsDiscovered = new();
 
-    private Func<CancellationToken, Task> _toRun = null;
-    private Func<TimeSpan> _sleepCalculation = null;
+    private Func<CancellationToken, Task> _toRun;
+    private Func<TimeSpan> _sleepCalculation;
 
     public WeeklyUpsideReversalService(
         ILogger<WeeklyUpsideReversalService> logger,
@@ -113,7 +112,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var stocks = await _portfolioStorage.GetStocks(user.Id);
                 var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(user.State.Id))
-                    .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
+                    .Where(l => l.State.ContainsTag(core.fs.Alerts.Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)
                     .Select(t => t.Ticker);
 
@@ -144,7 +143,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly);
                 if (!priceBars.IsOk)
                 {
-                    _logger.LogError("Unabel to get price bars for {ticker} with error {error}", ticker, priceBars.Error);
+                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error);
                     continue;
                 }
 
@@ -193,7 +192,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 new {
                     identifier = "Weekly Upside Reversals",
                     alerts = u.Value.Select(d => EmailNotificationService.ToEmailRow(
-                        valueType: d.Pattern.valueFormat,
+                        valueFormat: d.Pattern.valueFormat,
                         triggeredValue: d.Pattern.value,
                         ticker: d.Ticker,
                         description: "Weekly Upside Reversal",
