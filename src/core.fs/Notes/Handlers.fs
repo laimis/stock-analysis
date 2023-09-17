@@ -1,6 +1,7 @@
 namespace core.fs.Notes
 
     open System
+    open System.ComponentModel.DataAnnotations
     open core.Notes
     open core.Shared
     open core.Shared.Adapters.CSV
@@ -9,14 +10,18 @@ namespace core.fs.Notes
 
     type AddNote = 
         {
+            [<Required>]
             Note: string
+            [<Required>]
             Ticker: Ticker
             UserId: Guid
         }
         
     type UpdateNote = 
         {
+            [<Required>]
             NoteId: Guid
+            [<Required>]
             Note: string
             UserId: Guid
         }

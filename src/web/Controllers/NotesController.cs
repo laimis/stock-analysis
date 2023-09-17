@@ -1,9 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using core.Notes;
-using core.Notes.Handlers;
-using MediatR;
+using core.fs.Notes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,76 +14,61 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class NotesController : ControllerBase
     {
-        private IMediator _mediator;
-
-        public NotesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-        
         [HttpPost]
-        public async Task<object> Add(Add.Command input)
-        {
-            input.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(input);
-
-            if (r.Error != null)
-            {
-                return this.Error(r.Error);
-            }
-
-            return r.Aggregate;
-        }
+        public Task<ActionResult> Add([FromBody] AddNote input, [FromServices] Handler service) =>
+            this.OkOrError(service.Handle(
+                    new AddNote(note: input.Note, ticker: input.Ticker, userId: User.Identifier())
+                )
+            );
 
         [HttpPatch]
-        public async Task<object> Update(Save.Command input)
-        {
-            input.WithUserId(User.Identifier());
-
-            await _mediator.Send(input);
-            
-            return Ok();
-        }
+        public Task<ActionResult> Update([FromBody] UpdateNote input, [FromServices] Handler service) =>
+            this.OkOrError(service.Handle(
+                    new UpdateNote(
+                        noteId: input.NoteId,
+                        note: input.Note,
+                        userId: User.Identifier()
+                    )
+                )
+            );
 
         [HttpGet]
-        public async Task<object> List(string ticker)
+        public Task<ActionResult> List([FromQuery]string ticker, [FromServices] Handler service)
         {
-            var query = new List.Query(User.Identifier(), ticker);
+            var response =
+                ticker switch {
+                    null => service.Handle(new GetNotes(User.Identifier())),
+                    _ => service.Handle(new GetNotesForTicker(new core.Shared.Ticker(ticker), User.Identifier()))
+                };
 
-            var result = await _mediator.Send(query);
-            
-            return result;
+            return this.OkOrError(response);
         }
 
         [HttpGet("export")]
-        public Task<ActionResult> Export()
-        {
-            return this.GenerateExport(_mediator, new Export.Query(User.Identifier()));
-        }
+        public Task<ActionResult> Export([FromServices] Handler service) =>
+            this.GenerateExport(service.Handle(new Export(User.Identifier())));
 
         [HttpGet("{noteId}")]
-        public async Task<object> Get(Guid noteId)
-        {
-            var query = new Get.Query(User.Identifier(), noteId);
+        public Task<ActionResult> Get([FromRoute] Guid noteId, [FromServices] Handler service) =>
+            this.OkOrError(
+                service.Handle(
+                    new GetNote(userId: User.Identifier(), noteId: noteId)
+                )
+            );
 
-            var result = await _mediator.Send(query);
-            
-            return result;
-        }
         
         [HttpPost("import")]
-        public async Task<ActionResult> Import(IFormFile file)
+        public async Task<ActionResult> Import(IFormFile file, [FromServices] Handler service)
         {
             using var streamReader = new StreamReader(file.OpenReadStream());
 
             var content = await streamReader.ReadToEndAsync();
 
-            var cmd = new Import.Command(content);
-
-            cmd.WithUserId(User.Identifier());
-
-            return this.OkOrError(await _mediator.Send(cmd));
+            var import = service.Handle(
+                new Import(userId: User.Identifier(), content: content)
+            );
+            
+            return await this.OkOrError(import);
         }
     }
 }
