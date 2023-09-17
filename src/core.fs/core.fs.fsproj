@@ -25,6 +25,7 @@
     <Compile Include="Brokerage\Handlers.fs" />
     <Compile Include="Cryptos\Import.fs" />
     <Compile Include="Cryptos\Handlers.fs" />
+    <Compile Include="Notes\Handlers.fs" />
   </ItemGroup>
 
   <ItemGroup>
