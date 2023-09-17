@@ -11,14 +11,14 @@ namespace core.Portfolio.Handlers
 {
     public class PendingStockPositionsExport
     {
-        public class Query : RequestWithUserId<ExportResponse>
+        public class Query : RequestWithUserId<ServiceResponse<ExportResponse>>
         {
             public Query(Guid userId) : base(userId)
             {
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, ExportResponse>
+        public class Handler : HandlerWithStorage<Query, ServiceResponse<ExportResponse>>
         {
             private IAccountStorage _accounts;
             private ICSVWriter _csvWriter;
@@ -32,7 +32,7 @@ namespace core.Portfolio.Handlers
                 _csvWriter = csvWriter;
             }
 
-            public override async Task<ExportResponse> Handle(Query query, CancellationToken cancellationToken)
+            public override async Task<ServiceResponse<ExportResponse>> Handle(Query query, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(query.UserId)
                     ?? throw new UnauthorizedAccessException("Unable to find user");
@@ -43,7 +43,9 @@ namespace core.Portfolio.Handlers
                 
                 var filename = CSVExport.GenerateFilename("pendingpositions");
 
-                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, data));
+                var response = new ExportResponse(filename, CSVExport.Generate(_csvWriter, data));
+                
+                return new ServiceResponse<ExportResponse>(response);
             }
         }
     }

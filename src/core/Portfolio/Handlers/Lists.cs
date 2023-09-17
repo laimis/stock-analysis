@@ -86,7 +86,7 @@ namespace core.Portfolio.Handlers
     
     public class ListsExport
     {
-        public class Query : RequestWithUserId<ExportResponse>
+        public class Query : RequestWithUserId<ServiceResponse<ExportResponse>>
         {
             public Query(bool justTickers, string name, Guid userId) : base(userId)
             {
@@ -98,7 +98,7 @@ namespace core.Portfolio.Handlers
             public string Name { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, ExportResponse>
+        public class Handler : HandlerWithStorage<Query, ServiceResponse<ExportResponse>>
         {
             private IAccountStorage _accountsStorage;
             private ICSVWriter _csvWriter;
@@ -112,7 +112,7 @@ namespace core.Portfolio.Handlers
                 _csvWriter = csvWriter;
             }
 
-            public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<ServiceResponse<ExportResponse>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accountsStorage.GetUser(request.UserId);
                 if (user == null)
@@ -128,7 +128,9 @@ namespace core.Portfolio.Handlers
 
                 var filename = CSVExport.GenerateFilename($"Stocks_{request.Name}");
 
-                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, list.State, request.JustTickers));
+                var response = new ExportResponse(filename, CSVExport.Generate(_csvWriter, list.State, request.JustTickers));
+                
+                return new ServiceResponse<ExportResponse>(response);
             }
         }
     }

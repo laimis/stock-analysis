@@ -8,5 +8,7 @@ namespace core.Cryptos
         DateTimeOffset When { get; }
         decimal Quantity { get; }
         decimal DollarAmount { get; }
+        string Token { get; }
+        string Notes { get;  }
     }
 }

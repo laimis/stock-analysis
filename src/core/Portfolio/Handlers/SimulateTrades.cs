@@ -29,7 +29,7 @@ namespace core.Portfolio.Handlers
             public int NumberOfPositions { get; }
         }
 
-        public class ExportQuery : RequestWithUserId<ExportResponse>
+        public class ExportQuery : RequestWithUserId<ServiceResponse<ExportResponse>>
         {
             public ExportQuery(bool closePositionIfOpenAtTheEnd, int numberOfTrades, Guid userId)
             {
@@ -44,7 +44,7 @@ namespace core.Portfolio.Handlers
 
         public class Handler
             : HandlerWithStorage<Query, List<TradingStrategyPerformance>>,
-            IRequestHandler<ExportQuery, ExportResponse>
+            IRequestHandler<ExportQuery, ServiceResponse<ExportResponse>>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
@@ -135,7 +135,7 @@ namespace core.Portfolio.Handlers
                 return new TradingStrategyPerformance(strategyGroup.Key, performance, strategyPositions);
             }
 
-            public async Task<ExportResponse> Handle(ExportQuery request, CancellationToken cancellationToken)
+            public async Task<ServiceResponse<ExportResponse>> Handle(ExportQuery request, CancellationToken cancellationToken)
             {
                 var query = new Query(request.ClosePositionIfOpenAtTheEnd, request.NumberOfPositions, request.UserId);
 
@@ -145,7 +145,9 @@ namespace core.Portfolio.Handlers
 
                 var filename = CSVExport.GenerateFilename($"simulated-trades-{request.NumberOfPositions}");
                 
-                return new ExportResponse(filename, content);
+                var response = new ExportResponse(filename, content);
+                
+                return new ServiceResponse<ExportResponse>(response);
             }
         }
     }

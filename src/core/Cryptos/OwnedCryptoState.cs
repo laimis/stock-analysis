@@ -14,11 +14,11 @@ namespace core.Cryptos
         public decimal Quantity { get; private set; }
         public decimal Cost { get; private set; }
         public decimal AverageCost => Cost / Quantity;
-        public List<CryptoTransaction> Transactions { get; } = new List<CryptoTransaction>();
-        internal List<ICryptoTransaction> BuyOrSell { get; } = new List<ICryptoTransaction>();
-        internal HashSet<Guid> Deletes { get; } = new HashSet<Guid>();
+        public List<CryptoTransaction> Transactions { get; } = new();
+        internal List<ICryptoTransaction> BuyOrSell { get; } = new();
+        internal HashSet<Guid> Deletes { get; } = new();
 
-        public List<PositionInstance> PositionInstances { get; } = new List<PositionInstance>();
+        public List<PositionInstance> PositionInstances { get; } = new();
 
         public string Description => $"{Quantity} tokens at avg cost {Math.Round(AverageCost, 2)}";
 

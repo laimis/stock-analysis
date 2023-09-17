@@ -74,5 +74,5 @@ namespace core.fs.Admin
                     
                 let filename = CSVExport.GenerateFilename("users")
                 
-                return ExportResponse(filename, CSVExport.Generate(csvWriter, users))
+                return ExportResponse(filename, CSVExport.Generate(csvWriter, users)) |> ResponseUtils.success<ExportResponse>
             }

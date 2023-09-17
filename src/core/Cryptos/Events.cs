@@ -1,6 +1,5 @@
 using System;
 using core.Shared;
-using MediatR;
 
 namespace core.Cryptos
 {
@@ -11,10 +10,7 @@ namespace core.Cryptos
         }
     }
 
-    public class CryptoPurchased :
-        AggregateEvent,
-        INotification,
-        ICryptoTransaction
+    public class CryptoPurchased : AggregateEvent, ICryptoTransaction
     {
         public CryptoPurchased(
             Guid id,
@@ -44,7 +40,6 @@ namespace core.Cryptos
 
     public class CryptoSold :
         AggregateEvent,
-        INotification,
         ICryptoTransaction
     {
         public CryptoSold(
@@ -76,7 +71,6 @@ namespace core.Cryptos
 
     public class CryptoAwarded :
         AggregateEvent,
-        INotification,
         ICryptoTransaction
     {
         public CryptoAwarded(
@@ -107,7 +101,6 @@ namespace core.Cryptos
 
     public class CryptoYielded :
         AggregateEvent,
-        INotification,
         ICryptoTransaction
     {
         public CryptoYielded(

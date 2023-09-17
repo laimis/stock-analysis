@@ -1,5 +1,5 @@
 using System.Linq;
-using core.Cryptos.Handlers;
+using core.fs.Cryptos.Import;
 using Xunit;
 
 namespace coretests.Crypto
@@ -9,68 +9,30 @@ namespace coretests.Crypto
         [Fact]
         public void EndToEnd()
         {
-            var container = new CoinbaseProContainer();
-
-            var records = new CoinbaseProRecord[] {
+            var records = new [] {
                 // buying algo
-                new CoinbaseProRecord {
-                    Amount = -462,
-                    AmountBalanceUnit = "USD",
-                    Time = System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"),
-                    TradeId = "18726758",
-                    Type = "match"
-                },
-                new CoinbaseProRecord {
-                    Amount = 300,
-                    AmountBalanceUnit = "ALGO",
-                    Time = System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"),
-                    TradeId = "18726758",
-                    Type = "match"
-                },
+                new CoinbaseProRecord(type: "match", time: System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"), tradeId: "18726758", amount: -462, amountBalanceUnit: "USD", orderId: ""),
+                new CoinbaseProRecord(type: "match", time: System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"), tradeId: "18726758", amount: 300, amountBalanceUnit: "ALGO", orderId: ""),
                 // buying link
-                new CoinbaseProRecord {
-                    Amount = -174.7397855m,
-                    AmountBalanceUnit = "USD",
-                    Time = System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"),
-                    TradeId = "1",
-                    Type = "match"
-                },
-                new CoinbaseProRecord {
-                    Amount = 10.51m,
-                    AmountBalanceUnit = "LINK",
-                    Time = System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"),
-                    TradeId = "1",
-                    Type = "match"
-                },
+                new CoinbaseProRecord(type: "match", time: System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"), tradeId: "1", amount: -174.7397855m, amountBalanceUnit: "USD", orderId: ""),
+                new CoinbaseProRecord(type: "match", time: System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"), tradeId: "1", amount: 10.51m, amountBalanceUnit: "LINK", orderId: ""),
                 // selling link 1
-                new CoinbaseProRecord {
-                    Amount = -9.1m,
-                    AmountBalanceUnit = "LINK",
-                    Time = System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"),
-                    TradeId = "2",
-                    Type = "match"
-                },
-                new CoinbaseProRecord {
-                    Amount = 163.837037m,
-                    AmountBalanceUnit = "USD",
-                    Time = System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"),
-                    TradeId = "2",
-                    Type = "match"
-                },
+                new CoinbaseProRecord(type: "match", time: System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"), tradeId: "2", amount: -9.1m, amountBalanceUnit: "LINK", orderId: ""),
+                new CoinbaseProRecord(type: "match", time: System.DateTimeOffset.Parse("2021-04-17T13:20:46.608Z"), tradeId: "2", amount: 163.837037m, amountBalanceUnit: "USD", orderId: ""),
             };
 
-            container.AddRecords(records);
+            var container = new CoinbaseProContainer(records);
 
             Assert.NotEmpty(container.Transactions);
             
-            var buy = container.GetBuys().First();
+            var buy = container.Buys.First();
 
             Assert.Equal("ALGO", buy.Token);
             Assert.Equal(300, buy.Quantity);
             Assert.Equal(462, buy.DollarAmount);
             Assert.Equal(2021, buy.Date.Year);
 
-            var sell = container.GetSells().First();
+            var sell = container.Sells.First();
 
             Assert.Equal("LINK", sell.Token);
             Assert.Equal(9.1m, sell.Quantity);

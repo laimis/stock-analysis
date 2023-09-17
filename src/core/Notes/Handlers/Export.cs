@@ -9,14 +9,14 @@ namespace core.Notes.Handlers
 {
     public class Export
     {
-        public class Query : RequestWithUserId<ExportResponse>
+        public class Query : RequestWithUserId<ServiceResponse<ExportResponse>>
         {
             public Query(Guid userId) : base(userId)
             {
             }
         }
 
-        public class Handler : HandlerWithStorage<Query, ExportResponse>
+        public class Handler : HandlerWithStorage<Query, ServiceResponse<ExportResponse>>
         {
             private ICSVWriter _csvWriter;
 
@@ -27,13 +27,15 @@ namespace core.Notes.Handlers
                 _csvWriter = csvWriter;
             }
 
-            public override async Task<ExportResponse> Handle(Query query, CancellationToken cancellationToken)
+            public override async Task<ServiceResponse<ExportResponse>> Handle(Query query, CancellationToken cancellationToken)
             {
                 var notes = await _storage.GetNotes(query.UserId);
 
                 var filename = CSVExport.GenerateFilename("notes");
 
-                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, notes));
+                var response = new ExportResponse(filename, CSVExport.Generate(_csvWriter, notes));
+                
+                return new ServiceResponse<ExportResponse>(response);
             }
         }
     }

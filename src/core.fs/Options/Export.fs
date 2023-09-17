@@ -22,5 +22,5 @@ module Export =
                 return ExportResponse(
                     request.Filename |> CSVExport.GenerateFilename,
                     csv
-                );
+                ) |> ResponseUtils.success<ExportResponse>;
             }

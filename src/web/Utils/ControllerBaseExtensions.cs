@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using core.fs.Options;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 using MediatR;
@@ -11,26 +12,32 @@ namespace web.Utils
         public static Task<ActionResult> GenerateExport(
             this ControllerBase controller,
             IMediator mediator,
-            IRequest<ExportResponse> query)
+            IRequest<ServiceResponse<ExportResponse>> query)
         {
             return controller.GenerateExport(mediator.Send(query));
         }
 
         public static async Task<ActionResult> GenerateExport(
             this ControllerBase controller,
-            Task<ExportResponse> responseTask)
+            Task<ServiceResponse<ExportResponse>> responseTask)
             {
                 var response = await responseTask;
-                
-                controller.HttpContext.Response.Headers.Add(
-                    "content-disposition", 
-                    $"attachment; filename={response.Filename}");
 
-                return new ContentResult
+                if (response.IsOk)
                 {
-                    Content = response.Content,
-                    ContentType = response.ContentType
-                };
+                    var content = response.Success;
+                    controller.HttpContext.Response.Headers.Add(
+                        "content-disposition", 
+                        $"attachment; filename={content.Filename}");
+
+                    return new ContentResult
+                    {
+                        Content = content.Content,
+                        ContentType = content.ContentType
+                    };
+                }
+
+                return controller.Error(response.Error!.Message);
             }
 
         public static ActionResult Error(

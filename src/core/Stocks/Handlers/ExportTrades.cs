@@ -18,7 +18,7 @@ namespace core.Stocks.Handlers
             Closed
         }
 
-        public class Query : RequestWithUserId<ExportResponse>
+        public class Query : RequestWithUserId<ServiceResponse<ExportResponse>>
         {
             public Query(Guid userId, ExportType exportType) : base(userId)
             {
@@ -28,7 +28,7 @@ namespace core.Stocks.Handlers
             public ExportType ExportType { get; }
         }
 
-        public class Handler : HandlerWithStorage<Query, ExportResponse>
+        public class Handler : HandlerWithStorage<Query, ServiceResponse<ExportResponse>>
         {
             private IAccountStorage _accounts;
             private IBrokerage _brokerage;
@@ -45,7 +45,7 @@ namespace core.Stocks.Handlers
                 _csvWriter = csvWriter;
             }
 
-            public override async Task<ExportResponse> Handle(Query request, CancellationToken cancellationToken)
+            public override async Task<ServiceResponse<ExportResponse>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _accounts.GetUser(request.UserId);
                 if (user == null)
@@ -83,7 +83,9 @@ namespace core.Stocks.Handlers
 
                 var filename = CSVExport.GenerateFilename("positions");
 
-                return new ExportResponse(filename, CSVExport.Generate(_csvWriter, final));
+                var response = new ExportResponse(filename, CSVExport.Generate(_csvWriter, final));
+                
+                return new ServiceResponse<ExportResponse>(response);
             }
         }
     }
