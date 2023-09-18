@@ -7,7 +7,6 @@ namespace core.fs.Alerts
     open core.Stocks.Services.Analysis
 
     type private StockPositionMonitorKey = {
-        Description: string
         Ticker: string
         UserId: Guid
     }
@@ -123,7 +122,7 @@ namespace core.fs.Alerts
         
         
         member _.Register (alert:TriggeredAlert) =
-            let key = { Description = alert.description; Ticker = alert.ticker; UserId = alert.userId }
+            let key = { Ticker = alert.ticker; UserId = alert.userId }
             
             match alerts.TryAdd(key, alert) with
             | true -> alert |> addToRecent
@@ -131,15 +130,15 @@ namespace core.fs.Alerts
             
         member _.DeregisterAlert (alert:TriggeredAlert) =
             
-            { Description = alert.description; Ticker = alert.ticker; UserId = alert.userId }
+            { Ticker = alert.ticker; UserId = alert.userId }
             |> alerts.TryRemove |> ignore
             
         member _.Deregister alertIdentifier ticker userId =
-            { Description = alertIdentifier; Ticker = ticker; UserId = userId }
+            { Ticker = ticker; UserId = userId }
             |> alerts.TryRemove |> ignore
             
         member _.DeregisterStopPriceAlert ticker userId =
-            { Description = "Stop price"; Ticker = ticker; UserId = userId }
+            { Ticker = ticker; UserId = userId }
             |> alerts.TryRemove |> ignore
             
         member _.GetRecentlyTriggered (userId:Guid) =
