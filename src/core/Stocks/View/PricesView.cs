@@ -10,8 +10,8 @@ namespace core.Stocks.View
         public PricesView(PriceBar[] prices)
         {
             Prices = prices;
-            SMA = core.Stocks.Services.SMAContainer.Generate(prices);
-            PercentChanges = core.Stocks.Services.Analysis.NumberAnalysis.PercentChanges(prices);
+            SMA = SMAContainer.Generate(prices);
+            PercentChanges = NumberAnalysis.PercentChanges(prices);
         }
 
         public PriceBar[] Prices { get; }
