@@ -518,7 +518,7 @@ export interface StockAlert {
   triggeredValue: number
   watchedValue: number
   alertType: string
-  valueType: string
+  valueFormat: string
 }
 
 export interface StockAlertMessage {

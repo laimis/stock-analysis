@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { StocksService, PositionInstance, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder, StockViolation } from '../../services/stocks.service';
+import {GetErrors} from "../../services/utils";
 
 @Component({
   selector: 'app-stock-trading-dashboard',
@@ -18,6 +19,7 @@ export class StockTradingComponent implements OnInit {
   violations: StockViolation[]
   brokerageOrders: BrokerageOrder[];
   cashBalance: number;
+  errors: string[];
 
   constructor(
     private stockService:StocksService,
@@ -31,7 +33,7 @@ export class StockTradingComponent implements OnInit {
     this.loadEntries()
   }
 
-  
+
   isActive(tabName:string) {
     return tabName == this.activeTab
   }
@@ -64,12 +66,14 @@ export class StockTradingComponent implements OnInit {
       this.cashBalance = r.cashBalance
       this.loading = false
       this.loaded = true
-    }, _ => {
+    }, err => {
       this.loading = false
       this.loaded = true
+      console.log(err)
+      this.errors = GetErrors(err)
     })
   }
-  
+
   numberOfPositions: number = 0
   invested: number = 0
 }

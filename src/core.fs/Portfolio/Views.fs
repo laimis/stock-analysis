@@ -39,7 +39,7 @@ type TradingPerformanceContainerView(closedPositions:PositionInstance array,numb
             span.ToArray()
         
         member _.ClosedPositions = closedPositions
-        member _.RecentClosedPositions = Span<PositionInstance>(closedPositions, 0, recentLengthToTake);
+        member _.RecentClosedPositions = closedPositions |> Array.take recentLengthToTake
         member this.Recent = TradingPerformance.Create(this.RecentClosedPositions);
         member _.Overall = TradingPerformance.Create(closedPositions);
         member _.TrendsAll = generateTrends recentLengthToTake closedPositions;

@@ -48,7 +48,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let alert of g" 
+          <tr *ngFor="let alert of g"
             [ngClass]="{
               'table-warning': alert.alertType === 'Negative',
               'table-success': alert.alertType === 'Positive',
@@ -61,8 +61,8 @@
             <td>
               {{alert.description}}
             </td>
-            <td>{{getValue(alert.watchedValue, alert.valueType)}}</td>
-            <td>{{getValue(alert.triggeredValue, alert.valueType)}}</td>
+            <td>{{getValue(alert.watchedValue, alert.valueFormat)}}</td>
+            <td>{{getValue(alert.triggeredValue, alert.valueFormat)}}</td>
             <td>Triggered on {{alert.when | date:'short'}}</td>
             <td>
               <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{alert.sourceList}}</a>
@@ -71,7 +71,7 @@
       </table>
     </section>
   </ng-container>
-  
+
   <section *ngIf="!container.alerts">
     No alerts were triggered
   </section>
