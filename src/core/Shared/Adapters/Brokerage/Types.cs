@@ -113,6 +113,14 @@ public class TradingAccount
     public OptionPosition[] OptionPositions { get; set; }
     public Order[] Orders { get; set; }
     public decimal? CashBalance { get; set; }
+
+    public static readonly TradingAccount Empty = new()
+    {
+        StockPositions = Array.Empty<StockPosition>(),
+        OptionPositions = Array.Empty<OptionPosition>(),
+        Orders = Array.Empty<Order>(),
+        CashBalance = 0
+    };
 }
 
 #pragma warning restore IDE1006 // Naming Styles

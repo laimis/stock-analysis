@@ -69,7 +69,7 @@ namespace core.Stocks
             );
         }
 
-        internal void SetRiskAmount(decimal riskAmount, int positionId)
+        public void SetRiskAmount(decimal riskAmount, int positionId)
         {
             var position = State.GetPosition(positionId);
             if (position == null)
@@ -199,7 +199,7 @@ namespace core.Stocks
             );
         }
 
-        public void AssignGrade(int positionId, TradeGrade grade, string note)
+        public bool AssignGrade(int positionId, TradeGrade grade, string note)
         {
             var position = State.GetPosition(positionId);
             if (position == null)
@@ -214,7 +214,7 @@ namespace core.Stocks
 
             if (position.Grade == grade && position.GradeNote == note)
             {
-                return;
+                return false;
             }
 
             Apply(
@@ -228,6 +228,8 @@ namespace core.Stocks
                     positionId: positionId
                 )
             );
+
+            return true;
         }
 
         public bool DeletePosition(int positionId)
@@ -257,7 +259,7 @@ namespace core.Stocks
             return true;
         }
 
-        internal bool SetPositionLabel(int positionId, string key, string value)
+        public bool SetPositionLabel(int positionId, string key, string value)
         {
             var position = State.GetPosition(positionId);
             if (position == null)
@@ -295,7 +297,7 @@ namespace core.Stocks
             return true;
         }
 
-        internal bool DeletePositionLabel(int positionId, string key)
+        public bool DeletePositionLabel(int positionId, string key)
         {
             var position = State.GetPosition(positionId);
             if (position == null)

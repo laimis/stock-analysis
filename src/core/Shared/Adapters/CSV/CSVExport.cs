@@ -26,7 +26,7 @@ namespace core.Shared.Adapters.CSV
         private record struct StockListRecordJustTicker(string ticker);
         private record struct TradingStrategyResultRecord(string strategyName, string ticker, decimal profit, decimal rr, decimal returnPct, decimal numberOfShares, decimal cost, decimal averageBuyCostPerShare, decimal averageSaleCostPerShare, string opened, string closed, decimal daysHeld);
 
-        public static string Generate(ICSVWriter writer, List<TradingStrategyPerformance> strategies)
+        public static string Generate(ICSVWriter writer, IEnumerable<TradingStrategyPerformance> strategies)
         {
             var rows = strategies
                 .SelectMany(strategy => 

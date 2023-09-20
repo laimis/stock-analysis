@@ -193,8 +193,8 @@ namespace storage.shared
         public Task Save(StockList list, Guid userId) =>
             Save(list, _stock_list_entity, userId);
 
-        public Task DeleteStockList(StockList list, Guid id) =>
-            _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: id);
+        public Task DeleteStockList(StockList list, Guid userId) =>
+            _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: userId);
 
         public Task Save(PendingStockPosition position, Guid userId) =>
             Save(position, _pending_stock_position_entity, userId);

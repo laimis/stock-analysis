@@ -302,7 +302,7 @@ namespace core.Stocks
 
         private Dictionary<string, string> _labels { get; set; } = new Dictionary<string, string>();
         public IEnumerable<KeyValuePair<string, string>> Labels => _labels;
-        internal bool ContainsLabel(string key, string value)
+        public bool ContainsLabel(string key, string value)
         {
             if (!ContainsLabel(key))
             {
@@ -317,7 +317,7 @@ namespace core.Stocks
             _labels[labelSet.Key] = labelSet.Value;
         }
 
-        internal bool ContainsLabel(string key)
+        public bool ContainsLabel(string key)
         {
             return _labels.ContainsKey(key);
         }
@@ -327,6 +327,6 @@ namespace core.Stocks
             _labels.Remove(labelDeleted.Key);
         }
 
-        internal string GetLabelValue(string key) => _labels[key];
+        public string GetLabelValue(string key) => _labels[key];
     }
 }

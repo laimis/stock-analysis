@@ -66,7 +66,7 @@ namespace core.Portfolio
             );
         }
 
-        internal void Close(bool purchased, decimal? price = null)
+        public void Close(bool purchased, decimal? price = null)
         {
             Apply(
                 new PendingStockPositionClosed(

@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <TargetFramework>net7.0</TargetFramework>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <LanguageVersion>preview</LanguageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,11 @@
     <Compile Include="Cryptos\Import.fs" />
     <Compile Include="Cryptos\Handlers.fs" />
     <Compile Include="Notes\Handlers.fs" />
+    <Compile Include="Portfolio\Views.fs" />
+    <Compile Include="Portfolio\Handler.fs" />
+    <Compile Include="Portfolio\ListsHandler.fs" />
+    <Compile Include="Portfolio\PendingPositionsHandler.fs" />
+    <Compile Include="Portfolio\RoutinesHandler.fs" />
   </ItemGroup>
 
   <ItemGroup>

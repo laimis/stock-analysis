@@ -25,10 +25,11 @@ namespace core.Portfolio
 
         protected void ApplyInternal(dynamic obj) => ApplyInternal(obj);
 
-        internal void SetPrice(decimal price)
+        public PendingStockPositionState SetPrice(decimal price)
         {
             Price = price;
             PercentDiffBetweenBidAndPrice = (price - Bid) / Bid;
+            return this;
         }
 
         private void ApplyInternal(PendingStockPositionCreated created)

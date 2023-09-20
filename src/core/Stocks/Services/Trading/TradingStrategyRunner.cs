@@ -17,13 +17,13 @@ namespace core.Stocks.Services.Trading
             _hours = hours;
         }
 
-        public Task<TradingStrategyResults> RunAsync(
+        public Task<TradingStrategyResults> Run(
             UserState user,
             PositionInstance position,
             bool closeIfOpenAtTheEnd = false
         )
         {
-            return RunAsync(
+            return Run(
                 user: user,
                 numberOfShares: position.CompletedPositionShares,
                 price: position.CompletedPositionCostPerShare,
@@ -36,7 +36,7 @@ namespace core.Stocks.Services.Trading
                 actualTrade: position);
         }
 
-        public Task<TradingStrategyResults> RunAsync(
+        public Task<TradingStrategyResults> Run(
             UserState user,
             decimal numberOfShares,
             decimal price,
@@ -45,7 +45,7 @@ namespace core.Stocks.Services.Trading
             DateTimeOffset when,
             bool closeIfOpenAtTheEnd = false)
         {
-            return RunAsync(
+            return Run(
                 user,
                 numberOfShares,
                 price,
@@ -56,7 +56,7 @@ namespace core.Stocks.Services.Trading
                 actualTrade: null);
         }
 
-        private async Task<TradingStrategyResults> RunAsync(
+        private async Task<TradingStrategyResults> Run(
             UserState user,
             decimal numberOfShares,
             decimal price,

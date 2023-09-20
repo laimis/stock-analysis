@@ -23,7 +23,7 @@ namespace core.Shared.Adapters.Storage
         Task<IEnumerable<StockList>> GetStockLists(Guid userId);
         Task<StockList> GetStockList(string name, Guid userId);
         Task Save(StockList list, Guid userId);
-        Task DeleteStockList(StockList list, Guid id);
+        Task DeleteStockList(StockList list, Guid userId);
 
         Task Save(PendingStockPosition position, Guid userId);
         Task<IEnumerable<PendingStockPosition>> GetPendingStockPositions(Guid userId);

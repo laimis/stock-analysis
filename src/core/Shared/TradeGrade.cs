@@ -2,7 +2,7 @@ using System;
 
 namespace core.Shared
 {
-    public struct TradeGrade : IComparable
+    public readonly struct TradeGrade : IComparable
     {
         private readonly string _grade;
 

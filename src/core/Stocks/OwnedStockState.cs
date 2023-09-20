@@ -16,9 +16,9 @@ namespace core.Stocks
         
         private List<PositionInstance> Positions { get; } = new List<PositionInstance>();
         public PositionInstance OpenPosition { get; private set;}
-        internal PositionInstance GetPosition(int positionId) =>
+        public PositionInstance GetPosition(int positionId) =>
             Positions.SingleOrDefault(x => x.PositionId == positionId);
-        internal IEnumerable<PositionInstance> GetClosedPositions() => Positions.Where(x => x.IsClosed);
+        public IEnumerable<PositionInstance> GetClosedPositions() => Positions.Where(x => x.IsClosed);
         internal IReadOnlyList<PositionInstance> GetAllPositions() => Positions.AsReadOnly();
 
         private int _positionId = 0;

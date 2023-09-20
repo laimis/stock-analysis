@@ -57,7 +57,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var runner = CreateRunner(100, i => 10 + i);
 
-            var results = await runner.RunAsync(
+            var results = await runner.Run(
                 new UserState(),
                 numberOfShares: 100,
                 price: 10,
@@ -127,7 +127,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var runner = CreateRunner(100, i => 10 + i);
 
-            var result = await runner.RunAsync(
+            var result = await runner.Run(
                 new UserState(),
                 numberOfShares: 2,
                 price: 50,
