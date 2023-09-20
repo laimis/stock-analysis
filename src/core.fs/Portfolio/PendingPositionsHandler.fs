@@ -10,6 +10,8 @@ open core.Shared.Adapters.CSV
 open core.Shared.Adapters.Storage
 open core.fs
 
+[<CLIMutable>]
+[<Struct>]
 type Create =
     {
         [<Required>]
@@ -28,6 +30,10 @@ type Create =
         Strategy: string
         UserId: Guid
     }
+    
+    static member WithUserId (userId:Guid) (command:Create) =
+        { command with UserId = userId }
+        
 type Close =
     {
         [<Required>]

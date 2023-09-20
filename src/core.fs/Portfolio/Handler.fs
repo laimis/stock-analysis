@@ -14,7 +14,7 @@ open core.Stocks
 open core.Stocks.Services.Trading
 open core.fs
 
-type GetPortfolio =
+type Query =
     {
         UserId: Guid
     }
@@ -37,6 +37,8 @@ type GradePosition =
         Grade: TradeGrade
         Note: string
     }
+    
+    static member WithUserId (userId:Guid) (command:GradePosition) = { command with UserId = userId }
     
 type RemoveLabel =
     {
@@ -61,6 +63,8 @@ type AddLabel =
         Value: string
     }
     
+    static member WithUserId (userId:Guid) (command:AddLabel) = { command with UserId = userId }
+    
 type ProfitPointsQuery =
     {
         [<Required>]
@@ -80,6 +84,7 @@ type SetRisk =
         [<Required>]
         RiskAmount: Nullable<decimal>
     }
+    static member WithUserId (userId:Guid) (command:SetRisk) = { command with UserId = userId }
     
 type SimulateTrade = 
     {
@@ -93,7 +98,7 @@ type SimulateTrade =
 type SimulateTradeForTicker =
     {
         Date: DateTimeOffset
-        NumberOfShares: int
+        NumberOfShares: decimal
         Price: decimal
         StopPrice: decimal
         Ticker: Ticker
@@ -103,11 +108,16 @@ type SimulateTradeForTicker =
 type SimulateUserTrades =
     {
         UserId: Guid
-        NumberOfPositions: int
+        NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
     }
     
-type ExportUserSimulatedTrades = SimulateUserTrades
+type ExportUserSimulatedTrades =
+    {
+        UserId: Guid
+        NumberOfTrades: int
+        ClosePositionIfOpenAtTheEnd: bool
+    }
 
 type QueryTradingEntries =
     {
@@ -138,7 +148,7 @@ type TransactionSummary =
             (start, ``end``)
         | _ ->
             let date = DateTimeOffset.UtcNow.Date;
-            let offset = (int)date.DayOfWeek - 1;
+            let offset = int date.DayOfWeek - 1;
             let toSubtract =
                 match offset with
                 | x when x < 0 -> 6
@@ -173,7 +183,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 return ServiceResponse()
     }
         
-    member this.Handle (query:GetPortfolio) = task {
+    member this.Handle (query:Query) = task {
         let! stocks = storage.GetStocks(query.UserId)
         
         let openStocks = stocks |> Seq.filter (fun s -> s.State.OpenPosition = null |> not) |> Seq.map (fun s -> s.State) |> Seq.toList
@@ -418,7 +428,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.collect (fun s -> s.GetClosedPositions())
                 |> Seq.filter (fun p -> p.StopPrice.HasValue)
                 |> Seq.sortByDescending (fun p -> p.Closed.Value)
-                |> Seq.take command.NumberOfPositions
+                |> Seq.take command.NumberOfTrades
                 |> Seq.toList
                 
             let runner = TradingStrategyRunner(brokerage, marketHours)
@@ -440,15 +450,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member this.HandleExport (command:ExportUserSimulatedTrades) = task {
-        let simulateCommand = {
+        let (simulateCommand:SimulateUserTrades) = {
             UserId = command.UserId
-            NumberOfPositions = command.NumberOfPositions
+            NumberOfTrades = command.NumberOfTrades
             ClosePositionIfOpenAtTheEnd = command.ClosePositionIfOpenAtTheEnd}
         let! results = this.Handle(simulateCommand)
         match results.IsOk with
         | true ->
             let content = CSVExport.Generate(csvWriter, results.Success);
-            let filename = CSVExport.GenerateFilename($"simulated-trades-{command.NumberOfPositions}");
+            let filename = CSVExport.GenerateFilename($"simulated-trades-{command.NumberOfTrades}");
             let response = ExportResponse(filename, content);
             return ServiceResponse<ExportResponse>(response);
             
@@ -568,29 +578,29 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
             TransactionsView(log, query.GroupBy, tickers);
             
-            
-            
         let! stocks = storage.GetStocks(query.UserId)
         let! options = storage.GetOwnedOptions(query.UserId)
         let! cryptos = storage.GetCryptos(query.UserId)
         
-        return toTransactionsView stocks options cryptos
+        let transactionsView = toTransactionsView stocks options cryptos
+        
+        return ServiceResponse<TransactionsView>(transactionsView)
     }
     
     member _.Handle (query:TransactionSummary) = task {
         
         let! stocks = storage.GetStocks(query.UserId)
         let! options = storage.GetOwnedOptions(query.UserId)
-        let (start, ``end``) = query.GetDates()
+        let start, ``end`` = query.GetDates()
         
         let transactions =
             stocks
             |> Seq.collect (fun s -> s.State.Transactions)
-            |> Seq.filter (fun t -> t.DateAsDate >= start)
+            |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
             |> Seq.append(
                 options
                 |> Seq.collect (fun o -> o.State.Transactions)
-                |> Seq.filter (fun t -> t.DateAsDate >= start)
+                |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
             )
         
         let stockTransactions =
@@ -621,17 +631,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         let closedPositions =
             stocks
             |> Seq.collect (fun s -> s.State.GetClosedPositions())
-            |> Seq.filter (fun p -> p.Closed.Value >= start && p.Closed.Value <= ``end``)
+            |> Seq.filter (fun p -> p.Closed.Value >= DateTimeOffset(start) && p.Closed.Value <= DateTimeOffset(``end``))
             |> Seq.toList
             
         let openPositions =
             stocks
             |> Seq.map (fun s -> s.State.OpenPosition)
             |> Seq.filter (fun p -> p = null |> not)
-            |> Seq.filter (fun p -> p.Opened.Value >= start && p.Opened.Value <= ``end``)
+            |> Seq.filter (fun p -> p.Opened.Value >= DateTimeOffset(start) && p.Opened.Value <= DateTimeOffset(``end``))
             |> Seq.toList
             
-        return TransactionSummaryView(
+        let view = TransactionSummaryView(
             start=start,
             ``end``=``end``,
             openPositions=openPositions,
@@ -641,4 +651,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             plStockTransactions=plStockTransactions,
             plOptionTransactions=plOptionTransactions
         )
+        
+        return ServiceResponse<TransactionSummaryView>(view)
     }

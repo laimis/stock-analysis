@@ -35,6 +35,7 @@ type AddStockToList =
         [<Required>]
         Ticker: Ticker
     }
+    static member WithUserId (userId:Guid) (command:AddStockToList) = { command with UserId = userId }
     
 type RemoveStockFromList =
     {
@@ -55,6 +56,7 @@ type AddTagToList =
         Name: string
         UserId: Guid
     }
+    static member WithUserId (userId:Guid) (command:AddTagToList) = { command with UserId = userId }
     
 type RemoveTagFromList =
     {
@@ -71,6 +73,7 @@ type Create =
         Description: string
         UserId: Guid
     }
+    static member WithUserId (userId:Guid) (command:Create) = { command with UserId = userId }
     
 type Update =
     {
@@ -78,6 +81,7 @@ type Update =
         Description: string
         UserId: Guid
     }
+    static member WithUserId (userId:Guid) (command:Update) = { command with UserId = userId }
     
 type Delete =
     {

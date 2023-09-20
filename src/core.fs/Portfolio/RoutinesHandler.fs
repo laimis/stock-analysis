@@ -1,4 +1,4 @@
-namespace core.fs.Portfolio
+namespace core.fs.Portfolio.Routines
 
 open System
 open System.ComponentModel.DataAnnotations
@@ -19,6 +19,9 @@ type Create =
         Description:string
     }
     
+    static member WithUserId (userId:Guid) (create:Create) =
+        { create with UserId = userId }
+    
 type Update =
     {
         UserId:Guid
@@ -28,6 +31,9 @@ type Update =
         NewName:string
         Description:string
     }
+    
+    static member WithUserId (userId:Guid) (update:Update) =
+        { update with UserId = userId }
     
 type Delete =
     {
@@ -44,6 +50,8 @@ type AddStep =
         Label:string
         Url:string
     }
+    static member WithUserId (userId:Guid) (add:AddStep) =
+        { add with UserId = userId }
 
 type MoveStep =
     {
@@ -55,6 +63,8 @@ type MoveStep =
         Direction:Nullable<int>
         UserId:Guid
     }
+    static member WithUserId (userId:Guid) (move:MoveStep) =
+        { move with UserId = userId }
     
 type RemoveStep =
     {
@@ -77,7 +87,10 @@ type UpdateStep =
         UserId:Guid
     }
     
-type Routines(accounts:IAccountStorage,storage:IPortfolioStorage) =
+    static member WithUserId (userId:Guid) (update:UpdateStep) =
+        { update with UserId = userId }
+    
+type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
     
     interface IApplicationService
     

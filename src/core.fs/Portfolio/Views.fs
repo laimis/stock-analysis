@@ -131,4 +131,4 @@ type TransactionSummaryView(start,``end``,openPositions,closedPositions,stockTra
         member _.PLOptionTransactions = plOptionTransactions
         
         member _.StockPL = plStockTransactions |> Seq.sumBy (fun (t:Transaction) -> t.Amount)
-        member _.OptionPL = plOptionTransactions |> Seq.sumBy (fun (t:t:Transaction) -> t.Amount)
+        member _.OptionPL = plOptionTransactions |> Seq.sumBy (fun (t:Transaction) -> t.Amount)

@@ -40,6 +40,7 @@ namespace web
                 .AddJsonOptions(
                     o => {
                         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                        o.JsonSerializerOptions.Converters.Add(new TickerConverter());
                 });
 
             services.Configure<ForwardedHeadersOptions>(options =>
