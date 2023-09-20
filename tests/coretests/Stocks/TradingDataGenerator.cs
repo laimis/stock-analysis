@@ -6,7 +6,7 @@ namespace coretests.Stocks
 {
     public class TradingDataGenerator
     {
-        internal static Span<PositionInstance> GetClosedPositions()
+        internal static PositionInstance[] GetClosedPositions()
         {
             var closedPositions = new List<PositionInstance>();
 
@@ -25,7 +25,7 @@ namespace coretests.Stocks
             position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
-            return new Span<PositionInstance>(closedPositions.ToArray());
+            return closedPositions.ToArray();
         }
     }
 }

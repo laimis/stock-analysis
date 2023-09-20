@@ -1,18 +1,15 @@
-using core.Portfolio.Views;
+using core.fs.Portfolio;
 using Xunit;
 
 namespace coretests.Stocks
 {
     public class TradingPerformanceContainerViewTests
     {
-        private TradingPerformanceContainerView _container;
+        private TradingPerformanceContainerView _container =
+            new TradingPerformanceContainerView(TradingDataGenerator.GetClosedPositions(), 1);
 
-        public TradingPerformanceContainerViewTests()
-        {
-            // create a set of closed positions
-            _container = new TradingPerformanceContainerView(TradingDataGenerator.GetClosedPositions(), 1);
-        }
-        
+        // create a set of closed positions
+
         [Fact]
         public void RecentCorrect() => Assert.Equal(1, _container.Recent.NumberOfTrades);
 
