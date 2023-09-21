@@ -7,6 +7,10 @@
         *ngFor="let link of chain.links"
         class="badge me-2"
         [ngClass]="{
+          'bg-level-5-success': link.success && link.level == 5,
+          'bg-level-5-failure': !link.success && link.level == 5,
+          'bg-level-4-success': link.success && link.level == 4,
+          'bg-level-4-failure': !link.success && link.level == 4,
           'bg-level-3-success': link.success && link.level == 3,
           'bg-level-3-failure': !link.success && link.level == 3,
           'bg-level-2-success': link.success && link.level == 2,

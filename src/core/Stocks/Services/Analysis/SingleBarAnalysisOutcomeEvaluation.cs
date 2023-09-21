@@ -11,7 +11,7 @@ namespace core.Stocks.Services.Analysis
         private const decimal ExcellentClosingRange = 0.80m;
         private const decimal LowClosingRange = 0.20m;
 
-        internal static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(IEnumerable<TickerOutcomes> tickerOutcomes)
+        public static IEnumerable<AnalysisOutcomeEvaluation> Evaluate(IEnumerable<TickerOutcomes> tickerOutcomes)
         {
             yield return new AnalysisOutcomeEvaluation(
                 "High Volume with Excellent Closing Range and High Percent Change",

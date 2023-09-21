@@ -1,12 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using core.Reports;
-using core.Reports.Views;
 using core.Shared.Adapters.Stocks;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
+using core.fs.Reports;
+using core.Shared;
 
 namespace web.Controllers
 {
@@ -15,57 +14,61 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class ReportsController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly Handler _service;
 
-        public ReportsController(IMediator mediator)
+        public ReportsController(Handler service)
         {
-            _mediator = mediator;
+            _service = service;
         }
-
+        
         [HttpGet("chain")]
-        public Task<object> Chain()
-        {
-            var query = new Chain.Query(User.Identifier());
-
-            return _mediator.Send(query);
-        }
+        public Task<ActionResult> Chain() =>
+            this.OkOrError(
+                _service.Handle(
+                    new ChainQuery(
+                        User.Identifier()
+                    )
+                )
+            );
 
         [HttpGet("sells")]
-        public Task<SellsView> Sells()
-        {
-            var query = new Sells.Query(User.Identifier());
-
-            return _mediator.Send(query);
-        }
+        public Task<ActionResult> Sells() =>
+            this.OkOrError(
+                _service.Handle(
+                    new SellsQuery(
+                        User.Identifier()
+                    )
+                )
+            );
 
         [HttpPost("outcomes")]
-        public Task<OutcomesReportView> TickersOutcomes(
-            [FromBody]OutcomesReport.ForTickersQuery query)
+        public Task<ActionResult> TickersOutcomes(
+            [FromBody]OutcomesReportQuery query)
         {
-            query.WithUserId(User.Identifier());
+            var withUserId = OutcomesReportQuery.WithUserId(User.Identifier(), query);
             
-            return _mediator.Send(query);
+            return this.OkOrError(_service.Handle(withUserId));
         }
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
-        public Task<PercentChangeStatisticsView> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
-            => _mediator.Send(new PercentChangeStatistics.ForTickerQuery(frequency, ticker, User.Identifier()));
+        public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
+            => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(frequency, ticker, User.Identifier())));
 
         [HttpGet("gaps/tickers/{ticker}")]
-        public Task<GapsView> TickerGaps(string ticker, [FromQuery] PriceFrequency frequency)
-            => _mediator.Send(new GapReport.ForTickerQuery(frequency, ticker, User.Identifier()));
+        public Task<ActionResult> TickerGaps(string ticker, [FromQuery] PriceFrequency frequency)
+            => this.OkOrError(_service.Handle(new GapReportQuery(User.Identifier(), ticker, frequency)));
 
         [HttpGet("positions")]
-        public Task<OutcomesReportView> Portfolio() =>
-            _mediator.Send(new PositionReport.Query(User.Identifier()));
+        public Task<ActionResult> Portfolio() =>
+            this.OkOrError(_service.Handle(new OutcomesReportForPositionsQuery(User.Identifier())));
 
         [Obsolete("Not using this anymore, keeping it around in case I change my mind")]
         [HttpGet("dailyoutcomescoresreport/{ticker}")]
         public Task<ActionResult> DailyOutcomeScoresReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
-            this.ExecuteAsync(_mediator, new DailyOutcomeScoresReport.Query(start, end, ticker, User.Identifier()));
+            this.OkOrError(_service.Handle(new DailyOutcomeScoreReportQuery(User.Identifier(), start, end, new Ticker(ticker))));
 
         [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
-        public Task<DailyPositionReportView> DailyPositionReport(string ticker, int positionId) =>
-            _mediator.Send(new DailyPositionReport.Query(ticker, positionId, User.Identifier()));
+        public Task<ActionResult> DailyPositionReport(string ticker, int positionId) =>
+            this.OkOrError(_service.Handle(new DailyPositionReportQuery(User.Identifier(), ticker, positionId)));
     }
 }

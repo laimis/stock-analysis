@@ -14,7 +14,7 @@ namespace core.Stocks.Services.Analysis
         string message
     );
 
-    public record struct TickerOutcomes(List<AnalysisOutcome> outcomes, string ticker);
+    public record struct TickerOutcomes(IEnumerable<AnalysisOutcome> outcomes, string ticker);
 
     public record struct AnalysisOutcomeEvaluation(
         string name,
@@ -30,7 +30,7 @@ namespace core.Stocks.Services.Analysis
         decimal value,
         ValueFormat valueFormat);
     
-    public record struct TickerPatterns(List<Pattern> patterns, string ticker);
+    public record struct TickerPatterns(IEnumerable<Pattern> patterns, string ticker);
 
     public record struct DateScorePair(System.DateTimeOffset date, decimal score);
 
@@ -60,7 +60,7 @@ namespace core.Stocks.Services.Analysis
             return counts;
         }
 
-        internal static Dictionary<string, int> GenerateEvaluationCounts(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
+        public static Dictionary<string, int> GenerateEvaluationCounts(IEnumerable<AnalysisOutcomeEvaluation> evaluations)
         {
             var counts = new Dictionary<string, int>();
             foreach (var category in evaluations)

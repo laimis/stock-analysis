@@ -12,7 +12,7 @@ namespace core.Stocks
         public Guid UserId { get; private set; }
 
         public List<Transaction> Transactions { get; } = new List<Transaction>();
-        internal List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
+        public List<IStockTransaction> BuyOrSell { get; } = new List<IStockTransaction>();
         
         private List<PositionInstance> Positions { get; } = new List<PositionInstance>();
         public PositionInstance OpenPosition { get; private set;}
@@ -241,7 +241,7 @@ namespace core.Stocks
         }
     }
 
-    internal interface IStockTransaction
+    public interface IStockTransaction
     {
         decimal NumberOfShares { get; }
         decimal Price { get; }
@@ -250,7 +250,7 @@ namespace core.Stocks
         string Notes { get; }
     }
 
-    internal interface IStockTransactionWithStopPrice : IStockTransaction
+    public interface IStockTransactionWithStopPrice : IStockTransaction
     {
         decimal? StopPrice { get; }
     }
