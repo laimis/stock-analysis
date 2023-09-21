@@ -160,7 +160,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             
             let! positions = portfolio.GetPendingStockPositions(query.UserId)
             
-            let data = positions |> Seq.map(fun x -> x.State) |> Seq.sortByDescending(fun x -> x.Date)
+            let data =
+                positions
+                |> Seq.map(fun x -> x.State)
+                |> Seq.filter (fun x -> x.IsClosed |> not)
+                |> Seq.sortByDescending(fun x -> x.Date)
             
             let tickers = data |> Seq.map(fun x -> x.Ticker)
             let! priceResponse = brokerage.GetQuotes(user.State, tickers)
