@@ -105,6 +105,8 @@ namespace web
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)
         {
+            services.AddSingleton<IOutbox, IncompleteOutbox>();
+            
             var storage = configuration.GetValue<string>("storage");
 
             logger.LogInformation("Read storage configuration type: {storage}", storage);
