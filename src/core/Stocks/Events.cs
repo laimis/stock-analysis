@@ -1,6 +1,5 @@
 using System;
 using core.Shared;
-using MediatR;
 
 namespace core.Stocks
 {
@@ -13,7 +12,6 @@ namespace core.Stocks
 
     public class StockPurchased : 
         AggregateEvent,
-        INotification,
         IStockTransaction
     {
         public StockPurchased(
@@ -43,7 +41,6 @@ namespace core.Stocks
 
     public class StockPurchased_v2 : 
         AggregateEvent,
-        INotification,
         IStockTransactionWithStopPrice
     {
         public StockPurchased_v2(
@@ -76,7 +73,6 @@ namespace core.Stocks
 
     public class StockSold :
         AggregateEvent,
-        INotification,
         IStockTransaction
     {
         public StockSold(
@@ -141,7 +137,7 @@ namespace core.Stocks
         public Guid UserId { get; }
     }
 
-    public class StopPriceSet : AggregateEvent, INotification
+    public class StopPriceSet : AggregateEvent
     {
         public StopPriceSet(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker, decimal stopPrice) : base(id, aggregateId, when)
         {
@@ -183,7 +179,7 @@ namespace core.Stocks
         public decimal RiskAmount { get; }
     }
 
-    public class StopDeleted : AggregateEvent, INotification
+    public class StopDeleted : AggregateEvent
     {
         public StopDeleted(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string ticker) : base(id, aggregateId, when)
         {
@@ -195,7 +191,7 @@ namespace core.Stocks
         public string Ticker { get; }
     }
 
-    public class TradeGradeAssigned : AggregateEvent, INotification
+    public class TradeGradeAssigned : AggregateEvent
     {
         public TradeGradeAssigned(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string grade, string note, int positionId) : base(id, aggregateId, when)
         {
@@ -211,7 +207,7 @@ namespace core.Stocks
         public string Note { get; }
     }
 
-    public class PositionDeleted : AggregateEvent, INotification
+    public class PositionDeleted : AggregateEvent
     {
         public PositionDeleted(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, int positionId) : base(id, aggregateId, when)
         {

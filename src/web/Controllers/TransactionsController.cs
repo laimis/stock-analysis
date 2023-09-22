@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
-using core.Transactions.Handlers;
-using MediatR;
+using core.fs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +13,11 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class TransactionsController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly ImportTransactions.Handler _service;
 
-        public TransactionsController(IMediator mediator)
+        public TransactionsController(ImportTransactions.Handler service)
         {
-            _mediator = mediator;
+            _service = service;
         }
         
         [HttpPost("import")]
@@ -28,11 +27,9 @@ namespace web.Controllers
 
             var content = await streamReader.ReadToEndAsync();
 
-            var cmd = new Import.Command(content);
+            var cmd = new ImportTransactions.Command(content, User.Identifier());
 
-            cmd.WithUserId(User.Identifier());
-
-            return this.OkOrError(await _mediator.Send(cmd));
+            return await this.OkOrError(_service.Handle(cmd));
         }
     }
 }

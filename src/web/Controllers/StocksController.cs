@@ -1,13 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using core.Shared.Adapters.Brokerage;
+using core.fs.Stocks;
+using core.Shared;
 using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.Stocks;
-using core.Stocks;
-using core.Stocks.Handlers;
-using core.Stocks.View;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,117 +17,85 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class StocksController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly Handler _service;
 
-        public StocksController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public StocksController(Handler service) =>
+            _service = service;
 
-        [HttpGet()]
-        public Task<object> Dashboard() => _mediator.Send(new Dashboard.Query(User.Identifier()));
+        [HttpGet]
+        public Task<ActionResult> Dashboard() => this.OkOrError(_service.Handle(new DashboardQuery(User.Identifier())));
 
         [HttpGet("{ticker}")]
-        public Task<StockDetailsView> Details(string ticker) => _mediator.Send(new Details.Query(ticker, User.Identifier()));
+        public Task<ActionResult> Details([FromRoute]string ticker) => this.OkOrError(_service.Handle(new DetailsQuery(ticker, User.Identifier())));
 
         [HttpGet("{ticker}/prices")]
-        public Task<ActionResult> Prices(string ticker, [FromQuery] int numberOfDays) =>
-            this.ExecuteAsync(_mediator, new Prices.Query(numberOfDays, ticker, User.Identifier()));
+        public Task<ActionResult> Prices([FromRoute]string ticker, [FromQuery] int numberOfDays) =>
+            this.OkOrError(_service.Handle(PricesQuery.NumberOfDays(numberOfDays, ticker, User.Identifier())));
 
         [HttpGet("{ticker}/secfilings")]
-        public Task<CompanyFilings> SECFilings(string ticker) =>
-            _mediator.Send(new SECFilings.Query(ticker, User.Identifier()));
+        public Task<ActionResult> SecFilings([FromRoute] string ticker) =>
+            this.OkOrError(_service.Handle(new CompanyFilingsQuery(new Ticker(ticker), User.Identifier())));
 
         [HttpGet("{ticker}/prices/{start}/{end}")]
-        public Task<ActionResult> Prices(string ticker, DateTimeOffset start, DateTimeOffset end) =>
-            this.ExecuteAsync(_mediator, new Prices.Query(start:start, end:end, ticker, User.Identifier()));
+        public Task<ActionResult> Prices([FromRoute] string ticker, [FromRoute] DateTimeOffset start, [FromRoute] DateTimeOffset end) =>
+            this.OkOrError(_service.Handle(new PricesQuery(userId: User.Identifier(), ticker: new Ticker(ticker), start: start, end:end)));
 
         [HttpGet("{ticker}/price")]
-        public Task<decimal?> Price(string ticker) => _mediator.Send(new Price.Query(ticker, User.Identifier()));
+        public Task<ActionResult> Price([FromRoute] string ticker) => 
+            this.OkOrError(_service.Handle(new PriceQuery(userId: User.Identifier(), ticker: new Ticker(ticker))));
 
         [HttpGet("{ticker}/quote")]
-        public Task<ActionResult> Quote(string ticker) => this.ExecuteAsync(_mediator, new Quote.Query(ticker, User.Identifier()));
+        public Task<ActionResult> Quote([FromRoute] string ticker) =>
+            this.OkOrError(_service.Handle(new QuoteQuery(new Ticker(ticker), User.Identifier())));
         
         [HttpGet("{ticker}/ownership")]
-        public Task<StockOwnershipView> Ownership(string ticker) => _mediator.Send(new Ownership.Query(ticker, User.Identifier()));
+        public Task<ActionResult> Ownership(string ticker) => 
+            this.OkOrError(_service.Handle(new OwnershipQuery(new Ticker(ticker), User.Identifier())));
 
         [HttpDelete("{id}")]
-        public async Task<object> Delete(Guid id)
-        {
-            var cmd = new Delete.Command(id, User.Identifier());
-
-            return await _mediator.Send(cmd);
-        }
+        public async Task<ActionResult> Delete([FromRoute] Guid id) =>
+            this.OkOrError(await _service.Handle(new DeleteStock(id, User.Identifier())));
 
         [HttpDelete("{ticker}/transactions/{eventId}")]
-        public async Task<object> DeleteTransaction(string ticker, Guid eventId)
-        {
-            var cmd = new DeleteTransaction.Command(ticker, eventId, User.Identifier());
-
-            return await _mediator.Send(cmd);
-        }
+        public Task<ActionResult> DeleteTransaction([FromRoute] string ticker, [FromRoute] Guid eventId) =>
+            this.OkOrError(
+                _service.Handle(
+                    new DeleteTransaction(new Ticker(ticker), eventId, User.Identifier()
+                    )
+                )
+            );
 
         [HttpGet("search/{term}")]
-        public Task<SearchResult[]> Search(string term) => _mediator.Send(new Search.Query(term, User.Identifier()));
+        public Task<ActionResult> Search([FromRoute] string term) => 
+            this.OkOrError(_service.Handle(new SearchQuery(term, User.Identifier())));
 
         [HttpPost("{ticker}/stop")]
-        public async Task<ActionResult> Stop(SetStop.Command command)
-        {
-            command.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(command);
-
-            return this.OkOrError(r);
-        }
-
+        public Task<ActionResult> Stop([FromBody] SetStop command) =>
+            this.OkOrError(_service.Handle(SetStop.WithUserId(User.Identifier(), command)));
+        
         [HttpDelete("{ticker}/stop")]
-        public async Task<ActionResult> DeleteStop(string ticker)
-        {
-            var command = new DeleteStop.Command(ticker);
-            command.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(command);
-
-            return this.OkOrError(r);
-        }
+        public async Task<ActionResult> DeleteStop([FromRoute] string ticker) =>
+            this.OkOrError(await _service.Handle(new DeleteStop(new Ticker(ticker), User.Identifier())));
 
         [HttpPost("sell")]
-        public async Task<ActionResult> Sell(Sell.Command model)
-        {
-            model.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(model);
-
-            return this.OkOrError(r);
-        }
+        public Task<ActionResult> Sell([FromBody]StockTransaction model) =>
+            this.OkOrError(_service.Handle(BuyOrSell.NewSell(model, User.Identifier())));
 
         [HttpPost("buy")]
-        public async Task<ActionResult> Buy(Buy.Command model)
-        {
-            model.WithUserId(User.Identifier());
-
-            var r = await _mediator.Send(model);
-
-            return this.OkOrError(r);
-        }
-
+        public async Task<ActionResult> Buy([FromBody]StockTransaction model) =>
+            this.OkOrError(await _service.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
+        
         [HttpGet("export")]
-        public Task<ActionResult> Export()
-        {
-            return this.GenerateExport(_mediator, new ExportTransactions.Query(User.Identifier()));
-        }
-
+        public Task<ActionResult> Export() =>
+            this.GenerateExport(_service.Handle(new ExportTransactions(User.Identifier())));
+        
         [HttpGet("export/closed")]
-        public Task<ActionResult> ExportClosed()
-        {
-            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.Handlers.ExportTrades.ExportType.Closed));
-        }
+        public Task<ActionResult> ExportClosed() =>
+            this.GenerateExport(_service.Handle(new ExportTrades(User.Identifier(), ExportType.Closed)));
 
         [HttpGet("export/open")]
-        public Task<ActionResult> ExportTrades()
-        {
-            return this.GenerateExport(_mediator, new ExportTrades.Query(User.Identifier(), core.Stocks.Handlers.ExportTrades.ExportType.Open));
-        }
+        public Task<ActionResult> ExportTrades() =>
+            this.GenerateExport(_service.Handle(new ExportTrades(User.Identifier(), ExportType.Open)));
 
         [HttpPost("import")]
         public async Task<ActionResult> Import(IFormFile file)
@@ -139,11 +104,9 @@ namespace web.Controllers
 
             var content = await streamReader.ReadToEndAsync();
 
-            var cmd = new Import.Command(content);
-
-            cmd.WithUserId(User.Identifier());
-
-            return this.OkOrError(await _mediator.Send(cmd));
+            var cmd = new ImportStocks(userId: User.Identifier(), content: content);
+            
+            return await this.OkOrError(_service.Handle(cmd));
         }
     }
 }

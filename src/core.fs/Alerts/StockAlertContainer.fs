@@ -7,7 +7,7 @@ namespace core.fs.Alerts
     open core.Stocks.Services.Analysis
 
     type private StockPositionMonitorKey = {
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
     }
     
@@ -19,7 +19,7 @@ namespace core.fs.Alerts
     
     [<Struct>]
     type AlertCheck = {
-        ticker: string
+        ticker: Ticker
         listName: string
         user: UserState
     }
@@ -41,7 +41,7 @@ namespace core.fs.Alerts
             triggeredValue:decimal
             watchedValue:decimal
             ``when``:DateTimeOffset
-            ticker:string
+            ticker:Ticker
             description:string
             sourceList:string
             userId:Guid

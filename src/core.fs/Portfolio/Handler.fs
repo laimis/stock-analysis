@@ -22,7 +22,7 @@ type Query =
 type DeletePosition =
     {
         PositionId: int
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
     }
 
@@ -31,7 +31,7 @@ type GradePosition =
         [<Required>]
         PositionId: int
         [<Required>]
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
         [<Required>]
         Grade: TradeGrade
@@ -44,7 +44,7 @@ type RemoveLabel =
     {
         PositionId: int
         [<Required>]
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
         [<Required>]
         Key: string
@@ -55,7 +55,7 @@ type AddLabel =
         [<Required>]
         PositionId: int
         [<Required>]
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
         [<Required>]
         Key: string
@@ -70,7 +70,7 @@ type ProfitPointsQuery =
         [<Required>]
         PositionId: int
         [<Required>]
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
     }
     
@@ -79,7 +79,7 @@ type SetRisk =
         [<Required>]
         PositionId: int
         [<Required>]
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
         [<Required>]
         RiskAmount: Nullable<decimal>
@@ -89,7 +89,7 @@ type SetRisk =
 type SimulateTrade = 
     {
         [<Required>]
-        Ticker: string
+        Ticker: Ticker
         UserId: Guid
         [<Required>]
         PositionId: int
@@ -130,7 +130,7 @@ type QueryTransactions =
         Show:string
         GroupBy:string
         TxType:string
-        Ticker:string
+        Ticker:Nullable<Ticker>
     }
     
 type TransactionSummary =
@@ -486,8 +486,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | false -> TradingAccount.Empty
                 
             let tickers =
-                positions |> Seq.map (fun p -> p.Ticker)
-                |> Seq.append (account.StockPositions |> Seq.map (fun p -> p.Ticker))
+                positions |> Seq.map (fun p -> p.Ticker.Value)
+                |> Seq.append (account.StockPositions |> Seq.map (fun p -> p.Ticker.Value))
                 |> Seq.distinct
                 
             let! pricesResponse = brokerage.GetQuotes(user.State, tickers)
@@ -526,7 +526,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 )
                 |> Array.sortByDescending (fun p -> p.performance.Profit)
                 
-            let violations = core.Stocks.Handlers.Dashboard.Handler.GetViolations(account.StockPositions, positions, prices) |> Seq.toArray;
+            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
             
             let (tradingEntries:TradingEntriesView) =
                 {
@@ -544,13 +544,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     member _.Handle(query:QueryTransactions) = task {
         
         let toTransactionsView (stocks:OwnedStock seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
-            let tickers = stocks |> Seq.map (fun s -> s.State.Ticker) |> Seq.append (options |> Seq.map (fun o -> o.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
+            let tickers = stocks |> Seq.map (fun s -> s.State.Ticker.Value) |> Seq.append (options |> Seq.map (fun o -> o.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
             
             let stockTransactions =
                 match query.Show = "shares" || query.Show = null with
                 | true ->
                     stocks
-                    |> Seq.filter (fun s -> s.State.Ticker = query.Ticker || query.Ticker = null)
+                    |> Seq.filter (fun s -> query.Ticker.HasValue = false || s.State.Ticker = query.Ticker.Value)
                     |> Seq.collect (fun s -> s.State.Transactions)
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
@@ -559,7 +559,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match query.Show = "options" || query.Show = null with
                 | true ->
                     options
-                    |> Seq.filter (fun o -> o.State.Ticker = query.Ticker || query.Ticker = null)
+                    |> Seq.filter (fun o -> query.Ticker.HasValue = false || o.State.Ticker = query.Ticker.Value.Value)
                     |> Seq.collect (fun o -> o.State.Transactions)
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
@@ -568,7 +568,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match query.Show = "cryptos" || query.Show = null with
                 | true ->
                     cryptos
-                    |> Seq.filter (fun c -> c.State.Token = query.Ticker || query.Ticker = null)
+                    |> Seq.filter (fun c -> query.Ticker.HasValue = false || c.State.Token = query.Ticker.Value.Value)
                     |> Seq.collect (fun c -> c.State.Transactions)
                     |> Seq.map (fun c -> c.ToSharedTransaction())
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)

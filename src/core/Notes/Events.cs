@@ -1,6 +1,5 @@
 using System;
 using core.Shared;
-using MediatR;
 
 namespace core.Notes
 {
@@ -12,7 +11,7 @@ namespace core.Notes
         }
     }
 
-    public class NoteCreated : AggregateEvent, INotification
+    public class NoteCreated : AggregateEvent
     {
         public NoteCreated(Guid id, Guid aggregateId, DateTimeOffset when, Guid userId, string note, string ticker)
             : base(id, aggregateId, when)

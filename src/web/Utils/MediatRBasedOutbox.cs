@@ -1,32 +1,24 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using core.Account;
-using core.fs.Accounts;
-using core.fs.Alerts;
 using core.Shared;
-using core.Stocks;
-using MediatR;
 using storage.shared;
 
 namespace web.Utils;
 
-public class MediatRBasedOutbox : IOutbox
+public class IncompleteOutbox : IOutbox
 {
-    private readonly IMediator _mediator;
-    
-    public MediatRBasedOutbox(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-    
+    // TODO: will need to build proper outbox
+    // this used to shuffle the events to mediatr and then to the handlers
+    // but it was without any ability to handle failures etc and dependent on
+    // mediatr. I might still use simple outbox that does not offer failure handling
+    // but it will not be dependent on mediatr
     public Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
     {
         foreach (var @event in e)
         {
-            if (@event is INotification notification)
-            {
+            // if (@event is INotification notification)
+            // {
                 // TODO: these need to be brought back vai real outbox
                 // if (@event is UserCreated u)
                 // {
@@ -57,8 +49,8 @@ public class MediatRBasedOutbox : IOutbox
                 //     _alertsAlertContainerHandler.Handle(sd);
                 // }
                 
-                _mediator.Publish(notification);
-            }
+            //     _mediator.Publish(notification);
+            // }
         }
         
         return Task.FromResult(new ServiceResponse());

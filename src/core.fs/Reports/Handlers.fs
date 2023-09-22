@@ -19,7 +19,7 @@ type ChainQuery =
 type ChainLinkView = 
     {
         success: bool
-        ticker: string
+        ticker: Ticker
         level: int
         profit: decimal
     }
@@ -154,7 +154,7 @@ type SellsQuery =
     
 type SellView =
     {
-        Ticker: string
+        Ticker: Ticker
         Date: DateTimeOffset
         NumberOfShares: decimal
         Price: decimal
@@ -484,7 +484,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | _ ->
             let! stocks = storage.GetStocks query.UserId
             
-            let! priceResult = brokerage.GetQuotes(user.State, stocks |> Seq.map (fun stock -> stock.State.Ticker))
+            let! priceResult = brokerage.GetQuotes(user.State, stocks |> Seq.map (fun stock -> stock.State.Ticker.Value))
             
             let prices =
                 match priceResult.IsOk with

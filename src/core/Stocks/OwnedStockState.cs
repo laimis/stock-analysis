@@ -8,7 +8,7 @@ namespace core.Stocks
     public class OwnedStockState : IAggregateState
 	{
         public Guid Id { get; private set; }
-        public string Ticker { get; private set; }
+        public Ticker Ticker { get; private set; }
         public Guid UserId { get; private set; }
 
         public List<Transaction> Transactions { get; } = new List<Transaction>();
@@ -19,7 +19,7 @@ namespace core.Stocks
         public PositionInstance GetPosition(int positionId) =>
             Positions.SingleOrDefault(x => x.PositionId == positionId);
         public IEnumerable<PositionInstance> GetClosedPositions() => Positions.Where(x => x.IsClosed);
-        internal IReadOnlyList<PositionInstance> GetAllPositions() => Positions.AsReadOnly();
+        public IReadOnlyList<PositionInstance> GetAllPositions() => Positions.AsReadOnly();
 
         private int _positionId = 0;
 

@@ -53,7 +53,7 @@ namespace core.Stocks
         public decimal CombinedProfit => Profit + (UnrealizedProfit ?? 0);
         public bool IsClosed => Closed != null;
         public int PositionId { get; }
-        public string Ticker { get; }
+        public Ticker Ticker { get; }
         public DateTimeOffset? Closed { get; private set; }
         public decimal? FirstStop { get; private set; }
         public decimal? RiskedAmount { get; private set; }
@@ -217,8 +217,13 @@ namespace core.Stocks
             Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", PositionEventType.risk, riskAmount, when));
         }
 
-        public void SetPrice(decimal price)
+        public void SetPrice(decimal? price)
         {
+            if (price == null)
+            {
+                return;
+            }
+            
             Price = price;
             UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
             UnrealizedGainPct = AverageCostPerShare switch {

@@ -38,24 +38,24 @@ module Import =
         let recordToCommand record userId =
             
             let toOptionTransaction record =
-                let tx = OptionTransaction()
-                tx.ExpirationDate <- record.expiration;
-                tx.Filled <- record.filled;
-                tx.NumberOfContracts <- record.amount;
-                tx.OptionType <- record.optiontype;
-                tx.Premium <- record.premium;
-                tx.StrikePrice <- record.strike;
-                tx.Ticker <- record.ticker;
-                tx.UserId <- userId;
-                tx
+                {
+                    ExpirationDate = record.expiration
+                    Filled = Nullable<DateTimeOffset> record.filled
+                    NumberOfContracts = record.amount
+                    OptionType = record.optiontype
+                    Premium = Nullable<decimal> record.premium
+                    StrikePrice = Nullable<decimal> record.strike
+                    Ticker = Ticker record.ticker
+                    Notes = null 
+                }
                 
             let (command:Object) =
                 match record.``type`` with
                 | "sell" ->
-                    BuyOrSell.Sell(record |> toOptionTransaction)
+                    BuyOrSell.Sell(record |> toOptionTransaction, userId)
                     
                 | "buy" ->
-                    BuyOrSell.Buy(record |> toOptionTransaction)
+                    BuyOrSell.Buy(record |> toOptionTransaction, userId)
                     
                 | "expired" ->
                     Expire.ExpireViaLookup(
@@ -83,7 +83,7 @@ module Import =
 
             match parseResponse.IsOk with
             | false ->
-                return CommandResponse.Failed(parseResponse.Error.Message)
+                return parseResponse.Error.Message |> ResponseUtils.failed
             | true ->
                 
                 let! processedRecords = parseResponse.Success |> runAsAsync token request.UserId  
@@ -91,8 +91,8 @@ module Import =
                 
                 let finalResult =
                     match failed with
-                    | None -> CommandResponse.Success()
-                    | Some f -> CommandResponse.Failed(f.Error.Message)
+                    | None -> ServiceResponse()
+                    | Some f -> f.Error.Message |> ResponseUtils.failed
                     
                 return finalResult
         }

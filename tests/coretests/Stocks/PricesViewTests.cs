@@ -1,5 +1,5 @@
+using core.fs.Stocks;
 using core.Shared.Adapters.Stocks;
-using core.Stocks.View;
 using Xunit;
 
 namespace coretests.Stocks

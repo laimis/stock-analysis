@@ -56,8 +56,9 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     TimeSpan AfterMarketCloseOnFriday() {
         var nowInMarketHours = _marketHours.ToMarketTime(DateTimeOffset.UtcNow);
         var nextFriday = nowInMarketHours.AddDays(5 - (int)nowInMarketHours.DayOfWeek);
-        var nextFriday5pm = nextFriday.Date.AddHours(17);
-        var sleepDuration = nextFriday5pm - nowInMarketHours;
+        // ReSharper disable once InconsistentNaming
+        var nextFriday5PM = nextFriday.Date.AddHours(17);
+        var sleepDuration = nextFriday5PM - nowInMarketHours;
         return sleepDuration;
     }
 
@@ -110,7 +111,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 _logger.LogInformation("Processing user {email} upsides", email);
 
                 var stocks = await _portfolioStorage.GetStocks(user.Id);
-                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
+                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker.Value);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(user.State.Id))
                     .Where(l => l.State.ContainsTag(core.fs.Alerts.Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)
@@ -122,7 +123,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to process weekly upsde check {email}: {exception}", email, ex);
+                _logger.LogError("Failed to process weekly upside check {email}: {exception}", email, ex);
             }
         }
 

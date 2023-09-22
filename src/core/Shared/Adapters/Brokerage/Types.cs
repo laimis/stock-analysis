@@ -59,7 +59,7 @@ public class Order
     public decimal Price { get; set; }
     public int Quantity { get; set; }
     public string Status { get; set; }
-    public string Ticker { get; set; }
+    public Ticker Ticker { get; set; }
     public string Description { get; set; }
     public string Type { get; set; }
     public string AssetType { get; set; }
@@ -90,7 +90,7 @@ public class Order
 
 public class StockPosition
 {
-    public string Ticker { get; set; }
+    public Ticker Ticker { get; set; }
     public decimal AverageCost { get; set; }
     public decimal Quantity { get; set; }
 }

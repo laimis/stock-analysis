@@ -22,18 +22,18 @@ namespace core.fs.Alerts
                 container.RequestManualRun()
                 
             member this.Handle(stockSold:StockSold) =
-                stockSold.Ticker |> deregisterStopPriceMonitoring stockSold.UserId
+                stockSold.Ticker |> Ticker |> deregisterStopPriceMonitoring stockSold.UserId
                 
             member this.Handle(stopPriceSet:StopPriceSet) =
-                stopPriceSet.Ticker |> deregisterStopPriceMonitoring stopPriceSet.UserId
+                stopPriceSet.Ticker |> Ticker |> deregisterStopPriceMonitoring stopPriceSet.UserId
                 
             member this.Handle(stopDeleted:StopDeleted) =
-                stopDeleted.Ticker |> deregisterStopPriceMonitoring stopDeleted.UserId
+                stopDeleted.Ticker |> Ticker |> deregisterStopPriceMonitoring stopDeleted.UserId
                 
             member this.Handle(query:Query) =
                 let alerts = 
                     container.GetAlerts(query.UserId)
-                    |> Seq.sortBy (fun a -> a.ticker, a.description)
+                    |> Seq.sortBy (fun a -> a.ticker.Value, a.description)
                     |> Seq.toList
 
                 let recentlyTriggered = container.GetRecentlyTriggered(query.UserId)

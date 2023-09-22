@@ -26,13 +26,12 @@ namespace coretests.Options
         {
             var cmd = CreateSellCommand() as BuyOrSell.Command.Sell;
             
-
             var opt = new OwnedOption(
-                cmd.Item.Ticker,
-                cmd.Item.StrikePrice.Value,
-                (OptionType)Enum.Parse(typeof(OptionType), cmd.Item.OptionType),
-                cmd.Item.ExpirationDate.Value,
-                cmd.Item.UserId);
+                cmd.Item1.Ticker,
+                cmd.Item1.StrikePrice.Value,
+                (OptionType)Enum.Parse(typeof(OptionType), cmd.Item1.OptionType),
+                cmd.Item1.ExpirationDate.Value,
+                cmd.Item2);
 
             opt.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
@@ -49,18 +48,16 @@ namespace coretests.Options
 
         public static BuyOrSell.Command CreateSellCommand()
         {
-            var cmd = new OptionTransaction()
-            {
-                Ticker = _ticker,
-                NumberOfContracts = 1,
-                Premium = 10,
-                StrikePrice = 20,
-                OptionType = OptionType.PUT.ToString(),
-                ExpirationDate = DateTimeOffset.UtcNow.AddDays(10),
-                Filled = DateTimeOffset.UtcNow,
-                UserId = _user.Id
-            };
-            return BuyOrSell.Command.NewSell(cmd);
+            var cmd = new OptionTransaction(
+                strikePrice: 20,
+                optionType: OptionType.PUT.ToString(),
+                expirationDate: DateTimeOffset.UtcNow.AddDays(10),
+                ticker: _ticker,
+                numberOfContracts: 1,
+                premium: 10,
+                filled: DateTimeOffset.UtcNow,
+                notes: null);
+            return BuyOrSell.Command.NewSell(cmd, _user.Id);
         }
 
         internal IAccountStorage CreateAccountStorageWithUserAsync()

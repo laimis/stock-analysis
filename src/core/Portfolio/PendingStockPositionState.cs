@@ -7,7 +7,7 @@ namespace core.Portfolio
     public class PendingStockPositionState : IAggregateState
     {
         public Guid Id { get; private set; }
-        public string Ticker { get; private set; }
+        public Ticker Ticker { get; private set; }
         public Guid UserId { get; private set; }
         public decimal Bid { get; private set; }
         public decimal? Price { get; private set;}
@@ -59,7 +59,7 @@ namespace core.Portfolio
             Bid = created.Price;
             StopPrice = created.StopPrice;
             Strategy = created.Strategy;
-            Ticker = created.Ticker;
+            Ticker = new Ticker(created.Ticker);
             UserId = created.UserId;
         }
 

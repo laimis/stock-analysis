@@ -103,8 +103,8 @@ namespace core.Portfolio
         public Guid UserId { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public List<StockListTicker> Tickers { get; } = new List<StockListTicker>();
-        public HashSet<string> Tags { get; } = new HashSet<string>();
+        public List<StockListTicker> Tickers { get; } = new();
+        public HashSet<string> Tags { get; } = new();
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 

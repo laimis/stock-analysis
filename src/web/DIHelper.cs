@@ -10,7 +10,6 @@ using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.SMS;
 using core.Shared.Adapters.Storage;
 using core.Shared.Adapters.Subscriptions;
-using core.Stocks.Handlers;
 using csvparser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,13 +42,6 @@ namespace web
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddSingleton<IMarketHours, timezonesupport.MarketHours>();
             services.AddSingleton<StockAlertContainer>();
-            services.AddMediatR(mediatrConfiguration =>
-            {
-                mediatrConfiguration.RegisterServicesFromAssemblies(
-                    typeof(Sell).Assembly,
-                    typeof(DIHelper).Assembly
-                );
-            });
             services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
@@ -117,8 +109,6 @@ namespace web
 
             logger.LogInformation("Read storage configuration type: {storage}", storage);
             
-            services.AddSingleton<IOutbox, MediatRBasedOutbox>();
-
             if (storage == "postgres")
             {
                 RegisterPostgresImplemenations(configuration, services);

@@ -39,11 +39,9 @@ namespace web.Controllers
         [HttpPost("sell")]
         public Task<ActionResult> Sell([FromBody]OptionTransaction cmd, [FromServices] BuyOrSell.Handler service)
         {
-            cmd.UserId = User.Identifier();
-
             return this.OkOrError(
                 service.Handle(
-                    BuyOrSell.Command.NewSell(cmd)
+                    BuyOrSell.Command.NewSell(cmd, User.Identifier())
                 )
             );
         }
@@ -51,11 +49,9 @@ namespace web.Controllers
         [HttpPost("buy")]
         public Task<ActionResult> Buy([FromBody]OptionTransaction cmd, [FromServices] BuyOrSell.Handler service)
         {
-            cmd.UserId = User.Identifier();
-
             return this.OkOrError(
                 service.Handle(
-                    BuyOrSell.Command.NewBuy(cmd)
+                    BuyOrSell.Command.NewBuy(cmd, User.Identifier())
                 )
             );
         }

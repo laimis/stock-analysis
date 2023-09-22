@@ -27,7 +27,7 @@ module core.fs.Options.Expire
     type Handler(storage: IPortfolioStorage) =
         
         let expireOption command = task {
-            let (data,assign) = 
+            let data,assign = 
                 match command with
                 | Expire(data) -> (data, false)
                 | Assign(data) -> (data, true)
@@ -36,15 +36,15 @@ module core.fs.Options.Expire
             
             match option with
             | null ->
-                return CommandResponse<OwnedOption>.Failed($"option for id {data.OptionId} not found")
+                return $"option for id {data.OptionId} not found" |> ResponseUtils.failedTyped<OwnedOption>
             | _ ->
                 option.Expire(assign=assign)
                 do! storage.Save(option, data.UserId)
-                return CommandResponse<OwnedOption>.Success(option)
+                return ServiceResponse<OwnedOption>(option)
         }
         
         let expireViaLookup (command:LookupCommand) = task {
-            let (data,assigned) = 
+            let data,assigned = 
                 match command with
                 | ExpireViaLookup(data) -> (data, false)
                 | AssignViaLookup(data) -> (data, true)
@@ -61,7 +61,7 @@ module core.fs.Options.Expire
                 return ServiceResponse<OwnedOption>(o)
                 
             | None ->
-                return ServiceResponse<OwnedOption>(ServiceError($"option for ticker {data.Ticker} strike {data.StrikePrice} expiration {data.Expiration} not found"))
+                return $"option for ticker {data.Ticker} strike {data.StrikePrice} expiration {data.Expiration} not found" |> ResponseUtils.failedTyped<OwnedOption>
         }
         
         interface IApplicationService

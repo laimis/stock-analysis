@@ -6,7 +6,7 @@ open core.Shared
 open core.Shared.Adapters.Brokerage
 open core.Stocks
 open core.Stocks.Services.Trading
-open core.Stocks.View
+open core.fs
 
 type TradingPerformanceContainerView(closedPositions:PositionInstance array,numberOfPositions:int) =
         let recentLengthToTake =

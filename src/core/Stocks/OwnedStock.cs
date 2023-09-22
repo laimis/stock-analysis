@@ -51,7 +51,7 @@ namespace core.Stocks
             );
         }
 
-        internal void DeleteStop()
+        public void DeleteStop()
         {
             if (State.OpenPosition == null)
             {

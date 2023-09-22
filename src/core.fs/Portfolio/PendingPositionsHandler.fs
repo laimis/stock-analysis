@@ -64,7 +64,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             
             let! existing = portfolio.GetPendingStockPositions(command.UserId)
             
-            let found = existing |> Seq.tryFind (fun x -> x.State.Ticker = command.Ticker.Value)
+            let found = existing |> Seq.tryFind (fun x -> x.State.Ticker = command.Ticker)
             
             match found with
             | Some _ -> return "Position already exists" |> ResponseUtils.failed
@@ -166,7 +166,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 |> Seq.filter (fun x -> x.IsClosed |> not)
                 |> Seq.sortByDescending(fun x -> x.Date)
             
-            let tickers = data |> Seq.map(fun x -> x.Ticker)
+            let tickers = data |> Seq.map(fun x -> x.Ticker.Value)
             let! priceResponse = brokerage.GetQuotes(user.State, tickers)
             let prices =
                 match priceResponse.IsOk with

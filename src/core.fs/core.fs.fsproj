@@ -33,6 +33,8 @@
     <Compile Include="Portfolio\PendingPositionsHandler.fs" />
     <Compile Include="Portfolio\RoutinesHandler.fs" />
     <Compile Include="Reports\Handlers.fs" />
+    <Compile Include="Stocks\Handlers.fs" />
+    <Compile Include="ImportTransactions.fs" />
   </ItemGroup>
 
   <ItemGroup>
