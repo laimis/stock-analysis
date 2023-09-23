@@ -41,6 +41,7 @@ namespace web
                     o => {
                         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                         o.JsonSerializerOptions.Converters.Add(new TickerConverter());
+                        o.JsonSerializerOptions.Converters.Add(new GradeConverter());
                 });
 
             services.Configure<ForwardedHeadersOptions>(options =>

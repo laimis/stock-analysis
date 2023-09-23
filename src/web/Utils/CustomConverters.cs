@@ -17,3 +17,16 @@ public class TickerConverter : JsonConverter<Ticker>
         writer.WriteStringValue(value.Value);
     }
 }
+
+public class GradeConverter : JsonConverter<TradeGrade>
+{
+    public override TradeGrade Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return new TradeGrade(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, TradeGrade value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Value);
+    }
+}
