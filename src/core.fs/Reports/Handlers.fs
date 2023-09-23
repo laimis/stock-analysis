@@ -71,7 +71,7 @@ type GapReportView =
     }
     
 type OutcomesReportDuration =
-    | SingleBars = 0
+    | SingleBar = 0
     | AllBars = 1
 
 type OutcomesReportQuery =
@@ -350,7 +350,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         
                         let outcomes =
                             match query.Duration with
-                            | OutcomesReportDuration.SingleBars ->  SingleBarAnalysisRunner.Run(priceResponse.Success)
+                            | OutcomesReportDuration.SingleBar ->  SingleBarAnalysisRunner.Run(priceResponse.Success)
                             | OutcomesReportDuration.AllBars -> MultipleBarPriceAnalysis.Run(priceResponse.Success[-1].Close, priceResponse.Success)
                             | _ -> failwith "Unexpected duration"
                         
@@ -385,7 +385,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             
             let evaluations =
                 match query.Duration with
-                | OutcomesReportDuration.SingleBars -> SingleBarAnalysisOutcomeEvaluation.Evaluate(outcomes)
+                | OutcomesReportDuration.SingleBar -> SingleBarAnalysisOutcomeEvaluation.Evaluate(outcomes)
                 | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.Evaluate(outcomes)
                 | _ -> failwith "Unexpected duration"
             
@@ -425,7 +425,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | true ->
                         
                         // TODO: this is not nice, can we avoid it setting the price here?
-                        position.SetPrice priceResponse.Success[-1].Close
+                        match priceResponse.Success.Length > 0 with
+                        | true -> position.SetPrice priceResponse.Success[priceResponse.Success.Length - 1].Close
+                        | false -> ()
                         
                         let outcomes = PositionAnalysis.Generate(position, priceResponse.Success, orders)
                         let tickerOutcome:TickerOutcomes = TickerOutcomes(outcomes, position.Ticker)

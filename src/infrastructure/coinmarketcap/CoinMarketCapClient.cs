@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using core;
 using core.Shared;
 using core.Shared.Adapters.Cryptos;
 using Microsoft.Extensions.Logging;
@@ -11,8 +10,8 @@ namespace coinmarketcap
 {
     public class CoinMarketCapClient : ICryptoService
     {
-        private static HttpClient _httpClient = new HttpClient();
-        private ILogger<CoinMarketCapClient>? _logger;
+        private static readonly HttpClient _httpClient = new();
+        private readonly ILogger<CoinMarketCapClient>? _logger;
 
         public CoinMarketCapClient(ILogger<CoinMarketCapClient>? logger, string accessToken)
         {
