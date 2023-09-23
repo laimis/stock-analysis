@@ -4,7 +4,7 @@
 
   <app-stock-transaction [ticker]="stock.ticker" (transactionRecorded)="transactionRecorded($event)" ></app-stock-transaction>
 
-  <app-brokerage-neworder *ngIf="stock" (brokerageOrderEntered)="brokerageOrderEntered()"></app-brokerage-neworder>
+  <app-brokerage-neworder *ngIf="stock" (brokerageOrderEntered)="brokerageOrderEntered()" [ticker]="stock.ticker"></app-brokerage-neworder>
 
   <app-brokerage-orders *ngIf="stock" [filteredTickers]="[stock.ticker]" (orderExecuted)="brokerageOrderExecuted()"></app-brokerage-orders>
 
@@ -15,7 +15,7 @@
         closed {{position.closed | date:'shortDate' }} for profit of {{position.profit | currency}}
       </span>
     </h5>
-    <app-stock-trading-position [position]="position"></app-stock-trading-position>  
+    <app-stock-trading-position [position]="position"></app-stock-trading-position>
   </section>
 
   <div class="card border-danger mb-3">

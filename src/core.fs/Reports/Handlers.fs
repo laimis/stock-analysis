@@ -351,7 +351,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         let outcomes =
                             match query.Duration with
                             | OutcomesReportDuration.SingleBar ->  SingleBarAnalysisRunner.Run(priceResponse.Success)
-                            | OutcomesReportDuration.AllBars -> MultipleBarPriceAnalysis.Run(priceResponse.Success[-1].Close, priceResponse.Success)
+                            | OutcomesReportDuration.AllBars ->
+                                let lastPrice = priceResponse.Success[priceResponse.Success.Length - 1].Close
+                                MultipleBarPriceAnalysis.Run(lastPrice, priceResponse.Success)
                             | _ -> failwith "Unexpected duration"
                         
                         let tickerOutcome:TickerOutcomes = TickerOutcomes(outcomes, t)

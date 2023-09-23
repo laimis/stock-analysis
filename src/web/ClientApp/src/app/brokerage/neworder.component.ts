@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import {Component, Output, EventEmitter, Input} from '@angular/core';
 import { Observable } from 'rxjs';
 import { brokerageordercommand, KeyValuePair, StockQuote, StocksService } from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
@@ -15,7 +15,7 @@ export class BrokerageNewOrderComponent {
   brokerageOrderType : string
   numberOfShares : number | null = null
   price : number | null = null
-  ticker : string
+  selectedTicker : string
   quote : StockQuote
   total: number | null = null
   errorMessage: string | null = null;
@@ -44,6 +44,11 @@ export class BrokerageNewOrderComponent {
   @Output()
   brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
 
+  @Input()
+  set ticker(value: string) {
+    this.selectTicker(value)
+  }
+
   numberOfSharesChanged() {
     if (this.numberOfShares && this.price) {
       this.total = this.numberOfShares * this.price
@@ -70,7 +75,11 @@ export class BrokerageNewOrderComponent {
   }
 
   onTickerSelected(ticker: string) {
-    this.ticker = ticker
+    this.selectTicker(ticker)
+  }
+
+  selectTicker(ticker: string) {
+    this.selectedTicker = ticker
     this.stockService.getStockQuote(ticker).subscribe(
       prices => {
         this.quote = prices
@@ -98,7 +107,7 @@ export class BrokerageNewOrderComponent {
   execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
     this.errorMessage = null
     var cmd : brokerageordercommand = {
-      ticker: this.ticker,
+      ticker: this.selectedTicker,
       numberOfShares: this.numberOfShares,
       price: this.price,
       type: this.brokerageOrderType,
@@ -106,11 +115,11 @@ export class BrokerageNewOrderComponent {
     }
 
     fn(cmd).subscribe(
-      _ => { 
+      _ => {
         this.reset()
         this.brokerageOrderEntered.emit("entered")
     },
-      err => { 
+      err => {
         this.errorMessage = GetErrors(err)[0]
         console.error(err)
       }
