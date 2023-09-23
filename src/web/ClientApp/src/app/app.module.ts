@@ -94,72 +94,73 @@ import { RoutineComponent } from './routines/routines-routine.component';
 import { CandlestickChartComponent } from './shared/candlestick-chart/candlestick-chart.component';
 import { OptionSpreadsComponent } from './options/option-chain/option-spreads.component';
 import { OptionBrokerageOrdersComponent } from './options/option-dashboard/option-brokerage-orders.component';
+import { RoutinesActiveRoutineComponent } from './routines/routines-active-routine.component';
 
 
-var routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuardAdminOnly] },
-  { path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly] },
-  { path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly] },
-  { path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly] },
-  { path: 'contact', component: ContactComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
-  { path: 'landing', component: LandingComponent },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
-  { path: 'profile/create', component: ProfileCreateComponent },
-  { path: 'profile/create/:plan', component: ProfileCreateComponent },
-  { path: 'profile/login', component: ProfileLoginComponent },
-  { path: 'profile/verify', component: ProfileVerifyComponent },
-  { path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent },
-  { path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
-  { path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
-  { path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
-  { path: 'notes/filtered/:ticker', component: NotesComponent, canActivate: [AuthGuard]},
-  { path: 'notes/:id', component: NoteComponent, canActivate: [AuthGuard]},
+let routes: Routes = [
+  {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
+  {path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuardAdminOnly]},
+  {path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly]},
+  {path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly]},
+  {path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly]},
+  {path: 'contact', component: ContactComponent},
+  {path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
+  {path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
+  {path: 'landing', component: LandingComponent},
+  {path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
+  {path: 'profile/create', component: ProfileCreateComponent},
+  {path: 'profile/create/:plan', component: ProfileCreateComponent},
+  {path: 'profile/login', component: ProfileLoginComponent},
+  {path: 'profile/verify', component: ProfileVerifyComponent},
+  {path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent},
+  {path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
+  {path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
+  {path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
+  {path: 'notes/filtered/:ticker', component: NotesComponent, canActivate: [AuthGuard]},
+  {path: 'notes/:id', component: NoteComponent, canActivate: [AuthGuard]},
 
-  { path: 'options', component: OptionsComponent, canActivate: [AuthGuard] },
-  { path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard] },
-  { path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard] },
-  { path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard] },
-  { path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
+  {path: 'options', component: OptionsComponent, canActivate: [AuthGuard]},
+  {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
+  {path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard]},
+  {path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard]},
+  {path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
 
-  { path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly] },
+  {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
 
-  { path: 'summary', component: SummaryComponent, canActivate: [AuthGuard] },
-  { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
-  { path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
-  { path: 'privacy', component: PrivacyComponent},
-  { path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
-  { path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard]},
-  { path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
-  { path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
-  { path: 'trading/review', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
-  { path: 'trading/review/:tab', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
-  { path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
+  {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
+  {path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
+  {path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
+  {path: 'privacy', component: PrivacyComponent},
+  {path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
+  {path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard]},
+  {path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
+  {path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
+  {path: 'trading/review', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
+  {path: 'trading/review/:tab', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
+  {path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
 
-  { path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard]},
-  { path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard]},
-  { path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard]},
-  { path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard] },
-  { path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard] },
+  {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard]},
+  {path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard]},
+  {path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard]},
+  {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
+  {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
 
-  { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
-  { path: 'terms', component: TermsComponent},
-  { path: 'test', component: SymbolSearchComponent},
+  {path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard]},
+  {path: 'terms', component: TermsComponent},
+  {path: 'test', component: SymbolSearchComponent},
 
-  { path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
-  { path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
-  { path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard]},
-  { path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard]},
+  {path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
+  {path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
+  {path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard]},
+  {path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard]},
 
-  { path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard]},
-  { path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard]},
-  { path: 'routines/:name', component: RoutineComponent, canActivate: [AuthGuard]},
+  {path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard]},
+  {path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard]},
+  {path: 'routines/:name', component: RoutineComponent, canActivate: [AuthGuard]},
 
-  { path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
-  { path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
-]
+  {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
+  {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
+];
 
 @NgModule({
   declarations: [
@@ -206,7 +207,7 @@ var routes: Routes = [
     StockOwnershipComponent,
     StockTradingOpenPositionsComponent,
     StockViolationsComponent,
-    
+
     StockTradingComponent,
     StockTradingPositionComponent,
     StockTradingPositionsComponent,
@@ -219,21 +220,21 @@ var routes: Routes = [
     StockTradingSimulationsComponent,
     TradingPerformanceSummaryComponent,
     TradingActualVsSimulatedPositionComponent,
-    
+
     BrokerageOrdersComponent,
     BrokerageNewOrderComponent,
 
     SymbolSearchComponent,
     TransactionsComponent,
     TermsComponent,
-    
+
     FailuresuccesschainComponent,
     RecentSellsComponent,
 
     CryptoDashboardComponent,
     CryptoOwnershipGridComponent,
     CryptoDetailsComponent,
-    
+
     StockAnalysisComponent,
     OutcomesComponent,
     OutcomesReportComponent,
@@ -261,7 +262,8 @@ var routes: Routes = [
     OptionBrokerageOrdersComponent,
 
     RoutineDashboardComponent,
-    RoutineComponent
+    RoutineComponent,
+    RoutinesActiveRoutineComponent
   ],
   imports: [
     BrowserModule,

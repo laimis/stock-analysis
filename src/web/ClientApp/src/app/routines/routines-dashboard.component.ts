@@ -9,10 +9,10 @@ import { GetErrors, toggleVisuallyHidden } from '../services/utils';
 })
 
 export class RoutineDashboardComponent implements OnInit {
-  
+
 
   routines:Routine[] = []
-
+  activeRoutine:Routine = null
   errors:string[] = null
 
   constructor(private service:StocksService) { }
@@ -29,8 +29,15 @@ export class RoutineDashboardComponent implements OnInit {
     );
   }
 
-  
-  toggleVisibility(element) {
+  activate(routine:Routine) {
+    this.activeRoutine = routine;
+  }
+
+  deactivate() {
+    this.activeRoutine = null;
+  }
+
+  toggleVisibility(element:HTMLElement) {
     toggleVisuallyHidden(element)
   }
 

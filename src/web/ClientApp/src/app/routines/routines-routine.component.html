@@ -1,7 +1,7 @@
 <div *ngIf="!activeRoutine && routine">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/routines">Routines</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/routines']">Routines</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{routine.name}}</li>
         </ol>
     </nav>
@@ -28,15 +28,15 @@
         <div #addNewStepSection class="visually-hidden">
             <form>
                 <div class="form-group">
-                    <label for="stepLebal">Label</label>
-                    <input class="form-control" type="text" id="stepLebal" name="stepLebal" #stepLabel>
+                    <label for="stepLabel">Label</label>
+                    <input class="form-control" type="text" id="stepLabel" name="stepLabel" #stepLabel>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="stepUrl">Url</label>
                     <input class="form-control" type="text" id="stepUrl" name="stepUrl" #stepUrl>
                 </div>
-    
+
                 <button type="button" class="btn btn-primary btn-sm me-2" (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility(addNewStepSection)">Add</button>
                 <button type="button" class="btn btn-secondary btn-sm" (click)="toggleVisibility(addNewStepSection)">Cancel</button>
             </form>
@@ -82,7 +82,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="row" class="visually-hidden" #editSection>
+                    <div class="row visually-hidden" #editSection>
                         <div class="col-5">
                             <input type="text" #stepLabel value="{{step.label}}">
                         </div>
@@ -101,38 +101,6 @@
             </tr>
         </tbody>
     </table>
-
 </div>
+<app-routines-active-routine *ngIf="activeRoutine" [routine]="activeRoutine" (onDeactivate)="deactivate()" ></app-routines-active-routine>
 
-<div *ngIf="activeRoutine && activeStep">
-
-    <h4>
-        {{activeRoutine.name}}
-        <button class="btn btn-primary btn-sm float-end" (click)="deactivate()">Deactivate</button>
-    </h4>
-
-    <div class="wrapper text-center">
-        <div class="step-container">
-            <div class="step">
-                <a
-                    target="_blank"
-                    [href]="activeStep.url">{{activeStep.label}}
-                </a>
-            </div>
-            <div class="step-url">
-                <a
-                    target="_blank"
-                    [href]="activeStep.url">{{activeStep.url}}
-                </a>
-            </div>
-            <div class="step-url">
-                {{currentStepIndex + 1}} / {{activeRoutine.steps.length}}
-            </div>
-        </div>
-        
-    </div>
-
-    <button class="btn btn-primary btn-sm" (click)="prevStep()" [disabled]="currentStepIndex === 0">Prev</button>
-    <button class="btn btn-primary btn-sm float-end" (click)="nextStep()" [disabled]="currentStepIndex >= activeRoutine.steps.length - 1">Next</button>
-
-</div>

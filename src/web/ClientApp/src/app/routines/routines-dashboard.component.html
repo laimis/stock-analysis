@@ -1,45 +1,45 @@
 <div>
-    <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item active" aria-current="page">Routines</li>
-    </ol>
-    </nav>
-    <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-    <button type="submit" class="btn btn-secondary me-2 mb-2" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>
-    
-    <section #addNewRoutineSection class="visually-hidden">
-        <h5>Add new routine</h5>
-        <form>
-            <div class="form-group">
-                <label for="newName">Name</label>
-                <input class="form-control" type="text" id="newName" name="newName" #newName>
-            </div>
-            
-            <div class="form-group">
-                <label for="newDescription">Description</label>
-                <textarea class="form-control" id="newDescription" name="newDescription" rows="5" #newDescription></textarea>
-            </div>
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-            <button type="button" class="btn btn-primary btn-small me-2" (click)="create(newName.value, newDescription.value)">Create</button>
-            <button type="button" class="btn btn-secondary btn-small" (click)="toggleVisibility(addNewRoutineSection)">Cancel</button>
-        </form>
-    </section>
+  <section #addNewRoutineSection class="visually-hidden">
+      <h5>Add new routine</h5>
+      <form>
+          <div class="form-group">
+              <label for="newName">Name</label>
+              <input class="form-control" type="text" id="newName" name="newName" #newName>
+          </div>
 
-    <table>
-        <tbody>
-            <tr *ngFor="let routine of routines">
-                <td>
-                    <a class="fs-4" [routerLink]="['/routines', routine.name, 'activate']">{{routine.name}}</a>
-                </td>
-                <td>
-                    <a class="ms-4" [routerLink]="['/routines', routine.name, 'edit']">
-                        <i class="bi bi-pencil-fill"></i>
-                    </a>
-                </td>
+          <div class="form-group">
+              <label for="newDescription">Description</label>
+              <textarea class="form-control" id="newDescription" name="newDescription" rows="5" #newDescription></textarea>
+          </div>
 
-            </tr>
-        </tbody>
-    </table>
+          <button type="button" class="btn btn-primary btn-small me-2" (click)="create(newName.value, newDescription.value)">Create</button>
+          <button type="button" class="btn btn-secondary btn-small" (click)="toggleVisibility(addNewRoutineSection)">Cancel</button>
+      </form>
+  </section>
+
+  <table class="table table-borderless" *ngIf="!activeRoutine">
+      <thead>
+          <tr>
+              <th colspan="2" class="text-end">
+                <button type="submit" class="btn btn-secondary me-2 mb-2 float-end" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>
+              </th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let routine of routines">
+              <td>
+                <button class="fs-4 btn btn-link" (click)="activate(routine)">{{routine.name}}</button>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-primary" [routerLink]="['/routines', routine.name, 'edit']">Edit</a>
+              </td>
+          </tr>
+      </tbody>
+  </table>
+
+  <app-routines-active-routine *ngIf="activeRoutine" [routine]="activeRoutine" (onDeactivate)="deactivate()"></app-routines-active-routine>
 
 </div>

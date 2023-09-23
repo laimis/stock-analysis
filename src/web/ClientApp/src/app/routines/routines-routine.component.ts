@@ -10,15 +10,12 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 export class RoutineComponent implements OnInit {
-  
 
-  activeRoutine = null
-  activeStep = null
-  currentStepIndex = 0
 
   errors:string[] = null
-  private routineName: string;
+  private readonly routineName: string;
   routine: Routine;
+  activeRoutine: Routine = null;
   mode: string;
 
   // accept route service where I can extract current routine name from :name parameter
@@ -44,49 +41,16 @@ export class RoutineComponent implements OnInit {
     );
   }
 
-  activate(routine) {
+  activate(routine:Routine) {
     this.activeRoutine = routine
-    this.updateActiveStep(0);
-  }
-
-  private updateActiveStep(increment) {
-    var index = this.currentStepIndex
-    if (increment !== 0) {
-      index += increment
-    } else {
-      index = 0
-    }
-
-    if (index < 0) {
-      return
-    } else if (index >= this.activeRoutine.steps.length) {
-      return
-    }
-
-    this.currentStepIndex = index
-    this.activeStep = this.activeRoutine.steps[this.currentStepIndex];
   }
 
   deactivate() {
     this.activeRoutine = null
-    this.activeStep = null
-    this.currentStepIndex = 0
     this.mode = null;
   }
 
-  nextStep() {
-    this.updateActiveStep(1)
-  }
-
-  prevStep() {
-    this.updateActiveStep(-1)
-  }
-
-  reset() {
-    this.updateActiveStep(0)
-  }
-
-  toggleVisibility(element) {
+  toggleVisibility(element:HTMLElement) {
     toggleVisuallyHidden(element)
   }
 
@@ -102,12 +66,12 @@ export class RoutineComponent implements OnInit {
   }
 
   moveUp(routine:Routine, stepIndex:number) {
-    var direction = -1;
+    let direction = -1;
     this.moveStep(routine, stepIndex, direction);
   }
 
   moveDown(routine:Routine, stepIndex:number) {
-    var direction = 1;
+    let direction = 1;
     this.moveStep(routine, stepIndex, direction);
   }
 
@@ -166,26 +130,4 @@ export class RoutineComponent implements OnInit {
     )
   }
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) { 
-    console.log(event.key)
-    if (this.activeRoutine === null) {
-      return
-    }
-    
-    if (event.key === "ArrowRight") {
-      this.nextStep();
-      event.preventDefault();
-    } else if (event.key === "ArrowLeft") {
-      this.prevStep();
-      event.preventDefault();
-    } else if (event.key === "Escape") {
-      this.deactivate();
-      event.preventDefault();
-    } else if (event.key === "Enter") {
-      // open the url in the active step in a new tab
-      window.open(this.activeStep.url, "_blank");
-      event.preventDefault();
-    }
-  }
 }

@@ -6,31 +6,3 @@ li {
 input {
     margin-right: 10px;
 }
-
-.wrapper {
-    align-items: center;
-}
-
-.step {
-    font-size: 24px;
-    font-weight: bold;
-    padding: 15px;
-    color: #0071BC;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.step a {
-    color: #0071BC;
-    text-decoration: none;
-}
-
-.step-url a {
-    text-decoration: none;
-}
-
-.step-url {
-    font-size: 12px;
-    font-weight: bold;
-    color: #0071BC;
-}
