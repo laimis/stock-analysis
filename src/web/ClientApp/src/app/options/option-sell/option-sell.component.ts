@@ -3,6 +3,7 @@ import { StocksService } from '../../services/stocks.service';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GetErrors } from 'src/app/services/utils';
+import {tick} from "@angular/core/testing";
 
 @Component({
   selector: 'app-option-sell',
@@ -86,4 +87,6 @@ export class OptionSellComponent implements OnInit {
   onTickerSelected(ticker:string) {
     this.ticker = ticker;
   }
+
+  protected readonly tick = tick;
 }

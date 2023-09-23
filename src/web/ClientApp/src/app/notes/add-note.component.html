@@ -11,7 +11,7 @@
       <app-symbol-search
         label="Ticker"
         (tickerSelected)="onTickerSelected($event)"
-        initialValue="{{ticker}}"
+        [ticker]="ticker"
         cssClass="form-control">
       </app-symbol-search>
     </div>

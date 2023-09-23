@@ -15,7 +15,7 @@
             label="Ticker"
             (tickerSelected)="onTickerSelected($event)"
             cssClass="form-control"
-            initialValue="{{ticker}}">
+            [ticker]="ticker">
           </app-symbol-search>
         </div>
         <div class="col">
@@ -32,7 +32,7 @@
 
         <div class="col">
           <label for="optionType">Option Type &nbsp;&nbsp; </label>
-          <select class="form-control btn border rounded" name="optionType" [(ngModel)]="optionType">
+          <select class="form-control btn border rounded" id="optionType" name="optionType" [(ngModel)]="optionType">
             <option>CALL</option>
             <option>PUT</option>
           </select>
@@ -54,14 +54,14 @@
       <div class="row mt-2">
         <div class="col">
           <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
-          <select class="form-control btn border rounded" name="positionType" [(ngModel)]="positionType">
+          <select class="form-control btn border rounded" id="positionType" name="positionType" [(ngModel)]="positionType">
             <option value="buy">Bought</option>
             <option value="sell">Sold</option>
           </select>
         </div>
         <div class="col">
           <label for="filled">Filled Date</label>
-          <input type="date" class="form-control" id="filled"name="filled" [(ngModel)]="filled">
+          <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
         </div>
       </div>
 
