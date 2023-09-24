@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {createChart, IChartApi} from "lightweight-charts";
-import {DailyScore, Prices} from "../../services/stocks.service";
+import {createChart, IChartApi, ISeriesApi} from "lightweight-charts";
+import {DataPoint} from "../../services/stocks.service";
 
 @Component({
   selector: 'app-line-chart',
@@ -12,20 +12,30 @@ export class LineChartComponent {
 
   @Input()
   chartHeight: number = 400;
-  private _values: DailyScore[];
+  private _values: DataPoint[];
 
   @Input()
-  set lineData(values: DailyScore[]) {
+  set data(values: DataPoint[]) {
     if (values) {
       this._values = values
       this.renderChart();
     }
   }
 
+  @Input()
+  chartType = 'line'; // can also be 'bar'
+
   private removeChart() {
     if (this.chart) {
       this.chart.remove();
     }
+  }
+
+  private assignData(series:ISeriesApi<any>) {
+    series.setData(this._values.map(v => {
+      let time = v.label.indexOf('T') > -1 ? v.label.split('T')[0] : v.label;
+      return {time: time, value: v.value}
+    }));
   }
 
   private renderChart() {
@@ -46,11 +56,12 @@ export class LineChartComponent {
       }
     );
 
-    let lineSeries = this.chart.addLineSeries();
+    let series =
+      this.chartType == 'line'
+        ? this.chart.addLineSeries() :
+        this.chart.addBarSeries();
 
-    lineSeries.setData(this._values.map(v => {
-      return {time: v.date.split('T')[0], value: v.score}
-    }));
+    this.assignData(series);
 
     this.chart.timeScale().fitContent();
   }

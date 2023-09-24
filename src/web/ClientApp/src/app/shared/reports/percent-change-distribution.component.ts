@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
-import { StockPercentChangeResponse } from '../../services/stocks.service';
+import {DataPoint, DataPointContainer, StockPercentChangeResponse} from '../../services/stocks.service';
 
 @Component({
   selector: 'app-percent-change-distribution',
@@ -8,49 +7,34 @@ import { StockPercentChangeResponse } from '../../services/stocks.service';
   styleUrls: ['./percent-change-distribution.component.css']
 })
 export class PercentChangeDistributionComponent {
-  
+
   error: string = null;
   data: StockPercentChangeResponse;
+  recentData: DataPoint[];
+  allTimeData: DataPoint[];
 
   @Input()
   set percentChangeDistribution(value: StockPercentChangeResponse) {
     if (!value) {
       return
     }
-    
+
     this.data = value
 
-    this.recentDataLabels = value.recent.buckets.map(b => b.value.toString());
-    this.recentData = [
-      {
-        data: value.recent.buckets.map(b => b.frequency),
-        label: "Frequency",
-        fill: false
-      }]
+    this.recentData = value.recent.buckets.map(b => {
+      return {
+        value: b.frequency,
+        label: b.value.toString()
+      }
+    });
 
-    this.allTimeDataLabels = value.allTime.buckets.map(b => b.value.toString());
-    this.allTimeData = [
-      {
-        data: value.allTime.buckets.map(b => b.frequency),
-        label: "Frequency",
-        fill: false
-      }]
+    this.allTimeData = value.allTime.buckets.map(b => {
+      return {
+        value: b.frequency,
+        label: b.value.toString()
+      }
+    });
   }
 
-  public lineChartPlugins = [];
-  public chartType : ChartType = 'bar';
-  public lineChartLegend = true;
-  public recentData: ChartDataset[] = [];
-  public recentDataLabels: string[] = [];
-  public allTimeData: ChartDataset[] = [];
-  public allTimeDataLabels: string[] = [];
-  public chartOptions: ChartOptions = {
-    responsive: true,
-    plugins: {
-      annotation: {
-        annotations: []
-      }
-    }
-  };
-  
+
 }

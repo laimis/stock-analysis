@@ -50,20 +50,8 @@
     </table>
 
     <h5>Recent Distribution</h5>
-    <canvas *ngIf="recentData && recentData.length > 0"
-    baseChart
-    [datasets]="recentData"
-    [labels]="recentDataLabels"
-    [options]="chartOptions"
-    [type]="chartType">
-    </canvas>
+    <app-line-chart [chartType]="'bar'" [data]="recentData"></app-line-chart>
 
     <h5>All-Time Distribution</h5>
-    <canvas *ngIf="allTimeData && allTimeData.length > 0"
-    baseChart
-    [datasets]="allTimeData"
-    [labels]="allTimeDataLabels"
-    [options]="chartOptions"
-    [type]="chartType">
-    </canvas>
+    <app-line-chart [chartType]="'bar'" [data]="allTimeData"></app-line-chart>
 </div>

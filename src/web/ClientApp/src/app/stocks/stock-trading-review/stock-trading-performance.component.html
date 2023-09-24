@@ -4,7 +4,7 @@
     <h5>Recent Performance</h5>
     <app-trading-performance-summary [performance]="performance.recent" title="Recent"></app-trading-performance-summary>
   </section>
-  
+
   <section>
     <h5>Overall Performance</h5>
     <app-trading-performance-summary [performance]="performance.overall" title="Overall"></app-trading-performance-summary>
@@ -31,16 +31,10 @@
       </form>
     </div>
 
-    <canvas
-      class="mb-2"
-      *ngFor="let t of trends"
-      baseChart
-      [datasets]="getData(t)"
-      [labels]="getLabels(t)"
-      [options]="getOptions(t)"
-      [legend]="lineChartLegend"
-      [plugins]="lineChartPlugins"
-      [type]="getChartType(t)">
-    </canvas>
+    <div *ngFor="let t of trends">
+
+      <div class="text-center">{{t.label}}</div>
+      <app-line-chart [chartType]="t.chartType" [data]="t.data"></app-line-chart>
+    </div>
   </section>
 </div>

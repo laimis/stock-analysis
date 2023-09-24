@@ -49,7 +49,6 @@ import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
-import { NgChartsModule } from 'ng2-charts';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
 import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-trading-positions.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
@@ -78,7 +77,6 @@ import { TradingActualVsSimulatedPositionComponent } from './shared/stocks/tradi
 import { StockListsDashboardComponent } from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
 import { StockListComponent } from './stocks/stock-lists/stock-list/stock-list.component';
 import { StockTradingSimulationsComponent } from './stocks/stock-trading/stock-trading-simulations.component';
-import { ChartComponent } from './shared/chart/chart.component';
 import { DailyOutcomeScoresComponent } from './shared/reports/daily-outcome-scores.component';
 import { StockTradingReviewDashboardComponent } from './stocks/stock-trading-review/stock-trading-review-dashboard.component';
 import { StockTradingPendingPositionsComponent } from './stocks/stock-trading/stock-trading-pendingpositions.component';
@@ -249,7 +247,6 @@ let routes: Routes = [
     StockNewPositionComponent,
     StockListsDashboardComponent,
     StockListComponent,
-    ChartComponent,
     CandlestickChartComponent,
     StockTradingReviewDashboardComponent,
     StockTradingPendingPositionsComponent,
@@ -271,7 +268,6 @@ let routes: Routes = [
     BrowserModule,
     HttpClientModule,
     FormsModule,
-    NgChartsModule,
     RouterModule.forRoot(routes, { })
   ],
   providers: [

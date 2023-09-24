@@ -90,7 +90,9 @@
       [dailyScores]="dailyPositionReport.dailyGainPct"
       [errors]="scoresErrors">
     </app-daily-outcome-scores>
+  </section>
 
+  <section *ngIf="dailyPositionReport">
     <h5>Daily P/L</h5>
     <app-daily-outcome-scores
       [dailyScores]="dailyPositionReport.dailyProfit"

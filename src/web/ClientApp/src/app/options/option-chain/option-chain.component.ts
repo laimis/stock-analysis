@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, OptionDefinition, OptionSpread } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
-import { ChartType } from 'chart.js';
 import { OptionService } from 'src/app/services/option.service';
 import { GetErrors } from 'src/app/services/utils';
 
@@ -28,8 +27,6 @@ export class OptionChainComponent implements OnInit {
   public minStrikePrice : number = 0
   public maxStrikePrice : number = 0
 
-  chartType: ChartType = 'bar';
-
   volatility: number;
   numberOfContracts: number;
 
@@ -38,7 +35,7 @@ export class OptionChainComponent implements OnInit {
   bullPutSpreads: OptionSpread[] = [];
   bearCallSpreads: OptionSpread[] = [];
   bearPutSpreads: OptionSpread[] = [];
-  
+
   errors: string[] = [];
 
   constructor(
@@ -242,7 +239,7 @@ export class OptionChainComponent implements OnInit {
     if (option.optionType == "call") {
       return this.stockPrice > option.strikePrice
     }
-    
+
     if (option.optionType == "put") {
       return this.stockPrice < option.strikePrice
     }

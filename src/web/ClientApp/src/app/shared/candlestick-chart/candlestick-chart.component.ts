@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import {PriceBar, Prices, SMA} from 'src/app/services/stocks.service';
-import {IChartApi, PriceLineOptions, createChart, BaselineData} from 'lightweight-charts';
+import {IChartApi, PriceLineOptions, createChart} from 'lightweight-charts';
 
 @Component({
   selector: 'app-candlestick-chart',
@@ -29,10 +29,10 @@ export class CandlestickChartComponent implements OnDestroy {
   stopPrice = null;
 
   @Input()
-  buyDates = null;
+  buyDates:string[] = null;
 
   @Input()
-  sellDates = null;
+  sellDates:string[] = null;
 
   ngOnDestroy(): void {
     this.removeChart();
