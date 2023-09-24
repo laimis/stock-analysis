@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import { Prices } from 'src/app/services/stocks.service';
-import { IChartApi, PriceLineOptions, createChart } from 'lightweight-charts';
+import {PriceBar, Prices, SMA} from 'src/app/services/stocks.service';
+import {IChartApi, PriceLineOptions, createChart, BaselineData} from 'lightweight-charts';
 
 @Component({
   selector: 'app-candlestick-chart',
@@ -9,6 +9,30 @@ import { IChartApi, PriceLineOptions, createChart } from 'lightweight-charts';
 })
 export class CandlestickChartComponent implements OnDestroy {
   chart: IChartApi;
+
+  @Input()
+  chartHeight: number = 400;
+  private _prices: Prices;
+
+  @Input()
+  set prices(value: Prices) {
+    if (value) {
+      this._prices = value;
+      this.renderChart();
+    }
+  }
+
+  @Input()
+  averageBuyPrice = null;
+
+  @Input()
+  stopPrice = null;
+
+  @Input()
+  buyDates = null;
+
+  @Input()
+  sellDates = null;
 
   ngOnDestroy(): void {
     this.removeChart();
@@ -33,28 +57,33 @@ export class CandlestickChartComponent implements OnDestroy {
       { height: this.chartHeight }
     );
 
-    let createLineData = (sma, interval, priceBars) => {
+    let createLineData = (sma:SMA, interval:number, priceBars) => {
       return sma.values
         .filter(v => v != null)
         .map( (p, index) => ({ value: p, time: priceBars[index + interval].time }));
     }
 
-    let toCandleStickData = (p) => {
+    let toPriceBar = (p:PriceBar) => {
       return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close }
     }
 
-    let addLineSeries = (sma, color, interval, priceBars) => {
+    let toVolumeBar = (p:PriceBar) => {
+      let color = p.close > p.open ? '#26a69a' : '#ef5350'
+      return { time: p.dateStr, value: p.volume, color: color }
+    }
+
+    let addLineSeries = (sma:SMA, color:string, interval:number, priceBars) => {
       const smaSeries = this.chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
       let smaLineData = createLineData(sma, interval, priceBars)
       smaSeries.setData(smaLineData);
     }
 
     const barSeries = this.chart.addCandlestickSeries();
-    let priceBars = this._prices.prices.map(toCandleStickData)
+    let priceBars = this._prices.prices.map(toPriceBar)
     barSeries.setData(priceBars);
-    
+
     if (this.averageBuyPrice) {
-      var buyPrice : PriceLineOptions = {
+      let buyPrice : PriceLineOptions = {
         'title': 'avg cost',
         price: this.averageBuyPrice,
         color: 'blue',
@@ -70,7 +99,7 @@ export class CandlestickChartComponent implements OnDestroy {
     }
 
     if (this.stopPrice) {
-      var stopPrice : PriceLineOptions = {
+      let stopPrice : PriceLineOptions = {
         'title': 'stop',
         price: this.stopPrice,
         color: 'red',
@@ -102,34 +131,36 @@ export class CandlestickChartComponent implements OnDestroy {
       })
     }
     barSeries.setMarkers(markers)
-    
+    barSeries.priceScale().applyOptions({
+      scaleMargins: {
+        top: 0.1, // highest point of the series will be 10% away from the top
+        bottom: 0.4, // lowest point will be 40% away from the bottom
+      },
+    });
+
+    // volume
+    const volumeSeries = this.chart.addHistogramSeries({
+      priceFormat: {
+        type: 'volume',
+      },
+
+      priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+    });
+    volumeSeries.priceScale().applyOptions({
+      // set the positioning of the volume series
+      scaleMargins: {
+        top: 0.7, // highest point of the series will be 70% away from the top
+        bottom: 0,
+      },
+    });
+    let volumeData = this._prices.prices.map(toVolumeBar)
+    volumeSeries.setData(volumeData);
+
     this.chart.timeScale().setVisibleRange({
       from: priceBars[priceBars.length - 60].time,
       to: priceBars[priceBars.length - 1].time
     });
+
+
   }
-
-  @Input()
-  chartHeight: number = 400;
-  private _prices: Prices;
-
-  @Input()
-  set prices(value: Prices) {
-    if (value) {
-      this._prices = value;
-      this.renderChart();
-    }
-  }
-
-  @Input()
-  averageBuyPrice = null;
-
-  @Input()
-  stopPrice = null;
-
-  @Input()
-  buyDates = null;
-
-  @Input()
-  sellDates = null;
 }
