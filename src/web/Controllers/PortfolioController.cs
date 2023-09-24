@@ -239,7 +239,7 @@ namespace web.Controllers
                 service.Handle(
                     new ProfitPointsQuery(
                         positionId: positionId,
-                        ticker: ticker,
+                        ticker: new Ticker(ticker),
                         userId: User.Identifier()
                     )
                 )

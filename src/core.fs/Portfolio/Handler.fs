@@ -279,7 +279,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     member _.Handle (query:ProfitPointsQuery) = task {
         let! account = accounts.GetUser(query.UserId)
         match account with
-        | null -> return "User not found" |> ResponseUtils.failed
+        | null -> return "User not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
         | _ ->
             let! stocks = storage.GetStocks(query.UserId)
             
@@ -289,12 +289,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.tryHead
                 
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failed
+            | None -> return "Stock not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
             | Some stock ->
-                
+                Console.WriteLine($"Stock: {stock.State.Ticker}")
                 let position = stock.State.GetPosition(query.PositionId)
                 match position with
-                | null -> return "Position not found" |> ResponseUtils.failed
+                | null -> return "Position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
                 | _ ->
                     let levels = 4
                     let stopBased =
