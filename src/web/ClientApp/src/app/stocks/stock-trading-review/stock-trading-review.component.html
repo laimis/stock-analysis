@@ -43,7 +43,7 @@
     </div>
     <div class="mb-3">
       <div class="form-check form-check-inline">
-        <input 
+        <input
           [checked]="this.assignedGrade === 'A'"
           value="A"
           (click)="this.assignedGrade = 'A'"
@@ -87,18 +87,15 @@
   <section *ngIf="dailyPositionReport">
     <h5>Daily Gain %</h5>
     <app-daily-outcome-scores
-      [setDailyScores]="dailyPositionReport.dailyGainPct"
-      [errors]="scoresErrors"
-      [chartType]="'line'">
+      [dailyScores]="dailyPositionReport.dailyGainPct"
+      [errors]="scoresErrors">
     </app-daily-outcome-scores>
 
     <h5>Daily P/L</h5>
     <app-daily-outcome-scores
-      [setDailyScores]="dailyPositionReport.dailyProfit"
-      [errors]="scoresErrors"
-      [chartType]="'line'">
+      [dailyScores]="dailyPositionReport.dailyProfit"
+      [errors]="scoresErrors">
     </app-daily-outcome-scores>
-    
   </section>
 
   <section>
@@ -112,5 +109,5 @@
       [sellDates]="positionSells">
     </app-candlestick-chart>
   </section>
-  
+
 </div>

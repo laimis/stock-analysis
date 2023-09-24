@@ -95,6 +95,7 @@ import { CandlestickChartComponent } from './shared/candlestick-chart/candlestic
 import { OptionSpreadsComponent } from './options/option-chain/option-spreads.component';
 import { OptionBrokerageOrdersComponent } from './options/option-dashboard/option-brokerage-orders.component';
 import { RoutinesActiveRoutineComponent } from './routines/routines-active-routine.component';
+import { LineChartComponent } from './shared/line-chart/line-chart.component';
 
 
 let routes: Routes = [
@@ -263,7 +264,8 @@ let routes: Routes = [
 
     RoutineDashboardComponent,
     RoutineComponent,
-    RoutinesActiveRoutineComponent
+    RoutinesActiveRoutineComponent,
+    LineChartComponent
   ],
   imports: [
     BrowserModule,
