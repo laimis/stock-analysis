@@ -114,7 +114,8 @@ public class EmailNotificationService : GenericBackgroundServiceHost
                 // get all alerts for that user
                 var alertGroups = _container.GetAlerts(user.State.Id)
                     .GroupBy(a => a.identifier)
-                    .Select(ToAlertEmailGroup);
+                    .Select(ToAlertEmailGroup)
+                    .ToArray();
 
                 var data = new { alertGroups };
 
@@ -140,6 +141,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
                 .OrderBy(a => a.sourceList)
                 .ThenBy(a => a.ticker)
                 .Select(ToEmailData)
+                .ToArray()
         };
     }
 

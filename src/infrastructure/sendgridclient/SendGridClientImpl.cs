@@ -70,7 +70,9 @@ namespace sendgridclient
 
         private Task SendWithoutClient(Recipient recipient, Sender sender, EmailTemplate template, object properties)
         {
-            _logger?.LogInformation("Dummy send with template {templateId}", template.Id);
+            var json = System.Text.Json.JsonSerializer.Serialize(properties);
+            
+            _logger?.LogInformation("Dummy send with template {templateId}: {json}", template.Id, json);
 
             return Task.CompletedTask;
         }
