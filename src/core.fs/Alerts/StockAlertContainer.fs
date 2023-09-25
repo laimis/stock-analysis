@@ -35,8 +35,6 @@ namespace core.fs.Alerts
     
     
     [<Struct>]
-    [<CustomEquality>]
-    [<CustomComparison>]
     type TriggeredAlert =
         {
             identifier:string
@@ -94,35 +92,7 @@ namespace core.fs.Alerts
                 alertType = AlertType.Neutral
                 valueFormat = pattern.valueFormat
             }
-            
-        override this.Equals (other:obj) =
-            match other with
-            | :? TriggeredAlert as other ->
-                this.identifier = other.identifier &&
-                this.ticker = other.ticker &&
-                this.userId = other.userId
-            | _ -> false
-            
-        override this.GetHashCode () =
-            let hashCodeParts = [
-                this.identifier.GetHashCode()
-                this.ticker.GetHashCode()
-                this.userId.GetHashCode()
-            ]
-            
-            hashCodeParts
-            |> List.fold (fun acc x -> -1640531527 + x + (acc <<< 6) + (acc >>> 2)) 0
-            
-            
-        interface IComparable with
-            member this.CompareTo (other:obj) =
-                match other with
-                | :? TriggeredAlert as other ->
-                    match this.identifier = other.identifier && this.ticker = other.ticker && this.userId = other.userId with
-                    | true -> 0
-                    | false -> this.identifier.CompareTo(other.identifier)
-                | _ -> -1
-    
+        
     type StockAlertContainer() =
         let alerts = ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert>()
         let recentlyTriggered = ConcurrentDictionary<Guid, List<TriggeredAlert>>()
