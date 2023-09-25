@@ -14,10 +14,10 @@ namespace core.Stocks.Services.Trading
     public static class TradingStrategyConstants
     {
         // TODO: this needs to come from the environment or user settings
-        public const decimal AVG_PERCENT_GAIN = 0.07m;
-        public const decimal DEFAULT_STOP_PRICE_MULTIPLIER = 0.95m;
-        public const int MAX_NUMBER_OF_DAYS_TO_SIMULATE = 365;
-        public const string ACTUAL_TRADES_NAME = "Actual trades ⭐";
+        public const decimal AvgPercentGain = 0.07m;
+        public const decimal DefaultStopPriceMultiplier = 0.95m;
+        public const int MaxNumberOfDaysToSimulate = 365;
+        public const string ActualTradesName = "Actual trades ⭐";
     }
 
     public interface ITradingStrategy
@@ -42,17 +42,12 @@ namespace core.Stocks.Services.Trading
 
     public struct TradingPerformance
     {
-        public static TradingPerformance Create(Span<PositionInstance> closedPositions)
+        public static TradingPerformance Create(IEnumerable<PositionInstance> closedPositions)
         {
-            if (closedPositions.Length == 0)
-            {
-                return new TradingPerformance();
-            }
-
             var wins = 0;
             var maxWinAmount = 0m;
             var winMaxReturnPct = 0m;
-            var numberOfTrades = closedPositions.Length;
+            var numberOfTrades = 0;
             var totalWinAmount = 0m;
             var totalWinReturnPct = 0m;
             var totalWinDaysHeld = 0;
@@ -77,6 +72,7 @@ namespace core.Stocks.Services.Trading
 
             foreach(var e in closedPositions)
             {
+                numberOfTrades++;
                 totalDaysHeld += e.DaysHeld;
                 profit += e.Profit;
                 totalCost += e.Cost != 0 ? e.Cost : e.CompletedPositionCost;
@@ -117,6 +113,11 @@ namespace core.Stocks.Services.Trading
                     }
                 }
             }
+
+            if (numberOfTrades == 0)
+            {
+                return new TradingPerformance();
+            }
             
             var winningPct = wins * 1.0m / numberOfTrades;
 
@@ -129,7 +130,7 @@ namespace core.Stocks.Services.Trading
             };
             
             return new TradingPerformance {
-                AvgDaysHeld = totalDaysHeld / numberOfTrades,
+                AvgDaysHeld = totalDaysHeld / (numberOfTrades * 1.0),
                 AvgLossAmount = losses > 0 ? totalLossAmount / losses : 0,
                 AvgReturnPct = totalCost > 0 ? profit / totalCost : 0,
                 AvgWinAmount = wins > 0 ? totalWinAmount / wins : 0,
@@ -138,7 +139,7 @@ namespace core.Stocks.Services.Trading
                 GradeDistribution = gradeDistribution.Select(kp => new LabelWithFrequency(label: kp.Key.Value, frequency: kp.Value)).ToArray(),
                 LatestDate = latestDate,
                 MaxLossAmount = maxLossAmount,
-                LossAvgDaysHeld = losses > 0 ? totalLossDaysHeld / losses : 0,
+                LossAvgDaysHeld = losses > 0 ? totalLossDaysHeld / (losses * 1.0) : 0,
                 LossMaxReturnPct = lossMaxReturnPct,
                 LossAvgReturnPct = losses > 0  ? totalLossReturnPct / losses : 0,
                 Losses = losses,
@@ -148,7 +149,7 @@ namespace core.Stocks.Services.Trading
                 rrRatio = rrRatio,
                 NumberOfTrades = numberOfTrades,
                 TotalCost = totalCost,
-                WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / wins : 0,
+                WinAvgDaysHeld = wins > 0 ? totalWinDaysHeld / (wins * 1.0) : 0,
                 WinAvgReturnPct = wins > 0 ? totalWinReturnPct / wins : 0,
                 WinMaxReturnPct = winMaxReturnPct,
                 WinPct = winningPct,

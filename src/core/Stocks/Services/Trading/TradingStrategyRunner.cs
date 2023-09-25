@@ -29,7 +29,7 @@ namespace core.Stocks.Services.Trading
                 price: position.CompletedPositionCostPerShare,
                 stopPrice: position.FirstStop.HasValue ?
                     position.FirstStop.Value
-                    : position.CompletedPositionCostPerShare * TradingStrategyConstants.DEFAULT_STOP_PRICE_MULTIPLIER,
+                    : position.CompletedPositionCostPerShare * TradingStrategyConstants.DefaultStopPriceMultiplier,
                 ticker: position.Ticker,
                 when: position.Opened.Value,
                 closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,
@@ -75,7 +75,7 @@ namespace core.Stocks.Services.Trading
                 ticker,
                 Shared.Adapters.Stocks.PriceFrequency.Daily,
                 convertedWhen,
-                convertedWhen.AddDays(TradingStrategyConstants.MAX_NUMBER_OF_DAYS_TO_SIMULATE));
+                convertedWhen.AddDays(TradingStrategyConstants.MaxNumberOfDaysToSimulate));
             
             var results = new TradingStrategyResults();
 

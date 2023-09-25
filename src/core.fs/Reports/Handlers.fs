@@ -119,13 +119,13 @@ type OutcomesReportView(evaluations,outcomes,gaps,patterns) =
     member _.TickerSummary: OutcomesReportViewTickerCountPair seq =
         evaluations
         |> AnalysisOutcomeEvaluationScoringHelper.GenerateTickerCounts
-        |> Seq.map (fun (kv) -> {Ticker=kv.Key; Count=kv.Value})
-        |> Seq.sortByDescending (fun (pair) -> pair.Count)
+        |> Seq.map (fun kv -> {Ticker=kv.Key; Count=kv.Value})
+        |> Seq.sortByDescending (fun pair -> pair.Count)
     
     member _.EvaluationSummary: OutcomesReportViewEvaluationCountPair seq =
         evaluations
         |> AnalysisOutcomeEvaluationScoringHelper.GenerateEvaluationCounts
-        |> Seq.map (fun (kv) -> (kv, evaluations |> Seq.find (fun (e) -> e.name = kv.Key)))
+        |> Seq.map (fun kv -> (kv, evaluations |> Seq.find (fun e -> e.name = kv.Key)))
         |> Seq.sortBy (fun (kp, evaluation) -> (evaluation.``type``, kp.Value* -1))
         |> Seq.map (fun (kp, evaluation) -> {
             Evaluation=kp.Key
@@ -154,7 +154,7 @@ type SellsQuery =
     
 type SellView =
     {
-        Ticker: Ticker
+        Ticker: string
         Date: DateTimeOffset
         NumberOfShares: decimal
         Price: decimal
@@ -178,7 +178,7 @@ type SellsView(stocks:OwnedStock seq,prices:Dictionary<string,StockQuote>) =
         |> Seq.groupBy (fun t -> t.stock.State.Ticker)
         |> Seq.map (fun (ticker, sells) -> {|ticker = ticker; latest = sells |> Seq.maxBy (fun t -> t.buyOrSell.When)|})
         |> Seq.map (fun t -> {
-            Ticker = t.ticker
+            Ticker = t.ticker.Value
             Date = t.latest.buyOrSell.When
             NumberOfShares = t.latest.buyOrSell.NumberOfShares
             Price = t.latest.buyOrSell.Price

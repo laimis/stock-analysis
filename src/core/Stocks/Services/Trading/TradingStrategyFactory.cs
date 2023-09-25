@@ -45,8 +45,8 @@ namespace core.Stocks.Services.Trading
             return new TradingStrategyWithProfitPoints(
                 $"Profit taking ({profitPoints} % levels)",
                 numberOfProfitPoints: 3,
-                (position, level) => ProfitPoints.GetProfitPointWithPercentGain(position, level, TradingStrategyConstants.AVG_PERCENT_GAIN).Value,
-                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AVG_PERCENT_GAIN).Value)
+                (position, level) => ProfitPoints.GetProfitPointWithPercentGain(position, level, TradingStrategyConstants.AvgPercentGain).Value,
+                (position, level) => _advancingStop(level, position, ( l ) => ProfitPoints.GetProfitPointWithPercentGain(position, l, TradingStrategyConstants.AvgPercentGain).Value)
             );
         }
 

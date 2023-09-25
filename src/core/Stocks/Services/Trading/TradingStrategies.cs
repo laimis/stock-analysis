@@ -65,7 +65,7 @@ namespace core.Stocks.Services.Trading
                 maxDrawdownPctRecent: maxDrawdownPctRecent,
                 maxGainPctRecent: maxGainPctRecent,
                 position: position,
-                strategyName: TradingStrategyConstants.ACTUAL_TRADES_NAME
+                strategyName: TradingStrategyConstants.ActualTradesName
             );
         }
     }

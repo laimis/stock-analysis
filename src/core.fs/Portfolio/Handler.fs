@@ -305,13 +305,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     
                     let percentBased =
                         [|1..levels|]
-                        |> Array.map (fun i -> ProfitPoints.GetProfitPointWithPercentGain(position, i, TradingStrategyConstants.AVG_PERCENT_GAIN))
+                        |> Array.map (fun i -> ProfitPoints.GetProfitPointWithPercentGain(position, i, TradingStrategyConstants.AvgPercentGain))
                         |> Array.filter (fun v -> v.HasValue)
                         |> Array.map (fun v -> v.Value)
                     
                     let arr = [|
                         ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
-                        ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AVG_PERCENT_GAIN}%% intervals", prices=percentBased)
+                        ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
                         |]
                     
                     return ServiceResponse<ProfitPoints.ProfitPointContainer []>(arr)
@@ -398,7 +398,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             
-            let actualTradingResult = TradingStrategyResult(0, 0, 0, 0, position, TradingStrategyConstants.ACTUAL_TRADES_NAME)
+            let actualTradingResult = TradingStrategyResult(0, 0, 0, 0, position, TradingStrategyConstants.ActualTradesName)
             results.Results.Insert(0, actualTradingResult)
             return results.Results
         }
@@ -407,12 +407,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             let positions = results |> Seq.map (fun r -> r.position) |> Seq.toArray
             let performance =
                 try
-                    TradingPerformance.Create(Span<PositionInstance>(positions))
+                    TradingPerformance.Create(positions)
                 with
                     // TODO: something is throwing Value was either too large or too small for a Decimal
                     // for certain simulations.
                     // ignoring it here because I need the results, but need to look at it at some point
-                    | :?OverflowException -> TradingPerformance.Create(Span<PositionInstance>([||]))
+                    | :?OverflowException -> TradingPerformance.Create(Array.Empty<PositionInstance>())
             TradingStrategyPerformance(name, performance, positions)
         
         let! account = accounts.GetUser(command.UserId)
@@ -518,13 +518,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let strategyByPerformance =
                 past
-                |> Array.filter (fun p -> p.ContainsLabel(key="strategy"))
-                |> Array.groupBy (fun p -> p.GetLabelValue(key="strategy"))
-                |> Array.map (fun (name, positions) ->
-                    let performance = TradingPerformance.Create(Span<PositionInstance>(positions))
-                    TradingStrategyPerformance(name, performance, positions)
+                |> Seq.filter (fun p -> p.ContainsLabel(key="strategy"))
+                |> Seq.groupBy (fun p -> p.GetLabelValue(key="strategy"))
+                |> Seq.map (fun (name, positions) ->
+                    let performance = TradingPerformance.Create(positions)
+                    TradingStrategyPerformance(name, performance, positions |> Seq.toArray)
                 )
-                |> Array.sortByDescending (fun p -> p.performance.Profit)
+                |> Seq.sortByDescending (fun p -> p.performance.Profit)
+                |> Seq.toArray
                 
             let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
             

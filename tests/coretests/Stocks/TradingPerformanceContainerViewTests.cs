@@ -5,8 +5,8 @@ namespace coretests.Stocks
 {
     public class TradingPerformanceContainerViewTests
     {
-        private TradingPerformanceContainerView _container =
-            new TradingPerformanceContainerView(TradingDataGenerator.GetClosedPositions(), 1);
+        private readonly TradingPerformanceContainerView _container =
+            new (TradingDataGenerator.GetClosedPositions(), 1);
 
         // create a set of closed positions
 
