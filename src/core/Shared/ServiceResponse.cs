@@ -12,14 +12,18 @@ namespace core.Shared
         public bool IsOk => Error == null;
     }
 
-    public class ServiceResponse<TSuccess> : ServiceResponse
+    public class ServiceResponse<TSuccess>
     {
         public TSuccess? Success { get; }
+        public ServiceError? Error { get; }
         
         public ServiceResponse(TSuccess success) =>
             Success = success;
 
-        public ServiceResponse(ServiceError error) : base(error) {}
+        public ServiceResponse(ServiceError error) =>
+            Error = error;
+        
+        public bool IsOk => Error == null;
     }
 
     public class ServiceError
