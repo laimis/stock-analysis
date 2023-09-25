@@ -511,10 +511,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.sortByDescending (fun p -> p.Closed.Value)
                 |> Seq.toArray
                 
-            let performance = TradingPerformanceContainerView(
-                past,
-                20
-            )
+            let performance = TradingPerformanceContainerView(past)
             
             let strategyByPerformance =
                 past

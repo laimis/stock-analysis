@@ -6,12 +6,10 @@ namespace coretests.Stocks
 {
     public class TradingPerformanceViewTests
     {
-        private TradingPerformance _performance;
-
-        public TradingPerformanceViewTests()
-        {
-            _performance = TradingPerformance.Create(TradingDataGenerator.GetClosedPositions());
-        }
+        private readonly TradingPerformance _performance =
+            TradingPerformance.Create(
+                TradingDataGenerator.GetClosedPositions()
+                );
 
         [Fact]
         public void TestTotal() => Assert.Equal(3, _performance.NumberOfTrades);

@@ -9,20 +9,22 @@ open core.Stocks
 open core.Stocks.Services.Trading
 open core.fs
 
-type TradingPerformanceContainerView(inputPositions:PositionInstance array,numberOfPositions:int) =
+type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
+     
+        // feels a bit hacky, but the expectation is that the positions will always be sorted
+        // from the most recent to the oldest. And for performance trends we want window by
+        // date from oldest to most recent
+        let closedPositions = inputPositions |> Array.sortBy (fun p -> p.Closed.Value)
         
-        let closedPositions = inputPositions |> Array.rev
+        let defaultWindowSize = 20
         
         let recentLengthToTake =
-            match closedPositions.Length > numberOfPositions with
-            | true -> numberOfPositions
+            match closedPositions.Length > defaultWindowSize with
+            | true -> defaultWindowSize
             | false -> closedPositions.Length
             
         
         let generateOutcomeHistogram (label:string) transactions valueFunc (buckets:int) symmetric annotation =
-            // buckets 50
-            // symmetric false
-            // annotation null
             
             let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.bar, annotation)
           
@@ -75,7 +77,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array,numbe
             let zeroLineAnnotationVertical = ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.vertical);
             let oneLineAnnotationHorizontal = ChartAnnotationLine(1, "One", ChartAnnotationLineType.horizontal);
             
-            // go over each closed transaction and calculate number of wins for 20 trades rolling window
+            // go over each closed transaction and calculate number of wins for each window
             let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal);
             let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.line);
             let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
@@ -91,29 +93,37 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array,numbe
             let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.line);
             let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.line, zeroLineAnnotationHorizontal);
             
-            trades
-                |> Seq.iteri (fun i _ ->
-                    if i + windowSize >= trades.Length then
-                        ()
-                    else
-                        let window = trades[i..i+windowSize-1]
-                        
-                        let perfView = TradingPerformance.Create(window)
-                        profits.Add(window[0].Closed.Value, perfView.Profit)
-                        wins.Add(window[0].Closed.Value, perfView.WinPct)
-                        avgWinPct.Add(window[0].Closed.Value, perfView.WinAvgReturnPct)
-                        avgLossPct.Add(window[0].Closed.Value, perfView.LossAvgReturnPct)
-                        ev.Add(window[0].Closed.Value, perfView.EV)
-                        avgWinAmount.Add(window[0].Closed.Value, perfView.AvgWinAmount)
-                        avgLossAmount.Add(window[0].Closed.Value, perfView.AvgLossAmount)
-                        gainPctRatio.Add(window[0].Closed.Value, perfView.ReturnPctRatio)
-                        profitRatio.Add(window[0].Closed.Value, perfView.ProfitRatio)
-                        rrRatio.Add(window[0].Closed.Value, perfView.rrRatio)
-                        maxWin.Add(window[0].Closed.Value, perfView.MaxWinAmount)
-                        maxLoss.Add(window[0].Closed.Value, perfView.MaxLossAmount)
-                        rrSum.Add(window[0].Closed.Value, perfView.rrSum)
-                        invested.Add(window[0].Closed.Value, perfView.TotalCost)
-                )
+            let days =
+                match trades with
+                | [||] -> -1
+                | _ ->
+                    let firstDate = trades[0].Closed.Value.Date
+                    let lastDate = trades[trades.Length-1].Closed.Value.Date
+                    (lastDate - firstDate).TotalDays |> int
+                    
+            [0..days]
+            |> Seq.iter (fun i ->
+                let firstDate = trades[0].Closed.Value.Date
+                let start = firstDate.AddDays(i)
+                let ``end`` = firstDate.AddDays(float i+20.0)
+                
+                let perfView = trades |> Seq.filter (fun t -> t.Closed.Value.Date >= start && t.Closed.Value.Date < ``end``) |> TradingPerformance.Create
+                
+                profits.Add(start, perfView.Profit)
+                wins.Add(start, perfView.WinPct)
+                avgWinPct.Add(start, perfView.WinAvgReturnPct)
+                avgLossPct.Add(start, perfView.LossAvgReturnPct)
+                ev.Add(start, perfView.EV)
+                avgWinAmount.Add(start, perfView.AvgWinAmount)
+                avgLossAmount.Add(start, perfView.AvgLossAmount)
+                gainPctRatio.Add(start, perfView.ReturnPctRatio)
+                profitRatio.Add(start, perfView.ProfitRatio)
+                rrRatio.Add(start, perfView.rrRatio)
+                maxWin.Add(start, perfView.MaxWinAmount)
+                maxLoss.Add(start, perfView.MaxLossAmount)
+                rrSum.Add(start, perfView.rrSum)
+                invested.Add(start, perfView.TotalCost)
+            )
             
             // non windowed stats
             let mutable aGrades = 0;

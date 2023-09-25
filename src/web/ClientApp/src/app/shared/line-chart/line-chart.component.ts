@@ -59,7 +59,7 @@ export class LineChartComponent {
     let series =
       this.chartType == 'line'
         ? this.chart.addLineSeries() :
-        this.chart.addBarSeries();
+        this.chart.addHistogramSeries();
 
     this.assignData(series);
 
