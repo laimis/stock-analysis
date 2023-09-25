@@ -23,7 +23,7 @@ namespace core.Shared
             AnnotationLine = annotationLine;
         }
 
-        public List<DataPoint<T>> Data { get; private set; } = new List<DataPoint<T>>();
+        public List<DataPoint<T>> Data { get; } = new();
         public ChartAnnotationLine AnnotationLine { get; }
 
         public void Add(DateTimeOffset label, T value)
