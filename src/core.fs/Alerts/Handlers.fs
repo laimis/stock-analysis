@@ -61,6 +61,8 @@ namespace core.fs.Alerts
         
         type Handler(smsService:ISMSClient) =
             
+            interface IApplicationService
+            
             member this.Handle (send:SendSMS) = task {
                 do! smsService.SendSMS(send.Body)
                 return ServiceResponse()

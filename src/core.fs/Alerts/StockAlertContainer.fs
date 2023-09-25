@@ -152,6 +152,7 @@ namespace core.fs.Alerts
         member _.GetAlerts (userId:Guid) =
             alerts.Values
             |> Seq.filter (fun alert -> alert.userId = userId)
+            |> Seq.sortBy (fun x -> x.sourceList,x.ticker.Value)
             
         member _.AddNotice message =
             if notices.Count = 10 then
