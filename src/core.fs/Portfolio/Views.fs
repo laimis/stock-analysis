@@ -78,7 +78,8 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let oneLineAnnotationHorizontal = ChartAnnotationLine(1, "One", ChartAnnotationLineType.horizontal);
             
             // go over each closed transaction and calculate number of wins for each window
-            let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal);
+            let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal)
+            let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.line, zeroLineAnnotationHorizontal);
             let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.line);
             let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
             let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
@@ -100,7 +101,9 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                     let firstDate = trades[0].Closed.Value.Date
                     let lastDate = trades[trades.Length-1].Closed.Value.Date
                     (lastDate - firstDate).TotalDays |> int
-                    
+            
+            let mutable equity = 0m;
+            
             [0..days]
             |> Seq.iter (fun i ->
                 let firstDate = trades[0].Closed.Value.Date
@@ -123,14 +126,17 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 maxLoss.Add(start, perfView.MaxLossAmount)
                 rrSum.Add(start, perfView.rrSum)
                 invested.Add(start, perfView.TotalCost)
+                
+                // calculate equity curve
+                equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (fun t -> t.Profit))
+                
+                equityCurve.Add(start, equity)
             )
             
             // non windowed stats
             let mutable aGrades = 0;
             let mutable bGrades = 0;
             let mutable cGrades = 0;
-            let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.line, zeroLineAnnotationHorizontal);
-            let mutable equity = 0m;
             let mutable minCloseDate = DateTimeOffset.MaxValue;
             let mutable maxCloseDate = DateTimeOffset.MinValue;
             let positionsClosedByDate = Dictionary<DateTimeOffset, int>();
@@ -140,8 +146,6 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             
             trades
                 |> Seq.iter ( fun position ->
-                    equity <- equity + position.Profit
-                    equityCurve.Add(position.Closed.Value, equity)
                     if position.Grade = "A" then
                         aGrades <- aGrades + 1
                     else if position.Grade = "B" then
@@ -230,25 +234,25 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                         
             trends.Add(profits)
             trends.Add(equityCurve)
-            trends.Add(gradeContainer)
-            trends.Add(gainDistribution)
-            trends.Add(gainPctDistribution)
-            trends.Add(rrDistribution)
-            trends.Add(wins)
-            trends.Add(avgWinPct)
-            trends.Add(avgLossPct)
-            trends.Add(ev)
-            trends.Add(avgWinAmount)
-            trends.Add(avgLossAmount)
-            trends.Add(gainPctRatio)
-            trends.Add(profitRatio)
-            trends.Add(rrRatio)
-            trends.Add(rrSum)
-            trends.Add(invested)
-            trends.Add(maxWin)
-            trends.Add(maxLoss)
-            trends.Add(positionsOpenedByDateContainer)
-            trends.Add(positionsClosedByDateContainer)
+            // trends.Add(gradeContainer)
+            // trends.Add(gainDistribution)
+            // trends.Add(gainPctDistribution)
+            // trends.Add(rrDistribution)
+            // trends.Add(wins)
+            // trends.Add(avgWinPct)
+            // trends.Add(avgLossPct)
+            // trends.Add(ev)
+            // trends.Add(avgWinAmount)
+            // trends.Add(avgLossAmount)
+            // trends.Add(gainPctRatio)
+            // trends.Add(profitRatio)
+            // trends.Add(rrRatio)
+            // trends.Add(rrSum)
+            // trends.Add(invested)
+            // trends.Add(maxWin)
+            // trends.Add(maxLoss)
+            // trends.Add(positionsOpenedByDateContainer)
+            // trends.Add(positionsClosedByDateContainer)
             
             trends
             
