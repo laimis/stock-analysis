@@ -1,10 +1,10 @@
 <div>
 
   <app-error-display [errors]="errors"></app-error-display>
-  
+
   <div class="mb-3 mt-3">
     <label for="tickerFilter" class="form-label">Ticker filter</label>
-    <select #tickerSelect class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
+    <select #tickerSelect id="tickerFilter" name="tickerFilter" class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
         <option value="all">All</option>
         <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
     </select>
@@ -39,7 +39,7 @@
     [report]="singleBarReportDaily"
     [showSummary]="true">
   </app-outcomes-analysis-report>
-  
+
   <app-outcomes
     *ngIf="singleBarReportDaily"
     [title]="'Daily outcomes'"
@@ -53,7 +53,7 @@
     [report]="singleBarReportWeekly"
     [tickerFilter]="tickerFilter"
     [showSummary]="true">
-  </app-outcomes-analysis-report>  
+  </app-outcomes-analysis-report>
 
   <app-outcomes
     *ngIf="singleBarReportWeekly"
@@ -63,5 +63,5 @@
   </app-outcomes>
 
   <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
-  
+
 </div>

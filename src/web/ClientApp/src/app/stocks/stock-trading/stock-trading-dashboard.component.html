@@ -37,7 +37,7 @@
   <app-stock-trading-positions    *ngIf="isActive('positions') && positions" [positions]=positions [orders]="brokerageOrders"></app-stock-trading-positions>
   <app-stock-trading-open-positions *ngIf="isActive('openreview')" [orders]="brokerageOrders" [positions]=positions></app-stock-trading-open-positions>
   <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
-  <app-stock-trading-outcomes-reports       *ngIf="isActive('analysis')" [allTimeMode]="true" [positions]="positions"></app-stock-trading-outcomes-reports>
+  <app-stock-trading-outcomes-reports       *ngIf="isActive('analysis') && positions" [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
   <app-stock-trading-summary  *ngIf="isActive('summary')" [positions]="positions" [cashBalance]="cashBalance" ></app-stock-trading-summary>
 
 </div>

@@ -7,9 +7,9 @@ import { StocksService, OutcomesReport, PositionInstance, StockGaps } from '../.
   templateUrl: './stock-trading-outcomes-reports.component.html',
   styleUrls: ['./stock-trading-outcomes-reports.component.css']
 })
-export class StockPositionReportsComponent implements OnInit {
+export class StockPositionReportsComponent {
 
-  
+
   sortColumn: string
   sortDirection: number = -1
   allBarsReport: OutcomesReport;
@@ -18,60 +18,39 @@ export class StockPositionReportsComponent implements OnInit {
   positionsReport: OutcomesReport;
   gaps: StockGaps[] = [];
   tickerFilter: string;
-  
+
 
 	constructor(private service : StocksService){}
 
   @Input()
-  dailyMode: boolean = false
+  set dailyAnalysis(value:PositionInstance[]) {
+    this.loadPositionData(value)
+  }
 
   @Input()
-  allTimeMode: boolean = false
+  set allTimeAnalysis(value:PositionInstance[]) {
+    this.loadAllTimeData(value)
+  }
 
-  _positions: PositionInstance[] = []
   tickers: string[] = []
-  @Input()
-  set positions(value: PositionInstance[]) {
-    this._positions = value
-    if (value) {
-      this.tickers = value.map(p => p.ticker)
-    }
-  }
-  get positions(): PositionInstance[] {
-    return this._positions
-  }
-
   errors: string[] = null
-
-
-	ngOnInit(): void {
-    
-    if (this.allTimeMode) {
-      this.loadAllTimeData()
-    }
-
-    if (this.dailyMode) {
-      this.loadPositionData()
-    }
-  }
-
-  loadDailyData() {
-    var tickers = this.positions.map(p => p.ticker)
-    this.service.reportOutcomesSingleBarDaily(tickers).subscribe(
+  loadDailyData(positions:PositionInstance[]) {
+    this.tickers = positions.map(p => p.ticker)
+    this.service.reportOutcomesSingleBarDaily(this.tickers).subscribe(
       report => {
         this.singleBarReportDaily = report
-        this.loadWeeklyData()
+        this.loadWeeklyData(positions)
       },
       error => {
         this.handleApiError("Unable to load daily data", error)
-        this.loadWeeklyData()
+        this.loadWeeklyData(positions)
       }
     )
   }
 
-  loadWeeklyData() {
-    var tickers = this.positions.map(p => p.ticker)
-    this.service.reportOutcomesSingleBarWeekly(tickers).subscribe(report => {
+  loadWeeklyData(positions:PositionInstance[]) {
+    this.tickers = positions.map(p => p.ticker)
+    this.service.reportOutcomesSingleBarWeekly(this.tickers).subscribe(report => {
       this.singleBarReportWeekly = report
     }, error => {
       this.handleApiError("Unable to load weekly data", error)
@@ -79,13 +58,13 @@ export class StockPositionReportsComponent implements OnInit {
 
   }
 
-  loadPositionData() {
+  loadPositionData(positions:PositionInstance[]) {
     this.service.reportPositions().subscribe(report => {
       this.positionsReport = report
-      this.loadDailyData()
+      this.loadDailyData(positions)
     }, error => {
       this.handleApiError("Unable to load position reports", error)
-      this.loadDailyData()
+      this.loadDailyData(positions)
     })
   }
 
@@ -95,9 +74,9 @@ export class StockPositionReportsComponent implements OnInit {
     this.errors = [errorMessage]
   }
 
-  loadAllTimeData() {
-    var tickers = this.positions.map(p => p.ticker)
-    this.service.reportOutcomesAllBars(tickers).subscribe(report => {
+  loadAllTimeData(positions:PositionInstance[]) {
+    this.tickers = positions.map(p => p.ticker)
+    this.service.reportOutcomesAllBars(this.tickers).subscribe(report => {
       this.allBarsReport = report
       this.gaps = report.gaps
     }, error => {
