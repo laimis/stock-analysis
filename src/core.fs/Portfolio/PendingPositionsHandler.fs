@@ -64,7 +64,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             
             let! existing = portfolio.GetPendingStockPositions(command.UserId)
             
-            let found = existing |> Seq.tryFind (fun x -> x.State.Ticker = command.Ticker)
+            let found = existing |> Seq.tryFind (fun x -> x.State.Ticker = command.Ticker && x.State.IsClosed = false)
             
             match found with
             | Some _ -> return "Position already exists" |> ResponseUtils.failed
