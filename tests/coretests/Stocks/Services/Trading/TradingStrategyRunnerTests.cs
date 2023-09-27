@@ -100,7 +100,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(100, i => 10 + i);
 
-            var testPosition = new PositionInstance(0, "tsla");
+            var testPosition = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
             testPosition.Buy(2, 10, System.DateTimeOffset.UtcNow, Guid.NewGuid());
             testPosition.SetStopPrice(5, System.DateTimeOffset.UtcNow);
 
@@ -222,7 +222,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var data = GeneratePriceBars(10, i => 50 + i);
 
-            var positionInstance = new PositionInstance(0, "tsla");
+            var positionInstance = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
             positionInstance.Buy(
                 numberOfShares: 5,
                 price: 50,
@@ -257,7 +257,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(20, i => 50 - i);
 
-            var position = new PositionInstance(0, "tsla");
+            var position = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
             position.Buy(
                 numberOfShares: 5,
                 price: 50,
@@ -292,7 +292,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(50, i => 50 + i);
 
-            var position = new PositionInstance(0, "tsla");
+            var position = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
             position.Buy(
                 numberOfShares: 5,
                 price: 50,
@@ -330,7 +330,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(10, i => 50 - i);
 
-            var positionInstance = new PositionInstance(0, "tsla");
+            var positionInstance = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
             positionInstance.Buy(
                 numberOfShares: 5,
                 price: 50,

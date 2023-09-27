@@ -170,10 +170,10 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                     else
                         positionsClosedByDate[position.Closed.Value.Date] <- 1
                         
-                    if positionsOpenedByDate.ContainsKey(position.Opened.Value.Date) then
-                        positionsOpenedByDate[position.Opened.Value.Date] <- positionsOpenedByDate[position.Opened.Value.Date] + 1
+                    if positionsOpenedByDate.ContainsKey(position.Opened.Date) then
+                        positionsOpenedByDate[position.Opened.Date] <- positionsOpenedByDate[position.Opened.Date] + 1
                     else
-                        positionsOpenedByDate[position.Opened.Value.Date] <- 1
+                        positionsOpenedByDate[position.Opened.Date] <- 1
                 )
             
             

@@ -10,7 +10,7 @@ namespace coretests.Stocks
 
         public PositionInstanceWithExplicitStopPriceTests()
         {
-            _position = new PositionInstance(0, "TSLA");
+            _position = new PositionInstance(0, "TSLA", DateTime.Parse("2020-01-23"));
 
             _position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             _position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
@@ -29,7 +29,7 @@ namespace coretests.Stocks
         [Fact]
         public void CostAtRiskedBasedOnStopPrice()
         {
-            var position = new PositionInstance(0, "TSLA");
+            var position = new PositionInstance(0, "TSLA", DateTime.Parse("2020-01-23"));
 
             position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());

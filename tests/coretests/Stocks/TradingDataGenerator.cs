@@ -10,17 +10,17 @@ namespace coretests.Stocks
         {
             var closedPositions = new List<PositionInstance>();
 
-            var position = new PositionInstance(0, "AMD");
+            var position = new PositionInstance(0, "AMD", DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
             position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
-            position = new PositionInstance(1, "AMD");
+            position = new PositionInstance(1, "AMD", DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
             position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
-            position = new PositionInstance(2, "AMD");
+            position = new PositionInstance(2, "AMD", DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
             position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
@@ -46,7 +46,7 @@ namespace coretests.Stocks
                 var days = random.Next(1, 100);
                 var sellPrice = random.Next(1, 1000);
                 
-                var position = new PositionInstance(i, stock);
+                var position = new PositionInstance(i, stock, date);
                 position.Buy(shares, price, date, transactionId: Guid.NewGuid());
                 position.Sell(shares, sellPrice, transactionId: Guid.NewGuid(), date.AddDays(days));
                 closedPositions.Add(position);

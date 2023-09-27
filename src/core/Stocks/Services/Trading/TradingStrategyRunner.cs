@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
+using core.Shared;
 using core.Shared.Adapters.Brokerage;
 
 namespace core.Stocks.Services.Trading
@@ -31,7 +32,7 @@ namespace core.Stocks.Services.Trading
                     position.FirstStop.Value
                     : position.CompletedPositionCostPerShare * TradingStrategyConstants.DefaultStopPriceMultiplier,
                 ticker: position.Ticker,
-                when: position.Opened.Value,
+                when: position.Opened,
                 closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,
                 actualTrade: position);
         }
@@ -61,7 +62,7 @@ namespace core.Stocks.Services.Trading
             decimal numberOfShares,
             decimal price,
             decimal stopPrice,
-            string ticker,
+            Ticker ticker,
             DateTimeOffset when,
             bool closeIfOpenAtTheEnd = false,
             PositionInstance actualTrade = null)
@@ -101,7 +102,7 @@ namespace core.Stocks.Services.Trading
 
             foreach(var strategy in TradingStrategyFactory.GetStrategies())
             {
-                var positionInstance = new PositionInstance(0, ticker);
+                var positionInstance = new PositionInstance(0, ticker, when);
 
                 positionInstance.Buy(numberOfShares, price, when, Guid.NewGuid());
                 positionInstance.SetStopPrice(stopPrice, when);
