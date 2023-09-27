@@ -9,15 +9,7 @@ export class LineChartComponent {
 
   @Input()
   chartHeight: number = 400;
-  options: {
-    data: { dataPoints: { x: Date | string; y: number }[]; type: string }[];
-    zoomEnabled: boolean;
-    axisY: { crosshair: { enabled: boolean } };
-    axisX: { crosshair: { snapToDataPoint: boolean; enabled: boolean },valueFormatString: string };
-    exportEnabled: boolean;
-    logarithmic: boolean;
-    title: { text: string }
-  };
+  options: any
 
   @Input()
   set dataContainer(container: DataPointContainer) {
@@ -26,48 +18,28 @@ export class LineChartComponent {
     }
   }
 
-  private getLineChartData(container: DataPointContainer) {
-    let data = container.data.map(p => {
-      let x = p.isDate ? new Date(Date.parse(p.label)) : p.label;
+  private toDataPoint(p: DataPoint) {
 
+    if (p.isDate) {
       return {
-        x: x,
+        x: new Date(Date.parse(p.label)),
         y: p.value,
-        format: p.isDate ? "MMM DD, YYYY" : null
+        format: "MMM DD, YYYY"
       }
-    });
-
-    let isDate = container.data[0].isDate;
-
-    return [{
-      type: "line",
-      xValueFormatString: isDate ? "MMM DD, YYYY" : null,
-      dataPoints: data
-    }];
-  }
-
-  private getColumnChartData(container: DataPointContainer) {
-    let data = container.data.map(p => {
-      let x = p.isDate ? new Date(Date.parse(p.label)) : p.label;
-
+    } else {
       return {
-        x: x,
-        y: p.value,
-        format: p.isDate ? "MMM DD, YYYY" : null
+        label: p.label,
+        y: p.value
       }
-    });
-
-    return [{
-      type: "column",
-      dataPoints: data
-    }];
+    }
   }
 
   private renderChart(container: DataPointContainer) {
-    let data = container.chartType === 'line' ? this.getLineChartData(container) : this.getColumnChartData(container);
-    let isDate = container.data[0].isDate;
+    let dataPoints = container.data.map(p => this.toDataPoint(p))
+    let chartType = container.chartType // they match 1:1 today
+    let isDate = container.data[0].isDate
+
     this.options = {
-      logarithmic: true,
       exportEnabled: true,
       zoomEnabled: true,
       title: {
@@ -75,18 +47,20 @@ export class LineChartComponent {
       },
       axisX: {
         valueFormatString: isDate ? "YYYY-MM-DD" : null,
-        crosshair: {
-          enabled: true,
-          snapToDataPoint: true
-        }
+        // crosshair: {
+        //   enabled: true,
+        //   snapToDataPoint: true
+        // }
       },
       axisY: {
-        // title: <-- should start passing this back perhaps
-        crosshair: {
-          enabled: true
-        }
+        // crosshair: {
+        //   enabled: true
+        // }
       },
-      data: data
+      data: [{
+        type: chartType,
+        dataPoints: dataPoints
+      }]
     };
   }
 }

@@ -13,6 +13,7 @@ export class PlaygroundComponent implements OnInit {
   tickers: string[];
   prices: Prices;
   options: any;
+  manualOptions: any;
   container: DataPointContainer;
   constructor(
     private stocks:StocksService,
@@ -32,16 +33,29 @@ export class PlaygroundComponent implements OnInit {
 
     this.container = {
       data: [
-        {label: "2019-01-01", value: 1, isDate: true},
-        {label: "2019-01-02", value: 2, isDate: true},
-        {label: "2019-01-03", value: 3, isDate: true},
-        {label: "2019-01-04", value: 4, isDate: true},
-        {label: "2019-01-05", value: 5, isDate: true}
+        {label: "A", value: 2, isDate: false},
+        {label: "B", value: 14, isDate: false},
+        {label: "C", value: 2, isDate: false}
       ],
       label: "Sample data",
-      chartType: 'line',
+      chartType: 'column',
       annotationLine: null
     };
+
+    this.manualOptions = {
+      title:{
+        text: "Angular Column Chart"
+      },
+      animationEnabled: true,
+      data: [{
+        type: "column",
+        dataPoints: [
+          { label: "A", y: 71 },
+          { label: "B", y: 55 },
+          { label: "C", y: 50 }
+        ]
+      }]
+    }
   }
 
   renderNewChart(prices:Prices) {
