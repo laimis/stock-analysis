@@ -2,18 +2,18 @@
 
     <section>
         <h5>Chart</h5>
-        <app-candlestick-chart
+        <app-lightweight-chart-candlestick
             [prices]="prices"
             [buyDates]="upGaps"
             [sellDates]="downGaps">
-        </app-candlestick-chart>
+        </app-lightweight-chart-candlestick>
     </section>
-    
+
     <section>
         <h5>Gaps</h5>
         <app-gaps [gaps]="gaps"></app-gaps>
     </section>
-    
+
     <section>
         <h5>% Change Distribution</h5>
         <app-percent-change-distribution [percentChangeDistribution]="percentChangeDistribution">
@@ -33,7 +33,7 @@
                     </tr>
                 </tbody>
             </table>
-        
+
             <table class="table table-hover border">
                 <tbody>
                     <tr *ngFor="let o of dailyOutcomes.outcomes">
@@ -51,9 +51,9 @@
                     </tr>
                 </tbody>
             </table>
-        </div>  
+        </div>
     </section>
-    
+
     <section>
         <h5>Multiple bar outcomes</h5>
         <div *ngIf="multipleBarOutcomes">
@@ -67,7 +67,7 @@
                     </tr>
                 </tbody>
             </table>
-        
+
             <table class="table table-hover border">
                 <tbody>
                     <tr *ngFor="let o of multipleBarOutcomes.outcomes">
@@ -87,14 +87,14 @@
             </table>
         </div>
     </section>
-    
+
     <section>
         <h5>Daily Analysis Report</h5>
         <app-outcomes-analysis-report
             [report]="dailyOutcomesReport"
             [showSummary]="true">
         </app-outcomes-analysis-report>
-    </section>    
-    
+    </section>
+
 </div>
 

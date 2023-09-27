@@ -26,7 +26,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         
         let generateOutcomeHistogram (label:string) transactions valueFunc (buckets:int) symmetric annotation =
             
-            let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.bar, annotation)
+            let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.column, annotation)
           
             let min, max =
                 transactions
@@ -78,7 +78,8 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let oneLineAnnotationHorizontal = ChartAnnotationLine(1, "One", ChartAnnotationLineType.horizontal);
             
             // go over each closed transaction and calculate number of wins for each window
-            let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal);
+            let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal)
+            let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.line, zeroLineAnnotationHorizontal);
             let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.line);
             let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
             let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
@@ -100,7 +101,9 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                     let firstDate = trades[0].Closed.Value.Date
                     let lastDate = trades[trades.Length-1].Closed.Value.Date
                     (lastDate - firstDate).TotalDays |> int
-                    
+            
+            let mutable equity = 0m;
+            
             [0..days]
             |> Seq.iter (fun i ->
                 let firstDate = trades[0].Closed.Value.Date
@@ -123,25 +126,26 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 maxLoss.Add(start, perfView.MaxLossAmount)
                 rrSum.Add(start, perfView.rrSum)
                 invested.Add(start, perfView.TotalCost)
+                
+                // calculate equity curve
+                equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (fun t -> t.Profit))
+                
+                equityCurve.Add(start, equity)
             )
             
             // non windowed stats
             let mutable aGrades = 0;
             let mutable bGrades = 0;
             let mutable cGrades = 0;
-            let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.line, zeroLineAnnotationHorizontal);
-            let mutable equity = 0m;
             let mutable minCloseDate = DateTimeOffset.MaxValue;
             let mutable maxCloseDate = DateTimeOffset.MinValue;
             let positionsClosedByDate = Dictionary<DateTimeOffset, int>();
-            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
+            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.column);
             let positionsOpenedByDate = Dictionary<DateTimeOffset, int>();
-            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.bar);
+            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.column);
             
             trades
                 |> Seq.iter ( fun position ->
-                    equity <- equity + position.Profit
-                    equityCurve.Add(position.Closed.Value, equity)
                     if position.Grade = "A" then
                         aGrades <- aGrades + 1
                     else if position.Grade = "B" then
@@ -166,10 +170,10 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                     else
                         positionsClosedByDate[position.Closed.Value.Date] <- 1
                         
-                    if positionsOpenedByDate.ContainsKey(position.Opened.Value.Date) then
-                        positionsOpenedByDate[position.Opened.Value.Date] <- positionsOpenedByDate[position.Opened.Value.Date] + 1
+                    if positionsOpenedByDate.ContainsKey(position.Opened.Date) then
+                        positionsOpenedByDate[position.Opened.Date] <- positionsOpenedByDate[position.Opened.Date] + 1
                     else
-                        positionsOpenedByDate[position.Opened.Value.Date] <- 1
+                        positionsOpenedByDate[position.Opened.Date] <- 1
                 )
             
             
@@ -183,7 +187,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 positionsClosedByDateContainer.Add(key, positionsClosed)
                 positionsOpenedByDateContainer.Add(key, positionsOpened)
             
-            let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.bar);
+            let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.column);
             gradeContainer.Add("A", aGrades);
             gradeContainer.Add("B", bGrades);
             gradeContainer.Add("C", cGrades);
@@ -192,7 +196,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let gainDistribution =
                 let label = "Gain Distribution"
                 match trades.Length with
-                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.bar)
+                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.column)
                 | _ ->
                     generateOutcomeHistogram
                         label
@@ -205,7 +209,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let rrDistribution =
                 let label = "RR Distribution"
                 match trades.Length with
-                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.bar)
+                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.column)
                 | _ ->
                     generateOutcomeHistogram
                         label
@@ -218,7 +222,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let gainPctDistribution =
                 let label = "Gain % Distribution"
                 match trades.Length with
-                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.bar)
+                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.column)
                 | _ ->
                     generateOutcomeHistogram
                         label

@@ -77,7 +77,7 @@ namespace core.Stocks.Services.Trading
                 profit += e.Profit;
                 totalCost += e.Cost != 0 ? e.Cost : e.CompletedPositionCost;
                 rrSum += e.RR;
-                earliestDate = e.Opened.HasValue && e.Opened.Value < earliestDate ? e.Opened.Value : earliestDate;
+                earliestDate = e.Opened < earliestDate ? e.Opened : earliestDate;
                 latestDate = e.Closed.HasValue && e.Closed.Value > latestDate ? e.Closed.Value : latestDate;
 
                 if (e.Profit >= 0)

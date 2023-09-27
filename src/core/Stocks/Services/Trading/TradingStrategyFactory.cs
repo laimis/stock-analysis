@@ -63,7 +63,7 @@ namespace core.Stocks.Services.Trading
         {
             return new TradingStrategyCloseOnCondition(
                 $"Close after {days} days",
-                (ctx, bar) => bar.Date.Subtract(ctx.Position.Opened.Value).TotalDays >= days
+                (ctx, bar) => bar.Date.Subtract(ctx.Position.Opened).TotalDays >= days
             );
         }
 
@@ -72,7 +72,7 @@ namespace core.Stocks.Services.Trading
             return new TradingStrategyCloseOnCondition(
                 $"Close after {days} days (respect stop)",
                 (ctx, bar) => {
-                    if (bar.Date.Subtract(ctx.Position.Opened.Value).TotalDays >= days)
+                    if (bar.Date.Subtract(ctx.Position.Opened).TotalDays >= days)
                     {
                         return true;
                     }

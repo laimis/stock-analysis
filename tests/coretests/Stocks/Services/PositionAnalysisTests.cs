@@ -13,7 +13,7 @@ namespace coretests.Stocks.Services
     {
         private static (PositionInstance position, PriceBar[] bars, Order[] orders) CreateTestData()
         {
-            var position = new PositionInstance(0, "SHEL");
+            var position = new PositionInstance(0, "SHEL", System.DateTimeOffset.UtcNow);
             position.Buy(numberOfShares: 10, price: 100m, when: System.DateTimeOffset.UtcNow, transactionId: System.Guid.NewGuid());
             position.SetPrice(110m);
             

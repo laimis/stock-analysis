@@ -32,8 +32,6 @@ namespace core.Stocks.Services.Analysis
     
     public record struct TickerPatterns(IEnumerable<Pattern> patterns, string ticker);
 
-    public record struct DateScorePair(System.DateTimeOffset date, decimal score);
-
     public static class AnalysisOutcomeEvaluationScoringHelper
     {
         public static Dictionary<string, int> GenerateTickerCounts(IEnumerable<AnalysisOutcomeEvaluation> evaluations)

@@ -1,68 +1,92 @@
 import {Component, Input} from '@angular/core';
-import {createChart, IChartApi, ISeriesApi} from "lightweight-charts";
-import {DataPoint} from "../../services/stocks.service";
+import {DataPoint, DataPointContainer} from "../../services/stocks.service";
 
 @Component({
   selector: 'app-line-chart',
-  templateUrl: './line-chart.component.html',
-  styleUrls: ['./line-chart.component.css']
+  templateUrl: './line-chart.component.html'
 })
 export class LineChartComponent {
-  chart: IChartApi;
 
   @Input()
   chartHeight: number = 400;
-  private _values: DataPoint[];
+  options: {
+    data: { dataPoints: { x: Date | string; y: number }[]; type: string }[];
+    zoomEnabled: boolean;
+    axisY: { crosshair: { enabled: boolean } };
+    axisX: { crosshair: { snapToDataPoint: boolean; enabled: boolean },valueFormatString: string };
+    exportEnabled: boolean;
+    logarithmic: boolean;
+    title: { text: string }
+  };
 
   @Input()
-  set data(values: DataPoint[]) {
-    if (values) {
-      this._values = values
-      this.renderChart();
+  set dataContainer(container: DataPointContainer) {
+    if (container) {
+      this.renderChart(container);
     }
   }
 
-  @Input()
-  chartType = 'line'; // can also be 'bar'
+  private getLineChartData(container: DataPointContainer) {
+    let data = container.data.map(p => {
+      let x = p.isDate ? new Date(Date.parse(p.label)) : p.label;
 
-  private removeChart() {
-    if (this.chart) {
-      this.chart.remove();
-    }
-  }
-
-  private assignData(series:ISeriesApi<any>) {
-    series.setData(this._values.map(v => {
-      let time = v.label.indexOf('T') > -1 ? v.label.split('T')[0] : v.label;
-      return {time: time, value: v.value}
-    }));
-  }
-
-  private renderChart() {
-    this.removeChart();
-
-    this.chart = createChart(
-      document.getElementById('chart'),
-      {
-        height: this.chartHeight,
-        handleScale: {
-          axisPressedMouseMove: false
-        },
-        handleScroll: {
-          mouseWheel: false,
-          pressedMouseMove: false,
-          vertTouchDrag: false
-        }
+      return {
+        x: x,
+        y: p.value,
+        format: p.isDate ? "MMM DD, YYYY" : null
       }
-    );
+    });
 
-    let series =
-      this.chartType == 'line'
-        ? this.chart.addLineSeries() :
-        this.chart.addHistogramSeries();
+    let isDate = container.data[0].isDate;
 
-    this.assignData(series);
+    return [{
+      type: "line",
+      xValueFormatString: isDate ? "MMM DD, YYYY" : null,
+      dataPoints: data
+    }];
+  }
 
-    this.chart.timeScale().fitContent();
+  private getColumnChartData(container: DataPointContainer) {
+    let data = container.data.map(p => {
+      let x = p.isDate ? new Date(Date.parse(p.label)) : p.label;
+
+      return {
+        x: x,
+        y: p.value,
+        format: p.isDate ? "MMM DD, YYYY" : null
+      }
+    });
+
+    return [{
+      type: "column",
+      dataPoints: data
+    }];
+  }
+
+  private renderChart(container: DataPointContainer) {
+    let data = container.chartType === 'line' ? this.getLineChartData(container) : this.getColumnChartData(container);
+    let isDate = container.data[0].isDate;
+    this.options = {
+      logarithmic: true,
+      exportEnabled: true,
+      zoomEnabled: true,
+      title: {
+        text: container.label,
+      },
+      axisX: {
+        valueFormatString: isDate ? "YYYY-MM-DD" : null,
+        crosshair: {
+          enabled: true,
+          snapToDataPoint: true
+        }
+      },
+      axisY: {
+        // title: <-- should start passing this back perhaps
+        crosshair: {
+          enabled: true
+        }
+      },
+      data: data
+    };
   }
 }

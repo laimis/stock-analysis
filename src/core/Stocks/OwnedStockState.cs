@@ -74,7 +74,7 @@ namespace core.Stocks
 
             if (OpenPosition == null)
             {
-                OpenPosition = new PositionInstance(_positionId, purchased.Ticker);
+                OpenPosition = new PositionInstance(_positionId, purchased.Ticker, purchased.When);
                 Positions.Add(OpenPosition);
                 _positionId++;
             }
