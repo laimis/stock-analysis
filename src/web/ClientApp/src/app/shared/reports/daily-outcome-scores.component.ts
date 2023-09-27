@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {DailyScore, DataPoint} from '../../services/stocks.service';
+import {DataPointContainer} from '../../services/stocks.service';
 
 @Component({
   selector: 'app-daily-outcome-scores',
@@ -7,17 +7,9 @@ import {DailyScore, DataPoint} from '../../services/stocks.service';
   styleUrls: ['./daily-outcome-scores.component.css']
 })
 export class DailyOutcomeScoresComponent {
-  data: DataPoint[] = [];
 
   @Input()
-  set dailyScores(values:DailyScore[]) {
-    this.data = values.map(x => {
-      return {
-        label: x.date,
-        value: x.score
-      }
-    })
-  }
+  dailyScores:DataPointContainer
 
   @Input()
   errors: string[];

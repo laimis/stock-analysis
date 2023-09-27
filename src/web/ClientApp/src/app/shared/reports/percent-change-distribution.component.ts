@@ -10,8 +10,8 @@ export class PercentChangeDistributionComponent {
 
   error: string = null;
   data: StockPercentChangeResponse;
-  recentData: DataPoint[];
-  allTimeData: DataPoint[];
+  recentData: DataPointContainer;
+  allTimeData: DataPointContainer;
 
   @Input()
   set percentChangeDistribution(value: StockPercentChangeResponse) {
@@ -21,20 +21,31 @@ export class PercentChangeDistributionComponent {
 
     this.data = value
 
-    this.recentData = value.recent.buckets.map(b => {
-      return {
-        value: b.frequency,
-        label: b.value.toString()
-      }
-    });
+    this.recentData = {
+      data: value.recent.buckets.map(b => {
+        return {
+          label: b.value.toString(),
+          value: b.frequency,
+          isDate: false
+        }
+      }),
+      label: "Recent",
+      chartType: 'column',
+      annotationLine: null
+    };
 
-    this.allTimeData = value.allTime.buckets.map(b => {
-      return {
-        value: b.frequency,
-        label: b.value.toString()
-      }
-    });
+    this.allTimeData = {
+      data: value.allTime.buckets.map(b => {
+        return {
+          label: b.value.toString(),
+          value: b.frequency,
+          isDate: false
+        }
+      }),
+      label: "All time",
+      chartType: 'column',
+      annotationLine: null
+    };
   }
-
 
 }

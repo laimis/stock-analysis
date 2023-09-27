@@ -1,11 +1,21 @@
 <div>
   <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
 
-  <app-candlestick-chart
+  <app-lightweight-chart-candlestick
     [averageBuyPrice]=210
     [prices]="prices"
     >
-  </app-candlestick-chart>
+  </app-lightweight-chart-candlestick>
+
+  <section>
+    <h3>New chart type</h3>
+    <canvasjs-chart *ngIf="options" [options]="options" (chartInstance)="getChartInstance($event)"></canvasjs-chart>
+  </section>
+
+  <section>
+    <h3>Profit</h3>
+    <app-line-chart [dataContainer]="container"></app-line-chart>
+  </section>
 
   <app-symbol-search></app-symbol-search>
   this is just a symbol app-symbol-search

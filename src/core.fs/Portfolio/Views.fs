@@ -26,7 +26,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         
         let generateOutcomeHistogram (label:string) transactions valueFunc (buckets:int) symmetric annotation =
             
-            let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.bar, annotation)
+            let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.column, annotation)
           
             let min, max =
                 transactions
@@ -140,9 +140,9 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let mutable minCloseDate = DateTimeOffset.MaxValue;
             let mutable maxCloseDate = DateTimeOffset.MinValue;
             let positionsClosedByDate = Dictionary<DateTimeOffset, int>();
-            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.bar);
+            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.column);
             let positionsOpenedByDate = Dictionary<DateTimeOffset, int>();
-            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.bar);
+            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.column);
             
             trades
                 |> Seq.iter ( fun position ->
@@ -187,7 +187,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 positionsClosedByDateContainer.Add(key, positionsClosed)
                 positionsOpenedByDateContainer.Add(key, positionsOpened)
             
-            let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.bar);
+            let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.column);
             gradeContainer.Add("A", aGrades);
             gradeContainer.Add("B", bGrades);
             gradeContainer.Add("C", cGrades);
@@ -196,7 +196,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let gainDistribution =
                 let label = "Gain Distribution"
                 match trades.Length with
-                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.bar)
+                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.column)
                 | _ ->
                     generateOutcomeHistogram
                         label
@@ -209,7 +209,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let rrDistribution =
                 let label = "RR Distribution"
                 match trades.Length with
-                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.bar)
+                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.column)
                 | _ ->
                     generateOutcomeHistogram
                         label
@@ -222,7 +222,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let gainPctDistribution =
                 let label = "Gain % Distribution"
                 match trades.Length with
-                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.bar)
+                | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.column)
                 | _ ->
                     generateOutcomeHistogram
                         label
@@ -234,25 +234,25 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                         
             trends.Add(profits)
             trends.Add(equityCurve)
-            // trends.Add(gradeContainer)
-            // trends.Add(gainDistribution)
-            // trends.Add(gainPctDistribution)
-            // trends.Add(rrDistribution)
-            // trends.Add(wins)
-            // trends.Add(avgWinPct)
-            // trends.Add(avgLossPct)
-            // trends.Add(ev)
-            // trends.Add(avgWinAmount)
-            // trends.Add(avgLossAmount)
-            // trends.Add(gainPctRatio)
-            // trends.Add(profitRatio)
-            // trends.Add(rrRatio)
-            // trends.Add(rrSum)
-            // trends.Add(invested)
-            // trends.Add(maxWin)
-            // trends.Add(maxLoss)
-            // trends.Add(positionsOpenedByDateContainer)
-            // trends.Add(positionsClosedByDateContainer)
+            trends.Add(gradeContainer)
+            trends.Add(gainDistribution)
+            trends.Add(gainPctDistribution)
+            trends.Add(rrDistribution)
+            trends.Add(wins)
+            trends.Add(avgWinPct)
+            trends.Add(avgLossPct)
+            trends.Add(ev)
+            trends.Add(avgWinAmount)
+            trends.Add(avgLossAmount)
+            trends.Add(gainPctRatio)
+            trends.Add(profitRatio)
+            trends.Add(rrRatio)
+            trends.Add(rrSum)
+            trends.Add(invested)
+            trends.Add(maxWin)
+            trends.Add(maxLoss)
+            trends.Add(positionsOpenedByDateContainer)
+            trends.Add(positionsClosedByDateContainer)
             
             trends
             
