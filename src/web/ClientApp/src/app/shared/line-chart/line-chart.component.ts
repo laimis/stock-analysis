@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {DataPoint, DataPointContainer} from "../../services/stocks.service";
+import {ChartAnnotationLine, DataPoint, DataPointContainer} from "../../services/stocks.service";
 
 @Component({
   selector: 'app-line-chart',
@@ -34,10 +34,55 @@ export class LineChartComponent {
     }
   }
 
+  private createAnnotationDataPoints(annotationLine:ChartAnnotationLine, dataPoints:any[]) {
+
+    // it can be either horizontal or vertical
+    // if it is horizontal, it's x is the x of the data points and y is a constant value
+
+    if (annotationLine.chartAnnotationLineType === "horizontal") {
+      let data = dataPoints.map(p => {
+        return {
+          label: p.label,
+          x: p.x,
+          y: annotationLine.value,
+          markerSize: 0
+        }
+      })
+
+      return data
+    } else {
+      return null
+      // let data = dataPoints.map(p => {
+      //   return {
+      //     label: p.label,
+      //     x: annotationLine.value,
+      //     y: p.y
+      //   }
+      // });
+      //
+      // return data
+    }
+  }
+
   private renderChart(container: DataPointContainer) {
     let dataPoints = container.data.map(p => this.toDataPoint(p))
     let chartType = container.chartType // they match 1:1 today
     let isDate = container.data[0].isDate
+
+    let data = [{
+      type: chartType,
+      dataPoints: dataPoints
+    }]
+
+    if (container.annotationLine) {
+      let annotationDataPoints = this.createAnnotationDataPoints(container.annotationLine, dataPoints)
+      if (annotationDataPoints !== null) {
+        data.push({
+          type: "line",
+          dataPoints: annotationDataPoints
+        })
+      }
+    }
 
     this.options = {
       exportEnabled: true,
@@ -57,10 +102,7 @@ export class LineChartComponent {
         //   enabled: true
         // }
       },
-      data: [{
-        type: chartType,
-        dataPoints: dataPoints
-      }]
+      data: data
     };
   }
 }

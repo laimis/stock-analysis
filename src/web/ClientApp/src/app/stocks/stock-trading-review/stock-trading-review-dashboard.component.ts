@@ -27,7 +27,7 @@ export class StockTradingReviewDashboardComponent implements OnInit {
 
   loadEntries() {
     this.loading = true
-    this.stockService.getTradingEntries().subscribe(
+    this.stockService.getPastTradingEntries().subscribe(
       response => {
         this.past = response.past
         this.performance = response.performance

@@ -11,11 +11,9 @@ import {GetErrors} from "../../services/utils";
 })
 export class StockTradingComponent implements OnInit {
   positions: PositionInstance[]
-  closed: PositionInstance[]
   loaded: boolean = false
   loading: boolean = true
   activeTab:string = 'positions'
-  performance: StockTradingPerformanceCollection;
   violations: StockViolation[]
   brokerageOrders: BrokerageOrder[];
   cashBalance: number;
@@ -59,8 +57,6 @@ export class StockTradingComponent implements OnInit {
     this.loading = true
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
       this.positions = r.current
-      this.closed = r.past
-      this.performance = r.performance
       this.violations = r.violations
       this.brokerageOrders = r.brokerageOrders
       this.cashBalance = r.cashBalance

@@ -20,6 +20,10 @@ export class StocksService {
     return this.http.get<StockTradingPositions>('/api/portfolio/tradingentries')
   }
 
+  getPastTradingEntries(): Observable<PastStockTradingPositions> {
+    return this.http.get<PastStockTradingPositions>('/api/portfolio/pasttradingentries')
+  }
+
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionsView> {
     if (ticker === null) {
       ticker = ''
@@ -1023,12 +1027,15 @@ export interface BrokerageAccount {
 
 export interface StockTradingPositions {
   current: PositionInstance[]
-  past: PositionInstance[]
-  performance: StockTradingPerformanceCollection
-  strategyPerformance: TradingStrategyPerformance[]
   violations: StockViolation[]
   cashBalance: number
   brokerageOrders: BrokerageOrder[]
+}
+
+export interface PastStockTradingPositions {
+  past: PositionInstance[]
+  performance: StockTradingPerformanceCollection
+  strategyPerformance: TradingStrategyPerformance[]
 }
 
 export interface PriceWithDate {

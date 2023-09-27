@@ -1,7 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { Prices, StocksService, PositionInstance, TradingStrategyResults, StockTradingPositions, PriceWithDate, DailyPositionReport, BrokerageOrder } from 'src/app/services/stocks.service';
-import { GetErrors } from 'src/app/services/utils';
+import {Component, OnInit} from '@angular/core';
+import {Title} from '@angular/platform-browser';
+import {
+  DailyPositionReport,
+  PastStockTradingPositions,
+  PositionInstance,
+  Prices,
+  StocksService,
+  TradingStrategyResults
+} from 'src/app/services/stocks.service';
+import {GetErrors} from 'src/app/services/utils';
 
 
 @Component({
@@ -10,7 +17,7 @@ import { GetErrors } from 'src/app/services/utils';
   styleUrls: ['./stock-trading-review.component.css']
 })
 export class StockTradingReviewComponent implements OnInit {
-  
+
   positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
@@ -22,16 +29,14 @@ export class StockTradingReviewComponent implements OnInit {
   simulationErrors: string[];
   scoresErrors: string[];
   dailyPositionReport: DailyPositionReport
-  orders: BrokerageOrder[];
 
   constructor (
     private stockService: StocksService,
     private title: Title) { }
 
   ngOnInit(): void {
-    this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
+    this.stockService.getPastTradingEntries().subscribe((r: PastStockTradingPositions) => {
         this.positions = r.past
-        this.orders = r.brokerageOrders
         this.updateCurrentPosition()
       }, (error) => {
         console.log("error fetching positions: " + error)
@@ -104,8 +109,7 @@ export class StockTradingReviewComponent implements OnInit {
   }
 
   dropdownClick(elem: EventTarget) {
-    var index = Number.parseInt((elem as HTMLInputElement).value)
-    this._index = index
+    this._index = Number.parseInt((elem as HTMLInputElement).value)
     this.updateCurrentPosition()
   }
 

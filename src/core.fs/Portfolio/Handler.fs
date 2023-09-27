@@ -124,6 +124,11 @@ type QueryTradingEntries =
         UserId: Guid
     }
     
+type QueryPastTradingEntries =
+    {
+        UserId: Guid
+    }
+    
 type QueryTransactions =
     {
         UserId: Guid
@@ -504,6 +509,25 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let current = positions |> Array.sortByDescending (fun p -> p.RR)
             
+            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
+            
+            let (tradingEntries:TradingEntriesView) =
+                {
+                    current=current;
+                    violations=violations;
+                    cashBalance=account.CashBalance;
+                    brokerageOrders=account.Orders
+                }
+            return ServiceResponse<TradingEntriesView>(tradingEntries)
+    }
+    
+    member _.Handle (query:QueryPastTradingEntries) = task {
+        let! user = accounts.GetUser(query.UserId)
+        match user with
+        | null -> return "User not found" |> ResponseUtils.failedTyped<PastTradingEntriesView>
+        | _ ->
+            let! stocks = storage.GetStocks(query.UserId)
+            
             let past =
                 stocks
                 |> Seq.map (fun s -> s.State)
@@ -524,19 +548,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.sortByDescending (fun p -> p.performance.Profit)
                 |> Seq.toArray
                 
-            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
-            
-            let (tradingEntries:TradingEntriesView) =
+            let (tradingEntries:PastTradingEntriesView) =
                 {
-                    current=current;
                     past=past;
                     performance=performance;
-                    violations=violations;
                     strategyPerformance=strategyByPerformance;
-                    cashBalance=account.CashBalance;
-                    brokerageOrders=account.Orders
                 }
-            return ServiceResponse<TradingEntriesView>(tradingEntries)
+            return ServiceResponse<PastTradingEntriesView>(tradingEntries)
     }
     
     member _.Handle(query:QueryTransactions) = task {

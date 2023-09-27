@@ -92,7 +92,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.line);
             let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
             let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.line);
-            let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.line, zeroLineAnnotationHorizontal);
+            let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.line);
             
             let days =
                 match trades with
@@ -311,12 +311,16 @@ type PortfolioView =
 type TradingEntriesView =
     {
         current: PositionInstance array
-        past: PositionInstance array
-        performance: TradingPerformanceContainerView
         violations: StockViolationView array
-        strategyPerformance: TradingStrategyPerformance array
         cashBalance: Nullable<decimal>
         brokerageOrders: Order array
+    }
+    
+type PastTradingEntriesView =
+    {
+        past: PositionInstance array
+        performance: TradingPerformanceContainerView
+        strategyPerformance: TradingStrategyPerformance array
     }
     
 type TransactionGroup(name:string,transactions:Transaction seq) =

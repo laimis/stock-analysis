@@ -331,5 +331,15 @@ namespace web.Controllers
                     )
                 )
             );
+        
+        [HttpGet("pasttradingentries")]
+        public Task<ActionResult> PastTradingEntries([FromServices] Handler service) =>
+            this.OkOrError(
+                service.Handle(
+                    new QueryTradingEntries(
+                        User.Identifier()
+                    )
+                )
+            );
     }
 }
