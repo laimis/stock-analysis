@@ -40,7 +40,7 @@ type DailyOutcomeScoreReportQuery =
 type DailyOutcomeScoreReportView =
     {
         Ticker: Ticker
-        DailyScores: DateScorePair seq
+        DailyScores: ChartDataPointContainer<int>
     }
     
 type DailyPositionReportQuery =
