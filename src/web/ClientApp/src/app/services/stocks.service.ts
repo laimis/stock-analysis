@@ -878,20 +878,15 @@ export interface OutcomesReport {
   evaluationSummary: EvaluationCountPair[],
   patterns: TickerPatterns[]
 }
-
-export interface DailyScore {
-  date: string
-  score: number
-}
 export interface DailyOutcomeScoresReport {
   ticker: string
-  dailyScores: DailyScore[]
+  dailyScores: DataPointContainer
 }
 
 export interface DailyPositionReport {
   ticker: string
-  dailyProfit: DailyScore[]
-  dailyGainPct: DailyScore[]
+  dailyProfit: DataPointContainer
+  dailyGainPct: DataPointContainer
 }
 
 export interface TickerCountPair {
@@ -978,6 +973,7 @@ export interface StockTradingPerformance {
 export interface DataPoint {
   value: number
   label: string
+  isDate: boolean
 }
 
 export interface ChartAnnotationLine {

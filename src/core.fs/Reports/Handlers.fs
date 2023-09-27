@@ -40,7 +40,7 @@ type DailyOutcomeScoreReportQuery =
 type DailyOutcomeScoreReportView =
     {
         Ticker: Ticker
-        DailyScores: DateScorePair seq
+        DailyScores: ChartDataPointContainer<int>
     }
     
 type DailyPositionReportQuery =
@@ -52,8 +52,8 @@ type DailyPositionReportQuery =
     
 type DailyPositionReportView =
     {
-        DailyProfit: DateScorePair seq
-        DailyGainPct: DateScorePair seq
+        DailyProfit: ChartDataPointContainer<decimal>
+        DailyGainPct: ChartDataPointContainer<decimal>
         Ticker: string
     }
     
@@ -268,7 +268,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 | null -> return "Position not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
                 | _ ->
                         
-                    let start = position.Opened.Value |> marketHours.GetMarketStartOfDayTimeInUtc
+                    let start = position.Opened |> marketHours.GetMarketStartOfDayTimeInUtc
                     let ``end`` =
                         match position.Closed.HasValue with
                         | true -> position.Closed.Value |> marketHours.GetMarketEndOfDayTimeInUtc
@@ -418,7 +418,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     let! priceResponse =
                         brokerage.GetPriceHistory(
                             user.State, position.Ticker, PriceFrequency.Daily,
-                            position.Opened.Value, DateTimeOffset.UtcNow
+                            position.Opened, DateTimeOffset.UtcNow
                         )
                         |> Async.AwaitTask
                     

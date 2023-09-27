@@ -366,7 +366,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 
             let sorted =
                 trades
-                |> Seq.sortBy (fun x -> if x.Closed.HasValue then x.Closed.Value else x.Opened.Value)
+                |> Seq.sortBy (fun x -> if x.Closed.HasValue then x.Closed.Value else x.Opened)
                 
             let filename = CSVExport.GenerateFilename("positions")
             

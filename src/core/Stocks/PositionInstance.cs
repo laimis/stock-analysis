@@ -20,20 +20,21 @@ namespace core.Stocks
     // to the time when the last share is sold.
     public class PositionInstance
     {
-        public PositionInstance(int positionId, string ticker)
+        public PositionInstance(int positionId, Ticker ticker, DateTimeOffset opened)
         {
             PositionId = positionId;
             Ticker = ticker;
+            Opened = opened;
         }
 
-        public decimal NumberOfShares { get; private set; } = 0;
-        public decimal AverageCostPerShare { get; private set; } = 0;
-        public decimal AverageSaleCostPerShare { get; private set; } = 0;
-        public decimal AverageBuyCostPerShare { get; private set; } = 0;
-        public DateTimeOffset? Opened { get; private set; }
-        public int DaysHeld => Opened != null ? (int)(!IsClosed ? DateTimeOffset.UtcNow : Closed.Value).Subtract(Opened.Value).TotalDays : 0;
-        public decimal Cost { get; private set; } = 0;
-        public decimal Profit { get; private set; } = 0;
+        public decimal NumberOfShares { get; private set; }
+        public decimal AverageCostPerShare { get; private set; }
+        public decimal AverageSaleCostPerShare { get; private set; }
+        public decimal AverageBuyCostPerShare { get; private set; }
+        public DateTimeOffset Opened { get; }
+        public int DaysHeld => (int)(Closed ?? DateTimeOffset.UtcNow).Subtract(Opened).TotalDays;
+        public decimal Cost { get; private set; }
+        public decimal Profit { get; private set; }
         public decimal GainPct => IsClosed switch {
             true => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare,
             false => UnrealizedGainPct ?? 0
@@ -46,10 +47,10 @@ namespace core.Stocks
         public decimal RRWeighted => RR * Cost;
 
         public decimal? Price { get; private set; }
-        public decimal? UnrealizedProfit { get; private set; } = null;
-        public decimal? UnrealizedGainPct { get; private set; } = null;
-        public decimal? UnrealizedRR { get; private set; } = null;
-        public decimal? PercentToStop { get; private set; } = null;
+        public decimal? UnrealizedProfit { get; private set; }
+        public decimal? UnrealizedGainPct { get; private set; }
+        public decimal? UnrealizedRR { get; private set; }
+        public decimal? PercentToStop { get; private set; }
         public decimal CombinedProfit => Profit + (UnrealizedProfit ?? 0);
         public bool IsClosed => Closed != null;
         public int PositionId { get; }
@@ -62,8 +63,8 @@ namespace core.Stocks
             _ => null
         };
         
-        public List<PositionTransaction> Transactions { get; private set; } = new List<PositionTransaction>();
-        public List<PositionEvent> Events { get; private set; } = new List<PositionEvent>();
+        public List<PositionTransaction> Transactions { get; private set; } = new();
+        public List<PositionEvent> Events { get; private set; } = new();
 
         public decimal? StopPrice { get; private set; }
         public DateTimeOffset LastTransaction { get; private set; }
@@ -71,13 +72,13 @@ namespace core.Stocks
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
         private readonly List<decimal> _slots = new();
 
-        private bool PositionCompleted = false;
-        public decimal CompletedPositionCost { get; private set; } = 0;
-        public decimal CompletedPositionShares { get; private set; } = 0;
+        private bool PositionCompleted;
+        public decimal CompletedPositionCost { get; private set; }
+        public decimal CompletedPositionShares { get; private set; }
         public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
 
-        public string Grade { get; private set; } = null;
-        public string GradeNote { get; private set; } = null;
+        public string Grade { get; private set; }
+        public string GradeNote { get; private set; }
         public void SetGrade(TradeGrade grade, string note = null)
         {
             Grade = grade;
@@ -95,11 +96,6 @@ namespace core.Stocks
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
-            if (NumberOfShares == 0)
-            {
-                Opened = when;
-            }
-
             Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
             Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", type: PositionEventType.buy, value: price, when: when, quantity: numberOfShares));
 
@@ -193,7 +189,7 @@ namespace core.Stocks
                 var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
                 Events.Add(
-                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage.ToString("P1")})", PositionEventType.stop, stopPrice, when));
+                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage:P1})", PositionEventType.stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -305,7 +301,7 @@ namespace core.Stocks
             };
         }
 
-        private Dictionary<string, string> _labels { get; set; } = new Dictionary<string, string>();
+        private Dictionary<string, string> _labels { get; set; } = new();
         public IEnumerable<KeyValuePair<string, string>> Labels => _labels;
         public bool ContainsLabel(string key, string value)
         {

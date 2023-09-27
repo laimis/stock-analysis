@@ -394,7 +394,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     price=position.CompletedPositionCostPerShare,
                     stopPrice=position.FirstStop.Value,
                     ticker=position.Ticker,
-                    ``when``=position.Opened.Value,
+                    ``when``=position.Opened,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             
@@ -636,7 +636,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             stocks
             |> Seq.map (fun s -> s.State.OpenPosition)
             |> Seq.filter (fun p -> p = null |> not)
-            |> Seq.filter (fun p -> p.Opened.Value >= DateTimeOffset(start) && p.Opened.Value <= DateTimeOffset(``end``))
+            |> Seq.filter (fun p -> p.Opened >= DateTimeOffset(start) && p.Opened <= DateTimeOffset(``end``))
             |> Seq.toList
             
         let view = TransactionSummaryView(

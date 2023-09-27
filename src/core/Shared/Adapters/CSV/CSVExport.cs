@@ -41,7 +41,7 @@ namespace core.Shared.Adapters.CSV
                             r.CompletedPositionShares * r.CompletedPositionCostPerShare,
                             r.CompletedPositionCostPerShare,
                             r.AverageSaleCostPerShare,
-                            r.Opened.Value.ToString(DATE_FORMAT),
+                            r.Opened.ToString(DATE_FORMAT),
                             r.Closed.Value.ToString(DATE_FORMAT),
                             r.DaysHeld
                         )
@@ -81,7 +81,7 @@ namespace core.Shared.Adapters.CSV
             var rows = trades.Select(t =>
                 new TradesRecord(
                     symbol: t.Ticker,
-                    opened: t.Opened?.ToString(DATE_FORMAT),
+                    opened: t.Opened.ToString(DATE_FORMAT),
                     closed: t.Closed?.ToString(DATE_FORMAT),
                     daysheld: t.DaysHeld,
                     firstbuycost: t.CompletedPositionCostPerShare,

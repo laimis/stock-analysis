@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using core.Shared;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Analysis
 {
     public class PositionDailyPLAndGain
     {
-        public static (List<DateScorePair> profit, List<DateScorePair> gainPct) Generate(
+        public static (ChartDataPointContainer<decimal> profit, ChartDataPointContainer<decimal> gainPct) Generate(
             PriceBar[] bars, 
             PositionInstance position)
         {
@@ -13,7 +14,7 @@ namespace core.Stocks.Services.Analysis
             var firstBar = 0;
             for (var i = 0; i < bars.Length; i++)
             {
-                if (bars[i].Date >= position.Opened.Value)
+                if (bars[i].Date >= position.Opened)
                 {
                     firstBar = i;
                     break;
@@ -34,8 +35,8 @@ namespace core.Stocks.Services.Analysis
                 }
             }
 
-            var profit = new List<DateScorePair>();
-            var gainPct = new List<DateScorePair>();
+            var profit = new ChartDataPointContainer<decimal>(label: "Profit", DataPointChartType.line);
+            var gainPct = new ChartDataPointContainer<decimal>(label: "Gain %", DataPointChartType.line);
 
             var shares = position.CompletedPositionShares;
             var costBasis = position.AverageBuyCostPerShare;
@@ -48,8 +49,8 @@ namespace core.Stocks.Services.Analysis
                 var currentGainPct = (currentPrice - costBasis) / costBasis * 100;
                 var currentProfit = shares * (currentPrice - costBasis);
 
-                profit.Add(new DateScorePair(bar.Date, currentProfit));
-                gainPct.Add(new DateScorePair(bar.Date, currentGainPct));
+                profit.Add(bar.Date, currentProfit);
+                gainPct.Add(bar.Date, currentGainPct);
             }
 
             return (profit, gainPct);

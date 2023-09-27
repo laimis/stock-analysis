@@ -37,7 +37,7 @@ namespace core.Shared
         }
     }
 
-    public enum DataPointChartType { line, bar }
+    public enum DataPointChartType { line, column }
 
 
     public class ChartDataPointContainerBase
@@ -54,17 +54,23 @@ namespace core.Shared
 
     public class DataPoint<T>
     {
-        public DataPoint(string label, T value)
+        private DataPoint(string label, T value, bool isDate)
         {
             Label = label;
             Value = value;
+            IsDate = isDate;
         }
-
-        public DataPoint(DateTimeOffset timestamp, T value) : this(timestamp.ToString("yyyy-MM-dd"), value)
+        
+        public DataPoint(string label, T value) : this(label, value, isDate: false)
         {
         }
 
-        public string Label { get; set; }
-        public T Value { get; set; }
+        public DataPoint(DateTimeOffset timestamp, T value) : this(timestamp.ToString("yyyy-MM-dd"), value, isDate: true)
+        {
+        }
+
+        public string Label { get; }
+        public T Value { get; }
+        public bool IsDate { get; }
     }
 }

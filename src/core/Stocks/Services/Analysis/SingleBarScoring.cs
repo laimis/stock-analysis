@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using core.Shared;
 using core.Shared.Adapters.Stocks;
 
 namespace core.Stocks.Services.Analysis
 {
     public class SingleBarDailyScoring
     {
-        public static List<DateScorePair> Generate(
+        public static ChartDataPointContainer<int> Generate(
             PriceBar[] bars, 
             DateTimeOffset start,
             string ticker)
@@ -23,20 +24,23 @@ namespace core.Stocks.Services.Analysis
 
                 indexOfFirstBar++;
             }
+            
+            var container = new ChartDataPointContainer<int>(label: "Scores for " + ticker, DataPointChartType.line);
 
-            return Enumerable.Range(indexOfFirstBar, bars.Length - indexOfFirstBar)
-                .Select(index => {
-                    var barsToUse = bars[..(index+1)];
+            foreach (var index in Enumerable.Range(indexOfFirstBar, bars.Length - indexOfFirstBar))
+            {
+                var barsToUse = bars[..(index + 1)];
 
-                    var currentBar = barsToUse[^1];
+                var currentBar = barsToUse[^1];
 
-                    var outcomes = SingleBarAnalysisRunner.Run(barsToUse);
-                    var tickerOutcomes = new TickerOutcomes(outcomes, ticker);
-                    var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[]{tickerOutcomes});
-                    var counts = AnalysisOutcomeEvaluationScoringHelper.GenerateTickerCounts(evaluations);
-                    return new DateScorePair(currentBar.Date, counts.GetValueOrDefault(ticker, 0));
-                })
-                .ToList();
+                var outcomes = SingleBarAnalysisRunner.Run(barsToUse);
+                var tickerOutcomes = new TickerOutcomes(outcomes, ticker);
+                var evaluations = SingleBarAnalysisOutcomeEvaluation.Evaluate(new[] { tickerOutcomes });
+                var counts = AnalysisOutcomeEvaluationScoringHelper.GenerateTickerCounts(evaluations);
+                container.Add(currentBar.Date, counts.GetValueOrDefault(ticker, 0));
+            }
+
+            return container;
         }
     }
 }

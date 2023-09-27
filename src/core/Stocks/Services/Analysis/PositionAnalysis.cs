@@ -185,7 +185,7 @@ namespace core.Stocks.Services.Analysis
             // add days since opened as outcome
             var daysSinceOpened =
                 Math.Ceiling(
-                    DateTimeOffset.UtcNow.Subtract(position.Opened!.Value).TotalDays
+                    DateTimeOffset.UtcNow.Subtract(position.Opened).TotalDays
                 );
 
             yield return new AnalysisOutcome(

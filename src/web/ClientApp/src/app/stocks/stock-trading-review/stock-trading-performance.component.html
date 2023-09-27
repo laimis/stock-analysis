@@ -32,8 +32,7 @@
     </div>
 
     <div *ngFor="let t of trends">
-      <div class="text-center">{{t.label}}</div>
-      <app-line-chart [chartType]="t.chartType" [data]="t.data"></app-line-chart>
+      <app-line-chart [dataContainer]="t"></app-line-chart>
     </div>
 
   </section>

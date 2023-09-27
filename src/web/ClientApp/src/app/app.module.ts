@@ -89,11 +89,12 @@ import { TradingViewLinkComponent } from './shared/stocks/trading-view-link.comp
 import { OptionBrokeragePositionsComponent } from './options/option-dashboard/option-brokerage-positions.component';
 import { StockLinkComponent } from './shared/stocks/stock-link.component';
 import { RoutineComponent } from './routines/routines-routine.component';
-import { CandlestickChartComponent } from './shared/candlestick-chart/candlestick-chart.component';
 import { OptionSpreadsComponent } from './options/option-chain/option-spreads.component';
 import { OptionBrokerageOrdersComponent } from './options/option-dashboard/option-brokerage-orders.component';
 import { RoutinesActiveRoutineComponent } from './routines/routines-active-routine.component';
 import { LineChartComponent } from './shared/line-chart/line-chart.component';
+import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
+import {LightWeightChartCandlestickComponent} from "./shared/candlestick-chart/lightweight-chart-candlestick.component";
 
 
 let routes: Routes = [
@@ -247,7 +248,7 @@ let routes: Routes = [
     StockNewPositionComponent,
     StockListsDashboardComponent,
     StockListComponent,
-    CandlestickChartComponent,
+    LightWeightChartCandlestickComponent,
     StockTradingReviewDashboardComponent,
     StockTradingPendingPositionsComponent,
     StockSECFilingsComponent,
@@ -268,6 +269,7 @@ let routes: Routes = [
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    CanvasJSAngularChartsModule,
     RouterModule.forRoot(routes, { })
   ],
   providers: [
