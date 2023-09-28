@@ -1,6 +1,8 @@
 using System;
 using core.fs;
 using core.fs.Alerts;
+using core.fs.Shared;
+using core.fs.Shared.Adapters.Storage;
 using core.Shared.Adapters;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
@@ -8,7 +10,6 @@ using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.SMS;
-using core.Shared.Adapters.Storage;
 using core.Shared.Adapters.Subscriptions;
 using csvparser;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +51,7 @@ namespace web
             // go over all types in core.fs assembly, find any innner classes and register any type that implements IApplicationService
             // interface as a singleton
             var markerInterface = typeof(IApplicationService);
-            var assembly = typeof(core.fs.Options.Dashboard).Assembly;
+            var assembly = typeof(core.fs.Options.Handler).Assembly;
             
             foreach (var type in assembly.GetTypes())
             {

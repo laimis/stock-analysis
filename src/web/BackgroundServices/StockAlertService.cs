@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Alerts;
+using core.fs.Shared.Adapters.Storage;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
-using core.Shared.Adapters.Storage;
 using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -172,7 +172,7 @@ namespace web.BackgroundServices
                 _listChecks.Add(Constants.MonitorTagPattern, list);
             }
 
-            _nextListMonitoringRun = core.fs.Alerts.MonitoringServices.nextMonitoringRun(
+            _nextListMonitoringRun = MonitoringServices.nextMonitoringRun(
                 DateTimeOffset.UtcNow,
                 _marketHours
             );

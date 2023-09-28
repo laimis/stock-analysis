@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Storage;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
-using core.Shared.Adapters.Storage;
+using core.Shared.Adapters.CSV;
 using Moq;
 using Xunit;
 
@@ -26,7 +26,7 @@ namespace coretests.Options
         {
             var (storage, _) = _fixture.CreateStorageWithSoldOption();
             
-            var query = new Dashboard.Query(Guid.NewGuid());
+            var query = new DashboardQuery(Guid.NewGuid());
 
             var accounts = new Mock<IAccountStorage>();
             accounts.Setup(x => x.GetUser(It.IsAny<Guid>()))
@@ -52,7 +52,7 @@ namespace coretests.Options
                     )
                 ));
             
-            var handler = new Dashboard.Handler(accounts.Object, brokerage.Object, storage);
+            var handler = new Handler(accounts.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>());
 
             var result = await handler.Handle(query);
 

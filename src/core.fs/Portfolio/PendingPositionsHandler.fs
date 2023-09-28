@@ -7,8 +7,8 @@ open core.Portfolio
 open core.Shared
 open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
-open core.Shared.Adapters.Storage
-open core.fs
+open core.fs.Shared
+open core.fs.Shared.Adapters.Storage
 
 [<CLIMutable>]
 [<Struct>]
@@ -93,7 +93,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                         userId=command.UserId
                     )
                     
-                    do! portfolio.Save(position, command.UserId)
+                    do! portfolio.SavePendingPosition position command.UserId
                 
                     return ServiceResponse()
     }
@@ -128,7 +128,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                         
                     position.Close(purchased=false)
                 
-                    do! portfolio.Save(position, command.UserId)
+                    do! portfolio.SavePendingPosition position command.UserId
                 
                     return ServiceResponse()
     }

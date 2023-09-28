@@ -2,6 +2,8 @@
 
 namespace core.Account
 {
+    public record struct EmailIdPair(string Email, string Id);
+    
     public class ProcessIdToUserAssociation
     {
         private ProcessIdToUserAssociation(Guid id, Guid userId, DateTimeOffset timestamp)

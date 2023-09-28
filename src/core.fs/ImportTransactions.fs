@@ -6,8 +6,9 @@ open core.Account
 open core.Shared
 open core.Shared.Adapters.CSV
 open core.Shared.Adapters.Emails
-open core.Shared.Adapters.Storage
 open core.fs.Options
+open core.fs.Shared
+open core.fs.Shared.Adapters.Storage
 open core.fs.Stocks
 
 module ImportTransactions =
@@ -47,7 +48,7 @@ module ImportTransactions =
             
         member this.StrikePrice() =
             let m = TransactionRecord.OptionRegex.Match(this.Description)
-            Decimal.Parse(m.Groups.[3].Value)
+            Decimal.Parse(m.Groups[3].Value)
             
         member this.ExpirationDate() =
             let m = TransactionRecord.OptionRegex.Match(this.Description)
@@ -65,7 +66,7 @@ module ImportTransactions =
         accounts:IAccountStorage,
         emailService:IEmailService,
         csvParser:ICSVParser,
-        optionsImport:BuyOrSell.Handler,
+        optionsImport:core.fs.Options.Handler,
         stocksImport:core.fs.Stocks.Handler) =
         
         interface IApplicationService
@@ -125,14 +126,14 @@ module ImportTransactions =
                             match r.IsOption(),r.IsStock(),r.IsBuy(),r.IsSell() with
                             | true, _, true, _ -> // buy option
                                 let data = r |> createOptionTransaction
-                                let cmd = BuyOrSell.Buy(data, cmd.UserId)
+                                let cmd = BuyOrSellCommand.Buy(data, cmd.UserId)
                                 let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
                                 match result.IsOk with
                                 | false -> return result.Error.Message
                                 | true -> return ""
                             | true, _, _, true -> // sell option
                                 let data = r |> createOptionTransaction
-                                let cmd = BuyOrSell.Sell(data, cmd.UserId)
+                                let cmd = BuyOrSellCommand.Sell(data, cmd.UserId)
                                 let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
                                 match result.IsOk with
                                 | false -> return result.Error.Message

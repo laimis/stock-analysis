@@ -3,12 +3,10 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Options;
-using core.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
-using Delete = core.fs.Options.Delete;
 
 namespace web.Controllers
 {
@@ -17,79 +15,86 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class OptionsController : ControllerBase
     {
+        private readonly Handler _service;
+
+        public OptionsController(Handler service)
+        {
+            _service = service;
+        }
+        
         [HttpGet("{ticker}/chain")]
-        public Task<ActionResult> Chain([FromRoute] string ticker, [FromServices] Chain.Handler service) =>
+        public Task<ActionResult> Chain([FromRoute] string ticker) =>
             this.OkOrError(
-                service.Handle(
-                    new Chain.Query(
+                _service.Handle(
+                    new ChainQuery(
                         ticker: ticker, userId: User.Identifier()
                     )
                 )
             );
         
         [HttpGet("{optionId:guid}")]
-        public Task<ActionResult> Get([FromRoute] Guid optionId, [FromServices] Details.Handler service) =>
+        public Task<ActionResult> Get([FromRoute] Guid optionId) =>
             this.OkOrError(
-                service.Handle(
-                    new Details.Query(optionId: optionId, userId: User.Identifier()
+                _service.Handle(
+                    new DetailsQuery(optionId: optionId, userId: User.Identifier()
                     )
                 )
             );
 
         [HttpPost("sell")]
-        public Task<ActionResult> Sell([FromBody]OptionTransaction cmd, [FromServices] BuyOrSell.Handler service)
+        public Task<ActionResult> Sell([FromBody]OptionTransaction cmd)
         {
             return this.OkOrError(
-                service.Handle(
-                    BuyOrSell.Command.NewSell(cmd, User.Identifier())
+                _service.Handle(
+                    BuyOrSellCommand.NewSell(cmd, User.Identifier())
                 )
             );
         }
 
         [HttpPost("buy")]
-        public Task<ActionResult> Buy([FromBody]OptionTransaction cmd, [FromServices] BuyOrSell.Handler service)
+        public Task<ActionResult> Buy([FromBody]OptionTransaction cmd)
         {
             return this.OkOrError(
-                service.Handle(
-                    BuyOrSell.Command.NewBuy(cmd, User.Identifier())
+                _service.Handle(
+                    BuyOrSellCommand.NewBuy(cmd, User.Identifier())
                 )
             );
         }
 
         [HttpDelete("{id}")]
-        public Task<ActionResult> Delete([FromServices]Delete.Handler service, [FromRoute] Guid id)
+        public Task<ActionResult> Delete([FromRoute] Guid id)
             => this.OkOrError(
-                service.Handle(
-                    new Delete.Command(id, User.Identifier())
+                _service.Handle(
+                    new DeleteCommand(id, User.Identifier())
                 )
             );
 
         [HttpPost("{optionId}/expire")]
-        public Task<ActionResult> Expire([FromServices]Expire.Handler service, [FromRoute] Guid optionId)
+        public Task<ActionResult> Expire([FromRoute] Guid optionId)
             => this.OkOrError(
-                service.Handle(
-                    core.fs.Options.Expire.Command.NewExpire(
-                        new Expire.ExpireData(userId: User.Identifier(), optionId: optionId)
+                _service.Handle(
+                    ExpireCommand.NewExpire(
+                        new ExpireData(userId: User.Identifier(), optionId: optionId)
                     )
                 )
             );
         
         [HttpPost("{optionId}/assign")]
-        public Task<ActionResult> Assign([FromServices]Expire.Handler service, [FromRoute] Guid optionId)
+        public Task<ActionResult> Assign([FromRoute] Guid optionId)
             => this.OkOrError(
-                service.Handle(
-                    core.fs.Options.Expire.Command.NewAssign(
-                        new Expire.ExpireData(userId: User.Identifier(), optionId: optionId)
+                _service.Handle(
+                    ExpireCommand.NewAssign(
+                        new ExpireData(userId: User.Identifier(), optionId: optionId)
                     )
                 )
             );
         
         [HttpGet("export")]
-        public Task<ActionResult> Export([FromServices]Export.Handler service)
+        public Task<ActionResult> Export()
         {
             return this.GenerateExport(
-                service.Handle(
-                    new Export.Query(
+                _service.Handle(
+                    new ExportQuery(
                         User.Identifier()
                     )
                 )
@@ -112,10 +117,10 @@ namespace web.Controllers
         }
 
         [HttpGet]
-        public Task<ActionResult> Dashboard([FromServices]Dashboard.Handler service)
+        public Task<ActionResult> Dashboard()
             => this.OkOrError(
-                service.Handle(
-                    new Dashboard.Query(
+                _service.Handle(
+                    new DashboardQuery(
                         User.Identifier()
                     )
                 ));

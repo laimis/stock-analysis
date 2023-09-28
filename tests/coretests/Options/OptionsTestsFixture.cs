@@ -1,11 +1,9 @@
 using System;
-using core;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Storage;
 using core.Options;
 using core.Shared;
-using core.Shared.Adapters.Storage;
-using core.Stocks;
 using Moq;
 
 namespace coretests.Options
@@ -24,7 +22,7 @@ namespace coretests.Options
 
         public (IPortfolioStorage, OwnedOption) CreateStorageWithSoldOption()
         {
-            var cmd = CreateSellCommand() as BuyOrSell.Command.Sell;
+            var cmd = CreateSellCommand() as BuyOrSellCommand.Sell;
             
             var opt = new OwnedOption(
                 cmd.Item1.Ticker,
@@ -46,7 +44,7 @@ namespace coretests.Options
             return (mock.Object, opt);
         }
 
-        public static BuyOrSell.Command CreateSellCommand()
+        public static BuyOrSellCommand CreateSellCommand()
         {
             var cmd = new OptionTransaction(
                 strikePrice: 20,
@@ -57,7 +55,7 @@ namespace coretests.Options
                 premium: 10,
                 filled: DateTimeOffset.UtcNow,
                 notes: null);
-            return BuyOrSell.Command.NewSell(cmd, _user.Id);
+            return BuyOrSellCommand.NewSell(cmd, _user.Id);
         }
 
         internal IAccountStorage CreateAccountStorageWithUserAsync()

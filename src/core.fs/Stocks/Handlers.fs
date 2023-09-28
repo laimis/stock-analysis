@@ -8,11 +8,11 @@ open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.Shared.Adapters.SEC
 open core.Shared.Adapters.Stocks
-open core.Shared.Adapters.Storage
 open core.Stocks
 open core.Stocks.Services
 open core.Stocks.Services.Analysis
-open core.fs
+open core.fs.Shared
+open core.fs.Shared.Adapters.Storage
 
 
 type StockTransaction =
@@ -202,7 +202,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | null -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stock = portfolio.GetStock(ticker=data.Ticker, userId=userId)
+            let! stock = portfolio.GetStock data.Ticker.Value userId
             
             let stockToUse =
                 match stock with
@@ -217,7 +217,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             | true -> stockToUse.SetPositionLabel(positionId=stockToUse.State.OpenPosition.PositionId, key="strategy", value=data.Strategy) |> ignore
             | _ -> ()
             
-            do! portfolio.Save(stockToUse, userId)
+            do! portfolio.Save stockToUse userId
             
             let! pendingPositions = portfolio.GetPendingStockPositions(userId)
             let pendingPositionOption = pendingPositions |> Seq.tryFind (fun x -> x.State.Ticker = data.Ticker && x.State.IsClosed = false)
@@ -225,7 +225,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             match (pendingPositionOption, isNewPosition) with
             | Some pendingPosition, true ->
                 // transfer some data from pending position to this new position
-                let! updatedStock = portfolio.GetStock(ticker=data.Ticker, userId=userId)
+                let! updatedStock = portfolio.GetStock data.Ticker.Value userId
                 let opened = updatedStock.State.OpenPosition
                 
                 let stopSet = updatedStock.SetStop(pendingPosition.State.StopPrice.Value)
@@ -241,7 +241,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                     | _ -> updatedStock.SetPositionLabel(positionId=opened.PositionId, key="strategy", value=pendingPosition.State.Strategy)
                     
                 match stopSet || notesSet || strategySet with
-                | true -> do! portfolio.Save(updatedStock, userId)
+                | true -> do! portfolio.Save updatedStock userId
                 | false -> ()
             | _ -> ()
             
@@ -300,32 +300,32 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
 
     member _.Handle (cmd:DeleteStock) = task {
         
-        let! stock = portfolio.GetStock(cmd.StockId, cmd.UserId)
+        let! stock = portfolio.GetStockByStockId cmd.StockId cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
             stock.Delete()
-            do! portfolio.Save(stock, cmd.UserId)
+            do! portfolio.Save stock cmd.UserId
             return ServiceResponse()
     }
     
     member _.Handle (cmd:DeleteStop) = task {
-        let! stock = portfolio.GetStock(cmd.Ticker, cmd.UserId)
+        let! stock = portfolio.GetStock cmd.Ticker.Value cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
             stock.DeleteStop()
-            do! portfolio.Save(stock, cmd.UserId)
+            do! portfolio.Save stock cmd.UserId
             return ServiceResponse()
     }
     
     member _.Handle (cmd:DeleteTransaction) = task {
-        let! stock = portfolio.GetStock(cmd.Ticker, cmd.UserId)
+        let! stock = portfolio.GetStock cmd.Ticker.Value cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
             stock.DeleteTransaction(cmd.TransactionId)
-            do! portfolio.Save(stock, cmd.UserId)
+            do! portfolio.Save stock cmd.UserId
             return ServiceResponse()
     }
     
@@ -437,7 +437,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<OwnershipView>
         | _ ->
-            let! stock = portfolio.GetStock(ticker=query.Ticker, userId=query.UserId)
+            let! stock = portfolio.GetStock query.Ticker.Value query.UserId
             match stock with
             | null -> return "Stock not found" |> ResponseUtils.failedTyped<OwnershipView>
             | _ ->
@@ -523,12 +523,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     }
     
     member _.Handle (cmd:SetStop) = task {
-        let! stock = portfolio.GetStock(cmd.Ticker, cmd.UserId)
+        let! stock = portfolio.GetStock cmd.Ticker.Value cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
             stock.SetStop(cmd.StopPrice.Value) |> ignore
-            do! portfolio.Save(stock, cmd.UserId)
+            do! portfolio.Save stock cmd.UserId
             return ServiceResponse()
     }
     

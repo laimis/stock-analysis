@@ -9,10 +9,10 @@ open core.Options
 open core.Shared
 open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
-open core.Shared.Adapters.Storage
 open core.Stocks
 open core.Stocks.Services.Trading
-open core.fs
+open core.fs.Shared
+open core.fs.Shared.Adapters.Storage
 
 type Query =
     {
@@ -184,7 +184,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | None -> return "Stock not found" |> ResponseUtils.failed
             | Some stock ->
                 stock.DeletePosition(command.PositionId) |> ignore
-                do! storage.Save(stock, command.UserId)
+                do! storage.Save stock command.UserId
                 return ServiceResponse()
     }
         
@@ -230,7 +230,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 match stock.AssignGrade(positionId=command.PositionId, grade=command.Grade, note=command.Note) with
                 | false -> ()
-                | true -> do! storage.Save(stock, command.UserId)
+                | true -> do! storage.Save stock command.UserId
                 
                 return ServiceResponse()
     }
@@ -253,7 +253,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 match stock.DeletePositionLabel(positionId=command.PositionId, key=command.Key) with
                 | false -> ()
-                | true -> do! storage.Save(stock, command.UserId)
+                | true -> do! storage.Save stock command.UserId
                 
                 return ServiceResponse()
     }
@@ -276,7 +276,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 match stock.SetPositionLabel(positionId=command.PositionId, key=command.Key, value=command.Value) with
                 | false -> ()
-                | true -> do! storage.Save(stock, command.UserId)
+                | true -> do! storage.Save stock command.UserId
                 
                 return ServiceResponse()
     }
@@ -340,7 +340,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 stock.SetRiskAmount(positionId=command.PositionId, riskAmount=command.RiskAmount.Value)
                 
-                do! storage.Save(stock, command.UserId)
+                do! storage.Save stock command.UserId
                 
                 return ServiceResponse()
     }

@@ -6,9 +6,9 @@ namespace core.fs.Cryptos
     open core.Shared
     open core.Shared.Adapters.CSV
     open core.Shared.Adapters.Cryptos
-    open core.Shared.Adapters.Storage
-    open core.fs
     open core.fs.Cryptos.Import
+    open core.fs.Shared
+    open core.fs.Shared.Adapters.Storage
     
     type CryptoTransaction =
         {
@@ -76,7 +76,7 @@ namespace core.fs.Cryptos
         
     type OwnershipQuery =
         {
-            Token:string
+            Token:Token
             UserId:Guid
         }
     
@@ -144,7 +144,7 @@ namespace core.fs.Cryptos
             match user with
             | null -> return ResponseUtils.failed "User not found"
             | _ ->
-                let! crypto = portfolio.GetCrypto(token=data.Token,userId=userId)
+                let! crypto = portfolio.GetCrypto data.Token.Value userId
                 
                 if crypto = null && isSell then
                     return ResponseUtils.failed "Cannot sell crypto that is not owned"
@@ -156,7 +156,7 @@ namespace core.fs.Cryptos
                         
                     func data cryptoToUse
                     
-                    do! portfolio.Save(cryptoToUse, userId)
+                    do! portfolio.SaveCrypto cryptoToUse userId
                 
                     return ServiceResponse()
         }
@@ -186,9 +186,9 @@ namespace core.fs.Cryptos
             match user with
             | null -> return ResponseUtils.failed "User not found"
             | _ ->
-                let! crypto = portfolio.GetCrypto(token=cmd.Token,userId=cmd.UserId)
+                let! crypto = portfolio.GetCrypto cmd.Token.Value cmd.UserId
                 crypto.DeleteTransaction(cmd.TransactionId)
-                do! portfolio.Save(crypto, cmd.UserId)
+                do! portfolio.SaveCrypto crypto cmd.UserId
                 return ServiceResponse()
         }
         
@@ -345,7 +345,7 @@ namespace core.fs.Cryptos
             match user with
             | null -> return ResponseUtils.failedTyped<CryptoOwnershipView> "User not found"
             | _ ->
-                let! crypto = portfolio.GetCrypto(query.Token, query.UserId)
+                let! crypto = portfolio.GetCrypto query.Token.Value query.UserId
                 
                 match crypto with
                 | null -> return ResponseUtils.failedTyped<CryptoOwnershipView> "Crypto not found"

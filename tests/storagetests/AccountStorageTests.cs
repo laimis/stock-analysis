@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
-using core.Shared.Adapters.Storage;
+using core.fs.Shared.Adapters.Storage;
 using Xunit;
 
 namespace storagetests
@@ -36,7 +36,7 @@ namespace storagetests
             Assert.Equal("lastname", fromDb.State.Lastname);
 
             var users = await storage.GetUserEmailIdPairs();
-            Assert.NotEmpty(users.Where(u => u.Item1.Contains(email)));
+            Assert.NotEmpty(users.Where(u => u.Email == email));
 
             await storage.Delete(user);
 
@@ -49,7 +49,7 @@ namespace storagetests
             Assert.Null(fromDb);
 
             users = await storage.GetUserEmailIdPairs();
-            Assert.Empty(users.Where(u => u.Item1.Contains(email)));
+            Assert.Empty(users.Where(u => u.Email == email));
         }
 
         [Fact]

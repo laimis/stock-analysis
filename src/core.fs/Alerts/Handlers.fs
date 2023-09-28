@@ -4,7 +4,7 @@ namespace core.fs.Alerts
     open core.Shared
     open core.Shared.Adapters.SMS
     open core.Stocks
-    open core.fs
+    open core.fs.Shared
 
     module AlertContainer =
         

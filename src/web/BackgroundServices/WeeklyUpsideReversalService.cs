@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs.Shared.Adapters.Storage;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
-using core.Shared.Adapters.Storage;
 using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Logging;
 
@@ -92,7 +92,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
         _tickersToCheck.Clear();
 
-        foreach (var (email, id) in pairs)
+        foreach (var emailId in pairs)
         {
             if (stoppingToken.IsCancellationRequested)
             {
@@ -101,14 +101,14 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             try
             {
-                var user = await _accounts.GetUserByEmail(email);
+                var user = await _accounts.GetUserByEmail(emailId.Email);
                 if (user == null)
                 {
-                    _logger.LogError("User not found for {email}", email);
+                    _logger.LogError("User not found for {email}", emailId.Email);
                     return;
                 }
 
-                _logger.LogInformation("Processing user {email} upsides", email);
+                _logger.LogInformation("Processing user {email} upsides", emailId.Email);
 
                 var stocks = await _portfolioStorage.GetStocks(user.Id);
                 var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker.Value);
@@ -123,7 +123,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to process weekly upside check {email}: {exception}", email, ex);
+                _logger.LogError("Failed to process weekly upside check {email}: {exception}", emailId.Email, ex);
             }
         }
 

@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using core;
 using core.Cryptos;
+using core.fs.Shared.Adapters.Storage;
 using core.Notes;
 using core.Options;
 using core.Portfolio;
 using core.Shared;
-using core.Shared.Adapters.Storage;
 using core.Stocks;
 
 namespace storage.shared
@@ -41,7 +40,7 @@ namespace storage.shared
 
         public Task SaveViewModel<T>(Guid userId, T t, string version)
         {
-            return _blobStorage.Save<T>(typeof(T).Name + "#" + version + "#" + userId, t);
+            return _blobStorage.Save(typeof(T).Name + "#" + version + "#" + userId, t);
         }
 
         public async Task<OwnedStock> GetStock(string ticker, Guid userId)
@@ -51,7 +50,7 @@ namespace storage.shared
             return stocks.SingleOrDefault(s => s.State.Ticker == ticker);
         }
 
-        public async Task<OwnedStock> GetStock(Guid stockId, Guid userId)
+        public async Task<OwnedStock> GetStockByStockId(Guid stockId, Guid userId)
         {
             var stocks = await GetStocks(userId);
             
@@ -63,7 +62,7 @@ namespace storage.shared
             return Save(stock, _stock_entity, userId);
         }
 
-        public Task Save(OwnedOption option, Guid userId)
+        public Task SaveOwnedOption(OwnedOption option, Guid userId)
         {
             return Save(option, _option_entity, userId);
         }
@@ -90,14 +89,12 @@ namespace storage.shared
         {
             var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId);
 
-            var events = list.ToList();
-
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedOption(g))
                 .Where(g => g.State.Deleted == false);
         }
 
-        public Task Save(Note note, Guid userId)
+        public Task SaveNote(Note note, Guid userId)
         {
             return Save(note, _note_entity, userId);
         }
@@ -134,14 +131,14 @@ namespace storage.shared
             return cryptos.SingleOrDefault(s => s.State.Token == token);
         }
 
-        public async Task<OwnedCrypto> GetCrypto(Guid cryptoId, Guid userId)
+        public async Task<OwnedCrypto> GetCryptoByCryptoId(Guid cryptoId, Guid userId)
         {
             var cryptos = await GetCryptos(userId);
             
             return cryptos.SingleOrDefault(s => s.Id == cryptoId);
         }
 
-        public Task Save(OwnedCrypto crypto, Guid userId)
+        public Task SaveCrypto(OwnedCrypto crypto, Guid userId)
         {
             return Save(crypto, _crypto_entity, userId);
         }
@@ -162,7 +159,7 @@ namespace storage.shared
                 .Select(g => new Routine(g));
         }
 
-        public Task Save(Routine routine, Guid userId) =>
+        public Task SaveRoutine(Routine routine, Guid userId) =>
             Save(routine, _routine_entity, userId);
 
         public async Task<Routine> GetRoutine(string name, Guid userId)
@@ -190,13 +187,13 @@ namespace storage.shared
             return list.SingleOrDefault(s => s.State.Name == name);
         }
 
-        public Task Save(StockList list, Guid userId) =>
+        public Task SaveStockList(StockList list, Guid userId) =>
             Save(list, _stock_list_entity, userId);
 
         public Task DeleteStockList(StockList list, Guid userId) =>
             _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: userId);
 
-        public Task Save(PendingStockPosition position, Guid userId) =>
+        public Task SavePendingPosition(PendingStockPosition position, Guid userId) =>
             Save(position, _pending_stock_position_entity, userId);
 
         public Task<IEnumerable<PendingStockPosition>> GetPendingStockPositions(Guid userId) =>

@@ -1,4 +1,4 @@
-namespace core.fs
+namespace core.fs.Shared
 
 open System
 open System.Collections.Generic

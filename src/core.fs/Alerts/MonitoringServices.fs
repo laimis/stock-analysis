@@ -4,9 +4,9 @@ module core.fs.Alerts.MonitoringServices
     open System.Threading
     open core.Account
     open core.Shared.Adapters.Brokerage
-    open core.Shared.Adapters.Storage
     open core.Stocks
-    open core.fs
+    open core.fs.Shared
+    open core.fs.Shared.Adapters.Storage
 
     // stop loss should be monitored at the following times:
     // on trading days every 5 minutes from 9:45am to 4:00pm
@@ -126,7 +126,7 @@ module core.fs.Alerts.MonitoringServices
             
             let! _ =
                 users
-                |> Seq.map (fun struct(_, id) -> runStopLossCheckForUser cancellationToken (id |> Guid))
+                |> Seq.map (fun emailIdPair -> runStopLossCheckForUser cancellationToken (emailIdPair.Id |> Guid))
                 |> Async.Sequential
                 |> Async.StartAsTask
                 

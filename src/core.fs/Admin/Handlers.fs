@@ -6,9 +6,9 @@ namespace core.fs.Admin
     open core.Options
     open core.Shared
     open core.Shared.Adapters.CSV
-    open core.Shared.Adapters.Storage
     open core.Stocks
-    open core.fs
+    open core.fs.Shared
+    open core.fs.Shared.Adapters.Storage
 
     module Users =
         
@@ -52,8 +52,8 @@ namespace core.fs.Admin
                     
                     let! result = 
                         users
-                        |> Seq.map (fun struct(_,userId) -> async {
-                            return! userId |> Guid |> buildQueryResponse
+                        |> Seq.map (fun emailId -> async {
+                            return! emailId.Id |> Guid |> buildQueryResponse
                         })
                         |> Async.Parallel
                         |> Async.StartAsTask
@@ -66,8 +66,8 @@ namespace core.fs.Admin
                 
                 let! users = 
                     pairs
-                    |> Seq.map (fun struct(_,userId) -> async {
-                        return! userId |> Guid |> storage.GetUser |> Async.AwaitTask
+                    |> Seq.map (fun emailId -> async {
+                        return! emailId.Id |> Guid |> storage.GetUser |> Async.AwaitTask
                     })
                     |> Async.Parallel
                     |> Async.StartAsTask

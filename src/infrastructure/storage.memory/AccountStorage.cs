@@ -1,5 +1,5 @@
 ﻿using core.Account;
-using core.Shared.Adapters.Storage;
+using core.fs.Shared.Adapters.Storage;
 using storage.shared;
 
 namespace storage.memory;
@@ -22,7 +22,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     public Task<User?> GetUser(Guid userId)
     {
         _users.TryGetValue(userId, out User? u);
-        return Task<User?>.FromResult(u);
+        return Task.FromResult(u);
     }
 
     public Task<ProcessIdToUserAssociation?> GetUserAssociation(Guid guid) =>
@@ -38,9 +38,9 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.FromResult(user);
     }
 
-    public Task<IEnumerable<(string email, string id)>> GetUserEmailIdPairs() =>
+    public Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs() =>
         Task.FromResult(
-            _users.Values.Where(u => u != null).Select(u => (u!.State.Email, u.Id.ToString()))
+            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(Email: u!.State.Email, Id: u.Id.ToString()))
         );
 
     public async Task Save(User u)

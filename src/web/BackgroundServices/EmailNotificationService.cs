@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Alerts;
+using core.fs.Shared.Adapters.Storage;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
-using core.Shared.Adapters.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;

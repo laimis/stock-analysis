@@ -5,8 +5,8 @@ open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
 open core.Shared.Adapters.CSV
-open core.Shared.Adapters.Storage
-open core.fs
+open core.fs.Shared
+open core.fs.Shared.Adapters.Storage
 
 
 type GetLists =
@@ -109,7 +109,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ -> return list.State |> ResponseUtils.success
@@ -121,7 +121,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<ExportResponse>
             | _ ->
@@ -136,12 +136,12 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.AddStock(ticker=command.Ticker, note=null)
-                do! portfolio.Save(list, userId=command.UserId)
+                do! portfolio.SaveStockList list command.UserId
                 return list.State |> ResponseUtils.success
     }
     
@@ -151,12 +151,12 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.RemoveStock(ticker=command.Ticker)
-                do! portfolio.Save(list, userId=command.UserId)
+                do! portfolio.SaveStockList list command.UserId
                 return list.State |> ResponseUtils.success
     }
     
@@ -166,12 +166,12 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.AddTag(tag=command.Tag)
-                do! portfolio.Save(list, userId=command.UserId)
+                do! portfolio.SaveStockList list command.UserId
                 return list.State |> ResponseUtils.success
     }
     
@@ -181,12 +181,12 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.RemoveTag(tag=command.Tag)
-                do! portfolio.Save(list, userId=command.UserId)
+                do! portfolio.SaveStockList list command.UserId
                 return list.State |> ResponseUtils.success
     }
     
@@ -196,11 +196,11 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null ->
                 let newList = StockList(name=command.Name, description=command.Description, userId=command.UserId)
-                do! portfolio.Save(newList, userId=command.UserId)
+                do! portfolio.SaveStockList newList command.UserId
                 return newList.State |> ResponseUtils.success
             | _ ->
                 return "List already exists" |> ResponseUtils.failedTyped<StockListState>
@@ -212,12 +212,12 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.Update(name=command.Name, description=command.Description)
-                do! portfolio.Save(list, userId=command.UserId)
+                do! portfolio.SaveStockList list command.UserId
                 return list.State |> ResponseUtils.success
     }
     
@@ -227,10 +227,10 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | null -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! list = portfolio.GetStockList(name=command.Name, userId=command.UserId)
+            let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null -> return "List not found" |> ResponseUtils.failed
             | _ ->
-                do! portfolio.DeleteStockList(list, userId=command.UserId)
+                do! portfolio.DeleteStockList list command.UserId
                 return ServiceResponse()
     }

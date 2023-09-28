@@ -7,7 +7,7 @@ open core.Shared
 open core.Shared.Adapters.Brokerage
 open core.Stocks
 open core.Stocks.Services.Trading
-open core.fs
+open core.fs.Shared
 
 // TODO: this view class is very busy, doing all kinds of stuff. Maybe a service
 // should do this and this type would just contain data...

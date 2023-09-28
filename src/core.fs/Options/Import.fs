@@ -2,9 +2,9 @@ namespace core.fs.Options
 
 open System
 open core.Shared.Adapters.CSV
+open core.fs.Shared
 
 module Import =
-    open core.fs
     open core.Shared
 
     type OptionRecord = {
@@ -22,16 +22,16 @@ module Import =
         member _.UserId = userId
         member _.Content = content
 
-    type Handler(csvParser:ICSVParser, buyOrSellHandler:BuyOrSell.Handler, expireHandler:Expire.Handler) =
+    type Handler(csvParser:ICSVParser, optionHandler:core.fs.Options.Handler) =
         
         let processCommand record (command:Object) userId token =
             match command with
             
-            | :? Expire.LookupCommand as expCommand ->
-                expCommand |> expireHandler.Handle |> Async.AwaitTask
+            | :? ExpireViaLookupCommand as expCommand ->
+                expCommand |> optionHandler.Handle |> Async.AwaitTask
                 
-            | :? BuyOrSell.Command as bsCommand ->
-                buyOrSellHandler.Handle bsCommand |> Async.AwaitTask
+            | :? BuyOrSellCommand as bsCommand ->
+                bsCommand |> optionHandler.Handle |> Async.AwaitTask
                 
             | _ -> Exception($"Handler for command type {record.GetType()} not available") |> raise
         
@@ -52,18 +52,18 @@ module Import =
             let (command:Object) =
                 match record.``type`` with
                 | "sell" ->
-                    BuyOrSell.Sell(record |> toOptionTransaction, userId)
+                    BuyOrSellCommand.Sell(record |> toOptionTransaction, userId)
                     
                 | "buy" ->
-                    BuyOrSell.Buy(record |> toOptionTransaction, userId)
+                    BuyOrSellCommand.Buy(record |> toOptionTransaction, userId)
                     
                 | "expired" ->
-                    Expire.ExpireViaLookup(
-                        Expire.ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
+                    ExpireViaLookupCommand.ExpireViaLookup(
+                        ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
                     )
                 | "assigned" ->
-                    Expire.AssignViaLookup(
-                        Expire.ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
+                    ExpireViaLookupCommand.AssignViaLookup(
+                        ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
                     )
                 | _ -> Exception($"Unexpected command type: {record.``type``}") |> raise
             

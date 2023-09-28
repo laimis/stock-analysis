@@ -5,8 +5,8 @@ namespace core.fs.Notes
     open core.Notes
     open core.Shared
     open core.Shared.Adapters.CSV
-    open core.Shared.Adapters.Storage
-    open core.fs
+    open core.fs.Shared
+    open core.fs.Shared.Adapters.Storage
 
     type AddNote = 
         {
@@ -76,7 +76,7 @@ namespace core.fs.Notes
             | null -> return "User not found" |> ResponseUtils.failedTyped<Note>
             | _ -> 
                 let note = Note(userId=command.UserId,ticker=command.Ticker,note=command.Note,created=DateTime.UtcNow)
-                do! portfolio.Save(note, command.UserId)
+                do! portfolio.SaveNote note command.UserId
                 return note |> ResponseUtils.success<Note>
         }
         
@@ -86,7 +86,7 @@ namespace core.fs.Notes
             match user with
             | null -> return "User not found" |> ResponseUtils.failedTyped<NoteState>
             | _ -> 
-                let! note = portfolio.GetNote(noteId=command.NoteId, userId=command.UserId)
+                let! note = portfolio.GetNote command.NoteId command.UserId
                 
                 match note with
                 | null -> return "Note not found" |> ResponseUtils.failedTyped<NoteState>
@@ -119,13 +119,13 @@ namespace core.fs.Notes
             match user with
             | null -> return "User not found" |> ResponseUtils.failedTyped<Note>
             | _ -> 
-                let! note = portfolio.GetNote(noteId=command.NoteId, userId=command.UserId)
+                let! note = portfolio.GetNote command.NoteId command.UserId
                 
                 match note with
                 | null -> return "Note not found" |> ResponseUtils.failedTyped<Note>
                 | _ -> 
                     note.Update(command.Note)
-                    do! portfolio.Save(note, command.UserId)
+                    do! portfolio.SaveNote note command.UserId
                     return note |> ResponseUtils.success<Note>
         }
         

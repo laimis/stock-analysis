@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\..\core\core.csproj" />
   </ItemGroup>
 

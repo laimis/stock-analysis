@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
-using core.Shared.Adapters.Storage;
+using core.fs.Shared.Adapters.Storage;
 using Dapper;
 using storage.shared;
 
@@ -93,11 +93,11 @@ namespace storage.postgres
             return await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
         }
 
-        public async Task<IEnumerable<(string email, string id)>> GetUserEmailIdPairs()
+        public async Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs()
         {
             using var db = GetConnection();
             
-            return await db.QueryAsync<(string, string)>(
+            return await db.QueryAsync<EmailIdPair>(
                 @"SELECT email,id FROM users"
             );
         }

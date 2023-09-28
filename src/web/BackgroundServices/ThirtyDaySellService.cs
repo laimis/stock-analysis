@@ -2,9 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.Account;
 using core.fs.Reports;
+using core.fs.Shared.Adapters.Storage;
 using core.Shared.Adapters.Emails;
-using core.Shared.Adapters.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
@@ -46,23 +47,23 @@ namespace web.BackgroundServices
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogError("Failed to process 30 day check for {email}: {exception}", p.email, ex);
+                    _logger.LogError("Failed to process 30 day check for {email}: {exception}", p.Email, ex);
                 }
             }
         }
 
-        private async Task ProcessUser((string email, string id) p)
+        private async Task ProcessUser(EmailIdPair p)
         {
             // 30 day crosser
-            _logger.LogInformation("Scanning {email}", p.email);
+            _logger.LogInformation("Scanning {email}", p.Email);
 
-            var query = new SellsQuery(new Guid(p.id));
+            var query = new SellsQuery(new Guid(p.Id));
 
             var sellView = await _service.Handle(query);
 
             if (sellView.IsOk == false)
             {
-                _logger.LogError("Failed to get sells for {email}: {error}", p.email, sellView.Error);
+                _logger.LogError("Failed to get sells for {email}: {error}", p.Email, sellView.Error);
                 return;
             }
             
@@ -71,7 +72,7 @@ namespace web.BackgroundServices
             if (sellsOfInterest.Count > 0)
             {
                 await _emails.Send(
-                    recipient: new Recipient(email: p.email, name: null),
+                    recipient: new Recipient(email: p.Email, name: null),
                     Sender.NoReply,
                     template: EmailTemplate.SellAlert,
                     new { sells = sellsOfInterest }
@@ -79,7 +80,7 @@ namespace web.BackgroundServices
             }
             else
             {
-                _logger.LogInformation("No sells of interest for {email}", p.email);
+                _logger.LogInformation("No sells of interest for {email}", p.Email);
             }
         }
     }

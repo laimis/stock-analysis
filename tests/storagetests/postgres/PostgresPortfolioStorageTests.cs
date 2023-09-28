@@ -1,5 +1,4 @@
-﻿using core;
-using core.Shared.Adapters.Storage;
+﻿using core.fs.Shared.Adapters.Storage;
 using storage.postgres;
 using storage.shared;
 using testutils;

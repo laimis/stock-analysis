@@ -6,10 +6,10 @@ open System.ComponentModel.DataAnnotations
 open core.Shared
 open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.Stocks
-open core.Shared.Adapters.Storage
 open core.Stocks
 open core.Stocks.Services.Analysis
-open core.fs
+open core.fs.Shared
+open core.fs.Shared.Adapters.Storage
 
 type ChainQuery =
     {
@@ -257,7 +257,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | null -> return "User not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
         | _ ->
             
-            let! stock = storage.GetStock(ticker=request.Ticker, userId=request.UserId)
+            let! stock = storage.GetStock request.Ticker request.UserId
             
             match stock with
             | null -> return "Stock not found" |> ResponseUtils.failedTyped<DailyPositionReportView>

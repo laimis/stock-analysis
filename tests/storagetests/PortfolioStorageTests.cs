@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Cryptos;
+using core.fs.Shared.Adapters.Storage;
 using core.Notes;
 using core.Options;
 using core.Portfolio;
 using core.Shared;
-using core.Shared.Adapters.Storage;
 using core.Stocks;
 using Xunit;
 using Xunit.Abstractions;
@@ -95,7 +95,7 @@ namespace storagetests
 
             var storage = CreateStorage();
 
-            await storage.Save(option, _userId);
+            await storage.SaveOwnedOption(option, _userId);
 
             var loaded = await storage.GetOwnedOption(
                 option.State.Id,
@@ -125,7 +125,7 @@ namespace storagetests
 
             var storage = CreateStorage();
 
-            await storage.Save(note, _userId);
+            await storage.SaveNote(note, _userId);
 
             var notes = await storage.GetNotes(_userId);
 
@@ -135,7 +135,7 @@ namespace storagetests
 
             note.Update("new note");
 
-            await storage.Save(note, _userId);
+            await storage.SaveNote(note, _userId);
 
             var fromDb = await storage.GetNote(_userId, note.State.Id);
             
@@ -157,7 +157,7 @@ namespace storagetests
 
             var storage = CreateStorage();
 
-            await storage.Save(crypto, _userId);
+            await storage.SaveCrypto(crypto, _userId);
 
             var loadedList = await storage.GetCryptos(_userId);
 
@@ -169,7 +169,7 @@ namespace storagetests
 
             loaded.Purchase(5, 5, DateTime.UtcNow);
 
-            await storage.Save(loaded, _userId);
+            await storage.SaveCrypto(loaded, _userId);
 
             loaded = await storage.GetCrypto(loaded.State.Token, loaded.State.UserId);
 
@@ -234,7 +234,7 @@ namespace storagetests
 
             routine.AddStep("step", "url");
 
-            await storage.Save(routine, _userId);
+            await storage.SaveRoutine(routine, _userId);
 
             existing = await storage.GetRoutines(_userId);
 
@@ -268,7 +268,7 @@ namespace storagetests
 
             list.AddStock("tsla", "yeah yeah");
 
-            await storage.Save(list, _userId);
+            await storage.SaveStockList(list, _userId);
 
             existing = await storage.GetStockLists(_userId);
 
@@ -310,7 +310,7 @@ namespace storagetests
                 userId: _userId
             );
 
-            await storage.Save(position, _userId);
+            await storage.SavePendingPosition(position, _userId);
 
             existing = await storage.GetPendingStockPositions(_userId);
 
@@ -322,7 +322,7 @@ namespace storagetests
 
             loaded.Close(purchased: true, price: 2.2m);
 
-            await storage.Save(loaded, _userId);
+            await storage.SavePendingPosition(loaded, _userId);
 
             existing = await storage.GetPendingStockPositions(_userId);
 

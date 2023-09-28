@@ -1,11 +1,10 @@
 using System;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using core;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Storage;
 using core.Options;
-using core.Shared.Adapters.Storage;
+using core.Shared.Adapters.Brokerage;
+using core.Shared.Adapters.CSV;
 using Moq;
 using Xunit;
 
@@ -25,7 +24,7 @@ namespace coretests.Options
         {
             var mock = new Mock<IPortfolioStorage>();
 
-            mock.Setup(x => x.Save(It.IsAny<OwnedOption>(), It.IsAny<Guid>()))
+            mock.Setup(x => x.SaveOwnedOption(It.IsAny<OwnedOption>(), It.IsAny<Guid>()))
                 .Callback((OwnedOption option, Guid userId) =>
                 {
                     Assert.Equal(-1, option.State.NumberOfContracts);
@@ -33,7 +32,7 @@ namespace coretests.Options
 
             var account = _fixture.CreateAccountStorageWithUserAsync();
 
-            var handler = new BuyOrSell.Handler(account, mock.Object);
+            var handler = new Handler(account, Mock.Of<IBrokerage>(), mock.Object, Mock.Of<ICSVWriter>());
 
             await handler.Handle(
                 OptionsTestsFixture.CreateSellCommand());
