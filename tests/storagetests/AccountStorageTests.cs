@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using Xunit;
 
 namespace storagetests
@@ -63,7 +64,7 @@ namespace storagetests
 
             var fromDb = await storage.GetUserAssociation(r.Id);
 
-            Assert.Equal(r.UserId, fromDb.UserId);
+            Assert.Equal(r.UserId, fromDb.Value.UserId);
         }
     }
 }

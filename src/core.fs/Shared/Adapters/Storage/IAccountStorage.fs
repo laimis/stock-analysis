@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Threading.Tasks
 open core.Account
+open core.fs.Shared.Domain.Accounts
 
 type IAccountStorage =
     
@@ -12,5 +13,5 @@ type IAccountStorage =
     abstract member Save: u:User -> Task
     abstract member Delete: u:User -> Task
     abstract member SaveUserAssociation: r:ProcessIdToUserAssociation -> Task
-    abstract member GetUserAssociation: guid:Guid -> Task<ProcessIdToUserAssociation>
+    abstract member GetUserAssociation: guid:Guid -> Task<ProcessIdToUserAssociation option>
     abstract member GetUserEmailIdPairs: unit -> Task<IEnumerable<EmailIdPair>>

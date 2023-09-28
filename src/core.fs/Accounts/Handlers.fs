@@ -10,6 +10,7 @@ namespace core.fs.Accounts
     open core.Shared.Adapters.Subscriptions
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Domain.Accounts
     
     module Authenticate =
 
@@ -117,8 +118,8 @@ namespace core.fs.Accounts
             member this.Handle (command:Command) = task {
                 let! association = storage.GetUserAssociation(command.Id)
                 match association with
-                | null -> return "Invalid confirmation identifier." |> ResponseUtils.failedTyped<User>
-                | _ ->
+                | None -> return "Invalid confirmation identifier." |> ResponseUtils.failedTyped<User>
+                | Some association ->
                     let! user = storage.GetUser(association.UserId)
                     match user with
                     | null -> return "User not found" |> ResponseUtils.failedTyped<User>
@@ -291,8 +292,8 @@ namespace core.fs.Accounts
             member this.Handle (reset:ResetPassword) = task {
                 let! association = storage.GetUserAssociation(reset.Id)
                 match association with
-                | null -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ResponseUtils.failedTyped<User>
-                | _ ->
+                | None -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ResponseUtils.failedTyped<User>
+                | Some association ->
                     let! user = storage.GetUser(association.UserId)
                     match user with
                     | null -> return "User account is no longer valid" |> ResponseUtils.failedTyped<User>

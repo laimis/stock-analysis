@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.Account;
 using core.fs.Reports;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters.Emails;
 using Microsoft.Extensions.Logging;
 

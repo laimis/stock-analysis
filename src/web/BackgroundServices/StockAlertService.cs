@@ -160,9 +160,9 @@ namespace web.BackgroundServices
             
             var users = await _accounts.GetUserEmailIdPairs();
 
-            foreach(var (_, userId) in users)    
+            foreach(var emailIdPair in users)    
             {
-                var user = await _accounts.GetUser(new Guid(userId));
+                var user = await _accounts.GetUser(new Guid(emailIdPair.Id));
                 var list = (await _portfolio.GetStockLists(user.Id))
                     .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers.Select(t => (l, t)))

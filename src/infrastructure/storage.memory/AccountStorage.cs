@@ -1,5 +1,7 @@
 ﻿using core.Account;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
+using Microsoft.FSharp.Core;
 using storage.shared;
 
 namespace storage.memory;
@@ -25,11 +27,11 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.FromResult(u);
     }
 
-    public Task<ProcessIdToUserAssociation?> GetUserAssociation(Guid guid) =>
+    public Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid guid) =>
         Task.FromResult(
             _associations.TryGetValue(guid, out ProcessIdToUserAssociation? association)
-                ? association
-                : null
+                ? new FSharpOption<ProcessIdToUserAssociation>(association)
+                : FSharpOption<ProcessIdToUserAssociation>.None
         );
 
     public Task<User?> GetUserByEmail(string emailAddress)
@@ -40,7 +42,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs() =>
         Task.FromResult(
-            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(Email: u!.State.Email, Id: u.Id.ToString()))
+            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: u.Id.ToString()))
         );
 
     public async Task Save(User u)

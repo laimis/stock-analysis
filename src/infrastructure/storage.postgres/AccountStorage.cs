@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using Dapper;
+using Microsoft.FSharp.Core;
 using storage.shared;
 
 namespace storage.postgres
@@ -84,7 +86,7 @@ namespace storage.postgres
             await db.ExecuteAsync(query, new {r.Id, userId = r.UserId, timestamp = r.Timestamp});
         }
 
-        public async Task<ProcessIdToUserAssociation> GetUserAssociation(Guid id)
+        public async Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid id)
         {
             using var db = GetConnection();
             

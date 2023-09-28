@@ -95,19 +95,19 @@ public class EmailNotificationService : GenericBackgroundServiceHost
             
             var users = await _accounts.GetUserEmailIdPairs();
 
-            foreach (var (_, userId) in users)
+            foreach (var emailId in users)
             {
                 if (stoppingToken.IsCancellationRequested)
                 {
                     return;
                 }
 
-                _logger.LogInformation($"Sending email to {userId}");
+                _logger.LogInformation($"Sending email to {emailId.Id}");
 
-                var user = await _accounts.GetUser(new Guid(userId));
+                var user = await _accounts.GetUser(new Guid(emailId.Id));
                 if (user == null)
                 {
-                    _logger.LogError("Unable to find user for " + userId);
+                    _logger.LogError("Unable to find user for " + emailId.Id);
                     continue;
                 }
 
