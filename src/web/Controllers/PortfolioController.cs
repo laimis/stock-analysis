@@ -336,7 +336,7 @@ namespace web.Controllers
         public Task<ActionResult> PastTradingEntries([FromServices] Handler service) =>
             this.OkOrError(
                 service.Handle(
-                    new QueryTradingEntries(
+                    new QueryPastTradingEntries(
                         User.Identifier()
                     )
                 )

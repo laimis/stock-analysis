@@ -9,6 +9,8 @@ open core.Stocks
 open core.Stocks.Services.Trading
 open core.fs
 
+// TODO: this view class is very busy, doing all kinds of stuff. Maybe a service
+// should do this and this type would just contain data...
 type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
      
         // feels a bit hacky, but the expectation is that the positions will always be sorted
@@ -73,19 +75,19 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             
             let trends = List<ChartDataPointContainer<decimal>>();
             
-            let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.horizontal);
-            let zeroLineAnnotationVertical = ChartAnnotationLine(0, "Zero", ChartAnnotationLineType.vertical);
-            let oneLineAnnotationHorizontal = ChartAnnotationLine(1, "One", ChartAnnotationLineType.horizontal);
+            let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.horizontal);
+            let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.vertical);
+            let oneLineAnnotationHorizontal = ChartAnnotationLine(1, ChartAnnotationLineType.horizontal);
             
             // go over each closed transaction and calculate number of wins for each window
             let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.line, zeroLineAnnotationHorizontal)
             let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.line, zeroLineAnnotationHorizontal);
-            let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.line);
-            let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.line);
-            let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.line);
-            let ev = ChartDataPointContainer<decimal>("EV", DataPointChartType.line, zeroLineAnnotationHorizontal);
-            let avgWinAmount = ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.line);
-            let avgLossAmount = ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.line);
+            let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.horizontal));
+            let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.line, ChartAnnotationLine(0.12m, ChartAnnotationLineType.horizontal));
+            let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.line, ChartAnnotationLine(-0.07m, ChartAnnotationLineType.horizontal));
+            let ev = ChartDataPointContainer<decimal>("EV", DataPointChartType.line, ChartAnnotationLine(40, ChartAnnotationLineType.horizontal));
+            let avgWinAmount = ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.line, ChartAnnotationLine(60, ChartAnnotationLineType.horizontal));
+            let avgLossAmount = ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.line, ChartAnnotationLine(-30, ChartAnnotationLineType.horizontal));
             let gainPctRatio = ChartDataPointContainer<decimal>("% Ratio", DataPointChartType.line, oneLineAnnotationHorizontal);
             let profitRatio = ChartDataPointContainer<decimal>("$ Ratio", DataPointChartType.line, oneLineAnnotationHorizontal);
             let rrRatio = ChartDataPointContainer<decimal>("RR Ratio", DataPointChartType.line, oneLineAnnotationHorizontal);
@@ -93,6 +95,8 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.line);
             let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.line);
             let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.line);
+            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.column);
+            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.column);
             
             let days =
                 match trades with
@@ -115,10 +119,10 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 profits.Add(start, perfView.Profit)
                 wins.Add(start, perfView.WinPct)
                 avgWinPct.Add(start, perfView.WinAvgReturnPct)
-                avgLossPct.Add(start, perfView.LossAvgReturnPct)
+                avgLossPct.Add(start, -1.0m * perfView.LossAvgReturnPct)
                 ev.Add(start, perfView.EV)
                 avgWinAmount.Add(start, perfView.AvgWinAmount)
-                avgLossAmount.Add(start, perfView.AvgLossAmount)
+                avgLossAmount.Add(start, -1.0m * perfView.AvgLossAmount)
                 gainPctRatio.Add(start, perfView.ReturnPctRatio)
                 profitRatio.Add(start, perfView.ProfitRatio)
                 rrRatio.Add(start, perfView.rrRatio)
@@ -127,65 +131,30 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 rrSum.Add(start, perfView.rrSum)
                 invested.Add(start, perfView.TotalCost)
                 
+                // number of positions opened on start day
+                let numberOfPositionsOpened = trades |> Seq.filter (fun t -> t.Opened.Date = start) |> Seq.length
+                positionsOpenedByDateContainer.Add(start, decimal numberOfPositionsOpened)
+                
+                // number of positions closed on start day
+                let numberOfPositionsClosed = trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.length
+                positionsClosedByDateContainer.Add(start, decimal numberOfPositionsClosed)
+                
                 // calculate equity curve
                 equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (fun t -> t.Profit))
                 
                 equityCurve.Add(start, equity)
             )
             
-            // non windowed stats
-            let mutable aGrades = 0;
-            let mutable bGrades = 0;
-            let mutable cGrades = 0;
-            let mutable minCloseDate = DateTimeOffset.MaxValue;
-            let mutable maxCloseDate = DateTimeOffset.MinValue;
-            let positionsClosedByDate = Dictionary<DateTimeOffset, int>();
-            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.column);
-            let positionsOpenedByDate = Dictionary<DateTimeOffset, int>();
-            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.column);
-            
-            trades
-                |> Seq.iter ( fun position ->
-                    if position.Grade = "A" then
-                        aGrades <- aGrades + 1
-                    else if position.Grade = "B" then
-                        bGrades <- bGrades + 1
-                    else if position.Grade = "C" then
-                        cGrades <- cGrades + 1
-                    else
-                        ()
-                        
-                    if position.Closed.Value < minCloseDate then
-                        minCloseDate <- position.Closed.Value
-                    else
-                        ()
-                        
-                    if position.Closed.Value > maxCloseDate then
-                        maxCloseDate <- position.Closed.Value
-                    else
-                        ()
-                        
-                    if positionsClosedByDate.ContainsKey(position.Closed.Value.Date) then
-                        positionsClosedByDate[position.Closed.Value.Date] <- positionsClosedByDate[position.Closed.Value.Date] + 1
-                    else
-                        positionsClosedByDate[position.Closed.Value.Date] <- 1
-                        
-                    if positionsOpenedByDate.ContainsKey(position.Opened.Date) then
-                        positionsOpenedByDate[position.Opened.Date] <- positionsOpenedByDate[position.Opened.Date] + 1
-                    else
-                        positionsOpenedByDate[position.Opened.Date] <- 1
-                )
-            
-            
-            // for the range that the positions are in, calculate the number of buys for each date
-            let days = (maxCloseDate - minCloseDate).TotalDays |> int
-            
-            for d in [0 .. days] do
-                let key = minCloseDate.AddDays(float d).Date
-                let positionsClosed = if positionsClosedByDate.ContainsKey(key) then positionsClosedByDate[key] else 0
-                let positionsOpened = if positionsOpenedByDate.ContainsKey(key) then positionsOpenedByDate[key] else 0
-                positionsClosedByDateContainer.Add(key, positionsClosed)
-                positionsOpenedByDateContainer.Add(key, positionsOpened)
+            let aGrades, bGrades, cGrades =
+                trades
+                |> Seq.fold ( fun (a, b, c) position ->
+                    match position.Grade with
+                    | "A" -> (a+1, b, c)
+                    | "B" -> (a, b+1, c)
+                    | "C" -> (a, b, c+1)
+                    | _ -> (a, b, c)
+                    
+                    ) (0, 0, 0)
             
             let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.column);
             gradeContainer.Add("A", aGrades);

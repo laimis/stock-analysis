@@ -69,8 +69,10 @@ export class LineChartComponent {
     let chartType = container.chartType // they match 1:1 today
     let isDate = container.data[0].isDate
 
-    let data = [{
+    let data : any = [{
       type: chartType,
+      markerSize: 1,
+      color: "#4682B4",
       dataPoints: dataPoints
     }]
 
@@ -92,12 +94,14 @@ export class LineChartComponent {
       },
       axisX: {
         valueFormatString: isDate ? "YYYY-MM-DD" : null,
+        gridThickness: 0,
         // crosshair: {
         //   enabled: true,
         //   snapToDataPoint: true
         // }
       },
       axisY: {
+        gridThickness: 0,
         // crosshair: {
         //   enabled: true
         // }

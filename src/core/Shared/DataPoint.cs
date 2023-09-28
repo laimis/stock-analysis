@@ -5,7 +5,7 @@ namespace core.Shared
 {
     public enum ChartAnnotationLineType { vertical, horizontal}
     
-    public record ChartAnnotationLine(decimal value, string label, ChartAnnotationLineType chartAnnotationLineType);
+    public record ChartAnnotationLine(decimal value, ChartAnnotationLineType chartAnnotationLineType);
 
     public class ChartDataPointContainer<T> : ChartDataPointContainerBase
     {

@@ -31,7 +31,7 @@
       </form>
     </div>
 
-    <div *ngFor="let t of trends">
+    <div *ngFor="let t of trends" class="p-5 m-2 border">
       <app-line-chart [dataContainer]="t"></app-line-chart>
     </div>
 
