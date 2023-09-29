@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace storagetests
@@ -23,7 +24,7 @@ namespace storagetests
 
             var fromDbOption = await storage.GetUserByEmail(email);
 
-            Assert.Null(fromDbOption.Value);
+            Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
             await storage.Save(user);
 
@@ -45,11 +46,11 @@ namespace storagetests
 
             fromDbOption = await storage.GetUserByEmail(email);
 
-            Assert.Null(fromDbOption.Value);
+            Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
             fromDbOption = await storage.GetUser(user.Id);
 
-            Assert.Null(fromDbOption.Value);
+            Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
             users = await storage.GetUserEmailIdPairs();
             Assert.Empty(users.Where(u => u.Email == email));
