@@ -7,9 +7,7 @@ import {ChartAnnotationLine, DataPoint, DataPointContainer} from "../../services
 })
 export class LineChartComponent {
 
-  @Input()
-  chartHeight: number = 400;
-  options: any
+  options: any // don't have type from canvasjs .... blerg
 
   @Input()
   set dataContainer(container: DataPointContainer) {
@@ -65,6 +63,22 @@ export class LineChartComponent {
   }
 
   private renderChart(container: DataPointContainer) {
+    if (container.data.length === 0) {
+      this.options = {
+        title: {
+          text: container.label + " (no data)",
+        },
+        axisX: {
+          gridThickness: 0,
+        },
+        axisY: {
+          gridThickness: 0,
+        },
+        data: []
+      };
+      return
+    }
+
     let dataPoints = container.data.map(p => this.toDataPoint(p))
     let chartType = container.chartType // they match 1:1 today
     let isDate = container.data[0].isDate

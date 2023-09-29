@@ -230,7 +230,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             
         let generateTrendsForAtMost (numberOfTrades:int) (trades:PositionInstance array) =
             match trades.Length with
-            | tradeLength when tradeLength >= numberOfTrades -> generateTrends trades[trades.Length - numberOfTrades - 1..numberOfTrades-1]
+            | tradeLength when tradeLength >= numberOfTrades -> generateTrends trades[trades.Length - numberOfTrades - 1..trades.Length-1]
             | _ -> List<ChartDataPointContainer<decimal>>()
             
         let timeBasedSlice cutOff (trades:PositionInstance array) =
@@ -249,7 +249,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             span.ToArray()
         
         member _.ClosedPositions = closedPositions
-        member _.RecentClosedPositions = closedPositions |> Array.take recentLengthToTake
+        member _.RecentClosedPositions = closedPositions |> Array.skip (closedPositions.Length - recentLengthToTake)
         member this.Recent = TradingPerformance.Create(this.RecentClosedPositions);
         member _.Overall = TradingPerformance.Create(closedPositions);
         member _.TrendsAll = generateTrends closedPositions;
