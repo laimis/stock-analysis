@@ -4,13 +4,11 @@ namespace core.Shared
 {
     public readonly struct TradeGrade : IComparable
     {
-        private readonly string _grade;
-
         public TradeGrade(string grade)
         {
             if (string.IsNullOrWhiteSpace(grade))
             {
-                throw new ArgumentException(nameof(grade), "Grade cannot be blank");
+                throw new ArgumentException("Grade cannot be blank", nameof(grade));
             }
             
             // right now we allow only A, B, C
@@ -19,21 +17,21 @@ namespace core.Shared
                 !grade.Equals("B", StringComparison.OrdinalIgnoreCase) &&
                 !grade.Equals("C", StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException(nameof(grade), "Grade must be A, B, or C");
+                throw new ArgumentException("Grade must be A, B, or C", nameof(grade));
             }
 
-            _grade = grade.ToUpper();
+            Value = grade.ToUpper();
         }
 
-        public static implicit operator string(TradeGrade g) => g._grade;
-        public static implicit operator TradeGrade(string g) => new TradeGrade(g);
-        public string Value => _grade;
+        public static implicit operator string(TradeGrade g) => g.Value;
+        public static implicit operator TradeGrade(string g) => new(g);
+        public string Value { get; }
 
         public int CompareTo(object obj)
         {
             if (obj is TradeGrade other)
             {
-                return string.Compare(_grade, other._grade, StringComparison.Ordinal);
+                return string.Compare(Value, other.Value, StringComparison.Ordinal);
             }
 
             throw new ArgumentException("Object is not a TradeGrade");

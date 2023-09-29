@@ -71,7 +71,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             )
             gains
             
-        let generateTrends (windowSize:int) (trades:PositionInstance array) =
+        let generateTrends (trades:PositionInstance array) =
             
             let trends = List<ChartDataPointContainer<decimal>>();
             
@@ -227,7 +227,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             
         let generateTrendsForAtMost (numberOfTrades:int) (trades:PositionInstance array) =
             match trades.Length with
-            | tradeLength when tradeLength >= numberOfTrades -> generateTrends 5 trades[0..numberOfTrades-1]
+            | tradeLength when tradeLength >= numberOfTrades -> generateTrends trades[0..numberOfTrades-1]
             | _ -> List<ChartDataPointContainer<decimal>>()
             
         let timeBasedSlice cutOff (trades:PositionInstance array) =
@@ -249,7 +249,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         member _.RecentClosedPositions = closedPositions |> Array.take recentLengthToTake
         member this.Recent = TradingPerformance.Create(this.RecentClosedPositions);
         member _.Overall = TradingPerformance.Create(closedPositions);
-        member _.TrendsAll = generateTrends recentLengthToTake closedPositions;
+        member _.TrendsAll = generateTrends closedPositions;
         member _.TrendsLast20 = closedPositions |> generateTrendsForAtMost 20
         member _.TrendsLast50 = closedPositions |> generateTrendsForAtMost 50
         member _.TrendsLast100 = closedPositions |> generateTrendsForAtMost 100
@@ -257,17 +257,17 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         member this.TrendsTwoMonths =
             this.ClosedPositions
             |> timeBasedSlice (DateTimeOffset.Now.AddMonths(-2))
-            |> generateTrends recentLengthToTake
+            |> generateTrends
         
         member _.TrendsYTD =
             closedPositions
             |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero))
-            |> generateTrends recentLengthToTake
+            |> generateTrends
         
         member _.TrendsOneYear = 
             closedPositions
             |> timeBasedSlice (DateTimeOffset.Now.AddYears(-1))
-            |> generateTrends recentLengthToTake
+            |> generateTrends
             
 type PortfolioView =
     {

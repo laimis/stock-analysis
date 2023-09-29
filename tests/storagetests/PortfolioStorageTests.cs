@@ -210,7 +210,7 @@ namespace storagetests
 
             var lastTx = position.Transactions.Last();
 
-            loaded.DeleteTransaction(lastTx.transactionId);
+            loaded.DeleteTransaction(lastTx.TransactionId);
 
             await storage.Save(loaded, _userId);
 

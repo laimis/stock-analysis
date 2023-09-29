@@ -140,7 +140,7 @@ namespace core.Stocks
             var position = Positions.Single(x => x.PositionId == deleted.PositionId);
             
             // remove all transactions for this position
-            var transactionsToRemove = position.Transactions.Select(x => x.transactionId).ToList();
+            var transactionsToRemove = position.Transactions.Select(x => x.TransactionId).ToList();
             foreach (var transactionId in transactionsToRemove)
             {
                 var transaction = Transactions.Single(x => x.EventId == transactionId);

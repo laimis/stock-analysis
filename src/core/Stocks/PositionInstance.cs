@@ -6,14 +6,14 @@ using core.Shared;
 namespace core.Stocks
 {
     public enum PositionEventType { buy, stop, sell, risk }
-    public record struct PositionEvent (Guid id, string description, PositionEventType type, decimal? value, DateTimeOffset when, decimal? quantity = null)
+    public readonly record struct PositionEvent (Guid Id, string Description, PositionEventType Type, decimal? Value, DateTimeOffset When, decimal? Quantity = null)
     {
-        public readonly string Date => when.ToString("yyyy-MM-dd");
+        public readonly string Date => When.ToString("yyyy-MM-dd");
     }
-    public record struct PositionTransaction(decimal numberOfShares, decimal price, Guid transactionId, string type, DateTimeOffset when)
+    public readonly record struct PositionTransaction(decimal NumberOfShares, decimal Price, Guid TransactionId, string Type, DateTimeOffset When)
     {
-        public readonly string Date => when.ToString("yyyy-MM-dd");
-        public readonly int AgeInDays => (int)(DateTimeOffset.Now - when).TotalDays;
+        public readonly string Date => When.ToString("yyyy-MM-dd");
+        public readonly int AgeInDays => (int)(DateTimeOffset.Now - When).TotalDays;
     }
 
     // PositionInstance models a stock position from the time the first share is opened
@@ -72,12 +72,12 @@ namespace core.Stocks
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
         private readonly List<decimal> _slots = new();
 
-        private bool PositionCompleted;
+        private bool _positionCompleted;
         public decimal CompletedPositionCost { get; private set; }
         public decimal CompletedPositionShares { get; private set; }
         public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
 
-        public string Grade { get; private set; }
+        public TradeGrade? Grade { get; private set; }
         public string GradeNote { get; private set; }
         public void SetGrade(TradeGrade grade, string note = null)
         {
@@ -96,10 +96,10 @@ namespace core.Stocks
 
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
-            Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId: transactionId, type:"buy", when));
-            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", type: PositionEventType.buy, value: price, when: when, quantity: numberOfShares));
+            Transactions.Add(new PositionTransaction(numberOfShares, price, TransactionId: transactionId, Type:"buy", when));
+            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", Type: PositionEventType.buy, Value: price, When: when, Quantity: numberOfShares));
 
-            if (PositionCompleted == false)
+            if (_positionCompleted == false)
             {
                 CompletedPositionCost += price * numberOfShares;
                 CompletedPositionShares += numberOfShares;
@@ -117,15 +117,15 @@ namespace core.Stocks
 
         internal void RemoveTransaction(Guid transactionId)
         {
-            var tx = Transactions.SingleOrDefault(t => t.transactionId == transactionId);
-            if (tx.transactionId == default)
+            var tx = Transactions.SingleOrDefault(t => t.TransactionId == transactionId);
+            if (tx.TransactionId == default)
             {
                 throw new InvalidOperationException($"Transaction {transactionId} not found");
             }
             Transactions.Remove(tx);
 
-            var ev = Events.SingleOrDefault(e => e.id == transactionId);
-            if (ev.id == default)
+            var ev = Events.SingleOrDefault(e => e.Id == transactionId);
+            if (ev.Id == default)
             {
                 throw new InvalidOperationException($"Event {transactionId} not found");
             }
@@ -144,15 +144,15 @@ namespace core.Stocks
 
             // once we stop adding and do our first sale, that should be our position
             // completion
-            if (!PositionCompleted)
+            if (!_positionCompleted)
             {
-                PositionCompleted = true;
+                _positionCompleted = true;
             }
 
             var percentGainAtSale = (price - AverageCostPerShare) / AverageCostPerShare;
 
-            Transactions.Add(new PositionTransaction(numberOfShares, price, transactionId:transactionId, type: "sell", when));
-            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale:P})", PositionEventType.sell, price, when, quantity: numberOfShares));
+            Transactions.Add(new PositionTransaction(numberOfShares, price, TransactionId:transactionId, Type: "sell", when));
+            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale:P})", PositionEventType.sell, price, when, Quantity: numberOfShares));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
@@ -176,7 +176,7 @@ namespace core.Stocks
             }
         }
 
-        private bool HasEventWithDescription(string testDescription) => Events.Any(e => e.description == testDescription);
+        private bool HasEventWithDescription(string testDescription) => Events.Any(e => e.Description == testDescription);
 
         public void SetStopPrice(decimal? stopPrice, DateTimeOffset when)
         {
@@ -250,34 +250,34 @@ namespace core.Stocks
             decimal totalNumberOfSharesBought = 0;
 
             Transactions.ForEach(transaction => {
-            if (transaction.type == "buy")
+            if (transaction.Type == "buy")
             {
-                for (var i = 0; i < transaction.numberOfShares; i++)
+                for (var i = 0; i < transaction.NumberOfShares; i++)
                 {
-                    _slots.Add(transaction.price);
-                    cost += transaction.price;
+                    _slots.Add(transaction.Price);
+                    cost += transaction.Price;
                     numberOfShares++;
                 }
 
-                totalBuy += transaction.price * transaction.numberOfShares;
-                totalNumberOfSharesBought += transaction.numberOfShares;
+                totalBuy += transaction.Price * transaction.NumberOfShares;
+                totalNumberOfSharesBought += transaction.NumberOfShares;
             }
             else
             {
                 // remove quantity number of slots from the beginning of an array
-                var removed = _slots.Take((int)transaction.numberOfShares).ToList();
-                _slots.RemoveRange(0, (int)transaction.numberOfShares);
+                var removed = _slots.Take((int)transaction.NumberOfShares).ToList();
+                _slots.RemoveRange(0, (int)transaction.NumberOfShares);
                 removed.ForEach(
                     removedElement =>
                     {
-                        profit += transaction.price - removedElement;
+                        profit += transaction.Price - removedElement;
                         cost -= removedElement;
                         numberOfShares--;
                     }
                 );
                 
-                totalSale += transaction.price * transaction.numberOfShares;
-                totalNumberOfSharesSold += transaction.numberOfShares;
+                totalSale += transaction.Price * transaction.NumberOfShares;
+                totalNumberOfSharesSold += transaction.NumberOfShares;
             }
             });
 
@@ -301,7 +301,7 @@ namespace core.Stocks
             };
         }
 
-        private Dictionary<string, string> _labels { get; set; } = new();
+        private readonly Dictionary<string, string> _labels = new();
         public IEnumerable<KeyValuePair<string, string>> Labels => _labels;
         public bool ContainsLabel(string key, string value)
         {

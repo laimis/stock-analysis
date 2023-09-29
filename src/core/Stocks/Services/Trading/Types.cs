@@ -101,15 +101,15 @@ namespace core.Stocks.Services.Trading
                     totalRRLosses += Math.Abs(e.RR);
                 }
                 
-                if (e.Grade != null)
+                if (e.Grade.HasValue)
                 {
-                    if (gradeDistribution.ContainsKey(e.Grade))
+                    if (gradeDistribution.ContainsKey(e.Grade.Value))
                     {
-                        gradeDistribution[e.Grade]++;
+                        gradeDistribution[e.Grade.Value]++;
                     }
                     else
                     {
-                        gradeDistribution.Add(e.Grade, 1);
+                        gradeDistribution.Add(e.Grade.Value, 1);
                     }
                 }
             }
