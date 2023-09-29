@@ -148,12 +148,15 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let aGrades, bGrades, cGrades =
                 trades
                 |> Seq.fold ( fun (a, b, c) position ->
-                    match position.Grade with
-                    | "A" -> (a+1, b, c)
-                    | "B" -> (a, b+1, c)
-                    | "C" -> (a, b, c+1)
-                    | _ -> (a, b, c)
-                    
+                    match position.Grade.HasValue with
+                    | false -> (a, b, c)
+                    | _ ->
+                        match position.Grade.Value.Value with
+                        | "A" -> (a+1, b, c)
+                        | "B" -> (a, b+1, c)
+                        | "C" -> (a, b, c+1)
+                        | _ -> (a, b, c)
+                        
                     ) (0, 0, 0)
             
             let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.column);
@@ -227,7 +230,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             
         let generateTrendsForAtMost (numberOfTrades:int) (trades:PositionInstance array) =
             match trades.Length with
-            | tradeLength when tradeLength >= numberOfTrades -> generateTrends trades[0..numberOfTrades-1]
+            | tradeLength when tradeLength >= numberOfTrades -> generateTrends trades[trades.Length - numberOfTrades - 1..numberOfTrades-1]
             | _ -> List<ChartDataPointContainer<decimal>>()
             
         let timeBasedSlice cutOff (trades:PositionInstance array) =
