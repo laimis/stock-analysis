@@ -21,15 +21,17 @@ namespace storagetests
 
             var storage = GetStorage();
 
-            var fromDb = await storage.GetUserByEmail(email);
+            var fromDbOption = await storage.GetUserByEmail(email);
 
-            Assert.Null(fromDb);
+            Assert.Null(fromDbOption.Value);
 
             await storage.Save(user);
 
-            fromDb = await storage.GetUserByEmail(email);
+            fromDbOption = await storage.GetUserByEmail(email);
 
-            Assert.NotNull(fromDb);
+            Assert.NotNull(fromDbOption.Value);
+            
+            var fromDb = fromDbOption.Value;
 
             Assert.NotEqual(Guid.Empty, fromDb.State.Id);
             Assert.Equal(email, fromDb.State.Email);
@@ -41,13 +43,13 @@ namespace storagetests
 
             await storage.Delete(user);
 
-            fromDb = await storage.GetUserByEmail(email);
+            fromDbOption = await storage.GetUserByEmail(email);
 
-            Assert.Null(fromDb);
+            Assert.Null(fromDbOption.Value);
 
-            fromDb = await storage.GetUser(user.Id);
+            fromDbOption = await storage.GetUser(user.Id);
 
-            Assert.Null(fromDb);
+            Assert.Null(fromDbOption.Value);
 
             users = await storage.GetUserEmailIdPairs();
             Assert.Empty(users.Where(u => u.Email == email));

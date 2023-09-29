@@ -7,6 +7,7 @@ using core.fs.Shared.Adapters.Storage;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
+using Microsoft.FSharp.Core;
 using Moq;
 using Xunit;
 
@@ -31,7 +32,9 @@ namespace coretests.Options
             var accounts = new Mock<IAccountStorage>();
             accounts.Setup(x => x.GetUser(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(
-                    new User("e", "f", "l"))
+                        new FSharpOption<User>(
+                            new User("e", "f", "l"))
+                    )
                 );
 
             var brokerage = new Mock<IBrokerage>();
