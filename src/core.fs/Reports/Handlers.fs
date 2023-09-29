@@ -226,8 +226,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         
         let! user = accounts.GetUser request.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<DailyOutcomeScoreReportView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<DailyOutcomeScoreReportView>
+        | Some user ->
             
             let start = request.Start |> DateTimeOffset.Parse |> marketHours.GetMarketStartOfDayTimeInUtc
             let ``end`` =
@@ -254,8 +254,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         
         let! user = accounts.GetUser request.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
+        | Some user ->
             
             let! stock = storage.GetStock request.Ticker request.UserId
             
@@ -302,8 +302,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         
         let! user = accounts.GetUser query.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<GapReportView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<GapReportView>
+        | Some user ->
             
             let! priceResponse = brokerage.GetPriceHistory(
                 state=user.State, ticker=query.Ticker, frequency=query.Frequency
@@ -322,8 +322,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         let! user = accounts.GetUser query.UserId
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
+        | Some user ->
             
             let! tasks =
                 query.Tickers
@@ -400,8 +400,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         
         let! user = accounts.GetUser query.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
+        | Some user ->
             let! stocks = storage.GetStocks query.UserId
             
             let positions = stocks |> Seq.filter (fun stock -> stock.State.OpenPosition = null |> not) |> Seq.map (fun stock -> stock.State.OpenPosition)
@@ -460,8 +460,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
     member _.Handle (query:PercentChangeStatisticsQuery) = task {
         let! user = accounts.GetUser query.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
+        | Some user ->
             let! pricesResponse = brokerage.GetPriceHistory(
                     user.State,
                     query.Ticker,
@@ -484,8 +484,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
     member _.Handle (query:SellsQuery) = task {
         let! user = accounts.GetUser query.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<SellsView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<SellsView>
+        | Some user ->
             let! stocks = storage.GetStocks query.UserId
             
             let! priceResult = brokerage.GetQuotes(user.State, stocks |> Seq.map (fun stock -> stock.State.Ticker.Value))

@@ -34,8 +34,11 @@ namespace web.Controllers
         public async Task<ActionResult> LoginAs(Guid userId)
         {
             var u = await _storage.GetUser(userId);
+            
+            if (u.Value == null)
+                return NotFound();
 
-            await AccountController.EstablishSignedInIdentity(HttpContext, u);
+            await AccountController.EstablishSignedInIdentity(HttpContext, u.Value);
 
             return Redirect("~/");
         }
@@ -61,9 +64,12 @@ namespace web.Controllers
         public async Task<ActionResult> Welcome(Guid userId)
         {
             var user = await _storage.GetUser(userId);
+            
+            if (user.Value == null)
+                return NotFound();
 
             await _email.Send(
-                new Recipient(email: user.State.Email, name: user.State.Name),
+                new Recipient(email: user.Value.State.Email, name: user.Value.State.Name),
                 Sender.Support,
                 EmailTemplate.NewUserWelcome,
                 new object()

@@ -98,9 +98,8 @@ module core.fs.Alerts.MonitoringServices
                 let! user = accounts.GetUser(userId) |> Async.AwaitTask
                 
                 match user with
-                | null ->
-                    logError $"Unable to find user {userId}"
-                | _ ->
+                | None -> logError $"Unable to find user {userId}"
+                | Some user ->
                         logInformation $"Found user {userId}"
                         
                         let! checks = portfolio.GetStocks(user.Id) |> Async.AwaitTask

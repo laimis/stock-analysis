@@ -101,12 +101,14 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             try
             {
-                var user = await _accounts.GetUserByEmail(emailId.Email);
-                if (user == null)
+                var userOption = await _accounts.GetUserByEmail(emailId.Email);
+                if (userOption.Value == null)
                 {
                     _logger.LogError("User not found for {email}", emailId.Email);
                     return;
                 }
+                
+                var user = userOption.Value;
 
                 _logger.LogInformation("Processing user {email} upsides", emailId.Email);
 

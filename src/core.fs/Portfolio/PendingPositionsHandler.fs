@@ -59,8 +59,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failed
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failed
+        | Some user ->
             
             let! existing = portfolio.GetPendingStockPositions(command.UserId)
             
@@ -102,8 +102,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failed
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failed
+        | Some user ->
             
             let! existing = portfolio.GetPendingStockPositions(command.UserId)
             
@@ -137,10 +137,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+        | Some user ->
             
-            let! positions = portfolio.GetPendingStockPositions(command.UserId)
+            let! positions = portfolio.GetPendingStockPositions(user.Id)
             
             let data = positions |> Seq.sortByDescending(fun x -> x.State.Date);
                 
@@ -155,8 +155,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<PendingStockPositionState array>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<PendingStockPositionState array>
+        | Some user ->
             
             let! positions = portfolio.GetPendingStockPositions(query.UserId)
             

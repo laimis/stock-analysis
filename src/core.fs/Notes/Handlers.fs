@@ -73,7 +73,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<Note>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<Note>
             | _ -> 
                 let note = Note(userId=command.UserId,ticker=command.Ticker,note=command.Note,created=DateTime.UtcNow)
                 do! portfolio.SaveNote note command.UserId
@@ -84,7 +84,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<NoteState>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<NoteState>
             | _ -> 
                 let! note = portfolio.GetNote command.NoteId command.UserId
                 
@@ -97,7 +97,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<NotesView>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<NotesView>
             | _ -> 
                 let! notes = portfolio.GetNotes(userId=command.UserId)
                 return NotesView(notes) |> ResponseUtils.success<NotesView>
@@ -107,7 +107,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<NotesView>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<NotesView>
             | _ -> 
                 let! notes = portfolio.GetNotes(userId=command.UserId)
                 return NotesView(notes |> Seq.filter(fun n -> n.State.RelatedToTicker = command.Ticker.Value)) |> ResponseUtils.success<NotesView>
@@ -117,7 +117,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<Note>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<Note>
             | _ -> 
                 let! note = portfolio.GetNote command.NoteId command.UserId
                 
@@ -133,7 +133,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
             | _ -> 
                 let! notes = portfolio.GetNotes(userId=command.UserId)
                 
@@ -152,7 +152,7 @@ namespace core.fs.Notes
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null -> return "User not found" |> ResponseUtils.failed
+            | None -> return "User not found" |> ResponseUtils.failed
             | _ -> 
                 let records = csvParser.Parse<ImportRecord>(command.Content)
                 match records.IsOk with

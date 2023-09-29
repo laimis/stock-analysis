@@ -21,10 +21,11 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
 
-    public Task<User?> GetUser(Guid userId)
+    public Task<FSharpOption<User>> GetUser(Guid userId)
     {
-        _users.TryGetValue(userId, out User? u);
-        return Task.FromResult(u);
+        var response = _users.TryGetValue(userId, out var u) ? new FSharpOption<User>(u!) : FSharpOption<User>.None;
+        
+        return Task.FromResult(response);
     }
 
     public Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid guid) =>
@@ -34,10 +35,10 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
                 : FSharpOption<ProcessIdToUserAssociation>.None
         );
 
-    public Task<User?> GetUserByEmail(string emailAddress)
+    public Task<FSharpOption<User>> GetUserByEmail(string emailAddress)
     {
         var user = _users.Values.FirstOrDefault(u => u?.State?.Email == emailAddress);
-        return Task.FromResult(user);
+        return Task.FromResult(user == null ? FSharpOption<User>.None : new FSharpOption<User>(user));
     }
 
     public Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs() =>

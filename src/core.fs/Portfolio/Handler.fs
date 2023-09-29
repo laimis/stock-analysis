@@ -169,9 +169,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     interface IApplicationService
 
     member this.Handle (command:DeletePosition) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failed
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! stocks = storage.GetStocks(command.UserId)
             
@@ -213,9 +213,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member _.Handle (command:GradePosition) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failed
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! stocks = storage.GetStocks(command.UserId)
             
@@ -236,9 +236,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member _.Handle (command:RemoveLabel) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failed
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! stocks = storage.GetStocks(command.UserId)
             
@@ -259,9 +259,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member _.Handle (command:AddLabel) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failed
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! stocks = storage.GetStocks(command.UserId)
             
@@ -282,9 +282,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member _.Handle (query:ProfitPointsQuery) = task {
-        let! account = accounts.GetUser(query.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
+        let! user = accounts.GetUser(query.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
         | _ ->
             let! stocks = storage.GetStocks(query.UserId)
             
@@ -323,9 +323,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member _.Handle (command:SetRisk) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failed
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! stocks = storage.GetStocks(command.UserId)
             
@@ -346,10 +346,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     }
     
     member _.Handle (command:SimulateTrade) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
-        | _ ->
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
+        | Some user ->
             let! stocks = storage.GetStocks(command.UserId)
             
             let stock =
@@ -366,19 +366,19 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | null -> return "Position not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
                 | _ ->
                     let runner = TradingStrategyRunner(brokerage, marketHours)
-                    let! simulation = runner.Run(account.State, position=position)
+                    let! simulation = runner.Run(user.State, position=position)
                     return ServiceResponse<TradingStrategyResults>(simulation)
     }
     
     member _.Handle (command:SimulateTradeForTicker) = task {
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
-        | _ ->
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
+        | Some user ->
             let runner = TradingStrategyRunner(brokerage, marketHours)
                 
             let! results = runner.Run(
-                    account.State,
+                    user.State,
                     numberOfShares=command.NumberOfShares,
                     price=command.Price,
                     stopPrice=command.StopPrice,
@@ -420,10 +420,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     | :?OverflowException -> TradingPerformance.Create(Array.Empty<PositionInstance>())
             TradingStrategyPerformance(name, performance, positions)
         
-        let! account = accounts.GetUser(command.UserId)
-        match account with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyPerformance array>
-        | _ ->
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyPerformance array>
+        | Some user ->
             
             let! stocks = storage.GetStocks(command.UserId)
             
@@ -440,7 +440,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let! simulations =
                 positions
-                |> Seq.map (fun p -> runSimulation runner account.State p command.ClosePositionIfOpenAtTheEnd)
+                |> Seq.map (fun p -> runSimulation runner user.State p command.ClosePositionIfOpenAtTheEnd)
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
@@ -473,8 +473,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     member _.Handle (query:QueryTradingEntries) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<TradingEntriesView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingEntriesView>
+        | Some user ->
             let! stocks = storage.GetStocks(query.UserId)
             
             let positions =
@@ -524,7 +524,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     member _.Handle (query:QueryPastTradingEntries) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<PastTradingEntriesView>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<PastTradingEntriesView>
         | _ ->
             let! stocks = storage.GetStocks(query.UserId)
             

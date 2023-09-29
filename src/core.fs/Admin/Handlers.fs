@@ -41,7 +41,7 @@ namespace core.fs.Admin
                     let! notes = portfolio.GetNotes(userId) |> Async.AwaitTask
                     let! stocks = portfolio.GetStocks(userId) |> Async.AwaitTask
                     
-                    return QueryResponse(user, stocks, options, notes)
+                    return QueryResponse(user.Value, stocks, options, notes)
                 }
                 
             interface IApplicationService
@@ -64,13 +64,15 @@ namespace core.fs.Admin
             member _.Handle (_:Export) = task {
                 let! pairs = storage.GetUserEmailIdPairs()
                 
-                let! users = 
+                let! userTasks = 
                     pairs
                     |> Seq.map (fun emailId -> async {
                         return! emailId.Id |> Guid |> storage.GetUser |> Async.AwaitTask
                     })
                     |> Async.Parallel
                     |> Async.StartAsTask
+                    
+                let users = userTasks |> Seq.choose id
                     
                 let filename = CSVExport.GenerateFilename("users")
                 

@@ -50,59 +50,62 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
     member this.Handle(request: DashboardQuery) =
         task {
             let! user = request.UserId |> accounts.GetUser
+            
+            match user with
+            | None -> return "User not found" |> ResponseUtils.failedTyped<OptionDashboardView>
+            | Some user ->
+                let! options = storage.GetOwnedOptions(user.Id)
 
-            let! options = storage.GetOwnedOptions(user.Id)
+                let closedOptions =
+                    options
+                    |> Seq.filter (fun o -> o.State.Closed.HasValue)
+                    |> Seq.map (fun o -> o.State)
+                    |> Seq.sortByDescending (fun o -> o.FirstFill.Value)
+                    |> Seq.map (fun o -> OwnedOptionView(o, null))
 
-            let closedOptions =
-                options
-                |> Seq.filter (fun o -> o.State.Closed.HasValue)
-                |> Seq.map (fun o -> o.State)
-                |> Seq.sortByDescending (fun o -> o.FirstFill.Value)
-                |> Seq.map (fun o -> OwnedOptionView(o, null))
+                let openOptionsTasks =
+                    options
+                    |> Seq.filter (fun o -> o.State.Closed.HasValue |> not)
+                    |> Seq.map (fun o -> o.State)
+                    |> Seq.sortBy (fun o -> o.Ticker, o.Expiration)
+                    |> Seq.map (fun o ->
+                        task {
+                            let! chain = brokerage.GetOptions(user.State, o.Ticker, o.Expiration)
 
-            let openOptionsTasks =
-                options
-                |> Seq.filter (fun o -> o.State.Closed.HasValue |> not)
-                |> Seq.map (fun o -> o.State)
-                |> Seq.sortBy (fun o -> o.Ticker, o.Expiration)
-                |> Seq.map (fun o ->
-                    task {
-                        let! chain = brokerage.GetOptions(user.State, o.Ticker, o.Expiration)
+                            let detail =
+                                match chain.IsOk with
+                                | true -> chain.Success.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
+                                | false -> null
 
-                        let detail =
-                            match chain.IsOk with
-                            | true -> chain.Success.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
-                            | false -> null
+                            return OwnedOptionView(o, detail)
+                        })
 
-                        return OwnedOptionView(o, detail)
-                    })
+                let! openOptions = System.Threading.Tasks.Task.WhenAll(openOptionsTasks)
 
-            let! openOptions = System.Threading.Tasks.Task.WhenAll(openOptionsTasks)
+                let! brokerageAccount = brokerage.GetAccount(user.State)
 
-            let! brokerageAccount = brokerage.GetAccount(user.State)
+                let brokeragePositions =
+                    match brokerageAccount.IsOk with
+                    | true ->
+                        brokerageAccount.Success.OptionPositions
+                        |> Seq.filter (fun p ->
+                            openOptions
+                            |> Seq.exists (fun o ->
+                                o.Ticker = p.Ticker
+                                && o.StrikePrice = p.StrikePrice
+                                && o.OptionType = p.OptionType)
+                            |> not)
+                    | false -> Seq.empty
 
-            let brokeragePositions =
-                match brokerageAccount.IsOk with
-                | true ->
-                    brokerageAccount.Success.OptionPositions
-                    |> Seq.filter (fun p ->
-                        openOptions
-                        |> Seq.exists (fun o ->
-                            o.Ticker = p.Ticker
-                            && o.StrikePrice = p.StrikePrice
-                            && o.OptionType = p.OptionType)
-                        |> not)
-                | false -> Seq.empty
+                let brokerageOrders =
+                    match brokerageAccount.IsOk with
+                    | true -> brokerageAccount.Success.Orders
+                    | false -> Array.empty
 
-            let brokerageOrders =
-                match brokerageAccount.IsOk with
-                | true -> brokerageAccount.Success.Orders
-                | false -> Array.empty
+                let view =
+                    OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders)
 
-            let view =
-                OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders)
-
-            return ServiceResponse<OptionDashboardView>(view)
+                return ServiceResponse<OptionDashboardView>(view)
         }
 
     member _.Handle(request: ExportQuery) =
@@ -120,8 +123,8 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
         task {
             let data, assign =
                 match command with
-                | Expire (data) -> (data, false)
-                | Assign (data) -> (data, true)
+                | Expire data -> (data, false)
+                | Assign data -> (data, true)
 
             let! option = storage.GetOwnedOption data.OptionId data.UserId
 
@@ -140,8 +143,8 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
         task {
             let data, assigned =
                 match command with
-                | ExpireViaLookup (data) -> (data, false)
-                | AssignViaLookup (data) -> (data, true)
+                | ExpireViaLookup data -> (data, false)
+                | AssignViaLookup data -> (data, true)
 
             let! options = storage.GetOwnedOptions(data.UserId)
 
@@ -153,7 +156,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     && o.State.Expiration = data.Expiration)
 
             match option with
-            | Some (o) ->
+            | Some o ->
                 o.Expire(assign = assigned)
                 do! storage.SaveOwnedOption o data.UserId
                 return ServiceResponse<OwnedOption>(o)
@@ -192,10 +195,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = accounts.GetUser(userId)
 
             match user with
-            | null ->
-                return
-                    "User not found"
-                    |> ResponseUtils.failedTyped<OwnedOption>
+            | None -> return "User not found" |> ResponseUtils.failedTyped<OwnedOption>
             | _ ->
 
                 let optionType = Enum.Parse(typedefof<OptionType>, data.OptionType) :?> OptionType
@@ -221,11 +221,8 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = accounts.GetUser(query.UserId)
 
             match user with
-            | null ->
-                return
-                    "User not found"
-                    |> ResponseUtils.failedTyped<OwnedOptionView>
-            | _ ->
+            | None -> return "User not found" |> ResponseUtils.failedTyped<OwnedOptionView>
+            | Some user ->
 
                 let! option = storage.GetOwnedOption query.OptionId query.UserId
                 let! chain = brokerage.GetOptions(user.State, option.State.Ticker)
@@ -245,8 +242,8 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = accounts.GetUser(userId = query.UserId)
 
             match user with
-            | null -> return "User not found" |> ResponseUtils.failedTyped<OptionDetailsViewModel>
-            | _ ->
+            | None -> return "User not found" |> ResponseUtils.failedTyped<OptionDetailsViewModel>
+            | Some user ->
 
                 let! priceResult = brokerage.GetQuote(state = user.State, ticker = query.Ticker)
 

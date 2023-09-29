@@ -18,23 +18,19 @@ namespace storage.postgres
         {
         }
 
-        public async Task<User> GetUser(Guid userId)
+        public async Task<FSharpOption<User>> GetUser(Guid userId)
         {
             var events = await GetEventsAsync(_user_entity, userId);
 
             var u = new User(events);
-            if (u.Id == Guid.Empty)
-            {
-                return null;
-            }
-            return u;
+            return u.Id == Guid.Empty ? FSharpOption<User>.None : new FSharpOption<User>(u);
         }
 
-        public async Task<User> GetUserByEmail(string emailAddress)
+        public async Task<FSharpOption<User>> GetUserByEmail(string emailAddress)
         {
             emailAddress = emailAddress.ToLowerInvariant();
 
-            string identifier = null;
+            string identifier;
             using(var db = GetConnection())
             {
                 var query = @"SELECT id FROM users WHERE email = :emailAddress";
@@ -44,7 +40,7 @@ namespace storage.postgres
 
             if (identifier == null)
             {
-                return null;
+                return FSharpOption<User>.None;
             }
 
             return await GetUser(new Guid(identifier));

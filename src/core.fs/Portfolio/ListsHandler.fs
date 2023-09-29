@@ -96,7 +96,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState array>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState array>
         | _ ->
             let! lists = portfolio.GetStockLists(command.UserId)
             let states = lists |> Seq.map (fun l -> l.State) |> Seq.sortBy (fun s -> s.Name) |> Seq.toArray
@@ -107,7 +107,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -119,7 +119,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -134,7 +134,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -149,7 +149,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -164,7 +164,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -179,7 +179,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -194,7 +194,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -210,7 +210,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
@@ -225,7 +225,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with

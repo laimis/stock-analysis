@@ -8,8 +8,8 @@ open core.fs.Shared.Domain.Accounts
 
 type IAccountStorage =
     
-    abstract member GetUserByEmail: emailAddress:string -> Task<User>
-    abstract member GetUser: userId:Guid -> Task<User>
+    abstract member GetUserByEmail: emailAddress:string -> Task<User option>
+    abstract member GetUser: userId:Guid -> Task<User option>
     abstract member Save: u:User -> Task
     abstract member Delete: u:User -> Task
     abstract member SaveUserAssociation: r:ProcessIdToUserAssociation -> Task

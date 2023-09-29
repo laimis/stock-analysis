@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -104,12 +105,14 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
                 _logger.LogInformation($"Sending email to {emailId.Id}");
 
-                var user = await _accounts.GetUser(new Guid(emailId.Id));
-                if (user == null)
+                var userOption = await _accounts.GetUser(new Guid(emailId.Id));
+                if (userOption.Value == null)
                 {
                     _logger.LogError("Unable to find user for " + emailId.Id);
                     continue;
                 }
+
+                var user = userOption.Value;
 
                 // get all alerts for that user
                 var alertGroups = _container.GetAlerts(user.State.Id)
@@ -161,7 +164,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
                 core.Shared.ValueFormat.Percentage => triggeredValue.ToString("P1"),
                 core.Shared.ValueFormat.Currency => triggeredValue.ToString("C2"),
                 core.Shared.ValueFormat.Number => triggeredValue.ToString("N2"),
-                core.Shared.ValueFormat.Boolean => triggeredValue.ToString(),
+                core.Shared.ValueFormat.Boolean => triggeredValue.ToString(CultureInfo.InvariantCulture),
                 _ => throw new Exception("Unexpected alert value type: " + valueFormat)
             };
         }

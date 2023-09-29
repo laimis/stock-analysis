@@ -142,7 +142,7 @@ namespace web.BackgroundServices
                 end: end
             );
 
-            if (!prices.IsOk)
+            if (prices.Error != null)
             {
                 _logger.LogCritical("Could not get price history for {ticker}: {message}", ticker, prices.Error.Message);
             }
@@ -162,7 +162,8 @@ namespace web.BackgroundServices
 
             foreach(var emailIdPair in users)    
             {
-                var user = await _accounts.GetUser(new Guid(emailIdPair.Id));
+                var userOption = await _accounts.GetUser(new Guid(emailIdPair.Id));
+                var user = userOption.Value;
                 var list = (await _portfolio.GetStockLists(user.Id))
                     .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers.Select(t => (l, t)))

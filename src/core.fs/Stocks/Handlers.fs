@@ -200,7 +200,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! user = accounts.GetUser(userId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
             let! stock = portfolio.GetStock data.Ticker.Value userId
             
@@ -251,8 +251,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     member _.Handle (query:DashboardQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<DashboardView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<DashboardView>
+        | Some user ->
             let! stocks = portfolio.GetStocks(query.UserId)
             
             let positions =
@@ -332,8 +332,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     member _.Handle (query:DetailsQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<DetailsView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<DetailsView>
+        | Some user ->
             let! profileResponse = brokerage.GetStockProfile(user.State, query.Ticker)
             let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
             let price =
@@ -354,7 +354,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
         | _ ->
             let! stocks = portfolio.GetStocks(query.UserId)
             
@@ -435,8 +435,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     member _.Handle (query:OwnershipQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<OwnershipView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<OwnershipView>
+        | Some user ->
             let! stock = portfolio.GetStock query.Ticker.Value query.UserId
             match stock with
             | null -> return "Stock not found" |> ResponseUtils.failedTyped<OwnershipView>
@@ -466,8 +466,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<Nullable<decimal>>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<Nullable<decimal>>
+        | Some user ->
             let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
             let price =
                 match priceResponse.IsOk with
@@ -481,8 +481,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<PricesView>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<PricesView>
+        | Some user ->
             let! priceResponse = brokerage.GetPriceHistory(user.State, query.Ticker, start=query.Start, ``end``=query.End)
             match priceResponse.IsOk with
             | false -> return priceResponse.Error.Message |> ResponseUtils.failedTyped<PricesView>
@@ -495,8 +495,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<StockQuote>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockQuote>
+        | Some user ->
             let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
             match priceResponse.IsOk with
             | false -> return priceResponse.Error.Message |> ResponseUtils.failedTyped<StockQuote>
@@ -506,8 +506,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     member _.Handle (query:SearchQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<SearchResult seq>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<SearchResult seq>
+        | Some user ->
             let! matches = brokerage.Search(user.State, query.Term)
             
             match matches.IsOk with

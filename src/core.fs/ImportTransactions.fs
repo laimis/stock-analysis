@@ -108,8 +108,8 @@ module ImportTransactions =
             
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | null -> return "User not found" |> ResponseUtils.failed
-            | _ ->
+            | None -> return "User not found" |> ResponseUtils.failed
+            | Some user ->
                 
                 let records = cmd.Content |> csvParser.Parse<TransactionRecord>
                 match records.IsOk with

@@ -42,8 +42,8 @@ namespace core.fs.Accounts
                 let! user = storage.GetUserByEmail(command.Email)
                 
                 match user with
-                | null -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<User>
-                | _ -> return! command |> attemptLogin user
+                | None -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<User>
+                | Some user -> return! command |> attemptLogin user
             }
             
     module ClearAccount =
@@ -61,8 +61,8 @@ namespace core.fs.Accounts
                 let! user = storage.GetUser(command.UserId)
                 
                 match user with
-                | null -> return "User not found" |> ResponseUtils.failed
-                | _ ->
+                | None -> return "User not found" |> ResponseUtils.failed
+                | Some user ->
                     do! portfolioStorage.Delete(user.Id)
                     return ServiceResponse()
             }
@@ -86,8 +86,8 @@ namespace core.fs.Accounts
                 let! user = storage.GetUser(command.UserId)
                 
                 match user with
-                | null -> return "User not found" |> ResponseUtils.failed
-                | _ ->
+                | None -> return "User not found" |> ResponseUtils.failed
+                | Some user ->
                     user.Delete(command.Feedback)
                     do! storage.Save(user)
                     
@@ -122,8 +122,8 @@ namespace core.fs.Accounts
                 | Some association ->
                     let! user = storage.GetUser(association.UserId)
                     match user with
-                    | null -> return "User not found" |> ResponseUtils.failedTyped<User>
-                    | _ ->
+                    | None -> return "User not found" |> ResponseUtils.failedTyped<User>
+                    | Some user ->
                         
                         match association.IsOlderThan(TimeSpan.FromDays(30)) with
                         | true -> return "Confirmation link is expired. Please request a new one." |> ResponseUtils.failedTyped<User>
@@ -264,8 +264,8 @@ namespace core.fs.Accounts
                 
                 let! exists = storage.GetUserByEmail(command.UserInfo.Email)
                 match exists with
-                | null -> return $"Account with {command.UserInfo.Email} already exists" |> ResponseUtils.failedTyped<User>
-                | _ ->
+                | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ResponseUtils.failedTyped<User>
+                | None ->
                     let u = User(email=command.UserInfo.Email, firstname=command.UserInfo.FirstName, lastname=command.UserInfo.LastName)
                     
                     let struct(hash, salt) = hashProvider.Generate(command.UserInfo.Password, saltLength=32);
@@ -285,8 +285,8 @@ namespace core.fs.Accounts
             member this.Validate (userInfo:UserInfo) = task {
                 let! exists = storage.GetUserByEmail(userInfo.Email)
                 match exists with
-                | null -> return ServiceResponse()
-                | _ -> return $"Account with {userInfo.Email} already exists" |> ResponseUtils.failed
+                | None -> return ServiceResponse()
+                | Some _ -> return $"Account with {userInfo.Email} already exists" |> ResponseUtils.failed
             }
             
             member this.Handle (reset:ResetPassword) = task {
@@ -296,8 +296,8 @@ namespace core.fs.Accounts
                 | Some association ->
                     let! user = storage.GetUser(association.UserId)
                     match user with
-                    | null -> return "User account is no longer valid" |> ResponseUtils.failedTyped<User>
-                    | _ ->
+                    | None -> return "User account is no longer valid" |> ResponseUtils.failedTyped<User>
+                    | Some user ->
                         match association.IsOlderThan(TimeSpan.FromMinutes(15)) with
                         | true -> return "Password reset link is expired. Please request a new one." |> ResponseUtils.failedTyped<User>
                         | false ->
@@ -311,8 +311,8 @@ namespace core.fs.Accounts
                 
                 let! user = storage.GetUser(createNotifications.UserId)
                 match user with
-                | null -> return "User not found" |> ResponseUtils.failed
-                | _ ->
+                | None -> return "User not found" |> ResponseUtils.failed
+                | Some user ->
                     let request = ProcessIdToUserAssociation(createNotifications.UserId, createNotifications.Created)
                     
                     do! storage.SaveUserAssociation(request)
@@ -355,8 +355,8 @@ namespace core.fs.Accounts
                 let! user = storage.GetUserByEmail(request.Email)
                 
                 match user with
-                | null -> return ServiceResponse() // don't return an error so that user accounts can't be enumerated
-                | _ ->
+                | None -> return ServiceResponse() // don't return an error so that user accounts can't be enumerated
+                | Some user ->
                     let association = new ProcessIdToUserAssociation(user.Id, DateTimeOffset.UtcNow)
                     
                     do! storage.SaveUserAssociation(association)
@@ -429,17 +429,16 @@ namespace core.fs.Accounts
         
         type Handler(storage:IAccountStorage) =
             
-            let successOrError (user:User) =
+            let successOrError (user:User option) =
                 match user with
-                    | null -> AccountStatusView.notFound() 
-                    | _ -> user.State |> AccountStatusView.fromUserState
+                    | None -> AccountStatusView.notFound() 
+                    | Some user -> user.State |> AccountStatusView.fromUserState
                 |> ResponseUtils.success<AccountStatusView>
                 
             interface IApplicationService
             
             member this.Handle (query:LookupById) = task {
                 let! user = storage.GetUser(query.UserId)
-                
                 return user |> successOrError
             }
             
@@ -477,25 +476,29 @@ namespace core.fs.Accounts
                 let! r = brokerage.ConnectCallback(cmd.Code)
                 
                 let! user = accounts.GetUser(cmd.UserId)
-                
-                user.ConnectToBrokerage(r.access_token, r.refresh_token, r.token_type, r.expires_in, r.scope, r.refresh_token_expires_in)
-                
-                do! accounts.Save(user)
-                
-                return ServiceResponse()
+                match user with
+                None -> return "User not found" |> ResponseUtils.failed
+                | Some user ->
+                    user.ConnectToBrokerage(r.access_token, r.refresh_token, r.token_type, r.expires_in, r.scope, r.refresh_token_expires_in)
+                    do! accounts.Save(user)
+                    return ServiceResponse()
             }
             
             member this.HandleDisconnect(cmd:Disconnect) = task {
                 let! user = accounts.GetUser(cmd.UserId)
-                user.DisconnectFromBrokerage()
-                do! accounts.Save(user)
-                return ServiceResponse()
+                match user with
+                | None -> return "User not found" |> ResponseUtils.failed
+                | Some user ->
+                    user.DisconnectFromBrokerage()
+                    do! accounts.Save(user)
+                    return ServiceResponse()
             }
             
             member this.HandleInfo(cmd:Info) = task {
-                let! user = accounts.GetUser(cmd.UserId);
-
-                let! oauth = brokerage.GetAccessToken(user.State)
-                
-                return ServiceResponse<OAuthResponse>(oauth)
+                let! user = accounts.GetUser(cmd.UserId)
+                match user with
+                | None -> return "User not found" |> ResponseUtils.failedTyped<OAuthResponse>
+                | Some user ->
+                    let! oauth = brokerage.GetAccessToken(user.State)
+                    return ServiceResponse<OAuthResponse>(oauth)
             }

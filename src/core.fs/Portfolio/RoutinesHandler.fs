@@ -4,7 +4,6 @@ open System
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
-open core.fs
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
 
@@ -99,8 +98,8 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser create.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
-        | _ ->
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | Some _ ->
             let! routine = storage.GetRoutine create.Name create.UserId
             match routine with
             | null ->
@@ -114,7 +113,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser update.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
             let! routine = storage.GetRoutine update.Name update.UserId
             match routine with
@@ -129,7 +128,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser delete.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
             let! routine = storage.GetRoutine delete.Name delete.UserId
             match routine with
@@ -143,7 +142,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser query.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState array>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState array>
         | _ ->
             let! routines = storage.GetRoutines query.UserId
             let states =
@@ -158,7 +157,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser add.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
             let! routine = storage.GetRoutine add.RoutineName add.UserId
             match routine with
@@ -173,7 +172,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser move.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
             let! routine = storage.GetRoutine move.RoutineName move.UserId
             match routine with
@@ -188,7 +187,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser remove.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
             let! routine = storage.GetRoutine remove.RoutineName remove.UserId
             match routine with
@@ -203,7 +202,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser update.UserId
         match user with
-        | null -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
             let! routine = storage.GetRoutine update.RoutineName update.UserId
             match routine with

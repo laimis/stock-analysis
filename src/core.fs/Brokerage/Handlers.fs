@@ -47,7 +47,7 @@ module core.fs.Brokerage
         
         member _.Handle (command:BrokerageTransaction) = task {
             
-            let (userId, data, func) = 
+            let userId, data, func = 
                 match command with
                 | Buy (data,userId) -> (userId, data, buy)
                 | Sell (data,userId) -> (userId, data, sell)
@@ -55,9 +55,9 @@ module core.fs.Brokerage
             let! user = accounts.GetUser(userId)
             
             match user with
-            | null ->
-                return ResponseUtils.failed "User not found"
-            | _ ->
+            | None ->
+                return "User not found" |> ResponseUtils.failed 
+            | Some user ->
                 let! _ = user.State |> func data
                 return ServiceResponse()
         }
@@ -66,9 +66,8 @@ module core.fs.Brokerage
             let! user = accounts.GetUser(command.UserId)
             
             match user with
-            | null ->
-                return ResponseUtils.failed "User not found"
-            | _ ->
+            | None -> return ResponseUtils.failed "User not found"
+            | Some user ->
                 let! _ = brokerage.CancelOrder(user.State, command.OrderId)
                 return ServiceResponse()
         }
@@ -77,10 +76,8 @@ module core.fs.Brokerage
             let! user = accounts.GetUser(query.UserId)
             
             match user with
-            | null ->
-                return ResponseUtils.failedTyped<TradingAccount> "User not found"
-            | _ ->
-                return! brokerage.GetAccount(user.State)
+            | None -> return ResponseUtils.failedTyped<TradingAccount> "User not found"
+            | Some user -> return! brokerage.GetAccount(user.State)
         }
             
         

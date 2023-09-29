@@ -142,7 +142,7 @@ namespace core.fs.Cryptos
                 
             let! user = accounts.GetUser(userId)
             match user with
-            | null -> return ResponseUtils.failed "User not found"
+            | None -> return ResponseUtils.failed "User not found"
             | _ ->
                 let! crypto = portfolio.GetCrypto data.Token.Value userId
                 
@@ -165,7 +165,7 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(query.UserId)
             match user with
-            | null ->
+            | None ->
                 return ResponseUtils.failedTyped<CryptoDashboardView> "User not found"
             | _ ->
                 let! cryptos = portfolio.GetCryptos(query.UserId)
@@ -184,7 +184,7 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | null -> return ResponseUtils.failed "User not found"
+            | None -> return ResponseUtils.failed "User not found"
             | _ ->
                 let! crypto = portfolio.GetCrypto cmd.Token.Value cmd.UserId
                 crypto.DeleteTransaction(cmd.TransactionId)
@@ -205,7 +205,7 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(query.UserId)
             match user with
-            | null -> return ResponseUtils.failedTyped<ExportResponse> "User not found"
+            | None -> return ResponseUtils.failedTyped<ExportResponse> "User not found"
             | _ ->
                 let! cryptos = portfolio.GetCryptos(query.UserId)
                 
@@ -231,7 +231,7 @@ namespace core.fs.Cryptos
                 
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | null -> return ResponseUtils.failed "User not found"
+            | None -> return ResponseUtils.failed "User not found"
             | _ ->
                 let parserResponse = csvParser.Parse<{|TransactionType:string; Cryptocurrency:string; Amount:decimal; ConfirmedAt:DateTimeOffset|}>(cmd.Content)
                 
@@ -272,7 +272,7 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | null -> return ResponseUtils.failed "User not found"
+            | None -> return ResponseUtils.failed "User not found"
             | _ ->
                 let parserResponse = csvParser.Parse<{|Timestamp:DateTimeOffset; TransactionType:string; Asset:string; QuantityTransacted:decimal; USDSubtotal:decimal|}>(cmd.Content)
                 
@@ -309,7 +309,7 @@ namespace core.fs.Cryptos
                 
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | null -> return ResponseUtils.failed "User not found"
+            | None -> return ResponseUtils.failed "User not found"
             | _ ->
                 let parserResponse = csvParser.Parse<CoinbaseProRecord>(cmd.Content)
                 
@@ -343,7 +343,7 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(query.UserId)
             match user with
-            | null -> return ResponseUtils.failedTyped<CryptoOwnershipView> "User not found"
+            | None -> return ResponseUtils.failedTyped<CryptoOwnershipView> "User not found"
             | _ ->
                 let! crypto = portfolio.GetCrypto query.Token.Value query.UserId
                 
