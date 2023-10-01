@@ -4,12 +4,8 @@ using core.Shared;
 
 namespace core.Options
 {
-    public class OwnedOption : Aggregate
+    public class OwnedOption : Aggregate<OwnedOptionState>
      {
-         public OwnedOptionState State { get; } = new OwnedOptionState();
- 
-         public override IAggregateState AggregateState => State;
- 
          public OwnedOption(IEnumerable<AggregateEvent> events) : base(events)
          {
          }

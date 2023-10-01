@@ -5,11 +5,8 @@ using core.Shared;
 
 namespace core.Cryptos
 {
-    public class OwnedCrypto : Aggregate
+    public class OwnedCrypto : Aggregate<OwnedCryptoState>
     {
-        public OwnedCryptoState State { get; } = new OwnedCryptoState();
-        public override IAggregateState AggregateState => State;
-        
         public OwnedCrypto(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
@@ -109,7 +106,7 @@ namespace core.Cryptos
 
         public void DeleteTransaction(Guid transactionId)
         {
-            if (!State.BuyOrSell.Any(t => t.Id == transactionId))
+            if (State.BuyOrSell.All(t => t.Id != transactionId))
             {
                 throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);
             }

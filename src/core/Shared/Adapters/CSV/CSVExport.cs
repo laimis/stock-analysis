@@ -135,7 +135,7 @@ namespace core.Shared.Adapters.CSV
             return writer.Generate(rows);
         }
 
-        private static IEnumerable<object> StockEventToParts((Aggregate a, AggregateEvent ae) tuple)
+        private static IEnumerable<object> StockEventToParts((IAggregate a, AggregateEvent ae) tuple)
         {
             switch(tuple.ae)
             {

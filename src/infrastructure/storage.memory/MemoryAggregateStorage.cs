@@ -59,7 +59,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
         return Task.FromResult(_aggregates[key].AsEnumerable());
     }
 
-    public async Task SaveEventsAsync(Aggregate agg, string entity, UserId userId)
+    public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId)
     {
         var key = MakeKey(entity, userId);
 

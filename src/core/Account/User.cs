@@ -4,11 +4,8 @@ using core.Shared;
 
 namespace core.Account
 {
-    public class User : Aggregate
+    public class User : Aggregate<UserState>
     {
-        public UserState State { get; } = new UserState();
-        public override IAggregateState AggregateState => State;
-
         public User(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
