@@ -1,6 +1,5 @@
 namespace core.fs.Portfolio.Lists
 
-open System
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
@@ -36,7 +35,7 @@ type AddStockToList =
         [<Required>]
         Ticker: Ticker
     }
-    static member WithUserId (userId:UserId) (command:AddStockToList) = { command with UserId = userId }
+    static member WithUserId userId (command:AddStockToList) = { command with UserId = userId }
     
 type RemoveStockFromList =
     {
@@ -57,7 +56,7 @@ type AddTagToList =
         Name: string
         UserId: UserId
     }
-    static member WithUserId (userId:UserId) (command:AddTagToList) = { command with UserId = userId }
+    static member WithUserId userId (command:AddTagToList) = { command with UserId = userId }
     
 type RemoveTagFromList =
     {
@@ -74,7 +73,7 @@ type Create =
         Description: string
         UserId: UserId
     }
-    static member WithUserId (userId:UserId) (command:Create) = { command with UserId = userId }
+    static member WithUserId userId (command:Create) = { command with UserId = userId }
     
 type Update =
     {
@@ -82,7 +81,7 @@ type Update =
         Description: string
         UserId: UserId
     }
-    static member WithUserId (userId:UserId) (command:Update) = { command with UserId = userId }
+    static member WithUserId userId (command:Update) = { command with UserId = userId }
     
 type Delete =
     {

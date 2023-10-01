@@ -89,7 +89,7 @@ type OutcomesReportQuery =
         EndDate: string
     }
     
-    static member WithUserId (userId:UserId) (query:OutcomesReportQuery) =
+    static member WithUserId userId (query:OutcomesReportQuery) =
         {query with UserId=userId}
     
 type OutcomesReportForPositionsQuery =

@@ -75,7 +75,7 @@ namespace core.fs.Accounts
                 Feedback: string
             }
         
-            member this.WithUserId (userId:UserId) = { this with UserId = userId }
+            member this.WithUserId userId = { this with UserId = userId }
        
         
         type Handler(storage:IAccountStorage, portfolio:IPortfolioStorage, email:IEmailService) =

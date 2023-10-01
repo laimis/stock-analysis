@@ -20,7 +20,7 @@ type Create =
         Description:string
     }
     
-    static member WithUserId (userId:UserId) (create:Create) =
+    static member WithUserId userId (create:Create) =
         { create with UserId = userId }
     
 type Update =
@@ -33,7 +33,7 @@ type Update =
         Description:string
     }
     
-    static member WithUserId (userId:UserId) (update:Update) =
+    static member WithUserId userId (update:Update) =
         { update with UserId = userId }
     
 type Delete =
@@ -51,7 +51,7 @@ type AddStep =
         Label:string
         Url:string
     }
-    static member WithUserId (userId:UserId) (add:AddStep) =
+    static member WithUserId userId (add:AddStep) =
         { add with UserId = userId }
 
 type MoveStep =
@@ -64,7 +64,7 @@ type MoveStep =
         Direction:Nullable<int>
         UserId:UserId
     }
-    static member WithUserId (userId:UserId) (move:MoveStep) =
+    static member WithUserId userId (move:MoveStep) =
         { move with UserId = userId }
     
 type RemoveStep =
@@ -88,7 +88,7 @@ type UpdateStep =
         UserId:UserId
     }
     
-    static member WithUserId (userId:UserId) (update:UpdateStep) =
+    static member WithUserId userId (update:UpdateStep) =
         { update with UserId = userId }
     
 type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =

@@ -138,7 +138,7 @@ namespace storagetests
 
             await storage.SaveNote(note, _userId);
 
-            var fromDb = await storage.GetNote(IdentifierHelper.getUserId(_userId), UserId.NewUserId(note.State.Id));
+            var fromDb = await storage.GetNote(note.State.Id, _userId);
             
             Assert.Equal("new note", fromDb.State.Note);
 
@@ -318,8 +318,8 @@ namespace storagetests
             Assert.NotEmpty(existing);
             
             var loaded = await storage.GetNote(
-                IdentifierHelper.getUserId(_userId),
-                UserId.NewUserId(note.State.Id)
+                note.State.Id,
+                _userId
             );
             
             Assert.Equal(note.State.Note, loaded.State.Note);

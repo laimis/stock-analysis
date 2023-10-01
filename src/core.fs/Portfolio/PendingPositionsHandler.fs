@@ -32,7 +32,7 @@ type Create =
         UserId: UserId
     }
     
-    static member WithUserId (userId:UserId) (command:Create) =
+    static member WithUserId userId (command:Create) =
         { command with UserId = userId }
         
 type Close =

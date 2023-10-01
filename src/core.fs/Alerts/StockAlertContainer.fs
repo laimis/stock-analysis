@@ -142,7 +142,7 @@ namespace core.fs.Alerts
             { Ticker = ticker; UserId = userId }
             |> alerts.TryRemove |> ignore
             
-        member _.GetRecentlyTriggered (userId:UserId) =
+        member _.GetRecentlyTriggered userId =
             let list =
                 match recentlyTriggered.TryGetValue(userId) with
                 | true, alerts -> alerts
@@ -150,7 +150,7 @@ namespace core.fs.Alerts
             
             list |> List.sortByDescending (fun x -> x.``when``)
             
-        member _.GetAlerts (userId:UserId) =
+        member _.GetAlerts userId =
             alerts.Values
             |> Seq.filter (fun alert -> alert.userId = userId)
             |> Seq.sortBy (fun x -> x.sourceList,x.ticker.Value)

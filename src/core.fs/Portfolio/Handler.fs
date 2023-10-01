@@ -39,7 +39,7 @@ type GradePosition =
         Note: string
     }
     
-    static member WithUserId (userId:UserId) (command:GradePosition) = { command with UserId = userId }
+    static member WithUserId userId (command:GradePosition) = { command with UserId = userId }
     
 type RemoveLabel =
     {
@@ -64,7 +64,7 @@ type AddLabel =
         Value: string
     }
     
-    static member WithUserId (userId:UserId) (command:AddLabel) = { command with UserId = userId }
+    static member WithUserId userId (command:AddLabel) = { command with UserId = userId }
     
 type ProfitPointsQuery =
     {
@@ -85,7 +85,7 @@ type SetRisk =
         [<Required>]
         RiskAmount: Nullable<decimal>
     }
-    static member WithUserId (userId:UserId) (command:SetRisk) = { command with UserId = userId }
+    static member WithUserId userId (command:SetRisk) = { command with UserId = userId }
     
 type SimulateTrade = 
     {
