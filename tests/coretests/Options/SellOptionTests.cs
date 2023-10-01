@@ -26,7 +26,7 @@ namespace coretests.Options
             var mock = new Mock<IPortfolioStorage>();
 
             mock.Setup(x => x.SaveOwnedOption(It.IsAny<OwnedOption>(), It.IsAny<UserId>()))
-                .Callback((OwnedOption option, Guid _) =>
+                .Callback((OwnedOption option, UserId _) =>
                 {
                     Assert.Equal(-1, option.State.NumberOfContracts);
                 });
