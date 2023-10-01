@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using Dapper;
 using Newtonsoft.Json;
@@ -31,99 +32,87 @@ namespace storage.postgres
             return cnn; 
         }
 
-        public async Task DeleteAggregates(string entity, Guid userId)
+        public async Task DeleteAggregates(string entity, UserId userId)
         {
             using (var db = GetConnection())
             {
                 await db.ExecuteAsync(
                     @"DELETE FROM events WHERE entity = :entity AND userId = :userId",
-                    new { userId, entity }
+                    new { userId = userId.Item, entity }
                 );
             }
         }
 
-        public async Task DeleteAggregate(string entity, Guid aggregateId, Guid userId)
+        public async Task DeleteAggregate(string entity, Guid aggregateId, UserId userId)
         {
-            using (var db = GetConnection())
-            {
-                // TODO: no aggregate id in the column, huh?
-                // might want to do a migration and add one...
-                await db.ExecuteAsync(
-                    @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND eventjson LIKE :aggregateId",
-                    new { userId, entity, aggregateId = $"%{aggregateId}%" }
-                );
-            }
+            using var db = GetConnection();
+            // TODO: no aggregate id in the column, huh?
+            // might want to do a migration and add one...
+            await db.ExecuteAsync(
+                @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND eventjson LIKE :aggregateId",
+                new { userId = userId.Item, entity, aggregateId = $"%{aggregateId}%" }
+            );
         }
 
-        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, UserId userId)
         {
-            using (var db = GetConnection())
-            {
-                var list = await db.QueryAsync<StoredAggregateEvent>(
-                    @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY version",
-                    new { entity, userId }
-                );
+            using var db = GetConnection();
+            var list = await db.QueryAsync<StoredAggregateEvent>(
+                @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY version",
+                new { entity, userId = userId.Item }
+            );
 
-                return list.Select(e => e.Event);
-            }
+            return list.Select(e => e.Event);
         }
 
-        public async Task SaveEventsAsync(Aggregate agg, string entity, Guid userId)
+        public async Task SaveEventsAsync(Aggregate agg, string entity, UserId userId)
         {
-            using (var db = GetConnection())
+            using var db = GetConnection();
+            int version = agg.Version;
+
+            var eventsToBlast = new List<AggregateEvent>();
+
+            using var tx = db.BeginTransaction();
+            foreach (var e in agg.Events.Skip(agg.Version))
             {
-                int version = agg.Version;
-
-                var eventsToBlast = new List<AggregateEvent>();
-
-                using (var tx = db.BeginTransaction())
+                var se = new StoredAggregateEvent
                 {
-                    foreach (var e in agg.Events.Skip(agg.Version))
-                    {
-                        var se = new StoredAggregateEvent
-                        {
-                            Entity = entity,
-                            Event = e,
-                            Key = e.Id.ToString(),
-                            UserId = userId,
-                            Created = DateTimeOffset.UtcNow,
-                            Version = ++version
-                        };
+                    Entity = entity,
+                    Event = e,
+                    Key = e.Id.ToString(),
+                    UserId = userId.Item,
+                    Created = DateTimeOffset.UtcNow,
+                    Version = ++version
+                };
 
-                        var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
+                var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
 						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
 
-                        await db.ExecuteAsync(query, se);
+                await db.ExecuteAsync(query, se);
 
-                        eventsToBlast.Add(e);
-                    }
-
-                    await _outbox.AddEvents(eventsToBlast, tx);
-
-                    tx.Commit();
-                }
+                eventsToBlast.Add(e);
             }
+
+            await _outbox.AddEvents(eventsToBlast, tx);
+
+            tx.Commit();
         }
 
         public async Task DoHealthCheck()
         {
-            using (var db = GetConnection())
-            {
-                await db.QueryAsync<int>(@"select 1");
-            }
+            using var db = GetConnection();
+            await db.QueryAsync<int>(@"select 1");
         }
 
-        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, Guid userId)
+        public async Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, UserId userId)
         {
-            using (var db = GetConnection())
-            {
-                var list = await db.QueryAsync<StoredAggregateEvent>(
-                    @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version",
-                    new { entity, userId }
-                );
+            using var db = GetConnection();
+            var list = await db.QueryAsync<StoredAggregateEvent>(
+                @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY key, version",
+                new { entity, userId = userId.Item }
+            );
 
-                return list;
-            }
+            return list;
         }
 
         public async Task<T> Get<T>(string key)
