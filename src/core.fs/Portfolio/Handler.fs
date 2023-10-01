@@ -297,7 +297,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             match stock with
             | None -> return "Stock not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
             | Some stock ->
-                Console.WriteLine($"Stock: {stock.State.Ticker}")
+                
                 let position = stock.State.GetPosition(query.PositionId)
                 match position with
                 | null -> return "Position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
