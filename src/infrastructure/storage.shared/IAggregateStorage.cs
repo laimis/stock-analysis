@@ -9,7 +9,7 @@ namespace storage.shared
     public interface IAggregateStorage
     {
         Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, UserId userId);
-        Task SaveEventsAsync(Aggregate agg, string entity, UserId userId);
+        Task SaveEventsAsync(IAggregate agg, string entity, UserId userId);
         Task DoHealthCheck();
         Task DeleteAggregates(string entity, UserId userId);
         Task DeleteAggregate(string entity, Guid aggregateId, UserId userId);

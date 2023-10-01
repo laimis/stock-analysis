@@ -165,6 +165,7 @@ namespace web.BackgroundServices
             
             var users = await _accounts.GetUserEmailIdPairs();
 
+            var alertList = new List<AlertCheck>();
             foreach(var emailIdPair in users)    
             {
                 var userOption = await _accounts.GetUser(emailIdPair.Id);
@@ -172,11 +173,12 @@ namespace web.BackgroundServices
                 var list = (await _portfolio.GetStockLists(emailIdPair.Id))
                     .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
-                    .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user.State))
-                    .ToList();
-
-                _listChecks.Add(Constants.MonitorTagPattern, list);
+                    .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker,
+                        listName: listTickerPair.l.State.Name, user: user.State));
+                alertList.AddRange(list);
             }
+            
+            _listChecks.Add(Constants.MonitorTagPattern, alertList);
 
             _nextListMonitoringRun = MonitoringServices.nextMonitoringRun(
                 DateTimeOffset.UtcNow,

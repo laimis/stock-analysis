@@ -4,11 +4,8 @@ using core.Shared;
 
 namespace core.Portfolio
 {
-    public class PendingStockPosition : Aggregate
+    public class PendingStockPosition : Aggregate<PendingStockPositionState>
     {
-        public PendingStockPositionState State { get; } = new PendingStockPositionState();
-        public override IAggregateState AggregateState => State;
-
         public PendingStockPosition(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

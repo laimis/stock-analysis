@@ -4,12 +4,8 @@ using core.Shared;
 
 namespace core.Portfolio
 {
-    public class StockList : Aggregate
+    public class StockList : Aggregate<StockListState>
     {
-        public StockListState State { get; } = new StockListState();
-
-        public override IAggregateState AggregateState => State;
-
         public StockList(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

@@ -68,7 +68,7 @@ namespace storage.shared
             return Save(option, _option_entity, userId);
         }
 
-        private Task Save(Aggregate agg, string entityName, UserId userId)
+        private Task Save(IAggregate agg, string entityName, UserId userId)
         {
             return _aggregateStorage.SaveEventsAsync(agg, entityName, userId);
         }

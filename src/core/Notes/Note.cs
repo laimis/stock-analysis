@@ -4,11 +4,8 @@ using core.Shared;
 
 namespace core.Notes
 {
-    public class Note : Aggregate
+    public class Note : Aggregate<NoteState>
     {
-        public NoteState State { get; } = new NoteState();
-        public override IAggregateState AggregateState => State;
-
         public Note(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

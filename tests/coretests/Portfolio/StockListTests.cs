@@ -10,7 +10,7 @@ namespace coretests.Portfolio
         private static Guid _userId = Guid.NewGuid();
 
         private static StockList Create(string name, string description) =>
-            new StockList(description: description, name: name, userId: _userId);
+            new(description: description, name: name, userId: _userId);
         
         [Fact]
         public void CreateWorks()
@@ -104,14 +104,14 @@ namespace coretests.Portfolio
 
             list.AddStock("aapl", "note");
 
-            var events = list.Events.Count;
+            var events = list.Events.Count();
 
             list.AddStock("aapl", "note");
             list.AddStock("aapl", "note");
 
 
             Assert.Single(list.State.Tickers);
-            Assert.Equal(events, list.Events.Count);
+            Assert.Equal(events, list.Events.Count());
         }
 
         [Fact]

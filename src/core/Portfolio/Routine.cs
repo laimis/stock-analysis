@@ -5,12 +5,8 @@ using core.Shared;
 
 namespace core.Portfolio
 {
-    public class Routine : Aggregate
+    public class Routine : Aggregate<RoutineState>
     {
-        public RoutineState State { get; } = new RoutineState();
-
-        public override IAggregateState AggregateState => State;
-
         public Routine(IEnumerable<AggregateEvent> events) : base(events)
         {
         }

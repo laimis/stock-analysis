@@ -5,11 +5,8 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public class OwnedStock : Aggregate
+    public class OwnedStock : Aggregate<OwnedStockState>
     {
-        public OwnedStockState State { get; } = new OwnedStockState();
-        public override IAggregateState AggregateState => State;
-        
         public OwnedStock(IEnumerable<AggregateEvent> events) : base(events)
         {
         }
