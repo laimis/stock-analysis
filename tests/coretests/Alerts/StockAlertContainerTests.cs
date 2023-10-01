@@ -1,13 +1,15 @@
 using System;
 using System.Linq;
 using core.fs.Alerts;
+using core.fs.Shared.Domain.Accounts;
+using core.Shared;
 using Xunit;
 
 namespace coretests.Alerts
 {
     public class StockAlertContainerTests
     {
-        private readonly Guid _userId = Guid.NewGuid();
+        private readonly UserId _userId = UserId.NewUserId(Guid.NewGuid());
         private readonly StockAlertContainer _uat = new();
 
         public StockAlertContainerTests()
@@ -16,7 +18,7 @@ namespace coretests.Alerts
             {
                 _uat.Register(
                     TriggeredAlert.StopPriceAlert(
-                        ticker: "AMD", price: 100, stopPrice: 105, DateTimeOffset.Now, userId: _userId
+                        ticker: new Ticker("AMD"), price: 100, stopPrice: 105, DateTimeOffset.Now, userId: _userId
                     )
                 );
             }
@@ -30,6 +32,6 @@ namespace coretests.Alerts
         public void Alerts_ForUser_OnlyOne() => Assert.Single(_uat.GetAlerts(_userId));
 
         [Fact]
-        public void Alerts_ForDifferentUser_Empty() => Assert.Empty(_uat.GetAlerts(Guid.NewGuid()));
+        public void Alerts_ForDifferentUser_Empty() => Assert.Empty(_uat.GetAlerts(UserId.NewUserId(Guid.NewGuid())));
     }
 }

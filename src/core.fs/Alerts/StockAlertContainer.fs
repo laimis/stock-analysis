@@ -5,10 +5,11 @@ namespace core.fs.Alerts
     open core.Account
     open core.Shared
     open core.Stocks.Services.Analysis
+    open core.fs.Shared.Domain.Accounts
 
     type private StockPositionMonitorKey = {
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
     
     [<Struct>]
@@ -44,7 +45,7 @@ namespace core.fs.Alerts
             ticker:Ticker
             description:string
             sourceList:string
-            userId:Guid
+            userId:UserId
             alertType:AlertType
             valueFormat:ValueFormat
         }
@@ -95,7 +96,7 @@ namespace core.fs.Alerts
         
     type StockAlertContainer() =
         let alerts = ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert>()
-        let recentlyTriggered = ConcurrentDictionary<Guid, List<TriggeredAlert>>()
+        let recentlyTriggered = ConcurrentDictionary<UserId, List<TriggeredAlert>>()
         let notices = System.Collections.Generic.List<AlertContainerMessage>(capacity=10)
         
         let mutable manualRun = false
@@ -141,7 +142,7 @@ namespace core.fs.Alerts
             { Ticker = ticker; UserId = userId }
             |> alerts.TryRemove |> ignore
             
-        member _.GetRecentlyTriggered (userId:Guid) =
+        member _.GetRecentlyTriggered userId =
             let list =
                 match recentlyTriggered.TryGetValue(userId) with
                 | true, alerts -> alerts
@@ -149,7 +150,7 @@ namespace core.fs.Alerts
             
             list |> List.sortByDescending (fun x -> x.``when``)
             
-        member _.GetAlerts (userId:Guid) =
+        member _.GetAlerts userId =
             alerts.Values
             |> Seq.filter (fun alert -> alert.userId = userId)
             |> Seq.sortBy (fun x -> x.sourceList,x.ticker.Value)

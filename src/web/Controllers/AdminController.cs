@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.fs.Admin;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters.Emails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,9 +32,9 @@ namespace web.Controllers
         public ActionResult Test() => Ok();
 
         [HttpGet("loginas/{userId}")]
-        public async Task<ActionResult> LoginAs(Guid userId)
+        public async Task<ActionResult> LoginAs([FromRoute]Guid userId)
         {
-            var u = await _storage.GetUser(userId);
+            var u = await _storage.GetUser(UserId.NewUserId(userId));
             
             if (u.Value == null)
                 return NotFound();
@@ -45,7 +46,7 @@ namespace web.Controllers
 
         [HttpGet("delete/{userId}")]
         public Task<ActionResult> Delete([FromRoute]Guid userId, DeleteAccount.Handler service) =>
-            this.OkOrError(service.Handle(new DeleteAccount.Command(userId, null)));
+            this.OkOrError(service.Handle(new DeleteAccount.Command(UserId.NewUserId(userId), null)));
 
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)
@@ -61,9 +62,9 @@ namespace web.Controllers
         }
 
         [HttpGet("welcome")]
-        public async Task<ActionResult> Welcome(Guid userId)
+        public async Task<ActionResult> Welcome([FromQuery]Guid userId)
         {
-            var user = await _storage.GetUser(userId);
+            var user = await _storage.GetUser(UserId.NewUserId(userId));
             
             if (user.Value == null)
                 return NotFound();

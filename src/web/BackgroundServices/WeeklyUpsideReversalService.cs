@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
 using core.Stocks.Services.Analysis;
@@ -111,10 +112,11 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var user = userOption.Value;
 
                 _logger.LogInformation("Processing user {email} upsides", emailId.Email);
-
-                var stocks = await _portfolioStorage.GetStocks(user.Id);
+                
+                var userId = UserId.NewUserId(user.Id);
+                var stocks = await _portfolioStorage.GetStocks(userId);
                 var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker.Value);
-                var tickersFromLists = (await _portfolioStorage.GetStockLists(user.State.Id))
+                var tickersFromLists = (await _portfolioStorage.GetStockLists(userId))
                     .Where(l => l.State.ContainsTag(core.fs.Alerts.Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)
                     .Select(t => t.Ticker);

@@ -60,7 +60,7 @@ namespace web.Controllers
         public Task<ActionResult> DeleteTransaction([FromRoute] string ticker, [FromRoute] Guid eventId) =>
             this.OkOrError(
                 _service.Handle(
-                    new DeleteTransaction(new Ticker(ticker), eventId, User.Identifier()
+                    new DeleteTransaction(new Ticker(ticker), User.Identifier(), eventId
                     )
                 )
             );

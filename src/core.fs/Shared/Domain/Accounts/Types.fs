@@ -2,18 +2,26 @@
 
 open System
 
+type UserId = UserId of Guid
+
+module IdentifierHelper =
+    
+    let getUserId userId =
+        match userId with
+        | UserId id -> id
+    
 [<Struct>]
-type EmailIdPair(email:string, id:string) =
+type EmailIdPair(email:string, id:UserId) =
     
     member _.Email = email
     member _.Id = id
     
    
-type ProcessIdToUserAssociation(Id:Guid, UserId:Guid, Timestamp:DateTimeOffset) =
+type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset) =
     
-    new(userId:Guid, timestamp:DateTimeOffset) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, timestamp)
-    new(userId:Guid, timestamp:string) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, DateTimeOffset.Parse(timestamp))
-    new(id:Guid, userId:Guid, timestamp:string) = ProcessIdToUserAssociation(id, userId, DateTimeOffset.Parse(timestamp))
+    new(userId, timestamp:DateTimeOffset) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, timestamp)
+    new(userId, timestamp:string) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, DateTimeOffset.Parse(timestamp))
+    new(id:Guid, userId:Guid, timestamp:string) = ProcessIdToUserAssociation(id, userId |> UserId, DateTimeOffset.Parse(timestamp))
     
     member _.IsOlderThan(duration:TimeSpan) = DateTimeOffset.UtcNow.Subtract(Timestamp) > duration
     member _.Id = Id

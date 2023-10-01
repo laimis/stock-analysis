@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
@@ -27,10 +28,10 @@ namespace coretests.Options
         {
             var (storage, opt) = _fixture.CreateStorageWithSoldOption();
             
-            var query = new DetailsQuery(opt.State.Id, opt.State.UserId);
+            var query = new DetailsQuery(opt.State.Id, UserId.NewUserId(opt.State.UserId));
 
             var accountMock = new Mock<IAccountStorage>();
-            accountMock.Setup(x => x.GetUser(opt.State.UserId))
+            accountMock.Setup(x => x.GetUser(UserId.NewUserId(opt.State.UserId)))
                 .Returns(Task.FromResult(
                     new FSharpOption<User>(
                         new User("email", "f", "l")

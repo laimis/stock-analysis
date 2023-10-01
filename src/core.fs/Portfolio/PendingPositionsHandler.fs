@@ -9,6 +9,7 @@ open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
 [<CLIMutable>]
 [<Struct>]
@@ -28,27 +29,27 @@ type Create =
         Ticker: Ticker
         [<Required(AllowEmptyStrings = false)>]
         Strategy: string
-        UserId: Guid
+        UserId: UserId
     }
     
-    static member WithUserId (userId:Guid) (command:Create) =
+    static member WithUserId userId (command:Create) =
         { command with UserId = userId }
         
 type Close =
     {
         [<Required>]
         PositionId: Guid
-        UserId: Guid
+        UserId: UserId
     }
     
 type Export =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type Query =
     {
-        UserId: Guid
+        UserId: UserId
     }
 
 type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioStorage,csvWriter:ICSVWriter) =
@@ -90,7 +91,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                         stopPrice=command.StopPrice,
                         strategy=command.Strategy,
                         ticker=command.Ticker,
-                        userId=command.UserId
+                        userId=(command.UserId |> IdentifierHelper.getUserId)
                     )
                     
                     do! portfolio.SavePendingPosition position command.UserId
@@ -138,9 +139,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
         
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
-        | Some user ->
+        | Some _ ->
             
-            let! positions = portfolio.GetPendingStockPositions(user.Id)
+            let! positions = portfolio.GetPendingStockPositions(command.UserId)
             
             let data = positions |> Seq.sortByDescending(fun x -> x.State.Date);
                 

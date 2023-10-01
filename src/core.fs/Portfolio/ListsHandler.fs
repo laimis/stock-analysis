@@ -1,29 +1,29 @@
 namespace core.fs.Portfolio.Lists
 
-open System
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
 open core.Shared.Adapters.CSV
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
 
 type GetLists =
     {
-        UserId:Guid
+        UserId:UserId
     }
 
 type GetList =
     {
         Name: string
-        UserId: Guid
+        UserId: UserId
     }
     
 type ExportList =
     {
         Name: string
-        UserId: Guid
+        UserId: UserId
         JustTickers: bool
     }
     
@@ -31,17 +31,17 @@ type AddStockToList =
     {
         [<Required>]
         Name: string
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         Ticker: Ticker
     }
-    static member WithUserId (userId:Guid) (command:AddStockToList) = { command with UserId = userId }
+    static member WithUserId userId (command:AddStockToList) = { command with UserId = userId }
     
 type RemoveStockFromList =
     {
         [<Required>]
         Name: string
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         Ticker: Ticker
     }
@@ -54,9 +54,9 @@ type AddTagToList =
         Tag: string
         [<Required>]
         Name: string
-        UserId: Guid
+        UserId: UserId
     }
-    static member WithUserId (userId:Guid) (command:AddTagToList) = { command with UserId = userId }
+    static member WithUserId userId (command:AddTagToList) = { command with UserId = userId }
     
 type RemoveTagFromList =
     {
@@ -64,29 +64,29 @@ type RemoveTagFromList =
         Tag: string
         [<Required>]
         Name: string
-        UserId: Guid
+        UserId: UserId
     }
     
 type Create =
     {
         Name: string
         Description: string
-        UserId: Guid
+        UserId: UserId
     }
-    static member WithUserId (userId:Guid) (command:Create) = { command with UserId = userId }
+    static member WithUserId userId (command:Create) = { command with UserId = userId }
     
 type Update =
     {
         Name: string
         Description: string
-        UserId: Guid
+        UserId: UserId
     }
-    static member WithUserId (userId:Guid) (command:Update) = { command with UserId = userId }
+    static member WithUserId userId (command:Update) = { command with UserId = userId }
     
 type Delete =
     {
         Name: string
-        UserId: Guid
+        UserId: UserId
     }
     
 type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:ICSVWriter) =
@@ -199,7 +199,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
             let! list = portfolio.GetStockList command.Name command.UserId
             match list with
             | null ->
-                let newList = StockList(name=command.Name, description=command.Description, userId=command.UserId)
+                let newList = StockList(name=command.Name, description=command.Description, userId=(command.UserId |> IdentifierHelper.getUserId))
                 do! portfolio.SaveStockList newList command.UserId
                 return newList.State |> ResponseUtils.success
             | _ ->

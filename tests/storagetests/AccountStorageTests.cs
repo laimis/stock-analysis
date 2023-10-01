@@ -48,7 +48,7 @@ namespace storagetests
 
             Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
-            fromDbOption = await storage.GetUser(user.Id);
+            fromDbOption = await storage.GetUser(UserId.NewUserId(user.Id));
 
             Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
@@ -61,7 +61,7 @@ namespace storagetests
         {
             var storage = GetStorage();
 
-            var r = new ProcessIdToUserAssociation(Guid.NewGuid(), DateTimeOffset.UtcNow);
+            var r = new ProcessIdToUserAssociation(UserId.NewUserId(Guid.NewGuid()), DateTimeOffset.UtcNow);
 
             await storage.SaveUserAssociation(r);
 

@@ -7,6 +7,7 @@ module core.fs.Alerts.MonitoringServices
     open core.Stocks
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Domain.Accounts
 
     // stop loss should be monitored at the following times:
     // on trading days every 5 minutes from 9:45am to 4:00pm
@@ -80,10 +81,10 @@ module core.fs.Alerts.MonitoringServices
                 let price = priceResponse.Success.Price
                 match price <= position.StopPrice.Value with
                 | true ->
-                    TriggeredAlert.StopPriceAlert position.Ticker price position.StopPrice.Value DateTimeOffset.UtcNow user.Id
+                    TriggeredAlert.StopPriceAlert position.Ticker price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)
                     |> container.Register
                 | false ->
-                    container.DeregisterStopPriceAlert position.Ticker user.Id
+                    container.DeregisterStopPriceAlert position.Ticker (user.Id |> UserId)
         }
             
         
@@ -102,7 +103,7 @@ module core.fs.Alerts.MonitoringServices
                 | Some user ->
                         logInformation $"Found user {userId}"
                         
-                        let! checks = portfolio.GetStocks(user.Id) |> Async.AwaitTask
+                        let! checks = user.Id |> UserId |> portfolio.GetStocks |> Async.AwaitTask
                         
                         let! _ =
                             checks
@@ -125,7 +126,7 @@ module core.fs.Alerts.MonitoringServices
             
             let! _ =
                 users
-                |> Seq.map (fun emailIdPair -> runStopLossCheckForUser cancellationToken (emailIdPair.Id |> Guid))
+                |> Seq.map (fun emailIdPair -> runStopLossCheckForUser cancellationToken emailIdPair.Id)
                 |> Async.Sequential
                 |> Async.StartAsTask
                 

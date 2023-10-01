@@ -2,6 +2,7 @@ using System;
 using core.Account;
 using core.fs.Options;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Options;
 using core.Shared;
 using Moq;
@@ -29,16 +30,16 @@ namespace coretests.Options
                 cmd.Item1.StrikePrice.Value,
                 (OptionType)Enum.Parse(typeof(OptionType), cmd.Item1.OptionType),
                 cmd.Item1.ExpirationDate.Value,
-                cmd.Item2);
+                cmd.Item2.Item);
 
             opt.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
             var mock = new Mock<IPortfolioStorage>();
 
-            mock.Setup(s => s.GetOwnedOptions(_user.Id))
+            mock.Setup(s => s.GetOwnedOptions(UserId.NewUserId(_user.Id)))
                 .ReturnsAsync(new[] { opt });
 
-            mock.Setup(s => s.GetOwnedOption(opt.Id, _user.Id))
+            mock.Setup(s => s.GetOwnedOption(opt.Id, UserId.NewUserId(_user.Id)))
                 .ReturnsAsync(opt);
 
             return (mock.Object, opt);
@@ -55,7 +56,7 @@ namespace coretests.Options
                 premium: 10,
                 filled: DateTimeOffset.UtcNow,
                 notes: null);
-            return BuyOrSellCommand.NewSell(cmd, _user.Id);
+            return BuyOrSellCommand.NewSell(cmd, UserId.NewUserId(_user.Id));
         }
 
         internal IAccountStorage CreateAccountStorageWithUserAsync()
@@ -65,7 +66,7 @@ namespace coretests.Options
             mock.Setup(s => s.GetUserByEmail(_user.State.Email))
                 .ReturnsAsync(_user);
 
-            mock.Setup(s => s.GetUser(_user.State.Id))
+            mock.Setup(s => s.GetUser(UserId.NewUserId(_user.State.Id)))
                 .ReturnsAsync(_user);
 
             return mock.Object;
