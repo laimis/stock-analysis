@@ -11,7 +11,7 @@ import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services
 })
 export class StockTradingNewPositionComponent {
   strategies: { key: string; value: string; }[];
-  
+
   constructor(
       private stockService:StocksService,
       private datePipe: DatePipe
@@ -70,14 +70,14 @@ export class StockTradingNewPositionComponent {
   gaps: StockGaps
 
   onBuyTickerSelected(ticker: string) {
-    
+
     this.costToBuy = null
     this.numberOfShares = null
     this.sizeStopPrice = null
     this.positionStopPrice = null
     this.ticker = ticker
-    this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
-    
+    // this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
+
     this.stockService.getStockQuote(ticker)
       .subscribe(quote => {
         this.costToBuy = quote.mark
@@ -177,7 +177,7 @@ export class StockTradingNewPositionComponent {
 
     var singleShareLoss = this.costToBuy - this.sizeStopPrice
     this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
-    
+
     this.updateBuyingValues(singleShareLoss)
   }
 
@@ -221,12 +221,14 @@ export class StockTradingNewPositionComponent {
     }
 
     this.stockService.purchase(cmd).subscribe(
-      _ => { 
+      _ => {
         this.stockPurchased.emit(cmd)
         this.recordInProgress = false
     },
-      _ => {
-        alert('purchase failed')
+      err => {
+        let errors = GetErrors(err)
+        let errorMessages = errors.join(", ")
+        alert('purchase failed: ' + errorMessages)
         this.recordInProgress = false
       }
     )
@@ -256,10 +258,10 @@ export class StockTradingNewPositionComponent {
         this.pendingPositionCreated.emit(cmd)
         this.reset()
       },
-      errors => { 
+      errors => {
         var errorMessageArray = GetErrors(errors)
         var errorMessages = errorMessageArray.join(", ")
-        alert('pending position failed: ' + errorMessages) 
+        alert('pending position failed: ' + errorMessages)
       }
     )
   }
@@ -274,10 +276,10 @@ export class StockTradingNewPositionComponent {
   lookupPendingPosition(ticker: string) {
     this.stockService.getPendingStockPositions().subscribe(
       positions => {
-        var position = positions.find(p => p.ticker === ticker)
+        let position = positions.find(p => p.ticker === ticker)
         if (position) {
           this.costToBuy = position.bid
-          this.numberOfShares = position.numberOfShares
+          this.numberOfShares = null
           this.positionStopPrice = position.stopPrice
           this.notes = position.notes
           this.strategy = position.strategy

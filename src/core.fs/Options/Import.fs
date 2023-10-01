@@ -3,6 +3,7 @@ namespace core.fs.Options
 open System
 open core.Shared.Adapters.CSV
 open core.fs.Shared
+open core.fs.Shared.Domain.Accounts
 
 module Import =
     open core.Shared
@@ -18,13 +19,13 @@ module Import =
         ``type``:string
     }
           
-    type Command(content:string,userId:Guid) =
+    type Command(content:string,userId:UserId) =
         member _.UserId = userId
         member _.Content = content
 
     type Handler(csvParser:ICSVParser, optionHandler:core.fs.Options.Handler) =
         
-        let processCommand record (command:Object) userId token =
+        let processCommand record (command:Object) _ _ =
             match command with
             
             | :? ExpireViaLookupCommand as expCommand ->

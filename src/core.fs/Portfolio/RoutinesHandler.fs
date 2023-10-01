@@ -6,25 +6,26 @@ open core.Portfolio
 open core.Shared
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
 type Query =
     {
-        UserId:Guid
+        UserId:UserId
     }
     
 type Create =
     {
-        UserId:Guid
+        UserId:UserId
         Name:string
         Description:string
     }
     
-    static member WithUserId (userId:Guid) (create:Create) =
+    static member WithUserId userId (create:Create) =
         { create with UserId = userId }
     
 type Update =
     {
-        UserId:Guid
+        UserId:UserId
         [<Required>]
         Name:string
         [<Required>]
@@ -32,25 +33,25 @@ type Update =
         Description:string
     }
     
-    static member WithUserId (userId:Guid) (update:Update) =
+    static member WithUserId userId (update:Update) =
         { update with UserId = userId }
     
 type Delete =
     {
-        UserId:Guid
+        UserId:UserId
         Name:string
     }
     
 type AddStep =
     {
-        UserId:Guid
+        UserId:UserId
         [<Required>]
         RoutineName:string
         [<Required>]
         Label:string
         Url:string
     }
-    static member WithUserId (userId:Guid) (add:AddStep) =
+    static member WithUserId userId (add:AddStep) =
         { add with UserId = userId }
 
 type MoveStep =
@@ -61,9 +62,9 @@ type MoveStep =
         StepIndex:Nullable<int>
         [<Required>]
         Direction:Nullable<int>
-        UserId:Guid
+        UserId:UserId
     }
-    static member WithUserId (userId:Guid) (move:MoveStep) =
+    static member WithUserId userId (move:MoveStep) =
         { move with UserId = userId }
     
 type RemoveStep =
@@ -72,7 +73,7 @@ type RemoveStep =
         RoutineName: string
         [<Required>]
         StepIndex:Nullable<int>
-        UserId:Guid
+        UserId:UserId
     }
     
 type UpdateStep =
@@ -84,10 +85,10 @@ type UpdateStep =
         [<Required>]
         Label:string
         Url:string
-        UserId:Guid
+        UserId:UserId
     }
     
-    static member WithUserId (userId:Guid) (update:UpdateStep) =
+    static member WithUserId userId (update:UpdateStep) =
         { update with UserId = userId }
     
 type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
@@ -103,7 +104,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
             let! routine = storage.GetRoutine create.Name create.UserId
             match routine with
             | null ->
-                let routine = Routine(name=create.Name,description=create.Description,userId=create.UserId)
+                let routine = Routine(name=create.Name,description=create.Description,userId=(create.UserId |> IdentifierHelper.getUserId))
                 do! storage.SaveRoutine routine create.UserId
                 return ServiceResponse<RoutineState>(routine.State)
             | _ -> return "Routine already exists" |> ResponseUtils.failedTyped<RoutineState>

@@ -9,6 +9,7 @@ namespace core.fs.Cryptos
     open core.fs.Cryptos.Import
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Domain.Accounts
     
     type CryptoTransaction =
         {
@@ -24,19 +25,19 @@ namespace core.fs.Cryptos
         }
         
     type CryptoTransactionWithUserId =
-        | Buy of CryptoTransaction * Guid
-        | Sell of CryptoTransaction * Guid
-        | Reward of CryptoTransaction * Guid
-        | Yield of CryptoTransaction * Guid
+        | Buy of CryptoTransaction * UserId
+        | Sell of CryptoTransaction * UserId
+        | Reward of CryptoTransaction * UserId
+        | Yield of CryptoTransaction * UserId
         
     type DashboardQuery =
         {
-            UserId:Guid
+            UserId:UserId
         }
         
     type DeleteTransaction =
         {
-            UserId:Guid
+            UserId:UserId
             TransactionId:Guid
             Token:Token
         }
@@ -48,24 +49,24 @@ namespace core.fs.Cryptos
         
     type Export =
         {
-            UserId:Guid
+            UserId:UserId
         }
         
     type ImportBlockFi =
         {
-            UserId:Guid
+            UserId:UserId
             Content:string
         }
         
     type ImportCoinbase =
         {
-            UserId:Guid
+            UserId:UserId
             Content:string
         }
         
     type ImportCoinbasePro =
         {
-            UserId:Guid
+            UserId:UserId
             Content:string
         }
         
@@ -77,7 +78,7 @@ namespace core.fs.Cryptos
     type OwnershipQuery =
         {
             Token:Token
-            UserId:Guid
+            UserId:UserId
         }
     
     type OwnedCryptoView(owned:OwnedCryptoState) =
@@ -151,7 +152,7 @@ namespace core.fs.Cryptos
                 else            
                     let cryptoToUse =
                         match crypto with
-                        | null -> OwnedCrypto(data.Token, userId)
+                        | null -> OwnedCrypto(data.Token, userId |> IdentifierHelper.getUserId)
                         | _ -> crypto
                         
                     func data cryptoToUse

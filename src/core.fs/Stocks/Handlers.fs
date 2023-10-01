@@ -13,6 +13,7 @@ open core.Stocks.Services
 open core.Stocks.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
 
 type StockTransaction =
@@ -31,12 +32,12 @@ type StockTransaction =
     }
     
 type BuyOrSell =
-    | Buy of StockTransaction * Guid
-    | Sell of StockTransaction * Guid
+    | Buy of StockTransaction * UserId
+    | Sell of StockTransaction * UserId
     
 type DashboardQuery =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type DashboardView =
@@ -48,26 +49,26 @@ type DashboardView =
 type DeleteStock =
     {
         StockId: Guid
-        UserId: Guid
+        UserId: UserId
     }
     
 type DeleteStop =
     {
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
     
 type DeleteTransaction =
     {
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
         TransactionId: Guid
     }
     
 type DetailsQuery =
     {
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
     
 type DetailsView =
@@ -83,18 +84,18 @@ type ExportType =
     
 type ExportTrades =
     {
-        UserId: Guid
+        UserId: UserId
         ExportType: ExportType
     }
 
 type ExportTransactions =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type ImportStocks =
     {
-        UserId: Guid
+        UserId: UserId
         Content: string
     }
 
@@ -110,7 +111,7 @@ type private ImportRecord =
 type OwnershipQuery =
     {
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
     
 type OwnershipView =
@@ -123,13 +124,13 @@ type OwnershipView =
     
 type PriceQuery =
     {
-        UserId:Guid
+        UserId:UserId
         Ticker:Ticker
     }
     
 type PricesQuery =
     {
-        UserId:Guid
+        UserId:UserId
         Ticker:Ticker
         Start:DateTimeOffset
         End:DateTimeOffset
@@ -155,19 +156,19 @@ type PricesView(prices:PriceBar array) =
 type QuoteQuery =
     {
         Ticker:Ticker
-        UserId:Guid
+        UserId:UserId
     }
     
 type SearchQuery =
     {
         Term:string
-        UserId:Guid
+        UserId:UserId
     }
     
 type CompanyFilingsQuery =
     {
         Ticker:Ticker
-        UserId:Guid
+        UserId:UserId
     }
     
 type SetStop =
@@ -175,7 +176,7 @@ type SetStop =
         [<Required>]
         StopPrice:Nullable<decimal>
         Ticker:Ticker
-        UserId:Guid
+        UserId:UserId
     }
     
     static member WithUserId userId (cmd:SetStop) =
@@ -206,7 +207,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             
             let stockToUse =
                 match stock with
-                | null -> OwnedStock(ticker=data.Ticker, userId=userId)
+                | null -> OwnedStock(ticker=data.Ticker, userId=(userId |> IdentifierHelper.getUserId))
                 | _ -> stock
                 
             let isNewPosition = stockToUse.State.OpenPosition = null

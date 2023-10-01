@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.fs.Alerts;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
@@ -98,15 +99,19 @@ namespace web.BackgroundServices
 
                     foreach(var patternName in PatternDetection.AvailablePatterns)
                     {
-                        _container.Deregister(patternName, c.ticker, c.user.Id);
+                        _container.Deregister(patternName, c.ticker, UserId.NewUserId(c.user.Id));
                     }
 
                     var patterns = PatternDetection.Generate(prices.Success);
 
                     foreach(var pattern in patterns)
                     {
-                        var alert = TriggeredAlert.PatternAlert(pattern, c.ticker, c.listName, DateTimeOffset.Now,
-                            c.user.Id);
+                        var alert = TriggeredAlert.PatternAlert(
+                            pattern,
+                            c.ticker,
+                            c.listName,
+                            DateTimeOffset.Now,
+                            UserId.NewUserId(c.user.Id));
                         _container.Register(alert);
                     }
                 }
@@ -162,9 +167,9 @@ namespace web.BackgroundServices
 
             foreach(var emailIdPair in users)    
             {
-                var userOption = await _accounts.GetUser(new Guid(emailIdPair.Id));
+                var userOption = await _accounts.GetUser(emailIdPair.Id);
                 var user = userOption.Value;
-                var list = (await _portfolio.GetStockLists(user.Id))
+                var list = (await _portfolio.GetStockLists(emailIdPair.Id))
                     .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
                     .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker, listName: listTickerPair.l.State.Name, user: user.State))

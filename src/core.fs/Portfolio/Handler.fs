@@ -13,17 +13,18 @@ open core.Stocks
 open core.Stocks.Services.Trading
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
 type Query =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type DeletePosition =
     {
         PositionId: int
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
 
 type GradePosition =
@@ -32,20 +33,20 @@ type GradePosition =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         Grade: TradeGrade
         Note: string
     }
     
-    static member WithUserId (userId:Guid) (command:GradePosition) = { command with UserId = userId }
+    static member WithUserId userId (command:GradePosition) = { command with UserId = userId }
     
 type RemoveLabel =
     {
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         Key: string
     }
@@ -56,14 +57,14 @@ type AddLabel =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         Key: string
         [<Required>]
         Value: string
     }
     
-    static member WithUserId (userId:Guid) (command:AddLabel) = { command with UserId = userId }
+    static member WithUserId userId (command:AddLabel) = { command with UserId = userId }
     
 type ProfitPointsQuery =
     {
@@ -71,7 +72,7 @@ type ProfitPointsQuery =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
     
 type SetRisk =
@@ -80,17 +81,17 @@ type SetRisk =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         RiskAmount: Nullable<decimal>
     }
-    static member WithUserId (userId:Guid) (command:SetRisk) = { command with UserId = userId }
+    static member WithUserId userId (command:SetRisk) = { command with UserId = userId }
     
 type SimulateTrade = 
     {
         [<Required>]
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         PositionId: int
     }
@@ -102,36 +103,36 @@ type SimulateTradeForTicker =
         Price: decimal
         StopPrice: decimal
         Ticker: Ticker
-        UserId: Guid
+        UserId: UserId
     }
     
 type SimulateUserTrades =
     {
-        UserId: Guid
+        UserId: UserId
         NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
     }
     
 type ExportUserSimulatedTrades =
     {
-        UserId: Guid
+        UserId: UserId
         NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
     }
 
 type QueryTradingEntries =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type QueryPastTradingEntries =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type QueryTransactions =
     {
-        UserId: Guid
+        UserId: UserId
         Show:string
         GroupBy:string
         TxType:string
@@ -141,7 +142,7 @@ type QueryTransactions =
 type TransactionSummary =
     {
         Period: string
-        UserId: Guid
+        UserId: UserId
     }
     
     member this.GetDates() =

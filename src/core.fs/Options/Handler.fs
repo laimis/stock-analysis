@@ -7,15 +7,16 @@ open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
-type DashboardQuery(userId: Guid) =
+type DashboardQuery(userId: UserId) =
     member _.UserId = userId
 
-type ExportQuery(userId: Guid) =
+type ExportQuery(userId: UserId) =
     member _.UserId = userId
     member _.Filename = "options"
 
-type ExpireData(optionId: Guid, userId: Guid) =
+type ExpireData(optionId: Guid, userId: UserId) =
     member this.OptionId = optionId
     member this.UserId = userId
 
@@ -23,7 +24,7 @@ type ExpireCommand =
     | Expire of ExpireData
     | Assign of ExpireData
 
-type ExpireViaLookupData(ticker: string, strikePrice: decimal, expiration: DateTimeOffset, userId: Guid) =
+type ExpireViaLookupData(ticker: string, strikePrice: decimal, expiration: DateTimeOffset, userId: UserId) =
     member this.Ticker = ticker
     member this.StrikePrice = strikePrice
     member this.Expiration = expiration
@@ -33,15 +34,15 @@ type ExpireViaLookupCommand =
     | ExpireViaLookup of ExpireViaLookupData
     | AssignViaLookup of ExpireViaLookupData
 
-type DeleteCommand = { OptionId: Guid; UserId: Guid }
+type DeleteCommand = { OptionId: Guid; UserId: UserId }
 
 type BuyOrSellCommand =
-    | Buy of OptionTransaction * Guid
-    | Sell of OptionTransaction * Guid
+    | Buy of OptionTransaction * UserId
+    | Sell of OptionTransaction * UserId
 
-type DetailsQuery = { OptionId: Guid; UserId: Guid }
+type DetailsQuery = { OptionId: Guid; UserId: UserId }
 
-type ChainQuery = { Ticker: string; UserId: Guid }
+type ChainQuery = { Ticker: string; UserId: UserId }
 
 type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter) =
 
@@ -54,7 +55,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             match user with
             | None -> return "User not found" |> ResponseUtils.failedTyped<OptionDashboardView>
             | Some user ->
-                let! options = storage.GetOwnedOptions(user.Id)
+                let! options = storage.GetOwnedOptions(UserId user.Id)
 
                 let closedOptions =
                     options
@@ -201,13 +202,13 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                 let optionType = Enum.Parse(typedefof<OptionType>, data.OptionType) :?> OptionType
 
                 let! options = storage.GetOwnedOptions(userId)
-
+                
                 let option =
                     options
                     |> Seq.tryFind (fun o ->
                         o.IsMatch(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value))
                     |> Option.defaultWith (fun () ->
-                        OwnedOption(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value, userId))
+                        OwnedOption(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value, userId |> IdentifierHelper.getUserId))
 
                 func option data
 

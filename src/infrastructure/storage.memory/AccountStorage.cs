@@ -21,9 +21,9 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
 
-    public Task<FSharpOption<User>> GetUser(Guid userId)
+    public Task<FSharpOption<User>> GetUser(UserId userId)
     {
-        var response = _users.TryGetValue(userId, out var u) ? new FSharpOption<User>(u!) : FSharpOption<User>.None;
+        var response = _users.TryGetValue(userId.Item, out var u) ? new FSharpOption<User>(u!) : FSharpOption<User>.None;
         
         return Task.FromResult(response);
     }
@@ -43,7 +43,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs() =>
         Task.FromResult(
-            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: u.Id.ToString()))
+            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: UserId.NewUserId(u.Id)))
         );
 
     public async Task Save(User u)

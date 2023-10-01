@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using core.fs.Options;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Options;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
@@ -24,8 +25,8 @@ namespace coretests.Options
         {
             var mock = new Mock<IPortfolioStorage>();
 
-            mock.Setup(x => x.SaveOwnedOption(It.IsAny<OwnedOption>(), It.IsAny<Guid>()))
-                .Callback((OwnedOption option, Guid userId) =>
+            mock.Setup(x => x.SaveOwnedOption(It.IsAny<OwnedOption>(), It.IsAny<UserId>()))
+                .Callback((OwnedOption option, UserId _) =>
                 {
                     Assert.Equal(-1, option.State.NumberOfContracts);
                 });

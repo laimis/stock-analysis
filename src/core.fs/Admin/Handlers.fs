@@ -9,6 +9,7 @@ namespace core.fs.Admin
     open core.Stocks
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Domain.Accounts
 
     module Users =
         
@@ -52,9 +53,7 @@ namespace core.fs.Admin
                     
                     let! result = 
                         users
-                        |> Seq.map (fun emailId -> async {
-                            return! emailId.Id |> Guid |> buildQueryResponse
-                        })
+                        |> Seq.map (fun emailId -> emailId.Id |> buildQueryResponse)
                         |> Async.Parallel
                         |> Async.StartAsTask
                         
@@ -66,9 +65,9 @@ namespace core.fs.Admin
                 
                 let! userTasks = 
                     pairs
-                    |> Seq.map (fun emailId -> async {
-                        return! emailId.Id |> Guid |> storage.GetUser |> Async.AwaitTask
-                    })
+                    |> Seq.map (fun emailId ->
+                        emailId.Id |> storage.GetUser |> Async.AwaitTask
+                    )
                     |> Async.Parallel
                     |> Async.StartAsTask
                     

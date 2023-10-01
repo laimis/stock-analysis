@@ -7,6 +7,7 @@ namespace core.fs.Notes
     open core.Shared.Adapters.CSV
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Domain.Accounts
 
     type AddNote = 
         {
@@ -14,7 +15,7 @@ namespace core.fs.Notes
             Note: string
             [<Required>]
             Ticker: Ticker
-            UserId: Guid
+            UserId: UserId
         }
         
     type UpdateNote = 
@@ -23,34 +24,34 @@ namespace core.fs.Notes
             NoteId: Guid
             [<Required>]
             Note: string
-            UserId: Guid
+            UserId: UserId
         }
         
     type GetNote =
         {
             NoteId: Guid
-            UserId: Guid
+            UserId: UserId
         }
         
     type GetNotes =
         {
-            UserId: Guid
+            UserId: UserId
         }
         
     type GetNotesForTicker =
         {
             Ticker: Ticker
-            UserId: Guid
+            UserId: UserId
         }
         
     type Export = 
         {
-            UserId: Guid
+            UserId: UserId
         }
         
     type Import = 
         {
-            UserId: Guid
+            UserId: UserId
             Content: string
         }
         
@@ -75,7 +76,7 @@ namespace core.fs.Notes
             match user with
             | None -> return "User not found" |> ResponseUtils.failedTyped<Note>
             | _ -> 
-                let note = Note(userId=command.UserId,ticker=command.Ticker,note=command.Note,created=DateTime.UtcNow)
+                let note = Note(userId=(command.UserId |> IdentifierHelper.getUserId),ticker=command.Ticker,note=command.Note,created=DateTime.UtcNow)
                 do! portfolio.SaveNote note command.UserId
                 return note |> ResponseUtils.success<Note>
         }
