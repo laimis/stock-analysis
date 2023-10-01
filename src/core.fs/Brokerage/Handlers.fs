@@ -6,6 +6,7 @@ module core.fs.Brokerage
     open core.Shared.Adapters.Brokerage
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Domain.Accounts
 
     type BuyOrSellData =
         {
@@ -22,18 +23,18 @@ module core.fs.Brokerage
         }
         
     type BrokerageTransaction =
-        | Buy of BuyOrSellData * Guid
-        | Sell of BuyOrSellData * Guid
+        | Buy of BuyOrSellData * UserId
+        | Sell of BuyOrSellData * UserId
         
     type CancelOrder =
         {
-            UserId:Guid
+            UserId:UserId
             OrderId:string
         }
         
     type QueryAccount =
         {
-            UserId:Guid
+            UserId:UserId
         }
         
     type Handler(accounts:IAccountStorage, brokerage:IBrokerage) =

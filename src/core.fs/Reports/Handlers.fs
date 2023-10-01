@@ -10,10 +10,11 @@ open core.Stocks
 open core.Stocks.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 
 type ChainQuery =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type ChainLinkView = 
@@ -31,7 +32,7 @@ type ChainView =
     
 type DailyOutcomeScoreReportQuery =
     {
-        UserId: Guid
+        UserId: UserId
         Start: string
         End: string
         Ticker: Ticker
@@ -45,7 +46,7 @@ type DailyOutcomeScoreReportView =
     
 type DailyPositionReportQuery =
     {
-        UserId: Guid
+        UserId: UserId
         Ticker: string
         PositionId: int
     }
@@ -59,7 +60,7 @@ type DailyPositionReportView =
     
 type GapReportQuery =
     {
-        UserId: Guid
+        UserId: UserId
         Ticker: string
         Frequency: PriceFrequency
     }
@@ -78,7 +79,7 @@ type OutcomesReportQuery =
     {
         [<Required>]
         Tickers: string[]
-        UserId: Guid
+        UserId: UserId
         [<Required>]
         Duration: OutcomesReportDuration
         [<Required>]
@@ -88,12 +89,12 @@ type OutcomesReportQuery =
         EndDate: string
     }
     
-    static member WithUserId (userId:Guid) (query:OutcomesReportQuery) =
+    static member WithUserId (userId:UserId) (query:OutcomesReportQuery) =
         {query with UserId=userId}
     
 type OutcomesReportForPositionsQuery =
     {
-        UserId: Guid
+        UserId: UserId
     }
 
 type OutcomesReportViewTickerCountPair =
@@ -137,7 +138,7 @@ type PercentChangeStatisticsQuery =
     {
         Frequency: PriceFrequency
         Ticker: string
-        UserId: Guid
+        UserId: UserId
     }
     
 type PercentChangeStatisticsView =
@@ -149,7 +150,7 @@ type PercentChangeStatisticsView =
     
 type SellsQuery =
     {
-        UserId: Guid
+        UserId: UserId
     }
     
 type SellView =

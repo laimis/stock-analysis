@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using core.fs.Shared.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using storage.shared;
@@ -23,9 +24,11 @@ namespace web.Controllers
         [HttpGet]
         public async Task<object> Index(string entity, Guid? userId, Guid? aggregateId)
         {
+            var u = userId == null ? null : UserId.NewUserId(userId.Value);
+            
             var list = await _storage.GetStoredEvents(
                 entity,
-                userId ?? User.Identifier());
+                u.Item);
 
             if (aggregateId != null)
             {

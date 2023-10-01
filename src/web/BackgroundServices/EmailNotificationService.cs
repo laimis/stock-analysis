@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Alerts;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
     private readonly StockAlertContainer _container;
     private readonly IEmailService _emails;
     private readonly IMarketHours _marketHours;
-    Func<TimeSpan> _sleepFunction = null;
+    Func<TimeSpan> _sleepFunction;
 
     public EmailNotificationService(
         IAccountStorage accounts,
@@ -105,7 +106,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
                 _logger.LogInformation($"Sending email to {emailId.Id}");
 
-                var userOption = await _accounts.GetUser(new Guid(emailId.Id));
+                var userOption = await _accounts.GetUser(emailId.Id);
                 if (userOption.Value == null)
                 {
                     _logger.LogError("Unable to find user for " + emailId.Id);
@@ -115,7 +116,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
                 var user = userOption.Value;
 
                 // get all alerts for that user
-                var alertGroups = _container.GetAlerts(user.State.Id)
+                var alertGroups = _container.GetAlerts(emailId.Id)
                     .GroupBy(a => a.identifier)
                     .Select(ToAlertEmailGroup);
 

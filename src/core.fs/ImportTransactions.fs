@@ -9,6 +9,7 @@ open core.Shared.Adapters.Emails
 open core.fs.Options
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain.Accounts
 open core.fs.Stocks
 
 module ImportTransactions =
@@ -16,7 +17,7 @@ module ImportTransactions =
     type Command =
         {
             Content:string
-            UserId:Guid
+            UserId:UserId
         }
         
     type internal TransactionRecord =

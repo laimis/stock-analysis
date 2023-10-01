@@ -18,9 +18,9 @@ namespace storage.postgres
         {
         }
 
-        public async Task<FSharpOption<User>> GetUser(Guid userId)
+        public async Task<FSharpOption<User>> GetUser(UserId userId)
         {
-            var events = await GetEventsAsync(_user_entity, userId);
+            var events = await GetEventsAsync(_user_entity, userId.Item);
 
             var u = new User(events);
             return u.Id == Guid.Empty ? FSharpOption<User>.None : new FSharpOption<User>(u);
@@ -43,7 +43,7 @@ namespace storage.postgres
                 return FSharpOption<User>.None;
             }
 
-            return await GetUser(new Guid(identifier));
+            return await GetUser(UserId.NewUserId(new Guid(identifier)));
         }
 
         public async Task Save(User u)

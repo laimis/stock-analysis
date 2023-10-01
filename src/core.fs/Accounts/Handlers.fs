@@ -50,7 +50,7 @@ namespace core.fs.Accounts
         
         [<Struct>]
         type Command = {
-            UserId: Guid
+            UserId: UserId
         }
         
         type Handler(storage:IAccountStorage, portfolioStorage:IPortfolioStorage) =
@@ -63,7 +63,7 @@ namespace core.fs.Accounts
                 match user with
                 | None -> return "User not found" |> ResponseUtils.failed
                 | Some user ->
-                    do! portfolioStorage.Delete(user.Id)
+                    do! portfolioStorage.Delete(user.Id |> UserId)
                     return ServiceResponse()
             }
             
@@ -71,11 +71,11 @@ namespace core.fs.Accounts
         
         type Command =
             {
-                UserId: Guid
+                UserId: UserId
                 Feedback: string
             }
         
-            member this.WithUserId (userId:Guid) = { this with UserId = userId }
+            member this.WithUserId (userId:UserId) = { this with UserId = userId }
        
         
         type Handler(storage:IAccountStorage, portfolio:IPortfolioStorage, email:IEmailService) =
@@ -100,7 +100,7 @@ namespace core.fs.Accounts
                         properties= {|feedback = command.Feedback; email = user.State.Email;|}
                     )
                     do! storage.Delete(user)
-                    do! portfolio.Delete(user.Id)
+                    do! portfolio.Delete(user.Id |> UserId)
                     return ServiceResponse()
             }
             
@@ -230,7 +230,7 @@ namespace core.fs.Accounts
         
         type SendCreateNotifications =
             {
-                UserId: Guid
+                UserId: UserId
                 Email: string
                 FirstName: string
                 LastName: string
@@ -294,7 +294,7 @@ namespace core.fs.Accounts
                 match association with
                 | None -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ResponseUtils.failedTyped<User>
                 | Some association ->
-                    let! user = storage.GetUser(association.UserId)
+                    let! user = association.UserId |>  storage.GetUser
                     match user with
                     | None -> return "User account is no longer valid" |> ResponseUtils.failedTyped<User>
                     | Some user ->
@@ -357,7 +357,7 @@ namespace core.fs.Accounts
                 match user with
                 | None -> return ServiceResponse() // don't return an error so that user accounts can't be enumerated
                 | Some user ->
-                    let association = new ProcessIdToUserAssociation(user.Id, DateTimeOffset.UtcNow)
+                    let association = ProcessIdToUserAssociation(user.Id |> UserId, DateTimeOffset.UtcNow)
                     
                     do! storage.SaveUserAssociation(association)
                     
@@ -379,7 +379,7 @@ namespace core.fs.Accounts
         }
         
         type LookupById = {
-            UserId:Guid
+            UserId:UserId
         }
         
         type AccountStatusView =
@@ -454,16 +454,20 @@ namespace core.fs.Accounts
         [<Struct>]
         type ConnectCallback = {
             Code:string
-            UserId:Guid
+            UserId:UserId
         }
         
         [<Struct>]
-        type Disconnect(userId:Guid) =
-            member _.UserId = userId
+        type Disconnect =
+            {
+                UserId:UserId
+            }
             
         [<Struct>]
-        type Info(userId:Guid) =
-            member _.UserId = userId
+        type Info =
+            {
+                UserId:UserId
+            }
     
         type Handler(accounts:IAccountStorage, brokerage:IBrokerage) = 
             

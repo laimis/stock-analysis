@@ -1,14 +1,16 @@
 namespace core.fs.Alerts
 
-    open System
     open core.Shared
     open core.Shared.Adapters.SMS
     open core.Stocks
     open core.fs.Shared
+    open core.fs.Shared.Domain.Accounts
 
     module AlertContainer =
         
-        type Query = { UserId:Guid;}
+        type Query = {
+            UserId:UserId
+        }
         type QueryAvailableMonitors = struct end
         type Run = struct end
         
@@ -22,13 +24,13 @@ namespace core.fs.Alerts
                 container.RequestManualRun()
                 
             member this.Handle(stockSold:StockSold) =
-                stockSold.Ticker |> Ticker |> deregisterStopPriceMonitoring stockSold.UserId
+                stockSold.Ticker |> Ticker |> deregisterStopPriceMonitoring (stockSold.UserId |> UserId)
                 
             member this.Handle(stopPriceSet:StopPriceSet) =
-                stopPriceSet.Ticker |> Ticker |> deregisterStopPriceMonitoring stopPriceSet.UserId
+                stopPriceSet.Ticker |> Ticker |> deregisterStopPriceMonitoring (stopPriceSet.UserId |> UserId)
                 
             member this.Handle(stopDeleted:StopDeleted) =
-                stopDeleted.Ticker |> Ticker |> deregisterStopPriceMonitoring stopDeleted.UserId
+                stopDeleted.Ticker |> Ticker |> deregisterStopPriceMonitoring (stopDeleted.UserId |> UserId)
                 
             member this.Handle(query:Query) =
                 let alerts = 

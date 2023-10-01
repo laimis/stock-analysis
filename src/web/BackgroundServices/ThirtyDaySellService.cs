@@ -57,7 +57,7 @@ namespace web.BackgroundServices
             // 30 day crosser
             _logger.LogInformation("Scanning {email}", p.Email);
 
-            var query = new SellsQuery(new Guid(p.Id));
+            var query = new SellsQuery(p.Id);
 
             var sellView = await _service.Handle(query);
 
