@@ -1,3 +1,4 @@
+using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using storage.shared;
 
@@ -15,13 +16,13 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
     private static readonly Dictionary<string, object> _blobs = new();
     private readonly IOutbox _outbox;
 
-    public Task DeleteAggregates(string entity, Guid userId)
+    public Task DeleteAggregates(string entity, UserId userId)
     {
         _aggregates.Remove(MakeKey(entity, userId));
         return Task.CompletedTask;
     }
 
-    public Task DeleteAggregate(string entity, Guid aggregateId, Guid userId)
+    public Task DeleteAggregate(string entity, Guid aggregateId, UserId userId)
     {
         var key = MakeKey(entity, userId);
 
@@ -37,18 +38,18 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
         return Task.CompletedTask;
     }
 
-    private string MakeKey(string entity, Guid aggregateId) => $"{entity}-{aggregateId}";
+    private string MakeKey(string entity, UserId aggregateId) => $"{entity}-{aggregateId}";
 
     public Task DoHealthCheck() => Task.CompletedTask;
 
-    public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid userId)
+    public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, UserId userId)
     {
         var events = await GetStoredEvents(entity, userId);
 
         return events.Select(e => e.Event);
     }
 
-    public Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, Guid userId)
+    public Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, UserId userId)
     {
         var key = MakeKey(entity, userId);
         if (!_aggregates.ContainsKey(key))
@@ -58,7 +59,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
         return Task.FromResult(_aggregates[key].AsEnumerable());
     }
 
-    public async Task SaveEventsAsync(Aggregate agg, string entity, Guid userId)
+    public async Task SaveEventsAsync(Aggregate agg, string entity, UserId userId)
     {
         var key = MakeKey(entity, userId);
 
@@ -78,7 +79,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
                 Entity = entity,
                 Event = e,
                 Key = e.Id.ToString(),
-                UserId = userId,
+                UserId = userId.Item,
                 Created = e.When,
                 Version = ++version
             };

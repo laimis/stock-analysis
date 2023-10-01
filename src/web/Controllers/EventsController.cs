@@ -28,7 +28,7 @@ namespace web.Controllers
             
             var list = await _storage.GetStoredEvents(
                 entity,
-                u.Item);
+                u);
 
             if (aggregateId != null)
             {

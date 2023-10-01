@@ -11,10 +11,10 @@ module IdentifierHelper =
         | UserId id -> id
     
 [<Struct>]
-type EmailIdPair(email:string, id:UserId) =
+type EmailIdPair(email:string, id:string) =
     
     member _.Email = email
-    member _.Id = id
+    member _.Id = id |> Guid |> UserId
     
    
 type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset) =

@@ -7,9 +7,9 @@ using storage.shared;
 namespace storage.memory;
 public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 {
-    private static readonly Dictionary<Guid, User?> _users = new();
+    private static readonly Dictionary<UserId, User?> _users = new();
     private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new();
-    private static readonly Dictionary<Guid, object> _viewModels = new();
+    private static readonly Dictionary<UserId, object> _viewModels = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -17,13 +17,13 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task Delete(User u)
     {
-        _users.Remove(u.Id);
+        _users.Remove(UserId.NewUserId(u.Id));
         return Task.CompletedTask;
     }
 
     public Task<FSharpOption<User>> GetUser(UserId userId)
     {
-        var response = _users.TryGetValue(userId.Item, out var u) ? new FSharpOption<User>(u!) : FSharpOption<User>.None;
+        var response = _users.TryGetValue(userId, out var u) ? new FSharpOption<User>(u!) : FSharpOption<User>.None;
         
         return Task.FromResult(response);
     }
@@ -43,14 +43,16 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs() =>
         Task.FromResult(
-            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: UserId.NewUserId(u.Id)))
+            _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: u.Id.ToString()))
         );
 
     public async Task Save(User u)
     {
-        _users[u.Id] = u;
+        var userId = UserId.NewUserId(u.Id);
+        
+        _users[userId] = u;
 
-        await SaveEventsAsync(agg: u, entity: "user", userId: u.Id);
+        await SaveEventsAsync(agg: u, entity: "user", userId: userId);
     }
 
     public Task SaveUserAssociation(ProcessIdToUserAssociation r)
@@ -59,7 +61,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
 
-    public Task SaveViewModel<T>(T user, Guid userId)
+    public Task SaveViewModel<T>(T user, UserId userId)
     {
         if (user == null)
         {
@@ -70,7 +72,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
 
-    public Task<T?> ViewModel<T>(Guid userId)
+    public Task<T?> ViewModel<T>(UserId userId)
     {
         _viewModels.TryGetValue(userId, out object? vm);
         return Task.FromResult((T?)vm);

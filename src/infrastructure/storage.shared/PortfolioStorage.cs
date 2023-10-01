@@ -70,12 +70,12 @@ namespace storage.shared
 
         private Task Save(Aggregate agg, string entityName, UserId userId)
         {
-            return _aggregateStorage.SaveEventsAsync(agg, entityName, userId.Item);
+            return _aggregateStorage.SaveEventsAsync(agg, entityName, userId);
         }
 
         public async Task<IEnumerable<OwnedStock>> GetStocks(UserId userId)
         {
-            var list = await _aggregateStorage.GetEventsAsync(_stock_entity, userId.Item);
+            var list = await _aggregateStorage.GetEventsAsync(_stock_entity, userId);
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedStock(g));
@@ -88,7 +88,7 @@ namespace storage.shared
 
         public async Task<IEnumerable<OwnedOption>> GetOwnedOptions(UserId userId)
         {
-            var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId.Item);
+            var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId);
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedOption(g))
@@ -102,7 +102,7 @@ namespace storage.shared
 
         public async Task<IEnumerable<Note>> GetNotes(UserId userId)
         {
-            var list = await _aggregateStorage.GetEventsAsync(_note_entity, userId.Item);
+            var list = await _aggregateStorage.GetEventsAsync(_note_entity, userId);
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new Note(g));
@@ -117,12 +117,12 @@ namespace storage.shared
 
         public async Task Delete(UserId userId)
         {
-            await _aggregateStorage.DeleteAggregates(_note_entity, userId.Item);
-            await _aggregateStorage.DeleteAggregates(_option_entity, userId.Item);
-            await _aggregateStorage.DeleteAggregates(_stock_entity, userId.Item);
-            await _aggregateStorage.DeleteAggregates(_crypto_entity, userId.Item);
-            await _aggregateStorage.DeleteAggregates(_stock_list_entity, userId.Item);
-            await _aggregateStorage.DeleteAggregates(_pending_stock_position_entity, userId.Item);
+            await _aggregateStorage.DeleteAggregates(_note_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_option_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_stock_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_crypto_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_stock_list_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_pending_stock_position_entity, userId);
         }
 
         public async Task<OwnedCrypto> GetCrypto(string token, UserId userId)
@@ -146,7 +146,7 @@ namespace storage.shared
 
         public async Task<IEnumerable<OwnedCrypto>> GetCryptos(UserId userId)
         {
-            var list = await _aggregateStorage.GetEventsAsync(_crypto_entity, userId.Item);
+            var list = await _aggregateStorage.GetEventsAsync(_crypto_entity, userId);
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedCrypto(g));
@@ -154,7 +154,7 @@ namespace storage.shared
 
         public async Task<IEnumerable<Routine>> GetRoutines(UserId userId)
         {
-            var list = await _aggregateStorage.GetEventsAsync(_routine_entity, userId.Item);
+            var list = await _aggregateStorage.GetEventsAsync(_routine_entity, userId);
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new Routine(g));
@@ -171,11 +171,11 @@ namespace storage.shared
         }
 
         public Task DeleteRoutine(Routine routine, UserId userId) =>
-            _aggregateStorage.DeleteAggregate(entity: _routine_entity, aggregateId: routine.Id, userId: userId.Item);
+            _aggregateStorage.DeleteAggregate(entity: _routine_entity, aggregateId: routine.Id, userId: userId);
 
         public async Task<IEnumerable<StockList>> GetStockLists(UserId userId)
         {
-            var list = await _aggregateStorage.GetEventsAsync(_stock_list_entity, userId.Item);
+            var list = await _aggregateStorage.GetEventsAsync(_stock_list_entity, userId);
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new StockList(g));
@@ -192,13 +192,13 @@ namespace storage.shared
             Save(list, _stock_list_entity, userId);
 
         public Task DeleteStockList(StockList list, UserId userId) =>
-            _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: userId.Item);
+            _aggregateStorage.DeleteAggregate(entity: _stock_list_entity, aggregateId: list.Id, userId: userId);
 
         public Task SavePendingPosition(PendingStockPosition position, UserId userId) =>
             Save(position, _pending_stock_position_entity, userId);
 
         public Task<IEnumerable<PendingStockPosition>> GetPendingStockPositions(UserId userId) =>
-            _aggregateStorage.GetEventsAsync(_pending_stock_position_entity, userId.Item)
+            _aggregateStorage.GetEventsAsync(_pending_stock_position_entity, userId)
                 .ContinueWith(t => t.Result.GroupBy(e => e.AggregateId)
                     .Select(g => new PendingStockPosition(g)));
     }

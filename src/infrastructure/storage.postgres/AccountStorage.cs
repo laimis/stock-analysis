@@ -20,7 +20,7 @@ namespace storage.postgres
 
         public async Task<FSharpOption<User>> GetUser(UserId userId)
         {
-            var events = await GetEventsAsync(_user_entity, userId.Item);
+            var events = await GetEventsAsync(_user_entity, userId);
 
             var u = new User(events);
             return u.Id == Guid.Empty ? FSharpOption<User>.None : new FSharpOption<User>(u);
@@ -57,7 +57,7 @@ namespace storage.postgres
                 await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
             }
 
-            await SaveEventsAsync(u, _user_entity, u.State.Id);
+            await SaveEventsAsync(u, _user_entity, UserId.NewUserId(u.State.Id));
         }
 
         public async Task Delete(User user)
@@ -70,7 +70,7 @@ namespace storage.postgres
                 await db.ExecuteAsync(query, new {id = user.Id.ToString()});
             }
 
-            await DeleteAggregates(_user_entity, user.Id);
+            await DeleteAggregates(_user_entity, UserId.NewUserId(user.Id));
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)
@@ -79,7 +79,7 @@ namespace storage.postgres
             
             var query = @"INSERT INTO processidtouserassociations (id, userId, timestamp) VALUES (:id, :userId, :timestamp)";
 
-            await db.ExecuteAsync(query, new {r.Id, userId = r.UserId, timestamp = r.Timestamp});
+            await db.ExecuteAsync(query, new {r.Id, userId = r.UserId.Item, timestamp = r.Timestamp});
         }
 
         public async Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid id)
