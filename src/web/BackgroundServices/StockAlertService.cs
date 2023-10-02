@@ -169,13 +169,17 @@ namespace web.BackgroundServices
             foreach(var emailIdPair in users)    
             {
                 var userOption = await _accounts.GetUser(emailIdPair.Id);
-                var user = userOption.Value;
-                var list = (await _portfolio.GetStockLists(emailIdPair.Id))
-                    .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
-                    .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
-                    .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker,
-                        listName: listTickerPair.l.State.Name, user: user.State));
-                alertList.AddRange(list);
+
+                if (userOption != null)
+                {
+                    var user = userOption.Value;
+                    var list = (await _portfolio.GetStockLists(emailIdPair.Id))
+                        .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
+                        .SelectMany(l => l.State.Tickers.Select(t => (l, t)))
+                        .Select(listTickerPair => new AlertCheck(ticker: listTickerPair.t.Ticker,
+                            listName: listTickerPair.l.State.Name, user: user.State));
+                    alertList.AddRange(list);
+                }
             }
             
             _listChecks.Add(Constants.MonitorTagPattern, alertList);

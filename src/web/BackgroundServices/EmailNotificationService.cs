@@ -107,7 +107,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
                 _logger.LogInformation($"Sending email to {emailId.Id}");
 
                 var userOption = await _accounts.GetUser(emailId.Id);
-                if (userOption.Value == null)
+                if (userOption == null)
                 {
                     _logger.LogError("Unable to find user for " + emailId.Id);
                     continue;

@@ -103,10 +103,10 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
             try
             {
                 var userOption = await _accounts.GetUserByEmail(emailId.Email);
-                if (userOption.Value == null)
+                if (userOption == null)
                 {
                     _logger.LogError("User not found for {email}", emailId.Email);
-                    return;
+                    continue;
                 }
                 
                 var user = userOption.Value;

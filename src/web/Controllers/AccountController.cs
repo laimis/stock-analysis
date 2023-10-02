@@ -18,8 +18,20 @@ namespace web.Controllers
     public class AccountController : ControllerBase
     {
         [HttpGet("status")]
-        public Task<ActionResult> Identity([FromServices]Status.Handler handler) =>
-            this.OkOrError(handler.Handle(new Status.LookupById(User.Identifier())));
+        public Task<ActionResult> Identity([FromServices] Status.Handler handler)
+        {
+            if (User.Identity is { IsAuthenticated: false })
+            {
+                var view = Status.AccountStatusView.notFound();
+                return Task.FromResult<ActionResult>(Ok(view));
+            }
+
+            return this.OkOrError(
+                handler.Handle(
+                    new Status.LookupById(User.Identifier())
+                )
+            );
+        }
         
 
         [HttpPost("validate")]
