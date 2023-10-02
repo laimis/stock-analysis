@@ -1,8 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
   DailyPositionReport,
-  PastStockTradingPositions,
   PositionInstance,
   Prices,
   StocksService,
@@ -16,9 +15,8 @@ import {GetErrors} from 'src/app/services/utils';
   templateUrl: './stock-trading-review.component.html',
   styleUrls: ['./stock-trading-review.component.css']
 })
-export class StockTradingReviewComponent implements OnInit {
+export class StockTradingReviewComponent {
 
-  positions: PositionInstance[]
   private _index: number = 0
   currentPosition: PositionInstance
   currentPositionPrice: number
@@ -29,19 +27,20 @@ export class StockTradingReviewComponent implements OnInit {
   simulationErrors: string[];
   scoresErrors: string[];
   dailyPositionReport: DailyPositionReport
+  private _positions: PositionInstance[];
 
   constructor (
     private stockService: StocksService,
     private title: Title) { }
 
-  ngOnInit(): void {
-    this.stockService.getPastTradingEntries().subscribe((r: PastStockTradingPositions) => {
-        this.positions = r.past
-        this.updateCurrentPosition()
-      }, (error) => {
-        console.log("error fetching positions: " + error)
-      }
-    );
+  @Input()
+  set positions(value: PositionInstance[]) {
+    this._index = 0
+    this._positions = value
+    this.updateCurrentPosition()
+  }
+  get positions(): PositionInstance[] {
+    return this._positions
   }
 
   updateCurrentPosition() {

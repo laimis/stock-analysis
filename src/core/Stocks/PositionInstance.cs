@@ -5,8 +5,15 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public enum PositionEventType { buy, stop, sell, risk }
-    public readonly record struct PositionEvent (Guid Id, string Description, PositionEventType Type, decimal? Value, DateTimeOffset When, decimal? Quantity = null)
+    public static class PositionEventType
+    {
+        public const string Buy = "buy";
+        public const string Stop = "stop";
+        public const string Sell = "sell";
+        public const string Risk = "risk";
+    }
+    
+    public readonly record struct PositionEvent (Guid Id, string Description, string Type, decimal? Value, DateTimeOffset When, decimal? Quantity = null)
     {
         public readonly string Date => When.ToString("yyyy-MM-dd");
     }
@@ -63,8 +70,8 @@ namespace core.Stocks
             _ => null
         };
         
-        public List<PositionTransaction> Transactions { get; private set; } = new();
-        public List<PositionEvent> Events { get; private set; } = new();
+        public List<PositionTransaction> Transactions { get; } = new();
+        public List<PositionEvent> Events { get; } = new();
 
         public decimal? StopPrice { get; private set; }
         public DateTimeOffset LastTransaction { get; private set; }
@@ -88,7 +95,7 @@ namespace core.Stocks
             Notes.Add(note);
         }
 
-        public List<string> Notes { get; private set; } = new List<string>();
+        public List<string> Notes { get; } = new();
         public void AddNotes(string notes)
         {
             Notes.Add(notes);
@@ -97,7 +104,7 @@ namespace core.Stocks
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
             Transactions.Add(new PositionTransaction(numberOfShares, price, TransactionId: transactionId, Type:"buy", when));
-            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", Type: PositionEventType.buy, Value: price, When: when, Quantity: numberOfShares));
+            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", Type: PositionEventType.Buy, Value: price, When: when, Quantity: numberOfShares));
 
             if (_positionCompleted == false)
             {
@@ -152,7 +159,7 @@ namespace core.Stocks
             var percentGainAtSale = (price - AverageCostPerShare) / AverageCostPerShare;
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, TransactionId:transactionId, Type: "sell", when));
-            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale:P})", PositionEventType.sell, price, when, Quantity: numberOfShares));
+            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale:P})", PositionEventType.Sell, price, when, Quantity: numberOfShares));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
@@ -189,7 +196,7 @@ namespace core.Stocks
                 var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
                 Events.Add(
-                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage:P1})", PositionEventType.stop, stopPrice, when));
+                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage:P1})", PositionEventType.Stop, stopPrice, when));
 
                 if (RiskedAmount == null)
                 {
@@ -203,14 +210,14 @@ namespace core.Stocks
             StopPrice = null;
             RiskedAmount = null;
             
-            Events.Add(new PositionEvent(Guid.Empty, "Stop price deleted", PositionEventType.stop, null, when));
+            Events.Add(new PositionEvent(Guid.Empty, "Stop price deleted", PositionEventType.Stop, null, when));
         }
 
         public void SetRiskAmount(decimal riskAmount, DateTimeOffset when)
         {
             RiskedAmount = riskAmount;
 
-            Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", PositionEventType.risk, riskAmount, when));
+            Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", PositionEventType.Risk, riskAmount, when));
         }
 
         public void SetPrice(decimal? price)
