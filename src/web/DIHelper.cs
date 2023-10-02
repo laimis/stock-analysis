@@ -1,8 +1,8 @@
 using System;
-using core.fs;
 using core.fs.Alerts;
 using core.fs.Shared;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Adapters.Subscriptions;
 using core.Shared.Adapters;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
@@ -10,7 +10,6 @@ using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.SMS;
-using core.Shared.Adapters.Subscriptions;
 using csvparser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

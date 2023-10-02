@@ -16,7 +16,7 @@ namespace coretests.Options
 
         static OptionsTestsFixture()
         {
-            var u = new User("email", "f", "l");
+            var u = User.Create("email", "f", "l");
             u.Confirm();
             _user = u;
         }

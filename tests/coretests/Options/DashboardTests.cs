@@ -34,7 +34,7 @@ namespace coretests.Options
             accounts.Setup(x => x.GetUser(It.IsAny<UserId>()))
                 .Returns(Task.FromResult(
                         new FSharpOption<User>(
-                            new User("e", "f", "l"))
+                            User.Create("e", "f", "l"))
                     )
                 );
 

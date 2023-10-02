@@ -18,7 +18,7 @@ namespace storagetests
         {
             var email = Guid.NewGuid().ToString();
 
-            var user = new User(email, "firstname", "lastname");
+            var user = User.Create(email, "firstname", "lastname");
 
             var storage = GetStorage();
 

@@ -25,7 +25,7 @@ namespace core.Account
         public string Lastname { get; }
     }
 
-    internal class UserDeleted : AggregateEvent
+    public class UserDeleted : AggregateEvent
     {
         public UserDeleted(Guid id, Guid aggregateId, DateTimeOffset when, string feedback) : base(id, aggregateId, when)
         {
@@ -50,7 +50,7 @@ namespace core.Account
         }
     }
 
-    internal class UserPasswordSet : AggregateEvent
+    public class UserPasswordSet : AggregateEvent
     {
         public UserPasswordSet(Guid id, Guid aggregateId, DateTimeOffset when, string hash, string salt)
             : base(id, aggregateId, when)
@@ -63,7 +63,7 @@ namespace core.Account
         public string Salt { get; }
     }
 
-    internal class UserSubscribedToPlan : AggregateEvent
+    public class UserSubscribedToPlan : AggregateEvent
     {
         public UserSubscribedToPlan(
             Guid id,
@@ -84,7 +84,7 @@ namespace core.Account
         public string SubscriptionId { get; }
     }
 
-    internal class UserConnectedToBrokerage : AggregateEvent
+    public class UserConnectedToBrokerage : AggregateEvent
     {
         public UserConnectedToBrokerage(
             Guid id,
@@ -114,7 +114,7 @@ namespace core.Account
         public long RefreshTokenExpiresInSeconds { get; }
     }
 
-    internal class UserRefreshedBrokerageConnection : AggregateEvent
+    public class UserRefreshedBrokerageConnection : AggregateEvent
     {
         public UserRefreshedBrokerageConnection(
             Guid id,
@@ -144,7 +144,7 @@ namespace core.Account
         public long RefreshTokenExpiresInSeconds { get; }
     }
 
-    internal class UserDisconnectedFromBrokerage : AggregateEvent
+    public class UserDisconnectedFromBrokerage : AggregateEvent
     {
         public UserDisconnectedFromBrokerage(Guid id, Guid aggregateId, DateTimeOffset when) : base(id, aggregateId, when)
         {

@@ -1,7 +1,5 @@
 namespace core.fs.Admin
 
-    open System
-    open core.Account
     open core.Notes
     open core.Options
     open core.Shared
@@ -75,5 +73,7 @@ namespace core.fs.Admin
                     
                 let filename = CSVExport.GenerateFilename("users")
                 
-                return ExportResponse(filename, CSVExport.Generate(csvWriter, users)) |> ResponseUtils.success<ExportResponse>
+                // TODO: bring it back in once it is fixed
+                // return ExportResponse(filename, CSVExport.Generate(csvWriter, users)) |> ResponseUtils.success<ExportResponse>
+            return ExportResponse(filename, "") |> ResponseUtils.success<ExportResponse>
             }
