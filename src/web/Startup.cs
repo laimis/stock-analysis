@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -37,11 +38,18 @@ namespace web
                     o => {
                         o.InputFormatters.Add(new TextPlainInputFormatter());
                 })
-                .AddJsonOptions(
-                    o => {
-                        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                        o.JsonSerializerOptions.Converters.Add(new TickerConverter());
-                        o.JsonSerializerOptions.Converters.Add(new GradeConverter());
+                .AddJsonOptions(o => {
+                    
+                    // go through this assembly types, and find all types that are JsonConverter<T>
+                    // and add them to the options
+                    foreach(var type in typeof(Startup).Assembly.GetTypes())
+                    {
+                        if (type.IsSubclassOf(typeof(JsonConverter)))
+                        {
+                            var converter = Activator.CreateInstance(type);
+                            o.JsonSerializerOptions.Converters.Add((JsonConverter)converter);
+                        }
+                    }
                 });
 
             services.Configure<ForwardedHeadersOptions>(options =>
