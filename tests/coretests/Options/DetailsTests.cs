@@ -34,7 +34,7 @@ namespace coretests.Options
             accountMock.Setup(x => x.GetUser(UserId.NewUserId(opt.State.UserId)))
                 .Returns(Task.FromResult(
                     new FSharpOption<User>(
-                        new User("email", "f", "l")
+                        User.Create("email", "f", "l")
                     )
                 ));
 

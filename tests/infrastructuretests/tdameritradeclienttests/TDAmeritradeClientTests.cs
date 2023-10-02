@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using core.Account;
+using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters.Brokerage;
 using tdameritradeclient;
 using Xunit;
@@ -40,7 +40,7 @@ namespace tdameritradeclienttests
                 config[1]
             );
 
-            var user = new User("test", "test", "test");
+            var user = User.Create("test", "test", "test");
             user.ConnectToBrokerage(
                 at!.access_token,
                 at!.refresh_token,

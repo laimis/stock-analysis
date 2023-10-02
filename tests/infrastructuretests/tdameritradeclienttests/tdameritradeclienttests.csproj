@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\..\..\src\core\core.csproj" />
     <ProjectReference Include="..\..\..\src\infrastructure\tdameritradeclient\tdameritradeclient.csproj" />
     <ProjectReference Include="..\..\testutils\testutils.csproj" />

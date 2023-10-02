@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\..\core\core.csproj" />
   </ItemGroup>
 

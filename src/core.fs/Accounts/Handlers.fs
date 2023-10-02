@@ -7,9 +7,9 @@ namespace core.fs.Accounts
     open core.Shared.Adapters
     open core.Shared.Adapters.Brokerage
     open core.Shared.Adapters.Emails
-    open core.Shared.Adapters.Subscriptions
     open core.fs.Shared
     open core.fs.Shared.Adapters.Storage
+    open core.fs.Shared.Adapters.Subscriptions
     open core.fs.Shared.Domain.Accounts
     
     module Authenticate =
@@ -244,18 +244,13 @@ namespace core.fs.Accounts
             subscriptions:ISubscriptions) =
             
             let processPaymentInfo user paymentInfo =
-                let result = subscriptions.Create(
-                    user=user,
-                    email=paymentInfo.Token.Email,
-                    planId=paymentInfo.PlanId,
-                    paymentToken=paymentInfo.Token.Id
-                )
+                let result = subscriptions.Create user paymentInfo.Token.Email paymentInfo.PlanId paymentInfo.Token.Id
                 
                 match result.CustomerId with
                 | null ->
                     $"Failed to process the payment, please try again or use a different payment form" |> ResponseUtils.failed
                 | _ ->
-                    user.SubscribeToPlan(paymentInfo.PlanId, result.CustomerId, result.SubscriptionId);
+                    user.SubscribeToPlan paymentInfo.PlanId result.CustomerId result.SubscriptionId
                     ServiceResponse()
             
             interface IApplicationService
@@ -266,11 +261,11 @@ namespace core.fs.Accounts
                 match exists with
                 | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ResponseUtils.failedTyped<User>
                 | None ->
-                    let u = User(email=command.UserInfo.Email, firstname=command.UserInfo.FirstName, lastname=command.UserInfo.LastName)
+                    let u = User.Create(email=command.UserInfo.Email, firstname=command.UserInfo.FirstName, lastname=command.UserInfo.LastName)
                     
                     let struct(hash, salt) = hashProvider.Generate(command.UserInfo.Password, saltLength=32);
                     
-                    u.SetPassword(hash=hash, salt=salt)
+                    u.SetPassword hash salt
                     
                     let paymentResponse = command.PaymentInfo |> processPaymentInfo u
                     
@@ -302,7 +297,7 @@ namespace core.fs.Accounts
                         | true -> return "Password reset link is expired. Please request a new one." |> ResponseUtils.failedTyped<User>
                         | false ->
                             let struct(hash, salt) = hashProvider.Generate(reset.Password, saltLength=32);
-                            user.SetPassword(hash=hash, salt=salt)
+                            user.SetPassword hash salt
                             do! storage.Save(user)
                             return user |> ResponseUtils.success<User>
             }
@@ -483,7 +478,7 @@ namespace core.fs.Accounts
                 match user with
                 None -> return "User not found" |> ResponseUtils.failed
                 | Some user ->
-                    user.ConnectToBrokerage(r.access_token, r.refresh_token, r.token_type, r.expires_in, r.scope, r.refresh_token_expires_in)
+                    user.ConnectToBrokerage r.access_token r.refresh_token r.token_type r.expires_in r.scope r.refresh_token_expires_in
                     do! accounts.Save(user)
                     return ServiceResponse()
             }

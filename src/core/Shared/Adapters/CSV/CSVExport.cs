@@ -97,12 +97,14 @@ namespace core.Shared.Adapters.CSV
 
             return writer.Generate(rows);
         }
-        public static string Generate(ICSVWriter writer, IEnumerable<User> users)
-        {
-            var rows = users.Select(u => new UserRecord(u.State.Email, u.State.Firstname, u.State.Lastname));
-
-            return writer.Generate(rows);
-        }
+        
+        // TODO: bring this back once it is moved to core.fs
+        // public static string Generate(ICSVWriter writer, IEnumerable<User> users)
+        // {
+        //     var rows = users.Select(u => new UserRecord(u.State.Email, u.State.Firstname, u.State.Lastname));
+        //
+        //     return writer.Generate(rows);
+        // }
         
         public static string Generate(ICSVWriter writer, IEnumerable<OwnedCrypto> cryptos)
         {

@@ -1,6 +1,5 @@
 using System;
 using core.Shared;
-using core.Shared.Adapters.Subscriptions;
 
 namespace core.Account
 {
@@ -39,7 +38,7 @@ namespace core.Account
             Lastname = c.Lastname;
         }
 
-        internal void ApplyInternal(UserPasswordSet p)
+        public void ApplyInternal(UserPasswordSet p)
         {
             PasswordHash = p.Hash;
             Salt = p.Salt;
@@ -60,10 +59,11 @@ namespace core.Account
         {
             Verified = d.When;
         }
-
+        
+        // TODO: comment out once this is moved to core.fs
         internal void ApplyInternal(UserSubscribedToPlan p)
         {
-            SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
+            // SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
         }
 
         internal static void ApplyInternal(UserPasswordResetRequested _)
@@ -87,7 +87,7 @@ namespace core.Account
             BrokerageAccessTokenExpires = DateTimeOffset.MinValue;
         }
 
-        internal bool PasswordHashMatches(string hash)
+        public bool PasswordHashMatches(string hash)
         {
             return PasswordHash == hash;
         }
