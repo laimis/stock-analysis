@@ -62,16 +62,34 @@ namespace core.Portfolio
                 strategy: strategy)
             );
         }
+        
+        public void Purchase(decimal price)
+        {
+            if (price <= 0)
+            {
+                throw new InvalidOperationException("Price cannot be negative or zero");
+            }
 
-        public void Close(bool purchased, decimal? price = null)
+            Apply(
+                new PendingStockPositionClosed(
+                    Guid.NewGuid(),
+                    State.Id,
+                    when : DateTimeOffset.UtcNow,
+                    purchased: true,
+                    price: price
+                )
+            );
+        }
+
+        public void Close()
         {
             Apply(
                 new PendingStockPositionClosed(
                     Guid.NewGuid(),
                     State.Id,
                     when : DateTimeOffset.UtcNow,
-                    purchased,
-                    price
+                    purchased: false,
+                    price: null
                 )
             );
         }

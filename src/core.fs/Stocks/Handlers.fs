@@ -244,6 +244,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 match stopSet || notesSet || strategySet with
                 | true -> do! portfolio.Save updatedStock userId
                 | false -> ()
+                
+                pendingPosition.Purchase stockToUse.State.OpenPosition.AverageCostPerShare
+                
+                do! portfolio.SavePendingPosition pendingPosition userId
+                
             | _ -> ()
             
             return ServiceResponse()
