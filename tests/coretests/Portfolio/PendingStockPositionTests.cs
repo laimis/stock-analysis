@@ -130,7 +130,7 @@ namespace coretests.Portfolio
                 ticker: "AAPL",
                 userId: Guid.NewGuid());
 
-            pending.Close(purchased: false);
+            pending.Close();
 
             Assert.NotNull(pending.State.Closed);
         }

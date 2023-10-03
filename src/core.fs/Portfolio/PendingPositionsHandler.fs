@@ -127,7 +127,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
-                    position.Close(purchased=false)
+                    position.Close()
                 
                     do! portfolio.SavePendingPosition position command.UserId
                 

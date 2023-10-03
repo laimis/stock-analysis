@@ -360,7 +360,7 @@ namespace storagetests
 
             Assert.Equal(position.State.Id, loaded.State.Id);
 
-            loaded.Close(purchased: true, price: 2.2m);
+            loaded.Purchase(price: 2.2m);
 
             await storage.SavePendingPosition(loaded, _userId);
 
