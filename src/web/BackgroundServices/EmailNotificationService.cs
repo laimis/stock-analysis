@@ -156,7 +156,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
         return ToEmailRow(valueFormat, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
     }
 
-    public static object ToEmailRow(core.Shared.ValueFormat valueFormat, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
+    public static object ToEmailRow(string valueFormat, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
     {
         string FormattedValue()
         {

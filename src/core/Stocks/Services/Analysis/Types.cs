@@ -4,13 +4,18 @@ using core.Shared;
 
 namespace core.Stocks.Services.Analysis
 {
-    public enum OutcomeType { Positive, Negative, Neutral };
+    public static class OutcomeType
+    {
+        public const string Positive = nameof(Positive);
+        public const string Negative = nameof(Negative);
+        public const string Neutral = nameof(Neutral);
+    }
 
     public record AnalysisOutcome(
         string key,
-        OutcomeType type,
+        string type,
         decimal value,
-        ValueFormat valueType,
+        string valueType,
         string message
     );
 
@@ -18,7 +23,7 @@ namespace core.Stocks.Services.Analysis
 
     public record struct AnalysisOutcomeEvaluation(
         string name,
-        OutcomeType type,
+        string type,
         string sortColumn,
         List<TickerOutcomes> matchingTickers
     );
@@ -28,7 +33,7 @@ namespace core.Stocks.Services.Analysis
         string name,
         string description,
         decimal value,
-        ValueFormat valueFormat);
+        string valueFormat);
     
     public record struct TickerPatterns(IEnumerable<Pattern> patterns, string ticker);
 

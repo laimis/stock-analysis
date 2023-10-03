@@ -106,7 +106,7 @@ type OutcomesReportViewTickerCountPair =
 type OutcomesReportViewEvaluationCountPair =
     {
         Evaluation: string
-        Type: OutcomeType
+        Type: string
         Count: int
     }
     

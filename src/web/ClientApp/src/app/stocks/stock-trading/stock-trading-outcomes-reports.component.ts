@@ -24,12 +24,16 @@ export class StockPositionReportsComponent {
 
   @Input()
   set dailyAnalysis(value:PositionInstance[]) {
-    this.loadPositionData(value)
+    if (value) {
+      this.loadPositionData(value)
+    }
   }
 
   @Input()
   set allTimeAnalysis(value:PositionInstance[]) {
-    this.loadAllTimeData(value)
+    if (value) {
+      this.loadAllTimeData(value)
+    }
   }
 
   tickers: string[] = []

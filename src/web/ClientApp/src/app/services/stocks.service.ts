@@ -420,7 +420,7 @@ export class StocksService {
   reportOutcomesAllBars(tickers:string[],startDate:string = null, endDate:string = null) : Observable<OutcomesReport> {
     return this.http.post<OutcomesReport>(
       '/api/reports/outcomes',
-      {tickers, duration: "allbars", includeGapAnalysis: true, startDate, endDate}
+      {tickers, duration: 1, includeGapAnalysis: true, startDate, endDate}
     )
   }
 
@@ -435,8 +435,8 @@ export class StocksService {
         tickers,
         highlightTitle,
         highlightTickers,
-        duration: "singlebar",
-        frequency: "daily",
+        duration: 0, // singlebar
+        frequency: 0,
         endDate
       }
     )
@@ -446,8 +446,8 @@ export class StocksService {
     return this.http.post<OutcomesReport>(
       '/api/reports/outcomes',
       {
-        tickers, duration: "singlebar",
-        frequency: "weekly",
+        tickers, duration: 0,
+        frequency: 1,
         endDate
       })
   }

@@ -47,7 +47,7 @@ namespace core.fs.Alerts
             sourceList:string
             userId:UserId
             alertType:AlertType
-            valueFormat:ValueFormat
+            valueFormat:string
         }
         
         member this.Age() = (DateTimeOffset.UtcNow - this.``when``)
