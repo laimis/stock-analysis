@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using core.Stocks;
 
 namespace web.Utils;
 
@@ -67,6 +68,19 @@ public class BrokerageOrderDurationConverter : JsonConverter<BrokerageOrderDurat
     }
 
     public override void Write(Utf8JsonWriter writer, BrokerageOrderDuration value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Value);
+    }
+}
+
+public class PositionEventTypeConverter : JsonConverter<PositionEventType>
+{
+    public override PositionEventType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return new PositionEventType(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, PositionEventType value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.Value);
     }
