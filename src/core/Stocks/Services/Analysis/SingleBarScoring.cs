@@ -25,7 +25,7 @@ namespace core.Stocks.Services.Analysis
                 indexOfFirstBar++;
             }
             
-            var container = new ChartDataPointContainer<int>(label: "Scores for " + ticker, DataPointChartType.line);
+            var container = new ChartDataPointContainer<int>(label: "Scores for " + ticker, DataPointChartType.Line);
 
             foreach (var index in Enumerable.Range(indexOfFirstBar, bars.Length - indexOfFirstBar))
             {

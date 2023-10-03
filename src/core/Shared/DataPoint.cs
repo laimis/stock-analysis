@@ -3,21 +3,32 @@ using System.Collections.Generic;
 
 namespace core.Shared
 {
-    public enum ChartAnnotationLineType { vertical, horizontal}
+    public static class ChartAnnotationLineType
+    {
+        public const string Vertical = "vertical";
+        public const string Horizontal = "horizontal";
+    }
     
-    public record ChartAnnotationLine(decimal value, ChartAnnotationLineType chartAnnotationLineType);
+    public static class DataPointChartType
+    {
+        public const string Line = "line";
+        public const string Column = "column";
+    }
+
+    
+    public record ChartAnnotationLine(decimal Value, string ChartAnnotationLineType);
 
     public class ChartDataPointContainer<T> : ChartDataPointContainerBase
     {
         public ChartDataPointContainer(
             string label,
-            DataPointChartType chartType) : base(label, chartType)
+            string chartType) : base(label, chartType)
         {
         }
 
         public ChartDataPointContainer(
             string label,
-            DataPointChartType chartType,
+            string chartType,
             ChartAnnotationLine annotationLine) : base(label, chartType)
         {
             AnnotationLine = annotationLine;
@@ -37,19 +48,17 @@ namespace core.Shared
         }
     }
 
-    public enum DataPointChartType { line, column }
-
 
     public class ChartDataPointContainerBase
     {
-        public ChartDataPointContainerBase(string label, DataPointChartType chartType)
+        protected ChartDataPointContainerBase(string label, string chartType)
         {
             Label = label;
             ChartType = chartType;
         }
 
         public string Label { get; }
-        public DataPointChartType ChartType { get; }
+        public string ChartType { get; }
     }
 
     public class DataPoint<T>

@@ -535,7 +535,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.collect (fun s -> s.GetClosedPositions())
                 |> Seq.sortByDescending (fun p -> p.Closed.Value)
                 |> Seq.toArray
-                
+            
             let performance = TradingPerformanceContainerView(past)
             
             let strategyByPerformance =
@@ -555,6 +555,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     performance=performance;
                     strategyPerformance=strategyByPerformance;
                 }
+                
             return ServiceResponse<PastTradingEntriesView>(tradingEntries)
     }
     

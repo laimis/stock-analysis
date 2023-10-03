@@ -35,8 +35,8 @@ namespace core.Stocks.Services.Analysis
                 }
             }
 
-            var profit = new ChartDataPointContainer<decimal>(label: "Profit", DataPointChartType.line);
-            var gainPct = new ChartDataPointContainer<decimal>(label: "Gain %", DataPointChartType.line);
+            var profit = new ChartDataPointContainer<decimal>(label: "Profit", DataPointChartType.Line);
+            var gainPct = new ChartDataPointContainer<decimal>(label: "Gain %", DataPointChartType.Line);
 
             var shares = position.CompletedPositionShares;
             var costBasis = position.AverageBuyCostPerShare;

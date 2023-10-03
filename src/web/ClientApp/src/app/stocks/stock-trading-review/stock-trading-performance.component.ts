@@ -39,8 +39,6 @@ export class StockTradingPerformanceComponent {
     } else if (this.tradePeriod == "last100") {
       this.trends = this.performance.trendsLast100
     }
-    console.log("tradePeriod: " + this.tradePeriod)
-    console.log("trends: " + this.trends)
   }
 
   tradePeriodChanged(value:string) {
