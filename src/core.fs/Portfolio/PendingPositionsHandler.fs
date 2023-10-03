@@ -76,8 +76,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                     ticker= command.Ticker,
                     numberOfShares= command.NumberOfShares,
                     price= command.Price,
-                    ``type``= BrokerageOrderType.Limit,
-                    duration = BrokerageOrderDuration.GtcPlus
+                    ``type``= BrokerageOrderType(BrokerageOrderType.Limit),
+                    duration = BrokerageOrderDuration(BrokerageOrderDuration.GtcPlus)
                 )
                 
                 match order.IsOk with

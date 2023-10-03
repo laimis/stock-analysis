@@ -543,7 +543,7 @@ public class TDAmeritradeClient : IBrokerage
     }
 
     private static string GetBuyOrderType(BrokerageOrderType type) =>
-        type switch {
+        type.Value switch {
             BrokerageOrderType.Limit => "LIMIT",
             BrokerageOrderType.Market => "MARKET",
             BrokerageOrderType.StopMarket => "STOP",
@@ -551,7 +551,7 @@ public class TDAmeritradeClient : IBrokerage
         };
 
     private static decimal? GetPrice(BrokerageOrderType type, decimal? price) =>
-        type switch {
+        type.Value switch {
             BrokerageOrderType.Limit => price,
             BrokerageOrderType.Market => null,
             BrokerageOrderType.StopMarket => null,
@@ -559,7 +559,7 @@ public class TDAmeritradeClient : IBrokerage
         };
 
     private static decimal? GetActivationPrice(BrokerageOrderType type, decimal? price) =>
-        type switch {
+        type.Value switch {
             BrokerageOrderType.Limit => null,
             BrokerageOrderType.Market => null,
             BrokerageOrderType.StopMarket => price,
@@ -567,7 +567,7 @@ public class TDAmeritradeClient : IBrokerage
         };
 
     private static string GetBuyOrderDuration(BrokerageOrderDuration duration) =>
-        duration switch {
+        duration.Value switch {
             BrokerageOrderDuration.Day => "DAY",
             BrokerageOrderDuration.Gtc => "GOOD_TILL_CANCEL",
             BrokerageOrderDuration.DayPlus => "DAY",
@@ -576,7 +576,7 @@ public class TDAmeritradeClient : IBrokerage
         };
 
     private static string GetSession(BrokerageOrderDuration duration) =>
-        duration switch {
+        duration.Value switch {
             BrokerageOrderDuration.Day => "NORMAL",
             BrokerageOrderDuration.Gtc => "NORMAL",
             BrokerageOrderDuration.DayPlus => "SEAMLESS",

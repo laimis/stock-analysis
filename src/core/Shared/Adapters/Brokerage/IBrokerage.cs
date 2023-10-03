@@ -30,18 +30,45 @@ namespace core.Shared.Adapters.Brokerage
         Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, string ticker);
     }
 
-    public enum BrokerageOrderDuration
+    public struct BrokerageOrderDuration
     {
-        Day,
-        Gtc,
-        DayPlus,
-        GtcPlus
+        public const string Day = nameof(Day);
+        public const string Gtc = nameof(Gtc);
+        public const string DayPlus = nameof(DayPlus);
+        public const string GtcPlus = nameof(GtcPlus);
+        
+        public BrokerageOrderDuration(string value)
+        {
+            Value = value switch
+            {
+                Day => Day,
+                Gtc => Gtc,
+                DayPlus => DayPlus,
+                GtcPlus => GtcPlus,
+                _ => throw new ArgumentException("Invalid order duration", nameof(value))
+            };
+        }
+
+        public string Value { get; }
     }
 
-    public enum BrokerageOrderType
+    public struct BrokerageOrderType
     {
-        Limit,
-        Market,
-        StopMarket
+        public const string Limit = nameof(Limit);
+        public const string Market = nameof(Market);
+        public const string StopMarket = nameof(StopMarket);
+        
+        public BrokerageOrderType(string value)
+        {
+            Value = value switch
+            {
+                Limit => Limit,
+                Market => Market,
+                StopMarket => StopMarket,
+                _ => throw new ArgumentException("Invalid order type", nameof(value))
+            };
+        }
+
+        public string Value { get; }
     }
 }
