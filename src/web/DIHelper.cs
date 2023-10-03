@@ -29,7 +29,7 @@ namespace web
             IServiceCollection services,
             ILogger logger)
         {
-            
+            services.AddSingleton<core.fs.Shared.Adapters.Logging.ILogger, GenericLogger>();
             services.AddSingleton<coinmarketcap.CoinMarketCapClient>(s =>
                 new coinmarketcap.CoinMarketCapClient(
                     s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),

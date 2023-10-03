@@ -12,6 +12,7 @@
         <Compile Include="Shared\Adapters\Storage\IAccountStorage.fs"/>
         <Compile Include="Shared\Adapters\Storage\IPortfolioStorage.fs"/>
         <Compile Include="Shared\Adapters\Subscriptions\Types.fs" />
+        <Compile Include="Shared\Adapters\Logging.fs" />
         <Compile Include="Options\Input.fs"/>
         <Compile Include="Options\Views.fs"/>
         <Compile Include="Options\Handler.fs"/>

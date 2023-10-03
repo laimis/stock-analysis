@@ -6,6 +6,7 @@ module core.fs.Alerts.MonitoringServices
     open core.Shared.Adapters.Brokerage
     open core.Stocks
     open core.fs.Shared
+    open core.fs.Shared.Adapters.Logging
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Domain.Accounts
 
@@ -64,11 +65,11 @@ module core.fs.Alerts.MonitoringServices
             
             marketHours.ToUniversalTime(nextDay);
         
-    type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, portfolio:IPortfolioStorage) =
+    type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, portfolio:IPortfolioStorage, logger:ILogger) =
         
         // need to decide how I will log these
-        let logInformation _ = ()
-        let logError _ = ()
+        let logInformation = logger.LogInformation
+        let logError = logger.LogError
         
         let runStopLossCheck (user:UserState) (_:CancellationToken) (position:PositionInstance) = async {
             let! priceResponse = brokerage.GetQuote(user, position.Ticker) |> Async.AwaitTask
@@ -88,7 +89,7 @@ module core.fs.Alerts.MonitoringServices
         }
             
         
-        let runStopLossCheckForUser (cancellationToken:CancellationToken) userId = async {
+        let runStopLossCheckForUser (cancellationToken:CancellationToken) userId = task {
             
             match cancellationToken.IsCancellationRequested with
             | true ->
@@ -103,7 +104,7 @@ module core.fs.Alerts.MonitoringServices
                 | Some user ->
                         logInformation $"Found user {userId}"
                         
-                        let! checks = user.Id |> UserId |> portfolio.GetStocks |> Async.AwaitTask
+                        let! checks = user.Id |> UserId |> portfolio.GetStocks
                         
                         let! _ =
                             checks
@@ -112,6 +113,7 @@ module core.fs.Alerts.MonitoringServices
                             |> Seq.filter (fun p -> p.StopPrice.HasValue)
                             |> Seq.map (fun p -> p |> runStopLossCheck user.State cancellationToken)
                             |> Async.Parallel
+                            |> Async.StartAsTask
                             
                         logInformation("done")
         }
@@ -126,7 +128,9 @@ module core.fs.Alerts.MonitoringServices
             
             let! _ =
                 users
-                |> Seq.map (fun emailIdPair -> runStopLossCheckForUser cancellationToken emailIdPair.Id)
+                |> Seq.map (fun emailIdPair ->
+                    runStopLossCheckForUser cancellationToken emailIdPair.Id
+                    |> Async.AwaitTask)
                 |> Async.Sequential
                 |> Async.StartAsTask
                 

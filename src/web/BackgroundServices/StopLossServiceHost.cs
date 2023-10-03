@@ -20,7 +20,8 @@ public class StopLossServiceHost : GenericBackgroundServiceHost
         _service = stopLossMonitoringService;
     }
 
-    protected override TimeSpan GetSleepDuration() => MonitoringServices.nextStopLossRun(DateTimeOffset.UtcNow, _marketHours) - DateTimeOffset.UtcNow;
+    protected override TimeSpan GetSleepDuration() =>
+        MonitoringServices.nextStopLossRun(DateTimeOffset.UtcNow, _marketHours) - DateTimeOffset.UtcNow;
 
     protected override async Task Loop(CancellationToken stoppingToken) => await _service.Execute(stoppingToken);
 }
