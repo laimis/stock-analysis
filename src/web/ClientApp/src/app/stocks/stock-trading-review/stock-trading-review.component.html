@@ -98,12 +98,9 @@
     </app-daily-outcome-scores>
   </section>
 
-  <section>
+  <section *ngIf="currentPosition && positionChartInformation">
     <h5>Stock chart</h5>
-    <app-candlestick-chart
-      *ngIf="currentPosition && positionChartInformation"
-      [chartInformation]="positionChartInformation">
-    </app-candlestick-chart>
+    <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
   </section>
 
 </div>

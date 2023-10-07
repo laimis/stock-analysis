@@ -11,7 +11,6 @@ import {DataPointContainer, Prices, StocksService} from '../services/stocks.serv
 
 export class PlaygroundComponent implements OnInit {
   tickers: string[];
-  prices: Prices;
   options: any;
   manualOptions: any;
   container: DataPointContainer;

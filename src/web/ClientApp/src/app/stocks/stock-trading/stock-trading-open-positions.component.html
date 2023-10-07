@@ -36,15 +36,10 @@
     <app-stock-trading-position [position]="currentPosition" [orders]="orders"></app-stock-trading-position>
   </section>
 
-  <section>
+  <section *ngIf="chartInfo">
     <h5>Stock chart</h5>
 
-    <app-candlestick-chart [prices]="prices"
-      [averageBuyPrice]="currentPosition.averageBuyCostPerShare"
-      [stopPrice]="currentPosition.stopPrice"
-      [buyDates]="positionBuys"
-      [sellDates]="positionSells">
-    </app-candlestick-chart>
+    <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
   </section>
 
   <section *ngIf="dailyScores">
