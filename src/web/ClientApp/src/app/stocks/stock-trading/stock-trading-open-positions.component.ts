@@ -6,9 +6,8 @@ import {
   TickerOutcomes,
   TradingStrategyResults,
   BrokerageOrder,
-  DailyOutcomeScoresReport,
-  PriceWithDate,
-  DailyPositionReport
+  DailyPositionReport,
+  PositionChartInformation
 } from 'src/app/services/stocks.service';
 
 
@@ -23,12 +22,9 @@ export class StockTradingOpenPositionsComponent {
   private _index: number = 0
   currentPosition: PositionInstance
   simulationResults: TradingStrategyResults
-  prices: Prices
   outcomes: TickerOutcomes;
   dailyScores: DailyPositionReport;
-  positionBuys: string[]
-  positionSells: string[]
-
+  chartInfo: PositionChartInformation;
   constructor (private stockService: StocksService) { }
 
   @Input()
@@ -47,11 +43,9 @@ export class StockTradingOpenPositionsComponent {
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
     this.dailyScores = null
-    this.prices = null
+    this.chartInfo = null
     this.simulationResults = null
-    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date)
-    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date)
-    
+
     // get price data and pass it to chart
     this.getSimulatedTrades();
   }
@@ -75,7 +69,14 @@ export class StockTradingOpenPositionsComponent {
     // only take the last 365 of prices
     this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
       (r: Prices) => {
-        this.prices = r;
+        this.chartInfo = {
+          buyDates: this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date),
+          sellDates: this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date),
+          ticker: this.currentPosition.ticker,
+          prices: r,
+          averageBuyPrice: this.currentPosition.averageCostPerShare,
+          stopPrice: this.currentPosition.stopPrice
+        };
       }
     );
   }
@@ -90,7 +91,7 @@ export class StockTradingOpenPositionsComponent {
   }
 
   dropdownClick(elem: EventTarget) {
-    var index = Number.parseInt((elem as HTMLInputElement).value)
+    let index = Number.parseInt((elem as HTMLInputElement).value)
     console.log("dropdown click " + index)
     this._index = index
     this.updateCurrentPosition()
@@ -110,18 +111,6 @@ export class StockTradingOpenPositionsComponent {
       this._index = this.positions.length - 1
     }
     this.updateCurrentPosition()
-  }
-
-  linesOfInterest(positionInstance:PositionInstance) : number[] {
-    var arr = [positionInstance.averageCostPerShare]
-    if (positionInstance.stopPrice) {
-      arr.push(positionInstance.stopPrice)
-    }
-    return arr
-  }
-
-  interestingOutcomes(a: TickerOutcomes): any {
-    return a.outcomes.filter(o => o.type == 'Positive' || o.type == 'Negative')
   }
 
 }

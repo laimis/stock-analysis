@@ -30,6 +30,6 @@
 
     <app-stock-trading-closed-positions *ngIf="isActive('positions') && past" [positions]=past></app-stock-trading-closed-positions>
     <app-stock-trading-performance *ngIf="isActive('performance')" [performance]=performance></app-stock-trading-performance>
-    <app-stock-trading-review *ngIf="isActive('review')" [positions]="past"></app-stock-trading-review>
     <app-stock-trading-strategies *ngIf="isActive('strategies') && strategies" [results]=strategies></app-stock-trading-strategies>
+    <app-stock-trading-review *ngIf="isActive('review')" [positions]="past"></app-stock-trading-review>
   </div>

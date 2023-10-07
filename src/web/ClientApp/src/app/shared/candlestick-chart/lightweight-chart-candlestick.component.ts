@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import {PriceBar, Prices, SMA} from 'src/app/services/stocks.service';
+import {PositionChartInformation, PriceBar, Prices, SMA} from 'src/app/services/stocks.service';
 import {IChartApi, PriceLineOptions, createChart} from 'lightweight-charts';
 
 @Component({
@@ -14,24 +14,12 @@ export class LightWeightChartCandlestickComponent implements OnDestroy {
   private _prices: Prices;
 
   @Input()
-  set prices(value: Prices) {
+  set chartInformation(value: PositionChartInformation) {
     if (value) {
-      this._prices = value;
-      this.renderChart();
+      this.renderChart(value);
     }
   }
 
-  @Input()
-  averageBuyPrice = null;
-
-  @Input()
-  stopPrice = null;
-
-  @Input()
-  buyDates:string[] = null;
-
-  @Input()
-  sellDates:string[] = null;
 
   ngOnDestroy(): void {
     this.removeChart();
@@ -43,11 +31,12 @@ export class LightWeightChartCandlestickComponent implements OnDestroy {
     }
   }
 
-  renderChart() {
+  renderChart(info:PositionChartInformation) {
+
 
     console.log('rendering chart')
-    console.log(this.buyDates)
-    console.log(this.sellDates)
+    console.log(info.buyDates)
+    console.log(info.sellDates)
 
     this.removeChart();
 
@@ -81,10 +70,10 @@ export class LightWeightChartCandlestickComponent implements OnDestroy {
     let priceBars = this._prices.prices.map(toPriceBar)
     barSeries.setData(priceBars);
 
-    if (this.averageBuyPrice) {
+    if (info.averageBuyPrice) {
       let buyPrice : PriceLineOptions = {
         'title': 'avg cost',
-        price: this.averageBuyPrice,
+        price: info.averageBuyPrice,
         color: 'blue',
         lineWidth: 1,
         lineVisible: true,
@@ -97,10 +86,10 @@ export class LightWeightChartCandlestickComponent implements OnDestroy {
       barSeries.createPriceLine(buyPrice);
     }
 
-    if (this.stopPrice) {
+    if (info.stopPrice) {
       let stopPrice : PriceLineOptions = {
         'title': 'stop',
-        price: this.stopPrice,
+        price: info.stopPrice,
         color: 'red',
         lineWidth: 1,
         lineVisible: true,
@@ -119,13 +108,13 @@ export class LightWeightChartCandlestickComponent implements OnDestroy {
     addLineSeries(this._prices.sma.sma200, 'blue', 200, priceBars);
 
     let markers = []
-    if (this.buyDates) {
-      this.buyDates.forEach(d => {
+    if (info.buyDates) {
+      info.buyDates.forEach(d => {
         markers.push({ time: d, position: 'belowBar', color: 'green', shape: 'arrowUp', text: 'buy' })
       })
     }
-    if (this.sellDates) {
-      this.sellDates.forEach(d => {
+    if (info.sellDates) {
+      info.sellDates.forEach(d => {
         markers.push({ time: d, position: 'aboveBar', color: 'red', shape: 'arrowDown', text: 'sell' })
       })
     }

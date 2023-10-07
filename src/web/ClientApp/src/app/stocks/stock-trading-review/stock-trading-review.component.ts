@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
   DailyPositionReport,
-  PositionInstance,
+  PositionInstance, PositionChartInformation,
   Prices,
   StocksService,
   TradingStrategyResults
@@ -21,13 +21,11 @@ export class StockTradingReviewComponent {
   currentPosition: PositionInstance
   currentPositionPrice: number
   simulationResults: TradingStrategyResults
-  prices: Prices
-  positionBuys: string[]
-  positionSells: string[]
   simulationErrors: string[];
   scoresErrors: string[];
   dailyPositionReport: DailyPositionReport
   private _positions: PositionInstance[];
+  positionChartInformation: PositionChartInformation;
 
   constructor (
     private stockService: StocksService,
@@ -50,8 +48,6 @@ export class StockTradingReviewComponent {
     this.gradingSuccess = null
     this.assignedGrade = this.currentPosition.grade
     this.assignedNote = this.currentPosition.gradeNote
-    this.positionBuys = this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date)
-    this.positionSells = this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date)
 
     this.runTradingStrategies();
     this.fetchPrice();
@@ -102,7 +98,14 @@ export class StockTradingReviewComponent {
   private getPrices() {
     this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
       (r: Prices) => {
-        this.prices = r;
+        this.positionChartInformation = {
+          averageBuyPrice: this.currentPosition.averageCostPerShare,
+          stopPrice: this.currentPosition.stopPrice,
+          buyDates: this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date),
+          sellDates: this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date),
+          prices: r,
+          ticker: this.currentPosition.ticker
+        }
       }
     );
   }

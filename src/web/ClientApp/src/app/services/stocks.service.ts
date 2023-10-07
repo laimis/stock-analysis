@@ -778,6 +778,15 @@ export interface Prices {
   percentChanges: DistributionStatistics
 }
 
+export interface PositionChartInformation {
+  ticker: string
+  prices: Prices
+  buyDates: string[]
+  sellDates: string[]
+  averageBuyPrice: number | null
+  stopPrice: number | null
+}
+
 export interface SMAContainer {
   sma20: SMA
   sma50: SMA

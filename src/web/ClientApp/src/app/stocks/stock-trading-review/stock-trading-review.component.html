@@ -101,12 +101,8 @@
   <section>
     <h5>Stock chart</h5>
     <app-lightweight-chart-candlestick
-      *ngIf="currentPosition && prices"
-      [prices]="prices"
-      [averageBuyPrice]="currentPosition.averageBuyCostPerShare"
-      [stopPrice]="currentPosition.stopPrice"
-      [buyDates]="positionBuys"
-      [sellDates]="positionSells">
+      *ngIf="currentPosition && positionChartInformation"
+      [chartInformation]="positionChartInformation">
     </app-lightweight-chart-candlestick>
   </section>
 

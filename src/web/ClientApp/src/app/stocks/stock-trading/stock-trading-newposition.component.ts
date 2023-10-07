@@ -1,6 +1,15 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Prices, SMA, StockAnalysisOutcome, StockGaps, StocksService, stocktransactioncommand, TickerOutcomes } from 'src/app/services/stocks.service';
+import {
+  PositionChartInformation,
+  Prices,
+  SMA,
+  StockAnalysisOutcome,
+  StockGaps,
+  StocksService,
+  stocktransactioncommand,
+  TickerOutcomes
+} from 'src/app/services/stocks.service';
 import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
 
 @Component({
@@ -11,11 +20,10 @@ import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services
 })
 export class StockTradingNewPositionComponent {
   strategies: { key: string; value: string; }[];
+  chartInfo: PositionChartInformation;
+  prices: Prices;
 
-  constructor(
-      private stockService:StocksService,
-      private datePipe: DatePipe
-      )
+  constructor(private stockService:StocksService)
   {
     this.strategies = GetStrategies()
   }
@@ -62,8 +70,6 @@ export class StockTradingNewPositionComponent {
   notes: string | null = null
   strategy: string = ""
 
-  prices: Prices | null = null
-
   chartStop: number = null;
 
   outcomes: TickerOutcomes
@@ -107,6 +113,7 @@ export class StockTradingNewPositionComponent {
     this.sizeStopPrice = null
     this.ticker = null
     this.prices = null
+    this.chartInfo = null
     this.notes = null
     this.strategy = ""
   }
@@ -114,7 +121,14 @@ export class StockTradingNewPositionComponent {
   updateChart(ticker:string) {
     this.stockService.getStockPrices(ticker, 365).subscribe(
       prices => {
-        this.prices = prices
+        this.chartInfo = {
+          ticker: ticker,
+          prices: prices,
+          buyDates: [],
+          sellDates: [],
+          averageBuyPrice: null,
+          stopPrice: this.chartStop
+        }
       }
     )
   }
@@ -160,7 +174,7 @@ export class StockTradingNewPositionComponent {
       console.log("not enough info to calculate")
       return
     }
-    var singleShareLoss = this.costToBuy - this.positionStopPrice
+    let singleShareLoss = this.costToBuy - this.positionStopPrice
     this.updateBuyingValues(singleShareLoss)
   }
 
@@ -175,7 +189,7 @@ export class StockTradingNewPositionComponent {
       return
     }
 
-    var singleShareLoss = this.costToBuy - this.sizeStopPrice
+    let singleShareLoss = this.costToBuy - this.sizeStopPrice
     this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
 
     this.updateBuyingValues(singleShareLoss)
@@ -186,7 +200,7 @@ export class StockTradingNewPositionComponent {
       console.log("positionStopChanged: not enough info to calculate the rest")
       return
     }
-    var singleShareLoss = this.costToBuy - this.positionStopPrice
+    let singleShareLoss = this.costToBuy - this.positionStopPrice
     this.updateBuyingValues(singleShareLoss)
   }
 
@@ -212,7 +226,7 @@ export class StockTradingNewPositionComponent {
   recordInProgress : boolean = false
   record() {
     this.recordInProgress = true
-    var cmd = this.createPurchaseCommand();
+    let cmd = this.createPurchaseCommand();
 
     if (!this.recordPositions) {
       this.stockPurchased.emit(cmd)
@@ -235,7 +249,7 @@ export class StockTradingNewPositionComponent {
   }
 
   private createPurchaseCommand() {
-    var cmd = new stocktransactioncommand();
+    let cmd = new stocktransactioncommand();
     cmd.ticker = this.ticker;
     cmd.numberOfShares = this.numberOfShares;
     cmd.price = this.costToBuy;
@@ -247,20 +261,20 @@ export class StockTradingNewPositionComponent {
   }
 
   createPendingPosition() {
-    var cmd = this.createPurchaseCommand()
+    let cmd = this.createPurchaseCommand()
 
     this.stockService.createPendingStockPosition(cmd).subscribe(
       _ => {
         this.ticker = null
         this.prices = null
+        this.chartInfo = null
         this.gaps = null
         this.outcomes = null
         this.pendingPositionCreated.emit(cmd)
         this.reset()
       },
       errors => {
-        var errorMessageArray = GetErrors(errors)
-        var errorMessages = errorMessageArray.join(", ")
+        let errorMessages = GetErrors(errors).join(", ")
         alert('pending position failed: ' + errorMessages)
       }
     )
@@ -293,7 +307,7 @@ export class StockTradingNewPositionComponent {
     toggleVisuallyHidden(elem)
   }
 
-  assignSizeStopPrice(value) {
+  assignSizeStopPrice(value:number) {
     this.sizeStopPrice = value
     this.updateBuyingValuesSizeStopPrice()
   }

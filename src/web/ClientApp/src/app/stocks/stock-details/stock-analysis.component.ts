@@ -1,6 +1,15 @@
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { DailyOutcomeScoresReport, OutcomesReport, OutcomeValueTypeEnum, Prices, PriceWithDate, StockAnalysisOutcome, StockGaps, StockPercentChangeResponse, StocksService, TickerOutcomes } from 'src/app/services/stocks.service';
+import {
+  OutcomesReport,
+  OutcomeValueTypeEnum,
+  PositionChartInformation,
+  StockAnalysisOutcome,
+  StockGaps,
+  StockPercentChangeResponse,
+  StocksService,
+  TickerOutcomes
+} from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-analysis',
@@ -10,17 +19,15 @@ import { DailyOutcomeScoresReport, OutcomesReport, OutcomeValueTypeEnum, Prices,
 })
 export class StockAnalysisComponent {
   multipleBarOutcomes: TickerOutcomes;
-  
+
   dailyOutcomesReport : OutcomesReport;
   dailyOutcomes: TickerOutcomes;
-  
+
   gaps: StockGaps;
   percentChangeDistribution: StockPercentChangeResponse;
-  prices: Prices;
   private _ticker: string;
-  upGaps: string[] = [];
-  downGaps: string[] = [];
-  
+  chartInfo: PositionChartInformation
+
   constructor(
     private stockService : StocksService,
     private percentPipe: PercentPipe,
@@ -40,7 +47,14 @@ export class StockAnalysisComponent {
   private getPrices() {
     this.stockService.getStockPrices(this.ticker, 365).subscribe(
       data => {
-        this.prices = data;
+        this.chartInfo = {
+          ticker: this.ticker,
+          prices: data,
+          buyDates: [],
+          sellDates: [],
+          averageBuyPrice: null,
+          stopPrice: null
+        }
         this.getOutcomesReportAllBars();
       }
     );
@@ -59,10 +73,8 @@ export class StockAnalysisComponent {
   private getOutcomesReportAllBars() {
     this.stockService.reportOutcomesAllBars([this.ticker]).subscribe(report => {
       this.gaps = report.gaps[0];
-      this.upGaps = this.gaps.gaps.filter(g => g.type === 'Up').map(g => g.bar.dateStr)
-      this.downGaps = this.gaps.gaps.filter(g => g.type === 'Down').map(g => g.bar.dateStr)
       this.multipleBarOutcomes = report.outcomes[0]
-      
+
       this.getOutcomesReportSingleBarDaily();
     });
   }
