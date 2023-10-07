@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {DataPointContainer, Prices, StocksService} from '../services/stocks.service';
+import {DataPointContainer, PositionChartInformation, Prices, StocksService} from '../services/stocks.service';
 
 
 @Component({
@@ -12,8 +12,11 @@ import {DataPointContainer, Prices, StocksService} from '../services/stocks.serv
 export class PlaygroundComponent implements OnInit {
   tickers: string[];
   options: any;
+  prices: Prices;
   manualOptions: any;
   container: DataPointContainer;
+  chartInfo: PositionChartInformation;
+
   constructor(
     private stocks:StocksService,
     private route:ActivatedRoute) { }
@@ -26,6 +29,14 @@ export class PlaygroundComponent implements OnInit {
       this.tickers = tickerParam.split(',');
       this.stocks.getStockPrices(this.tickers[0], 365).subscribe(result => {
         this.prices = result
+        this.chartInfo = {
+          ticker: this.tickers[0],
+          prices: result,
+          buyDates: [],
+          sellDates: [],
+          averageBuyPrice: null,
+          stopPrice: null
+        }
         this.renderNewChart(result)
       });
     }
