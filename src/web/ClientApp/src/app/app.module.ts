@@ -94,7 +94,7 @@ import { OptionBrokerageOrdersComponent } from './options/option-dashboard/optio
 import { RoutinesActiveRoutineComponent } from './routines/routines-active-routine.component';
 import { LineChartComponent } from './shared/line-chart/line-chart.component';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
-import {LightWeightChartCandlestickComponent} from "./shared/candlestick-chart/lightweight-chart-candlestick.component";
+import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-chart.component";
 
 
 let routes: Routes = [
@@ -248,7 +248,7 @@ let routes: Routes = [
     StockNewPositionComponent,
     StockListsDashboardComponent,
     StockListComponent,
-    LightWeightChartCandlestickComponent,
+    CandlestickChartComponent,
     StockTradingReviewDashboardComponent,
     StockTradingPendingPositionsComponent,
     StockSECFilingsComponent,

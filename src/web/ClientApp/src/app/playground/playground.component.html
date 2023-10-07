@@ -1,11 +1,11 @@
 <div>
   <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
 
-  <app-lightweight-chart-candlestick
+  <app-candlestick-chart
     [averageBuyPrice]=210
     [prices]="prices"
     >
-  </app-lightweight-chart-candlestick>
+  </app-candlestick-chart>
 
   <section>
     <h3>New chart type</h3>

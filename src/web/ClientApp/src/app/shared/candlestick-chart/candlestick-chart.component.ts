@@ -3,10 +3,10 @@ import {PositionChartInformation, PriceBar, Prices, SMA} from 'src/app/services/
 import {IChartApi, PriceLineOptions, createChart} from 'lightweight-charts';
 
 @Component({
-  selector: 'app-lightweight-chart-candlestick',
-  templateUrl: './lightweight-chart-candlestick.component.html'
+  selector: 'app-candlestick-chart',
+  templateUrl: './candlestick-chart.component.html'
 })
-export class LightWeightChartCandlestickComponent implements OnDestroy {
+export class CandlestickChartComponent implements OnDestroy {
   chart: IChartApi;
 
   @Input()
