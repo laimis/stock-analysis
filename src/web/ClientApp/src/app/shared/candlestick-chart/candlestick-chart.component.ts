@@ -11,7 +11,6 @@ export class CandlestickChartComponent implements OnDestroy {
 
   @Input()
   chartHeight: number = 400;
-  private _prices: Prices;
 
   @Input()
   set chartInformation(value: PositionChartInformation) {
@@ -67,7 +66,7 @@ export class CandlestickChartComponent implements OnDestroy {
     }
 
     const barSeries = this.chart.addCandlestickSeries();
-    let priceBars = this._prices.prices.map(toPriceBar)
+    let priceBars = info.prices.prices.map(toPriceBar)
     barSeries.setData(priceBars);
 
     if (info.averageBuyPrice) {
@@ -102,10 +101,10 @@ export class CandlestickChartComponent implements OnDestroy {
       barSeries.createPriceLine(stopPrice);
     }
 
-    addLineSeries(this._prices.sma.sma20, 'red', 20, priceBars);
-    addLineSeries(this._prices.sma.sma50, 'green', 50, priceBars);
-    addLineSeries(this._prices.sma.sma150, 'lightblue', 150, priceBars);
-    addLineSeries(this._prices.sma.sma200, 'blue', 200, priceBars);
+    addLineSeries(info.prices.sma.sma20, 'red', 20, priceBars);
+    addLineSeries(info.prices.sma.sma50, 'green', 50, priceBars);
+    addLineSeries(info.prices.sma.sma150, 'lightblue', 150, priceBars);
+    addLineSeries(info.prices.sma.sma200, 'blue', 200, priceBars);
 
     let markers = []
     if (info.buyDates) {
@@ -141,7 +140,7 @@ export class CandlestickChartComponent implements OnDestroy {
         bottom: 0,
       },
     });
-    let volumeData = this._prices.prices.map(toVolumeBar)
+    let volumeData = info.prices.prices.map(toVolumeBar)
     volumeSeries.setData(volumeData);
 
     this.chart.timeScale().setVisibleRange({
