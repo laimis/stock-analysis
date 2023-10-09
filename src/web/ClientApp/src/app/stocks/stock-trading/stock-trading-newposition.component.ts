@@ -121,6 +121,7 @@ export class StockTradingNewPositionComponent {
   updateChart(ticker:string) {
     this.stockService.getStockPrices(ticker, 365).subscribe(
       prices => {
+        this.prices = prices
         this.chartInfo = {
           ticker: ticker,
           prices: prices,

@@ -11,7 +11,7 @@ export class StockTradingClosedPositionsComponent {
   private _positions: PositionInstance[];
   tickers: string[];
   groupedByMonth: {month:string, positions:PositionInstance[], wins:PositionInstance[], losses:PositionInstance[]}[]
-  
+
   @Input()
   set positions(value: PositionInstance[]) {
     this._positions = value
@@ -50,7 +50,7 @@ export class StockTradingClosedPositionsComponent {
   }
 
   matchesFilter(position:PositionInstance) {
-    
+
     if (this.tickerFilter != 'all' && !position.ticker.toLowerCase().includes(this.tickerFilter.toLowerCase())) {
       return false
     }
@@ -59,14 +59,25 @@ export class StockTradingClosedPositionsComponent {
       return false
     }
 
-    var winMasmatch = position.profit >= 0 && this.outcomeFilter === 'loss'
-    var lossMismatch = position.profit < 0 && this.outcomeFilter === 'win'
-
-    if (this.outcomeFilter != 'all' && (winMasmatch || lossMismatch)) {
-      return false
+    if (this.plFilter != 'all') {
+      if (this.plFilter === 'plus150') {
+        return position.profit >= 150
+      } else if (this.plFilter === 'plus100') {
+        return position.profit >= 100
+      } else if (this.plFilter === 'minus50') {
+        return position.profit < -50
+      } else if (this.plFilter === 'minus100') {
+        return position.profit < -100
+      } else {
+        console.log("unrecognized pl filter " + this.plFilter)
+        return false
+      }
     }
 
-    return true
+    let winMasmatch = position.profit >= 0 && this.outcomeFilter === 'loss'
+    let lossMismatch = position.profit < 0 && this.outcomeFilter === 'win'
+
+    return !(this.outcomeFilter != 'all' && (winMasmatch || lossMismatch));
   }
 
   sortColumn : string = 'closed'
@@ -74,6 +85,7 @@ export class StockTradingClosedPositionsComponent {
   tickerFilter: string = 'all'
   gradeFilter: string = 'all'
   outcomeFilter: string = 'all'
+  plFilter: string = 'all'
   showNotes: number = -1
 
   toggleShowNotes(index:number) {
@@ -94,6 +106,10 @@ export class StockTradingClosedPositionsComponent {
 
   filterByOutcomeChanged(value:string) {
     this.outcomeFilter = value
+  }
+
+  filterByPLChanged(value:string) {
+    this.plFilter = value
   }
 
   // ugly name, but essentially this returns a property for grouping

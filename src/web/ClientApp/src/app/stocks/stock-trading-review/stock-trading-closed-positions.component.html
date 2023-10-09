@@ -26,8 +26,17 @@
               <option value="loss">Losses</option>
             </select>
           </div>
+          <div class="form-group col">
+            <label class="form-label" for="filterByPL">Filter by P/L</label>
+            <select #filterByPL class="form-select" id="filterByPL" (change)="filterByPLChanged(filterByPL.value)">
+              <option value="all">Show all</option>
+              <option value="plus150">+150</option>
+              <option value="plus100">+100</option>
+              <option value="minus50">-50</option>
+              <option value="minus100">-100</option>
+            </select>
+          </div>
           <div class="col">
-            
             <div class="form-check form-switch float-end">
               <input class="form-check-input" type="checkbox" id="cardLayoutSwitch" (click)="toggleLayout()">
               <label class="form-check-label" for="cardLayoutSwitch">Split Layout</label>
@@ -73,7 +82,7 @@
         <div class="row mt-2">
           <ng-template *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.wins, label: 'Wins'}"></ng-template>
           <ng-template *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.losses, label: 'Losses'}"></ng-template>
-          
+
         </div>
       </div>
     </div>
@@ -108,8 +117,8 @@
           <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span> C trades</td>
           <td class="pt-3"><span class="fw-bold">{{ getTradeCountForMonth(p) }}</span> Total</td>
         </tr>
-  
-        <tr 
+
+        <tr
           *ngIf="matchesFilter(p)"
           (click)="toggleShowNotes(i)"
           style="cursor: pointer"
@@ -146,6 +155,6 @@
       </tbody>
     </table>
   </div>
-  
+
 
 </div>
