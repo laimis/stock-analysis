@@ -29,7 +29,7 @@ export class StockTradingNewPositionComponent {
   }
 
   @Input()
-  maxLoss: number = 120
+  maxLoss: number = 60
 
   @Input()
   showChart: boolean = true
