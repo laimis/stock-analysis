@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Alerts;
 using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Emails;
 using Microsoft.Extensions.Logging;
@@ -35,8 +34,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
     protected override TimeSpan GetSleepDuration() => _sleepFunction();
 
-    private static readonly TimeOnly[] _emailTimes = new TimeOnly[]
-            {
+    private static readonly TimeOnly[] _emailTimes = {
                 TimeOnly.Parse("09:50"),
                 TimeOnly.Parse("15:45")
             };
@@ -140,6 +138,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
     {
         return new {
             identifier = group.Key,
+            alertCount = group.Count(), // need to include this as some template engines don't support length calls on collections
             alerts = group.Select(ToEmailData)
         };
     }
