@@ -110,7 +110,7 @@
     <table *ngIf="positions" class="table table-hover mt-3">
       <thead>
         <tr>
-          <th width="100"></th>
+          <th style="width: 50px"></th>
           <th class="sort-header" (click)="sort('ticker')">Stock</th>
           <th class="sort-header" (click)="sort('opened')">Opened</th>
           <th class="sort-header" (click)="sort('closed')">Closed</th>
@@ -138,13 +138,12 @@
 
         <tr
           *ngIf="matchesFilter(p)"
-          (click)="toggleShowNotes(i)"
-          style="cursor: pointer"
           [ngClass]="{
             'table-success':p.grade === 'A',
             'table-warning':p.grade === 'C',
           }">
-          <td>{{i + 1}}</td>
+          <td style="cursor: pointer"
+              (click)="toggleShowNotes(i)">{{i + 1}}</td>
           <td>
             <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
             <app-stock-link [ticker]="p.ticker"></app-stock-link>
@@ -162,7 +161,7 @@
           <td>{{p.grade}}</td>
         </tr>
         <tr *ngIf="showNotes === i">
-          <td colspan="8">
+          <td colspan="9">
             <div *ngFor="let n of p.notes" class="mb-2">
               <!-- <span class="badge bg-secondary me-1"></span> -->
               {{n}}
