@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { PositionInstance } from 'src/app/services/stocks.service';
+import {GetStrategies} from "../../services/utils";
 
 
 @Component({
@@ -11,6 +12,7 @@ export class StockTradingClosedPositionsComponent {
   private _positions: PositionInstance[];
   tickers: string[];
   groupedByMonth: {month:string, positions:PositionInstance[], wins:PositionInstance[], losses:PositionInstance[]}[]
+  strategies: string[] = []
 
   @Input()
   set positions(value: PositionInstance[]) {
@@ -42,7 +44,18 @@ export class StockTradingClosedPositionsComponent {
     })
     this.groupedByMonth = groupedByMonthArray
 
-    console.log(this.groupedByMonth)
+    value.map(
+        (s) => {
+          let strategyLabel = s.labels.findIndex(l => l.key === 'strategy')
+          if (strategyLabel === -1) {
+            return null
+          }
+          return s.labels[strategyLabel].value
+        }
+      )
+      .filter((v, i, a) => v !== null && a.indexOf(v) === i) // unique
+      .sort()
+      .forEach(s =>this.strategies.push(s))
   }
 
   get positions(): PositionInstance[] {
@@ -56,6 +69,10 @@ export class StockTradingClosedPositionsComponent {
     }
 
     if (this.gradeFilter != 'all' && position.grade != this.gradeFilter) {
+      return false
+    }
+
+    if (this.strategyFilter != 'all' && !this.matchesStrategyCheck(position, this.strategyFilter)) {
       return false
     }
 
@@ -86,6 +103,7 @@ export class StockTradingClosedPositionsComponent {
   gradeFilter: string = 'all'
   outcomeFilter: string = 'all'
   plFilter: string = 'all'
+  strategyFilter: string = 'all'
   showNotes: number = -1
 
   toggleShowNotes(index:number) {
@@ -110,6 +128,14 @@ export class StockTradingClosedPositionsComponent {
 
   filterByPLChanged(value:string) {
     this.plFilter = value
+  }
+
+  filterByStrategyChanged(value:string) {
+    this.strategyFilter = value
+  }
+
+  matchesStrategyCheck(p:PositionInstance, strategy:string) {
+    return p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
   }
 
   // ugly name, but essentially this returns a property for grouping
