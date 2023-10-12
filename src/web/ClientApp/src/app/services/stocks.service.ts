@@ -379,8 +379,8 @@ export class StocksService {
     return this.http.post<object>('/api/account/validate', obj)
   }
 
-  loginAccount(obj:object) : Observable<object> {
-    return this.http.post<object>('/api/account/login', obj)
+  loginAccount(obj:object) : Observable<AccountStatus> {
+    return this.http.post<AccountStatus>('/api/account/login', obj)
   }
 
   requestPasswordReset(obj:object) : Observable<object> {
@@ -401,6 +401,10 @@ export class StocksService {
 
   sendMessage(obj: { email: string; message: string; }) {
     return this.http.post<object>('/api/account/contact', obj)
+  }
+
+  updateAccountSettings(obj:KeyValuePair) : Observable<AccountStatus> {
+    return this.http.post<AccountStatus>('/api/account/settings', obj)
   }
 
   // ------------------- payments ------------------------
@@ -1227,8 +1231,8 @@ export interface OptionChain {
   options: OptionDefinition[]
 }
 
-export interface AccountStatus {
-  username: String
+export class AccountStatus {
+  username: string
   email: string
   firstname: string
   lastname: string
@@ -1238,6 +1242,7 @@ export interface AccountStatus {
   isAdmin: boolean
   subscriptionLevel: string
   connectedToBrokerage: boolean
+  maxLoss: number
 }
 
 export interface TrackingPreview {

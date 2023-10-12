@@ -1,18 +1,22 @@
 using System;
 using System.Linq;
-using System.Runtime.Serialization;
 using core.fs.Shared.Adapters.Subscriptions;
 using core.fs.Shared.Domain.Accounts;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Account
 {
     public class UserTests
     {
+        public UserTests()
+        {
+        }
+
         [Fact]
         public void CreatingSetsId()
         {
-            var u = User.Create("laimis@gmail.com", "firstname", "last");
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
 
             Assert.NotEqual(Guid.Empty, u.State.Id);
         }
@@ -29,7 +33,7 @@ namespace coretests.Account
         [Fact]
         public void SettingPasswordMatchEvalCorrect()
         {
-            var u = User.Create("laimis@gmail.com", "firstname", "last");
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
 
             u.SetPassword("hash", "salt");
 
@@ -39,7 +43,7 @@ namespace coretests.Account
         [Fact]
         public void Deleting_MarksAsDeleted()
         {
-            var u = User.Create("laimis@gmail.com", "firstname", "last");
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
 
             u.Delete("delete feedback");
 
@@ -50,7 +54,7 @@ namespace coretests.Account
         [Fact]
         public void RequestPasswordReset()
         {
-            var u = User.Create("laimis@gmail.com", "firstname", "last");
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
 
             u.RequestPasswordReset(DateTimeOffset.UtcNow);
 
@@ -60,11 +64,37 @@ namespace coretests.Account
         [Fact]
         public void Subscribe()
         {
-            var u = User.Create("laimis@gmail.com", "firstname", "last");
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
 
             u.SubscribeToPlan(Plans.Full, "customer", "subscription");
             // TODO: bring it back once fsharp conversion is done
             // Assert.Equal(nameof(Plans.Full), u.State.SubscriptionLevel);
+        }
+
+        [Fact]
+        public void SetSetting()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+
+            u.SetSetting("maxLoss", "60");
+            
+            Assert.Equal(60m, u.State.MaxLoss);
+        }
+        
+        [Fact]
+        public void SetSetting_InvalidKey()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+
+            Assert.Throws<InvalidOperationException>(() => u.SetSetting("maxloss", "60.1"));
+        }
+        
+        [Fact]
+        public void SetSetting_InvalidValue()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+
+            Assert.Throws<FormatException>(() => u.SetSetting("maxLoss", "large"));
         }
     }
 }

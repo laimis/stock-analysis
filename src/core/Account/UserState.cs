@@ -15,7 +15,7 @@ namespace core.Account
         public DateTimeOffset? Deleted { get; private set; }
         public string DeleteFeedback { get; private set; }
         public DateTimeOffset? Verified { get; private set; }
-        public string SubscriptionLevel { get; private set; }
+        public string SubscriptionLevel { get; private set; } = "Free";
         public bool IsPasswordAvailable => GetSalt() != null;
         public string Name => $"{Firstname} {Lastname}";
         public string BrokerageAccessToken { get; private set; }
@@ -23,11 +23,7 @@ namespace core.Account
         public DateTimeOffset BrokerageAccessTokenExpires { get; private set; }
         public bool ConnectedToBrokerage { get; private set; }
         public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
-
-        public UserState()
-        {
-            SubscriptionLevel = "Free";
-        }
+        public decimal? MaxLoss { get; private set; }
 
         internal void ApplyInternal(UserCreated c)
         {
@@ -66,7 +62,7 @@ namespace core.Account
             // SubscriptionLevel = p.PlanId == Plans.Starter ? "Starter" : "Full";
         }
 
-        internal static void ApplyInternal(UserPasswordResetRequested _)
+        internal void ApplyInternal(UserPasswordResetRequested _)
         {
             // no state to modify, this event gets captured via INotification mechanism
         }
@@ -85,6 +81,19 @@ namespace core.Account
             BrokerageAccessToken = null;
             BrokerageRefreshToken = null;
             BrokerageAccessTokenExpires = DateTimeOffset.MinValue;
+        }
+
+        internal void ApplyInternal(UserSettingSet e)
+        {
+            switch (e.Key)
+            {
+                case "maxLoss":
+                    var maxLoss = Decimal.Parse(e.Value);
+                    MaxLoss = maxLoss;
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown setting: {e.Key}");
+            }
         }
 
         public bool PasswordHashMatches(string hash)

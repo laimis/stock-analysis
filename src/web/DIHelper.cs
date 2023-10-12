@@ -29,6 +29,9 @@ namespace web
             IServiceCollection services,
             ILogger logger)
         {
+            services.AddSingleton<IRoleService>(s => new RoleService(
+                configuration.GetValue<string>("ADMINEmail")
+            ));
             services.AddSingleton<core.fs.Shared.Adapters.Logging.ILogger, GenericLogger>();
             services.AddSingleton<coinmarketcap.CoinMarketCapClient>(s =>
                 new coinmarketcap.CoinMarketCapClient(

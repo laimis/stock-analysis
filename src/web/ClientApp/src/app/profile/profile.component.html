@@ -22,6 +22,21 @@
     </div>
   </div>
 
+  <!-- settings section -->
+  <div class="card mb-3" *ngIf="profile">
+    <div class="card-header">
+      Settings
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <label for="maxLoss" class="form-label">Max Loss</label>
+          <input type="number" #maxLoss class="form-control" name="maxLoss" id="maxLoss" [(ngModel)]="profile.maxLoss" (change)="updateMaxLoss(maxLoss.value)">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Integrations section -->
   <div class="card mb-3" *ngIf="profile">
     <div class="card-header">

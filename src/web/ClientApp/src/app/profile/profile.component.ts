@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, AccountStatus } from '../services/stocks.service';
+import {StocksService, AccountStatus, KeyValuePair} from '../services/stocks.service';
 import { Router } from '@angular/router';
 import { GetErrors } from '../services/utils';
+import {GlobalService} from "../services/global.service";
 
 @Component({
   selector: 'app-profile',
@@ -20,11 +21,15 @@ export class ProfileComponent implements OnInit {
 
   deleteFeedback: string = ''
 
-  constructor(private service:StocksService, private router:Router) { }
+  constructor(
+    private global:GlobalService,
+    private service:StocksService,
+    private router:Router) { }
 
   ngOnInit() {
-    this.service.getProfile().subscribe(p => {
-      this.profile = p
+    this.global.accountStatusFeed.subscribe(s => {
+      console.log("profile component")
+      this.profile = s
     })
   }
 
@@ -39,6 +44,14 @@ export class ProfileComponent implements OnInit {
 
   undoDelete() {
     this.showDelete = false
+  }
+
+  updateMaxLoss(value:string) {
+    let keyValue : KeyValuePair = {key:"maxLoss", value:value}
+    this.service.updateAccountSettings(keyValue).subscribe(
+      s => this.profile.maxLoss = s.maxLoss,
+      error => console.log(error)
+    )
   }
 
   deleteFinal() {

@@ -23,8 +23,8 @@ export class NavMenuComponent {
     public globalService: GlobalService,
     private router: Router
   ) {
-    this.globalService.customVariable.subscribe((value) => {
-      this.isLoggedIn = value.isLoggedIn;
+    this.globalService.accountStatusFeed.subscribe((value) => {
+      this.isLoggedIn = value.loggedIn;
     });
 
     this.router.events.subscribe((val) => {

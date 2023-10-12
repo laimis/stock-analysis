@@ -11,6 +11,7 @@ import {
   TickerOutcomes
 } from 'src/app/services/stocks.service';
 import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
+import {GlobalService} from "../../services/global.service";
 
 @Component({
   selector: 'app-stock-trading-newposition',
@@ -22,14 +23,19 @@ export class StockTradingNewPositionComponent {
   strategies: { key: string; value: string; }[];
   chartInfo: PositionChartInformation;
   prices: Prices;
+  private maxLoss = 60;
 
-  constructor(private stockService:StocksService)
+  constructor(
+    private stockService:StocksService,
+    globalService:GlobalService)
   {
     this.strategies = GetStrategies()
+    globalService.accountStatusFeed.subscribe(value => {
+      if (value.maxLoss) {
+        this.maxLoss = value.maxLoss
+      }
+    })
   }
-
-  @Input()
-  maxLoss: number = 60
 
   @Input()
   showChart: boolean = true

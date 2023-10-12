@@ -150,4 +150,16 @@ namespace core.Account
         {
         }
     }
+
+    public class UserSettingSet : AggregateEvent
+    {
+        public UserSettingSet(Guid id, Guid aggregateId, DateTimeOffset when, string key, string value) : base(id, aggregateId, when)
+        {
+            Key = key;
+            Value = value;
+        }
+
+        public string Value { get; }
+        public string Key { get; }
+    }
 }

@@ -5,6 +5,7 @@ using core.fs.Accounts;
 using core.fs.Admin;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
+using core.Shared.Adapters;
 using core.Shared.Adapters.Emails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +20,16 @@ namespace web.Controllers
     {
         private readonly IAccountStorage _storage;
         private readonly IEmailService _email;
+        private readonly IRoleService _roleService;
 
         public AdminController(
             IAccountStorage storage,
-            IEmailService email)
+            IEmailService email,
+            IRoleService roleService)
         {
             _storage = storage;
             _email = email;
+            _roleService = roleService;
         }
 
         [HttpGet("test")]
@@ -39,7 +43,9 @@ namespace web.Controllers
             if (u.Value == null)
                 return NotFound();
 
-            await AccountController.EstablishSignedInIdentity(HttpContext, u.Value);
+            var view = AccountStatusView.fromUserState(_roleService.IsAdmin(u.Value.State), u.Value.State);
+
+            await AccountController.EstablishSignedInIdentity(HttpContext, view);
 
             return Redirect("~/");
         }
@@ -51,12 +57,7 @@ namespace web.Controllers
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)
         {
-            await _email.Send(
-                new Recipient(email: obj.To, name: null),
-                new Sender(obj.From, obj.FromName),
-                obj.Subject,
-                obj.Body
-            );
+            await _email.Send(obj);
 
             return Ok();
         }
@@ -96,19 +97,5 @@ namespace web.Controllers
                 service.Handle(new Users.Export())
             );
         }
-    }
-
-    public class EmailInput
-    {
-        [Required]
-        public string From { get; set; }
-        [Required]
-        public string FromName { get; set; }
-        [Required]
-        public string Subject { get; set; }
-        [Required]
-        public string Body { get; set; }
-        [Required]
-        public string To { get; set; }
     }
 }
