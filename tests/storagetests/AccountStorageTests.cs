@@ -39,9 +39,19 @@ namespace storagetests
             Assert.Equal("firstname", fromDb.State.Firstname);
             Assert.Equal("lastname", fromDb.State.Lastname);
 
+            // change settings, save, reload
+            fromDb.SetSetting("maxLoss", "60");
+            
+            await storage.Save(fromDb);
+            
+            fromDbOption = await storage.GetUserByEmail(email);
+            
+            Assert.NotNull(fromDbOption.Value);
+            Assert.Equal(60, fromDbOption.Value.State.MaxLoss);
+
             var users = await storage.GetUserEmailIdPairs();
             Assert.NotEmpty(users.Where(u => u.Email == email));
-
+            
             await storage.Delete(user);
 
             fromDbOption = await storage.GetUserByEmail(email);

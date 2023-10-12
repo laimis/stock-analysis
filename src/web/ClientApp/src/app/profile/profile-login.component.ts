@@ -44,9 +44,9 @@ export class ProfileLoginComponent implements OnInit {
       password: this.password
     }
 
-    this.stockService.loginAccount(obj).subscribe(_ => {
+    this.stockService.loginAccount(obj).subscribe(status => {
       console.log("logged in setting global variable")
-      this.globalService.markLoggedIn()
+      this.globalService.markLoggedIn(status)
       this.router.navigateByUrl(this.returnUrl)
     }, err => {
       this.inProgress = false
@@ -59,11 +59,11 @@ export class ProfileLoginComponent implements OnInit {
     this.errors = null
     this.passwordRequestSuccess = false
 
-    var obj = {
+    let obj = {
       email: this.email
     }
 
-    this.stockService.requestPasswordReset(obj).subscribe(r => {
+    this.stockService.requestPasswordReset(obj).subscribe(_ => {
       this.email = null
       this.passwordRequestSuccess = true
     }, err => {

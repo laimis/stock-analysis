@@ -12,6 +12,51 @@ namespace core.fs.Accounts
     open core.fs.Shared.Adapters.Subscriptions
     open core.fs.Shared.Domain.Accounts
     
+    type AccountStatusView =
+        {
+            LoggedIn: bool
+            Id: Guid
+            Verified: bool
+            Created: DateTimeOffset
+            Email: string
+            Firstname: string
+            Lastname: string
+            IsAdmin: bool
+            SubscriptionLevel : string
+            ConnectedToBrokerage: bool
+            BrokerageAccessTokenExpired: bool
+        }
+
+        static member fromUserState (isAdmin:bool) (state:UserState) =
+            {
+                LoggedIn = true
+                Id = state.Id
+                Verified = state.Verified.HasValue
+                Created = state.Created
+                Email = state.Email
+                Firstname = state.Firstname
+                Lastname = state.Lastname
+                IsAdmin = isAdmin
+                SubscriptionLevel = state.SubscriptionLevel
+                ConnectedToBrokerage = state.ConnectedToBrokerage
+                BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
+            }
+            
+        static member notFound() =
+            {
+                LoggedIn = false
+                Id = Guid.Empty
+                Verified = false
+                Created = DateTimeOffset.MinValue
+                Email = null
+                Firstname = null
+                Lastname = null
+                IsAdmin = false
+                SubscriptionLevel = null
+                ConnectedToBrokerage = false
+                BrokerageAccessTokenExpired = true
+            }    
+    
     module Authenticate =
 
         [<CLIMutable>]
@@ -23,7 +68,7 @@ namespace core.fs.Accounts
             Password: string
         }
         
-        type Handler(storage:IAccountStorage, hashProvider:IPasswordHashProvider) =
+        type Handler(storage:IAccountStorage, hashProvider:IPasswordHashProvider, roles:IRoleService) =
             let INVALID_EMAIL_PASSWORD = "Invalid email/password combination"
         
             let attemptLogin (user:User) command = task {
@@ -33,8 +78,8 @@ namespace core.fs.Accounts
                     |> user.PasswordHashMatches
                 
                 match validPassword with
-                | false -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<User>
-                | true -> return ServiceResponse<User>(user)
+                | false -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<AccountStatusView>
+                | true -> return ServiceResponse<AccountStatusView> (user.State |> AccountStatusView.fromUserState (roles.IsAdmin user.State))
             }
             
             interface IApplicationService
@@ -42,7 +87,7 @@ namespace core.fs.Accounts
                 let! user = storage.GetUserByEmail(command.Email)
                 
                 match user with
-                | None -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<User>
+                | None -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<AccountStatusView>
                 | Some user -> return! command |> attemptLogin user
             }
             
@@ -78,7 +123,7 @@ namespace core.fs.Accounts
             member this.WithUserId userId = { this with UserId = userId }
        
         
-        type Handler(storage:IAccountStorage, portfolio:IPortfolioStorage, email:IEmailService) =
+        type Handler(storage:IAccountStorage, portfolio:IPortfolioStorage, email:IEmailService, roleService:IRoleService) =
             
             interface IApplicationService
             
@@ -94,7 +139,7 @@ namespace core.fs.Accounts
                     // TODO: technically it would be better to mark the user as deleted and then have a background process
                     // to send emails, delete the actual user record, and delete portfolio data
                     do! email.Send(
-                        recipient= EmailSettings.Admin,
+                        recipient= Recipient(email=roleService.GetAdminEmail(), name="Admin"),
                         sender=Sender.NoReply,
                         template=EmailTemplate.AdminUserDeleted,
                         properties= {|feedback = command.Feedback; email = user.State.Email;|}
@@ -111,22 +156,22 @@ namespace core.fs.Accounts
             Id: Guid
         }
         
-        type Handler(storage:IAccountStorage, email:IEmailService) =
+        type Handler(storage:IAccountStorage, email:IEmailService, roleService:IRoleService) =
             
             interface IApplicationService
             
             member this.Handle (command:Command) = task {
                 let! association = storage.GetUserAssociation(command.Id)
                 match association with
-                | None -> return "Invalid confirmation identifier." |> ResponseUtils.failedTyped<User>
+                | None -> return "Invalid confirmation identifier." |> ResponseUtils.failedTyped<AccountStatusView>
                 | Some association ->
                     let! user = storage.GetUser(association.UserId)
                     match user with
-                    | None -> return "User not found" |> ResponseUtils.failedTyped<User>
+                    | None -> return "User not found" |> ResponseUtils.failedTyped<AccountStatusView>
                     | Some user ->
                         
                         match association.IsOlderThan(TimeSpan.FromDays(30)) with
-                        | true -> return "Confirmation link is expired. Please request a new one." |> ResponseUtils.failedTyped<User>
+                        | true -> return "Confirmation link is expired. Please request a new one." |> ResponseUtils.failedTyped<AccountStatusView>
                         | false ->
                             user.Confirm()
                             do! storage.Save(user)
@@ -137,7 +182,7 @@ namespace core.fs.Accounts
                                 EmailTemplate.NewUserWelcome,
                                 {||}
                             );
-                            return user |> ResponseUtils.success<User>
+                            return user.State |> AccountStatusView.fromUserState (roleService.IsAdmin(user.State)) |> ResponseUtils.success<AccountStatusView>
             }
             
     module Contact =
@@ -151,13 +196,13 @@ namespace core.fs.Accounts
             Message: string
         }
         
-        type Handler(emailService:IEmailService) =
+        type Handler(emailService:IEmailService, roleService:IRoleService) =
             
             interface IApplicationService
             
             member this.Handle (command:Command) = task {
                 do! emailService.Send(
-                    recipient = EmailSettings.Admin,
+                    recipient = Recipient(email=roleService.GetAdminEmail(), name=null),
                     sender = Sender.NoReply,
                     template = EmailTemplate.AdminContact,
                     properties = {|message = command.Message; email = command.Email|}
@@ -241,6 +286,7 @@ namespace core.fs.Accounts
             storage:IAccountStorage,
             hashProvider:IPasswordHashProvider,
             email:IEmailService,
+            roleService:IRoleService,
             subscriptions:ISubscriptions) =
             
             let processPaymentInfo user paymentInfo =
@@ -259,7 +305,7 @@ namespace core.fs.Accounts
                 
                 let! exists = storage.GetUserByEmail(command.UserInfo.Email)
                 match exists with
-                | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ResponseUtils.failedTyped<User>
+                | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ResponseUtils.failedTyped<AccountStatusView>
                 | None ->
                     let u = User.Create(email=command.UserInfo.Email, firstname=command.UserInfo.FirstName, lastname=command.UserInfo.LastName)
                     
@@ -271,10 +317,10 @@ namespace core.fs.Accounts
                     
                     match paymentResponse.IsOk with
                     | false ->
-                        return paymentResponse.Error.Message |> ResponseUtils.failedTyped<User>
+                        return paymentResponse.Error.Message |> ResponseUtils.failedTyped<AccountStatusView>
                     | _ ->
                         do! storage.Save(u)
-                        return ServiceResponse<User>(u)
+                        return ServiceResponse<AccountStatusView>(u.State |> AccountStatusView.fromUserState (roleService.IsAdmin u.State))
             }
             
             member this.Validate (userInfo:UserInfo) = task {
@@ -287,19 +333,19 @@ namespace core.fs.Accounts
             member this.Handle (reset:ResetPassword) = task {
                 let! association = storage.GetUserAssociation(reset.Id)
                 match association with
-                | None -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ResponseUtils.failedTyped<User>
+                | None -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ResponseUtils.failedTyped<AccountStatusView>
                 | Some association ->
                     let! user = association.UserId |>  storage.GetUser
                     match user with
-                    | None -> return "User account is no longer valid" |> ResponseUtils.failedTyped<User>
+                    | None -> return "User account is no longer valid" |> ResponseUtils.failedTyped<AccountStatusView>
                     | Some user ->
                         match association.IsOlderThan(TimeSpan.FromMinutes(15)) with
-                        | true -> return "Password reset link is expired. Please request a new one." |> ResponseUtils.failedTyped<User>
+                        | true -> return "Password reset link is expired. Please request a new one." |> ResponseUtils.failedTyped<AccountStatusView>
                         | false ->
                             let struct(hash, salt) = hashProvider.Generate(reset.Password, saltLength=32);
                             user.SetPassword hash salt
                             do! storage.Save(user)
-                            return user |> ResponseUtils.success<User>
+                            return user.State |> AccountStatusView.fromUserState (roleService.IsAdmin(user.State)) |> ResponseUtils.success<AccountStatusView>
             }
             
             member this.Handle (createNotifications:SendCreateNotifications) = task {
@@ -322,7 +368,7 @@ namespace core.fs.Accounts
                     )
                     
                     do! email.Send(
-                        recipient=EmailSettings.Admin,
+                        recipient=Recipient(email=roleService.GetAdminEmail(), name="Admin"),
                         sender=Sender.NoReply,
                         template=EmailTemplate.AdminNewUser,
                         properties= {|email = user.State.Email; |}
@@ -377,57 +423,12 @@ namespace core.fs.Accounts
             UserId:UserId
         }
         
-        type AccountStatusView =
-            {
-                LoggedIn: bool
-                Id: Guid
-                Verified: bool
-                Created: DateTimeOffset
-                Email: string
-                Firstname: string
-                Lastname: string
-                IsAdmin: bool
-                SubscriptionLevel : string
-                ConnectedToBrokerage: bool
-                BrokerageAccessTokenExpired: bool
-            }
-            
-            static member fromUserState (state:UserState) =
-                {
-                    LoggedIn = true
-                    Id = state.Id
-                    Verified = state.Verified.HasValue
-                    Created = state.Created
-                    Email = state.Email
-                    Firstname = state.Firstname
-                    Lastname = state.Lastname
-                    IsAdmin = state.Email = EmailSettings.Admin.Email // TODO: there has to be a better way :)
-                    SubscriptionLevel = state.SubscriptionLevel
-                    ConnectedToBrokerage = state.ConnectedToBrokerage
-                    BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
-                }
-                
-            static member notFound() =
-                {
-                    LoggedIn = false
-                    Id = Guid.Empty
-                    Verified = false
-                    Created = DateTimeOffset.MinValue
-                    Email = null
-                    Firstname = null
-                    Lastname = null
-                    IsAdmin = false
-                    SubscriptionLevel = null
-                    ConnectedToBrokerage = false
-                    BrokerageAccessTokenExpired = true
-                }
-        
-        type Handler(storage:IAccountStorage) =
+        type Handler(storage:IAccountStorage, roleService:IRoleService) =
             
             let successOrError (user:User option) =
                 match user with
                     | None -> AccountStatusView.notFound() 
-                    | Some user -> user.State |> AccountStatusView.fromUserState
+                    | Some user -> user.State |> AccountStatusView.fromUserState (roleService.IsAdmin(user.State))
                 |> ResponseUtils.success<AccountStatusView>
                 
             interface IApplicationService
@@ -500,4 +501,33 @@ namespace core.fs.Accounts
                 | Some user ->
                     let! oauth = brokerage.GetAccessToken(user.State)
                     return ServiceResponse<OAuthResponse>(oauth)
+            }
+            
+    module Settings =
+        
+        [<CLIMutable>]
+        type Command =
+            {
+                UserId: UserId
+                [<Required>]
+                Key: string
+                [<Required>]
+                Value: string
+            }
+        
+            member this.WithUserId userId = { this with UserId = userId }
+        
+        type Handler(storage:IAccountStorage, roleService:IRoleService) =
+            
+            interface IApplicationService
+            
+            member this.Handle (command:Command) = task {
+                let! user = storage.GetUser(command.UserId)
+                
+                match user with
+                | None -> return "User not found" |> ResponseUtils.failedTyped<AccountStatusView>
+                | Some user ->
+                    user.SetSetting command.Key command.Value
+                    do! storage.Save(user)
+                    return ServiceResponse<AccountStatusView>(user.State |> AccountStatusView.fromUserState (user.State |> roleService.IsAdmin))
             }

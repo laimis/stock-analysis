@@ -1,7 +1,6 @@
 ﻿namespace core.fs.Shared.Domain.Accounts
 
 open System
-open System.Collections
 open core.Account
 open core.Shared
 
@@ -93,4 +92,8 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
         
     member this.RequestPasswordReset ``when`` =
         let event = UserPasswordResetRequested(Guid.NewGuid(), this.Id, ``when``)
+        this.Apply(event)
+        
+    member this.SetSetting name value =
+        let event = UserSettingSet(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, name, value)
         this.Apply(event)

@@ -22,7 +22,7 @@ namespace web.Controllers
         {
             if (User.Identity is { IsAuthenticated: false })
             {
-                var view = Status.AccountStatusView.notFound();
+                var view = AccountStatusView.notFound();
                 return Task.FromResult<ActionResult>(Ok(view));
             }
 
@@ -65,14 +65,14 @@ namespace web.Controllers
             return this.OkOrError(r);
         }
 
-        internal static async Task EstablishSignedInIdentity(HttpContext context, User user)
+        internal static async Task EstablishSignedInIdentity(HttpContext context, AccountStatusView user)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.GivenName,             user.State.Firstname),
-                new Claim(ClaimTypes.Surname,               user.State.Lastname),
-                new Claim(ClaimTypes.Email,                 user.State.Email),
-                new Claim(IdentityExtensions.ID_CLAIM_NAME, user.State.Id.ToString())
+                new(ClaimTypes.GivenName,             user.Firstname),
+                new(ClaimTypes.Surname,               user.Lastname),
+                new(ClaimTypes.Email,                 user.Email),
+                new(IdentityExtensions.ID_CLAIM_NAME, user.Id.ToString())
             };
 
             var claimsIdentity = new ClaimsIdentity(
@@ -226,5 +226,10 @@ namespace web.Controllers
 
             return Redirect("~/");
         }
+        
+        [HttpPost("settings")]
+        [Authorize]
+        public Task<ActionResult> Settings([FromBody]Settings.Command cmd, [FromServices]Settings.Handler service)
+            => this.OkOrError(service.Handle(cmd.WithUserId(User.Identifier())));
     }
 }

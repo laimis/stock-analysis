@@ -12,7 +12,7 @@ namespace coretests.testdata
             var content = File.ReadAllText($"testdata/pricefeed_{ticker}.txt");
 
             return content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => PriceBar.Parse(x))
+                .Select(PriceBar.Parse)
                 .ToArray();
         }
 
@@ -34,5 +34,7 @@ namespace coretests.testdata
                     )
                 .ToArray();
         }
+        
+        public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
     }
 }

@@ -8,8 +8,13 @@ namespace web
 {
     public class AuthHelper
     {
-        internal static void Configure(IConfiguration configuration, IServiceCollection services)
+        internal static void Configure(IConfiguration configuration, IServiceCollection services, string adminEmail)
         {
+            if (string.IsNullOrWhiteSpace(adminEmail))
+            {
+                throw new System.Exception("ADMINEmail is not set");
+            }
+            
             var authBuilder = services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -34,7 +39,7 @@ namespace web
             }
 
             services.AddAuthorization(opt => 
-                opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Email, "laimis@gmail.com"))
+                opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Email, adminEmail))
             );
         }
     }

@@ -23,7 +23,7 @@ export class AuthGuard  {
       this.router.navigate(['/profile/verify'])
       return false;
     }
-    this.globalService.markLoggedIn()
+    this.globalService.markLoggedIn(result)
     return true;
   }
 }
@@ -43,7 +43,7 @@ export class AuthGuardUnverifiedAllowed  {
      this.router.navigate(['/landing'])
      return false;
    }
-   this.globalService.markLoggedIn()
+   this.globalService.markLoggedIn(result)
    return true;
  }
 }
@@ -63,7 +63,7 @@ export class AuthGuardAdminOnly  {
      this.router.navigate(['/unauthorized'])
      return false;
    }
-   this.globalService.markLoggedIn()
+   this.globalService.markLoggedIn(result)
    return true;
  }
 }

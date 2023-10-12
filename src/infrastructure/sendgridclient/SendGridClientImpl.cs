@@ -56,6 +56,13 @@ namespace sendgridclient
             _logger.LogInformation("Sendgrid status {statusCode} with body: {responseBody}", response.StatusCode, responseBody);
         }
 
+        public Task Send(EmailInput obj) => Send(
+            recipient: new Recipient(email: obj.To, name: null),
+            sender: new Sender(obj.From, obj.FromName),
+            subject: obj.Subject,
+            body: obj.Body
+        );
+
         public Task Send(
             Recipient recipient,
             Sender sender,

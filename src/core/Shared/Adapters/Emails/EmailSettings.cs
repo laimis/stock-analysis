@@ -1,8 +1,23 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace core.Shared.Adapters.Emails
 {
+    public class EmailInput
+    {
+        [Required]
+        public string From { get; set; }
+        [Required]
+        public string FromName { get; set; }
+        [Required]
+        public string Subject { get; set; }
+        [Required]
+        public string Body { get; set; }
+        [Required]
+        public string To { get; set; }
+    }
+    
     public static class EmailSettings
     {
-        public static readonly Recipient Admin = new(email: "laimis@gmail.com", name: null);
         public const string PasswordResetUrl = "https://www.nightingaletrading.com/profile/passwordreset";
         public const string ConfirmAccountUrl = "https://www.nightingaletrading.com/api/account/confirm";
     }

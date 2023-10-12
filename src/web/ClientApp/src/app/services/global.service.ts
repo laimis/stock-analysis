@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import {AccountStatus} from "./stocks.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class GlobalService {
-  public customVariable = new BehaviorSubject<any>({
-    isLoggedIn: false
-  });
+  public customVariable = new BehaviorSubject<AccountStatus>(new AccountStatus());
 
-  markLoggedIn() {
-    this.customVariable.value.isLoggedIn = true
-    this.customVariable.next(this.customVariable.value)
+  markLoggedIn(accountStatus:AccountStatus) {
+    this.customVariable.next(accountStatus)
   }
 }
 
