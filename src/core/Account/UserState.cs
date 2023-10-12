@@ -23,7 +23,7 @@ namespace core.Account
         public DateTimeOffset BrokerageAccessTokenExpires { get; private set; }
         public bool ConnectedToBrokerage { get; private set; }
         public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
-        public decimal MaxLoss { get; private set; }
+        public decimal? MaxLoss { get; private set; }
 
         internal void ApplyInternal(UserCreated c)
         {

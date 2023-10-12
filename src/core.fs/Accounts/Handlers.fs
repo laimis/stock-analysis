@@ -25,6 +25,7 @@ namespace core.fs.Accounts
             SubscriptionLevel : string
             ConnectedToBrokerage: bool
             BrokerageAccessTokenExpired: bool
+            MaxLoss: decimal option
         }
 
         static member fromUserState (isAdmin:bool) (state:UserState) =
@@ -40,6 +41,7 @@ namespace core.fs.Accounts
                 SubscriptionLevel = state.SubscriptionLevel
                 ConnectedToBrokerage = state.ConnectedToBrokerage
                 BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
+                MaxLoss = if state.MaxLoss.HasValue then Some state.MaxLoss.Value else None
             }
             
         static member notFound() =
@@ -55,6 +57,7 @@ namespace core.fs.Accounts
                 SubscriptionLevel = null
                 ConnectedToBrokerage = false
                 BrokerageAccessTokenExpired = true
+                MaxLoss = None 
             }    
     
     module Authenticate =
