@@ -27,7 +27,7 @@ export class ProfileComponent implements OnInit {
     private router:Router) { }
 
   ngOnInit() {
-    this.global.customVariable.subscribe(s => {
+    this.global.accountStatusFeed.subscribe(s => {
       console.log("profile component")
       this.profile = s
     })

@@ -6,10 +6,10 @@ import {AccountStatus} from "./stocks.service";
   providedIn: 'root'
 })
 export class GlobalService {
-  public customVariable = new BehaviorSubject<AccountStatus>(new AccountStatus());
+  public accountStatusFeed = new BehaviorSubject<AccountStatus>(new AccountStatus());
 
   markLoggedIn(accountStatus:AccountStatus) {
-    this.customVariable.next(accountStatus)
+    this.accountStatusFeed.next(accountStatus)
   }
 }
 
