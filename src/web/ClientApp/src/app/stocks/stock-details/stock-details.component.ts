@@ -36,13 +36,14 @@ export class StockDetailsComponent implements OnInit {
 
     this.activeTab = this.route.snapshot.paramMap.get('tab') || 'stocks'
 	}
-
   fetchSecFilings() {
     this.stocks.getStockSECFilings(this.ticker).subscribe(result => {
       this.filings = result.filings
-      this.recentFilings = this.filings.filter(
-        f => new Date(f.filingDate) > new Date(new Date().setDate(new Date().getDate() - 7))
-      )
+      if (this.filings) {
+        this.recentFilings = this.filings.filter(
+          f => new Date(f.filingDate) > new Date(new Date().setDate(new Date().getDate() - 7))
+        )
+      }
     }, error => {
       console.error(error)
     })
@@ -73,6 +74,8 @@ export class StockDetailsComponent implements OnInit {
   loadOptionOwnership() {
     this.stocks.getOwnedOptions(this.ticker).subscribe(result => {
       this.options = result
+    }, err => {
+      console.error(err)
     })
   }
 
@@ -88,6 +91,8 @@ export class StockDetailsComponent implements OnInit {
       {
         this.activeTab = 'analysis'
       }
+    }, err => {
+      console.error(err)
     })
   }
 

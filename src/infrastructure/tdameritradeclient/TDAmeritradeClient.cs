@@ -131,7 +131,7 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<StockProfile>(mapped);
     }
 
-    public async Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit = 10)
+    public async Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit)
     {
         var function = $"instruments?symbol={query}.*&projection=symbol-regex";
 

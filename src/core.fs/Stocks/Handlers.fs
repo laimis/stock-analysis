@@ -514,7 +514,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<SearchResult seq>
         | Some user ->
-            let! matches = brokerage.Search(user.State, query.Term)
+            let! matches = brokerage.Search(user.State, query.Term, 10)
             
             match matches.IsOk with
             | false -> return matches.Error.Message |> ResponseUtils.failedTyped<SearchResult seq>
