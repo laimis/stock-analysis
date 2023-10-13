@@ -3,9 +3,9 @@
 open System
 open core.Options
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.fs.Shared
+open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -42,7 +42,7 @@ type BuyOrSellCommand =
 
 type DetailsQuery = { OptionId: Guid; UserId: UserId }
 
-type ChainQuery = { Ticker: string; UserId: UserId }
+type ChainQuery = { Ticker: Ticker; UserId: UserId }
 
 type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter) =
 
@@ -68,10 +68,10 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     options
                     |> Seq.filter (fun o -> o.State.Closed.HasValue |> not)
                     |> Seq.map (fun o -> o.State)
-                    |> Seq.sortBy (fun o -> o.Ticker, o.Expiration)
+                    |> Seq.sortBy (fun o -> o.Ticker.Value, o.Expiration)
                     |> Seq.map (fun o ->
                         task {
-                            let! chain = brokerage.GetOptions(user.State, o.Ticker, o.Expiration)
+                            let! chain = brokerage.GetOptions user.State o.Ticker (Some o.Expiration) None None
 
                             let detail =
                                 match chain.IsOk with
@@ -92,7 +92,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                         |> Seq.filter (fun p ->
                             openOptions
                             |> Seq.exists (fun o ->
-                                o.Ticker = p.Ticker
+                                o.Ticker.Value = p.Ticker
                                 && o.StrikePrice = p.StrikePrice
                                 && o.OptionType = p.OptionType)
                             |> not)
@@ -152,7 +152,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let option =
                 options
                 |> Seq.tryFind (fun o ->
-                    o.State.Ticker = data.Ticker
+                    o.State.Ticker.Value = data.Ticker
                     && o.State.StrikePrice = data.StrikePrice
                     && o.State.Expiration = data.Expiration)
 
@@ -226,7 +226,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | Some user ->
 
                 let! option = storage.GetOwnedOption query.OptionId query.UserId
-                let! chain = brokerage.GetOptions(user.State, option.State.Ticker)
+                let! chain = brokerage.GetOptions user.State option.State.Ticker None None None
 
                 let detail =
                     chain.Success.FindMatchingOption(
@@ -246,14 +246,14 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | None -> return "User not found" |> ResponseUtils.failedTyped<OptionDetailsViewModel>
             | Some user ->
 
-                let! priceResult = brokerage.GetQuote(state = user.State, ticker = query.Ticker)
+                let! priceResult = brokerage.GetQuote user.State query.Ticker
 
                 let price =
                     match priceResult.IsOk with
                     | true -> Nullable<decimal>(priceResult.Success.Price)
                     | false -> Nullable<decimal>()
 
-                let! details = brokerage.GetOptions(state = user.State, ticker = query.Ticker)
+                let! details = brokerage.GetOptions user.State query.Ticker None None None
 
                 match details.IsOk with
                 | true ->

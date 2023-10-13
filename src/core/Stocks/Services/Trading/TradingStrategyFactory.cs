@@ -5,7 +5,7 @@ namespace core.Stocks.Services.Trading
 {
     public class TradingStrategyFactory
     {
-        internal static IEnumerable<ITradingStrategy> GetStrategies()
+        public static IEnumerable<ITradingStrategy> GetStrategies()
         {
             yield return CreateProfitTakingStrategy();
 
@@ -108,7 +108,7 @@ namespace core.Stocks.Services.Trading
             );
         }
 
-        internal static ITradingStrategy CreateActualTrade() => new TradingStrategyActualTrade();
+        public static ITradingStrategy CreateActualTrade() => new TradingStrategyActualTrade();
         
         private static Func<int, PositionInstance, Func<int, decimal>, decimal> _advancingStop = (level, position, rrLevelFunc) => level switch {
                         1 => position.AverageCostPerShare,

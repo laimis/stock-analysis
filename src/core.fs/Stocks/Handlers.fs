@@ -12,6 +12,7 @@ open core.Stocks
 open core.Stocks.Services
 open core.Stocks.Services.Analysis
 open core.fs.Shared
+open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -73,7 +74,7 @@ type DetailsQuery =
     
 type DetailsView =
     {
-        Ticker: Ticker
+        Ticker: string
         Price: Nullable<decimal>
         Profile: StockProfile
     }
@@ -203,7 +204,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stock = portfolio.GetStock data.Ticker.Value userId
+            let! stock = portfolio.GetStock data.Ticker userId
             
             let stockToUse =
                 match stock with
@@ -226,7 +227,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             match (pendingPositionOption, isNewPosition) with
             | Some pendingPosition, true ->
                 // transfer some data from pending position to this new position
-                let! updatedStock = portfolio.GetStock data.Ticker.Value userId
+                let! updatedStock = portfolio.GetStock data.Ticker userId
                 let opened = updatedStock.State.OpenPosition
                 
                 let stopSet = updatedStock.SetStop(pendingPosition.State.StopPrice.Value)
@@ -273,9 +274,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 | false -> Array.Empty<StockPosition>()
                 | true -> brokerageAccount.Success.StockPositions
                 
-            let! quotesResponse = brokerage.GetQuotes(
-                user.State,
-                brokeragePositions |> Seq.map (fun x -> x.Ticker.Value) |> Seq.append (positions |> Seq.map (fun x -> x.Ticker.Value)) |> Seq.distinct)
+            let! quotesResponse =
+                brokerage.GetQuotes
+                    user.State
+                    (brokeragePositions |> Seq.map (fun x -> x.Ticker) |> Seq.append (positions |> Seq.map (fun x -> x.Ticker)) |> Seq.distinct)
             
             let prices =
                 match quotesResponse.IsOk with
@@ -316,7 +318,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     }
     
     member _.Handle (cmd:DeleteStop) = task {
-        let! stock = portfolio.GetStock cmd.Ticker.Value cmd.UserId
+        let! stock = portfolio.GetStock cmd.Ticker cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
@@ -326,7 +328,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     }
     
     member _.Handle (cmd:DeleteTransaction) = task {
-        let! stock = portfolio.GetStock cmd.Ticker.Value cmd.UserId
+        let! stock = portfolio.GetStock cmd.Ticker cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
@@ -340,15 +342,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<DetailsView>
         | Some user ->
-            let! profileResponse = brokerage.GetStockProfile(user.State, query.Ticker)
-            let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
+            let! profileResponse = brokerage.GetStockProfile user.State query.Ticker
+            let! priceResponse = brokerage.GetQuote user.State query.Ticker
             let price =
                 match priceResponse.IsOk with
                 | true -> Nullable<decimal>(priceResponse.Success.Price)
                 | false -> Nullable<decimal>()
                 
             let view = {
-                Ticker = query.Ticker
+                Ticker = query.Ticker.Value
                 Price = price
                 Profile = profileResponse.Success
             }
@@ -438,11 +440,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<OwnershipView>
         | Some user ->
-            let! stock = portfolio.GetStock query.Ticker.Value query.UserId
+            let! stock = portfolio.GetStock query.Ticker query.UserId
             match stock with
             | null -> return "Stock not found" |> ResponseUtils.failedTyped<OwnershipView>
             | _ ->
-                let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
+                let! priceResponse = brokerage.GetQuote user.State query.Ticker
                 let price =
                     match priceResponse.IsOk with
                     | true -> Nullable<decimal>(priceResponse.Success.Price)
@@ -469,7 +471,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<Nullable<decimal>>
         | Some user ->
-            let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
+            let! priceResponse = brokerage.GetQuote user.State query.Ticker
             let price =
                 match priceResponse.IsOk with
                 | true -> Nullable<decimal>(priceResponse.Success.Price)
@@ -484,7 +486,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<PricesView>
         | Some user ->
-            let! priceResponse = brokerage.GetPriceHistory(user.State, query.Ticker, start=query.Start, ``end``=query.End)
+            let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker PriceFrequency.Daily query.Start query.End
             match priceResponse.IsOk with
             | false -> return priceResponse.Error.Message |> ResponseUtils.failedTyped<PricesView>
             | true ->
@@ -498,7 +500,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockQuote>
         | Some user ->
-            let! priceResponse = brokerage.GetQuote(user.State, query.Ticker)
+            let! priceResponse = brokerage.GetQuote user.State query.Ticker
             match priceResponse.IsOk with
             | false -> return priceResponse.Error.Message |> ResponseUtils.failedTyped<StockQuote>
             | true -> return ServiceResponse<StockQuote>(priceResponse.Success)
@@ -509,7 +511,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<SearchResult seq>
         | Some user ->
-            let! matches = brokerage.Search(user.State, query.Term, 10)
+            let! matches = brokerage.Search user.State query.Term 10
             
             match matches.IsOk with
             | false -> return matches.Error.Message |> ResponseUtils.failedTyped<SearchResult seq>
@@ -524,7 +526,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     }
     
     member _.Handle (cmd:SetStop) = task {
-        let! stock = portfolio.GetStock cmd.Ticker.Value cmd.UserId
+        let! stock = portfolio.GetStock cmd.Ticker cmd.UserId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->

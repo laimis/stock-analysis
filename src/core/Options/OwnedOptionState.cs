@@ -18,7 +18,7 @@ namespace core.Options
         }
 
         public Guid Id { get; private set; }
-        public string Ticker { get; internal set; }
+        public Ticker Ticker { get; internal set; }
         public decimal StrikePrice { get; internal set; }
         public DateTimeOffset Expiration { get; private set; }
         public string ExpirationDate => Expiration.ToString("yyyy-MM-dd");

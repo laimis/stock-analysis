@@ -301,7 +301,7 @@ type TransactionGroup(name:string,transactions:Transaction seq) =
     member _.Sum = transactions |> Seq.sumBy (fun t -> t.Amount)
     
 
-type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:string seq) =
+type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Ticker array) =
     
     let groupByValue (groupBy:string) (t:Transaction) =
         match groupBy with
@@ -315,7 +315,7 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:stri
         | _ -> transactions |> Seq.sortByDescending (fun t -> t.DateAsDate)
     
     member _.Transactions = ordered groupBy transactions
-    member _.Tickers = tickers
+    member _.Tickers = tickers |> Array.map (fun t -> t.Value)
     member _.Grouped =
         match groupBy with
         | null  -> Seq.empty<TransactionGroup>

@@ -6,12 +6,13 @@ open core.Cryptos
 open core.Notes
 open core.Options
 open core.Portfolio
+open core.Shared
 open core.Stocks
 open core.fs.Shared.Domain.Accounts
 
 type IPortfolioStorage =
     
-    abstract member GetStock : ticker:string -> userId:UserId -> Task<OwnedStock>
+    abstract member GetStock : ticker:Ticker -> userId:UserId -> Task<OwnedStock>
     abstract member GetStockByStockId : id:System.Guid -> userId:UserId -> Task<OwnedStock>
     abstract member GetStocks : userId:UserId -> Task<IEnumerable<OwnedStock>>
     abstract member Save : stock:OwnedStock -> userId:UserId -> Task

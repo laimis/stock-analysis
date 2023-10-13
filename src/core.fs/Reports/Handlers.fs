@@ -9,6 +9,7 @@ open core.Shared.Adapters.Stocks
 open core.Stocks
 open core.Stocks.Services.Analysis
 open core.fs.Shared
+open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -47,7 +48,7 @@ type DailyOutcomeScoreReportView =
 type DailyPositionReportQuery =
     {
         UserId: UserId
-        Ticker: string
+        Ticker: Ticker
         PositionId: int
     }
     
@@ -61,7 +62,7 @@ type DailyPositionReportView =
 type GapReportQuery =
     {
         UserId: UserId
-        Ticker: string
+        Ticker: Ticker
         Frequency: PriceFrequency
     }
     
@@ -78,7 +79,7 @@ type OutcomesReportDuration =
 type OutcomesReportQuery =
     {
         [<Required>]
-        Tickers: string[]
+        Tickers: Ticker array
         UserId: UserId
         [<Required>]
         Duration: OutcomesReportDuration
@@ -137,7 +138,7 @@ type OutcomesReportView(evaluations,outcomes,gaps,patterns) =
 type PercentChangeStatisticsQuery =
     {
         Frequency: PriceFrequency
-        Ticker: string
+        Ticker: Ticker
         UserId: UserId
     }
     
@@ -236,10 +237,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 | null -> DateTimeOffset.MinValue
                 | _ -> request.End |> DateTimeOffset.Parse |> marketHours.GetMarketEndOfDayTimeInUtc
             
-            let! pricesResponse = brokerage.GetPriceHistory(
-                state=user.State, ticker=request.Ticker, frequency=PriceFrequency.Daily,
-                start=start.AddDays(-365), // going back a bit to have enough data for "relative" stats
-                ``end``=``end``)
+            let! pricesResponse =
+                brokerage.GetPriceHistory
+                    user.State
+                    request.Ticker
+                    PriceFrequency.Daily
+                    (start.AddDays(-365)) // going back a bit to have enough data for "relative" stats
+                    ``end``
             
             match pricesResponse.IsOk with
             | false ->
@@ -275,25 +279,26 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         | true -> position.Closed.Value |> marketHours.GetMarketEndOfDayTimeInUtc
                         | false -> DateTimeOffset.MinValue
                     
-                    let! pricesResponse = brokerage.GetPriceHistory(
-                        state=user.State, ticker=request.Ticker, frequency=PriceFrequency.Daily,
-                        start=start, ``end``=``end``)
+                    let! pricesResponse =
+                        brokerage.GetPriceHistory
+                            user.State
+                            request.Ticker
+                            PriceFrequency.Daily
+                            start
+                            ``end``
                     
                     match pricesResponse.IsOk with
                     | false ->
                         return pricesResponse.Error.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
                     | true ->
-                        let plAndGain = PositionDailyPLAndGain.Generate(
-                                pricesResponse.Success,
-                                position
-                            )
+                        let plAndGain = PositionDailyPLAndGain.Generate(pricesResponse.Success,position)
                         
                         let profit, pct = plAndGain.ToTuple()
                         
                         let response = {
                             DailyProfit = profit
                             DailyGainPct = pct
-                            Ticker = request.Ticker
+                            Ticker = request.Ticker.Value
                         }
                         
                         return ServiceResponse<DailyPositionReportView>(response)                   
@@ -306,16 +311,20 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | None -> return "User not found" |> ResponseUtils.failedTyped<GapReportView>
         | Some user ->
             
-            let! priceResponse = brokerage.GetPriceHistory(
-                state=user.State, ticker=query.Ticker, frequency=query.Frequency
-            )
+            let! priceResponse =
+                brokerage.GetPriceHistory
+                    user.State
+                    query.Ticker
+                    query.Frequency
+                    DateTimeOffset.MinValue
+                    DateTimeOffset.MinValue
             
             match priceResponse.IsOk with
             | false ->
                 return priceResponse.Error.Message |> ResponseUtils.failedTyped<GapReportView>
             | true ->
                 let gaps = GapAnalysis.Generate(priceResponse.Success, numberOfBarsToAnalyze=60)
-                let response = {gaps=gaps; ticker=query.Ticker}
+                let response = {gaps=gaps; ticker=query.Ticker.Value}
                 return ServiceResponse<GapReportView>(response)
     }
     
@@ -340,9 +349,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         | _ -> marketHours.GetMarketEndOfDayTimeInUtc(DateTimeOffset.Parse(query.EndDate))
                         
                     let! priceResponse =
-                        brokerage.GetPriceHistory(
-                            user.State, t, query.Frequency, startDate, endDate
-                        )
+                        brokerage.GetPriceHistory
+                            user.State
+                            t
+                            query.Frequency
+                            startDate
+                            endDate
                         |> Async.AwaitTask
                     
                     match priceResponse.IsOk with
@@ -363,7 +375,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             match query.IncludeGapAnalysis with
                             | true ->
                                 let gaps = GapAnalysis.Generate(priceResponse.Success, numberOfBarsToAnalyze=60)
-                                Some {gaps=gaps; ticker=t}
+                                Some {gaps=gaps; ticker=t.Value}
                             | false -> None
                             
                         let tickerPatterns = TickerPatterns(PatternDetection.Generate(priceResponse.Success), t)
@@ -417,16 +429,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 positions
                 |> Seq.map (fun position -> async {
                     let! priceResponse =
-                        brokerage.GetPriceHistory(
-                            user.State, position.Ticker, PriceFrequency.Daily,
-                            position.Opened, DateTimeOffset.UtcNow
-                        )
+                        brokerage.GetPriceHistory
+                            user.State
+                            position.Ticker
+                            PriceFrequency.Daily
+                            position.Opened
+                            DateTimeOffset.UtcNow
                         |> Async.AwaitTask
                     
                     match priceResponse.IsOk with
                     | false -> return None
                     | true ->
-                        
                         // TODO: this is not nice, can we avoid it setting the price here?
                         match priceResponse.Success.Length > 0 with
                         | true -> position.SetPrice priceResponse.Success[priceResponse.Success.Length - 1].Close
@@ -463,10 +476,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
         | Some user ->
-            let! pricesResponse = brokerage.GetPriceHistory(
-                    user.State,
-                    query.Ticker,
-                    query.Frequency)
+            let! pricesResponse =
+                brokerage.GetPriceHistory
+                    user.State
+                    query.Ticker
+                    query.Frequency
+                    DateTimeOffset.MinValue
+                    DateTimeOffset.MinValue
             
             match pricesResponse.IsOk with
             | false -> return pricesResponse.Error.Message |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
@@ -478,7 +494,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
                 let recent = NumberAnalysis.PercentChanges(pricesResponse.Success |> Seq.skip toSkip |> Seq.map (fun p -> p.Close) |> Seq.toArray)
                 let allTime = NumberAnalysis.PercentChanges(pricesResponse.Success |> Seq.map (fun p -> p.Close) |> Seq.toArray)
-                let response = {Ticker=query.Ticker; Recent=recent; AllTime=allTime}
+                let response = {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
                 return ServiceResponse<PercentChangeStatisticsView>(response)
     }
     
@@ -489,7 +505,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | Some user ->
             let! stocks = storage.GetStocks query.UserId
             
-            let! priceResult = brokerage.GetQuotes(user.State, stocks |> Seq.map (fun stock -> stock.State.Ticker.Value))
+            let! priceResult =
+                brokerage.GetQuotes
+                    user.State
+                    (stocks |> Seq.map (fun stock -> stock.State.Ticker))
             
             let prices =
                 match priceResult.IsOk with

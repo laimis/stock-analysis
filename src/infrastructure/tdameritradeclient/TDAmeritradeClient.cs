@@ -1,14 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using core.Account;
+using core.fs.Shared.Adapters.Brokerage;
 using core.Shared;
 using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Options;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
+using Microsoft.FSharp.Core;
 using Polly;
 using Polly.RateLimit;
 using Polly.Retry;
@@ -98,9 +99,9 @@ public class TDAmeritradeClient : IBrokerage
         return Task.FromResult(url);
     }
 
-    public async Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, string ticker)
+    public async Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, Ticker ticker)
     {
-        var function = $"instruments?symbol={ticker}&projection=fundamental";
+        var function = $"instruments?symbol={ticker.Value}&projection=fundamental";
 
         var results = await CallApi<Dictionary<string, SearchItemWithFundamental>>(
             state, function, HttpMethod.Get
@@ -111,8 +112,8 @@ public class TDAmeritradeClient : IBrokerage
             return new ServiceResponse<StockProfile>(results.Error);
         }
 
-        var fundamentals = results.Success![ticker].fundamental ?? new Dictionary<string, object>();
-        var data = results.Success[ticker];
+        var fundamentals = results.Success![ticker.Value].fundamental ?? new Dictionary<string, object>();
+        var data = results.Success[ticker.Value];
 
         var mapped = new StockProfile {
             Symbol = data.symbol,
@@ -216,7 +217,7 @@ public class TDAmeritradeClient : IBrokerage
             .Where(p => p.instrument?.assetType == "EQUITY")
             .Select(p => new StockPosition
             {
-                Ticker = p.instrument?.resolvedSymbol,
+                Ticker = new Ticker(p.instrument?.resolvedSymbol),
                 Quantity = p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1,
                 AverageCost = p.averagePrice
             }).ToArray();
@@ -289,7 +290,7 @@ public class TDAmeritradeClient : IBrokerage
 
     public Task<ServiceResponse<bool>> BuyOrder(
         UserState user,
-        string ticker,
+        Ticker ticker,
         decimal numberOfShares,
         decimal price,
         BrokerageOrderType type,
@@ -299,7 +300,7 @@ public class TDAmeritradeClient : IBrokerage
             instruction = "Buy",
             quantity = numberOfShares,
             instrument = new {
-                symbol = ticker,
+                symbol = ticker.Value,
                 assetType = "EQUITY"
             }
         };
@@ -320,7 +321,7 @@ public class TDAmeritradeClient : IBrokerage
 
     public Task<ServiceResponse<bool>> SellOrder(
         UserState user,
-        string ticker,
+        Ticker ticker,
         decimal numberOfShares,
         decimal price,
         BrokerageOrderType type,
@@ -330,7 +331,7 @@ public class TDAmeritradeClient : IBrokerage
             instruction = "Sell",
             quantity = numberOfShares,
             instrument = new {
-                symbol = ticker,
+                symbol = ticker.Value,
                 assetType = "EQUITY"
             }
         };
@@ -348,9 +349,9 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public async Task<ServiceResponse<StockQuote>> GetQuote(UserState user, string ticker)
+    public async Task<ServiceResponse<StockQuote>> GetQuote(UserState user, Ticker ticker)
     {
-        var function = $"marketdata/{ticker}/quotes";
+        var function = $"marketdata/{ticker.Value}/quotes";
 
         var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
         if (!response.IsOk)
@@ -366,29 +367,29 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<StockQuote>(quote);
     }
 
-    public Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState user, IEnumerable<string> tickers)
+    public Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
     {
-        var function = $"marketdata/quotes?symbol={string.Join(",", tickers)}";
+        var function = $"marketdata/quotes?symbol={string.Join(",", tickers.Select(t => t.Value))}";
 
         return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
     }
 
-    public async Task<ServiceResponse<core.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, string ticker, DateTimeOffset? expirationDate = null, decimal? strikePrice = null, string? contractType = null)
+    public async Task<ServiceResponse<core.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
     {
-        var function = $"marketdata/chains?symbol={ticker}";
+        var function = $"marketdata/chains?symbol={ticker.Value}";
 
-        if (contractType != null)
+        if (FSharpOption<string>.None.Equals(contractType) == false)
         {
             function += $"&contractType={contractType}";
         }
 
-        if (expirationDate != null)
+        if (FSharpOption<DateTimeOffset>.None.Equals(expirationDate) == false)
         {
             function += $"&fromDate={expirationDate.Value.ToString("yyyy-MM-dd")}";
             function += $"&toDate={expirationDate.Value.ToString("yyyy-MM-dd")}";
         }
 
-        if (strikePrice != null)
+        if (FSharpOption<decimal>.None.Equals(strikePrice) == false)
         {
             function += $"&strike={strikePrice.Value}";
         }
@@ -464,10 +465,10 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<PriceBar[]>> GetPriceHistory(
         UserState state,
-        string ticker,
-        PriceFrequency frequency = PriceFrequency.Daily,
-        DateTimeOffset start = default,
-        DateTimeOffset end = default)
+        Ticker ticker,
+        PriceFrequency frequency,
+        DateTimeOffset start,
+        DateTimeOffset end)
     {
         var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
         var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
@@ -479,7 +480,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, null)
         };
         
-        var function = $"marketdata/{ticker}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}";
+        var function = $"marketdata/{ticker.Value}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}";
 
         var response = await CallApi<PriceHistoryResponse>(
             state,

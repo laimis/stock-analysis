@@ -1,6 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using core.fs.Shared.Domain.Accounts;
+using core.Shared;
 using core.Shared.Adapters.Brokerage;
+using Microsoft.FSharp.Core;
 using tdameritradeclient;
 using Xunit;
 
@@ -50,7 +53,7 @@ namespace tdameritradeclienttests
                 1
             );
 
-            var chainResponse = await client.GetOptions(user.State, "RELL");
+            var chainResponse = await client.GetOptions(user.State, new Ticker("RELL"), FSharpOption<DateTimeOffset>.None, FSharpOption<decimal>.None, FSharpOption<string>.None);
 
             var chain = chainResponse.Success!;
 

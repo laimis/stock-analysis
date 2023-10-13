@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Alerts;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Hosting;
@@ -130,7 +130,7 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(UserState user, string ticker)
+        private async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(UserState user, Ticker ticker)
         {
             if (_priceCache.TryGetValue(ticker, out ServiceResponse<PriceBar[]> value))
             {
@@ -140,11 +140,11 @@ namespace web.BackgroundServices
             var start = _marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365));
             var end = _marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow);
             var prices = await _brokerage.GetPriceHistory(
-                state: user,
-                ticker: ticker,
-                frequency: PriceFrequency.Daily,
-                start: start,
-                end: end
+                user,
+                ticker,
+                PriceFrequency.Daily,
+                start,
+                end
             );
 
             if (prices.Error != null)

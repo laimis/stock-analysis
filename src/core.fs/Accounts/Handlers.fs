@@ -8,6 +8,7 @@ namespace core.fs.Accounts
     open core.Shared.Adapters.Brokerage
     open core.Shared.Adapters.Emails
     open core.fs.Shared
+    open core.fs.Shared.Adapters.Brokerage
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Adapters.Subscriptions
     open core.fs.Shared.Domain.Accounts

@@ -1,10 +1,10 @@
 using System;
 using core.fs.Alerts;
 using core.fs.Shared;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Adapters.Subscriptions;
 using core.Shared.Adapters;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Cryptos;
 using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Emails;

@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Options;
 using Microsoft.FSharp.Core;

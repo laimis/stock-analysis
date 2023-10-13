@@ -11,7 +11,9 @@ open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.Stocks
 open core.Stocks.Services.Trading
+open core.fs.Services.Trading
 open core.fs.Shared
+open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -367,7 +369,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | null -> return "Position not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
                 | _ ->
                     let runner = TradingStrategyRunner(brokerage, marketHours)
-                    let! simulation = runner.Run(user.State, position=position)
+                    let! simulation = runner.Run(user.State, position=position, closeIfOpenAtTheEnd=false)
                     return ServiceResponse<TradingStrategyResults>(simulation)
     }
     
@@ -384,7 +386,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     price=command.Price,
                     stopPrice=command.StopPrice,
                     ticker=command.Ticker,
-                    ``when``= command.Date
+                    ``when``= command.Date,
+                    closeIfOpenAtTheEnd=false
                 )
                 
             return ServiceResponse<TradingStrategyResults>(results)
@@ -492,11 +495,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | false -> TradingAccount.Empty
                 
             let tickers =
-                positions |> Seq.map (fun p -> p.Ticker.Value)
-                |> Seq.append (account.StockPositions |> Seq.map (fun p -> p.Ticker.Value))
+                positions |> Seq.map (fun p -> p.Ticker)
+                |> Seq.append (account.StockPositions |> Seq.map (fun p -> p.Ticker))
                 |> Seq.distinct
                 
-            let! pricesResponse = brokerage.GetQuotes(user.State, tickers)
+            let! pricesResponse = brokerage.GetQuotes user.State tickers
             let prices =
                 match pricesResponse.IsOk with
                 | true -> pricesResponse.Success
@@ -562,7 +565,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     member _.Handle(query:QueryTransactions) = task {
         
         let toTransactionsView (stocks:OwnedStock seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
-            let tickers = stocks |> Seq.map (fun s -> s.State.Ticker.Value) |> Seq.append (options |> Seq.map (fun o -> o.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
+            let tickers = stocks |> Seq.map (fun s -> s.State.Ticker) |> Seq.append (options |> Seq.map (fun o -> o.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
             
             let stockTransactions =
                 match query.Show = "shares" || query.Show = null with
@@ -577,7 +580,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match query.Show = "options" || query.Show = null with
                 | true ->
                     options
-                    |> Seq.filter (fun o -> query.Ticker.HasValue = false || o.State.Ticker = query.Ticker.Value.Value)
+                    |> Seq.filter (fun o -> query.Ticker.HasValue = false || o.State.Ticker = query.Ticker.Value)
                     |> Seq.collect (fun o -> o.State.Transactions)
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty

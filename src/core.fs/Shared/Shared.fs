@@ -32,6 +32,7 @@ type StockViolationView =
             | _ -> -1
    
 type ServiceResponse = Ok | Error of ServiceError
+// type ServiceResult<'a> = Result<'a, ServiceError>
 
 module ResponseUtils =
             
