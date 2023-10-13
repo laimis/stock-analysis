@@ -30,18 +30,38 @@ type StockViolationView =
             match other with
             | :? StockViolationView as res -> this.Ticker.Value.CompareTo(res.Ticker.Value)
             | _ -> -1
-    
+   
+type ServiceResponse = Ok | Error of ServiceError
 
 module ResponseUtils =
-    
+            
     let failedTyped<'a> (message: string) =
         ServiceResponse<'a>(ServiceError(message))
         
     let failed (message: string) =
-        ServiceResponse(ServiceError(message))
+        ServiceError(message) |> Error
         
     let success<'a> (data: 'a) =
         ServiceResponse<'a>(data)
+    
+    let toOkOrError (response: ServiceResponse<'a>) =
+        match response.IsOk with
+        | true -> Ok
+        | false -> Error response.Error
+        
+    let toOkOrConcatErrors serviceResponses =
+        let failures =
+            serviceResponses
+            |> Seq.map (fun r ->
+                match r with
+                | Ok -> None
+                | Error serviceError -> Some serviceError
+            )
+            |> Seq.choose id
+        
+        match failures |> Seq.isEmpty with
+        | true -> Ok
+        | false -> failed (failures |> Seq.map (fun r -> r.Message) |> String.concat "\n")
         
 module Helpers =
     

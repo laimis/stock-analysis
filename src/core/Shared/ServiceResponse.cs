@@ -1,17 +1,6 @@
 #nullable enable
 namespace core.Shared
 {
-    public class ServiceResponse
-    {
-        public ServiceError? Error { get; }
-
-        public ServiceResponse(ServiceError error) =>
-            Error = error;
-        public ServiceResponse() { }
-        
-        public bool IsOk => Error == null;
-    }
-
     public class ServiceResponse<TSuccess>
     {
         public TSuccess? Success { get; }

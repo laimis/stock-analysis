@@ -251,7 +251,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 
             | _ -> ()
             
-            return ServiceResponse()
+            return Ok
     }
     
     member _.Handle (query:DashboardQuery) = task {
@@ -312,7 +312,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | _ ->
             stock.Delete()
             do! portfolio.Save stock cmd.UserId
-            return ServiceResponse()
+            return Ok
     }
     
     member _.Handle (cmd:DeleteStop) = task {
@@ -322,7 +322,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | _ ->
             stock.DeleteStop()
             do! portfolio.Save stock cmd.UserId
-            return ServiceResponse()
+            return Ok
     }
     
     member _.Handle (cmd:DeleteTransaction) = task {
@@ -332,7 +332,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | _ ->
             stock.DeleteTransaction(cmd.TransactionId)
             do! portfolio.Save stock cmd.UserId
-            return ServiceResponse()
+            return Ok
     }
     
     member _.Handle (query:DetailsQuery) = task {
@@ -430,12 +430,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
-            let failed =
-                results |> Seq.filter (fun x -> x.IsOk = false) |> Seq.map (fun x -> x.Error.Message) |> Seq.toArray
-                
-            match failed.Length with
-            | 0 -> return ServiceResponse()
-            | _ -> return String.Concat(failed, ",") |> ResponseUtils.failed
+            return results |> ResponseUtils.toOkOrConcatErrors
     }
     
     member _.Handle (query:OwnershipQuery) = task {
@@ -535,7 +530,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | _ ->
             stock.SetStop(cmd.StopPrice.Value) |> ignore
             do! portfolio.Save stock cmd.UserId
-            return ServiceResponse()
+            return Ok
     }
     
     

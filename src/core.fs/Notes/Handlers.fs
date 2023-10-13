@@ -171,7 +171,7 @@ namespace core.fs.Notes
                         imports |> Seq.filter(fun r -> r.IsOk = false)
                         
                     match failedImports |> Seq.isEmpty with
-                    | true -> return ServiceResponse()
+                    | true -> return Ok
                     | false -> 
                         let failedImports = failedImports |> Seq.map(fun r -> r.Error.Message) |> String.concat "\n"
                         return failedImports |> ResponseUtils.failed

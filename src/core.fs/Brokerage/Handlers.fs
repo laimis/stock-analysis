@@ -60,7 +60,7 @@ module core.fs.Brokerage
                 return "User not found" |> ResponseUtils.failed 
             | Some user ->
                 let! _ = user.State |> func data
-                return ServiceResponse()
+                return Ok
         }
         
         member _.Handle (command:CancelOrder) = task {
@@ -70,7 +70,7 @@ module core.fs.Brokerage
             | None -> return ResponseUtils.failed "User not found"
             | Some user ->
                 let! _ = brokerage.CancelOrder(user.State, command.OrderId)
-                return ServiceResponse()
+                return Ok
         }
         
         member _.Handle (query:QueryAccount) = task {

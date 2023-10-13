@@ -8,5 +8,5 @@ namespace storage.shared;
 
 public interface IOutbox
 {
-    Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
+    Task<core.fs.Shared.ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
 }

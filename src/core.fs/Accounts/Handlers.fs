@@ -112,7 +112,7 @@ namespace core.fs.Accounts
                 | None -> return "User not found" |> ResponseUtils.failed
                 | Some user ->
                     do! portfolioStorage.Delete(user.Id |> UserId)
-                    return ServiceResponse()
+                    return Ok
             }
             
     module DeleteAccount =
@@ -149,7 +149,7 @@ namespace core.fs.Accounts
                     )
                     do! storage.Delete(user)
                     do! portfolio.Delete(user.Id |> UserId)
-                    return ServiceResponse()
+                    return Ok
             }
             
     module ConfirmAccount =
@@ -210,7 +210,7 @@ namespace core.fs.Accounts
                     template = EmailTemplate.AdminContact,
                     properties = {|message = command.Message; email = command.Email|}
                 )
-                return ServiceResponse()
+                return Ok
             }
             
     module Create =
@@ -300,7 +300,7 @@ namespace core.fs.Accounts
                     $"Failed to process the payment, please try again or use a different payment form" |> ResponseUtils.failed
                 | _ ->
                     user.SubscribeToPlan paymentInfo.PlanId result.CustomerId result.SubscriptionId
-                    ServiceResponse()
+                    Ok
             
             interface IApplicationService
             
@@ -318,9 +318,9 @@ namespace core.fs.Accounts
                     
                     let paymentResponse = command.PaymentInfo |> processPaymentInfo u
                     
-                    match paymentResponse.IsOk with
-                    | false ->
-                        return paymentResponse.Error.Message |> ResponseUtils.failedTyped<AccountStatusView>
+                    match paymentResponse with
+                    | Error err ->
+                        return err.Message |> ResponseUtils.failedTyped<AccountStatusView>
                     | _ ->
                         do! storage.Save(u)
                         return ServiceResponse<AccountStatusView>(u.State |> AccountStatusView.fromUserState (roleService.IsAdmin u.State))
@@ -329,7 +329,7 @@ namespace core.fs.Accounts
             member this.Validate (userInfo:UserInfo) = task {
                 let! exists = storage.GetUserByEmail(userInfo.Email)
                 match exists with
-                | None -> return ServiceResponse()
+                | None -> return Ok
                 | Some _ -> return $"Account with {userInfo.Email} already exists" |> ResponseUtils.failed
             }
             
@@ -377,7 +377,7 @@ namespace core.fs.Accounts
                         properties= {|email = user.State.Email; |}
                     )
                     
-                    return ServiceResponse()
+                    return Ok
             }
             
     
@@ -399,7 +399,7 @@ namespace core.fs.Accounts
                 let! user = storage.GetUserByEmail(request.Email)
                 
                 match user with
-                | None -> return ServiceResponse() // don't return an error so that user accounts can't be enumerated
+                | None -> return Ok // don't return an error so that user accounts can't be enumerated
                 | Some user ->
                     let association = ProcessIdToUserAssociation(user.Id |> UserId, DateTimeOffset.UtcNow)
                     
@@ -413,7 +413,7 @@ namespace core.fs.Accounts
                         template=EmailTemplate.PasswordReset,
                         properties= {|reseturl = resetUrl|}
                     )
-                    return ServiceResponse()
+                    return Ok
             }
             
     module Status =
@@ -484,7 +484,7 @@ namespace core.fs.Accounts
                 | Some user ->
                     user.ConnectToBrokerage r.access_token r.refresh_token r.token_type r.expires_in r.scope r.refresh_token_expires_in
                     do! accounts.Save(user)
-                    return ServiceResponse()
+                    return Ok
             }
             
             member this.HandleDisconnect(cmd:Disconnect) = task {
@@ -494,7 +494,7 @@ namespace core.fs.Accounts
                 | Some user ->
                     user.DisconnectFromBrokerage()
                     do! accounts.Save(user)
-                    return ServiceResponse()
+                    return Ok
             }
             
             member this.HandleInfo(cmd:Info) = task {

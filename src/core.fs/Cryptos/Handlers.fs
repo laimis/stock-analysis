@@ -129,7 +129,7 @@ namespace core.fs.Cryptos
             
         let ``yield`` (data:CryptoTransaction) (crypto:OwnedCrypto) =
             crypto.Yield(data.Quantity,data.DollarAmount,data.Date,data.Notes)
-        
+            
         interface IApplicationService
         
         member _.Handle(cmd:CryptoTransactionWithUserId) = task {
@@ -159,7 +159,7 @@ namespace core.fs.Cryptos
                     
                     do! portfolio.SaveCrypto cryptoToUse userId
                 
-                    return ServiceResponse()
+                    return Ok
         }
         
         member _.Handle(query:DashboardQuery) = task {
@@ -190,7 +190,7 @@ namespace core.fs.Cryptos
                 let! crypto = portfolio.GetCrypto cmd.Token.Value cmd.UserId
                 crypto.DeleteTransaction(cmd.TransactionId)
                 do! portfolio.SaveCrypto crypto cmd.UserId
-                return ServiceResponse()
+                return Ok
         }
         
         member _.Handle(query:Details) = task {
@@ -247,11 +247,7 @@ namespace core.fs.Cryptos
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
-                    let failures = commands |> Seq.filter (fun r -> r.IsOk = false)
-                    
-                    match failures |> Seq.isEmpty with
-                    | true -> return ServiceResponse()
-                    | false -> return ResponseUtils.failed (failures |> Seq.map (fun r -> r.Error.Message) |> String.concat "\n")
+                    return commands |> ResponseUtils.toOkOrConcatErrors
         }
         
         member this.Handle(cmd:ImportCoinbase) = task {
@@ -288,11 +284,7 @@ namespace core.fs.Cryptos
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
-                    let failures = commands |> Seq.filter (fun r -> r.IsOk = false)
-                    
-                    match failures |> Seq.isEmpty with
-                    | true -> return ServiceResponse()
-                    | false -> return ResponseUtils.failed (failures |> Seq.map (fun r -> r.Error.Message) |> String.concat "\n")
+                    return commands |> ResponseUtils.toOkOrConcatErrors
         }
         
         member this.Handle(cmd:ImportCoinbasePro) = task {
@@ -331,7 +323,7 @@ namespace core.fs.Cryptos
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
-                    return ServiceResponse()
+                    return Ok
         }
         
         member this.Handle(import:ImportCryptoCommand) =

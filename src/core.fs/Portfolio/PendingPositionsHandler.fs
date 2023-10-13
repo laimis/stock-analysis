@@ -96,7 +96,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                     
                     do! portfolio.SavePendingPosition position command.UserId
                 
-                    return ServiceResponse()
+                    return Ok
     }
     
     member this.Handle (command:Close) = task {
@@ -131,7 +131,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 
                     do! portfolio.SavePendingPosition position command.UserId
                 
-                    return ServiceResponse()
+                    return Ok
     }
     
     member this.Handle (command:Export) = task {

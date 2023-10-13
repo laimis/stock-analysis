@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using core.fs.Shared;
 using core.Shared;
 using core.Shared.Adapters.CSV;
 using Microsoft.AspNetCore.Mvc;
@@ -58,9 +59,10 @@ namespace web.Utils
             this ControllerBase controller,
             ServiceResponse r)
         {
-            if (r.Error != null)
+            if (r.IsError)
             {
-                return controller.Error(r.Error.Message);
+                var error = r as ServiceResponse.Error;
+                return controller.Error(error!.Item.Message);
             }
 
             return controller.Ok();

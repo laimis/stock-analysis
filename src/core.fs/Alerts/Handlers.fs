@@ -67,17 +67,17 @@ namespace core.fs.Alerts
             
             member this.Handle (send:SendSMS) = task {
                 do! smsService.SendSMS(send.Body)
-                return ServiceResponse()
+                return Ok
             }
             
             member this.Handle (_:TurnSMSOn) = task {
                 smsService.TurnOn()
-                return ServiceResponse()
+                return Ok
             }
             
             member this.Handle (_:TurnSMSOff) = task {
                 smsService.TurnOff()
-                return ServiceResponse()
+                return Ok
             }
             
             member this.Handle (_:Status) = task {

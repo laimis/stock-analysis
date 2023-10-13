@@ -186,7 +186,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | Some stock ->
                 stock.DeletePosition(command.PositionId) |> ignore
                 do! storage.Save stock command.UserId
-                return ServiceResponse()
+                return Ok
     }
         
     member this.Handle (query:Query) = task {
@@ -233,7 +233,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | false -> ()
                 | true -> do! storage.Save stock command.UserId
                 
-                return ServiceResponse()
+                return Ok
     }
     
     member _.Handle (command:RemoveLabel) = task {
@@ -256,7 +256,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | false -> ()
                 | true -> do! storage.Save stock command.UserId
                 
-                return ServiceResponse()
+                return Ok
     }
     
     member _.Handle (command:AddLabel) = task {
@@ -279,7 +279,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | false -> ()
                 | true -> do! storage.Save stock command.UserId
                 
-                return ServiceResponse()
+                return Ok
     }
     
     member _.Handle (query:ProfitPointsQuery) = task {
@@ -343,7 +343,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 do! storage.Save stock command.UserId
                 
-                return ServiceResponse()
+                return Ok
     }
     
     member _.Handle (command:SimulateTrade) = task {
