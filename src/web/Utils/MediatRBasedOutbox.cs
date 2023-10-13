@@ -13,7 +13,7 @@ public class IncompleteOutbox : IOutbox
     // but it was without any ability to handle failures etc and dependent on
     // mediatr. I might still use simple outbox that does not offer failure handling
     // but it will not be dependent on mediatr
-    public Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
+    public Task<core.fs.Shared.ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
     {
         foreach (var @event in e)
         {
@@ -52,8 +52,8 @@ public class IncompleteOutbox : IOutbox
             //     _mediator.Publish(notification);
             // }
         }
-        
-        return Task.FromResult(new ServiceResponse());
+
+        return Task.FromResult(core.fs.Shared.ServiceResponse.Ok);
     }
 }
 

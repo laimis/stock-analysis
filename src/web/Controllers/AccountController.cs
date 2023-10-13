@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using core.fs.Accounts;
+using core.fs.Shared;
 using core.fs.Shared.Domain.Accounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -110,6 +111,17 @@ namespace web.Controllers
                     )
                 )
             );
+        
+        private ActionResult RedirectOrError(ServiceResponse result)
+        {
+            if (result.IsError)
+            {
+                var error = result as ServiceResponse.Error;
+                return BadRequest(error!.Item.Message);
+            }
+            
+            return Redirect("~/profile");
+        }
 
         [HttpGet("integrations/tdameritrade/disconnect")]
         [Authorize]
@@ -118,11 +130,7 @@ namespace web.Controllers
             var result = await service.HandleDisconnect(
                 new Brokerage.Disconnect(User.Identifier())
             );
-
-            return result.Error switch {
-                null => Redirect("~/profile"),
-                _ => BadRequest(result.Error)
-            };
+            return RedirectOrError(result);
         }
 
         [HttpGet("integrations/tdameritrade/callback")]
@@ -132,10 +140,7 @@ namespace web.Controllers
             var result = await service.HandleConnectCallback(
                 new Brokerage.ConnectCallback(code, User.Identifier()));
 
-            return result.Error switch {
-                null => Redirect("~/profile"),
-                _ => BadRequest(result.Error)
-            };
+            return RedirectOrError(result);
         }
 
         [HttpPost("requestpasswordreset")]
@@ -175,15 +180,14 @@ namespace web.Controllers
             
             var result = await service.Handle(cmd);
             
-            if (result.Error != null)
+            if (result.IsError)
             {
-                return this.Error(result.Error.Message);
+                var error = result as ServiceResponse.Error;
+                return this.Error(error!.Item.Message);
             }
-            else
-            {
-                await HttpContext.SignOutAsync();
-                return Ok();
-            }
+
+            await HttpContext.SignOutAsync();
+            return Ok();
         }
 
         [HttpPost("clear")]

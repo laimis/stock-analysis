@@ -92,7 +92,7 @@ module Import =
                 
                 let finalResult =
                     match failed with
-                    | None -> ServiceResponse()
+                    | None -> Ok
                     | Some f -> f.Error.Message |> ResponseUtils.failed
                     
                 return finalResult

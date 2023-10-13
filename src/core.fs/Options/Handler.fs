@@ -173,11 +173,11 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! opt = storage.GetOwnedOption command.OptionId command.UserId
 
             match opt with
-            | null -> return ServiceResponse(ServiceError("Unable to find option do delete"))
+            | null -> return "Unable to find option do delete" |> ServiceError |> Error
             | _ ->
                 opt.Delete()
                 do! storage.SaveOwnedOption opt command.UserId
-                return ServiceResponse()
+                return Ok
         }
 
     member this.Handle(cmd: BuyOrSellCommand) =

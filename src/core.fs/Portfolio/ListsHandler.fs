@@ -232,5 +232,5 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
             | null -> return "List not found" |> ResponseUtils.failed
             | _ ->
                 do! portfolio.DeleteStockList list command.UserId
-                return ServiceResponse()
+                return Ok
     }
