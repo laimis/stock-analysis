@@ -27,7 +27,7 @@ namespace coretests.Stocks.Services.Trading
                 x => 
                     x.GetPriceHistory(
                         It.IsAny<UserState>(),
-                        It.IsAny<string>(),
+                        It.IsAny<Ticker>(),
                         It.IsAny<PriceFrequency>(),
                         It.IsAny<System.DateTimeOffset>(),
                         It.IsAny<System.DateTimeOffset>()
