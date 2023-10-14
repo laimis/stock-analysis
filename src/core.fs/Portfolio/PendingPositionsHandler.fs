@@ -5,7 +5,6 @@ open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
@@ -74,8 +73,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 return "Position already exists" |> ResponseUtils.failed
             | None ->
                 
-                let orderType = BrokerageOrderType(BrokerageOrderType.Limit)
-                let duration = BrokerageOrderDuration(BrokerageOrderDuration.GtcPlus)
+                let orderType = Limit
+                let duration = GtcPlus
                 
                 let! order = brokerage.BuyOrder user.State command.Ticker command.NumberOfShares command.Price orderType duration
                 
@@ -120,7 +119,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                     
                     let! _ =
                         account.Success.Orders
-                        |> Seq.filter (fun x -> x.Ticker = position.State.Ticker)
+                        |> Seq.filter (fun x -> x.Ticker.Value = position.State.Ticker)
                         |> Seq.map (fun x -> brokerage.CancelOrder user.State x.OrderId |> Async.AwaitTask)
                         |> Async.Sequential
                         |> Async.StartAsTask

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using core.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Brokerage;
+using core.Shared;
 using core.Shared.Adapters.Stocks;
 using core.Stocks;
 using core.Stocks.Services.Analysis;
 using coretests.testdata;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace coretests.Stocks.Services
@@ -19,9 +21,9 @@ namespace coretests.Stocks.Services
             
             var bars = TestDataGenerator.PriceBars("SHEL");
 
-            var orders = new Order[] {
+            var orders = new[] {
                 new Order {
-                    Ticker = "SHEL",
+                    Ticker = new FSharpOption<Ticker>(new Ticker("SHEL")),
                     Price = 100m,
                     Type = "SELL"
                 }
@@ -33,9 +35,9 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithNoStrategy_SetsRightLabel()
         {
-            var (position, bars, orders) = CreateTestData();
+            var (position, bars, _) = CreateTestData();
 
-            var outcomes = PositionAnalysis.Generate(position, bars, orders);
+            var outcomes = PositionAnalysis.Generate(position, bars);
 
             Assert.Contains(outcomes, o => o.key == PortfolioAnalysisKeys.StrategyLabel && o.value == 0);
         }
@@ -43,11 +45,11 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Evaluate_WithNoStrategy_SelectsTicker()
         {
-            var (position, bars, orders) = CreateTestData();
+            var (position, bars, _) = CreateTestData();
 
             var outcomes = new List<TickerOutcomes> {
                 new TickerOutcomes(
-                    PositionAnalysis.Generate(position, bars, orders).ToList(),
+                    PositionAnalysis.Generate(position, bars).ToList(),
                     ticker: position.Ticker
                 )
             };

@@ -1,9 +1,9 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Stocks;
 
 namespace web.Utils;
@@ -51,12 +51,12 @@ public class BrokerageOrderTypeConverter : JsonConverter<BrokerageOrderType>
 {
     public override BrokerageOrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return new BrokerageOrderType(reader.GetString());
+        return BrokerageOrderType.FromString(reader.GetString());
     }
 
     public override void Write(Utf8JsonWriter writer, BrokerageOrderType value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.Value);
+        writer.WriteStringValue(BrokerageOrderType.ToString(value));
     }
 }
 
@@ -64,12 +64,12 @@ public class BrokerageOrderDurationConverter : JsonConverter<BrokerageOrderDurat
 {
     public override BrokerageOrderDuration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return new BrokerageOrderDuration(reader.GetString());
+        return BrokerageOrderDuration.FromString(reader.GetString());
     }
 
     public override void Write(Utf8JsonWriter writer, BrokerageOrderDuration value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.Value);
+        writer.WriteStringValue(BrokerageOrderDuration.ToString(value));
     }
 }
 

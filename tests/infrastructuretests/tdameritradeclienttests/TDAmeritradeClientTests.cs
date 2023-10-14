@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using Microsoft.FSharp.Core;
 using tdameritradeclient;
 using Xunit;

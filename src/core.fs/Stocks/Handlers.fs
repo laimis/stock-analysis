@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.Shared.Adapters.SEC
 open core.Shared.Adapters.Stocks
@@ -287,7 +286,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             let violations =
                 match brokerageAccount.IsOk with
                 | false -> Array.Empty<StockViolationView>()
-                | true -> Helpers.getViolations brokeragePositions positions prices |> Seq.toArray
+                | true -> core.fs.Helpers.getViolations brokeragePositions positions prices |> Seq.toArray
                 
             // TODO: how to eliminate this state manipulation
             positions |> Seq.iter( fun p ->

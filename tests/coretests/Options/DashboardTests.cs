@@ -7,7 +7,6 @@ using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
 using Microsoft.FSharp.Core;
 using Moq;

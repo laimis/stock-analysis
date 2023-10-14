@@ -92,7 +92,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                         |> Seq.filter (fun p ->
                             openOptions
                             |> Seq.exists (fun o ->
-                                o.Ticker.Value = p.Ticker
+                                o.Ticker.Value = p.Ticker.Value.Value
                                 && o.StrikePrice = p.StrikePrice
                                 && o.OptionType = p.OptionType)
                             |> not)

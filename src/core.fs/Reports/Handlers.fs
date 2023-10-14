@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.Stocks
 open core.Stocks
 open core.Stocks.Services.Analysis
@@ -445,7 +444,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         | true -> position.SetPrice priceResponse.Success[priceResponse.Success.Length - 1].Close
                         | false -> ()
                         
-                        let outcomes = PositionAnalysis.Generate(position, priceResponse.Success, orders)
+                        // TODO: bring back orders once we migrate position analysis to f#
+                        let outcomes = PositionAnalysis.Generate(position, priceResponse.Success) //, orders)
                         let tickerOutcome:TickerOutcomes = TickerOutcomes(outcomes, position.Ticker)
                         let tickerPatterns = TickerPatterns(PatternDetection.Generate(priceResponse.Success), position.Ticker)
                         

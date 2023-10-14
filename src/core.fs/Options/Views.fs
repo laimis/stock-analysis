@@ -2,8 +2,8 @@ namespace core.fs.Options
 
 open System
 open core.Options
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.Options
+open core.fs.Shared.Adapters.Brokerage
 
 
 type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail) =
@@ -91,7 +91,7 @@ type OwnedOptionStats(summaries:seq<OwnedOptionView>) =
     
     member this.EV =
         match (this.AvgWinAmount.HasValue, this.AverageLossAmount.HasValue) with
-        | (true, true) ->
+        | true, true ->
             let winPart = (this.AvgWinAmount.Value * decimal this.Wins / decimal this.Count)
             let lossPart = (this.AverageLossAmount.Value * decimal this.Losses / decimal this.Count)
             Nullable<decimal>(winPart - lossPart)
@@ -108,9 +108,9 @@ type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OwnedOptionVi
     member this.Open = ``open``
     member this.Orders = orders
     member this.BrokeragePositions = brokeragePositions
-    member this.OverallStats = new OwnedOptionStats(closed)
-    member this.BuyStats = new OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Bought"))
-    member this.SellStats = new OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Sold"))
+    member this.OverallStats = OwnedOptionStats(closed)
+    member this.BuyStats = OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Bought"))
+    member this.SellStats = OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Sold"))
 
 type OptionDetailsViewModel(price:Nullable<decimal>, chain:OptionChain) =
     

@@ -5,7 +5,6 @@ using System.Text.Json;
 using core.Account;
 using core.fs.Shared.Adapters.Brokerage;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Options;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
@@ -25,8 +24,8 @@ public class TDAmeritradeClient : IBrokerage
     // in memory dictionary of access tokens (they expire every 30 mins)
     private readonly ConcurrentDictionary<Guid, OAuthResponse> _accessTokens = new();
 
-    private const string _apiUrl = "https://api.tdameritrade.com/v1";
-    private const string _authUrl = "https://auth.tdameritrade.com";
+    private const string ApiUrl = "https://api.tdameritrade.com/v1";
+    private const string AuthUrl = "https://auth.tdameritrade.com";
 
     private readonly HttpClient _httpClient;
     private static readonly AsyncRetryPolicy _retryPolicy = Policy
@@ -94,7 +93,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var encodedClientId = Uri.EscapeDataString($"{_clientId}@AMER.OAUTHAP");
         var encodedCallbackUrl = Uri.EscapeDataString(_callbackUrl);
-        var url = $"{_authUrl}/auth?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}";
+        var url = $"{AuthUrl}/auth?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}";
         
         return Task.FromResult(url);
     }
@@ -206,7 +205,7 @@ public class TDAmeritradeClient : IBrokerage
             Cancelable = tuple.o.cancelable,
             Price = tuple.o.ResolvePrice(),
             Quantity = Convert.ToInt32(tuple.o.quantity),
-            Ticker = tuple.l.instrument?.resolvedSymbol,
+            Ticker = new FSharpOption<Ticker>(new Ticker(tuple.l.instrument?.resolvedSymbol)),
             Description = tuple.l.instrument?.description,
             Type = tuple.l.instruction,
             AssetType = tuple.l.instrument?.assetType
@@ -215,25 +214,24 @@ public class TDAmeritradeClient : IBrokerage
 
         var stockPositions = tdPositions
             .Where(p => p.instrument?.assetType == "EQUITY")
-            .Select(p => new StockPosition
-            {
-                Ticker = new Ticker(p.instrument?.resolvedSymbol),
-                Quantity = p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1,
-                AverageCost = p.averagePrice
-            }).ToArray();
+            .Select(p => new StockPosition(
+                new Ticker(p.instrument?.resolvedSymbol),
+                p.averagePrice,
+                p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1))
+            .ToArray();
 
         var optionPositions = tdPositions
             .Where(p => p.instrument?.assetType == "OPTION")
             .Select(p => {
-                var desription = p.instrument?.description;
+                var description = p.instrument?.description;
                 // description looks like this: AGI Jul 21 2023 13.0 Call
                 // AGI is ticker, Jul 21 2023 is expiration date, 13.0 is strike price
                 // and Call is CALL type, parse all of these values from the description
 
-                var parts = desription?.Split(" ");
+                var parts = description?.Split(" ");
                 if (parts == null || parts.Length != 6)
                 {
-                    throw new Exception("Could not parse option description: " + desription);
+                    throw new Exception("Could not parse option description: " + description);
                 }
 
                 var ticker = parts[0];
@@ -243,7 +241,7 @@ public class TDAmeritradeClient : IBrokerage
 
                 return new OptionPosition
                 {
-                    Ticker = ticker,
+                    Ticker = new FSharpOption<Ticker>(new Ticker(ticker)),
                     Quantity = p.longQuantity > 0 ? p.longQuantity : p.shortQuantity * -1,
                     AverageCost = p.averagePrice,
                     StrikePrice = strike,
@@ -371,7 +369,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers.Select(t => t.Value))}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
     }
 
     public async Task<ServiceResponse<core.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
@@ -385,8 +383,8 @@ public class TDAmeritradeClient : IBrokerage
 
         if (FSharpOption<DateTimeOffset>.None.Equals(expirationDate) == false)
         {
-            function += $"&fromDate={expirationDate.Value.ToString("yyyy-MM-dd")}";
-            function += $"&toDate={expirationDate.Value.ToString("yyyy-MM-dd")}";
+            function += $"&fromDate={expirationDate.Value:yyyy-MM-dd}";
+            function += $"&toDate={expirationDate.Value:yyyy-MM-dd}";
         }
 
         if (FSharpOption<decimal>.None.Equals(strikePrice) == false)
@@ -497,7 +495,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (prices.candles == null)
         {
-            throw new Exception($"Null candles for historcal prices for {ticker} {start} {end}");
+            throw new Exception($"Null candles for historical prices for {ticker} {start} {end}");
         }
 
         var payload = prices.candles.Select(c => new PriceBar(
@@ -511,7 +509,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (payload.Length == 0)
         {
-            _logger?.LogError("No candles for historcal prices for {function}", function);
+            _logger?.LogError("No candles for historical prices for {function}", function);
         }
 
         return new ServiceResponse<PriceBar[]>(payload);
@@ -543,45 +541,58 @@ public class TDAmeritradeClient : IBrokerage
         };
     }
 
-    private static string GetBuyOrderType(BrokerageOrderType type) =>
-        type.Value switch {
-            BrokerageOrderType.Limit => "LIMIT",
-            BrokerageOrderType.Market => "MARKET",
-            BrokerageOrderType.StopMarket => "STOP",
-            _ => throw new ArgumentException("Unknown order type: " + type)
-        };
+    private static string GetBuyOrderType(BrokerageOrderType type)
+    {
+        if (type.IsLimit)
+        {
+            return "LIMIT";
+        }
+
+        if (type.IsMarket)
+        {
+            return "MARKET";
+        }
+
+        if (type.IsStopMarket)
+        {
+            return "STOP";
+        }
+
+        throw new ArgumentException("Unknown order type: " + type);
+    }
+        
 
     private static decimal? GetPrice(BrokerageOrderType type, decimal? price) =>
-        type.Value switch {
-            BrokerageOrderType.Limit => price,
-            BrokerageOrderType.Market => null,
-            BrokerageOrderType.StopMarket => null,
+        (type.IsLimit,type.IsMarket,type.IsStopMarket) switch {
+            (true, false, false) => price,
+            (false, true, false) => null,
+            (false, false, true) => null,
             _ => throw new ArgumentException("Unknown order type: " + type)
         };
 
     private static decimal? GetActivationPrice(BrokerageOrderType type, decimal? price) =>
-        type.Value switch {
-            BrokerageOrderType.Limit => null,
-            BrokerageOrderType.Market => null,
-            BrokerageOrderType.StopMarket => price,
+        (type.IsLimit,type.IsMarket,type.IsStopMarket) switch {
+            (true, false, false) => null,
+            (false, true, false) => null,
+            (false, false, true) => price,
             _ => throw new ArgumentException("Unknown order type: " + type)
         };
 
     private static string GetBuyOrderDuration(BrokerageOrderDuration duration) =>
-        duration.Value switch {
-            BrokerageOrderDuration.Day => "DAY",
-            BrokerageOrderDuration.Gtc => "GOOD_TILL_CANCEL",
-            BrokerageOrderDuration.DayPlus => "DAY",
-            BrokerageOrderDuration.GtcPlus => "GOOD_TILL_CANCEL",
+        (duration.IsDay, duration.IsGtc, duration.IsDayPlus, duration.IsGtcPlus) switch {
+            (true, false, false, false) => "DAY",
+            (false, true, false, false) => "GOOD_TILL_CANCEL",
+            (false, false, true, false) => "DAY",
+            (false, false, false, true) => "GOOD_TILL_CANCEL",
             _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
     private static string GetSession(BrokerageOrderDuration duration) =>
-        duration.Value switch {
-            BrokerageOrderDuration.Day => "NORMAL",
-            BrokerageOrderDuration.Gtc => "NORMAL",
-            BrokerageOrderDuration.DayPlus => "SEAMLESS",
-            BrokerageOrderDuration.GtcPlus => "SEAMLESS",
+        (duration.IsDay, duration.IsGtc, duration.IsDayPlus, duration.IsGtcPlus) switch {
+            (true, false, false, false) => "NORMAL",
+            (false, true, false, false) => "NORMAL",
+            (false, false, true, false) => "SEAMLESS",
+            (false,  false, false, true) => "SEAMLESS",
             _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
@@ -692,5 +703,5 @@ public class TDAmeritradeClient : IBrokerage
         return deserialized;
     }
 
-    private static string GenerateApiUrl(string function) => $"{_apiUrl}/{function}";
+    private static string GenerateApiUrl(string function) => $"{ApiUrl}/{function}";
 }

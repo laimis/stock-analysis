@@ -4,10 +4,10 @@ open System
 open System.Collections.Generic
 open Microsoft.FSharp.Collections
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Stocks
 open core.Stocks.Services.Trading
 open core.fs.Shared
+open core.fs.Shared.Adapters.Brokerage
 
 // TODO: this view class is very busy, doing all kinds of stuff. Maybe a service
 // should do this and this type would just contain data...
@@ -284,7 +284,7 @@ type TradingEntriesView =
     {
         current: PositionInstance array
         violations: StockViolationView array
-        cashBalance: Nullable<decimal>
+        cashBalance: decimal option
         brokerageOrders: Order array
     }
     

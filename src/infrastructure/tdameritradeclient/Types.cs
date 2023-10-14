@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using core.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Brokerage;
 
 namespace tdameritradeclient;
 

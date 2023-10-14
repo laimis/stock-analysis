@@ -7,7 +7,6 @@ open Microsoft.FSharp.Core
 open core.Cryptos
 open core.Options
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.Stocks
 open core.Stocks.Services.Trading
@@ -513,7 +512,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let current = positions |> Array.sortByDescending (fun p -> p.RR)
             
-            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
+            let violations = core.fs.Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
             
             let (tradingEntries:TradingEntriesView) =
                 {
