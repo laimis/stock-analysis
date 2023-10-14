@@ -1,6 +1,6 @@
 using System;
 using core.fs.Alerts;
-using core.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Brokerage;
 using Xunit;
 
 namespace coretests.Alerts

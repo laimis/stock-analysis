@@ -44,11 +44,11 @@ namespace storage.shared
             return _blobStorage.Save(typeof(T).Name + "#" + version + "#" + userId, t);
         }
 
-        public async Task<OwnedStock> GetStock(string ticker, UserId userId)
+        public async Task<OwnedStock> GetStock(Ticker ticker, UserId userId)
         {
             var stocks = await GetStocks(userId);
             
-            return stocks.SingleOrDefault(s => s.State.Ticker == ticker);
+            return stocks.SingleOrDefault(s => s.State.Ticker == ticker.Value);
         }
 
         public async Task<OwnedStock> GetStockByStockId(Guid stockId, UserId userId)

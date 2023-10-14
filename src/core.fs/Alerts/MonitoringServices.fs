@@ -3,9 +3,9 @@ module core.fs.Alerts.MonitoringServices
     open System
     open System.Threading
     open core.Account
-    open core.Shared.Adapters.Brokerage
     open core.Stocks
     open core.fs.Shared
+    open core.fs.Shared.Adapters.Brokerage
     open core.fs.Shared.Adapters.Logging
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Domain.Accounts
@@ -72,7 +72,7 @@ module core.fs.Alerts.MonitoringServices
         let logError = logger.LogError
         
         let runStopLossCheck (user:UserState) (_:CancellationToken) (position:PositionInstance) = async {
-            let! priceResponse = brokerage.GetQuote(user, position.Ticker) |> Async.AwaitTask
+            let! priceResponse = brokerage.GetQuote user position.Ticker |> Async.AwaitTask
             
             match priceResponse.IsOk with
             | false ->

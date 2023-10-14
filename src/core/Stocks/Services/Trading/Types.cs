@@ -29,9 +29,9 @@ namespace core.Stocks.Services.Trading
     {
         public List<TradingStrategyResult> Results { get; } = new List<TradingStrategyResult>();
 
-        internal void Add(TradingStrategyResult result) => Results.Add(result);
+        public void Add(TradingStrategyResult result) => Results.Add(result);
 
-        internal void Insert(int index, TradingStrategyResult result) =>
+        public void Insert(int index, TradingStrategyResult result) =>
             Results.Insert(index, result);
 
         public string FailedReason { get; private set; }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
 using Microsoft.FSharp.Core;
 using Moq;
@@ -39,7 +39,7 @@ namespace coretests.Options
                 );
 
             var brokerage = new Mock<IBrokerage>();
-            brokerage.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<string>>()))
+            brokerage.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<Ticker>>()))
                 .Returns(Task.FromResult(
                     new ServiceResponse<Dictionary<string, StockQuote>>(
                         new Dictionary<string, StockQuote>()

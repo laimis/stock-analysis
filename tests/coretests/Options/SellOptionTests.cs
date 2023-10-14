@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Options;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
 using Moq;
 using Xunit;

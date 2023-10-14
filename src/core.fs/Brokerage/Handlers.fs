@@ -1,10 +1,9 @@
 module core.fs.Brokerage
 
-    open System
     open System.ComponentModel.DataAnnotations
     open core.Shared
-    open core.Shared.Adapters.Brokerage
     open core.fs.Shared
+    open core.fs.Shared.Adapters.Brokerage
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Domain.Accounts
 
@@ -40,9 +39,9 @@ module core.fs.Brokerage
     type Handler(accounts:IAccountStorage, brokerage:IBrokerage) =
         
         let buy (data:BuyOrSellData) user = 
-            brokerage.BuyOrder(user, data.Ticker, data.NumberOfShares, data.Price, data.Type, data.Duration)
+            brokerage.BuyOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
         let sell (data:BuyOrSellData) user = 
-            brokerage.SellOrder(user, data.Ticker, data.NumberOfShares, data.Price, data.Type, data.Duration)
+            brokerage.SellOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
         
         interface IApplicationService
         
@@ -69,7 +68,7 @@ module core.fs.Brokerage
             match user with
             | None -> return ResponseUtils.failed "User not found"
             | Some user ->
-                let! _ = brokerage.CancelOrder(user.State, command.OrderId)
+                let! _ = brokerage.CancelOrder user.State command.OrderId
                 return Ok
         }
         

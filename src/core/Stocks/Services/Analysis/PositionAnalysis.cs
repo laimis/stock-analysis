@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using core.Shared;
 
 namespace core.Stocks.Services.Analysis
 {
@@ -9,8 +10,7 @@ namespace core.Stocks.Services.Analysis
     {
         public static IEnumerable<AnalysisOutcome> Generate(
             PositionInstance position,
-            Shared.Adapters.Stocks.PriceBar[] bars,
-            core.Shared.Adapters.Brokerage.Order[] orders)
+            Shared.Adapters.Stocks.PriceBar[] bars)
         {
             // add price as outcome
             yield return new AnalysisOutcome(
@@ -205,14 +205,15 @@ namespace core.Stocks.Services.Analysis
             );
 
             // has sell order
-            var hasSellOrderInOrders = orders.Any(o => o.IsSellOrder && o.Ticker == position.Ticker);
-            yield return new AnalysisOutcome(
-                PortfolioAnalysisKeys.HasSellOrder,
-                OutcomeType.Neutral,
-                hasSellOrderInOrders ? 1 : 0,
-                Shared.ValueFormat.Boolean,
-                $"Has sell order"
-            );
+            // TODO: bring this back once we can pass in orders again
+            // var hasSellOrderInOrders = orders.Any(o => o.IsSellOrder && o.Ticker == position.Ticker);
+            // yield return new AnalysisOutcome(
+            //     PortfolioAnalysisKeys.HasSellOrder,
+            //     OutcomeType.Neutral,
+            //     hasSellOrderInOrders ? 1 : 0,
+            //     Shared.ValueFormat.Boolean,
+            //     $"Has sell order"
+            // );
         }
 
     }

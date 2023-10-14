@@ -123,10 +123,10 @@ namespace core.Portfolio
         }
 
         private void ApplyInternal(StockListTickerAdded added) =>
-            Tickers.Add(new StockListTicker(added.Note, added.Ticker, added.When));
+            Tickers.Add(new StockListTicker(added.Note, new Ticker(added.Ticker), added.When));
 
         private void ApplyInternal(StockListTickerRemoved removed) =>
-            Tickers.RemoveAll(x => x.Ticker == removed.Ticker);
+            Tickers.RemoveAll(x => x.Ticker.Value == removed.Ticker);
 
         private void ApplyInternal(StockListTagAdded added) =>
             Tags.Add(added.Tag);
@@ -135,5 +135,5 @@ namespace core.Portfolio
             Tags.Remove(removed.Tag);
     }
 
-    public record StockListTicker(string Note, string Ticker, DateTimeOffset When);
+    public record StockListTicker(string Note, Ticker Ticker, DateTimeOffset When);
 }

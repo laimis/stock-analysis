@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
-using core.Shared.Adapters.Brokerage;
+using core.Shared;
 using core.Shared.Adapters.Emails;
 using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Logging;
@@ -28,7 +29,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     private readonly IEmailService _emails;
     private readonly IMarketHours _marketHours;
 
-    private readonly Dictionary<UserState, HashSet<string>> _tickersToCheck = new();
+    private readonly Dictionary<UserState, HashSet<Ticker>> _tickersToCheck = new();
     private readonly Dictionary<UserState, List<(string Ticker, Pattern Pattern)>> _patternsDiscovered = new();
 
     private Func<CancellationToken, Task> _toRun;
@@ -115,13 +116,13 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 
                 var userId = UserId.NewUserId(user.Id);
                 var stocks = await _portfolioStorage.GetStocks(userId);
-                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker.Value);
+                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(userId))
                     .Where(l => l.State.ContainsTag(core.fs.Alerts.Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)
                     .Select(t => t.Ticker);
 
-                var set = new HashSet<string>(tickersFromLists.Union(tickersFromPositions));
+                var set = new HashSet<Ticker>(tickersFromLists.Union(tickersFromPositions));
 
                 _tickersToCheck[user.State] = set;
             }
@@ -145,7 +146,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             foreach(var ticker in tickersToCheck)
             {
-                var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly);
+                var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
                 if (!priceBars.IsOk)
                 {
                     _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error);

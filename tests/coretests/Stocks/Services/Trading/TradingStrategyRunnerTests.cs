@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs.Services.Trading;
+using core.fs.Shared.Adapters.Brokerage;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.Stocks;
 using core.Stocks;
 using core.Stocks.Services.Trading;
@@ -26,7 +27,7 @@ namespace coretests.Stocks.Services.Trading
                 x => 
                     x.GetPriceHistory(
                         It.IsAny<UserState>(),
-                        It.IsAny<string>(),
+                        It.IsAny<Ticker>(),
                         It.IsAny<PriceFrequency>(),
                         It.IsAny<System.DateTimeOffset>(),
                         It.IsAny<System.DateTimeOffset>()
@@ -59,11 +60,12 @@ namespace coretests.Stocks.Services.Trading
 
             var results = await runner.Run(
                 new UserState(),
-                numberOfShares: 100,
-                price: 10,
-                stopPrice: 5,
-                ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow);
+                100,
+                10,
+                5,
+                new Ticker("tsla"),
+                DateTimeOffset.UtcNow,
+                false);
 
             var oneThirdResult = results.Results[0];
 
@@ -133,7 +135,8 @@ namespace coretests.Stocks.Services.Trading
                 price: 50,
                 stopPrice: 0.01m,
                 ticker: "tsla",
-                when: System.DateTimeOffset.UtcNow);
+                DateTimeOffset.UtcNow,
+                false);
 
             foreach(var r in result.Results.Take(1))
             {

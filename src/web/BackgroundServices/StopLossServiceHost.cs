@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Alerts;
-using core.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Brokerage;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;

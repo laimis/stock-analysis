@@ -5,9 +5,9 @@ open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
-open core.Shared.Adapters.Brokerage
 open core.Shared.Adapters.CSV
 open core.fs.Shared
+open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -60,7 +60,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None ->
+            return "User not found" |> ResponseUtils.failed
         | Some user ->
             
             let! existing = portfolio.GetPendingStockPositions(command.UserId)
@@ -68,17 +69,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             let found = existing |> Seq.tryFind (fun x -> x.State.Ticker = command.Ticker && x.State.IsClosed = false)
             
             match found with
-            | Some _ -> return "Position already exists" |> ResponseUtils.failed
+            | Some _ ->
+                return "Position already exists" |> ResponseUtils.failed
             | None ->
                 
-                let! order = brokerage.BuyOrder(
-                    user= user.State,
-                    ticker= command.Ticker,
-                    numberOfShares= command.NumberOfShares,
-                    price= command.Price,
-                    ``type``= BrokerageOrderType(BrokerageOrderType.Limit),
-                    duration = BrokerageOrderDuration(BrokerageOrderDuration.GtcPlus)
-                )
+                let orderType = Limit
+                let duration = GtcPlus
+                
+                let! order = brokerage.BuyOrder user.State command.Ticker command.NumberOfShares command.Price orderType duration
                 
                 match order.IsOk with
                 | false -> return order.Error.Message |> ResponseUtils.failed
@@ -95,7 +93,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                     )
                     
                     do! portfolio.SavePendingPosition position command.UserId
-                
                     return Ok
     }
     
@@ -122,8 +119,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                     
                     let! _ =
                         account.Success.Orders
-                        |> Seq.filter (fun x -> x.Ticker = position.State.Ticker)
-                        |> Seq.map (fun x -> brokerage.CancelOrder(user.State, x.OrderId) |> Async.AwaitTask)
+                        |> Seq.filter (fun x -> x.Ticker.Value = position.State.Ticker)
+                        |> Seq.map (fun x -> brokerage.CancelOrder user.State x.OrderId |> Async.AwaitTask)
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
@@ -167,8 +164,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 |> Seq.filter (fun x -> x.IsClosed |> not)
                 |> Seq.sortByDescending(fun x -> x.Date)
             
-            let tickers = data |> Seq.map(fun x -> x.Ticker.Value)
-            let! priceResponse = brokerage.GetQuotes(user.State, tickers)
+            let tickers = data |> Seq.map(fun x -> x.Ticker)
+            let! priceResponse = brokerage.GetQuotes user.State tickers
             let prices =
                 match priceResponse.IsOk with
                 | false -> Dictionary<string, StockQuote>()

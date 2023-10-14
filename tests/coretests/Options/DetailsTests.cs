@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Brokerage;
 using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Options;
 using Microsoft.FSharp.Core;
@@ -39,7 +39,7 @@ namespace coretests.Options
                 ));
 
             var brokerage = new Mock<IBrokerage>();
-            brokerage.Setup(x => x.GetOptions(It.IsAny<UserState>(), It.IsAny<string>(), null, null, null))
+            brokerage.Setup(x => x.GetOptions(It.IsAny<UserState>(), It.IsAny<Ticker>(), null, null, null))
                 .Returns(Task.FromResult(
                     new ServiceResponse<OptionChain>(new OptionChain("TICKER", 0, 0, Array.Empty<OptionDetail>()))
                 ));
