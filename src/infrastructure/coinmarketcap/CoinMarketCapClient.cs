@@ -2,9 +2,10 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using core.fs.Shared.Adapters.Cryptos;
 using core.Shared;
-using core.Shared.Adapters.Cryptos;
 using Microsoft.Extensions.Logging;
+using Microsoft.FSharp.Core;
 
 namespace coinmarketcap
 {
@@ -19,7 +20,7 @@ namespace coinmarketcap
             _logger = logger;
         }
 
-        public async Task<Listings> Get()
+        public async Task<Listings> GetAll()
         {
             var url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
 
@@ -38,31 +39,25 @@ namespace coinmarketcap
             return value;
         }
 
-        public async Task<Price?> Get(string token)
+        public async Task<FSharpOption<Price>> Get(string token)
         {
-            var prices = await Get();
+            var prices = await GetAll();
 
-            if (prices.TryGet(token, out var price))
-            {
-                return price;
-            }
-
-            _logger?.LogError("Did not find price for " + token);
-
-            return null;
+            return prices.TryGet(token);
         }
 
         public async Task<Dictionary<string, Price>> Get(IEnumerable<string> tokens)
         {
-            var prices = await Get();
+            var prices = await GetAll();
 
             var result = new Dictionary<string, Price>();
 
             foreach (var token in tokens)
             {
-                if (prices.TryGet(token, out var price))
+                var price = prices.TryGet(token);
+                if (price != null)
                 {
-                    result.Add(token, price!.Value);
+                    result.Add(token, price.Value);
                 }
                 else
                 {

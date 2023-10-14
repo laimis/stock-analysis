@@ -7,12 +7,12 @@ open Microsoft.FSharp.Core
 open core.Cryptos
 open core.Options
 open core.Shared
-open core.Shared.Adapters.CSV
 open core.Stocks
 open core.Stocks.Services.Trading
 open core.fs.Services.Trading
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -465,8 +465,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         let! results = this.Handle(simulateCommand)
         match results.IsOk with
         | true ->
-            let content = CSVExport.Generate(csvWriter, results.Success);
-            let filename = CSVExport.GenerateFilename($"simulated-trades-{command.NumberOfTrades}");
+            let content = CSVExport.strategyPerformance csvWriter results.Success
+            let filename = CSVExport.generateFilename $"simulated-trades-{command.NumberOfTrades}"
             let response = ExportResponse(filename, content);
             return ServiceResponse<ExportResponse>(response);
             

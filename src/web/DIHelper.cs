@@ -2,11 +2,11 @@ using System;
 using core.fs.Alerts;
 using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Cryptos;
+using core.fs.Shared.Adapters.CSV;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Adapters.Subscriptions;
 using core.Shared.Adapters;
-using core.Shared.Adapters.Cryptos;
-using core.Shared.Adapters.CSV;
 using core.Shared.Adapters.Emails;
 using core.Shared.Adapters.SEC;
 using core.Shared.Adapters.SMS;
@@ -22,7 +22,7 @@ using web.Utils;
 
 namespace web
 {
-    public class DIHelper
+    public static class DIHelper
     {
         internal static void RegisterServices(
             IConfiguration configuration,

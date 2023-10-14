@@ -1,6 +1,4 @@
-using core;
-using core.Shared;
-using core.Shared.Adapters.CSV;
+using core.fs.Shared.Adapters.CSV;
 using Xunit;
 
 namespace coretests

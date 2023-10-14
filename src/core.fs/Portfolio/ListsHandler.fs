@@ -3,8 +3,8 @@ namespace core.fs.Portfolio.Lists
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
-open core.Shared.Adapters.CSV
 open core.fs.Shared
+open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -125,8 +125,8 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<ExportResponse>
             | _ ->
-                let filename = CSVExport.GenerateFilename($"Stocks_{command.Name}");
-                let response = ExportResponse(filename, CSVExport.Generate(csvWriter, list.State, command.JustTickers))
+                let filename = CSVExport.generateFilename($"Stocks_{command.Name}");
+                let response = ExportResponse(filename, CSVExport.stockList csvWriter list.State command.JustTickers)
                 return response |> ResponseUtils.success
     }
     

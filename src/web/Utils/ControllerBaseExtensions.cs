@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using core.fs.Shared;
+using core.fs.Shared.Adapters.CSV;
 using core.Shared;
-using core.Shared.Adapters.CSV;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Utils

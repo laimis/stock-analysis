@@ -4,10 +4,10 @@ namespace core.fs.Cryptos
     open System.ComponentModel.DataAnnotations
     open core.Cryptos
     open core.Shared
-    open core.Shared.Adapters.CSV
-    open core.Shared.Adapters.Cryptos
     open core.fs.Cryptos.Import
     open core.fs.Shared
+    open core.fs.Shared.Adapters.CSV
+    open core.fs.Shared.Adapters.Cryptos
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Domain.Accounts
     
@@ -195,11 +195,11 @@ namespace core.fs.Cryptos
         
         member _.Handle(query:Details) = task {
             
-            let! prices = crypto.Get()
+            let! prices = crypto.GetAll()
             return
                 match prices.TryGet(query.Token) with
-                | true, price -> CryptoDetailsView(query.Token, price) |> ResponseUtils.success<CryptoDetailsView>
-                | false, _ -> $"Price not found for {query.Token.ToString()}" |> ResponseUtils.failedTyped<CryptoDetailsView>
+                | Some price -> CryptoDetailsView(query.Token, price) |> ResponseUtils.success<CryptoDetailsView>
+                | None -> $"Price not found for {query.Token.ToString()}" |> ResponseUtils.failedTyped<CryptoDetailsView>
         }
         
         member _.Handle(query:Export) = task {
@@ -210,8 +210,8 @@ namespace core.fs.Cryptos
             | _ ->
                 let! cryptos = portfolio.GetCryptos(query.UserId)
                 
-                let filename = CSVExport.GenerateFilename("cryptos")
-                let csv = CSVExport.Generate(csvWriter, cryptos)
+                let filename = CSVExport.generateFilename "cryptos"
+                let csv = CSVExport.cryptos csvWriter cryptos
                 
                 return ExportResponse(filename, csv) |> ResponseUtils.success<ExportResponse>
         }

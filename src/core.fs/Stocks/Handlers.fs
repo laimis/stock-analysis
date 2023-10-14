@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Shared.Adapters.CSV
 open core.Shared.Adapters.SEC
 open core.Shared.Adapters.Stocks
 open core.Stocks
@@ -12,6 +11,7 @@ open core.Stocks.Services
 open core.Stocks.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -375,9 +375,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 trades
                 |> Seq.sortBy (fun x -> if x.Closed.HasValue then x.Closed.Value else x.Opened)
                 
-            let filename = CSVExport.GenerateFilename("positions")
+            let filename = CSVExport.generateFilename("positions")
             
-            let response = ExportResponse(filename, CSVExport.Generate(csvWriter, sorted))
+            let response = ExportResponse(filename, CSVExport.trades csvWriter sorted)
             
             return ServiceResponse<ExportResponse>(response)
     }
@@ -386,9 +386,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         
         let! stocks = portfolio.GetStocks(query.UserId)
         
-        let filename = CSVExport.GenerateFilename("stocks")
+        let filename = CSVExport.generateFilename("stocks")
         
-        let response = ExportResponse(filename, CSVExport.Generate(csvWriter, stocks))
+        let response = ExportResponse(filename, CSVExport.stocks csvWriter stocks)
         
         return ServiceResponse<ExportResponse>(response)
     }

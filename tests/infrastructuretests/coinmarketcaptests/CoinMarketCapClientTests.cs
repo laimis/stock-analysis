@@ -1,6 +1,4 @@
-using System;
 using System.Threading.Tasks;
-using core.Shared.Adapters.Cryptos;
 using testutils;
 using Xunit;
 
@@ -18,13 +16,13 @@ namespace coinmarketcaptests
                 null,
                 creds);
 
-            core.Shared.Adapters.Cryptos.Listings listings = await client.Get();
+            var listings = await client.GetAll();
 
             Assert.NotNull(listings);
 
-            listings.TryGet("BTC", out var btc);
+            var price = listings.TryGet("BTC");
 
-            Assert.True(btc.Value.Amount > 0);
+            Assert.True(price.Value.Amount > 0);
         }
     }
 }

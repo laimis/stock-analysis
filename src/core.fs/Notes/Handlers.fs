@@ -4,8 +4,8 @@ namespace core.fs.Notes
     open System.ComponentModel.DataAnnotations
     open core.Notes
     open core.Shared
-    open core.Shared.Adapters.CSV
     open core.fs.Shared
+    open core.fs.Shared.Adapters.CSV
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Domain.Accounts
 
@@ -138,9 +138,9 @@ namespace core.fs.Notes
             | _ -> 
                 let! notes = portfolio.GetNotes(userId=command.UserId)
                 
-                let filename = CSVExport.GenerateFilename("notes")
+                let filename = CSVExport.generateFilename "notes"
                 
-                let response = ExportResponse(filename, CSVExport.Generate(csvWriter, notes))
+                let response = ExportResponse(filename, CSVExport.notes csvWriter notes)
                 
                 return response |> ResponseUtils.success<ExportResponse>
         }
