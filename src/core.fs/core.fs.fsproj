@@ -13,6 +13,7 @@
         <Compile Include="Shared\Adapters\IPortfolioStorage.fs" />
         <Compile Include="Shared\Adapters\Subscriptions.fs" />
         <Compile Include="Shared\Adapters\Logging.fs" />
+        <Compile Include="Shared\Adapters\Options.fs" />
         <Compile Include="Shared\Adapters\Brokerage.fs" />
         <Compile Include="Shared\Adapters\Cryptos.fs" />
         <Compile Include="Shared\Adapters\CSV.fs" />
@@ -20,7 +21,6 @@
         <Compile Include="Shared\Adapters\SEC.fs" />
         <Compile Include="Shared\Adapters\SMS.fs" />
         <Compile Include="Shared\Adapters\Authentication.fs" />
-        <Compile Include="Shared\Adapters\Options.fs" />
         <Compile Include="Helpers.fs" />
         <Compile Include="Services\Trading.fs" />
         <Compile Include="Options\Input.fs"/>

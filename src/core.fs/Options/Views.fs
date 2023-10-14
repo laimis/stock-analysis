@@ -2,11 +2,11 @@ namespace core.fs.Options
 
 open System
 open core.Options
-open core.Shared.Adapters.Options
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Adapters.Options
 
 
-type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail) =
+type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail option) =
     
     let getItmOtmLabel (currentPrice:decimal) (optionType:string) (strikePrice:decimal) =
         match optionType with
@@ -45,9 +45,9 @@ type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail) =
     member this.Detail = optionDetail
     member this.PremiumReceived = state.Transactions |> Seq.filter (fun t -> not t.IsPL && t.Amount >= 0m) |> Seq.sumBy (fun t -> t.Amount)
     member this.PremiumPaid = state.Transactions |> Seq.filter (fun t -> not t.IsPL && t.Amount < 0m) |> Seq.sumBy (fun t -> abs t.Amount)
-    member this.CurrentPrice = if optionDetail = null |> not && optionDetail.UnderlyingPrice.HasValue then optionDetail.UnderlyingPrice.Value else 0m
-    member this.ItmOtmLabel = if optionDetail = null |> not && optionDetail.UnderlyingPrice.HasValue then getItmOtmLabel this.CurrentPrice this.OptionType this.StrikePrice else ""
-    member this.IsFavorable = if optionDetail = null |> not && optionDetail.UnderlyingPrice.HasValue then isFavorable this.BoughtOrSold this.ItmOtmLabel else false
+    member this.CurrentPrice = if optionDetail.IsSome && optionDetail.Value.UnderlyingPrice.IsSome then optionDetail.Value.UnderlyingPrice.Value else 0m
+    member this.ItmOtmLabel = if optionDetail.IsSome && optionDetail.Value.UnderlyingPrice.IsSome then getItmOtmLabel this.CurrentPrice this.OptionType this.StrikePrice else ""
+    member this.IsFavorable = if optionDetail.IsSome && optionDetail.Value.UnderlyingPrice.IsSome then isFavorable this.BoughtOrSold this.ItmOtmLabel else false
     member this.StrikePriceDiff = if this.CurrentPrice > 0m then abs (this.StrikePrice - this.CurrentPrice) / this.CurrentPrice else 0m
     member this.PremiumCapture =
         if this.BoughtOrSold = "Bought" then

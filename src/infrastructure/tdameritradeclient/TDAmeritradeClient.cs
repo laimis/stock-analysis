@@ -5,7 +5,6 @@ using System.Text.Json;
 using core.Account;
 using core.fs.Shared.Adapters.Brokerage;
 using core.Shared;
-using core.Shared.Adapters.Options;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
@@ -372,7 +371,7 @@ public class TDAmeritradeClient : IBrokerage
         return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
     }
 
-    public async Task<ServiceResponse<core.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
+    public async Task<ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
     {
         var function = $"marketdata/chains?symbol={ticker.Value}";
 
@@ -396,12 +395,12 @@ public class TDAmeritradeClient : IBrokerage
 
         if (!chainResponse.IsOk)
         {
-            return new ServiceResponse<core.Shared.Adapters.Options.OptionChain>(chainResponse.Error!);
+            return new ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>(chainResponse.Error!);
         }
 
-        static IEnumerable<OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
+        static IEnumerable<core.fs.Shared.Adapters.Options.OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
             map.SelectMany(kp => kp.Value.Values).SelectMany(v => v)
-            .Select(d => new OptionDetail(symbol: d.symbol!, side: d.putCall?.ToLower()!, description: d.description!) {
+            .Select(d => new core.fs.Shared.Adapters.Options.OptionDetail(symbol: d.symbol!, side: d.putCall?.ToLower()!, description: d.description!) {
                 Ask = d.ask,
                 Bid = d.bid,
                 StrikePrice = d.strikePrice,
@@ -426,14 +425,14 @@ public class TDAmeritradeClient : IBrokerage
 
         var chain = chainResponse.Success!;
 
-        var response = new core.Shared.Adapters.Options.OptionChain(
+        var response = new core.fs.Shared.Adapters.Options.OptionChain(
             symbol: chain.symbol!,
             volatility: chain.volatility,
             numberOfContracts: chain.numberOfContracts,
             options: ToOptionDetails(chain.callExpDateMap!, chain.underlyingPrice).Union(ToOptionDetails(chain.putExpDateMap!, chain.underlyingPrice)).ToArray()
         );
 
-        return new ServiceResponse<core.Shared.Adapters.Options.OptionChain>(response);
+        return new ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>(response);
     }
 
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)

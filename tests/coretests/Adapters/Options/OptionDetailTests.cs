@@ -1,38 +1,29 @@
 using System;
-using core.Shared.Adapters.Options;
+using core.fs.Shared.Adapters.Options;
 using Xunit;
 
 namespace coretests.Adapters.Options
 {
     public class OptionDetailTests
     {
-        private OptionDetail _put;
-        private OptionDetail _call;
-
-        public OptionDetailTests()
+        private OptionDetail _put = new(symbol: "TICKER", side: "put", description: "desc")
         {
-            _put = new OptionDetail(symbol: "TICKER", side: "put", description: "desc")
-            {
-                Side = "put",
-                Bid = 1,
-                Ask = 2,
-                ParsedExpirationDate = DateTime.UtcNow.AddDays(20),
-                StrikePrice = 22,
-                OpenInterest = 1,
-                Volume = 2
-            };
-
-            _call = new OptionDetail(symbol: "TICKER", side: "call", description: "desc")
-            {
-                Side = "call",
-                Bid = 1,
-                Ask = 2,
-                ParsedExpirationDate = DateTime.UtcNow.AddDays(20),
-                StrikePrice = 22,
-                OpenInterest = 1,
-                Volume = 2
-            };
-        }
+            Bid = 1,
+            Ask = 2,
+            ParsedExpirationDate = DateTimeOffset.UtcNow.AddDays(20),
+            StrikePrice = 22,
+            OpenInterest = 1,
+            Volume = 2
+        };
+        private OptionDetail _call = new(symbol: "TICKER", side: "call", description: "desc")
+        {
+            Bid = 1,
+            Ask = 2,
+            ParsedExpirationDate = DateTimeOffset.UtcNow.AddDays(20),
+            StrikePrice = 22,
+            OpenInterest = 1,
+            Volume = 2
+        };
 
         [Fact]
         public void CallChecks()
