@@ -2,12 +2,11 @@ namespace core.fs
 
 open System
 open System.Text.RegularExpressions
-open core.Account
 open core.Shared
-open core.Shared.Adapters.CSV
 open core.Shared.Adapters.Emails
 open core.fs.Options
 open core.fs.Shared
+open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 open core.fs.Stocks

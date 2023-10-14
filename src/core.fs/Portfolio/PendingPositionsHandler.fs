@@ -5,9 +5,9 @@ open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
-open core.Shared.Adapters.CSV
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -142,9 +142,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             
             let data = positions |> Seq.sortByDescending(fun x -> x.State.Date);
                 
-            let filename = CSVExport.GenerateFilename("pendingpositions");
+            let filename = CSVExport.generateFilename("pendingpositions");
 
-            let response = ExportResponse(filename, CSVExport.Generate(csvWriter, data));
+            let response = ExportResponse(filename, CSVExport.pendingPositions csvWriter data);
             
             return ServiceResponse<ExportResponse>(response)
     }

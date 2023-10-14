@@ -3,9 +3,9 @@
 open System
 open core.Options
 open core.Shared
-open core.Shared.Adapters.CSV
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -113,10 +113,10 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
         task {
             let! options = request.UserId |> storage.GetOwnedOptions
 
-            let csv = CSVExport.Generate(csvWriter, options)
+            let csv = options |> CSVExport.options csvWriter
 
             return
-                ExportResponse(request.Filename |> CSVExport.GenerateFilename, csv)
+                ExportResponse(request.Filename |> CSVExport.generateFilename, csv)
                 |> ResponseUtils.success<ExportResponse>
         }
 

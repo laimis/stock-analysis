@@ -3,9 +3,9 @@ namespace core.fs.Admin
     open core.Notes
     open core.Options
     open core.Shared
-    open core.Shared.Adapters.CSV
     open core.Stocks
     open core.fs.Shared
+    open core.fs.Shared.Adapters.CSV
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Domain.Accounts
 
@@ -71,9 +71,7 @@ namespace core.fs.Admin
                     
                 let users = userTasks |> Seq.choose id
                     
-                let filename = CSVExport.GenerateFilename("users")
+                let filename = CSVExport.generateFilename "users"
                 
-                // TODO: bring it back in once it is fixed
-                // return ExportResponse(filename, CSVExport.Generate(csvWriter, users)) |> ResponseUtils.success<ExportResponse>
-            return ExportResponse(filename, "") |> ResponseUtils.success<ExportResponse>
+                return ExportResponse(filename, CSVExport.users csvWriter users) |> ResponseUtils.success<ExportResponse>
             }

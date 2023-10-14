@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using core.Shared.Adapters.CSV;
+using core.fs.Shared.Adapters.CSV;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -9,7 +9,7 @@ namespace csvparser
 {
     public class CsvWriterImpl : ICSVWriter
     {
-        CsvConfiguration _config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        private readonly CsvConfiguration _config = new(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
             Delimiter = ","
@@ -20,7 +20,7 @@ namespace csvparser
             using var writer = new StringWriter();
             using var csv = new CsvWriter(writer, _config);
 
-            csv.WriteRecords<T>(rows);
+            csv.WriteRecords(rows);
 
             return writer.ToString();
         }

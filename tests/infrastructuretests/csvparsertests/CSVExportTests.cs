@@ -1,9 +1,9 @@
 using System;
 using core.Cryptos;
+using core.fs.Shared.Adapters.CSV;
 using core.Notes;
 using core.Options;
 using core.Shared;
-using core.Shared.Adapters.CSV;
 using core.Stocks;
 using csvparser;
 using Xunit;
@@ -16,12 +16,12 @@ namespace csvparsertests
         [Fact]
         public void ExportStocksHeader()
         {
-            var stock = new OwnedStock("tsla", Guid.NewGuid());
+            var stock = new OwnedStock(new Ticker("tsla"), Guid.NewGuid());
             stock.Purchase(1, 100, DateTime.UtcNow, "some note");
             
-            var report = CSVExport.Generate(_csvWriter, new[] {stock});
+            var report = CSVExport.stocks(_csvWriter, new[] {stock});
 
-            Assert.Contains("ticker,type,amount,price,date,notes", report);
+            Assert.Contains("Ticker,Type,Amount,Price,Date,Notes", report);
             Assert.Contains("TSLA", report);
         }
 
@@ -33,9 +33,9 @@ namespace csvparsertests
             crypto.Purchase(quantity: 1.2m, dollarAmountSpent: 200, date: DateTimeOffset.UtcNow);
             crypto.Sell(quantity: 0.2m, dollarAmountReceived: 100, date: DateTimeOffset.UtcNow);
 
-            var report = CSVExport.Generate(_csvWriter, new[] {crypto});
+            var report = CSVExport.cryptos(_csvWriter, new[] {crypto});
 
-            Assert.Contains("symbol,type,amount,price,date", report);
+            Assert.Contains("Symbol,Type,Amount,Price,Date", report);
             Assert.Contains("BTC", report);
             Assert.Contains("buy", report);
             Assert.Contains("sell", report);
@@ -53,9 +53,9 @@ namespace csvparsertests
             
             option.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
 
-            var report = CSVExport.Generate(_csvWriter, new[] {option});
+            var report = CSVExport.options(_csvWriter, new[] {option});
 
-            Assert.Contains("ticker,type,strike,optiontype,expiration,amount,premium,filled", report);
+            Assert.Contains("Ticker,Type,Strike,OptionType,Expiration,Amount,Premium,Filled", report);
             
             Assert.Contains("TLSA", report);
             Assert.Contains("CALL", report);
@@ -67,9 +67,9 @@ namespace csvparsertests
         {
             var note = new Note(Guid.NewGuid(), "my note", "stockticker", DateTimeOffset.UtcNow);
 
-            var report = CSVExport.Generate(_csvWriter, new[] {note});
+            var report = CSVExport.notes(_csvWriter, new[] {note});
 
-            Assert.Contains("created,ticker,note", report);
+            Assert.Contains("Created,Ticker,Note", report);
             Assert.Contains(note.State.RelatedToTicker, report);
             Assert.Contains("my note", report);
         }
@@ -77,7 +77,7 @@ namespace csvparsertests
         [Fact]
         public void FilenameEndsWithCSV()
         {
-            var filename = CSVExport.GenerateFilename("option");
+            var filename = CSVExport.generateFilename("option");
 
             Assert.Contains("option", filename);
             Assert.EndsWith("csv", filename);
