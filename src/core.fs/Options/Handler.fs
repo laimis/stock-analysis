@@ -62,7 +62,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     |> Seq.filter (fun o -> o.State.Closed.HasValue)
                     |> Seq.map (fun o -> o.State)
                     |> Seq.sortByDescending (fun o -> o.FirstFill.Value)
-                    |> Seq.map (fun o -> OwnedOptionView(o, null))
+                    |> Seq.map (fun o -> OwnedOptionView(o, None))
 
                 let openOptionsTasks =
                     options
@@ -76,7 +76,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                             let detail =
                                 match chain.IsOk with
                                 | true -> chain.Success.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
-                                | false -> null
+                                | false -> None
 
                             return OwnedOptionView(o, detail)
                         })

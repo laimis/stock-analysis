@@ -3,11 +3,10 @@ namespace core.fs.Shared.Adapters.Brokerage
 open System
 open System.Collections.Generic
 open System.Threading.Tasks
-open System.Xml
 open core.Account
 open core.Shared
-open core.Shared.Adapters.Options
 open core.Shared.Adapters.Stocks
+open core.fs.Shared.Adapters.Options
 
 type OAuthResponse() =
     
