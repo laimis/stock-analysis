@@ -1,5 +1,5 @@
 using core.Account;
-using core.Shared.Adapters;
+using core.fs.Shared.Adapters.Authentication;
 
 namespace web.Utils;
 

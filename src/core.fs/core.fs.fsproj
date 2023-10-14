@@ -20,6 +20,7 @@
         <Compile Include="Shared\Adapters\SEC.fs" />
         <Compile Include="Shared\Adapters\SMS.fs" />
         <Compile Include="Shared\Adapters\Authentication.fs" />
+        <Compile Include="Shared\Adapters\Options.fs" />
         <Compile Include="Helpers.fs" />
         <Compile Include="Services\Trading.fs" />
         <Compile Include="Options\Input.fs"/>

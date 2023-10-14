@@ -376,18 +376,18 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/chains?symbol={ticker.Value}";
 
-        if (FSharpOption<string>.None.Equals(contractType) == false)
+        if (FSharpOption<string>.get_IsSome(contractType))
         {
-            function += $"&contractType={contractType}";
+            function += $"&contractType={contractType.Value}";
         }
 
-        if (FSharpOption<DateTimeOffset>.None.Equals(expirationDate) == false)
+        if (FSharpOption<DateTimeOffset>.get_IsSome(expirationDate))
         {
             function += $"&fromDate={expirationDate.Value:yyyy-MM-dd}";
             function += $"&toDate={expirationDate.Value:yyyy-MM-dd}";
         }
 
-        if (FSharpOption<decimal>.None.Equals(strikePrice) == false)
+        if (FSharpOption<decimal>.get_IsSome(strikePrice))
         {
             function += $"&strike={strikePrice.Value}";
         }
