@@ -2,10 +2,10 @@ using System;
 using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.fs.Admin;
+using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared.Adapters;
-using core.Shared.Adapters.Emails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
@@ -56,7 +56,7 @@ namespace web.Controllers
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)
         {
-            await _email.Send(obj);
+            await _email.SendWithInput(obj);
 
             return Ok();
         }
@@ -69,7 +69,7 @@ namespace web.Controllers
             if (user.Value == null)
                 return NotFound();
 
-            await _email.Send(
+            await _email.SendWithTemplate(
                 new Recipient(email: user.Value.State.Email, name: user.Value.State.Name),
                 Sender.Support,
                 EmailTemplate.NewUserWelcome,

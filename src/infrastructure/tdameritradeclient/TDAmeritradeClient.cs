@@ -369,7 +369,7 @@ public class TDAmeritradeClient : IBrokerage
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers.Select(t => t.Value))}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get, debug: true);
+        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
     }
 
     public async Task<ServiceResponse<core.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)

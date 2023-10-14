@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Shared.Adapters.SEC
 open core.Shared.Adapters.Stocks
 open core.Stocks
 open core.Stocks.Services
@@ -12,6 +11,7 @@ open core.Stocks.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.CSV
+open core.fs.Shared.Adapters.SEC
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -521,7 +521,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! response = secFilings.GetFilings(query.Ticker)
         match response.IsOk with
         | false -> return response.Error.Message |> ResponseUtils.failedTyped<CompanyFiling seq>
-        | true -> return ServiceResponse<CompanyFiling seq>(response.Success.filings)
+        | true -> return ServiceResponse<CompanyFiling seq>(response.Success.Filings)
     }
     
     member _.Handle (cmd:SetStop) = task {

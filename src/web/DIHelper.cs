@@ -1,15 +1,15 @@
 using System;
 using core.fs.Alerts;
 using core.fs.Shared;
+using core.fs.Shared.Adapters.Authentication;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Cryptos;
 using core.fs.Shared.Adapters.CSV;
+using core.fs.Shared.Adapters.Email;
+using core.fs.Shared.Adapters.SEC;
+using core.fs.Shared.Adapters.SMS;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Adapters.Subscriptions;
-using core.Shared.Adapters;
-using core.Shared.Adapters.Emails;
-using core.Shared.Adapters.SEC;
-using core.Shared.Adapters.SMS;
 using csvparser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +19,7 @@ using securityutils;
 using storage.shared;
 using web.BackgroundServices;
 using web.Utils;
+using IRoleService = core.Shared.Adapters.IRoleService;
 
 namespace web
 {

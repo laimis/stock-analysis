@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Alerts;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Storage;
-using core.Shared.Adapters.Emails;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;
@@ -120,7 +120,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
                 var data = new { alertGroups };
 
-                await _emails.Send(
+                await _emails.SendWithTemplate (
                     new Recipient(email: user.State.Email, name: user.State.Name),
                     Sender.NoReply,
                     EmailTemplate.Alerts,

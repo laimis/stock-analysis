@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Emails;
 using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Logging;
 
@@ -209,7 +209,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
             };
 
             var data = new { alertGroups };
-            await _emails.Send(
+            await _emails.SendWithTemplate(
                     recipient: new Recipient(email: u.Key.Email, name: u.Key.Name),
                     Sender.NoReply,
                     template: EmailTemplate.Alerts,

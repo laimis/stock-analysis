@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using core.Shared.Adapters.Emails;
+using core.fs.Shared.Adapters.Email;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -56,14 +56,14 @@ namespace sendgridclient
             _logger.LogInformation("Sendgrid status {statusCode} with body: {responseBody}", response.StatusCode, responseBody);
         }
 
-        public Task Send(EmailInput obj) => Send(
+        public Task SendWithInput(EmailInput obj) => Send(
             recipient: new Recipient(email: obj.To, name: null),
             sender: new Sender(obj.From, obj.FromName),
             subject: obj.Subject,
             body: obj.Body
         );
 
-        public Task Send(
+        public Task SendWithTemplate(
             Recipient recipient,
             Sender sender,
             EmailTemplate template,
