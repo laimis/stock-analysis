@@ -3,6 +3,7 @@ using core.Cryptos;
 using core.fs.Shared.Adapters.CSV;
 using core.Notes;
 using core.Options;
+using core.Shared;
 using core.Stocks;
 using csvparser;
 using Xunit;
@@ -15,12 +16,12 @@ namespace csvparsertests
         [Fact]
         public void ExportStocksHeader()
         {
-            var stock = new OwnedStock("tsla", Guid.NewGuid());
+            var stock = new OwnedStock(new Ticker("tsla"), Guid.NewGuid());
             stock.Purchase(1, 100, DateTime.UtcNow, "some note");
             
             var report = CSVExport.stocks(_csvWriter, new[] {stock});
 
-            Assert.Contains("ticker,type,amount,price,date,notes", report);
+            Assert.Contains("Ticker,Type,Amount,Price,Date,Notes", report);
             Assert.Contains("TSLA", report);
         }
 
@@ -34,7 +35,7 @@ namespace csvparsertests
 
             var report = CSVExport.cryptos(_csvWriter, new[] {crypto});
 
-            Assert.Contains("symbol,type,amount,price,date", report);
+            Assert.Contains("Symbol,Type,Amount,Price,Date", report);
             Assert.Contains("BTC", report);
             Assert.Contains("buy", report);
             Assert.Contains("sell", report);

@@ -255,6 +255,15 @@ module CSVExport =
             |> Seq.sortBy (fun (_, e) -> e.When)
             |> Seq.map (fun (o, e) ->
                 match e with
+                | :? StockPurchased_v2 as sp -> 
+                    {
+                        Ticker = o.State.Ticker.Value
+                        Type = "buy"
+                        Amount = sp.NumberOfShares
+                        Price = sp.Price
+                        Date = sp.When.ToString(DATE_FORMAT)
+                        Notes = sp.Notes
+                    }
                 | :? StockPurchased as sp -> 
                     {
                         Ticker = o.State.Ticker.Value
