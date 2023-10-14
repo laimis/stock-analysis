@@ -1,9 +1,9 @@
 namespace core.fs.Alerts
 
     open core.Shared
-    open core.Shared.Adapters.SMS
     open core.Stocks
     open core.fs.Shared
+    open core.fs.Shared.Adapters.SMS
     open core.fs.Shared.Domain.Accounts
 
     module AlertContainer =

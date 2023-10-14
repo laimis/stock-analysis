@@ -3,10 +3,10 @@ namespace core.fs
 open System
 open System.Text.RegularExpressions
 open core.Shared
-open core.Shared.Adapters.Emails
 open core.fs.Options
 open core.fs.Shared
 open core.fs.Shared.Adapters.CSV
+open core.fs.Shared.Adapters.Email
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 open core.fs.Stocks
@@ -73,14 +73,8 @@ module ImportTransactions =
         
         member _.Handle(cmd:Command) = task {
             
-            let sendEmail (user:User) subject body = task {
-                do! emailService.Send(
-                    recipient=Recipient(email=user.State.Email, name=user.State.Name),
-                    sender=Sender.NoReply,
-                    subject=subject,
-                    body=body
-                )
-            }
+            let sendEmail (user:User) subject body =
+                emailService.Send (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply subject body
             
             let createOptionTransaction r =
                 {

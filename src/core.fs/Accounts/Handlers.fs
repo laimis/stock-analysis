@@ -4,10 +4,10 @@ namespace core.fs.Accounts
     open System.ComponentModel.DataAnnotations
     open core.Account
     open core.Shared
-    open core.Shared.Adapters
-    open core.Shared.Adapters.Emails
     open core.fs.Shared
+    open core.fs.Shared.Adapters.Authentication
     open core.fs.Shared.Adapters.Brokerage
+    open core.fs.Shared.Adapters.Email
     open core.fs.Shared.Adapters.Storage
     open core.fs.Shared.Adapters.Subscriptions
     open core.fs.Shared.Domain.Accounts
@@ -77,7 +77,7 @@ namespace core.fs.Accounts
             let attemptLogin (user:User) command = task {
                 
                 let validPassword =
-                    hashProvider.Generate(password=command.Password, salt=user.State.GetSalt())
+                    hashProvider.GenerateHash command.Password (user.State.GetSalt())
                     |> user.PasswordHashMatches
                 
                 match validPassword with
@@ -141,12 +141,9 @@ namespace core.fs.Accounts
                     
                     // TODO: technically it would be better to mark the user as deleted and then have a background process
                     // to send emails, delete the actual user record, and delete portfolio data
-                    do! email.Send(
-                        recipient= Recipient(email=roleService.GetAdminEmail(), name="Admin"),
-                        sender=Sender.NoReply,
-                        template=EmailTemplate.AdminUserDeleted,
-                        properties= {|feedback = command.Feedback; email = user.State.Email;|}
-                    )
+                    let properties = {|feedback = command.Feedback; email = user.State.Email;|}
+                    do! email.SendWithTemplate (Recipient(email=roleService.GetAdminEmail(), name="Admin")) Sender.NoReply EmailTemplate.AdminUserDeleted properties
+                        
                     do! storage.Delete(user)
                     do! portfolio.Delete(user.Id |> UserId)
                     return Ok
@@ -178,13 +175,7 @@ namespace core.fs.Accounts
                         | false ->
                             user.Confirm()
                             do! storage.Save(user)
-                            
-                            do! email.Send(
-                                Recipient(email = user.State.Email, name = user.State.Name),
-                                Sender.Support,
-                                EmailTemplate.NewUserWelcome,
-                                {||}
-                            );
+                            do! email.SendWithTemplate (Recipient(email = user.State.Email, name = user.State.Name)) Sender.Support EmailTemplate.NewUserWelcome {||}
                             return user.State |> AccountStatusView.fromUserState (roleService.IsAdmin(user.State)) |> ResponseUtils.success<AccountStatusView>
             }
             
@@ -204,12 +195,7 @@ namespace core.fs.Accounts
             interface IApplicationService
             
             member this.Handle (command:Command) = task {
-                do! emailService.Send(
-                    recipient = Recipient(email=roleService.GetAdminEmail(), name=null),
-                    sender = Sender.NoReply,
-                    template = EmailTemplate.AdminContact,
-                    properties = {|message = command.Message; email = command.Email|}
-                )
+                do! emailService.SendWithTemplate (Recipient(email=roleService.GetAdminEmail(), name=null)) Sender.NoReply EmailTemplate.AdminContact {|message = command.Message; email = command.Email|}
                 return Ok
             }
             
@@ -312,9 +298,9 @@ namespace core.fs.Accounts
                 | None ->
                     let u = User.Create(email=command.UserInfo.Email, firstname=command.UserInfo.FirstName, lastname=command.UserInfo.LastName)
                     
-                    let struct(hash, salt) = hashProvider.Generate(command.UserInfo.Password, saltLength=32);
+                    let hashAndSalt = hashProvider.GenerateHashAndSalt command.UserInfo.Password 32
                     
-                    u.SetPassword hash salt
+                    u.SetPassword hashAndSalt.Hash hashAndSalt.Salt
                     
                     let paymentResponse = command.PaymentInfo |> processPaymentInfo u
                     
@@ -345,8 +331,8 @@ namespace core.fs.Accounts
                         match association.IsOlderThan(TimeSpan.FromMinutes(15)) with
                         | true -> return "Password reset link is expired. Please request a new one." |> ResponseUtils.failedTyped<AccountStatusView>
                         | false ->
-                            let struct(hash, salt) = hashProvider.Generate(reset.Password, saltLength=32);
-                            user.SetPassword hash salt
+                            let hashAndSalt = hashProvider.GenerateHashAndSalt reset.Password 32
+                            user.SetPassword hashAndSalt.Hash hashAndSalt.Salt
                             do! storage.Save(user)
                             return user.State |> AccountStatusView.fromUserState (roleService.IsAdmin(user.State)) |> ResponseUtils.success<AccountStatusView>
             }
@@ -363,19 +349,8 @@ namespace core.fs.Accounts
                     
                     let confirmUrl = $"{EmailSettings.ConfirmAccountUrl}/{request.Id}"
                     
-                    do! email.Send(
-                        recipient=Recipient(email=user.State.Email, name=user.State.Name),
-                        sender=Sender.NoReply,
-                        template=EmailTemplate.ConfirmAccount,
-                        properties= {|confirmurl = confirmUrl|}
-                    )
-                    
-                    do! email.Send(
-                        recipient=Recipient(email=roleService.GetAdminEmail(), name="Admin"),
-                        sender=Sender.NoReply,
-                        template=EmailTemplate.AdminNewUser,
-                        properties= {|email = user.State.Email; |}
-                    )
+                    do! email.SendWithTemplate (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply EmailTemplate.ConfirmAccount {|confirmurl = confirmUrl|}
+                    do! email.SendWithTemplate (Recipient(email=roleService.GetAdminEmail(), name="Admin")) Sender.NoReply EmailTemplate.AdminNewUser {|email = user.State.Email; |}
                     
                     return Ok
             }
@@ -407,12 +382,8 @@ namespace core.fs.Accounts
                     
                     let resetUrl = $"{EmailSettings.PasswordResetUrl}/{association.Id}"
                     
-                    do! emailService.Send(
-                        recipient=Recipient(email=user.State.Email, name=user.State.Name),
-                        sender=Sender.NoReply,
-                        template=EmailTemplate.PasswordReset,
-                        properties= {|reseturl = resetUrl|}
-                    )
+                    do! emailService.SendWithTemplate (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply EmailTemplate.PasswordReset {|reseturl = resetUrl|}
+                    
                     return Ok
             }
             

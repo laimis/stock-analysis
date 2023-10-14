@@ -3,8 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using core.fs.Stocks;
 using core.Shared;
-using core.Shared.Adapters.SEC;
-using core.Shared.Adapters.Stocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

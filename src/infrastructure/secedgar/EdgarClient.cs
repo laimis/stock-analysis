@@ -1,12 +1,12 @@
-﻿using core.Shared;
-using core.Shared.Adapters.SEC;
+﻿using core.fs.Shared.Adapters.SEC;
+using core.Shared;
 using Microsoft.Extensions.Logging;
 using SecuritiesExchangeCommission.Edgar;
 
 namespace secedgar;
 public class EdgarClient : ISECFilings
 {
-    private ILogger<EdgarClient>? _logger;
+    private readonly ILogger<EdgarClient>? _logger;
 
     public EdgarClient(ILogger<EdgarClient>? logger) : this(logger, "NGTD/1.0"){}
     
@@ -18,7 +18,7 @@ public class EdgarClient : ISECFilings
     }
         
 
-    public async Task<ServiceResponse<CompanyFilings>> GetFilings(string symbol)
+    public async Task<ServiceResponse<CompanyFilings>> GetFilings(Ticker symbol)
     {
         try
         {
@@ -31,13 +31,12 @@ public class EdgarClient : ISECFilings
 
             foreach(var r in results.Results)
             {
-                var filing = new CompanyFiling {
-                    Description = r.Description,
-                    DocumentsUrl = r.DocumentsUrl,
-                    FilingDate = r.FilingDate,
-                    Filing = r.Filing,
-                    InteractiveDataUrl = r.InteractiveDataUrl,
-                };
+                var filing = new CompanyFiling(r.Description,
+                    r.DocumentsUrl,
+                    r.FilingDate,
+                    r.Filing,
+                    r.InteractiveDataUrl
+                );
 
                 filings.Add(filing);
             }

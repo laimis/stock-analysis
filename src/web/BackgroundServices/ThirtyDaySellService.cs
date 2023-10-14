@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Reports;
+using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
-using core.Shared.Adapters.Emails;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices
@@ -71,7 +71,7 @@ namespace web.BackgroundServices
 
             if (sellsOfInterest.Count > 0)
             {
-                await _emails.Send(
+                await _emails.SendWithTemplate(
                     recipient: new Recipient(email: p.Email, name: null),
                     Sender.NoReply,
                     template: EmailTemplate.SellAlert,

@@ -1,4 +1,4 @@
-﻿using core.Shared.Adapters.SMS;
+﻿using core.fs.Shared.Adapters.SMS;
 using Microsoft.Extensions.Logging;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
@@ -7,10 +7,10 @@ using Twilio.Types;
 namespace twilioclient;
 public class TwilioClientWrapper : ISMSClient
 {
-    private PhoneNumber? _fromPhoneNumber = null;
-    private PhoneNumber? _toPhoneNumber = null;
-    private bool _configured;
-    private ILogger<TwilioClientWrapper> _logger;
+    private readonly PhoneNumber? _fromPhoneNumber;
+    private readonly PhoneNumber? _toPhoneNumber;
+    private readonly bool _configured;
+    private readonly ILogger<TwilioClientWrapper> _logger;
 
     public bool IsOn { get; private set; }
 
@@ -31,8 +31,8 @@ public class TwilioClientWrapper : ISMSClient
 
         TwilioClient.Init(accountSid, authToken);
 
-        _fromPhoneNumber = new Twilio.Types.PhoneNumber(fromPhoneNumber);
-        _toPhoneNumber = new Twilio.Types.PhoneNumber(toPhoneNumber);
+        _fromPhoneNumber = new PhoneNumber(fromPhoneNumber);
+        _toPhoneNumber = new PhoneNumber(toPhoneNumber);
         _configured = true;
         IsOn = true;
     }
@@ -47,14 +47,14 @@ public class TwilioClientWrapper : ISMSClient
 
     private Task ToLogger(string message)
     {
-        _logger?.LogInformation($"Sending SMS: {message}");
+        _logger.LogInformation($"Sending SMS: {message}");
         return Task.CompletedTask;
     }
 
     private Task SendViaTwilio(string message)
     {
         // Send SMS
-        _logger?.LogInformation($"Sending SMS to {_toPhoneNumber}: {message}");
+        _logger.LogInformation($"Sending SMS to {_toPhoneNumber}: {message}");
         
         var response = MessageResource.Create(
             body: message,
@@ -62,7 +62,7 @@ public class TwilioClientWrapper : ISMSClient
             to: _toPhoneNumber
         );
 
-        _logger?.LogInformation("Response from twilio: " + response.ToString());
+        _logger.LogInformation("Response from twilio: " + response.ToString());
 
         return Task.CompletedTask;
     }

@@ -16,6 +16,10 @@
         <Compile Include="Shared\Adapters\Brokerage.fs" />
         <Compile Include="Shared\Adapters\Cryptos.fs" />
         <Compile Include="Shared\Adapters\CSV.fs" />
+        <Compile Include="Shared\Adapters\Email.fs" />
+        <Compile Include="Shared\Adapters\SEC.fs" />
+        <Compile Include="Shared\Adapters\SMS.fs" />
+        <Compile Include="Shared\Adapters\Authentication.fs" />
         <Compile Include="Helpers.fs" />
         <Compile Include="Services\Trading.fs" />
         <Compile Include="Options\Input.fs"/>

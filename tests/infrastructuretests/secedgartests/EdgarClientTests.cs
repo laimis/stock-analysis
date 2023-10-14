@@ -1,3 +1,4 @@
+using core.Shared;
 using secedgar;
 
 namespace secedgartests;
@@ -9,7 +10,7 @@ public class EdgarClientTests
     public async Task TestAsync()
     {
         var client = new EdgarClient(null, "NGTD/1.0");
-        var response = await client.GetFilings("AAPL");
-        Assert.True(response.Success.filings.Count > 0);
+        var response = await client.GetFilings(new Ticker("AAPL"));
+        Assert.NotEmpty(response.Success.Filings);
     }
 }
