@@ -54,7 +54,7 @@ namespace csvparsertests
 
             var report = CSVExport.options(_csvWriter, new[] {option});
 
-            Assert.Contains("ticker,type,strike,optiontype,expiration,amount,premium,filled", report);
+            Assert.Contains("Ticker,Type,Strike,OptionType,Expiration,Amount,Premium,Filled", report);
             
             Assert.Contains("TLSA", report);
             Assert.Contains("CALL", report);
@@ -68,7 +68,7 @@ namespace csvparsertests
 
             var report = CSVExport.notes(_csvWriter, new[] {note});
 
-            Assert.Contains("created,ticker,note", report);
+            Assert.Contains("Created,Ticker,Note", report);
             Assert.Contains(note.State.RelatedToTicker, report);
             Assert.Contains("my note", report);
         }
