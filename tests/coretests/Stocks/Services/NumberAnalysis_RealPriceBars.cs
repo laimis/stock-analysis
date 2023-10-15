@@ -1,6 +1,6 @@
 using System.Linq;
-using core.Shared.Adapters.Stocks;
-using core.Stocks.Services.Analysis;
+using core.fs.Services;
+using core.fs.Services.Analysis;
 using coretests.testdata;
 using Xunit;
 
@@ -14,7 +14,7 @@ namespace coretests.Stocks.Services
         {
             var bars = TestDataGenerator.PriceBars();
 
-            _percentChanges = NumberAnalysis.PercentChanges(bars.Select(x => x.Close).ToArray());
+            _percentChanges = NumberAnalysis.PercentChangesForPriceBars(bars);
         }
 
         [Fact]

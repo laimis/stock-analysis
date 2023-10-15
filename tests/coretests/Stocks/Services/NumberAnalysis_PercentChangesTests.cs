@@ -1,17 +1,14 @@
 using System.Linq;
-using core.Stocks.Services.Analysis;
+using core.fs.Services;
+using core.fs.Services.Analysis;
 using Xunit;
 
 namespace coretests.Stocks.Services
 {
     public class NumberAnalysis_PercentChangesTests
     {
-        private DistributionStatistics _percentChangeStatistics;
-
-        public NumberAnalysis_PercentChangesTests()
-        {
-            _percentChangeStatistics = NumberAnalysis.PercentChanges(new decimal[] { 1, 2, 3, 4, 5 });
-        }
+        private DistributionStatistics _percentChangeStatistics =
+            NumberAnalysis.PercentChanges(false, new decimal[] { 1, 2, 3, 4, 5 });
 
         [Fact]
         public void MeanIsCorrect() => Assert.Equal(0.52m, _percentChangeStatistics.mean);

@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.fs.Portfolio;
-using core.Portfolio;
 using core.Shared;
-using core.Stocks.Services.Trading;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
 using web.Utils;
 using PendingPositions = core.fs.Portfolio.PendingPositions;
 using Routines = core.fs.Portfolio.Routines;

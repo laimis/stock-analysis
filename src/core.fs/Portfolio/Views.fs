@@ -5,7 +5,7 @@ open System.Collections.Generic
 open Microsoft.FSharp.Collections
 open core.Shared
 open core.Stocks
-open core.Stocks.Services.Trading
+open core.fs.Services.Trading
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 

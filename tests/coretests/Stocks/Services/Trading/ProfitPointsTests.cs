@@ -1,6 +1,6 @@
 using System;
+using core.fs.Services.Trading;
 using core.Stocks;
-using core.Stocks.Services.Trading;
 using Xunit;
 
 namespace coretests.Stocks.Services.Trading
@@ -21,21 +21,21 @@ namespace coretests.Stocks.Services.Trading
         [Fact]
         public void ProfitLevelsWork()
         {
-            Assert.Equal(37.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 1));
-            Assert.Equal(42.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 2));
-            Assert.Equal(47.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 3));
-            Assert.Equal(52.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 4));
-            Assert.Equal(57.5m, ProfitPoints.GetProfitPointWithStopPrice(_position, 5));
+            Assert.Equal(37.5m, ProfitPoints.getProfitPointWithStopPrice(_position, 1));
+            Assert.Equal(42.5m, ProfitPoints.getProfitPointWithStopPrice(_position, 2));
+            Assert.Equal(47.5m, ProfitPoints.getProfitPointWithStopPrice(_position, 3));
+            Assert.Equal(52.5m, ProfitPoints.getProfitPointWithStopPrice(_position, 4));
+            Assert.Equal(57.5m, ProfitPoints.getProfitPointWithStopPrice(_position, 5));
         }
 
         [Fact]
         public void PercentLevelsWork()
         {
-            Assert.Equal(34.125m, ProfitPoints.GetProfitPointWithPercentGain(_position, 1, 0.05m));
-            Assert.Equal(35.75m, ProfitPoints.GetProfitPointWithPercentGain(_position, 2, 0.05m));
-            Assert.Equal(37.375m, ProfitPoints.GetProfitPointWithPercentGain(_position, 3, 0.05m));
-            Assert.Equal(39.0m, ProfitPoints.GetProfitPointWithPercentGain(_position, 4, 0.05m));
-            Assert.Equal(40.625m, ProfitPoints.GetProfitPointWithPercentGain(_position, 5, 0.05m));
+            Assert.Equal(34.125m, ProfitPoints.getProfitPointWithPercentGain(_position, 1, 0.05m));
+            Assert.Equal(35.75m, ProfitPoints.getProfitPointWithPercentGain(_position, 2, 0.05m));
+            Assert.Equal(37.375m, ProfitPoints.getProfitPointWithPercentGain(_position, 3, 0.05m));
+            Assert.Equal(39.0m, ProfitPoints.getProfitPointWithPercentGain(_position, 4, 0.05m));
+            Assert.Equal(40.625m, ProfitPoints.getProfitPointWithPercentGain(_position, 5, 0.05m));
         }
     }
 }

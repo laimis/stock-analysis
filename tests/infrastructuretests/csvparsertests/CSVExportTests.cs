@@ -1,5 +1,6 @@
 using System;
 using core.Cryptos;
+using core.fs.Services;
 using core.fs.Shared.Adapters.CSV;
 using core.Notes;
 using core.Options;
@@ -75,7 +76,7 @@ namespace csvparsertests
         }
 
         [Fact]
-        public void FilenameEndsWithCSV()
+        public void FilenameEndsWithCsv()
         {
             var filename = CSVExport.generateFilename("option");
 

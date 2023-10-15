@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using core.Stocks.Services.Analysis;
+using core.fs.Services.Analysis;
 using coretests.testdata;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace coretests.Stocks.Services
         {
             var bars = TestDataGenerator.PriceBars("SWCH");
 
-            _outcomes = SingleBarAnalysisRunner.Run(bars);
+            _outcomes = SingleBarPriceAnalysis.run(bars);
         }
 
         [Fact]
@@ -30,9 +30,9 @@ namespace coretests.Stocks.Services
         {
             var bars = TestDataGenerator.PriceBars("SHEL");
 
-            var outcomes = SingleBarAnalysisRunner.Run(bars);
+            var outcomes = SingleBarPriceAnalysis.run(bars);
 
-            Assert.Contains(outcomes, o => o.key == SingleBarOutcomeKeys.NewHigh && o.value == 1);
+            Assert.Contains(outcomes, o => o.Key == SingleBarPriceAnalysis.SingleBarOutcomeKeys.NewHigh && o.Value == 1);
         }
 
         [Fact]
@@ -40,9 +40,9 @@ namespace coretests.Stocks.Services
         {
             var bars = TestDataGenerator.PriceBars("NET");
 
-            var outcomes = SingleBarAnalysisRunner.Run(bars);
+            var outcomes = SingleBarPriceAnalysis.run(bars);
 
-            Assert.Contains(outcomes, o => o.key == SingleBarOutcomeKeys.NewHigh && o.value == 0);
+            Assert.Contains(outcomes, o => o.Key == SingleBarPriceAnalysis.SingleBarOutcomeKeys.NewHigh && o.Value == 0);
         }
     }
 }

@@ -4,6 +4,7 @@ namespace core.fs.Admin
     open core.Options
     open core.Shared
     open core.Stocks
+    open core.fs.Services
     open core.fs.Shared
     open core.fs.Shared.Adapters.CSV
     open core.fs.Shared.Adapters.Storage

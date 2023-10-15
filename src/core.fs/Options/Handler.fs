@@ -3,6 +3,7 @@
 open System
 open core.Options
 open core.Shared
+open core.fs.Services
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.CSV

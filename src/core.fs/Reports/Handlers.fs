@@ -4,11 +4,14 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Shared.Adapters.Stocks
 open core.Stocks
-open core.Stocks.Services.Analysis
+open core.fs.Services
+open core.fs.Services.Analysis
+open core.fs.Services.GapAnalysis
+open core.fs.Services.MultipleBarPriceAnalysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -28,14 +31,6 @@ type ChainLinkView =
 type ChainView =
     {
         links: ChainLinkView seq
-    }
-    
-type DailyOutcomeScoreReportQuery =
-    {
-        UserId: UserId
-        Start: string
-        End: string
-        Ticker: Ticker
     }
     
 type DailyOutcomeScoreReportView =
@@ -119,18 +114,18 @@ type OutcomesReportView(evaluations,outcomes,gaps,patterns) =
     
     member _.TickerSummary: OutcomesReportViewTickerCountPair seq =
         evaluations
-        |> AnalysisOutcomeEvaluationScoringHelper.GenerateTickerCounts
+        |> AnalysisOutcomeEvaluationScoringHelper.generateTickerCounts
         |> Seq.map (fun kv -> {Ticker=kv.Key; Count=kv.Value})
         |> Seq.sortByDescending (fun pair -> pair.Count)
     
     member _.EvaluationSummary: OutcomesReportViewEvaluationCountPair seq =
         evaluations
         |> AnalysisOutcomeEvaluationScoringHelper.GenerateEvaluationCounts
-        |> Seq.map (fun kv -> (kv, evaluations |> Seq.find (fun e -> e.name = kv.Key)))
-        |> Seq.sortBy (fun (kp, evaluation) -> (evaluation.``type``, kp.Value* -1))
+        |> Seq.map (fun kv -> (kv, evaluations |> Seq.find (fun e -> e.Name = kv.Key)))
+        |> Seq.sortBy (fun (kp, evaluation) -> (evaluation.Type, kp.Value* -1))
         |> Seq.map (fun (kp, evaluation) -> {
             Evaluation=kp.Key
-            Type=evaluation.``type``
+            Type=evaluation.Type
             Count=kp.Value
         })
         
@@ -223,37 +218,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         return ServiceResponse<ChainView>(response)
     }
     
-    member _.Handle(request:DailyOutcomeScoreReportQuery) = task {
-        
-        let! user = accounts.GetUser request.UserId
-        match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<DailyOutcomeScoreReportView>
-        | Some user ->
-            
-            let start = request.Start |> DateTimeOffset.Parse |> marketHours.GetMarketStartOfDayTimeInUtc
-            let ``end`` =
-                match request.End with
-                | null -> DateTimeOffset.MinValue
-                | _ -> request.End |> DateTimeOffset.Parse |> marketHours.GetMarketEndOfDayTimeInUtc
-            
-            let! pricesResponse =
-                brokerage.GetPriceHistory
-                    user.State
-                    request.Ticker
-                    PriceFrequency.Daily
-                    (start.AddDays(-365)) // going back a bit to have enough data for "relative" stats
-                    ``end``
-            
-            match pricesResponse.IsOk with
-            | false ->
-                return pricesResponse.Error.Message |> ResponseUtils.failedTyped<DailyOutcomeScoreReportView>
-            | true ->
-                
-                let scoresList = SingleBarDailyScoring.Generate(pricesResponse.Success, start, request.Ticker)
-                let response = {Ticker=request.Ticker; DailyScores=scoresList}
-                return ServiceResponse<DailyOutcomeScoreReportView>(response)
-    }
-    
     member _.Handle(request:DailyPositionReportQuery) = task {
         
         let! user = accounts.GetUser request.UserId
@@ -290,9 +254,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | false ->
                         return pricesResponse.Error.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
                     | true ->
-                        let plAndGain = PositionDailyPLAndGain.Generate(pricesResponse.Success,position)
-                        
-                        let profit, pct = plAndGain.ToTuple()
+                        let profit, pct = PositionAnalysis.dailyPLAndGain pricesResponse.Success position
                         
                         let response = {
                             DailyProfit = profit
@@ -322,7 +284,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             | false ->
                 return priceResponse.Error.Message |> ResponseUtils.failedTyped<GapReportView>
             | true ->
-                let gaps = GapAnalysis.Generate(priceResponse.Success, numberOfBarsToAnalyze=60)
+                let gaps = GapAnalysis.Generate priceResponse.Success 60
                 let response = {gaps=gaps; ticker=query.Ticker.Value}
                 return ServiceResponse<GapReportView>(response)
     }
@@ -362,22 +324,23 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         
                         let outcomes =
                             match query.Duration with
-                            | OutcomesReportDuration.SingleBar ->  SingleBarAnalysisRunner.Run(priceResponse.Success)
+                            | OutcomesReportDuration.SingleBar ->  SingleBarPriceAnalysis.run priceResponse.Success
                             | OutcomesReportDuration.AllBars ->
                                 let lastPrice = priceResponse.Success[priceResponse.Success.Length - 1].Close
-                                MultipleBarPriceAnalysis.Run(lastPrice, priceResponse.Success)
+                                MultipleBarPriceAnalysis.Run lastPrice priceResponse.Success
                             | _ -> failwith "Unexpected duration"
                         
-                        let tickerOutcome:TickerOutcomes = TickerOutcomes(outcomes, t)
+                        let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t.Value}
                         
                         let gapsView =
                             match query.IncludeGapAnalysis with
                             | true ->
-                                let gaps = GapAnalysis.Generate(priceResponse.Success, numberOfBarsToAnalyze=60)
+                                let gaps = GapAnalysis.Generate priceResponse.Success 60
                                 Some {gaps=gaps; ticker=t.Value}
                             | false -> None
                             
-                        let tickerPatterns = TickerPatterns(PatternDetection.Generate(priceResponse.Success), t)
+                        let patterns = PatternDetection.generate priceResponse.Success
+                        let tickerPatterns = {patterns = patterns; ticker = t.Value}
                         
                         return Some (tickerOutcome, gapsView, tickerPatterns)
                     }
@@ -399,8 +362,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             
             let evaluations =
                 match query.Duration with
-                | OutcomesReportDuration.SingleBar -> SingleBarAnalysisOutcomeEvaluation.Evaluate(outcomes)
-                | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.Evaluate(outcomes)
+                | OutcomesReportDuration.SingleBar -> SingleBarPriceAnalysisEvaluation.evaluate outcomes
+                | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.evaluate outcomes
                 | _ -> failwith "Unexpected duration"
             
             let response = OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns)
@@ -445,9 +408,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         | false -> ()
                         
                         // TODO: bring back orders once we migrate position analysis to f#
-                        let outcomes = PositionAnalysis.Generate(position, priceResponse.Success) //, orders)
-                        let tickerOutcome:TickerOutcomes = TickerOutcomes(outcomes, position.Ticker)
-                        let tickerPatterns = TickerPatterns(PatternDetection.Generate(priceResponse.Success), position.Ticker)
+                        let outcomes = PositionAnalysis.generate position priceResponse.Success orders
+                        let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker.Value}
+                        let tickerPatterns = {patterns = PatternDetection.generate priceResponse.Success; ticker = position.Ticker.Value}
                         
                         return Some (tickerOutcome, tickerPatterns)
                     }
@@ -464,7 +427,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     (newOutcomes, newPatterns)
                 ) ([], [])
                 
-            let evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(outcomes)
+            let evaluations = PositionAnalysis.evaluate outcomes
             
             let response = OutcomesReportView(evaluations, outcomes, [], patterns)
             
@@ -492,8 +455,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | true -> pricesResponse.Success.Length - 30
                     | false -> 0
                 
-                let recent = NumberAnalysis.PercentChanges(pricesResponse.Success |> Seq.skip toSkip |> Seq.map (fun p -> p.Close) |> Seq.toArray)
-                let allTime = NumberAnalysis.PercentChanges(pricesResponse.Success |> Seq.map (fun p -> p.Close) |> Seq.toArray)
+                let recent = NumberAnalysis.PercentChanges true (pricesResponse.Success |> Seq.skip toSkip |> Seq.map (fun p -> p.Close))
+                let allTime = NumberAnalysis.PercentChanges true (pricesResponse.Success |> Seq.map (fun p -> p.Close))
                 let response = {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
                 return ServiceResponse<PercentChangeStatisticsView>(response)
     }

@@ -1,8 +1,8 @@
 namespace core.fs.Services
 
 open core.Shared
-open core.Stocks.Services.Analysis
 open core.fs.Services.Analysis
+open core.fs.Services.Analysis.SingleBarPriceAnalysis
 open core.fs.Services.GapAnalysis
 open core.fs.Shared.Adapters.Stocks
 
@@ -19,7 +19,7 @@ module PatternDetection =
             if gaps.Count = 0 || gaps[0].Type <> GapType.Up then
                 None
             else
-                let gap = gaps.[0]
+                let gap = gaps[0]
                 Some({
                     date = current.Date
                     name = gapUpName
@@ -34,8 +34,8 @@ module PatternDetection =
         if bars.Length < 2 then
             None
         else
-            let current = bars.[bars.Length - 1]
-            let previous = bars.[bars.Length - 2]
+            let current = bars[bars.Length - 1]
+            let previous = bars[bars.Length - 2]
             
             // upside reversal pattern detection
             if current.Close > System.Math.Max(previous.Open, previous.Close) && current.Low < previous.Low then
@@ -73,8 +73,8 @@ module PatternDetection =
             let startIndex = 
                 bars
                 |> Array.indexed
-                |> Array.tryFind (fun (i, b) -> b.Date < thresholdDate)
-                |> Option.map (fun (i, b) -> i)
+                |> Array.tryFind (fun (_, b) -> b.Date < thresholdDate)
+                |> Option.map (fun (i, _) -> i)
                 |> Option.defaultValue (bars.Length - 1)
             
             // we couldn't find a bar that's older than 1 year, so no pattern
@@ -90,7 +90,7 @@ module PatternDetection =
                     |> Array.max
                     
                 if highestVolume = bars[bars.Length - 1].Volume then
-                    let bar = bars.[bars.Length - 1]
+                    let bar = bars[bars.Length - 1]
                     Some({
                         date = bar.Date
                         name = highest1YearVolumeName
@@ -115,14 +115,14 @@ module PatternDetection =
             let stats = NumberAnalysis.PercentChanges false subsetOfBars
             
             // now take the last bar volume
-            let lastBarVolume = bars.[bars.Length - 1].Volume
+            let lastBarVolume = bars[bars.Length - 1].Volume
             let multiplier = decimal(lastBarVolume) / stats.median
             
             // if the last bar volume is some predefined multiple of the average volume, then we have a pattern
             let threshold = stats.median * decimal(5) |> int64
             
             if lastBarVolume > threshold then
-                let bar = bars.[bars.Length - 1]
+                let bar = bars[bars.Length - 1]
                 Some({
                     date = bar.Date
                     name = highVolumeName
@@ -142,7 +142,12 @@ module PatternDetection =
             gapUpName, gapUp
         ]
         |> Map.ofList
-        
+
+    let availablePatterns =
+        patternGenerators
+        |> Map.toSeq
+        |> Seq.map (fun (name, _) -> name)
+        |> Seq.toList        
         
     let generate (bars: PriceBar[]) =
         

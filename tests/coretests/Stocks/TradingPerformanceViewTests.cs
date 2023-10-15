@@ -1,5 +1,5 @@
 using System;
-using core.Stocks.Services.Trading;
+using core.fs.Services.Trading;
 using Xunit;
 
 namespace coretests.Stocks
@@ -36,7 +36,7 @@ namespace coretests.Stocks
         public void WinMaxReturnPctCorrect() => Assert.Equal(0.10m, _performance.WinMaxReturnPct);
 
         [Fact]
-        public void WinAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.WinAvgDaysHeld);
+        public void WinAvgDaysHeldCorrect() => Assert.Equal(1.0m, _performance.WinAvgDaysHeld);
 
         [Fact]
         public void LossAvgAmountCorrect() => Assert.Equal(10m, _performance.AvgLossAmount);
@@ -54,9 +54,9 @@ namespace coretests.Stocks
         public void LossAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.LossAvgDaysHeld);
 
         [Fact]
-        public void AvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.AvgDaysHeld);
+        public void AvgDaysHeldCorrect() => Assert.Equal(1.0m, _performance.AverageDaysHeld);
 
         [Fact]
-        public void EVCorrect() => Assert.Equal(3.33m, Math.Round(_performance.EV, 2));
+        public void EV_Correct() => Assert.Equal(3.33m, Math.Round(_performance.EV, 2));
     }
 }

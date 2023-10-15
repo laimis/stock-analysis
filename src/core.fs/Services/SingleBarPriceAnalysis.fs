@@ -359,28 +359,3 @@ module SingleBarPriceAnalysisEvaluation =
                 )
             )
         ]
-        
-module SingleBarDailyScoring =
-  
-    let generate bars (start:DateTimeOffset) ticker =
-        
-        let indexOfFirstBar = 
-            bars
-            |> Seq.mapi (fun i (x:PriceBar) -> (x, i))
-            |> Seq.filter (fun x -> x |> fst |> fun x -> x.Date.Date >= start.Date)
-            |> Seq.map (fun x -> x |> snd)
-            |> Seq.tryHead
-            
-        match indexOfFirstBar with
-        | Some x ->
-            let barsToUse = bars |> Seq.take (x + 1) |> Seq.toArray
-            let currentBar = barsToUse[barsToUse.Length - 1]
-            let outcomes = run barsToUse
-            let tickerOutcomes = {
-                outcomes = outcomes
-                ticker = ticker
-            }
-            let evaluations = SingleBarPriceAnalysisEvaluation.evaluate [tickerOutcomes]
-            let counts = AnalysisOutcomeEvaluationScoringHelper.generateTickerCounts evaluations
-            Some (currentBar.Date, counts[ticker])
-        | _ -> None

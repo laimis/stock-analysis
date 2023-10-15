@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
+using core.fs.Services;
+using core.fs.Services.Analysis;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
-using core.Shared.Adapters.Stocks;
 using core.Stocks;
-using core.Stocks.Services.Analysis;
 using coretests.testdata;
 using Microsoft.FSharp.Core;
 using Xunit;
@@ -35,28 +35,28 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithNoStrategy_SetsRightLabel()
         {
-            var (position, bars, _) = CreateTestData();
+            var (position, bars, orders) = CreateTestData();
 
-            var outcomes = PositionAnalysis.Generate(position, bars);
+            var outcomes = PositionAnalysis.generate(position, bars, orders);
 
-            Assert.Contains(outcomes, o => o.key == PortfolioAnalysisKeys.StrategyLabel && o.value == 0);
+            Assert.Contains(outcomes, o => o.Key == PositionAnalysis.PortfolioAnalysisKeys.StrategyLabel && o.Value == 0);
         }
 
         [Fact]
         public void Evaluate_WithNoStrategy_SelectsTicker()
         {
-            var (position, bars, _) = CreateTestData();
+            var (position, bars, orders) = CreateTestData();
 
             var outcomes = new List<TickerOutcomes> {
                 new TickerOutcomes(
-                    PositionAnalysis.Generate(position, bars).ToList(),
+                    PositionAnalysis.generate(position, bars,orders),
                     ticker: position.Ticker
                 )
             };
 
-            var evaluations = PositionAnalysisOutcomeEvaluation.Evaluate(outcomes);
+            var evaluations = PositionAnalysis.evaluate(outcomes);
 
-            Assert.Contains(evaluations, e => e.sortColumn == PortfolioAnalysisKeys.StrategyLabel);
+            Assert.Contains(evaluations, e => e.SortColumn == PositionAnalysis.PortfolioAnalysisKeys.StrategyLabel);
         }
     }
 }

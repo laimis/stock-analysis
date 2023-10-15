@@ -4,7 +4,8 @@ namespace core.fs.Alerts
     open System.Collections.Concurrent
     open core.Account
     open core.Shared
-    open core.Stocks.Services.Analysis
+    open core.fs.Services.Analysis
+    open core.fs.Services.GapAnalysis
     open core.fs.Shared.Domain.Accounts
 
     type private StockPositionMonitorKey = {
@@ -55,8 +56,8 @@ namespace core.fs.Alerts
         static member GapUpAlert ticker sourceList (gap:Gap) ``when`` userId =
             {
                 identifier = "Gap up"
-                triggeredValue = gap.gapSizePct
-                watchedValue = gap.gapSizePct
+                triggeredValue = gap.GapSizePct
+                watchedValue = gap.GapSizePct
                 ``when`` = ``when``
                 ticker = ticker
                 description = "Gap up"

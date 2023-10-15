@@ -2,12 +2,13 @@ namespace core.fs.Services
 
 open System.Collections.Generic
 open core.fs.Services.Analysis
+open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
 module NumberAnalysis =
     
     // by default number of buckets should be 21
-    let calculateHistogram (numbers:decimal array) (min:decimal) max numberOfBuckets : seq<ValueWithFrequency> =
+    let calculateHistogram (numbers:decimal array) (min:decimal) max numberOfBuckets : array<ValueWithFrequency> =
         
         let bucketSize = (max - min) / decimal(numberOfBuckets)
         
@@ -39,7 +40,7 @@ module NumberAnalysis =
                 result[firstSlot] <- {value = result[firstSlot].value; frequency = result[firstSlot].frequency + 1}
         )
         
-        result
+        result.ToArray()
     
     let private calculateStats (numbers:decimal[]) : DistributionStatistics =
         if numbers.Length = 0 then
@@ -82,7 +83,7 @@ module NumberAnalysis =
                 match stdDevDouble with
                 | double.PositiveInfinity -> 0m
                 | double.NegativeInfinity -> 0m
-                | _ -> (decimal)stdDevDouble
+                | _ -> decimal stdDevDouble
             
             let skewnessDouble =
                 numbers
@@ -95,7 +96,7 @@ module NumberAnalysis =
                 match skewnessDouble with
                 | double.PositiveInfinity -> 0m
                 | double.NegativeInfinity -> 0m
-                | _ -> (decimal)skewnessDouble
+                | _ -> decimal skewnessDouble
             
             let kurtosisDouble = 
                 numbers
@@ -107,7 +108,7 @@ module NumberAnalysis =
                 match kurtosisDouble with
                 | double.PositiveInfinity -> 0m
                 | double.NegativeInfinity -> 0m
-                | _ -> (decimal)kurtosisDouble
+                | _ -> decimal kurtosisDouble
                 
             let buckets = calculateHistogram numbers min max 21
             

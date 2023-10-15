@@ -8,8 +8,9 @@ open core.Cryptos
 open core.Options
 open core.Shared
 open core.Stocks
-open core.Stocks.Services.Trading
+open core.fs.Services
 open core.fs.Services.Trading
+open core.fs.Services.TradingStrategies
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.CSV
@@ -303,19 +304,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match position with
                 | null -> return "Position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
                 | _ ->
-                    let levels = 4
-                    let stopBased =
-                        [|1..levels|]
-                        |> Array.map (fun i -> ProfitPoints.GetProfitPointWithStopPrice(position, i))
-                        |> Array.filter (fun v -> v.HasValue)
-                        |> Array.map (fun v -> v.Value)
+                    let stopBased = ProfitPoints.getProfitPointsWithStopPrice(position, 4)
                     
-                    let percentBased =
-                        [|1..levels|]
-                        |> Array.map (fun i -> ProfitPoints.GetProfitPointWithPercentGain(position, i, TradingStrategyConstants.AvgPercentGain))
-                        |> Array.filter (fun v -> v.HasValue)
-                        |> Array.map (fun v -> v.Value)
-                    
+                    let percentBased level =
+                        ProfitPoints.getProfitPointWithPercentGain position level TradingStrategyConstants.AvgPercentGain
+                        
+                    let percentBased = ProfitPoints.getProfitPoints percentBased 4
+                        
                     let arr = [|
                         ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
                         ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
@@ -406,13 +401,20 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             
-            let actualTradingResult = TradingStrategyResult(0, 0, 0, 0, position, TradingStrategyConstants.ActualTradesName)
+            let actualTradingResult = {
+                StrategyName = TradingStrategyConstants.ActualTradesName
+                Position = position
+                MaxDrawdownPct = 0m
+                MaxGainPct = 0m
+                MaxDrawdownPctRecent = 0m
+                MaxGainPctRecent = 0m 
+            }
             results.Results.Insert(0, actualTradingResult)
             return results.Results
         }
         
         let mapToStrategyPerformance (name:string, results:TradingStrategyResult seq) =
-            let positions = results |> Seq.map (fun r -> r.position) |> Seq.toArray
+            let positions = results |> Seq.map (fun r -> r.Position) |> Seq.toArray
             let performance =
                 try
                     TradingPerformance.Create(positions)
@@ -421,7 +423,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     // for certain simulations.
                     // ignoring it here because I need the results, but need to look at it at some point
                     | :?OverflowException -> TradingPerformance.Create(Array.Empty<PositionInstance>())
-            TradingStrategyPerformance(name, performance, positions)
+            
+            {performance = performance; strategyName = name; positions = positions}
         
         let! user = accounts.GetUser(command.UserId)
         match user with
@@ -450,7 +453,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             let results =
                 simulations
                 |> Seq.concat
-                |> Seq.groupBy (fun r -> r.strategyName)
+                |> Seq.groupBy (fun r -> r.StrategyName)
                 |> Seq.map (fun (name, results) -> mapToStrategyPerformance(name, results))
                 |> Seq.toArray
                 
@@ -546,7 +549,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.groupBy (fun p -> p.GetLabelValue(key="strategy"))
                 |> Seq.map (fun (name, positions) ->
                     let performance = TradingPerformance.Create(positions)
-                    TradingStrategyPerformance(name, performance, positions |> Seq.toArray)
+                    {strategyName = name; performance = performance; positions = (positions |> Seq.toArray)}
                 )
                 |> Seq.sortByDescending (fun p -> p.performance.Profit)
                 |> Seq.toArray

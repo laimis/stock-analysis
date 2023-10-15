@@ -2,8 +2,6 @@ namespace core.fs.Services
 
 open System.Collections.Generic
 open core.Shared
-open core.Stocks.Services
-open core.Stocks.Services.Analysis
 open core.fs.Services.Analysis
 open core.fs.Shared.Adapters.Stocks
 
@@ -39,14 +37,21 @@ module MultipleBarPriceAnalysis =
             
             let smaOutcomes = List<AnalysisOutcome>()
             
-            for sma in smaContainer.GetEnumerable() do
+            for sma in smaContainer.All do
                 
-                let value = sma.LastValue
+                let value =
+                    match sma.LastValue with
+                    | Some v ->
+                        match v with
+                        | Some v -> v
+                        | None -> 0m
+                    | None -> 0m
+                    
                 let outcome =
                     AnalysisOutcome(
                         MultipleBarOutcomeKeys.SMA(sma.Interval),
                         OutcomeType.Neutral,
-                        (if value.HasValue then value.Value else 0m),
+                        value,
                         ValueFormat.Currency,
                         $"SMA {sma.Interval} is {value}"
                     )
@@ -60,12 +65,12 @@ module MultipleBarPriceAnalysis =
             let sma20Below50Days = 
                 smaContainer.sma20.Values
                 |> Array.rev
-                |> Array.findIndex (fun v -> v.HasValue && v.Value < smaContainer.sma50.Values[0].Value)
+                |> Array.findIndex (fun v -> v.IsSome && v.Value < smaContainer.sma50.Values[0].Value)
                 
             let sma20Above50Days = 
                 smaContainer.sma20.Values
                 |> Array.rev
-                |> Array.findIndex (fun v -> v.HasValue && v.Value > smaContainer.sma50.Values[0].Value)
+                |> Array.findIndex (fun v -> v.IsSome && v.Value > smaContainer.sma50.Values[0].Value)
                 
             let sma20Above50DaysOutcomeType =
                 if sma20Below50Days > 0 then
@@ -304,9 +309,8 @@ module MultipleBarPriceAnalysis =
             
             outcomes
             
-        let Run (currentPrice: decimal) = GenerateOutcomes currentPrice
+        let Run (currentPrice: decimal) prices = GenerateOutcomes currentPrice prices
 
 
     module MultipleBarAnalysisOutcomeEvaluation =
-        let Evaluate tickerOutcomes =
-            List<AnalysisOutcomeEvaluation>()
+        let evaluate tickerOutcomes = []

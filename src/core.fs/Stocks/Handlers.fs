@@ -6,12 +6,13 @@ open System.ComponentModel.DataAnnotations
 open core.Shared
 open core.Shared.Adapters.Stocks
 open core.Stocks
-open core.Stocks.Services
-open core.Stocks.Services.Analysis
+open core.fs.Services
+open core.fs.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.SEC
+open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
@@ -150,7 +151,7 @@ type PricesQuery =
     
 type PricesView(prices:PriceBar array) =
     member _.SMA = SMAContainer.Generate(prices)
-    member _.PercentChanges = NumberAnalysis.PercentChanges(prices)
+    member _.PercentChanges = NumberAnalysis.PercentChangesForPriceBars prices
     member _.Prices = prices
 
 type QuoteQuery =

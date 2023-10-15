@@ -1,7 +1,7 @@
 namespace core.fs.Services
 
 open System.Collections.Generic
-open core.Stocks.Services.Analysis
+open core.fs.Services.Analysis
 open core.fs.Shared.Adapters.Stocks
 
 module GapAnalysis =
@@ -105,15 +105,13 @@ module GapAnalysis =
                 prices.Length - numberOfBarsToAnalyze * 2
             else
                 0
-                
-        let volumeStats = NumberAnalysis.Statistics (
+            
+        let data =
             prices
             |> Array.map (fun p -> p.Volume |> decimal)
             |> Array.skip volumeStart
             |> Array.take (min numberOfBarsToAnalyze prices.Length)
-        )
+            
+        let volumeStats = NumberAnalysis.PercentChanges false data
         
         GenerateInternal (prices |> Array.skip start |> Array.take (prices.Length - start)) volumeStats
-        
-  
-

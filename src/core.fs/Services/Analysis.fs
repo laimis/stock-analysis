@@ -1,6 +1,7 @@
 namespace core.fs.Services.Analysis
 
 open System.Collections.Generic
+open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
 module OutcomeType =
@@ -54,18 +55,18 @@ type SMA(values,interval) =
         
     static member ToSMA (prices:decimal array) interval =
         
-        let sma = Array.create (prices.Length) None
+        let sma = Array.create prices.Length None
         
         for i in 0..prices.Length-1 do
             if i < interval then
-                sma.[i] <- None
+                sma[i] <- None
             else
                 let sum = 
                     [interval-1..-1..i-interval]
-                    |> Seq.map (fun j -> prices.[j])
+                    |> Seq.map (fun j -> prices[j])
                     |> Seq.sum
                     
-                sma.[i] <- Some (sum / decimal interval)
+                sma[i] <- Some (sum / decimal interval)
         
         SMA(sma, interval)        
         
@@ -138,5 +139,5 @@ type DistributionStatistics =
         median: decimal
         skewness: decimal
         stdDev: decimal
-        buckets: seq<ValueWithFrequency>
+        buckets: array<ValueWithFrequency>
     }

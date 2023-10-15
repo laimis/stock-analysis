@@ -53,34 +53,30 @@ type ITradingStrategy =
         
 module ProfitPoints =
     
-    type ProfitPointContainer(name:string, prices:decimal[]) =
+    type ProfitPointContainer(name:string, prices:decimal seq) =
         member this.Name = name
         member this.Prices = prices
         
-    let getProfitPointsWithStopPrice(position:PositionInstance, levels:int) =
+    let getProfitPointWithStopPrice (position:PositionInstance) (level:int) =
         let riskPerShare = position.CompletedPositionCostPerShare - position.FirstStop.Value
-        
-        let getProfitPoint(level:int) =
-            position.CompletedPositionCostPerShare + riskPerShare * decimal(level)
-            
-        let profitPoints =
-            [1..levels]
-            |> List.map getProfitPoint
-            |> List.filter (fun p -> p > position.CompletedPositionCostPerShare)
-            
-        profitPoints
-        
-    let getProfitPointWithPercentGain(position:PositionInstance, level:int, percentGain:decimal) =
+        position.CompletedPositionCostPerShare + riskPerShare * decimal(level)
+     
+    let getProfitPointWithPercentGain (position:PositionInstance) (level:int) (percentGain:decimal) =
         let singleLevel = position.CompletedPositionCostPerShare * percentGain
         position.CompletedPositionCostPerShare + singleLevel * decimal(level)
     
-    let getProfitPoints func position levels =
+    
+    let getProfitPointsWithStopPrice(position:PositionInstance, levels:int) =
+        let profitPoints =
+            [1..levels]
+            |> List.map (getProfitPointWithStopPrice position)
+            |> List.filter (fun p -> p > position.CompletedPositionCostPerShare)
+            
+        profitPoints
+    
+    let getProfitPoints func levels =
         [1..levels]
-        |> List.map (fun level ->
-            let value : Nullable<decimal> = func position level
-            value)
-        |> List.filter (fun p -> p.HasValue)
-        |> List.map (fun p -> p.Value)
+        |> List.map (fun level -> func level)
         
 
 type TradingPerformance =
@@ -165,7 +161,7 @@ type TradingPerformance =
                                 | true ->
                                     let gradeDistribution =
                                         match perf.GradeDistribution |> Array.tryFind (fun g -> g.label = position.Grade.Value.Value) with
-                                        | Some g -> perf.GradeDistribution |> Array.map (fun g -> if g.label = position.Grade.Value.Value then { g with frequency = g.frequency + 1 } else g)
+                                        | Some _ -> perf.GradeDistribution |> Array.map (fun g -> if g.label = position.Grade.Value.Value then { g with frequency = g.frequency + 1 } else g)
                                         | None -> perf.GradeDistribution |> Array.append [| { label = position.Grade.Value.Value; frequency = 1 } |]
                                     gradeDistribution
                                 | false -> perf.GradeDistribution
