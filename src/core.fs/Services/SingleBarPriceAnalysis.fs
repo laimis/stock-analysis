@@ -169,7 +169,7 @@ module SingleBarPriceAnalysis =
     let volumeAnalysis (bars:PriceBar array) =
         
         let currentBar = bars[bars.Length - 1]
-        let volumeStats = NumberAnalysis.PercentChanges false (bars |> Array.map (fun x -> x.Volume |> decimal))
+        let volumeStats = NumberAnalysis.calculateStats (bars |> Array.map (fun x -> x.Volume |> decimal))
         let relativeVolume = 
             match volumeStats.mean with
             | 0m -> 0m

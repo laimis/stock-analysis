@@ -112,6 +112,6 @@ module GapAnalysis =
             |> Array.skip volumeStart
             |> Array.take (min numberOfBarsToAnalyze prices.Length)
             
-        let volumeStats = NumberAnalysis.PercentChanges false data
+        let volumeStats = NumberAnalysis.calculateStats data
         
         GenerateInternal (prices |> Array.skip start |> Array.take (prices.Length - start)) volumeStats

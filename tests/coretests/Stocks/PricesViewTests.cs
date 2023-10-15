@@ -9,7 +9,7 @@ namespace coretests.Stocks
         [Fact]
         public void GivesPrices_SMAs_Are_Correct()
         {
-            // generate a set of 504 prices from o to 504 increasing by one each day
+            // generate a set of 504 prices from 0 to 504 increasing by one each day
             var prices = new PriceBar[504];
             var baseDate = new System.DateTimeOffset(2020, 1, 1, 0, 0, 0, System.TimeSpan.Zero);
             for (var i = 0; i < 504; i++)

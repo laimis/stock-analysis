@@ -42,7 +42,7 @@ module NumberAnalysis =
         
         result.ToArray()
     
-    let private calculateStats (numbers:decimal[]) : DistributionStatistics =
+    let calculateStats (numbers:decimal[]) : DistributionStatistics =
         if numbers.Length = 0 then
             {
                 count = 0m

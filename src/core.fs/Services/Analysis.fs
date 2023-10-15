@@ -62,7 +62,7 @@ type SMA(values,interval) =
                 sma[i] <- None
             else
                 let sum = 
-                    [interval-1..-1..i-interval]
+                    [i-interval..i-1]
                     |> Seq.map (fun j -> prices[j])
                     |> Seq.sum
                     

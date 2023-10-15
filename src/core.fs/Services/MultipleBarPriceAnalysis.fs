@@ -62,34 +62,25 @@ module MultipleBarPriceAnalysis =
             
         let private GenerateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
             
-            let sma20Below50Days = 
+            let sma20Above50Sequence = 
                 smaContainer.sma20.Values
+                |> Array.zip smaContainer.sma50.Values
+                |> Array.filter (fun (sma20, sma50) -> sma20.IsSome && sma50.IsSome)
+                |> Array.map (fun (sma20, sma50) -> (sma20.Value, sma50.Value))
+                |> Array.map (fun (sma20, sma50) -> (sma20 - sma50) > 0m)
                 |> Array.rev
-                |> Array.findIndex (fun v -> v.IsSome && v.Value < smaContainer.sma50.Values[0].Value)
                 
-            let sma20Above50Days = 
-                smaContainer.sma20.Values
-                |> Array.rev
-                |> Array.findIndex (fun v -> v.IsSome && v.Value > smaContainer.sma50.Values[0].Value)
-                
-            let sma20Above50DaysOutcomeType =
-                if sma20Below50Days > 0 then
-                    OutcomeType.Negative
-                else
-                    OutcomeType.Positive
-                    
-            let sma20Above50DaysValue =
-                if sma20Below50Days > 0 then
-                    sma20Below50Days * -1
-                else
-                    sma20Above50Days
+            let outcomeType, value =
+                match sma20Above50Sequence[0] with
+                | true -> OutcomeType.Positive, sma20Above50Sequence |> Array.findIndex (fun v -> v = false) |> decimal
+                | false -> OutcomeType.Negative, sma20Above50Sequence |> Array.findIndex (fun v -> v = true) |> decimal
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.SMA20Above50Days,
-                outcomeType = sma20Above50DaysOutcomeType,
-                value = (sma20Above50DaysValue |> decimal),
+                outcomeType = outcomeType,
+                value = value,
                 valueType = ValueFormat.Number,
-                message = "SMA 20 has been " + (if sma20Below50Days > 0 then "below" else "above") + $" SMA 50 for {sma20Above50DaysValue} days"
+                message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} days"
             )
             
         let Generate (prices: PriceBar array) =
@@ -144,7 +135,7 @@ module MultipleBarPriceAnalysis =
             
         let private GenerateLowestPriceOutcome (prices: PriceBar array) =
             
-            let lowest = prices[0]
+            let lowest = prices |> Array.minBy (fun p -> p.Close)
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.LowestPrice,
@@ -156,7 +147,7 @@ module MultipleBarPriceAnalysis =
             
         let private GenerateLowestPriceDaysAgoOutcome (prices: PriceBar array) =
             
-            let lowest = prices[0]
+            let lowest = prices |> Array.minBy (fun p -> p.Close)
             let lowestPriceDaysAgo = System.Math.Round(System.DateTimeOffset.Now.Subtract(lowest.Date).TotalDays, 0)
             let lowestPriceDaysAgoOutcomeType = if lowestPriceDaysAgo <= 30 then OutcomeType.Negative else OutcomeType.Neutral
             
@@ -170,7 +161,7 @@ module MultipleBarPriceAnalysis =
             
         let private GeneratePercentAboveLowOutcome (currentPrice: decimal) (prices: PriceBar array) =
             
-            let lowest = prices[0]
+            let lowest = prices |> Array.minBy (fun p -> p.Close)
             let percentAboveLow = (currentPrice - lowest.Close) / lowest.Close
             let percentAboveLowOutcomeType = OutcomeType.Neutral
             
@@ -184,7 +175,7 @@ module MultipleBarPriceAnalysis =
             
         let private GenerateHighestPriceOutcome (prices: PriceBar array) =
             
-            let highest = prices[0]
+            let highest = prices |> Array.maxBy (fun p -> p.Close)
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.HighestPrice,
@@ -196,7 +187,7 @@ module MultipleBarPriceAnalysis =
             
         let private GenerateHighestPriceDaysAgoOutcome (prices: PriceBar array) =
             
-            let highest = prices[0]
+            let highest = prices |> Array.maxBy (fun p -> p.Close)
             let highestPriceDaysAgo = System.Math.Round(System.DateTimeOffset.Now.Subtract(highest.Date).TotalDays, 0)
             let highestPriceDaysAgoOutcomeType = if highestPriceDaysAgo <= 30 then OutcomeType.Positive else OutcomeType.Neutral
             
@@ -210,7 +201,7 @@ module MultipleBarPriceAnalysis =
             
         let private GeneratePercentBelowHighOutcome (currentPrice: decimal) (prices: PriceBar array) =
             
-            let highest = prices[0]
+            let highest = prices |> Array.maxBy (fun p -> p.Close)
             let percentBelowHigh = (highest.Close - currentPrice) / highest.Close
             let percentBelowHighOutcomeType = OutcomeType.Neutral
             

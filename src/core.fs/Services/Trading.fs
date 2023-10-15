@@ -192,6 +192,21 @@ type TradingPerformance =
                                 | true -> perf.WinReturnPctTotal + position.GainPct
                                 | false -> perf.WinReturnPctTotal
                                 
+                            Losses = 
+                                match position.Profit < 0m with
+                                | true -> perf.Losses + 1
+                                | false -> perf.Losses
+                            
+                            LossAmount =
+                                match position.Profit < 0m with
+                                | true -> perf.LossAmount + position.Profit
+                                | false -> perf.LossAmount
+                            
+                            MaxLossAmount =
+                                match position.Profit < 0m with
+                                | true -> Math.Min(perf.MaxLossAmount, position.Profit)
+                                | false -> perf.MaxLossAmount
+                                
                     }
                 ) { NumberOfTrades = 0
                     Wins = 0

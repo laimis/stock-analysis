@@ -23,7 +23,7 @@ module PatternDetection =
                 Some({
                     date = current.Date
                     name = gapUpName
-                    description = $"%s{gapUpName} %f{gap.GapSizePct}"
+                    description = $"%s{gapUpName} {gap.GapSizePct:P}%%"
                     value = gap.GapSizePct
                     valueFormat = ValueFormat.Percentage
                 })
@@ -44,7 +44,7 @@ module PatternDetection =
                     if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
                         
                         let latestVolume = bars |> Array.skip (bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis) |> Array.map (fun b -> b.Volume |> decimal)
-                        let stats = NumberAnalysis.PercentChanges false latestVolume
+                        let stats = NumberAnalysis.calculateStats latestVolume
                         
                         let multiplier = decimal(current.Volume) / stats.median
                         ", volume x" + multiplier.ToString("N1")
@@ -112,7 +112,7 @@ module PatternDetection =
                 |> Array.skip (bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                 |> Array.map (fun b -> b.Volume |> decimal)
                 
-            let stats = NumberAnalysis.PercentChanges false subsetOfBars
+            let stats = NumberAnalysis.calculateStats subsetOfBars
             
             // now take the last bar volume
             let lastBarVolume = bars[bars.Length - 1].Volume
