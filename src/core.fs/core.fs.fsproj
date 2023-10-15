@@ -13,6 +13,7 @@
         <Compile Include="Shared\Adapters\IPortfolioStorage.fs" />
         <Compile Include="Shared\Adapters\Subscriptions.fs" />
         <Compile Include="Shared\Adapters\Logging.fs" />
+        <Compile Include="Shared\Adapters\Stocks.fs" />
         <Compile Include="Shared\Adapters\Options.fs" />
         <Compile Include="Shared\Adapters\Brokerage.fs" />
         <Compile Include="Shared\Adapters\Cryptos.fs" />
@@ -23,6 +24,14 @@
         <Compile Include="Shared\Adapters\Authentication.fs" />
         <Compile Include="Helpers.fs" />
         <Compile Include="Services\Trading.fs" />
+        <Compile Include="Services\TradingStrategies.fs" />
+        <Compile Include="Services\Analysis.fs" />
+        <Compile Include="Services\GapAnalysis.fs" />
+        <Compile Include="Services\NumberAnalysis.fs" />
+        <Compile Include="Services\MultipleBarPriceAnalysis.fs" />
+        <Compile Include="Services\PatternDetection.fs" />
+        <Compile Include="Services\Positions.fs" />
+        <Compile Include="Services\SingleBarPriceAnalysis.fs" />
         <Compile Include="Options\Input.fs"/>
         <Compile Include="Options\Views.fs"/>
         <Compile Include="Options\Handler.fs"/>

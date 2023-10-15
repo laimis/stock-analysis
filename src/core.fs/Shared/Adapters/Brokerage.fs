@@ -7,6 +7,7 @@ open core.Account
 open core.Shared
 open core.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Options
+open core.fs.Shared.Adapters.Stocks
 
 type OAuthResponse() =
     
