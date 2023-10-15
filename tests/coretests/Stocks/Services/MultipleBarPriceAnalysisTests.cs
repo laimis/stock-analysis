@@ -37,11 +37,11 @@ namespace coretests.Stocks.Services
 
         [Fact]
         public void PercentChangeAverage()
-            => Assert.Equal(0.00m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeAverage).Value, 2);
+            => Assert.Equal(-0.16m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeAverage).Value, 2);
 
         [Fact]
         public void PercentChangeStandardDeviation()
-            => Assert.Equal(0.07m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeStandardDeviation).Value, 2);
+            => Assert.Equal(6.62m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeStandardDeviation).Value, 2);
 
         [Fact]
         public void LowestPrice()

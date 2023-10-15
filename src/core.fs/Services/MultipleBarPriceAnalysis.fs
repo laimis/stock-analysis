@@ -290,8 +290,7 @@ module MultipleBarPriceAnalysis =
     
     module MultipleBarPriceAnalysis =
         
-        let private GenerateOutcomes (currentPrice: decimal) (prices: PriceBar array) =
-            
+        let Run (currentPrice: decimal) prices =
             let outcomes = List<AnalysisOutcome>()
             
             prices |> PriceAnalysis.Generate currentPrice |> outcomes.AddRange
@@ -300,7 +299,6 @@ module MultipleBarPriceAnalysis =
             
             outcomes
             
-        let Run (currentPrice: decimal) prices = GenerateOutcomes currentPrice prices
 
 
     module MultipleBarAnalysisOutcomeEvaluation =

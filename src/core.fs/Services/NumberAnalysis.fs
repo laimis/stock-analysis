@@ -130,16 +130,13 @@ module NumberAnalysis =
         let percentChanges = 
             numbers 
             |> Seq.pairwise 
-            |> Seq.map (fun (x, y) -> (y - x) / x)
+            |> Seq.map (fun (x, y) ->
+                let change = (y - x) / x
+                match multipleByHundred with
+                | true -> System.Math.Round(change * 100m, 2)
+                | false -> change
+            )
             |> Seq.toArray
-
-        let percentChanges = 
-            if multipleByHundred then
-                percentChanges
-                |> Array.map (fun x -> x * 100m)
-                |> Array.map (fun x -> System.Math.Round(x, 2))
-            else
-                percentChanges
 
         calculateStats percentChanges
         
