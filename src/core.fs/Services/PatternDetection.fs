@@ -20,10 +20,15 @@ module PatternDetection =
                 None
             else
                 let gap = gaps[0]
+                let gapPercentFormatted =
+                    System.Math.Round(
+                        gap.GapSizePct * 100m,
+                        2
+                    )
                 Some({
                     date = current.Date
                     name = gapUpName
-                    description = $"%s{gapUpName} {gap.GapSizePct:P}"
+                    description = $"%s{gapUpName} {gapPercentFormatted}%%"
                     value = gap.GapSizePct
                     valueFormat = ValueFormat.Percentage
                 })
