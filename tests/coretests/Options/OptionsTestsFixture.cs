@@ -28,7 +28,7 @@ namespace coretests.Options
             var opt = new OwnedOption(
                 cmd.Item1.Ticker,
                 cmd.Item1.StrikePrice.Value,
-                (OptionType)Enum.Parse(typeof(OptionType), cmd.Item1.OptionType.ToString()),
+                cmd.Item1.OptionType.ToEnum(),
                 cmd.Item1.ExpirationDate.Value,
                 cmd.Item2.Item);
 
