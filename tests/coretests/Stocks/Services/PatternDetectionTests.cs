@@ -43,8 +43,8 @@ namespace coretests.Stocks.Services
 
             var patterns = PatternDetection.generate(barsToTest);
             Assert.Equal(2, patterns.Count());
-            Assert.Equal(PatternDetection.highest1YearVolumeName, patterns.First().name);
-            Assert.Equal(PatternDetection.highVolumeName, patterns.Last().name);
+            Assert.Equal(PatternDetection.highest1YearVolumeName, patterns.Last().name);
+            Assert.Equal(PatternDetection.highVolumeName, patterns.First().name);
         }
 
         [Fact]

@@ -65,7 +65,7 @@ module PatternDetection =
     let highest1YearVolumeName = "Highest 1 year volume"
     
     let highest1YearVolume (bars: PriceBar[]) =
-        if bars.Length = 0 then
+        if bars.Length < 2 then
             None
         else
             // find the starting bar, which is higher date than 1 year ago

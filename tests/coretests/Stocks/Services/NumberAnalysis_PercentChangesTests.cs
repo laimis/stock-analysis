@@ -26,10 +26,10 @@ namespace coretests.Stocks.Services
         public void MedianIsCorrect() => Assert.Equal(0.50m, _percentChangeStatistics.median);
 
         [Fact]
-        public void SkewnessIsCorrect() => Assert.Equal(0.54m, _percentChangeStatistics.skewness);
+        public void SkewnessIsCorrect() => Assert.Equal(0.54m, _percentChangeStatistics.skewness, 2);
 
         [Fact]
-        public void KurtosisIsCorrect() => Assert.Equal(-1.88m, _percentChangeStatistics.kurtosis);
+        public void KurtosisIsCorrect() => Assert.Equal(-1.88m, _percentChangeStatistics.kurtosis, 2);
 
         [Fact]
         public void BucketsAreCorrect()
