@@ -23,7 +23,7 @@ module PatternDetection =
                 Some({
                     date = current.Date
                     name = gapUpName
-                    description = $"%s{gapUpName} {gap.GapSizePct:P}%%"
+                    description = $"%s{gapUpName} {gap.GapSizePct:P}"
                     value = gap.GapSizePct
                     valueFormat = ValueFormat.Percentage
                 })

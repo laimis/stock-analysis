@@ -111,7 +111,7 @@ namespace coretests.Stocks.Services
 
             var pattern = patterns.First();
             Assert.Equal(PatternDetection.gapUpName, pattern.name);
-            Assert.Contains("Gap Up 10.00", pattern.description);
+            Assert.Equal("Gap Up 10.00%", pattern.description);
         }
     }
 }
