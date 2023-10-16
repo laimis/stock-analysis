@@ -92,11 +92,9 @@ type TradingPerformance =
         Losses:int
         LossAmount:decimal
         MaxLossAmount:decimal
-        LossAvgReturnPct:decimal
+        LossReturnPctTotal:decimal
         LossMaxReturnPct:decimal
-        LossAvgDaysHeld:double
-        WinPct:decimal
-        EV:decimal
+        TotalDaysHeldLosses:decimal
         AvgReturnPct:decimal
         TotalDaysHeld:decimal
         rrSum:decimal
@@ -121,11 +119,21 @@ type TradingPerformance =
                 match this.Wins with
                 | 0 -> 0m
                 | _ -> this.WinReturnPctTotal / decimal(this.Wins)
+                
+            member this.LossAvgReturnPct =
+                match this.Losses with
+                | 0 -> 0m
+                | _ -> this.LossReturnPctTotal / decimal(this.Losses)
         
             member this.WinAvgDaysHeld =
                 match this.Wins with
                 | 0 -> 0m
                 | _ -> this.TotalDaysHeldWins / decimal(this.Wins)
+                
+            member this.LossAvgDaysHeld =
+                match this.Losses with
+                | 0 -> 0m
+                | _ -> this.TotalDaysHeldLosses / decimal(this.Losses)
               
             member this.ReturnPctRatio =
                 match this.LossAvgReturnPct with
@@ -142,6 +150,15 @@ type TradingPerformance =
                 | 0 -> 0m
                 | _ -> this.TotalDaysHeld / decimal(this.NumberOfTrades)
                 
+            member this.WinPct = 
+                match this.NumberOfTrades with
+                | 0 -> 0m
+                | _ -> decimal(this.Wins) / decimal(this.NumberOfTrades)
+                
+            member this.EV =
+                match this.NumberOfTrades with
+                | 0 -> 0m
+                | _ -> this.WinPct * this.WinAmount - (1m - this.WinPct) * this.LossAmount
                 
             static member Create(closedPositions:seq<PositionInstance>) =
                 
@@ -186,6 +203,11 @@ type TradingPerformance =
                                 match position.Profit >= 0m with
                                 | true -> perf.TotalDaysHeldWins + decimal(position.DaysHeld)
                                 | false -> perf.TotalDaysHeldWins
+                            
+                            TotalDaysHeldLosses =
+                                match position.Profit < 0m with
+                                | true -> perf.TotalDaysHeldLosses + decimal(position.DaysHeld)
+                                | false -> perf.TotalDaysHeldLosses
                                 
                             WinReturnPctTotal =
                                 match position.Profit >= 0m with
@@ -207,6 +229,20 @@ type TradingPerformance =
                                 | true -> Math.Min(perf.MaxLossAmount, position.Profit)
                                 | false -> perf.MaxLossAmount
                                 
+                            WinMaxReturnPct =
+                                match position.Profit >= 0m with
+                                | true -> Math.Max(perf.WinMaxReturnPct, position.GainPct)
+                                | false -> perf.WinMaxReturnPct
+                                
+                            LossMaxReturnPct =
+                                match position.Profit < 0m with
+                                | true -> Math.Min(perf.LossMaxReturnPct, position.GainPct)
+                                | false -> perf.LossMaxReturnPct
+                                
+                            LossReturnPctTotal =
+                                match position.Profit < 0m with
+                                | true -> perf.LossReturnPctTotal + position.GainPct
+                                | false -> perf.LossReturnPctTotal
                     }
                 ) { NumberOfTrades = 0
                     Wins = 0
@@ -217,11 +253,7 @@ type TradingPerformance =
                     Losses = 0
                     LossAmount = 0m
                     MaxLossAmount = 0m
-                    LossAvgReturnPct = 0m
                     LossMaxReturnPct = 0m
-                    LossAvgDaysHeld = 0.0
-                    WinPct = 0m
-                    EV = 0m
                     AvgReturnPct = 0m
                     TotalDaysHeld = 0m
                     rrSum = 0m
@@ -231,7 +263,9 @@ type TradingPerformance =
                     GradeDistribution = [||]
                     TotalCost = 0m
                     TotalDaysHeldWins = 0m
-                    WinReturnPctTotal = 0m 
+                    TotalDaysHeldLosses = 0m 
+                    WinReturnPctTotal = 0m
+                    LossReturnPctTotal = 0m 
                 }
 
 type TradingStrategyPerformance =
