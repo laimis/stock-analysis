@@ -6,7 +6,6 @@ using core.Account;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
-using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
 using Polly;

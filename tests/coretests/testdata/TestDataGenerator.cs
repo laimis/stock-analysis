@@ -25,7 +25,7 @@ namespace coretests.testdata
                     x =>
                         new PriceBar(
                             date: DateTime.Now.AddDays(-numOfBars).AddDays(x),
-                            open: x,
+                            x,
                             high: x,
                             low: x == 0 ? x : x - 1,
                             close: x,

@@ -5,7 +5,6 @@ open System.Collections.Generic
 open System.Threading.Tasks
 open core.Account
 open core.Shared
-open core.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Options
 open core.fs.Shared.Adapters.Stocks
 
@@ -35,6 +34,41 @@ type MarketHours() =
     member val product : string = "" with get, set
     member val productName : string = "" with get, set
     
+[<CLIMutable>]
+type SearchResult =
+    {
+        Symbol:string
+        SecurityName:string
+        SecurityType:string
+        Region:string
+        Exchange:string
+    }
+    
+    with
+        member this.IsSupportedType =
+            match this.SecurityType with
+            | "SHARE" -> true
+            | "cs" -> true
+            | "et" -> true
+            | "ad" -> true
+            | _ -> false
+            
+
+[<CLIMutable>]
+type StockQueryResult =
+    {
+        Symbol:string
+        CompanyName:string
+        LatestPrice:decimal
+        LatestSource:string
+        LatestTime:string
+        MarketCap:int64
+        Volume:int64
+        Week52High:decimal
+        Week52Low:decimal
+        PERatio:decimal option
+    }
+
 [<CLIMutable>]
 type StockQuote =
     {

@@ -1,6 +1,4 @@
-using System;
 using System.Threading.Tasks;
-using core.Shared.Adapters.Stocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
