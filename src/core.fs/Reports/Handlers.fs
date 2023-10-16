@@ -297,7 +297,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             | false ->
                 return priceResponse.Error.Message |> ResponseUtils.failedTyped<GapReportView>
             | true ->
-                let gaps = GapAnalysis.Generate priceResponse.Success 60
+                let gaps = generate priceResponse.Success 60
                 let response = {gaps=gaps; ticker=query.Ticker.Value}
                 return ServiceResponse<GapReportView>(response)
     }
@@ -341,14 +341,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             | OutcomesReportDuration.AllBars ->
                                 let lastPrice = priceResponse.Success[priceResponse.Success.Length - 1].Close
                                 MultipleBarPriceAnalysis.Run lastPrice priceResponse.Success
-                            | _ -> failwith "Unexpected duration"
                         
                         let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t.Value}
                         
                         let gapsView =
                             match query.IncludeGapAnalysis with
                             | true ->
-                                let gaps = GapAnalysis.Generate priceResponse.Success 60
+                                let gaps = generate priceResponse.Success 60
                                 Some {gaps=gaps; ticker=t.Value}
                             | false -> None
                             
@@ -377,7 +376,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 match query.Duration with
                 | OutcomesReportDuration.SingleBar -> SingleBarPriceAnalysisEvaluation.evaluate outcomes
                 | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.evaluate outcomes
-                | _ -> failwith "Unexpected duration"
             
             let response = OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns)
             

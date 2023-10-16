@@ -4,6 +4,27 @@ open System
 open System.ComponentModel.DataAnnotations
 open core.Shared
 
+type OptionType =
+    | Call
+    | Put
+    
+    with
+        override this.ToString() =
+            match this with
+            | Call -> nameof Call
+            | Put -> nameof Put
+            
+        member this.ToEnum() =
+            match this with
+            | Call -> core.Options.OptionType.CALL
+            | Put -> core.Options.OptionType.PUT
+            
+        static member FromString(value:string) =
+            match value with
+            | nameof Call -> Call
+            | nameof Put -> Put
+            | _ -> failwithf $"Invalid option type: %s{value}"
+            
 type OptionTransaction =
     {
         [<Range(1, 10000)>]
@@ -12,8 +33,7 @@ type OptionTransaction =
         [<Required>]
         ExpirationDate : Nullable<DateTimeOffset>
         [<Required>]
-        [<ValidValues("CALL", "PUT")>]
-        OptionType : string        
+        OptionType : OptionType        
         [<Range(1, 10000, ErrorMessage = "Invalid number of contracts specified")>]
         NumberOfContracts : int
         [<Range(1, 100000)>]

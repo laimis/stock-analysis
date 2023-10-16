@@ -200,7 +200,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | None -> return "User not found" |> ResponseUtils.failedTyped<OwnedOption>
             | _ ->
 
-                let optionType = Enum.Parse(typedefof<OptionType>, data.OptionType) :?> OptionType
+                let optionType = data.OptionType.ToEnum()
 
                 let! options = storage.GetOwnedOptions(userId)
                 

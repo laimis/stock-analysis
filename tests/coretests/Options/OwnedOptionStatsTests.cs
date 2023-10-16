@@ -2,6 +2,7 @@
 using core.fs.Options;
 using core.Options;
 using Xunit;
+using OptionType = core.Options.OptionType;
 
 namespace coretests.Options
 {

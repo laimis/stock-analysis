@@ -1,11 +1,11 @@
 using System;
-using core.Account;
 using core.fs.Options;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Options;
 using core.Shared;
 using Moq;
+using OptionType = core.Options.OptionType;
 
 namespace coretests.Options
 {
@@ -28,7 +28,7 @@ namespace coretests.Options
             var opt = new OwnedOption(
                 cmd.Item1.Ticker,
                 cmd.Item1.StrikePrice.Value,
-                (OptionType)Enum.Parse(typeof(OptionType), cmd.Item1.OptionType),
+                (OptionType)Enum.Parse(typeof(OptionType), cmd.Item1.OptionType.ToString()),
                 cmd.Item1.ExpirationDate.Value,
                 cmd.Item2.Item);
 
@@ -49,7 +49,7 @@ namespace coretests.Options
         {
             var cmd = new OptionTransaction(
                 strikePrice: 20,
-                optionType: OptionType.PUT.ToString(),
+                optionType: core.fs.Options.OptionType.Put,
                 expirationDate: DateTimeOffset.UtcNow.AddDays(10),
                 ticker: _ticker,
                 numberOfContracts: 1,

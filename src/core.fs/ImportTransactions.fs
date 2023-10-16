@@ -56,7 +56,7 @@ module ImportTransactions =
             
         member this.OptionType() =
             let m = TransactionRecord.OptionRegex.Match(this.Description)
-            m.Groups[4].Value
+            OptionType.FromString m.Groups[4].Value
             
         member this.GetTickerFromOptionDescription() =
             let m = TransactionRecord.OptionRegex.Match(this.Description)

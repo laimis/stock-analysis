@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using core.fs.Options;
 using core.fs.Reports;
 using core.fs.Services;
 using core.fs.Shared;
@@ -72,6 +73,19 @@ public class OutcomeReprtDurationConverter : JsonConverter<OutcomesReportDuratio
     }
 
     public override void Write(Utf8JsonWriter writer, OutcomesReportDuration value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public class OptionTypeConverter : JsonConverter<OptionType>
+{
+    public override OptionType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OptionType.FromString(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, OptionType value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString());
     }

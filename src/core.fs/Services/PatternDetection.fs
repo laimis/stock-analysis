@@ -16,7 +16,7 @@ module PatternDetection =
             None
         else
             let current = bars[bars.Length - 1]
-            let gaps = Generate bars 2
+            let gaps = generate bars 2
             if gaps.Count = 0 || gaps[0].Type <> GapType.Up then
                 None
             else

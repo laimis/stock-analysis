@@ -34,7 +34,7 @@ module GapAnalysis =
             ClosingRange: decimal
         }
         
-    let private ClosingConditionMet (prices: PriceBar array) (start: int) (length: int) (closingCondition: PriceBar -> bool) =
+    let private closingConditionMet (prices: PriceBar array) (start: int) (length: int) (closingCondition: PriceBar -> bool) =
         
         let rec loop (i: int) =
             if i < start + length && i < prices.Length then
@@ -47,7 +47,7 @@ module GapAnalysis =
                 
         loop start
         
-    let private GenerateInternal (prices: PriceBar array) (volumeStats: DistributionStatistics) =
+    let private generateInternal (prices: PriceBar array) (volumeStats: DistributionStatistics) =
         
         let gaps = List<Gap>()
         
@@ -83,8 +83,8 @@ module GapAnalysis =
                     | x when x < 0m -> fun bar -> bar.Close >= yesterday.Close
                     | _ -> failwith "Invalid gap type"
                     
-                let closedQuickly = ClosingConditionMet prices (i + 1) 10 closingCondition
-                let open' = not (ClosingConditionMet prices (i + 1) (prices.Length - i) closingCondition)
+                let closedQuickly = closingConditionMet prices (i + 1) 10 closingCondition
+                let open' = not (closingConditionMet prices (i + 1) (prices.Length - i) closingCondition)
                 let relativeVolume = System.Math.Round ((currentBar.Volume |> decimal) / volumeStats.mean, 2)
                 let closingRange = currentBar.ClosingRange()
                 
@@ -104,7 +104,7 @@ module GapAnalysis =
                 
         gaps
         
-    let Generate (prices: PriceBar array) (numberOfBarsToAnalyze: int) =
+    let generate (prices: PriceBar array) (numberOfBarsToAnalyze: int) =
         
         let start =
             if prices.Length > numberOfBarsToAnalyze then
@@ -126,4 +126,4 @@ module GapAnalysis =
             
         let volumeStats = NumberAnalysis.calculateStats data
         
-        GenerateInternal (prices |> Array.skip start |> Array.take (prices.Length - start)) volumeStats
+        generateInternal (prices |> Array.skip start |> Array.take (prices.Length - start)) volumeStats

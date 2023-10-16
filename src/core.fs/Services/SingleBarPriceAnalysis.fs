@@ -99,7 +99,7 @@ module SingleBarPriceAnalysis =
                 
                 
             // see if there was a gap down or gap up
-            let gaps = GapAnalysis.Generate bars SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+            let gaps = GapAnalysis.generate bars SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
             
             let gap = gaps |> Seq.tryFind (fun x -> x.Equals(currentBar))
             
