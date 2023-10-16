@@ -21,8 +21,10 @@ type OAuthResponse() =
     member val expires_in : int64 = 0L with get, set
     member val scope : string = "" with get, set
     member val refresh_token_expires_in : int64 = 0L with get, set
+    member val error : string = "" with get, set
     member this.IsExpired : bool =
         created.AddSeconds(this.expires_in |> float) < DateTimeOffset.UtcNow
+    member this.IsError : bool = this.error <> ""
 
 type MarketHours() =
     
@@ -161,14 +163,14 @@ type BrokerageOrderDuration =
     with
         static member FromString (value:string) =
             match value with
-            | "Day" -> Day
-            | "Gtc" -> Gtc
-            | "DayPlus" -> DayPlus
-            | "GtcPlus" -> GtcPlus
+            | nameof(Day) -> Day
+            | nameof(Gtc) -> Gtc
+            | nameof(DayPlus) -> DayPlus
+            | nameof(GtcPlus) -> GtcPlus
             | _ -> failwithf $"Invalid order duration: %s{value}"
             
-        static member ToString (value:BrokerageOrderDuration) =
-            match value with
+        override this.ToString() =
+            match this with
             | Day -> "Day"
             | Gtc -> "Gtc"
             | DayPlus -> "DayPlus"
@@ -182,13 +184,13 @@ type BrokerageOrderType =
     with
         static member FromString(value:string) =
             match value with
-            | "Limit" -> Limit
-            | "Market" -> Market
-            | "StopMarket" -> StopMarket
+            | nameof Limit -> Limit
+            | nameof Market -> Market
+            | nameof StopMarket -> StopMarket
             | _ -> failwithf $"Invalid order type: %s{value}"
             
-        static member ToString(value:BrokerageOrderType) =
-            match value with
+        override this.ToString() =
+            match this with
             | Limit -> "Limit"
             | Market -> "Market"
             | StopMarket -> "StopMarket"

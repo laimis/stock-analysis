@@ -1,7 +1,11 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using core.fs.Reports;
+using core.fs.Services;
+using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Stocks;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using core.Stocks;
@@ -34,6 +38,45 @@ public class UserIdConverter : JsonConverter<UserId>
     }
 }
 
+public class GapTypeConverter : JsonConverter<GapAnalysis.GapType>
+{
+    public override GapAnalysis.GapType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return GapAnalysis.GapType.FromString(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, GapAnalysis.GapType value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public class PriceFrequencyConverter : JsonConverter<PriceFrequency>
+{
+    public override PriceFrequency Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return PriceFrequency.FromString(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, PriceFrequency value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public class OutcomeReprtDurationConverter : JsonConverter<OutcomesReportDuration>
+{
+    public override OutcomesReportDuration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OutcomesReportDuration.FromString(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, OutcomesReportDuration value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
 public class GradeConverter : JsonConverter<TradeGrade>
 {
     public override TradeGrade Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -47,6 +90,19 @@ public class GradeConverter : JsonConverter<TradeGrade>
     }
 }
 
+public class ValueFormatTypeConverter : JsonConverter<ValueFormat>
+{
+    public override ValueFormat Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return ValueFormat.FromString(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, ValueFormat value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
 public class BrokerageOrderTypeConverter : JsonConverter<BrokerageOrderType>
 {
     public override BrokerageOrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -56,7 +112,7 @@ public class BrokerageOrderTypeConverter : JsonConverter<BrokerageOrderType>
 
     public override void Write(Utf8JsonWriter writer, BrokerageOrderType value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(BrokerageOrderType.ToString(value));
+        writer.WriteStringValue(value.ToString());
     }
 }
 
@@ -69,7 +125,7 @@ public class BrokerageOrderDurationConverter : JsonConverter<BrokerageOrderDurat
 
     public override void Write(Utf8JsonWriter writer, BrokerageOrderDuration value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(BrokerageOrderDuration.ToString(value));
+        writer.WriteStringValue(value.ToString());
     }
 }
 

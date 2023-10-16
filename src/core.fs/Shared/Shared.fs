@@ -73,3 +73,26 @@ type LabelWithFrequency =
         label: string
         frequency: int
     }
+    
+ type ValueFormat =
+    | Percentage
+    | Currency
+    | Number
+    | Boolean
+    
+    with
+        
+        override this.ToString() =
+            match this with
+            | Percentage -> nameof Percentage
+            | Currency -> nameof Currency
+            | Number -> nameof Number
+            | Boolean -> nameof Boolean
+            
+        static member FromString (value: string) =
+            match value with
+            | nameof Percentage -> Percentage
+            | nameof Currency -> Currency
+            | nameof Number -> Number
+            | nameof Boolean -> Boolean
+            | _ -> failwithf $"Unknown value format: %s{value}"

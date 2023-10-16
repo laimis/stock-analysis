@@ -67,9 +67,22 @@ type GapReportView =
     }
     
 type OutcomesReportDuration =
-    | SingleBar = 0
-    | AllBars = 1
-
+    | SingleBar
+    | AllBars
+    
+    with
+        
+        override this.ToString() =
+            match this with
+            | SingleBar -> (nameof SingleBar).ToLowerInvariant()
+            | AllBars -> (nameof AllBars).ToLowerInvariant()
+            
+        static member FromString(value:string) =
+            match value.ToLowerInvariant() with
+            | "singlebar" -> SingleBar
+            | "allbars" -> AllBars
+            | _ -> failwith $"Unexpected value {value}"
+    
 type OutcomesReportQuery =
     {
         [<Required>]

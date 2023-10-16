@@ -10,6 +10,18 @@ module GapAnalysis =
         | Up
         | Down
         
+        with
+            static member FromString(value:string) =
+                match value with
+                | nameof Up -> Up
+                | nameof Down -> Down
+                | _ -> failwith $"Invalid gap type: {value}"
+                
+            override this.ToString() =
+                match this with
+                | Up -> nameof Up
+                | Down -> nameof Down
+        
     type Gap =
         {
             Type: GapType

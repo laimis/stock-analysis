@@ -9,7 +9,7 @@ module OutcomeType =
     let Negative = "Negative"
     let Neutral = "Neutral"
 
-type AnalysisOutcome(key:string, outcomeType:string, value:decimal, valueType:string, message:string) =
+type AnalysisOutcome(key:string, outcomeType:string, value:decimal, valueType:ValueFormat, message:string) =
     member val Key = key
     member val OutcomeType = outcomeType
     member val Value = value
@@ -34,7 +34,7 @@ type Pattern =
         name: string
         description: string
         value: decimal
-        valueFormat: string
+        valueFormat: ValueFormat
     }
     
 type TickerPatterns =

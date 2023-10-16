@@ -54,8 +54,8 @@ namespace web.Controllers
             => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(PriceFrequency.FromString(frequency), new Ticker(ticker), User.Identifier())));
 
         [HttpGet("gaps/tickers/{ticker}")]
-        public Task<ActionResult> TickerGaps(string ticker, [FromQuery] PriceFrequency frequency)
-            => this.OkOrError(_service.Handle(new GapReportQuery(User.Identifier(), ticker, frequency)));
+        public Task<ActionResult> TickerGaps(string ticker, [FromQuery] string frequency)
+            => this.OkOrError(_service.Handle(new GapReportQuery(User.Identifier(), ticker, PriceFrequency.FromString(frequency))));
 
         [HttpGet("positions")]
         public Task<ActionResult> Portfolio() =>
