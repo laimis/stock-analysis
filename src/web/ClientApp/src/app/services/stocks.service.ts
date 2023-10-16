@@ -426,7 +426,7 @@ export class StocksService {
       '/api/reports/outcomes',
       {
         tickers,
-        duration: "allbars",
+        duration: "AllBars",
         includeGapAnalysis: true,
         startDate,
         endDate}
@@ -444,8 +444,8 @@ export class StocksService {
         tickers,
         highlightTitle,
         highlightTickers,
-        duration: "singlebar",
-        frequency: "daily",
+        duration: "SingleBar",
+        frequency: "Daily",
         endDate
       }
     )
@@ -456,8 +456,8 @@ export class StocksService {
       '/api/reports/outcomes',
       {
         tickers,
-        duration: "singlebar",
-        frequency: "weekly",
+        duration: "SingleBar",
+        frequency: "Weekly",
         endDate
       })
   }

@@ -74,13 +74,13 @@ type OutcomesReportDuration =
         
         override this.ToString() =
             match this with
-            | SingleBar -> (nameof SingleBar).ToLowerInvariant()
-            | AllBars -> (nameof AllBars).ToLowerInvariant()
+            | SingleBar -> nameof SingleBar
+            | AllBars -> nameof AllBars
             
         static member FromString(value:string) =
-            match value.ToLowerInvariant() with
-            | "singlebar" -> SingleBar
-            | "allbars" -> AllBars
+            match value with
+            | nameof SingleBar -> SingleBar
+            | nameof AllBars -> AllBars
             | _ -> failwith $"Unexpected value {value}"
     
 type OutcomesReportQuery =

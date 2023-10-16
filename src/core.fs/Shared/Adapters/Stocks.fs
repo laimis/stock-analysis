@@ -23,17 +23,17 @@ type PriceFrequency =
     
         static member FromString (value: string) =
             match value with
-            | "daily" -> Daily
-            | "weekly" -> Weekly
-            | "monthly" -> Monthly
-            | _ -> failwith "Invalid PriceFrequency"
+            | nameof Daily -> Daily
+            | nameof Weekly -> Weekly
+            | nameof Monthly -> Monthly
+            | _ -> failwith $"Invalid PriceFrequency: {value}"
         
         override this.ToString () =
             
             match this with
-            | Daily -> "daily"
-            | Weekly -> "weekly"
-            | Monthly -> "monthly"
+            | Daily -> nameof Daily
+            | Weekly -> nameof Weekly
+            | Monthly -> nameof Monthly
             
 type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, close:decimal, volume:int64) =
     
