@@ -60,3 +60,16 @@ module ResponseUtils =
         match failures |> Seq.isEmpty with
         | true -> Ok
         | false -> failed (failures |> Seq.map (fun r -> r.Message) |> String.concat "\n")
+        
+   
+type ValueWithFrequency =
+    {
+        value: decimal
+        frequency: int
+    }
+
+type LabelWithFrequency =
+    {
+        label: string
+        frequency: int
+    }

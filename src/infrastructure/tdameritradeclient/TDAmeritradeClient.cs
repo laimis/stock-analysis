@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using core.Account;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
 using core.Shared.Adapters.Stocks;
 using Microsoft.Extensions.Logging;
@@ -470,10 +471,10 @@ public class TDAmeritradeClient : IBrokerage
         var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
         var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
 
-        var frequencyType = frequency switch {
-            PriceFrequency.Daily => "daily",
-            PriceFrequency.Weekly => "weekly",
-            PriceFrequency.Monthly => "monthly",
+        var frequencyType = frequency.Tag switch {
+            PriceFrequency.Tags.Daily => "daily",
+            PriceFrequency.Tags.Weekly => "weekly",
+            PriceFrequency.Tags.Monthly => "monthly",
             _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, null)
         };
         
@@ -498,11 +499,11 @@ public class TDAmeritradeClient : IBrokerage
         }
 
         var payload = prices.candles.Select(c => new PriceBar(
-            close: c.close,
+            date: DateTimeOffset.FromUnixTimeMilliseconds(c.datetime),
+            c.open,
             high: c.high,
             low: c.low,
-            open: c.open,
-            date: DateTimeOffset.FromUnixTimeMilliseconds(c.datetime),
+            close: c.close,
             volume: c.volume
         )).ToArray();
 

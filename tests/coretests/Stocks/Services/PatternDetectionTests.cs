@@ -1,6 +1,6 @@
 using System.Linq;
-using core.Shared.Adapters.Stocks;
-using core.Stocks.Services.Analysis;
+using core.fs.Services;
+using core.fs.Shared.Adapters.Stocks;
 using coretests.testdata;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace coretests.Stocks.Services
         public void Generate_WithOnlyOneBarReturnsNothing()
         {
             var bars = new PriceBar[1];
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }
 
@@ -20,11 +20,11 @@ namespace coretests.Stocks.Services
         public void Generate_WithENPH_FindsUpsideReversal()
         {
             var bars = TestDataGenerator.PriceBars("ENPH");
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
             Assert.Single(patterns);
 
             var pattern = patterns.First();
-            Assert.Equal(PatternDetection.UpsideReversalName, pattern.name);
+            Assert.Equal(PatternDetection.upsideReversalName, pattern.name);
             Assert.Contains(", volume x0.9", pattern.description);
         }
 
@@ -41,17 +41,17 @@ namespace coretests.Stocks.Services
             // and run pattern finder, it should find two: highest volume and x volume
             var barsToTest = bars.Take(barIndex + 1).ToArray();
 
-            var patterns = PatternDetection.Generate(barsToTest);
+            var patterns = PatternDetection.generate(barsToTest);
             Assert.Equal(2, patterns.Count());
-            Assert.Equal(PatternDetection.Highest1YearVolumeName, patterns.First().name);
-            Assert.Equal(PatternDetection.HighVolumeName, patterns.Last().name);
+            Assert.Equal(PatternDetection.highest1YearVolumeName, patterns.Last().name);
+            Assert.Equal(PatternDetection.highVolumeName, patterns.First().name);
         }
 
         [Fact]
         public void Generate_WithSmallInput_ReturnsNothing()
         {
             var bars = TestDataGenerator.IncreasingPriceBars();
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }
 
@@ -62,9 +62,9 @@ namespace coretests.Stocks.Services
             
             bars = AppendHighVolumeBar(bars);
 
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
             Assert.Single(patterns);
-            Assert.Equal(PatternDetection.HighVolumeName, patterns.First().name);
+            Assert.Equal(PatternDetection.highVolumeName, patterns.First().name);
         }
 
         private static PriceBar[] AppendHighVolumeBar(PriceBar[] bars)
@@ -83,7 +83,7 @@ namespace coretests.Stocks.Services
 
             bars = AppendHighVolumeBar(bars);
 
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
 
             Assert.Empty(patterns);
         }
@@ -92,7 +92,7 @@ namespace coretests.Stocks.Services
         public void Generate_WithEmptyBars_DoesNotBlowUp()
         {
             var bars = new PriceBar[0];
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }
 
@@ -106,11 +106,11 @@ namespace coretests.Stocks.Services
             var newBar = new PriceBar(lastBar.Date.AddDays(1), lastBar.Open * 1.1m, lastBar.High * 1.1m, lastBar.Close * 1.1m, lastBar.Close * 1.1m, lastBar.Volume);
             bars = bars.Append(newBar).ToArray();
 
-            var patterns = PatternDetection.Generate(bars);
+            var patterns = PatternDetection.generate(bars);
             Assert.Single(patterns);
 
             var pattern = patterns.First();
-            Assert.Equal(PatternDetection.GapUpName, pattern.name);
+            Assert.Equal(PatternDetection.gapUpName, pattern.name);
             Assert.Contains("Gap Up 10.00", pattern.description);
         }
     }

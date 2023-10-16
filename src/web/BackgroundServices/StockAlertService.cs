@@ -5,12 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Alerts;
+using core.fs.Services;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Stocks;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Shared.Adapters.Stocks;
-using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -97,12 +97,12 @@ namespace web.BackgroundServices
 
                     completed.Add(c);
 
-                    foreach(var patternName in PatternDetection.AvailablePatterns)
+                    foreach(var patternName in PatternDetection.availablePatterns)
                     {
                         _container.Deregister(patternName, c.ticker, UserId.NewUserId(c.user.Id));
                     }
 
-                    var patterns = PatternDetection.Generate(prices.Success);
+                    var patterns = PatternDetection.generate(prices.Success);
 
                     foreach(var pattern in patterns)
                     {

@@ -4,6 +4,7 @@ namespace core.fs.Notes
     open System.ComponentModel.DataAnnotations
     open core.Notes
     open core.Shared
+    open core.fs.Services
     open core.fs.Shared
     open core.fs.Shared.Adapters.CSV
     open core.fs.Shared.Adapters.Storage

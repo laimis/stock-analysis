@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 using core.fs.Reports;
+using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
 
 namespace web.Controllers
@@ -51,8 +52,8 @@ namespace web.Controllers
         }
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
-        public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] PriceFrequency frequency)
-            => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(frequency, ticker, User.Identifier())));
+        public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] string frequency)
+            => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(PriceFrequency.FromString(frequency), new Ticker(ticker), User.Identifier())));
 
         [HttpGet("gaps/tickers/{ticker}")]
         public Task<ActionResult> TickerGaps(string ticker, [FromQuery] PriceFrequency frequency)
@@ -61,11 +62,6 @@ namespace web.Controllers
         [HttpGet("positions")]
         public Task<ActionResult> Portfolio() =>
             this.OkOrError(_service.Handle(new OutcomesReportForPositionsQuery(User.Identifier())));
-
-        [Obsolete("Not using this anymore, keeping it around in case I change my mind")]
-        [HttpGet("dailyoutcomescoresreport/{ticker}")]
-        public Task<ActionResult> DailyOutcomeScoresReport(string ticker, [FromQuery]string start, [FromQuery]string end) =>
-            this.OkOrError(_service.Handle(new DailyOutcomeScoreReportQuery(User.Identifier(), start, end, new Ticker(ticker))));
 
         [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
         public Task<ActionResult> DailyPositionReport(string ticker, int positionId) =>

@@ -5,6 +5,7 @@ namespace core.fs.Cryptos
     open core.Cryptos
     open core.Shared
     open core.fs.Cryptos.Import
+    open core.fs.Services
     open core.fs.Shared
     open core.fs.Shared.Adapters.CSV
     open core.fs.Shared.Adapters.Cryptos

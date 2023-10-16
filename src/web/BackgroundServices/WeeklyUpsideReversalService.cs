@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs.Services;
+using core.fs.Services.Analysis;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Email;
+using core.fs.Shared.Adapters.Stocks;
 using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
-using core.Stocks.Services.Analysis;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;
@@ -146,14 +148,14 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             foreach(var ticker in tickersToCheck)
             {
-                var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, core.Shared.Adapters.Stocks.PriceFrequency.Weekly, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+                var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, PriceFrequency.Weekly, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
                 if (!priceBars.IsOk)
                 {
                     _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error);
                     continue;
                 }
 
-                var pattern = PatternDetection.UpsideReversal(priceBars.Success);
+                var pattern = PatternDetection.upsideReversal(priceBars.Success);
 
                 // this is important, we need to remove the check from the tickers to check list while adding in to 
                 // upside reversal list because midway through this process broker will throw exception most likely 

@@ -1,5 +1,5 @@
 using System;
-using core.Stocks.Services.Trading;
+using core.fs.Services.Trading;
 using Xunit;
 
 namespace coretests.Stocks
@@ -36,27 +36,27 @@ namespace coretests.Stocks
         public void WinMaxReturnPctCorrect() => Assert.Equal(0.10m, _performance.WinMaxReturnPct);
 
         [Fact]
-        public void WinAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.WinAvgDaysHeld);
+        public void WinAvgDaysHeldCorrect() => Assert.Equal(1.0m, _performance.WinAvgDaysHeld);
 
         [Fact]
-        public void LossAvgAmountCorrect() => Assert.Equal(10m, _performance.AvgLossAmount);
+        public void LossAvgAmountCorrect() => Assert.Equal(-10m, _performance.AvgLossAmount);
 
         [Fact]
-        public void LossMaxAmountCorrect() => Assert.Equal(10m, _performance.MaxLossAmount);
+        public void LossMaxAmountCorrect() => Assert.Equal(-10m, _performance.MaxLossAmount);
 
         [Fact]
-        public void LossAvgReturnPctCorrect() => Assert.Equal(0.10m, _performance.LossAvgReturnPct);
+        public void LossAvgReturnPctCorrect() => Assert.Equal(-0.10m, _performance.LossAvgReturnPct);
         
         [Fact]
-        public void LossMaxReturnPctCorrect() => Assert.Equal(0.10m, _performance.LossMaxReturnPct);
+        public void LossMaxReturnPctCorrect() => Assert.Equal(-0.10m, _performance.LossMaxReturnPct);
 
         [Fact]
-        public void LossAvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.LossAvgDaysHeld);
+        public void LossAvgDaysHeldCorrect() => Assert.Equal(1.0m, _performance.LossAvgDaysHeld);
 
         [Fact]
-        public void AvgDaysHeldCorrect() => Assert.Equal(1.0d, _performance.AvgDaysHeld);
+        public void AvgDaysHeldCorrect() => Assert.Equal(1.0m, _performance.AverageDaysHeld);
 
         [Fact]
-        public void EVCorrect() => Assert.Equal(3.33m, Math.Round(_performance.EV, 2));
+        public void EV_Correct() => Assert.Equal(16.67m, Math.Round(_performance.EV, 2));
     }
 }

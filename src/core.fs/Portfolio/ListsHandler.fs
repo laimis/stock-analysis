@@ -3,6 +3,7 @@ namespace core.fs.Portfolio.Lists
 open System.ComponentModel.DataAnnotations
 open core.Portfolio
 open core.Shared
+open core.fs.Services
 open core.fs.Shared
 open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage

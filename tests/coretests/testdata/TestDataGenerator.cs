@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using core.Shared.Adapters.Stocks;
+using core.fs.Shared.Adapters.Stocks;
 
 namespace coretests.testdata
 {
