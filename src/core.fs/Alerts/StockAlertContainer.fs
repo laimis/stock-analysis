@@ -6,6 +6,7 @@ namespace core.fs.Alerts
     open core.Shared
     open core.fs.Services.Analysis
     open core.fs.Services.GapAnalysis
+    open core.fs.Shared
     open core.fs.Shared.Domain.Accounts
 
     type private StockPositionMonitorKey = {
@@ -48,7 +49,7 @@ namespace core.fs.Alerts
             sourceList:string
             userId:UserId
             alertType:AlertType
-            valueFormat:string
+            valueFormat:ValueFormat
         }
         
         member this.Age() = (DateTimeOffset.UtcNow - this.``when``)

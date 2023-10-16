@@ -25,6 +25,7 @@ namespace core.fs.Accounts
             SubscriptionLevel : string
             ConnectedToBrokerage: bool
             BrokerageAccessTokenExpired: bool
+            BrokerageAccessTokenExpirationDate: DateTimeOffset
             MaxLoss: decimal option
         }
 
@@ -41,6 +42,7 @@ namespace core.fs.Accounts
                 SubscriptionLevel = state.SubscriptionLevel
                 ConnectedToBrokerage = state.ConnectedToBrokerage
                 BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
+                BrokerageAccessTokenExpirationDate = state.BrokerageAccessTokenExpires
                 MaxLoss = if state.MaxLoss.HasValue then Some state.MaxLoss.Value else None
             }
             
@@ -57,7 +59,8 @@ namespace core.fs.Accounts
                 SubscriptionLevel = null
                 ConnectedToBrokerage = false
                 BrokerageAccessTokenExpired = true
-                MaxLoss = None 
+                BrokerageAccessTokenExpirationDate = DateTimeOffset.MinValue 
+                MaxLoss = None
             }    
     
     module Authenticate =
@@ -420,6 +423,10 @@ namespace core.fs.Accounts
             
     module Brokerage =
         type Connect = struct end
+        
+        type RefreshConnection = {
+            UserId:UserId
+        }
     
         [<Struct>]
         type ConnectCallback = {
@@ -474,7 +481,11 @@ namespace core.fs.Accounts
                 | None -> return "User not found" |> ResponseUtils.failedTyped<OAuthResponse>
                 | Some user ->
                     let! oauth = brokerage.GetAccessToken(user.State)
-                    return ServiceResponse<OAuthResponse>(oauth)
+                    
+                    return
+                        match oauth.IsError with
+                        | true -> oauth.error |> ResponseUtils.failedTyped<OAuthResponse>
+                        | false -> ServiceResponse<OAuthResponse>(oauth)
             }
             
     module Settings =

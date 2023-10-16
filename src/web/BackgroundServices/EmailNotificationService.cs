@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Alerts;
+using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Storage;
@@ -155,16 +156,16 @@ public class EmailNotificationService : GenericBackgroundServiceHost
         return ToEmailRow(valueFormat, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
     }
 
-    public static object ToEmailRow(string valueFormat, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
+    public static object ToEmailRow(ValueFormat valueFormat, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
     {
         string FormattedValue()
         {
-            return valueFormat switch
+            return valueFormat.Tag switch
             {
-                core.Shared.ValueFormat.Percentage => triggeredValue.ToString("P1"),
-                core.Shared.ValueFormat.Currency => triggeredValue.ToString("C2"),
-                core.Shared.ValueFormat.Number => triggeredValue.ToString("N2"),
-                core.Shared.ValueFormat.Boolean => triggeredValue.ToString(CultureInfo.InvariantCulture),
+                ValueFormat.Tags.Percentage => triggeredValue.ToString("P1"),
+                ValueFormat.Tags.Currency => triggeredValue.ToString("C2"),
+                ValueFormat.Tags.Number => triggeredValue.ToString("N2"),
+                ValueFormat.Tags.Boolean => triggeredValue.ToString(CultureInfo.InvariantCulture),
                 _ => throw new Exception("Unexpected alert value type: " + valueFormat)
             };
         }

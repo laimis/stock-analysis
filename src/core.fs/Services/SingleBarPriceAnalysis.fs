@@ -5,6 +5,7 @@ open System.Collections.Generic
 open core.Shared
 open core.fs.Services
 open core.fs.Services.MultipleBarPriceAnalysis
+open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
 

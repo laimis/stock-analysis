@@ -3,6 +3,7 @@ namespace core.fs.Services
 open System.Collections.Generic
 open core.Shared
 open core.fs.Services.Analysis
+open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
 module MultipleBarPriceAnalysis =

@@ -4,6 +4,7 @@ open core.Shared
 open core.fs.Services.Analysis
 open core.fs.Services.Analysis.SingleBarPriceAnalysis
 open core.fs.Services.GapAnalysis
+open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
 module PatternDetection =
