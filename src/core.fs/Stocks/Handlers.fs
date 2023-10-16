@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Shared.Adapters.Stocks
 open core.Stocks
 open core.fs.Services
 open core.fs.Services.Analysis
