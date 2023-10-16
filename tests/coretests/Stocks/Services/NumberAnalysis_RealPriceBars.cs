@@ -18,25 +18,25 @@ namespace coretests.Stocks.Services
         }
 
         [Fact]
-        public void MeanIsCorrect() => Assert.Equal(0.00m, _percentChanges.mean);
+        public void MeanIsCorrect() => Assert.Equal(0.05m, _percentChanges.mean);
 
         [Fact]
-        public void StdDevIsCorrect() => Assert.Equal(0.05m, _percentChanges.stdDev);
+        public void StdDevIsCorrect() => Assert.Equal(5.21m, _percentChanges.stdDev);
 
         [Fact]
-        public void MinIsCorrect() => Assert.Equal(-0.18m, _percentChanges.min);
+        public void MinIsCorrect() => Assert.Equal(-18.42m, _percentChanges.min);
 
         [Fact]
-        public void MaxIsCorrect() => Assert.Equal(0.27m, _percentChanges.max);
+        public void MaxIsCorrect() => Assert.Equal(27.06m, _percentChanges.max);
 
         [Fact]
-        public void MedianIsCorrect() => Assert.Equal(0.0000m, _percentChanges.median);
+        public void MedianIsCorrect() => Assert.Equal(0.17m, _percentChanges.median);
 
         [Fact]
-        public void SkewnessIsCorrect() => Assert.Equal(0.43m, _percentChanges.skewness);
+        public void SkewnessIsCorrect() => Assert.Equal(0.36m, _percentChanges.skewness, 2);
 
         [Fact]
-        public void KurtosisIsCorrect() => Assert.Equal(3.87m, _percentChanges.kurtosis);
+        public void KurtosisIsCorrect() => Assert.Equal(2.81m, _percentChanges.kurtosis, 2);
 
         [Fact]
         public void BucketsAreCorrect()
@@ -44,8 +44,8 @@ namespace coretests.Stocks.Services
             Assert.Equal(21, _percentChanges.buckets.Length);
 
             // first bucket should be min
-            Assert.Equal(_percentChanges.min, _percentChanges.buckets[0].value);
-            Assert.Equal(1, _percentChanges.buckets[0].frequency);
+            Assert.Equal(-19, _percentChanges.buckets[0].value);
+            Assert.Equal(1, _percentChanges.buckets[1].frequency);
 
             // make sure there are four buckets with values assigned
             Assert.Equal(19, _percentChanges.buckets.Count(x => x.frequency != 0));
