@@ -26,6 +26,7 @@ namespace core.fs.Accounts
             ConnectedToBrokerage: bool
             BrokerageAccessTokenExpired: bool
             BrokerageAccessTokenExpirationDate: DateTimeOffset
+            BrokerageRefreshTokenExpirationDate: DateTimeOffset
             MaxLoss: decimal option
         }
 
@@ -43,6 +44,7 @@ namespace core.fs.Accounts
                 ConnectedToBrokerage = state.ConnectedToBrokerage
                 BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
                 BrokerageAccessTokenExpirationDate = state.BrokerageAccessTokenExpires
+                BrokerageRefreshTokenExpirationDate = state.BrokerageRefreshTokenExpires
                 MaxLoss = if state.MaxLoss.HasValue then Some state.MaxLoss.Value else None
             }
             
@@ -59,7 +61,8 @@ namespace core.fs.Accounts
                 SubscriptionLevel = null
                 ConnectedToBrokerage = false
                 BrokerageAccessTokenExpired = true
-                BrokerageAccessTokenExpirationDate = DateTimeOffset.MinValue 
+                BrokerageAccessTokenExpirationDate = DateTimeOffset.MinValue
+                BrokerageRefreshTokenExpirationDate = DateTimeOffset.MinValue
                 MaxLoss = None
             }    
     

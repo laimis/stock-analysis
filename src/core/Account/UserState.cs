@@ -21,6 +21,7 @@ namespace core.Account
         public string BrokerageAccessToken { get; private set; }
         public string BrokerageRefreshToken { get; private set; }
         public DateTimeOffset BrokerageAccessTokenExpires { get; private set; }
+        public DateTimeOffset BrokerageRefreshTokenExpires { get; private set; }
         public bool ConnectedToBrokerage { get; private set; }
         public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
         public decimal? MaxLoss { get; private set; }
@@ -73,6 +74,7 @@ namespace core.Account
             BrokerageAccessToken = e.AccessToken;
             BrokerageRefreshToken = e.RefreshToken;
             BrokerageAccessTokenExpires = e.When.AddSeconds(e.ExpiresInSeconds);
+            BrokerageRefreshTokenExpires = e.When.AddDays(90);
         }
 
         internal void ApplyInternal(UserDisconnectedFromBrokerage _)
