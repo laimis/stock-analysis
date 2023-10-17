@@ -9,10 +9,6 @@ namespace coretests.Account
 {
     public class UserTests
     {
-        public UserTests()
-        {
-        }
-
         [Fact]
         public void CreatingSetsId()
         {
@@ -95,6 +91,38 @@ namespace coretests.Account
             var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
 
             Assert.Throws<FormatException>(() => u.SetSetting("maxLoss", "large"));
+        }
+        
+        [Fact]
+        public void ConnectToBrokerage_SetsState()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+
+            u.ConnectToBrokerage("access", "refresh", "token", 3600, "Accounts",
+                (int)TimeSpan.FromDays(90).TotalSeconds);
+
+            Assert.True(u.State.ConnectedToBrokerage);
+            Assert.Equal("access", u.State.BrokerageAccessToken);
+            Assert.Equal("refresh", u.State.BrokerageRefreshToken);
+            Assert.Equal(DateTimeOffset.UtcNow.AddSeconds(1800), u.State.BrokerageAccessTokenExpires, TimeSpan.FromSeconds(1));
+            Assert.Equal(DateTimeOffset.UtcNow.AddDays(90), u.State.BrokerageRefreshTokenExpires,
+                TimeSpan.FromSeconds(1));
+        }
+
+        [Fact]
+        public void RefreshBrokerageConnection_SetsState()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+            
+            u.RefreshBrokerageConnection("access", "refresh", "token", 3600, "Accounts",
+                (int)TimeSpan.FromDays(90).TotalSeconds);
+            
+            Assert.True(u.State.ConnectedToBrokerage);
+            Assert.Equal("access", u.State.BrokerageAccessToken);
+            Assert.Equal("refresh", u.State.BrokerageRefreshToken);
+            Assert.Equal(DateTimeOffset.UtcNow.AddSeconds(1800), u.State.BrokerageAccessTokenExpires, TimeSpan.FromSeconds(1));
+            Assert.Equal(DateTimeOffset.UtcNow.AddDays(90), u.State.BrokerageRefreshTokenExpires,
+                TimeSpan.FromSeconds(1));
         }
     }
 }

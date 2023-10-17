@@ -1254,6 +1254,7 @@ export class AccountStatus {
   isAdmin: boolean
   subscriptionLevel: string
   connectedToBrokerage: boolean
+  brokerageRefreshTokenExpirationDate: string
   maxLoss: number
 }
 

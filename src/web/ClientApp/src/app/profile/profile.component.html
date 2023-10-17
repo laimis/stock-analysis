@@ -45,9 +45,14 @@
     <div class="card-body">
       <div class="row">
         <div class="col">
-          <div class="card-title">
-            <a href="/api/account/integrations/tdameritrade/connect" *ngIf="!profile.connectedToBrokerage" class="btn btn-primary card-link">TDAmeritrade</a>
+          <div class="card-title" *ngIf="profile.connectedToBrokerage">
             <a href="/api/account/integrations/tdameritrade/disconnect" *ngIf="profile.connectedToBrokerage" class="btn btn-primary card-link">Disconnect TDAmeritrade</a>
+            <div>
+              Refresh expires: {{profile.brokerageRefreshTokenExpirationDate | date}}
+            </div>
+          </div>
+          <div class="card-title" *ngIf="!profile.connectedToBrokerage">
+            <a href="/api/account/integrations/tdameritrade/connect" *ngIf="!profile.connectedToBrokerage" class="btn btn-primary card-link">TDAmeritrade</a>
           </div>
         </div>
       </div>
