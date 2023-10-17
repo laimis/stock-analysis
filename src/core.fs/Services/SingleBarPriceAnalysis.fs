@@ -69,8 +69,15 @@ module SingleBarPriceAnalysis =
                 // add change as outcome
                 yield AnalysisOutcome (SingleBarOutcomeKeys.PercentChange, (if percentChange >= 0m then OutcomeType.Positive else OutcomeType.Negative), percentChange, ValueFormat.Percentage, $"%% change from close is {percentChange}.")
                 
-                // generate percent change statistical data for recent days
-                let descriptor = NumberAnalysis.PercentChanges true (previousBars |> Array.map (fun x -> x.Close))
+                // generate percent change statistical data for NumberOfDaysForRecentAnalysis days
+                let data =
+                    match previousBars.Length with
+                    | x when x > SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis ->
+                        previousBars |> Array.skip (previousBars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
+                    | _ -> previousBars
+                    |> Array.map (fun x -> x.Close)
+                    
+                let descriptor = NumberAnalysis.PercentChanges true data
                 
                 // for some price feeds, price has finished changing, so mean and
                 // standard deviation will be 0, we need to check for that so that we don't divide by 0

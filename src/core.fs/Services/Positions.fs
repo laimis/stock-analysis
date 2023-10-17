@@ -103,8 +103,8 @@ module PositionAnalysis =
     let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
         
         let percentToStopThreshold = -0.02m
-        let recentlyOpenThreshold = 5.0m
-        let withinTwoWeeksThreshold = 14.0m
+        let recentlyOpenThreshold = 5m
+        let withinTwoWeeksThreshold = 14m
         
         [
             AnalysisOutcomeEvaluation(
