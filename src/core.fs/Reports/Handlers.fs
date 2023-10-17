@@ -107,7 +107,7 @@ type OutcomesReportForPositionsQuery =
 
 type OutcomesReportViewTickerCountPair =
     {
-        Ticker: string
+        Ticker: Ticker
         Count: int
     }
     
@@ -177,7 +177,7 @@ type SellView =
         | false -> 0m
         | true -> (this.CurrentPrice.Value - this.Price) / this.Price
     
-type SellsView(stocks:OwnedStock seq,prices:Dictionary<string,StockQuote>) =
+type SellsView(stocks:OwnedStock seq,prices:Dictionary<Ticker,StockQuote>) =
     
     member _.Sells: SellView seq =
         stocks
@@ -342,7 +342,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                                 let lastPrice = priceResponse.Success[priceResponse.Success.Length - 1].Close
                                 MultipleBarPriceAnalysis.Run lastPrice priceResponse.Success
                         
-                        let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t.Value}
+                        let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t}
                         
                         let gapsView =
                             match query.IncludeGapAnalysis with
@@ -352,7 +352,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             | false -> None
                             
                         let patterns = PatternDetection.generate priceResponse.Success
-                        let tickerPatterns = {patterns = patterns; ticker = t.Value}
+                        let tickerPatterns = {patterns = patterns; ticker = t}
                         
                         return Some (tickerOutcome, gapsView, tickerPatterns)
                     }
@@ -420,8 +420,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         
                         // TODO: bring back orders once we migrate position analysis to f#
                         let outcomes = PositionAnalysis.generate position priceResponse.Success orders
-                        let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker.Value}
-                        let tickerPatterns = {patterns = PatternDetection.generate priceResponse.Success; ticker = position.Ticker.Value}
+                        let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
+                        let tickerPatterns = {patterns = PatternDetection.generate priceResponse.Success; ticker = position.Ticker}
                         
                         return Some (tickerOutcome, tickerPatterns)
                     }
@@ -486,7 +486,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             
             let prices =
                 match priceResult.IsOk with
-                | false -> Dictionary<string,StockQuote>()
+                | false -> Dictionary<Ticker,StockQuote>()
                 | true -> priceResult.Success
                 
             let response = SellsView(stocks, prices)

@@ -32,7 +32,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     private readonly IMarketHours _marketHours;
 
     private readonly Dictionary<UserState, HashSet<Ticker>> _tickersToCheck = new();
-    private readonly Dictionary<UserState, List<(string Ticker, Pattern Pattern)>> _patternsDiscovered = new();
+    private readonly Dictionary<UserState, List<(Ticker Ticker, Pattern Pattern)>> _patternsDiscovered = new();
 
     private Func<CancellationToken, Task> _toRun;
     private Func<TimeSpan> _sleepCalculation;
@@ -168,9 +168,9 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                     continue;
                 }
 
-                if (!_patternsDiscovered.TryGetValue(u.Key, out List<(string Ticker, Pattern Pattern)> value))
+                if (!_patternsDiscovered.TryGetValue(u.Key, out List<(Ticker Ticker, Pattern Pattern)> value))
                 {
-                    value = new List<(string, Pattern)>();
+                    value = new List<(Ticker, Pattern)>();
                     _patternsDiscovered[u.Key] = value;
                 }
 

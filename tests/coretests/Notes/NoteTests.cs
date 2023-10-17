@@ -1,6 +1,7 @@
 using System;
 using core.Notes;
 using core.Shared;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Notes
@@ -21,7 +22,7 @@ namespace coretests.Notes
             return new Note(
                 Guid.NewGuid(),
                 "description",
-                "tsla",
+                TestDataGenerator.TSLA,
                 DateTimeOffset.UtcNow
             );
         }
@@ -47,25 +48,25 @@ namespace coretests.Notes
         [Fact]
         public void Ticker()
         {
-            Assert.Equal("TSLA", _state.RelatedToTicker);
+            Assert.Equal(TestDataGenerator.TSLA, _state.RelatedToTicker);
         }
 
         [Fact]
         public void FailWithEmptyUser()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(Guid.Empty, "some note", "ticker", DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.Empty, "some note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithNoNote()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "", "ticker", DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "", TestDataGenerator.TSLA, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithFutureCreated()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "note", "ticker", DateTimeOffset.UtcNow.AddDays(1)));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow.AddDays(1)));
         }
 
         [Fact]
@@ -91,9 +92,7 @@ namespace coretests.Notes
         {
             var note = CreateTestNote();
 
-            Ticker t = new Ticker(note.State.RelatedToTicker);
-
-            Assert.True(note.MatchesTickerFilter(t));
+            Assert.True(note.MatchesTickerFilter(note.State.RelatedToTicker));
         }
     }
 }

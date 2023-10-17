@@ -1,6 +1,7 @@
 namespace core.fs.Services.Analysis
 
 open System.Collections.Generic
+open core.Shared
 open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
@@ -19,7 +20,7 @@ type AnalysisOutcome(key:string, outcomeType:string, value:decimal, valueType:Va
 type TickerOutcomes =
     {
         outcomes: seq<AnalysisOutcome>
-        ticker:string
+        ticker:Ticker
     }
     
 type AnalysisOutcomeEvaluation(name:string,``type``:string,sortColumn:string,matchingTickers:seq<TickerOutcomes>) =
@@ -40,7 +41,7 @@ type Pattern =
 type TickerPatterns =
     {
         patterns: seq<Pattern>
-        ticker:string
+        ticker:Ticker
     }
     
 type SMA(values,interval) =
@@ -93,7 +94,7 @@ type SMAContainer(sma20,sma50,sma150,sma200) =
 module AnalysisOutcomeEvaluationScoringHelper =
     
     let generateTickerCounts evaluations =
-        let counts = Dictionary<string, int>()
+        let counts = Dictionary<Ticker, int>()
         
         evaluations
         |> Seq.iter (fun (category:AnalysisOutcomeEvaluation) ->

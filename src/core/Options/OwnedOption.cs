@@ -41,7 +41,7 @@ namespace core.Options
                  Guid.NewGuid(),
                  Guid.NewGuid(),
                  DateTimeOffset.UtcNow,
-                 ticker,
+                 ticker.Value,
                  strikePrice,
                  type,
                  expiration.Date,
@@ -59,7 +59,7 @@ namespace core.Options
              );
          }
  
-         public bool IsMatch(string ticker, decimal strike, OptionType type, DateTimeOffset expiration)
+         public bool IsMatch(Ticker ticker, decimal strike, OptionType type, DateTimeOffset expiration)
              => State.IsMatch(ticker, strike, type, expiration);
  
          public void Buy(int numberOfContracts, decimal premium, DateTimeOffset filled, string notes)

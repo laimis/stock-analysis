@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\infrastructure\csvparser\csvparser.csproj" />
+    <ProjectReference Include="..\..\coretests\coretests.csproj" />
   </ItemGroup>
 
 </Project>

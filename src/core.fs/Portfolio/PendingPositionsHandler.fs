@@ -169,7 +169,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             let! priceResponse = brokerage.GetQuotes user.State tickers
             let prices =
                 match priceResponse.IsOk with
-                | false -> Dictionary<string, StockQuote>()
+                | false -> Dictionary<Ticker, StockQuote>()
                 | true -> priceResponse.Success
                 
             let dataWithPrices =

@@ -1,20 +1,21 @@
 namespace core.fs
 
 open System.Collections.Generic
+open core.Shared
 open core.Stocks
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 
 module Helpers =
 
-    let getViolations brokeragePositions localPositions (prices:Dictionary<string,StockQuote>) =
+    let getViolations brokeragePositions localPositions (prices:Dictionary<Ticker,StockQuote>) =
         
         let brokerageSideViolations =
             brokeragePositions
             |> Seq.map( fun (brokeragePosition:StockPosition) ->
                 
                 let currentPrice =
-                    match prices.TryGetValue(brokeragePosition.Ticker.Value) with
+                    match prices.TryGetValue(brokeragePosition.Ticker) with
                     | true, price -> price.Price
                     | false, _ -> 0m
                     

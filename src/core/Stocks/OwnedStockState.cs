@@ -26,7 +26,7 @@ namespace core.Stocks
         internal void ApplyInternal(TickerObtained o)
         {
             Id = o.AggregateId;
-            Ticker = o.Ticker;
+            Ticker = new Ticker(o.Ticker);
             UserId = o.UserId;
         }
 
@@ -74,7 +74,7 @@ namespace core.Stocks
 
             if (OpenPosition == null)
             {
-                OpenPosition = new PositionInstance(_positionId, purchased.Ticker, purchased.When);
+                OpenPosition = new PositionInstance(_positionId, new Ticker(purchased.Ticker), purchased.When);
                 Positions.Add(OpenPosition);
                 _positionId++;
             }

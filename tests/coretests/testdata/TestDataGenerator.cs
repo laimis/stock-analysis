@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using core.fs.Shared.Adapters.Stocks;
+using core.Shared;
 
 namespace coretests.testdata
 {
@@ -36,5 +37,6 @@ namespace coretests.testdata
         }
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
+        public static Ticker TSLA = new("tsla");
     }
 }

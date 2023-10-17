@@ -505,7 +505,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             let prices =
                 match pricesResponse.IsOk with
                 | true -> pricesResponse.Success
-                | false -> Dictionary<string, StockQuote>()
+                | false -> Dictionary<Ticker, StockQuote>()
                 
             positions |> Array.iter (fun p ->
                 match prices.TryGetValue(p.Ticker) with

@@ -26,7 +26,7 @@ type CompanyFiling =
         member this.IsNew = this.FilingDate > System.DateTime.Now.AddDays(-7)
 
 [<Struct>]
-type CompanyFilings(ticker:string, filings:seq<CompanyFiling>) =
+type CompanyFilings(ticker:Ticker, filings:seq<CompanyFiling>) =
     member _.Ticker = ticker
     member _.Filings = filings
 

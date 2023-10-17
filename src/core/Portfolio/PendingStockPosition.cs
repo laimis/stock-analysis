@@ -54,7 +54,7 @@ namespace core.Portfolio
                 Guid.NewGuid(),
                 when: DateTimeOffset.UtcNow,
                 userId: userId,
-                ticker: ticker,
+                ticker: ticker.Value,
                 price: price,
                 numberOfShares: numberOfShares,
                 stopPrice: stopPrice,

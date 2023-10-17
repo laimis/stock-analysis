@@ -6,6 +6,7 @@ using core.Notes;
 using core.Options;
 using core.Shared;
 using core.Stocks;
+using coretests.testdata;
 using csvparser;
 using Xunit;
 
@@ -17,13 +18,13 @@ namespace csvparsertests
         [Fact]
         public void ExportStocksHeader()
         {
-            var stock = new OwnedStock(new Ticker("tsla"), Guid.NewGuid());
+            var stock = new OwnedStock(TestDataGenerator.TSLA, Guid.NewGuid());
             stock.Purchase(1, 100, DateTime.UtcNow, "some note");
             
             var report = CSVExport.stocks(_csvWriter, new[] {stock});
 
             Assert.Contains("Ticker,Type,Amount,Price,Date,Notes", report);
-            Assert.Contains("TSLA", report);
+            Assert.Contains(TestDataGenerator.TSLA.Value, report);
         }
 
         [Fact]
@@ -46,7 +47,7 @@ namespace csvparsertests
         public void ExportOptionsHeader()
         {
             var option = new OwnedOption(
-                "tlsa",
+                new Ticker("tlsa"),
                 2.5m,
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
@@ -66,12 +67,12 @@ namespace csvparsertests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note(Guid.NewGuid(), "my note", "stockticker", DateTimeOffset.UtcNow);
+            var note = new Note(Guid.NewGuid(), "my note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
 
             var report = CSVExport.notes(_csvWriter, new[] {note});
 
             Assert.Contains("Created,Ticker,Note", report);
-            Assert.Contains(note.State.RelatedToTicker, report);
+            Assert.Contains(note.State.RelatedToTicker.Value, report);
             Assert.Contains("my note", report);
         }
 

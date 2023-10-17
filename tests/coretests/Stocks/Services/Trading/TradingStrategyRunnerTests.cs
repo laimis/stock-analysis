@@ -9,6 +9,7 @@ using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
 using core.Stocks;
+using coretests.testdata;
 using Moq;
 using Xunit;
 
@@ -63,7 +64,7 @@ namespace coretests.Stocks.Services.Trading
                 100,
                 10,
                 5,
-                new Ticker("tsla"),
+                TestDataGenerator.TSLA,
                 DateTimeOffset.UtcNow,
                 false);
 
@@ -102,7 +103,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(100, i => 10 + i);
 
-            var testPosition = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
+            var testPosition = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
             testPosition.Buy(2, 10, System.DateTimeOffset.UtcNow, Guid.NewGuid());
             testPosition.SetStopPrice(5, System.DateTimeOffset.UtcNow);
             
@@ -135,7 +136,7 @@ namespace coretests.Stocks.Services.Trading
                 numberOfShares: 2,
                 price: 50,
                 stopPrice: 0.01m,
-                ticker: "tsla",
+                ticker: TestDataGenerator.TSLA,
                 DateTimeOffset.UtcNow,
                 false);
 
@@ -226,7 +227,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var data = GeneratePriceBars(10, i => 50 + i);
 
-            var positionInstance = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
+            var positionInstance = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
             positionInstance.Buy(
                 numberOfShares: 5,
                 price: 50,
@@ -261,7 +262,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(20, i => 50 - i);
 
-            var position = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
+            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
             position.Buy(
                 numberOfShares: 5,
                 price: 50,
@@ -296,7 +297,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(50, i => 50 + i);
 
-            var position = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
+            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
             position.Buy(
                 numberOfShares: 5,
                 price: 50,
@@ -334,7 +335,7 @@ namespace coretests.Stocks.Services.Trading
         {
             var bars = GeneratePriceBars(10, i => 50 - i);
 
-            var positionInstance = new PositionInstance(0, "tsla", DateTimeOffset.UtcNow);
+            var positionInstance = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
             positionInstance.Buy(
                 numberOfShares: 5,
                 price: 50,

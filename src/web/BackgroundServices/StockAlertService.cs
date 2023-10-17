@@ -24,7 +24,7 @@ namespace web.BackgroundServices
         private readonly ILogger<StockAlertService> _logger;
         private readonly IMarketHours _marketHours;
         private readonly IPortfolioStorage _portfolio;
-        private readonly Dictionary<string, ServiceResponse<PriceBar[]>> _priceCache = new();
+        private readonly Dictionary<Ticker, ServiceResponse<PriceBar[]>> _priceCache = new();
         
         public StockAlertService(
             IAccountStorage accounts,

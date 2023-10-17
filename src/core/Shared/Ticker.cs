@@ -2,7 +2,7 @@ using System;
 
 namespace core.Shared
 {
-    public struct Ticker : IComparable
+    public struct Ticker : IComparable, IEquatable<Ticker>
     {
         private readonly string _ticker;
 
@@ -15,9 +15,6 @@ namespace core.Shared
             _ticker = ticker.ToUpper();
         }
 
-        public static implicit operator string(Ticker t) => t._ticker;
-        public static implicit operator Ticker(string t) => new Ticker(t);
-
         public string Value => _ticker;
         public int CompareTo(object obj)
         {
@@ -27,6 +24,23 @@ namespace core.Shared
             }
 
             return -1;
+        }
+
+        public override string ToString() => _ticker;
+
+        public bool Equals(Ticker other)
+        {
+            return _ticker == other._ticker;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Ticker other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_ticker != null ? _ticker.GetHashCode() : 0);
         }
     }
 }

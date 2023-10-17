@@ -1,5 +1,6 @@
 using System;
 using core.Portfolio;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Portfolio
@@ -15,7 +16,7 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid());
             
             Assert.Equal("this is a note", pending.State.Notes);
@@ -23,7 +24,7 @@ namespace coretests.Portfolio
             Assert.Equal(10, pending.State.Bid);
             Assert.Equal(5, pending.State.StopPrice);
             Assert.Equal("alltimehigh", pending.State.Strategy);
-            Assert.Equal("AAPL", pending.State.Ticker);
+            Assert.Equal(TestDataGenerator.TSLA, pending.State.Ticker);
             Assert.NotEqual(Guid.Empty, pending.State.UserId);
         }
 
@@ -36,7 +37,7 @@ namespace coretests.Portfolio
                 price: 0,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid()));
         }
 
@@ -49,7 +50,7 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid()));
         }
 
@@ -62,7 +63,7 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: -1,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid()));
         }
 
@@ -75,7 +76,7 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid()));
         }
 
@@ -88,23 +89,10 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.Empty));
         }
-
-        [Fact]
-        public void Create_WithInvalidTicker_Throws()
-        {
-            Assert.Throws<ArgumentException>(() => new PendingStockPosition(
-                notes: "this is a note",
-                numberOfShares: 100,
-                price: 10,
-                stopPrice: 5,
-                strategy: "alltimehigh",
-                ticker: "",
-                userId: Guid.NewGuid()));
-        }
-
+        
         [Fact]
         public void Create_WithInvalidStrategy_Throws()
         {
@@ -114,7 +102,7 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: 5,
                 strategy: "",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid()));
         }
 
@@ -127,7 +115,7 @@ namespace coretests.Portfolio
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: "AAPL",
+                ticker: TestDataGenerator.TSLA,
                 userId: Guid.NewGuid());
 
             pending.Close();

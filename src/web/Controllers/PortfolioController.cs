@@ -169,7 +169,7 @@ namespace web.Controllers
                         show: show,
                         groupBy: groupBy,
                         txType: txType,
-                        ticker: ticker)
+                        ticker: new Ticker(ticker))
                 )
             );
 
@@ -218,7 +218,7 @@ namespace web.Controllers
             this.OkOrError(
                 service.Handle(
                     new SimulateTrade(
-                        ticker: ticker,
+                        ticker: new Ticker(ticker),
                         positionId: positionId, 
                         userId: User.Identifier()
                     )
@@ -257,7 +257,7 @@ namespace web.Controllers
             this.OkOrError(
                 handler.Handle(
                     new DeletePosition(
-                        ticker: ticker,
+                        ticker: new Ticker(ticker),
                         positionId: positionId,
                         userId: User.Identifier()
                     )
@@ -281,7 +281,7 @@ namespace web.Controllers
             this.OkOrError(
                 handler.Handle(
                     new RemoveLabel(
-                        ticker: ticker,
+                        ticker: new Ticker(ticker),
                         positionId: positionId,
                         key: label,
                         userId: User.Identifier()

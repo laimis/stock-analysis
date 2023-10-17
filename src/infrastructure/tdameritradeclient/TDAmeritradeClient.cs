@@ -357,7 +357,7 @@ public class TDAmeritradeClient : IBrokerage
             return new ServiceResponse<StockQuote>(response.Error!);
         }
 
-        if (!response.Success!.TryGetValue(ticker, out var quote))
+        if (!response.Success!.TryGetValue(ticker.Value, out var quote))
         {
             return new ServiceResponse<StockQuote>(new ServiceError("Could not find quote for ticker"));
         }
@@ -365,11 +365,22 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<StockQuote>(quote);
     }
 
-    public Task<ServiceResponse<Dictionary<string, StockQuote>>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
+    public async Task<ServiceResponse<Dictionary<Ticker, StockQuote>>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
     {
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers.Select(t => t.Value))}";
 
-        return CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+        var result = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
+
+        // doing this conversion as I can't seem to find a way for system.text.json to support dictionary deserialization where
+        // the key is something other than string. If I put Ticker in there, I get a runtime error. Tried to use converters
+        // but that did not work, seems like you had to add dictionary converter and it got ugly pretty quickly
+        return result.IsOk switch
+        {
+            false => new ServiceResponse<Dictionary<Ticker, StockQuote>>(result.Error!),
+            true => new ServiceResponse<Dictionary<Ticker, StockQuote>>(
+                result.Success!.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
+            )
+        };
     }
 
     public async Task<ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
