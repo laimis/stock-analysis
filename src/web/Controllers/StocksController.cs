@@ -24,11 +24,11 @@ namespace web.Controllers
         public Task<ActionResult> Dashboard() => this.OkOrError(_service.Handle(new DashboardQuery(User.Identifier())));
 
         [HttpGet("{ticker}")]
-        public Task<ActionResult> Details([FromRoute]string ticker) => this.OkOrError(_service.Handle(new DetailsQuery(ticker, User.Identifier())));
+        public Task<ActionResult> Details([FromRoute]string ticker) => this.OkOrError(_service.Handle(new DetailsQuery(new Ticker(ticker), User.Identifier())));
 
         [HttpGet("{ticker}/prices")]
         public Task<ActionResult> Prices([FromRoute]string ticker, [FromQuery] int numberOfDays) =>
-            this.OkOrError(_service.Handle(PricesQuery.NumberOfDays(numberOfDays, ticker, User.Identifier())));
+            this.OkOrError(_service.Handle(PricesQuery.NumberOfDays(numberOfDays, new Ticker(ticker), User.Identifier())));
 
         [HttpGet("{ticker}/secfilings")]
         public Task<ActionResult> SecFilings([FromRoute] string ticker) =>

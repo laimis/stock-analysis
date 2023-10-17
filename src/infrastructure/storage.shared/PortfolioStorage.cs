@@ -48,7 +48,7 @@ namespace storage.shared
         {
             var stocks = await GetStocks(userId);
             
-            return stocks.SingleOrDefault(s => s.State.Ticker == ticker.Value);
+            return stocks.SingleOrDefault(s => s.State.Ticker.Equals(ticker));
         }
 
         public async Task<OwnedStock> GetStockByStockId(Guid stockId, UserId userId)

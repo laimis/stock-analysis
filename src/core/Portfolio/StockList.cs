@@ -42,24 +42,24 @@ namespace core.Portfolio
 
         public void AddStock(Ticker ticker, string note)
         {
-            var exists = State.Tickers.Exists(x => x.Ticker == ticker);
+            var exists = State.Tickers.Exists(x => x.Ticker.Equals(ticker));
             if (exists)
             {
                 return;
             }
             
-            Apply(new StockListTickerAdded(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, note, ticker));
+            Apply(new StockListTickerAdded(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, note, ticker.Value));
         }
 
         public void RemoveStock(Ticker ticker)
         {
-            var exists = State.Tickers.Exists(x => x.Ticker == ticker);
+            var exists = State.Tickers.Exists(x => x.Ticker.Equals(ticker));
             if (!exists)
             {
                 throw new InvalidOperationException("Ticker does not exist in the list");
             }
 
-            Apply(new StockListTickerRemoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, ticker));
+            Apply(new StockListTickerRemoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, ticker.Value));
         }
 
         public void AddTag(string tag)

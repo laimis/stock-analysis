@@ -46,7 +46,6 @@ namespace web
                     {
                         if (type.IsSubclassOf(typeof(JsonConverter)))
                         {
-                            Console.WriteLine($"Converter: {type}");
                             var converter = Activator.CreateInstance(type);
                             o.JsonSerializerOptions.Converters.Add((JsonConverter)converter);
                         }

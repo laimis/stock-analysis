@@ -112,7 +112,7 @@ namespace core.fs.Notes
             | None -> return "User not found" |> ResponseUtils.failedTyped<NotesView>
             | _ -> 
                 let! notes = portfolio.GetNotes(userId=command.UserId)
-                return NotesView(notes |> Seq.filter(fun n -> n.State.RelatedToTicker = command.Ticker.Value)) |> ResponseUtils.success<NotesView>
+                return NotesView(notes |> Seq.filter(fun n -> n.State.RelatedToTicker.Equals(command.Ticker))) |> ResponseUtils.success<NotesView>
         }
         
         member _.Handle (command: UpdateNote) = task {

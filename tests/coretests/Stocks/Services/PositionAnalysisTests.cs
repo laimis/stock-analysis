@@ -15,15 +15,15 @@ namespace coretests.Stocks.Services
     {
         private static (PositionInstance position, PriceBar[] bars, Order[] orders) CreateTestData()
         {
-            var position = new PositionInstance(0, "SHEL", System.DateTimeOffset.UtcNow);
+            var position = new PositionInstance(0, TestDataGenerator.TSLA, System.DateTimeOffset.UtcNow);
             position.Buy(numberOfShares: 10, price: 100m, when: System.DateTimeOffset.UtcNow, transactionId: System.Guid.NewGuid());
             position.SetPrice(110m);
             
-            var bars = TestDataGenerator.PriceBars("SHEL");
+            var bars = TestDataGenerator.PriceBars(TestDataGenerator.TSLA.Value);
 
             var orders = new[] {
                 new Order {
-                    Ticker = new FSharpOption<Ticker>(new Ticker("SHEL")),
+                    Ticker = new FSharpOption<Ticker>(TestDataGenerator.TSLA),
                     Price = 100m,
                     Type = "SELL"
                 }

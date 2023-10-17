@@ -6,7 +6,7 @@ namespace core.Notes
     public class NoteState : IAggregateState
     {
         public Guid Id { get; internal set; }
-        public string RelatedToTicker { get; internal set; }
+        public Ticker RelatedToTicker { get; internal set; }
         public DateTimeOffset Created { get; internal set; }
         public string Note { get; internal set; }
         public Guid UserId { get; internal set; }
@@ -57,7 +57,7 @@ namespace core.Notes
         {
             Id = c.AggregateId;
             UserId = c.UserId;
-            RelatedToTicker = c.Ticker;
+            RelatedToTicker = new Ticker(c.Ticker);
             Created = c.When;
             Note = c.Note;
         }

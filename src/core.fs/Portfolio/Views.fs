@@ -305,7 +305,7 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
     
     let groupByValue (groupBy:string) (t:Transaction) =
         match groupBy with
-        | "ticker" -> t.Ticker
+        | "ticker" -> t.Ticker.Value
         | "week" -> t.DateAsDate.AddDays(- float t.DateAsDate.DayOfWeek+1.0).ToString("MMMM dd, yyyy")
         | _ -> t.DateAsDate.ToString("MMMM, yyyy")
         

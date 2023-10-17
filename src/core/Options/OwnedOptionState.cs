@@ -164,16 +164,16 @@ namespace core.Options
         internal void ApplyInternal(OptionOpened opened)
         {
             Id = opened.AggregateId;
-            Ticker = opened.Ticker;
+            Ticker = new Ticker(opened.Ticker);
             StrikePrice = opened.StrikePrice;
             Expiration = opened.Expiration;
             OptionType = opened.OptionType;
             UserId = opened.UserId;
         }
 
-        internal bool IsMatch(string ticker, decimal strike, OptionType type, DateTimeOffset expiration)
+        internal bool IsMatch(Ticker ticker, decimal strike, OptionType type, DateTimeOffset expiration)
         {
-            return Ticker == ticker 
+            return Ticker.Equals(ticker) 
                 && StrikePrice == strike 
                 && OptionType == type 
                 && Expiration.Date == expiration.Date;

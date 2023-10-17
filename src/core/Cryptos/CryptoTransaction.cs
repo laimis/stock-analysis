@@ -55,8 +55,8 @@ namespace core.Cryptos
         }
 
         public Transaction ToSharedTransaction() => Credit switch {
-            > 0 => Transaction.NonPLTx(AggregateId, TransactionId, Token, Description, Price, Credit, When, isOption: false),
-            _ => Transaction.NonPLTx(AggregateId, TransactionId, Token, Description, Price, Debit, When, isOption: false)
+            > 0 => Transaction.NonPLTx(AggregateId, TransactionId, new Ticker(Token), Description, Price, Credit, When, isOption: false),
+            _ => Transaction.NonPLTx(AggregateId, TransactionId, new Ticker(Token), Description, Price, Debit, When, isOption: false)
         };
     }
 }

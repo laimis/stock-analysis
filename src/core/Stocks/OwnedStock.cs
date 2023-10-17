@@ -18,7 +18,7 @@ namespace core.Stocks
                 throw new InvalidOperationException("Missing user id");
             }
 
-            Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker, userId));
+            Apply(new TickerObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, ticker.Value, userId));
         }
 
         public void Purchase(decimal numberOfShares, decimal price, DateTimeOffset date, string notes = null, decimal? stopPrice = null)
@@ -39,7 +39,7 @@ namespace core.Stocks
                     State.Id,
                     date,
                     State.UserId,
-                    State.Ticker,
+                    State.Ticker.Value,
                     numberOfShares,
                     price,
                     notes,
@@ -61,7 +61,7 @@ namespace core.Stocks
                     State.Id,
                     DateTimeOffset.UtcNow,
                     State.UserId,
-                    State.Ticker
+                    State.Ticker.Value
                 )
             );
         }
@@ -100,7 +100,7 @@ namespace core.Stocks
             }
 
             Apply(
-                new StopPriceSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker, stopPrice)
+                new StopPriceSet(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, State.UserId, State.Ticker.Value, stopPrice)
             );
 
             return true;
@@ -189,7 +189,7 @@ namespace core.Stocks
                     State.Id,
                     date,
                     State.UserId,
-                    State.Ticker,
+                    State.Ticker.Value,
                     numberOfShares,
                     price,
                     notes)

@@ -41,8 +41,8 @@ namespace coretests.Options
             var brokerage = new Mock<IBrokerage>();
             brokerage.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<Ticker>>()))
                 .Returns(Task.FromResult(
-                    new ServiceResponse<Dictionary<string, StockQuote>>(
-                        new Dictionary<string, StockQuote>()
+                    new ServiceResponse<Dictionary<Ticker, StockQuote>>(
+                        new Dictionary<Ticker, StockQuote>()
                     )
                 ));
 

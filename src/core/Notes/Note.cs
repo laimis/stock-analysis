@@ -34,7 +34,7 @@ namespace core.Notes
                     created,
                     userId,
                     note,
-                    ticker
+                    ticker.Value
                 )
             );
         }
@@ -46,7 +46,7 @@ namespace core.Notes
                 return true;
             }
 
-            return State.RelatedToTicker == filter.Value;
+            return State.RelatedToTicker.Equals(filter.Value);
         }
 
         public void Update(string note)

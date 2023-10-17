@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using core.Portfolio;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Portfolio
@@ -58,10 +59,10 @@ namespace coretests.Portfolio
         {
             var list = Create("name", "description");
 
-            list.AddStock("aapl", "note");
+            list.AddStock(TestDataGenerator.TSLA, "note");
 
             Assert.Single(list.State.Tickers);
-            Assert.Equal(new core.Shared.Ticker("aapl"), list.State.Tickers[0].Ticker);
+            Assert.Equal(TestDataGenerator.TSLA, list.State.Tickers[0].Ticker);
         }
 
         [Fact]
@@ -69,10 +70,10 @@ namespace coretests.Portfolio
         {
             var list = Create("name", "description");
 
-            list.AddStock("aapl", null);
+            list.AddStock(TestDataGenerator.TSLA, null);
 
             Assert.Single(list.State.Tickers);
-            Assert.Equal(new core.Shared.Ticker("aapl"), list.State.Tickers[0].Ticker);
+            Assert.Equal(TestDataGenerator.TSLA, list.State.Tickers[0].Ticker);
         }
 
         [Fact]
@@ -80,11 +81,11 @@ namespace coretests.Portfolio
         {
             var list = Create("name", "description");
 
-            list.AddStock("aapl", "note");
+            list.AddStock(TestDataGenerator.TSLA, "note");
 
             Assert.Single(list.State.Tickers);
 
-            list.RemoveStock("aapl");
+            list.RemoveStock(TestDataGenerator.TSLA);
 
             Assert.Empty(list.State.Tickers);
         }
@@ -94,7 +95,7 @@ namespace coretests.Portfolio
         {
             var list = Create("name", "description");
 
-            Assert.Throws<InvalidOperationException>(() => list.RemoveStock("aapl"));
+            Assert.Throws<InvalidOperationException>(() => list.RemoveStock(TestDataGenerator.TSLA));
         }
 
         [Fact]
@@ -102,12 +103,12 @@ namespace coretests.Portfolio
         {
             var list = Create("name", "description");
 
-            list.AddStock("aapl", "note");
+            list.AddStock(TestDataGenerator.TSLA, "note");
 
             var events = list.Events.Count();
 
-            list.AddStock("aapl", "note");
-            list.AddStock("aapl", "note");
+            list.AddStock(TestDataGenerator.TSLA, "note");
+            list.AddStock(TestDataGenerator.TSLA, "note");
 
 
             Assert.Single(list.State.Tickers);

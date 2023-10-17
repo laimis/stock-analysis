@@ -8,6 +8,7 @@ using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Storage;
+using core.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace web.BackgroundServices;
@@ -156,7 +157,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
         return ToEmailRow(valueFormat, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
     }
 
-    public static object ToEmailRow(ValueFormat valueFormat, decimal triggeredValue, string ticker, string description, string sourceList, DateTimeOffset time)
+    public static object ToEmailRow(ValueFormat valueFormat, decimal triggeredValue, Ticker ticker, string description, string sourceList, DateTimeOffset time)
     {
         string FormattedValue()
         {
@@ -172,7 +173,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
         return new
         {
-            ticker,
+            ticker = ticker.Value,
             value = FormattedValue(),
             description,
             sourceList,

@@ -285,7 +285,7 @@ module CSVExport =
             |> Seq.map (fun n ->
                 {
                     Created = n.State.Created.ToString(DATE_FORMAT)
-                    Ticker = n.State.RelatedToTicker
+                    Ticker = n.State.RelatedToTicker.Value
                     Note = n.State.Note
                 }
             )

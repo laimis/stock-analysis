@@ -9,6 +9,7 @@ using core.Options;
 using core.Portfolio;
 using core.Shared;
 using core.Stocks;
+using coretests.testdata;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,7 +30,7 @@ namespace storagetests
         {
             var storage = CreateStorage();
 
-            Assert.Null(await storage.GetStock("nonexisting", _userId));
+            Assert.Null(await storage.GetStock(new Ticker("nonexisting"), _userId));
         }
 
         protected abstract IPortfolioStorage CreateStorage();
@@ -76,9 +77,9 @@ namespace storagetests
             Assert.Empty(afterDelete);
         }
 
-        private static string GenerateTestTicker()
+        private static Ticker GenerateTestTicker()
         {
-            return $"test-{Guid.NewGuid().ToString("N")[..4]}";
+            return new Ticker($"test-{Guid.NewGuid().ToString("N")[..4]}");
         }
 
         [Fact]
@@ -108,7 +109,7 @@ namespace storagetests
 
             var list = await storage.GetOwnedOptions(_userId);
 
-            var fromList = list.Single(o => o.State.Ticker == option.State.Ticker);
+            var fromList = list.Single(o => o.State.Ticker.Equals(option.State.Ticker));
 
             Assert.Equal(option.State.StrikePrice, fromList.State.StrikePrice);
 
@@ -122,7 +123,7 @@ namespace storagetests
         [Fact]
         public async Task NoteStorageWorksAsync()
         {
-            var note = new Note(_userId.Item, "note", new Ticker("tsla"), DateTimeOffset.UtcNow);
+            var note = new Note(_userId.Item, "note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
@@ -202,7 +203,7 @@ namespace storagetests
 
             await storage.Save(loaded, _userId);
 
-            loaded = await storage.GetStock(new Ticker(loaded.State.Ticker), UserId.NewUserId(loaded.State.UserId));
+            loaded = await storage.GetStock(loaded.State.Ticker, UserId.NewUserId(loaded.State.UserId));
 
             var position = loaded.State.GetAllPositions()[0];
 
@@ -216,7 +217,7 @@ namespace storagetests
             await storage.Save(loaded, _userId);
 
             // make sure we can still load it
-            _ = await storage.GetStock(loaded.State.Ticker.Value, UserId.NewUserId(loaded.State.UserId));
+            _ = await storage.GetStock(loaded.State.Ticker, UserId.NewUserId(loaded.State.UserId));
 
             // clean up
             await storage.Delete(_userId);    
@@ -267,7 +268,7 @@ namespace storagetests
 
             var list = new StockList("description", "name", _userId.Item);
 
-            list.AddStock("tsla", "yeah yeah");
+            list.AddStock(TestDataGenerator.TSLA, "yeah yeah");
 
             await storage.SaveStockList(list, _userId);
 
@@ -279,7 +280,7 @@ namespace storagetests
 
             Assert.Equal(list.State.Name, loaded.State.Name);
 
-            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker == new Ticker("tsla"));
+            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker.Equals(TestDataGenerator.TSLA));
 
             Assert.NotNull(ticker);
 
@@ -304,7 +305,7 @@ namespace storagetests
             var note = new Note(
                 _userId.Item,
                 "description",
-                "tsla",
+                TestDataGenerator.TSLA,
                 DateTimeOffset.UtcNow
             );
             
@@ -346,7 +347,7 @@ namespace storagetests
                 price: 2.1m,
                 stopPrice: 2m,
                 strategy: "strategy",
-                ticker: "tsla",
+                ticker: TestDataGenerator.TSLA,
                 userId: _userId.Item
             );
 
@@ -356,7 +357,7 @@ namespace storagetests
 
             Assert.Single(existing);
 
-            var loaded = existing.Single(p => p.State.Ticker.Value == "TSLA");
+            var loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.TSLA));
 
             Assert.Equal(position.State.Id, loaded.State.Id);
 
@@ -368,7 +369,7 @@ namespace storagetests
 
             Assert.NotEmpty(existing);
 
-            loaded = existing.Single(p => p.State.Ticker.Value == "TSLA");
+            loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.TSLA));
 
             Assert.True(loaded.State.IsClosed);
             Assert.NotNull(loaded.State.Closed);

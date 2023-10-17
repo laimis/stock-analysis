@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using core.Shared;
 using core.Stocks;
+using coretests.testdata;
 
 namespace coretests.Stocks
 {
@@ -10,17 +12,17 @@ namespace coretests.Stocks
         {
             var closedPositions = new List<PositionInstance>();
 
-            var position = new PositionInstance(0, "AMD", DateTimeOffset.Now.AddDays(-1));
+            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
             position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
-            position = new PositionInstance(1, "AMD", DateTimeOffset.Now.AddDays(-1));
+            position = new PositionInstance(1, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
             position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
-            position = new PositionInstance(2, "AMD", DateTimeOffset.Now.AddDays(-1));
+            position = new PositionInstance(2, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
             position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
@@ -56,7 +58,7 @@ namespace coretests.Stocks
         }
         
         private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private static string GenerateRandomTicker(Random random)
+        private static Ticker GenerateRandomTicker(Random random)
         {
             var length = random.Next(3, 5);
             var ticker = new char[length];
@@ -64,7 +66,7 @@ namespace coretests.Stocks
             {
                 ticker[i] = Chars[random.Next(Chars.Length)];
             }
-            return ticker.ToString();
+            return new Ticker(ticker.ToString());
         }
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using core.Shared;
 using core.Stocks;
+using coretests.testdata;
 using Xunit;
 
 namespace coretests.Stocks
@@ -8,15 +10,16 @@ namespace coretests.Stocks
     public class OwnedStockTests
     {
         private static Guid _userId = Guid.NewGuid();
+        private static Ticker TEUM = new Ticker("TEUM");
             
         [Fact]
         public void PurchaseWorks()
         {
-            var stock = new OwnedStock("TEUM", _userId);
+            var stock = new OwnedStock(TEUM, _userId);
 
             stock.Purchase(10, 2.1m, DateTime.UtcNow);
 
-            Assert.Equal("TEUM", stock.State.Ticker);
+            Assert.Equal(TEUM, stock.State.Ticker);
             Assert.Equal(_userId, stock.State.UserId);
             Assert.Equal(10, stock.State.OpenPosition.NumberOfShares);
             Assert.Equal(21, stock.State.OpenPosition.Cost);
@@ -34,7 +37,7 @@ namespace coretests.Stocks
         [Fact]
         public void SellingNotOwnedFails()
         {
-            var stock = new OwnedStock("TEUM", _userId);
+            var stock = new OwnedStock(TEUM, _userId);
 
             stock.Purchase(10, 2.1m, DateTime.UtcNow);
 
@@ -44,7 +47,7 @@ namespace coretests.Stocks
         [Fact]
         public void BuyingForZeroThrows()
         {
-            var stock = new OwnedStock("tlsa", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.UtcNow));
         }
@@ -52,7 +55,7 @@ namespace coretests.Stocks
         [Fact]
         public void BuyingWithBadDateThrows()
         {
-            var stock = new OwnedStock("tlsa", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.MinValue));
         }
@@ -60,13 +63,13 @@ namespace coretests.Stocks
         [Fact]
         public void BuyingWithBadUserThrows()
         {
-            Assert.Throws<InvalidOperationException>(() => new OwnedStock("tlsa", Guid.Empty));
+            Assert.Throws<InvalidOperationException>(() => new OwnedStock(TestDataGenerator.TSLA, Guid.Empty));
         }
 
         [Fact]
         public void PurchaseWithDateNotProvidedThrows()
         {
-            var stock = new OwnedStock("tlsa", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTime.MinValue));
         }
@@ -74,7 +77,7 @@ namespace coretests.Stocks
         [Fact]
         public void EventCstrReplaysEvents()
         {
-            var stock = new OwnedStock("tlsa", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 10, DateTime.UtcNow);
 
@@ -88,7 +91,7 @@ namespace coretests.Stocks
         [Fact]
         public void MultipleBuysAverageCostCorrect()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
@@ -120,7 +123,7 @@ namespace coretests.Stocks
         [Fact]
         public void SellCreatesPLTransaction()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             // buying two shares one at a time, average cost should be 7.5
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
@@ -155,7 +158,7 @@ namespace coretests.Stocks
         [Fact]
         public void MultipleBuysDeletingTransactions()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow);
             stock.Purchase(1, 10, DateTimeOffset.UtcNow);
@@ -187,7 +190,7 @@ namespace coretests.Stocks
         [Fact]
         public void DaysHeldCorrect()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Purchase(1, 10, DateTimeOffset.UtcNow.AddDays(-2));
@@ -208,7 +211,7 @@ namespace coretests.Stocks
         [Fact]
         public void PositionId_LogicIsCorrect()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             // first time buying, position should be 0
             // then, once closed out, open position is null
@@ -241,7 +244,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssignGrade_To_OpenPosition_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
 
@@ -253,7 +256,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssignGrade_To_ClosedPosition_Succeeds()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
@@ -271,7 +274,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssignGrade_To_ClosedPosition_UpdatesExistingGrade()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
@@ -288,7 +291,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssignGrade_WithUpdatedNote_RemovesPreviousNoteAndAddsNewOne()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
@@ -307,7 +310,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssignInvalidGrade_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
@@ -320,7 +323,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssigningStop_Works()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
 
@@ -339,7 +342,7 @@ namespace coretests.Stocks
         [Fact]
         public void AssigningStop_ToClosedPosition_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
@@ -352,7 +355,7 @@ namespace coretests.Stocks
         [Fact]
         public void AddingNote_Works()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
 
@@ -371,7 +374,7 @@ namespace coretests.Stocks
         [Fact]
         public void AddingNote_ToClosedPosition_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
@@ -384,7 +387,7 @@ namespace coretests.Stocks
         [Fact]
         public void DeletePosition_OnClosedPosition_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;
@@ -398,7 +401,7 @@ namespace coretests.Stocks
         [Fact]
         public void DeletePosition_Works()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;
@@ -426,7 +429,7 @@ namespace coretests.Stocks
         [Fact]
         public void LabelsWork()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;
@@ -444,7 +447,7 @@ namespace coretests.Stocks
         [Fact]
         public void SetLabel_WithNullValue_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;
@@ -457,7 +460,7 @@ namespace coretests.Stocks
         [Fact]
         public void SetLabel_WithNullKey_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;
@@ -470,7 +473,7 @@ namespace coretests.Stocks
         [Fact]
         public void DeleteLabel_Works()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;
@@ -488,7 +491,7 @@ namespace coretests.Stocks
         [Fact]
         public void DeleteLabel_WithNullKey_Fails()
         {
-            var stock = new OwnedStock("tsla", _userId);
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
             var positionId = stock.State.OpenPosition.PositionId;

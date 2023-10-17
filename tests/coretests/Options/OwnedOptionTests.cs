@@ -128,7 +128,7 @@ namespace coretests.Options
         {
             var option = GetTestOption(_expiration);
 
-            option.IsMatch("TEUM", 2.5m, OptionType.PUT, _expiration);
+            option.IsMatch(new Ticker("TEUM"), 2.5m, OptionType.PUT, _expiration);
         }
 
         [Theory]
@@ -137,7 +137,7 @@ namespace coretests.Options
         public void CreateWithBadTickerFails(string ticker, decimal strikePrice)
         {
             Assert.Throws<InvalidOperationException>( () =>
-                new OwnedOption(ticker, strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, Guid.NewGuid()));
+                new OwnedOption(new Ticker(ticker), strikePrice, OptionType.CALL, DateTimeOffset.UtcNow, Guid.NewGuid()));
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace coretests.Options
             decimal strikePrice = 2.5m)
         {
             var option = new OwnedOption(
-                ticker,
+                new Ticker(ticker),
                 strikePrice,
                 optionType,
                 expiration,

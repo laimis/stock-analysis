@@ -6,7 +6,7 @@ namespace core.Shared
     {
         public Guid AggregateId { get; }
         public Guid EventId { get; }
-        public string Ticker { get; }
+        public Ticker Ticker { get; }
         public string Description { get; }
         public decimal Price { get; set; }
         public decimal Amount { get; }
@@ -19,7 +19,7 @@ namespace core.Shared
         private Transaction(
             Guid aggregateId,
             Guid eventId,
-            string ticker,
+            Ticker ticker,
             string description,
             decimal price,
             decimal amount,
@@ -38,12 +38,12 @@ namespace core.Shared
             IsPL = isPL;
         }
 
-        public static Transaction NonPLTx(Guid aggregateId, Guid eventId, string ticker, string description, decimal price, decimal amount, DateTimeOffset when, bool isOption)
+        public static Transaction NonPLTx(Guid aggregateId, Guid eventId, Ticker ticker, string description, decimal price, decimal amount, DateTimeOffset when, bool isOption)
         {
             return new Transaction(aggregateId, eventId, ticker, description, price, amount, when, isOption, false);
         }
 
-        public static Transaction PLTx(Guid aggregateId, string ticker, string description, decimal price, decimal amount, DateTimeOffset when, bool isOption)
+        public static Transaction PLTx(Guid aggregateId, Ticker ticker, string description, decimal price, decimal amount, DateTimeOffset when, bool isOption)
         {
             return new Transaction(aggregateId, Guid.Empty, ticker, description, price, amount, when, isOption, true);
         }

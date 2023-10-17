@@ -280,7 +280,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             
             let prices =
                 match quotesResponse.IsOk with
-                | false -> Dictionary<string,StockQuote>()
+                | false -> Dictionary<Ticker,StockQuote>()
                 | true -> quotesResponse.Success
                 
             let violations =

@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Options;
+using core.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace web.Controllers
             this.OkOrError(
                 _service.Handle(
                     new ChainQuery(
-                        ticker: ticker, userId: User.Identifier()
+                        ticker: new Ticker(ticker), userId: User.Identifier()
                     )
                 )
             );
