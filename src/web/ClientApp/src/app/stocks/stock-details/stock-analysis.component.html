@@ -36,13 +36,13 @@
                         <td>
                             <span
                                 class="badge"
-                                [ngClass]="{'bg-success': o.type === 'Positive', 'bg-danger': o.type === 'Negative', 'bg-secondary': o.type === 'Neutral'}">
+                                [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
                                 &nbsp;
                             </span>
                         </td>
                         <td>{{o.key}}</td>
                         <td>{{getValue(o)}}</td>
-                        <td>{{o.type}}</td>
+                        <td>{{o.outcomeType}}</td>
                         <td>{{o.message}}</td>
                     </tr>
                 </tbody>
@@ -70,13 +70,13 @@
                         <td>
                             <span
                                 class="badge"
-                                [ngClass]="{'bg-success': o.type === 'Positive', 'bg-danger': o.type === 'Negative', 'bg-secondary': o.type === 'Neutral'}">
+                                [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
                                 &nbsp;
                             </span>
                         </td>
                         <td>{{o.key}}</td>
                         <td>{{getValue(o)}}</td>
-                        <td>{{o.type}}</td>
+                        <td>{{o.outcomeType}}</td>
                         <td>{{o.message}}</td>
                     </tr>
                 </tbody>

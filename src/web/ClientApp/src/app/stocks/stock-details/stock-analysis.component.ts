@@ -98,11 +98,11 @@ export class StockAnalysisComponent {
   }
 
   positiveCount(outcomes: TickerOutcomes) {
-    return outcomes.outcomes.filter(r => r.type === 'Positive').length;
+    return outcomes.outcomes.filter(r => r.outcomeType === 'Positive').length;
   }
 
   negativeCount(outcomes: TickerOutcomes) {
-    return outcomes.outcomes.filter(r => r.type === 'Negative').length;
+    return outcomes.outcomes.filter(r => r.outcomeType === 'Negative').length;
   }
 
 }

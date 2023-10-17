@@ -16,12 +16,12 @@
             <app-stock-link [ticker]="s.ticker" [openInNewTab]="true"></app-stock-link>
           </td>
           <td *ngFor="let o of outcomesForRendering(s.outcomes)"
-            [ngClass]="{'text-end': true, 'text-success': o.type === 'Positive', 'text-danger': o.type === 'Negative'}" class="text-end">
+            [ngClass]="{'text-end': true, 'text-success': o.outcomeType === 'Positive', 'text-danger': o.outcomeType === 'Negative'}" class="text-end">
             {{ getValue(o)}}
           </td>
         </tr>
       </tbody>
     </table>
   </section>
-  
+
 </div>

@@ -559,8 +559,14 @@ export enum OutcomeValueTypeEnum {
   String = 'String'
 }
 
+export enum OutcomeTypeEnum {
+  Positive = "Positive",
+  Negative = "Negative",
+  Neutral = "Neutral"
+}
+
 export interface StockAnalysisOutcome {
-  type: string
+  outcomeType: OutcomeTypeEnum
   message: string
   key: string
   value: number

@@ -291,7 +291,7 @@ export class StockTradingNewPositionComponent {
     if (!this.outcomes) {
       return []
     }
-    return this.outcomes.outcomes.filter(o => o.type !== "Neutral")
+    return this.outcomes.outcomes.filter(o => o.outcomeType !== "Neutral")
   }
 
   lookupPendingPosition(ticker: string) {
