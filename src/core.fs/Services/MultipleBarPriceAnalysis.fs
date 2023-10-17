@@ -1,7 +1,6 @@
 namespace core.fs.Services
 
 open System.Collections.Generic
-open core.Shared
 open core.fs.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
@@ -71,10 +70,20 @@ module MultipleBarPriceAnalysis =
                 |> Array.map (fun (sma20, sma50) -> (sma20 - sma50) > 0m)
                 |> Array.rev
                 
+            let findIndexOrReturnLength func arr =
+                arr
+                |> Array.tryFindIndex func
+                |> Option.defaultWith (fun () -> arr.Length)
+                |> decimal
+                
             let outcomeType, value =
                 match sma20Above50Sequence[0] with
-                | true -> OutcomeType.Positive, sma20Above50Sequence |> Array.findIndex (fun v -> v = false) |> decimal
-                | false -> OutcomeType.Negative, sma20Above50Sequence |> Array.findIndex (fun v -> v = true) |> decimal
+                | true ->
+                    OutcomeType.Positive,
+                    sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = false)
+                | false ->
+                    OutcomeType.Negative,
+                    sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = true)
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.SMA20Above50Days,
