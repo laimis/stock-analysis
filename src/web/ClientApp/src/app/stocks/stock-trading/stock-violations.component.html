@@ -47,7 +47,7 @@
                 [setTicker]="violation.ticker"
                 [showChart]="false"
                 [showAnalysis]="false"
-                [hideCreatePendingPosition]="true"
+                [isPendingPositionMode]="false"
                 (stockPurchased)="transactionRecorded($event)">
               </app-stock-trading-newposition>
             </div>
@@ -56,7 +56,7 @@
       </ng-container>
     </tbody>
   </table>
-    
+
   <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-neworder>
   <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted($event)" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
 

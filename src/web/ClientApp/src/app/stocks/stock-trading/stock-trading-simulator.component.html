@@ -1,6 +1,6 @@
 <div>
 
-  
+
   <h2>Position simulator</h2>
 
   <div class="row" *ngIf="showExisting">
@@ -14,12 +14,13 @@
       </li>
     </ul>
   </div>
-  
+
   <div class="row" *ngIf="!showExisting">
     <div class="col-md-8" *ngIf="!ticker">
       <app-stock-trading-newposition
         (stockPurchased)="initialPosition($event)"
-        [recordPositions]="false">
+        [recordPositions]="false"
+        [isPendingPositionMode]="false">
       </app-stock-trading-newposition>
     </div>
     <div class="col-md-8" *ngIf="ticker">
@@ -98,7 +99,7 @@
               <td>Unrealize R/R</td>
               <td class="value">{{unrealizedRR | number}}</td>
             </tr>
-            
+
             <tr class="table-success">
               <td></td><td></td>
             </tr>
@@ -119,12 +120,12 @@
               <td>Number of Shares</td>
               <td class="value">{{numberOfShares | number}}</td>
             </tr>
-            
-            
+
+
             <tr class="table-success">
               <td></td><td></td>
             </tr>
-            
+
             <tr>
               <td>Profit</td>
               <td class="value">{{profit | currency}}</td>
@@ -150,13 +151,13 @@
       </div>
     </div>
   </div>
-  
-  
+
+
 
   <div>
     <button class="btn btn-primary me-3" (click)="showExistingPositions()">Load</button>
     <button class="btn btn-primary me-3" (click)="reset()">Reset</button>
   </div>
-  
+
 
 </div>

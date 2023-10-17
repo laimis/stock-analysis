@@ -55,7 +55,7 @@
           (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
         />
       </div>
-      <div class="col">
+      <div class="col" *ngIf="isPendingPositionMode === false">
         <label for="date" class="form-label">Purchase Date</label>
         <input
           type="date"
@@ -94,10 +94,10 @@
       </div>
     </div>
     <div class="row mt-3" *ngIf="prices">
-      <div class="col" *ngIf="!hideCreatePendingPosition">
+      <div class="col" *ngIf="isPendingPositionMode">
         <button class="btn btn-primary w-100" (click)="createPendingPosition()">Create Pending Position</button>
       </div>
-      <div class="col" >
+      <div class="col" *ngIf="isPendingPositionMode === false">
         <button *ngIf="!recordInProgress" class="btn btn-primary w-100" (click)="record()">Record</button>
         <button *ngIf="recordInProgress" class="btn btn-primary w-100" disabled>Record</button>
       </div>

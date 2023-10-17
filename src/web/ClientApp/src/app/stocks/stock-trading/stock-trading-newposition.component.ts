@@ -52,7 +52,7 @@ export class StockTradingNewPositionComponent {
   }
 
   @Input()
-  hideCreatePendingPosition: boolean = false
+  isPendingPositionMode: boolean = true
 
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
