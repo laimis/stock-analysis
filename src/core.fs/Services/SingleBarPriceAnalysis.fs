@@ -241,7 +241,7 @@ module SingleBarPriceAnalysisEvaluation =
             )
             
             AnalysisOutcomeEvaluation(
-                "Above Average Volume and High Percent Change",
+                "High Volume and High Percent Change",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.RelativeVolume,
                 tickerOutcomes
@@ -281,7 +281,7 @@ module SingleBarPriceAnalysisEvaluation =
                     t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value < LowClosingRange)
                 )
             )
-            g
+            
             AnalysisOutcomeEvaluation(
                 "High Volume with Low Closing Range and Small Percent Change",
                 OutcomeType.Negative,
