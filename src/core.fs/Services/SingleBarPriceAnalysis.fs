@@ -273,17 +273,6 @@ module SingleBarPriceAnalysisEvaluation =
             )
             
             AnalysisOutcomeEvaluation(
-                "Above Average Volume and Positive Percent Change",
-                OutcomeType.Positive,
-                SingleBarOutcomeKeys.RelativeVolume,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value >= 0m)
-                )
-            )
-            
-            AnalysisOutcomeEvaluation(
                 "Low Closing Range",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.ClosingRange,
