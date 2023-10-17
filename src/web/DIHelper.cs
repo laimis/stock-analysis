@@ -104,6 +104,7 @@ namespace web
             services.AddHostedService<WeeklyUpsideReversalService>();
             services.AddHostedService<EmailNotificationService>();
             services.AddHostedService<StopLossServiceHost>();
+            services.AddHostedService<BrokerageServiceHost>();
         }
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)

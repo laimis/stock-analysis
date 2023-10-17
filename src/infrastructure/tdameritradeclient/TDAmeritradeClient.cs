@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using core.Account;
+using core.fs.Admin;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
@@ -670,17 +671,7 @@ public class TDAmeritradeClient : IBrokerage
         return tuple;
     }
 
-    public async Task<OAuthResponse> GetAccessToken(UserState user)
-    {
-        if (!_accessTokens.TryGetValue(user.Id, out OAuthResponse? value) || value.IsExpired)
-        {
-            value = await RefreshAccessToken(user);
-            _accessTokens[user.Id] = value;
-        }
-        return value;
-    }
-
-    private async Task<OAuthResponse> RefreshAccessToken(UserState user)
+    private async Task<OAuthResponse> RefreshAccessTokenInternal(UserState user, bool fullRefresh)
     {
         var postData = new Dictionary<string, string>
         {
@@ -688,6 +679,11 @@ public class TDAmeritradeClient : IBrokerage
             { "refresh_token", user.BrokerageRefreshToken },
             { "client_id", _clientId }
         };
+
+        if (fullRefresh)
+        {
+            postData.Add("access_type", "offline");
+        }
 
         var content = new FormUrlEncodedContent(postData);
 
@@ -698,8 +694,21 @@ public class TDAmeritradeClient : IBrokerage
         var responseString = await response.Content.ReadAsStringAsync();
 
         var deserialized = JsonSerializer.Deserialize<OAuthResponse>(responseString) ??
-            throw new Exception("Could not deserialize access token: " + responseString);
+                           throw new Exception("Could not deserialize access token: " + responseString);
         return deserialized;
+    }
+
+    public Task<OAuthResponse> RefreshAccessToken(UserState user) =>
+        RefreshAccessTokenInternal(user, fullRefresh: true);
+
+    public async Task<OAuthResponse> GetAccessToken(UserState user)
+    {
+        if (!_accessTokens.TryGetValue(user.Id, out var value) || value.IsExpired)
+        {
+            value = await RefreshAccessTokenInternal(user, fullRefresh: false);
+            _accessTokens[user.Id] = value;
+        }
+        return value;
     }
 
     private static string GenerateApiUrl(string function) => $"{ApiUrl}/{function}";

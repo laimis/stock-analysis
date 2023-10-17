@@ -68,14 +68,20 @@ namespace core.Account
             // no state to modify, this event gets captured via INotification mechanism
         }
 
-        internal void ApplyInternal(UserConnectedToBrokerage e)
+        private void RefreshBrokerageData(string accessToken, string refreshToken, DateTimeOffset eventTimestamp)
         {
             ConnectedToBrokerage = true;
-            BrokerageAccessToken = e.AccessToken;
-            BrokerageRefreshToken = e.RefreshToken;
-            BrokerageAccessTokenExpires = e.When.AddSeconds(e.ExpiresInSeconds);
-            BrokerageRefreshTokenExpires = e.When.AddDays(90);
+            BrokerageAccessToken = accessToken;
+            BrokerageRefreshToken = refreshToken;
+            BrokerageAccessTokenExpires = eventTimestamp.AddSeconds(1800);
+            BrokerageRefreshTokenExpires = eventTimestamp.AddDays(90);
         }
+
+        internal void ApplyInternal(UserConnectedToBrokerage e) =>
+            RefreshBrokerageData(e.AccessToken, e.RefreshToken, e.When);
+        
+        internal void ApplyInternal(UserRefreshedBrokerageConnection e) =>
+            RefreshBrokerageData(e.AccessToken, e.RefreshToken, e.When);
 
         internal void ApplyInternal(UserDisconnectedFromBrokerage _)
         {
