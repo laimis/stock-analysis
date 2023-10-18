@@ -14,16 +14,19 @@ namespace coretests.Stocks
 
             var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
+            position.SetStopPrice(95m, DateTimeOffset.Now.AddDays(-1));
             position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
             position = new PositionInstance(1, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
+            position.SetStopPrice(95m, DateTimeOffset.Now.AddDays(-1));
             position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 
             position = new PositionInstance(2, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
             position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
+            position.SetStopPrice(95m, DateTimeOffset.Now.AddDays(-1));
             position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
             closedPositions.Add(position);
 

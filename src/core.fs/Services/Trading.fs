@@ -89,16 +89,16 @@ type TradingPerformance =
         Profit:decimal
         WinReturnPctTotal:decimal
         WinMaxReturnPct:decimal
+        WinRRTotal:decimal
         Losses:int
         LossAmount:decimal
         MaxLossAmount:decimal
         LossReturnPctTotal:decimal
         LossMaxReturnPct:decimal
+        LossRRTotal:decimal
         TotalDaysHeldLosses:decimal
-        AvgReturnPct:decimal
         TotalDaysHeld:decimal
         rrSum:decimal
-        rrRatio:decimal
         EarliestDate:DateTimeOffset
         LatestDate:DateTimeOffset
         GradeDistribution:LabelWithFrequency[]
@@ -138,12 +138,12 @@ type TradingPerformance =
             member this.ReturnPctRatio =
                 match this.LossAvgReturnPct with
                 | 0m -> 0m
-                | _ -> this.WinAvgReturnPct / this.LossAvgReturnPct
+                | _ -> this.WinAvgReturnPct / this.LossAvgReturnPct |> Math.Abs
                 
             member this.ProfitRatio =
                 match this.AvgLossAmount with
                 | 0m -> 0m
-                | _ -> this.AvgWinAmount / this.AvgLossAmount
+                | _ -> this.AvgWinAmount / this.AvgLossAmount |> Math.Abs
                 
             member this.AverageDaysHeld =
                 match this.NumberOfTrades with
@@ -158,7 +158,39 @@ type TradingPerformance =
             member this.EV =
                 match this.NumberOfTrades with
                 | 0 -> 0m
-                | _ -> this.WinPct * this.WinAmount - (1m - this.WinPct) * this.LossAmount
+                | _ ->
+                    let winRatio =
+                        match this.Wins with
+                        | 0 -> 0m
+                        | _ -> this.WinAmount / decimal this.Wins
+                        
+                    let lossRatio =
+                        match this.Losses with
+                        | 0 -> 0m
+                        | _ -> this.LossAmount / decimal this.Losses
+                        
+                    this.WinPct * winRatio - (1m - this.WinPct) * lossRatio
+                
+            member this.WinAvgRR =
+                match this.Wins with
+                | 0 -> 0m
+                | _ -> this.WinRRTotal / decimal this.Wins
+                
+            member this.LossAvgRR =
+                match this.Losses with
+                | 0 -> 0m
+                | _ -> this.LossRRTotal / decimal this.Losses
+                
+            member this.rrRatio =
+                match (this.WinAvgRR, this.LossAvgRR) with
+                | 0m, _ -> this.LossAvgRR
+                | _, 0m -> this.WinAvgRR
+                | _ -> this.WinAvgRR / this.LossAvgRR |> Math.Abs
+                
+            member this.AvgReturnPct =
+                match this.NumberOfTrades with
+                | 0 -> 0m
+                | _ -> this.Profit / this.TotalCost
                 
             static member Create(closedPositions:seq<PositionInstance>) =
                 
@@ -243,6 +275,16 @@ type TradingPerformance =
                                 match position.Profit < 0m with
                                 | true -> perf.LossReturnPctTotal + position.GainPct
                                 | false -> perf.LossReturnPctTotal
+                                
+                            WinRRTotal =
+                                match position.Profit >= 0m with
+                                | true -> perf.WinRRTotal + position.RR
+                                | false -> perf.WinRRTotal
+                                
+                            LossRRTotal =
+                                match position.Profit < 0m with
+                                | true -> perf.LossRRTotal + position.RR
+                                | false -> perf.LossRRTotal
                     }
                 ) { NumberOfTrades = 0
                     Wins = 0
@@ -254,10 +296,8 @@ type TradingPerformance =
                     LossAmount = 0m
                     MaxLossAmount = 0m
                     LossMaxReturnPct = 0m
-                    AvgReturnPct = 0m
                     TotalDaysHeld = 0m
                     rrSum = 0m
-                    rrRatio = 0m
                     EarliestDate = DateTimeOffset.MaxValue
                     LatestDate = DateTimeOffset.MinValue
                     GradeDistribution = [||]
@@ -265,7 +305,9 @@ type TradingPerformance =
                     TotalDaysHeldWins = 0m
                     TotalDaysHeldLosses = 0m 
                     WinReturnPctTotal = 0m
-                    LossReturnPctTotal = 0m 
+                    LossReturnPctTotal = 0m
+                    WinRRTotal = 0m
+                    LossRRTotal = 0m 
                 }
 
 type TradingStrategyPerformance =

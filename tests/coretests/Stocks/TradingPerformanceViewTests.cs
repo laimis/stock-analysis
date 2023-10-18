@@ -57,6 +57,18 @@ namespace coretests.Stocks
         public void AvgDaysHeldCorrect() => Assert.Equal(1.0m, _performance.AverageDaysHeld);
 
         [Fact]
-        public void EV_Correct() => Assert.Equal(16.67m, Math.Round(_performance.EV, 2));
+        public void EV_Correct() => Assert.Equal(10.00m, Math.Round(_performance.EV, 2));
+
+        [Fact]
+        public void ReturnPctRatio_Correct() => Assert.Equal(1, _performance.ReturnPctRatio);
+        
+        [Fact]
+        public void rrRatio_Correct() => Assert.Equal(1, _performance.rrRatio);
+        
+        [Fact]
+        public void ProfitRatio_Correct() => Assert.Equal(1, _performance.ProfitRatio);
+        
+        [Fact]
+        public void AvgReturnPct_Correct() => Assert.Equal(0.03m, _performance.AvgReturnPct, 2);
     }
 }
