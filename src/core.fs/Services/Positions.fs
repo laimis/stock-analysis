@@ -58,14 +58,14 @@ module PositionAnalysis =
         let min = bars |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
         let drawdown = (min - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
-        let last10 = if bars.Length > 10 then bars[0..9] else bars
+        let last10 = if bars.Length <= 10 then bars else bars[bars.Length - 10..]
         let last10Max = last10 |> Array.maxBy (fun b -> b.High) |> fun b -> b.High
         let last10Gain = (last10Max - last10[0].Close) / last10[0].Close
         
         let last10Min = last10 |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
         let last10Drawdown = (last10Min - last10[0].Close) / last10[0].Close
         
-        let last10MaxGainDrawdownDiff = last10Gain - last10Drawdown * -1.0m
+        let last10MaxGainDrawdownDiff = last10Gain + last10Drawdown
         
         let daysSinceOpened = 
             position.Opened
