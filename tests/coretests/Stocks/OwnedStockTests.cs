@@ -249,7 +249,7 @@ namespace coretests.Stocks
             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
 
             Assert.Throws<InvalidOperationException>(() => 
-                stock.AssignGrade(0, "A", "this trade went perfectly!")
+                stock.AssignGrade(0, TestDataGenerator.A, "this trade went perfectly!")
             );
         }
 
@@ -262,11 +262,11 @@ namespace coretests.Stocks
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             var positionId = 0;
-            stock.AssignGrade(positionId, "A", "this trade went perfectly!");
+            stock.AssignGrade(positionId, TestDataGenerator.A, "this trade went perfectly!");
 
             var position = stock.State.GetPosition(0);
 
-            Assert.Equal("A", position.Grade);
+            Assert.Equal(TestDataGenerator.A, position.Grade);
             Assert.Equal("this trade went perfectly!", position.GradeNote);
             Assert.Contains(position.GradeNote, position.Notes);
         }
@@ -280,11 +280,11 @@ namespace coretests.Stocks
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             var positionId = 0;
-            stock.AssignGrade(positionId, "A", "this trade went perfectly!");
-            stock.AssignGrade(positionId, "B", "this trade went perfectly!");
+            stock.AssignGrade(positionId, TestDataGenerator.A, "this trade went perfectly!");
+            stock.AssignGrade(positionId, TestDataGenerator.B, "this trade went perfectly!");
 
             var position = stock.State.GetPosition(0);
-            Assert.Equal("B", position.Grade);
+            Assert.Equal(TestDataGenerator.B, position.Grade);
             Assert.Equal("this trade went perfectly!", position.GradeNote);
         }
 
@@ -297,11 +297,11 @@ namespace coretests.Stocks
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             var positionId = 0;
-            stock.AssignGrade(positionId, "A", "this trade went perfectly!");
-            stock.AssignGrade(positionId, "A", "this trade went perfectly! (updated)");
+            stock.AssignGrade(positionId, TestDataGenerator.A, "this trade went perfectly!");
+            stock.AssignGrade(positionId, TestDataGenerator.A, "this trade went perfectly! (updated)");
 
             var position = stock.State.GetPosition(0);
-            Assert.Equal("A", position.Grade);
+            Assert.Equal(TestDataGenerator.A, position.Grade);
             Assert.Equal("this trade went perfectly! (updated)", position.GradeNote);
             Assert.DoesNotContain("this trade went perfectly!", position.Notes);
             Assert.Contains("this trade went perfectly! (updated)", position.Notes);
@@ -316,7 +316,7 @@ namespace coretests.Stocks
             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
 
             Assert.Throws<ArgumentException>(() => 
-                stock.AssignGrade(0, "Z", "this trade went perfectly!")
+                stock.AssignGrade(0, new TradeGrade("L"), "this trade went perfectly!")
             );
         }
 

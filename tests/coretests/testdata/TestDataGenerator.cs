@@ -38,5 +38,7 @@ namespace coretests.testdata
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
         public static Ticker TSLA = new("tsla");
+        public static TradeGrade A = new("A");
+        public static TradeGrade B = new("B");
     }
 }

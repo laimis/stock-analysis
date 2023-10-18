@@ -23,8 +23,6 @@ namespace core.Shared
             Value = grade.ToUpper();
         }
 
-        public static implicit operator string(TradeGrade g) => g.Value;
-        public static implicit operator TradeGrade(string g) => new(g);
         public string Value { get; }
 
         public int CompareTo(object obj)
