@@ -87,7 +87,7 @@ module PositionAnalysis =
             AnalysisOutcome(PortfolioAnalysisKeys.Profit, (if position.CombinedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.CombinedProfit, ValueFormat.Currency, $"{position.CombinedProfit}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdown, OutcomeType.Neutral, drawdown, ValueFormat.Percentage, $"Max drawdown is {drawdown:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.GainAndDrawdownDiff, (if (gain - drawdown) * -1.0m >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), (gain - drawdown) * -1.0m, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
+            AnalysisOutcome(PortfolioAnalysisKeys.GainAndDrawdownDiff, (if gain + drawdown >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), gain + drawdown, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxGainLast10, OutcomeType.Neutral, last10Gain, ValueFormat.Percentage, $"Max gain in last 10 bars is {last10Gain:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdownLast10, OutcomeType.Neutral, last10Drawdown, ValueFormat.Percentage, $"Max drawdown in last 10 bars is {last10Drawdown:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.GainDiffLast10, (if last10MaxGainDrawdownDiff >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), last10MaxGainDrawdownDiff, ValueFormat.Percentage, $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}")
@@ -124,7 +124,7 @@ module PositionAnalysis =
                     |> Seq.toList
             )
             AnalysisOutcomeEvaluation(
-                $"Opened in the last {recentlyOpenThreshold} days",
+                $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
@@ -132,7 +132,7 @@ module PositionAnalysis =
                     |> Seq.toList
             )
             AnalysisOutcomeEvaluation(
-                $"Opened in the last {withinTwoWeeksThreshold} days",
+                $"Opened in the last {withinTwoWeeksThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
