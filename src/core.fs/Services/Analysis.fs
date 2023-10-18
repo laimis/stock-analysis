@@ -54,7 +54,7 @@ type SMA(values,interval) =
         | true -> None
         | false -> Some (values |> Seq.last)
         
-    static member ToSMA (prices:decimal array) interval =
+    static member ToSMA interval (prices:decimal array) =
         
         let sma = Array.create prices.Length None
         
@@ -67,29 +67,25 @@ type SMA(values,interval) =
                     |> Seq.map (fun j -> prices[j])
                     |> Seq.sum
                     
-                sma[i] <- Some (sum / decimal interval)
+                sma[i] <- Some (System.Math.Round(sum / decimal interval, 2))
         
         SMA(sma, interval)        
         
-type SMAContainer(sma20,sma50,sma150,sma200) =
+type SMAContainer(all:SMA array) =
     
-    let all = [|sma20;sma50;sma150;sma200|]
-        
     member this.All = all
     member this.Length = all.Length
-    member this.sma20 = sma20
-    member this.sma50 = sma50
-    member this.sma150 = sma150
-    member this.sma200 = sma200
+    member this.sma20 = all |> Array.find (fun x -> x.Interval = 20)
+    member this.sma50 = all |> Array.find (fun x -> x.Interval = 50)
+    member this.sma150 = all |> Array.find (fun x -> x.Interval = 150)
+    member this.sma200 = all |> Array.find (fun x -> x.Interval = 200)
     
     static member Generate (prices:PriceBar array) =
         
-        SMAContainer(
-            SMA.ToSMA (prices |> Array.map (fun p -> p.Close)) 20,
-            SMA.ToSMA (prices |> Array.map (fun p -> p.Close)) 50,
-            SMA.ToSMA (prices |> Array.map (fun p -> p.Close)) 150,
-            SMA.ToSMA (prices |> Array.map (fun p -> p.Close)) 200
-        )
+        let generate interval =
+            prices |> Array.map (fun x -> x.Close) |> SMA.ToSMA interval
+        
+        [|20;50;150;200|] |> Array.map generate |> SMAContainer
     
 module AnalysisOutcomeEvaluationScoringHelper =
     

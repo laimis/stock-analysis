@@ -51,7 +51,7 @@ namespace web.Controllers
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] string frequency)
-            => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(PriceFrequency.FromString(frequency), new Ticker(ticker), User.Identifier())));
+            => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(PriceFrequency.FromString(frequency ?? PriceFrequency.Daily.ToString()), new Ticker(ticker), User.Identifier())));
 
         [HttpGet("gaps/tickers/{ticker}")]
         public Task<ActionResult> TickerGaps(string ticker, [FromQuery] string frequency)

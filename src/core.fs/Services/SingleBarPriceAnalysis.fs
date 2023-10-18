@@ -2,7 +2,6 @@ namespace core.fs.Services.Analysis
 
 open System
 open System.Collections.Generic
-open core.Shared
 open core.fs.Services
 open core.fs.Services.MultipleBarPriceAnalysis
 open core.fs.Shared
@@ -33,7 +32,7 @@ module SingleBarPriceAnalysis =
         
         let currentBar = bars[bars.Length - 1]
         
-        let outcomes = SMAAnalysis.Generate (bars |> Array.take (bars.Length - 1))
+        let outcomes = SMAAnalysis.generate (bars |> Array.take (bars.Length - 1))
         
         let outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Days)
         let sma20outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
@@ -175,19 +174,36 @@ module SingleBarPriceAnalysis =
         
     let volumeAnalysis (bars:PriceBar array) =
         
+        let recentVolumeStartIndex =
+            match bars.Length with
+            | x when x > SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis ->
+                bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+            | _ -> 0
+            
+        let volumeStats = bars[recentVolumeStartIndex..] |> Array.map (fun x -> x.Volume |> decimal) |> DistributionStatistics.calculate
+        
         let currentBar = bars[bars.Length - 1]
-        let volumeStats = DistributionStatistics.calculate (bars |> Array.map (fun x -> x.Volume |> decimal))
+        
         let relativeVolume = 
             match volumeStats.mean with
             | 0m -> 0m
             | _ -> Math.Round(decimal(currentBar.Volume) / volumeStats.mean, 2)
+            
         let priceDirection =
             match currentBar.Close > currentBar.Open with
             | true -> OutcomeType.Positive
             | _ -> OutcomeType.Negative
+            
+        let relativeVolumeOutcomeType =
+            match relativeVolume with
+            | x when x >= 0.9m -> priceDirection
+            | _ -> OutcomeType.Neutral
+        
+        let relativeVolumeOutcomeDescription = $"Relative volume is {relativeVolume}x average volume over the last {volumeStats.count} days."
+        
         [
             AnalysisOutcome (SingleBarOutcomeKeys.Volume, OutcomeType.Neutral, currentBar.Volume, ValueFormat.Number, "Volume")
-            AnalysisOutcome (SingleBarOutcomeKeys.RelativeVolume, (if relativeVolume >= 0.9m then priceDirection else OutcomeType.Neutral), relativeVolume, ValueFormat.Number, $"Relative volume is {relativeVolume}x the average volume over the last {volumeStats.count} days.")
+            AnalysisOutcome (SingleBarOutcomeKeys.RelativeVolume, relativeVolumeOutcomeType, relativeVolume, ValueFormat.Number, relativeVolumeOutcomeDescription)
         ]
         
     let run bars =

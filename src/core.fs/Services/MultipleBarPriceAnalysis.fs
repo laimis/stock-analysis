@@ -33,7 +33,7 @@ module MultipleBarPriceAnalysis =
 
     module SMAAnalysis =
         
-        let private GenerateSMAOutcomes (smaContainer: SMAContainer) =
+        let private generateSMAOutcomes (smaContainer: SMAContainer) =
             
             let smaOutcomes = List<AnalysisOutcome>()
             
@@ -60,11 +60,11 @@ module MultipleBarPriceAnalysis =
                 
             smaOutcomes
             
-        let private GenerateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
+        let private generateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
             
             let sma20Above50Sequence = 
-                smaContainer.sma20.Values
-                |> Array.zip smaContainer.sma50.Values
+                smaContainer.sma50.Values
+                |> Array.zip smaContainer.sma20.Values 
                 |> Array.filter (fun (sma20, sma50) -> sma20.IsSome && sma50.IsSome)
                 |> Array.map (fun (sma20, sma50) -> (sma20.Value, sma50.Value))
                 |> Array.map (fun (sma20, sma50) -> (sma20 - sma50) > 0m)
@@ -93,27 +93,29 @@ module MultipleBarPriceAnalysis =
                 message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} days"
             )
             
-        let Generate (prices: PriceBar array) =
+        let generate (prices: PriceBar array) =
             
             let smaContainer = SMAContainer.Generate prices
             
-            let smaOutcomes = GenerateSMAOutcomes smaContainer
-            let sma20Above50DaysOutcome = GenerateSMA20Above50DaysOutcome smaContainer
+            let smaOutcomes = generateSMAOutcomes smaContainer
+            let sma20Above50DaysOutcome = generateSMA20Above50DaysOutcome smaContainer
             
             smaOutcomes.Add(sma20Above50DaysOutcome)
             smaOutcomes
        
     module VolumeAnalysis =
         
-        let private GenerateAverageVolumeOutcome (prices: PriceBar array) =
+        let private generateAverageVolumeOutcome (prices: PriceBar array) =
             
-            let totalVolume =
-                prices
-                |> Array.map (fun p -> p.Volume |> decimal)
-                |> Array.sum
+            let (recentVolumeStart, interval) =
+                match prices.Length with
+                | x when x > MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis ->
+                    prices.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis, MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis
+                | _ -> 0, prices.Length
                 
-            let interval = min MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis prices.Length
-            let averageVolume = System.Math.Round (totalVolume / (interval |> decimal), 0)
+            let values = prices.[recentVolumeStart..] |> Array.map (fun p -> p.Volume)
+                
+            let averageVolume = (values |> Array.sum) / (int64 values.Length)
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.AverageVolume,
@@ -123,11 +125,11 @@ module MultipleBarPriceAnalysis =
                 message = $"Average volume over the last {interval} days is {averageVolume}"
             )
             
-        let Generate (prices: PriceBar array) =
+        let generate (prices: PriceBar array) =
             
-            let averageVolumeOutcome = GenerateAverageVolumeOutcome prices
-            
-            [averageVolumeOutcome]
+            let list = List<AnalysisOutcome>()
+            prices |> generateAverageVolumeOutcome |> list.Add
+            list
 
     module PriceAnalysis =
         
@@ -300,8 +302,8 @@ module MultipleBarPriceAnalysis =
             let outcomes = List<AnalysisOutcome>()
             
             prices |> PriceAnalysis.Generate currentPrice |> outcomes.AddRange
-            prices |> VolumeAnalysis.Generate |> outcomes.AddRange
-            prices |> SMAAnalysis.Generate |> outcomes.AddRange
+            prices |> VolumeAnalysis.generate |> outcomes.AddRange
+            prices |> SMAAnalysis.generate |> outcomes.AddRange
             
             outcomes
             

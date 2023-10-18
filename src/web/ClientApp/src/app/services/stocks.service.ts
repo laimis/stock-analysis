@@ -427,6 +427,7 @@ export class StocksService {
       {
         tickers,
         duration: "AllBars",
+        frequency: "Daily",
         includeGapAnalysis: true,
         startDate,
         endDate}
