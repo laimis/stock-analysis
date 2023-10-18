@@ -49,8 +49,10 @@ module PatternDetection =
                 // see if we can do volume numbers
                     if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
                         
-                        let latestVolume = bars |> Array.skip (bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis) |> Array.map (fun b -> b.Volume |> decimal)
-                        let stats = NumberAnalysis.calculateStats latestVolume
+                        let stats =
+                            bars[bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis..]
+                            |> Array.map (fun b -> b.Volume |> decimal)
+                            |> DistributionStatistics.calculate
                         
                         let multiplier = decimal(current.Volume) / stats.median
                         ", volume x" + multiplier.ToString("N1")
@@ -114,18 +116,16 @@ module PatternDetection =
             None
         else
             let subsetOfBars =
-                bars
-                |> Array.skip (bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
-                |> Array.map (fun b -> b.Volume |> decimal)
+                bars[bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis..]
                 
-            let stats = NumberAnalysis.calculateStats subsetOfBars
+            let volumeStats = subsetOfBars |> Array.map (fun b -> b.Volume |> decimal) |> DistributionStatistics.calculate
             
             // now take the last bar volume
             let lastBarVolume = bars[bars.Length - 1].Volume
-            let multiplier = decimal(lastBarVolume) / stats.median
+            let multiplier = decimal(lastBarVolume) / volumeStats.median
             
             // if the last bar volume is some predefined multiple of the average volume, then we have a pattern
-            let threshold = stats.median * decimal(5) |> int64
+            let threshold = volumeStats.median * decimal(5) |> int64
             
             if lastBarVolume > threshold then
                 let bar = bars[bars.Length - 1]

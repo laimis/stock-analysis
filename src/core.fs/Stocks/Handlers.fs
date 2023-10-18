@@ -150,7 +150,7 @@ type PricesQuery =
     
 type PricesView(prices:PriceBar array) =
     member _.SMA = SMAContainer.Generate(prices)
-    member _.PercentChanges = NumberAnalysis.PercentChangesForPriceBars prices
+    member _.PercentChanges = PercentChangeAnalysis.calculateForPriceBars prices
     member _.Prices = prices
 
 type QuoteQuery =

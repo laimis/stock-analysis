@@ -26,7 +26,6 @@
         <Compile Include="Services\Trading.fs" />
         <Compile Include="Services\TradingStrategies.fs" />
         <Compile Include="Services\Analysis.fs" />
-        <Compile Include="Services\NumberAnalysis.fs" />
         <Compile Include="Services\GapAnalysis.fs" />
         <Compile Include="Services\MultipleBarPriceAnalysis.fs" />
         <Compile Include="Services\Positions.fs" />

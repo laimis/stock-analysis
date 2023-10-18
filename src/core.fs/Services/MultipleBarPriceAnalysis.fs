@@ -131,6 +131,12 @@ module MultipleBarPriceAnalysis =
 
     module PriceAnalysis =
         
+        let private recentBars (bars:PriceBar array) =
+            match bars.Length with
+                | x when x > MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis ->
+                    bars[bars.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis..]
+                | _ -> bars
+                
         let private GenerateEarliestPriceOutcome (prices: PriceBar array) =
             
             let earliestPrice = prices[0]
@@ -238,12 +244,7 @@ module MultipleBarPriceAnalysis =
             
         let private GeneratePercentChangeAverageOutcome (prices: PriceBar array) =
             
-            let data =
-                prices
-                |> Array.map (fun p -> p.Close)
-                |> Array.skip (prices.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis)
-
-            let descriptor = NumberAnalysis.PercentChanges true data
+            let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.PercentChangeAverage,
@@ -255,12 +256,7 @@ module MultipleBarPriceAnalysis =
             
         let private GeneratePercentChangeStandardDeviationOutcome (prices: PriceBar array) =
             
-            let subset =
-                prices
-                |> Array.map (fun p -> p.Close)
-                |> Array.skip (prices.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis)
-                
-            let descriptor = NumberAnalysis.PercentChanges true subset
+            let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.PercentChangeStandardDeviation,
@@ -312,4 +308,4 @@ module MultipleBarPriceAnalysis =
 
 
     module MultipleBarAnalysisOutcomeEvaluation =
-        let evaluate tickerOutcomes = []
+        let evaluate _ = []

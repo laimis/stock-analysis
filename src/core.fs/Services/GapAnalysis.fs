@@ -113,17 +113,13 @@ module GapAnalysis =
                 0
                 
         let volumeStart =
-            if prices.Length > numberOfBarsToAnalyze * 2 then
-                prices.Length - numberOfBarsToAnalyze * 2
-            else
-                0
+            match prices.Length with
+            | x when x > numberOfBarsToAnalyze * 2 -> prices.Length - numberOfBarsToAnalyze * 2
+            | x when x > numberOfBarsToAnalyze -> prices.Length - numberOfBarsToAnalyze
+            | _ -> 0
             
-        let data =
-            prices
-            |> Array.map (fun p -> p.Volume |> decimal)
-            |> Array.skip volumeStart
-            |> Array.take (min numberOfBarsToAnalyze prices.Length)
+        let volumeData = prices |> Array.map (fun p -> p.Volume |> decimal)
             
-        let volumeStats = NumberAnalysis.calculateStats data
+        let volumeStats = DistributionStatistics.calculate volumeData[volumeStart..]
         
-        generateInternal (prices |> Array.skip start |> Array.take (prices.Length - start)) volumeStats
+        generateInternal prices[start..] volumeStats

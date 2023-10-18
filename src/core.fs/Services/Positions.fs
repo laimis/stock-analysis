@@ -103,8 +103,8 @@ module PositionAnalysis =
     let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
         
         let percentToStopThreshold = -0.02m
-        let recentlyOpenThreshold = 5m
-        let withinTwoWeeksThreshold = 14m
+        let recentlyOpenThreshold = TimeSpan.FromDays(5)
+        let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
         
         [
             AnalysisOutcomeEvaluation(
@@ -128,7 +128,7 @@ module PositionAnalysis =
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= recentlyOpenThreshold))
+                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays))
                     |> Seq.toList
             )
             AnalysisOutcomeEvaluation(
@@ -136,7 +136,7 @@ module PositionAnalysis =
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
                 tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= withinTwoWeeksThreshold))
+                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays))
                     |> Seq.toList
             )
             AnalysisOutcomeEvaluation(

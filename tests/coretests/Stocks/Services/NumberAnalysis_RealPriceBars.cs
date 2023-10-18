@@ -14,7 +14,7 @@ namespace coretests.Stocks.Services
         {
             var bars = TestDataGenerator.PriceBars();
 
-            _percentChanges = NumberAnalysis.PercentChangesForPriceBars(bars);
+            _percentChanges = PercentChangeAnalysis.calculateForPriceBars(bars);
         }
 
         [Fact]

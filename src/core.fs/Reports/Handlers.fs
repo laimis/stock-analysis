@@ -461,13 +461,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             match pricesResponse.IsOk with
             | false -> return pricesResponse.Error.Message |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
             | true ->
-                let toSkip =
+                let startIndex =
                     match pricesResponse.Success.Length > 30 with
                     | true -> pricesResponse.Success.Length - 30
                     | false -> 0
                 
-                let recent = NumberAnalysis.PercentChanges true (pricesResponse.Success |> Seq.skip toSkip |> Seq.map (fun p -> p.Close))
-                let allTime = NumberAnalysis.PercentChanges true (pricesResponse.Success |> Seq.map (fun p -> p.Close))
+                let recent = pricesResponse.Success[startIndex..] |> PercentChangeAnalysis.calculateForPriceBars
+                let allTime = pricesResponse.Success |> PercentChangeAnalysis.calculateForPriceBars
                 let response = {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
                 return ServiceResponse<PercentChangeStatisticsView>(response)
     }

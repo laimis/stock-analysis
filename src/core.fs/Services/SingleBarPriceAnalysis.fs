@@ -75,9 +75,8 @@ module SingleBarPriceAnalysis =
                     | x when x > SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis ->
                         previousBars |> Array.skip (previousBars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
                     | _ -> previousBars
-                    |> Array.map (fun x -> x.Close)
                     
-                let descriptor = NumberAnalysis.PercentChanges true data
+                let descriptor = PercentChangeAnalysis.calculateForPriceBars data
                 
                 // for some price feeds, price has finished changing, so mean and
                 // standard deviation will be 0, we need to check for that so that we don't divide by 0
@@ -177,7 +176,7 @@ module SingleBarPriceAnalysis =
     let volumeAnalysis (bars:PriceBar array) =
         
         let currentBar = bars[bars.Length - 1]
-        let volumeStats = NumberAnalysis.calculateStats (bars |> Array.map (fun x -> x.Volume |> decimal))
+        let volumeStats = DistributionStatistics.calculate (bars |> Array.map (fun x -> x.Volume |> decimal))
         let relativeVolume = 
             match volumeStats.mean with
             | 0m -> 0m
