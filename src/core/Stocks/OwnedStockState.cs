@@ -59,7 +59,7 @@ namespace core.Stocks
         internal void ApplyInternal(TradeGradeAssigned gradeAssigned)
         {
             var position = Positions.Single(x => x.PositionId == gradeAssigned.PositionId);
-            position.SetGrade(gradeAssigned.Grade, gradeAssigned.Note);
+            position.SetGrade(new TradeGrade(gradeAssigned.Grade), gradeAssigned.Note);
         }
 
         internal void ApplyInternal(PositionRiskAmountSet riskAmountSet)

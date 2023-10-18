@@ -209,7 +209,7 @@ namespace core.Stocks
                 throw new InvalidOperationException("Cannot assign grade to an open position");
             }
 
-            if (position.Grade == grade && position.GradeNote == note)
+            if (position.Grade.Equals(grade) && position.GradeNote == note)
             {
                 return false;
             }
@@ -220,7 +220,7 @@ namespace core.Stocks
                     State.Id,
                     DateTimeOffset.UtcNow,
                     userId: State.UserId,
-                    grade: grade,
+                    grade: grade.Value,
                     note: note,
                     positionId: positionId
                 )

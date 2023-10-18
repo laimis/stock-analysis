@@ -199,7 +199,7 @@ namespace storagetests
 
             loaded.Sell(10, 2.2m, DateTime.UtcNow, "sell");
 
-            loaded.AssignGrade(0, "A", "test");
+            loaded.AssignGrade(0, TestDataGenerator.A, "test");
 
             await storage.Save(loaded, _userId);
 
@@ -207,7 +207,7 @@ namespace storagetests
 
             var position = loaded.State.GetAllPositions()[0];
 
-            Assert.Equal("A", position.Grade);
+            Assert.Equal(TestDataGenerator.A, position.Grade);
             Assert.Equal("test", position.GradeNote);
 
             var lastTx = position.Transactions.Last();
