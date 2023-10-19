@@ -69,13 +69,13 @@ module SingleBarPriceAnalysis =
                 yield AnalysisOutcome (SingleBarOutcomeKeys.PercentChange, (if percentChange >= 0m then OutcomeType.Positive else OutcomeType.Negative), percentChange, ValueFormat.Percentage, $"%% change from close is {percentChange}.")
                 
                 // generate percent change statistical data for NumberOfDaysForRecentAnalysis days
-                let data =
+                let recentDataIndex =
                     match previousBars.Length with
                     | x when x > SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis ->
-                        previousBars |> Array.skip (previousBars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis)
-                    | _ -> previousBars
+                        previousBars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+                    | _ -> 0
                     
-                let descriptor = PercentChangeAnalysis.calculateForPriceBars data
+                let descriptor = previousBars[recentDataIndex..] |> PercentChangeAnalysis.calculateForPriceBars
                 
                 // for some price feeds, price has finished changing, so mean and
                 // standard deviation will be 0, we need to check for that so that we don't divide by 0
@@ -87,10 +87,7 @@ module SingleBarPriceAnalysis =
                 let sigmaRatio = 
                     match sigmaRatioDenominator with
                     | 0m -> 0m
-                    | _ -> 
-                        match percentChange with
-                        | x when x >= 0m -> percentChange / sigmaRatioDenominator
-                        | _ -> -1m * (percentChange / sigmaRatioDenominator)
+                    | _ -> Math.Abs(percentChange * 100m/sigmaRatioDenominator)
                         
                 let sigmaRatioOutcomeType =
                     match sigmaRatio with

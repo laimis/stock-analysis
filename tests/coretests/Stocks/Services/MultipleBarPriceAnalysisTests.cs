@@ -46,15 +46,32 @@ namespace coretests.Stocks.Services
         [Fact]
         public void LowestPrice()
             => Assert.Equal(37.84m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPrice).Value, 2);
+        
+        [Fact]
+        public void LowestPriceDaysAgo()
+            => Assert.Equal(344, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo).Value);
 
         [Fact]
         public void HighestPrice()
             => Assert.Equal(217.25m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.HighestPrice).Value, 2);
 
         [Fact]
-        public void DaysAgo()
+        public void HighestPriceDaysAgo()
             => Assert.True(
                 _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.HighestPriceDaysAgo).Value > _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo).Value
             );
+        
+        [Fact]
+        public void CurrentPrice()
+            => Assert.Equal(49.14m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.CurrentPrice).Value, 2);
+        
+        [Fact]
+        public void EarliestPrice()
+            => Assert.Equal(75.08m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EarliestPrice).Value, 2);
+        
+        [Fact]
+        public void Gain()
+            => Assert.Equal(-0.35m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.Gain).Value, 2);
+        
     }
 }

@@ -252,7 +252,7 @@ module MultipleBarPriceAnalysis =
                 key = MultipleBarOutcomeKeys.PercentChangeAverage,
                 outcomeType = OutcomeType.Neutral,
                 value = descriptor.mean,
-                valueType = ValueFormat.Number,
+                valueType = ValueFormat.Percentage,
                 message = $"%% Change Average: {descriptor.mean}"
             )
             
