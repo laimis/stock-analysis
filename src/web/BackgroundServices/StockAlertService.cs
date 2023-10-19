@@ -110,7 +110,7 @@ namespace web.BackgroundServices
                             pattern,
                             c.ticker,
                             c.listName,
-                            DateTimeOffset.Now,
+                            DateTimeOffset.UtcNow,
                             UserId.NewUserId(c.user.Id));
                         _container.Register(alert);
                     }

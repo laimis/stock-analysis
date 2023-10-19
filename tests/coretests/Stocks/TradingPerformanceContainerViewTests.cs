@@ -9,7 +9,7 @@ namespace coretests.Stocks
     {
         private readonly TradingPerformanceContainerView _container =
             new (TradingDataGenerator.GenerateRandomSet(
-                DateTimeOffset.Now.AddDays(-100),
+                DateTimeOffset.UtcNow.AddDays(-100),
                 100));
         
         [Fact]

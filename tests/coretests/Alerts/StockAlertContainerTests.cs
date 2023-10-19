@@ -18,7 +18,7 @@ namespace coretests.Alerts
             {
                 _uat.Register(
                     TriggeredAlert.StopPriceAlert(
-                        ticker: new Ticker("AMD"), price: 100, stopPrice: 105, DateTimeOffset.Now, userId: _userId
+                        ticker: new Ticker("AMD"), price: 100, stopPrice: 105, DateTimeOffset.UtcNow, userId: _userId
                     )
                 );
             }

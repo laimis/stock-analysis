@@ -37,7 +37,7 @@ namespace core.Stocks
     public readonly record struct PositionTransaction(decimal NumberOfShares, decimal Price, Guid TransactionId, string Type, DateTimeOffset When)
     {
         public readonly string Date => When.ToString("yyyy-MM-dd");
-        public readonly int AgeInDays => (int)(DateTimeOffset.Now - When).TotalDays;
+        public readonly int AgeInDays => (int)(DateTimeOffset.UtcNow - When).TotalDays;
     }
 
     // PositionInstance models a stock position from the time the first share is opened

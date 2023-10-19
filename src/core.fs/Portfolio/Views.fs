@@ -259,7 +259,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         
         member this.TrendsTwoMonths =
             this.ClosedPositions
-            |> timeBasedSlice (DateTimeOffset.Now.AddMonths(-2))
+            |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
             |> generateTrends
         
         member _.TrendsYTD =
@@ -269,7 +269,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         
         member _.TrendsOneYear = 
             closedPositions
-            |> timeBasedSlice (DateTimeOffset.Now.AddYears(-1))
+            |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
             |> generateTrends
             
 type PortfolioView =

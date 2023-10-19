@@ -77,7 +77,7 @@ module PatternDetection =
             None
         else
             // find the starting bar, which is higher date than 1 year ago
-            let thresholdDate = System.DateTimeOffset.Now.AddYears(-1)
+            let thresholdDate = System.DateTimeOffset.UtcNow.AddYears(-1)
             let startIndex = 
                 bars
                 |> Array.indexed

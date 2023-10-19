@@ -12,22 +12,22 @@ namespace coretests.Stocks
         {
             var closedPositions = new List<PositionInstance>();
 
-            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
-            position.SetStopPrice(95m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
+            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow.AddDays(-1));
+            position.Buy(1, 100m, DateTimeOffset.UtcNow.AddDays(-1), transactionId: Guid.NewGuid());
+            position.SetStopPrice(95m, DateTimeOffset.UtcNow.AddDays(-1));
+            position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.UtcNow);
             closedPositions.Add(position);
 
-            position = new PositionInstance(1, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
-            position.SetStopPrice(95m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
+            position = new PositionInstance(1, TestDataGenerator.TSLA, DateTimeOffset.UtcNow.AddDays(-1));
+            position.Buy(1, 100m, DateTimeOffset.UtcNow.AddDays(-1), transactionId: Guid.NewGuid());
+            position.SetStopPrice(95m, DateTimeOffset.UtcNow.AddDays(-1));
+            position.Sell(1, 110m, transactionId: Guid.NewGuid(), DateTimeOffset.UtcNow);
             closedPositions.Add(position);
 
-            position = new PositionInstance(2, TestDataGenerator.TSLA, DateTimeOffset.Now.AddDays(-1));
-            position.Buy(1, 100m, DateTimeOffset.Now.AddDays(-1), transactionId: Guid.NewGuid());
-            position.SetStopPrice(95m, DateTimeOffset.Now.AddDays(-1));
-            position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.Now);
+            position = new PositionInstance(2, TestDataGenerator.TSLA, DateTimeOffset.UtcNow.AddDays(-1));
+            position.Buy(1, 100m, DateTimeOffset.UtcNow.AddDays(-1), transactionId: Guid.NewGuid());
+            position.SetStopPrice(95m, DateTimeOffset.UtcNow.AddDays(-1));
+            position.Sell(1, 90m, transactionId: Guid.NewGuid(), DateTimeOffset.UtcNow);
             closedPositions.Add(position);
 
             return closedPositions.ToArray();

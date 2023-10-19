@@ -12,7 +12,7 @@ namespace core.Shared
         public decimal Amount { get; }
         public DateTimeOffset DateAsDate { get; }
         public string Date => DateAsDate.ToString("yyyy-MM-dd");
-        public double AgeInDays => Math.Floor(DateTimeOffset.Now.Subtract(DateAsDate).TotalDays);
+        public double AgeInDays => Math.Floor(DateTimeOffset.UtcNow.Subtract(DateAsDate).TotalDays);
         public bool IsOption { get; }
         public bool IsPL { get; }
 
