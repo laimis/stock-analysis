@@ -49,7 +49,7 @@ namespace coretests.Stocks.Services
         
         [Fact]
         public void LowestPriceDaysAgo()
-            => Assert.Equal(344, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo).Value);
+            => Assert.Equal(345, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo).Value);
 
         [Fact]
         public void HighestPrice()

@@ -2,6 +2,7 @@ namespace core.fs.Shared.Adapters.Stocks
 
 open System
 open System.Collections.Generic
+open System.Globalization
 
 [<CLIMutable>]
 type StockProfile = {
@@ -60,7 +61,7 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
     static member Parse (value:string) =
         let parts = value.Split(',')
         PriceBar(
-            date = DateTimeOffset.Parse(parts[0]),
+            date = DateTimeOffset.Parse(parts[0], formatProvider=null, styles=DateTimeStyles.AssumeUniversal),
             ``open`` = Decimal.Parse(parts[1]),
             high = Decimal.Parse(parts[2]),
             low = Decimal.Parse(parts[3]),
