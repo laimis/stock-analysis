@@ -44,7 +44,7 @@ namespace web
                     // and add them to the options
                     foreach(var type in typeof(Startup).Assembly.GetTypes())
                     {
-                        if (type.IsSubclassOf(typeof(JsonConverter)))
+                        if (type.IsSubclassOf(typeof(JsonConverter)) && !type.IsAbstract)
                         {
                             var converter = Activator.CreateInstance(type);
                             o.JsonSerializerOptions.Converters.Add((JsonConverter)converter);

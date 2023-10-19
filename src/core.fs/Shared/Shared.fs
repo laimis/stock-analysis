@@ -1,6 +1,7 @@
 namespace core.fs.Shared
 
 open System
+open System.Collections.Generic
 open core.Shared
 
 type IApplicationService = interface end
@@ -74,7 +75,7 @@ type LabelWithFrequency =
         frequency: int
     }
     
- type ValueFormat =
+type ValueFormat =
     | Percentage
     | Currency
     | Number
@@ -96,3 +97,71 @@ type LabelWithFrequency =
             | nameof Number -> Number
             | nameof Boolean -> Boolean
             | _ -> failwithf $"Unknown value format: %s{value}"
+            
+type ChartAnnotationLineType =
+    | Vertical
+    | Horizontal
+    
+    with
+    
+        override this.ToString() =
+            match this with
+            | Vertical -> nameof Vertical
+            | Horizontal -> nameof Horizontal
+            
+        static member FromString (value: string) =
+            match value with
+            | nameof Vertical -> Vertical
+            | nameof Horizontal -> Horizontal
+            | _ -> failwithf $"Unknown chart annotation line type: %s{value}"
+
+type DataPointChartType =
+    | Line
+    | Column
+    
+    with 
+    
+        override this.ToString() =
+            match this with
+            | Line -> nameof Line
+            | Column -> nameof Column
+            
+        static member FromString (value: string) =
+            match value with
+            | nameof Line -> Line
+            | nameof Column -> Column
+            | _ -> failwithf $"Unknown data point chart type: %s{value}"
+            
+type ChartAnnotationLine(value:decimal,chartAnnotationLineType:ChartAnnotationLineType) =
+    member this.Value = value
+    member this.ChartAnnotationLineType = chartAnnotationLineType
+
+type DataPoint<'a>(label:string,value:'a,isDate:bool) =
+    
+    new(label:string,value:'a) =
+        DataPoint(label,value,isDate = false)
+        
+    new(timestamp:DateTimeOffset,value:'a) =
+        DataPoint(timestamp.ToString("yyyy-MM-dd"),value,isDate = true)
+        
+    member this.Label = label
+    member this.Value = value
+    member this.IsDate = isDate
+    
+type ChartDataPointContainer<'a>(label:string,chartType:DataPointChartType,annotationLine:ChartAnnotationLine option) =
+    
+    let data = List<DataPoint<'a>>()
+    
+    new (label:string,chartType:DataPointChartType) =
+        ChartDataPointContainer(label,chartType,None)
+    
+    member this.Label = label
+    member this.ChartType = chartType
+    member this.Data = data
+    member this.AnnotationLine = annotationLine
+    
+    member this.Add(label:string,value:'a) =
+        data.Add(DataPoint(label,value,isDate = false))
+        
+    member this.Add(timestamp:DateTimeOffset,value:'a) =
+        data.Add(DataPoint(timestamp,value))

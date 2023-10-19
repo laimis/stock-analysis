@@ -14,6 +14,14 @@ using core.Stocks;
 
 namespace web.Utils;
 
+public abstract class GenericConverterWithToString<T> : JsonConverter<T>
+{
+    public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
 public class TickerConverter : JsonConverter<Ticker>
 {
     public override Ticker Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -40,55 +48,35 @@ public class UserIdConverter : JsonConverter<UserId>
     }
 }
 
-public class GapTypeConverter : JsonConverter<GapAnalysis.GapType>
+public class GapTypeConverter : GenericConverterWithToString<GapAnalysis.GapType>
 {
     public override GapAnalysis.GapType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return GapAnalysis.GapType.FromString(reader.GetString());
     }
-
-    public override void Write(Utf8JsonWriter writer, GapAnalysis.GapType value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
 }
 
-public class PriceFrequencyConverter : JsonConverter<PriceFrequency>
+public class PriceFrequencyConverter : GenericConverterWithToString<PriceFrequency>
 {
     public override PriceFrequency Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return PriceFrequency.FromString(reader.GetString());
     }
-
-    public override void Write(Utf8JsonWriter writer, PriceFrequency value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
 }
 
-public class OutcomeReprtDurationConverter : JsonConverter<OutcomesReportDuration>
+public class OutcomeReprtDurationConverter : GenericConverterWithToString<OutcomesReportDuration>
 {
     public override OutcomesReportDuration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return OutcomesReportDuration.FromString(reader.GetString());
     }
-
-    public override void Write(Utf8JsonWriter writer, OutcomesReportDuration value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
 }
 
-public class OptionTypeConverter : JsonConverter<OptionType>
+public class OptionTypeConverter : GenericConverterWithToString<OptionType>
 {
     public override OptionType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return OptionType.FromString(reader.GetString());
-    }
-
-    public override void Write(Utf8JsonWriter writer, OptionType value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
     }
 }
 
@@ -105,55 +93,35 @@ public class GradeConverter : JsonConverter<TradeGrade>
     }
 }
 
-public class ValueFormatTypeConverter : JsonConverter<ValueFormat>
+public class ValueFormatTypeConverter : GenericConverterWithToString<ValueFormat>
 {
     public override ValueFormat Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return ValueFormat.FromString(reader.GetString());
     }
-
-    public override void Write(Utf8JsonWriter writer, ValueFormat value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
 }
 
-public class OutcomeTypeTypeConverter : JsonConverter<OutcomeType>
+public class OutcomeTypeTypeConverter : GenericConverterWithToString<OutcomeType>
 {
     public override OutcomeType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return OutcomeType.FromString(reader.GetString());
     }
-
-    public override void Write(Utf8JsonWriter writer, OutcomeType value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
 }
 
-public class BrokerageOrderTypeConverter : JsonConverter<BrokerageOrderType>
+public class BrokerageOrderTypeConverter : GenericConverterWithToString<BrokerageOrderType>
 {
     public override BrokerageOrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return BrokerageOrderType.FromString(reader.GetString());
     }
-
-    public override void Write(Utf8JsonWriter writer, BrokerageOrderType value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
 }
 
-public class BrokerageOrderDurationConverter : JsonConverter<BrokerageOrderDuration>
+public class BrokerageOrderDurationConverter : GenericConverterWithToString<BrokerageOrderDuration>
 {
     public override BrokerageOrderDuration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return BrokerageOrderDuration.FromString(reader.GetString());
-    }
-
-    public override void Write(Utf8JsonWriter writer, BrokerageOrderDuration value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
     }
 }
 
@@ -167,5 +135,21 @@ public class PositionEventTypeConverter : JsonConverter<PositionEventType>
     public override void Write(Utf8JsonWriter writer, PositionEventType value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.Value);
+    }
+}
+
+public class ChartAnnotationLineTypeConverter : GenericConverterWithToString<ChartAnnotationLineType>
+{
+    public override ChartAnnotationLineType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return ChartAnnotationLineType.FromString(reader.GetString());
+    }
+}
+
+public class DataPointChartTypeConverter : GenericConverterWithToString<DataPointChartType>
+{
+    public override DataPointChartType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return DataPointChartType.FromString(reader.GetString());
     }
 }

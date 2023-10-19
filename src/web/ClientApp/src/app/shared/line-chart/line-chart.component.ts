@@ -37,7 +37,7 @@ export class LineChartComponent {
     // it can be either horizontal or vertical
     // if it is horizontal, it's x is the x of the data points and y is a constant value
 
-    if (annotationLine.chartAnnotationLineType === "horizontal") {
+    if (annotationLine.chartAnnotationLineType === "Horizontal") {
       let data = dataPoints.map(p => {
         return {
           label: p.label,
@@ -80,7 +80,13 @@ export class LineChartComponent {
     }
 
     let dataPoints = container.data.map(p => this.toDataPoint(p))
-    let chartType = container.chartType // they match 1:1 today
+    let chartType = "line"
+    if (container.chartType === "Column") {
+      chartType = "column"
+    } else if (container.chartType === "Line" ) {
+      chartType = "line"
+    }
+    
     let isDate = container.data[0].isDate
 
     let data : any = [{
