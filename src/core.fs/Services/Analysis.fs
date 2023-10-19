@@ -5,12 +5,26 @@ open core.Shared
 open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
 
-module OutcomeType =
-    let Positive = "Positive"
-    let Negative = "Negative"
-    let Neutral = "Neutral"
+type OutcomeType =
+    | Positive
+    | Negative
+    | Neutral
+    
+    with
+        static member FromString(value:string) =
+            match value with
+            | nameof Positive -> Positive
+            | nameof Negative -> Negative
+            | nameof Neutral -> Neutral
+            | _ -> failwith $"Unknown OutcomeType: {value}"
+            
+        override this.ToString() =
+            match this with
+            | Positive -> nameof Positive
+            | Negative -> nameof Negative
+            | Neutral -> nameof Neutral
 
-type AnalysisOutcome(key:string, outcomeType:string, value:decimal, valueType:ValueFormat, message:string) =
+type AnalysisOutcome(key:string, outcomeType:OutcomeType, value:decimal, valueType:ValueFormat, message:string) =
     member val Key = key
     member val OutcomeType = outcomeType
     member val Value = value
@@ -23,7 +37,7 @@ type TickerOutcomes =
         ticker:Ticker
     }
     
-type AnalysisOutcomeEvaluation(name:string,``type``:string,sortColumn:string,matchingTickers:seq<TickerOutcomes>) =
+type AnalysisOutcomeEvaluation(name:string,``type``:OutcomeType,sortColumn:string,matchingTickers:seq<TickerOutcomes>) =
     member val Name = name
     member val Type = ``type``
     member val SortColumn = sortColumn
@@ -95,11 +109,10 @@ module AnalysisOutcomeEvaluationScoringHelper =
         evaluations
         |> Seq.iter (fun (category:AnalysisOutcomeEvaluation) ->
             let toAdd =
-                // TODO: can this be union type
                 match category.Type with
-                | nameof OutcomeType.Positive -> 1
-                | nameof OutcomeType.Negative -> -1
-                | _ -> 0
+                | Positive -> 1
+                | Negative -> -1
+                | Neutral -> 0
                 
             category.MatchingTickers
             |> Seq.iter (fun o ->

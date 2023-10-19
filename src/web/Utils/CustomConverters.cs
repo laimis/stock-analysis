@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using core.fs.Options;
 using core.fs.Reports;
 using core.fs.Services;
+using core.fs.Services.Analysis;
 using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Stocks;
@@ -112,6 +113,19 @@ public class ValueFormatTypeConverter : JsonConverter<ValueFormat>
     }
 
     public override void Write(Utf8JsonWriter writer, ValueFormat value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public class OutcomeTypeTypeConverter : JsonConverter<OutcomeType>
+{
+    public override OutcomeType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OutcomeType.FromString(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, OutcomeType value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString());
     }
