@@ -166,7 +166,7 @@ module MultipleBarPriceAnalysis =
         let private GenerateLowestPriceDaysAgoOutcome (prices: PriceBar array) =
             
             let lowest = prices |> Array.minBy (fun p -> p.Close)
-            let lowestPriceDaysAgo = System.Math.Round(System.DateTimeOffset.UtcNow.Subtract(lowest.Date).TotalDays, 0)
+            let lowestPriceDaysAgo = System.Math.Floor(System.DateTimeOffset.UtcNow.Subtract(lowest.Date).TotalDays)
             let lowestPriceDaysAgoOutcomeType = if lowestPriceDaysAgo <= 30 then OutcomeType.Negative else OutcomeType.Neutral
             
             AnalysisOutcome(
