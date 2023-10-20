@@ -275,11 +275,9 @@ type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
                     
             let results = TradingStrategyResults()
             
-            match prices.IsOk with
-            | false ->
-                results.MarkAsFailed($"Failed to get price history for {ticker}: {prices.Error.Value.Message}")
-            | true ->
-                let bars = prices.Success.Value
+            match prices.Success with
+            | None -> results.MarkAsFailed($"Failed to get price history for {ticker}: {prices.Error.Value.Message}")
+            | Some bars ->
                 match bars with
                 | [||] -> results.MarkAsFailed($"No price history found for {ticker}")
                 | _ ->
