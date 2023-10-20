@@ -123,6 +123,8 @@ module core.fs.Alerts.MonitoringServices
             
             container.SetStopLossCheckCompleted(false)
             
+            container.ClearStopLossAlert()
+            
             let! users = accounts.GetUserEmailIdPairs()
             
             let! _ =

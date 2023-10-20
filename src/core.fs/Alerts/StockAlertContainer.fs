@@ -33,8 +33,9 @@ namespace core.fs.Alerts
         | Positive = 2
         
     module Constants =
-        let MonitorTagPattern = "monitor:patterns";
-        let MonitorNamePattern = "Patterns";
+        let MonitorTagPattern = "monitor:patterns"
+        let MonitorNamePattern = "Patterns"
+        let StopLossIdentifier = "Stop loss"
     
     
     [<Struct>]
@@ -70,7 +71,7 @@ namespace core.fs.Alerts
             
         static member StopPriceAlert ticker price stopPrice ``when`` userId =
             {
-                identifier = "Stop price"
+                identifier = Constants.StopLossIdentifier
                 triggeredValue = price
                 watchedValue = stopPrice
                 ``when`` = ``when``
@@ -169,4 +170,10 @@ namespace core.fs.Alerts
 
         member _.SetListCheckCompleted completed = listChecksCompleted <- completed
         member _.SetStopLossCheckCompleted completed = stopLossCheckCompleted <- completed
-        member _.ContainerReadyForNotifications() = listChecksCompleted && stopLossCheckCompleted;
+        member _.ContainerReadyForNotifications() = listChecksCompleted && stopLossCheckCompleted
+        member this.ClearStopLossAlert() =
+            alerts.Values
+            |> Seq.filter (fun x -> x.identifier = Constants.StopLossIdentifier)
+            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId })
+            |> Seq.iter (fun x -> alerts.TryRemove(x) |> ignore)
+            
