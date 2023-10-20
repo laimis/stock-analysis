@@ -36,7 +36,7 @@ type ServiceError(message:string) =
 type ServiceResponse =
     | Ok
     | Error of ServiceError
-
+    
 type ServiceResponse<'a>(success:'a option,error:ServiceError option) =
     
     new(success:'a) =
@@ -52,7 +52,7 @@ type ServiceResponse<'a>(success:'a option,error:ServiceError option) =
 module ResponseUtils =
             
     let failedTyped<'a> (message: string) =
-        new ServiceResponse<'a>(message |> ServiceError)
+        message |> ServiceError |> ServiceResponse<'a>
         
     let failed (message: string) : ServiceResponse =
         message |> ServiceError |> Error
