@@ -6,6 +6,7 @@ open core.Options
 open core.Portfolio
 open core.Shared
 open core.Stocks
+open core.fs.Shared
 open core.fs.Shared.Domain.Accounts
 
 type ExportResponse(filename:string, content:string) = 
@@ -17,5 +18,5 @@ type ICSVWriter =
     abstract Generate<'T> : rows:seq<'T> -> string
     
 type ICSVParser =
-    abstract Parse<'T> : content:string -> core.Shared.ServiceResponse<seq<'T>>
+    abstract Parse<'T> : content:string -> ServiceResponse<seq<'T>>
     

@@ -39,7 +39,7 @@ namespace web.Utils
             }
 
             identity.AddClaim(
-                new Claim(IdentityExtensions.ID_CLAIM_NAME, response.Success.Id.ToString())
+                new Claim(IdentityExtensions.ID_CLAIM_NAME, response.Success.Value.Id.ToString())
             );
         }
 

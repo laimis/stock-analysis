@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.fs.Shared;
-using core.fs.Shared.Domain.Accounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -57,10 +56,9 @@ namespace web.Controllers
             }
 
             var r = await service.Handle(cmd);
-            var error = r.Error;
-            if (error == null)
+            if (r.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, r.Success);
+                await EstablishSignedInIdentity(HttpContext, r.Success.Value);
             }
 
             return this.OkOrError(r);
@@ -153,7 +151,7 @@ namespace web.Controllers
             var response = await service.Handle(cmd);
             if (response.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, response.Success);
+                await EstablishSignedInIdentity(HttpContext, response.Success.Value);
             }
             
             return this.OkOrError(response);
@@ -206,9 +204,9 @@ namespace web.Controllers
         {
             var result = await handler.Handle(cmd);
 
-            if (result.Error == null)
+            if (result.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, result.Success);
+                await EstablishSignedInIdentity(HttpContext, result.Success.Value);
             }
 
             return this.OkOrError(result);
@@ -221,14 +219,13 @@ namespace web.Controllers
                 new ConfirmAccount.Command(id)
             );
 
-            if (result.Error != null)
+            if (result.IsOk)
             {
-                return this.Error(result.Error.Message);
+                await EstablishSignedInIdentity(HttpContext, result.Success.Value);
+                return Redirect("~/");
             }
-
-            await EstablishSignedInIdentity(HttpContext, result.Success);
-
-            return Redirect("~/");
+            
+            return this.Error(result.Error.Value.Message);
         }
         
         [HttpPost("settings")]

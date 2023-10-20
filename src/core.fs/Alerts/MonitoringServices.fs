@@ -74,12 +74,11 @@ module core.fs.Alerts.MonitoringServices
         let runStopLossCheck (user:UserState) (_:CancellationToken) (position:PositionInstance) = async {
             let! priceResponse = brokerage.GetQuote user position.Ticker |> Async.AwaitTask
             
-            match priceResponse.IsOk with
-            | false ->
-                logError($"Could not get price for {position.Ticker}: {priceResponse.Error.Message}")
-            | true ->
+            match priceResponse.Success with
+            | None -> logError($"Could not get price for {position.Ticker}: {priceResponse.Error.Value.Message}")
+            | Some response ->
                 
-                let price = priceResponse.Success.Price
+                let price = response.Price
                 match price <= position.StopPrice.Value with
                 | true ->
                     TriggeredAlert.StopPriceAlert position.Ticker price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)

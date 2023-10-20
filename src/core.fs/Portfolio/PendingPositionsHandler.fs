@@ -79,9 +79,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 
                 let! order = brokerage.BuyOrder user.State command.Ticker command.NumberOfShares command.Price orderType duration
                 
-                match order.IsOk with
-                | false -> return order.Error.Message |> ResponseUtils.failed
-                | true ->
+                match order.Success with
+                | None -> return order |> ResponseUtils.toOkOrError
+                | Some _ ->
                     
                     let position = PendingStockPosition(
                         notes=command.Notes,
@@ -114,12 +114,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 
                 let! account = brokerage.GetAccount(user.State)
                 
-                match account.IsOk with
-                | false -> return account.Error.Message |> ResponseUtils.failed
-                | true ->
+                match account.Success with
+                | None -> return account |> ResponseUtils.toOkOrError
+                | Some account ->
                     
                     let! _ =
-                        account.Success.Orders
+                        account.Orders
                         |> Seq.filter (fun x -> x.Ticker.Value = position.State.Ticker)
                         |> Seq.map (fun x -> brokerage.CancelOrder user.State x.OrderId |> Async.AwaitTask)
                         |> Async.Sequential
@@ -168,9 +168,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
             let tickers = data |> Seq.map(fun x -> x.Ticker)
             let! priceResponse = brokerage.GetQuotes user.State tickers
             let prices =
-                match priceResponse.IsOk with
-                | false -> Dictionary<Ticker, StockQuote>()
-                | true -> priceResponse.Success
+                match priceResponse.Success with
+                | None -> Dictionary<Ticker, StockQuote>()
+                | Some prices -> prices
                 
             let dataWithPrices =
                 data

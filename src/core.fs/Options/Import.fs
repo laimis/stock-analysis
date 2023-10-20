@@ -82,18 +82,18 @@ module Import =
         member _.Handle (request:Command) token = task {
             let parseResponse = csvParser.Parse<OptionRecord>(request.Content)
 
-            match parseResponse.IsOk with
-            | false ->
-                return parseResponse.Error.Message |> ResponseUtils.failed
-            | true ->
+            match parseResponse.Success with
+            | None ->
+                return parseResponse |> ResponseUtils.toOkOrError
+            | Some response ->
                 
-                let! processedRecords = parseResponse.Success |> runAsAsync token request.UserId  
-                let failed = processedRecords |> Seq.filter (fun r -> r.Error = null |> not) |> Seq.tryHead
+                let! processedRecords = response |> runAsAsync token request.UserId  
+                let failed = processedRecords |> Seq.filter (fun r -> r.IsOk |> not) |> Seq.tryHead
                 
                 let finalResult =
                     match failed with
                     | None -> Ok
-                    | Some f -> f.Error.Message |> ResponseUtils.failed
+                    | Some f -> f |> ResponseUtils.toOkOrError
                     
                 return finalResult
         }

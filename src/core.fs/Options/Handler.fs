@@ -76,7 +76,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
                             let detail =
                                 match chain.IsOk with
-                                | true -> chain.Success.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
+                                | true -> chain.Success.Value.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
                                 | false -> None
 
                             return OwnedOptionView(o, detail)
@@ -89,7 +89,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                 let brokeragePositions =
                     match brokerageAccount.IsOk with
                     | true ->
-                        brokerageAccount.Success.OptionPositions
+                        brokerageAccount.Success.Value.OptionPositions
                         |> Seq.filter (fun p ->
                             openOptions
                             |> Seq.exists (fun o ->
@@ -100,9 +100,9 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     | false -> Seq.empty
 
                 let brokerageOrders =
-                    match brokerageAccount.IsOk with
-                    | true -> brokerageAccount.Success.Orders
-                    | false -> Array.empty
+                    match brokerageAccount.Success with
+                    | Some orders -> orders.Orders
+                    | None -> Array.empty
 
                 let view =
                     OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders)
@@ -230,7 +230,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                 let! chain = brokerage.GetOptions user.State option.State.Ticker None None None
 
                 let detail =
-                    chain.Success.FindMatchingOption(
+                    chain.Success.Value.FindMatchingOption(
                         strikePrice = option.State.StrikePrice,
                         expirationDate = option.State.ExpirationDate,
                         optionType = option.State.OptionType
@@ -251,14 +251,15 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
                 let price =
                     match priceResult.IsOk with
-                    | true -> Nullable<decimal>(priceResult.Success.Price)
+                    | true -> Nullable<decimal>(priceResult.Success.Value.Price)
                     | false -> Nullable<decimal>()
 
                 let! details = brokerage.GetOptions user.State query.Ticker None None None
 
-                match details.IsOk with
-                | true ->
-                    let model = OptionDetailsViewModel(price, details.Success)
+                match details.Success with
+                | Some success ->
+                    let model = OptionDetailsViewModel(price, success)
                     return ServiceResponse<OptionDetailsViewModel>(model)
-                | false -> return ServiceResponse<OptionDetailsViewModel>(ServiceError(details.Error.Message))
+                | None ->
+                    return details.Error.Value.Message |> ResponseUtils.failedTyped<OptionDetailsViewModel>
         }

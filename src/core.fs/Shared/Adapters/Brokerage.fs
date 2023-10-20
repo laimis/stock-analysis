@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Threading.Tasks
 open core.Account
 open core.Shared
+open core.fs.Shared
 open core.fs.Shared.Adapters.Options
 open core.fs.Shared.Adapters.Stocks
 

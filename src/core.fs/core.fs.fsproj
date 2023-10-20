@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Shared\Domain\Accounts\Types.fs" />
+        <Compile Include="Shared\Domain\Accounts.fs" />
         <Compile Include="Shared\Shared.fs"/>
         <Compile Include="Shared\Adapters\IAccountStorage.fs" />
         <Compile Include="Shared\Adapters\IPortfolioStorage.fs" />

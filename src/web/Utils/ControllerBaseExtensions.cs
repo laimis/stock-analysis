@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using core.fs.Shared;
 using core.fs.Shared.Adapters.CSV;
-using core.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web.Utils
@@ -16,7 +15,7 @@ namespace web.Utils
 
                 if (response.IsOk)
                 {
-                    var content = response.Success;
+                    var content = response.Success.Value;
                     controller.HttpContext.Response.Headers.Add(
                         "content-disposition", 
                         $"attachment; filename={content.Filename}");
@@ -28,7 +27,7 @@ namespace web.Utils
                     };
                 }
 
-                return controller.Error(response.Error!.Message);
+                return controller.Error(response.Error.Value.Message);
             }
 
         public static ActionResult Error(
@@ -74,7 +73,7 @@ namespace web.Utils
         {
             if (r.IsOk == false)
             {
-                return controller.Error(r.Error!.Message);
+                return controller.Error(r.Error.Value.Message);
             }
 
             return controller.Ok(r.Success);

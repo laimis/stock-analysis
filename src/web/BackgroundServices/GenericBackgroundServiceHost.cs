@@ -149,11 +149,11 @@ public class ThirtyDaySellService : GenericBackgroundServiceHost
 
         if (sellView.IsOk == false)
         {
-            _logger.LogError("Failed to get sells for {email}: {error}", p.Email, sellView.Error);
+            _logger.LogError("Failed to get sells for {email}: {error}", p.Email, sellView.Error.Value);
             return;
         }
         
-        var sellsOfInterest = sellView.Success.Sells.Where(s => s.Age.Days is >= 27 and <= 31).ToList();
+        var sellsOfInterest = sellView.Success.Value.Sells.Where(s => s.Age.Days is >= 27 and <= 31).ToList();
 
         if (sellsOfInterest.Count > 0)
         {

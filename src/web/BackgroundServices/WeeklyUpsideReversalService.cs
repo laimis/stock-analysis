@@ -151,11 +151,11 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, PriceFrequency.Weekly, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
                 if (!priceBars.IsOk)
                 {
-                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error);
+                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error.Value);
                     continue;
                 }
 
-                var pattern = PatternDetection.upsideReversal(priceBars.Success);
+                var pattern = PatternDetection.upsideReversal(priceBars.Success.Value);
 
                 // this is important, we need to remove the check from the tickers to check list while adding in to 
                 // upside reversal list because midway through this process broker will throw exception most likely 

@@ -157,12 +157,12 @@ namespace core.fs.Notes
             | None -> return "User not found" |> ResponseUtils.failed
             | _ -> 
                 let records = csvParser.Parse<ImportRecord>(command.Content)
-                match records.IsOk with
-                | false -> return records.Error.Message |> ResponseUtils.failed
-                | true ->
+                match records.Success with
+                | None -> return records |> ResponseUtils.toOkOrError 
+                | Some records ->
                     
                     let! imports =
-                        records.Success
+                        records
                         |> Seq.map(fun r -> {Note=r.note;Ticker=r.ticker;UserId=command.UserId})
                         |> Seq.map(saveNote)
                         |> Async.Parallel
@@ -174,6 +174,6 @@ namespace core.fs.Notes
                     match failedImports |> Seq.isEmpty with
                     | true -> return Ok
                     | false -> 
-                        let failedImports = failedImports |> Seq.map(fun r -> r.Error.Message) |> String.concat "\n"
+                        let failedImports = failedImports |> Seq.map(fun r -> r.Error.Value.Message) |> String.concat "\n"
                         return failedImports |> ResponseUtils.failed
         }
