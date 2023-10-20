@@ -106,14 +106,14 @@ module ImportTransactions =
             | Some user ->
                 
                 let records = cmd.Content |> csvParser.Parse<TransactionRecord>
-                match records.IsOk with
-                | false -> return records.Error.Message |> ResponseUtils.failed
-                | true ->
+                match records.Success with
+                | None -> return records.Error.Value.Message |> ResponseUtils.failed
+                | Some records ->
                     do! sendEmail user "Started importing transactions" ""
                     
                     
                     let! processed =
-                        records.Success
+                        records
                         |> Seq.rev
                         |> Seq.filter(fun r -> r.Qualify())
                         |> Seq.map(fun r -> async {

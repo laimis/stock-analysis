@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.CSV;
 using core.fs.Shared.Adapters.Storage;
@@ -60,7 +61,7 @@ namespace coretests.Options
 
             var result = await handler.Handle(query);
 
-            Assert.Equal(0, result.Success.BuyStats.Count);
+            Assert.Equal(0, result.Success.Value.BuyStats.Count);
         }
     }
 }

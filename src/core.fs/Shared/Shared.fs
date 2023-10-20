@@ -29,32 +29,49 @@ type StockViolationView =
             | :? StockViolationView as res -> this.Ticker.Value.CompareTo(res.Ticker.Value)
             | _ -> -1
    
-type ServiceResponse = Ok | Error of ServiceError
-// type ServiceResult<'a> = Result<'a, ServiceError>
+   
+type ServiceError(message:string) =
+    member this.Message = message
+    
+type ServiceResponse =
+    | Ok
+    | Error of ServiceError
 
+type ServiceResponse<'a>(success:'a option,error:ServiceError option) =
+    
+    new(success:'a) =
+        ServiceResponse<'a>(success = Some(success),error = None)
+    
+    new(error:ServiceError) =
+        ServiceResponse<'a>(success = None,error = Some(error))
+        
+    member this.Success = success
+    member this.Error = error
+    member this.IsOk = match this.Success with | Some _ -> true | None -> false
+    
 module ResponseUtils =
             
     let failedTyped<'a> (message: string) =
-        ServiceResponse<'a>(ServiceError(message))
+        new ServiceResponse<'a>(message |> ServiceError)
         
-    let failed (message: string) =
-        ServiceError(message) |> Error
+    let failed (message: string) : ServiceResponse =
+        message |> ServiceError |> Error
         
     let success<'a> (data: 'a) =
         ServiceResponse<'a>(data)
     
-    let toOkOrError (response: ServiceResponse<'a>) =
+    let toOkOrError (response: ServiceResponse<'a>) : ServiceResponse =
         match response.IsOk with
         | true -> Ok
-        | false -> Error response.Error
+        | false -> Error response.Error.Value
         
-    let toOkOrConcatErrors serviceResponses =
+    let toOkOrConcatErrors serviceResponses : ServiceResponse =
         let failures =
             serviceResponses
-            |> Seq.map (fun r ->
+            |> Seq.map (fun (r:ServiceResponse) ->
                 match r with
                 | Ok -> None
-                | Error serviceError -> Some serviceError
+                | Error err -> Some err
             )
             |> Seq.choose id
         

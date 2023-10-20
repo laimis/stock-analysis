@@ -263,11 +263,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             start
                             ``end``
                     
-                    match pricesResponse.IsOk with
-                    | false ->
-                        return pricesResponse.Error.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
-                    | true ->
-                        let profit, pct = PositionAnalysis.dailyPLAndGain pricesResponse.Success position
+                    match pricesResponse.Success with
+                    | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
+                    | Some prices ->
+                        let profit, pct = PositionAnalysis.dailyPLAndGain prices position
                         
                         let response = {
                             DailyProfit = profit
@@ -293,11 +292,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     DateTimeOffset.MinValue
                     DateTimeOffset.MinValue
             
-            match priceResponse.IsOk with
-            | false ->
-                return priceResponse.Error.Message |> ResponseUtils.failedTyped<GapReportView>
-            | true ->
-                let gaps = generate priceResponse.Success 60
+            match priceResponse.Success with
+            | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<GapReportView>
+            | Some prices ->
+                let gaps = generate prices 60
                 let response = {gaps=gaps; ticker=query.Ticker.Value}
                 return ServiceResponse<GapReportView>(response)
     }
@@ -331,27 +329,27 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             endDate
                         |> Async.AwaitTask
                     
-                    match priceResponse.IsOk with
-                    | false -> return None
-                    | true ->
+                    match priceResponse.Success with
+                    | None -> return None
+                    | Some prices ->
                         
                         let outcomes =
                             match query.Duration with
-                            | OutcomesReportDuration.SingleBar ->  SingleBarPriceAnalysis.run priceResponse.Success
+                            | OutcomesReportDuration.SingleBar ->  SingleBarPriceAnalysis.run prices
                             | OutcomesReportDuration.AllBars ->
-                                let lastPrice = priceResponse.Success[priceResponse.Success.Length - 1].Close
-                                MultipleBarPriceAnalysis.Run lastPrice priceResponse.Success
+                                let lastPrice = prices[prices.Length - 1].Close
+                                MultipleBarPriceAnalysis.Run lastPrice prices
                         
                         let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t}
                         
                         let gapsView =
                             match query.IncludeGapAnalysis with
                             | true ->
-                                let gaps = generate priceResponse.Success 60
+                                let gaps = generate prices 60
                                 Some {gaps=gaps; ticker=t.Value}
                             | false -> None
                             
-                        let patterns = PatternDetection.generate priceResponse.Success
+                        let patterns = PatternDetection.generate prices
                         let tickerPatterns = {patterns = patterns; ticker = t}
                         
                         return Some (tickerOutcome, gapsView, tickerPatterns)
@@ -392,11 +390,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             
             let positions = stocks |> Seq.filter (fun stock -> stock.State.OpenPosition = null |> not) |> Seq.map (fun stock -> stock.State.OpenPosition)
             
-            let! orderResponse = brokerage.GetAccount user.State
+            let! account = brokerage.GetAccount user.State
             let orders =
-                match orderResponse.IsOk with
-                | false -> Array.Empty<Order>()
-                | true -> orderResponse.Success.Orders
+                match account.Success with
+                | None -> Array.Empty<Order>()
+                | Some account -> account.Orders
                 
             let! tasks =
                 positions
@@ -410,18 +408,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             DateTimeOffset.UtcNow
                         |> Async.AwaitTask
                     
-                    match priceResponse.IsOk with
-                    | false -> return None
-                    | true ->
+                    match priceResponse.Success with
+                    | None -> return None
+                    | Some prices ->
                         // TODO: this is not nice, can we avoid it setting the price here?
-                        match priceResponse.Success.Length > 0 with
-                        | true -> position.SetPrice priceResponse.Success[priceResponse.Success.Length - 1].Close
-                        | false -> ()
+                        match prices with
+                        | [||] -> ()
+                        | _ -> position.SetPrice prices[prices.Length - 1].Close
                         
-                        // TODO: bring back orders once we migrate position analysis to f#
-                        let outcomes = PositionAnalysis.generate position priceResponse.Success orders
+                        let outcomes = PositionAnalysis.generate position prices orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
-                        let tickerPatterns = {patterns = PatternDetection.generate priceResponse.Success; ticker = position.Ticker}
+                        let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
                         
                         return Some (tickerOutcome, tickerPatterns)
                     }
@@ -458,16 +455,16 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     DateTimeOffset.MinValue
                     DateTimeOffset.MinValue
             
-            match pricesResponse.IsOk with
-            | false -> return pricesResponse.Error.Message |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
-            | true ->
+            match pricesResponse.Success with
+            | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
+            | Some prices ->
                 let startIndex =
-                    match pricesResponse.Success.Length > 30 with
-                    | true -> pricesResponse.Success.Length - 30
+                    match prices.Length > 30 with
+                    | true -> prices.Length - 30
                     | false -> 0
                 
-                let recent = pricesResponse.Success[startIndex..] |> PercentChangeAnalysis.calculateForPriceBars
-                let allTime = pricesResponse.Success |> PercentChangeAnalysis.calculateForPriceBars
+                let recent = prices[startIndex..] |> PercentChangeAnalysis.calculateForPriceBars
+                let allTime = prices |> PercentChangeAnalysis.calculateForPriceBars
                 let response = {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
                 return ServiceResponse<PercentChangeStatisticsView>(response)
     }
@@ -485,9 +482,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     (stocks |> Seq.map (fun stock -> stock.State.Ticker))
             
             let prices =
-                match priceResult.IsOk with
-                | false -> Dictionary<Ticker,StockQuote>()
-                | true -> priceResult.Success
+                match priceResult.Success with
+                | None -> Dictionary<Ticker,StockQuote>()
+                | Some prices -> prices
                 
             let response = SellsView(stocks, prices)
             return ServiceResponse<SellsView>(response)

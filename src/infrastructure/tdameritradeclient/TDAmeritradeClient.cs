@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using core.Account;
-using core.fs.Admin;
+using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
@@ -106,13 +106,13 @@ public class TDAmeritradeClient : IBrokerage
             state, function, HttpMethod.Get
         );
 
-        if (results.Error != null)
+        if (results.IsOk == false)
         {
-            return new ServiceResponse<StockProfile>(results.Error);
+            return new ServiceResponse<StockProfile>(results.Error.Value);
         }
 
-        var fundamentals = results.Success![ticker.Value].fundamental ?? new Dictionary<string, object>();
-        var data = results.Success[ticker.Value];
+        var fundamentals = results.Success.Value![ticker.Value].fundamental ?? new Dictionary<string, object>();
+        var data = results.Success.Value[ticker.Value];
 
         var mapped = new StockProfile {
             Symbol = data.symbol,
@@ -136,12 +136,12 @@ public class TDAmeritradeClient : IBrokerage
         var function = $"instruments?symbol={query}.*&projection=symbol-regex";
 
         var results = await CallApi<Dictionary<string, SearchItem>>(state, function, HttpMethod.Get);
-        if (results.Error != null)
+        if (results.IsOk == false)
         {
-            return new ServiceResponse<SearchResult[]>(results.Error);
+            return new ServiceResponse<SearchResult[]>(results.Error.Value);
         }
 
-        var converted = results.Success!.Values.Select(
+        var converted = results.Success.Value.Values.Select(
             i => new SearchResult
             {
                 Symbol = i.symbol,
@@ -181,13 +181,13 @@ public class TDAmeritradeClient : IBrokerage
             "/accounts?fields=positions,orders",
             HttpMethod.Get
         );
-            
-        if (response.Error != null)
+
+        if (response.IsOk == false)
         {
-            return new ServiceResponse<TradingAccount>(response.Error);
+            return new ServiceResponse<TradingAccount>(response.Error.Value);
         }
 
-        var accounts = response.Success!;
+        var accounts = response.Success.Value;
 
         var tdPositions = (accounts[0].securitiesAccount?.positions)
             ?? throw new Exception("Could not find positions in response");
@@ -267,12 +267,12 @@ public class TDAmeritradeClient : IBrokerage
         // get account first
         var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
 
-        if (response.Error != null)
+        if (response.IsOk == false)
         {
-            return new ServiceResponse<bool>(response.Error);
+            return new ServiceResponse<bool>(response.Error.Value);
         }
 
-        var accounts = response.Success!;
+        var accounts = response.Success.Value;
 
         var accountId = accounts[0].securitiesAccount?.accountId;
 
@@ -352,12 +352,12 @@ public class TDAmeritradeClient : IBrokerage
         var function = $"marketdata/{ticker.Value}/quotes";
 
         var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
-        if (!response.IsOk)
+        if (response.IsOk == false)
         {
-            return new ServiceResponse<StockQuote>(response.Error!);
+            return new ServiceResponse<StockQuote>(response.Error.Value);
         }
 
-        if (!response.Success!.TryGetValue(ticker.Value, out var quote))
+        if (!response.Success.Value.TryGetValue(ticker.Value, out var quote))
         {
             return new ServiceResponse<StockQuote>(new ServiceError("Could not find quote for ticker"));
         }
@@ -376,9 +376,9 @@ public class TDAmeritradeClient : IBrokerage
         // but that did not work, seems like you had to add dictionary converter and it got ugly pretty quickly
         return result.IsOk switch
         {
-            false => new ServiceResponse<Dictionary<Ticker, StockQuote>>(result.Error!),
+            false => new ServiceResponse<Dictionary<Ticker, StockQuote>>(result.Error.Value),
             true => new ServiceResponse<Dictionary<Ticker, StockQuote>>(
-                result.Success!.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
+                result.Success.Value.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
             )
         };
     }
@@ -405,9 +405,9 @@ public class TDAmeritradeClient : IBrokerage
 
         var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get);
 
-        if (!chainResponse.IsOk)
+        if (chainResponse.IsOk == false)
         {
-            return new ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>(chainResponse.Error!);
+            return new ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>(chainResponse.Error.Value);
         }
 
         static IEnumerable<core.fs.Shared.Adapters.Options.OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
@@ -435,7 +435,7 @@ public class TDAmeritradeClient : IBrokerage
                 UnderlyingPrice = underlyingPrice
             });
 
-        var chain = chainResponse.Success!;
+        var chain = chainResponse.Success.Value;
 
         var response = new core.fs.Shared.Adapters.Options.OptionChain(
             symbol: chain.symbol!,
@@ -453,22 +453,22 @@ public class TDAmeritradeClient : IBrokerage
         var function = $"marketdata/EQUITY/hours?date={dateStr}";
 
         var wrapper = await CallApi<MarketHoursWrapper>(state, function, HttpMethod.Get, jsonData: null);
-        if (!wrapper.IsOk)
+        if (wrapper.IsOk == false)
         {
-            return new ServiceResponse<MarketHours>(wrapper.Error!);
+            return new ServiceResponse<MarketHours>(wrapper.Error.Value);
         }
 
-        if (wrapper.Success!.equity == null)
+        if (wrapper.Success.Value.equity == null)
         {
             return new ServiceResponse<MarketHours>(new ServiceError("Could not find market hours for date"));
         }
 
-        if (wrapper.Success.equity.EQ == null)
+        if (wrapper.Success.Value.equity.EQ == null)
         {
             return new ServiceResponse<MarketHours>(new ServiceError("Could not find market hours for date (EQ)"));
         }
 
-        return new ServiceResponse<MarketHours>(wrapper.Success.equity.EQ);
+        return new ServiceResponse<MarketHours>(wrapper.Success.Value.equity.EQ);
     }
 
 
@@ -497,12 +497,12 @@ public class TDAmeritradeClient : IBrokerage
             HttpMethod.Get
         );
 
-        if (response.Error != null)
+        if (response.IsOk == false)
         {
-            return new ServiceResponse<PriceBar[]>(response.Error);
+            return new ServiceResponse<PriceBar[]>(response.Error.Value);
         }
 
-        var prices = response.Success!;
+        var prices = response.Success.Value;
 
         if (prices.candles == null)
         {
@@ -530,12 +530,12 @@ public class TDAmeritradeClient : IBrokerage
     {
         var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
 
-        if (response.Error != null)
+        if (response.IsOk == false)
         {
-            return new ServiceResponse<bool>(response.Error);
+            return new ServiceResponse<bool>(response.Error.Value);
         }
 
-        var accounts = response.Success!;
+        var accounts = response.Success.Value;
 
         var accountId = accounts[0].securitiesAccount?.accountId;
 

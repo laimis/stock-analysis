@@ -11,6 +11,6 @@ public class EdgarClientTests
     {
         var client = new EdgarClient(null, "NGTD/1.0");
         var response = await client.GetFilings(new Ticker("AAPL"));
-        Assert.NotEmpty(response.Success.Filings);
+        Assert.NotEmpty(response.Success.Value.Filings);
     }
 }

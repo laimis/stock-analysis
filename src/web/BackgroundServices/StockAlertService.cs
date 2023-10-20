@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core.Account;
 using core.fs.Alerts;
 using core.fs.Services;
+using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Stocks;
 using core.fs.Shared.Adapters.Storage;
@@ -90,7 +91,7 @@ namespace web.BackgroundServices
                     }
 
                     var prices = await GetPricesForTicker(c.user, c.ticker);
-                    if (!prices.IsOk)
+                    if (prices.IsOk == false)
                     {
                         continue;
                     }
@@ -102,7 +103,7 @@ namespace web.BackgroundServices
                         _container.Deregister(patternName, c.ticker, UserId.NewUserId(c.user.Id));
                     }
 
-                    var patterns = PatternDetection.generate(prices.Success);
+                    var patterns = PatternDetection.generate(prices.Success.Value);
 
                     foreach(var pattern in patterns)
                     {
@@ -147,9 +148,9 @@ namespace web.BackgroundServices
                 end
             );
 
-            if (prices.Error != null)
+            if (prices.IsOk == false)
             {
-                _logger.LogCritical("Could not get price history for {ticker}: {message}", ticker, prices.Error.Message);
+                _logger.LogCritical("Could not get price history for {ticker}: {message}", ticker, prices.Error.Value.Message);
             }
             else
             {

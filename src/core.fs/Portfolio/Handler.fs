@@ -468,12 +468,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         let! results = this.Handle(simulateCommand)
         match results.IsOk with
         | true ->
-            let content = CSVExport.strategyPerformance csvWriter results.Success
+            let content = CSVExport.strategyPerformance csvWriter results.Success.Value
             let filename = CSVExport.generateFilename $"simulated-trades-{command.NumberOfTrades}"
             let response = ExportResponse(filename, content);
             return ServiceResponse<ExportResponse>(response);
             
-        | false -> return results.Error.Message |> ResponseUtils.failedTyped<ExportResponse>
+        | false -> return results.Error.Value.Message |> ResponseUtils.failedTyped<ExportResponse>
     }
     
     member _.Handle (query:QueryTradingEntries) = task {
@@ -492,9 +492,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
             let! accountResponse = brokerage.GetAccount(user.State)
             let account =
-                match accountResponse.IsOk with
-                | true -> accountResponse.Success
-                | false -> TradingAccount.Empty
+                match accountResponse.Success with
+                | Some acc -> acc
+                | None -> TradingAccount.Empty
                 
             let tickers =
                 positions |> Seq.map (fun p -> p.Ticker)
@@ -503,15 +503,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
             let! pricesResponse = brokerage.GetQuotes user.State tickers
             let prices =
-                match pricesResponse.IsOk with
-                | true -> pricesResponse.Success
-                | false -> Dictionary<Ticker, StockQuote>()
-                
-            positions |> Array.iter (fun p ->
-                match prices.TryGetValue(p.Ticker) with
-                | true, price -> p.SetPrice(price.Price)
-                | _ -> ()
-            )
+                match pricesResponse.Success with
+                | Some prices ->
+                    positions |> Array.iter (fun p ->
+                        match prices.TryGetValue(p.Ticker) with
+                        | true, price -> p.SetPrice(price.Price)
+                        | _ -> ()
+                    )
+                    prices
+                | None -> Dictionary<Ticker, StockQuote>()
             
             let current = positions |> Array.sortByDescending (fun p -> p.RR)
             

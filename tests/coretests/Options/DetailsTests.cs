@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using core.Account;
 using core.fs.Options;
+using core.fs.Shared;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.CSV;
 using core.fs.Shared.Adapters.Options;

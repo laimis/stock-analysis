@@ -74,8 +74,8 @@ type DetailsQuery =
 type DetailsView =
     {
         Ticker: string
-        Price: Nullable<decimal>
-        Profile: StockProfile
+        Price: decimal option
+        Profile: StockProfile option
     }
     
 type ExportType =
@@ -269,9 +269,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 
             let! brokerageAccount = brokerage.GetAccount(user.State)
             let brokeragePositions =
-                match brokerageAccount.IsOk with
-                | false -> Array.Empty<StockPosition>()
-                | true -> brokerageAccount.Success.StockPositions
+                match brokerageAccount.Success with
+                | Some account -> account.StockPositions
+                | None -> Array.Empty<StockPosition>()
                 
             let! quotesResponse =
                 brokerage.GetQuotes
@@ -279,9 +279,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                     (brokeragePositions |> Seq.map (fun x -> x.Ticker) |> Seq.append (positions |> Seq.map (fun x -> x.Ticker)) |> Seq.distinct)
             
             let prices =
-                match quotesResponse.IsOk with
-                | false -> Dictionary<Ticker,StockQuote>()
-                | true -> quotesResponse.Success
+                match quotesResponse.Success with
+                | Some prices -> prices
+                | None -> Dictionary<Ticker,StockQuote>()
                 
             let violations =
                 match brokerageAccount.IsOk with
@@ -344,9 +344,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             let! profileResponse = brokerage.GetStockProfile user.State query.Ticker
             let! priceResponse = brokerage.GetQuote user.State query.Ticker
             let price =
-                match priceResponse.IsOk with
-                | true -> Nullable<decimal>(priceResponse.Success.Price)
-                | false -> Nullable<decimal>()
+                match priceResponse.Success with
+                | Some price -> Some price.Price
+                | None -> None
                 
             let view = {
                 Ticker = query.Ticker.Value
@@ -395,11 +395,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     
     member this.Handle (cmd:ImportStocks) = task {
         let records = csvParser.Parse<ImportRecord>(cmd.Content)
-        match records.IsOk with
-        | false -> return records.Error.Message |> ResponseUtils.failed
-        | _ ->
+        match records.Success with
+        | None -> return records |> ResponseUtils.toOkOrError
+        | Some records ->
             let! results =
-                records.Success
+                records
                 |> Seq.map (fun r -> async {
                     let command =
                         match r.``type`` with
@@ -444,14 +444,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             | null -> return "Stock not found" |> ResponseUtils.failedTyped<OwnershipView>
             | _ ->
                 let! priceResponse = brokerage.GetQuote user.State query.Ticker
-                let price =
-                    match priceResponse.IsOk with
-                    | true -> Nullable<decimal>(priceResponse.Success.Price)
-                    | false -> Nullable<decimal>()
-                    
-                if stock.State.OpenPosition <> null then
-                    stock.State.OpenPosition.SetPrice(price)
-                else
+                match priceResponse.Success with
+                | Some price ->
+                    if stock.State.OpenPosition = null |> not then
+                        stock.State.OpenPosition.SetPrice(price.Price)
+                | None ->
                     ()
                     
                 let positions = stock.State.GetAllPositions()
@@ -468,15 +465,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<Nullable<decimal>>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<decimal option>
         | Some user ->
             let! priceResponse = brokerage.GetQuote user.State query.Ticker
             let price =
-                match priceResponse.IsOk with
-                | true -> Nullable<decimal>(priceResponse.Success.Price)
-                | false -> Nullable<decimal>()
+                match priceResponse.Success with
+                | Some price -> Some price.Price
+                | None -> None
                 
-            return ServiceResponse<Nullable<decimal>>(price)
+            return ServiceResponse<decimal option>(price)
     }
     
     member _.Handle (query:PricesQuery) = task {
@@ -486,11 +483,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | None -> return "User not found" |> ResponseUtils.failedTyped<PricesView>
         | Some user ->
             let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker PriceFrequency.Daily query.Start query.End
-            match priceResponse.IsOk with
-            | false -> return priceResponse.Error.Message |> ResponseUtils.failedTyped<PricesView>
-            | true ->
-                let view = PricesView(priceResponse.Success)
-                return ServiceResponse<PricesView>(view)
+            match priceResponse.Success with
+            | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<PricesView>
+            | Some prices -> return ServiceResponse<PricesView>(PricesView(prices))
     }
     
     member _.Handle (query:QuoteQuery) = task {
@@ -500,28 +495,28 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockQuote>
         | Some user ->
             let! priceResponse = brokerage.GetQuote user.State query.Ticker
-            match priceResponse.IsOk with
-            | false -> return priceResponse.Error.Message |> ResponseUtils.failedTyped<StockQuote>
-            | true -> return ServiceResponse<StockQuote>(priceResponse.Success)
+            match priceResponse.Success with
+            | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<StockQuote>
+            | Some _ -> return priceResponse
     }
     
     member _.Handle (query:SearchQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<SearchResult seq>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<SearchResult array>
         | Some user ->
             let! matches = brokerage.Search user.State query.Term 10
             
-            match matches.IsOk with
-            | false -> return matches.Error.Message |> ResponseUtils.failedTyped<SearchResult seq>
-            | true -> return ServiceResponse<SearchResult seq>(matches.Success)
+            match matches.Success with
+            | None -> return matches.Error.Value.Message |> ResponseUtils.failedTyped<SearchResult array>
+            | Some m -> return matches
     }
     
     member _.Handle (query:CompanyFilingsQuery) = task {
         let! response = secFilings.GetFilings(query.Ticker)
-        match response.IsOk with
-        | false -> return response.Error.Message |> ResponseUtils.failedTyped<CompanyFiling seq>
-        | true -> return ServiceResponse<CompanyFiling seq>(response.Success.Filings)
+        match response.Success with
+        | None -> return response.Error.Value.Message |> ResponseUtils.failedTyped<CompanyFiling seq>
+        | Some response -> return ServiceResponse<CompanyFiling seq>(response.Filings)
     }
     
     member _.Handle (cmd:SetStop) = task {

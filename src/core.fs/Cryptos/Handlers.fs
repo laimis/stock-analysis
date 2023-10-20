@@ -237,11 +237,11 @@ namespace core.fs.Cryptos
             | _ ->
                 let parserResponse = csvParser.Parse<{|TransactionType:string; Cryptocurrency:string; Amount:decimal; ConfirmedAt:DateTimeOffset|}>(cmd.Content)
                 
-                match parserResponse.IsOk with
-                | false -> return ResponseUtils.failed parserResponse.Error.Message
-                | true ->
+                match parserResponse.Success with
+                | None -> return parserResponse |> ResponseUtils.toOkOrError
+                | Some response  ->
                     let! commands =
-                        parserResponse.Success
+                        response
                         |> Seq.map(fun obj -> createCommand (obj.TransactionType.ToLower()) obj.Amount obj.ConfirmedAt (Token obj.Cryptocurrency) cmd.UserId)
                         |> Seq.choose id
                         |> Seq.map( fun cmd -> this.Handle(cmd) |> Async.AwaitTask)
@@ -274,11 +274,11 @@ namespace core.fs.Cryptos
             | _ ->
                 let parserResponse = csvParser.Parse<{|Timestamp:DateTimeOffset; TransactionType:string; Asset:string; QuantityTransacted:decimal; USDSubtotal:decimal|}>(cmd.Content)
                 
-                match parserResponse.IsOk with
-                | false -> return ResponseUtils.failed parserResponse.Error.Message
-                | true ->
+                match parserResponse.Success with
+                | None -> return parserResponse |> ResponseUtils.toOkOrError
+                | Some response ->
                     let! commands =
-                        parserResponse.Success
+                        response
                         |> Seq.map(fun obj -> createCommand obj.TransactionType obj.Timestamp obj.USDSubtotal obj.QuantityTransacted (Token obj.Asset) null cmd.UserId)
                         |> Seq.choose id
                         |> Seq.map( fun cmd -> this.Handle(cmd) |> Async.AwaitTask)
@@ -307,10 +307,10 @@ namespace core.fs.Cryptos
             | _ ->
                 let parserResponse = csvParser.Parse<CoinbaseProRecord>(cmd.Content)
                 
-                match parserResponse.IsOk with
-                | false -> return ResponseUtils.failed parserResponse.Error.Message
-                | true ->
-                    let container = CoinbaseProContainer(parserResponse.Success)
+                match parserResponse.Success with
+                | None -> return parserResponse |> ResponseUtils.toOkOrError
+                | Some response ->
+                    let container = CoinbaseProContainer(response)
                     
                     let! _ =
                         container.Buys
