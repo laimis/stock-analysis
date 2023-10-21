@@ -46,10 +46,15 @@ namespace coretests.Stocks.Services
         [Fact]
         public void LowestPrice()
             => Assert.Equal(37.84m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPrice).Value, 2);
-        
+
         [Fact]
         public void LowestPriceDaysAgo()
-            => Assert.Equal(345, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo).Value);
+            => Assert.True(
+                System.Math.Abs(
+                    345 - _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo)
+                        .Value
+                ) <= 1  // sometimes it's 346 based on the time that the test runs
+            );
 
         [Fact]
         public void HighestPrice()
