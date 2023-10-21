@@ -16,12 +16,13 @@ namespace coretests.Stocks.Services
         private static (PositionInstance position, PriceBar[] bars, Order[] orders) CreateTestData()
         {
             var ticker = new Ticker("SHEL");
-            var position = new PositionInstance(0, ticker, System.DateTimeOffset.UtcNow);
-            position.Buy(numberOfShares: 10, price: 100m, when: System.DateTimeOffset.UtcNow, transactionId: System.Guid.NewGuid());
-            position.SetPrice(110m);
             
             var bars = TestDataGenerator.PriceBars(ticker.Value);
 
+            var position = new PositionInstance(0, ticker, bars[0].Date);
+            position.Buy(numberOfShares: 10, price: 100m, when: bars[0].Date, transactionId: System.Guid.NewGuid());
+            position.SetPrice(bars[0].Close);
+            
             var orders = new[] {
                 new Order {
                     Ticker = new FSharpOption<Ticker>(ticker),
@@ -58,6 +59,25 @@ namespace coretests.Stocks.Services
             var evaluations = PositionAnalysis.evaluate(outcomes);
 
             Assert.Contains(evaluations, e => e.SortColumn == PositionAnalysis.PortfolioAnalysisKeys.StrategyLabel);
+        }
+
+        [Fact]
+        public void DailyPL_Correct()
+        {
+            var (position, bars, orders) = CreateTestData();
+            
+            var midPointInBars = bars.Length / 2;
+            
+            position.Sell(
+                numberOfShares: position.NumberOfShares,
+                price: bars[midPointInBars].Close,
+                when: bars[midPointInBars].Date,
+                transactionId: System.Guid.NewGuid());
+
+            var dailyPlAndGain= PositionAnalysis.dailyPLAndGain(bars, position);
+            
+            Assert.Equal(midPointInBars + 1, dailyPlAndGain.Item1.Data.Count);
+            Assert.Equal(midPointInBars + 1, dailyPlAndGain.Item2.Data.Count);
         }
     }
 }

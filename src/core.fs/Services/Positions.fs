@@ -159,7 +159,7 @@ module PositionAnalysis =
             match position.Closed.HasValue with
             | true ->
                 bars
-                |> Array.findIndex (fun b -> b.Date <= position.Closed.Value)
+                |> Array.findIndexBack (fun b -> b.Date <= position.Closed.Value)
             | false -> bars.Length - 1
         
         let shares = position.CompletedPositionShares
