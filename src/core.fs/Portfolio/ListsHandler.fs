@@ -32,11 +32,9 @@ type AddStockToList =
     {
         [<Required>]
         Name: string
-        UserId: UserId
         [<Required>]
         Ticker: Ticker
     }
-    static member WithUserId userId (command:AddStockToList) = { command with UserId = userId }
     
 type RemoveStockFromList =
     {
@@ -55,9 +53,7 @@ type AddTagToList =
         Tag: string
         [<Required>]
         Name: string
-        UserId: UserId
     }
-    static member WithUserId userId (command:AddTagToList) = { command with UserId = userId }
     
 type RemoveTagFromList =
     {
@@ -72,17 +68,13 @@ type Create =
     {
         Name: string
         Description: string
-        UserId: UserId
     }
-    static member WithUserId userId (command:Create) = { command with UserId = userId }
     
 type Update =
     {
         Name: string
         Description: string
-        UserId: UserId
     }
-    static member WithUserId userId (command:Update) = { command with UserId = userId }
     
 type Delete =
     {
@@ -131,18 +123,18 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
                 return response |> ResponseUtils.success
     }
     
-    member _.Handle (command: AddStockToList) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleAddStockToList userId (command: AddStockToList) = task {
+        let! user = accounts.GetUser userId
         
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Name userId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.AddStock(ticker=command.Ticker, note=null)
-                do! portfolio.SaveStockList list command.UserId
+                do! portfolio.SaveStockList list userId
                 return list.State |> ResponseUtils.success
     }
     
@@ -161,18 +153,18 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
                 return list.State |> ResponseUtils.success
     }
     
-    member _.Handle (command: AddTagToList) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleAddTagToList userId (command: AddTagToList) = task {
+        let! user = accounts.GetUser userId
         
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Name userId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.AddTag(tag=command.Tag)
-                do! portfolio.SaveStockList list command.UserId
+                do! portfolio.SaveStockList list userId
                 return list.State |> ResponseUtils.success
     }
     
@@ -191,34 +183,34 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
                 return list.State |> ResponseUtils.success
     }
     
-    member _.Handle (command: Create) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleCreate userId (command: Create) = task {
+        let! user = accounts.GetUser userId
         
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Name userId
             match list with
             | null ->
-                let newList = StockList(name=command.Name, description=command.Description, userId=(command.UserId |> IdentifierHelper.getUserId))
-                do! portfolio.SaveStockList newList command.UserId
+                let newList = StockList(name=command.Name, description=command.Description, userId=(userId |> IdentifierHelper.getUserId))
+                do! portfolio.SaveStockList newList userId
                 return newList.State |> ResponseUtils.success
             | _ ->
                 return "List already exists" |> ResponseUtils.failedTyped<StockListState>
     }
     
-    member _.Handle (command: Update) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleUpdate userId (command: Update) = task {
+        let! user = accounts.GetUser userId
         
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockListState>
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Name userId
             match list with
             | null -> return "List not found" |> ResponseUtils.failedTyped<StockListState>
             | _ ->
                 list.Update(name=command.Name, description=command.Description)
-                do! portfolio.SaveStockList list command.UserId
+                do! portfolio.SaveStockList list userId
                 return list.State |> ResponseUtils.success
     }
     

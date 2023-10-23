@@ -29,8 +29,8 @@ namespace web.Controllers
         [HttpPost("pendingstockpositions")]
         public Task<ActionResult> CreatePendingStockPosition([FromBody]PendingPositions.Create command, [FromServices]PendingPositions.Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    PendingPositions.Create.WithUserId(User.Identifier(), command)
+                service.HandleCreate(
+                    User.Identifier(), command
                 )
             );
 
@@ -112,7 +112,7 @@ namespace web.Controllers
 
         [HttpPost("stocklists")]
         public Task<ActionResult> CreateStockList([FromBody]Lists.Create command, [FromServices]Lists.Handler service) =>
-            this.OkOrError(service.Handle(Lists.Create.WithUserId(User.Identifier(), command)));
+            this.OkOrError(service.HandleCreate(User.Identifier(), command));
 
         [HttpDelete("stocklists/{name}")]
         public Task<ActionResult> DeleteStockList([FromRoute]string name, [FromServices]Lists.Handler service) =>
@@ -120,12 +120,12 @@ namespace web.Controllers
 
         [HttpPost("stocklists/{name}")]
         public Task UpdateStockList([FromBody]Lists.Update command, [FromServices]Lists.Handler service) =>
-            this.OkOrError(service.Handle(Lists.Update.WithUserId(User.Identifier(), command)));
+            this.OkOrError(service.HandleUpdate(User.Identifier(), command));
 
         [HttpPut("stocklists/{name}")]
         public Task<ActionResult> AddStockToList([FromBody] Lists.AddStockToList command,
             [FromServices] Lists.Handler service) =>
-            this.OkOrError(service.Handle(Lists.AddStockToList.WithUserId(User.Identifier(), command)));
+            this.OkOrError(service.HandleAddStockToList(User.Identifier(), command));
 
         [HttpDelete("stocklists/{name}/{ticker}")]
         public Task<ActionResult> RemoveStockFromList([FromRoute] string name, [FromRoute] string ticker,
@@ -134,7 +134,7 @@ namespace web.Controllers
 
         [HttpPut("stocklists/{name}/tags")]
         public Task<ActionResult> AddTagToStockList([FromBody]Lists.AddTagToList command, [FromServices]Lists.Handler service) =>
-            this.OkOrError(service.Handle(Lists.AddTagToList.WithUserId(User.Identifier(), command)));
+            this.OkOrError(service.HandleAddTagToList(User.Identifier(), command));
 
         [HttpDelete("stocklists/{name}/tags/{tag}")]
         public Task<ActionResult> RemoveTagFromStockList([FromRoute] string name, [FromRoute] string tag, [FromServices] Lists.Handler service) =>
@@ -246,8 +246,8 @@ namespace web.Controllers
         [HttpPost("{ticker}/positions/{positionId}/grade")]
         public Task Grade([FromBody]GradePosition command, [FromServices]Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    GradePosition.WithUserId(User.Identifier(), command)
+                service.HandleGradePosition(
+                    User.Identifier(), command
                 )
             );
 
@@ -269,8 +269,8 @@ namespace web.Controllers
         [HttpPost("{ticker}/positions/{positionId}/labels")]
         public Task SetLabel([FromBody]AddLabel command, [FromServices] Handler handler) =>
             this.OkOrError(
-                handler.Handle(
-                    AddLabel.WithUserId(User.Identifier(), command)
+                handler.HandleAddLabel(
+                    User.Identifier(), command
                 )
             );
 
@@ -294,8 +294,8 @@ namespace web.Controllers
         [HttpPost("{ticker}/positions/{positionId}/risk")]
         public Task<ActionResult> Risk(SetRisk command, [FromServices] Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    SetRisk.WithUserId(User.Identifier(), command)
+                service.HandleSetRisk(
+                    User.Identifier(), command
                 )
             );
 

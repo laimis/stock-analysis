@@ -30,11 +30,7 @@ type Create =
         Ticker: Ticker
         [<Required(AllowEmptyStrings = false)>]
         Strategy: string
-        UserId: UserId
     }
-    
-    static member WithUserId userId (command:Create) =
-        { command with UserId = userId }
         
 type Close =
     {
@@ -57,15 +53,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
     
     interface IApplicationService
     
-    member this.Handle (command:Create) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member this.HandleCreate userId (command:Create) = task {
+        let! user = accounts.GetUser userId
         
         match user with
         | None ->
             return "User not found" |> ResponseUtils.failed
         | Some user ->
             
-            let! existing = portfolio.GetPendingStockPositions(command.UserId)
+            let! existing = portfolio.GetPendingStockPositions userId
             
             let found = existing |> Seq.tryFind (fun x -> x.State.Ticker = command.Ticker && x.State.IsClosed = false)
             
@@ -90,10 +86,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                         stopPrice=command.StopPrice,
                         strategy=command.Strategy,
                         ticker=command.Ticker,
-                        userId=(command.UserId |> IdentifierHelper.getUserId)
+                        userId=(userId |> IdentifierHelper.getUserId)
                     )
                     
-                    do! portfolio.SavePendingPosition position command.UserId
+                    do! portfolio.SavePendingPosition position userId
                     return Ok
     }
     

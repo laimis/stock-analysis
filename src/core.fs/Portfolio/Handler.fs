@@ -35,13 +35,10 @@ type GradePosition =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: UserId
         [<Required>]
         Grade: TradeGrade
         Note: string
     }
-    
-    static member WithUserId userId (command:GradePosition) = { command with UserId = userId }
     
 type RemoveLabel =
     {
@@ -59,14 +56,11 @@ type AddLabel =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: UserId
         [<Required>]
         Key: string
         [<Required>]
         Value: string
     }
-    
-    static member WithUserId userId (command:AddLabel) = { command with UserId = userId }
     
 type ProfitPointsQuery =
     {
@@ -83,11 +77,9 @@ type SetRisk =
         PositionId: int
         [<Required>]
         Ticker: Ticker
-        UserId: UserId
         [<Required>]
         RiskAmount: Nullable<decimal>
     }
-    static member WithUserId userId (command:SetRisk) = { command with UserId = userId }
     
 type SimulateTrade = 
     {
@@ -215,12 +207,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         return view |> ResponseUtils.success    
     }
     
-    member _.Handle (command:GradePosition) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleGradePosition userId (command:GradePosition) = task {
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks(command.UserId)
+            let! stocks = storage.GetStocks userId
             
             let stock =
                 stocks
@@ -233,7 +225,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 match stock.AssignGrade(positionId=command.PositionId, grade=command.Grade, note=command.Note) with
                 | false -> ()
-                | true -> do! storage.Save stock command.UserId
+                | true -> do! storage.Save stock userId
                 
                 return Ok
     }
@@ -261,12 +253,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 return Ok
     }
     
-    member _.Handle (command:AddLabel) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleAddLabel userId (command:AddLabel) = task {
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks(command.UserId)
+            let! stocks = storage.GetStocks userId
             
             let stock =
                 stocks
@@ -279,7 +271,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 match stock.SetPositionLabel(positionId=command.PositionId, key=command.Key, value=command.Value) with
                 | false -> ()
-                | true -> do! storage.Save stock command.UserId
+                | true -> do! storage.Save stock userId
                 
                 return Ok
     }
@@ -319,12 +311,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     return ServiceResponse<ProfitPoints.ProfitPointContainer []>(arr)
     }
     
-    member _.Handle (command:SetRisk) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.HandleSetRisk userId (command:SetRisk) = task {
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks(command.UserId)
+            let! stocks = storage.GetStocks userId
             
             let stock =
                 stocks
@@ -337,7 +329,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
                 stock.SetRiskAmount(positionId=command.PositionId, riskAmount=command.RiskAmount.Value)
                 
-                do! storage.Save stock command.UserId
+                do! storage.Save stock userId
                 
                 return Ok
     }

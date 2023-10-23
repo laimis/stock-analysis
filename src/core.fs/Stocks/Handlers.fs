@@ -176,11 +176,8 @@ type SetStop =
         [<Required>]
         StopPrice:Nullable<decimal>
         Ticker:Ticker
-        UserId:UserId
     }
     
-    static member WithUserId userId (cmd:SetStop) =
-        {cmd with UserId=userId}
     
 type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFilings,portfolio:IPortfolioStorage,csvParser:ICSVParser,csvWriter:ICSVWriter) =
     
@@ -519,13 +516,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | Some response -> return ServiceResponse<CompanyFiling seq>(response.Filings)
     }
     
-    member _.Handle (cmd:SetStop) = task {
-        let! stock = portfolio.GetStock cmd.Ticker cmd.UserId
+    member _.HandleSetStop userId (cmd:SetStop) = task {
+        let! stock = portfolio.GetStock cmd.Ticker userId
         match stock with
         | null -> return "Stock not found" |> ResponseUtils.failed
         | _ ->
             stock.SetStop(cmd.StopPrice.Value) |> ignore
-            do! portfolio.Save stock cmd.UserId
+            do! portfolio.Save stock userId
             return Ok
     }
     

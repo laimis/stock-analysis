@@ -69,7 +69,7 @@ namespace web.Controllers
 
         [HttpPost("{ticker}/stop")]
         public Task<ActionResult> Stop([FromBody] SetStop command) =>
-            this.OkOrError(_service.Handle(SetStop.WithUserId(User.Identifier(), command)));
+            this.OkOrError(_service.HandleSetStop(User.Identifier(), command));
         
         [HttpDelete("{ticker}/stop")]
         public async Task<ActionResult> DeleteStop([FromRoute] string ticker) =>
