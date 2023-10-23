@@ -87,7 +87,6 @@ type OutcomesReportQuery =
     {
         [<Required>]
         Tickers: Ticker array
-        UserId: UserId
         [<Required>]
         Duration: OutcomesReportDuration
         [<Required>]
@@ -96,9 +95,6 @@ type OutcomesReportQuery =
         StartDate: string
         EndDate: string
     }
-    
-    static member WithUserId userId (query:OutcomesReportQuery) =
-        {query with UserId=userId}
     
 type OutcomesReportForPositionsQuery =
     {
@@ -300,8 +296,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 return ServiceResponse<GapReportView>(response)
     }
     
-    member _.Handle (query:OutcomesReportQuery) = task {
-        let! user = accounts.GetUser query.UserId
+    member _.HandleOutcomesReport userId (query:OutcomesReportQuery) = task {
+        let! user = accounts.GetUser userId
         
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>

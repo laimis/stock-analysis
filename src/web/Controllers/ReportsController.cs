@@ -42,12 +42,8 @@ namespace web.Controllers
 
         [HttpPost("outcomes")]
         public Task<ActionResult> TickersOutcomes(
-            [FromBody]OutcomesReportQuery query)
-        {
-            var withUserId = OutcomesReportQuery.WithUserId(User.Identifier(), query);
-            
-            return this.OkOrError(_service.Handle(withUserId));
-        }
+            [FromBody]OutcomesReportQuery query) =>
+            this.OkOrError(_service.HandleOutcomesReport(User.Identifier(), query));
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] string frequency)

@@ -15,26 +15,18 @@ type Query =
     
 type Create =
     {
-        UserId:UserId
         Name:string
         Description:string
     }
     
-    static member WithUserId userId (create:Create) =
-        { create with UserId = userId }
-    
 type Update =
     {
-        UserId:UserId
         [<Required>]
         Name:string
         [<Required>]
         NewName:string
         Description:string
     }
-    
-    static member WithUserId userId (update:Update) =
-        { update with UserId = userId }
     
 type Delete =
     {
@@ -44,16 +36,13 @@ type Delete =
     
 type AddStep =
     {
-        UserId:UserId
         [<Required>]
         RoutineName:string
         [<Required>]
         Label:string
         Url:string
     }
-    static member WithUserId userId (add:AddStep) =
-        { add with UserId = userId }
-
+    
 type MoveStep =
     {
         [<Required>]
@@ -62,11 +51,7 @@ type MoveStep =
         StepIndex:Nullable<int>
         [<Required>]
         Direction:Nullable<int>
-        UserId:UserId
     }
-    static member WithUserId userId (move:MoveStep) =
-        { move with UserId = userId }
-    
 type RemoveStep =
     {
         [<Required>]
@@ -85,43 +70,39 @@ type UpdateStep =
         [<Required>]
         Label:string
         Url:string
-        UserId:UserId
     }
-    
-    static member WithUserId userId (update:UpdateStep) =
-        { update with UserId = userId }
     
 type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
     
     interface IApplicationService
     
-    member _.Handle (create:Create) = task {
+    member _.HandleCreate userId (create:Create) = task {
         
-        let! user = accounts.GetUser create.UserId
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | Some _ ->
-            let! routine = storage.GetRoutine create.Name create.UserId
+            let! routine = storage.GetRoutine create.Name userId
             match routine with
             | null ->
-                let routine = Routine(name=create.Name,description=create.Description,userId=(create.UserId |> IdentifierHelper.getUserId))
-                do! storage.SaveRoutine routine create.UserId
+                let routine = Routine(name=create.Name,description=create.Description,userId=(userId |> IdentifierHelper.getUserId))
+                do! storage.SaveRoutine routine userId
                 return ServiceResponse<RoutineState>(routine.State)
             | _ -> return "Routine already exists" |> ResponseUtils.failedTyped<RoutineState>
     }
     
-    member _.Handle (update:Update) = task {
+    member _.HandleUpdate userId (update:Update) = task {
         
-        let! user = accounts.GetUser update.UserId
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
-            let! routine = storage.GetRoutine update.Name update.UserId
+            let! routine = storage.GetRoutine update.Name userId
             match routine with
             | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
             | _ ->
                 routine.Update(name=update.NewName,description=update.Description)
-                do! storage.SaveRoutine routine update.UserId
+                do! storage.SaveRoutine routine userId
                 return ServiceResponse<RoutineState>(routine.State)
     }
     
@@ -154,33 +135,33 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
             return ServiceResponse<RoutineState array>(states)
     }
     
-    member _.Handle (add:AddStep) = task {
+    member _.HandleAddStep userId (add:AddStep) = task {
         
-        let! user = accounts.GetUser add.UserId
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
-            let! routine = storage.GetRoutine add.RoutineName add.UserId
+            let! routine = storage.GetRoutine add.RoutineName userId
             match routine with
             | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
             | _ ->
                 routine.AddStep(label=add.Label,url=add.Url)
-                do! storage.SaveRoutine routine add.UserId
+                do! storage.SaveRoutine routine userId
                 return ServiceResponse<RoutineState>(routine.State)
     }
     
-    member _.Handle (move:MoveStep) = task {
+    member _.HandleMoveStep userId (move:MoveStep) = task {
         
-        let! user = accounts.GetUser move.UserId
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
-            let! routine = storage.GetRoutine move.RoutineName move.UserId
+            let! routine = storage.GetRoutine move.RoutineName userId
             match routine with
             | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
             | _ ->
                 routine.MoveStep(stepIndex=move.StepIndex.Value,direction=move.Direction.Value)
-                do! storage.SaveRoutine routine move.UserId
+                do! storage.SaveRoutine routine userId
                 return ServiceResponse<RoutineState>(routine.State)
     }
     
@@ -199,18 +180,18 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
                 return ServiceResponse<RoutineState>(routine.State)
     }
     
-    member _.Handle (update:UpdateStep) = task {
+    member _.HandleUpdateStep userId (update:UpdateStep) = task {
         
-        let! user = accounts.GetUser update.UserId
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
         | _ ->
-            let! routine = storage.GetRoutine update.RoutineName update.UserId
+            let! routine = storage.GetRoutine update.RoutineName userId
             match routine with
             | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
             | _ ->
                 routine.UpdateStep(index=update.StepIndex.Value,label=update.Label,url=update.Url)
-                do! storage.SaveRoutine routine update.UserId
+                do! storage.SaveRoutine routine userId
                 return ServiceResponse<RoutineState>(routine.State)
     }
     

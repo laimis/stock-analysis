@@ -47,16 +47,18 @@ namespace web.Controllers
         public Task<ActionResult> CreateRoutine([FromBody] Routines.Create command,
             [FromServices] Routines.Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    Routines.Create.WithUserId(User.Identifier(), command)
+                service.HandleCreate(
+                    User.Identifier(),
+                    command
                 )
             );
 
         [HttpPut("routines/{routineName}")]
         public Task UpdateRoutine([FromBody]Routines.Update command, [FromServices]Routines.Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    Routines.Update.WithUserId(User.Identifier(), command)
+                service.HandleUpdate(
+                    User.Identifier(),
+                    command
                 )
             );
 
@@ -71,16 +73,16 @@ namespace web.Controllers
         [HttpPut("routines/{routineName}/steps")]
         public Task<ActionResult> AddRoutineStep([FromBody]Routines.AddStep command, [FromServices]Routines.Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    Routines.AddStep.WithUserId(User.Identifier(), command)
+                service.HandleAddStep(
+                    User.Identifier(), command
                 )
             );
         
         [HttpPost("routines/{routineName}/steps/{stepIndex}")]
         public Task<ActionResult> UpdateRoutineStep([FromBody]Routines.UpdateStep command, [FromServices]Routines.Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    Routines.UpdateStep.WithUserId(User.Identifier(), command)
+                service.HandleUpdateStep(
+                    User.Identifier(), command
                 )
             );
 
@@ -99,8 +101,8 @@ namespace web.Controllers
         public Task<ActionResult> MoveRoutineStep([FromBody] Routines.MoveStep cmd,
             [FromServices] Routines.Handler service) =>
             this.OkOrError(
-                service.Handle(
-                    Routines.MoveStep.WithUserId(User.Identifier(), cmd)
+                service.HandleMoveStep(
+                    User.Identifier(), cmd
                 )
             );
 
