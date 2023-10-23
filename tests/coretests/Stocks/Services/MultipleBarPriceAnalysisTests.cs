@@ -50,10 +50,7 @@ namespace coretests.Stocks.Services
         [Fact]
         public void LowestPriceDaysAgo()
             => Assert.True(
-                System.Math.Abs(
-                    345 - _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo)
-                        .Value
-                ) <= 1  // sometimes it's 346 based on the time that the test runs
+                _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.LowestPriceDaysAgo).Value > 345 // it keeps on increasing as time goes by and test data's date is static
             );
 
         [Fact]

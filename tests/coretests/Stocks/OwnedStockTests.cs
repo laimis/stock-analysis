@@ -71,7 +71,15 @@ namespace coretests.Stocks
         {
             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
 
-            Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTime.MinValue));
+            Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTimeOffset.MinValue));
+        }
+
+        [Fact]
+        public void Purchase_WithDateInTheFuture_Throws()
+        {
+            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
+            
+            Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTimeOffset.UtcNow.AddDays(1)));
         }
 
         [Fact]

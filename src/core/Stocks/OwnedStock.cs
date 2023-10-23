@@ -28,9 +28,14 @@ namespace core.Stocks
                 throw new InvalidOperationException("Price cannot be negative or zero");
             }
 
-            if (date == DateTimeOffset.MinValue)
+            if (date.Subtract(DateTimeOffset.UtcNow).TotalHours >= 12) // giving some leeway
             {
-                throw new InvalidOperationException("Purchase date not specified");
+                throw new InvalidOperationException("Purchase date cannot be in the future");
+            }
+            
+            if (date < DateTimeOffset.UnixEpoch)
+            {
+                throw new InvalidOperationException("Purchase date cannot be before 1970");
             }
 
             Apply(
