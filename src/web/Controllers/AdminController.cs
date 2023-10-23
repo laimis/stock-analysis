@@ -50,8 +50,8 @@ namespace web.Controllers
         }
 
         [HttpGet("delete/{userId}")]
-        public Task<ActionResult> Delete([FromRoute]Guid userId, DeleteAccount.Handler service) =>
-            this.OkOrError(service.Handle(new DeleteAccount.Command(UserId.NewUserId(userId), null)));
+        public Task<ActionResult> Delete([FromRoute]Guid userId, [FromServices]Handler service) =>
+            this.OkOrError(service.HandleDelete(UserId.NewUserId(userId), new Delete(null)));
 
         [HttpPost("email")]
         public async Task<ActionResult> Email(EmailInput obj)

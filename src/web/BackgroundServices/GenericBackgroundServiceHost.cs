@@ -11,6 +11,7 @@ using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Handler = core.fs.Reports.Handler;
 
 namespace web.BackgroundServices;
 

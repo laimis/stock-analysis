@@ -28,7 +28,7 @@ namespace core.Stocks
                 throw new InvalidOperationException("Price cannot be negative or zero");
             }
 
-            if (date == DateTime.MinValue)
+            if (date == DateTimeOffset.MinValue)
             {
                 throw new InvalidOperationException("Purchase date not specified");
             }

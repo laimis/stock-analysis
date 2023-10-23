@@ -17,8 +17,12 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
+        private readonly Handler _handler;
+        
+        public AccountController(Handler handler) => _handler = handler;
+        
         [HttpGet("status")]
-        public Task<ActionResult> Identity([FromServices] Status.Handler handler)
+        public Task<ActionResult> Identity()
         {
             if (User.Identity is { IsAuthenticated: false })
             {
@@ -27,35 +31,30 @@ namespace web.Controllers
             }
 
             return this.OkOrError(
-                handler.Handle(
-                    new Status.LookupById(User.Identifier())
+                _handler.Handle(
+                    new LookupById(User.Identifier())
                 )
             );
         }
         
 
         [HttpPost("validate")]
-        public async Task<ActionResult> Validate([FromBody]Create.UserInfo command, [FromServices]Create.Handler service)
+        public Task<ActionResult> Validate([FromBody]UserInfo command)
         {
-            if (User.Identity is { IsAuthenticated: true })
-            {
-                return BadRequest("User already has an account");
-            }
-
-            var result = await service.Validate(command);
-
-            return this.OkOrError(result);
+            return User.Identity is { IsAuthenticated: true } ?
+                Task.FromResult<ActionResult>(BadRequest("User already has an account")) 
+                : this.OkOrError(_handler.Validate(command));
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody]Create.Command cmd, [FromServices]Create.Handler service)
+        public async Task<ActionResult> Create([FromBody]CreateAccount cmd)
         {
             if (User.Identity is { IsAuthenticated: true })
             {
                 return BadRequest("User already has an account");
             }
 
-            var r = await service.Handle(cmd);
+            var r = await _handler.Handle(cmd);
             if (r.IsOk)
             {
                 await EstablishSignedInIdentity(HttpContext, r.Success.Value);
@@ -93,19 +92,19 @@ namespace web.Controllers
 
         [HttpGet("integrations/tdameritrade/connect")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritrade([FromServices]Brokerage.Handler service)
+        public async Task<ActionResult> TdAmeritrade()
         {
-            var url = await service.HandleConnect(new Brokerage.Connect());
+            var url = await _handler.Handle(new Connect());
 
             return Redirect(url);
         }
 
         [HttpGet("integrations/tdameritrade")]
         [Authorize]
-        public Task<ActionResult> TdAmeritradeInfo([FromServices] Brokerage.Handler service) =>
+        public Task<ActionResult> TdAmeritradeInfo() =>
             this.OkOrError(
-                service.HandleInfo(
-                    new Brokerage.Info(User.Identifier()
+                _handler.HandleInfo(
+                    new BrokerageInfo(User.Identifier()
                     )
                 )
             );
@@ -123,32 +122,31 @@ namespace web.Controllers
 
         [HttpGet("integrations/tdameritrade/disconnect")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeDisconnect([FromServices] Brokerage.Handler service)
+        public async Task<ActionResult> TdAmeritradeDisconnect()
         {
-            var result = await service.HandleDisconnect(
-                new Brokerage.Disconnect(User.Identifier())
+            var result = await _handler.HandleDisconnect(
+                new BrokerageDisconnect(User.Identifier())
             );
             return RedirectOrError(result);
         }
 
         [HttpGet("integrations/tdameritrade/callback")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code, [FromServices] Brokerage.Handler service)
+        public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code)
         {
-            var result = await service.HandleConnectCallback(
-                new Brokerage.ConnectCallback(code, User.Identifier()));
+            var result = await _handler.HandleConnectCallback(
+                new ConnectCallback(code, User.Identifier()));
 
             return RedirectOrError(result);
         }
 
         [HttpPost("requestpasswordreset")]
-        public Task<ActionResult> RequestPasswordReset([FromBody]PasswordReset.RequestCommand cmd, [FromServices] PasswordReset.Handler service) =>
-            this.OkOrError(service.Handle(cmd));
+        public Task<ActionResult> RequestPasswordReset([FromBody]RequestPasswordReset cmd) => this.OkOrError(_handler.Handle(cmd));
 
         [HttpPost("login")]
-        public async Task<ActionResult> Authenticate([FromBody]Authenticate.Command cmd, [FromServices]Authenticate.Handler service)
+        public async Task<ActionResult> Authenticate([FromBody]Authenticate cmd)
         {
-            var response = await service.Handle(cmd);
+            var response = await _handler.Handle(cmd);
             if (response.IsOk)
             {
                 await EstablishSignedInIdentity(HttpContext, response.Success.Value);
@@ -158,8 +156,7 @@ namespace web.Controllers
         }
 
         [HttpPost("contact")]
-        public Task<ActionResult> Contact([FromBody]Contact.Command cmd, [FromServices]Contact.Handler service)
-            => this.OkOrError(service.Handle(cmd));
+        public Task<ActionResult> Contact([FromBody]Contact cmd) => this.OkOrError(_handler.Handle(cmd));
 
         [HttpGet("logout")]
         [Authorize]
@@ -172,11 +169,9 @@ namespace web.Controllers
 
         [HttpPost("delete")]
         [Authorize]
-        public async Task<ActionResult> Delete([FromBody]DeleteAccount.Command cmd, [FromServices]DeleteAccount.Handler service)
+        public async Task<ActionResult> Delete([FromBody]Delete cmd)
         {
-            cmd = cmd.WithUserId(User.Identifier());
-            
-            var result = await service.Handle(cmd);
+            var result = await _handler.HandleDelete(User.Identifier(), cmd);
             
             if (result.IsError)
             {
@@ -190,9 +185,9 @@ namespace web.Controllers
 
         [HttpPost("clear")]
         [Authorize]
-        public async Task<ActionResult> Clear([FromServices]ClearAccount.Handler handler)
+        public async Task<ActionResult> Clear()
         {
-            await handler.Handle(new ClearAccount.Command(User.Identifier()));
+            await _handler.Handle(new Clear(User.Identifier()));
 
             await HttpContext.SignOutAsync();
 
@@ -200,9 +195,9 @@ namespace web.Controllers
         }
 
         [HttpPost("resetpassword")]
-        public async Task<ActionResult> ResetPassword([FromBody] Create.ResetPassword cmd, [FromServices]Create.Handler handler)
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPassword cmd)
         {
-            var result = await handler.Handle(cmd);
+            var result = await _handler.Handle(cmd);
 
             if (result.IsOk)
             {
@@ -213,10 +208,10 @@ namespace web.Controllers
         }
 
         [HttpGet("confirm/{id}")]
-        public async Task<ActionResult> Confirm(Guid id, [FromServices] ConfirmAccount.Handler handler)
+        public async Task<ActionResult> Confirm(Guid id)
         {
-            var result = await handler.Handle(
-                new ConfirmAccount.Command(id)
+            var result = await _handler.Handle(
+                new Confirm(id)
             );
 
             if (result.IsOk)
@@ -230,7 +225,7 @@ namespace web.Controllers
         
         [HttpPost("settings")]
         [Authorize]
-        public Task<ActionResult> Settings([FromBody]Settings.Command cmd, [FromServices]Settings.Handler service)
-            => this.OkOrError(service.Handle(cmd.WithUserId(User.Identifier())));
+        public Task<ActionResult> Settings([FromBody]SetSetting cmd)
+            => this.OkOrError(_handler.HandleSettings(User.Identifier(), cmd));
     }
 }

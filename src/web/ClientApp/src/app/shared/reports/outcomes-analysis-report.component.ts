@@ -35,6 +35,7 @@ export class OutcomesAnalysisReportComponent {
 
   @Input()
   set excludeTickers(value:string[]) {
+    if (this._report == null) return
     this.tickersForSummary = this._report.tickerSummary.filter(t => !value.includes(t.ticker))
     this.patterns = this._report.patterns.filter(t => !value.includes(t.ticker))
   }
@@ -48,7 +49,7 @@ export class OutcomesAnalysisReportComponent {
       this.selectedEvaluationName = evaluation
     }
   }
-  
+
 	getKeys(entries:TickerOutcomes[]) {
     return entries[0].outcomes.map(o => o.key)
   }

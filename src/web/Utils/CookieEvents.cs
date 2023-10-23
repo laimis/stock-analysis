@@ -10,11 +10,11 @@ namespace web.Utils
     public class CookieEvents : CookieAuthenticationEvents
     {
         private readonly ILogger<CookieEvents> _logger;
-        private readonly Status.Handler _service;
+        private readonly Handler _service;
 
         public CookieEvents(
             ILogger<CookieEvents> logger,
-            Status.Handler service)
+            Handler service)
         {
             _logger = logger;
             _service = service;
@@ -22,7 +22,7 @@ namespace web.Utils
         
         public override async Task SigningIn(CookieSigningInContext context)
         {
-            var query = new Status.LookupByEmail(context.Principal.Email());
+            var query = new LookupByEmail(context.Principal.Email());
 
             var response = await _service.Handle(query);
 
@@ -45,7 +45,7 @@ namespace web.Utils
 
         public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
         {
-            var query = new Status.LookupByEmail(context.Principal.Email());
+            var query = new LookupByEmail(context.Principal.Email());
 
             var id = await _service.Handle(query);
             if (id.IsOk == false)

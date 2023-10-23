@@ -53,8 +53,6 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
         let user = User()
         user.Apply(event)
         user
-        
-    member this.Id = this.State.Id
     
     member this.SubscribeToPlan planId customerId subscriptionId =
         let event = UserSubscribedToPlan(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, planId, customerId, subscriptionId)
