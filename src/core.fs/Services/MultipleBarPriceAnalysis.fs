@@ -86,14 +86,14 @@ module MultipleBarPriceAnalysis =
                     priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = false)
                 | false ->
                     OutcomeType.Negative,
-                    priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = true)
+                    priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = true) |> fun x -> x * -1m
                     
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.PriceAbove20SMADays,
                 outcomeType = outcomeType,
                 value = value,
                 valueType = ValueFormat.Number,
-                message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {value} days"
+                message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {abs value} days"
             )
             
         let private generateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =

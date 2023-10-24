@@ -367,7 +367,7 @@ module SingleBarPriceAnalysisEvaluation =
                 SingleBarOutcomeKeys.PriceAbove20SMADays,
                 tickerOutcomes
                 |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = 1m && o.OutcomeType = OutcomeType.Positive)
+                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = 1m)
                 )
             )
             
@@ -377,7 +377,7 @@ module SingleBarPriceAnalysisEvaluation =
                 SingleBarOutcomeKeys.PriceAbove20SMADays,
                 tickerOutcomes
                 |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = 1m && o.OutcomeType = OutcomeType.Negative)
+                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = -1m)
                 )
             )
         ]
