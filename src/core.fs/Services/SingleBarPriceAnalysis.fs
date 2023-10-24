@@ -362,7 +362,7 @@ module SingleBarPriceAnalysisEvaluation =
             
             AnalysisOutcomeEvaluation(
                 "Price went above 20 SMA",
-                OutcomeType.Negative,
+                OutcomeType.Positive,
                 SingleBarOutcomeKeys.PriceAbove20SMADays,
                 tickerOutcomes
                 |> Seq.filter (fun t ->
