@@ -47,9 +47,9 @@ export class StocksService {
     return `/api/portfolio/simulate/trades/export?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
   }
 
-  getStrategyProfitPoints(ticker: string, positionId: number): Observable<StrategyProfitPoint[]> {
+  getStrategyProfitPoints(ticker: string, positionId: number, numberOfPoints: number): Observable<StrategyProfitPoint[]> {
     return this.http.get<StrategyProfitPoint[]>(
-      `/api/portfolio/${ticker}/positions/${positionId}/profitpoints`
+      `/api/portfolio/${ticker}/positions/${positionId}/profitpoints?numberOfPoints=${numberOfPoints}`
     )
   }
 

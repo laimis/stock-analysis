@@ -66,7 +66,7 @@ module ProfitPoints =
         position.CompletedPositionCostPerShare + singleLevel * decimal(level)
     
     
-    let getProfitPointsWithStopPrice(position:PositionInstance, levels:int) =
+    let getProfitPointsWithStopPrice position levels =
         let profitPoints =
             [1..levels]
             |> List.map (getProfitPointWithStopPrice position)

@@ -231,11 +231,13 @@ namespace web.Controllers
         public Task<ActionResult> ProfitPoints(
             [FromRoute] int positionId,
             [FromRoute] string ticker,
+            [FromQuery] int numberOfPoints,
             [FromServices] Handler service) =>
 
             this.OkOrError(
                 service.Handle(
                     new ProfitPointsQuery(
+                        numberOfPoints: numberOfPoints,
                         positionId: positionId,
                         ticker: new Ticker(ticker),
                         userId: User.Identifier()

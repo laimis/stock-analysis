@@ -13,6 +13,7 @@ export class StockTradingPositionComponent {
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
     _position: PositionInstance;
+    numberOfProfitPoints: number = 4
 
     positionProfitPoints : StrategyProfitPoint[] = []
     positionStrategy: string = null
@@ -23,7 +24,7 @@ export class StockTradingPositionComponent {
     @Input()
     set position(v:PositionInstance) {
         this._position = v
-        
+
         if (this._position) {
             this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
             this.positionProfitPoints = []
@@ -61,13 +62,16 @@ export class StockTradingPositionComponent {
     }
 
     fetchProfitPoints() {
-        this.stockService.getStrategyProfitPoints(this._position.ticker, this._position.positionId).subscribe(
+        this.stockService.getStrategyProfitPoints(
+          this._position.ticker,
+          this._position.positionId,
+          this.numberOfProfitPoints).subscribe(
             (profitPoints) => {
                 this.positionProfitPoints = profitPoints
             }
         )
     }
-    
+
     setCandidateValues() {
         this.candidateRiskAmount = this._position.riskedAmount
         this.candidateStopPrice = this._position.stopPrice
@@ -128,8 +132,8 @@ export class StockTradingPositionComponent {
         }
     }
 
-    
-    deleteTransaction(transactionId:string) 
+
+    deleteTransaction(transactionId:string)
     {
         if (confirm("are you sure you want to delete the transaction?")) {
             this.stockService.deleteStockTransaction(this._position.ticker, transactionId)

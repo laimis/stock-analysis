@@ -64,11 +64,12 @@ type AddLabel =
     
 type ProfitPointsQuery =
     {
+        NumberOfPoints: int
         [<Required>]
         PositionId: int
+        UserId: UserId
         [<Required>]
         Ticker: Ticker
-        UserId: UserId
     }
     
 type SetRisk =
@@ -296,16 +297,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match position with
                 | null -> return "Position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
                 | _ ->
-                    let stopBased = ProfitPoints.getProfitPointsWithStopPrice(position, 4)
+                    let stopBased = ProfitPoints.getProfitPointsWithStopPrice position query.NumberOfPoints
                     
                     let percentBased level =
                         ProfitPoints.getProfitPointWithPercentGain position level TradingStrategyConstants.AvgPercentGain
                         
-                    let percentBased = ProfitPoints.getProfitPoints percentBased 4
+                    let percentBased = ProfitPoints.getProfitPoints percentBased query.NumberOfPoints
                         
-                    let arr = [|
-                        ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
-                        ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
+                    let arr =
+                        [|
+                            ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
+                            ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
                         |]
                     
                     return ServiceResponse<ProfitPoints.ProfitPointContainer []>(arr)
