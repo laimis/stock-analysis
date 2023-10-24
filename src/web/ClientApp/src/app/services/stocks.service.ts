@@ -560,6 +560,11 @@ export enum OutcomeValueTypeEnum {
   String = 'String'
 }
 
+export enum ChartType {
+  Column = "Column",
+  Line = "Line"
+}
+
 export enum OutcomeTypeEnum {
   Positive = "Positive",
   Negative = "Negative",

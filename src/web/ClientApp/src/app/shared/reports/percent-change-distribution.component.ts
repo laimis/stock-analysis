@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {DataPoint, DataPointContainer, StockPercentChangeResponse} from '../../services/stocks.service';
+import {ChartType, DataPoint, DataPointContainer, StockPercentChangeResponse} from '../../services/stocks.service';
 
 @Component({
   selector: 'app-percent-change-distribution',
@@ -30,7 +30,7 @@ export class PercentChangeDistributionComponent {
         }
       }),
       label: "Recent",
-      chartType: 'column',
+      chartType: ChartType.Column,
       annotationLine: null
     };
 
@@ -43,7 +43,7 @@ export class PercentChangeDistributionComponent {
         }
       }),
       label: "All time",
-      chartType: 'column',
+      chartType: ChartType.Column,
       annotationLine: null
     };
   }

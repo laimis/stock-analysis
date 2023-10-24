@@ -27,8 +27,8 @@ export class StockDetailsComponent implements OnInit {
     private title: Title){}
 
 	ngOnInit(): void {
-		var ticker = this.route.snapshot.paramMap.get('ticker');
-		if (ticker){
+    const ticker = this.route.snapshot.paramMap.get('ticker');
+    if (ticker){
       this.ticker = ticker;
 			this.fetchStock();
       this.fetchSecFilings();
@@ -82,15 +82,6 @@ export class StockDetailsComponent implements OnInit {
   loadStockOwnership() {
     this.stocks.getStockOwnership(this.ticker).subscribe(result => {
       this.ownership = result
-
-      if (this.ownership != null)
-      {
-        this.activeTab = 'stocks'
-      }
-      else
-      {
-        this.activeTab = 'analysis'
-      }
     }, err => {
       console.error(err)
     })
