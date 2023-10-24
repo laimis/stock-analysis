@@ -25,7 +25,7 @@
           (ngModelChange)="updateBuyingValuesWithCostToBuy()"
         />
       </div>
-      <div class="col">
+      <div class="col" *ngIf="isPendingPositionMode === true">
         <label for="sizeStopPrice" class="form-label">Size Stop</label>
         <input
           type="number"
