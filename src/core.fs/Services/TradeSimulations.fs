@@ -2,6 +2,7 @@ namespace core.fs.Services.TradingStrategies
 
 open System
 open System.Collections.Generic
+open System.Security.Cryptography
 open core.Account
 open core.Shared
 open core.Stocks
@@ -14,7 +15,7 @@ type TradingStrategy(name:string) =
     
     let mutable _numberOfSharesAtStart = 0m
     
-    static member CalculateMaxDrawdownAndGain(last10Bars:seq<PriceBar>) =
+    static member CalculateMaxDrawdownAndGain (last10Bars:seq<PriceBar>) =
         
         let maxDrawdownPctRecent,maxGainPctRecent =
             last10Bars
@@ -31,9 +32,9 @@ type TradingStrategy(name:string) =
     member this.Name = name
     member this.NumberOfSharesAtStart = _numberOfSharesAtStart
     
-    abstract member ApplyPriceBarToPositionInternal : SimulationContext * PriceBar -> unit
+    abstract member ApplyPriceBarToPositionInternal : SimulationContext -> PriceBar -> unit
     
-    member this.ApplyPriceBarToPosition(context:SimulationContext,bar:PriceBar) =
+    member this.ApplyPriceBarToPosition (context:SimulationContext) (bar:PriceBar) =
         
         let position = context.Position
         
@@ -42,7 +43,7 @@ type TradingStrategy(name:string) =
         else
             position.SetPrice(bar.Close)
             
-            this.ApplyPriceBarToPositionInternal(context,bar)
+            this.ApplyPriceBarToPositionInternal context bar
             
             let last10bars = context.Last10Bars
             
@@ -59,7 +60,7 @@ type TradingStrategy(name:string) =
                     Last10Bars = last10bars
             }
     
-    member this.ClosePosition(price:decimal,date:DateTimeOffset,position:PositionInstance) =
+    member this.ClosePosition price date (position:PositionInstance) =
         if position.NumberOfShares > 0m then
             position.Sell(
                 numberOfShares = position.NumberOfShares,
@@ -84,10 +85,8 @@ type TradingStrategy(name:string) =
                 
             let finalContext =
                 bars
-                |> Seq.fold (fun context bar -> this.ApplyPriceBarToPosition(context,bar)) context
+                |> Seq.fold this.ApplyPriceBarToPosition context
                 
-            let finalPosition = finalContext.Position
-            
             let maxDrawdownPctRecent,maxGainPctRecent = TradingStrategy.CalculateMaxDrawdownAndGain finalContext.Last10Bars
             
             {
@@ -95,7 +94,7 @@ type TradingStrategy(name:string) =
                 MaxGainPct = finalContext.MaxGain
                 MaxDrawdownPctRecent = maxDrawdownPctRecent
                 MaxGainPctRecent = maxGainPctRecent
-                Position = finalPosition
+                Position = finalContext.Position
                 StrategyName = this.Name
             }
 
@@ -103,9 +102,9 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
     
     inherit TradingStrategy(name)
     
-    override this.ApplyPriceBarToPositionInternal(context:SimulationContext,bar:PriceBar) =
+    override this.ApplyPriceBarToPositionInternal (context:SimulationContext) (bar:PriceBar) =
         if exitCondition context bar then
-            this.ClosePosition(bar.Close,bar.Date,context.Position)
+            this.ClosePosition bar.Close bar.Date context.Position
             
 
 type TradingStrategyActualTrade() =
@@ -144,64 +143,61 @@ type TradingStrategyActualTrade() =
                 StrategyName = TradingStrategyConstants.ActualTradesName
             }
 
-type TradingStrategyWithAdvancingStops(name:string,profitPointFunc,stopPriceFunc) =
-    
-    inherit TradingStrategy(name)
-    
-    override this.ApplyPriceBarToPositionInternal(context:SimulationContext,bar:PriceBar) =
-        
-        let profitPoint = profitPointFunc context.Position
-        
-        if bar.High > profitPoint then
-            context.Position.SetStopPrice(stopPriceFunc context.Position,bar.Date)
-            
-        if bar.Close <= context.Position.StopPrice.Value then
-            this.ClosePosition(bar.Close,bar.Date,context.Position)
+// type TradingStrategyWithAdvancingStops(name:string,profitPointFunc,stopPriceFunc) =
+//     
+//     inherit TradingStrategy(name)
+//     
+//     override this.ApplyPriceBarToPositionInternal context bar =
+//         
+//         let profitPoint = profitPointFunc context.Position
+//         
+//         if bar.High > profitPoint then
+//             context.Position.SetStopPrice(stopPriceFunc context.Position,bar.Date)
+//             
+//         if bar.Close <= context.Position.StopPrice.Value then
+//             this.ClosePosition bar.Close bar.Date context.Position
 
 
-type TradingStrategyWithDownsideProtection(name:string,profitPointFunc,stopPriceFunc,downsideProtectionSize) =
-    
-    inherit TradingStrategy(name)
-    
-    let mutable _executed = false
-    let mutable _level = 0
-    
-    override this.ApplyPriceBarToPositionInternal(context:SimulationContext,bar:PriceBar) =
-        
-        let profitPoint = profitPointFunc  context.Position _level
-        
-        if bar.High > profitPoint then
-            context.Position.SetStopPrice(stopPriceFunc context.Position,bar.Date)
-            _level <- _level + 1
-            
-        if not _executed && context.Position.RR < -0.5m && context.Position.NumberOfShares > 0m then
-            let stocksToSell = int (context.Position.NumberOfShares / downsideProtectionSize)
-            if stocksToSell > 0 then
-                context.Position.Sell(stocksToSell,bar.Close,Guid.NewGuid(),bar.Date)
-                _executed <- true
-                
+// type TradingStrategyWithDownsideProtection(name:string,profitPointFunc,stopPriceFunc,downsideProtectionSize) =
+//     
+//     inherit TradingStrategy(name)
+//     
+//     let mutable _executed = false
+//     let mutable _level = 0
+//     
+//     override this.ApplyPriceBarToPositionInternal(context:SimulationContext,bar:PriceBar) =
+//         
+//         let profitPoint = profitPointFunc  context.Position _level
+//         
+//         if bar.High > profitPoint then
+//             context.Position.SetStopPrice(stopPriceFunc context.Position,bar.Date)
+//             _level <- _level + 1
+//             
+//         if not _executed && context.Position.RR < -0.5m && context.Position.NumberOfShares > 0m then
+//             let stocksToSell = int (context.Position.NumberOfShares / downsideProtectionSize)
+//             if stocksToSell > 0 then
+//                 context.Position.Sell(stocksToSell,bar.Close,Guid.NewGuid(),bar.Date)
+//                 _executed <- true
+//                 
 
 type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPointFunc,stopPriceFunc) =
     
     inherit TradingStrategy(name)
     
-    let mutable _numberOfProfitPoints = numberOfProfitPoints
-    let mutable _profitPointFunc = profitPointFunc
-    let mutable _stopPriceFunc = stopPriceFunc
     let mutable _level = 1
     
     member this.ExecuteProfitSell (position:PositionInstance) sellPrice (bar:PriceBar) =
         
-        let portion = int (this.NumberOfSharesAtStart / _numberOfProfitPoints) |> decimal
-        
-        if portion = 0m then
-            _numberOfProfitPoints <- 1m
-            
-        if position.NumberOfShares < portion then
-            _numberOfProfitPoints <- position.NumberOfShares
-            
-        if _level |> decimal = _numberOfProfitPoints then
-            _numberOfProfitPoints <- position.NumberOfShares
+        // figure out how much to sell based on the number of profit points
+        // and how many shares we have left
+        let portion =
+            if _level = numberOfProfitPoints then
+                position.NumberOfShares
+            else
+                match int (this.NumberOfSharesAtStart / decimal numberOfProfitPoints) |> decimal with
+                | 0m -> 1m
+                | x when x > position.NumberOfShares -> position.NumberOfShares    
+                | x -> x
             
         position.Sell(
             numberOfShares = portion,
@@ -211,29 +207,30 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
         )
         
         if position.NumberOfShares > 0m then
+            let stopPrice:decimal = stopPriceFunc position _level
             position.SetStopPrice(
-                _stopPriceFunc position _level,
+                stopPrice,
                 bar.Date
             )
             
-    override this.ApplyPriceBarToPositionInternal(context:SimulationContext,bar:PriceBar) =
+    override this.ApplyPriceBarToPositionInternal context bar =
         
-        let sellPrice = _profitPointFunc context.Position _level
+        let sellPrice = profitPointFunc context.Position _level
         
         if bar.High >= sellPrice then
             this.ExecuteProfitSell context.Position sellPrice bar
             _level <- _level + 1
             
         if bar.Close <= context.Position.StopPrice.Value then
-            this.ClosePosition(bar.Close,bar.Date,context.Position)
+            this.ClosePosition bar.Close bar.Date context.Position
             
             
 module TradingStrategyFactory =
     
-    let advancingStop (level:int) (position:PositionInstance) (rrLevelFunc:int -> decimal) =
+    let advancingStop (level:int) (position:PositionInstance) rrFunc =
         match level with
         | 1 -> position.AverageCostPerShare
-        | _ -> rrLevelFunc (level - 1)
+        | _ -> rrFunc position (level - 1)
     
     let delayedAdvancingStop (level:int) (position:PositionInstance) (rrLevelFunc:int -> decimal) =
         match level with
@@ -242,10 +239,25 @@ module TradingStrategyFactory =
         | _ -> rrLevelFunc (level - 2)
     
     let createActualTrade() : ITradingStrategy = TradingStrategyActualTrade()
+    let createProfitPointsTrade numberOfProfitPoints : ITradingStrategy =
+        let stopFunc = fun (position:PositionInstance) (level:int) -> advancingStop level position ProfitPoints.getProfitPointWithStopPrice
+        TradingStrategyWithProfitPoints($"Profit points: {numberOfProfitPoints}", numberOfProfitPoints, ProfitPoints.getProfitPointWithStopPrice, stopFunc)
+    
+    let createProfitPointsBasedOnPctGainTrade percentGain numberOfProfitPoints : ITradingStrategy =
+        let profitPointFunc = fun (position:PositionInstance) (level:int) -> ProfitPoints.getProfitPointWithPercentGain position level percentGain
+        let stopFunc = fun (position:PositionInstance) (level:int) -> advancingStop level position ProfitPoints.getProfitPointWithStopPrice
+        TradingStrategyWithProfitPoints($"{numberOfProfitPoints} profit points at {percentGain}%% intervals", numberOfProfitPoints, profitPointFunc, stopFunc)
+        
+    let createCloseAfterFixedNumberOfDays numberOfDays : ITradingStrategy =
+        let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
+        TradingStrategyCloseOnCondition($"Close after {numberOfDays} days", exitCondition)
     
     let getStrategies() : ITradingStrategy seq =
         [
-            createActualTrade()
+            createProfitPointsTrade 3 // 3 profit points
+            createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
+            createCloseAfterFixedNumberOfDays 15
+            createCloseAfterFixedNumberOfDays 30
         ]
     
 type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
@@ -281,12 +293,6 @@ type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
                 match bars with
                 | [||] -> results.MarkAsFailed($"No price history found for {ticker}")
                 | _ ->
-                    // HACK: sometimes stock is purchased in after hours at a much higher or lower price
-                    // than what the day's high/close was, we need to move the prices to the next day
-                    let bars =
-                        match price > bars[0].High with
-                        | true -> bars[1..]
-                        | false -> bars
                     
                     TradingStrategyFactory.getStrategies()
                     |> Seq.iter ( fun strategy ->

@@ -150,7 +150,7 @@ public class ThirtyDaySellService : GenericBackgroundServiceHost
 
         if (sellView.IsOk == false)
         {
-            _logger.LogError("Failed to get sells for {email}: {error}", p.Email, sellView.Error.Value);
+            _logger.LogError("Failed to get sells for {email}: {error}", p.Email, sellView.Error.Value.Message);
             return;
         }
         

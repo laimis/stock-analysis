@@ -403,7 +403,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 MaxDrawdownPctRecent = 0m
                 MaxGainPctRecent = 0m 
             }
-            results.Results.Insert(0, actualTradingResult)
+            results.Insert(0, actualTradingResult)
             return results.Results
         }
         

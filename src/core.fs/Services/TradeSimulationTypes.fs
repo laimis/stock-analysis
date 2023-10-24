@@ -33,17 +33,17 @@ type TradingStrategyResult =
 
 type TradingStrategyResults() =
     
-    member val Results = List<TradingStrategyResult>() with get, set
+    let results = List<TradingStrategyResult>()
+    
+    member val Results = results.AsReadOnly() with get, set
     
     member this.Add(result:TradingStrategyResult) =
-        this.Results.Add(result)
+        results.Add(result)
         
     member this.Insert(index:int, result:TradingStrategyResult) =
-        this.Results.Insert(index, result)
+        results.Insert(index, result)
         
     member val FailedReason:string option = None with get, set
-    
-    member this.Failed = this.FailedReason.IsNone
     
     member this.MarkAsFailed(reason:string) =
         this.FailedReason <- Some reason
