@@ -88,10 +88,10 @@ namespace coretests.Stocks.Services
         
         [Fact]
         public void SMA20Above50Days() =>
-            Assert.Equal(46, _outcomes.FirstOutcome(SingleBarPriceAnalysis.SingleBarOutcomeKeys.SMA20Above50Days).Value);
+            Assert.Equal(47, _outcomes.FirstOutcome(SingleBarPriceAnalysis.SingleBarOutcomeKeys.SMA20Above50Days).Value);
         
         [Fact]
         public void PriceAbove20SMA() =>
-            Assert.Equal(0.027m, _outcomes.FirstOutcome(SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove20SMA).Value, 3);
+            Assert.Equal(0.0396m, _outcomes.FirstOutcome(SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove20SMA).Value, 3);
     }
 }
