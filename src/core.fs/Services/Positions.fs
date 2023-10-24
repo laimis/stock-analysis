@@ -110,7 +110,7 @@ module PositionAnalysis =
             AnalysisOutcomeEvaluation(
                 "Below stop loss",
                 OutcomeType.Negative,
-                PortfolioAnalysisKeys.PercentToStopLoss,
+                PortfolioAnalysisKeys.Profit,
                 tickerOutcomes
                     |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0.0m))
                     |> Seq.toList
@@ -126,7 +126,7 @@ module PositionAnalysis =
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
-                PortfolioAnalysisKeys.DaysSinceOpened,
+                PortfolioAnalysisKeys.Profit,
                 tickerOutcomes
                     |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays))
                     |> Seq.toList
