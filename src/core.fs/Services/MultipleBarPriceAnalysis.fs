@@ -19,6 +19,7 @@ module MultipleBarPriceAnalysis =
         let PercentBelowHigh = "PercentBelowHigh"
         let PercentAboveLow = "PercentAboveLow"
         let SMA20Above50Days = "SMA20Above50Days"
+        let PriceAbove20SMADays = "PriceAbove20SMADays"
         let CurrentPrice = "CurrentPrice"
         let PercentChangeAverage = "PercentChangeAverage"
         let PercentChangeStandardDeviation = "PercentChangeStandardDeviation"
@@ -60,6 +61,41 @@ module MultipleBarPriceAnalysis =
                 
             smaOutcomes
             
+        let private generatePriceAboveSMA20Outcome (bars:PriceBar array) (container:SMAContainer) =
+            
+            let closingPrices = bars |> Array.map (fun b -> b.Close)
+            
+            let priceAndSMA20 =
+                container.sma20.Values
+                |> Array.zip closingPrices
+                |> Array.filter (fun (_, sma20) -> sma20.IsSome)
+                |> Array.map (fun (price, sma20) -> (price, sma20.Value))
+                |> Array.map (fun (price, sma20) -> (price - sma20) > 0m)
+                |> Array.rev
+
+            let findIndexOrReturnLength func arr =
+                arr
+                |> Array.tryFindIndex func
+                |> Option.defaultWith (fun () -> arr.Length)
+                |> decimal
+                
+            let outcomeType, value =
+                match priceAndSMA20[0] with
+                | true ->
+                    OutcomeType.Positive,
+                    priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = false)
+                | false ->
+                    OutcomeType.Negative,
+                    priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = true)
+                    
+            AnalysisOutcome(
+                key = MultipleBarOutcomeKeys.PriceAbove20SMADays,
+                outcomeType = outcomeType,
+                value = value,
+                valueType = ValueFormat.Number,
+                message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {value} days"
+            )
+            
         let private generateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
             
             let sma20Above50Sequence = 
@@ -98,22 +134,23 @@ module MultipleBarPriceAnalysis =
             let smaContainer = SMAContainer.Generate prices
             
             let smaOutcomes = generateSMAOutcomes smaContainer
-            let sma20Above50DaysOutcome = generateSMA20Above50DaysOutcome smaContainer
             
-            smaOutcomes.Add(sma20Above50DaysOutcome)
+            smaContainer |> generateSMA20Above50DaysOutcome |> smaOutcomes.Add
+            smaContainer |> generatePriceAboveSMA20Outcome prices |> smaOutcomes.Add
+            
             smaOutcomes
        
     module VolumeAnalysis =
         
         let private generateAverageVolumeOutcome (prices: PriceBar array) =
             
-            let (recentVolumeStart, interval) =
+            let recentVolumeStart, interval =
                 match prices.Length with
                 | x when x > MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis ->
                     prices.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis, MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis
                 | _ -> 0, prices.Length
                 
-            let values = prices.[recentVolumeStart..] |> Array.map (fun p -> p.Volume)
+            let values = prices[recentVolumeStart..] |> Array.map (fun p -> p.Volume)
                 
             let averageVolume = (values |> Array.sum) / (int64 values.Length)
             
