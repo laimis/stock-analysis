@@ -307,6 +307,7 @@ module SingleBarPriceAnalysisEvaluation =
                     t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
                     && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value <= LowClosingRange)
                     && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && Math.Abs(o.Value) < SigmaRatioThreshold)
+                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value > 0m)
                 )
             )
             
