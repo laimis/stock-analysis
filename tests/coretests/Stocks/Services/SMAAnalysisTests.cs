@@ -16,8 +16,16 @@ public class SMAAnalysisTests
     [Fact]
     public void SMAAnalysis_Adds_AllOutcomes() => Assert.Equal(6, _outcomes.Count);
 
-    private void OutcomeExistsAndValueMatches(string key, decimal value) =>
-        Assert.Contains(_outcomes, o => o.Key == key && o.Value == value);
+    private void OutcomeExistsAndValueMatches(string key, decimal value)
+    {
+        Assert.Contains(_outcomes, o => o.Key == key);
+        
+        Assert.Equal(
+            value,
+            _outcomes.Single(o => o.Key == key).Value
+        );
+    }
+        
     
     [Fact]
     public void SMA20_Present_And_Valid() => OutcomeExistsAndValueMatches(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA(20), 248.5m);
@@ -33,6 +41,9 @@ public class SMAAnalysisTests
     
     [Fact]
     public void SMA20_Above_SMA50() => OutcomeExistsAndValueMatches(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA20Above50Days, 210);
+    
+    [Fact]
+    public void Price_Above_20SMA() => OutcomeExistsAndValueMatches(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMADays, 240);
 
     [Fact]
     public void SMA20_Above_SMA50_Positive() =>
