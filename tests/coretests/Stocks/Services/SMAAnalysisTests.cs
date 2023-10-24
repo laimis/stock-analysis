@@ -14,7 +14,7 @@ public class SMAAnalysisTests
     );
 
     [Fact]
-    public void SMAAnalysis_Adds_AllOutcomes() => Assert.Equal(5, _outcomes.Count);
+    public void SMAAnalysis_Adds_AllOutcomes() => Assert.Equal(6, _outcomes.Count);
 
     private void OutcomeExistsAndValueMatches(string key, decimal value) =>
         Assert.Contains(_outcomes, o => o.Key == key && o.Value == value);
