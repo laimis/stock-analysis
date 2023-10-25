@@ -10,7 +10,7 @@ namespace coretests.Stocks.Services
 
     public static class AnalysisOutcomeExtensions
     {
-        public static AnalysisOutcome FirstOutcome(this List<AnalysisOutcome> outcomes, string key) => outcomes.First(x => x.Key == key);
+        public static AnalysisOutcome FirstOutcome(this IEnumerable<AnalysisOutcome> outcomes, string key) => outcomes.First(x => x.Key == key);
     }
 
     public class MultipleBarPriceAnalysisTests
@@ -19,7 +19,7 @@ namespace coretests.Stocks.Services
 
         public MultipleBarPriceAnalysisTests()
         {
-            var bars = TestDataGenerator.PriceBars();
+            var bars = TestDataGenerator.PriceBars(TestDataGenerator.NET);
 
             _outcomes = MultipleBarPriceAnalysis.MultipleBarPriceAnalysis.Run(bars[^1].Close, bars);
         }

@@ -17,7 +17,7 @@ namespace coretests.Stocks.Services
         {
             var ticker = new Ticker("SHEL");
             
-            var bars = TestDataGenerator.PriceBars(ticker.Value);
+            var bars = TestDataGenerator.PriceBars(ticker);
 
             var position = new PositionInstance(0, ticker, bars[0].Date);
             position.Buy(numberOfShares: 10, price: 100m, when: bars[0].Date, transactionId: System.Guid.NewGuid());

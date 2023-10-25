@@ -104,7 +104,7 @@ module GapAnalysis =
                 
         gaps
         
-    let generate (prices: PriceBar array) (numberOfBarsToAnalyze: int) =
+    let detectGaps (prices: PriceBar array) (numberOfBarsToAnalyze: int) =
         
         let start =
             if prices.Length > numberOfBarsToAnalyze then

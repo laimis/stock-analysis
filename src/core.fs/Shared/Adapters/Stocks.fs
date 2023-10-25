@@ -20,21 +20,19 @@ type PriceFrequency =
     | Weekly
     | Monthly
     
-    with
+    static member FromString (value: string) =
+        match value with
+        | nameof Daily -> Daily
+        | nameof Weekly -> Weekly
+        | nameof Monthly -> Monthly
+        | _ -> failwith $"Invalid PriceFrequency: {value}"
     
-        static member FromString (value: string) =
-            match value with
-            | nameof Daily -> Daily
-            | nameof Weekly -> Weekly
-            | nameof Monthly -> Monthly
-            | _ -> failwith $"Invalid PriceFrequency: {value}"
+    override this.ToString () =
         
-        override this.ToString () =
-            
-            match this with
-            | Daily -> nameof Daily
-            | Weekly -> nameof Weekly
-            | Monthly -> nameof Monthly
+        match this with
+        | Daily -> nameof Daily
+        | Weekly -> nameof Weekly
+        | Monthly -> nameof Monthly
             
 type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, close:decimal, volume:int64) =
     
@@ -81,3 +79,13 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         match rangeDenominator with
         | 0m -> 0m
         | _ -> (this.Close - this.Low) / rangeDenominator
+        
+type PriceBars(bars:PriceBar array) =
+    member this.Bars = bars
+    member this.Length = bars.Length
+    member this.LastBar = bars[this.Length - 1]
+    member this.LastBars numberOfBars =
+        match numberOfBars > this.Length with
+        | true -> this.Bars
+        | false -> this.Bars[this.Length - numberOfBars ..]
+    member this.AllButLast = this.Bars[0 .. this.Length - 2]

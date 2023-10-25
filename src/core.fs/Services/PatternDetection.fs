@@ -15,8 +15,7 @@ module PatternDetection =
         if bars.Length < 2 then
             None
         else
-            let current = bars[bars.Length - 1]
-            let gaps = generate bars 2
+            let gaps = detectGaps bars 2
             if gaps.Count = 0 || gaps[0].Type <> GapType.Up then
                 None
             else
@@ -27,7 +26,7 @@ module PatternDetection =
                         2
                     )
                 Some({
-                    date = current.Date
+                    date = bars[bars.Length - 1].Date
                     name = gapUpName
                     description = $"%s{gapUpName} {gapPercentFormatted}%%"
                     value = gap.GapSizePct

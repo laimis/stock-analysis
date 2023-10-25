@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using core.fs.Services;
 using core.fs.Shared.Adapters.Stocks;
@@ -19,7 +20,7 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithENPH_FindsUpsideReversal()
         {
-            var bars = TestDataGenerator.PriceBars("ENPH");
+            var bars = TestDataGenerator.PriceBars(TestDataGenerator.ENPH);
             var patterns = PatternDetection.generate(bars);
             Assert.Single(patterns);
 
@@ -29,9 +30,9 @@ namespace coretests.Stocks.Services
         }
 
         [Fact]
-        public void Generate_WithENPH_FindsXVolume()
+        public void Generate_With_ENPH_FindsXVolume()
         {
-            var bars = TestDataGenerator.PriceBars("ENPH");
+            var bars = TestDataGenerator.PriceBars(TestDataGenerator.ENPH);
 
             // find the bar with the highest volume
             var highestVolume = bars.Max(x => x.Volume);
@@ -91,7 +92,7 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithEmptyBars_DoesNotBlowUp()
         {
-            var bars = new PriceBar[0];
+            var bars = Array.Empty<PriceBar>();
             var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }

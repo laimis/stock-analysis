@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using core.fs.Services.Analysis;
+using core.Shared;
 using coretests.testdata;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace coretests.Stocks.Services
 {
     public static class SingleBarPriceAnalysisFunctions
     {
-        public static List<AnalysisOutcome> Generate(string ticker) =>
+        public static List<AnalysisOutcome> Generate(Ticker ticker) =>
             SingleBarPriceAnalysis.run(TestDataGenerator.PriceBars(ticker));
     }
     
@@ -16,7 +17,7 @@ namespace coretests.Stocks.Services
     // exceptions related to stddev and other stats being zero
     public class SingleBarPriceAnalysisTests_FeedWithPricesNotChanging
     {
-        private readonly List<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate("SWCH");
+        private readonly List<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate(new Ticker("SWCH"));
 
         [Fact]
         public void OutcomesMatch() => Assert.NotEmpty(_outcomes);
@@ -27,21 +28,21 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Run_WithNewHigh_IncludesNewHighOutcome() =>
             Assert.Contains(
-                SingleBarPriceAnalysisFunctions.Generate("SHEL"),
+                SingleBarPriceAnalysisFunctions.Generate(new Ticker("SHEL")),
                 o => o.Key == SingleBarPriceAnalysis.SingleBarOutcomeKeys.NewHigh && o.Value == 1
             );
 
         [Fact]
         public void Run_WithoutNewHigh_DoesNotIncludeNewHigh() =>
             Assert.Contains(
-                SingleBarPriceAnalysisFunctions.Generate("NET"),
+                SingleBarPriceAnalysisFunctions.Generate(TestDataGenerator.NET),
                 o => o.Key == SingleBarPriceAnalysis.SingleBarOutcomeKeys.NewHigh && o.Value == 0
             );
     }
 
     public class SingleBarPriceAnalysisTests
     {
-        private readonly List<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate("NET");
+        private readonly List<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate(TestDataGenerator.NET);
         
         [Fact]
         public void OutcomesMatch() => Assert.NotEmpty(_outcomes);

@@ -12,7 +12,7 @@ namespace coretests.Stocks.Services
 
         public NumberAnalysis_RealPriceBars()
         {
-            var bars = TestDataGenerator.PriceBars();
+            var bars = TestDataGenerator.PriceBars(TestDataGenerator.NET);
 
             _percentChanges = PercentChangeAnalysis.calculateForPriceBars(bars);
         }

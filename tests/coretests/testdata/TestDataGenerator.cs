@@ -8,9 +8,9 @@ namespace coretests.testdata
 {
     public class TestDataGenerator
     {
-        public static PriceBar[] PriceBars(string ticker = "NET")
+        public static PriceBar[] PriceBars(Ticker ticker)
         {
-            var content = File.ReadAllText($"testdata/pricefeed_{ticker}.txt");
+            var content = File.ReadAllText($"testdata/pricefeed_{ticker.Value}.txt");
 
             return content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(PriceBar.Parse)
@@ -38,6 +38,8 @@ namespace coretests.testdata
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
         public static Ticker TSLA = new("tsla");
+        public static Ticker NET = new("net");
+        public static Ticker ENPH = new("enph");
         public static TradeGrade A = new("A");
         public static TradeGrade B = new("B");
     }
