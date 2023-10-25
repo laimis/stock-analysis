@@ -8,18 +8,20 @@ namespace coretests.testdata
 {
     public class TestDataGenerator
     {
-        public static PriceBar[] PriceBars(Ticker ticker)
+        public static PriceBars PriceBars(Ticker ticker)
         {
             var content = File.ReadAllText($"testdata/pricefeed_{ticker.Value}.txt");
 
-            return content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(PriceBar.Parse)
+            var array = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => new PriceBar(s))
                 .ToArray();
+
+            return new PriceBars(array);
         }
 
-        public static PriceBar[] IncreasingPriceBars(int numOfBars = 10)
+        public static PriceBars IncreasingPriceBars(int numOfBars = 10)
         {
-            return 
+            var array =
                 Enumerable
                     .Range(0, numOfBars)
                     .Select(
@@ -34,6 +36,8 @@ namespace coretests.testdata
                         )
                     )
                 .ToArray();
+            
+            return new PriceBars(array);
         }
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";

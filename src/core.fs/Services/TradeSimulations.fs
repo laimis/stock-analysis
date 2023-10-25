@@ -2,7 +2,6 @@ namespace core.fs.Services.TradingStrategies
 
 open System
 open System.Collections.Generic
-open System.Security.Cryptography
 open core.Account
 open core.Shared
 open core.Stocks
@@ -71,7 +70,7 @@ type TradingStrategy(name:string) =
 
     interface  ITradingStrategy with
     
-        member this.Run (position:PositionInstance) (bars:seq<PriceBar>) =
+        member this.Run (position:PositionInstance) (bars:PriceBars) =
             
             let context = 
                 {
@@ -84,7 +83,7 @@ type TradingStrategy(name:string) =
             _numberOfSharesAtStart <- position.NumberOfShares
                 
             let finalContext =
-                bars
+                bars.Bars
                 |> Seq.fold this.ApplyPriceBarToPosition context
                 
             let maxDrawdownPctRecent,maxGainPctRecent = TradingStrategy.CalculateMaxDrawdownAndGain finalContext.Last10Bars
@@ -111,10 +110,10 @@ type TradingStrategyActualTrade() =
     
     interface ITradingStrategy with
     
-        member this.Run (position:PositionInstance) (bars:seq<PriceBar>) =
+        member this.Run (position:PositionInstance) (bars:PriceBars) =
             
             let finalPosition, maxDrawdownPct, maxGainPct, last10Bars =
-                bars
+                bars.Bars
                 |> Seq.fold (fun (position:PositionInstance, maxDrawdownPct, maxGainPct, last10Bars:PriceBar list) bar ->
                     if position.IsClosed && bar.Date.Date = position.Closed.Value.Date then
                         position, maxDrawdownPct, maxGainPct, last10Bars
@@ -290,7 +289,7 @@ type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
             match prices.Success with
             | None -> results.MarkAsFailed($"Failed to get price history for {ticker}: {prices.Error.Value.Message}")
             | Some bars ->
-                match bars with
+                match bars.Bars with
                 | [||] -> results.MarkAsFailed($"No price history found for {ticker}")
                 | _ ->
                     
@@ -305,9 +304,9 @@ type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
                         if closeIfOpenAtTheEnd && not result.Position.IsClosed then
                             result.Position.Sell(
                                 numberOfShares = result.Position.NumberOfShares,
-                                price = bars[bars.Length - 1].Close,
+                                price = bars.Last.Close,
                                 transactionId = Guid.NewGuid(),
-                                ``when`` = bars[bars.Length - 1].Date
+                                ``when`` = bars.Last.Date
                             )
                             
                         results.Add(result)

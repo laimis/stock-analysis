@@ -47,14 +47,14 @@ module GapAnalysis =
                 
         loop start
         
-    let private generateInternal (prices: PriceBar array) (volumeStats: DistributionStatistics) =
+    let private generateInternal (prices: PriceBars) (volumeStats: DistributionStatistics) =
         
         let gaps = List<Gap>()
         
         for i in 1 .. prices.Length - 1 do
             
-            let yesterday = prices[i - 1]
-            let currentBar = prices[i]
+            let yesterday = prices.Bars[i - 1]
+            let currentBar = prices.Bars[i]
             
             let gapSizePct =
                 if currentBar.Low > yesterday.High || currentBar.High < yesterday.Low then
@@ -83,8 +83,8 @@ module GapAnalysis =
                     | x when x < 0m -> fun bar -> bar.Close >= yesterday.Close
                     | _ -> failwith "Invalid gap type"
                     
-                let closedQuickly = closingConditionMet prices (i + 1) 10 closingCondition
-                let open' = not (closingConditionMet prices (i + 1) (prices.Length - i) closingCondition)
+                let closedQuickly = closingConditionMet prices.Bars (i + 1) 10 closingCondition
+                let open' = not (closingConditionMet prices.Bars (i + 1) (prices.Length - i) closingCondition)
                 let relativeVolume = System.Math.Round ((currentBar.Volume |> decimal) / volumeStats.mean, 2)
                 let closingRange = currentBar.ClosingRange()
                 
@@ -104,22 +104,12 @@ module GapAnalysis =
                 
         gaps
         
-    let detectGaps (prices: PriceBar array) (numberOfBarsToAnalyze: int) =
+    let detectGaps (prices: PriceBars) (numberOfBarsToAnalyze: int) =
         
-        let start =
-            if prices.Length > numberOfBarsToAnalyze then
-                prices.Length - numberOfBarsToAnalyze
-            else
-                0
-                
-        let volumeStart =
-            match prices.Length with
-            | x when x > numberOfBarsToAnalyze * 2 -> prices.Length - numberOfBarsToAnalyze * 2
-            | x when x > numberOfBarsToAnalyze -> prices.Length - numberOfBarsToAnalyze
-            | _ -> 0
-            
-        let volumeData = prices |> Array.map (fun p -> p.Volume |> decimal)
-            
-        let volumeStats = DistributionStatistics.calculate volumeData[volumeStart..]
+        let barsForAnalysis = numberOfBarsToAnalyze |> prices.LatestOrAll
         
-        generateInternal prices[start..] volumeStats
+        let barsForVolume = numberOfBarsToAnalyze * 2 |> prices.LatestOrAll 
+            
+        let volumeStats = barsForVolume.Volumes() |> DistributionStatistics.calculate
+        
+        generateInternal barsForAnalysis volumeStats

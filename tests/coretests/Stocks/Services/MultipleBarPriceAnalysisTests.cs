@@ -15,14 +15,10 @@ namespace coretests.Stocks.Services
 
     public class MultipleBarPriceAnalysisTests
     {
-        private List<AnalysisOutcome> _outcomes;
-
-        public MultipleBarPriceAnalysisTests()
-        {
-            var bars = TestDataGenerator.PriceBars(TestDataGenerator.NET);
-
-            _outcomes = MultipleBarPriceAnalysis.MultipleBarPriceAnalysis.Run(bars[^1].Close, bars);
-        }
+        private readonly List<AnalysisOutcome> _outcomes =
+            MultipleBarPriceAnalysis.MultipleBarPriceAnalysis.run(
+                TestDataGenerator.PriceBars(TestDataGenerator.NET)
+            );
 
         [Fact]
         public void OutcomesMatch() => Assert.NotEmpty(_outcomes);

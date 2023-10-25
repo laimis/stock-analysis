@@ -29,9 +29,9 @@ module SingleBarPriceAnalysis =
         let NewLow = "NewLow"
         let SigmaRatio = "SigmaRatio"
     
-    let smaAnalysis (bars:PriceBar array) =
+    let smaAnalysis (bars:PriceBars) =
         
-        let outcomes = SMAAnalysis.generate bars
+        let outcomes =  bars |> SMAAnalysis.generate
         
         let sma20Above50Outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Days)
         let sma20outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
@@ -42,7 +42,7 @@ module SingleBarPriceAnalysis =
                 AnalysisOutcome (SingleBarOutcomeKeys.SMA20Above50Days, sma20Above50Outcome.Value.OutcomeType, sma20Above50Outcome.Value.Value, sma20Above50Outcome.Value.ValueType, sma20Above50Outcome.Value.Message)
                 
             if sma20outcome.IsSome && sma20outcome.Value.Value <> 0m then
-                let currentBar = bars[bars.Length - 1]        
+                let currentBar = bars.Last        
                 let pctDiff = (currentBar.Close - sma20outcome.Value.Value) / sma20outcome.Value.Value
                 
                 AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
@@ -51,10 +51,10 @@ module SingleBarPriceAnalysis =
                 AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMADays, priceAbove20SMAOutcome.Value.OutcomeType, priceAbove20SMAOutcome.Value.Value, priceAbove20SMAOutcome.Value.ValueType, priceAbove20SMAOutcome.Value.Message)
         ]
         
-    let priceAnalysis (bars:PriceBar array) =
+    let priceAnalysis (bars:PriceBars) =
         
-        let currentBar = bars[bars.Length - 1]
-        let previousBars = bars |> Array.take (bars.Length - 1)
+        let currentBar = bars.Last
+        let previousBars = bars.AllButLast
         let range = currentBar.ClosingRange()
         
         [
@@ -64,21 +64,19 @@ module SingleBarPriceAnalysis =
             
             if previousBars.Length > 0 then            
                 // use yesterday's close as reference
-                let yesterday = previousBars[previousBars.Length - 1]
+                let yesterday = previousBars.Last
                 // today's change from yesterday's close
                 let percentChange = (currentBar.Close - yesterday.Close) / yesterday.Close
+                let percentChangeOutcomeType =
+                    match percentChange with
+                    | x when x >= 0m -> OutcomeType.Positive
+                    | _ -> OutcomeType.Negative
             
                 // add change as outcome
-                yield AnalysisOutcome (SingleBarOutcomeKeys.PercentChange, (if percentChange >= 0m then OutcomeType.Positive else OutcomeType.Negative), percentChange, ValueFormat.Percentage, $"%% change from close is {percentChange}.")
+                yield AnalysisOutcome (SingleBarOutcomeKeys.PercentChange, percentChangeOutcomeType, percentChange, ValueFormat.Percentage, $"%% change from close is {percentChange}.")
                 
                 // generate percent change statistical data for NumberOfDaysForRecentAnalysis days
-                let recentDataIndex =
-                    match previousBars.Length with
-                    | x when x > SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis ->
-                        previousBars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
-                    | _ -> 0
-                    
-                let descriptor = previousBars[recentDataIndex..] |> PercentChangeAnalysis.calculateForPriceBars
+                let descriptor = SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis |> previousBars.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
                 
                 // for some price feeds, price has finished changing, so mean and
                 // standard deviation will be 0, we need to check for that so that we don't divide by 0
@@ -124,7 +122,7 @@ module SingleBarPriceAnalysis =
             // see if the latest bar is a one year high or low
             let oneYearAgoDate = currentBar.Date.AddYears(-1)
             let oneYearAgoIndex =
-                previousBars
+                previousBars.Bars
                 |> Array.mapi (fun i x -> (x, i))
                 |> Array.filter (fun x -> x |> fst |> fun x -> x.Date <= oneYearAgoDate)
                 |> Array.map (fun x -> x |> snd)
@@ -133,7 +131,7 @@ module SingleBarPriceAnalysis =
             // now create a new high sequence from that bar
             let oneYearAgoBars = 
                 match oneYearAgoIndex with
-                | Some x -> bars[x..]
+                | Some x -> bars.Bars[x..]
                 | _ -> [||]
                 
             let initValue = [|oneYearAgoBars[0]|]
@@ -161,7 +159,7 @@ module SingleBarPriceAnalysis =
             let newHigh = newHighSequenceLastBar.Equals(currentBar) && dayDifferenceBetweenBars > 60
              
             let newLow = 
-                 previousBars
+                 previousBars.Bars
                  |> Array.filter (fun x -> x.Date >= oneYearAgoDate)
                  |> Array.forall (fun x -> x.Low > currentBar.Low)
                  
@@ -172,17 +170,11 @@ module SingleBarPriceAnalysis =
             yield AnalysisOutcome (SingleBarOutcomeKeys.NewLow, (if newLow then OutcomeType.Negative else OutcomeType.Neutral), (if newLow then -1m else 0m), ValueFormat.Boolean, "New low reached")
         ]
         
-    let volumeAnalysis (bars:PriceBar array) =
+    let volumeAnalysis (bars:PriceBars) =
         
-        let recentVolumeStartIndex =
-            match bars.Length with
-            | x when x > SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis ->
-                bars.Length - SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
-            | _ -> 0
-            
-        let volumeStats = bars[recentVolumeStartIndex..] |> Array.map (fun x -> x.Volume |> decimal) |> DistributionStatistics.calculate
+        let volumeStats = SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis |> bars.LatestOrAll |> fun x -> x.Volumes() |> DistributionStatistics.calculate
         
-        let currentBar = bars[bars.Length - 1]
+        let currentBar = bars.Last
         
         let relativeVolume = 
             match volumeStats.mean with
@@ -215,7 +207,6 @@ module SingleBarPriceAnalysis =
         bars |> smaAnalysis |> outcomes.AddRange
         
         outcomes
-        
         
 open SingleBarPriceAnalysis
 

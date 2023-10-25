@@ -68,7 +68,7 @@ type SMA(values,interval) =
         | true -> None
         | false -> Some (values |> Seq.last)
         
-    static member ToSMA interval (prices:decimal array) =
+    static member ToSMA (prices:decimal array) interval =
         
         let sma = Array.create prices.Length None
         
@@ -94,10 +94,11 @@ type SMAContainer(all:SMA array) =
     member this.sma150 = all |> Array.find (fun x -> x.Interval = 150)
     member this.sma200 = all |> Array.find (fun x -> x.Interval = 200)
     
-    static member Generate (prices:PriceBar array) =
+    static member Generate (prices:PriceBars) =
         
-        let generate interval =
-            prices |> Array.map (fun x -> x.Close) |> SMA.ToSMA interval
+        let closingPrices = prices.ClosingPrices()
+        
+        let generate = closingPrices |> SMA.ToSMA
         
         [|20;50;150;200|] |> Array.map generate |> SMAContainer
     
@@ -289,7 +290,5 @@ module PercentChangeAnalysis =
 
         DistributionStatistics.calculate percentChanges
         
-    let calculateForPriceBars priceBars =
-        priceBars
-        |> Array.map (fun (x:PriceBar) -> x.Close)
-        |> calculate true
+    let calculateForPriceBars (priceBars:PriceBars) =
+        priceBars.ClosingPrices() |> calculate true

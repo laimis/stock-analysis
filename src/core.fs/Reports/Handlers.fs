@@ -333,9 +333,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         let outcomes =
                             match query.Duration with
                             | OutcomesReportDuration.SingleBar ->  SingleBarPriceAnalysis.run prices
-                            | OutcomesReportDuration.AllBars ->
-                                let lastPrice = prices[prices.Length - 1].Close
-                                MultipleBarPriceAnalysis.Run lastPrice prices
+                            | OutcomesReportDuration.AllBars -> MultipleBarPriceAnalysis.run prices
                         
                         let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t}
                         
@@ -409,9 +407,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | None -> return None
                     | Some prices ->
                         // TODO: this is not nice, can we avoid it setting the price here?
-                        match prices with
+                        match prices.Bars with
                         | [||] -> ()
-                        | _ -> position.SetPrice prices[prices.Length - 1].Close
+                        | _ -> position.SetPrice prices.Last.Close
                         
                         let outcomes = PositionAnalysis.generate position prices orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
@@ -455,12 +453,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             match pricesResponse.Success with
             | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
             | Some prices ->
-                let startIndex =
-                    match prices.Length > 30 with
-                    | true -> prices.Length - 30
-                    | false -> 0
-                
-                let recent = prices[startIndex..] |> PercentChangeAnalysis.calculateForPriceBars
+                let recent = 30 |> prices.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
                 let allTime = prices |> PercentChangeAnalysis.calculateForPriceBars
                 let response = {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
                 return ServiceResponse<PercentChangeStatisticsView>(response)

@@ -36,6 +36,17 @@ type PriceFrequency =
             
 type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, close:decimal, volume:int64) =
     
+    new(value:string) =
+        let parts = value.Split(',')
+        PriceBar(
+            date = DateTimeOffset.Parse(parts[0], formatProvider=null, styles=DateTimeStyles.AssumeUniversal),
+            ``open`` = Decimal.Parse(parts[1]),
+            high = Decimal.Parse(parts[2]),
+            low = Decimal.Parse(parts[3]),
+            close = Decimal.Parse(parts[4]),
+            volume = Int64.Parse(parts[5])
+        )
+        
     member this.Date = date
     member this.Open = ``open``
     member this.High = high
@@ -56,17 +67,6 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
     override this.GetHashCode () =
         this.DateStr.GetHashCode ()
     
-    static member Parse (value:string) =
-        let parts = value.Split(',')
-        PriceBar(
-            date = DateTimeOffset.Parse(parts[0], formatProvider=null, styles=DateTimeStyles.AssumeUniversal),
-            ``open`` = Decimal.Parse(parts[1]),
-            high = Decimal.Parse(parts[2]),
-            low = Decimal.Parse(parts[3]),
-            close = Decimal.Parse(parts[4]),
-            volume = Int64.Parse(parts[5])
-        )
-    
     member this.PercentDifferenceFromLow (value:decimal) =
         (this.Low - value) / value
     
@@ -83,9 +83,13 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
 type PriceBars(bars:PriceBar array) =
     member this.Bars = bars
     member this.Length = bars.Length
-    member this.LastBar = bars[this.Length - 1]
-    member this.LastBars numberOfBars =
+    member this.First = bars[0]
+    member this.Last = bars[this.Length - 1]
+    member this.LatestOrAll numberOfBars =
         match numberOfBars > this.Length with
         | true -> this.Bars
         | false -> this.Bars[this.Length - numberOfBars ..]
-    member this.AllButLast = this.Bars[0 .. this.Length - 2]
+        |> PriceBars
+    member this.AllButLast = this.Bars[0 .. this.Length - 2] |> PriceBars
+    member this.ClosingPrices() = this.Bars |> Array.map (fun bar -> bar.Close)
+    member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal) 

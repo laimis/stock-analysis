@@ -13,15 +13,15 @@ namespace coretests.Stocks.Services
 {
     public class PositionAnalysisTests
     {
-        private static (PositionInstance position, PriceBar[] bars, Order[] orders) CreateTestData()
+        private static (PositionInstance position, PriceBars bars, Order[] orders) CreateTestData()
         {
             var ticker = new Ticker("SHEL");
             
             var bars = TestDataGenerator.PriceBars(ticker);
 
-            var position = new PositionInstance(0, ticker, bars[0].Date);
-            position.Buy(numberOfShares: 10, price: 100m, when: bars[0].Date, transactionId: System.Guid.NewGuid());
-            position.SetPrice(bars[0].Close);
+            var position = new PositionInstance(0, ticker, bars.First.Date);
+            position.Buy(numberOfShares: 10, price: 100m, when: bars.First.Date, transactionId: System.Guid.NewGuid());
+            position.SetPrice(bars.First.Close);
             
             var orders = new[] {
                 new Order {
@@ -64,14 +64,14 @@ namespace coretests.Stocks.Services
         [Fact]
         public void DailyPL_Correct()
         {
-            var (position, bars, orders) = CreateTestData();
+            var (position, bars, _) = CreateTestData();
             
             var midPointInBars = bars.Length / 2;
             
             position.Sell(
                 numberOfShares: position.NumberOfShares,
-                price: bars[midPointInBars].Close,
-                when: bars[midPointInBars].Date,
+                price: bars.Bars[midPointInBars].Close,
+                when: bars.Bars[midPointInBars].Date,
                 transactionId: System.Guid.NewGuid());
 
             var dailyPlAndGain= PositionAnalysis.dailyPLAndGain(bars, position);

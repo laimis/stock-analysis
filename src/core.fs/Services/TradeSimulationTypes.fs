@@ -49,7 +49,7 @@ type TradingStrategyResults() =
         this.FailedReason <- Some reason
 
 type ITradingStrategy =
-    abstract Run : position:PositionInstance -> bars:seq<PriceBar> -> TradingStrategyResult
+    abstract Run : position:PositionInstance -> bars:PriceBars -> TradingStrategyResult
         
 module ProfitPoints =
     
