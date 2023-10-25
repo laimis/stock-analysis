@@ -30,28 +30,30 @@ namespace coretests.Stocks.Services.Trading
                         It.IsAny<UserState>(),
                         It.IsAny<Ticker>(),
                         It.IsAny<PriceFrequency>(),
-                        It.IsAny<System.DateTimeOffset>(),
-                        It.IsAny<System.DateTimeOffset>()
+                        It.IsAny<DateTimeOffset>(),
+                        It.IsAny<DateTimeOffset>()
                     )
                 )
                 .ReturnsAsync(
-                    new ServiceResponse<PriceBar[]>(prices.ToArray())
+                    new ServiceResponse<PriceBars>(prices)
                 );
 
             return new TradingStrategyRunner(mock.Object, Mock.Of<IMarketHours>());
         }
 
-        private static List<PriceBar> GeneratePriceBars(int numberOfBars, Func<int, decimal> priceFunction)
+        private static PriceBars GeneratePriceBars(int numberOfBars, Func<int, decimal> priceFunction)
         {
-            return Enumerable.Range(0, numberOfBars)
+            var arr = Enumerable.Range(0, numberOfBars)
                 .Select(i =>
                     new PriceBar(
-                        date: System.DateTimeOffset.UtcNow.AddDays(i),
+                        date: DateTimeOffset.UtcNow.AddDays(i),
                         priceFunction(i), high: priceFunction(i) + 0.01m,
                         low: priceFunction(i) - 0.01m, close: priceFunction(i),
                         volume: 1000
                     )
-                ).ToList();
+                ).ToArray();
+            
+            return new PriceBars(arr);
         }
 
         [Fact]
@@ -205,7 +207,7 @@ namespace coretests.Stocks.Services.Trading
             Assert.Equal(-0.0002m, maxDrawdown);
         }
 
-        private (List<PriceBar> bars, PositionInstance position) CreateDownsideTestData()
+        private (PriceBars bars, PositionInstance position) CreateDownsideTestData()
         {
             var bars = GeneratePriceBars(10, i => 50 - i);
 

@@ -12,7 +12,7 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithOnlyOneBarReturnsNothing()
         {
-            var bars = new PriceBar[1];
+            var bars = new PriceBars(new PriceBar[1]);
             var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }
@@ -35,12 +35,12 @@ namespace coretests.Stocks.Services
             var bars = TestDataGenerator.PriceBars(TestDataGenerator.ENPH);
 
             // find the bar with the highest volume
-            var highestVolume = bars.Max(x => x.Volume);
-            var barIndex = bars.ToList().FindIndex(x => x.Volume == highestVolume);
+            var highestVolume = bars.Bars.Max(x => x.Volume);
+            var barIndex = bars.Bars.ToList().FindIndex(x => x.Volume == highestVolume);
 
             // generate new array that contains bars from 0 to the highest bar index (inclusive)
             // and run pattern finder, it should find two: highest volume and x volume
-            var barsToTest = bars.Take(barIndex + 1).ToArray();
+            var barsToTest = new PriceBars(bars.Bars.Take(barIndex + 1).ToArray());
 
             var patterns = PatternDetection.generate(barsToTest);
             Assert.Equal(2, patterns.Count());
@@ -68,13 +68,12 @@ namespace coretests.Stocks.Services
             Assert.Equal(PatternDetection.highVolumeName, patterns.First().name);
         }
 
-        private static PriceBar[] AppendHighVolumeBar(PriceBar[] bars)
+        private static PriceBars AppendHighVolumeBar(PriceBars bars)
         {
             // append a bar with 10x the volume of the last bar
-            var lastBar = bars[^1];
+            var lastBar = bars.Last;
             var newBar = new PriceBar(lastBar.Date.AddDays(1), lastBar.Open, lastBar.High, lastBar.Low, lastBar.Close, lastBar.Volume * 10);
-            bars = bars.Append(newBar).ToArray();
-            return bars;
+            return new PriceBars(bars.Bars.Append(newBar).ToArray());
         }
 
         [Fact]
@@ -92,7 +91,7 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithEmptyBars_DoesNotBlowUp()
         {
-            var bars = Array.Empty<PriceBar>();
+            var bars = new PriceBars(Array.Empty<PriceBar>());
             var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }
@@ -103,9 +102,9 @@ namespace coretests.Stocks.Services
             var bars = TestDataGenerator.IncreasingPriceBars(numOfBars: 10);
 
             // append a bar with a gap up
-            var lastBar = bars[^1];
+            var lastBar = bars.Last;
             var newBar = new PriceBar(lastBar.Date.AddDays(1), lastBar.Open * 1.1m, lastBar.High * 1.1m, lastBar.Close * 1.1m, lastBar.Close * 1.1m, lastBar.Volume);
-            bars = bars.Append(newBar).ToArray();
+            bars = new PriceBars(bars.Bars.Append(newBar).ToArray());
 
             var patterns = PatternDetection.generate(bars);
             Assert.Single(patterns);

@@ -34,7 +34,7 @@ module PositionAnalysis =
         let StrategyLabel = "StrategyLabel"
         let HasSellOrder = "HasSellOrder"
 
-    let generate (position:PositionInstance) bars orders =
+    let generate (position:PositionInstance) (bars:PriceBars) orders =
         
         let stopLoss = 
             match position.StopPrice.HasValue with
@@ -52,18 +52,18 @@ module PositionAnalysis =
             | p when p < 0.0m -> OutcomeType.Negative
             | _ -> OutcomeType.Neutral
         
-        let max = bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> fun b -> b.High
+        let max = bars.Bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> fun b -> b.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
-        let min = bars |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
+        let min = bars.Bars |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
         let drawdown = (min - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
-        let last10 = if bars.Length <= 10 then bars else bars[bars.Length - 10..]
-        let last10Max = last10 |> Array.maxBy (fun b -> b.High) |> fun b -> b.High
-        let last10Gain = (last10Max - last10[0].Close) / last10[0].Close
+        let last10 = 10 |> bars.LatestOrAll
+        let last10Max = last10.Bars |> Array.maxBy (fun b -> b.High) |> fun b -> b.High
+        let last10Gain = (last10Max - last10.First.Close) / last10.First.Close
         
-        let last10Min = last10 |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
-        let last10Drawdown = (last10Min - last10[0].Close) / last10[0].Close
+        let last10Min = last10.Bars |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
+        let last10Drawdown = (last10Min - last10.First.Close) / last10.First.Close
         
         let last10MaxGainDrawdownDiff = last10Gain + last10Drawdown
         
@@ -149,16 +149,16 @@ module PositionAnalysis =
             )
         ]
 
-    let dailyPLAndGain (bars:PriceBar[]) (position:PositionInstance) =
+    let dailyPLAndGain (bars:PriceBars) (position:PositionInstance) =
         
         let firstBar = 
-            bars
+            bars.Bars
             |> Array.findIndex (fun b -> b.Date >= position.Opened)
         
         let lastBar = 
             match position.Closed.HasValue with
             | true ->
-                bars
+                bars.Bars
                 |> Array.findIndexBack (fun b -> b.Date <= position.Closed.Value)
             | false -> bars.Length - 1
         
@@ -169,7 +169,7 @@ module PositionAnalysis =
         let gainPct = ChartDataPointContainer<decimal>("Gain %", DataPointChartType.Line)
         
         for i in firstBar..lastBar do
-            let bar = bars[i]
+            let bar = bars.Bars[i]
             
             let currentPrice = bar.High
             let currentGainPct = (currentPrice - costBasis) / costBasis * 100.0m

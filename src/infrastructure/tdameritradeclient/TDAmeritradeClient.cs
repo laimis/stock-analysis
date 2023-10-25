@@ -472,7 +472,7 @@ public class TDAmeritradeClient : IBrokerage
     }
 
 
-    public async Task<ServiceResponse<PriceBar[]>> GetPriceHistory(
+    public async Task<ServiceResponse<PriceBars>> GetPriceHistory(
         UserState state,
         Ticker ticker,
         PriceFrequency frequency,
@@ -499,7 +499,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (response.IsOk == false)
         {
-            return new ServiceResponse<PriceBar[]>(response.Error.Value);
+            return new ServiceResponse<PriceBars>(response.Error.Value);
         }
 
         var prices = response.Success.Value;
@@ -523,7 +523,7 @@ public class TDAmeritradeClient : IBrokerage
             _logger?.LogError("No candles for historical prices for {function}", function);
         }
 
-        return new ServiceResponse<PriceBar[]>(payload);
+        return new ServiceResponse<PriceBars>(new PriceBars(payload));
     }
 
     private async Task<ServiceResponse<bool>> EnterOrder(UserState user, object postData)

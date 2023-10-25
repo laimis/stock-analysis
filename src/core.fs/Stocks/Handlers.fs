@@ -148,9 +148,9 @@ type PricesQuery =
             End = ``end``
         }
     
-type PricesView(prices:PriceBar array) =
-    member _.SMA = SMAContainer.Generate(prices)
-    member _.PercentChanges = PercentChangeAnalysis.calculateForPriceBars prices
+type PricesView(prices:PriceBars) =
+    member _.SMA = prices |> SMAContainer.Generate
+    member _.PercentChanges = prices |> PercentChangeAnalysis.calculateForPriceBars
     member _.Prices = prices
 
 type QuoteQuery =
@@ -482,7 +482,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker PriceFrequency.Daily query.Start query.End
             match priceResponse.Success with
             | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<PricesView>
-            | Some prices -> return ServiceResponse<PricesView>(PricesView(prices))
+            | Some prices -> return prices |> PricesView |> ResponseUtils.success
     }
     
     member _.Handle (query:QuoteQuery) = task {
@@ -506,7 +506,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             
             match matches.Success with
             | None -> return matches.Error.Value.Message |> ResponseUtils.failedTyped<SearchResult array>
-            | Some m -> return matches
+            | Some _ -> return matches
     }
     
     member _.Handle (query:CompanyFilingsQuery) = task {

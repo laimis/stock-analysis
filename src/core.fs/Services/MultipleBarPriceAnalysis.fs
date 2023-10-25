@@ -61,9 +61,9 @@ module MultipleBarPriceAnalysis =
                 
             smaOutcomes
             
-        let private generatePriceAboveSMA20Outcome (bars:PriceBar array) (container:SMAContainer) =
+        let private generatePriceAboveSMA20Outcome (bars:PriceBars) (container:SMAContainer) =
             
-            let closingPrices = bars |> Array.map (fun b -> b.Close)
+            let closingPrices = bars.ClosingPrices()
             
             let priceAndSMA20 =
                 container.sma20.Values
@@ -129,12 +129,11 @@ module MultipleBarPriceAnalysis =
                 message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} days"
             )
             
-        let generate (prices: PriceBar array) =
+        let generate (prices: PriceBars) =
             
-            let smaContainer = SMAContainer.Generate prices
+            let smaContainer =  prices |> SMAContainer.Generate
             
-            let smaOutcomes = generateSMAOutcomes smaContainer
-            
+            let smaOutcomes = smaContainer |> generateSMAOutcomes
             smaContainer |> generateSMA20Above50DaysOutcome |> smaOutcomes.Add
             smaContainer |> generatePriceAboveSMA20Outcome prices |> smaOutcomes.Add
             
@@ -142,43 +141,31 @@ module MultipleBarPriceAnalysis =
        
     module VolumeAnalysis =
         
-        let private generateAverageVolumeOutcome (prices: PriceBar array) =
+        let private generateAverageVolumeOutcome (prices: PriceBars) =
             
-            let recentVolumeStart, interval =
-                match prices.Length with
-                | x when x > MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis ->
-                    prices.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis, MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis
-                | _ -> 0, prices.Length
+            let values = MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis |> prices.LatestOrAll |> fun x -> x.Volumes()
                 
-            let values = prices[recentVolumeStart..] |> Array.map (fun p -> p.Volume)
-                
-            let averageVolume = (values |> Array.sum) / (int64 values.Length)
+            let averageVolume = (values |> Array.sum) / (decimal values.Length) |> int64
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.AverageVolume,
                 outcomeType = OutcomeType.Neutral,
                 value = averageVolume,
                 valueType = ValueFormat.Number,
-                message = $"Average volume over the last {interval} days is {averageVolume}"
+                message = $"Average volume over the last {values.Length} bars is {averageVolume}"
             )
             
-        let generate (prices: PriceBar array) =
-            
-            let list = List<AnalysisOutcome>()
-            prices |> generateAverageVolumeOutcome |> list.Add
-            list
+        let generate (prices: PriceBars) =
+            [prices |> generateAverageVolumeOutcome]
 
     module PriceAnalysis =
         
-        let private recentBars (bars:PriceBar array) =
-            match bars.Length with
-                | x when x > MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis ->
-                    bars[bars.Length - MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis..]
-                | _ -> bars
+        let private recentBars (bars:PriceBars) =
+            MultipleBarPriceAnalysisConstants.NumberOfDaysForRecentAnalysis |> bars.LatestOrAll
                 
-        let private GenerateEarliestPriceOutcome (prices: PriceBar array) =
+        let private generateEarliestPriceOutcome (prices: PriceBars) =
             
-            let earliestPrice = prices[0]
+            let earliestPrice = prices.First
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.EarliestPrice,
@@ -188,9 +175,9 @@ module MultipleBarPriceAnalysis =
                 message = $"Earliest price was {earliestPrice.Close} on {earliestPrice.Date}"
             )
             
-        let private GenerateLowestPriceOutcome (prices: PriceBar array) =
+        let private generateLowestPriceOutcome (prices: PriceBars) =
             
-            let lowest = prices |> Array.minBy (fun p -> p.Close)
+            let lowest = prices.Bars |> Array.minBy (fun p -> p.Close)
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.LowestPrice,
@@ -200,9 +187,9 @@ module MultipleBarPriceAnalysis =
                 message = $"Lowest price was {lowest.Close} on {lowest.Date}"
             )
             
-        let private GenerateLowestPriceDaysAgoOutcome (prices: PriceBar array) =
+        let private generateLowestPriceDaysAgoOutcome (prices: PriceBars) =
             
-            let lowest = prices |> Array.minBy (fun p -> p.Close)
+            let lowest = prices.Bars |> Array.minBy (fun p -> p.Close)
             let lowestPriceDaysAgo = System.Math.Floor(System.DateTimeOffset.UtcNow.Subtract(lowest.Date).TotalDays)
             let lowestPriceDaysAgoOutcomeType = if lowestPriceDaysAgo <= 30 then OutcomeType.Negative else OutcomeType.Neutral
             
@@ -214,10 +201,10 @@ module MultipleBarPriceAnalysis =
                 message = $"Lowest price was {lowest.Close} on {lowest.Date} which was {lowestPriceDaysAgo} days ago"
             )
             
-        let private GeneratePercentAboveLowOutcome (currentPrice: decimal) (prices: PriceBar array) =
+        let private generatePercentAboveLowOutcome (prices: PriceBars) =
             
-            let lowest = prices |> Array.minBy (fun p -> p.Close)
-            let percentAboveLow = (currentPrice - lowest.Close) / lowest.Close
+            let lowest = prices.Bars |> Array.minBy (fun p -> p.Close)
+            let percentAboveLow = (prices.Last.Close - lowest.Close) / lowest.Close
             let percentAboveLowOutcomeType = OutcomeType.Neutral
             
             AnalysisOutcome(
@@ -228,9 +215,9 @@ module MultipleBarPriceAnalysis =
                 message = $"Percent above recent low: {percentAboveLow}%%"
             )
             
-        let private GenerateHighestPriceOutcome (prices: PriceBar array) =
+        let private generateHighestPriceOutcome (prices: PriceBars) =
             
-            let highest = prices |> Array.maxBy (fun p -> p.Close)
+            let highest = prices.Bars |> Array.maxBy (fun p -> p.Close)
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.HighestPrice,
@@ -240,9 +227,9 @@ module MultipleBarPriceAnalysis =
                 message = $"Highest price was {highest.Close} on {highest.Date}"
             )
             
-        let private GenerateHighestPriceDaysAgoOutcome (prices: PriceBar array) =
+        let private generateHighestPriceDaysAgoOutcome (prices: PriceBars) =
             
-            let highest = prices |> Array.maxBy (fun p -> p.Close)
+            let highest = prices.Bars |> Array.maxBy (fun p -> p.Close)
             let highestPriceDaysAgo = System.Math.Round(System.DateTimeOffset.UtcNow.Subtract(highest.Date).TotalDays, 0)
             let highestPriceDaysAgoOutcomeType = if highestPriceDaysAgo <= 30 then OutcomeType.Positive else OutcomeType.Neutral
             
@@ -254,10 +241,10 @@ module MultipleBarPriceAnalysis =
                 message = $"Highest price was {highest.Close} on {highest.Date} which was {highestPriceDaysAgo} days ago"
             )
             
-        let private GeneratePercentBelowHighOutcome (currentPrice: decimal) (prices: PriceBar array) =
+        let private generatePercentBelowHighOutcome (prices: PriceBars) =
             
-            let highest = prices |> Array.maxBy (fun p -> p.Close)
-            let percentBelowHigh = (highest.Close - currentPrice) / highest.Close
+            let highest = prices.Bars |> Array.maxBy (fun p -> p.Close)
+            let percentBelowHigh = (highest.Close - prices.Last.Close) / highest.Close
             let percentBelowHighOutcomeType = OutcomeType.Neutral
             
             AnalysisOutcome(
@@ -268,9 +255,9 @@ module MultipleBarPriceAnalysis =
                 message = $"Percent below recent high: {percentBelowHigh}%%"
             )
             
-        let private GenerateGainOutcome (currentPrice: decimal) (prices: PriceBar array) =
+        let private generateGainOutcome (prices: PriceBars) =
             
-            let gain = (currentPrice - prices[0].Close) / prices[0].Close
+            let gain = (prices.Last.Close - prices.First.Close) / prices.First.Close
             let gainOutcomeType = if gain > 0m then OutcomeType.Positive else OutcomeType.Negative
             
             AnalysisOutcome(
@@ -281,7 +268,7 @@ module MultipleBarPriceAnalysis =
                 message = $"Gain from earliest to latest: {gain}%%"
             )
             
-        let private GeneratePercentChangeAverageOutcome (prices: PriceBar array) =
+        let private generatePercentChangeAverageOutcome (prices: PriceBars) =
             
             let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
             
@@ -293,7 +280,7 @@ module MultipleBarPriceAnalysis =
                 message = $"%% Change Average: {descriptor.mean}"
             )
             
-        let private GeneratePercentChangeStandardDeviationOutcome (prices: PriceBar array) =
+        let private generatePercentChangeStandardDeviationOutcome (prices: PriceBars) =
             
             let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
             
@@ -305,7 +292,9 @@ module MultipleBarPriceAnalysis =
                 message = $"%% Change StD: {descriptor.stdDev}"
             )
             
-        let private GenerateCurrentPriceOutcome (currentPrice: decimal) =
+        let private generateCurrentPriceOutcome (prices:PriceBars) =
+            
+            let currentPrice = prices.Last.Close
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.CurrentPrice,
@@ -315,30 +304,28 @@ module MultipleBarPriceAnalysis =
                 message = $"Current price is {currentPrice:C2}"
             )
             
-        let Generate (currentPrice: decimal) (prices: PriceBar array) =
+        let generate (prices: PriceBars) =
             
-            let outcomes = List<AnalysisOutcome>()
-            
-            outcomes.Add (GenerateCurrentPriceOutcome currentPrice)
-            outcomes.Add (GenerateEarliestPriceOutcome prices)
-            outcomes.Add (GenerateLowestPriceOutcome prices)
-            outcomes.Add (GenerateLowestPriceDaysAgoOutcome prices)
-            outcomes.Add (GeneratePercentAboveLowOutcome currentPrice prices)
-            outcomes.Add (GenerateHighestPriceOutcome prices)
-            outcomes.Add (GenerateHighestPriceDaysAgoOutcome prices)
-            outcomes.Add (GeneratePercentBelowHighOutcome currentPrice prices)
-            outcomes.Add (GenerateGainOutcome currentPrice prices)
-            outcomes.Add (GeneratePercentChangeAverageOutcome prices)
-            outcomes.Add (GeneratePercentChangeStandardDeviationOutcome prices)
-            
-            outcomes
+            [
+                prices |> generateCurrentPriceOutcome
+                prices |> generateEarliestPriceOutcome
+                prices |> generateLowestPriceOutcome
+                prices |> generateLowestPriceDaysAgoOutcome
+                prices |> generatePercentAboveLowOutcome
+                prices |> generateHighestPriceOutcome
+                prices |> generateHighestPriceDaysAgoOutcome
+                prices |> generatePercentBelowHighOutcome
+                prices |> generateGainOutcome
+                prices |> generatePercentChangeAverageOutcome
+                prices |> generatePercentChangeStandardDeviationOutcome
+            ]
     
     module MultipleBarPriceAnalysis =
         
-        let Run (currentPrice: decimal) prices =
+        let run prices =
             let outcomes = List<AnalysisOutcome>()
             
-            prices |> PriceAnalysis.Generate currentPrice |> outcomes.AddRange
+            prices |> PriceAnalysis.generate |> outcomes.AddRange
             prices |> VolumeAnalysis.generate |> outcomes.AddRange
             prices |> SMAAnalysis.generate |> outcomes.AddRange
             

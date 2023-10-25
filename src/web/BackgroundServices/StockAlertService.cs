@@ -25,7 +25,7 @@ namespace web.BackgroundServices
         private readonly ILogger<StockAlertService> _logger;
         private readonly IMarketHours _marketHours;
         private readonly IPortfolioStorage _portfolio;
-        private readonly Dictionary<Ticker, ServiceResponse<PriceBar[]>> _priceCache = new();
+        private readonly Dictionary<Ticker, ServiceResponse<PriceBars>> _priceCache = new();
         
         public StockAlertService(
             IAccountStorage accounts,
@@ -131,9 +131,9 @@ namespace web.BackgroundServices
             }
         }
 
-        private async Task<ServiceResponse<PriceBar[]>> GetPricesForTicker(UserState user, Ticker ticker)
+        private async Task<ServiceResponse<PriceBars>> GetPricesForTicker(UserState user, Ticker ticker)
         {
-            if (_priceCache.TryGetValue(ticker, out ServiceResponse<PriceBar[]> value))
+            if (_priceCache.TryGetValue(ticker, out ServiceResponse<PriceBars> value))
             {
                 return value;
             }

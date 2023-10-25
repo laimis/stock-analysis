@@ -23,7 +23,7 @@ namespace coretests.Stocks
                     volume: 1000);
             }
 
-            var view = new PricesView(prices);
+            var view = new PricesView(new PriceBars(prices));
 
             Assert.Equal(504, view.Prices.Length);
             Assert.Equal(4, view.SMA.Length);
