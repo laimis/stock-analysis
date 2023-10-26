@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 using PendingPositions = core.fs.Portfolio.PendingPositions;
-using Routines = core.fs.Portfolio.Routines;
 using Lists = core.fs.Portfolio.Lists;
 namespace web.Controllers
 {
@@ -38,73 +37,6 @@ namespace web.Controllers
         public Task<ActionResult> ClosePendingStockPosition([FromRoute] Guid id,
             [FromServices] PendingPositions.Handler service) =>
             this.OkOrError(service.Handle(new PendingPositions.Close(id, User.Identifier())));
-
-        [HttpGet("routines")]
-        public Task<ActionResult> GetRoutines([FromServices] Routines.Handler service) =>
-            this.OkOrError(service.Handle(new Routines.Query(User.Identifier())));
-
-        [HttpPost("routines")]
-        public Task<ActionResult> CreateRoutine([FromBody] Routines.Create command,
-            [FromServices] Routines.Handler service) =>
-            this.OkOrError(
-                service.HandleCreate(
-                    User.Identifier(),
-                    command
-                )
-            );
-
-        [HttpPut("routines/{routineName}")]
-        public Task UpdateRoutine([FromBody]Routines.Update command, [FromServices]Routines.Handler service) =>
-            this.OkOrError(
-                service.HandleUpdate(
-                    User.Identifier(),
-                    command
-                )
-            );
-
-        [HttpDelete("routines/{routineName}")]
-        public Task DeleteRoutine([FromRoute]string routineName, [FromServices]Routines.Handler service) =>
-            this.OkOrError(
-                service.Handle(
-                    new Routines.Delete(User.Identifier(), routineName)
-                )
-            );
-
-        [HttpPut("routines/{routineName}/steps")]
-        public Task<ActionResult> AddRoutineStep([FromBody]Routines.AddStep command, [FromServices]Routines.Handler service) =>
-            this.OkOrError(
-                service.HandleAddStep(
-                    User.Identifier(), command
-                )
-            );
-        
-        [HttpPost("routines/{routineName}/steps/{stepIndex}")]
-        public Task<ActionResult> UpdateRoutineStep([FromBody]Routines.UpdateStep command, [FromServices]Routines.Handler service) =>
-            this.OkOrError(
-                service.HandleUpdateStep(
-                    User.Identifier(), command
-                )
-            );
-
-
-        [HttpDelete("routines/{routineName}/steps/{stepIndex}")]
-        public Task<ActionResult> RemoveRoutineStep([FromRoute] string routineName, [FromRoute] int stepIndex,
-            [FromServices] Routines.Handler service) =>
-            this.OkOrError(
-                service.Handle(
-                    new Routines.RemoveStep(routineName, stepIndex, User.Identifier()
-                    )
-                )
-            );
-
-        [HttpPost("routines/{routineName}/steps/{stepIndex}/position")]
-        public Task<ActionResult> MoveRoutineStep([FromBody] Routines.MoveStep cmd,
-            [FromServices] Routines.Handler service) =>
-            this.OkOrError(
-                service.HandleMoveStep(
-                    User.Identifier(), cmd
-                )
-            );
 
         [HttpGet("stocklists")]
         public Task<ActionResult> StockLists([FromServices]Lists.Handler service) =>

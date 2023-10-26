@@ -1,16 +1,18 @@
 using System;
 using System.Linq;
-using core.Portfolio;
+using core.fs.Shared.Domain.Accounts;
+using core.Routines;
+using coretests.testdata;
 using Xunit;
 
-namespace coretests.Portfolio
+namespace coretests.Routines
 {
     public class RoutineTests
     {
-        private static Guid _userId = Guid.NewGuid();
+        private static readonly UserId _userId = TestDataGenerator.RandomUserId();
 
         private static Routine Create(string name, string description) =>
-            new Routine(description: description, name: name, userId: _userId);
+            new Routine(description: description, name: name, userId: _userId.Item);
 
         [Fact]
         public void CreateWorks()
@@ -23,7 +25,7 @@ namespace coretests.Portfolio
             var state = routine.State;
 
             Assert.NotEqual(Guid.Empty, state.Id);
-            Assert.Equal(_userId, state.UserId);
+            Assert.Equal(_userId.Item, state.UserId);
             Assert.Equal(description, state.Description);
             Assert.Equal(name, state.Name);
         }

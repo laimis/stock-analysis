@@ -1,9 +1,8 @@
-namespace core.fs.Portfolio.Routines
+namespace core.fs.Routines
 
 open System
 open System.ComponentModel.DataAnnotations
-open core.Portfolio
-open core.Shared
+open core.Routines
 open core.fs.Shared
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts

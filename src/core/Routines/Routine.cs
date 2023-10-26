@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Routines
 {
     public class Routine : Aggregate<RoutineState>
     {

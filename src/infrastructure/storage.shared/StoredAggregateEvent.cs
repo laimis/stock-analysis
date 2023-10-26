@@ -6,7 +6,7 @@ namespace storage.shared
 {
     public class StoredAggregateEvent
     {
-        static JsonSerializerSettings _formatting = new JsonSerializerSettings
+        static JsonSerializerSettings _formatting = new()
         {
             TypeNameHandling = TypeNameHandling.Objects
         };
@@ -18,12 +18,11 @@ namespace storage.shared
 
         public string EventJson
         {
-            get { return JsonConvert.SerializeObject(Event, _formatting); }
+            get => JsonConvert.SerializeObject(Event, _formatting);
 
-            set
-            {
-                Event = JsonConvert.DeserializeObject<AggregateEvent>(value, _formatting);
-            }
+            set => Event = JsonConvert.DeserializeObject<AggregateEvent>(
+                EventInfraAdjustments.AdjustIfNeeded(value),
+                _formatting);
         }
 
         public int Version { get; set; }
