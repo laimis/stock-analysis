@@ -1,10 +1,10 @@
-namespace core.fs.Portfolio.PendingPositions
+namespace core.fs.Stocks.PendingPositions
 
 open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
-open core.Portfolio
 open core.Shared
+open core.Stocks
 open core.fs.Services
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage

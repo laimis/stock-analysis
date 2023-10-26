@@ -2,7 +2,7 @@ using System;
 using core.Shared;
 using core.Stocks;
 
-namespace core.Portfolio
+namespace core.Stocks
 {
     public class PendingStockPositionState : IAggregateState
     {

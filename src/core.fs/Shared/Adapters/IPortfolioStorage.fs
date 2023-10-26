@@ -5,7 +5,6 @@ open System.Threading.Tasks
 open core.Cryptos
 open core.Notes
 open core.Options
-open core.Portfolio
 open core.Routines
 open core.Shared
 open core.Stocks

@@ -3,7 +3,6 @@ namespace core.fs.Services
 open core.Cryptos
 open core.Notes
 open core.Options
-open core.Portfolio
 open core.Shared
 open core.Stocks
 open core.fs.Services.Trading

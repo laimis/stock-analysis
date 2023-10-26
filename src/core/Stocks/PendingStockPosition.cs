@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Stocks
 {
     public class PendingStockPosition : Aggregate<PendingStockPositionState>
     {

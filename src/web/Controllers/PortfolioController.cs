@@ -5,7 +5,6 @@ using core.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
-using PendingPositions = core.fs.Portfolio.PendingPositions;
 
 namespace web.Controllers;
 
@@ -14,39 +13,17 @@ namespace web.Controllers;
 [Route("api/[controller]")]
 public class PortfolioController : ControllerBase
 {
-    [HttpGet("pendingstockpositions")]
-    public Task<ActionResult> PendingStockPositions([FromServices]PendingPositions.Handler service) =>
-        this.OkOrError(service.Handle(new PendingPositions.Query(User.Identifier())));
-
-        
-    [HttpGet("pendingstockpositions/export")]
-    public Task<ActionResult> ExportPendingStockPositions([FromServices]PendingPositions.Handler service) =>
-        this.GenerateExport(
-            service.Handle(new PendingPositions.Export(User.Identifier())
-            ));
-        
-    [HttpPost("pendingstockpositions")]
-    public Task<ActionResult> CreatePendingStockPosition([FromBody]PendingPositions.Create command, [FromServices]PendingPositions.Handler service) =>
-        this.OkOrError(
-            service.HandleCreate(
-                User.Identifier(), command
-            )
-        );
-
-    [HttpDelete("pendingstockpositions/{id}")]
-    public Task<ActionResult> ClosePendingStockPosition([FromRoute] Guid id,
-        [FromServices] PendingPositions.Handler service) =>
-        this.OkOrError(service.Handle(new PendingPositions.Close(id, User.Identifier())));
-
+    private readonly Handler _handler;
+    public PortfolioController(Handler handler) => _handler = handler;
+    
     [HttpGet]
-    public Task<ActionResult> Index([FromServices] Handler service) =>
-        this.OkOrError(service.Handle(new Query(User.Identifier())));
-
+    public Task<ActionResult> Index() =>
+        this.OkOrError(_handler.Handle(new Query(User.Identifier())));
+    
     [HttpGet("transactions")]
-    public Task<ActionResult> Transactions(string ticker, string groupBy, string show, string txType,
-        [FromServices] Handler service) =>
+    public Task<ActionResult> Transactions(string ticker, string groupBy, string show, string txType) =>
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new QueryTransactions(
                     userId: User.Identifier(),
                     show: show,
@@ -57,17 +34,16 @@ public class PortfolioController : ControllerBase
         );
 
     [HttpGet("transactionsummary")]
-    public Task<ActionResult> Review(string period, [FromServices] Handler service) =>
-        this.OkOrError(service.Handle(new TransactionSummary(period: period, userId: User.Identifier())));
+    public Task<ActionResult> Review(string period) =>
+        this.OkOrError(_handler.Handle(new TransactionSummary(period: period, userId: User.Identifier())));
 
     [HttpGet("simulate/trades")]
     public Task<ActionResult> Trade(
         [FromQuery] bool closePositionIfOpenAtTheEnd,
-        [FromQuery] int numberOfTrades,
-        [FromServices] Handler service) =>
+        [FromQuery] int numberOfTrades) =>
 
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new SimulateUserTrades(
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
                     numberOfTrades: numberOfTrades,
@@ -79,11 +55,10 @@ public class PortfolioController : ControllerBase
     [HttpGet("simulate/trades/export")]
     public Task<ActionResult> SimulateTradesExport(
         [FromQuery] bool closePositionIfOpenAtTheEnd,
-        [FromQuery] int numberOfTrades,
-        [FromServices] Handler service) =>
+        [FromQuery] int numberOfTrades) =>
 
         this.GenerateExport(
-            service.HandleExport(
+            _handler.HandleExport(
                 new ExportUserSimulatedTrades(
                     userId: User.Identifier(),
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
@@ -95,11 +70,10 @@ public class PortfolioController : ControllerBase
     [HttpGet("{ticker}/positions/{positionId}/simulate/trades")]
     public Task<ActionResult> Trade(
         [FromRoute] int positionId,
-        [FromRoute] string ticker,
-        [FromServices] Handler service) =>
+        [FromRoute] string ticker) =>
 
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new SimulateTrade(
                     ticker: new Ticker(ticker),
                     positionId: positionId, 
@@ -112,11 +86,10 @@ public class PortfolioController : ControllerBase
     public Task<ActionResult> ProfitPoints(
         [FromRoute] int positionId,
         [FromRoute] string ticker,
-        [FromQuery] int numberOfPoints,
-        [FromServices] Handler service) =>
+        [FromQuery] int numberOfPoints) =>
 
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new ProfitPointsQuery(
                     numberOfPoints: numberOfPoints,
                     positionId: positionId,
@@ -127,9 +100,9 @@ public class PortfolioController : ControllerBase
         );
 
     [HttpPost("{ticker}/positions/{positionId}/grade")]
-    public Task Grade([FromBody]GradePosition command, [FromServices]Handler service) =>
+    public Task Grade([FromBody]GradePosition command) =>
         this.OkOrError(
-            service.HandleGradePosition(
+            _handler.HandleGradePosition(
                 User.Identifier(), command
             )
         );
@@ -175,9 +148,9 @@ public class PortfolioController : ControllerBase
         );
 
     [HttpPost("{ticker}/positions/{positionId}/risk")]
-    public Task<ActionResult> Risk(SetRisk command, [FromServices] Handler service) =>
+    public Task<ActionResult> Risk(SetRisk command) =>
         this.OkOrError(
-            service.HandleSetRisk(
+            _handler.HandleSetRisk(
                 User.Identifier(), command
             )
         );
@@ -188,11 +161,10 @@ public class PortfolioController : ControllerBase
         [FromQuery] decimal numberOfShares,
         [FromQuery] decimal price,
         [FromQuery] decimal stopPrice,
-        [FromQuery] string when,
-        [FromServices] Handler service) =>
+        [FromQuery] string when) =>
 
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new SimulateTradeForTicker(
                     userId: User.Identifier(),
                     ticker: new Ticker(ticker),
@@ -204,9 +176,9 @@ public class PortfolioController : ControllerBase
         );
 
     [HttpGet("tradingentries")]
-    public Task<ActionResult> TradingEntries([FromServices] Handler service) =>
+    public Task<ActionResult> TradingEntries() =>
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new QueryTradingEntries(
                     User.Identifier()
                 )
@@ -214,9 +186,9 @@ public class PortfolioController : ControllerBase
         );
         
     [HttpGet("pasttradingentries")]
-    public Task<ActionResult> PastTradingEntries([FromServices] Handler service) =>
+    public Task<ActionResult> PastTradingEntries() =>
         this.OkOrError(
-            service.Handle(
+            _handler.Handle(
                 new QueryPastTradingEntries(
                     User.Identifier()
                 )
