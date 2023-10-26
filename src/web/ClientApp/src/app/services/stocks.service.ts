@@ -159,15 +159,15 @@ export class StocksService {
 
   // ----------------- pending positions ---------------------
   getPendingStockPositions(): Observable<PendingStockPosition[]> {
-    return this.http.get<PendingStockPosition[]>('/api/portfolio/pendingstockpositions')
+    return this.http.get<PendingStockPosition[]>('/api/stocks/pendingpositions')
   }
 
   createPendingStockPosition(cmd: stocktransactioncommand): Observable<PendingStockPosition> {
-    return this.http.post<PendingStockPosition>('/api/portfolio/pendingstockpositions', cmd)
+    return this.http.post<PendingStockPosition>('/api/stocks/pendingpositions', cmd)
   }
 
   closePendingPosition(id: string): Observable<any> {
-    return this.http.delete<any>('/api/portfolio/pendingstockpositions/' + id)
+    return this.http.delete<any>('/api/stocks/pendingpositions/' + id)
   }
 
   // ----------------- alerts ---------------------

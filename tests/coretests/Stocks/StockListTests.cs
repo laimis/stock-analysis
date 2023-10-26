@@ -4,7 +4,7 @@ using core.Stocks;
 using coretests.testdata;
 using Xunit;
 
-namespace coretests.Portfolio
+namespace coretests.Stocks
 {
     public class StockListTests
     {
