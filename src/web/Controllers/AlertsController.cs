@@ -11,41 +11,39 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AlertsController : ControllerBase
     {
+        private readonly Handler _handler;
+        public AlertsController(Handler handler) => _handler = handler;
+        
+        // TODO: this is exposed anonymously to allow trendview to ping this endpoint
+        // and they don't support authorization. I should at the very least set up some sort of query
+        // string key or something along those lines
         [AllowAnonymous]
         [Consumes("text/plain")]
         [HttpPost("sms")]
-        public Task SMS([FromBody] string body, [FromServices] SMS.Handler service) =>
-            service.Handle(new SMS.SendSMS(body));
+        public Task Sms([FromBody] string body) =>
+            _handler.Handle(new SendSMS(body));
 
         [AllowAnonymous]
         [HttpGet("sms/status")]
-        public Task<ActionResult> SmsStatus([FromServices] SMS.Handler service) =>
-            this.OkOrError(service.Handle(new SMS.Status()));
+        public Task<ActionResult> SmsStatus() =>
+            this.OkOrError(_handler.Handle(new SMSStatus()));
 
         [Authorize("admin")]
         [HttpPost("sms/on")]
-        public Task SmsOn([FromServices] SMS.Handler service) => service.Handle(new SMS.TurnSMSOn());
+        public Task SmsOn() => _handler.Handle(new TurnSMSOn());
 
         [Authorize("admin")]
         [HttpPost("sms/off")]
-        public Task SmsOff([FromServices] SMS.Handler service) => service.Handle(new SMS.TurnSMSOff());
+        public Task SmsOff() => _handler.Handle(new TurnSMSOff());
 
         [Authorize("admin")]
         [HttpPost("run")]
-        public ActionResult Run([FromServices] AlertContainer.Handler service)
-        {
-            service.Handle(new AlertContainer.Run());
-            return Ok();
-        }
+        public ActionResult Run() => this.OkOrError(_handler.Handle(new Run()));
 
-        // TODO: consider returning a specific type vs object
         [HttpGet]
-        public object Index([FromServices]AlertContainer.Handler service) =>
-            service.Handle(new AlertContainer.Query(User.Identifier()));
-            
-        // TODO: consider returning a specific type vs object
+        public ActionResult Index() => this.OkOrError(_handler.Handle(new QueryAlerts(User.Identifier())));
+
         [HttpGet("monitors")]
-        public object Monitors([FromServices]AlertContainer.Handler service) =>
-            service.Handle(new AlertContainer.QueryAvailableMonitors());
+        public ActionResult Monitors() => this.OkOrError(_handler.Handle(new QueryAvailableMonitors()));
     }
 }
