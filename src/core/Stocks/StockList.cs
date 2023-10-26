@@ -2,8 +2,52 @@ using System;
 using System.Collections.Generic;
 using core.Shared;
 
-namespace core.Portfolio
+namespace core.Stocks
 {
+    public class StockListState : IAggregateState
+    {
+        public Guid Id { get; private set; }
+        public Guid UserId { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public List<StockListTicker> Tickers { get; } = new();
+        public HashSet<string> Tags { get; } = new();
+
+        public void Apply(AggregateEvent e) => ApplyInternal(e);
+
+        public bool ContainsTag(string tag) => Tags.Contains(tag);
+
+        protected void ApplyInternal(dynamic obj) => ApplyInternal(obj);
+
+        private void ApplyInternal(StockListCreated created)
+        {
+            Description = created.Description;
+            Id = created.AggregateId;
+            Name = created.Name;
+            UserId = created.UserId;
+        }
+
+        private void ApplyInternal(StockListUpdated updated)
+        {
+            Description = updated.Description;
+            Name = updated.Name;
+        }
+
+        private void ApplyInternal(StockListTickerAdded added) =>
+            Tickers.Add(new StockListTicker(added.Note, new Ticker(added.Ticker), added.When));
+
+        private void ApplyInternal(StockListTickerRemoved removed) =>
+            Tickers.RemoveAll(x => x.Ticker.Value == removed.Ticker);
+
+        private void ApplyInternal(StockListTagAdded added) =>
+            Tags.Add(added.Tag);
+
+        private void ApplyInternal(StockListTagRemoved removed) =>
+            Tags.Remove(removed.Tag);
+    }
+
+    public record StockListTicker(string Note, Ticker Ticker, DateTimeOffset When);
+    
     public class StockList : Aggregate<StockListState>
     {
         public StockList(IEnumerable<AggregateEvent> events) : base(events)
@@ -92,48 +136,4 @@ namespace core.Portfolio
             Apply(new StockListTagRemoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, tag));
         }
     }
-
-    public class StockListState : IAggregateState
-    {
-        public Guid Id { get; private set; }
-        public Guid UserId { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public List<StockListTicker> Tickers { get; } = new();
-        public HashSet<string> Tags { get; } = new();
-
-        public void Apply(AggregateEvent e) => ApplyInternal(e);
-
-        public bool ContainsTag(string tag) => Tags.Contains(tag);
-
-        protected void ApplyInternal(dynamic obj) => ApplyInternal(obj);
-
-        private void ApplyInternal(StockListCreated created)
-        {
-            Description = created.Description;
-            Id = created.AggregateId;
-            Name = created.Name;
-            UserId = created.UserId;
-        }
-
-        private void ApplyInternal(StockListUpdated updated)
-        {
-            Description = updated.Description;
-            Name = updated.Name;
-        }
-
-        private void ApplyInternal(StockListTickerAdded added) =>
-            Tickers.Add(new StockListTicker(added.Note, new Ticker(added.Ticker), added.When));
-
-        private void ApplyInternal(StockListTickerRemoved removed) =>
-            Tickers.RemoveAll(x => x.Ticker.Value == removed.Ticker);
-
-        private void ApplyInternal(StockListTagAdded added) =>
-            Tags.Add(added.Tag);
-
-        private void ApplyInternal(StockListTagRemoved removed) =>
-            Tags.Remove(removed.Tag);
-    }
-
-    public record StockListTicker(string Note, Ticker Ticker, DateTimeOffset When);
 }

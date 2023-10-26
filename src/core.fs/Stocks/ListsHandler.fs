@@ -1,8 +1,8 @@
-namespace core.fs.Portfolio.Lists
+namespace core.fs.Stocks.Lists
 
 open System.ComponentModel.DataAnnotations
-open core.Portfolio
 open core.Shared
+open core.Stocks
 open core.fs.Services
 open core.fs.Shared
 open core.fs.Shared.Adapters.CSV

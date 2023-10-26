@@ -127,31 +127,31 @@ export class StocksService {
 
   // ----------------- stock lists ---------------------
   getStockLists(): Observable<StockList[]> {
-    return this.http.get<StockList[]>('/api/portfolio/stocklists')
+    return this.http.get<StockList[]>('/api/stocks/lists')
   }
   getStockList(name: string): Observable<StockList> {
-    return this.http.get<StockList>('/api/portfolio/stocklists/' + name)
+    return this.http.get<StockList>('/api/stocks/lists/' + name)
   }
   addToStockList(name: string, ticker: string): Observable<StockList> {
-    return this.http.put<StockList>('/api/portfolio/stocklists/' + name, { name: name, ticker: ticker })
+    return this.http.put<StockList>('/api/stocks/lists/' + name, { name: name, ticker: ticker })
   }
   removeFromStockList(name: string, ticker: string): Observable<StockList> {
-    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name + '/' + ticker)
+    return this.http.delete<StockList>('/api/stocks/lists/' + name + '/' + ticker)
   }
   createStockList(input): Observable<StockList> {
-    return this.http.post<StockList>('/api/portfolio/stocklists', input)
+    return this.http.post<StockList>('/api/stocks/lists', input)
   }
   deleteStockList(name: string): Observable<StockList> {
-    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name)
+    return this.http.delete<StockList>('/api/stocks/lists/' + name)
   }
   assignTagToStockList(name: string, tag: string): Observable<StockList> {
-    return this.http.put<StockList>('/api/portfolio/stocklists/' + name + '/tags', { name: name, tag: tag })
+    return this.http.put<StockList>('/api/stocks/lists/' + name + '/tags', { name: name, tag: tag })
   }
   removeTagFromStockList(name: string, tag: string): Observable<StockList> {
-    return this.http.delete<StockList>('/api/portfolio/stocklists/' + name + '/tags/' + tag)
+    return this.http.delete<StockList>('/api/stocks/lists/' + name + '/tags/' + tag)
   }
   updateStockList(oldName:string, newName: string, description: string): Observable<StockList> {
-    return this.http.post<StockList>('/api/portfolio/stocklists/' + oldName, { name:oldName, newName: newName, description: description })
+    return this.http.post<StockList>('/api/stocks/lists/' + oldName, { name:oldName, newName: newName, description: description })
   }
   //
 

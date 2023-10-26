@@ -14,6 +14,11 @@ public static class EventInfraAdjustments
         {
             json = json.Replace("\"$type\":\"core.Portfolio.Routine", "\"$type\":\"core.Routines.Routine");
         }
+        
+        if (json.Contains("\"$type\":\"core.Portfolio.StockList"))
+        {
+            json = json.Replace("\"$type\":\"core.Portfolio.StockList", "\"$type\":\"core.Stocks.StockList");
+        }
 
         return json;
     }
