@@ -75,7 +75,8 @@
         <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
       </div>
       <div class="col text-end">
-        <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev | percent }}</strong> </span>
+        <span class="me-2" (click)="assignSizeStopPrice(calculateAtrBasedStop())">ATR: <strong>{{ atr | currency }}</strong> </span>
+        <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
         <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get20sma())">20: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
         <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get50sma())">50: <strong [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
         <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get150sma())">150: <strong [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>

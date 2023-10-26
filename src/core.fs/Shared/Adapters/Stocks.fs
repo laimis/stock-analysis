@@ -80,6 +80,16 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         | 0m -> 0m
         | _ -> (this.Close - this.Low) / rangeDenominator
         
+    member this.TrueRange (previousBar:PriceBar option) =
+        let candidates =
+            [
+                high - low
+                if previousBar.IsSome then abs (high - previousBar.Value.Close) else 0m
+                if previousBar.IsSome then abs (low - previousBar.Value.Close) else 0m
+            ]
+            
+        candidates |> List.max
+        
 type PriceBars(bars:PriceBar array) =
     member this.Bars = bars
     member this.Length = bars.Length
@@ -90,6 +100,6 @@ type PriceBars(bars:PriceBar array) =
         | true -> this.Bars
         | false -> this.Bars[this.Length - numberOfBars ..]
         |> PriceBars
-    member this.AllButLast = this.Bars[0 .. this.Length - 2] |> PriceBars
+    member this.AllButLast() = this.Bars[0 .. this.Length - 2] |> PriceBars
     member this.ClosingPrices() = this.Bars |> Array.map (fun bar -> bar.Close)
     member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal) 

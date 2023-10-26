@@ -28,6 +28,7 @@ module SingleBarPriceAnalysis =
         let NewHigh = "NewHigh"
         let NewLow = "NewLow"
         let SigmaRatio = "SigmaRatio"
+        let TrueRange = "TrueRange"
     
     let smaAnalysis (bars:PriceBars) =
         
@@ -54,7 +55,7 @@ module SingleBarPriceAnalysis =
     let priceAnalysis (bars:PriceBars) =
         
         let currentBar = bars.Last
-        let previousBars = bars.AllButLast
+        let previousBars = bars.AllButLast()
         let range = currentBar.ClosingRange()
         
         [
@@ -168,6 +169,10 @@ module SingleBarPriceAnalysis =
              
              // add new low as outcome
             yield AnalysisOutcome (SingleBarOutcomeKeys.NewLow, (if newLow then OutcomeType.Negative else OutcomeType.Neutral), (if newLow then -1m else 0m), ValueFormat.Boolean, "New low reached")
+            
+            let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
+            
+            yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
         ]
         
     let volumeAnalysis (bars:PriceBars) =

@@ -552,6 +552,9 @@ export interface Monitor {
   tag: string
 }
 
+export enum OutcomeKeys {
+  AverageTrueRange = 'AverageTrueRange',
+}
 export enum OutcomeValueTypeEnum {
   Percentage = 'Percentage',
   Currency = 'Currency',

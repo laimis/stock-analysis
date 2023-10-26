@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
+  OutcomeKeys,
   PositionChartInformation,
   Prices,
   SMA,
@@ -24,6 +25,7 @@ export class StockTradingNewPositionComponent {
   chartInfo: PositionChartInformation;
   prices: Prices;
   private maxLoss = 60;
+  private atrMultiplier = 2;
 
   constructor(
     private stockService:StocksService,
@@ -80,6 +82,7 @@ export class StockTradingNewPositionComponent {
 
   outcomes: TickerOutcomes
   gaps: StockGaps
+  atr: number
 
   onBuyTickerSelected(ticker: string) {
 
@@ -106,6 +109,7 @@ export class StockTradingNewPositionComponent {
       .subscribe(data => {
         this.outcomes = data.outcomes[0]
         this.gaps = data.gaps[0]
+        this.atr = this.outcomes.outcomes.filter(o => o.key === OutcomeKeys.AverageTrueRange)[0].value
       }, error => {
         console.error(error)
       }
@@ -314,7 +318,18 @@ export class StockTradingNewPositionComponent {
     toggleVisuallyHidden(elem)
   }
 
+  calculateAtrBasedStop() {
+    if (!this.atr) {
+      return
+    }
+    return this.costToBuy - this.atr * this.atrMultiplier
+  }
+
   assignSizeStopPrice(value:number) {
+
+    // round to 2 decimal places
+    value = Math.round(value * 100) / 100
+
     this.sizeStopPrice = value
     this.updateBuyingValuesSizeStopPrice()
   }

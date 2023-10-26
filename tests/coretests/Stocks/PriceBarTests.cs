@@ -1,5 +1,6 @@
 using core.fs.Shared.Adapters.Stocks;
 using coretests.testdata;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace coretests.Stocks;
@@ -19,6 +20,9 @@ public class PriceBarTests
     
     [Fact]
     public void DateStr_Works() => Assert.Equal("2020-11-30", _bar.DateStr);
+    
+    [Fact]
+    public void TrueRange_Correct() => Assert.Equal(6.67m, _bar.TrueRange(FSharpOption<PriceBar>.None), 2);
 }
 
 public class PriceBarsTests
@@ -26,21 +30,21 @@ public class PriceBarsTests
     private readonly PriceBars _bars = TestDataGenerator.PriceBars(TestDataGenerator.NET);
     
     [Fact]
-    public void Length_Correct() => Assert.Equal(505, _bars.Length);
+    public void Length() => Assert.Equal(505, _bars.Length);
 
     [Fact]
-    public void AllButLast_Correct()
+    public void AllButLast()
     {
-        Assert.Equal(504, _bars.AllButLast.Length);
-        Assert.Equal("2020-11-30", _bars.AllButLast.First.DateStr);
-        Assert.Equal("2022-11-29", _bars.AllButLast.Last.DateStr);
+        Assert.Equal(504, _bars.AllButLast().Length);
+        Assert.Equal("2020-11-30", _bars.AllButLast().First.DateStr);
+        Assert.Equal("2022-11-29", _bars.AllButLast().Last.DateStr);
     }
     
     [Fact]
-    public void Last_Correct() => Assert.Equal("2022-11-30", _bars.Last.DateStr);
+    public void Last() => Assert.Equal("2022-11-30", _bars.Last.DateStr);
 
     [Fact]
-    public void LatestOrAll_WithSmallerRange_Correct()
+    public void LatestOrAll_WithSmallerRange()
     {
         var subset = _bars.LatestOrAll(numberOfBars: 20);
         
@@ -50,7 +54,7 @@ public class PriceBarsTests
     }
 
     [Fact]
-    public void ClosingPrices_Correct()
+    public void ClosingPrices()
     {
         Assert.Equal(505, _bars.ClosingPrices().Length);
         Assert.Equal(75.08m, _bars.ClosingPrices()[0]);
@@ -58,7 +62,7 @@ public class PriceBarsTests
     }
 
     [Fact]
-    public void Volumes_Correct()
+    public void Volumes()
     {
         Assert.Equal(505, _bars.Volumes().Length);
         Assert.Equal(17157618m, _bars.Volumes()[0]);

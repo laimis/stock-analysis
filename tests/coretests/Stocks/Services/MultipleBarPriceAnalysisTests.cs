@@ -71,5 +71,8 @@ namespace coretests.Stocks.Services
         public void Gain()
             => Assert.Equal(-0.35m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.Gain).Value, 2);
         
+        [Fact]
+        public void AverageTrueRange()
+            => Assert.Equal(3.98m, _outcomes.FirstOutcome(MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRange).Value, 2);
     }
 }

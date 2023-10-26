@@ -25,6 +25,7 @@ module MultipleBarPriceAnalysis =
         let PercentChangeStandardDeviation = "PercentChangeStandardDeviation"
         let EarliestPrice = "EarliestPrice"
         let Gain = "Gain"
+        let AverageTrueRange = "AverageTrueRange"
         
         let SMA interval = $"sma_%i{interval}"
 
@@ -292,6 +293,26 @@ module MultipleBarPriceAnalysis =
                 message = $"%% Change StD: {descriptor.stdDev}"
             )
             
+        let private generateAverageTrueRangeOutcome (prices:PriceBars) =
+            
+            let period = 14
+            
+            let value =
+                prices.Bars
+                |> Array.pairwise
+                |> Array.map (fun (a, b) -> a |> Some |> b.TrueRange)
+                |> Array.windowed period
+                |> Array.map (fun x -> x |> Array.average)
+                |> Array.last
+            
+            AnalysisOutcome(
+                key = MultipleBarOutcomeKeys.AverageTrueRange,
+                outcomeType = OutcomeType.Neutral,
+                value = value,
+                valueType = ValueFormat.Currency,
+                message = $"Average True Range: {value}"
+            )
+            
         let private generateCurrentPriceOutcome (prices:PriceBars) =
             
             let currentPrice = prices.Last.Close
@@ -318,6 +339,7 @@ module MultipleBarPriceAnalysis =
                 prices |> generateGainOutcome
                 prices |> generatePercentChangeAverageOutcome
                 prices |> generatePercentChangeStandardDeviationOutcome
+                prices |> generateAverageTrueRangeOutcome
             ]
     
     module MultipleBarPriceAnalysis =

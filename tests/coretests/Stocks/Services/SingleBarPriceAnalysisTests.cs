@@ -94,5 +94,9 @@ namespace coretests.Stocks.Services
         [Fact]
         public void PriceAbove20SMA() =>
             Assert.Equal(0.0396m, _outcomes.FirstOutcome(SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove20SMA).Value, 3);
+        
+        [Fact]
+        public void TrueRange() =>
+            Assert.Equal(6m, _outcomes.FirstOutcome(SingleBarPriceAnalysis.SingleBarOutcomeKeys.TrueRange).Value, 2);
     }
 }
