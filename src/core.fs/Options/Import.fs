@@ -51,6 +51,15 @@ module Import =
                 }
                 
             let (command:Object) =
+                
+                let createExpireViaLookupData record : LookupData =
+                    {
+                        Ticker = Ticker record.ticker
+                        StrikePrice = record.strike
+                        Expiration = record.expiration.Value
+                        UserId = userId
+                    }
+                
                 match record.``type`` with
                 | "sell" ->
                     BuyOrSellCommand.Sell(record |> toOptionTransaction, userId)
@@ -59,13 +68,9 @@ module Import =
                     BuyOrSellCommand.Buy(record |> toOptionTransaction, userId)
                     
                 | "expired" ->
-                    ExpireViaLookupCommand.ExpireViaLookup(
-                        ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
-                    )
+                    ExpireViaLookupCommand.ExpireViaLookup(record |> createExpireViaLookupData)
                 | "assigned" ->
-                    ExpireViaLookupCommand.AssignViaLookup(
-                        ExpireViaLookupData(ticker=record.ticker,strikePrice=record.strike,expiration=record.expiration.Value,userId=userId)
-                    )
+                    ExpireViaLookupCommand.AssignViaLookup(record |> createExpireViaLookupData)
                 | _ -> Exception($"Unexpected command type: {record.``type``}") |> raise
             
             (record,command)

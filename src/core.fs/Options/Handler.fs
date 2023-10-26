@@ -1,6 +1,7 @@
 ﻿namespace core.fs.Options
 
 open System
+open System.ComponentModel.DataAnnotations
 open core.Options
 open core.Shared
 open core.fs.Services
@@ -10,30 +11,60 @@ open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 
-type DashboardQuery(userId: UserId) =
-    member _.UserId = userId
-
-type ExportQuery(userId: UserId) =
-    member _.UserId = userId
-    member _.Filename = "options"
-
-type ExpireData(optionId: Guid, userId: UserId) =
-    member this.OptionId = optionId
-    member this.UserId = userId
-
+type OptionType =
+    | Call
+    | Put
+    
+    with
+        override this.ToString() =
+            match this with
+            | Call -> nameof Call
+            | Put -> nameof Put
+            
+        member this.ToEnum() =
+            match this with
+            | Call -> core.Options.OptionType.CALL
+            | Put -> core.Options.OptionType.PUT
+            
+        static member FromString(value:string) =
+            match value with
+            | nameof Call -> Call
+            | nameof Put -> Put
+            | _ -> failwithf $"Invalid option type: %s{value}"
+            
+type OptionTransaction =
+    {
+        [<Range(1, 10000)>]
+        [<Required>]
+        StrikePrice:Nullable<decimal>
+        [<Required>]
+        ExpirationDate : Nullable<DateTimeOffset>
+        [<Required>]
+        OptionType : OptionType        
+        [<Range(1, 10000, ErrorMessage = "Invalid number of contracts specified")>]
+        NumberOfContracts : int
+        [<Range(1, 100000)>]
+        [<Required>]
+        Premium : Nullable<decimal>
+        [<Required>]
+        Filled : Nullable<DateTimeOffset>
+        Notes : string
+        [<Required>]
+        Ticker : Ticker
+    }
+    
+type DashboardQuery = { UserId:UserId }
+type ExportQuery = { UserId: UserId }
+type ExpireData = { OptionId: Guid; UserId: UserId }
 type ExpireCommand =
     | Expire of ExpireData
     | Assign of ExpireData
 
-type ExpireViaLookupData(ticker: string, strikePrice: decimal, expiration: DateTimeOffset, userId: UserId) =
-    member this.Ticker = ticker
-    member this.StrikePrice = strikePrice
-    member this.Expiration = expiration
-    member this.UserId = userId
+type LookupData = { Ticker: Ticker; StrikePrice: decimal; Expiration: DateTimeOffset; UserId: UserId }
 
 type ExpireViaLookupCommand =
-    | ExpireViaLookup of ExpireViaLookupData
-    | AssignViaLookup of ExpireViaLookupData
+    | ExpireViaLookup of LookupData
+    | AssignViaLookup of LookupData
 
 type DeleteCommand = { OptionId: Guid; UserId: UserId }
 
@@ -117,7 +148,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let csv = options |> CSVExport.options csvWriter
 
             return
-                ExportResponse(request.Filename |> CSVExport.generateFilename, csv)
+                ExportResponse("options" |> CSVExport.generateFilename, csv)
                 |> ResponseUtils.success<ExportResponse>
         }
 
@@ -153,7 +184,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let option =
                 options
                 |> Seq.tryFind (fun o ->
-                    o.State.Ticker.Value = data.Ticker
+                    o.State.Ticker = data.Ticker
                     && o.State.StrikePrice = data.StrikePrice
                     && o.State.Expiration = data.Expiration)
 
