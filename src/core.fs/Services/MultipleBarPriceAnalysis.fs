@@ -32,7 +32,20 @@ module MultipleBarPriceAnalysis =
     module MultipleBarPriceAnalysisConstants =
         let NumberOfDaysForRecentAnalysis = 60
         
-
+    
+    module Indicators =
+        
+        let averageTrueRage (prices:PriceBars) =
+            
+            let period = 14
+            
+            prices.Bars
+            |> Array.pairwise
+            |> Array.map (fun (a, b) -> a |> Some |> b.TrueRange)
+            |> Array.windowed period
+            |> Array.map (fun x -> x |> Array.average)
+            
+    
     module SMAAnalysis =
         
         let private generateSMAOutcomes (smaContainer: SMAContainer) =
@@ -295,15 +308,7 @@ module MultipleBarPriceAnalysis =
             
         let private generateAverageTrueRangeOutcome (prices:PriceBars) =
             
-            let period = 14
-            
-            let value =
-                prices.Bars
-                |> Array.pairwise
-                |> Array.map (fun (a, b) -> a |> Some |> b.TrueRange)
-                |> Array.windowed period
-                |> Array.map (fun x -> x |> Array.average)
-                |> Array.last
+            let value = prices |> Indicators.averageTrueRage |> Array.last
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.AverageTrueRange,
@@ -342,18 +347,14 @@ module MultipleBarPriceAnalysis =
                 prices |> generateAverageTrueRangeOutcome
             ]
     
-    module MultipleBarPriceAnalysis =
+    let run prices =
+        let outcomes = List<AnalysisOutcome>()
         
-        let run prices =
-            let outcomes = List<AnalysisOutcome>()
+        prices |> PriceAnalysis.generate |> outcomes.AddRange
+        prices |> VolumeAnalysis.generate |> outcomes.AddRange
+        prices |> SMAAnalysis.generate |> outcomes.AddRange
+        
+        outcomes
             
-            prices |> PriceAnalysis.generate |> outcomes.AddRange
-            prices |> VolumeAnalysis.generate |> outcomes.AddRange
-            prices |> SMAAnalysis.generate |> outcomes.AddRange
-            
-            outcomes
-            
-
-
     module MultipleBarAnalysisOutcomeEvaluation =
         let evaluate _ = []

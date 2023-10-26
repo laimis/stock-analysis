@@ -152,6 +152,7 @@ type PricesView(prices:PriceBars) =
     member _.SMA = prices |> SMAContainer.Generate
     member _.PercentChanges = prices |> PercentChangeAnalysis.calculateForPriceBars
     member _.Prices = prices.Bars
+    member _.ATR = prices |> MultipleBarPriceAnalysis.Indicators.averageTrueRage
 
 type QuoteQuery =
     {
