@@ -20,6 +20,11 @@ public static class EventInfraAdjustments
             json = json.Replace("\"$type\":\"core.Portfolio.StockList", "\"$type\":\"core.Stocks.StockList");
         }
 
+        if (json.Contains("\"$type\":\"core.Portfolio.PendingStockPosition"))
+        {
+            json = json.Replace("\"$type\":\"core.Portfolio.PendingStockPosition", "\"$type\":\"core.Stocks.PendingStockPosition");
+        }
+
         return json;
     }
 }
