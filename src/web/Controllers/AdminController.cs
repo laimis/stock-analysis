@@ -2,13 +2,12 @@ using System;
 using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.fs.Admin;
-using core.fs.Shared.Adapters.Authentication;
 using core.fs.Shared.Adapters.Email;
-using core.fs.Shared.Adapters.Storage;
 using core.fs.Shared.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
+using Handler = core.fs.Admin.Handler;
 
 namespace web.Controllers
 {
@@ -17,84 +16,75 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
     {
-        private readonly IAccountStorage _storage;
-        private readonly IEmailService _email;
-        private readonly IRoleService _roleService;
+        private readonly Handler _handler;
 
         public AdminController(
-            IAccountStorage storage,
-            IEmailService email,
-            IRoleService roleService)
+            Handler handler)
         {
-            _storage = storage;
-            _email = email;
-            _roleService = roleService;
+            _handler = handler;
         }
 
         [HttpGet("test")]
         public ActionResult Test() => Ok();
 
         [HttpGet("loginas/{userId}")]
-        public async Task<ActionResult> LoginAs([FromRoute]Guid userId)
+        public async Task<ActionResult> LoginAs([FromRoute]Guid userId, [FromServices]core.fs.Accounts.Handler handler)
         {
-            var u = await _storage.GetUser(UserId.NewUserId(userId));
-            
-            if (u.Value == null)
+            var status = await handler.Handle(new LookupById(UserId.NewUserId(userId)));
+
+            if (status.IsOk == false)
+            {
                 return NotFound();
-
-            var view = AccountStatusView.fromUserState(_roleService.IsAdmin(u.Value.State), u.Value.State);
-
-            await AccountController.EstablishSignedInIdentity(HttpContext, view);
+            }
+            
+            await AccountController.EstablishSignedInIdentity(HttpContext, status.Success.Value);
 
             return Redirect("~/");
         }
 
         [HttpGet("delete/{userId}")]
-        public Task<ActionResult> Delete([FromRoute]Guid userId, [FromServices]Handler service) =>
-            this.OkOrError(service.HandleDelete(UserId.NewUserId(userId), new Delete(null)));
-
-        [HttpPost("email")]
-        public async Task<ActionResult> Email(EmailInput obj)
-        {
-            await _email.SendWithInput(obj);
-
-            return Ok();
-        }
-
-        [HttpGet("welcome")]
-        public async Task<ActionResult> Welcome([FromQuery]Guid userId)
-        {
-            var user = await _storage.GetUser(UserId.NewUserId(userId));
-            
-            if (user.Value == null)
-                return NotFound();
-
-            await _email.SendWithTemplate(
-                new Recipient(email: user.Value.State.Email, name: user.Value.State.Name),
-                Sender.Support,
-                EmailTemplate.NewUserWelcome,
-                new object()
+        public Task<ActionResult> Delete([FromRoute] Guid userId, [FromServices] core.fs.Accounts.Handler service) =>
+            this.OkOrError(
+                service.HandleDelete(
+                    UserId.NewUserId(userId),
+                    new Delete(null)
+                )
             );
 
-            return Ok();
-        }
+        [HttpPost("email")]
+        public Task<ActionResult> Email(EmailInput obj) =>
+            this.OkOrError(
+                _handler.Handle(
+                    new SendEmail(
+                        obj
+                    )
+                )
+            );
+        
+
+        [HttpGet("welcome")]
+        public Task<ActionResult> Welcome([FromQuery]Guid userId) =>
+            this.OkOrError(
+                _handler.Handle(
+                    new SendWelcomeEmail(UserId.NewUserId(userId))
+                )
+            );
 
         [HttpGet("users")]
-        public Task<ActionResult> ActiveAccountsAsync([FromServices]Users.Handler service)
+        public Task<ActionResult> ActiveAccounts()
         {
             return this.OkOrError(
-                service.Handle(
-                    new Users.Query(true)
+                _handler.Handle(
+                    new Query(true)
                 )
             );
         }
 
         [HttpGet("users/export")]
-        public Task<ActionResult> Export([FromServices]Users.Handler service)
-        {
-            return this.GenerateExport(
-                service.Handle(new Users.Export())
-            );
-        }
+        public Task<ActionResult> Export() => this.GenerateExport(
+            _handler.Handle(
+                new Export()
+            )
+        );
     }
 }
