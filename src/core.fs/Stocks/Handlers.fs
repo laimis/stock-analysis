@@ -152,8 +152,15 @@ type PricesView(prices:PriceBars) =
     member _.SMA = prices |> SMAContainer.Generate
     member _.PercentChanges = prices |> PercentChangeAnalysis.calculateForPriceBars
     member _.Prices = prices.Bars
-    member _.ATR = prices |> MultipleBarPriceAnalysis.Indicators.averageTrueRage
+    member _.ATR =
+        let atrContainer = prices|> MultipleBarPriceAnalysis.Indicators.averageTrueRage
 
+        let container = ChartDataPointContainer<decimal>($"ATR ({atrContainer.Period} days)", DataPointChartType.Line)
+        
+        atrContainer.DataPoints |> Array.iter container.Add
+        
+        container
+        
 type QuoteQuery =
     {
         Ticker:Ticker

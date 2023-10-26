@@ -800,7 +800,7 @@ export interface DistributionStatistics {
 export interface Prices {
   prices: PriceBar[]
   sma: SMAContainer
-  atr: number[]
+  atr: DataPointContainer
   percentChanges: DistributionStatistics
 }
 

@@ -1,6 +1,8 @@
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import {
+  ChartType,
+  DataPointContainer,
   OutcomesReport,
   OutcomeValueTypeEnum,
   PositionChartInformation,
@@ -27,6 +29,7 @@ export class StockAnalysisComponent {
   percentChangeDistribution: StockPercentChangeResponse;
   private _ticker: string;
   chartInfo: PositionChartInformation
+  atrContainer : DataPointContainer;
 
   constructor(
     private stockService : StocksService,

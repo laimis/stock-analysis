@@ -34,18 +34,29 @@ module MultipleBarPriceAnalysis =
         
     
     module Indicators =
-        
+   
+        type ATRContainer(period, dataPoints) =
+            member this.Period = period
+            member this.DataPoints = dataPoints
+            
         let averageTrueRage (prices:PriceBars) =
             
             let period = 14
             
-            prices.Bars
-            |> Array.pairwise
-            |> Array.map (fun (a, b) -> a |> Some |> b.TrueRange)
-            |> Array.windowed period
-            |> Array.map (fun x -> x |> Array.average)
-            
-    
+            let dataPoints =
+                prices.Bars
+                |> Array.pairwise
+                |> Array.map (fun (a, b) -> b, a |> Some |> b.TrueRange)
+                |> Array.windowed period
+                |> Array.map (fun x ->
+                    let average = x |> Array.averageBy (fun (_, v) -> v)
+                    let date = x |> Array.last |> fun (b, _) -> b.Date
+                
+                    DataPoint<decimal>(date, average)
+                )
+                
+            ATRContainer(period, dataPoints)
+                
     module SMAAnalysis =
         
         let private generateSMAOutcomes (smaContainer: SMAContainer) =
@@ -308,7 +319,7 @@ module MultipleBarPriceAnalysis =
             
         let private generateAverageTrueRangeOutcome (prices:PriceBars) =
             
-            let value = prices |> Indicators.averageTrueRage |> Array.last
+            let value = prices |> Indicators.averageTrueRage |> fun x -> x.DataPoints |> Array.last |> fun x -> x.Value
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.AverageTrueRange,

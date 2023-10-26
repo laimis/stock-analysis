@@ -75,6 +75,8 @@
         <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
       </div>
       <div class="col text-end">
+        <app-stock-link class="me-2" [ticker]="ticker"></app-stock-link>
+        <app-trading-view-link class="me-2" [ticker]="ticker"></app-trading-view-link>
         <span class="me-2" (click)="assignSizeStopPrice(calculateAtrBasedStop())">ATR: <strong>{{ atr | currency }}</strong> </span>
         <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
         <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get20sma())">20: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
