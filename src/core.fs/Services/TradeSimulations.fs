@@ -299,6 +299,12 @@ type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
                         positionInstance.Buy(numberOfShares, price, ``when``, Guid.NewGuid())
                         positionInstance.SetStopPrice(stopPrice, ``when``)
                         
+                        // if we are simulating against an actual trade, make sure simulated trade
+                        // has the same risk amount as the actual trade, so that we can get apples to apples
+                        // comparison on RR which is risk amount dependent
+                        if actualTrade.IsSome && actualTrade.Value.RiskedAmount.HasValue then
+                            positionInstance.SetRiskAmount(actualTrade.Value.RiskedAmount.Value, ``when``)
+                        
                         let result = strategy.Run positionInstance bars
                         
                         if closeIfOpenAtTheEnd && not result.Position.IsClosed then
