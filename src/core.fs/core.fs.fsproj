@@ -49,10 +49,10 @@
         <Compile Include="Portfolio\Handler.fs"/>
         <Compile Include="Portfolio\ListsHandler.fs"/>
         <Compile Include="Portfolio\PendingPositionsHandler.fs"/>
-        <Compile Include="Portfolio\RoutinesHandler.fs"/>
         <Compile Include="Reports\Handlers.fs"/>
         <Compile Include="Stocks\Handlers.fs"/>
         <Compile Include="ImportTransactions.fs"/>
+        <Compile Include="Routines\Handler.fs" />
     </ItemGroup>
 
     <ItemGroup>

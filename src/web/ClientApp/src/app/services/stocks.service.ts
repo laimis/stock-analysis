@@ -104,25 +104,25 @@ export class StocksService {
 
   // ----------------- routines ---------------------
   getRoutines(): Observable<Routine[]> {
-    return this.http.get<Routine[]>('/api/portfolio/routines')
+    return this.http.get<Routine[]>('/api/routines')
   }
   createRoutine(name,description): Observable<Routine> {
-    return this.http.post<Routine>('/api/portfolio/routines', {name,description})
+    return this.http.post<Routine>('/api/routines', {name,description})
   }
   updateRoutine(name,newName): Observable<Routine> {
-    return this.http.put<Routine>('/api/portfolio/routines/' + name, {name, newName})
+    return this.http.put<Routine>('/api/routines/' + name, {name, newName})
   }
   addRoutineStep(routineName, label, url): Observable<Routine> {
-    return this.http.put<Routine>('/api/portfolio/routines/' + routineName + "/steps", {label, url, routineName})
+    return this.http.put<Routine>('/api/routines/' + routineName + "/steps", {label, url, routineName})
   }
   updateRoutineStep(routineName, stepIndex:number, label, url): Observable<Routine> {
-    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/steps/' + stepIndex, {label, url, routineName, stepIndex})
+    return this.http.post<Routine>('/api/routines/' + routineName + '/steps/' + stepIndex, {label, url, routineName, stepIndex})
   }
   deleteRoutineStep(routineName, stepIndex:number): Observable<Routine> {
-    return this.http.delete<Routine>('/api/portfolio/routines/' + routineName + '/steps/' + stepIndex)
+    return this.http.delete<Routine>('/api/routines/' + routineName + '/steps/' + stepIndex)
   }
   moveRoutineStep(routineName, stepIndex:number, direction:number) {
-    return this.http.post<Routine>('/api/portfolio/routines/' + routineName + '/steps/' + stepIndex + '/position', {direction, routineName, stepIndex})
+    return this.http.post<Routine>('/api/routines/' + routineName + '/steps/' + stepIndex + '/position', {direction, routineName, stepIndex})
   }
 
   // ----------------- stock lists ---------------------
