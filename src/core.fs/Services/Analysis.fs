@@ -30,12 +30,23 @@ type AnalysisOutcome(key:string, outcomeType:OutcomeType, value:decimal, valueTy
     member val Value = value
     member val ValueType = valueType
     member val Message = message
-        
+    
 type TickerOutcomes =
     {
         outcomes: seq<AnalysisOutcome>
         ticker:Ticker
     }
+    
+module TickerOutcomes =
+    let filter conditions (tickerOutcomes:TickerOutcomes seq) =
+        tickerOutcomes
+        |> Seq.filter (
+            fun tickerOutcome ->
+                conditions
+                |> List.forall (fun condition ->
+                    tickerOutcome.outcomes |> Seq.exists condition
+                    )
+                )
     
 type AnalysisOutcomeEvaluation(name:string,``type``:OutcomeType,sortColumn:string,matchingTickers:seq<TickerOutcomes>) =
     member val Name = name

@@ -61,9 +61,8 @@ module MultipleBarPriceAnalysis =
         
         let private generateSMAOutcomes (smaContainer: SMAContainer) =
             
-            let smaOutcomes = List<AnalysisOutcome>()
-            
-            for sma in smaContainer.All do
+            smaContainer.All
+            |> Array.map (fun sma ->
                 
                 let value =
                     match sma.LastValue with
@@ -73,18 +72,14 @@ module MultipleBarPriceAnalysis =
                         | None -> 0m
                     | None -> 0m
                     
-                let outcome =
-                    AnalysisOutcome(
-                        MultipleBarOutcomeKeys.SMA(sma.Interval),
-                        OutcomeType.Neutral,
-                        value,
-                        ValueFormat.Currency,
-                        $"SMA {sma.Interval} is {value}"
-                    )
-                    
-                smaOutcomes.Add outcome
-                
-            smaOutcomes
+                AnalysisOutcome(
+                    MultipleBarOutcomeKeys.SMA(sma.Interval),
+                    OutcomeType.Neutral,
+                    value,
+                    ValueFormat.Currency,
+                    $"SMA {sma.Interval} is {value}"
+                )
+            )   
             
         let private generatePriceAboveSMA20Outcome (bars:PriceBars) (container:SMAContainer) =
             
@@ -158,11 +153,11 @@ module MultipleBarPriceAnalysis =
             
             let smaContainer =  prices |> SMAContainer.Generate
             
-            let smaOutcomes = smaContainer |> generateSMAOutcomes
-            smaContainer |> generateSMA20Above50DaysOutcome |> smaOutcomes.Add
-            smaContainer |> generatePriceAboveSMA20Outcome prices |> smaOutcomes.Add
-            
-            smaOutcomes
+            [
+                yield! smaContainer |> generateSMAOutcomes
+                smaContainer |> generateSMA20Above50DaysOutcome
+                smaContainer |> generatePriceAboveSMA20Outcome prices
+            ]
        
     module VolumeAnalysis =
         
@@ -359,13 +354,11 @@ module MultipleBarPriceAnalysis =
             ]
     
     let run prices =
-        let outcomes = List<AnalysisOutcome>()
-        
-        prices |> PriceAnalysis.generate |> outcomes.AddRange
-        prices |> VolumeAnalysis.generate |> outcomes.AddRange
-        prices |> SMAAnalysis.generate |> outcomes.AddRange
-        
-        outcomes
+        [
+            yield! prices |> PriceAnalysis.generate
+            yield! prices |> VolumeAnalysis.generate
+            yield! prices |> SMAAnalysis.generate    
+        ]
             
     module MultipleBarAnalysisOutcomeEvaluation =
         let evaluate _ = []

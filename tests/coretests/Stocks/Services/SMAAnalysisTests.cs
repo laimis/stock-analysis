@@ -9,12 +9,12 @@ namespace coretests.Stocks.Services;
 
 public class SMAAnalysisTests
 {
-    private readonly List<AnalysisOutcome> _outcomes = MultipleBarPriceAnalysis.SMAAnalysis.generate(
+    private readonly IEnumerable<AnalysisOutcome> _outcomes = MultipleBarPriceAnalysis.SMAAnalysis.generate(
         TestDataGenerator.IncreasingPriceBars(numOfBars: 260)
     );
 
     [Fact]
-    public void SMAAnalysis_Adds_AllOutcomes() => Assert.Equal(6, _outcomes.Count);
+    public void SMAAnalysis_Adds_AllOutcomes() => Assert.Equal(6, _outcomes.Count());
 
     private void OutcomeExistsAndValueMatches(string key, decimal value)
     {

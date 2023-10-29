@@ -15,7 +15,7 @@ namespace coretests.Stocks.Services
 
     public class MultipleBarPriceAnalysisTests
     {
-        private readonly List<AnalysisOutcome> _outcomes =
+        private readonly IEnumerable<AnalysisOutcome> _outcomes =
             MultipleBarPriceAnalysis.run(
                 TestDataGenerator.PriceBars(TestDataGenerator.NET)
             );

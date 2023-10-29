@@ -8,22 +8,22 @@ namespace coretests.Stocks.Services
 {
     public static class SingleBarPriceAnalysisFunctions
     {
-        public static List<AnalysisOutcome> Generate(Ticker ticker) =>
+        public static IEnumerable<AnalysisOutcome> Generate(Ticker ticker) =>
             SingleBarPriceAnalysis.run(TestDataGenerator.PriceBars(ticker));
     }
     
     // NOTE: this tests single bar analysis with a feed of prices that do not change
     // to make sure analysis still runs and does not breakdown with various
     // exceptions related to stddev and other stats being zero
-    public class SingleBarPriceAnalysisTests_FeedWithPricesNotChanging
+    public class SingleBarPriceAnalysisWithPricesNotChangingTests
     {
-        private readonly List<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate(new Ticker("SWCH"));
+        private readonly IEnumerable<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate(new Ticker("SWCH"));
 
         [Fact]
         public void OutcomesMatch() => Assert.NotEmpty(_outcomes);
     }
 
-    public class SingleBarPriceAnalysisTests_NewHighWorks
+    public class SingleBarPriceAnalysisWithNewHighTests
     {
         [Fact]
         public void Run_WithNewHigh_IncludesNewHighOutcome() =>
@@ -42,7 +42,7 @@ namespace coretests.Stocks.Services
 
     public class SingleBarPriceAnalysisTests
     {
-        private readonly List<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate(TestDataGenerator.NET);
+        private readonly IEnumerable<AnalysisOutcome> _outcomes = SingleBarPriceAnalysisFunctions.Generate(TestDataGenerator.NET);
         
         [Fact]
         public void OutcomesMatch() => Assert.NotEmpty(_outcomes);

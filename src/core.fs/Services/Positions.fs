@@ -111,41 +111,31 @@ module PositionAnalysis =
                 "Below stop loss",
                 OutcomeType.Negative,
                 PortfolioAnalysisKeys.Profit,
-                tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0.0m))
-                    |> Seq.toList
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0.0m) ]
             )
             AnalysisOutcomeEvaluation(
                 "Stop loss at risk",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.PercentToStopLoss,
-                tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value >= percentToStopThreshold && o.Value <= 0.0m))
-                    |> Seq.toList
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value >= percentToStopThreshold && o.Value <= 0.0m) ]
             )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.Profit,
-                tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays))
-                    |> Seq.toList
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {withinTwoWeeksThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PortfolioAnalysisKeys.DaysSinceOpened,
-                tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays))
-                    |> Seq.toList
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 "No Strategy",
                 OutcomeType.Negative,
                 PortfolioAnalysisKeys.StrategyLabel,
-                tickerOutcomes
-                    |> Seq.filter (fun t -> t.outcomes |> Seq.exists (fun o -> o.Key = PortfolioAnalysisKeys.StrategyLabel && o.Value = 0m))
-                    |> Seq.toList
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.StrategyLabel && o.Value = 0m) ]
             )
         ]
 

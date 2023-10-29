@@ -205,13 +205,11 @@ module SingleBarPriceAnalysis =
         
     let run bars =
         
-        let outcomes = List<AnalysisOutcome>()
-        
-        bars |> volumeAnalysis |> outcomes.AddRange
-        bars |> priceAnalysis |> outcomes.AddRange
-        bars |> smaAnalysis |> outcomes.AddRange
-        
-        outcomes
+        [
+            yield! bars |> volumeAnalysis
+            yield! bars |> priceAnalysis
+            yield! bars |> smaAnalysis
+        ]
         
 open SingleBarPriceAnalysis
 
@@ -227,11 +225,11 @@ module SingleBarPriceAnalysisEvaluation =
         
         let highVolumeWithExcellentClosingRangeAndHighPercentage =
             tickerOutcomes
-            |> Seq.filter (fun t ->
-                t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
-                && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value >= ExcellentClosingRange)
-                && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
-            )
+            |> TickerOutcomes.filter [
+                (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
+                (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value >= ExcellentClosingRange)
+                (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
+            ]
             
         [
             AnalysisOutcomeEvaluation (
@@ -245,135 +243,105 @@ module SingleBarPriceAnalysisEvaluation =
                 "Positive gap ups",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.GapPercentage,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.GapPercentage && o.Value > 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.GapPercentage && o.Value > 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
                 "High Volume and High Percent Change",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.RelativeVolume,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value >= 0m) // make sure it's positive
-                )
+                tickerOutcomes |> TickerOutcomes.filter
+                    [
+                        (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
+                        (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
+                        (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value >= 0m) // make sure it's positive
+                    ]
             )
             
             AnalysisOutcomeEvaluation(
                 "Excellent Closing Range and High Percent Change",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.ClosingRange,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value >= ExcellentClosingRange)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
-                )
+                tickerOutcomes |> TickerOutcomes.filter
+                    [
+                        (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value >= ExcellentClosingRange)
+                        (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
+                        (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value >= 0m) // make sure it's positive
+                    ]
             )
             
             AnalysisOutcomeEvaluation(
                 "New Highs",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.NewHigh,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.NewHigh && o.Value > 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [(fun o -> o.Key = SingleBarOutcomeKeys.NewHigh && o.Value > 0m)]
             )
             
             AnalysisOutcomeEvaluation(
                 "Low Closing Range",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.ClosingRange,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value < LowClosingRange)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [(fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value <= LowClosingRange)]
             )
             
             AnalysisOutcomeEvaluation(
                 "High Volume with Low Closing Range and Small Percent Change",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.RelativeVolume,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value <= LowClosingRange)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && Math.Abs(o.Value) < SigmaRatioThreshold)
-                    && t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value > 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
+                    (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value <= LowClosingRange)
+                    (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && Math.Abs(o.Value) < SigmaRatioThreshold)
+                    (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value > 0m)
+                ]
             )
             
             AnalysisOutcomeEvaluation(
                 "Negative gap downs",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.GapPercentage,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.GapPercentage && o.Value < 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.GapPercentage && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
                 "New Lows",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.NewLow,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.NewLow && o.Value < 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.NewLow && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
                 "SMA 20 below SMA 50",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.SMA20Above50Days,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Days && o.Value < 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Days && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
                 "Price above 20 SMA",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.PriceAbove20SMA,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMA && o.Value >= 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMA && o.Value >= 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
                 "Price below 20 SMA",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.PriceBelow20SMA,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMA && o.Value < 0m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMA && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
                 "Price went above 20 SMA",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.PriceAbove20SMADays,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = 1m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = 1m)  ]
             )
             
             AnalysisOutcomeEvaluation(
                 "Price went below 20 SMA",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.PriceAbove20SMADays,
-                tickerOutcomes
-                |> Seq.filter (fun t ->
-                    t.outcomes |> Seq.exists (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = -1m)
-                )
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = -1m)  ]
             )
         ]
