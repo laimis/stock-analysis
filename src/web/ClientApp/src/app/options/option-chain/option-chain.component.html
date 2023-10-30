@@ -2,9 +2,9 @@
   <div class="mt-2" *ngIf="loading">
     Loading option details...
   </div>
-  
+
   <app-error-display [errors]="errors"></app-error-display>
-    
+
   <div class="mt-2" *ngIf="options">
 
     <div>
@@ -22,8 +22,8 @@
         <tbody>
           <tr>
             <td>
-              <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
-              <app-stock-link [ticker]="ticker"></app-stock-link> - {{ stockPrice | currency }}</td>
+              <app-stock-link-and-tradingview-link [ticker]="ticker"></app-stock-link-and-tradingview-link>
+              - {{ stockPrice | currency }}</td>
             <td>{{volatility}}</td>
             <td>{{putOpenInterest() | number}} vs {{callOpenInterest() | number}}</td>
             <td>{{putOpenInterest() / callOpenInterest() | number }}</td>
@@ -43,7 +43,7 @@
           <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
         </select>
       </div>
-      <div class="col">  
+      <div class="col">
         <label class="form-label" for="sideSelect">Side</label>
         <select class="form-select" [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
           <option value=""></option>
@@ -99,7 +99,7 @@
       <div class="col">
         <button *ngIf="selectedSpread" class="btn btn-link" (click)="selectedSpread = null">Clear</button>
         <app-option-spreads *ngIf="selectedSpread === 'straddles'"  [spreads]="straddles"></app-option-spreads>
-        <app-option-spreads *ngIf="selectedSpread === 'bullCallSpreads'" [spreads]="bullCallSpreads"></app-option-spreads>    
+        <app-option-spreads *ngIf="selectedSpread === 'bullCallSpreads'" [spreads]="bullCallSpreads"></app-option-spreads>
         <app-option-spreads *ngIf="selectedSpread === 'bullPutSpreads'"  [spreads]="bullPutSpreads"></app-option-spreads>
         <app-option-spreads *ngIf="selectedSpread === 'bearCallSpreads'"  [spreads]="bearCallSpreads"></app-option-spreads>
         <app-option-spreads *ngIf="selectedSpread === 'bearPutSpreads'"  [spreads]="bearPutSpreads"></app-option-spreads>
@@ -113,7 +113,7 @@
           <span class="float-end">Expires in {{expiration[0].daysToExpiration}} day(s)</span>
         </h4>
         <div class="row mb-3">
-          <!-- chart sections that show open interest vs strike price 
+          <!-- chart sections that show open interest vs strike price
             I ended up not finding this useful, but leaving this in, in case it becomes useful later
 
           <app-chart

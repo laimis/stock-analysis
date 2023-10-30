@@ -95,6 +95,8 @@ import { RoutinesActiveRoutineComponent } from './routines/routines-active-routi
 import { LineChartComponent } from './shared/line-chart/line-chart.component';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-chart.component";
+import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-and-tradingview-link.component";
+import {NgOptimizedImage} from "@angular/common";
 
 
 let routes: Routes = [
@@ -256,6 +258,7 @@ let routes: Routes = [
     StockTradingStrategiesComponent,
     TradingViewLinkComponent,
     StockLinkComponent,
+    StockLinkAndTradingviewLinkComponent,
 
     OptionBrokeragePositionsComponent,
     OptionBrokerageOrdersComponent,
@@ -270,7 +273,8 @@ let routes: Routes = [
     HttpClientModule,
     FormsModule,
     CanvasJSAngularChartsModule,
-    RouterModule.forRoot(routes, { })
+    RouterModule.forRoot(routes, {}),
+    NgOptimizedImage
   ],
   providers: [
     { provide: "windowObject", useValue: window},

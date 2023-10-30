@@ -1,13 +1,13 @@
 <section>
   <h5>Pending Positions</h5>
-  
+
   <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
 
-  
+
   <div class="d-flex justify-content-end">
     <a class="btn btn-outline-secondary btn-sm" href="/api/portfolio/pendingstockpositions/export">Export</a>
   </div>
-  
+
   <div>
     <span *ngIf="loaded && positions.length === 0">No pending positions found</span>
     <table class="table table-striped table-hover" *ngIf="positions.length !== 0">
@@ -27,8 +27,7 @@
         <ng-container *ngFor="let position of positions">
           <tr>
             <td>
-              <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
-              <app-stock-link [ticker]="position.ticker" [openInNewTab]="true"></app-stock-link>
+              <app-stock-link-and-tradingview-link [ticker]="position.ticker" [openInNewTab]="true"></app-stock-link-and-tradingview-link>
             </td>
 
             <td>{{ position.numberOfShares }}</td>
@@ -50,7 +49,7 @@
             </td>
           </tr>
         </ng-container>
-        
+
       </tbody>
     </table>
   </div>

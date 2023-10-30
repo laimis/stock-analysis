@@ -29,7 +29,7 @@
   </div>
 
   <div *ngIf="renderStyle === 'card'">
-    <div class="card border-info mt-4" *ngFor="let position of sortedPositions;">  
+    <div class="card border-info mt-4" *ngFor="let position of sortedPositions;">
       <div class="card-body" *ngIf="position">
         <div class="card-title">
           <div class="container">
@@ -46,12 +46,12 @@
               <div class="col">
                 <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
               </div>
-            </div>  
+            </div>
           </div>
         </div>
         <div class="card-text" class="visually-hidden" #detailDiv>
           <app-stock-trading-position [position]="position" [orders]="orders" ></app-stock-trading-position>
-        </div>      
+        </div>
       </div>
     </div>
   </div>
@@ -80,8 +80,7 @@
       <tbody>
         <tr *ngFor="let position of sortedPositions">
           <td>
-            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
-            <app-stock-link [ticker]="position.ticker"></app-stock-link>
+            <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
           </td>
           <td>{{position.price | currency}}</td>
           <td>{{position.averageCostPerShare | currency}}</td>
@@ -102,6 +101,6 @@
     </table>
 
   </div>
-  
+
 
 </div>

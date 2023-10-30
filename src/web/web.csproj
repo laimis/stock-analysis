@@ -21,6 +21,10 @@
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+    <Content Remove="ClientApp\.angular\**" />
+    <None Remove="ClientApp\.angular\**" />
+    <Content Remove="ClientApp\dist\**" />
+    <None Remove="ClientApp\dist\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +41,16 @@
     <ProjectReference Include="..\infrastructure\secedgar\secedgar.csproj" />
     <ProjectReference Include="..\infrastructure\securityutils\securityutils.csproj" />
     <ProjectReference Include="..\core.fs\core.fs.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ClientApp\.angular\**" />
+    <Compile Remove="ClientApp\dist\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="ClientApp\.angular\**" />
+    <EmbeddedResource Remove="ClientApp\dist\**" />
   </ItemGroup>
 
 

@@ -55,8 +55,7 @@
               'text-white': alert.alertType === 'Positive'
             }">
             <td>
-              <app-trading-view-link [ticker]="alert.ticker"></app-trading-view-link>
-              <app-stock-link [ticker]="alert.ticker"></app-stock-link>
+              <app-stock-link-and-tradingview-link [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
             </td>
             <td>
               {{alert.description}}
@@ -88,7 +87,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let alert of container.recentlyTriggered" [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
-          <td>{{alert.ticker}}</td>
+          <td>
+            <app-stock-link-and-tradingview-link [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
+          </td>
           <td>{{alert.description}}</td>
           <td>{{alert.when | date:'short'}}</td>
         </tr>
