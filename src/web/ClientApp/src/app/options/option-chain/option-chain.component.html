@@ -23,7 +23,8 @@
           <tr>
             <td>
               <app-stock-link-and-tradingview-link [ticker]="ticker"></app-stock-link-and-tradingview-link>
-              - {{ stockPrice | currency }}</td>
+              <span>{{ stockPrice | currency }}</span>
+            </td>
             <td>{{volatility}}</td>
             <td>{{putOpenInterest() | number}} vs {{callOpenInterest() | number}}</td>
             <td>{{putOpenInterest() / callOpenInterest() | number }}</td>
