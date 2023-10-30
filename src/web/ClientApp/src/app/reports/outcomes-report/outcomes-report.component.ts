@@ -28,7 +28,7 @@ export class OutcomesReportComponent implements OnInit {
     private stocksService: StocksService,
     private route: ActivatedRoute) {
   }
-  
+
   ngOnInit(): void {
     var titleParam = this.route.snapshot.queryParamMap.get("title");
     if (titleParam) {
@@ -61,7 +61,7 @@ export class OutcomesReportComponent implements OnInit {
           }
           return t;
         });
-      
+
       if (this.tickers.length > 0) {
         this.loadSingleBarReport(this.tickers, this.earnings);
       }
@@ -69,9 +69,18 @@ export class OutcomesReportComponent implements OnInit {
     } else {
       this.errors = ["No tickers were provided"];
     }
-
   }
-  
+
+  runReports(start, end) {
+    if (this.tickers.length === 0) {
+      return
+    }
+
+    this.startDate = start;
+    this.endDate = end;
+    this.loadSingleBarReport(this.tickers, this.earnings);
+  }
+
   private loadSingleBarReport(tickers: string[], earnings: string[]) {
     return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings, this.endDate).subscribe(report => {
       this.singleBarReportDaily = report;

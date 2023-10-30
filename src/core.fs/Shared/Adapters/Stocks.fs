@@ -36,6 +36,14 @@ type PriceFrequency =
             
 type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, close:decimal, volume:int64) =
     
+    do
+        // check that none of the values are negative
+        if ``open`` < 0m then failwith $"Invalid open price: {``open``}"
+        if high < 0m then failwith $"Invalid high price: {high}"
+        if low < 0m then failwith $"Invalid low price: {low}"
+        if close < 0m then failwith $"Invalid close price: {close}"
+        if volume < 0L then failwith $"Invalid volume: {volume}"
+        
     new(value:string) =
         let parts = value.Split(',')
         PriceBar(

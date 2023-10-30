@@ -13,6 +13,17 @@ namespace coretests.Stocks.Services
         public static AnalysisOutcome FirstOutcome(this IEnumerable<AnalysisOutcome> outcomes, string key) => outcomes.First(x => x.Key == key);
     }
 
+    public class MultipleBarPriceAnalysisSmallNumberOfBars
+    {
+        private readonly IEnumerable<AnalysisOutcome> _outcomes =
+            MultipleBarPriceAnalysis.run(
+                TestDataGenerator.IncreasingPriceBars(numOfBars: 10)
+            );
+        
+        [Fact]
+        public void OutcomesMatch() => Assert.NotEmpty(_outcomes);
+    }
+
     public class MultipleBarPriceAnalysisTests
     {
         private readonly IEnumerable<AnalysisOutcome> _outcomes =

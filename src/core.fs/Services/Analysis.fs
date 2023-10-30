@@ -292,7 +292,10 @@ module PercentChangeAnalysis =
             numbers 
             |> Seq.pairwise 
             |> Seq.map (fun (x, y) ->
-                let change = (y - x) / x
+                let change =
+                    match x with
+                    | 0m -> 0m
+                    | _ -> (y - x) / x
                 match multipleByHundred with
                 | true -> System.Math.Round(change * 100m, 2)
                 | false -> change

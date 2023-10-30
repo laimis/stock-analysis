@@ -308,14 +308,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 query.Tickers
                 |> Seq.map( fun t -> async {
                     let startDate =
-                        match query.StartDate with
-                        | null -> DateTimeOffset.MinValue
-                        | _ -> marketHours.GetMarketStartOfDayTimeInUtc(DateTimeOffset.Parse(query.StartDate))
+                        match DateTimeOffset.TryParse(query.StartDate) with
+                        | false, _ -> DateTimeOffset.MinValue
+                        | true, dt -> marketHours.GetMarketStartOfDayTimeInUtc(dt)
                     
                     let endDate =
-                        match query.EndDate with
-                        | null -> DateTimeOffset.MinValue
-                        | _ -> marketHours.GetMarketEndOfDayTimeInUtc(DateTimeOffset.Parse(query.EndDate))
+                        match DateTimeOffset.TryParse(query.EndDate) with
+                        | false, _ -> DateTimeOffset.MinValue
+                        | true, dt -> marketHours.GetMarketEndOfDayTimeInUtc(dt)
                         
                     let! priceResponse =
                         brokerage.GetPriceHistory

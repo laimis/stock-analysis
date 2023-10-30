@@ -1,6 +1,5 @@
 namespace core.fs.Services
 
-open System.Collections.Generic
 open core.fs.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Stocks
@@ -99,22 +98,25 @@ module MultipleBarPriceAnalysis =
                 |> Option.defaultWith (fun () -> arr.Length)
                 |> decimal
                 
-            let outcomeType, value =
-                match priceAndSMA20[0] with
-                | true ->
-                    OutcomeType.Positive,
-                    priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = false)
-                | false ->
-                    OutcomeType.Negative,
-                    priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = true) |> fun x -> x * -1m
-                    
-            AnalysisOutcome(
-                key = MultipleBarOutcomeKeys.PriceAbove20SMADays,
-                outcomeType = outcomeType,
-                value = value,
-                valueType = ValueFormat.Number,
-                message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {abs value} days"
-            )
+            match priceAndSMA20 with
+            | [||] -> None
+            | _ ->
+                let outcomeType, value =
+                    match priceAndSMA20[0] with
+                    | true ->
+                        OutcomeType.Positive,
+                        priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = false)
+                    | false ->
+                        OutcomeType.Negative,
+                        priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = true) |> fun x -> x * -1m
+                        
+                AnalysisOutcome(
+                    key = MultipleBarOutcomeKeys.PriceAbove20SMADays,
+                    outcomeType = outcomeType,
+                    value = value,
+                    valueType = ValueFormat.Number,
+                    message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {abs value} days"
+                ) |> Some
             
         let private generateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
             
@@ -131,32 +133,38 @@ module MultipleBarPriceAnalysis =
                 |> Array.tryFindIndex func
                 |> Option.defaultWith (fun () -> arr.Length)
                 |> decimal
-                
-            let outcomeType, value =
-                match sma20Above50Sequence[0] with
-                | true ->
-                    OutcomeType.Positive,
-                    sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = false)
-                | false ->
-                    OutcomeType.Negative,
-                    sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = true)
             
-            AnalysisOutcome(
-                key = MultipleBarOutcomeKeys.SMA20Above50Days,
-                outcomeType = outcomeType,
-                value = value,
-                valueType = ValueFormat.Number,
-                message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} days"
-            )
+            match sma20Above50Sequence with
+            | [||] -> None
+            | _ ->
+                let outcomeType, value =
+                    match sma20Above50Sequence[0] with
+                    | true ->
+                        OutcomeType.Positive,
+                        sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = false)
+                    | false ->
+                        OutcomeType.Negative,
+                        sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = true)
+                
+                AnalysisOutcome(
+                    key = MultipleBarOutcomeKeys.SMA20Above50Days,
+                    outcomeType = outcomeType,
+                    value = value,
+                    valueType = ValueFormat.Number,
+                    message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} days"
+                ) |> Some
             
         let generate (prices: PriceBars) =
             
             let smaContainer =  prices |> SMAContainer.Generate
             
+            let sma20Over50Outcome = smaContainer |> generateSMA20Above50DaysOutcome
+            let priceOver20Outcome = smaContainer |> generatePriceAboveSMA20Outcome prices
+            
             [
                 yield! smaContainer |> generateSMAOutcomes
-                smaContainer |> generateSMA20Above50DaysOutcome
-                smaContainer |> generatePriceAboveSMA20Outcome prices
+                if sma20Over50Outcome.IsSome then sma20Over50Outcome.Value
+                if priceOver20Outcome.IsSome then priceOver20Outcome.Value
             ]
        
     module VolumeAnalysis =
@@ -224,7 +232,10 @@ module MultipleBarPriceAnalysis =
         let private generatePercentAboveLowOutcome (prices: PriceBars) =
             
             let lowest = prices.Bars |> Array.minBy (fun p -> p.Close)
-            let percentAboveLow = (prices.Last.Close - lowest.Close) / lowest.Close
+            let percentAboveLow =
+                match lowest.Close with
+                | 0m -> 0m
+                | _ -> (prices.Last.Close - lowest.Close) / lowest.Close
             let percentAboveLowOutcomeType = OutcomeType.Neutral
             
             AnalysisOutcome(
@@ -277,7 +288,11 @@ module MultipleBarPriceAnalysis =
             
         let private generateGainOutcome (prices: PriceBars) =
             
-            let gain = (prices.Last.Close - prices.First.Close) / prices.First.Close
+            let gain =
+                match prices.First.Close with
+                | 0m -> 0m
+                | _ -> (prices.Last.Close - prices.First.Close) / prices.First.Close
+                
             let gainOutcomeType = if gain > 0m then OutcomeType.Positive else OutcomeType.Negative
             
             AnalysisOutcome(
@@ -314,15 +329,20 @@ module MultipleBarPriceAnalysis =
             
         let private generateAverageTrueRangeOutcome (prices:PriceBars) =
             
-            let value = prices |> Indicators.averageTrueRage |> fun x -> x.DataPoints |> Array.last |> fun x -> x.Value
+            let dataPoints = prices |> Indicators.averageTrueRage |> fun x -> x.DataPoints
             
-            AnalysisOutcome(
-                key = MultipleBarOutcomeKeys.AverageTrueRange,
-                outcomeType = OutcomeType.Neutral,
-                value = value,
-                valueType = ValueFormat.Currency,
-                message = $"Average True Range: {value}"
-            )
+            match dataPoints with
+            | [||] -> None
+            | _ ->
+                let value = dataPoints |> Array.last |> fun x -> x.Value
+        
+                AnalysisOutcome(
+                    key = MultipleBarOutcomeKeys.AverageTrueRange,
+                    outcomeType = OutcomeType.Neutral,
+                    value = value,
+                    valueType = ValueFormat.Currency,
+                    message = $"Average True Range: {value}"
+                ) |> Some
             
         let private generateCurrentPriceOutcome (prices:PriceBars) =
             
@@ -338,6 +358,8 @@ module MultipleBarPriceAnalysis =
             
         let generate (prices: PriceBars) =
             
+            let atrOutcome = prices |> generateAverageTrueRangeOutcome
+            
             [
                 prices |> generateCurrentPriceOutcome
                 prices |> generateEarliestPriceOutcome
@@ -350,7 +372,7 @@ module MultipleBarPriceAnalysis =
                 prices |> generateGainOutcome
                 prices |> generatePercentChangeAverageOutcome
                 prices |> generatePercentChangeStandardDeviationOutcome
-                prices |> generateAverageTrueRangeOutcome
+                if atrOutcome.IsSome then atrOutcome.Value
             ]
     
     let run prices =
