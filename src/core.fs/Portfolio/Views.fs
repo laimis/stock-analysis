@@ -119,10 +119,10 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 profits.Add(start, perfView.Profit)
                 wins.Add(start, perfView.WinPct)
                 avgWinPct.Add(start, perfView.WinAvgReturnPct)
-                avgLossPct.Add(start, -1.0m * perfView.LossAvgReturnPct)
+                avgLossPct.Add(start, perfView.LossAvgReturnPct)
                 ev.Add(start, perfView.EV)
                 avgWinAmount.Add(start, perfView.AvgWinAmount)
-                avgLossAmount.Add(start, -1.0m * perfView.AvgLossAmount)
+                avgLossAmount.Add(start, perfView.AvgLossAmount)
                 gainPctRatio.Add(start, perfView.ReturnPctRatio)
                 profitRatio.Add(start, perfView.ProfitRatio)
                 rrRatio.Add(start, perfView.rrRatio)
@@ -163,7 +163,6 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             gradeContainer.Add("A", aGrades);
             gradeContainer.Add("B", bGrades);
             gradeContainer.Add("C", cGrades);
-            
             
             let gainDistribution =
                 let label = "Gain Distribution"
