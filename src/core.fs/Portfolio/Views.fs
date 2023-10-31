@@ -40,7 +40,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 ) (Decimal.MaxValue, Decimal.MinValue)
             ()
         
-            let min = Math.Floor(min);
+            let min = Math.Floor(min)
             let max = Math.Ceiling(max)
             
             let min,max =
@@ -73,30 +73,29 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             
         let generateTrends (trades:PositionInstance array) =
             
-            let trends = List<ChartDataPointContainer<decimal>>();
-            
-            let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some;
-            let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.Vertical) |> Option.Some;
-            let oneLineAnnotationHorizontal = ChartAnnotationLine(1, ChartAnnotationLineType.Horizontal) |> Option.Some;
+            let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
+            let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.Vertical) |> Option.Some
+            let oneLineAnnotationHorizontal = ChartAnnotationLine(1, ChartAnnotationLineType.Horizontal) |> Option.Some
             
             // go over each closed transaction and calculate number of wins for each window
             let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Line, zeroLineAnnotationHorizontal)
-            let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.Line, zeroLineAnnotationHorizontal);
-            let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.Line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.Horizontal) |> Option.Some);
-            let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.Line, ChartAnnotationLine(0.12m, ChartAnnotationLineType.Horizontal) |> Option.Some);
-            let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.Line, ChartAnnotationLine(-0.07m, ChartAnnotationLineType.Horizontal) |> Option.Some);
-            let ev = ChartDataPointContainer<decimal>("EV", DataPointChartType.Line, ChartAnnotationLine(40, ChartAnnotationLineType.Horizontal) |> Option.Some);
-            let avgWinAmount = ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.Line, ChartAnnotationLine(60, ChartAnnotationLineType.Horizontal) |> Option.Some);
-            let avgLossAmount = ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.Line, ChartAnnotationLine(-30, ChartAnnotationLineType.Horizontal) |> Option.Some);
-            let gainPctRatio = ChartDataPointContainer<decimal>("% Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal);
-            let profitRatio = ChartDataPointContainer<decimal>("$ Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal);
-            let rrRatio = ChartDataPointContainer<decimal>("RR Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal);
-            let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.Line);
-            let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.Line);
-            let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.Line);
-            let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.Line);
-            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.Column);
-            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.Column);
+            let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.Line, zeroLineAnnotationHorizontal)
+            let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.Line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.Horizontal) |> Option.Some)
+            let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.Line, ChartAnnotationLine(0.12m, ChartAnnotationLineType.Horizontal) |> Option.Some)
+            let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.Line, ChartAnnotationLine(-0.07m, ChartAnnotationLineType.Horizontal) |> Option.Some)
+            let ev = ChartDataPointContainer<decimal>("EV", DataPointChartType.Line, ChartAnnotationLine(40, ChartAnnotationLineType.Horizontal) |> Option.Some)
+            let avgWinAmount = ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.Line, ChartAnnotationLine(60, ChartAnnotationLineType.Horizontal) |> Option.Some)
+            let avgLossAmount = ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.Line, ChartAnnotationLine(-30, ChartAnnotationLineType.Horizontal) |> Option.Some)
+            let gainPctRatio = ChartDataPointContainer<decimal>("% Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal)
+            let profitRatio = ChartDataPointContainer<decimal>("$ Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal)
+            let rrRatio = ChartDataPointContainer<decimal>("RR Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal)
+            let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.Line)
+            let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.Line)
+            let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.Line)
+            let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.Line)
+            let tradeCount = ChartDataPointContainer<decimal>("Trade Count", DataPointChartType.Line)
+            let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.Column)
+            let positionsOpenedByDateContainer = ChartDataPointContainer<decimal>("Positions Opened", DataPointChartType.Column)
             
             let days =
                 match trades with
@@ -106,7 +105,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                     let lastDate = trades[trades.Length-1].Closed.Value.Date
                     (lastDate - firstDate).TotalDays |> int
             
-            let mutable equity = 0m;
+            let mutable equity = 0m
             
             [0..days]
             |> Seq.iter (fun i ->
@@ -130,6 +129,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 maxLoss.Add(start, perfView.MaxLossAmount)
                 rrSum.Add(start, perfView.rrSum)
                 invested.Add(start, perfView.TotalCost)
+                tradeCount.Add(start, perfView.NumberOfTrades)
                 
                 // number of positions opened on start day
                 let numberOfPositionsOpened = trades |> Seq.filter (fun t -> t.Opened.Date = start) |> Seq.length
@@ -159,10 +159,10 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                         
                     ) (0, 0, 0)
             
-            let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.Column);
-            gradeContainer.Add("A", aGrades);
-            gradeContainer.Add("B", bGrades);
-            gradeContainer.Add("C", cGrades);
+            let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.Column)
+            gradeContainer.Add("A", aGrades)
+            gradeContainer.Add("B", bGrades)
+            gradeContainer.Add("C", cGrades)
             
             let gainDistribution =
                 let label = "Gain Distribution"
@@ -202,30 +202,31 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                         40
                         true
                         zeroLineAnnotationVertical
-                        
-            trends.Add(profits)
-            trends.Add(equityCurve)
-            trends.Add(gradeContainer)
-            trends.Add(gainDistribution)
-            trends.Add(gainPctDistribution)
-            trends.Add(rrDistribution)
-            trends.Add(wins)
-            trends.Add(avgWinPct)
-            trends.Add(avgLossPct)
-            trends.Add(ev)
-            trends.Add(avgWinAmount)
-            trends.Add(avgLossAmount)
-            trends.Add(gainPctRatio)
-            trends.Add(profitRatio)
-            trends.Add(rrRatio)
-            trends.Add(rrSum)
-            trends.Add(invested)
-            trends.Add(maxWin)
-            trends.Add(maxLoss)
-            trends.Add(positionsOpenedByDateContainer)
-            trends.Add(positionsClosedByDateContainer)
             
-            trends
+            [
+                profits
+                equityCurve
+                gradeContainer
+                gainDistribution
+                gainPctDistribution
+                rrDistribution
+                wins
+                avgWinPct
+                avgLossPct
+                ev
+                avgWinAmount
+                avgLossAmount
+                gainPctRatio
+                profitRatio
+                rrRatio
+                rrSum
+                invested
+                maxWin
+                maxLoss
+                tradeCount
+                positionsOpenedByDateContainer
+                positionsClosedByDateContainer
+            ]
             
         let getAtMost (numberOfTrades:int) (trades:PositionInstance array) =
             match trades.Length with
@@ -249,8 +250,8 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         
         member _.ClosedPositions = closedPositions
         member _.RecentClosedPositions = closedPositions |> Array.skip (closedPositions.Length - recentLengthToTake)
-        member this.Recent = TradingPerformance.Create(this.RecentClosedPositions);
-        member _.Overall = TradingPerformance.Create(closedPositions);
+        member this.Recent = TradingPerformance.Create(this.RecentClosedPositions)
+        member _.Overall = TradingPerformance.Create(closedPositions)
         // TODO: very slow to calculate, commenting it out as I need to glance it rarely, but perhaps it's something
         // we can precalculate
         // member _.TrendsAll = closedPositions |> generateTrends
