@@ -251,10 +251,12 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
         member _.RecentClosedPositions = closedPositions |> Array.skip (closedPositions.Length - recentLengthToTake)
         member this.Recent = TradingPerformance.Create(this.RecentClosedPositions);
         member _.Overall = TradingPerformance.Create(closedPositions);
-        member _.TrendsAll = generateTrends [||]
+        // TODO: very slow to calculate, commenting it out as I need to glance it rarely, but perhaps it's something
+        // we can precalculate
+        // member _.TrendsAll = closedPositions |> generateTrends
         member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
-        member _.TrendsLast50 = closedPositions |> getAtMost 50
-        member _.TrendsLast100 = closedPositions |> getAtMost 100
+        member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends
+        member _.TrendsLast100 = closedPositions |> getAtMost 100 |> generateTrends
         
         member this.TrendsTwoMonths =
             this.ClosedPositions
