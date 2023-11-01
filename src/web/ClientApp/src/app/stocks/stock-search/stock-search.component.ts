@@ -1,14 +1,14 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
-import { StockSearchResult, StocksService } from '../services/stocks.service';
+import {StockSearchResult, StocksService} from "../../services/stocks.service";
 
 @Component({
-  selector: 'app-symbol-search',
-  templateUrl: './symbol-search.component.html',
-  styleUrls: ['./symbol-search.component.css']
+  selector: 'app-stock-search',
+  templateUrl: './stock-search.component.html',
+  styleUrls: ['./stock-search.component.css']
 })
-export class SymbolSearchComponent implements OnInit {
+export class StockSearchComponent implements OnInit {
 
   @Input() label: string = "Search for securities using ticker or name"
   @Input() cssClass: string = "form-control"

@@ -28,7 +28,6 @@ import { ProfileVerifyComponent } from './profile/profile-verify.component';
 import { ContactComponent } from './contact/contact.component';
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
-import { SymbolSearchComponent } from './symbol-search/symbol-search.component';
 import { PlaygroundComponent } from './playground/playground.component';
 import { AdminEmailComponent } from './admin/email/admin-email.component';
 import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
@@ -97,6 +96,7 @@ import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-chart.component";
 import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-and-tradingview-link.component";
 import {NgOptimizedImage} from "@angular/common";
+import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
 
 
 let routes: Routes = [
@@ -149,7 +149,7 @@ let routes: Routes = [
 
   {path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard]},
   {path: 'terms', component: TermsComponent},
-  {path: 'test', component: SymbolSearchComponent},
+  {path: 'test', component: StockSearchComponent},
 
   {path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
   {path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},
@@ -226,7 +226,7 @@ let routes: Routes = [
     BrokerageOrdersComponent,
     BrokerageNewOrderComponent,
 
-    SymbolSearchComponent,
+    StockSearchComponent,
     TransactionsComponent,
     TermsComponent,
 

@@ -3,13 +3,13 @@
   <div>
     <div class="row">
       <div class="col">
-        <app-symbol-search
+        <app-stock-search
           *ngIf="isPendingPositionMode === true"
             label="Ticker"
             placeholder="New position symbol"
             (tickerSelected)="onBuyTickerSelected($event)"
             cssClass="form-control">
-        </app-symbol-search>
+        </app-stock-search>
         <b *ngIf="isPendingPositionMode === false">{{ticker}}</b>
       </div>
     </div>

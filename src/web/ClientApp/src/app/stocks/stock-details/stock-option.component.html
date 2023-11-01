@@ -21,12 +21,12 @@
 		<form>
       <div class="row">
         <div class="col">
-          <app-symbol-search
+          <app-stock-search
             label="Ticker"
             (tickerSelected)="onTickerSelected($event)"
             cssClass="form-control"
             [ticker]="ticker">
-          </app-symbol-search>
+          </app-stock-search>
         </div>
         <div class="col">
           <label for="strikePrice">Strike Price</label>

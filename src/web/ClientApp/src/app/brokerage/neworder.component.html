@@ -4,13 +4,13 @@
   <div>
     <div class="row">
       <div class="col-md">
-        <app-symbol-search
+        <app-stock-search
               [ticker]="selectedTicker"
               label="Ticker"
               placeholder="New position symbol"
               (tickerSelected)="onTickerSelected($event)"
               cssClass="form-control">
-          </app-symbol-search>
+          </app-stock-search>
       </div>
       <div class="col-md">
         <label for="price" class="form-label">Price</label>

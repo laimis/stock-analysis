@@ -1,10 +1,10 @@
 <div>
-  <app-symbol-search
+  <app-stock-search
       label="{{null}}"
       placeholder="Search for securities using ticker or name"
       (tickerSelected)="onTokenSelected($event)"
       cssClass="form-control">
-  </app-symbol-search>
+  </app-stock-search>
 </div>
 
 <div *ngIf="loaded">
