@@ -1,22 +1,25 @@
 <div>
   <label for="ticker" class="form-label">{{label}}</label>
   <input type="text"
-    class="{{cssClass}}"
-    id="ticker"
-    #tickerBox
-    name="ticker"
-    [(ngModel)]="selectedValue"
-    (input)="search(tickerBox.value)"
-    (blur)="loseFocus()"
-    placeholder="{{placeholder}}"
-    autocomplete="off" />
+         class="{{cssClass}}"
+         id="ticker"
+         name="ticker"
+         [(ngModel)]="selectedValue"
+         (ngModelChange)="onModelChange($event)"
+         (blur)="loseFocus()"
+         (keydown)="onKeyDown($event)"
+         placeholder="{{placeholder}}"
+         autocomplete="off"/>
 
-    <div class="search-results" *ngIf="showSuggestions">
+  <div class="search-results" *ngIf="searchResultsSubscribedArray.length > 0" >
 
-      <div class="row" *ngFor="let r of searchResults$ | async" (click)="clicked(r.symbol)">
-        <div class="col ms-2 mb-2">{{r.symbol}}</div>
-        <div class="col-10">{{r.securityName}}</div>
-      </div>
+    <div class="row"
+         *ngFor="let r of searchResultsSubscribedArray; let i = index"
+         [class.highlighted]="i === highlightedIndex"
+         (click)="clicked(r.symbol)">
+      <div class="col ms-2 mb-2">{{r.symbol}}</div>
+      <div class="col-10">{{r.securityName}}</div>
     </div>
+  </div>
 
 </div>
