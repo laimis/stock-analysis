@@ -34,20 +34,19 @@ export class NavMenuComponent {
     })
   }
 
+  // on mobile, when clicking a link, collapse the menu, it
+  // doesn't collapse automatically
+  navbarSupportedContentId = 'navbarSupportedContent';
   collapseMenu() {
-    let element = document.getElementById('navbarSupportedContent');
+    let element = document.getElementById(this.navbarSupportedContentId);
     element.classList.remove('show');
   }
 
   navigateToTicker(ticker: string) {
-    console.log('navigateToTicker:' + ticker)
-    // this.collapseMenu();
-    console.log('post collapse call')
     this.router.navigate(['/stocks/' + ticker]).then(
       result => {
-        console.log('navigateToTicker done:' + result)
+        this.collapseMenu();
       }
     )
-    console.log('post router call')
   }
 }

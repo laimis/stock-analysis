@@ -2,9 +2,10 @@
   <div class="container-fluid">
 
     <a *ngIf="isLoggedIn"
-      class="nav-link"
-      [ngClass]="{'nav-item': true, 'nav-item-active': '/dashboard' === currentPath}"
-      [routerLink]="[ '/dashboard' ]">Dashboard</a>
+       class="nav-link"
+       (click)="collapseMenu()"
+       [ngClass]="{'nav-item': true, 'nav-item-active': '/dashboard' === currentPath}"
+       [routerLink]="[ '/dashboard' ]">Dashboard</a>
 
     <a *ngIf="!isLoggedIn" class="nav-link" [routerLink]="[ '/login' ]">Login</a>
 
@@ -19,7 +20,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse" [id]="navbarSupportedContentId">
       <ul *ngIf="isLoggedIn" class="navbar-nav me-auto mb-2 mb-lg-0">
         <li *ngFor="let l of links">
           <a
