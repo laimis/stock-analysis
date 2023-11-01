@@ -33,4 +33,9 @@ export class NavMenuComponent {
       }
     })
   }
+
+  collapseMenu() {
+    let element = document.getElementById('navbarSupportedContent');
+    element.classList.remove('show');
+  }
 }
