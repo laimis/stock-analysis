@@ -38,4 +38,16 @@ export class NavMenuComponent {
     let element = document.getElementById('navbarSupportedContent');
     element.classList.remove('show');
   }
+
+  navigateToTicker(ticker: string) {
+    console.log('navigateToTicker:' + ticker)
+    // this.collapseMenu();
+    console.log('post collapse call')
+    this.router.navigate(['/stocks/' + ticker]).then(
+      result => {
+        console.log('navigateToTicker done:' + result)
+      }
+    )
+    console.log('post router call')
+  }
 }

@@ -28,6 +28,8 @@
             class="nav-link" [routerLink]="[ l.path]">{{l.label}}</a>
         </li>
       </ul>
+
+      <app-stock-search [cssClass]="'d-flex ms-auto form-control'" [label]="''" [placeholder]="'Enter stock symbol'" (tickerSelected)="navigateToTicker($event)"></app-stock-search>
     </div>
   </div>
 </nav>

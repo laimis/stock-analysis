@@ -51,6 +51,8 @@ export class StockSearchComponent implements OnInit {
     this.searchResults.subscribe(value => {
       console.log("searchResults.subscribe: " + value.length)
       this.searchResultsSubscribedArray = value
+    }, error => {
+      console.log("searchResults.subscribe error: " + error)
     })
   }
 
