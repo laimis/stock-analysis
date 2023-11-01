@@ -29,7 +29,14 @@
         </li>
       </ul>
 
-      <app-stock-search [cssClass]="'d-flex ms-auto form-control'" [label]="''" [placeholder]="'Enter stock symbol'" (tickerSelected)="navigateToTicker($event)"></app-stock-search>
+      <app-stock-search
+        *ngIf="isLoggedIn"
+        [cssClass]="'d-flex ms-auto form-control'"
+        [label]="''"
+        [placeholder]="'Enter stock symbol'"
+        (tickerSelected)="navigateToTicker($event)"
+        [justTickers]="true">
+      </app-stock-search>
     </div>
   </div>
 </nav>

@@ -10,15 +10,17 @@ import {StockSearchResult, StocksService} from "../../services/stocks.service";
 })
 export class StockSearchComponent implements OnInit {
 
-  @Input() label: string = "Search for securities using ticker or name"
-  @Input() cssClass: string = "form-control"
+  @Input() label : string = "Search for securities using ticker or name"
+  @Input() cssClass : string = "form-control"
 
   @Input()
   set ticker(value: string) {
     this.selectedValue = value
   }
 
-  @Input() placeholder: string
+  @Input() placeholder : string
+  @Input() justTickers : boolean
+
   @Output() tickerSelected = new EventEmitter<string>();
 
   selectedValue: string = null

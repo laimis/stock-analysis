@@ -18,7 +18,7 @@
          [class.highlighted]="i === highlightedIndex"
          (click)="clicked(r.symbol)">
       <div class="col ms-2 mb-2">{{r.symbol}}</div>
-      <div class="col-10">{{r.securityName}}</div>
+      <div *ngIf="justTickers === false" class="col-10">{{r.securityName}}</div>
     </div>
   </div>
 
