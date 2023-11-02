@@ -2,8 +2,11 @@
 
   <div class="container">
     <div class="row">
-      <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-      <div class="col text-center">
+      <div class="col-md">
+        <button (click)="previous()" class="btn btn-primary"> &LessLess; </button>
+        <button (click)="next()" class="btn btn-primary float-end">&GreaterGreater;</button>
+      </div>
+      <div class="col-md text-center">
         <select class="form-select"  (change)="dropdownClick($event.target)">
           <option
             *ngFor="let position of positions; let i = index;"
@@ -13,20 +16,16 @@
           </option>
         </select>
       </div>
-      <div class="col">
+      <div class="col-md">
         <span class="text-muted">Price: </span>{{currentPosition.price | currency}}
       </div>
-      <div class="col">
-        <span class="text-muted">Stop: </span>{{currentPosition.stopPrice | currency}}
-      </div>
-      <div class="col">
+      <div class="col-md">
         <span class="text-muted">Cost/Share: </span>{{currentPosition.averageBuyCostPerShare | currency}}
       </div>
-      <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
     </div>
   </div>
 
-  <section>
+  <section class="d-none">
     <h5>Actual vs Trading Strategies</h5>
     <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
   </section>
