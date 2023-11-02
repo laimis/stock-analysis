@@ -3,18 +3,24 @@
   <div class="container">
     <div class="row">
       <div class="col-md">
-        <button (click)="previous()" class="btn btn-primary"> &LessLess; </button>
-        <button (click)="next()" class="btn btn-primary float-end">&GreaterGreater;</button>
-      </div>
-      <div class="col-md text-center">
-        <select class="form-select"  (change)="dropdownClick($event.target)">
-          <option
-            *ngFor="let position of positions; let i = index;"
-            [value]="i"
-            [selected]="position.ticker === currentPosition.ticker">
-            {{position.ticker}}
-          </option>
-        </select>
+        <div class="row">
+          <div class="col">
+            <button (click)="previous()" class="btn btn-primary"> &LessLess; </button>
+          </div>
+          <div class="col">
+            <select class="form-select"  (change)="dropdownClick($event.target)">
+              <option
+                *ngFor="let position of positions; let i = index;"
+                [value]="i"
+                [selected]="position.ticker === currentPosition.ticker">
+                {{position.ticker}}
+              </option>
+            </select>
+          </div>
+          <div class="col">
+            <button (click)="next()" class="btn btn-primary float-end">&GreaterGreater;</button>
+          </div>
+        </div>
       </div>
       <div class="col-md">
         <span class="text-muted">Price: </span>{{currentPosition.price | currency}}
