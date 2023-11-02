@@ -8,9 +8,11 @@
   z-index: 100;
   background-color: white;
   border: 1px solid black;
+  border-radius: 5px;
   padding: 5px;
   overflow: hidden;
   width: 100%;
+  box-shadow: 10px 5px 5px #888888;
 }
 
 .highlighted {

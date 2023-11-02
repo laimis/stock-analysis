@@ -149,7 +149,7 @@ let routes: Routes = [
 
   {path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard]},
   {path: 'terms', component: TermsComponent},
-  {path: 'test', component: StockSearchComponent},
+  {path: 'test', component: StockSearchComponent, canActivate: [AuthGuard]},
 
   {path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard]},
   {path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard]},

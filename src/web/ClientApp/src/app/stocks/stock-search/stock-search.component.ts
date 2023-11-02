@@ -70,7 +70,8 @@ export class StockSearchComponent implements OnInit {
     this.tickerSelected.emit(ticker)
   }
 
-  onModelChange($event: string) {
+  onModelChange($event: string)
+  {
     console.log("onModelChange: " + $event)
     this.searchTerms.next($event)
   }
