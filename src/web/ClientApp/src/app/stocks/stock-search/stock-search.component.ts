@@ -19,7 +19,7 @@ export class StockSearchComponent implements OnInit {
   }
 
   @Input() placeholder : string
-  @Input() justTickers : boolean
+  @Input() justTickers : boolean = false
 
   @Output() tickerSelected = new EventEmitter<string>();
 

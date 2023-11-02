@@ -10,8 +10,13 @@
   border: 1px solid black;
   padding: 5px;
   overflow: hidden;
+  width: 100%;
 }
 
 .highlighted {
   background-color: #e0e0e0;
+}
+
+.search-container {
+  position: relative;
 }
