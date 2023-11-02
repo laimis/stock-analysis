@@ -1,29 +1,29 @@
 <div>
   <section>
     <h5>Record trades for {{ticker}}</h5>
-    
+
     <form>
       <div class="row">
-        <div class="col">
+        <div class="col-md-3">
           <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
-          <select class="form-select btn border rounded" name="positionType" [(ngModel)]="positionType">
+          <select class="form-select btn border rounded" id="positionType" name="positionType" [(ngModel)]="positionType">
             <option value="buy">Bought</option>
             <option value="sell">Sold</option>
           </select>
         </div>
-  
-        <div class="col">
+
+        <div class="col-md-3">
           <label for="numberOfShares">Number of Shares</label>
           <input type="number" class="form-control" id="numberOfShares" name="numberOfShares"
             [(ngModel)]="numberOfShares">
         </div>
-  
-        <div class="col">
+
+        <div class="col-md-3">
           <label for="pricePerShare">Price per Share</label>
           <input type="number" step="0.01" class="form-control" id="pricePerShare" name="pricePerShare" [(ngModel)]="pricePerShare">
         </div>
-  
-        <div class="col">
+
+        <div class="col-md-3">
           <label for="filled">Filled</label>
           <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
         </div>
@@ -34,11 +34,13 @@
           <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="3"></textarea>
         </div>
       </div>
-  
-      <div>
-        <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
+
+      <div class="row">
+        <div class="col">
+          <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
+        </div>
       </div>
     </form>
   </section>
-  
+
 </div>
