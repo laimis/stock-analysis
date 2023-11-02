@@ -13,7 +13,7 @@
     </div>
 
     <div class="row">
-      <div class="col">
+      <div class="col-md-4">
 
         <div class="card">
           <div class="card-body">
@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="col">
+      <div class="col-md-4">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">
@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div class="col">
+      <div class="col-md-4">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">
@@ -64,15 +64,11 @@
               <i class="text-muted fas fa-toolbox"></i>
               Tools
             </h5>
-            <div class="row">
-              <div class="col">
-                <a
-                  *ngFor="let link of toolLinks"
-                  class="card-link"
-                  [routerLink]="[ link.path ]">{{link.label}}
-                </a>
-              </div>
-            </div>
+            <a
+              *ngFor="let link of toolLinks"
+              class="card-link"
+              [routerLink]="[ link.path ]">{{link.label}}
+            </a>
           </div>
         </div>
       </div>
