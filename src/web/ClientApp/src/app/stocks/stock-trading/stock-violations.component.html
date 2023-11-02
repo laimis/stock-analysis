@@ -2,7 +2,7 @@
   <span *ngIf="violations.length === 0">
     You have no violations.
   </span>
-  <table class="table table-hover border" *ngIf="violations.length > 0">
+  <table class="table table-hover border d-none" *ngIf="violations.length > 0">
     <thead>
       <tr>
         <th scope="col">Ticker</th>
@@ -55,6 +55,52 @@
       </ng-container>
     </tbody>
   </table>
+
+  <!-- render violations on mobile as cards -->
+  <div class="d-block d-sm-none">
+    <ng-container *ngFor="let violation of violations">
+      <div class="card mb-3">
+        <div class="card-title">
+          <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <button type="button" class="btn btn-secondary btn-block" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
+            </div>
+            <div class="col-md-6">
+              <button type="button" class="btn btn-secondary btn-block" (click)="openPosition(violation.ticker)">Open Position</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              {{violation.message}}
+            </div>
+          </div>
+          <div class="row"  *ngIf="activeTicker === violation.ticker">
+            <div class="col">
+              <app-stock-transaction
+                *ngIf="fixType === 'transaction'"
+                [ticker]="activeTicker"
+                [numberOfShares]="violation.numberOfShares"
+                [pricePerShare]="violation.pricePerShare"
+                (transactionFailed)="transactionFailed($event)"
+                (transactionRecorded)="transactionRecorded($event)">
+              </app-stock-transaction>
+              <app-stock-trading-newposition
+                *ngIf="fixType === 'position'"
+                [setTicker]="violation.ticker"
+                [showChart]="false"
+                [showAnalysis]="false"
+                [isPendingPositionMode]="false"
+                (stockPurchased)="transactionRecorded($event)">
+              </app-stock-trading-newposition>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
 
   <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-neworder>
   <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted($event)" [filteredTickers]="tickersInViolations"></app-brokerage-orders>

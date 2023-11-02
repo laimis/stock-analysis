@@ -11,7 +11,7 @@
          placeholder="{{placeholder}}"
          autocomplete="off"/>
 
-  <div class="search-results" *ngIf="searchResultsSubscribedArray.length > 0" >
+  <div class="search-results shadow rounded" *ngIf="searchResultsSubscribedArray.length > 0" >
 
     <div class="row"
          *ngFor="let r of searchResultsSubscribedArray; let i = index"

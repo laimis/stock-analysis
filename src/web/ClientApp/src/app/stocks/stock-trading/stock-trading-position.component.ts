@@ -79,7 +79,8 @@ export class StockTradingPositionComponent {
   }
 
   setCandidateValues() {
-    this.candidateRiskAmount = this._position.riskedAmount
+    // round risked amount to 2 decimal places
+    this.candidateRiskAmount = Math.round(this._position.riskedAmount * 100) / 100
     this.candidateStopPrice = this._position.stopPrice
   }
 
