@@ -21,7 +21,7 @@ export class AddNoteComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
-    var ticker = this.route.snapshot.paramMap.get('ticker');
+    const ticker = this.route.snapshot.paramMap.get('ticker');
     if (ticker){
       this.ticker = ticker;
     }
@@ -32,10 +32,10 @@ export class AddNoteComponent implements OnInit {
     this.saved = false;
     this.errors = null;
 
-    var obj = {
+    const obj = {
       ticker: this.ticker,
       note: this.note
-    }
+    };
 
     this.stockService.addNote(obj).subscribe(
       _ => this.router.navigate(['/notes/filtered', this.ticker]),

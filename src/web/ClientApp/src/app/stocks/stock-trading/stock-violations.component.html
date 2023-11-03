@@ -2,7 +2,7 @@
   <span *ngIf="violations.length === 0">
     You have no violations.
   </span>
-  <table class="table table-hover border d-none" *ngIf="violations.length > 0">
+  <table class="table table-hover border d-none d-md-block" *ngIf="violations.length > 0">
     <thead>
       <tr>
         <th scope="col">Ticker</th>
@@ -57,7 +57,7 @@
   </table>
 
   <!-- render violations on mobile as cards -->
-  <div class="d-block d-sm-none">
+  <div class="d-md-none">
     <ng-container *ngFor="let violation of violations">
       <div class="card mb-3">
         <div class="card-title">
