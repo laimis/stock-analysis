@@ -14,7 +14,7 @@ export class StockTradingSimulationsComponent implements OnInit {
   spyPrices: PriceBar[];
   qqqPrices: PriceBar[];
   errors: string[];
-  
+
   constructor(
     private stocks:StocksService,
     private route:ActivatedRoute) { }
@@ -23,27 +23,29 @@ export class StockTradingSimulationsComponent implements OnInit {
   closePositions:boolean = true;
 
   ngOnInit() {
-    var n = this.route.snapshot.queryParamMap.get('n');
-    var closePositionsParam = this.route.snapshot.queryParamMap.get('closePositions');
+    this.route.queryParams.subscribe(queryParams => {
+      const n = queryParams['n'];
+      const closePositionsParam = queryParams['closePositions'];
 
-    if (closePositionsParam) {
-      this.closePositions = closePositionsParam == 'true';
-    }
-    
-    if (n) {
-      this.numberOfTrades = parseInt(n);
-    }
+      if (closePositionsParam) {
+        this.closePositions = closePositionsParam === 'true';
+      }
 
-    this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe( results => {
-        this.results = results.sort((a,b) => b.performance.profit - a.performance.profit);
+      if (n) {
+        this.numberOfTrades = parseInt(n);
+      }
+
+      this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
+        this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
         this.fetchSpyPrices();
       }, error => {
         this.errors = GetErrors(error)
       });
+    });
   }
   fetchSpyPrices() {
-    var earliestDate = this.results[0].performance.earliestDate;
-    var latestDate = this.results[0].performance.latestDate;
+    const earliestDate = this.results[0].performance.earliestDate;
+    const latestDate = this.results[0].performance.latestDate;
 
     this.stocks.getStockPricesForDates("SPY", earliestDate, latestDate).subscribe(prices => {
       this.spyPrices = prices.prices;
@@ -55,11 +57,11 @@ export class StockTradingSimulationsComponent implements OnInit {
   }
 
   backgroundCssClassForActual(results:TradingStrategyPerformance[], strategyIndex: number, positionIndex: number) {
-    var simulatedPosition = results[strategyIndex].positions[positionIndex];
-    var actualPosition = results[0].positions[positionIndex];
+    const simulatedPosition = results[strategyIndex].positions[positionIndex];
+    const actualPosition = results[0].positions[positionIndex];
 
-    var simulatedProfit = simulatedPosition.combinedProfit;
-    var actualProfit = actualPosition.combinedProfit;
+    const simulatedProfit = simulatedPosition.combinedProfit;
+    const actualProfit = actualPosition.combinedProfit;
 
     return actualProfit >= simulatedProfit ? 'bg-success' : '';
   }

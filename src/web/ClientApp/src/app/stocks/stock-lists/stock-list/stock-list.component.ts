@@ -23,12 +23,11 @@ export class StockListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // should read name from the route and then use stock service injected in the constructor to load the list with that name
-    
-    var name = this.route.snapshot.paramMap.get('name');
-
-    this.loadList(name);
-    this.loadMonitors()
+    this.route.params.subscribe(params => {
+      const name = params['name']
+      this.loadList(name);
+      this.loadMonitors()
+    })
   }
 
   private loadList(name: string) {
@@ -64,7 +63,7 @@ export class StockListComponent implements OnInit {
     if (tickers.includes(',')) {
       separator = ',';
     }
-    
+
     let tickerArray = tickers.split(separator)
 
     this.AddTickersToList(tickerArray)
@@ -76,13 +75,13 @@ export class StockListComponent implements OnInit {
       this.importStatus = "Finished"
       return
     }
-    
+
     var ticker = tickerArray[0].trim();
     if (ticker.includes(':'))
     {
       ticker = ticker.split(':')[1].trim();
     }
-    
+
     if (ticker) {
       this.importStatus = `Importing ${ticker}...`
       this.stockService.addToStockList(this.list.name, ticker).subscribe(
@@ -102,7 +101,7 @@ export class StockListComponent implements OnInit {
   sortedTickers(list: StockList) {
     return list.tickers.sort((a, b) => a.ticker.localeCompare(b.ticker));
   }
-  
+
   getExportLink(list: StockList, justTickers:boolean) {
     return stockLists_getExportLink(list, justTickers)
   }
@@ -110,11 +109,11 @@ export class StockListComponent implements OnInit {
   toggleVisibility(elem: HTMLElement) {
     toggleVisuallyHidden(elem)
   }
-  
+
   getAnalysisLink(list: StockList) {
     return stockLists_getAnalysisLink(list)
   }
-  
+
   assignTag(tag:string) {
     this.stockService.assignTagToStockList(this.list.name, tag).subscribe(_ => {
       this.loadList(this.list.name)

@@ -8,23 +8,25 @@ import { StockGaps, StocksService } from '../../services/stocks.service';
   styleUrls: ['./gaps-report.component.css']
 })
 export class GapsReportComponent implements OnInit {
-  
+
   error: string = null;
   gaps: StockGaps;
-  
+
   constructor (
     private stocksService: StocksService,
     private route: ActivatedRoute) {
   }
-  
+
   ngOnInit(): void {
-    var tickerParam = this.route.snapshot.queryParamMap.get("ticker");
-    if (tickerParam) {
-      this.stocksService.reportTickerGaps(tickerParam).subscribe(data => {
-        this.gaps = data
-      });
-    } else {
-      this.error = "ticker query param missing";
-    }
+    this.route.queryParams.subscribe(queryParams => {
+      const tickerParam = queryParams['ticker'];
+      if (tickerParam) {
+        this.stocksService.reportTickerGaps(tickerParam).subscribe(data => {
+          this.gaps = data
+        });
+      } else {
+        this.error = "ticker query param missing";
+      }
+    })
   }
 }

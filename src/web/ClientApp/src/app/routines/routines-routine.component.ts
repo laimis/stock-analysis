@@ -13,7 +13,7 @@ export class RoutineComponent implements OnInit {
 
 
   errors:string[] = null
-  private readonly routineName: string;
+  private routineName: string;
   routine: Routine;
   activeRoutine: Routine = null;
   mode: string;
@@ -21,12 +21,11 @@ export class RoutineComponent implements OnInit {
   // accept route service where I can extract current routine name from :name parameter
   constructor(
     private route: ActivatedRoute,
-    private service:StocksService) {
-      this.routineName = this.route.snapshot.paramMap.get('name');
-      this.mode = this.route.snapshot.paramMap.get('mode');
-    }
+    private service:StocksService) {}
 
   ngOnInit() {
+    this.routineName = this.route.snapshot.paramMap.get('name');
+    this.mode = this.route.snapshot.paramMap.get('mode');
     this.fetchRoutines();
   }
 

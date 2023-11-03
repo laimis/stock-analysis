@@ -21,11 +21,13 @@ export class CryptoDetailsComponent {
     private title: Title){}
 
 	ngOnInit(): void {
-		var token = this.route.snapshot.paramMap.get('token');
-		if (token){
-      this.token = token;
-			this.fetchToken();
-		}
+		this.route.params.subscribe(param => {
+      const token = param['token']
+      if (token) {
+        this.token = token;
+        this.fetchToken();
+      }
+    })
 	}
 
 	fetchToken() {

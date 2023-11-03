@@ -27,14 +27,16 @@ export class StockDetailsComponent implements OnInit {
     private title: Title){}
 
 	ngOnInit(): void {
-    const ticker = this.route.snapshot.paramMap.get('ticker');
-    if (ticker){
-      this.ticker = ticker;
-			this.fetchStock();
-      this.fetchSecFilings();
-		}
+    this.route.params.subscribe(param => {
+      const ticker = param['ticker']
+      if (ticker){
+        this.ticker = ticker;
+        this.fetchStock();
+        this.fetchSecFilings();
+      }
 
-    this.activeTab = this.route.snapshot.paramMap.get('tab') || 'stocks'
+      this.activeTab = param['tab'] || 'stocks'
+    })
 	}
   fetchSecFilings() {
     this.stocks.getStockSECFilings(this.ticker).subscribe(result => {

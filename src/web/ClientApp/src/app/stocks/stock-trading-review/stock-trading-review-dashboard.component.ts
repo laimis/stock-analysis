@@ -21,8 +21,10 @@ export class StockTradingReviewDashboardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.route.params.subscribe(param => {
+      this.activeTab = param['tab'] || 'positions'
+    })
     this.loadEntries()
-    this.activeTab = this.route.snapshot.paramMap.get('tab') || 'positions'
   }
 
   loadEntries() {

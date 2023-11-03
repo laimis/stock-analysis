@@ -1,7 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
-import { StocksService, PositionInstance, StockTradingPositions, StockTradingPerformanceCollection, BrokerageOrder, StockViolation } from '../../services/stocks.service';
+import {Component, OnInit} from '@angular/core';
+import {Title} from '@angular/platform-browser';
+import {ActivatedRoute} from '@angular/router';
+import {
+  BrokerageOrder,
+  PositionInstance,
+  StocksService,
+  StockTradingPositions,
+  StockViolation
+} from '../../services/stocks.service';
 import {GetErrors} from "../../services/utils";
 
 @Component({
@@ -26,9 +32,11 @@ export class StockTradingComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.activeTab = this.route.snapshot.paramMap.get('tab') || 'positions'
-    this.title.setTitle("Trading Dashboard - Nightingale Trading")
-    this.loadEntries()
+    this.route.params.subscribe(param => {
+      this.activeTab = param['tab'] || 'positions'
+      this.title.setTitle("Trading Dashboard - Nightingale Trading")
+      this.loadEntries()
+    })
   }
 
 
