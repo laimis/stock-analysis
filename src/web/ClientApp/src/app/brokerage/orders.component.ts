@@ -19,6 +19,8 @@ export class BrokerageOrdersComponent implements OnInit {
     private stockService: StocksService
   ) { }
 
+  @Input()
+  justOrders: boolean = false;
 
   ngOnInit(): void {
     this.refreshOrders()
@@ -47,11 +49,11 @@ export class BrokerageOrdersComponent implements OnInit {
   }
 
   groupAndRenderOrders() {
-    let isTickerVisible = (ticker) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
-    let isFilled = (o) => o.status === 'FILLED'
-    let isBuy = (o) => o.type === 'BUY'
-    let isSell = (o) => o.type === 'SELL'
-    let orderBy = (a, b) => a.ticker.localeCompare(b.ticker)
+    let isTickerVisible = (ticker:string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
+    let isFilled = (o:BrokerageOrder) => o.status === 'FILLED'
+    let isBuy = (o:BrokerageOrder) => o.type === 'BUY'
+    let isSell = (o:BrokerageOrder) => o.type === 'SELL'
+    let orderBy = (a:BrokerageOrder, b:BrokerageOrder) => a.ticker.localeCompare(b.ticker)
 
     var buys = this._orders.filter(o => isBuy(o) && !isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
     var sells = this._orders.filter(o => isSell(o) && !isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);

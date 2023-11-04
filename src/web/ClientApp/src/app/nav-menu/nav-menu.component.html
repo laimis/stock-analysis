@@ -35,7 +35,7 @@
         *ngIf="isLoggedIn"
         [cssClass]="'d-flex ms-auto form-control'"
         [label]="''"
-        [placeholder]="'Enter stock symbol'"
+        [placeholder]="'Search stocks'"
         (tickerSelected)="navigateToTicker($event)"
         [justTickers]="true">
       </app-stock-search>

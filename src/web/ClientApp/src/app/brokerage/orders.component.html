@@ -1,5 +1,5 @@
 <section>
-  <h5>Brokerage Orders</h5>
+  <h5 *ngIf="justOrders === false">Brokerage Orders</h5>
   <div>
     <div *ngIf="isEmpty && filteredTickers.length > 0 ">
       No brokerage orders found for {{filteredTickers.join(', ')}}
@@ -8,9 +8,9 @@
       {{error}}
     </div>
     <table class="table" *ngFor="let groupedOrder of groupedOrders">
-      <thead *ngIf="groupedOrder.length > 0">
+      <thead *ngIf="groupedOrder.length > 0 && justOrders === false">
         <tr>
-          <th width="100"></th>
+          <th style="width: 100px;"></th>
           <th>Stock</th>
           <th>Type</th>
           <th>Quantity</th>
@@ -35,7 +35,7 @@
           </td>
         </tr>
       </tbody>
-      <tfoot  *ngIf="groupedOrder.length > 0">
+      <tfoot  *ngIf="groupedOrder.length > 0 && justOrders === false">
         <tr>
           <td></td>
           <td></td>

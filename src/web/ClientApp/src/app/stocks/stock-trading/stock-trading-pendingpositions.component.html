@@ -10,7 +10,7 @@
 
   <div>
     <span *ngIf="loaded && positions.length === 0">No pending positions found</span>
-    <table class="table table-striped table-hover" *ngIf="positions.length !== 0">
+    <table class="table table-hover" *ngIf="positions.length !== 0">
       <thead>
         <tr>
           <th scope="col">Ticker</th>
@@ -41,11 +41,16 @@
             </td>
           </tr>
           <tr>
-            <td colspan="6">
+            <td colspan="8">
               {{ position.notes }}
               <div>
                 <span class="badge bg-light text-secondary m-1">{{position.strategy}}</span>
               </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="8">
+              <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" ></app-brokerage-orders>
             </td>
           </tr>
         </ng-container>
