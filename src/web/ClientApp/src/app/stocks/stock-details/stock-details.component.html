@@ -23,18 +23,17 @@
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
       Options <span *ngIf="options && options.length > 0" class="badge rounded-pill bg-info">{{options.length}}</span>
     </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
+      Trade <span *ngIf="options && options.length > 0" class="badge rounded-pill bg-info">{{options.length}}</span>
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+      Analysis
+    </a>
     <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
       Fundamentals
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
       Notes <span *ngIf="notes && notes.notes.length > 0" class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
-      Analysis
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('secfilings')}" [routerLink]="" (click)="activateTab('secfilings')">
-      SEC Filings
-      <span *ngIf="recentFilings && recentFilings.length > 0" class="badge rounded-pill bg-info">{{recentFilings.length}}</span>
     </a>
     <span class="float-end">
       <span class="text-muted">Price:</span> {{stock.price | currency}}
@@ -56,7 +55,7 @@
 
   <app-stock-analysis *ngIf="isActive('analysis')" [ticker]=stock.ticker></app-stock-analysis>
 
-  <app-stock-secfilings *ngIf="isActive('secfilings')" [filings]=filings></app-stock-secfilings>
+  <app-stock-trading-newposition *ngIf="isActive('trade')" [isPendingPositionMode]="true" [presetTicker]="stock.ticker" ></app-stock-trading-newposition>
 
 </div>
 

@@ -43,7 +43,7 @@
               </app-stock-transaction>
               <app-stock-trading-newposition
                 *ngIf="fixType === 'position'"
-                [setTicker]="violation.ticker"
+                [presetTicker]="violation.ticker"
                 [showChart]="false"
                 [showAnalysis]="false"
                 [isPendingPositionMode]="false"
@@ -89,7 +89,7 @@
               </app-stock-transaction>
               <app-stock-trading-newposition
                 *ngIf="fixType === 'position'"
-                [setTicker]="violation.ticker"
+                [presetTicker]="violation.ticker"
                 [showChart]="false"
                 [showAnalysis]="false"
                 [isPendingPositionMode]="false"

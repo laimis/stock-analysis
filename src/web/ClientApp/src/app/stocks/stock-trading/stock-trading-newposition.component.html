@@ -1,7 +1,10 @@
 <section>
-  <h5>Initiate Position</h5>
+  <h5>
+    Initiate Position
+    <span class="float-end fs-6">max loss: {{maxLoss | currency}}</span>
+  </h5>
   <div>
-    <div class="row">
+    <div class="row" *ngIf="!presetTicker">
       <div class="col">
         <app-stock-search
           *ngIf="isPendingPositionMode === true"

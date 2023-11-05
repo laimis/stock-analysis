@@ -24,7 +24,7 @@ export class StockTradingNewPositionComponent {
   strategies: { key: string; value: string; }[];
   chartInfo: PositionChartInformation;
   prices: Prices;
-  private maxLoss = 60;
+  maxLoss = 60;
   private atrMultiplier = 2;
 
   constructor(
@@ -48,8 +48,13 @@ export class StockTradingNewPositionComponent {
   @Input()
   recordPositions: boolean = true
 
+  private _presetTicker: string = null
   @Input()
-  set setTicker(ticker:string) {
+  get presetTicker():string {
+    return this._presetTicker
+  }
+  set presetTicker(ticker:string) {
+    this._presetTicker = ticker
     this.onBuyTickerSelected(ticker)
   }
 
