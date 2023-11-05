@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { PositionInstance } from 'src/app/services/stocks.service';
-import {GetStrategies} from "../../services/utils";
 
 
 @Component({
