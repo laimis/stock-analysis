@@ -118,7 +118,7 @@ public class EmailNotificationService : GenericBackgroundServiceHost
                 // get all alerts for that user
                 var alertGroups = _container.GetAlerts(emailId.Id)
                     .GroupBy(a => a.identifier)
-                    .Select(ToAlertEmailGroup);
+                    .Select(g => ToAlertEmailGroup(g, _marketHours));
 
                 var data = new { alertGroups };
 
@@ -136,16 +136,16 @@ public class EmailNotificationService : GenericBackgroundServiceHost
         }
     }
 
-    private object ToAlertEmailGroup(IGrouping<string, TriggeredAlert> group)
+    public static object ToAlertEmailGroup(IGrouping<string, TriggeredAlert> group, IMarketHours marketHours)
     {
         return new {
             identifier = group.Key,
             alertCount = group.Count(), // need to include this as some template engines don't support length calls on collections
-            alerts = group.Select(ToEmailData)
+            alerts = group.Select(g => ToEmailData(g, marketHours))
         };
     }
 
-    private object ToEmailData(TriggeredAlert alert)
+    private static object ToEmailData(TriggeredAlert alert, IMarketHours marketHours)
     {
         var valueFormat = alert.valueFormat;
         var triggeredValue = alert.triggeredValue;
@@ -154,10 +154,10 @@ public class EmailNotificationService : GenericBackgroundServiceHost
         var sourceList = alert.sourceList;
         var time = alert.when;
 
-        return ToEmailRow(valueFormat, triggeredValue, ticker, description, sourceList, _marketHours.ToMarketTime(time));
+        return ToEmailRow(valueFormat, triggeredValue, ticker, description, sourceList, marketHours.ToMarketTime(time));
     }
 
-    public static object ToEmailRow(ValueFormat valueFormat, decimal triggeredValue, Ticker ticker, string description, string sourceList, DateTimeOffset time)
+    private static object ToEmailRow(ValueFormat valueFormat, decimal triggeredValue, Ticker ticker, string description, string sourceList, DateTimeOffset time)
     {
         string FormattedValue()
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs.Alerts;
 using core.fs.Services;
 using core.fs.Services.Analysis;
 using core.fs.Shared.Adapters.Brokerage;
@@ -32,7 +33,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     private readonly IMarketHours _marketHours;
 
     private readonly Dictionary<UserState, HashSet<Ticker>> _tickersToCheck = new();
-    private readonly Dictionary<UserState, List<(Ticker Ticker, Pattern Pattern)>> _patternsDiscovered = new();
+    private readonly Dictionary<UserState, List<(Ticker Ticker, TriggeredAlert)>> _patternsDiscovered = new();
 
     private Func<CancellationToken, Task> _toRun;
     private Func<TimeSpan> _sleepCalculation;
@@ -120,7 +121,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var stocks = await _portfolioStorage.GetStocks(userId);
                 var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(userId))
-                    .Where(l => l.State.ContainsTag(core.fs.Alerts.Constants.MonitorTagPattern))
+                    .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)
                     .Select(t => t.Ticker);
 
@@ -168,13 +169,16 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                     continue;
                 }
 
-                if (!_patternsDiscovered.TryGetValue(u.Key, out List<(Ticker Ticker, Pattern Pattern)> value))
+                var patternAlert = TriggeredAlert.PatternAlert(
+                    pattern.Value, ticker, "Watchlist", DateTimeOffset.UtcNow, UserId.NewUserId(u.Key.Id));
+
+                if (!_patternsDiscovered.TryGetValue(u.Key, out List<(Ticker Ticker, TriggeredAlert Pattern)> value))
                 {
-                    value = new List<(Ticker, Pattern)>();
+                    value = new List<(Ticker, TriggeredAlert)>();
                     _patternsDiscovered[u.Key] = value;
                 }
 
-                value.Add((ticker, pattern.Value));
+                value.Add((ticker, patternAlert));
             }
         }
 
@@ -196,21 +200,10 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 continue;
             }
 
-            var alertGroups = new List<object> {
-                new {
-                    identifier = "Weekly Upside Reversals",
-                    alerts = u.Value.Select(d => EmailNotificationService.ToEmailRow(
-                        valueFormat: d.Pattern.valueFormat,
-                        triggeredValue: d.Pattern.value,
-                        ticker: d.Ticker,
-                        description: "Weekly Upside Reversal",
-                        sourceList: "Portfolio",
-                        time: _marketHours.ToMarketTime(d.Pattern.date)
-                    ))
-                }
-            };
+            var alerts = u.Value.Select(u => u.Item2);
+            var grouping = alerts.GroupBy(a => "Weekly Upside Reversal");
+            var data = grouping.Select(g => EmailNotificationService.ToAlertEmailGroup(g, _marketHours));
 
-            var data = new { alertGroups };
             await _emails.SendWithTemplate(
                     recipient: new Recipient(email: u.Key.Email, name: u.Key.Name),
                     Sender.NoReply,
