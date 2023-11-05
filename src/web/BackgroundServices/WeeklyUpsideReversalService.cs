@@ -202,7 +202,9 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
             var alerts = u.Value.Select(u => u.Item2);
             var grouping = alerts.GroupBy(a => "Weekly Upside Reversal");
-            var data = grouping.Select(g => EmailNotificationService.ToAlertEmailGroup(g, _marketHours));
+            var alertGroups = grouping.Select(g => EmailNotificationService.ToAlertEmailGroup(g, _marketHours));
+            
+            var data = new { alertGroups };
 
             await _emails.SendWithTemplate(
                     recipient: new Recipient(email: u.Key.Email, name: u.Key.Name),
