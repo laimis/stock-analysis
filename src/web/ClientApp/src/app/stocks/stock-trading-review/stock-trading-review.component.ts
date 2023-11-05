@@ -152,8 +152,6 @@ export class StockTradingReviewComponent {
     );
   }
 
-
-
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
 
