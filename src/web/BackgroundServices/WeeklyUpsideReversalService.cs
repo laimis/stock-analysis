@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using core.Account;
 using core.fs.Alerts;
 using core.fs.Services;
-using core.fs.Services.Analysis;
 using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Adapters.Email;
 using core.fs.Shared.Adapters.Stocks;
@@ -200,18 +199,10 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 continue;
             }
 
-            var alerts = u.Value.Select(u => u.Item2);
-            var grouping = alerts.GroupBy(a => "Weekly Upside Reversal");
-            var alertGroups = grouping.Select(g => EmailNotificationService.ToAlertEmailGroup(g, _marketHours));
-            
-            var data = new { alertGroups };
-
-            await _emails.SendWithTemplate(
-                    recipient: new Recipient(email: u.Key.Email, name: u.Key.Name),
-                    Sender.NoReply,
-                    template: EmailTemplate.Alerts,
-                    data
-                );
+            var alerts = u.Value.Select(tickerAlert => tickerAlert.Item2);
+            var grouping = alerts.GroupBy(_ => "Weekly Upside Reversal");
+            var recipient = new Recipient(email: u.Key.Email, name: u.Key.Name);
+            await EmailNotificationService.SendAlerts(_emails, _marketHours, recipient, grouping);
         }
 
         _patternsDiscovered.Clear();

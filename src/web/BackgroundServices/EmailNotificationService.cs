@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -115,28 +116,21 @@ public class EmailNotificationService : GenericBackgroundServiceHost
 
                 var user = userOption.Value;
 
-                // get all alerts for that user
+                var recipient = new Recipient(email: user.State.Email, name: user.State.Name);
+
                 var alertGroups = _container.GetAlerts(emailId.Id)
-                    .GroupBy(a => a.identifier)
-                    .Select(g => ToAlertEmailGroup(g, _marketHours));
-
-                var data = new { alertGroups };
-
-                await _emails.SendWithTemplate (
-                    new Recipient(email: user.State.Email, name: user.State.Name),
-                    Sender.NoReply,
-                    EmailTemplate.Alerts,
-                    data
-                );
-
-                _container.AddNotice("Emails sent");
+                    .GroupBy(a => a.identifier);
+                
+                await SendAlerts(_emails, _marketHours, recipient, alertGroups);
             }
+            
+            _container.AddNotice("Emails sent");
 
             _sleepFunction = NextStopLossCheck;
         }
     }
 
-    public static object ToAlertEmailGroup(IGrouping<string, TriggeredAlert> group, IMarketHours marketHours)
+    private static object ToAlertEmailGroup(IGrouping<string, TriggeredAlert> group, IMarketHours marketHours)
     {
         return new {
             identifier = group.Key,
@@ -179,5 +173,19 @@ public class EmailNotificationService : GenericBackgroundServiceHost
             sourceList,
             time = time.ToString("HH:mm") + " ET"
         };
+    }
+
+    public static Task SendAlerts(IEmailService emails, IMarketHours marketHours, Recipient recipient, IEnumerable<IGrouping<string, TriggeredAlert>> grouping)
+    {
+        var alertGroups = grouping.Select(g => EmailNotificationService.ToAlertEmailGroup(g, marketHours));
+            
+        var data = new { alertGroups };
+
+        return emails.SendWithTemplate(
+            recipient: recipient,
+            Sender.NoReply,
+            template: EmailTemplate.Alerts,
+            data
+        );
     }
 }
