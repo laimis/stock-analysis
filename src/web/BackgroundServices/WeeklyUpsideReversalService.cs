@@ -32,7 +32,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
     private readonly IMarketHours _marketHours;
 
     private readonly Dictionary<UserState, HashSet<Ticker>> _tickersToCheck = new();
-    private readonly Dictionary<UserState, List<(Ticker Ticker, TriggeredAlert)>> _patternsDiscovered = new();
+    private readonly Dictionary<UserState, List<TriggeredAlert>> _weeklyUpsidesDiscovered = new();
 
     private Func<CancellationToken, Task> _toRun;
     private Func<TimeSpan> _sleepCalculation;
@@ -168,16 +168,15 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                     continue;
                 }
 
-                var patternAlert = TriggeredAlert.PatternAlert(
+                var alert = TriggeredAlert.PatternAlert(
                     pattern.Value, ticker, "Watchlist", DateTimeOffset.UtcNow, UserId.NewUserId(u.Key.Id));
 
-                if (!_patternsDiscovered.TryGetValue(u.Key, out List<(Ticker Ticker, TriggeredAlert Pattern)> value))
+                if (!_weeklyUpsidesDiscovered.ContainsKey(u.Key))
                 {
-                    value = new List<(Ticker, TriggeredAlert)>();
-                    _patternsDiscovered[u.Key] = value;
+                    _weeklyUpsidesDiscovered[u.Key] = new List<TriggeredAlert>();
                 }
 
-                value.Add((ticker, patternAlert));
+                _weeklyUpsidesDiscovered[u.Key].Add(alert);
             }
         }
 
@@ -188,24 +187,29 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
     private async Task SendEmails(CancellationToken token)
     {
-        _logger.LogInformation("Running weekly upside reversal emails for {count} users", _patternsDiscovered.Count);
+        _logger.LogInformation("Running weekly upside reversal emails for {count} users", _weeklyUpsidesDiscovered.Count);
 
-        foreach(var u in _patternsDiscovered)
+        foreach(var u in _weeklyUpsidesDiscovered)
         {
-            _logger.LogInformation("Processing {email} with {count} alerts", u.Key.Email, u.Value.Count);
+            var userState = u.Key;
+            var alerts = u.Value;
+            
+            _logger.LogInformation("Processing {email} with {count} alerts", userState.Email, alerts.Count);
 
-            if (u.Value.Count == 0)
+            if (alerts.Count == 0)
             {
                 continue;
             }
 
-            var alerts = u.Value.Select(tickerAlert => tickerAlert.Item2);
-            var grouping = alerts.GroupBy(_ => "Weekly Upside Reversal");
-            var recipient = new Recipient(email: u.Key.Email, name: u.Key.Name);
-            await EmailNotificationService.SendAlerts(_emails, _marketHours, recipient, grouping);
+            await EmailNotificationService.SendAlerts(
+                _emails,
+                _marketHours,
+                new Recipient(email: u.Key.Email, name: u.Key.Name),
+                u.Value.GroupBy(_ => "Weekly Upside Reversal")
+            );
         }
 
-        _patternsDiscovered.Clear();
+        _weeklyUpsidesDiscovered.Clear();
         _toRun = LoadTickersToCheck;
         _sleepCalculation = AfterMarketCloseOnFriday;
     }
