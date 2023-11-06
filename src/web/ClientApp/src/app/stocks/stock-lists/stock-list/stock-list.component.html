@@ -11,7 +11,21 @@
         ({{list.tickers.length}})
         <button class="btn btn-link" (click)="toggleVisibility(editSection)"><i class="bi bi-pencil"></i></button>
     </h3>
-    <small><a [routerLink]="['/stocks/lists']">back to lists</a></small>
+
+    <section #editSection class="visually-hidden">
+      <h5>Edit</h5>
+      <form>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input class="form-control" id="name" #name placeholder="Name" value="{{list.name}}">
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea class="form-control" id="description" #description placeholder="Description" rows="5">{{list.description}}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" (click)="update(name.value, description.value); toggleVisibility(editSection)">Update</button>
+      </form>
+    </section>
 
     <p>{{list.description}}</p>
 
@@ -41,21 +55,6 @@
                     </div>
                 </div>
             </div>
-        </form>
-    </section>
-
-    <section #editSection class="visually-hidden">
-        <h5>Edit</h5>
-        <form>
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input class="form-control" id="name" #name placeholder="Name" value="{{list.name}}">
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea class="form-control" id="description" #description placeholder="Description" rows="5">{{list.description}}</textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" (click)="update(name.value, description.value); toggleVisibility(editSection)">Update</button>
         </form>
     </section>
 

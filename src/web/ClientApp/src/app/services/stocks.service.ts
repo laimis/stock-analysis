@@ -166,7 +166,7 @@ export class StocksService {
     return this.http.get<PendingStockPosition[]>('/api/stocks/pendingpositions')
   }
 
-  createPendingStockPosition(cmd: stocktransactioncommand): Observable<PendingStockPosition> {
+  createPendingStockPosition(cmd: pendingstockpositioncommand): Observable<PendingStockPosition> {
     return this.http.post<PendingStockPosition>('/api/stocks/pendingpositions', cmd)
   }
 
@@ -1307,7 +1307,17 @@ export class stocktransactioncommand {
   notes: string
   stopPrice: number | null
   brokerageOrderId: string | null
+}
+
+export class pendingstockpositioncommand {
+  ticker: string
+  numberOfShares: number
+  price: number
+  date: string
+  notes: string
+  stopPrice: number | null
   strategy: string | null
+  useLimitOrder: boolean
 }
 
 export class brokerageordercommand {

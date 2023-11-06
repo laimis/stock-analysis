@@ -30,6 +30,8 @@ type Create =
         Ticker: Ticker
         [<Required(AllowEmptyStrings = false)>]
         Strategy: string
+        [<Required>]
+        UseLimitOrder: Boolean option
     }
         
 type Close =
@@ -70,9 +72,19 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                 return "Position already exists" |> ResponseUtils.failed
             | None ->
                 
-                let orderType = Limit
-                let duration = GtcPlus
-                
+                let orderType =
+                    match command.UseLimitOrder with
+                    | Some useLimit ->
+                        match useLimit with
+                        | true -> Limit
+                        | false -> Market
+                    | None -> Market
+                    
+                let duration =
+                    match orderType with
+                    | Limit -> GtcPlus
+                    | _ -> Gtc
+                    
                 let! order = brokerage.BuyOrder user.State command.Ticker command.NumberOfShares command.Price orderType duration
                 
                 match order.Success with

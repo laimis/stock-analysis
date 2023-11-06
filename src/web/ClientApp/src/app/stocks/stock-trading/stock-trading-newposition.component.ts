@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
-  OutcomeKeys,
+  OutcomeKeys, pendingstockpositioncommand,
   PositionChartInformation,
   Prices,
   SMA,
@@ -65,7 +65,7 @@ export class StockTradingNewPositionComponent {
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
   @Output()
-  pendingPositionCreated: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
+  pendingPositionCreated: EventEmitter<pendingstockpositioncommand> = new EventEmitter<pendingstockpositioncommand>()
 
   // variables for new positions
   positionSizeCalculated: number = null
@@ -264,6 +264,19 @@ export class StockTradingNewPositionComponent {
     )
   }
 
+  private createPendingPositionCommand(useLimitOrder:boolean) {
+    let cmd = new pendingstockpositioncommand();
+    cmd.ticker = this.ticker;
+    cmd.numberOfShares = this.numberOfShares;
+    cmd.price = this.costToBuy;
+    cmd.stopPrice = this.positionStopPrice;
+    cmd.notes = this.notes;
+    cmd.date = this.date;
+    cmd.strategy = this.strategy;
+    cmd.useLimitOrder = useLimitOrder;
+    return cmd;
+  }
+
   private createPurchaseCommand() {
     let cmd = new stocktransactioncommand();
     cmd.ticker = this.ticker;
@@ -272,12 +285,19 @@ export class StockTradingNewPositionComponent {
     cmd.stopPrice = this.positionStopPrice;
     cmd.notes = this.notes;
     cmd.date = this.date;
-    cmd.strategy = this.strategy;
     return cmd;
   }
 
-  createPendingPosition() {
-    let cmd = this.createPurchaseCommand()
+  createPendingPositionLimit() {
+    this.createPendingPosition(true)
+  }
+
+  createPendingPositionMarket() {
+    this.createPendingPosition(false)
+  }
+
+  createPendingPosition(useLimitOrder:boolean) {
+    let cmd = this.createPendingPositionCommand(useLimitOrder)
 
     this.stockService.createPendingStockPosition(cmd).subscribe(
       _ => {

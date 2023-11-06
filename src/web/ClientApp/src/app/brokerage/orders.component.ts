@@ -83,8 +83,7 @@ export class BrokerageOrdersComponent implements OnInit {
       date: order.date,
       notes: null,
       stopPrice: null,
-      brokerageOrderId: order.orderId,
-      strategy: null
+      brokerageOrderId: order.orderId
     }
 
     if (order.type === 'BUY') {
