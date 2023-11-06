@@ -3,6 +3,7 @@ import {StocksService, AccountStatus, KeyValuePair} from '../services/stocks.ser
 import { Router } from '@angular/router';
 import { GetErrors } from '../services/utils';
 import {GlobalService} from "../services/global.service";
+import {max} from "rxjs/operators";
 
 @Component({
   selector: 'app-profile',
@@ -20,6 +21,8 @@ export class ProfileComponent implements OnInit {
   showDelete: boolean = false
 
   deleteFeedback: string = ''
+
+  errors: string[]
 
   constructor(
     private global:GlobalService,
@@ -47,10 +50,11 @@ export class ProfileComponent implements OnInit {
   }
 
   updateMaxLoss(value:string) {
+    this.errors = null
     let keyValue : KeyValuePair = {key:"maxLoss", value:value}
     this.service.updateAccountSettings(keyValue).subscribe(
       s => this.profile.maxLoss = s.maxLoss,
-      error => console.log(error)
+      error => this.errors = GetErrors(error)
     )
   }
 
@@ -131,4 +135,6 @@ export class ProfileComponent implements OnInit {
     formData.append("file", file, file.name);
     return formData;
   }
+
+    protected readonly max = max;
 }

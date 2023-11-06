@@ -1,4 +1,6 @@
 <div>
+  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+
   <div class="card mb-3" *ngIf="profile">
     <div class="card-header">
       Profile
@@ -31,7 +33,12 @@
       <div class="row">
         <div class="col">
           <label for="maxLoss" class="form-label">Max Loss</label>
-          <input type="number" #maxLoss class="form-control" name="maxLoss" id="maxLoss" [(ngModel)]="profile.maxLoss" (change)="updateMaxLoss(maxLoss.value)">
+          <input type="number" #maxLoss class="form-control" name="maxLoss" id="maxLoss" [value]="profile.maxLoss">
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col">
+          <button class="btn btn-primary" (click)="updateMaxLoss(maxLoss.value)">Save</button>
         </div>
       </div>
     </div>
