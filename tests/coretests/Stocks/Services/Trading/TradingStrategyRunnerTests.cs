@@ -109,7 +109,6 @@ namespace coretests.Stocks.Services.Trading
             testPosition.Buy(2, 10, System.DateTimeOffset.UtcNow, Guid.NewGuid());
             testPosition.SetStopPrice(5, System.DateTimeOffset.UtcNow);
             
-            // TODO: bring all the tests back once profit strategy runners are fixed after conversion to fsharp
             var runner = TradingStrategyFactory.createProfitPointsTrade(3);
             
             var result = runner.Run(testPosition, bars);
