@@ -1,7 +1,6 @@
 module core.fs.Brokerage
 
     open System.ComponentModel.DataAnnotations
-    open System.ComponentModel.Design
     open core.Shared
     open core.fs.Shared
     open core.fs.Shared.Adapters.Brokerage
