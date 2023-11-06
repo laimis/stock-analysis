@@ -1,19 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\core\core.csproj" />
-    <ProjectReference Include="..\storage.shared\storage.shared.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\core\core.csproj"/>
+        <ProjectReference Include="..\storage.shared\storage.shared.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.15" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Npgsql" Version="7.0.6" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.1.15"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="Npgsql" Version="7.0.6"/>
+    </ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <LangVersion>Latest</LangVersion>  
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>Latest</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
 </Project>

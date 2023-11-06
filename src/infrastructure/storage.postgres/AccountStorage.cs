@@ -48,29 +48,25 @@ namespace storage.postgres
 
         public async Task Save(User u)
         {
-            // TODO: these should be done as part of the transaction with save events async
-            // or done as part of the outbox processing of the user events
-            using(var db = GetConnection())
-            {
-                var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
+            using var db = GetConnection();
+            using var tx = db.BeginTransaction();
+            
+            var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
 
-                await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
-            }
+            await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
 
-            await SaveEventsAsync(u, _user_entity, UserId.NewUserId(u.State.Id));
+            await SaveEventsAsync(u, _user_entity, UserId.NewUserId(u.State.Id), outsideTransaction: tx);
         }
 
         public async Task Delete(User user)
         {
-            // TODO: these should be done as part of the transaction with save events async
-            // or done as part of the outbox processing of the user events
-            using(var db = GetConnection())
-            {
-                var query = @"DELETE FROM users WHERE id = :id";
-                await db.ExecuteAsync(query, new {id = user.Id.ToString()});
-            }
-
-            await DeleteAggregates(_user_entity, UserId.NewUserId(user.Id));
+            using var db = GetConnection();
+            using var tx = db.BeginTransaction();
+            
+            var query = @"DELETE FROM users WHERE id = :id";
+            await db.ExecuteAsync(query, new {id = user.Id.ToString()});
+            
+            await DeleteAggregates(_user_entity, UserId.NewUserId(user.Id), outsideTransaction: tx);
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)

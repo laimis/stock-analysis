@@ -1,3 +1,4 @@
+using System.Data;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using storage.shared;
@@ -16,7 +17,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
     private static readonly Dictionary<string, object> _blobs = new();
     private readonly IOutbox _outbox;
 
-    public Task DeleteAggregates(string entity, UserId userId)
+    public Task DeleteAggregates(string entity, UserId userId, IDbTransaction? outsideTransaction = null)
     {
         _aggregates.Remove(MakeKey(entity, userId));
         return Task.CompletedTask;
@@ -59,7 +60,7 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
         return Task.FromResult(_aggregates[key].AsEnumerable());
     }
 
-    public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId)
+    public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
     {
         var key = MakeKey(entity, userId);
 

@@ -32,15 +32,15 @@ namespace storage.postgres
             return cnn; 
         }
 
-        public async Task DeleteAggregates(string entity, UserId userId)
+        public async Task DeleteAggregates(string entity, UserId userId, IDbTransaction? outsideTransaction = null)
         {
-            using (var db = GetConnection())
-            {
-                await db.ExecuteAsync(
-                    @"DELETE FROM events WHERE entity = :entity AND userId = :userId",
-                    new { userId = userId.Item, entity }
-                );
-            }
+            using var db = outsideTransaction?.Connection ?? GetConnection();
+            using var tx = outsideTransaction ?? db.BeginTransaction();
+            await db.ExecuteAsync(
+                @"DELETE FROM events WHERE entity = :entity AND userId = :userId",
+                new { userId = userId.Item, entity }
+            );
+            tx.Commit();
         }
 
         public async Task DeleteAggregate(string entity, Guid aggregateId, UserId userId)
@@ -65,14 +65,14 @@ namespace storage.postgres
             return list.Select(e => e.Event);
         }
 
-        public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId)
+        public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction outsideTransaction = null)
         {
-            using var db = GetConnection();
+            using var db = outsideTransaction?.Connection ?? GetConnection();
             int version = agg.Version;
 
             var eventsToBlast = new List<AggregateEvent>();
 
-            using var tx = db.BeginTransaction();
+            using var tx = outsideTransaction ?? db.BeginTransaction();
             foreach (var e in agg.Events.Skip(agg.Version))
             {
                 var se = new StoredAggregateEvent
@@ -115,7 +115,7 @@ namespace storage.postgres
             return list;
         }
 
-        public async Task<T> Get<T>(string key)
+        public async Task<T?> Get<T>(string key)
         {
             using var db = GetConnection();
 
@@ -130,13 +130,13 @@ namespace storage.postgres
             return JsonConvert.DeserializeObject<T>(blob);
         }
 
-        public Task Save<T>(string key, T t)
+        public async Task Save<T>(string key, T t)
         {
             var blob = JsonConvert.SerializeObject(t);
 
             using var db = GetConnection();
 
-            return db.ExecuteAsync(
+            await db.ExecuteAsync(
                 @"INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp)",
                 new { key, blob }
             );
