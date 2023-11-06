@@ -1,6 +1,6 @@
 <div class="summary-card rounded" *ngIf="positions">
   <div class="row">
-    <div class="col-mb mb-4 mt-2 text-center">
+    <div class="col-md mb-4 mt-2 text-center">
       <div class="text-muted sort-header" >
         Invested
       </div>
@@ -8,7 +8,7 @@
         {{ totalCost | currency }}
       </div>
     </div>
-    <div class="col-mb mb-4 mt-2 text-center">
+    <div class="col-md mb-4 mt-2 text-center">
       <div class="text-muted">
         Risked
       </div>
@@ -16,7 +16,7 @@
         {{ totalRiskedAmount | currency }}
       </div>
     </div>
-    <div class="col-mb mb-4 mt-2 text-center">
+    <div class="col-md mb-4 mt-2 text-center">
       <div class="text-muted">
         Positions
       </div>
@@ -24,7 +24,7 @@
         {{positions.length}}
       </div>
     </div>
-    <div class="col-mb mb-4 mt-2 text-center">
+    <div class="col-md mb-4 mt-2 text-center">
       <div class="text-muted">
         Profit
       </div>
@@ -32,7 +32,7 @@
         {{ totalProfit | currency}}
       </div>
     </div>
-    <div class="col-mb mb-4 mt-2 text-center">
+    <div class="col-md mb-4 mt-2 text-center">
       <div class="text-muted">
         Cash
       </div>
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <table class="table table-hover d-md-block">
+  <table class="table table-hover d-none d-md-table">
     <thead>
       <tr>
         <th class="sort-header" (click)="sort('strategy')">Strategy</th>
@@ -70,7 +70,7 @@
       <div class="card-body">
         <h5 class="card-title">Strategy: {{positionGroup.strategy}}</h5>
         <div class="row">
-          <div class="col-mb mb-4 mt-2 text-center">
+          <div class="col-md mb-4 mt-2 text-center">
             <div class="text-muted">
               Profit
             </div>
@@ -78,7 +78,7 @@
               {{ positionGroup.profit | currency}}
             </div>
           </div>
-          <div class="col-mb mb-4 mt-2 text-center">
+          <div class="col-md mb-4 mt-2 text-center">
             <div class="text-muted">
               Cost
             </div>
@@ -86,7 +86,7 @@
               {{ positionGroup.cost | currency}}
             </div>
           </div>
-          <div class="col-mb mb-4 mt-2 text-center">
+          <div class="col-md mb-4 mt-2 text-center">
             <div class="text-muted">
               Risk
             </div>
@@ -94,7 +94,7 @@
               {{ positionGroup.risk | currency}}
             </div>
           </div>
-          <div class="col-mb mb-4 mt-2 text-center">
+          <div class="col-md mb-4 mt-2 text-center">
             <div class="text-muted">
               Trades
             </div>
