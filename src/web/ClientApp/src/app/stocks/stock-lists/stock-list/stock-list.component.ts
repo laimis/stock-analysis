@@ -115,6 +115,12 @@ export class StockListComponent implements OnInit {
   }
 
   clear() {
+    // confirm that user wants to clear it
+
+    if (!confirm("Are you sure you want to clear this list?")) {
+      return
+    }
+
     this.stockService.clearStockList(this.list.name).subscribe(_ => {
       this.loadList(this.list.name)
     }, e => {
