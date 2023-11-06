@@ -288,6 +288,12 @@ export class StockTradingNewPositionComponent {
         this.outcomes = null
         this.pendingPositionCreated.emit(cmd)
         this.reset()
+
+        // if the UI is for a preset ticker, reset it to the same ticker
+        // to kick off "new position" UI once again
+        if (this.presetTicker) {
+          this.presetTicker = this.presetTicker
+        }
       },
       errors => {
         let errorMessages = GetErrors(errors).join(", ")
