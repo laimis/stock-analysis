@@ -65,7 +65,7 @@ namespace storage.postgres
             return list.Select(e => e.Event);
         }
 
-        public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction outsideTransaction = null)
+        public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
         {
             using var db = outsideTransaction?.Connection ?? GetConnection();
             int version = agg.Version;

@@ -30,7 +30,7 @@ namespace storage.postgres
         {
             emailAddress = emailAddress.ToLowerInvariant();
 
-            string identifier;
+            string? identifier;
             using(var db = GetConnection())
             {
                 var query = @"SELECT id FROM users WHERE email = :emailAddress";
@@ -84,7 +84,9 @@ namespace storage.postgres
             
             var query = @"SELECT * FROM processidtouserassociations WHERE id = :id";
 
-            return await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
+            var result = await db.QuerySingleOrDefaultAsync<ProcessIdToUserAssociation>(query, new { id });
+            
+            return result == null ? FSharpOption<ProcessIdToUserAssociation>.None : new FSharpOption<ProcessIdToUserAssociation>(result);
         }
 
         public async Task<IEnumerable<EmailIdPair>> GetUserEmailIdPairs()
@@ -96,7 +98,7 @@ namespace storage.postgres
             );
         }
 
-        public Task<T> ViewModel<T>(Guid userId) =>
+        public Task<T?> ViewModel<T>(Guid userId) =>
             Get<T>(typeof(T).Name + ":" + userId.ToString());
 
         public Task SaveViewModel<T>(T user, Guid userId) =>
