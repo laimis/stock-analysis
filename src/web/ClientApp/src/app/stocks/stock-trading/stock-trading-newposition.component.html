@@ -105,9 +105,11 @@
       <div class="col"><button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position [Limit Buy]</button></div>
       <div class="col"><button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending Position [Market Buy]</button></div>
     </div>
-    <div class="row mt-3" *ngIf="isPendingPositionMode === false && prices">
-      <div class="col"><button *ngIf="!recordInProgress" class="btn btn-primary w-100" (click)="record()">Record</button></div>
-      <div class="col"><button *ngIf="recordInProgress" class="btn btn-primary w-100" disabled>Record</button></div>
+    <div class="row mt-3" *ngIf="prices && !isPendingPositionMode">
+      <div class="col">
+        <button *ngIf="!recordInProgress" class="btn btn-primary w-100" (click)="record()">Record</button>
+        <button *ngIf="recordInProgress" class="btn btn-primary w-100" disabled>Record</button>
+      </div>
     </div>
     <div class="row mt-3" *ngIf="chartInfo && showChart">
       <div class="col">
