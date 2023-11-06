@@ -10,19 +10,18 @@ type OutcomeType =
     | Negative
     | Neutral
     
-    with
-        static member FromString(value:string) =
-            match value with
-            | nameof Positive -> Positive
-            | nameof Negative -> Negative
-            | nameof Neutral -> Neutral
-            | _ -> failwith $"Unknown OutcomeType: {value}"
-            
-        override this.ToString() =
-            match this with
-            | Positive -> nameof Positive
-            | Negative -> nameof Negative
-            | Neutral -> nameof Neutral
+    static member FromString(value:string) =
+        match value with
+        | nameof Positive -> Positive
+        | nameof Negative -> Negative
+        | nameof Neutral -> Neutral
+        | _ -> failwith $"Unknown OutcomeType: {value}"
+        
+    override this.ToString() =
+        match this with
+        | Positive -> nameof Positive
+        | Negative -> nameof Negative
+        | Neutral -> nameof Neutral
 
 type AnalysisOutcome(key:string, outcomeType:OutcomeType, value:decimal, valueType:ValueFormat, message:string) =
     member val Key = key
@@ -199,90 +198,89 @@ type DistributionStatistics =
         buckets: array<ValueWithFrequency>
     }
     
-    with
-    
-        static member calculate (numbers:decimal array) =
-           
-            if numbers.Length = 0 then
-                {
-                    count = 0m
-                    kurtosis = 0m
-                    min = 0m
-                    max = 0m
-                    mean = 0m
-                    median = 0m
-                    skewness = 0m
-                    stdDev = 0m
-                    buckets = [||] 
-                }
-            else
-                let mean = System.Math.Round(numbers |> Array.average, 2)
-                let min = System.Math.Round(numbers |> Array.min, 2)
-                let max = System.Math.Round(numbers |> Array.max, 2)
+module DistributionStatistics =
+    let calculate (numbers:decimal array) =
+       
+        if numbers.Length = 0 then
+            {
+                count = 0m
+                kurtosis = 0m
+                min = 0m
+                max = 0m
+                mean = 0m
+                median = 0m
+                skewness = 0m
+                stdDev = 0m
+                buckets = [||] 
+            }
+        else
+            let mean = System.Math.Round(numbers |> Array.average, 2)
+            let min = System.Math.Round(numbers |> Array.min, 2)
+            let max = System.Math.Round(numbers |> Array.max, 2)
+            
+            let median =
+                System.Math.Round(
+                numbers
+                |> Array.sort
+                |> Array.skip (numbers.Length / 2)
+                |> Array.head,
+                2)
+            
+            let count = numbers.Length
+            
+            let stdDevDouble =
+                System.Math.Round(
+                numbers
+                |> Array.map (fun x -> System.Math.Pow(double(x - mean), 2))
+                |> Array.sum
+                |> fun x -> x / ((numbers.Length - 1) |> float)
+                |> System.Math.Sqrt,
+                2)
+            
+            let stdDev = 
+                match stdDevDouble with
+                | double.PositiveInfinity -> 0m
+                | double.NegativeInfinity -> 0m
+                | _ -> decimal stdDevDouble
+            
+            let skewnessDouble =
+                numbers
+                |> Array.map (fun x -> System.Math.Pow(double(x - mean), 3))
+                |> Array.sum
+                |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 3)
                 
-                let median =
-                    System.Math.Round(
-                    numbers
-                    |> Array.sort
-                    |> Array.skip (numbers.Length / 2)
-                    |> Array.head,
-                    2)
+            
+            let skewness = 
+                match skewnessDouble with
+                | double.PositiveInfinity -> 0m
+                | double.NegativeInfinity -> 0m
+                | _ -> decimal skewnessDouble
+            
+            let kurtosisDouble = 
+                numbers
+                |> Array.map (fun x -> System.Math.Pow(double(x - mean), 4))
+                |> Array.sum
+                |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 4) - 3.0
+            
+            let kurtosis = 
+                match kurtosisDouble with
+                | double.PositiveInfinity -> 0m
+                | double.NegativeInfinity -> 0m
+                | _ -> decimal kurtosisDouble
                 
-                let count = numbers.Length
-                
-                let stdDevDouble =
-                    System.Math.Round(
-                    numbers
-                    |> Array.map (fun x -> System.Math.Pow(double(x - mean), 2))
-                    |> Array.sum
-                    |> fun x -> x / ((numbers.Length - 1) |> float)
-                    |> System.Math.Sqrt,
-                    2)
-                
-                let stdDev = 
-                    match stdDevDouble with
-                    | double.PositiveInfinity -> 0m
-                    | double.NegativeInfinity -> 0m
-                    | _ -> decimal stdDevDouble
-                
-                let skewnessDouble =
-                    numbers
-                    |> Array.map (fun x -> System.Math.Pow(double(x - mean), 3))
-                    |> Array.sum
-                    |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 3)
-                    
-                
-                let skewness = 
-                    match skewnessDouble with
-                    | double.PositiveInfinity -> 0m
-                    | double.NegativeInfinity -> 0m
-                    | _ -> decimal skewnessDouble
-                
-                let kurtosisDouble = 
-                    numbers
-                    |> Array.map (fun x -> System.Math.Pow(double(x - mean), 4))
-                    |> Array.sum
-                    |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 4) - 3.0
-                
-                let kurtosis = 
-                    match kurtosisDouble with
-                    | double.PositiveInfinity -> 0m
-                    | double.NegativeInfinity -> 0m
-                    | _ -> decimal kurtosisDouble
-                    
-                let buckets = Histogram.calculate numbers min max 21
-                
-                {
-                    count = decimal count
-                    kurtosis = kurtosis
-                    min = min
-                    max = max
-                    mean = mean
-                    median = median
-                    skewness = skewness
-                    stdDev = stdDev
-                    buckets = buckets
-                }
+            let buckets = Histogram.calculate numbers min max 21
+            
+            {
+                count = decimal count
+                kurtosis = kurtosis
+                min = min
+                max = max
+                mean = mean
+                median = median
+                skewness = skewness
+                stdDev = stdDev
+                buckets = buckets
+            }
                 
 module PercentChangeAnalysis =
     

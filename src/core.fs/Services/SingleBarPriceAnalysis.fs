@@ -1,7 +1,6 @@
 namespace core.fs.Services.Analysis
 
 open System
-open System.Collections.Generic
 open core.fs.Services
 open core.fs.Services.MultipleBarPriceAnalysis
 open core.fs.Shared

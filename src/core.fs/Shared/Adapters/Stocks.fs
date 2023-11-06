@@ -98,6 +98,9 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
             
         candidates |> List.max
         
+    member this.HasGap (referenceBar:PriceBar) =
+        this.Low > referenceBar.High || this.High < referenceBar.Low
+        
 type PriceBars(bars:PriceBar array) =
     member this.Bars = bars
     member this.Length = bars.Length
