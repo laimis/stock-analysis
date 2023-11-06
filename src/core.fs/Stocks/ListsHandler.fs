@@ -82,6 +82,12 @@ type Delete =
         UserId: UserId
     }
     
+type Clear =
+    {
+        Name: string
+        UserId: UserId
+    }
+    
 type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:ICSVWriter) =
     interface IApplicationService
     
@@ -225,5 +231,20 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
             | null -> return "List not found" |> ResponseUtils.failed
             | _ ->
                 do! portfolio.DeleteStockList list command.UserId
+                return Ok
+    }
+    
+    member _.Handle (clear:Clear) = task {
+        let! user = accounts.GetUser(clear.UserId)
+        
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
+        | _ ->
+            let! list = portfolio.GetStockList clear.Name clear.UserId
+            match list with
+            | null -> return "List not found" |> ResponseUtils.failed
+            | _ ->
+                list.Clear()
+                do! portfolio.SaveStockList list clear.UserId
                 return Ok
     }

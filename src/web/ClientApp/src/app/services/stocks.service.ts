@@ -153,6 +153,10 @@ export class StocksService {
   updateStockList(oldName:string, newName: string, description: string): Observable<StockList> {
     return this.http.post<StockList>('/api/stocks/lists/' + oldName, { name:oldName, newName: newName, description: description })
   }
+  clearStockList(name: string) : Observable<StockList> {
+    return this.http.post<StockList>('/api/stocks/lists/' + name + '/clear', {})
+  }
+
   //
 
   // monit

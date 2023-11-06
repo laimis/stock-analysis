@@ -44,6 +44,9 @@ namespace core.Stocks
 
         private void ApplyInternal(StockListTagRemoved removed) =>
             Tags.Remove(removed.Tag);
+        
+        private void ApplyInternal(StockListCleared cleared) =>
+            Tickers.Clear();
     }
 
     public record StockListTicker(string Note, Ticker Ticker, DateTimeOffset When);
@@ -134,6 +137,16 @@ namespace core.Stocks
             }
 
             Apply(new StockListTagRemoved(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow, tag));
+        }
+        
+        public void Clear()
+        {
+            if (State.Tickers.Count == 0)
+            {
+                return;
+            }
+
+            Apply(new StockListCleared(Guid.NewGuid(), State.Id, DateTimeOffset.UtcNow));
         }
     }
 }

@@ -155,5 +155,18 @@ namespace coretests.Stocks
 
             Assert.Empty(list.State.Tags);
         }
+
+        [Fact]
+        public void AddStocksWhenClear_ClearsList()
+        {
+            var list = Create("name", "description");
+            
+            list.AddStock(TestDataGenerator.NET, "note");
+            list.AddStock(TestDataGenerator.TSLA, "note");
+            
+            list.Clear();
+            
+            Assert.Empty(list.State.Tickers);
+        }
     }
 }

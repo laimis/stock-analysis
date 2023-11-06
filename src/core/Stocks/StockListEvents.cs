@@ -77,3 +77,11 @@ internal class StockListTagRemoved : AggregateEvent
     public string Tag { get; }
 }
 
+internal class StockListCleared : AggregateEvent
+{
+    public StockListCleared(Guid id, Guid aggregateId, DateTimeOffset when)
+        : base(id, aggregateId, when)
+    {
+    }
+}
+

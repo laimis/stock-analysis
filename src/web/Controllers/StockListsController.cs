@@ -66,5 +66,7 @@ public class StockListsController : ControllerBase
             )
         );
 
-    
+    [HttpPost("{name}/clear")]
+    public Task<ActionResult> ClearStockList([FromRoute] string name) =>
+        this.OkOrError(_handler.Handle(new Clear(name, User.Identifier())));
 }

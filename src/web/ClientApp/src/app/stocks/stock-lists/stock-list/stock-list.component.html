@@ -12,7 +12,7 @@
         <button class="btn btn-link" (click)="toggleVisibility(editSection)"><i class="bi bi-pencil"></i></button>
     </h3>
     <small><a [routerLink]="['/stocks/lists']">back to lists</a></small>
-    
+
     <p>{{list.description}}</p>
 
     <section>
@@ -20,11 +20,12 @@
         <form>
             <div class="row">
                 <div class="col-6">
-                    <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewSection)">Batch add</button>
-                    <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(monitoringSection)" >Monitoring</button>
-                    <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-2">Analysis</a>
-                    <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-2">Export</a>
-                    <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary">Export (just tickers)</a>
+                    <button type="submit" class="btn btn-secondary me-1" (click)="toggleVisibility(addNewSection)">Batch add</button>
+                    <button type="submit" class="btn btn-secondary me-1" (click)="toggleVisibility(monitoringSection)" >Monitoring</button>
+                    <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-1">Analysis</a>
+                    <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-1">Export</a>
+                    <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary me-1">Export (just tickers)</a>
+                    <button type="submit" class="btn btn-danger" (click)="clear()">Clear list</button>
                 </div>
                 <div class="col-6">
                     <div class="row">
@@ -100,4 +101,4 @@
             </tbody>
         </table>
     </section>
-</div>  
+</div>
