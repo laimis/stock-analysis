@@ -1,13 +1,14 @@
 import {Component, HostListener, Input} from '@angular/core';
 import {
-  Prices,
-  StocksService,
-  PositionInstance,
-  TickerOutcomes,
-  TradingStrategyResults,
   BrokerageOrder,
   DailyPositionReport,
-  PositionChartInformation
+  PositionChartInformation,
+  PositionInstance,
+  PriceFrequency,
+  Prices,
+  StocksService,
+  TickerOutcomes,
+  TradingStrategyResults
 } from 'src/app/services/stocks.service';
 
 
@@ -67,7 +68,7 @@ export class StockTradingOpenPositionsComponent {
 
   private getPricesForCurrentPosition() {
     // only take the last 365 of prices
-    this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
+    this.stockService.getStockPrices(this.currentPosition.ticker, 365, PriceFrequency.Daily).subscribe(
       (r: Prices) => {
         this.chartInfo = {
           buyDates: this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date),

@@ -2,7 +2,9 @@ import {Component, HostListener, Input} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
   DailyPositionReport,
-  PositionInstance, PositionChartInformation,
+  PositionChartInformation,
+  PositionInstance,
+  PriceFrequency,
   Prices,
   StocksService,
   TradingStrategyResults
@@ -96,7 +98,7 @@ export class StockTradingReviewComponent {
   }
 
   private getPrices() {
-    this.stockService.getStockPrices(this.currentPosition.ticker, 365).subscribe(
+    this.stockService.getStockPrices(this.currentPosition.ticker, 365, PriceFrequency.Daily).subscribe(
       (r: Prices) => {
         this.positionChartInformation = {
           averageBuyPrice: this.currentPosition.averageCostPerShare,

@@ -288,6 +288,7 @@ namespace core.fs.Accounts
                 let properties = {|feedback = command.Feedback; email = user.State.Email;|}
                 do! email.SendWithTemplate (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply EmailTemplate.AdminUserDeleted properties
                     
+                    
                 do! storage.Delete(user)
                 do! portfolioStorage.Delete(user.Id |> UserId)
                 return Ok

@@ -246,12 +246,12 @@ export class StocksService {
     return this.http.get<StockQuote>(`/api/stocks/${symbol}/quote`)
   }
 
-  getStockPrices(symbol:string, numberOfDays:number): Observable<Prices> {
-		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}`)
+  getStockPrices(symbol:string, numberOfDays:number, frequency:PriceFrequency): Observable<Prices> {
+		return this.http.get<Prices>(`/api/stocks/${symbol}/prices?numberOfDays=${numberOfDays}&frequency=${frequency}`)
   }
 
-  getStockPricesForDates(symbol:string, start:string, end:string): Observable<Prices> {
-    return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}`)
+  getStockPricesForDates(symbol:string, frequency:PriceFrequency, start:string, end:string): Observable<Prices> {
+    return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}?frequeyncy=${frequency}`)
   }
 
   deleteStocks(id: string): Observable<object> {
@@ -431,7 +431,7 @@ export class StocksService {
       {
         tickers,
         duration: "AllBars",
-        frequency: "Daily",
+        frequency: PriceFrequency.Daily,
         includeGapAnalysis: true,
         startDate,
         endDate}
@@ -450,7 +450,7 @@ export class StocksService {
         highlightTitle,
         highlightTickers,
         duration: "SingleBar",
-        frequency: "Daily",
+        frequency: PriceFrequency.Daily,
         endDate
       }
     )
@@ -462,7 +462,7 @@ export class StocksService {
       {
         tickers,
         duration: "SingleBar",
-        frequency: "Weekly",
+        frequency: PriceFrequency.Weekly,
         endDate
       })
   }
@@ -576,6 +576,12 @@ export enum OutcomeTypeEnum {
   Positive = "Positive",
   Negative = "Negative",
   Neutral = "Neutral"
+}
+
+export enum PriceFrequency {
+  Daily = "Daily",
+  Weekly = "Weekly",
+  Monthly = "Monthly"
 }
 
 export interface StockAnalysisOutcome {

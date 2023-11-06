@@ -1,11 +1,11 @@
-import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {Component, Input} from '@angular/core';
 import {
-  ChartType,
   DataPointContainer,
   OutcomesReport,
   OutcomeValueTypeEnum,
   PositionChartInformation,
+  PriceFrequency,
   StockAnalysisOutcome,
   StockGaps,
   StockPercentChangeResponse,
@@ -48,7 +48,7 @@ export class StockAnalysisComponent {
   }
 
   private getPrices() {
-    this.stockService.getStockPrices(this.ticker, 365).subscribe(
+    this.stockService.getStockPrices(this.ticker, 365, PriceFrequency.Daily).subscribe(
       data => {
         this.chartInfo = {
           ticker: this.ticker,

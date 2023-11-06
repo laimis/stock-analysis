@@ -1,27 +1,13 @@
 <div>
+  <app-error-display [errors]="errors"></app-error-display>
+
   <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
+  <select class="form-select" [(ngModel)]="priceFrequency" (ngModelChange)="priceFrequencyChanged()">
+    <option value="Daily">Daily</option>
+    <option value="Weekly">Weekly</option>
+  </select>
 
   <app-candlestick-chart [chartInformation]="chartInfo" >
   </app-candlestick-chart>
 
-  <section>
-    <h3>New chart type</h3>
-    <canvasjs-chart *ngIf="options" [options]="options" (chartInstance)="getChartInstance($event)"></canvasjs-chart>
-  </section>
-
-  <section>
-    <h3>Profit</h3>
-    <app-line-chart [dataContainer]="container"></app-line-chart>
-  </section>
-
-  <section>
-    <h3>Manual</h3>
-    <canvasjs-chart [options]="manualOptions"></canvasjs-chart>
-  </section>
-
-  <app-stock-search></app-stock-search>
-  this is just a symbol app-symbol-search
-  <div>
-    hello!
-  </div>
 </div>

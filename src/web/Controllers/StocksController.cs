@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using core.fs.Shared.Adapters.Stocks;
 using core.fs.Stocks;
 using core.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -27,16 +28,20 @@ namespace web.Controllers
         public Task<ActionResult> Details([FromRoute]string ticker) => this.OkOrError(_service.Handle(new DetailsQuery(new Ticker(ticker), User.Identifier())));
 
         [HttpGet("{ticker}/prices")]
-        public Task<ActionResult> Prices([FromRoute]string ticker, [FromQuery] int numberOfDays) =>
-            this.OkOrError(_service.Handle(PricesQuery.NumberOfDays(numberOfDays, new Ticker(ticker), User.Identifier())));
+        public Task<ActionResult> Prices([FromRoute]string ticker, [FromQuery] int numberOfDays, [FromQuery] string frequency) =>
+            this.OkOrError(_service.Handle(PricesQuery.NumberOfDays(frequency: PriceFrequency.FromString(frequency), numberOfDays: numberOfDays, ticker: new Ticker(ticker), userId: User.Identifier())));
 
         [HttpGet("{ticker}/secfilings")]
         public Task<ActionResult> SecFilings([FromRoute] string ticker) =>
             this.OkOrError(_service.Handle(new CompanyFilingsQuery(new Ticker(ticker), User.Identifier())));
 
         [HttpGet("{ticker}/prices/{start}/{end}")]
-        public Task<ActionResult> Prices([FromRoute] string ticker, [FromRoute] DateTimeOffset start, [FromRoute] DateTimeOffset end) =>
-            this.OkOrError(_service.Handle(new PricesQuery(userId: User.Identifier(), ticker: new Ticker(ticker), start: start, end:end)));
+        public Task<ActionResult> Prices(
+            [FromRoute] string ticker,
+            [FromRoute] DateTimeOffset start,
+            [FromRoute] DateTimeOffset end,
+            [FromQuery] string frequency) =>
+            this.OkOrError(_service.Handle(new PricesQuery(frequency: PriceFrequency.FromString(frequency), userId: User.Identifier(), ticker: new Ticker(ticker), start: start, end:end)));
 
         [HttpGet("{ticker}/price")]
         public Task<ActionResult> Price([FromRoute] string ticker) => 

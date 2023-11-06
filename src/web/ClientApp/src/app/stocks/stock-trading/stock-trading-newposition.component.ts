@@ -1,8 +1,10 @@
-import { DatePipe } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {DatePipe} from '@angular/common';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-  OutcomeKeys, pendingstockpositioncommand,
+  OutcomeKeys,
+  pendingstockpositioncommand,
   PositionChartInformation,
+  PriceFrequency,
   Prices,
   SMA,
   StockAnalysisOutcome,
@@ -11,7 +13,7 @@ import {
   stocktransactioncommand,
   TickerOutcomes
 } from 'src/app/services/stocks.service';
-import { GetErrors, GetStrategies, toggleVisuallyHidden } from 'src/app/services/utils';
+import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {GlobalService} from "../../services/global.service";
 
 @Component({
@@ -134,7 +136,7 @@ export class StockTradingNewPositionComponent {
   }
 
   updateChart(ticker:string) {
-    this.stockService.getStockPrices(ticker, 365).subscribe(
+    this.stockService.getStockPrices(ticker, 365, PriceFrequency.Daily).subscribe(
       prices => {
         this.prices = prices
         this.chartInfo = {

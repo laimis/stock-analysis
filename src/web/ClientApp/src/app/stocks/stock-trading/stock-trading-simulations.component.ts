@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { PriceBar, StocksService, TradingStrategyPerformance } from '../../services/stocks.service';
-import { GetErrors } from 'src/app/services/utils';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {PriceBar, PriceFrequency, StocksService, TradingStrategyPerformance} from '../../services/stocks.service';
+import {GetErrors} from 'src/app/services/utils';
 
 @Component({
   selector: 'app-stock-trading-simulations',
@@ -47,11 +47,11 @@ export class StockTradingSimulationsComponent implements OnInit {
     const earliestDate = this.results[0].performance.earliestDate;
     const latestDate = this.results[0].performance.latestDate;
 
-    this.stocks.getStockPricesForDates("SPY", earliestDate, latestDate).subscribe(prices => {
+    this.stocks.getStockPricesForDates("SPY", PriceFrequency.Daily, earliestDate, latestDate).subscribe(prices => {
       this.spyPrices = prices.prices;
     });
 
-    this.stocks.getStockPricesForDates("QQQ", earliestDate, latestDate).subscribe(prices => {
+    this.stocks.getStockPricesForDates("QQQ", PriceFrequency.Daily, earliestDate, latestDate).subscribe(prices => {
       this.qqqPrices = prices.prices;
     });
   }

@@ -134,9 +134,10 @@ type PricesQuery =
         Ticker:Ticker
         Start:DateTimeOffset
         End:DateTimeOffset
+        Frequency:PriceFrequency
     }
     
-    static member NumberOfDays(numberOfDays, ticker, userId) =
+    static member NumberOfDays(frequency, numberOfDays, ticker, userId) =
         let totalDays = numberOfDays + 200 // to make sure we have enough for the moving averages
         let start = DateTimeOffset.UtcNow.AddDays(-totalDays)
         let ``end`` = DateTimeOffset.UtcNow
@@ -146,6 +147,7 @@ type PricesQuery =
             UserId = userId
             Start = start
             End = ``end``
+            Frequency = frequency 
         }
     
 type PricesView(prices:PriceBars) =
@@ -487,7 +489,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<PricesView>
         | Some user ->
-            let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker PriceFrequency.Daily query.Start query.End
+            let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker query.Frequency query.Start query.End
             match priceResponse.Success with
             | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<PricesView>
             | Some prices -> return prices |> PricesView |> ResponseUtils.success

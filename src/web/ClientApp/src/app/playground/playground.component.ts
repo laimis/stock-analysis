@@ -1,6 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {DataPointContainer, PositionChartInformation, Prices, StocksService} from '../services/stocks.service';
+import {
+  DataPointContainer,
+  PositionChartInformation,
+  PriceBar, PriceFrequency,
+  Prices,
+  StocksService
+} from '../services/stocks.service';
+import {GetErrors} from "../services/utils";
 
 
 @Component({
@@ -16,119 +23,78 @@ export class PlaygroundComponent implements OnInit {
   manualOptions: any;
   container: DataPointContainer;
   chartInfo: PositionChartInformation;
+  priceFrequency: PriceFrequency = PriceFrequency.Daily;
 
   constructor(
     private stocks:StocksService,
     private route:ActivatedRoute) { }
 
-  startDate:string;
+  errors: string[];
 
   ngOnInit() {
     const tickerParam = this.route.snapshot.queryParamMap.get('tickers');
     if (tickerParam) {
       this.tickers = tickerParam.split(',');
-      this.stocks.getStockPrices(this.tickers[0], 365).subscribe(result => {
+      this.renderPrices(this.tickers)
+    }
+  }
+
+  renderPrices(tickers) {
+    this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
+      result => {
         this.prices = result
+
+        let peaksAndTroughs = this.calculatePeaksAndTroughs(result.prices);
+
         this.chartInfo = {
           ticker: this.tickers[0],
           prices: result,
-          buyDates: [],
-          sellDates: [],
+          buyDates: [], //peaksAndTroughs.troughs,
+          sellDates: peaksAndTroughs.peaks,
           averageBuyPrice: null,
           stopPrice: null
         }
-        this.renderNewChart(result)
-      });
-    }
-
-    this.container = {
-      data: [
-        {label: "A", value: 2, isDate: false},
-        {label: "B", value: 14, isDate: false},
-        {label: "C", value: 2, isDate: false}
-      ],
-      label: "Sample data",
-      chartType: 'column',
-      annotationLine: null
-    };
-
-    this.manualOptions = {
-      title:{
-        text: "Angular Column Chart"
       },
-      animationEnabled: true,
-      data: [{
-        type: "column",
-        dataPoints: [
-          { label: "A", y: 71 },
-          { label: "B", y: 55 },
-          { label: "C", y: 50 }
-        ]
-      }]
-    }
+      error => this.errors = GetErrors(error)
+    );
+  }
+  priceFrequencyChanged() {
+    this.chartInfo = null
+    this.renderPrices(this.tickers);
   }
 
-  renderNewChart(prices:Prices) {
-    let dataPoints = prices.prices.map(p => {
-      let date = new Date(Date.parse(p.dateStr))
-      return {
-        x: date,
-        y: [p.open, p.high, p.low, p.close]
+
+  calculatePeaksAndTroughs(prices:PriceBar[]) {
+    let diff = []
+
+    for (let i = 0; i < prices.length - 1; i++) {
+      diff.push(prices[i+1].close - prices[i].close);
+    }
+
+    let smoothed = []
+    for (let i = 0; i < diff.length - 1; i++) {
+      if (i == 0) {
+        smoothed.push((diff[i] + diff[i+1]) / 2);
+        continue;
       }
-    });
+      smoothed.push((diff[i-1] + diff[i] + diff[i+1]) / 3);
+    }
 
-    this.options = {
-      logarithmic: true,
-      exportEnabled: true,
-      zoomEnabled: true,
-      title: {
-        text: this.tickers[0] + " Price",
-      },
-      axisX: {
-        // valueFormatString: "MMM",
-        crosshair: {
-          enabled: true,
-          valueFormatString: "MMM YYYY",
-          snapToDataPoint: true
-        }
-      },
-      axisY: {
-        title: "Price in USD",
-        prefix: "$",
-        crosshair: {
-          enabled: true
-        }
-      },
-      data: [{
-        type: "candlestick",
-        risingColor: "green",
-        fallingColor: "red",
-        yValueFormatString: "$##.##",
-        xValueFormatString: "MMM YYYY",
-        dataPoints: dataPoints
-      }]
-    };
-  }
+    let peakIndexes = []
+    let troughIndexes = []
 
-  chart:any
-  getChartInstance(chart: object) {
-    this.chart = chart;
-    let sma = this.prices.sma.sma20.values.map( (p, i) => {
-      let date = new Date(Date.parse(this.prices.prices[i].dateStr))
-      return {
-        x: date,
-        y: p
+    for (let i = 0; i < smoothed.length - 1; i++) {
+      if (smoothed[i] > 0 && smoothed[i+1] < 0) {
+        peakIndexes.push(i);
+      } else if (smoothed[i] < 0 && smoothed[i+1] > 0) {
+        troughIndexes.push(i);
       }
-    });
+    }
 
-    this.chart.addTo("data", {
-      type: "line",
-      showInLegend: true,
-      markerSize: 0,
-      yValueFormatString: "$#,###.00",
-      name: "20 sma",
-      dataPoints: sma
-    });
+    let peaks = peakIndexes.map(i => prices[i+1].dateStr);
+    let troughs = troughIndexes.map(i => prices[i+1].dateStr);
+
+    return {peaks, troughs};
   }
 }
 
