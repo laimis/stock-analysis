@@ -53,8 +53,7 @@ export class StockAnalysisComponent {
         this.chartInfo = {
           ticker: this.ticker,
           prices: data,
-          buyDates: [],
-          sellDates: [],
+          markers: [],
           averageBuyPrice: null,
           stopPrice: null
         }

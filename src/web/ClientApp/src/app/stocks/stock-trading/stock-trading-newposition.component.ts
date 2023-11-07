@@ -142,8 +142,7 @@ export class StockTradingNewPositionComponent {
         this.chartInfo = {
           ticker: ticker,
           prices: prices,
-          buyDates: [],
-          sellDates: [],
+          markers: [],
           averageBuyPrice: null,
           stopPrice: this.chartStop
         }

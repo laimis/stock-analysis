@@ -1,6 +1,6 @@
 import {Component, HostListener, Input} from '@angular/core';
 import {
-  BrokerageOrder,
+  BrokerageOrder, ChartMarker,
   DailyPositionReport,
   PositionChartInformation,
   PositionInstance,
@@ -10,6 +10,7 @@ import {
   TickerOutcomes,
   TradingStrategyResults
 } from 'src/app/services/stocks.service';
+import {green, red} from "../../shared/candlestick-chart/candlestick-chart.component";
 
 
 @Component({
@@ -70,9 +71,21 @@ export class StockTradingOpenPositionsComponent {
     // only take the last 365 of prices
     this.stockService.getStockPrices(this.currentPosition.ticker, 365, PriceFrequency.Daily).subscribe(
       (r: Prices) => {
+
+        let markers : ChartMarker[] = []
+        let buyTxs = this.currentPosition.transactions.filter(t => t.type == 'buy')
+        let sellTxs = this.currentPosition.transactions.filter(t => t.type == 'sell')
+
+        if (buyTxs.length > 0) {
+          markers.push({date: buyTxs[0].date, label: 'Buy', color: green, shape: 'arrowUp'})
+        }
+
+        if (sellTxs.length > 0) {
+          markers.push({date: sellTxs[0].date, label: 'Sell', color: red, shape: 'arrowDown'})
+        }
+
         this.chartInfo = {
-          buyDates: this.currentPosition.transactions.filter(t => t.type == 'buy').map(t => t.date),
-          sellDates: this.currentPosition.transactions.filter(t => t.type == 'sell').map(t => t.date),
+          markers: markers,
           ticker: this.currentPosition.ticker,
           prices: r,
           averageBuyPrice: this.currentPosition.averageCostPerShare,

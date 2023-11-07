@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
+  ChartMarker,
   DataPointContainer,
   PositionChartInformation,
   PriceBar, PriceFrequency,
@@ -8,6 +9,7 @@ import {
   StocksService
 } from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
+import {green, red} from "../shared/candlestick-chart/candlestick-chart.component";
 
 
 @Component({
@@ -20,7 +22,6 @@ export class PlaygroundComponent implements OnInit {
   tickers: string[];
   options: any;
   prices: Prices;
-  manualOptions: any;
   container: DataPointContainer;
   chartInfo: PositionChartInformation;
   priceFrequency: PriceFrequency = PriceFrequency.Daily;
@@ -39,18 +40,21 @@ export class PlaygroundComponent implements OnInit {
     }
   }
 
-  renderPrices(tickers) {
+  renderPrices(tickers:string[]) {
     this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
       result => {
         this.prices = result
 
         let peaksAndTroughs = this.calculatePeaksAndTroughs(result.prices);
 
+        let markers = []
+        peaksAndTroughs.peaks.forEach(p => markers.push(p))
+        peaksAndTroughs.troughs.forEach(t => markers.push(t))
+
         this.chartInfo = {
           ticker: this.tickers[0],
           prices: result,
-          buyDates: [], //peaksAndTroughs.troughs,
-          sellDates: peaksAndTroughs.peaks,
+          markers: markers,
           averageBuyPrice: null,
           stopPrice: null
         }
@@ -91,10 +95,28 @@ export class PlaygroundComponent implements OnInit {
       }
     }
 
-    let peaks = peakIndexes.map(i => prices[i+1].dateStr);
-    let troughs = troughIndexes.map(i => prices[i+1].dateStr);
+    let peaks = peakIndexes
+      .map(i => {
+        const marker: ChartMarker = {
+          label: 'peak',
+          date: prices[i + 1].dateStr,
+          color: red,
+          shape: 'arrowDown'
+        }
+        return marker
+      })
+
+    let troughs = troughIndexes
+      .map(i => {
+        const marker: ChartMarker = {
+          label: 'trough',
+          date: prices[i + 1].dateStr,
+          color: green,
+          shape: 'arrowUp'
+        }
+        return marker
+      })
 
     return {peaks, troughs};
   }
 }
-

@@ -814,11 +814,16 @@ export interface Prices {
   percentChanges: DistributionStatistics
 }
 
+export interface ChartMarker {
+  date: string
+  color: string
+  label: string
+  shape: "arrowUp" | "arrowDown"
+}
 export interface PositionChartInformation {
   ticker: string
   prices: Prices
-  buyDates: string[]
-  sellDates: string[]
+  markers: ChartMarker[]
   averageBuyPrice: number | null
   stopPrice: number | null
 }

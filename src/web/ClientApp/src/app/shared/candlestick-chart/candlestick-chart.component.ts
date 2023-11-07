@@ -1,6 +1,62 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import {PositionChartInformation, PriceBar, Prices, SMA} from 'src/app/services/stocks.service';
-import {IChartApi, PriceLineOptions, createChart} from 'lightweight-charts';
+import {ChartMarker, PositionChartInformation, PriceBar, SMA} from 'src/app/services/stocks.service';
+import {IChartApi, PriceLineOptions, createChart, SeriesMarker, Time} from 'lightweight-charts';
+
+const chartElementId = "chart"
+const numberOfVisibleBars = 60
+
+export const blue = '#2196f3'
+export const green = '#26a69a'
+export const red = '#ef5350'
+export const white = '#ffffff'
+export const lightblue = '#add8e6'
+
+function createLineData(sma:SMA, interval:number, priceBars) {
+  return sma.values
+    .filter(v => v != null)
+    .map( (p, index) => ({ value: p, time: priceBars[index + interval].time }));
+}
+
+function toPriceBar (p:PriceBar) {
+  return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close }
+}
+
+function toVolumeBar (p:PriceBar) {
+  let color = p.close > p.open ? green : red
+  return { time: p.dateStr, value: p.volume, color: color }
+}
+
+function addLineSeries (chart:IChartApi, sma:SMA, color:string, interval:number, priceBars) {
+  const smaSeries = chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
+  let smaLineData = createLineData(sma, interval, priceBars)
+  smaSeries.setData(smaLineData);
+}
+
+function createPriceLine(title:string, price:number, color:string) {
+  let priceLine : PriceLineOptions = {
+    'title': title,
+    price: price,
+    color: color,
+    lineWidth: 1,
+    lineVisible: true,
+    axisLabelColor: color,
+    axisLabelTextColor: white,
+    lineStyle: 0,
+    axisLabelVisible: true
+  };
+
+  return priceLine
+}
+
+export function toSeriesMarker(marker:ChartMarker) : SeriesMarker<Time> {
+  return {
+    time: marker.date,
+    position: marker.shape == 'arrowUp' ? 'belowBar' : 'aboveBar',
+    color: marker.color,
+    shape: marker.shape,
+    text: marker.label
+  }
+}
 
 @Component({
   selector: 'app-candlestick-chart',
@@ -19,7 +75,6 @@ export class CandlestickChartComponent implements OnDestroy {
     }
   }
 
-
   ngOnDestroy(): void {
     this.removeChart();
   }
@@ -32,92 +87,41 @@ export class CandlestickChartComponent implements OnDestroy {
 
   renderChart(info:PositionChartInformation) {
 
-
-    console.log('rendering chart')
-    console.log(info.buyDates)
-    console.log(info.sellDates)
-
     this.removeChart();
 
     this.chart = createChart(
-      document.getElementById('chart'),
+      document.getElementById(chartElementId),
       { height: this.chartHeight }
     );
-
-    let createLineData = (sma:SMA, interval:number, priceBars) => {
-      return sma.values
-        .filter(v => v != null)
-        .map( (p, index) => ({ value: p, time: priceBars[index + interval].time }));
-    }
-
-    let toPriceBar = (p:PriceBar) => {
-      return { time: p.dateStr, open: p.open, high: p.high, low: p.low, close: p.close }
-    }
-
-    let toVolumeBar = (p:PriceBar) => {
-      let color = p.close > p.open ? '#26a69a' : '#ef5350'
-      return { time: p.dateStr, value: p.volume, color: color }
-    }
-
-    let addLineSeries = (sma:SMA, color:string, interval:number, priceBars) => {
-      const smaSeries = this.chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
-      let smaLineData = createLineData(sma, interval, priceBars)
-      smaSeries.setData(smaLineData);
-    }
 
     const barSeries = this.chart.addCandlestickSeries();
     let priceBars = info.prices.prices.map(toPriceBar)
     barSeries.setData(priceBars);
 
     if (info.averageBuyPrice) {
-      let buyPrice : PriceLineOptions = {
-        'title': 'avg cost',
-        price: info.averageBuyPrice,
-        color: 'blue',
-        lineWidth: 1,
-        lineVisible: true,
-        axisLabelColor: 'blue',
-        axisLabelTextColor: 'white',
-        lineStyle: 0,
-        axisLabelVisible: true
-      };
-
-      barSeries.createPriceLine(buyPrice);
+      barSeries.createPriceLine(
+        createPriceLine('avg cost', info.averageBuyPrice, blue)
+      );
     }
 
     if (info.stopPrice) {
-      let stopPrice : PriceLineOptions = {
-        'title': 'stop',
-        price: info.stopPrice,
-        color: 'red',
-        lineWidth: 1,
-        lineVisible: true,
-        axisLabelColor: 'red',
-        axisLabelTextColor: 'white',
-        lineStyle: 0,
-        axisLabelVisible: true
-      };
-
-      barSeries.createPriceLine(stopPrice);
+      barSeries.createPriceLine(
+        createPriceLine('stop', info.stopPrice, red)
+      );
     }
 
-    addLineSeries(info.prices.sma.sma20, 'red', 20, priceBars);
-    addLineSeries(info.prices.sma.sma50, 'green', 50, priceBars);
-    addLineSeries(info.prices.sma.sma150, 'lightblue', 150, priceBars);
-    addLineSeries(info.prices.sma.sma200, 'blue', 200, priceBars);
+    addLineSeries(this.chart, info.prices.sma.sma20, red, info.prices.sma.sma20.interval, priceBars);
+    addLineSeries(this.chart, info.prices.sma.sma50, green, info.prices.sma.sma50.interval, priceBars);
+    addLineSeries(this.chart, info.prices.sma.sma150, lightblue, info.prices.sma.sma150.interval, priceBars);
+    addLineSeries(this.chart, info.prices.sma.sma200, blue, info.prices.sma.sma200.interval, priceBars);
 
-    let markers = []
-    if (info.buyDates) {
-      info.buyDates.forEach(d => {
-        markers.push({ time: d, position: 'belowBar', color: 'green', shape: 'arrowUp', text: 'buy' })
-      })
+    if (info.markers) {
+      let markers = info.markers.map(toSeriesMarker)
+      console.log(markers)
+      markers.sort((a, b) => a.time.toLocaleString().localeCompare(b.time.toLocaleString()))
+      barSeries.setMarkers(markers)
     }
-    if (info.sellDates) {
-      info.sellDates.forEach(d => {
-        markers.push({ time: d, position: 'aboveBar', color: 'red', shape: 'arrowDown', text: 'sell' })
-      })
-    }
-    barSeries.setMarkers(markers)
+
     barSeries.priceScale().applyOptions({
       scaleMargins: {
         top: 0.1, // highest point of the series will be 10% away from the top
@@ -144,10 +148,12 @@ export class CandlestickChartComponent implements OnDestroy {
     volumeSeries.setData(volumeData);
 
     this.chart.timeScale().setVisibleRange({
-      from: priceBars[priceBars.length - 60].time,
+      from: priceBars[priceBars.length - numberOfVisibleBars].time,
       to: priceBars[priceBars.length - 1].time
     });
 
 
   }
+
+  protected readonly chartElementId = chartElementId;
 }
