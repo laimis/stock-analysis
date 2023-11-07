@@ -1038,9 +1038,9 @@ export interface ChartAnnotationLine {
 
 export interface DataPointContainer {
   label: string
-  chartType: string
+  chartType: ChartType
   data: DataPoint[],
-  annotationLine: ChartAnnotationLine
+  annotationLine?: ChartAnnotationLine
 }
 
 export interface StockTradingPerformanceCollection {
