@@ -14,14 +14,25 @@ import {
 import {GetErrors} from "../services/utils";
 import {green, red} from "../shared/candlestick-chart/candlestick-chart.component";
 
-type gradient = {delta:number,index:number,bar:PriceBar}
+enum InfectionPointType { Peak= "Peak", Valley = "Valley"}
+type Gradient = {delta:number,index:number,bar:PriceBar}
+type InflectionPoint = {gradient:Gradient, type:InfectionPointType}
 
-function toChartMarker(g:gradient) : ChartMarker {
+function toPeak(gradient:Gradient) : InflectionPoint {
+  return {gradient:gradient, type:InfectionPointType.Peak}
+}
+
+function toValley(gradient:Gradient): InflectionPoint {
+  return {gradient: gradient, type:InfectionPointType.Valley}
+}
+
+function toChartMarker(inflectionPoint:InflectionPoint) : ChartMarker {
+  const bar = inflectionPoint.gradient.bar
   return {
-    label: g.bar.close.toFixed(2),
-    date: g.bar.dateStr,
-    color: g.delta > 0 ? green : red,
-    shape:  g.delta > 0 ? 'arrowUp' : 'arrowDown'
+    label: bar.close.toFixed(2),
+    date: bar.dateStr,
+    color: inflectionPoint.type === InfectionPointType.Valley ? green : red,
+    shape: inflectionPoint.type === InfectionPointType.Valley ? 'arrowUp' : 'arrowDown'
   }
 }
 
@@ -32,22 +43,22 @@ function nextDay(currentDate:string) : string {
   return date.toISOString().substring(0,10)
 }
 
-function toDataPointContainer(label:string, gradients:gradient[]) : DataPointContainer {
+function toDailyBreakdownDataPointCointainer(label:string, points:InflectionPoint[]) : DataPointContainer {
 
   // we want to generate a data point for each day, even if there is no peak or valley
   // start with the first date and keep on going until we reach the last date
-  let currentDate = gradients[0].bar.dateStr
+  let currentDate = points[0].gradient.bar.dateStr
   let currentIndex = 0
   let dataPoints : DataPoint[] = []
 
-  while (currentIndex < gradients.length) {
+  while (currentIndex < points.length) {
 
-    if (currentDate == gradients[currentIndex].bar.dateStr) {
+    if (currentDate == points[currentIndex].gradient.bar.dateStr) {
 
       dataPoints.push({
-        label: gradients[currentIndex].bar.dateStr,
+        label: points[currentIndex].gradient.bar.dateStr,
         isDate: true,
-        value: gradients[currentIndex].bar.close
+        value: points[currentIndex].gradient.bar.close
       })
 
       currentIndex++
@@ -57,7 +68,7 @@ function toDataPointContainer(label:string, gradients:gradient[]) : DataPointCon
       dataPoints.push({
         label: currentDate,
         isDate: true,
-        value: gradients[currentIndex - 1].bar.close
+        value: points[currentIndex - 1].gradient.bar.close
       })
 
     }
@@ -72,16 +83,16 @@ function toDataPointContainer(label:string, gradients:gradient[]) : DataPointCon
   }
 }
 
-function calculatePeaksAndValleys(prices:PriceBar[]) {
-  let diffs : gradient[] = []
+function calculateInflectionPoints(prices:PriceBar[]) {
+  let diffs : Gradient[] = []
 
   for (let i = 0; i < prices.length - 1; i++) {
     let diff = prices[i+1].close - prices[i].close
-    let val : gradient = {bar: prices[i], delta: diff, index: i}
+    let val : Gradient = {bar: prices[i], delta: diff, index: i}
     diffs.push(val);
   }
 
-  let smoothed : gradient[] = []
+  let smoothed : Gradient[] = []
   for (let i = 0; i < diffs.length - 1; i++) {
     if (i == 0) {
       let smoothedDiff = (diffs[i].delta + diffs[i+1].delta) / 2
@@ -92,18 +103,17 @@ function calculatePeaksAndValleys(prices:PriceBar[]) {
     smoothed.push({bar: diffs[i].bar, delta: smoothedDiff, index: i});
   }
 
-  let peakGradients: gradient[] = []
-  let valleyGradients: gradient[] = []
+  let inflectionPoints : InflectionPoint[] = []
 
   for (let i = 0; i < smoothed.length - 1; i++) {
     if (smoothed[i].delta > 0 && smoothed[i + 1].delta < 0) {
-      peakGradients.push(smoothed[i + 1]);
+      inflectionPoints.push(toPeak(smoothed[i + 1]));
     } else if (smoothed[i].delta < 0 && smoothed[i + 1].delta > 0) {
-      valleyGradients.push(smoothed[i + 1]);
+      inflectionPoints.push(toValley(smoothed[i + 1]));
     }
   }
 
-  return {peakGradients, valleyGradients};
+  return inflectionPoints;
 }
 
 @Component({
@@ -142,13 +152,10 @@ export class PlaygroundComponent implements OnInit {
       result => {
         this.prices = result
 
-        const peaksAndValleys = calculatePeaksAndValleys(result.prices);
-        const peaks = peaksAndValleys.peakGradients
-        const valleys = peaksAndValleys.valleyGradients
+        const inflectionPoints = calculateInflectionPoints(result.prices);
 
         let markers = []
-        peaks.map(toChartMarker).forEach(p => markers.push(p))
-        valleys.map(toChartMarker).forEach(v => markers.push(v))
+        inflectionPoints.map(toChartMarker).forEach(p => markers.push(p))
 
         this.chartInfo = {
           ticker: this.tickers[0],
@@ -158,8 +165,8 @@ export class PlaygroundComponent implements OnInit {
           stopPrice: null
         }
 
-        this.peakContainer = toDataPointContainer('peaks', peaks)
-        this.valleyContainer = toDataPointContainer('valleys', valleys)
+        this.peakContainer = toDailyBreakdownDataPointCointainer('peaks', inflectionPoints.filter(p => p.type === InfectionPointType.Peak))
+        this.valleyContainer = toDailyBreakdownDataPointCointainer('valleys', inflectionPoints.filter(p => p.type === InfectionPointType.Valley))
         this.peaksAndValleys = [this.peakContainer, this.valleyContainer]
       },
       error => this.errors = GetErrors(error)
