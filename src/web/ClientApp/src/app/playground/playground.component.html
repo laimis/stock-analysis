@@ -10,14 +10,9 @@
   <app-candlestick-chart [chartInformation]="chartInfo" >
   </app-candlestick-chart>
 
-  <section>
-    <h3>Peaks</h3>
-    <app-line-chart [dataContainer]="peakContainer"></app-line-chart>
-  </section>
-
-  <section>
-    <h3>Valleys</h3>
-    <app-line-chart [dataContainer]="valleyContainer"></app-line-chart>
+  <section *ngFor="let container of lineContainers">
+    <h3>{{container.label}}</h3>
+    <app-line-chart [dataContainer]="container"></app-line-chart>
   </section>
 
   <section>
