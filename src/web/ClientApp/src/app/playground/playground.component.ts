@@ -72,7 +72,6 @@ function toDailyBreakdownDataPointCointainer(label:string, points:InflectionPoin
       })
 
     }
-
     currentDate = nextDay(currentDate)
   }
 

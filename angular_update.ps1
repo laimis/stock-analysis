@@ -24,6 +24,17 @@ if ($answer -ne "y") {
     exit
 }
 
+# check if there are any git changes, and if there are, report them and exit
+$gitStatus = git status --porcelain
+if ($gitStatus -ne "") {
+    Write-Host "There are uncommitted changes in git. Please commit or stash them and try again."
+    Write-Host "Git status:"
+    Write-Host $gitStatus
+
+    # exit with error code
+    exit 1
+}
+
 # loop through each package and update
 $updates | ForEach-Object {
     $package = [regex]::Match($_, "@[^\s]+").Value
