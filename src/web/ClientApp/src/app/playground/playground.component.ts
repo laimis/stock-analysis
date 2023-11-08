@@ -152,7 +152,50 @@ function toInflectionPointLog(inflectionPoints:InflectionPoint[]) : InflectionPo
     i += 1
   }
   return log
+}
 
+function toHistogram(inflectionPoints:InflectionPoint[]) {
+  // build a histogram of the inflection points
+  // the histogram will have a key for each price
+  // and the value will be the number of times that price was hit
+  let histogram = {}
+
+  for (let i = 0; i < inflectionPoints.length; i++) {
+    let price = inflectionPoints[i].gradient.bar.close
+
+    // we will round the price to the nearest dollar
+    let rounded = Math.round(price)
+
+    if (histogram[rounded]) {
+      histogram[rounded] += 1
+    } else {
+      histogram[rounded] = 1
+    }
+  }
+
+  return histogram
+}
+
+function toDataPointContainer(title:string, histogram:{}) {
+  let dataPoints : DataPoint[] = []
+  for (let key in histogram) {
+    dataPoints.push({
+      label: key,
+      isDate: false,
+      value: histogram[key]
+    })
+  }
+  return {
+    label: title,
+    chartType: ChartType.Column,
+    data: dataPoints
+  }
+}
+
+function age(point:InflectionPoint) : number {
+  const date = new Date(point.gradient.bar.dateStr).getTime()
+  const now = new Date().getTime()
+  return (now - date) / (1000 * 3600 * 24)
 }
 
 @Component({
@@ -190,7 +233,8 @@ export class PlaygroundComponent implements OnInit {
         this.prices = result
 
         const inflectionPoints = calculateInflectionPoints(result.prices);
-        this.log = toInflectionPointLog(inflectionPoints).reverse()
+        const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
+        const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
 
         this.chartInfo = {
           ticker: this.tickers[0],
@@ -200,19 +244,24 @@ export class PlaygroundComponent implements OnInit {
           stopPrice: null
         }
 
-        const peaks = toDailyBreakdownDataPointCointainer('peaks', inflectionPoints.filter(p => p.type === InfectionPointType.Peak))
-        const valleys = toDailyBreakdownDataPointCointainer('valleys', inflectionPoints.filter(p => p.type === InfectionPointType.Valley))
-        const smoothedPeaks = toDailyBreakdownDataPointCointainer(
-          'smoothed peaks',
-          inflectionPoints.filter(p => p.type === InfectionPointType.Peak), (p: number) => Math.round(p)
-        )
-        const smoothedValleys = toDailyBreakdownDataPointCointainer(
-          'smoothed valleys',
-          inflectionPoints.filter(p => p.type === InfectionPointType.Valley), (p: number) => Math.round(p)
-        )
+        const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
+        const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
+        const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
+        const smoothedValleys = toDailyBreakdownDataPointCointainer('smoothed valleys', valleys, (p: number) => Math.round(p))
+
+        this.log = toInflectionPointLog(inflectionPoints).reverse()
+
+        const sixMonths = 365 / 2
+        const twoMonths = 365 / 6
+        const ageValueToUse = twoMonths
+        const peaksHistogram = toHistogram(peaks.filter(p => age(p) < ageValueToUse))
+        const peaksHistogramPointContainer = toDataPointContainer('resistance histogram', peaksHistogram)
+
+        const valleysHistogram = toHistogram(valleys.filter(p => age(p) < ageValueToUsegit ))
+        const valleysHistogramPointContainer = toDataPointContainer('support histogram', valleysHistogram)
 
         this.lineContainers = [
-          peaks, smoothedPeaks, valleys, smoothedValleys
+          peaksHistogramPointContainer, valleysHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys
         ]
 
         this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
