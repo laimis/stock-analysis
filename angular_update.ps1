@@ -40,6 +40,13 @@ $updates | ForEach-Object {
     $package = [regex]::Match($_, "@[^\s]+").Value
     Write-Host "Applying update: $package"
     ng update $package
+
+    # check if the above commit was successful, if not, exit
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Update failed, exiting"
+        exit 1
+    }
+
     git add .
     git commit -m "Angular updates: $package"
 }
