@@ -20,7 +20,7 @@
     <div class="mt-4">
       <div class="row">
         <div class="col" *ngIf="ownership && ownership.quantity > 0">
-          Ownership: <b>{{ownership.quantity}}</b> @ <b>{{ownership.averageCost | currency}}</b> ({{(crypto.price.amount - ownership.averageCost) / crypto.price.amount | percent}})
+          Ownership: <b>{{ownership.quantity}}</b> &#64; <b>{{ownership.averageCost | currency}}</b> ({{(crypto.price.amount - ownership.averageCost) / crypto.price.amount | percent}})
         </div>
         <div class="col" *ngIf="crypto.price">
           Current price: <b>{{crypto.price.amount | currency}}</b>

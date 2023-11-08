@@ -2,7 +2,7 @@
 
   <div *ngIf="options">
     <div *ngFor="let option of options">
-      {{option.optionType}} @ {{option.strikePrice | currency}} expires {{option.expirationDate | date }}
+      {{option.optionType}} &#64; {{option.strikePrice | currency}} expires {{option.expirationDate | date }}
       (<a [routerLink]="[ '/optiondetails', option.id ]">more info</a>)
     </div>
   </div>

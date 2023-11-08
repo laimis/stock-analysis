@@ -86,7 +86,7 @@
       <div #ordersContainer>
         <div class="row" *ngFor="let order of positionOrders">
           <div class="col">
-            {{ order.status }} {{ order.type }} {{ order.quantity }} @ {{ order.price === 0 ? "MARKET" : order.price | currency }}
+            {{ order.status }} {{ order.type }} {{ order.quantity }} &#64; {{ order.price === 0 ? "MARKET" : order.price | currency }}
           </div>
         </div>
       </div>
