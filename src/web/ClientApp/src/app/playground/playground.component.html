@@ -10,6 +10,31 @@
   <app-candlestick-chart [chartInformation]="chartInfo" >
   </app-candlestick-chart>
 
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>From</th>
+      <th></th>
+      <th>To</th>
+      <th></th>
+      <th>Days</th>
+      <th>Change</th>
+      <th>% Change</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let entry of log">
+      <td>{{entry.from.gradient.bar.close}}</td>
+      <td>{{entry.from.gradient.bar.dateStr}}</td>
+      <td>{{entry.to.gradient.bar.close}}</td>
+      <td>{{entry.to.gradient.bar.dateStr}}</td>
+      <td>{{entry.days}}</td>
+      <td>{{entry.change | currency}}</td>
+      <td>{{entry.percentChange | percent}}</td>
+    </tr>
+    </tbody>
+  </table>
+
   <section *ngFor="let container of lineContainers">
     <h3>{{container.label}}</h3>
     <app-line-chart [dataContainer]="container"></app-line-chart>

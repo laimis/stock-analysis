@@ -134,6 +134,27 @@ function calculateInflectionPoints(prices:PriceBar[]) {
   return inflectionPoints;
 }
 
+// this function will traverse the inflection points and calculate
+// the change from peak to valley and valley to peak, and how many days
+// have past between the points
+type InflectionPointLog = {from:InflectionPoint, to:InflectionPoint, days:number, change:number, percentChange:number}
+function toInflectionPointLog(inflectionPoints:InflectionPoint[]) : InflectionPointLog[] {
+
+  let log : InflectionPointLog[] = []
+  let i = 1
+  while (i < inflectionPoints.length) {
+    let point1 = inflectionPoints[i-1]
+    let point2 = inflectionPoints[i]
+    let days = (new Date(point2.gradient.bar.dateStr).getTime() - new Date(point1.gradient.bar.dateStr).getTime()) / (1000 * 3600 * 24)
+    let change = point2.gradient.bar.close - point1.gradient.bar.close
+    let percentChange = change / point2.gradient.bar.close
+    log.push({from: point1, to: point2, days: days, change: change, percentChange: percentChange})
+    i += 1
+  }
+  return log
+
+}
+
 @Component({
   selector: 'app-playground',
   templateUrl: './playground.component.html',
@@ -149,6 +170,7 @@ export class PlaygroundComponent implements OnInit {
 
   lineContainers: DataPointContainer[];
   peaksAndValleys: DataPointContainer[];
+  log: InflectionPointLog[];
 
   constructor(
     private stocks:StocksService,
@@ -168,6 +190,7 @@ export class PlaygroundComponent implements OnInit {
         this.prices = result
 
         const inflectionPoints = calculateInflectionPoints(result.prices);
+        this.log = toInflectionPointLog(inflectionPoints).reverse()
 
         this.chartInfo = {
           ticker: this.tickers[0],
