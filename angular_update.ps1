@@ -26,7 +26,7 @@ if ($answer -ne "y") {
 
 # check if there are any git changes, and if there are, report them and exit
 $gitStatus = git status --porcelain
-Write-Host $gitStatus -eq $null
+Write-Host ($gitStatus -eq $null)
 if ($gitStatus -ne "") {
     Write-Host "There are uncommitted changes in git. Please commit or stash them and try again."
     Write-Host "Git status:"
