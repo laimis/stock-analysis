@@ -2,7 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
   ChartMarker,
-  ChartType, DataPoint,
+  ChartType,
+  DataPoint,
   DataPointContainer,
   PositionChartInformation,
   PriceBar,
@@ -24,14 +25,45 @@ function toChartMarker(g:gradient) : ChartMarker {
   }
 }
 
-function toDataPointContainer(label:string, g:gradient[]) : DataPointContainer {
-  let dataPoints : DataPoint[] = g.map(p => {
-    return {
-      label: p.bar.dateStr,
-      isDate: true,
-      value: p.bar.close
+function nextDay(currentDate:string) : string {
+  let d = new Date(currentDate + " 23:00:00") // adding hours to make sure that when input is treated as midnight UTC, it is still the same day as the input
+  let date = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  date.setDate(date.getDate() + 1)
+  return date.toISOString().substring(0,10)
+}
+
+function toDataPointContainer(label:string, gradients:gradient[]) : DataPointContainer {
+
+  // we want to generate a data point for each day, even if there is no peak or valley
+  // start with the first date and keep on going until we reach the last date
+  let currentDate = gradients[0].bar.dateStr
+  let currentIndex = 0
+  let dataPoints : DataPoint[] = []
+
+  while (currentIndex < gradients.length) {
+
+    if (currentDate == gradients[currentIndex].bar.dateStr) {
+
+      dataPoints.push({
+        label: gradients[currentIndex].bar.dateStr,
+        isDate: true,
+        value: gradients[currentIndex].bar.close
+      })
+
+      currentIndex++
+
+    } else {
+
+      dataPoints.push({
+        label: currentDate,
+        isDate: true,
+        value: gradients[currentIndex - 1].bar.close
+      })
+
     }
-  })
+
+    currentDate = nextDay(currentDate)
+  }
 
   return {
     label: label,
@@ -89,6 +121,7 @@ export class PlaygroundComponent implements OnInit {
 
   peakContainer: DataPointContainer;
   valleyContainer: DataPointContainer;
+  peaksAndValleys: DataPointContainer[];
 
   constructor(
     private stocks:StocksService,
@@ -127,6 +160,7 @@ export class PlaygroundComponent implements OnInit {
 
         this.peakContainer = toDataPointContainer('peaks', peaks)
         this.valleyContainer = toDataPointContainer('valleys', valleys)
+        this.peaksAndValleys = [this.peakContainer, this.valleyContainer]
       },
       error => this.errors = GetErrors(error)
     );
