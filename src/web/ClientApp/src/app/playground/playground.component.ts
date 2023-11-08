@@ -43,7 +43,26 @@ function nextDay(currentDate:string) : string {
   return date.toISOString().substring(0,10)
 }
 
-function toDailyBreakdownDataPointCointainer(label:string, points:InflectionPoint[]) : DataPointContainer {
+function toDailyBreakdownDataPointCointainer(label:string, points:InflectionPoint[], priceFunc?) : DataPointContainer {
+
+  if (priceFunc) {
+    points = points.map(p => {
+      let bar : PriceBar = {
+        dateStr: p.gradient.bar.dateStr,
+        close: priceFunc(p.gradient.bar.close),
+        open: priceFunc(p.gradient.bar.open),
+        high: priceFunc(p.gradient.bar.high),
+        low: priceFunc(p.gradient.bar.low),
+        volume: p.gradient.bar.volume
+      }
+      let newGradient : Gradient = {
+        bar: bar,
+        delta: p.gradient.delta,
+        index: p.gradient.index
+      }
+      return toValley(newGradient)
+    })
+  }
 
   // we want to generate a data point for each day, even if there is no peak or valley
   // start with the first date and keep on going until we reach the last date
@@ -150,13 +169,10 @@ export class PlaygroundComponent implements OnInit {
 
         const inflectionPoints = calculateInflectionPoints(result.prices);
 
-        let markers = []
-        inflectionPoints.map(toChartMarker).forEach(p => markers.push(p))
-
         this.chartInfo = {
           ticker: this.tickers[0],
           prices: result,
-          markers: markers,
+          markers: inflectionPoints.map(toChartMarker),
           averageBuyPrice: null,
           stopPrice: null
         }
@@ -165,41 +181,11 @@ export class PlaygroundComponent implements OnInit {
         const valleys = toDailyBreakdownDataPointCointainer('valleys', inflectionPoints.filter(p => p.type === InfectionPointType.Valley))
         const smoothedPeaks = toDailyBreakdownDataPointCointainer(
           'smoothed peaks',
-          inflectionPoints.filter(p => p.type === InfectionPointType.Peak).map(p => {
-            let bar : PriceBar = {
-              dateStr: p.gradient.bar.dateStr,
-              close: Math.ceil(p.gradient.bar.close),
-              open: Math.ceil(p.gradient.bar.open),
-              high: Math.ceil(p.gradient.bar.high),
-              low: Math.ceil(p.gradient.bar.low),
-              volume: p.gradient.bar.volume
-            }
-            let newGradient : Gradient = {
-              bar: bar,
-              delta: p.gradient.delta,
-              index: p.gradient.index
-            }
-            return toPeak(newGradient)
-          })
+          inflectionPoints.filter(p => p.type === InfectionPointType.Peak), (p: number) => Math.round(p)
         )
         const smoothedValleys = toDailyBreakdownDataPointCointainer(
           'smoothed valleys',
-          inflectionPoints.filter(p => p.type === InfectionPointType.Valley).map(p => {
-            let bar : PriceBar = {
-              dateStr: p.gradient.bar.dateStr,
-              close: Math.floor(p.gradient.bar.close),
-              open: Math.floor(p.gradient.bar.open),
-              high: Math.floor(p.gradient.bar.high),
-              low: Math.floor(p.gradient.bar.low),
-              volume: p.gradient.bar.volume
-            }
-            let newGradient : Gradient = {
-              bar: bar,
-              delta: p.gradient.delta,
-              index: p.gradient.index
-            }
-            return toValley(newGradient)
-          })
+          inflectionPoints.filter(p => p.type === InfectionPointType.Valley), (p: number) => Math.round(p)
         )
 
         this.lineContainers = [
