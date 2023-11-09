@@ -37,14 +37,17 @@ namespace web
                     options.ClientId = googleClientId;
                     options.ClientSecret = configuration.GetValue<string>("GoogleSecret");
                     options.ReturnUrlParameter = "returnUrl";
+                    var authEndpoint = options.Events.OnRedirectToAuthorizationEndpoint;
+                    
                     options.Events.OnRedirectToAuthorizationEndpoint = context =>
                     {
                         if (context.Request.Path.StartsWithSegments("/api"))
                         {
                             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            return Task.CompletedTask;
                         }
 
-                        return Task.CompletedTask;
+                        return authEndpoint(context);
                     };
                 });   
             }
