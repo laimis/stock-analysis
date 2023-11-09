@@ -232,6 +232,11 @@ namespace core.Stocks
 
         public void SetRiskAmount(decimal riskAmount, DateTimeOffset when)
         {
+            if (riskAmount == 0)
+            {
+                return;
+            }
+            
             RiskedAmount = riskAmount;
 
             Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", new PositionEventType(PositionEventType.Risk), riskAmount, DateOnly.FromDateTime(when.DateTime)));
@@ -251,7 +256,7 @@ namespace core.Stocks
                 _ => (price - AverageCostPerShare) / AverageCostPerShare
             };
             UnrealizedRR = RiskedAmount switch {
-                not null => UnrealizedProfit / RiskedAmount.Value,
+                not null =>  UnrealizedProfit / RiskedAmount.Value,
                 _ => 0
             };
             PercentToStop = StopPrice switch {
