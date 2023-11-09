@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using web.Utils;
@@ -35,6 +37,15 @@ namespace web
                     options.ClientId = googleClientId;
                     options.ClientSecret = configuration.GetValue<string>("GoogleSecret");
                     options.ReturnUrlParameter = "returnUrl";
+                    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+                    {
+                        if (context.Request.Path.StartsWithSegments("/api"))
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        }
+
+                        return Task.CompletedTask;
+                    };
                 });   
             }
 

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using core.fs.Accounts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace web.Utils
@@ -18,6 +19,16 @@ namespace web.Utils
         {
             _logger = logger;
             _service = service;
+        }
+
+        public override Task RedirectToLogin(RedirectContext<CookieAuthenticationOptions> ctx)
+        {
+            if (ctx.Request.Path.StartsWithSegments("/api"))
+            {
+                ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            }
+
+            return base.RedirectToLogin(ctx);
         }
         
         public override async Task SigningIn(CookieSigningInContext context)
