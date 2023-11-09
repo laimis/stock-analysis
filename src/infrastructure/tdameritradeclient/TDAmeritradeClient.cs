@@ -31,7 +31,7 @@ public class TDAmeritradeClient : IBrokerage
     private static readonly AsyncRetryPolicy _retryPolicy = Policy
         .Handle<RateLimitRejectedException>()
         .WaitAndRetryAsync(
-            retryCount: 3,
+            retryCount: 5,
             sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2)
         );
 
