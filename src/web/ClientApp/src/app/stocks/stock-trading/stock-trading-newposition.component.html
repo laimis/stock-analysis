@@ -3,139 +3,138 @@
     Initiate Position
     <span class="float-end fs-6">max loss: {{maxLoss | currency}}</span>
   </h5>
-  <div>
-    <div class="row" *ngIf="!presetTicker">
-      <div class="col">
-        <app-stock-search
-          *ngIf="isPendingPositionMode === true"
-            label="Ticker"
-            placeholder="New position symbol"
-            (tickerSelected)="onBuyTickerSelected($event)"
-            cssClass="form-control">
-        </app-stock-search>
-        <b *ngIf="isPendingPositionMode === false">{{ticker}}</b>
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="ticker">
-      <div class="col-md">
-        <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }} x {{ this.ask | currency }} )</label>
-        <input
-          type="number"
-          step="0.01"
-          id="costToBuy"
-          class="form-control"
-          [(ngModel)]="costToBuy"
-          (ngModelChange)="updateBuyingValuesWithCostToBuy()"
-        />
-      </div>
-      <div class="col-md" *ngIf="isPendingPositionMode === true">
-        <label for="sizeStopPrice" class="form-label">Size Stop</label>
-        <input
-          type="number"
-          step="0.01"
-          id="sizeStopPrice"
-          class="form-control"
-          [(ngModel)]="sizeStopPrice"
-          (ngModelChange)="updateBuyingValuesSizeStopPrice()"
-        />
-      </div>
-      <div class="col-md">
-        <label for="stopPrice" class="form-label">Stop</label>
-        <input
-          type="number"
-          step="0.01"
-          id="stopPrice"
-          class="form-control"
-          [(ngModel)]="positionStopPrice"
-          (ngModelChange)="updateBuyingValuesPositionStopPrice()"
-        />
-      </div>
-      <div class="col-md">
-        <label for="stocksToBuy" class="form-label">Shares #</label>
-        <input
-          type="number"
-          id="stocksToBuy"
-          class="form-control"
-          [(ngModel)]="numberOfShares"
-          (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
-        />
-      </div>
-      <div class="col-md" *ngIf="isPendingPositionMode === false">
-        <label for="date" class="form-label">Purchase Date</label>
-        <input
-          type="date"
-          class="form-control"
-          id="date"
-          [(ngModel)]="date">
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="prices">
-      <div class="col-md-6 fs-6">
-        <span class="me-2 visually-hidden" #sizeSpan (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
-        <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
-        <span class="me-2 visually-hidden" #lossSpan (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
-        <span class="me-2" #lossSpanAlt (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
-        <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
-      </div>
-      <div class="col-md-6 text-end">
-        <app-stock-link class="me-2" [ticker]="ticker"></app-stock-link>
-        <app-trading-view-link class="me-2" [ticker]="ticker"></app-trading-view-link>
-        <span class="me-2" (click)="assignSizeStopPrice(calculateAtrBasedStop())">ATR: <strong>{{ atr | currency }}</strong> </span>
-        <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
-        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get20sma())">20: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
-        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get50sma())">50: <strong [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
-        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get150sma())">150: <strong [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
-        <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get200sma())">200: <strong [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="prices">
-      <div class="col">
-        <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="prices">
-      <div class="col">
-        <select class="form-select" id="strategyInput" [(ngModel)]="strategy">
-          <option value="" selected>Select strategy...</option>
-          <option *ngFor="let s of strategies" [value]="s.key">{{s.value}}</option>
-        </select>
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="prices && isPendingPositionMode">
-      <div class="col"><button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position [Limit Buy]</button></div>
-      <div class="col"><button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending Position [Market Buy]</button></div>
-    </div>
-    <div class="row mt-3" *ngIf="prices && !isPendingPositionMode">
-      <div class="col">
-        <button *ngIf="!recordInProgress" class="btn btn-primary w-100" (click)="record()">Record</button>
-        <button *ngIf="recordInProgress" class="btn btn-primary w-100" disabled>Record</button>
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="chartInfo && showChart">
-      <div class="col">
-        <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="outcomes && showAnalysis">
-      <div class="col">
-        <table class="table table-hover border">
-          <tbody>
-            <tr *ngFor="let o of filteredOutcomes()">
-              <td>
-                <span
-                        class="badge"
-                        [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
 
-                    </span>
-                </td>
-                <td>{{o.key}}</td>
-                <td>{{o.value}}</td>
-                <td>{{o.outcomeType}}</td>
-                <td>{{o.message}}</td>
-              </tr>
-          </tbody>
-        </table>
+  <div class="row" *ngIf="!presetTicker">
+    <div class="col-md">
+      <app-stock-search
+        *ngIf="isPendingPositionMode === true"
+          label="Ticker"
+          placeholder="New position symbol"
+          (tickerSelected)="onBuyTickerSelected($event)"
+          cssClass="form-control">
+      </app-stock-search>
+      <b *ngIf="isPendingPositionMode === false">{{ticker}}</b>
     </div>
+  </div>
+  <div class="row mt-3" *ngIf="ticker">
+    <div class="col">
+      <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }} x {{ this.ask | currency }} )</label>
+      <input
+        type="number"
+        step="0.01"
+        id="costToBuy"
+        class="form-control"
+        [(ngModel)]="costToBuy"
+        (ngModelChange)="updateBuyingValuesWithCostToBuy()"
+      />
+    </div>
+    <div class="col-md-3" *ngIf="isPendingPositionMode === true">
+      <label for="sizeStopPrice" class="form-label">Size Stop</label>
+      <input
+        type="number"
+        step="0.01"
+        id="sizeStopPrice"
+        class="form-control"
+        [(ngModel)]="sizeStopPrice"
+        (ngModelChange)="updateBuyingValuesSizeStopPrice()"
+      />
+    </div>
+    <div class="col-md-3">
+      <label for="stopPrice" class="form-label">Stop</label>
+      <input
+        type="number"
+        step="0.01"
+        id="stopPrice"
+        class="form-control"
+        [(ngModel)]="positionStopPrice"
+        (ngModelChange)="updateBuyingValuesPositionStopPrice()"
+      />
+    </div>
+    <div class="col-md-3">
+      <label for="stocksToBuy" class="form-label">Shares #</label>
+      <input
+        type="number"
+        id="stocksToBuy"
+        class="form-control"
+        [(ngModel)]="numberOfShares"
+        (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
+      />
+    </div>
+    <div class="col-md-3" *ngIf="isPendingPositionMode === false">
+      <label for="date" class="form-label">Purchase Date</label>
+      <input
+        type="date"
+        class="form-control"
+        id="date"
+        [(ngModel)]="date">
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="prices">
+    <div class="col-md-6 fs-6">
+      <span class="me-2 visually-hidden" #sizeSpan (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
+      <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
+      <span class="me-2 visually-hidden" #lossSpan (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
+      <span class="me-2" #lossSpanAlt (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
+      <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
+    </div>
+    <div class="col-md-6 text-end">
+      <app-stock-link class="me-2" [ticker]="ticker"></app-stock-link>
+      <app-trading-view-link class="me-2" [ticker]="ticker"></app-trading-view-link>
+      <span class="me-2" (click)="assignSizeStopPrice(calculateAtrBasedStop())">ATR: <strong>{{ atr | currency }}</strong> </span>
+      <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
+      <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get20sma())">20: <strong [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
+      <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get50sma())">50: <strong [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
+      <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get150sma())">150: <strong [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
+      <span class="me-2" style="cursor: pointer;" (click)="assignSizeStopPrice(get200sma())">200: <strong [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="prices">
+    <div class="col">
+      <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="prices">
+    <div class="col">
+      <select class="form-select" id="strategyInput" [(ngModel)]="strategy">
+        <option value="" selected>Select strategy...</option>
+        <option *ngFor="let s of strategies" [value]="s.key">{{s.value}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="prices && isPendingPositionMode">
+    <div class="col"><button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position [Limit Buy]</button></div>
+    <div class="col"><button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending Position [Market Buy]</button></div>
+  </div>
+  <div class="row mt-3" *ngIf="prices && !isPendingPositionMode">
+    <div class="col">
+      <button *ngIf="!recordInProgress" class="btn btn-primary w-100" (click)="record()">Record</button>
+      <button *ngIf="recordInProgress" class="btn btn-primary w-100" disabled>Record</button>
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="chartInfo && showChart">
+    <div class="col">
+      <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="outcomes && showAnalysis">
+    <div class="col">
+      <table class="table table-hover border">
+        <tbody>
+          <tr *ngFor="let o of filteredOutcomes()">
+            <td>
+              <span
+                      class="badge"
+                      [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
+
+                  </span>
+              </td>
+              <td>{{o.key}}</td>
+              <td>{{o.value}}</td>
+              <td>{{o.outcomeType}}</td>
+              <td>{{o.message}}</td>
+            </tr>
+        </tbody>
+      </table>
     </div>
     <div class="row mt-3" *ngIf="gaps && showAnalysis">
       <app-gaps [gaps]="gaps"></app-gaps>
