@@ -37,7 +37,7 @@
     <section>
       <h5>{{g[0].identifier}} ({{g.length}})</h5>
 
-      <table class="table table-hover d-md-table">
+      <table class="table table-hover d-none d-md-table">
         <thead>
           <tr>
             <th class="sort-header" (click)="sort('ticker')">Ticker</th>
@@ -91,15 +91,7 @@
             </div>
             <div class="row">
               <div class="col">
-                Triggered on {{alert.when | date:'short'}}
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-6">
-                Watched Value: {{getValue(alert.watchedValue, alert.valueFormat)}}
-              </div>
-              <div class="col-6">
-                Triggered Value: {{getValue(alert.triggeredValue, alert.valueFormat)}}
+                <span class="stat-label">Triggered value of</span> {{getValue(alert.triggeredValue, alert.valueFormat)}}
               </div>
             </div>
           </div>
