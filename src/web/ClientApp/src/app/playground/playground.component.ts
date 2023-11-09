@@ -176,7 +176,7 @@ function toHistogram(inflectionPoints:InflectionPoint[]) {
   return histogram
 }
 
-function toDataPointContainer(title:string, histogram:{}) {
+function histogramToDataPointContainer(title:string, histogram:{}) {
   let dataPoints : DataPoint[] = []
   for (let key in histogram) {
     dataPoints.push({
@@ -198,18 +198,58 @@ function age(point:InflectionPoint) : number {
   return (now - date) / (1000 * 3600 * 24)
 }
 
+function logToDataPointContainer(label:string, log: InflectionPointLog[]) {
+  let dataPoints : DataPoint[] = []
+  for (let i = 0; i < log.length; i++) {
+    let point = log[i]
+    dataPoints.push({
+      label: point.from.gradient.bar.dateStr,
+      isDate: true,
+      value: Math.round(point.percentChange * 100)
+    })
+  }
+  return {
+    label: label,
+    chartType: ChartType.Column,
+    data: dataPoints
+  }
+}
+
+function humanFriendlyTime(ageValueToUse: number) {
+  // check if we are dealing with years
+  if (ageValueToUse > 365) {
+    return Math.round(ageValueToUse / 365) + ' years'
+  }
+
+  // check if we are dealing with months
+  if (ageValueToUse > 30) {
+    return Math.round(ageValueToUse / 30) + ' months'
+  }
+
+  // check if we are dealing with weeks
+  if (ageValueToUse > 7) {
+    return Math.round(ageValueToUse / 7) + ' weeks'
+  }
+
+  // check if we are dealing with days
+  return Math.round(ageValueToUse) + ' days'
+}
+
+const sixMonths = 365 / 2
+const twoMonths = 365 / 6
+
 @Component({
   selector: 'app-playground',
   templateUrl: './playground.component.html',
   styleUrls: ['./playground.component.css']
 })
-
 export class PlaygroundComponent implements OnInit {
   tickers: string[];
   options: any;
   prices: Prices;
   chartInfo: PositionChartInformation;
   priceFrequency: PriceFrequency = PriceFrequency.Daily;
+  ageValueToUse = twoMonths
 
   lineContainers: DataPointContainer[];
   peaksAndValleys: DataPointContainer[];
@@ -251,17 +291,17 @@ export class PlaygroundComponent implements OnInit {
 
         this.log = toInflectionPointLog(inflectionPoints).reverse()
 
-        const sixMonths = 365 / 2
-        const twoMonths = 365 / 6
-        const ageValueToUse = twoMonths
-        const peaksHistogram = toHistogram(peaks.filter(p => age(p) < ageValueToUse))
-        const peaksHistogramPointContainer = toDataPointContainer('resistance histogram', peaksHistogram)
+        const humanFriendlyTimeDuration = humanFriendlyTime(this.ageValueToUse)
+        const peaksHistogram = toHistogram(peaks.filter(p => age(p) < this.ageValueToUse))
+        const peaksHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' resistance histogram', peaksHistogram)
 
-        const valleysHistogram = toHistogram(valleys.filter(p => age(p) < ageValueToUsegit ))
-        const valleysHistogramPointContainer = toDataPointContainer('support histogram', valleysHistogram)
+        const valleysHistogram = toHistogram(valleys.filter(p => age(p) < this.ageValueToUse))
+        const valleysHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' support histogram', valleysHistogram)
+
+        const logChart = logToDataPointContainer("Log", this.log)
 
         this.lineContainers = [
-          peaksHistogramPointContainer, valleysHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys
+          peaksHistogramPointContainer, valleysHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys, logChart
         ]
 
         this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
@@ -274,4 +314,11 @@ export class PlaygroundComponent implements OnInit {
     this.renderPrices(this.tickers);
   }
 
+  ageValueChanged() {
+    this.chartInfo = null
+    this.renderPrices(this.tickers);
+  }
+
+  protected readonly twoMonths = twoMonths;
+  protected readonly sixMonths = sixMonths;
 }

@@ -2,10 +2,23 @@
   <app-error-display [errors]="errors"></app-error-display>
 
   <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
-  <select class="form-select" [(ngModel)]="priceFrequency" (ngModelChange)="priceFrequencyChanged()">
-    <option value="Daily">Daily</option>
-    <option value="Weekly">Weekly</option>
-  </select>
+
+  <div class="row">
+    <div class="col">
+      <label class="form-label" for="priceFrequency">Price Frequency</label>
+      <select class="form-select" id="priceFrequency" [(ngModel)]="priceFrequency" (ngModelChange)="priceFrequencyChanged()">
+        <option value="Daily">Daily</option>
+        <option value="Weekly">Weekly</option>
+      </select>
+    </div>
+    <div class="col">
+      <label class="form-label" for="ageValueToUse">Support/Resistance Age</label>
+      <select id="ageValueToUse" class="form-select" [(ngModel)]="ageValueToUse" (ngModelChange)="ageValueChanged()">
+        <option [value]="twoMonths">2 months</option>
+        <option [value]="sixMonths">6 months</option>
+      </select>
+    </div>
+  </div>
 
   <app-candlestick-chart [chartInformation]="chartInfo" >
   </app-candlestick-chart>
@@ -13,7 +26,7 @@
 
 
   <section *ngFor="let container of lineContainers">
-    <h3>{{container.label}}</h3>
+<!--    <h3>{{container.label}}</h3>-->
     <app-line-chart [dataContainer]="container"></app-line-chart>
   </section>
 
