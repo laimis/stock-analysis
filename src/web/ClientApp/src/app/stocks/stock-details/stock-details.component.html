@@ -56,7 +56,7 @@
   <app-stock-analysis *ngIf="isActive('analysis')" [ticker]=stock.ticker></app-stock-analysis>
 
   <app-brokerage-orders *ngIf="isActive('trade')" [filteredTickers]="[stock.ticker]"></app-brokerage-orders>
-  <app-stock-trading-newposition *ngIf="isActive('trade')" [isPendingPositionMode]="true" [presetTicker]="stock.ticker" ></app-stock-trading-newposition>
+  <app-stock-trading-new-position *ngIf="isActive('trade')" [isPendingPositionMode]="true" [presetTicker]="stock.ticker" ></app-stock-trading-new-position>
 
 
 </div>

@@ -116,6 +116,14 @@
       <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
     </div>
   </div>
+  <div class="row mt-3" *ngIf="resistanceContainer && supportContainer && showAnalysis">
+    <div class="col-md-6">
+      <app-line-chart [dataContainer]="supportContainer"></app-line-chart>
+    </div>
+    <div class="col-md-6">
+      <app-line-chart [dataContainer]="resistanceContainer"></app-line-chart>
+    </div>
+  </div>
   <div class="row mt-3" *ngIf="gaps && showAnalysis">
     <div class="col">
       <app-gaps [gaps]="gaps"></app-gaps>

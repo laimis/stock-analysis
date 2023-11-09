@@ -41,14 +41,14 @@
                 (transactionFailed)="transactionFailed($event)"
                 (transactionRecorded)="transactionRecorded($event)">
               </app-stock-transaction>
-              <app-stock-trading-newposition
+              <app-stock-trading-new-position
                 *ngIf="fixType === 'position'"
                 [presetTicker]="violation.ticker"
                 [showChart]="false"
                 [showAnalysis]="false"
                 [isPendingPositionMode]="false"
                 (stockPurchased)="transactionRecorded($event)">
-              </app-stock-trading-newposition>
+              </app-stock-trading-new-position>
             </div>
           </td>
         </tr>
@@ -88,14 +88,14 @@
                 (transactionFailed)="transactionFailed($event)"
                 (transactionRecorded)="transactionRecorded($event)">
               </app-stock-transaction>
-              <app-stock-trading-newposition
+              <app-stock-trading-new-position
                 *ngIf="fixType === 'position'"
                 [presetTicker]="violation.ticker"
                 [showChart]="false"
                 [showAnalysis]="false"
                 [isPendingPositionMode]="false"
                 (stockPurchased)="transactionRecorded($event)">
-              </app-stock-trading-newposition>
+              </app-stock-trading-new-position>
             </div>
           </div>
         </div>

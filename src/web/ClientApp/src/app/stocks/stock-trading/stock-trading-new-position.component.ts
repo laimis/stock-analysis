@@ -1,6 +1,7 @@
 import {DatePipe} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
+  DataPointContainer,
   OutcomeKeys,
   pendingstockpositioncommand,
   PositionChartInformation,
@@ -15,6 +16,12 @@ import {
 } from 'src/app/services/stocks.service';
 import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {GlobalService} from "../../services/global.service";
+import {
+  age,
+  calculateInflectionPoints,
+  histogramToDataPointContainer, InfectionPointType,
+  toHistogram
+} from "../../services/prices.service";
 
 @Component({
   selector: 'app-stock-trading-new-position',
@@ -89,6 +96,8 @@ export class StockTradingNewPositionComponent {
 
   gaps: StockGaps
   atr: number
+  resistanceContainer: DataPointContainer
+  supportContainer: DataPointContainer
 
   onBuyTickerSelected(ticker: string) {
 
@@ -104,7 +113,7 @@ export class StockTradingNewPositionComponent {
         this.costToBuy = quote.mark
         this.ask = quote.askPrice
         this.bid = quote.bidPrice
-        this.updateChart(ticker)
+        this.fetchAndRenderPriceRelatedInformation(ticker)
         this.lookupPendingPosition(ticker)
       }, error => {
         console.error(error)
@@ -134,19 +143,36 @@ export class StockTradingNewPositionComponent {
     this.strategy = ""
   }
 
-  updateChart(ticker:string) {
+  fetchAndRenderPriceRelatedInformation(ticker:string) {
     this.stockService.getStockPrices(ticker, 365, PriceFrequency.Daily).subscribe(
       prices => {
         this.prices = prices
-        this.chartInfo = {
-          ticker: ticker,
-          prices: prices,
-          markers: [],
-          averageBuyPrice: null,
-          stopPrice: this.chartStop
-        }
+        this.updateChart(ticker, prices)
+        this.updateSupportResistance(prices)
       }
     )
+  }
+
+  updateSupportResistance(prices:Prices) {
+    const inflectionPoints = calculateInflectionPoints(prices.prices);
+    const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
+    const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
+
+    const resistanceHistogram = toHistogram(peaks)
+    this.resistanceContainer = histogramToDataPointContainer('resistance histogram', resistanceHistogram)
+
+    const supportHistogram = toHistogram(valleys)
+    this.supportContainer = histogramToDataPointContainer('support histogram', supportHistogram)
+  }
+
+  updateChart(ticker:string, prices:Prices) {
+    this.chartInfo = {
+      ticker: ticker,
+      prices: prices,
+      markers: [],
+      averageBuyPrice: null,
+      stopPrice: this.chartStop
+    }
   }
 
   get20sma(): number {

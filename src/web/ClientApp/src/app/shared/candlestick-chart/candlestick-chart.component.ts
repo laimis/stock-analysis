@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy } from '@angular/core';
 import {ChartMarker, PositionChartInformation, PriceBar, SMA} from 'src/app/services/stocks.service';
 import {IChartApi, PriceLineOptions, createChart, SeriesMarker, Time} from 'lightweight-charts';
 
-const chartElementId = "chart"
 const numberOfVisibleBars = 60
 
 export const blue = '#2196f3'
@@ -90,7 +89,7 @@ export class CandlestickChartComponent implements OnDestroy {
     this.removeChart();
 
     this.chart = createChart(
-      document.getElementById(chartElementId),
+      document.getElementById("chart"),
       { height: this.chartHeight }
     );
 
@@ -154,6 +153,4 @@ export class CandlestickChartComponent implements OnDestroy {
 
 
   }
-
-  protected readonly chartElementId = chartElementId;
 }
