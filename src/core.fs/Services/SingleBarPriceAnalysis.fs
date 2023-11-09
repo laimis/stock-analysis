@@ -130,9 +130,9 @@ module SingleBarPriceAnalysis =
                 
             // now create a new high sequence from that bar
             let oneYearAgoBars = 
-                match oneYearAgoIndex with
+                match oneYearAgoIndex with 
                 | Some x -> bars.Bars[x..]
-                | _ -> [||]
+                | _ -> bars.Bars  // if we don't have one year old bars, then just use all bars
                 
             let initValue = [|oneYearAgoBars[0]|]
             
@@ -169,9 +169,9 @@ module SingleBarPriceAnalysis =
              // add new low as outcome
             yield AnalysisOutcome (SingleBarOutcomeKeys.NewLow, (if newLow then OutcomeType.Negative else OutcomeType.Neutral), (if newLow then -1m else 0m), ValueFormat.Boolean, "New low reached")
             
-            let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
-            
-            yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
+            if previousBars.Length > 0 then
+                let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
+                yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
         ]
         
     let volumeAnalysis (bars:PriceBars) =

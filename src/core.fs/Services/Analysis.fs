@@ -241,8 +241,9 @@ module DistributionStatistics =
                 match stdDevDouble with
                 | double.PositiveInfinity -> 0m
                 | double.NegativeInfinity -> 0m
+                | x when System.Double.IsNaN(x) -> 0m
                 | _ -> decimal stdDevDouble
-            
+                    
             let skewnessDouble =
                 numbers
                 |> Array.map (fun x -> System.Math.Pow(double(x - mean), 3))
@@ -254,6 +255,7 @@ module DistributionStatistics =
                 match skewnessDouble with
                 | double.PositiveInfinity -> 0m
                 | double.NegativeInfinity -> 0m
+                | x when System.Double.IsNaN(x) -> 0m
                 | _ -> decimal skewnessDouble
             
             let kurtosisDouble = 
@@ -266,6 +268,7 @@ module DistributionStatistics =
                 match kurtosisDouble with
                 | double.PositiveInfinity -> 0m
                 | double.NegativeInfinity -> 0m
+                | x when System.Double.IsNaN(x) -> 0m
                 | _ -> decimal kurtosisDouble
                 
             let buckets = Histogram.calculate numbers min max 21
