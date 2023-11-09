@@ -97,6 +97,7 @@ import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-
 import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-and-tradingview-link.component";
 import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
+import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 
 
 let routes: Routes = [
@@ -162,6 +163,8 @@ let routes: Routes = [
 
   {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
+
+  { path: '**', pathMatch: 'full', component: PageNotFoundComponent },
 ];
 
 @NgModule({
