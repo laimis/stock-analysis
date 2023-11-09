@@ -5,12 +5,12 @@ export function GetErrors(err:any): string[] {
     {
       objToMap = err.error
     }
-  
+
     if (typeof(objToMap) === 'string')
     {
       return [objToMap]
     }
-  
+
     return Object.keys(objToMap).map<string>(v => {
       return Object.getOwnPropertyDescriptor(objToMap, v).value
     })
@@ -18,13 +18,13 @@ export function GetErrors(err:any): string[] {
   catch(e){
     console.log("Failed to get errors: " + e)
     return []
-  } 
+  }
 }
-  
+
   export function HideIfHidden(value, hidden) {
     return hidden ? 0 : value;
   }
-  
+
   export function toggleVisuallyHidden(element:HTMLElement) {
     const className = 'visually-hidden';
     if (element.classList.contains(className)) {
@@ -37,6 +37,7 @@ export function GetErrors(err:any): string[] {
 // export an array of key value pairs representing strategies
 export function GetStrategies(): { key: string, value: string }[] {
     return [
+        { key: "discretionary", value: "Discretionary" },
         { key: "channelbottom", value: "Channel Bottom" },
         { key: "leadingindustry", value: "Leading Industry" },
         { key: "longterm", value: "Long Term" },
