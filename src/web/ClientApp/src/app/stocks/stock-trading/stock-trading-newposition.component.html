@@ -5,7 +5,7 @@
   </h5>
 
   <div class="row" *ngIf="!presetTicker">
-    <div class="col-md">
+    <div class="col">
       <app-stock-search
         *ngIf="isPendingPositionMode === true"
           label="Ticker"
@@ -116,27 +116,8 @@
       <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="outcomes && showAnalysis">
+  <div class="row mt-3" *ngIf="gaps && showAnalysis">
     <div class="col">
-      <table class="table table-hover border">
-        <tbody>
-          <tr *ngFor="let o of filteredOutcomes()">
-            <td>
-              <span
-                      class="badge"
-                      [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
-
-                  </span>
-              </td>
-              <td>{{o.key}}</td>
-              <td>{{o.value}}</td>
-              <td>{{o.outcomeType}}</td>
-              <td>{{o.message}}</td>
-            </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="row mt-3" *ngIf="gaps && showAnalysis">
       <app-gaps [gaps]="gaps"></app-gaps>
     </div>
   </div>

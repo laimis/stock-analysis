@@ -87,7 +87,6 @@ export class StockTradingNewPositionComponent {
 
   chartStop: number = null;
 
-  outcomes: TickerOutcomes
   gaps: StockGaps
   atr: number
 
@@ -114,9 +113,9 @@ export class StockTradingNewPositionComponent {
 
     this.stockService.reportOutcomesAllBars([ticker])
       .subscribe(data => {
-        this.outcomes = data.outcomes[0]
         this.gaps = data.gaps[0]
-        this.atr = this.outcomes.outcomes.filter(o => o.key === OutcomeKeys.AverageTrueRange)[0].value
+        this.gaps.gaps.sort((a, b) => b.bar.dateStr.localeCompare(a.bar.dateStr)) // we want reverse order than what backend provides
+        this.atr = data.outcomes[0].outcomes.filter(o => o.key === OutcomeKeys.AverageTrueRange)[0].value
       }, error => {
         console.error(error)
       }
@@ -306,7 +305,6 @@ export class StockTradingNewPositionComponent {
         this.prices = null
         this.chartInfo = null
         this.gaps = null
-        this.outcomes = null
         this.pendingPositionCreated.emit(cmd)
         this.reset()
 
@@ -321,13 +319,6 @@ export class StockTradingNewPositionComponent {
         alert('pending position failed: ' + errorMessages)
       }
     )
-  }
-
-  filteredOutcomes(): StockAnalysisOutcome[] {
-    if (!this.outcomes) {
-      return []
-    }
-    return this.outcomes.outcomes.filter(o => o.outcomeType !== "Neutral")
   }
 
   lookupPendingPosition(ticker: string) {
