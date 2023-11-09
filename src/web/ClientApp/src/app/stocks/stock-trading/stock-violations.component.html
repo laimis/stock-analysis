@@ -62,14 +62,15 @@
       <div class="card mb-3">
         <div class="card-title">
           <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
+          <span class="float-end">{{violation.currentPrice | currency}}</span>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
-              <button type="button" class="btn btn-secondary btn-block" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
+              <button type="button" class="btn btn-secondary btn-block w-100" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
             </div>
             <div class="col-md-6">
-              <button type="button" class="btn btn-secondary btn-block" (click)="openPosition(violation.ticker)">Open Position</button>
+              <button type="button" class="btn btn-secondary btn-block w-100" (click)="openPosition(violation.ticker)">Open Position</button>
             </div>
           </div>
           <div class="row">
