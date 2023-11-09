@@ -17,9 +17,9 @@ import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/u
 import {GlobalService} from "../../services/global.service";
 
 @Component({
-  selector: 'app-stock-trading-newposition',
-  templateUrl: './stock-trading-newposition.component.html',
-  styleUrls: ['./stock-trading-newposition.component.css'],
+  selector: 'app-stock-trading-new-position',
+  templateUrl: './stock-trading-new-position.component.html',
+  styleUrls: ['./stock-trading-new-position.component.css'],
   providers: [DatePipe]
 })
 export class StockTradingNewPositionComponent {

@@ -50,7 +50,7 @@ import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
 import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
 import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-trading-positions.component';
-import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-newposition.component';
+import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-new-position.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading-review/stock-trading-performance.component';
 import { StockTradingReviewComponent } from './stocks/stock-trading-review/stock-trading-review.component';
 import { StockTradingOpenPositionsComponent } from './stocks/stock-trading/stock-trading-open-positions.component';
