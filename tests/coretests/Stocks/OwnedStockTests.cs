@@ -9,17 +9,17 @@ namespace coretests.Stocks
 {
     public class OwnedStockTests
     {
-        private static Guid _userId = Guid.NewGuid();
-        private static Ticker TEUM = new Ticker("TEUM");
+        private static readonly Guid _userId = TestDataGenerator.RandomUserId().Item;
+        private static readonly Ticker _ticker = TestDataGenerator.TEUM;
             
         [Fact]
         public void PurchaseWorks()
         {
-            var stock = new OwnedStock(TEUM, _userId);
+            var stock = new OwnedStock(_ticker, _userId);
 
             stock.Purchase(10, 2.1m, DateTime.UtcNow);
 
-            Assert.Equal(TEUM, stock.State.Ticker);
+            Assert.Equal(_ticker, stock.State.Ticker);
             Assert.Equal(_userId, stock.State.UserId);
             Assert.Equal(10, stock.State.OpenPosition.NumberOfShares);
             Assert.Equal(21, stock.State.OpenPosition.Cost);
@@ -37,7 +37,7 @@ namespace coretests.Stocks
         [Fact]
         public void SellingNotOwnedFails()
         {
-            var stock = new OwnedStock(TEUM, _userId);
+            var stock = new OwnedStock(_ticker, _userId);
 
             stock.Purchase(10, 2.1m, DateTime.UtcNow);
 
@@ -507,6 +507,15 @@ namespace coretests.Stocks
             Assert.Throws<InvalidOperationException>(() => 
                 stock.DeletePositionLabel(positionId, null)
             );
+        }
+
+        [Fact]
+        public void BuyWithStopAtCost_Works()
+        {
+            var stock = new OwnedStock(_ticker, _userId);
+            stock.Purchase(1, 1, DateTimeOffset.UtcNow, notes:null, stopPrice: 1);
+            
+            Assert.Null(stock.State.OpenPosition.RiskedAmount);
         }
     }
 }

@@ -16,6 +16,7 @@ module SingleBarPriceAnalysis =
         let PriceAbove20SMA = "PriceAbove20SMA"
         let PriceAbove20SMADays = "PriceAbove20SMADays"
         let PriceBelow20SMA = "PriceBelow20SMA"
+        let PriceBelow20SMADays = "PriceBelow20SMADays"
         let RelativeVolume = "RelativeVolume"
         let Volume = "Volume"
         let PercentChange = "PercentChange"
@@ -340,7 +341,7 @@ module SingleBarPriceAnalysisEvaluation =
             AnalysisOutcomeEvaluation(
                 "Price went below 20 SMA",
                 OutcomeType.Negative,
-                SingleBarOutcomeKeys.PriceAbove20SMADays,
+                SingleBarOutcomeKeys.PriceBelow20SMADays,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = -1m)  ]
             )
         ]

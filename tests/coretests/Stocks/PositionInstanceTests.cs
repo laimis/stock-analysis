@@ -132,5 +132,15 @@ namespace coretests.Stocks
 
         [Fact]
         public void Ticker() => Assert.Equal(TestDataGenerator.TSLA, _position.Ticker);
+
+        [Fact]
+        public void SetRisk_Zero_Ignores()
+        {
+            var original = _position.RiskedAmount!.Value;
+            
+            _position.SetRiskAmount(0, DateTimeOffset.UtcNow);
+            
+            Assert.Equal(original, _position.RiskedAmount);
+        }
     }
 }

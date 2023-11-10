@@ -45,6 +45,7 @@ namespace coretests.testdata
         public static Ticker TSLA = new("tsla");
         public static Ticker NET = new("net");
         public static Ticker ENPH = new("enph");
+        public static Ticker TEUM = new("teum");
         public static TradeGrade A = new("A");
         public static TradeGrade B = new("B");
 
