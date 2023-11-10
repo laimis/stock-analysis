@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { PendingStockPosition, StocksService } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
+import {pendingpositions_export} from "../../services/links.service";
 
 @Component({
   selector: 'app-stock-trading-pendingpositions',
@@ -9,7 +10,7 @@ import { GetErrors } from 'src/app/services/utils';
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
   errors: string[];
-  
+
   constructor(
       private stockService:StocksService
       )
@@ -47,6 +48,10 @@ export class StockTradingPendingPositionsComponent implements OnInit {
         console.log(error)
       }
     )
+  }
+
+  getPendingPositionExportUrl() {
+    return pendingpositions_export()
   }
 }
 

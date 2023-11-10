@@ -36,6 +36,14 @@
     <app-trading-actual-vs-simulated [simulations]="simulationResults"></app-trading-actual-vs-simulated>
   </section>
 
+  <section *ngIf="dailyScores">
+    <h5>Daily Gain %</h5>
+    <app-daily-outcome-scores [dailyScores]="dailyScores.dailyGainPct"></app-daily-outcome-scores>
+
+    <h5>Daily P/L</h5>
+    <app-daily-outcome-scores [dailyScores]="dailyScores.dailyProfit"></app-daily-outcome-scores>
+  </section>
+
   <section>
     <h5>Position Information</h5>
     <app-stock-trading-position [position]="currentPosition" [orders]="orders"></app-stock-trading-position>
@@ -43,16 +51,7 @@
 
   <section *ngIf="chartInfo">
     <h5>Stock chart</h5>
-
     <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
-  </section>
-
-  <section *ngIf="dailyScores">
-    <h5>Daily Gain %</h5>
-    <app-daily-outcome-scores [dailyScores]="dailyScores.dailyGainPct"></app-daily-outcome-scores>
-
-    <h5>Daily P/L</h5>
-    <app-daily-outcome-scores [dailyScores]="dailyScores.dailyProfit"></app-daily-outcome-scores>
   </section>
 
 </div>
