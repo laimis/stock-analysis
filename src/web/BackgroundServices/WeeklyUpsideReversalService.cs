@@ -187,7 +187,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
 
     private async Task SendEmails(CancellationToken token)
     {
-        _logger.LogInformation("Running weekly upside reversal emails for {count} users", _weeklyUpsidesDiscovered.Count);
+        _logger.LogInformation("Weekly upside reversal emails discovered for {count} users", _weeklyUpsidesDiscovered.Count);
 
         foreach(var u in _weeklyUpsidesDiscovered)
         {
