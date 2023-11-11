@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -65,11 +64,11 @@ namespace web
             services.AddHealthChecks()
                 .AddCheck<HealthCheck>("storage based health check");
 
-            // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            // // In production, the Angular files will be served from this directory
+            // services.AddSpaStaticFiles(configuration =>
+            // {
+            //     configuration.RootPath = "ClientApp/dist";
+            // });
 
             DIHelper.RegisterServices(Configuration, services, Logger);
         }
@@ -102,7 +101,7 @@ namespace web
             }
 
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+            // app.UseSpaStaticFiles();
 
             app.UseRouting();
 
@@ -115,26 +114,26 @@ namespace web
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
-
-                spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
-                {
-                    OnPrepareResponse = context =>
-                    {
-                        if (context.File.Name == "index.html")
-                        {
-                            context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
-                            context.Context.Response.Headers.Add("Expires", "-1");
-                        }
-                    }
-                };
-            });
+            // app.UseSpa(spa =>
+            // {
+            //     spa.Options.SourcePath = "ClientApp";
+            //     if (env.IsDevelopment())
+            //     {
+            //         spa.UseAngularCliServer(npmScript: "start");
+            //     }
+            //
+            //     spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+            //     {
+            //         OnPrepareResponse = context =>
+            //         {
+            //             if (context.File.Name == "index.html")
+            //             {
+            //                 context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+            //                 context.Context.Response.Headers.Add("Expires", "-1");
+            //             }
+            //         }
+            //     };
+            // });
         }
     }
 }
