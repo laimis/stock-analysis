@@ -39,7 +39,6 @@ jobs:
             
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}"
       
       - name: Create Release
         id: create_release
