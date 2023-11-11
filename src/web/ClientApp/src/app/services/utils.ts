@@ -1,5 +1,15 @@
 export function GetErrors(err:any): string[] {
   try{
+
+    if (err.status && err.status === 401) {
+      return ["Unauthorized, please login to continue"]
+    }
+
+    if (err.error === undefined) {
+      console.error("Failed to get errors: " + err)
+      return [err.message ?? "Unknown error"]
+    }
+
     var objToMap = err.error.errors
     if (objToMap === undefined)
     {
@@ -20,19 +30,14 @@ export function GetErrors(err:any): string[] {
     return []
   }
 }
-
-  export function HideIfHidden(value, hidden) {
-    return hidden ? 0 : value;
+export function toggleVisuallyHidden(element:HTMLElement) {
+  const className = 'visually-hidden';
+  if (element.classList.contains(className)) {
+    element.classList.remove(className);
+  } else {
+    element.classList.add(className);
   }
-
-  export function toggleVisuallyHidden(element:HTMLElement) {
-    const className = 'visually-hidden';
-    if (element.classList.contains(className)) {
-      element.classList.remove(className);
-    } else {
-      element.classList.add(className);
-    }
-  }
+}
 
 // export an array of key value pairs representing strategies
 export function GetStrategies(): { key: string, value: string }[] {

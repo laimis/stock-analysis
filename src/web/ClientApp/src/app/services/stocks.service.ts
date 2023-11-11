@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
-import {catchError} from "rxjs/operators";
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -33,7 +32,6 @@ export class StocksService {
 
   getTradingEntries(): Observable<StockTradingPositions> {
     return this.http.get<StockTradingPositions>('/api/portfolio/tradingentries')
-      .pipe(catchError(this.handleError))
   }
 
   getPastTradingEntries(): Observable<PastStockTradingPositions> {
