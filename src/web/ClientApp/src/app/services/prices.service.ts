@@ -1,22 +1,22 @@
 import {ChartMarker, ChartType, DataPoint, DataPointContainer, PriceBar} from "./stocks.service";
 import {green, red} from "../shared/candlestick-chart/candlestick-chart.component";
 
-export enum InfectionPointType { Peak= "Peak", Valley = "Valley"}
-export type Gradient = {delta:number,index:number,bar:PriceBar}
-export type InflectionPoint = {gradient:Gradient, type:InfectionPointType}
+export enum InfectionPointType { Peak= "Peak", Valley = "Valley" }
+export type Gradient = { delta:number, index:number, bar:PriceBar }
+export type InflectionPoint = {gradient:Gradient, type:InfectionPointType, priceValue:number}
 
 export function toPeak(gradient:Gradient) : InflectionPoint {
-  return {gradient:gradient, type:InfectionPointType.Peak}
+  return {gradient:gradient, type:InfectionPointType.Peak, priceValue: gradient.bar.high}
 }
 
 export function toValley(gradient:Gradient): InflectionPoint {
-  return {gradient: gradient, type:InfectionPointType.Valley}
+  return {gradient: gradient, type:InfectionPointType.Valley, priceValue: gradient.bar.low}
 }
 
 export function toChartMarker(inflectionPoint:InflectionPoint) : ChartMarker {
   const bar = inflectionPoint.gradient.bar
   return {
-    label: bar.close.toFixed(2),
+    label: inflectionPoint.priceValue.toFixed(2),
     date: bar.dateStr,
     color: inflectionPoint.type === InfectionPointType.Valley ? green : red,
     shape: inflectionPoint.type === InfectionPointType.Valley ? 'arrowUp' : 'arrowDown'
@@ -64,7 +64,7 @@ export function toDailyBreakdownDataPointCointainer(label:string, points:Inflect
       dataPoints.push({
         label: points[currentIndex].gradient.bar.dateStr,
         isDate: true,
-        value: points[currentIndex].gradient.bar.close
+        value: points[currentIndex].priceValue
       })
 
       currentIndex++
@@ -74,7 +74,7 @@ export function toDailyBreakdownDataPointCointainer(label:string, points:Inflect
       dataPoints.push({
         label: currentDate,
         isDate: true,
-        value: points[currentIndex - 1].gradient.bar.close
+        value: points[currentIndex - 1].priceValue
       })
 
     }
@@ -148,7 +148,7 @@ export function toHistogram(inflectionPoints:InflectionPoint[]) {
   let histogram = {}
 
   for (let i = 0; i < inflectionPoints.length; i++) {
-    let price = inflectionPoints[i].gradient.bar.close
+    let price = inflectionPoints[i].priceValue
 
     // we will round the price to the nearest dollar
     let rounded = Math.round(price)
