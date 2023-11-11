@@ -4,10 +4,10 @@
     <div *ngIf="profile">
       <h3>{{profile.symbol}}: {{profile.description}}
         <a class="float-end ms-3" href="https://invest.ameritrade.com/grid/p/site#r=jPage/https://research.ameritrade.com/grid/wwws/research/stocks/summary?symbol={{stock.ticker}}&c_name=invest_VENDOR" target="_blank">
-          <img src="td-logo-vector.svg" height="25px" />
+          <img src="/assets/images/td-logo-vector.svg" height="25px" />
         </a>
         <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
-          <img src="finviz.png" height="25px" />
+          <img src="/assets/images/finviz.png" height="25px" />
         </a>
         <span class="float-end ms-3">
           <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>

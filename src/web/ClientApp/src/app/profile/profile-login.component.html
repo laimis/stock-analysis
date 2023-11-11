@@ -24,7 +24,7 @@
         <button *ngIf="inProgress" type="submit" disabled class="btn btn-primary me-3" >Almost there...</button>
         <button class="btn btn-secondary" (click)="back()">Back</button>
         <a href="/api/account/login?returnUrl={{returnUrl}}" role="button" class="float-end">
-          <img src="btn_google_signin_dark_normal_web@2x.png" height="45px" />
+          <img src="/assets/images/btn_google_signin_dark_normal_web@2x.png" height="45px" />
         </a>
       </div>
     </div>
@@ -34,8 +34,8 @@
   <form *ngIf="resetPasswordRequest">
     <div class="row">
       <div class="col">
-        <label for="email">Email</label>
-        <input class="form-control" autofocus type="email" id="email" name="email" [(ngModel)]="email" />
+        <label for="passwordResetEmail">Email</label>
+        <input class="form-control" autofocus type="email" id="passwordResetEmail" name="passwordResetEmail" [(ngModel)]="email" />
       </div>
     </div>
     <div class="row mt-2">
