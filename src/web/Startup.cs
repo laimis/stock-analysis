@@ -64,12 +64,6 @@ namespace web
             services.AddHealthChecks()
                 .AddCheck<HealthCheck>("storage based health check");
 
-            // // In production, the Angular files will be served from this directory
-            // services.AddSpaStaticFiles(configuration =>
-            // {
-            //     configuration.RootPath = "ClientApp/dist";
-            // });
-
             DIHelper.RegisterServices(Configuration, services, Logger);
         }
 
@@ -100,8 +94,18 @@ namespace web
                 app.UseHsts();
             }
 
-            app.UseStaticFiles();
-            // app.UseSpaStaticFiles();
+            var staticFileOptions = new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    if (ctx.File.Name == "index.html")
+                    {
+                        ctx.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+                        ctx.Context.Response.Headers.Add("Expires", "-1");
+                    }
+                }
+            };
+            app.UseStaticFiles(staticFileOptions);
 
             app.UseRouting();
 
@@ -112,28 +116,8 @@ namespace web
             {
                 endpoints.MapHealthChecks("/health");
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapFallbackToFile("index.html");
             });
-
-            // app.UseSpa(spa =>
-            // {
-            //     spa.Options.SourcePath = "ClientApp";
-            //     if (env.IsDevelopment())
-            //     {
-            //         spa.UseAngularCliServer(npmScript: "start");
-            //     }
-            //
-            //     spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
-            //     {
-            //         OnPrepareResponse = context =>
-            //         {
-            //             if (context.File.Name == "index.html")
-            //             {
-            //                 context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
-            //                 context.Context.Response.Headers.Add("Expires", "-1");
-            //             }
-            //         }
-            //     };
-            // });
         }
     }
 }
