@@ -63,7 +63,6 @@
     "node-forge": ">=0.10.0",
     "npm-registry-fetch": ">=4.0.5",
     "object-path": ">=0.11.5",
-    "protractor": "^7.0.0",
     "run-script-os": "^1.1.6",
     "ts-node": "^8.10.2",
     "tslint": "^6.1.3",
