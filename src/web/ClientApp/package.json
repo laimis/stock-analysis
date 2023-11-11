@@ -3,12 +3,12 @@
   "version": "2.0.36",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build --progress=false",
-    "build:production": "ng build --progress=false --configuration production",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "prestart": "node aspnetcore-https",
+    "start": "ng serve --port 44406 --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\"",
+    "build": "ng build",
+    "build:ssr": "ng run tradewatch:server:dev",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {

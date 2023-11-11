@@ -67,6 +67,10 @@
           "configurations": {
             "production": {
               "buildTarget": "web:build:production"
+            },
+            "development": {
+              "proxyConfig": "proxy.conf.js",
+              "buildTarget": "web:build:development"
             }
           }
         },
