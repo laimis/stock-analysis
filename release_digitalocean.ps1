@@ -39,10 +39,10 @@ if ($exitCode -ne 0) {
     exit
 }
 
-# ensure that the project can build by invoking npm run build:production
+# ensure that the project can build by invoking npm run build -- --configuration production
 # in src/web/ClientApp directory
 push-location "src/web/ClientApp"
-invoke-expression "npm run build:production"
+invoke-expression "npm run build -- --configuration production"
 $exitCode = $LASTEXITCODE
 pop-location
 if ($exitCode -ne 0) {
