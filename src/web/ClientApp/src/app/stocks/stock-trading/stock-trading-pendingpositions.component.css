@@ -1,0 +1,5 @@
+.no-border {
+  border: none;
+  border-top: none;
+  background: inherit;
+}

@@ -13,12 +13,34 @@
 
 
       <h2>Pending Positions ({{positions.length}})</h2>
-
       <div class="card mb-3" *ngFor="let position of positions">
+
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div class="card-title">
               <app-stock-link-and-tradingview-link [ticker]="position.ticker" [openInNewTab]="true"></app-stock-link-and-tradingview-link>
+              <div class="d-flex align-items-center">
+                <div class="pr-3">
+                  <span class="stat-label">Bid: </span> <span class="fw-bold">{{position.bid | currency }}</span>
+                </div>
+
+                <div class="px-3 border-left">
+                  <span class="stat-label">Current Price: </span> <span class="fw-bold">{{position.price }} ({{position.percentDiffBetweenBidAndPrice | percent}})</span>
+                </div>
+
+                <div class="px-3 border-left">
+                  <span class="stat-label">Shares: </span> <span class="fw-bold">{{position.numberOfShares}}</span>
+                </div>
+
+                <div class="px-3 border-left">
+                  <span class="stat-label">Created: </span><span class="fw-bold">{{position.date | date}}</span>
+                </div>
+
+                <div class="pl-3 border-left">
+                  <span class="stat-label">Stop: </span> <span class="fw-bold">{{position.stopPrice | currency}}</span>
+                </div>
+
+              </div>
             </div>
           </div>
 
@@ -26,35 +48,15 @@
             {{ position.notes }}
           </p>
 
-          <div class="d-flex align-items-center">
-            <div class="pr-3">
-              <span class="stat-label">Bid: </span> <span class="fw-bold">{{position.bid | currency }}</span>
-            </div>
 
-            <div class="px-3 border-left">
-              <span class="stat-label">Current Price: </span> <span class="fw-bold">{{position.price }} ({{position.percentDiffBetweenBidAndPrice | percent}})</span>
-            </div>
-
-            <div class="px-3 border-left">
-              <span class="stat-label">Shares: </span> <span class="fw-bold">{{position.numberOfShares}}</span>
-            </div>
-
-            <div class="px-3 border-left">
-              <span class="stat-label">Created: </span><span class="fw-bold">{{position.date | date}}</span>
-            </div>
-
-            <div class="pl-3 border-left">
-              <span class="stat-label">Stop: </span> <span class="fw-bold">{{position.stopPrice | currency}}</span>
-            </div>
-
-          </div>
 
           <div class="mt-4">
             <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" ></app-brokerage-orders>
           </div>
 
+        </div>
+        <div class="card-footer no-border">
           <button class="btn btn-warning btn-sm" (click)="closePendingPosition(position)">Close</button>
-
         </div>
       </div>
 
