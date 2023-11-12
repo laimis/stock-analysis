@@ -181,16 +181,4 @@ export class StockTradingReviewComponent {
     );
   }
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-
-    if (event.key === "ArrowRight") {
-      this.next();
-      event.preventDefault();
-    } else if (event.key === "ArrowLeft") {
-      this.previous();
-      event.preventDefault();
-    }
-  }
-
 }
