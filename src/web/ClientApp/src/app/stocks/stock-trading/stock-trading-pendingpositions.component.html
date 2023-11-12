@@ -10,52 +10,53 @@
 
   <div>
     <span *ngIf="loaded && positions.length === 0">No pending positions found</span>
-    <table class="table table-hover" *ngIf="positions.length !== 0">
-      <thead>
-        <tr>
-          <th scope="col">Ticker</th>
-          <th scope="col">Shares</th>
-          <th scope="col">Bid</th>
-          <th scope="col">Price</th>
-          <th scope="col">% diff</th>
-          <th scope="col">Stop</th>
-          <th scope="col">Date</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let position of positions">
-          <tr>
-            <td>
+
+
+      <h2>Pending Positions ({{positions.length}})</h2>
+
+      <div class="card mb-3" *ngFor="let position of positions">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div class="card-title">
               <app-stock-link-and-tradingview-link [ticker]="position.ticker" [openInNewTab]="true"></app-stock-link-and-tradingview-link>
-            </td>
+            </div>
+          </div>
 
-            <td>{{ position.numberOfShares }}</td>
-            <td>{{ position.bid | currency }}</td>
-            <td>{{ position.price | currency }}</td>
-            <td>{{ position.percentDiffBetweenBidAndPrice | percent }}</td>
-            <td>{{ position.stopPrice | currency }}</td>
-            <td>{{ position.date | date }}</td>
-            <td class="text-end">
-              <button class="btn btn-warning btn-sm" (click)="closePendingPosition(position)">Close</button>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="8">
-              {{ position.notes }}
-              <div>
-                <span class="badge bg-light text-secondary m-1">{{position.strategy}}</span>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="8">
-              <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" ></app-brokerage-orders>
-            </td>
-          </tr>
-        </ng-container>
+          <p class="card-text">
+            {{ position.notes }}
+          </p>
 
-      </tbody>
-    </table>
+          <div class="d-flex align-items-center">
+            <div class="pr-3">
+              <span class="stat-label">Bid: </span> <span class="fw-bold">{{position.bid | currency }}</span>
+            </div>
+
+            <div class="px-3 border-left">
+              <span class="stat-label">Current Price: </span> <span class="fw-bold">{{position.price }} ({{position.percentDiffBetweenBidAndPrice | percent}})</span>
+            </div>
+
+            <div class="px-3 border-left">
+              <span class="stat-label">Shares: </span> <span class="fw-bold">{{position.numberOfShares}}</span>
+            </div>
+
+            <div class="px-3 border-left">
+              <span class="stat-label">Created: </span><span class="fw-bold">{{position.date | date}}</span>
+            </div>
+
+            <div class="pl-3 border-left">
+              <span class="stat-label">Stop: </span> <span class="fw-bold">{{position.stopPrice | currency}}</span>
+            </div>
+
+          </div>
+
+          <div class="mt-4">
+            <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" ></app-brokerage-orders>
+          </div>
+
+          <button class="btn btn-warning btn-sm" (click)="closePendingPosition(position)">Close</button>
+
+        </div>
+      </div>
+
   </div>
 </section>

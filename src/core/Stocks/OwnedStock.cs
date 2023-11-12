@@ -144,9 +144,9 @@ namespace core.Stocks
 
         public void DeleteTransaction(Guid transactionId)
         {
-            if (!State.BuyOrSell.Any(t => t.Id == transactionId))
+            if (State.BuyOrSell.All(t => t.Id != transactionId))
             {
-                throw new InvalidOperationException("Unable to find transcation to delete using id " + transactionId);
+                throw new InvalidOperationException("Unable to find transaction to delete using id " + transactionId);
             }
 
             Apply(
@@ -242,7 +242,7 @@ namespace core.Stocks
                 return false;
             }
 
-            // we don't want to mess with closed positions, at leats for now
+            // we don't want to mess with closed positions
             if (position.IsClosed)
             {
                 throw new InvalidOperationException("Cannot delete a closed position");
