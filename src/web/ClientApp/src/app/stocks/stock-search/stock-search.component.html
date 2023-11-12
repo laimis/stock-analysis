@@ -1,15 +1,23 @@
 <div class="search-container">
   <label for="ticker" class="form-label" *ngIf="label">{{label}}</label>
-  <input type="text"
-         class="{{cssClass}}"
-         id="ticker"
-         name="ticker"
-         [(ngModel)]="selectedValue"
-         (ngModelChange)="onModelChange($event)"
-         (blur)="loseFocus()"
-         (keydown)="onKeyDown($event)"
-         placeholder="{{placeholder}}"
-         autocomplete="off"/>
+
+  <div class="position-relative">
+    <input type="text"
+           class="{{cssClass}} pe-5"
+           id="ticker"
+           name="ticker"
+           [(ngModel)]="selectedValue"
+           (ngModelChange)="onModelChange($event)"
+           (blur)="loseFocus()"
+           (keydown)="onKeyDown($event)"
+           placeholder="{{placeholder}}"
+           autocomplete="off"/>
+    <span
+      *ngIf="loading"
+      class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto opacity-50"
+      role="status"
+      aria-hidden="true"></span>
+  </div>
 
   <div class="search-results shadow rounded" *ngIf="searchResultsSubscribedArray.length > 0" >
 

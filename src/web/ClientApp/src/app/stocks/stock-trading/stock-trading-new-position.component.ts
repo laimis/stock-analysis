@@ -32,6 +32,8 @@ import {
 export class StockTradingNewPositionComponent {
   strategies: { key: string; value: string; }[];
   chartInfo: PositionChartInformation;
+  resistanceContainer: DataPointContainer
+  supportContainer: DataPointContainer
   prices: Prices;
   maxLoss = 60;
   private atrMultiplier = 2;
@@ -96,8 +98,6 @@ export class StockTradingNewPositionComponent {
 
   gaps: StockGaps
   atr: number
-  resistanceContainer: DataPointContainer
-  supportContainer: DataPointContainer
 
   onBuyTickerSelected(ticker: string) {
 
@@ -139,6 +139,8 @@ export class StockTradingNewPositionComponent {
     this.ticker = null
     this.prices = null
     this.chartInfo = null
+    this.resistanceContainer = null
+    this.supportContainer = null
     this.notes = null
     this.strategy = ""
   }

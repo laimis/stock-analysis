@@ -24,7 +24,7 @@ export class StockSearchComponent implements OnInit {
   @Output() tickerSelected = new EventEmitter<string>();
 
   selectedValue: string = null
-
+  loading:boolean = false
   public searchResults: Observable<StockSearchResult[]>;
   private searchTerms = new Subject<string>();
   searchResultsSubscribedArray: StockSearchResult[] = []
@@ -47,10 +47,14 @@ export class StockSearchComponent implements OnInit {
       // distinctUntilChanged(),
 
       // switch to new search observable each time the term changes
-      switchMap((term: string) => this.stocks.search(term)),
+      switchMap((term: string) => {
+        this.loading = true
+        return this.stocks.search(term)
+      }),
     );
 
     this.searchResults.subscribe(value => {
+      this.loading = false
       console.log("searchResults.subscribe: " + value.length)
       this.searchResultsSubscribedArray = value
     }, error => {
@@ -60,6 +64,7 @@ export class StockSearchComponent implements OnInit {
 
   loseFocus() {
     this.searchTerms.next('')
+    this.loading = false
     if (!this.selectedValue) {
     }
   }
