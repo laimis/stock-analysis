@@ -518,12 +518,17 @@ public class TDAmeritradeClient : IBrokerage
             volume: c.volume
         )).ToArray();
 
-        if (payload.Length == 0)
-        {
-            _logger?.LogError("No candles for historical prices for {function}", function);
-        }
-
-        return new ServiceResponse<PriceBars>(new PriceBars(payload));
+        return payload.Length == 0
+            ? new ServiceResponse<PriceBars>(
+                new ServiceError(
+                    $"No candles for historical prices for {ticker.Value}"
+                )
+            )
+            : new ServiceResponse<PriceBars>(
+                new PriceBars(
+                    payload
+                )
+            );
     }
 
     private async Task<ServiceResponse<bool>> EnterOrder(UserState user, object postData)

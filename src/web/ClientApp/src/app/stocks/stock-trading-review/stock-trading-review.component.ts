@@ -1,6 +1,7 @@
 import {Component, HostListener, Input} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
+  BrokerageOrder,
   ChartMarker,
   DailyPositionReport,
   PositionChartInformation,
@@ -27,6 +28,7 @@ export class StockTradingReviewComponent {
   simulationResults: TradingStrategyResults
   simulationErrors: string[];
   scoresErrors: string[];
+  pricesErrors: string[]
   dailyPositionReport: DailyPositionReport
   private _positions: PositionInstance[];
   positionChartInformation: PositionChartInformation;
@@ -44,6 +46,10 @@ export class StockTradingReviewComponent {
   get positions(): PositionInstance[] {
     return this._positions
   }
+
+  @Input()
+  orders:BrokerageOrder[]
+
 
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
@@ -75,6 +81,7 @@ export class StockTradingReviewComponent {
       this.currentPosition.ticker,
       this.currentPosition.positionId).subscribe(
       (r: DailyPositionReport) => {
+        this.scoresErrors = null
         this.dailyPositionReport = r;
         this.getPrices();
       },
@@ -89,6 +96,7 @@ export class StockTradingReviewComponent {
   private runTradingStrategies() {
     this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
       (r: TradingStrategyResults) => {
+        this.simulationErrors = null
         this.simulationResults = r;
         this.getPositionReport()
       },
@@ -115,7 +123,7 @@ export class StockTradingReviewComponent {
         if (sellTxs.length > 0) {
           markers.push({date: sellTxs[0].date, label: 'Sell', color: red, shape: 'arrowDown'})
         }
-
+        this.pricesErrors = null
         this.positionChartInformation = {
           averageBuyPrice: this.currentPosition.averageCostPerShare,
           stopPrice: this.currentPosition.stopPrice,
@@ -123,6 +131,10 @@ export class StockTradingReviewComponent {
           prices: r,
           ticker: this.currentPosition.ticker
         }
+      },
+      (error) => {
+        this.positionChartInformation = null
+        this.pricesErrors = GetErrors(error)
       }
     );
   }

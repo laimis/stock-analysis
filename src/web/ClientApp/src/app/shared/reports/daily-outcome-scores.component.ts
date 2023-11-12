@@ -10,7 +10,4 @@ export class DailyOutcomeScoresComponent {
 
   @Input()
   dailyScores:DataPointContainer
-
-  @Input()
-  errors: string[];
 }

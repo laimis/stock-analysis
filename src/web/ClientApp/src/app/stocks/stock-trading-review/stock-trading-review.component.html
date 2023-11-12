@@ -27,13 +27,14 @@
 
   <section>
     <h5>Actual vs Trading Strategies</h5>
+    <app-error-display [errors]="simulationErrors" *ngIf="simulationErrors"></app-error-display>
     <app-trading-actual-vs-simulated
       [simulations]="simulationResults"
       [simulationErrors]="simulationErrors">
     </app-trading-actual-vs-simulated>
   </section>
 
-  <section *ngIf="currentPosition">
+  <section *ngIf="currentPosition && currentPosition.isClosed">
     <h5>Grade</h5>
     <div *ngIf="gradingError" class="alert alert-danger" role="alert">
       {{gradingError }}
@@ -76,31 +77,29 @@
     </div>
   </section>
 
-  <section>
-    <h5>Position Information</h5>
-    <app-stock-trading-position [position]="currentPosition">
-    </app-stock-trading-position>
-  </section>
-
   <section *ngIf="dailyPositionReport">
     <h5>Daily Gain %</h5>
-    <app-daily-outcome-scores
-      [dailyScores]="dailyPositionReport.dailyGainPct"
-      [errors]="scoresErrors">
+    <app-error-display [errors]="scoresErrors" *ngIf="scoresErrors"></app-error-display>
+    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyGainPct">
     </app-daily-outcome-scores>
   </section>
 
   <section *ngIf="dailyPositionReport">
     <h5>Daily P/L</h5>
-    <app-daily-outcome-scores
-      [dailyScores]="dailyPositionReport.dailyProfit"
-      [errors]="scoresErrors">
+    <app-error-display [errors]="scoresErrors" *ngIf="scoresErrors"></app-error-display>
+    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyProfit">
     </app-daily-outcome-scores>
   </section>
 
-  <section *ngIf="currentPosition && positionChartInformation">
+  <section>
+    <h5>Position Information</h5>
+    <app-stock-trading-position [position]="currentPosition" [orders]="orders"></app-stock-trading-position>
+  </section>
+
+  <section *ngIf="currentPosition">
     <h5>Stock chart</h5>
-    <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
+    <app-error-display [errors]="pricesErrors" *ngIf="pricesErrors"></app-error-display>
+    <app-candlestick-chart *ngIf="positionChartInformation" [chartInformation]="positionChartInformation"></app-candlestick-chart>
   </section>
 
 </div>

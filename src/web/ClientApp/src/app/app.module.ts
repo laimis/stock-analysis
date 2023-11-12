@@ -53,7 +53,6 @@ import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-tra
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-new-position.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading-review/stock-trading-performance.component';
 import { StockTradingReviewComponent } from './stocks/stock-trading-review/stock-trading-review.component';
-import { StockTradingOpenPositionsComponent } from './stocks/stock-trading/stock-trading-open-positions.component';
 import { StockTradingClosedPositionsComponent } from './stocks/stock-trading-review/stock-trading-closed-positions.component';
 import { BrokerageOrdersComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-trading/stock-violations.component';
@@ -210,7 +209,6 @@ let routes: Routes = [
     StockOptionComponent,
     StockTransactionComponent,
     StockOwnershipComponent,
-    StockTradingOpenPositionsComponent,
     StockViolationsComponent,
 
     StockTradingComponent,
