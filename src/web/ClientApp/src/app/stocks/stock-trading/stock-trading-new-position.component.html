@@ -116,17 +116,35 @@
       <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="resistanceContainer && supportContainer && showAnalysis">
-    <div class="col-md-6">
-      <app-line-chart [dataContainer]="supportContainer"></app-line-chart>
+  <div *ngIf="showAnalysis && resistanceContainer && supportContainer">
+    <div class="row mt-3">
+      <div class="col">
+        <label class="form-label" for="priceFrequency">Price Frequency</label>
+        <select class="form-select" id="priceFrequency" [(ngModel)]="priceFrequency" (ngModelChange)="priceFrequencyChanged()">
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+        </select>
+      </div>
+      <div class="col">
+        <label class="form-label" for="ageValueToUse">Support/Resistance Age</label>
+        <select id="ageValueToUse" class="form-select" [(ngModel)]="ageValueToUse" (ngModelChange)="ageValueChanged()">
+          <option [value]="twoMonths">2 months</option>
+          <option [value]="sixMonths">6 months</option>
+        </select>
+      </div>
     </div>
-    <div class="col-md-6">
-      <app-line-chart [dataContainer]="resistanceContainer"></app-line-chart>
+    <div class="row mt-3" *ngIf="resistanceContainer && supportContainer">
+      <div class="col-md-6">
+        <app-line-chart [dataContainer]="supportContainer"></app-line-chart>
+      </div>
+      <div class="col-md-6">
+        <app-line-chart [dataContainer]="resistanceContainer"></app-line-chart>
+      </div>
     </div>
-  </div>
-  <div class="row mt-3" *ngIf="gaps && showAnalysis">
-    <div class="col">
-      <app-gaps [gaps]="gaps"></app-gaps>
+    <div class="row mt-3" *ngIf="gaps">
+      <div class="col">
+        <app-gaps [gaps]="gaps"></app-gaps>
+      </div>
     </div>
   </div>
 </section>

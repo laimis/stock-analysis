@@ -16,10 +16,6 @@ import {
   toChartMarker, toDailyBreakdownDataPointCointainer, toHistogram, toInflectionPointLog
 } from "../services/prices.service";
 
-
-const sixMonths = 365 / 2
-const twoMonths = 365 / 6
-
 @Component({
   selector: 'app-playground',
   templateUrl: './playground.component.html',
@@ -30,8 +26,12 @@ export class PlaygroundComponent implements OnInit {
   options: any;
   prices: Prices;
   chartInfo: PositionChartInformation;
+
+
+  protected readonly twoMonths = 365 / 6;
+  protected readonly sixMonths = 365 / 2;
   priceFrequency: PriceFrequency = PriceFrequency.Daily;
-  ageValueToUse = twoMonths
+  ageValueToUse:number;
 
   lineContainers: DataPointContainer[];
   peaksAndValleys: DataPointContainer[];
@@ -45,6 +45,7 @@ export class PlaygroundComponent implements OnInit {
   errors: string[];
 
   ngOnInit() {
+    this.ageValueToUse = this.twoMonths
     const tickerParam = this.route.snapshot.queryParamMap.get('tickers');
     this.tickers = tickerParam ? tickerParam.split(',') : ['AMD'];
     this.renderPrices(this.tickers)
@@ -102,7 +103,4 @@ export class PlaygroundComponent implements OnInit {
     this.chartInfo = null
     this.renderPrices(this.tickers);
   }
-
-  protected readonly twoMonths = twoMonths;
-  protected readonly sixMonths = sixMonths;
 }

@@ -36,13 +36,18 @@ export class StockTradingNewPositionComponent {
   supportContainer: DataPointContainer
   prices: Prices;
   maxLoss = 60;
-  private atrMultiplier = 2;
+  protected readonly atrMultiplier = 2;
+  protected readonly twoMonths = 365 / 6;
+  protected readonly sixMonths = 365 / 2;
+  ageValueToUse:number;
+  priceFrequency:PriceFrequency = PriceFrequency.Daily;
 
   constructor(
     private stockService:StocksService,
     globalService:GlobalService)
   {
     this.strategies = GetStrategies()
+    this.ageValueToUse = this.twoMonths
     globalService.accountStatusFeed.subscribe(value => {
       if (value.maxLoss) {
         this.maxLoss = value.maxLoss
@@ -146,7 +151,7 @@ export class StockTradingNewPositionComponent {
   }
 
   fetchAndRenderPriceRelatedInformation(ticker:string) {
-    this.stockService.getStockPrices(ticker, 365, PriceFrequency.Daily).subscribe(
+    this.stockService.getStockPrices(ticker, 365, this.priceFrequency).subscribe(
       prices => {
         this.prices = prices
         this.updateChart(ticker, prices)
@@ -157,8 +162,9 @@ export class StockTradingNewPositionComponent {
 
   updateSupportResistance(prices:Prices) {
     const inflectionPoints = calculateInflectionPoints(prices.prices);
-    const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
-    const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
+    const filteredByAge = inflectionPoints.filter(p => age(p) < this.ageValueToUse)
+    const peaks = filteredByAge.filter(p => p.type === InfectionPointType.Peak)
+    const valleys = filteredByAge.filter(p => p.type === InfectionPointType.Valley)
 
     const resistanceHistogram = toHistogram(peaks)
     this.resistanceContainer = histogramToDataPointContainer('resistance histogram', resistanceHistogram)
@@ -383,6 +389,14 @@ export class StockTradingNewPositionComponent {
 
     this.sizeStopPrice = value
     this.updateBuyingValuesSizeStopPrice()
+  }
+
+  priceFrequencyChanged() {
+    this.fetchAndRenderPriceRelatedInformation(this.ticker)
+  }
+
+  ageValueChanged() {
+    this.fetchAndRenderPriceRelatedInformation(this.ticker)
   }
 }
 
