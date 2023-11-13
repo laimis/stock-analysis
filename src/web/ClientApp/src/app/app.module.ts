@@ -58,7 +58,7 @@ import { BrokerageOrdersComponent } from './brokerage/orders.component';
 import { StockViolationsComponent } from './stocks/stock-trading/stock-violations.component';
 import { StockTransactionComponent } from './stocks/stock-details/stock-transaction.component';
 import { StockTradingSimulatorComponent } from './stocks/stock-trading/stock-trading-simulator.component';
-import { BrokerageNewOrderComponent } from './brokerage/neworder.component';
+import { BrokerageNewOrderComponent } from './brokerage/brokerage-new-order.component';
 import { StockAnalysisComponent } from './stocks/stock-details/stock-analysis.component';
 import { StockTradingPositionComponent } from './stocks/stock-trading/stock-trading-position.component';
 import { AlertsComponent } from './alerts/alerts.component';

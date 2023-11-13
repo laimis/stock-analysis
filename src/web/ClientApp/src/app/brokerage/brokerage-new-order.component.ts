@@ -6,9 +6,9 @@ import {BrokerageOrderDuration, BrokerageOrderType} from "../services/brokerage.
 
 
 @Component({
-  selector: 'app-brokerage-neworder',
-  templateUrl: './neworder.component.html',
-  styleUrls: ['./neworder.component.css']
+  selector: 'app-brokerage-new-order',
+  templateUrl: './brokerage-new-order.component.html',
+  styleUrls: ['./brokerage-new-order.component.css']
 })
 export class BrokerageNewOrderComponent {
 
@@ -60,12 +60,12 @@ export class BrokerageNewOrderComponent {
 
   brokerageOrderTypeChanged() {
     if (this.brokerageOrderType === BrokerageOrderType.Market) {
-      this.brokerageOrderDuration = BrokerageOrderDuration.Gtc
       this.orderDurations = this.marketOrderTypes
+      this.brokerageOrderDuration = BrokerageOrderDuration.Gtc
     }
     else {
-      this.brokerageOrderDuration = BrokerageOrderDuration.GtcPlus
       this.orderDurations = this.nonMarketOrderTypes
+      this.brokerageOrderDuration = BrokerageOrderDuration.GtcPlus
     }
   }
 

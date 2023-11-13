@@ -4,7 +4,7 @@
 
   <app-stock-transaction [ticker]="stock.ticker" (transactionRecorded)="transactionRecorded($event)" ></app-stock-transaction>
 
-  <app-brokerage-neworder *ngIf="stock" (brokerageOrderEntered)="brokerageOrderEntered()" [ticker]="stock.ticker"></app-brokerage-neworder>
+  <app-brokerage-new-order *ngIf="stock" (brokerageOrderEntered)="brokerageOrderEntered()" [ticker]="stock.ticker"></app-brokerage-new-order>
 
   <app-brokerage-orders *ngIf="stock" [filteredTickers]="[stock.ticker]" (orderExecuted)="brokerageOrderExecuted()"></app-brokerage-orders>
 

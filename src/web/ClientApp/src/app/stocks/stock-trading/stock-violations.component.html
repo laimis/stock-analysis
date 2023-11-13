@@ -103,7 +103,7 @@
     </ng-container>
   </div>
 
-  <app-brokerage-neworder *ngIf="tickersInViolations.length > 0" (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-neworder>
+  <app-brokerage-new-order *ngIf="tickersInViolations.length > 0" (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
   <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted($event)" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
 
 </div>
