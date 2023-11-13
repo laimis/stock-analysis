@@ -6,6 +6,17 @@ function Get-LastCommitMessage {
     return $lastCommit
 }
 
+# check if there are any git changes, and if there are, report them and exit
+$gitStatus = git status --porcelain
+if ($null -ne $gitStatus) {
+    Write-Host "There are uncommitted changes in git, please make sure everything is committed before doing a release."
+    Write-Host "Git status:"
+    Write-Host $gitStatus
+
+    # exit with error code
+    exit 1
+}
+
 if ([System.String]::IsNullOrEmpty($message))
 {
     $lastCommit = Get-LastCommitMessage
