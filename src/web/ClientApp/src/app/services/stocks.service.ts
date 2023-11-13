@@ -485,8 +485,8 @@ export class StocksService {
     return this.http.get<StockPercentChangeResponse>('/api/reports/percentChangeDistribution/tickers/' + ticker)
   }
 
-  reportTickerGaps(ticker:string): Observable<StockGaps> {
-    return this.http.get<StockGaps>('/api/reports/gaps/tickers/' + ticker)
+  reportTickerGaps(ticker:string, frequency:PriceFrequency = PriceFrequency.Daily): Observable<StockGaps> {
+    return this.http.get<StockGaps>('/api/reports/gaps/tickers/' + ticker + '?frequency=' + frequency)
   }
 
   reportPositions(): Observable<OutcomesReport> {

@@ -17,7 +17,7 @@ export class OutcomesComponent {
 
   @Input()
   title: string
-  
+
   @Input()
   outcomes: TickerOutcomes[]
 
@@ -32,8 +32,12 @@ export class OutcomesComponent {
 
   sortColumn: string;
   sortDirection: number = -1
-  
+
 	getKeys(entries:TickerOutcomes[]) {
+    if (entries === null || entries.length === 0) {
+      return []
+    }
+
     return entries[0].outcomes
       .filter(o => this.IsRenderableOutcome(o))
       .map(o => o.key)
@@ -80,11 +84,11 @@ export class OutcomesComponent {
       return (a:TickerOutcomes, b:TickerOutcomes) => {
         var aVal = a.outcomes.find(o => o.key === column).value
         var bVal = b.outcomes.find(o => o.key === column).value
-  
+
         return aVal - bVal
       }
     }
-    
+
   }
 
   getValue(o:StockAnalysisOutcome) {

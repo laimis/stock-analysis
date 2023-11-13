@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GetErrors } from 'src/app/services/utils';
 import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
+import {tap} from "rxjs/operators";
+import {concat} from "rxjs";
 
 @Component({
   selector: 'app-outcomes-report',
@@ -11,18 +13,19 @@ import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../
 export class OutcomesReportComponent implements OnInit {
   gaps: StockGaps[] = []
   errors: string[] = null;
-  allBarsReport: OutcomesReport;
-  singleBarReportDaily: OutcomesReport;
-  earningsOutcomes: TickerOutcomes[];
   startDate: string = null;
   endDate: string = null;
   earnings: string[] = [];
   title: string;
-  singleBarReportWeekly: OutcomesReport;
   tickers: string[] = [];
   excludedTickers: string[] = [];
 
   activeTicker: string = null;
+
+  allBarsReport: OutcomesReport;
+  singleBarReportDaily: OutcomesReport;
+  singleBarReportWeekly: OutcomesReport;
+  earningsOutcomes: TickerOutcomes[];
 
   constructor (
     private stocksService: StocksService,
@@ -50,12 +53,12 @@ export class OutcomesReportComponent implements OnInit {
       this.endDate = endDateParam;
     }
 
-    var tickerParam = this.route.snapshot.queryParamMap.get("tickers");
+    const tickerParam = this.route.snapshot.queryParamMap.get("tickers");
     if (tickerParam) {
       this.tickers = tickerParam
         .split(",")
         .map(t => {
-          var parts = t.split(":");
+          const parts = t.split(":");
           if (parts.length == 2) {
             return parts[1]
           }
@@ -63,7 +66,7 @@ export class OutcomesReportComponent implements OnInit {
         });
 
       if (this.tickers.length > 0) {
-        this.loadSingleBarReport(this.tickers, this.earnings);
+        this.loadData()
       }
 
     } else {
@@ -76,41 +79,82 @@ export class OutcomesReportComponent implements OnInit {
       return
     }
 
-    this.startDate = start;
-    this.endDate = end;
-    this.loadSingleBarReport(this.tickers, this.earnings);
+    this.startDate = start
+    this.endDate = end
+    this.loadData()
   }
 
-  private loadSingleBarReport(tickers: string[], earnings: string[]) {
-    return this.stocksService.reportOutcomesSingleBarDaily(tickers, "Earnings", earnings, this.endDate).subscribe(report => {
-      this.singleBarReportDaily = report;
-      if (this.earnings.length > 0) {
-        this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
+  loadData() {
+    if (this.tickers.length === 0) {
+      return
+    }
+
+    this.reset()
+
+    const singleBarDailyReport = this.singleBarDailyReportObservable()
+    const singleBarWeeklyReport = this.singleBarWeeklyReportObservable()
+    const allBarsReport = this.allBarsReportObservable()
+
+    concat(singleBarDailyReport, singleBarWeeklyReport, allBarsReport).subscribe(
+      (_) => {},
+      (error) => {
+        this.errors = GetErrors(error)
       }
-      this.loadSingleBarReportWeekly(tickers, earnings);
-    }, error => {
-      this.errors = GetErrors(error);
-      this.loadSingleBarReportWeekly(tickers, earnings);
-    });
+    )
   }
 
-  private loadSingleBarReportWeekly(tickers: string[], earnings: string[]) {
-    return this.stocksService.reportOutcomesSingleBarWeekly(tickers, this.endDate).subscribe(report => {
-      this.singleBarReportWeekly = report;
-      this.loadAllBarsReport(tickers);
-    }, error => {
-      this.errors = GetErrors(error);
-      this.loadAllBarsReport(tickers);
-    });
+  private reset() {
+    this.errors = null;
+    this.gaps = [];
+    this.allBarsReport = null;
+    this.singleBarReportDaily = null;
+    this.singleBarReportWeekly = null;
+    this.earningsOutcomes = [];
   }
 
-  private loadAllBarsReport(tickers: string[]) {
-    return this.stocksService.reportOutcomesAllBars(tickers, this.startDate, this.endDate).subscribe(report => {
-      this.allBarsReport = report;
-      this.gaps = report.gaps;
-    }, error => {
-      this.errors = GetErrors(error);
-    });
+  private allBarsReportObservable() {
+    return this.stocksService.reportOutcomesAllBars(this.tickers, this.startDate, this.endDate)
+      .pipe(
+        tap(
+          report => {
+            this.allBarsReport = report;
+          },
+          error => {
+            this.errors = GetErrors(error)
+          }
+        )
+      )
+  }
+
+  private singleBarWeeklyReportObservable() {
+    return this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
+      .pipe(
+        tap(
+          report => {
+            this.singleBarReportWeekly = report;
+          },
+          error => {
+            this.errors = GetErrors(error)
+          }
+        )
+      )
+  }
+
+  private singleBarDailyReportObservable() {
+    return this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
+      .pipe(
+        tap(
+          report => {
+            this.singleBarReportDaily = report;
+            if (this.earnings.length > 0) {
+              this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
+            }
+          },
+          error => {
+            this.errors = GetErrors(error)
+          }
+        )
+      )
   }
 
   onTickerChange(activeTicker:string) {
