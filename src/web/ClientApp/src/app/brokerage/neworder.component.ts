@@ -2,6 +2,7 @@ import {Component, Output, EventEmitter, Input} from '@angular/core';
 import { Observable } from 'rxjs';
 import { brokerageordercommand, KeyValuePair, StockQuote, StocksService } from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
+import {BrokerageOrderDuration, BrokerageOrderType} from "../services/brokerage.service";
 
 
 @Component({
@@ -21,14 +22,14 @@ export class BrokerageNewOrderComponent {
   errorMessage: string | null = null;
 
   private marketOrderTypes: KeyValuePair[] = [
-    { key: 'Day', value: 'Day' },
-    { key: 'Gtc', value: 'GTC' }
+    { key: BrokerageOrderDuration.Day, value: 'Day' },
+    { key: BrokerageOrderDuration.Gtc, value: 'GTC' }
   ]
   private nonMarketOrderTypes: KeyValuePair[] = [
-    { key: 'Day', value: 'Day' },
-    { key: 'Gtc', value: 'GTC' },
-    { key: 'DayPlus', value: 'Day+AH' },
-    { key: 'GtcPlus', value: 'GTC+AH' }
+    { key: BrokerageOrderDuration.Day, value: 'Day' },
+    { key: BrokerageOrderDuration.Gtc, value: 'GTC' },
+    { key: BrokerageOrderDuration.DayPlus, value: 'Day+AH' },
+    { key: BrokerageOrderDuration.GtcPlus, value: 'GTC+AH' }
   ]
 
   orderDurations: KeyValuePair[]
@@ -37,7 +38,7 @@ export class BrokerageNewOrderComponent {
     private stockService: StocksService
   )
   {
-    this.brokerageOrderType = 'Limit'
+    this.brokerageOrderType = BrokerageOrderType.Limit
     this.brokerageOrderTypeChanged()
   }
 
@@ -58,12 +59,12 @@ export class BrokerageNewOrderComponent {
   }
 
   brokerageOrderTypeChanged() {
-    if (this.brokerageOrderType === 'Market') {
-      this.brokerageOrderDuration = 'GTC'
+    if (this.brokerageOrderType === BrokerageOrderType.Market) {
+      this.brokerageOrderDuration = BrokerageOrderDuration.Gtc
       this.orderDurations = this.marketOrderTypes
     }
     else {
-      this.brokerageOrderDuration = 'GtcPlus'
+      this.brokerageOrderDuration = BrokerageOrderDuration.GtcPlus
       this.orderDurations = this.nonMarketOrderTypes
     }
   }
