@@ -1,20 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {
-  DataPointContainer,
-  PositionChartInformation,
-  PriceFrequency,
-  Prices,
-  StocksService
-} from '../services/stocks.service';
+import {StocksService} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
-import {
-  age,
-  calculateInflectionPoints, histogramToDataPointContainer, humanFriendlyTime,
-  InfectionPointType,
-  InflectionPointLog, logToDataPointContainer,
-  toChartMarker, toDailyBreakdownDataPointCointainer, toHistogram, toInflectionPointLog
-} from "../services/prices.service";
+import {concat} from "rxjs";
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-playground',
@@ -23,19 +12,6 @@ import {
 })
 export class PlaygroundComponent implements OnInit {
   tickers: string[];
-  options: any;
-  prices: Prices;
-  chartInfo: PositionChartInformation;
-
-
-  protected readonly twoMonths = 365 / 6;
-  protected readonly sixMonths = 365 / 2;
-  priceFrequency: PriceFrequency = PriceFrequency.Daily;
-  ageValueToUse:number;
-
-  lineContainers: DataPointContainer[];
-  peaksAndValleys: DataPointContainer[];
-  log: InflectionPointLog[];
 
   constructor(
     private stocks: StocksService,
@@ -43,64 +19,54 @@ export class PlaygroundComponent implements OnInit {
   }
 
   errors: string[];
+  status: string;
 
   ngOnInit() {
-    this.ageValueToUse = this.twoMonths
-    const tickerParam = this.route.snapshot.queryParamMap.get('tickers');
-    this.tickers = tickerParam ? tickerParam.split(',') : ['AMD'];
-    this.renderPrices(this.tickers)
-  }
+    const tickerParam = this.route.snapshot.queryParamMap.get('tickers')
+    this.tickers = tickerParam ? tickerParam.split(',') : ['AMD']
 
-  renderPrices(tickers: string[]) {
-    this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
-      result => {
-        this.prices = result
+    let positionReport = this.stocks.reportPositions().pipe(
+      tap((data) => {
+        this.status = "Positions done"
+        console.log("Positions")
+        console.log(data)
+      })
+    )
 
-        const inflectionPoints = calculateInflectionPoints(result.prices);
-        const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
-        const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
+    let singleBarDaily = this.stocks.reportOutcomesSingleBarDaily(this.tickers).pipe(
+      tap((data) => {
+        this.status = "Single bar daily done"
+        console.log("Single bar daily")
+        console.log(data)
+      }, (error) => {
+        console.log("Single bar daily error")
+        this.errors = GetErrors(error)
+      })
+    )
 
-        this.chartInfo = {
-          ticker: this.tickers[0],
-          prices: result,
-          markers: inflectionPoints.map(toChartMarker),
-          averageBuyPrice: null,
-          stopPrice: null
-        }
+    let singleBarWeekly = this.stocks.reportOutcomesSingleBarWeekly(this.tickers).pipe(
+      tap((data) => {
+        this.status = "Single bar weekly done"
+        console.log("Single bar weekly")
+        console.log(data)
+      })
+    )
 
-        const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
-        const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
-        const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
-        const smoothedValleys = toDailyBreakdownDataPointCointainer('smoothed valleys', valleys, (p: number) => Math.round(p))
+    let gapReport = this.stocks.reportTickerGaps(this.tickers[0]).pipe(
+      tap((data) => {
+        this.status = "Gaps done"
+        console.log("Gaps")
+        console.log(data)
+      })
+    )
 
-        this.log = toInflectionPointLog(inflectionPoints).reverse()
-
-        const humanFriendlyTimeDuration = humanFriendlyTime(this.ageValueToUse)
-        const resistanceHistogram = toHistogram(peaks.filter(p => age(p) < this.ageValueToUse))
-        const resistanceHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' resistance histogram', resistanceHistogram)
-
-        const supportHistogram = toHistogram(valleys.filter(p => age(p) < this.ageValueToUse))
-        const supportHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' support histogram', supportHistogram)
-
-        const logChart = logToDataPointContainer("Log", this.log)
-
-        this.lineContainers = [
-          resistanceHistogramPointContainer, supportHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys, logChart
-        ]
-
-        this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
+    concat(positionReport, gapReport, singleBarDaily, singleBarWeekly).subscribe(
+      (_) => {
+        this.status = "Done"
       },
-      error => this.errors = GetErrors(error)
-    );
-  }
-
-  priceFrequencyChanged() {
-    this.chartInfo = null
-    this.renderPrices(this.tickers);
-  }
-
-  ageValueChanged() {
-    this.chartInfo = null
-    this.renderPrices(this.tickers);
+      (error) => {
+        this.errors = GetErrors(error)
+      }
+    )
   }
 }

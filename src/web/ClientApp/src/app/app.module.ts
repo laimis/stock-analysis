@@ -97,6 +97,7 @@ import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-a
 import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
+import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 
 
 let routes: Routes = [
@@ -131,7 +132,10 @@ let routes: Routes = [
 
   {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
   {path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
+
   {path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
+  {path: 'playground/inflectionpoints', component: InflectionPointsComponent, canActivate: [AuthGuard]},
+
   {path: 'privacy', component: PrivacyComponent},
   {path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
   {path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard]},
@@ -192,7 +196,6 @@ let routes: Routes = [
     OptionClosedComponent,
 
     PaymentsComponent,
-    PlaygroundComponent,
     PrivacyComponent,
     ProfileComponent,
     ProfileCreateComponent,
@@ -201,6 +204,9 @@ let routes: Routes = [
     ProfileVerifyComponent,
     SummaryComponent,
     OwnedOptionComponent,
+
+    PlaygroundComponent,
+    InflectionPointsComponent,
 
     StockDetailsComponent,
     StockFundamentalsComponent,
