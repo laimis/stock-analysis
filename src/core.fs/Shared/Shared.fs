@@ -48,6 +48,10 @@ type ServiceResponse<'a>(success:'a option,error:ServiceError option) =
     member this.Success = success
     member this.Error = error
     member this.IsOk = match this.Success with | Some _ -> true | None -> false
+    member this.Result =
+        match this.Success with
+        | Some s -> Result.Ok s
+        | None -> Result.Error this.Error.Value
     
 module ResponseUtils =
             

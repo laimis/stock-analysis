@@ -7,11 +7,12 @@ open core.fs.Shared.Adapters.Storage
 open web
 
 let mutable host = null
+let mutable logger : ILogger = null
 
 let init args =
     
     let loggerFactory = LoggerFactory.Create(fun builder -> builder.AddConsole() |> ignore)
-    let logger = loggerFactory.CreateLogger("study")
+    logger <- loggerFactory.CreateLogger("study")
 
     let builder = Host.CreateApplicationBuilder args
      

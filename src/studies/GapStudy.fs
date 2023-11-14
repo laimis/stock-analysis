@@ -94,7 +94,7 @@ let getEarliestDateByTicker records =
             (ticker, earliestDate)
         )
         
-let run inputFilename (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<ServiceResponse<PriceBars>>) = async {
+let run inputFilename (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
     // parse and verify
     let records =
         inputFilename
@@ -114,21 +114,18 @@ let run inputFilename (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> A
     let! results =
         tickerDatePairs
         |> Array.map (fun (ticker, earliestDate) -> async {
-            printfn $"Ticker: %s{ticker}, earliest date: %A{earliestDate}"
             
             let earliestDateMinus365 = DateTimeOffset(earliestDate.date.AddDays(-365).ToDateTime(midnight))
             let today = DateTimeOffset.UtcNow
             
             let! prices = priceFunc earliestDateMinus365 today (ticker |> Ticker)
-            
-            printfn $"Prices: %A{if prices.IsOk then prices.Success.Value.Length else 0}"
-            
-            // ask to enter a key to continue
-            Console.ReadKey() |> ignore
-            
             return (ticker, prices)
         })
         |> Async.Sequential
         
-    printfn $"Results: %A{results}"
+    let failed = results |> Array.filter (fun (_, prices) -> prices.IsNone)
+    let succeeded = results |> Array.filter (fun (_, prices) -> prices.IsSome)
+    
+    printfn $"Failed: %d{failed.Length}"
+    printfn $"Succeeded: %d{succeeded.Length}"
 }
