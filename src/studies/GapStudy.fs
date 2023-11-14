@@ -2,6 +2,18 @@ module studies.GapStudy
 
 open System
 open FSharp.Data
+open core.Shared
+open core.fs.Shared
+open core.fs.Shared.Adapters.Stocks
+
+[<Literal>]
+let private minimumRecords = 10_000
+[<Literal>]
+let private earliestYear = 2020
+[<Literal>]
+let private latestYear = 2024
+
+let private midnight = TimeOnly.Parse "00:00:00"
 
 // "date","ticker","screenerid"
 type Input = {
@@ -17,7 +29,7 @@ let parseInput (inputFilename:string) =
         |> Seq.map (fun row ->
             let ticker = row["ticker"]
             let date = DateOnly.Parse row["date"]
-            let screenerid = Int32.Parse row["screenerid"]
+            let screenerid = row["screenerid"].AsInteger()
 
             { date = date; ticker = ticker; screenerid = screenerid }
         )
@@ -28,12 +40,12 @@ let verifyInput records =
     let numberOfRecords = records |> Array.length
     match numberOfRecords with
     | 0 -> failwith "no records"
-    | x when x < 10000 -> failwith "not enough records"
+    | x when x < minimumRecords -> failwith "not enough records"
     | _ -> ()
     
     // make sure no data is blank
     let dateFine =
-        records |> Array.forall (fun r -> r.date.Year > 2020 && r.date.Year < 2024)
+        records |> Array.forall (fun r -> r.date.Year > earliestYear && r.date.Year < latestYear)
     
     match dateFine with
     | false -> failwith "date is not in range"
@@ -82,7 +94,7 @@ let getEarliestDateByTicker records =
             (ticker, earliestDate)
         )
         
-let run inputFilename =
+let run inputFilename (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<ServiceResponse<PriceBars>>) = async {
     // parse and verify
     let records =
         inputFilename
@@ -95,3 +107,28 @@ let run inputFilename =
     
     // output how many records are left
     printfn $"Unique tickers: %d{tickerDatePairs.Length}"
+    
+    // when ready, for each ticker, get historical prices from price provider
+    // starting with 365 days before the earliest date through today
+    
+    let! results =
+        tickerDatePairs
+        |> Array.map (fun (ticker, earliestDate) -> async {
+            printfn $"Ticker: %s{ticker}, earliest date: %A{earliestDate}"
+            
+            let earliestDateMinus365 = DateTimeOffset(earliestDate.date.AddDays(-365).ToDateTime(midnight))
+            let today = DateTimeOffset.UtcNow
+            
+            let! prices = priceFunc earliestDateMinus365 today (ticker |> Ticker)
+            
+            printfn $"Prices: %A{if prices.IsOk then prices.Success.Value.Length else 0}"
+            
+            // ask to enter a key to continue
+            Console.ReadKey() |> ignore
+            
+            return (ticker, prices)
+        })
+        |> Async.Sequential
+        
+    printfn $"Results: %A{results}"
+}

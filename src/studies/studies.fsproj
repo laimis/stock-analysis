@@ -12,6 +12,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\infrastructure\csvparser\csvparser.csproj" />
+    <ProjectReference Include="..\core.fs\core.fs.fsproj" />
+    <ProjectReference Include="..\core\core.csproj" />
+    <ProjectReference Include="..\web\web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="6.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
   </ItemGroup>
 
 </Project>

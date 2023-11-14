@@ -113,4 +113,4 @@ type PriceBars(bars:PriceBar array) =
         |> PriceBars
     member this.AllButLast() = this.Bars[0 .. this.Length - 2] |> PriceBars
     member this.ClosingPrices() = this.Bars |> Array.map (fun bar -> bar.Close)
-    member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal) 
+    member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal)
