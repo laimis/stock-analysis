@@ -18,28 +18,15 @@ let getPrices (user:User) (brokerage:IBrokerage) startDate endDate ticker = asyn
     return! brokerage.GetPriceHistory user.State ticker PriceFrequency.Daily startDate endDate |> Async.AwaitTask
 }
 
-let loggerFactory = LoggerFactory.Create(fun builder -> builder.AddConsole() |> ignore)
-let logger = loggerFactory.CreateLogger("GapStudy")
+Environment.GetCommandLineArgs() |> ServiceHelper.init
 
-let builder = Host.CreateApplicationBuilder(Environment.GetCommandLineArgs())
- 
-DIHelper.RegisterServices(
-    builder.Configuration,
-    builder.Services,
-    logger
-)
-
-let host = builder.Build()
-let storage = host.Services.GetService(typeof<IAccountStorage>) :?> IAccountStorage
-let brokerage = host.Services.GetService(typeof<IBrokerage>) :?> IBrokerage
-
-let user = "laimis@gmail.com" |> getUser storage |> Async.RunSynchronously
+let user = "laimis@gmail.com" |> getUser (ServiceHelper.storage()) |> Async.RunSynchronously
 match user with
 | None -> failwith "User not found"
 | Some _ -> ()
 
 let inputFilename = "d:\studies\01_export_date_ticker_screenerid.csv"
 
-let func = getPrices user.Value brokerage
+let priceFunction = getPrices user.Value (ServiceHelper.brokerage())
 
-GapStudy.run inputFilename func |> Async.RunSynchronously
+GapStudy.run inputFilename priceFunction |> Async.RunSynchronously
