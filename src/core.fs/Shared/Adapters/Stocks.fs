@@ -123,6 +123,14 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         validBar && (this.Low > referenceBar.High || this.High < referenceBar.Low)
         
 type PriceBars(bars:PriceBar array) =
+    let dateIndex = Dictionary<DateOnly, PriceBar>()
+    do
+        for bar in bars do
+            dateIndex.Add(
+                DateOnly(bar.Date.Year, bar.Date.Month, bar.Date.Day),
+                bar
+            )
+            
     member this.Bars = bars
     member this.Length = bars.Length
     member this.First = bars[0]
@@ -135,3 +143,9 @@ type PriceBars(bars:PriceBar array) =
     member this.AllButLast() = this.Bars[0 .. this.Length - 2] |> PriceBars
     member this.ClosingPrices() = this.Bars |> Array.map (fun bar -> bar.Close)
     member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal)
+    member this.TryFindByDate (date:DateOnly) =
+        match dateIndex.TryGetValue(date) with
+        | true, bar -> Some bar
+        | _ -> None
+    member this.TryFindByDate (date:DateTimeOffset) =
+        DateOnly(date.Year, date.Month, date.Day) |> this.TryFindByDate

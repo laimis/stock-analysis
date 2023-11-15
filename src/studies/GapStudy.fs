@@ -202,11 +202,11 @@ let runTrades matchedInputFilename (priceFunc:string -> PriceBars) =
         |> Array.map (fun r ->
             let prices = r.ticker |> priceFunc
             
-            let startBar = prices.Bars |> Array.find (fun b -> b.DateStr = r.date.ToString("yyyy-MM-dd"))
-            let endBar7 = prices.Bars |> Array.tryFind (fun b -> b.DateStr = r.date.AddDays(7).ToString("yyyy-MM-dd"))
-            let endBar30 = prices.Bars |> Array.tryFind (fun b -> b.DateStr = r.date.AddDays(30).ToString("yyyy-MM-dd"))
-            let endBar60 = prices.Bars |> Array.tryFind (fun b -> b.DateStr = r.date.AddDays(60).ToString("yyyy-MM-dd"))
-            let endBar90 = prices.Bars |> Array.tryFind (fun b -> b.DateStr = r.date.AddDays(90).ToString("yyyy-MM-dd"))
+            let startBar = r.date |> prices.TryFindByDate |> Option.get
+            let endBar7 = r.date.AddDays(7) |> prices.TryFindByDate
+            let endBar30 = r.date.AddDays(30) |> prices.TryFindByDate
+            let endBar60 = r.date.AddDays(60) |> prices.TryFindByDate
+            let endBar90 = r.date.AddDays(90) |> prices.TryFindByDate
             
             let pl7 = match endBar7 with | Some endBar7 -> endBar7.Close - startBar.Close |> Some | None -> None
             let pl30 = match endBar30 with | Some endBar30 -> endBar30.Close - startBar.Close |> Some | None -> None
