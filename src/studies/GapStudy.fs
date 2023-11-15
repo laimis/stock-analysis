@@ -20,9 +20,10 @@ type Input = {
     date: DateOnly
     ticker: string
     screenerid: int
+    hasGapUp: bool option
 }
 
-type GapStudyOutput = CsvProvider<Schema = "ticker (string), date (string), screenerid (int)", HasHeaders=false>
+type GapStudyOutput = CsvProvider<Schema = "ticker (string), date (string), screenerid (int), hasGapUp (bool option)", HasHeaders=false>
 
 let parseInput (inputFilename:string) =
     let csvFile = CsvFile.Load(inputFilename)
@@ -33,7 +34,7 @@ let parseInput (inputFilename:string) =
             let date = DateOnly.Parse row["date"]
             let screenerid = row["screenerid"].AsInteger()
 
-            { date = date; ticker = ticker; screenerid = screenerid }
+            { date = date; ticker = ticker; screenerid = screenerid; hasGapUp = None }
         )
         |> Seq.toArray
         
@@ -46,8 +47,9 @@ let parseOutput (filepath:string) =
             let ticker = row.Ticker
             let date = DateOnly.Parse row.Date
             let screenerid = row.Screenerid
+            let hasGapUp = row.HasGapUp
 
-            { date = date; ticker = ticker; screenerid = screenerid }
+            { date = date; ticker = ticker; screenerid = screenerid; hasGapUp = hasGapUp }
         )
         |> Seq.toArray
 
@@ -175,14 +177,20 @@ let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> Dat
     printfn $"Gap up index: %d{gapUpIndex.Count}"
     
     // go through the records and only keep the ones that have a gap up
-    let recordsWithGapUps = recordsWithPrices |> Array.filter (fun r -> gapUpIndex.ContainsKey(r.ticker, r.date.ToString("yyyy-MM-dd")))
-    printfn $"Records with gap ups: %d{recordsWithGapUps.Length}"
+    let updatedRecords =
+        recordsWithPrices
+        |> Array.map (fun r ->
+            let hasGapUp = gapUpIndex.ContainsKey(r.ticker, r.date.ToString("yyyy-MM-dd"))
+            (r, hasGapUp)
+        )
+    
+    printfn $"Updated records: %d{updatedRecords.Length}"
     
     // output records with gap ups into CSV
     let rows =
-        recordsWithGapUps
-        |> Array.map (fun r ->
-            GapStudyOutput.Row(ticker=r.ticker, date=r.date.ToString("yyyy-MM-dd"), screenerid=r.screenerid)
+        updatedRecords
+        |> Array.map (fun (r,hasGapUp) ->
+            GapStudyOutput.Row(ticker=r.ticker, date=r.date.ToString("yyyy-MM-dd"), screenerid=r.screenerid, hasGapUp=Some hasGapUp)
         )
         
     let csvOutput = new GapStudyOutput(rows)
@@ -197,12 +205,29 @@ let runTrades matchedInputFilename (priceFunc:string -> PriceBars) =
          |> verifyRecords
          |> describeRecords
     
-    let pl =
+    // ridiculous, sometimes input data does not have prices for the date
+    // so we filter those records out
+    let dataWithPriceBars =
         data
         |> Array.map (fun r ->
             let prices = r.ticker |> priceFunc
+            let startBar = r.date |> prices.TryFindByDate
+            (r, prices, startBar)
+        )
+        |> Array.choose (fun (r,prices,startBar) ->
+            match startBar with
+            | None -> None
+            | Some startBar -> Some (r, prices, startBar)
+        )
+    
+    printfn "Ensured that data has prices"
+    
+    dataWithPriceBars |> Array.map (fun (r, _, _) -> r) |> describeRecords |> ignore
+       
+    let pl =
+        dataWithPriceBars
+        |> Array.map (fun (r, prices, startBar) ->
             
-            let startBar = r.date |> prices.TryFindByDate |> Option.get
             let endBar7 = r.date.AddDays(7) |> prices.TryFindByDate
             let endBar30 = r.date.AddDays(30) |> prices.TryFindByDate
             let endBar60 = r.date.AddDays(60) |> prices.TryFindByDate

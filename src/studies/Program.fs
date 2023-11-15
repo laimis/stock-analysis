@@ -20,6 +20,6 @@ let outputFilename = $"{studiesDirectory}\\02_export_date_ticker_screenerid_gap.
 let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
 let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
 
-// GapStudy.study inputFilename outputFilename priceFunction |> Async.RunSynchronously
+GapStudy.study inputFilename outputFilename getPricesWithBrokerage |> Async.RunSynchronously
 
 GapStudy.runTrades outputFilename getPricesFromCsv

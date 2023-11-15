@@ -1,6 +1,7 @@
 module studies.DataHelpers
 
 open System
+open System.Collections.Generic
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
@@ -16,11 +17,17 @@ let generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
     $"{studiesDirectory}\\{filename}"
 
+let private priceCache = Dictionary<string,PriceBars>()
+
 let readPricesFromCsv (path:string) =
-    ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
-    let csv = System.IO.File.ReadAllLines(path)
-    let bars = csv |> Array.map PriceBar |> PriceBars
-    bars
+    match priceCache.TryGetValue(path) with
+    | true, bars -> bars
+    | false, _ ->
+        ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
+        let csv = System.IO.File.ReadAllLines(path)
+        let bars = csv |> Array.map PriceBar |> PriceBars
+        priceCache.Add(path, bars)
+        bars
         
 // start / end date are here because we might be dealing with interfaces
 // that are passing dates but we always return just what we have
@@ -72,6 +79,7 @@ let getPricesWithBrokerage (user:User) (brokerage:IBrokerage) studiesDirectory s
     | NotAvailableForever -> return None
     | NotAvailable ->
         try
+            ServiceHelper.logger.LogInformation("Getting price history for {ticker} from {startDate} to {endDate}", ticker, startDate, endDate)
             let! response = brokerage.GetPriceHistory user.State ticker PriceFrequency.Daily startDate endDate |> Async.AwaitTask
             let result = response.Result
             match result with

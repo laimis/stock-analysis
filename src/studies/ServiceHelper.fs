@@ -11,9 +11,16 @@ let mutable logger : ILogger = null
 
 let init args =
     
+    // print args
+    args |> Array.iter (fun arg -> printfn $"%s{arg}")
+    
+    let verbose = args |> Array.contains "--v"
+    
     let loggerFactory = LoggerFactory.Create(fun builder ->
         builder.AddConsole() |> ignore
-        builder.SetMinimumLevel(LogLevel.Error) |> ignore
+        match verbose with
+        | true -> builder.SetMinimumLevel(LogLevel.Trace) |> ignore
+        | false -> builder.SetMinimumLevel(LogLevel.Error) |> ignore
     )
     logger <- loggerFactory.CreateLogger("study")
 
