@@ -3,10 +3,6 @@
 open System
 open studies
 
-let studiesDirectory = "d:\studies"
-
-
-
 Environment.GetCommandLineArgs() |> ServiceHelper.init
 
 let user = "laimis@gmail.com" |> DataHelpers.getUser (ServiceHelper.storage()) |> Async.RunSynchronously
@@ -14,6 +10,7 @@ match user with
 | None -> failwith "User not found"
 | Some _ -> ()
 
+let studiesDirectory = ServiceHelper.studiesDirectory
 let inputFilename = $"{studiesDirectory}\\01_export_date_ticker_screenerid.csv"
 let outputFilename = $"{studiesDirectory}\\02_export_date_ticker_screenerid_gap.csv"
 
