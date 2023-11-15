@@ -36,6 +36,9 @@ type PriceFrequency =
             
 type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, close:decimal, volume:int64) =
     
+    
+    let validBar = ``open`` <= high && ``open`` >= low
+    
     do
         // check that none of the values are negative
         if ``open`` < 0m then failwith $"Invalid open price: {``open``} on {date}"
@@ -43,6 +46,20 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         if low < 0m then failwith $"Invalid low price: {low}"
         if close < 0m then failwith $"Invalid close price: {close}"
         if volume < 0L then failwith $"Invalid volume: {volume}"
+        
+        // check that the high is greater than or equal to the low
+        if high < low then failwith $"Invalid high/low prices: {high}/{low}"
+        
+        // TODO: uncomment these checks when we have a better data source
+        // right now I see this happen in TD Ameritrade feed
+        // // check that the close is between the high and low
+        // if close > high then failwith $"Invalid close price: {close} is greater than high: {high} on {date}"
+        // if close < low then failwith $"Invalid close price: {close} is less than low: {low} on {date}"
+        //
+        // // check that the open is between the high and low
+        // if ``open`` > high then failwith $"Invalid open price: {``open``} is greater than high: {high} on {date}"
+        // if ``open`` < low then failwith $"Invalid open price: {``open``} is less than low: {low} on {date}"
+    
         
     new(value:string) =
         let parts = value.Split(',')
@@ -99,7 +116,11 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         candidates |> List.max
         
     member this.HasGap (referenceBar:PriceBar) =
-        this.Low > referenceBar.High || this.High < referenceBar.Low
+        // needed to add a check for valid bar here otherwise the gap condition
+        // will evaluate to true, but when calculating the gap will come back with nonsensical
+        // result because the bar itself is not valid. This due to data provider issues, take
+        // a look at the constructor
+        validBar && (this.Low > referenceBar.High || this.High < referenceBar.Low)
         
 type PriceBars(bars:PriceBar array) =
     member this.Bars = bars
