@@ -3,7 +3,7 @@ module studies.GapStudy
 open System
 open FSharp.Data
 open core.Shared
-open core.fs.Shared
+open core.fs.Services.GapAnalysis
 open core.fs.Shared.Adapters.Stocks
 
 [<Literal>]
@@ -22,9 +22,11 @@ type Input = {
     screenerid: int
 }
 
+type GapStudyOutput = CsvProvider<Schema = "ticker (string), date (string), screenerid (int)", HasHeaders=false>
+
 let parseInput (inputFilename:string) =
     let csvFile = CsvFile.Load(inputFilename)
-
+    
     csvFile.Rows
         |> Seq.map (fun row ->
             let ticker = row["ticker"]
@@ -94,7 +96,7 @@ let getEarliestDateByTicker records =
             (ticker, earliestDate)
         )
         
-let run inputFilename (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
+let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
     // parse and verify
     let records =
         inputFilename
@@ -118,14 +120,58 @@ let run inputFilename (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> A
             let earliestDateMinus365 = DateTimeOffset(earliestDate.date.AddDays(-365).ToDateTime(midnight))
             let today = DateTimeOffset.UtcNow
             
-            let! prices = priceFunc earliestDateMinus365 today (ticker |> Ticker)
+            let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
             return (ticker, prices)
         })
         |> Async.Sequential
         
     let failed = results |> Array.filter (fun (_, prices) -> prices.IsNone)
-    let succeeded = results |> Array.filter (fun (_, prices) -> prices.IsSome)
+    let prices =
+        results
+        |> Array.choose (fun (ticker, prices) ->
+            match prices with
+            | Some prices -> Some (ticker, prices)
+            | None -> None
+        )
+        |> Map.ofArray
     
     printfn $"Failed: %d{failed.Length}"
-    printfn $"Succeeded: %d{succeeded.Length}"
+    printfn $"Succeeded: %d{prices.Count}"
+    
+    let recordsWithPrices = records |> Array.filter (fun r -> prices.ContainsKey(r.ticker))
+    printfn $"Records with prices: %d{recordsWithPrices.Length}"
+    
+    // now we are interested in gap ups
+    let gapUpIndex =
+        prices |> Map.keys |> Seq.collect (fun key ->
+            let bars = prices[key]
+            let gaps = detectGaps bars bars.Length
+            let gapUps =
+                gaps
+                |> Array.filter (fun (g:Gap) -> g.Type = GapType.Up)
+                |> Array.map (fun (g:Gap) ->
+                    let gapKey = (key, g.Bar.DateStr)
+                    (gapKey,g)
+                )
+            gapUps
+        )
+        |> Map.ofSeq
+        
+        
+    printfn $"Gap up index: %d{gapUpIndex.Count}"
+    
+    // go through the records and only keep the ones that have a gap up
+    let recordsWithGapUps = recordsWithPrices |> Array.filter (fun r -> gapUpIndex.ContainsKey(r.ticker, r.date.ToString("yyyy-MM-dd")))
+    printfn $"Records with gap ups: %d{recordsWithGapUps.Length}"
+    
+    // output records with gap ups into CSV
+    let rows =
+        recordsWithGapUps
+        |> Array.map (fun r ->
+            GapStudyOutput.Row(ticker=r.ticker, date=r.date.ToString("yyyy-MM-dd"), screenerid=r.screenerid)
+        )
+        
+    let csvOutput = new GapStudyOutput(rows)
+    csvOutput.Save outputFilename
+    
 }

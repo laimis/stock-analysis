@@ -1,14 +1,12 @@
 ﻿// Gap study
 // read input from file 01_export_date_ticker_screenerid.csv
 open System
-open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain.Accounts
 open studies
-open web
 
 let studiesDirectory = "d:\studies"
 
@@ -89,7 +87,8 @@ match user with
 | Some _ -> ()
 
 let inputFilename = $"{studiesDirectory}\\01_export_date_ticker_screenerid.csv"
+let outputFilename = $"{studiesDirectory}\\02_export_date_ticker_screenerid_gap.csv"
 
 let priceFunction = getPrices user.Value (ServiceHelper.brokerage())
 
-GapStudy.run inputFilename priceFunction |> Async.RunSynchronously
+GapStudy.study inputFilename outputFilename priceFunction |> Async.RunSynchronously

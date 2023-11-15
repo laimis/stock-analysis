@@ -11,7 +11,10 @@ let mutable logger : ILogger = null
 
 let init args =
     
-    let loggerFactory = LoggerFactory.Create(fun builder -> builder.AddConsole() |> ignore)
+    let loggerFactory = LoggerFactory.Create(fun builder ->
+        builder.AddConsole() |> ignore
+        builder.SetMinimumLevel(LogLevel.Error) |> ignore
+    )
     logger <- loggerFactory.CreateLogger("study")
 
     let builder = Host.CreateApplicationBuilder args
