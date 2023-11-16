@@ -57,7 +57,7 @@ let private generateInternal (prices: PriceBars) (volumeStats: core.fs.Services.
             match gapSizePct with
             | x when x > 0m -> GapType.Up
             | x when x < 0m -> GapType.Down
-            | _ -> failwith "Invalid gap type"
+            | _ -> failwith $"Invalid gap type: {current} vs {yesterday}"
             
         let percentChange = (current.Close - yesterday.Close) / yesterday.Close
         

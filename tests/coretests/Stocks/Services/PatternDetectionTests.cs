@@ -12,7 +12,9 @@ namespace coretests.Stocks.Services
         [Fact]
         public void Generate_WithOnlyOneBarReturnsNothing()
         {
-            var bars = new PriceBars(new PriceBar[1]);
+            var bars = new PriceBars(
+                TestDataGenerator.PriceBars(TestDataGenerator.ENPH).Bars.Take(1).ToArray()
+            );
             var patterns = PatternDetection.generate(bars);
             Assert.Empty(patterns);
         }

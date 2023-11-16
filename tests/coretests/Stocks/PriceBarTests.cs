@@ -1,3 +1,4 @@
+using System;
 using core.fs.Shared.Adapters.Stocks;
 using coretests.testdata;
 using Microsoft.FSharp.Core;
@@ -67,5 +68,20 @@ public class PriceBarsTests
         Assert.Equal(505, _bars.Volumes().Length);
         Assert.Equal(17157618m, _bars.Volumes()[0]);
         Assert.Equal(6933219m, _bars.Volumes()[504]);
+    }
+    
+    [Fact]
+    public void FindByDate_ReturnsNone_WhenNotFound()
+    {
+        var result = _bars.TryFindByDate(DateTimeOffset.Parse("2020-01-01"));
+        Assert.True(FSharpOption<PriceBar>.get_IsNone(result));
+    }
+    
+    [Fact]
+    public void FindByDate_ReturnsSome_WhenFound()
+    {
+        var result = _bars.TryFindByDate(DateTimeOffset.Parse("2020-11-30"));
+        Assert.True(FSharpOption<PriceBar>.get_IsSome(result));
+        Assert.Equal("2020-11-30", result.Value.DateStr);
     }
 }

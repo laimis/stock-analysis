@@ -24,7 +24,7 @@ namespace web
 {
     public static class DIHelper
     {
-        internal static void RegisterServices(
+        public static void RegisterServices(
             IConfiguration configuration,
             IServiceCollection services,
             ILogger logger)
