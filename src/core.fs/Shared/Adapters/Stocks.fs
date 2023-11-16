@@ -122,14 +122,14 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         // a look at the constructor
         validBar && (this.Low > referenceBar.High || this.High < referenceBar.Low)
         
+type PriceBarWithIndex = PriceBar * int
+
 type PriceBars(bars:PriceBar array) =
-    let dateIndex = Dictionary<DateOnly, PriceBar>()
+    let dateIndex = Dictionary<DateOnly, PriceBarWithIndex>()
     do
-        for bar in bars do
-            dateIndex.Add(
-                DateOnly(bar.Date.Year, bar.Date.Month, bar.Date.Day),
-                bar
-            )
+        bars
+        |> Array.indexed
+        |> Array.iter (fun (index, bar) -> dateIndex.Add(DateOnly(bar.Date.Year, bar.Date.Month, bar.Date.Day), (bar, index)))
             
     member this.Bars = bars
     member this.Length = bars.Length

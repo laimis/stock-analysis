@@ -20,6 +20,7 @@ let studiesDirectory =
     
 let inputFilename = $"{studiesDirectory}\\01_export_date_ticker_screenerid.csv"
 let outputFilename = $"{studiesDirectory}\\02_export_date_ticker_screenerid_gap.csv"
+let tradeOutcomesFilename = $"{studiesDirectory}\\03_export_date_ticker_screenerid_gap_outcomes.csv"
 
 let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
 let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
@@ -33,6 +34,7 @@ match ServiceHelper.hasArgument "-s" with
 
 match ServiceHelper.hasArgument "-t" with
 | true -> 
-    GapStudy.runTrades outputFilename getPricesFromCsv
+    let outcomes = GapStudy.runTrades outputFilename getPricesFromCsv
+    outcomes |> GapStudy.saveOutcomes tradeOutcomesFilename
 | false ->
     ()

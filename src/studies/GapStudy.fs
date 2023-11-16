@@ -13,102 +13,92 @@ let private earliestYear = 2020
 [<Literal>]
 let private latestYear = 2024
 
-let private midnight = TimeOnly.Parse "00:00:00"
-
-// "date","ticker","screenerid"
-type Input = {
-    date: DateOnly
-    ticker: string
-    screenerid: int
-    hasGapUp: bool option
-}
-
-type GapStudyOutput = CsvProvider<Schema = "ticker (string), date (string), screenerid (int), hasGapUp (bool option)", HasHeaders=false>
-
-let parseInput (inputFilename:string) =
-    let csvFile = CsvFile.Load(inputFilename)
+type StudyInput = CsvProvider<Schema = "ticker (string), date (date), screenerid (int)", HasHeaders=false>
+type GapStudyOutput =
+    CsvProvider<
+        Schema = "ticker (string), date (date), screenerid (int), hasGapUp (bool)",
+        HasHeaders=false
+    >
     
-    csvFile.Rows
-        |> Seq.map (fun row ->
-            let ticker = row["ticker"]
-            let date = DateOnly.Parse row["date"]
-            let screenerid = row["screenerid"].AsInteger()
+type TradeOutcomeOutput =
+    CsvProvider<
+        Sample = "strategy (string), ticker (string), date (date), screenerid (int), hasGapUp (bool), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+        // Schema = "strategy (string), ticker (string), date (date), screenerid (int), hasGapUp (bool), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+        HasHeaders=true
+    >
 
-            { date = date; ticker = ticker; screenerid = screenerid; hasGapUp = None }
-        )
-        |> Seq.toArray
-        
-let parseOutput (filepath:string) =
-    
-    let csvFile = GapStudyOutput.Load(filepath)
-    
-    csvFile.Rows
-        |> Seq.map (fun row ->
-            let ticker = row.Ticker
-            let date = DateOnly.Parse row.Date
-            let screenerid = row.Screenerid
-            let hasGapUp = row.HasGapUp
+let parseInput (filepath:string) = StudyInput.Load(filepath).Rows
+let parseOutput (filepath:string) = GapStudyOutput.Load(filepath).Rows
+let parseTradeOutcomes (filepath:string) = TradeOutcomeOutput.Load(filepath).Rows
 
-            { date = date; ticker = ticker; screenerid = screenerid; hasGapUp = hasGapUp }
-        )
-        |> Seq.toArray
-
-let verifyRecords records =
+let verifyRecords (records:StudyInput.Row seq) =
     // make sure there is at least some records in here, ideally in thousands
-    let numberOfRecords = records |> Array.length
+    let numberOfRecords = records |> Seq.length
     match numberOfRecords with
     | 0 -> failwith "no records"
     | x when x < minimumRecords -> failwith $"not enough records: {x}"
     | _ -> ()
     
-    // make sure no data is blank
-    let dateFine =
-        records |> Array.forall (fun r -> r.date.Year > earliestYear && r.date.Year < latestYear)
-    
-    match dateFine with
-    | false -> failwith "date is not in range"
+    // make sure all dates are as expected
+    let datesFine = records |> Seq.forall (fun r -> r.Date.Year >= earliestYear && r.Date.Year <= latestYear)
+    match datesFine with
+    | false -> failwith "date is out of range"
     | true -> ()
     
     // make sure all tickers are set
-    let tickersFine =
-        records |> Array.forall (fun r -> String.IsNullOrWhiteSpace(r.ticker) = false)
-        
+    let tickersFine = records |> Seq.forall (fun r -> String.IsNullOrWhiteSpace(r.Ticker) = false)
     match tickersFine with
     | false -> failwith "ticker is blank"
     | true -> ()
     
     // make sure all screenerIds are set
-    let screenerIdsFine =
-        records |> Array.forall (fun r -> r.screenerid <> 0)
-        
+    let screenerIdsFine = records |> Seq.forall (fun r -> r.Screenerid <> 0)
     match screenerIdsFine with
     | false -> failwith "screenerid is blank"
     | true -> ()
     
     records
+
+type Unified =
+    | Input of StudyInput.Row
+    | Output of GapStudyOutput.Row
     
-let describeRecords records =
-    let numberOfRecords = records |> Array.length
-    let dates = records |> Array.map (fun r -> r.date) |> Array.distinct |> Array.length
-    let tickers = records |> Array.map (fun r -> r.ticker) |> Array.distinct |> Array.length
-    let screenerIds = records |> Array.map (fun r -> r.screenerid) |> Array.distinct |> Array.length
+let describeRecords (records:Unified seq) =
     
-    let minimumDate = records |> Array.minBy (fun r -> r.date)
-    let maximumDate = records |> Array.maxBy (fun r -> r.date)
+    let getDate unified =
+        match unified with
+        | Input row -> row.Date
+        | Output row -> row.Date
+        
+    let getTicker unified =
+        match unified with
+        | Input row -> row.Ticker
+        | Output row -> row.Ticker
+        
+    let getScreenerId unified =
+        match unified with
+        | Input row -> row.Screenerid
+        | Output row -> row.Screenerid
+    
+    let numberOfRecords = records |> Seq.length
+    let dates = records |> Seq.map (fun r -> r |> getDate) |> Seq.distinct |> Seq.length
+    let tickers = records |> Seq.map (fun r -> r |> getTicker) |> Seq.distinct |> Seq.length
+    let screenerIds = records |> Seq.map (fun r -> r |> getScreenerId) |> Seq.distinct |> Seq.length
+    
+    let minimumDate = records |> Seq.minBy (fun r -> r |> getDate) |> getDate
+    let maximumDate = records |> Seq.maxBy (fun r -> r |> getDate) |> getDate
     
     printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
-    printfn $"Minimum date: %A{minimumDate.date}"
-    printfn $"Maximum date: %A{maximumDate.date}"
+    printfn $"Minimum date: %A{minimumDate.Date}"
+    printfn $"Maximum date: %A{maximumDate.Date}"
     printfn ""
     
-    records
-    
-let getEarliestDateByTicker records =
+let getEarliestDateByTicker (records:StudyInput.Row seq) =
     
     records
-        |> Array.groupBy (fun r -> r.ticker)
-        |> Array.map (fun (ticker, records) ->
-            let earliestDate = records |> Array.minBy (fun r -> r.date)
+        |> Seq.groupBy (fun r -> r.Ticker)
+        |> Seq.map (fun (ticker, records) ->
+            let earliestDate = records |> Seq.minBy (fun r -> r.Date)
             (ticker, earliestDate)
         )
         
@@ -118,22 +108,24 @@ let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> Dat
         inputFilename
         |> parseInput
         |> verifyRecords
-        |> describeRecords
-
+        
+    // describe records
+    records |> Seq.map (fun r -> Input r) |> describeRecords
+        
     // generate a pair of ticker and the earliest data it is seen
     let tickerDatePairs = records |> getEarliestDateByTicker
     
     // output how many records are left
-    printfn $"Unique tickers: %d{tickerDatePairs.Length}"
+    printfn $"Unique tickers: %d{tickerDatePairs |> Seq.length}"
     
     // when ready, for each ticker, get historical prices from price provider
     // starting with 365 days before the earliest date through today
     
     let! results =
         tickerDatePairs
-        |> Array.map (fun (ticker, earliestDate) -> async {
+        |> Seq.map (fun (ticker, earliestDate) -> async {
             
-            let earliestDateMinus365 = DateTimeOffset(earliestDate.date.AddDays(-365).ToDateTime(midnight))
+            let earliestDateMinus365 = earliestDate.Date.AddDays(-365)
             let today = DateTimeOffset.UtcNow
             
             let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
@@ -154,8 +146,8 @@ let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> Dat
     printfn $"Failed: %d{failed.Length}"
     printfn $"Succeeded: %d{prices.Count}"
     
-    let recordsWithPrices = records |> Array.filter (fun r -> prices.ContainsKey(r.ticker))
-    printfn $"Records with prices: %d{recordsWithPrices.Length}"
+    let recordsWithPrices = records |> Seq.filter (fun r -> prices.ContainsKey(r.Ticker))
+    printfn $"Records with prices: %d{recordsWithPrices |> Seq.length}"
     
     // now we are interested in gap ups
     let gapUpIndex =
@@ -179,52 +171,187 @@ let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> Dat
     // go through the records and only keep the ones that have a gap up
     let updatedRecords =
         recordsWithPrices
-        |> Array.map (fun r ->
-            let hasGapUp = gapUpIndex.ContainsKey(r.ticker, r.date.ToString("yyyy-MM-dd"))
+        |> Seq.map (fun r ->
+            let hasGapUp = gapUpIndex.ContainsKey(r.Ticker, r.Date.ToString("yyyy-MM-dd"))
             (r, hasGapUp)
         )
     
-    printfn $"Updated records: %d{updatedRecords.Length}"
+    printfn $"Updated records: %d{updatedRecords |> Seq.length}"
     
     // output records with gap ups into CSV
     let rows =
         updatedRecords
-        |> Array.map (fun (r,hasGapUp) ->
-            GapStudyOutput.Row(ticker=r.ticker, date=r.date.ToString("yyyy-MM-dd"), screenerid=r.screenerid, hasGapUp=Some hasGapUp)
+        |> Seq.map (fun (r,hasGapUp) ->
+            let row = GapStudyOutput.Row(ticker=r.Ticker, date=r.Date, screenerid=r.Screenerid, hasGapUp=hasGapUp)
+            row
         )
-        
+       
     let csvOutput = new GapStudyOutput(rows)
     csvOutput.Save outputFilename
 }
 
+// - opened date
+// - open price
+// - closed date
+// - close price
+// - percent gain
+// - number of days held
+// - max gain
+// - max drawdown
+type TradeOutcome = {
+    signal:GapStudyOutput.Row
+    opened:DateTimeOffset
+    openPrice:decimal
+    closed:DateTimeOffset
+    closePrice:decimal
+    percentGain:decimal
+    numberOfDaysHeld:int
+}
+
+module TradingStrategies =
+    let buyAndHoldStrategy (prices:PriceBars) numberOfDaysToHold (signal:GapStudyOutput.Row) =
+        // we will buy this stock at the open price of the next day
+        
+        // find the next day
+        let openDay, openDayIndex =
+            match signal.Date.AddDays(1) |> prices.TryFindByDate with
+            | None -> signal.Date |> prices.TryFindByDate |> Option.get // if we can't find the next day, then just open at the signal date
+            | Some openDay -> openDay
+        
+        // find the close day
+        let closeBar =
+            match numberOfDaysToHold with
+            | None -> prices.Last
+            | Some numberOfDaysToHold ->
+                let closeDayIndex = openDayIndex + numberOfDaysToHold
+                match closeDayIndex with
+                | x when x >= prices.Length -> prices.Last
+                | _ -> prices.Bars[closeDayIndex]
+        
+        let openPrice = openDay.Open
+        let closePrice = closeBar.Close
+        
+        // calculate gain percentage
+        let gain = (closePrice - openPrice) / openPrice * 100m
+        
+        let daysHeld = closeBar.Date - openDay.Date
+        
+        {
+            signal = signal
+            opened = openDay.Date
+            openPrice = openPrice
+            closed = closeBar.Date
+            closePrice = closeBar.Close
+            percentGain = gain
+            numberOfDaysHeld = daysHeld.TotalDays |> int
+        }
+
+let summarizeTradeOutcomes name winnersAndLosers =
+    
+    let winners = winnersAndLosers |> fst
+    let losers = winnersAndLosers |> snd
+    
+    let numberOfWinners = winners |> Array.length
+    let numberOfLosers = losers |> Array.length
+    
+    let totalWinners = winners |> Array.sumBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
+    let totalLosers = losers |> Array.sumBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
+    
+    let averageWinner = totalWinners / decimal numberOfWinners
+    let averageLoser = totalLosers / decimal numberOfLosers
+    
+    let averageGain = (totalWinners + totalLosers) / decimal (numberOfWinners + numberOfLosers)
+    
+    let maxGain = winners |> Array.maxBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
+    let maxLoss = losers |> Array.minBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
+    
+    printfn $"Strategy: %s{name}"
+    printfn $"Winners: %d{numberOfWinners}, losers: %d{numberOfLosers}, total: %d{numberOfWinners + numberOfLosers}"
+    printfn $"Winning %%: %f{decimal numberOfWinners / decimal (numberOfWinners + numberOfLosers) * 100m}"
+    printfn $"Average winner: %f{averageWinner}, average loser: %f{averageLoser}"
+    printfn $"Average gain: %f{averageGain}"
+    printfn $"Max gain: %A{maxGain}"
+    printfn $"Max loss: %A{maxLoss}"
+    printfn ""
+    
+let runStrategy strategy dataWithPriceBars =
+    dataWithPriceBars
+    |> Seq.map(fun (r, prices) ->
+        let tradeOutcome = strategy prices r
+        tradeOutcome
+    )
+    
 let runTrades matchedInputFilename (priceFunc:string -> PriceBars) =
     
-    let data =
-         matchedInputFilename
-         |> parseOutput
-         |> verifyRecords
-         |> describeRecords
+    let data = matchedInputFilename |> parseOutput
+    
+    data |> Seq.map (fun r -> Output r) |> describeRecords
     
     // ridiculous, sometimes input data does not have prices for the date
     // so we filter those records out
     let dataWithPriceBars =
         data
-        |> Array.map (fun r ->
-            let prices = r.ticker |> priceFunc
-            let startBar = r.date |> prices.TryFindByDate
+        |> Seq.map (fun r ->
+            let prices = r.Ticker |> priceFunc
+            let startBar = r.Date |> prices.TryFindByDate
             (r, prices, startBar)
         )
-        |> Array.choose (fun (r,prices,startBar) ->
+        |> Seq.choose (fun (r,prices,startBar) ->
             match startBar with
             | None -> None
-            | Some startBar -> Some (r, prices, startBar)
+            | Some _ -> Some (r, prices)
         )
     
     printfn "Ensured that data has prices"
     
-    dataWithPriceBars |> Array.map (fun (r, _, _) -> r) |> describeRecords |> ignore
+    dataWithPriceBars |> Seq.map fst |> Seq.map Output |> describeRecords
        
-    printfn "Executing trades... not implemented"
+    printfn "Executing trades..."
     
-    ()
+    let strategies = [
+        "5 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 5))
+        "10 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 10))
+        "30 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 30))
+        "60 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 60))
+        "90 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 90))
+        "Hold Until End", (fun prices -> TradingStrategies.buyAndHoldStrategy prices None)
+    ]
     
+    let allOutcomes =
+        strategies
+        |> Seq.map (fun (name, strategy) ->
+            let outcomes = runStrategy strategy dataWithPriceBars  
+            (name, outcomes)
+        )
+        
+    allOutcomes
+    
+    
+let saveOutcomes (outputPath:string) outcomes =
+    
+    let rows =
+        outcomes
+        |> Seq.map (fun (name, outcomes) ->
+            let rows =
+                outcomes
+                |> Seq.map (fun outcome ->
+                    TradeOutcomeOutput.Row(
+                        strategy=name,
+                        ticker=outcome.signal.Ticker,
+                        date=outcome.signal.Date,
+                        screenerid=outcome.signal.Screenerid,
+                        hasGapUp=outcome.signal.HasGapUp,
+                        opened=outcome.opened.DateTime,
+                        openPrice=outcome.openPrice,
+                        closed=outcome.closed.DateTime,
+                        closePrice=outcome.closePrice,
+                        percentGain=outcome.percentGain,
+                        numberOfDaysHeld=outcome.numberOfDaysHeld
+                    )
+                )
+            rows
+        )
+        |> Seq.concat
+        
+    let csvOutput = new TradeOutcomeOutput(rows)
+    csvOutput.Save outputPath
