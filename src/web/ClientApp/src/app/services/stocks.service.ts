@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
+import {tap} from "rxjs/operators";
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -309,19 +310,31 @@ export class StocksService {
   }
 
   brokerageBuy(obj:brokerageordercommand) : Observable<any> {
-		return this.http.post('/api/brokerage/buy', obj)
+    this.brokerageAccountData = null
+    return this.http.post('/api/brokerage/buy', obj)
 	}
 
   brokerageSell(obj:brokerageordercommand) : Observable<any> {
-		return this.http.post('/api/brokerage/sell', obj)
+    this.brokerageAccountData = null
+    return this.http.post('/api/brokerage/sell', obj)
 	}
 
   brokerageCancelOrder(orderId:string) : Observable<any> {
+    this.brokerageAccountData = null
     return this.http.delete('/api/brokerage/orders/' + orderId)
   }
 
+  // TODO: remove this caching approach once we figure out how
+  // orders component can get orders passed to it instead of
+  // going out to get it itself
+  private brokerageAccountData:BrokerageAccount = null
   brokerageAccount() : Observable<BrokerageAccount> {
-    return this.http.get<BrokerageAccount>('/api/brokerage/account')
+    if (this.brokerageAccountData) {
+      return of(this.brokerageAccountData)
+    }
+    return this.http.get<BrokerageAccount>('/api/brokerage/account').pipe(
+      tap(data => this.brokerageAccountData = data),
+    )
   }
 
   search(term: string): Observable<StockSearchResult[]> {
