@@ -8,12 +8,18 @@ open web
 
 let mutable host = null
 let mutable logger : ILogger = null
-let mutable studiesDirectory = null
+let mutable private commandLine:string[] = null
+
+let studiesDirectory() =
+    commandLine |> Array.tryFindIndex (fun arg -> arg = "-d") |> Option.map (fun i -> commandLine[i+1])
+
+let hasArgument switch = commandLine |> Array.exists (fun arg -> arg = switch)
 
 let init args =
     
     // print args
     args |> Array.iter (fun arg -> printfn $"%s{arg}")
+    commandLine <- args
     
     // set up logging
     let verbose = args |> Array.contains "-v"
@@ -25,16 +31,6 @@ let init args =
     )
     logger <- loggerFactory.CreateLogger("study")
     
-    // find studies directory, it's passed in the arguments as -d directoryPath
-    let studiesDir = args |> Array.tryFindIndex (fun arg -> arg = "-d") |> Option.map (fun i -> args.[i+1])
-    match studiesDir with
-    | Some dir -> 
-        logger.LogInformation($"Using studies directory: {dir}")
-        studiesDirectory <- dir
-    | None ->
-        logger.LogError("No studies directory specified, use -d directoryPath")
-        exit 1
-
     let builder = Host.CreateApplicationBuilder args
      
     DIHelper.RegisterServices(
