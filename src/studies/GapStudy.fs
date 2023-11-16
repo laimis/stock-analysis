@@ -13,7 +13,8 @@ let private earliestYear = 2020
 [<Literal>]
 let private latestYear = 2024
 
-type StudyInput = CsvProvider<Schema = "ticker (string), date (date), screenerid (int)", HasHeaders=false>
+type StudyInput = CsvProvider<Sample = "date (date), ticker (string), screenerid (int)", HasHeaders=true>
+
 type GapStudyOutput =
     CsvProvider<
         Schema = "ticker (string), date (date), screenerid (int), hasGapUp (bool)",
@@ -32,10 +33,12 @@ type TradeSummary = {
     Winners:int
     Losers:int
     WinPct:decimal
-    AvgGain:decimal
+    AvgWin:decimal
     AvgLoss:decimal
     AvgGainLoss:decimal
     EV:decimal
+    Gains:decimal seq
+    GainDistribution:core.fs.Services.Analysis.DistributionStatistics
 }
 
 let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
@@ -46,11 +49,14 @@ let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
     let numberOfWinners = winners |> Seq.length
     let numberOfLosers = losers |> Seq.length
     let win_pct = decimal numberOfWinners / decimal total
-    let avg_gain = winners |> Seq.averageBy (fun o -> o.PercentGain)
+    let avg_win = winners |> Seq.averageBy (fun o -> o.PercentGain)
     let avg_loss = losers |> Seq.averageBy (fun o -> o.PercentGain)
-    let avg_gain_loss = avg_gain / avg_loss |> Math.Abs
-    let ev = win_pct * avg_gain - (1m - win_pct) * (avg_loss |> Math.Abs)
+    let avg_gain_loss = avg_win / avg_loss |> Math.Abs
+    let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> Math.Abs)
 
+    let gains = outcomes |> Seq.map (fun o -> o.PercentGain)
+    let gainDistribution = core.fs.Services.Analysis.DistributionStatistics.calculate gains
+    
     // return trade summary
     {
         StrategyName = strategyName
@@ -58,10 +64,12 @@ let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
         Winners = numberOfWinners
         Losers = numberOfLosers
         WinPct = win_pct
-        AvgGain = avg_gain
+        AvgWin = avg_win
         AvgLoss = avg_loss
         AvgGainLoss = avg_gain_loss
         EV = ev
+        Gains = gains
+        GainDistribution = gainDistribution 
     }
 
 

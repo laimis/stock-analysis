@@ -151,7 +151,7 @@ module AnalysisOutcomeEvaluationScoringHelper =
 
 module Histogram =
     // by default number of buckets should be 21
-    let calculate (numbers:decimal array) (min:decimal) max numberOfBuckets : array<ValueWithFrequency> =
+    let calculate (numbers:decimal seq) (min:decimal) max numberOfBuckets : array<ValueWithFrequency> =
         
         let bucketSize = (max - min) / decimal(numberOfBuckets)
         
@@ -175,7 +175,7 @@ module Histogram =
                 |> List.map (fun i -> {value = min + (decimal(i) * bucketSize); frequency = 0})
             )
         numbers
-        |> Array.iter ( fun n ->
+        |> Seq.iter ( fun n ->
             if n > result[result.Count - 1].value then
                 result[result.Count - 1] <- {value = result[result.Count - 1].value; frequency = result[result.Count - 1].frequency + 1}
             else
@@ -199,9 +199,9 @@ type DistributionStatistics =
     }
     
 module DistributionStatistics =
-    let calculate (numbers:decimal array) =
-       
-        if numbers.Length = 0 then
+    let calculate (numbers:decimal seq) =
+        
+        if numbers |> Seq.isEmpty then
             {
                 count = 0m
                 kurtosis = 0m
@@ -214,26 +214,27 @@ module DistributionStatistics =
                 buckets = [||] 
             }
         else
-            let mean = System.Math.Round(numbers |> Array.average, 2)
-            let min = System.Math.Round(numbers |> Array.min, 2)
-            let max = System.Math.Round(numbers |> Array.max, 2)
+            let length = numbers |> Seq.length
+            let mean = System.Math.Round(numbers |> Seq.average, 2)
+            let min = System.Math.Round(numbers |> Seq.min, 2)
+            let max = System.Math.Round(numbers |> Seq.max, 2)
             
             let median =
                 System.Math.Round(
                 numbers
-                |> Array.sort
-                |> Array.skip (numbers.Length / 2)
-                |> Array.head,
+                |> Seq.sort
+                |> Seq.skip (length / 2)
+                |> Seq.head,
                 2)
             
-            let count = numbers.Length
+            let count = length
             
             let stdDevDouble =
                 System.Math.Round(
                 numbers
-                |> Array.map (fun x -> System.Math.Pow(double(x - mean), 2))
-                |> Array.sum
-                |> fun x -> x / ((numbers.Length - 1) |> float)
+                |> Seq.map (fun x -> System.Math.Pow(double(x - mean), 2))
+                |> Seq.sum
+                |> fun x -> x / ((length - 1) |> float)
                 |> System.Math.Sqrt,
                 2)
             
@@ -246,8 +247,8 @@ module DistributionStatistics =
                     
             let skewnessDouble =
                 numbers
-                |> Array.map (fun x -> System.Math.Pow(double(x - mean), 3))
-                |> Array.sum
+                |> Seq.map (fun x -> System.Math.Pow(double(x - mean), 3))
+                |> Seq.sum
                 |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 3)
                 
             
@@ -260,8 +261,8 @@ module DistributionStatistics =
             
             let kurtosisDouble = 
                 numbers
-                |> Array.map (fun x -> System.Math.Pow(double(x - mean), 4))
-                |> Array.sum
+                |> Seq.map (fun x -> System.Math.Pow(double(x - mean), 4))
+                |> Seq.sum
                 |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 4) - 3.0
             
             let kurtosis = 
