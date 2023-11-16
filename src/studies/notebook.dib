@@ -1,0 +1,106 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":[],"languageName":"fsharp","name":"fsharp"}]}}
+
+#!fsharp
+
+#r "./bin/Debug/net7.0/studies.dll"
+#r "nuget:FSharp.Data"
+
+#!fsharp
+
+open FSharp.Data
+
+let trade_csv = "d:\\studies\\03_export_date_ticker_screenerid_gap_outcomes.csv"
+
+let csv = studies.GapStudy.parseTradeOutcomes trade_csv
+
+#!fsharp
+
+type TradeSummary = {
+    StrategyName:string
+    Total:int
+    Winners:int
+    Losers:int
+    WinPct:decimal
+    AvgGain:decimal
+    AvgLoss:decimal
+    AvgGainLoss:decimal
+    EV:decimal
+}
+
+let summarize strategyName (outcomes:studies.GapStudy.TradeOutcomeOutput.Row seq) =
+    // summarize the outcomes
+    let total = outcomes |> Seq.length
+    let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
+    let losers = outcomes |> Seq.filter (fun o -> o.PercentGain < 0m)
+    let numberOfWinners = winners |> Seq.length
+    let numberOfLosers = losers |> Seq.length
+    let win_pct = decimal numberOfWinners / decimal total
+    let avg_gain = winners |> Seq.averageBy (fun o -> o.PercentGain)
+    let avg_loss = losers |> Seq.averageBy (fun o -> o.PercentGain)
+    let avg_gain_loss = avg_gain / avg_loss |> Math.Abs
+    let ev = win_pct * avg_gain - (1m - win_pct) * (avg_loss |> Math.Abs)
+
+    // return trade summary
+    {
+        StrategyName = strategyName
+        Total = total
+        Winners = numberOfWinners
+        Losers = numberOfLosers
+        WinPct = win_pct
+        AvgGain = avg_gain
+        AvgLoss = avg_loss
+        AvgGainLoss = avg_gain_loss
+        EV = ev
+    }
+
+let outputSummary summary = 
+
+    // nicely formatted one line summary starting with trade name:
+    printfn "%s: %i trades, %i winners, %i losers, %.2f%% win pct, %.2f%% avg gain, %.2f%% avg loss, %.2f avg gain/loss, %.2f EV" 
+        summary.StrategyName summary.Total summary.Winners summary.Losers (summary.WinPct * 100m) (summary.AvgGain) (summary.AvgLoss) summary.AvgGainLoss summary.EV
+
+#!fsharp
+
+let filterNamePairs = [
+    ("All", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> true)
+    ("New Highs", fun o -> o.Screenerid = 28)
+    ("Top Gainers", fun o -> o.Screenerid = 29)
+    ("Gap ups", fun o -> o.HasGapUp)
+    ("Gap ups - new highs", fun o -> o.HasGapUp && o.Screenerid = 28)
+    ("Gap ups - top gainers", fun o -> o.HasGapUp && o.Screenerid = 29)
+]
+
+let strategies = csv |> Seq.groupBy (fun t -> t.Strategy) // all strategies, no filters
+
+let summaries =
+    strategies |> Seq.collect (fun (name,outcomes) ->
+        filterNamePairs |> Seq.map (fun (filterName, filter) ->
+            let filtered = outcomes |> Seq.filter filter
+            (sprintf "%s - %s" name filterName, filtered)
+        )
+    )
+    |> Seq.map (fun (name, outcomes) ->
+        summarize name outcomes
+    )
+// output the strategy names
+summaries
+|> Seq.sortByDescending (fun s -> s.EV)
+|> Seq.iter outputSummary
+
+#!fsharp
+
+strategies
+|> Seq.iter (fun (name, outcomes) ->
+    let newHighs = outcomes |> Seq.filter (fun o -> o.HasGapUp = true)
+    summarize (sprintf "%s - gap ups only" name) newHighs
+)
+
+#!fsharp
+
+strategies
+|> Seq.iter (fun (name, outcomes) ->
+    let newHighs = outcomes |> Seq.filter (fun o -> o.HasGapUp = true && o.Screenerid = 28)
+    summarize (sprintf "%s - new high, w/ gap ups" name) newHighs
+)
