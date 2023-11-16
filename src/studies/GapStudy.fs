@@ -224,43 +224,7 @@ let runTrades matchedInputFilename (priceFunc:string -> PriceBars) =
     
     dataWithPriceBars |> Array.map (fun (r, _, _) -> r) |> describeRecords |> ignore
        
-    let pl =
-        dataWithPriceBars
-        |> Array.map (fun (r, prices, startBar) ->
-            
-            let endBar7 = r.date.AddDays(7) |> prices.TryFindByDate
-            let endBar30 = r.date.AddDays(30) |> prices.TryFindByDate
-            let endBar60 = r.date.AddDays(60) |> prices.TryFindByDate
-            let endBar90 = r.date.AddDays(90) |> prices.TryFindByDate
-            
-            let pl7 = match endBar7 with | Some endBar7 -> endBar7.Close - startBar.Close |> Some | None -> None
-            let pl30 = match endBar30 with | Some endBar30 -> endBar30.Close - startBar.Close |> Some | None -> None
-            let pl60 = match endBar60 with | Some endBar60 -> endBar60.Close - startBar.Close |> Some | None -> None
-            let pl90 = match endBar90 with | Some endBar90 -> endBar90.Close - startBar.Close |> Some | None -> None
-            
-            (r, pl7, pl30, pl60, pl90)
-        )
-        
-    // number of records with pl > 0
-    let pl7 = pl |> Array.choose (fun (r, pl7, _, _, _) -> match pl7 with | Some pl7 -> Some (r, pl7) | None -> None)  |> Array.partition (fun (_, pl7) -> pl7 > 0m)
-    let pl30 = pl |> Array.choose (fun (r, _, pl30, _, _) -> match pl30 with | Some pl30 -> Some (r, pl30) | None -> None)  |> Array.partition (fun (_, pl30) -> pl30 > 0m)
-    let pl60 = pl |> Array.choose (fun (r, _, _, pl60, _) -> match pl60 with | Some pl60 -> Some (r, pl60) | None -> None)  |> Array.partition (fun (_, pl60) -> pl60 > 0m)
-    let pl90 = pl |> Array.choose (fun (r, _, _, _, pl90) -> match pl90 with | Some pl90 -> Some (r, pl90) | None -> None)  |> Array.partition (fun (_, pl90) -> pl90 > 0m)
+    printfn "Executing trades... not implemented"
     
-    let describeOutcome label plSection =
-        let wins = plSection |> fst
-        let losses = plSection |> snd
-        
-        let winGains = wins |> Array.map (fun (_, pl) -> pl) |> Array.sum
-        let lossGains = losses |> Array.map (fun (_, pl) -> pl) |> Array.sum
-        
-        printfn $"{label} positive: %d{wins |> Array.length}, %f{float (wins |> Array.length) / float pl.Length}"
-        printfn $"{label} win gains: %f{winGains}"
-        printfn $"{label} loss gains: %f{lossGains}"
-        printfn ""
-    
-    pl7 |> describeOutcome "PL7"
-    pl30 |> describeOutcome "PL30"
-    pl60 |> describeOutcome "PL60"
-    pl90 |> describeOutcome "PL90"
+    ()
     
