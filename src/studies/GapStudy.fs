@@ -23,9 +23,47 @@ type GapStudyOutput =
 type TradeOutcomeOutput =
     CsvProvider<
         Sample = "strategy (string), ticker (string), date (date), screenerid (int), hasGapUp (bool), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
-        // Schema = "strategy (string), ticker (string), date (date), screenerid (int), hasGapUp (bool), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
         HasHeaders=true
     >
+
+type TradeSummary = {
+    StrategyName:string
+    Total:int
+    Winners:int
+    Losers:int
+    WinPct:decimal
+    AvgGain:decimal
+    AvgLoss:decimal
+    AvgGainLoss:decimal
+    EV:decimal
+}
+
+let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
+    // summarize the outcomes
+    let total = outcomes |> Seq.length
+    let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
+    let losers = outcomes |> Seq.filter (fun o -> o.PercentGain < 0m)
+    let numberOfWinners = winners |> Seq.length
+    let numberOfLosers = losers |> Seq.length
+    let win_pct = decimal numberOfWinners / decimal total
+    let avg_gain = winners |> Seq.averageBy (fun o -> o.PercentGain)
+    let avg_loss = losers |> Seq.averageBy (fun o -> o.PercentGain)
+    let avg_gain_loss = avg_gain / avg_loss |> Math.Abs
+    let ev = win_pct * avg_gain - (1m - win_pct) * (avg_loss |> Math.Abs)
+
+    // return trade summary
+    {
+        StrategyName = strategyName
+        Total = total
+        Winners = numberOfWinners
+        Losers = numberOfLosers
+        WinPct = win_pct
+        AvgGain = avg_gain
+        AvgLoss = avg_loss
+        AvgGainLoss = avg_gain_loss
+        EV = ev
+    }
+
 
 let parseInput (filepath:string) = StudyInput.Load(filepath).Rows
 let parseOutput (filepath:string) = GapStudyOutput.Load(filepath).Rows
@@ -190,28 +228,14 @@ let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> Dat
     csvOutput.Save outputFilename
 }
 
-// - opened date
-// - open price
-// - closed date
-// - close price
-// - percent gain
-// - number of days held
-// - max gain
-// - max drawdown
-type TradeOutcome = {
-    signal:GapStudyOutput.Row
-    opened:DateTimeOffset
-    openPrice:decimal
-    closed:DateTimeOffset
-    closePrice:decimal
-    percentGain:decimal
-    numberOfDaysHeld:int
-}
-
 module TradingStrategies =
-    let buyAndHoldStrategy (prices:PriceBars) numberOfDaysToHold (signal:GapStudyOutput.Row) =
+    let buyAndHoldStrategy (prices:PriceBars) numberOfBarsToHold (signal:GapStudyOutput.Row) =
         // we will buy this stock at the open price of the next day
-        
+        let name =
+            match numberOfBarsToHold with
+            | None -> "Buy and Hold"
+            | Some numberOfDaysToHold -> $"Buy and Hold {numberOfDaysToHold} bars"
+            
         // find the next day
         let openDay, openDayIndex =
             match signal.Date.AddDays(1) |> prices.TryFindByDate with
@@ -220,7 +244,7 @@ module TradingStrategies =
         
         // find the close day
         let closeBar =
-            match numberOfDaysToHold with
+            match numberOfBarsToHold with
             | None -> prices.Last
             | Some numberOfDaysToHold ->
                 let closeDayIndex = openDayIndex + numberOfDaysToHold
@@ -236,43 +260,19 @@ module TradingStrategies =
         
         let daysHeld = closeBar.Date - openDay.Date
         
-        {
-            signal = signal
-            opened = openDay.Date
-            openPrice = openPrice
-            closed = closeBar.Date
-            closePrice = closeBar.Close
-            percentGain = gain
-            numberOfDaysHeld = daysHeld.TotalDays |> int
-        }
-
-let summarizeTradeOutcomes name winnersAndLosers =
-    
-    let winners = winnersAndLosers |> fst
-    let losers = winnersAndLosers |> snd
-    
-    let numberOfWinners = winners |> Array.length
-    let numberOfLosers = losers |> Array.length
-    
-    let totalWinners = winners |> Array.sumBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
-    let totalLosers = losers |> Array.sumBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
-    
-    let averageWinner = totalWinners / decimal numberOfWinners
-    let averageLoser = totalLosers / decimal numberOfLosers
-    
-    let averageGain = (totalWinners + totalLosers) / decimal (numberOfWinners + numberOfLosers)
-    
-    let maxGain = winners |> Array.maxBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
-    let maxLoss = losers |> Array.minBy (fun (_, tradeOutcome) -> tradeOutcome.percentGain)
-    
-    printfn $"Strategy: %s{name}"
-    printfn $"Winners: %d{numberOfWinners}, losers: %d{numberOfLosers}, total: %d{numberOfWinners + numberOfLosers}"
-    printfn $"Winning %%: %f{decimal numberOfWinners / decimal (numberOfWinners + numberOfLosers) * 100m}"
-    printfn $"Average winner: %f{averageWinner}, average loser: %f{averageLoser}"
-    printfn $"Average gain: %f{averageGain}"
-    printfn $"Max gain: %A{maxGain}"
-    printfn $"Max loss: %A{maxLoss}"
-    printfn ""
+        TradeOutcomeOutput.Row(
+            strategy=name,
+            ticker=signal.Ticker,
+            date=signal.Date,
+            screenerid=signal.Screenerid,
+            hasGapUp=signal.HasGapUp,
+            opened=openDay.Date.DateTime,
+            openPrice=openPrice,
+            closed=closeBar.Date.DateTime,
+            closePrice=closePrice,
+            percentGain=gain,
+            numberOfDaysHeld=(daysHeld.TotalDays |> int)
+        )
     
 let runStrategy strategy dataWithPriceBars =
     dataWithPriceBars
@@ -309,49 +309,26 @@ let runTrades matchedInputFilename (priceFunc:string -> PriceBars) =
     printfn "Executing trades..."
     
     let strategies = [
-        "5 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 5))
-        "10 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 10))
-        "30 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 30))
-        "60 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 60))
-        "90 Bars", (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 90))
-        "Hold Until End", (fun prices -> TradingStrategies.buyAndHoldStrategy prices None)
+        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 5))
+        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 10))
+        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 30))
+        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 60))
+        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 90))
+        (fun prices -> TradingStrategies.buyAndHoldStrategy prices None)
     ]
     
     let allOutcomes =
         strategies
-        |> Seq.map (fun (name, strategy) ->
+        |> Seq.map (fun strategy ->
             let outcomes = runStrategy strategy dataWithPriceBars  
-            (name, outcomes)
+            outcomes
         )
+        |> Seq.concat
         
     allOutcomes
     
     
-let saveOutcomes (outputPath:string) outcomes =
+let saveOutcomes (outputPath:string) outcomesByStrategy =
     
-    let rows =
-        outcomes
-        |> Seq.map (fun (name, outcomes) ->
-            let rows =
-                outcomes
-                |> Seq.map (fun outcome ->
-                    TradeOutcomeOutput.Row(
-                        strategy=name,
-                        ticker=outcome.signal.Ticker,
-                        date=outcome.signal.Date,
-                        screenerid=outcome.signal.Screenerid,
-                        hasGapUp=outcome.signal.HasGapUp,
-                        opened=outcome.opened.DateTime,
-                        openPrice=outcome.openPrice,
-                        closed=outcome.closed.DateTime,
-                        closePrice=outcome.closePrice,
-                        percentGain=outcome.percentGain,
-                        numberOfDaysHeld=outcome.numberOfDaysHeld
-                    )
-                )
-            rows
-        )
-        |> Seq.concat
-        
-    let csvOutput = new TradeOutcomeOutput(rows)
+    let csvOutput = new TradeOutcomeOutput(outcomesByStrategy)
     csvOutput.Save outputPath

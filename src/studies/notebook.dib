@@ -17,45 +17,7 @@ let csv = studies.GapStudy.parseTradeOutcomes trade_csv
 
 #!fsharp
 
-type TradeSummary = {
-    StrategyName:string
-    Total:int
-    Winners:int
-    Losers:int
-    WinPct:decimal
-    AvgGain:decimal
-    AvgLoss:decimal
-    AvgGainLoss:decimal
-    EV:decimal
-}
-
-let summarize strategyName (outcomes:studies.GapStudy.TradeOutcomeOutput.Row seq) =
-    // summarize the outcomes
-    let total = outcomes |> Seq.length
-    let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
-    let losers = outcomes |> Seq.filter (fun o -> o.PercentGain < 0m)
-    let numberOfWinners = winners |> Seq.length
-    let numberOfLosers = losers |> Seq.length
-    let win_pct = decimal numberOfWinners / decimal total
-    let avg_gain = winners |> Seq.averageBy (fun o -> o.PercentGain)
-    let avg_loss = losers |> Seq.averageBy (fun o -> o.PercentGain)
-    let avg_gain_loss = avg_gain / avg_loss |> Math.Abs
-    let ev = win_pct * avg_gain - (1m - win_pct) * (avg_loss |> Math.Abs)
-
-    // return trade summary
-    {
-        StrategyName = strategyName
-        Total = total
-        Winners = numberOfWinners
-        Losers = numberOfLosers
-        WinPct = win_pct
-        AvgGain = avg_gain
-        AvgLoss = avg_loss
-        AvgGainLoss = avg_gain_loss
-        EV = ev
-    }
-
-let outputSummary summary = 
+let outputSummary (summary:studies.GapStudy.TradeSummary) = 
 
     // nicely formatted one line summary starting with trade name:
     printfn "%s: %i trades, %i winners, %i losers, %.2f%% win pct, %.2f%% avg gain, %.2f%% avg loss, %.2f avg gain/loss, %.2f EV" 
@@ -82,7 +44,7 @@ let summaries =
         )
     )
     |> Seq.map (fun (name, outcomes) ->
-        summarize name outcomes
+        studies.GapStudy.summarize name outcomes
     )
 // output the strategy names
 summaries
