@@ -74,14 +74,14 @@ public class PriceBarsTests
     public void FindByDate_ReturnsNone_WhenNotFound()
     {
         var result = _bars.TryFindByDate(DateTimeOffset.Parse("2020-01-01"));
-        Assert.True(FSharpOption<PriceBar>.get_IsNone(result));
+        Assert.True(FSharpOption<Tuple<PriceBar,int>>.get_IsNone(result));
     }
     
     [Fact]
     public void FindByDate_ReturnsSome_WhenFound()
     {
         var result = _bars.TryFindByDate(DateTimeOffset.Parse("2020-11-30"));
-        Assert.True(FSharpOption<PriceBar>.get_IsSome(result));
-        Assert.Equal("2020-11-30", result.Value.DateStr);
+        Assert.True(FSharpOption<Tuple<PriceBar,int>>.get_IsSome(result));
+        Assert.Equal("2020-11-30", result.Value.Item1.DateStr);
     }
 }
