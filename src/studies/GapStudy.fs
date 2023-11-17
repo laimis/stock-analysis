@@ -6,36 +6,7 @@ open core.fs.Services.GapAnalysis
 open core.fs.Shared.Adapters.Stocks
 open studies.Types
 
-let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
-    // summarize the outcomes
-    let total = outcomes |> Seq.length
-    let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
-    let losers = outcomes |> Seq.filter (fun o -> o.PercentGain < 0m)
-    let numberOfWinners = winners |> Seq.length
-    let numberOfLosers = losers |> Seq.length
-    let win_pct = decimal numberOfWinners / decimal total
-    let avg_win = winners |> Seq.averageBy (fun o -> o.PercentGain)
-    let avg_loss = losers |> Seq.averageBy (fun o -> o.PercentGain)
-    let avg_gain_loss = avg_win / avg_loss |> Math.Abs
-    let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> Math.Abs)
 
-    let gains = outcomes |> Seq.map (fun o -> o.PercentGain)
-    let gainDistribution = core.fs.Services.Analysis.DistributionStatistics.calculate gains
-    
-    // return trade summary
-    {
-        StrategyName = strategyName
-        Total = total
-        Winners = numberOfWinners
-        Losers = numberOfLosers
-        WinPct = win_pct
-        AvgWin = avg_win
-        AvgLoss = avg_loss
-        AvgGainLoss = avg_gain_loss
-        EV = ev
-        Gains = gains
-        GainDistribution = gainDistribution 
-    }
 
 let parseTradeOutcomes (filepath:string) = TradeOutcomeOutput.Load(filepath).Rows
 
@@ -67,40 +38,6 @@ let verifyRecords (input:StudyInput) =
     | true -> ()
     
     records
-
-type Unified =
-    | Input of StudyInput.Row
-    | Output of GapStudyOutput.Row
-    
-let describeRecords (records:Unified seq) =
-    
-    let getDate unified =
-        match unified with
-        | Input row -> row.Date
-        | Output row -> row.Date
-        
-    let getTicker unified =
-        match unified with
-        | Input row -> row.Ticker
-        | Output row -> row.Ticker
-        
-    let getScreenerId unified =
-        match unified with
-        | Input row -> row.Screenerid
-        | Output row -> row.Screenerid
-    
-    let numberOfRecords = records |> Seq.length
-    let dates = records |> Seq.map (fun r -> r |> getDate) |> Seq.distinct |> Seq.length
-    let tickers = records |> Seq.map (fun r -> r |> getTicker) |> Seq.distinct |> Seq.length
-    let screenerIds = records |> Seq.map (fun r -> r |> getScreenerId) |> Seq.distinct |> Seq.length
-    
-    let minimumDate = records |> Seq.minBy (fun r -> r |> getDate) |> getDate
-    let maximumDate = records |> Seq.maxBy (fun r -> r |> getDate) |> getDate
-    
-    printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
-    printfn $"Minimum date: %A{minimumDate.Date}"
-    printfn $"Maximum date: %A{maximumDate.Date}"
-    printfn ""
     
 let getEarliestDateByTicker (records:StudyInput.Row seq) =
     
@@ -119,7 +56,7 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
         |> verifyRecords
         
     // describe records
-    records |> Seq.map (fun r -> Input r) |> describeRecords
+    records |> Seq.map (fun r -> Input r) |> Unified.describeRecords
         
     // generate a pair of ticker and the earliest data it is seen
     let tickerDatePairs = records |> getEarliestDateByTicker
@@ -198,63 +135,3 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
     let csvOutput = new GapStudyOutput(rows)
     csvOutput.Save outputFilename
 }
-    
-let runTrades (matchedInputFilename:string) (priceFunc:string -> Async<PriceBars>) = async {
-    
-    let data =
-        matchedInputFilename
-        |> GapStudyOutput.Load
-        |> fun x -> x.Rows
-    
-    data |> Seq.map Output |> describeRecords
-    
-    // ridiculous, sometimes data provider does not have prices for the date
-    // so we filter those records out
-    let! asyncData =
-        data
-        |> Seq.map (fun r -> async {
-            let! prices = r.Ticker |> priceFunc
-            let startBar = r.Date |> prices.TryFindByDate
-            return (r, prices, startBar)   
-        })
-        |> Async.Parallel
-        
-    let signalsWithPriceBars =
-        asyncData
-        |> Seq.choose (fun (r,prices,startBar) ->
-            match startBar with
-            | None -> None
-            | Some _ -> Some (r, prices)
-        )
-    
-    printfn "Ensured that data has prices"
-    
-    signalsWithPriceBars |> Seq.map fst |> Seq.map Output |> describeRecords
-       
-    printfn "Executing trades..."
-    
-    let strategies = [
-        TradingStrategies.buyAndHoldStrategy (Some 5)
-        TradingStrategies.buyAndHoldStrategy (Some 10)
-        TradingStrategies.buyAndHoldStrategy (Some 30)
-        TradingStrategies.buyAndHoldStrategy (Some 60)
-        TradingStrategies.buyAndHoldStrategy (Some 90)
-        TradingStrategies.buyAndHoldStrategy None
-    ]
-    
-    let allOutcomes =
-        signalsWithPriceBars
-        |> Seq.map (fun signalWithPriceBars ->
-            strategies |> Seq.map (fun strategy ->
-                strategy signalWithPriceBars
-            )
-        )
-        |> Seq.concat
-        
-    return allOutcomes
-}
-    
-let saveOutcomes (outputPath:string) outcomesByStrategy =
-    
-    let csvOutput = new TradeOutcomeOutput(outcomesByStrategy)
-    csvOutput.Save outputPath
