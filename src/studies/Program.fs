@@ -25,16 +25,18 @@ let tradeOutcomesFilename = $"{studiesDirectory}\\03_export_date_ticker_screener
 let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
 let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
 
-match ServiceHelper.hasArgument "-s" with
-| true ->
-    printfn "Running study"
-    GapStudy.study inputFilename outputFilename getPricesWithBrokerage |> Async.RunSynchronously
-| false ->
-    ()
+let actions = [
+    if ServiceHelper.hasArgument "-s" then fun () -> async {
+            do! GapStudy.study inputFilename outputFilename getPricesWithBrokerage
+        }
+    if ServiceHelper.hasArgument "-t" then fun () -> async {
+            let outcomes = GapStudy.runTrades outputFilename getPricesFromCsv
+            outcomes |> GapStudy.saveOutcomes tradeOutcomesFilename
+        }
+]
 
-match ServiceHelper.hasArgument "-t" with
-| true -> 
-    let outcomes = GapStudy.runTrades outputFilename getPricesFromCsv
-    outcomes |> GapStudy.saveOutcomes tradeOutcomesFilename
-| false ->
-    ()
+actions
+    |> List.map (fun a -> a())
+    |> Async.Sequential
+    |> Async.RunSynchronously
+    |> ignore
