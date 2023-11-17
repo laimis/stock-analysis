@@ -199,13 +199,6 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
     csvOutput.Save outputFilename
 }
     
-let runStrategy strategy dataWithPriceBars =
-    dataWithPriceBars
-    |> Seq.map(fun (r, prices) ->
-        let tradeOutcome = strategy prices r
-        tradeOutcome
-    )
-    
 let runTrades (matchedInputFilename:string) (priceFunc:string -> Async<PriceBars>) = async {
     
     let data =
@@ -226,7 +219,7 @@ let runTrades (matchedInputFilename:string) (priceFunc:string -> Async<PriceBars
         })
         |> Async.Parallel
         
-    let dataWithPriceBars =
+    let signalsWithPriceBars =
         asyncData
         |> Seq.choose (fun (r,prices,startBar) ->
             match startBar with
@@ -236,24 +229,25 @@ let runTrades (matchedInputFilename:string) (priceFunc:string -> Async<PriceBars
     
     printfn "Ensured that data has prices"
     
-    dataWithPriceBars |> Seq.map fst |> Seq.map Output |> describeRecords
+    signalsWithPriceBars |> Seq.map fst |> Seq.map Output |> describeRecords
        
     printfn "Executing trades..."
     
     let strategies = [
-        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 5))
-        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 10))
-        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 30))
-        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 60))
-        (fun prices -> TradingStrategies.buyAndHoldStrategy prices (Some 90))
-        (fun prices -> TradingStrategies.buyAndHoldStrategy prices None)
+        TradingStrategies.buyAndHoldStrategy (Some 5)
+        TradingStrategies.buyAndHoldStrategy (Some 10)
+        TradingStrategies.buyAndHoldStrategy (Some 30)
+        TradingStrategies.buyAndHoldStrategy (Some 60)
+        TradingStrategies.buyAndHoldStrategy (Some 90)
+        TradingStrategies.buyAndHoldStrategy None
     ]
     
     let allOutcomes =
-        strategies
-        |> Seq.map (fun strategy ->
-            let outcomes = runStrategy strategy dataWithPriceBars  
-            outcomes
+        signalsWithPriceBars
+        |> Seq.map (fun signalWithPriceBars ->
+            strategies |> Seq.map (fun strategy ->
+                strategy signalWithPriceBars
+            )
         )
         |> Seq.concat
         

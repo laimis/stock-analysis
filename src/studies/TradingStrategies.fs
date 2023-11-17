@@ -3,7 +3,7 @@ module studies.TradingStrategies
 open core.fs.Shared.Adapters.Stocks
 open studies.Types
 
-let buyAndHoldStrategy (prices:PriceBars) numberOfBarsToHold (signal:GapStudyOutput.Row) =
+let buyAndHoldStrategy numberOfBarsToHold (signal:GapStudyOutput.Row,prices:PriceBars) =
     // we will buy this stock at the open price of the next day
     let name =
         match numberOfBarsToHold with
