@@ -24,7 +24,7 @@ let readPricesFromCsv (path:string) = async {
         match priceCache.TryGetValue(path) with
         | true, bars -> return bars
         | false, _ ->
-            ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
+            if ServiceHelper.logger <> null then ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
             let! csv = System.IO.File.ReadAllLinesAsync(path) |> Async.AwaitTask
             let bars = csv |> Array.map PriceBar |> PriceBars
             priceCache.TryAdd(path, bars) |> ignore
