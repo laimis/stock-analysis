@@ -30,7 +30,7 @@ let actions = [
             do! GapStudy.study inputFilename outputFilename getPricesWithBrokerage
         }
     if ServiceHelper.hasArgument "-t" then fun () -> async {
-            let outcomes = GapStudy.runTrades outputFilename getPricesFromCsv
+            let! outcomes = GapStudy.runTrades outputFilename getPricesFromCsv
             outcomes |> GapStudy.saveOutcomes tradeOutcomesFilename
         }
 ]

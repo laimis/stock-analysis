@@ -1,6 +1,7 @@
 module studies.DataHelpers
 
 open System
+open System.Collections.Concurrent
 open System.Collections.Generic
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Stocks
@@ -17,24 +18,25 @@ let generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
     $"{studiesDirectory}\\{filename}"
 
-let private priceCache = Dictionary<string,PriceBars>()
+let private priceCache = ConcurrentDictionary<string,PriceBars>()
 
-let readPricesFromCsv (path:string) =
-    match priceCache.TryGetValue(path) with
-    | true, bars -> bars
-    | false, _ ->
-        ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
-        let csv = System.IO.File.ReadAllLines(path)
-        let bars = csv |> Array.map PriceBar |> PriceBars
-        priceCache.Add(path, bars)
-        bars
+let readPricesFromCsv (path:string) = async {
+        match priceCache.TryGetValue(path) with
+        | true, bars -> return bars
+        | false, _ ->
+            ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
+            let! csv = System.IO.File.ReadAllLinesAsync(path) |> Async.AwaitTask
+            let bars = csv |> Array.map PriceBar |> PriceBars
+            priceCache.TryAdd(path, bars) |> ignore
+            return bars
+    }
         
 // start / end date are here because we might be dealing with interfaces
 // that are passing dates but we always return just what we have
-let getPricesFromCsv studiesDirectory ticker =
-    let path = generatePriceCsvPath studiesDirectory ticker
-    path |> readPricesFromCsv
-  
+let getPricesFromCsv studiesDirectory ticker = async {
+        let path = generatePriceCsvPath studiesDirectory ticker
+        return! path |> readPricesFromCsv
+    }
 
 type private PriceAvailability =
     | Available
@@ -75,8 +77,13 @@ let getPricesWithBrokerage (user:User) (brokerage:IBrokerage) studiesDirectory s
         System.IO.File.WriteAllText(path, csv)
         
     match pricesAvailableOnFileSystem(path) with
-    | Available -> return path |> readPricesFromCsv |> Some
-    | NotAvailableForever -> return None
+    | Available ->
+        let! prices = path |> readPricesFromCsv
+        return prices |> Some
+        
+    | NotAvailableForever ->
+        return None
+    
     | NotAvailable ->
         try
             ServiceHelper.logger.LogInformation("Getting price history for {ticker} from {startDate} to {endDate}", ticker, startDate, endDate)

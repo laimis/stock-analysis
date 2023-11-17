@@ -140,7 +140,7 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
             let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
             return (ticker, prices)
         })
-        |> Async.Sequential
+        |> Async.Parallel
         
     let failed = results |> Array.filter (fun (_, prices) -> prices.IsNone)
     let prices =
@@ -252,7 +252,7 @@ let runStrategy strategy dataWithPriceBars =
         tradeOutcome
     )
     
-let runTrades (matchedInputFilename:string) (priceFunc:string -> PriceBars) =
+let runTrades (matchedInputFilename:string) (priceFunc:string -> Async<PriceBars>) = async {
     
     let data =
         matchedInputFilename
@@ -263,13 +263,17 @@ let runTrades (matchedInputFilename:string) (priceFunc:string -> PriceBars) =
     
     // ridiculous, sometimes input data does not have prices for the date
     // so we filter those records out
-    let dataWithPriceBars =
+    let! asyncData =
         data
-        |> Seq.map (fun r ->
-            let prices = r.Ticker |> priceFunc
+        |> Seq.map (fun r -> async {
+            let! prices = r.Ticker |> priceFunc
             let startBar = r.Date |> prices.TryFindByDate
-            (r, prices, startBar)
-        )
+            return (r, prices, startBar)   
+        })
+        |> Async.Parallel
+        
+    let dataWithPriceBars =
+        asyncData
         |> Seq.choose (fun (r,prices,startBar) ->
             match startBar with
             | None -> None
@@ -299,8 +303,8 @@ let runTrades (matchedInputFilename:string) (priceFunc:string -> PriceBars) =
         )
         |> Seq.concat
         
-    allOutcomes
-    
+    return allOutcomes
+}
     
 let saveOutcomes (outputPath:string) outcomesByStrategy =
     
