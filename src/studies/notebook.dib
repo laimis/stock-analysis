@@ -20,65 +20,55 @@ let csv = studies.GapStudy.parseTradeOutcomes trade_csv
 
 #!fsharp
 
-let outputSummary (summary:studies.GapStudy.TradeSummary) = 
+let outputSummary includeChart (summary:studies.GapStudy.TradeSummary) = 
 
-    // nicely formatted one line summary starting with trade name:
-    printfn "%s: %i trades, %i winners, %i losers, %.2f%% win pct, %.2f%% avg gain, %.2f%% avg loss, %.2f avg gain/loss, %.2f EV" 
-        summary.StrategyName summary.Total summary.Winners summary.Losers (summary.WinPct * 100m) (summary.AvgWin) (summary.AvgLoss) summary.AvgGainLoss summary.EV
+    printfn "%s: %i trades, %.2f%% win pct, %.2f%% avg gain, %.2f%% avg loss, %.2f avg gain/loss, %.2f EV" 
+        summary.StrategyName summary.Total (summary.WinPct * 100m) (summary.AvgWin) (summary.AvgLoss) summary.AvgGainLoss summary.EV
 
-    // let chart = 
-    //     Chart.Column(
-    //         (summary.GainDistribution.buckets |> Array.map (fun d -> (d.value, d.frequency))),
-    //         Name = "Distribution"
-    //     )
+    match includeChart with
+    | true ->
+        let chart = 
+            Chart.Histogram(
+                X = summary.Gains,
+                NBinsX = 40,
+                Name = "Gain Distribution"
+            )
 
-    // chart.Display() |> ignore
-
-    let chart = 
-        Chart.Histogram(
-            X = summary.Gains,
-            NBinsX = 40,
-            Name = "Gain Distribution"
-        )
-
-    chart.Display() |> ignore
+        chart.Display() |> ignore
+    | false -> ()
 
 #!fsharp
 
 let filterNamePairs = [
     ("All", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> true)
-    // ("New Highs", fun o -> o.Screenerid = 28)
-    // ("Top Gainers", fun o -> o.Screenerid = 29)
-    // ("Gap ups", fun o -> o.HasGapUp)
-    // ("Gap ups - new highs", fun o -> o.HasGapUp && o.Screenerid = 28)
-    // ("Gap ups - top gainers", fun o -> o.HasGapUp && o.Screenerid = 29)
+    ("New Highs", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> o.Screenerid = 28)
+    ("Top Gainers", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> o.Screenerid = 29)
+    ("Gap ups", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> o.HasGapUp)
+    ("Gap ups - new highs", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> o.HasGapUp && o.Screenerid = 28)
+    ("Gap ups - top gainers", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> o.HasGapUp && o.Screenerid = 29)
 ]
 
 let strategies = csv |> Seq.groupBy (fun t -> t.Strategy) // all strategies, no filters
 
 let summaries =
-    strategies |> Seq.collect (fun (name,outcomes) ->
-        filterNamePairs |> Seq.map (fun (filterName, filter) ->
-            let filtered = outcomes |> Seq.filter filter
-            (sprintf "%s - %s" name filterName, filtered)
-        )
+    filterNamePairs
+    |> Seq.iter (
+        fun (filterName,filter) ->
+
+            printfn $"Trade: {filterName}"
+            strategies
+            |> Seq.iter (
+                fun (strategy, trades) ->
+                    let filteredTrades = trades |> Seq.filter filter
+                    let summary = studies.GapStudy.summarize strategy filteredTrades
+                    outputSummary false summary
+            )
+
+            printfn ""
+            printfn ""
     )
-    |> Seq.map (fun (name, outcomes) ->
-        studies.GapStudy.summarize name outcomes
-    )
 
-summaries |> Seq.iter outputSummary
+#!fsharp
 
-// let summaryFuncs = 
-//     [
-//         "Top 5 EV", fun (s:studies.GapStudy.TradeSummary) -> s.EV
-//         "Top 5 Win %", fun (s:studies.GapStudy.TradeSummary) -> s.WinPct
-//         "Top 5 Avg Gain", fun (s:studies.GapStudy.TradeSummary) -> s.AvgGain
-//         "Top 5 Avg Loss", fun (s:studies.GapStudy.TradeSummary) -> s.AvgLoss
-//     ]
-
-// summaryFuncs 
-// |> Seq.iter ( fun (name, sortFunc) ->
-//     printfn "\n\n%s" name
-//     summaries |> Seq.sortByDescending sortFunc |> Seq.take 5 |> Seq.iter (fun summary -> printfn "%s %f" summary.StrategyName (sortFunc summary))
-// )
+#!html
+printfn "<h1>Gap Study</h1>"
