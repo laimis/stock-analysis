@@ -48,27 +48,54 @@ let filterNamePairs = [
     ("Gap ups - top gainers", fun (o:studies.GapStudy.TradeOutcomeOutput.Row) -> o.HasGapUp && o.Screenerid = 29)
 ]
 
-let strategies = csv |> Seq.groupBy (fun t -> t.Strategy) // all strategies, no filters
+let tradesGroupedByStrategy = csv |> Seq.groupBy (fun t -> t.Strategy) // all strategies, no filters
 
-let summaries =
-    filterNamePairs
-    |> Seq.iter (
-        fun (filterName,filter) ->
+filterNamePairs
+|> Seq.iter (
+    fun (filterName,filter) ->
 
-            printfn $"Trade: {filterName}"
-            strategies
-            |> Seq.iter (
-                fun (strategy, trades) ->
-                    let filteredTrades = trades |> Seq.filter filter
-                    let summary = studies.GapStudy.summarize strategy filteredTrades
-                    outputSummary false summary
-            )
+        printfn $"Trade: {filterName}"
+        strategies
+        |> Seq.iter (
+            fun (strategy, trades) ->
+                let filteredTrades = trades |> Seq.filter filter
+                let summary = studies.GapStudy.summarize strategy filteredTrades
+                outputSummary false summary
+        )
 
-            printfn ""
-            printfn ""
-    )
+        printfn ""
+        printfn ""
+)
 
 #!fsharp
 
-#!html
-printfn "<h1>Gap Study</h1>"
+let data =
+    filterNamePairs
+    |> Seq.map (fun (filterName, filter) ->
+        tradesGroupedByStrategy
+        |> Seq.map (fun (strategy, trades) ->
+            let filteredTrades = trades |> Seq.filter filter
+            let summary = studies.GapStudy.summarize strategy filteredTrades
+            (strategy, filterName, summary)
+        )
+    )
+    |> Seq.concat
+
+let sortFunctions = [
+    ("EV", fun (t:studies.GapStudy.TradeSummary) -> t.EV)
+    ("Win %", fun (t:studies.GapStudy.TradeSummary) -> t.WinPct)
+    ("Avg Gain", fun (t:studies.GapStudy.TradeSummary) -> t.AvgGainLoss)
+]
+
+sortFunctions
+|> Seq.iter (fun (sortLabel, sortFunction) ->
+    printfn $"Top 5 by: {sortLabel}"
+    data
+    |> Seq.sortByDescending (fun (strategy, filterName, summary) -> sortFunction summary)
+    |> Seq.take 5
+    |> Seq.iter (fun (strategy, filterName, summary) ->
+        printfn $"Strategy: {strategy}, Filter: {filterName}: {sortFunction summary}"
+    )
+    printfn ""
+    printfn ""
+)
