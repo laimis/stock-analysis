@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="ServiceHelper.fs" />
+    <Compile Include="Types.fs" />
     <Compile Include="GapStudy.fs" />
     <Compile Include="DataHelpers.fs" />
     <Compile Include="Program.fs" />

@@ -1,45 +1,10 @@
 module studies.GapStudy
 
 open System
-open FSharp.Data
 open core.Shared
 open core.fs.Services.GapAnalysis
 open core.fs.Shared.Adapters.Stocks
-
-[<Literal>]
-let private minimumRecords = 1_000
-[<Literal>]
-let private earliestYear = 2020
-[<Literal>]
-let private latestYear = 2024
-
-type StudyInput = CsvProvider<Sample = "date (date), ticker (string), screenerid (int)", HasHeaders=true>
-
-type GapStudyOutput =
-    CsvProvider<
-        Schema = "ticker (string), date (date), screenerid (int), hasGapUp (bool)",
-        HasHeaders=false
-    >
-    
-type TradeOutcomeOutput =
-    CsvProvider<
-        Sample = "strategy (string), ticker (string), date (date), screenerid (int), hasGapUp (bool), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
-        HasHeaders=true
-    >
-
-type TradeSummary = {
-    StrategyName:string
-    Total:int
-    Winners:int
-    Losers:int
-    WinPct:decimal
-    AvgWin:decimal
-    AvgLoss:decimal
-    AvgGainLoss:decimal
-    EV:decimal
-    Gains:decimal seq
-    GainDistribution:core.fs.Services.Analysis.DistributionStatistics
-}
+open studies.Types
 
 let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
     // summarize the outcomes
@@ -72,21 +37,19 @@ let summarize strategyName (outcomes:TradeOutcomeOutput.Row seq) =
         GainDistribution = gainDistribution 
     }
 
-
-let parseInput (filepath:string) = StudyInput.Load(filepath).Rows
-let parseOutput (filepath:string) = GapStudyOutput.Load(filepath).Rows
 let parseTradeOutcomes (filepath:string) = TradeOutcomeOutput.Load(filepath).Rows
 
-let verifyRecords (records:StudyInput.Row seq) =
+let verifyRecords (input:StudyInput) =
+    let records = input.Rows
     // make sure there is at least some records in here, ideally in thousands
     let numberOfRecords = records |> Seq.length
     match numberOfRecords with
     | 0 -> failwith "no records"
-    | x when x < minimumRecords -> failwith $"not enough records: {x}"
+    | x when x < Constants.MinimumRecords -> failwith $"not enough records: {x}"
     | _ -> ()
     
     // make sure all dates are as expected
-    let datesFine = records |> Seq.forall (fun r -> r.Date.Year >= earliestYear && r.Date.Year <= latestYear)
+    let datesFine = records |> Seq.forall (fun r -> r.Date.Year >= Constants.EarliestYear && r.Date.Year <= Constants.LatestYear)
     match datesFine with
     | false -> failwith "date is out of range"
     | true -> ()
@@ -148,11 +111,11 @@ let getEarliestDateByTicker (records:StudyInput.Row seq) =
             (ticker, earliestDate)
         )
         
-let study inputFilename (outputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
+let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
     // parse and verify
     let records =
         inputFilename
-        |> parseInput
+        |> StudyInput.Load
         |> verifyRecords
         
     // describe records
@@ -289,11 +252,14 @@ let runStrategy strategy dataWithPriceBars =
         tradeOutcome
     )
     
-let runTrades matchedInputFilename (priceFunc:string -> PriceBars) =
+let runTrades (matchedInputFilename:string) (priceFunc:string -> PriceBars) =
     
-    let data = matchedInputFilename |> parseOutput
+    let data =
+        matchedInputFilename
+        |> GapStudyOutput.Load
+        |> fun x -> x.Rows
     
-    data |> Seq.map (fun r -> Output r) |> describeRecords
+    data |> Seq.map Output |> describeRecords
     
     // ridiculous, sometimes input data does not have prices for the date
     // so we filter those records out
