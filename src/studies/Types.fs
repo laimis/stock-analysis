@@ -85,9 +85,8 @@ type TradeSummary = {
 }
 
 module TradeSummary =
-    let create (outcomes:TradeOutcomeOutput.Row seq) =
+    let create name (outcomes:TradeOutcomeOutput.Row seq) =
         // summarize the outcomes
-        let name = outcomes |> Seq.head |> fun o -> o.Strategy
         let total = outcomes |> Seq.length
         let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
         let losers = outcomes |> Seq.filter (fun o -> o.PercentGain < 0m)
