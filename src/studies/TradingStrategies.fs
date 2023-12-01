@@ -7,8 +7,8 @@ let buyAndHoldStrategy numberOfBarsToHold (signal:GapStudyOutput.Row,prices:Pric
     // we will buy this stock at the open price of the next day
     let name =
         match numberOfBarsToHold with
-        | None -> "Buy and Hold"
-        | Some numberOfDaysToHold -> $"Buy and Hold {numberOfDaysToHold} bars"
+        | None -> "B&H"
+        | Some numberOfDaysToHold -> $"B&H {numberOfDaysToHold} bars"
         
     // find the next day
     let openDay, openDayIndex =
@@ -52,8 +52,8 @@ let buyAndHoldStrategyWithStopLoss verbose numberOfBarsToHold (stopLossPercent:d
     // we will buy this stock at the open price of the next day
     let name =
         match numberOfBarsToHold with
-        | None -> "Buy and Hold with Stop Loss of " + stopLossPercent.ToString("0.00") + "%"
-        | Some numberOfDaysToHold -> $"Buy and Hold {numberOfDaysToHold} bars with Stop Loss of " + stopLossPercent.ToString("0.00") + "%"
+        | None -> "B&H with Stop Loss of " + stopLossPercent.ToString("0.00") + "%"
+        | Some numberOfDaysToHold -> $"B&H {numberOfDaysToHold} bars with Stop Loss of " + stopLossPercent.ToString("0.00") + "%"
         
     // find the next day
     let openDay, openDayIndex =
