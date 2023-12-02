@@ -3,6 +3,7 @@ module studies.TradingStrategies
 open core.fs.Shared.Adapters.Stocks
 open studies.Types
 
+
 let private toOutputRow name (signal:GapStudyOutput.Row) (openBar:PriceBar) (closeBar:PriceBar) =
     
     let openPrice = openBar.Open
@@ -40,7 +41,7 @@ let private findNextDayBarAndIndex (signal:GapStudyOutput.Row) (prices:PriceBars
 let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:GapStudyOutput.Row,prices:PriceBars) =
     let openBar, openDayIndex = findNextDayBarAndIndex signal prices
     
-    if verbose then printfn $"Open day for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} with open day index of %A{openDayIndex}"
+    if verbose then printfn $"Open bar for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} @ %A{openBar.Open}"
             
     // find the close day
     let closeBar =
@@ -48,7 +49,7 @@ let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (sign
         |> Seq.indexed
         |> Seq.skip openDayIndex
         |> Seq.map stopLossReachedFunc
-        |> Seq.filter (fun (_, _, stopLossReached) -> stopLossReached)
+        |> Seq.filter (fun (_, _, stopLossReached, closeDayReached) -> stopLossReached || closeDayReached)
         |> Seq.tryHead
         
     let closeBar =
@@ -56,9 +57,10 @@ let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (sign
         | None ->
             //if verbose then printfn $"Could not find close bar for %s{signal.Ticker} on %A{signal.Date}"
             failwith $"Could not find close bar for %s{signal.Ticker} on %A{signal.Date}"
-        | Some (_, (bar:PriceBar), _) ->
-            if verbose then printfn $"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{bar.Date}"
-            bar
+        | Some (_, (closeBar:PriceBar), stopLossReached, _) ->
+            let reason = if stopLossReached then "stop loss reached" else "close day reached"
+            if verbose then printfn $"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{closeBar.Date} because {reason}"
+            closeBar
     
     toOutputRow name signal openBar closeBar
 
@@ -95,10 +97,54 @@ let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPe
     let stopLossFunc (index, (bar:PriceBar)) =
         let stopPriceReached = bar.Close < stopPrice
         let closeDayReached = bar.Date >= closeBar.Date
-        let stopLossReached = stopPriceReached || closeDayReached
-        (index, bar, stopLossReached)
+        (index, bar, stopPriceReached, closeDayReached)
     
-    if verbose then printfn $"Open day for %s{signal.Ticker} on %A{signal.Date} is %A{openDay.Date} with open day index of %A{openDayIndex}"
-    if verbose then printfn $"Close day for %s{signal.Ticker} on %A{signal.Date} is based on %A{numberOfBarsToHold} number of bars to hold, and is on %A{closeBar.Date} or stop price of %A{stopPrice}"
-            
     buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    
+let buyAndHoldWithSignalOpenAsStop verbose (signal:GapStudyOutput.Row,prices:PriceBars) =
+    
+    let name = "B&H with signal open as stop"
+        
+    let closeBar = prices.Last        
+    let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> fst |> fun (bar:PriceBar) -> bar.Open
+    
+    let stopLossFunc (index, (bar:PriceBar)) =
+        let stopPriceReached = bar.Close < stopPrice
+        let closeDayReached = bar.Date >= closeBar.Date
+        (index, bar, stopPriceReached, closeDayReached)
+    
+    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    
+let buyAndHoldWithSignalCloseAsStop verbose (signal:GapStudyOutput.Row,prices:PriceBars) =
+    
+    let name = "B&H with signal close as stop"
+        
+    let closeBar = prices.Last        
+    let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> fst |> fun (bar:PriceBar) -> bar.Close
+    
+    let stopLossFunc (index, (bar:PriceBar)) =
+        let stopPriceReached = bar.Close < stopPrice
+        let closeDayReached = bar.Date >= closeBar.Date
+        (index, bar, stopPriceReached, closeDayReached)
+    
+    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    
+    
+let buyAndHoldWithTrailingStop verbose (signal:GapStudyOutput.Row,prices:PriceBars) =
+    
+    let name = "B&H with signal with trailing stop"
+    let maxPriceSeen = ref 0m
+    
+    let closeBar = prices.Last
+    
+    let stopLossFunc (index, (bar:PriceBar)) =
+        let closeDayReached = bar.Date >= closeBar.Date
+        
+        if bar.Close > maxPriceSeen.Value then maxPriceSeen.Value <- bar.Close
+        
+        let stopPriceReached = bar.Close < maxPriceSeen.Value * 0.95m
+        
+        (index, bar, stopPriceReached, closeDayReached)
+    
+    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    
