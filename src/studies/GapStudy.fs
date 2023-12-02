@@ -92,7 +92,26 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
     printfn $"Failed: %d{failed.Length}"
     printfn $"Succeeded: %d{prices.Count}"
     
-    let recordsWithPrices = records |> Seq.filter (fun r -> prices.ContainsKey(r.Ticker))
+    let recordsWithPrices =
+        records
+        |> Seq.filter (fun r -> prices.ContainsKey(r.Ticker))
+        |> Seq.filter (fun r ->
+            let ticker = r.Ticker
+            let date = r.Date
+            let prices = prices[ticker]
+            let signalBarWithIndex = prices.TryFindByDate date
+            match signalBarWithIndex with
+            | None ->
+                // failwith $"Could not find signal bar for {ticker} on {date}"
+                false
+            | Some signalBarWithIndex -> 
+                let nextDay = signalBarWithIndex |> snd |> fun x -> x + 1
+                let nextDayBar = prices.Bars |> Array.tryItem nextDay
+                match nextDayBar with
+                | Some _ -> true
+                | None -> false
+        )
+        
     printfn $"Records with prices: %d{recordsWithPrices |> Seq.length}"
     
     // now we are interested in gap ups

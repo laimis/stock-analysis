@@ -31,12 +31,12 @@ let actions = [
         }
     if ServiceHelper.hasArgument "-t" then fun () -> async {
             let strategies = [
-                TradingStrategies.buyAndHoldStrategy (Some 5)
-                TradingStrategies.buyAndHoldStrategy (Some 10)
-                TradingStrategies.buyAndHoldStrategy (Some 30)
-                TradingStrategies.buyAndHoldStrategy (Some 60)
-                TradingStrategies.buyAndHoldStrategy (Some 90)
-                TradingStrategies.buyAndHoldStrategy None
+                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 5) None
+                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 10) None
+                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 30) None
+                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 60) None
+                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 90) None
+                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false None None
             ]
     
             let! signalsWithPriceBars = Trading.prepareSignalsForTradeSimulations outputFilename getPricesFromCsv
