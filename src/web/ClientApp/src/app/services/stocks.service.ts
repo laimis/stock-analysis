@@ -1071,8 +1071,14 @@ export interface DataPointContainer {
 }
 
 export interface StockTradingPerformanceCollection {
-  overall: StockTradingPerformance,
-  recent: StockTradingPerformance,
+  performanceAll: StockTradingPerformance,
+  performanceLast20: StockTradingPerformance,
+  performanceLast50: StockTradingPerformance,
+  performanceLast100: StockTradingPerformance,
+  performanceTwoMonths: StockTradingPerformance,
+  performanceYTD: StockTradingPerformance,
+  performanceOneYear: StockTradingPerformance
+
   trendsAll: DataPointContainer[]
   trendsTwoMonths: DataPointContainer[]
   trendsYTD: DataPointContainer[]

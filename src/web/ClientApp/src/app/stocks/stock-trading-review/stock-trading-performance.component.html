@@ -2,12 +2,25 @@
 
   <section>
     <h5>Recent Performance</h5>
-    <app-trading-performance-summary [performance]="performance.recent" title="Recent"></app-trading-performance-summary>
-  </section>
-
-  <section>
-    <h5>Overall Performance</h5>
-    <app-trading-performance-summary [performance]="performance.overall" title="Overall"></app-trading-performance-summary>
+    <div>
+      <form>
+        <div class="row">
+          <div class="form-group col">
+            <label class="form-label" for="performanceTradePeriod">Trade Period</label>
+            <select #performanceTradePeriodDropdown class="form-select" id="performanceTradePeriod" (change)="performanceTradePeriodChanged(performanceTradePeriodDropdown.value)">
+              <option value="last20" [selected]="performanceTradePeriod === 'last20'">Last 20</option>
+              <option value="last50" [selected]="performanceTradePeriod === 'last50'">Last 50</option>
+              <option value="last100" [selected]="performanceTradePeriod === 'last100'">Last 100</option>
+              <option value="2m" [selected]="performanceTradePeriod === '2m'">Last 2 Months</option>
+              <option value="ytd" [selected]="performanceTradePeriod === 'ytd'">YTD</option>
+              <option value="1y" [selected]="performanceTradePeriod === '1y'">1 year</option>
+              <option value="all" [selected]="performanceTradePeriod === 'all'">Show all time</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <app-trading-performance-summary *ngIf="performanceSelection" [performance]="performanceSelection" [title]="performanceTitle"></app-trading-performance-summary>
   </section>
 
   <section>
