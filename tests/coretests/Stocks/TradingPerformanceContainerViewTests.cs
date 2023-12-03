@@ -22,7 +22,7 @@ namespace coretests.Stocks
         
         [Fact]
         public void TradingPerformance_NumberOfTrades_Correct() =>
-            Assert.True(_container.Recent.NumberOfTrades < _container.Overall.NumberOfTrades);
+            Assert.True(_container.PerformanceLast20.NumberOfTrades < _container.PerformanceAll.NumberOfTrades);
 
         [Fact]
         public void YTDContainer_Profit_DaysAreSequential()
