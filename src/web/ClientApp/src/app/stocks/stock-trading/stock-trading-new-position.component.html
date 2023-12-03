@@ -1,4 +1,7 @@
-<section>
+<section *ngIf="positionEntered">
+  Pending position has been succesfully created. To create another one, click <button class="btn btn-link" (click)="startNewPosition()">here</button>
+</section>
+<section *ngIf="positionEntered === false">
   <h5>
     Initiate Position
     <span class="float-end fs-6">max loss: {{maxLoss | currency}}</span>

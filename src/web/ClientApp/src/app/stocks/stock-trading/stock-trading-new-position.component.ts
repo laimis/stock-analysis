@@ -77,6 +77,16 @@ export class StockTradingNewPositionComponent {
   @Input()
   isPendingPositionMode: boolean = true
 
+  positionEntered = false
+  startNewPosition() {
+    this.positionEntered = false
+    // if the UI is for a preset ticker, reset it to the same ticker
+    // to kick off "new position" UI once again
+    if (this.presetTicker) {
+      this.presetTicker = this.presetTicker
+    }
+  }
+
   @Output()
   stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
 
@@ -342,11 +352,7 @@ export class StockTradingNewPositionComponent {
         this.pendingPositionCreated.emit(cmd)
         this.reset()
 
-        // if the UI is for a preset ticker, reset it to the same ticker
-        // to kick off "new position" UI once again
-        if (this.presetTicker) {
-          this.presetTicker = this.presetTicker
-        }
+        this.positionEntered = true
       },
       errors => {
         let errorMessages = GetErrors(errors).join(", ")

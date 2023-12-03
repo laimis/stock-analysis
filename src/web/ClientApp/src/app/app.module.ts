@@ -146,7 +146,7 @@ let routes: Routes = [
   {path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
 
   {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
-  {path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock List - :name'},
+  {path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
   {path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard]},
   {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
   {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
@@ -161,8 +161,8 @@ let routes: Routes = [
   {path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard], title : 'Gaps Report'},
 
   {path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard], title: 'Routines'},
-  {path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines - :name'},
-  {path: 'routines/:name', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines - :name'},
+  {path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
+  {path: 'routines/:name', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
 
   {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
   {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile, SECFiling } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import {BrokerageOrdersComponent} from "../../brokerage/orders.component";
 
 @Component({
   selector: 'app-stock-details',
@@ -20,6 +21,10 @@ export class StockDetailsComponent implements OnInit {
   activeTab: string = ''
   filings: SECFiling[]
   recentFilings: SECFiling[]
+
+  // reference child BrokerageOrdersComponent
+  @ViewChild(BrokerageOrdersComponent)
+  private orders: BrokerageOrdersComponent
 
 	constructor(
 		private stocks : StocksService,
@@ -103,5 +108,9 @@ export class StockDetailsComponent implements OnInit {
 
   optionOwnershipChanged(e) {
     this.loadOptionOwnership()
+  }
+
+  refreshOrders() {
+    this.orders.refreshOrders()
   }
 }
