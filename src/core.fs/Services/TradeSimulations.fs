@@ -116,6 +116,7 @@ type TradingStrategyActualTrade() =
                 bars.Bars
                 |> Seq.fold (fun (position:PositionInstance, maxDrawdownPct, maxGainPct, last10Bars:PriceBar list) bar ->
                     if position.IsClosed && bar.Date.Date = position.Closed.Value.Date then
+                        
                         position, maxDrawdownPct, maxGainPct, last10Bars
                     else
                         position.SetPrice(bar.Close)
@@ -140,44 +141,7 @@ type TradingStrategyActualTrade() =
                 MaxGainPctRecent = maxGainPctRecent
                 Position = finalPosition
                 StrategyName = TradingStrategyConstants.ActualTradesName
-            }
-
-// type TradingStrategyWithAdvancingStops(name:string,profitPointFunc,stopPriceFunc) =
-//     
-//     inherit TradingStrategy(name)
-//     
-//     override this.ApplyPriceBarToPositionInternal context bar =
-//         
-//         let profitPoint = profitPointFunc context.Position
-//         
-//         if bar.High > profitPoint then
-//             context.Position.SetStopPrice(stopPriceFunc context.Position,bar.Date)
-//             
-//         if bar.Close <= context.Position.StopPrice.Value then
-//             this.ClosePosition bar.Close bar.Date context.Position
-
-
-// type TradingStrategyWithDownsideProtection(name:string,profitPointFunc,stopPriceFunc,downsideProtectionSize) =
-//     
-//     inherit TradingStrategy(name)
-//     
-//     let mutable _executed = false
-//     let mutable _level = 0
-//     
-//     override this.ApplyPriceBarToPositionInternal(context:SimulationContext,bar:PriceBar) =
-//         
-//         let profitPoint = profitPointFunc  context.Position _level
-//         
-//         if bar.High > profitPoint then
-//             context.Position.SetStopPrice(stopPriceFunc context.Position,bar.Date)
-//             _level <- _level + 1
-//             
-//         if not _executed && context.Position.RR < -0.5m && context.Position.NumberOfShares > 0m then
-//             let stocksToSell = int (context.Position.NumberOfShares / downsideProtectionSize)
-//             if stocksToSell > 0 then
-//                 context.Position.Sell(stocksToSell,bar.Close,Guid.NewGuid(),bar.Date)
-//                 _executed <- true
-//                 
+            }    
 
 type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPointFunc,stopPriceFunc) =
     

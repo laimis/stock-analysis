@@ -160,7 +160,7 @@ namespace core.Stocks
 
         public void Sell(decimal numberOfShares, decimal price, Guid transactionId, DateTimeOffset when, string notes = null)
         {
-            if (NumberOfShares <= 0)
+            if (NumberOfShares - numberOfShares < 0)
             {
                 var details = $"Sell {numberOfShares} @ ${price} on {when} for {Ticker}";
                 throw new InvalidOperationException("Transaction would make amount owned invalid: " + details);
