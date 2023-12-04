@@ -14,6 +14,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\..\..\src\core\core.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\storage.memory\storage.memory.csproj" />
     <ProjectReference Include="..\..\..\src\infrastructure\tdameritradeclient\tdameritradeclient.csproj" />
     <ProjectReference Include="..\..\testutils\testutils.csproj" />
   </ItemGroup>

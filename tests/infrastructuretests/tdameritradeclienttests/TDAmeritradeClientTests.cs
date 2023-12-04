@@ -4,6 +4,9 @@ using core.fs.Shared.Adapters.Brokerage;
 using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using Microsoft.FSharp.Core;
+using Moq;
+using storage.memory;
+using storage.shared;
 using tdameritradeclient;
 using Xunit;
 
@@ -38,9 +41,10 @@ namespace tdameritradeclienttests
             var tokenJson = testutils.CredsHelper.GetTDAmeritradeToken();
             var at = System.Text.Json.JsonSerializer.Deserialize<OAuthResponse>(tokenJson);
             var client = new TDAmeritradeClient(
-                null,
+                new MemoryAggregateStorage(Mock.Of<IOutbox>()),
                 config[0],
-                config[1]
+                config[1],
+                null
             );
 
             var user = User.Create("test", "test", "test");

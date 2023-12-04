@@ -137,7 +137,7 @@ namespace storage.postgres
             using var db = GetConnection();
 
             await db.ExecuteAsync(
-                @"INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp)",
+                @"INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp) ON CONFLICT (key) DO UPDATE SET blob = @blob",
                 new { key, blob }
             );
         }
