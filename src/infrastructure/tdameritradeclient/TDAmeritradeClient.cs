@@ -101,6 +101,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, Ticker ticker)
     {
+        if (state.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<StockProfile>();
+        }
+        
         var function = $"instruments?symbol={ticker.Value}&projection=fundamental";
 
         var results = await CallApi<Dictionary<string, SearchItemWithFundamental>>(
@@ -133,6 +138,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit)
     {
+        if (state.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<SearchResult[]>();
+        }
+        
         var function = $"instruments?symbol={query}.*&projection=symbol-regex";
 
         var results = await CallApi<Dictionary<string, SearchItem>>(state, function, HttpMethod.Get);
@@ -176,6 +186,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<TradingAccount>> GetAccount(UserState user)
     {
+        if (user.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<TradingAccount>();
+        }
+        
         var response = await CallApi<AccountsResponse[]>(
             user,
             "/accounts?fields=positions,orders",
@@ -264,6 +279,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<bool>> CancelOrder(UserState user, string orderId)
     {
+        if (user.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<bool>();
+        }
+        
         // get account first
         var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
 
@@ -400,6 +420,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
     {
+        if (state.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<core.fs.Shared.Adapters.Options.OptionChain>();
+        }
+        
         var function = $"marketdata/chains?symbol={ticker.Value}";
 
         if (FSharpOption<string>.get_IsSome(contractType))
@@ -464,6 +489,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)
     {
+        if (state.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<MarketHours>();
+        }
+        
         var dateStr = date.ToString("yyyy-MM-dd");
         var function = $"marketdata/EQUITY/hours?date={dateStr}";
 
@@ -494,6 +524,11 @@ public class TDAmeritradeClient : IBrokerage
         DateTimeOffset start,
         DateTimeOffset end)
     {
+        if (state.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<PriceBars>();
+        }
+        
         var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
         var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
 
