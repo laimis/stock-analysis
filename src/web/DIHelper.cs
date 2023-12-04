@@ -29,11 +29,11 @@ namespace web
             IServiceCollection services,
             ILogger logger)
         {
-            services.AddSingleton<IRoleService>(s => new RoleService(
+            services.AddSingleton<IRoleService>(_ => new RoleService(
                 configuration.GetValue<string>("ADMINEmail")
             ));
             services.AddSingleton<core.fs.Shared.Adapters.Logging.ILogger, GenericLogger>();
-            services.AddSingleton<coinmarketcap.CoinMarketCapClient>(s =>
+            services.AddSingleton(s =>
                 new coinmarketcap.CoinMarketCapClient(
                     s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
                     configuration.GetValue<string>("COINMARKETCAPToken")
@@ -50,7 +50,7 @@ namespace web
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
             services.AddSingleton<ISECFilings, EdgarClient>();
 
-            // go over all types in core.fs assembly, find any innner classes and register any type that implements IApplicationService
+            // go over all types in core.fs assembly, find any inner classes and register any type that implements IApplicationService
             // interface as a singleton
             var markerInterface = typeof(IApplicationService);
             var assembly = typeof(core.fs.Options.Handler).Assembly;
@@ -92,9 +92,10 @@ namespace web
 
             services.AddSingleton<IBrokerage>(s =>
                 new tdameritradeclient.TDAmeritradeClient(
-                    s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>(),
+                    s.GetService<IBlobStorage>(),
                     configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL"),
-                    configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID")
+                    configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
+                    s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
                 ));
 
             StorageRegistrations(configuration, services, logger);

@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\..\core\core.csproj" />
+    <ProjectReference Include="..\storage.shared\storage.shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
