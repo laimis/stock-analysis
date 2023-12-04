@@ -13,6 +13,7 @@ using Polly;
 using Polly.RateLimit;
 using Polly.Retry;
 using Polly.Timeout;
+using storage.shared;
 
 namespace tdameritradeclient;
 public class TDAmeritradeClient : IBrokerage
@@ -21,9 +22,6 @@ public class TDAmeritradeClient : IBrokerage
     private readonly string _callbackUrl;
     private readonly string _clientId;
 
-    // in memory dictionary of access tokens (they expire every 30 mins)
-    private readonly ConcurrentDictionary<Guid, OAuthResponse> _accessTokens = new();
-
     private const string ApiUrl = "https://api.tdameritrade.com/v1";
     private const string AuthUrl = "https://auth.tdameritrade.com";
 
@@ -31,13 +29,13 @@ public class TDAmeritradeClient : IBrokerage
     private static readonly AsyncRetryPolicy _retryPolicy = Policy
         .Handle<RateLimitRejectedException>()
         .WaitAndRetryAsync(
-            retryCount: 5,
-            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(retryAttempt * 1.2)
+            retryCount: 3,
+            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2)
         );
 
     private static readonly AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(
         numberOfExecutions: 20,
-        perTimeSpan: TimeSpan.FromSeconds(4),
+        perTimeSpan: TimeSpan.FromSeconds(1),
         maxBurst: 10);
 
     private static readonly AsyncTimeoutPolicy _timeoutPolicy = Policy.TimeoutAsync(
@@ -48,11 +46,14 @@ public class TDAmeritradeClient : IBrokerage
         _retryPolicy, _rateLimit, _timeoutPolicy
     );
 
-    public TDAmeritradeClient(ILogger<TDAmeritradeClient>? logger, string callbackUrl, string clientId)
+    private readonly IBlobStorage _blogStorage;
+
+    public TDAmeritradeClient(IBlobStorage blobStorage, string callbackUrl, string clientId, ILogger<TDAmeritradeClient>? logger)
     {
-        _logger = logger;
+        _blogStorage = blobStorage;
         _callbackUrl = callbackUrl;
         _clientId = clientId;
+        _logger = logger;
         _httpClient = new HttpClient();
     }
 
@@ -126,8 +127,7 @@ public class TDAmeritradeClient : IBrokerage
                 f => f.Value.ToString()
             )
         };
-
-
+        
         return new ServiceResponse<StockProfile>(mapped);
     }
 
@@ -349,6 +349,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<StockQuote>> GetQuote(UserState user, Ticker ticker)
     {
+        if (user.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<StockQuote>();
+        }
+        
         var function = $"marketdata/{ticker.Value}/quotes";
 
         var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
@@ -367,6 +372,11 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<ServiceResponse<Dictionary<Ticker, StockQuote>>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
     {
+        if (user.ConnectedToBrokerage == false)
+        {
+            return NotConnectedToBrokerageError<Dictionary<Ticker, StockQuote>>();
+        }
+        
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers.Select(t => t.Value))}";
 
         var result = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
@@ -381,6 +391,11 @@ public class TDAmeritradeClient : IBrokerage
                 result.Success.Value.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
             )
         };
+    }
+
+    private static ServiceResponse<T> NotConnectedToBrokerageError<T>()
+    {
+        return new ServiceResponse<T>(new ServiceError("User is not connected to brokerage"));
     }
 
     public async Task<ServiceResponse<core.fs.Shared.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
@@ -669,20 +684,18 @@ public class TDAmeritradeClient : IBrokerage
                 // under documented TD Ameritrade limits, I still get this error sometimes.
                 // so I am capturing it here and simulating rate limit exception 
                 // so that polly can deal with it (it should wait and retry)
-                if (content.Contains("Individual App's transactions per seconds restriction reached"))
-                {
-                    throw new RateLimitRejectedException(
-                        retryAfter: TimeSpan.FromSeconds(1),
-                        message: "Transaction limit reached."
-                    );
-                }
+                // if (content.Contains("Individual App's transactions per seconds restriction reached"))
+                // {
+                //     throw new RateLimitRejectedException(
+                //         retryAfter: TimeSpan.FromSeconds(1),
+                //         message: "Transaction limit reached."
+                //     );
+                // }
 
                 return (response, content);
             },
             CancellationToken.None
         );
-
-        
 
         return tuple;
     }
@@ -719,12 +732,30 @@ public class TDAmeritradeClient : IBrokerage
 
     public async Task<OAuthResponse> GetAccessToken(UserState user)
     {
-        if (!_accessTokens.TryGetValue(user.Id, out var value) || value.IsExpired)
+        if (!user.ConnectedToBrokerage)
         {
-            value = await RefreshAccessTokenInternal(user, fullRefresh: false);
-            _accessTokens[user.Id] = value;
+            throw new Exception("User is not connected to brokerage");
         }
-        return value;
+        
+        // go to the storage to check for access token there
+        var storageKey = "access-token:" + user.Id;
+        var token = await _blogStorage.Get<OAuthResponse>(storageKey);
+        
+        if (token is { IsExpired: false })
+        {
+            _logger?.LogInformation("Returning cached access token, with expiration");
+            return token;
+        }
+        
+        token = await RefreshAccessTokenInternal(user, fullRefresh: false);
+        token.created = DateTimeOffset.UtcNow;
+        if (token.IsError)
+        {
+            throw new Exception("Could not refresh access token: " + token.error);
+        }
+        
+        await _blogStorage.Save(storageKey, token);
+        return token;
     }
 
     private static string GenerateApiUrl(string function) => $"{ApiUrl}/{function}";

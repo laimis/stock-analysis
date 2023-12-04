@@ -11,11 +11,6 @@ open core.fs.Shared.Adapters.Stocks
 
 type OAuthResponse() =
     
-    let mutable created:DateTimeOffset = DateTimeOffset.UtcNow
-    
-    do
-        created <- DateTimeOffset.UtcNow
-    
     member val access_token : string = "" with get, set
     member val refresh_token : string = "" with get, set
     member val token_type : string = "" with get, set
@@ -23,8 +18,9 @@ type OAuthResponse() =
     member val scope : string = "" with get, set
     member val refresh_token_expires_in : int64 = 0L with get, set
     member val error : string = "" with get, set
+    member val created : DateTimeOffset option = None with get, set
     member this.IsExpired : bool =
-        created.AddSeconds(this.expires_in |> float) < DateTimeOffset.UtcNow
+        this.created = None || this.created.Value.AddSeconds(this.expires_in |> float) < DateTimeOffset.UtcNow
     member this.IsError : bool = this.error <> ""
 
 type MarketHours() =
