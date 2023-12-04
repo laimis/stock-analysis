@@ -2,6 +2,7 @@ import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import {Subject, Observable} from 'rxjs';
 import {debounceTime, switchMap} from 'rxjs/operators';
 import {StockSearchResult, StocksService} from "../../services/stocks.service";
+import {GetErrors} from "../../services/utils";
 
 @Component({
   selector: 'app-stock-search',
@@ -12,6 +13,8 @@ export class StockSearchComponent implements OnInit {
 
   @Input() label : string = "Search for securities using ticker or name"
   @Input() cssClass : string = "form-control"
+
+  errors: string[] = [];
 
   @Input()
   set ticker(value: string) {
@@ -49,6 +52,7 @@ export class StockSearchComponent implements OnInit {
       // switch to new search observable each time the term changes
       switchMap((term: string) => {
         this.loading = true
+        this.errors = []
         return this.stocks.search(term)
       }),
     );
@@ -58,13 +62,17 @@ export class StockSearchComponent implements OnInit {
       console.log("searchResults.subscribe: " + value.length)
       this.searchResultsSubscribedArray = value
     }, error => {
-      console.log("searchResults.subscribe error: " + error)
+      this.loading = false
+      this.searchResultsSubscribedArray = []
+      this.errors = GetErrors(error)
+      console.log("searchResults.subscribe error: " + this.errors)
     })
   }
 
   loseFocus() {
     this.searchTerms.next('')
     this.loading = false
+    this.errors = []
     if (!this.selectedValue) {
     }
   }

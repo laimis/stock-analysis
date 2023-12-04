@@ -30,4 +30,12 @@
     </div>
   </div>
 
+  <div class="search-results shadow rounded" *ngIf="errors.length > 0" >
+
+    <div class="row"
+         *ngFor="let error of errors; let i = index">
+      <div class="col">{{error}}</div>
+    </div>
+  </div>
+
 </div>
