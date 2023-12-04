@@ -113,16 +113,14 @@ export class StockTradingReviewComponent {
 
         let markers: ChartMarker[] = []
 
-        let buyTxs = this.currentPosition.transactions.filter(t => t.type == 'buy')
-        let sellTxs = this.currentPosition.transactions.filter(t => t.type == 'sell')
+        this.currentPosition.transactions.filter(t => t.type == 'buy').forEach(t => {
+          markers.push({date: t.date, label: 'Buy', color: green, shape: 'arrowUp'})
+        })
 
-        if (buyTxs.length > 0) {
-          markers.push({date: buyTxs[0].date, label: 'Buy', color: green, shape: 'arrowUp'})
-        }
+        this.currentPosition.transactions.filter(t => t.type == 'sell').forEach(t => {
+          markers.push({date: t.date, label: 'Sell', color: red, shape: 'arrowDown'})
+        })
 
-        if (sellTxs.length > 0) {
-          markers.push({date: sellTxs[0].date, label: 'Sell', color: red, shape: 'arrowDown'})
-        }
         this.pricesErrors = null
         this.positionChartInformation = {
           averageBuyPrice: this.currentPosition.averageCostPerShare,
