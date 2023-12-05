@@ -32,6 +32,10 @@
     </table>
   </section>
 
+  <div *ngIf="container.alerts.length === 0">
+    No active alerts
+  </div>
+
   <ng-container *ngFor="let g of alertGroups">
 
     <section>
