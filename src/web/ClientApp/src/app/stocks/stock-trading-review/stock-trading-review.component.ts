@@ -58,8 +58,10 @@ export class StockTradingReviewComponent {
     this.gradingSuccess = null
     this.assignedGrade = this.currentPosition.grade
     this.assignedNote = this.currentPosition.gradeNote
-
+    this.simulationResults = null
+    this.dailyPositionReport = null
     this.runTradingStrategies();
+    this.positionChartInformation = null
     this.fetchPrice();
     this.setTitle();
   }

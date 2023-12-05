@@ -11,6 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json.Serialization;
 using web.Utils;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Primitives;
 
 namespace web
 {
@@ -100,8 +101,8 @@ namespace web
                 {
                     if (ctx.File.Name == "index.html")
                     {
-                        ctx.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
-                        ctx.Context.Response.Headers.Add("Expires", "-1");
+                        ctx.Context.Response.Headers["Cache-Control"] = new StringValues("no-cache, no-store");
+                        ctx.Context.Response.Headers["Expires"] = new StringValues("-1");
                     }
                 }
             };

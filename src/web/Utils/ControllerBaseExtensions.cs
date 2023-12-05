@@ -1,7 +1,9 @@
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using core.fs.Shared;
 using core.fs.Shared.Adapters.CSV;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace web.Utils
 {
@@ -16,9 +18,7 @@ namespace web.Utils
                 if (response.IsOk)
                 {
                     var content = response.Success.Value;
-                    controller.HttpContext.Response.Headers.Add(
-                        "content-disposition", 
-                        $"attachment; filename={content.Filename}");
+                    controller.HttpContext.Response.Headers["Content-Disposition"] = new StringValues($"attachment; filename={content.Filename}");
 
                     return new ContentResult
                     {

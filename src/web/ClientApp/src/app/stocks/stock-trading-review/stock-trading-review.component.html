@@ -28,7 +28,11 @@
   <section>
     <h5>Actual vs Trading Strategies</h5>
     <app-error-display [errors]="simulationErrors" *ngIf="simulationErrors"></app-error-display>
+    <p class="placeholder-glow" *ngIf="!simulationResults && !simulationErrors">
+      <span class="placeholder col-12"></span>
+    </p>
     <app-trading-actual-vs-simulated
+      *ngIf="simulationResults"
       [simulations]="simulationResults"
       [simulationErrors]="simulationErrors">
     </app-trading-actual-vs-simulated>
@@ -77,17 +81,23 @@
     </div>
   </section>
 
-  <section *ngIf="dailyPositionReport">
+  <section>
     <h5>Daily Gain %</h5>
     <app-error-display [errors]="scoresErrors" *ngIf="scoresErrors"></app-error-display>
-    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyGainPct">
+    <p class="placeholder-glow" *ngIf="!dailyPositionReport && !scoresErrors">
+      <span class="placeholder col-12"></span>
+    </p>
+    <app-daily-outcome-scores *ngIf="dailyPositionReport" [dailyScores]="dailyPositionReport.dailyGainPct">
     </app-daily-outcome-scores>
   </section>
 
-  <section *ngIf="dailyPositionReport">
+  <section>
     <h5>Daily P/L</h5>
     <app-error-display [errors]="scoresErrors" *ngIf="scoresErrors"></app-error-display>
-    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyProfit">
+    <p class="placeholder-glow" *ngIf="!dailyPositionReport && !scoresErrors">
+      <span class="placeholder col-12"></span>
+    </p>
+    <app-daily-outcome-scores *ngIf="dailyPositionReport" [dailyScores]="dailyPositionReport.dailyProfit">
     </app-daily-outcome-scores>
   </section>
 
@@ -96,9 +106,12 @@
     <app-stock-trading-position [position]="currentPosition" [orders]="orders"></app-stock-trading-position>
   </section>
 
-  <section *ngIf="currentPosition">
+  <section>
     <h5>Stock chart</h5>
     <app-error-display [errors]="pricesErrors" *ngIf="pricesErrors"></app-error-display>
+     <p class="placeholder-glow" *ngIf="!positionChartInformation && !pricesErrors">
+      <span class="placeholder col-12"></span>
+    </p>
     <app-candlestick-chart *ngIf="positionChartInformation" [chartInformation]="positionChartInformation"></app-candlestick-chart>
   </section>
 
