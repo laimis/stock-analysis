@@ -788,7 +788,7 @@ public class TDAmeritradeClient : IBrokerage
         using (await _asyncLock.LockAsync())
         {
             // check again, in case another thread has already refreshed the token
-            token = _blogStorage.Get<OAuthResponse>(storageKey).Result;
+            token = await _blogStorage.Get<OAuthResponse>(storageKey);
             if (token is { IsExpired: false })
             {
                 _logger?.LogInformation("Returning cached access token, without expiration");
