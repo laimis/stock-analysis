@@ -30,6 +30,8 @@ type OptionType =
             match value with
             | nameof Call -> Call
             | nameof Put -> Put
+            | "CALL" -> Call
+            | "PUT" -> Put
             | _ -> failwithf $"Invalid option type: %s{value}"
             
 type OptionTransaction =
