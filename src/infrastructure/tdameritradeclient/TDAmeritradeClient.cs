@@ -783,7 +783,7 @@ public class TDAmeritradeClient : IBrokerage
         }
         
         token = await RefreshAccessTokenInternal(user, fullRefresh: false);
-        token.created = DateTimeOffset.UtcNow;
+        token.created = FSharpOption<DateTimeOffset>.Some(DateTimeOffset.UtcNow);
         if (token.IsError)
         {
             _logger?.LogError("Could not refresh access token: {error}", token.error);
