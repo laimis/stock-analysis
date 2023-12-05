@@ -18,6 +18,6 @@ RUN apk add --no-cache -U \
 WORKDIR /app
 COPY --from=build-env /app/out /app
 
-HEALTHCHECK CMD curl -f http://localhost/health || exit 1
+ENV ASPNETCORE_URLS=http://*:8080
 
 ENTRYPOINT ["dotnet", "web.dll"]
