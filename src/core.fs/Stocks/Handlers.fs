@@ -120,6 +120,7 @@ type OwnershipView =
         CurrentPosition: PositionInstance
         Ticker:Ticker
         Positions: PositionInstance seq
+        Price:decimal option
     }
     
 type PriceQuery =
@@ -295,15 +296,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 | false -> Array.Empty<StockViolationView>()
                 | true -> core.fs.Helpers.getViolations brokeragePositions positions prices |> Seq.toArray
                 
-            // TODO: how to eliminate this state manipulation
-            positions |> Seq.iter( fun p ->
-                let price =
-                    match prices.TryGetValue(p.Ticker) with
-                    | true, price -> price.Price
-                    | false, _ -> 0m
-                p.SetPrice(price)
-            )
-            
             let dashboard = {
                 Positions = positions
                 Violations = violations
@@ -451,19 +443,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             | null -> return "Stock not found" |> ResponseUtils.failedTyped<OwnershipView>
             | _ ->
                 let! priceResponse = brokerage.GetQuote user.State query.Ticker
-                match priceResponse.Success with
-                | Some price ->
-                    if stock.State.OpenPosition = null |> not then
-                        stock.State.OpenPosition.SetPrice(price.Price)
-                | None ->
-                    ()
+                let price =
+                    match priceResponse.Success with
+                    | Some price -> Some price.Price
+                    | None -> None
                     
                 let positions = stock.State.GetAllPositions()
                 
                 let view =
                     match stock.State.OpenPosition with
-                    | null -> {Id=stock.State.Id; CurrentPosition=null; Ticker=stock.State.Ticker; Positions=positions}
-                    | _ -> {Id=stock.State.Id; CurrentPosition=stock.State.OpenPosition; Ticker=stock.State.Ticker; Positions=positions}
+                    | null -> {Id=stock.State.Id; CurrentPosition=null; Ticker=stock.State.Ticker; Positions=positions; Price=price}
+                    | _ -> {Id=stock.State.Id; CurrentPosition=stock.State.OpenPosition; Ticker=stock.State.Ticker; Positions=positions; Price=price}
                     
                 return ServiceResponse<OwnershipView>(view)
     }

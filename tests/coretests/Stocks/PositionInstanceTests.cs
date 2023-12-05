@@ -61,10 +61,6 @@ namespace coretests.Stocks
             Assert.Equal(30.875m, _position.StopPrice);
 
         [Fact]
-        public void PercentToStop_WithoutPrice_FullLoss() =>
-            Assert.Null(_position.PercentToStop);
-
-        [Fact]
         public void Cost()
         {
             var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTime.Parse("2020-01-23"));
@@ -73,44 +69,6 @@ namespace coretests.Stocks
             position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
 
             Assert.Equal(650, position.Cost);
-        }
-
-        [Fact]
-        public void SetPrice_SetsVariousMetricsThatDependOnIt()
-        {
-            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTime.Parse("2020-01-23"));
-
-            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
-            position.Buy(numberOfShares: 10, price: 35, when: DateTime.Parse("2020-01-25"), transactionId: Guid.NewGuid());
-            position.Sell(numberOfShares: 5, price: 36, when: DateTime.Parse("2020-02-25"), transactionId: Guid.NewGuid());
-            position.SetStopPrice(28, DateTimeOffset.UtcNow);
-
-            Assert.Null(position.Price);
-            Assert.Null(position.UnrealizedProfit);
-            Assert.Null(position.UnrealizedGainPct);
-            Assert.Null(position.PercentToStop);
-            Assert.Null(position.UnrealizedRR);
-
-            position.SetPrice(40);
-
-            Assert.Equal(40, position.Price);
-            Assert.Equal(100, position.UnrealizedProfit);
-            Assert.Equal(0.2m, position.UnrealizedGainPct.Value, 2);
-            Assert.Equal(0.2m, position.GainPct, 2);
-            Assert.Equal(3.08m, position.UnrealizedRR.Value, 2);
-            Assert.Equal(-0.43m, position.PercentToStop.Value, 2);
-        }
-
-        [Fact]
-        public void PercentToStop_WithPriceButNoStop_SetToMax()
-        {
-            var position = new PositionInstance(0, TestDataGenerator.TSLA, DateTime.Parse("2020-01-23"));
-
-            position.Buy(numberOfShares: 10, price: 30, when: DateTime.Parse("2020-01-23"), transactionId: Guid.NewGuid());
-
-            position.SetPrice(40);
-
-            Assert.Equal(-1, position.PercentToStop.Value);
         }
 
         [Fact]

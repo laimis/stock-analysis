@@ -406,10 +406,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     match priceResponse.Success with
                     | None -> return None
                     | Some prices ->
-                        // TODO: this is not nice, can we avoid it setting the price here?
-                        match prices.Bars with
-                        | [||] -> ()
-                        | _ -> position.SetPrice prices.Last.Close
                         
                         let outcomes = PositionAnalysis.generate position prices orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}

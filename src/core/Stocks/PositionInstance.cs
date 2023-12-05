@@ -61,21 +61,20 @@ namespace core.Stocks
         public decimal Profit { get; private set; }
         public decimal GainPct => IsClosed switch {
             true => (AverageSaleCostPerShare - AverageBuyCostPerShare) / AverageBuyCostPerShare,
-            false => UnrealizedGainPct ?? 0
+            false => 0
         };
             
         public decimal RR => RiskedAmount switch {
-            not null => Profit / RiskedAmount.Value + (UnrealizedRR ?? 0),
+            not null => 
+                RiskedAmount.Value switch
+                {
+                    0 => 0,
+                    _ => Profit / RiskedAmount.Value
+                },
             _ => 0
         };
         public decimal RRWeighted => RR * Cost;
 
-        public decimal? Price { get; private set; }
-        public decimal? UnrealizedProfit { get; private set; }
-        public decimal? UnrealizedGainPct { get; private set; }
-        public decimal? UnrealizedRR { get; private set; }
-        public decimal? PercentToStop { get; private set; }
-        public decimal CombinedProfit => Profit + (UnrealizedProfit ?? 0);
         public bool IsClosed => Closed != null;
         public int PositionId { get; }
         public Ticker Ticker { get; }
@@ -240,29 +239,6 @@ namespace core.Stocks
             RiskedAmount = riskAmount;
 
             Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", new PositionEventType(PositionEventType.Risk), riskAmount, DateOnly.FromDateTime(when.DateTime)));
-        }
-
-        public void SetPrice(decimal? price)
-        {
-            if (price == null)
-            {
-                return;
-            }
-            
-            Price = price;
-            UnrealizedProfit = _slots.Select(cost => price - cost).Sum();
-            UnrealizedGainPct = AverageCostPerShare switch {
-                0 => 0,
-                _ => (price - AverageCostPerShare) / AverageCostPerShare
-            };
-            UnrealizedRR = RiskedAmount switch {
-                not null =>  UnrealizedProfit / RiskedAmount.Value,
-                _ => 0
-            };
-            PercentToStop = StopPrice switch {
-                not null => (StopPrice.Value - price) / StopPrice.Value,
-                _ => -1
-            };
         }
 
         private void RunCalculations()

@@ -40,7 +40,6 @@ type TradingStrategy(name:string) =
         if position.IsClosed then
             context
         else
-            position.SetPrice(bar.Close)
             
             this.ApplyPriceBarToPositionInternal context bar
             
@@ -61,7 +60,7 @@ type TradingStrategy(name:string) =
     
     member this.ClosePosition price date (position:PositionInstance) =
         if position.NumberOfShares > 0m then
-            position.Sell(
+           position.Sell(
                 numberOfShares = position.NumberOfShares,
                 price = price,
                 transactionId = Guid.NewGuid(),
@@ -116,11 +115,8 @@ type TradingStrategyActualTrade() =
                 bars.Bars
                 |> Seq.fold (fun (position:PositionInstance, maxDrawdownPct, maxGainPct, last10Bars:PriceBar list) bar ->
                     if position.IsClosed && bar.Date.Date = position.Closed.Value.Date then
-                        
                         position, maxDrawdownPct, maxGainPct, last10Bars
                     else
-                        position.SetPrice(bar.Close)
-                        
                         let maxDrawdownPct = Math.Min(maxDrawdownPct,bar.PercentDifferenceFromLow(position.AverageBuyCostPerShare))
                         let maxGainPct = Math.Max(maxGainPct,bar.PercentDifferenceFromHigh(position.AverageBuyCostPerShare))
                         
@@ -259,6 +255,7 @@ type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
                     
                     TradingStrategyFactory.getStrategies()
                     |> Seq.iter ( fun strategy ->
+                        
                         let positionInstance = PositionInstance(0, ticker, ``when``)
                         positionInstance.Buy(numberOfShares, price, ``when``, Guid.NewGuid())
                         positionInstance.SetStopPrice(stopPrice, ``when``)

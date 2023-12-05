@@ -21,7 +21,6 @@ namespace coretests.Stocks.Services
 
             var position = new PositionInstance(0, ticker, bars.First.Date);
             position.Buy(numberOfShares: 10, price: 100m, when: bars.First.Date, transactionId: System.Guid.NewGuid());
-            position.SetPrice(bars.First.Close);
             
             var orders = new[] {
                 new Order {

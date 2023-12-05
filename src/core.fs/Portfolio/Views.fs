@@ -306,6 +306,7 @@ type TradingEntriesView =
         violations: StockViolationView array
         cashBalance: decimal option
         brokerageOrders: Order array
+        prices: Dictionary<Ticker, StockQuote>
     }
     
 type PastTradingEntriesView =

@@ -1,7 +1,6 @@
 namespace core.fs.Services
 
 open System
-open core.Shared
 open core.Stocks
 open core.fs.Services.Analysis
 open core.fs.Shared
@@ -20,6 +19,7 @@ module PositionAnalysis =
         let StopLoss = "StopLoss"
         let RR = "RR"
         let Profit = "Profit"
+        let UnrealizedProfit = "UnrealizedProfit"
         let Price = "Price"
         let RiskAmount = "RiskedAmount"
         let DaysSinceLastTransaction = "DaysSinceLastTransaction"
@@ -41,10 +41,10 @@ module PositionAnalysis =
             | true -> position.StopPrice.Value
             | false -> 0.0m
         
-        let pctToStop = 
-            match position.PercentToStop.HasValue with
-            | true -> position.PercentToStop.Value
-            | false -> 0.0m
+        let pctToStop =
+            match stopLoss with
+            | 0.0m -> 0.0m
+            | _ -> (stopLoss - bars.Last.Close) / stopLoss
         
         let rrOutcomeType = 
             match position.RR with
@@ -76,15 +76,18 @@ module PositionAnalysis =
         let hasSellOrderInOrders = 
             orders
             |> Array.exists (fun (o:Order) -> o.IsSellOrder && o.Ticker.Value = position.Ticker)
+            
+        let unrealizedProfit =  position.Profit + position.NumberOfShares * (bars.Last.Close - position.AverageCostPerShare)
         
         [
-            AnalysisOutcome(PortfolioAnalysisKeys.Price, OutcomeType.Neutral, position.Price.Value, ValueFormat.Currency, $"Price: {position.Price.Value:C2}")
+            AnalysisOutcome(PortfolioAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
             AnalysisOutcome(PortfolioAnalysisKeys.StopLoss, OutcomeType.Neutral, stopLoss, ValueFormat.Currency, $"Stop loss is {stopLoss:C2}")
             AnalysisOutcome(PortfolioAnalysisKeys.PercentToStopLoss, (if pctToStop < 0.0m then OutcomeType.Neutral else OutcomeType.Negative), pctToStop, ValueFormat.Percentage, $"%% difference to stop loss {stopLoss} is {pctToStop}")
             AnalysisOutcome(PortfolioAnalysisKeys.AverageCost, OutcomeType.Neutral, Math.Round(position.AverageCostPerShare, 2), ValueFormat.Currency, $"Average cost per share is {position.AverageCostPerShare:C2}")
             AnalysisOutcome(PortfolioAnalysisKeys.GainPct, (if position.GainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.GainPct, ValueFormat.Percentage, $"{position.GainPct:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.RR, rrOutcomeType, Math.Round(position.RR, 2), ValueFormat.Number, $"{position.RR:N2}")
-            AnalysisOutcome(PortfolioAnalysisKeys.Profit, (if position.CombinedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.CombinedProfit, ValueFormat.Currency, $"{position.CombinedProfit}")
+            AnalysisOutcome(PortfolioAnalysisKeys.Profit, (if position.Profit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.Profit, ValueFormat.Currency, $"{position.Profit}")
+            AnalysisOutcome(PortfolioAnalysisKeys.UnrealizedProfit, (if unrealizedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedProfit, ValueFormat.Currency, $"{unrealizedProfit}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdown, OutcomeType.Neutral, drawdown, ValueFormat.Percentage, $"Max drawdown is {drawdown:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.GainAndDrawdownDiff, (if gain + drawdown >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), gain + drawdown, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
