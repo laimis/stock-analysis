@@ -786,8 +786,11 @@ public class TDAmeritradeClient : IBrokerage
         token.created = DateTimeOffset.UtcNow;
         if (token.IsError)
         {
+            _logger?.LogError("Could not refresh access token: {error}", token.error);
             throw new Exception("Could not refresh access token: " + token.error);
         }
+
+        _logger?.LogCritical("Saving access token to storage");
         
         await _blogStorage.Save(storageKey, token);
         return token;
