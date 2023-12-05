@@ -350,7 +350,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         return Some (tickerOutcome, gapsView, tickerPatterns)
                     }
                 )
-                |> Async.Parallel
+                |> Async.Sequential
                 |> Async.StartAsTask
                 
             let outcomes, gaps, patterns =
@@ -418,7 +418,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         return Some (tickerOutcome, tickerPatterns)
                     }
                 )
-                |> Async.Parallel
+                |> Async.Sequential
                 |> Async.StartAsTask
                 
             let outcomes, patterns =

@@ -77,7 +77,7 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
             let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
             return (ticker, prices)
         })
-        |> Async.Parallel
+        |> Async.Sequential
         
     let failed = results |> Array.filter (fun (_, prices) -> prices.IsNone)
     let prices =

@@ -111,7 +111,7 @@ module core.fs.Alerts.MonitoringServices
                             |> Seq.map (fun s -> s.State.OpenPosition)
                             |> Seq.filter (fun p -> p.StopPrice.HasValue)
                             |> Seq.map (fun p -> p |> runStopLossCheck user.State cancellationToken)
-                            |> Async.Parallel
+                            |> Async.Sequential
                             |> Async.StartAsTask
                             
                         logInformation("done")

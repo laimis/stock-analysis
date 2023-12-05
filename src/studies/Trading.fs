@@ -21,7 +21,7 @@ let prepareSignalsForTradeSimulations (signalFilepath:string) (priceFunc:string 
             let startBar = r.Date |> prices.TryFindByDate
             return (r, prices, startBar)   
         })
-        |> Async.Parallel
+        |> Async.Sequential
         
     let signalsWithPriceBars =
         asyncData

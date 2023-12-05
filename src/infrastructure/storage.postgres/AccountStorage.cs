@@ -93,9 +93,11 @@ namespace storage.postgres
         {
             using var db = GetConnection();
             
-            return await db.QueryAsync<EmailIdPair>(
+            var users = await db.QueryAsync<EmailIdPair>(
                 @"SELECT email,id FROM users"
             );
+            
+            return users;
         }
 
         public Task<T?> ViewModel<T>(Guid userId) =>
