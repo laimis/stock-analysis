@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -9,6 +9,7 @@ using core.fs.Shared.Adapters.Stocks;
 using core.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
+using Nito.AsyncEx;
 using Polly;
 using Polly.RateLimit;
 using Polly.Retry;
@@ -765,6 +766,8 @@ public class TDAmeritradeClient : IBrokerage
     public Task<OAuthResponse> RefreshAccessToken(UserState user) =>
         RefreshAccessTokenInternal(user, fullRefresh: true);
 
+    private readonly AsyncLock _asyncLock = new AsyncLock();
+    
     public async Task<OAuthResponse> GetAccessToken(UserState user)
     {
         if (!user.ConnectedToBrokerage)
@@ -781,19 +784,32 @@ public class TDAmeritradeClient : IBrokerage
             _logger?.LogInformation("Returning cached access token, with expiration");
             return token;
         }
-        
-        token = await RefreshAccessTokenInternal(user, fullRefresh: false);
-        token.created = FSharpOption<DateTimeOffset>.Some(DateTimeOffset.UtcNow);
-        if (token.IsError)
-        {
-            _logger?.LogError("Could not refresh access token: {error}", token.error);
-            throw new Exception("Could not refresh access token: " + token.error);
-        }
 
-        _logger?.LogCritical("Saving access token to storage");
+        using (await _asyncLock.LockAsync())
+        {
+            // check again, in case another thread has already refreshed the token
+            token = _blogStorage.Get<OAuthResponse>(storageKey).Result;
+            if (token is { IsExpired: false })
+            {
+                _logger?.LogInformation("Returning cached access token, without expiration");
+                return token;
+            }
+            
+            _logger?.LogInformation("Refreshing access token");
+            
+            token = await RefreshAccessTokenInternal(user, fullRefresh: false);
+            token.created = FSharpOption<DateTimeOffset>.Some(DateTimeOffset.UtcNow);
+            if (token.IsError)
+            {
+                _logger?.LogError("Could not refresh access token: {error}", token.error);
+                throw new Exception("Could not refresh access token: " + token.error);
+            }
+
+            _logger?.LogCritical("Saving access token to storage");
         
-        await _blogStorage.Save(storageKey, token);
-        return token;
+            await _blogStorage.Save(storageKey, token);
+            return token;
+        }
     }
 
     private static string GenerateApiUrl(string function) => $"{ApiUrl}/{function}";
