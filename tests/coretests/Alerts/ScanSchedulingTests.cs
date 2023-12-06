@@ -1,6 +1,9 @@
 using System;
 using core.fs.Alerts;
 using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Shared.Adapters.Logging;
+using core.fs.Shared.Adapters.Storage;
+using Moq;
 using Xunit;
 
 namespace coretests.Alerts
@@ -35,11 +38,21 @@ namespace coretests.Alerts
         [InlineData("2023-03-04T00:00:00Z", "2023-03-06T14:45:00.0000000+00:00")] // friday evening et
         public void GetNextStopLossMonitor_Works(string inputUtc, string expectedUtc)
         {
+            var stopLossService = CreateStopLossMonitoringService();
+            
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = MonitoringServices.nextStopLossRun(time, _marketHours);
+            var nextRun = stopLossService.NextRunTime(time);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
+        }
+
+        private static MonitoringServices.StopLossMonitoringService CreateStopLossMonitoringService()
+        {
+            var stopLossService = new MonitoringServices.StopLossMonitoringService(
+                Mock.Of<IAccountStorage>(), Mock.Of<IBrokerage>(), new StockAlertContainer(),
+                Mock.Of<IPortfolioStorage>(), Mock.Of<ILogger>(), _marketHours);
+            return stopLossService;
         }
 
         [Theory]
@@ -53,8 +66,10 @@ namespace coretests.Alerts
         public void GetNextStopLossMonitor_Works2(string inputUtc, string expectedUtc)
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
+            
+            var service = CreateStopLossMonitoringService();
 
-            var nextRun = MonitoringServices.nextStopLossRun(time, _marketHours);
+            var nextRun = service.NextRunTime(time);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }
