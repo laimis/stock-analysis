@@ -62,22 +62,37 @@ public abstract class GenericBackgroundServiceHost : BackgroundService
 
 public class StopLossServiceHost : GenericBackgroundServiceHost
 {
-    private readonly IMarketHours _marketHours;
     private readonly MonitoringServices.StopLossMonitoringService _service;
 
     public StopLossServiceHost(
         ILogger<StopLossServiceHost> logger,
-        IMarketHours marketHours,
         MonitoringServices.StopLossMonitoringService stopLossMonitoringService) : base(logger)
     {
-        _marketHours = marketHours;
         _service = stopLossMonitoringService;
     }
 
     protected override TimeSpan GetSleepDuration() =>
-        MonitoringServices.nextStopLossRun(DateTimeOffset.UtcNow, _marketHours) - DateTimeOffset.UtcNow;
+        _service.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
 
     protected override async Task Loop(CancellationToken stoppingToken) => await _service.Execute(stoppingToken);
+}
+
+public class PatternMonitoringServiceHost : GenericBackgroundServiceHost
+{
+    private readonly MonitoringServices.PatternMonitoringService _service;
+
+    public PatternMonitoringServiceHost(
+        ILogger<PatternMonitoringServiceHost> logger,
+        MonitoringServices.PatternMonitoringService patternMonitoringService) : base(logger)
+    {
+        _service = patternMonitoringService;
+    }
+
+    protected override TimeSpan GetSleepDuration() =>
+        _service.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
+
+    protected override async Task Loop(CancellationToken stoppingToken) => await _service.Execute(stoppingToken);
+
 }
 
 public class BrokerageServiceHost : GenericBackgroundServiceHost
