@@ -20,7 +20,7 @@ namespace coretests.Alerts
         {
             var time = DateTimeOffset.Parse(inputUtc, null, System.Globalization.DateTimeStyles.AssumeUniversal);
 
-            var nextRun = MonitoringServices.nextMonitoringRun(time, _marketHours);
+            var nextRun = MonitoringServices.nextPatternMonitoringRun(time, _marketHours);
 
             Assert.Equal(expectedUtc, nextRun.ToString("o"));
         }

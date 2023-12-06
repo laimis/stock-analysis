@@ -101,7 +101,7 @@ namespace web
             StorageRegistrations(configuration, services, logger);
             
             services.AddHostedService<ThirtyDaySellService>();
-            services.AddHostedService<StockAlertService>();
+            services.AddHostedService<PatternMonitoringServiceHost>();
             services.AddHostedService<WeeklyUpsideReversalService>();
             services.AddHostedService<EmailNotificationService>();
             services.AddHostedService<StopLossServiceHost>();

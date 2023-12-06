@@ -229,6 +229,7 @@ module SingleBarPriceAnalysisEvaluation =
                 (fun o -> o.Key = SingleBarOutcomeKeys.RelativeVolume && o.Value >= RelativeVolumeThresholdPositive)
                 (fun o -> o.Key = SingleBarOutcomeKeys.ClosingRange && o.Value >= ExcellentClosingRange)
                 (fun o -> o.Key = SingleBarOutcomeKeys.SigmaRatio && o.Value >= SigmaRatioThreshold)
+                (fun o -> o.Key = SingleBarOutcomeKeys.PercentChange && o.Value >= 0m) // make sure it's positive
             ]
             
         [
