@@ -1,6 +1,10 @@
 <div>
   <app-error-display [errors]="errors"></app-error-display>
 
+  <button class="btn btn-primary" (click)="run()">Kick off</button>
+
   {{status}}
+
+  <app-brokerage-new-order [ticker]="testTicker" (brokerageOrderEntered)="brokerageOrderEntered($event)"></app-brokerage-new-order>
 
 </div>

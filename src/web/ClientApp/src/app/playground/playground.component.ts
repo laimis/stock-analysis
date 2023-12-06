@@ -20,10 +20,17 @@ export class PlaygroundComponent implements OnInit {
 
   errors: string[];
   status: string;
+  testTicker: string;
 
   ngOnInit() {
     const tickerParam = this.route.snapshot.queryParamMap.get('tickers')
     this.tickers = tickerParam ? tickerParam.split(',') : ['AMD']
+    this.testTicker = this.tickers[0]
+  }
+
+  run() {
+
+    this.status = "Running"
 
     let positionReport = this.stocks.reportPositions().pipe(
       tap((data) => {
@@ -60,13 +67,20 @@ export class PlaygroundComponent implements OnInit {
       })
     )
 
+    this.status = "Running..."
+
     concat(positionReport, gapReport, singleBarDaily, singleBarWeekly).subscribe(
       (_) => {
-        this.status = "Done"
+        // this.status = "Done"
+        // console.log("Done")
       },
       (error) => {
         this.errors = GetErrors(error)
       }
     )
+  }
+
+  brokerageOrderEntered($event) {
+    this.status = "Brokerage order entered: " + $event
   }
 }

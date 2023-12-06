@@ -2,6 +2,7 @@
   <h5>Brokerage Order</h5>
   <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
   <div>
+    @if (submittedOrder === false) {
     <div class="row">
       <div class="col-md">
         <app-stock-search
@@ -11,24 +12,6 @@
               (tickerSelected)="onTickerSelected($event)"
               cssClass="form-control">
           </app-stock-search>
-      </div>
-      <div class="col-md">
-        <label for="price" class="form-label">Price</label>
-        <input
-              type="number"
-              class="form-control"
-              id="price"
-              step="0.01"
-              [(ngModel)]="price">
-      </div>
-      <div class="col-md">
-        <label for="stocksToBuy" class="form-label"># of Shares</label>
-        <input
-              type="number"
-              class="form-control"
-              id="stocksToBuy"
-              [(ngModel)]="numberOfShares"
-              (ngModelChange)="numberOfSharesChanged()">
       </div>
       <div class="col-md" >
         <label for="brokerageOrderType" class="form-label">Order Type</label>
@@ -44,21 +27,61 @@
           <option *ngFor="let duration of orderDurations" [value]="duration.key">{{duration.value}}</option>
         </select>
       </div>
-    </div>
-    <div class="row" *ngIf="quote">
-      <div class="col-md"><div class="stat-label">bid</div><div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div></div>
-      <div class="col-md"><div class="stat-label">ask</div><div>{{ quote.askPrice | currency }} x {{ quote.askSize }}</div></div>
-      <div class="col-md"><div class="stat-label">last</div><div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div></div>
-      <div class="col-md"><div class="stat-label">exchange</div><div>{{ quote.exchangeName }}</div></div>
-      <div class="col-md"><div class="stat-label">total</div><div>{{total | currency}}</div></div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-md-6" >
-        <button class="btn btn-primary w-100" (click)="brokerageBuy()">Buy</button>
+      <div class="col-md">
+        <label for="price" class="form-label">Price</label>
+        <input
+              type="number"
+              [ngClass]="{'form-control': true, 'disabled': brokerageOrderType === 'Market'}"
+              id="price"
+              step="0.01"
+              [disabled]="brokerageOrderType === 'Market'"
+              [readOnly]="brokerageOrderType === 'Market'"
+              [(ngModel)]="price">
       </div>
-      <div class="col-md-6" >
-        <button class="btn btn-primary w-100" (click)="brokerageSell()">Sell</button>
+      <div class="col-md">
+        <label for="stocksToBuy" class="form-label"># of Shares</label>
+        <input
+              type="number"
+              class="form-control"
+              id="stocksToBuy"
+              [(ngModel)]="numberOfShares"
+              (ngModelChange)="numberOfSharesChanged()">
       </div>
     </div>
+    }
+
+    @if (quote && submittedOrder === false) {
+      <div class="row" *ngIf="quote">
+        <div class="col-md"><div class="stat-label">bid</div><div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div></div>
+        <div class="col-md"><div class="stat-label">ask</div><div>{{ quote.askPrice | currency }} x {{ quote.askSize }}</div></div>
+        <div class="col-md"><div class="stat-label">last</div><div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div></div>
+        <div class="col-md"><div class="stat-label">exchange</div><div>{{ quote.exchangeName }}</div></div>
+        <div class="col-md"><div class="stat-label">total</div><div>{{total | currency}}</div></div>
+      </div>
+    }
+
+    @if (submittedOrder === false && submittingOrder === false) {
+      <div class="row mt-3" *ngIf="!submittedOrder">
+        <div class="col-md-6" >
+          <button class="btn btn-primary w-100" (click)="brokerageBuy()">Buy</button>
+        </div>
+        <div class="col-md-6" >
+          <button class="btn btn-primary w-100" (click)="brokerageSell()">Sell</button>
+        </div>
+      </div>
+    } @else if (submittingOrder) {
+      <div class="row mt-3" *ngIf="submittingOrder">
+        <div class="col-md-12" >
+          <button class="btn btn-primary w-100 disabled" disabled>Submitting Order...</button>
+        </div>
+      </div>
+    } @else {
+      <div class="row mt-3" *ngIf="submittedOrder">
+        <div class="col-md-12" >
+          <button class="btn btn-primary w-100" (click)="submittedOrder = false">New Order</button>
+        </div>
+      </div>
+    }
+
   </div>
 </section>

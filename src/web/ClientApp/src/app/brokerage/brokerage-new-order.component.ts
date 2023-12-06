@@ -21,6 +21,9 @@ export class BrokerageNewOrderComponent {
   total: number | null = null
   errorMessage: string | null = null;
 
+  submittedOrder = false
+  submittingOrder = false
+
   private marketOrderTypes: KeyValuePair[] = [
     { key: BrokerageOrderDuration.Day, value: 'Day' },
     { key: BrokerageOrderDuration.Gtc, value: 'GTC' }
@@ -71,7 +74,6 @@ export class BrokerageNewOrderComponent {
 
   reset() {
     this.numberOfShares = null
-    this.price = null
     this.errorMessage = null
   }
 
@@ -107,6 +109,7 @@ export class BrokerageNewOrderComponent {
 
   execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
     this.errorMessage = null
+    this.submittingOrder = true
     var cmd : brokerageordercommand = {
       ticker: this.selectedTicker,
       numberOfShares: this.numberOfShares,
@@ -117,8 +120,10 @@ export class BrokerageNewOrderComponent {
 
     fn(cmd).subscribe(
       _ => {
+        this.submittingOrder = false
+        this.submittedOrder = true
         this.reset()
-        this.brokerageOrderEntered.emit("entered")
+        this.brokerageOrderEntered.emit(this.selectedTicker)
     },
       err => {
         this.errorMessage = GetErrors(err)[0]
