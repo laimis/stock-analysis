@@ -27,7 +27,7 @@ module core.fs.Alerts.MonitoringServices
         TimeOnly.Parse("11:15")
         TimeOnly.Parse("13:05")
         TimeOnly.Parse("14:35")
-        TimeOnly.Parse("15:40")
+        TimeOnly.Parse("15:45")
     ]
     let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
         let easternTime = marketHours.ToMarketTime(referenceTimeUtc)
