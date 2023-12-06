@@ -23,31 +23,6 @@ namespace core.Notes
             ApplyInternal(obj);
         }
         
-        protected void ApplyInternal(NoteArchived archived)
-        {
-        }
-        protected void ApplyInternal(NoteReminderCleared cleared)
-        {
-        }
-        protected void ApplyInternal(NoteReminderSet set)
-        {
-        }
-        protected void ApplyInternal(NoteFollowedUp e)
-        {
-        }
-
-        [Obsolete]
-        internal void ApplyInternal(NoteEnriched enriched)
-        {
-            StatsApplied = enriched.When;
-        }
-
-        [Obsolete]
-        internal void ApplyInternal(NoteEnrichedWithPrice enriched)
-        {
-            StatsApplied = enriched.When;
-        }
-
         internal void ApplyInternal(NoteUpdated updated)
         {
             Note = updated.Note;

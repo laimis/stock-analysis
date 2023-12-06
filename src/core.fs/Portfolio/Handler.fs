@@ -500,6 +500,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match pricesResponse.Success with
                 | Some prices -> prices
                 | None -> Dictionary<Ticker, StockQuote>()
+                
+            let pricesWithStringAsKey = prices.Keys |> Seq.map (fun p -> p.Value, prices[p]) |> Map.ofSeq
             
             let current = positions |> Array.sortByDescending (fun p -> p.RR)
             
@@ -511,7 +513,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     violations=violations
                     cashBalance=account.CashBalance
                     brokerageOrders=account.Orders
-                    prices=prices
+                    prices=pricesWithStringAsKey
                 }
             return ServiceResponse<TradingEntriesView>(tradingEntries)
     }
