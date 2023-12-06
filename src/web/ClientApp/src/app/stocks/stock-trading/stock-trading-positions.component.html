@@ -36,7 +36,7 @@
             <div class="row">
               <div class="col">
                 <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
-                <span class="position-price">{{position.price | currency}}</span>
+                <span class="position-price">{{getPrice(position) | currency}}</span>
                 <i
                   (click)="toggleVisibility(detailDiv);"
                   class="bi bi-info-square-fill ms-2"></i>
@@ -49,7 +49,7 @@
             </div>
           </div>
         </div>
-        <div class="card-text" class="visually-hidden" #detailDiv>
+        <div class="card-text visually-hidden" #detailDiv>
           <app-stock-trading-position [position]="position" [orders]="orders" ></app-stock-trading-position>
         </div>
       </div>
@@ -66,15 +66,11 @@
           <th>Stop</th>
           <th>Cost</th>
           <th>Shares</th>
-          <th>P/L (u)</th>
-          <th>% Gain (u)</th>
-          <th>R/R (u)</th>
           <th>P/L</th>
           <th>Risked</th>
           <th>R/R</th>
           <th>Opened</th>
           <th>Last tx Age</th>
-          <th>% to stop</th>
         </tr>
       </thead>
       <tbody>
@@ -82,20 +78,16 @@
           <td>
             <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
           </td>
-          <td>{{position.price | currency}}</td>
+          <td>{{getPrice(position) | currency}}</td>
           <td>{{position.averageCostPerShare | currency}}</td>
           <td>{{position.stopPrice | currency}}</td>
           <td>{{position.cost | currency}}</td>
           <td>{{position.numberOfShares}}</td>
-          <td>{{position.unrealizedProfit| currency}}</td>
-          <td>{{position.unrealizedGainPct | percent}}</td>
-          <td>{{position.unrealizedRR  | number}}</td>
-          <td>{{position.combinedProfit | currency}}</td>
+          <td>{{position.profit}}</td>
           <td>{{position.riskedAmount | currency}}</td>
           <td>{{position.rr | number}}</td>
           <td>{{position.opened | date}}</td>
           <td>{{position.daysSinceLastTransaction}}</td>
-          <td>{{position.percentToStop | percent}}</td>
         </tr>
       </tbody>
     </table>

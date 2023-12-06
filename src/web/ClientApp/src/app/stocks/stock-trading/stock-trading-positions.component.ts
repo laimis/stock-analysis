@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
-import { GetStrategies, isLongTermStrategy, toggleVisuallyHidden } from 'src/app/services/utils';
-import { BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StocksService } from '../../services/stocks.service';
-import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {GetStrategies, isLongTermStrategy, toggleVisuallyHidden} from 'src/app/services/utils';
+import {BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StocksService} from '../../services/stocks.service';
+import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 
 @Component({
   selector: 'app-stock-trading-positions',
@@ -18,7 +18,7 @@ export class StockTradingPositionsComponent {
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
     strategies: { key: string; value: string }[] = []
-    
+
     private NO_LONG_TERM_STRATEGY = "nolongterm"
     strategyToFilter = this.NO_LONG_TERM_STRATEGY
 
@@ -27,7 +27,7 @@ export class StockTradingPositionsComponent {
         this._positions = input
 
         // create an array of strategies where value is the stratey name and count of positions that match
-        
+
         let stratsWithCounts = GetStrategies().map(
             (s) => {
                 var count = input.filter(i => this.matchesStrategyCheck(i, s.key)).length
@@ -42,7 +42,7 @@ export class StockTradingPositionsComponent {
                 return strategy && isLongTermStrategy(strategy.value)
             }
         )
-        
+
         this.strategies.push({key: this.NO_LONG_TERM_STRATEGY, value: "All minus long term - " + (input.length - longTermPositions.length)})
         this.strategies = this.strategies.concat(
             stratsWithCounts
@@ -53,6 +53,9 @@ export class StockTradingPositionsComponent {
     @Input()
     orders:BrokerageOrder[];
 
+    @Input()
+    prices:{[ticker:string]:number};
+
     // constructor that takes stock service
     constructor(
         private stockService:StocksService,
@@ -60,7 +63,7 @@ export class StockTradingPositionsComponent {
         private currencyPipe: CurrencyPipe,
         private decimalPipe: DecimalPipe
     ) {}
-    
+
     toggleVisibility(elem:HTMLElement) {
         toggleVisuallyHidden(elem)
     }
@@ -92,15 +95,18 @@ export class StockTradingPositionsComponent {
         )
     }
 
+    getPrice(p:PositionInstance) {
+      if (this.prices) {
+        return this.prices[p.ticker]
+      }
+    }
+
     sortOptions: { name: string; value: string }[] = [
         { value: "rr", name: "R/R" },
         { value: "pl", name: "P/L" },
-        { value: "unrealizedPL", name: "Unrealized P/L" },
-        { value: "combinedPL", name: "Combined P/L" },
         { value: "plPercent", name: "P/L %" },
         { value: "cost", name: "Cost" },
         { value: "ticker", name: "Ticker" },
-        { value: "percentToStop", name: "% to Stop" },
         { value: "daysSinceLastTransaction", name: "Days Since Last Transaction" },
         { value: "riskedAmount", name: "Risked Amount" },
         { value: "riskedAmountFromStop", name: "Risked Amount from Stop" },
@@ -120,14 +126,13 @@ export class StockTradingPositionsComponent {
     }
 
     strategyToFilterChanged = (elem: EventTarget) => {
-        var value = (elem as HTMLInputElement).value
-        this.strategyToFilter = value
-        this.updatePositions()
+      this.strategyToFilter = (elem as HTMLInputElement).value
+      this.updatePositions()
     }
 
     metricChanged(elem: EventTarget) {
-        var value = (elem as HTMLInputElement).value
-        
+        let value = (elem as HTMLInputElement).value
+
         this.metricToRender = value
 
         switch (value) {
@@ -136,7 +141,7 @@ export class StockTradingPositionsComponent {
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break;
             case "plPercent":
-                this.metricFunc = (p:PositionInstance) => p.unrealizedGainPct
+                this.metricFunc = (p:PositionInstance) => p.gainPct
                 this.metricType = OutcomeValueTypeEnum.Percentage
                 break;
             case "cost":
@@ -151,10 +156,6 @@ export class StockTradingPositionsComponent {
                 this.metricFunc = (p:PositionInstance) => p.daysSinceLastTransaction
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
-            case "percentToStop":
-                this.metricFunc = (p:PositionInstance) => p.percentToStop
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break
             case "riskedAmount":
                 this.metricFunc = (p:PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
                 this.metricType = OutcomeValueTypeEnum.Currency
@@ -167,14 +168,6 @@ export class StockTradingPositionsComponent {
                 this.metricFunc = (p:PositionInstance) => p.daysHeld
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
-            case "unrealizedPL":
-                this.metricFunc = (p:PositionInstance) => p.unrealizedProfit
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break
-            case "combinedPL":
-                this.metricFunc = (p:PositionInstance) => p.combinedProfit
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break
             default:
                 this.metricFunc = (p:PositionInstance) => p.rr
                 this.metricType = OutcomeValueTypeEnum.Number
@@ -184,11 +177,11 @@ export class StockTradingPositionsComponent {
     }
 
     getMetricToRender(p:PositionInstance) {
-        var val = this.metricFunc(p)
+        let val = this.metricFunc(p)
         if (Number.isFinite(val)) {
             val = Math.round(val * 100) / 100
         }
-        
+
         if (this.metricType === OutcomeValueTypeEnum.Percentage) {
             return this.percentPipe.transform(val, '1.0-2')
           } else if (this.metricType === OutcomeValueTypeEnum.Currency) {
@@ -209,30 +202,28 @@ export class StockTradingPositionsComponent {
     }
 
     updatePositions() {
-        var positions = this._positions.sort((a, b) => {
-            if (Number.isFinite(this.metricFunc(a))) {
-                return this.metricFunc(b) - this.metricFunc(a)
-            }
-            return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
+      this.sortedPositions = this._positions.sort((a, b) => {
+          if (Number.isFinite(this.metricFunc(a))) {
+            return this.metricFunc(b) - this.metricFunc(a)
+          }
+          return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
         })
-        .filter(p => {
+          .filter(p => {
             if (this.strategyToFilter === "all") {
-                return true
+              return true
             }
-            
+
             let positionStrategy = p.labels.find(l => l.key === "strategy")
             if (!positionStrategy) {
-                return false
+              return false
             }
 
             if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
-                return !isLongTermStrategy(positionStrategy.value)
+              return !isLongTermStrategy(positionStrategy.value)
             }
 
             return positionStrategy.value === this.strategyToFilter
-        })
-
-        this.sortedPositions = positions
+          })
     }
 }
 

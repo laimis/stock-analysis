@@ -18,7 +18,7 @@
       <ng-container *ngFor="let r of sortedResults(); let i = index">
         <tr (click)="toggleShowDetails(i)">
           <td class="text-muted">{{r.strategyName}}</td>
-          <td [ngClass]="{'bg-negative': r.position.combinedProfit < 0, 'fw-bold': true}">{{r.position.combinedProfit | currency}}</td>
+          <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{r.position.profit | currency}}</td>
           <td>{{r.position.stopPrice | currency }}</td>
           <td>{{r.position.rr | number}}</td>
           <td>{{r.position.gainPct | percent}}</td>
@@ -30,7 +30,7 @@
             <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
           </td>
         </tr>
-        
+
         <tr *ngIf="showDetails === i">
           <td></td>
           <td colspan="9">
@@ -56,5 +56,6 @@
       <div class="alert alert-danger" role="alert">
         {{e}}
       </div>
+    </div>
   </div>
 </div>

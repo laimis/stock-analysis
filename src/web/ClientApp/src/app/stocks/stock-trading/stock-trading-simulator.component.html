@@ -5,7 +5,7 @@
 
   <div class="row" *ngIf="showExisting">
     <label for="tickerFilter" class="form-label">Ticker filter</label>
-    <input type="text" class="form-control" placeholder="Ticker filter" [(ngModel)]="positionFilter" (ngModelChange)="filterPositions()" name="tickerFilter">
+    <input type="text" class="form-control" placeholder="Ticker filter" [(ngModel)]="positionFilter" (ngModelChange)="filterPositions()" id="tickerFilter">
 
 
     <ul class="overflow-auto" style="max-height: 600px">

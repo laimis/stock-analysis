@@ -45,6 +45,9 @@ export class StockTradingPositionComponent {
     this.updatePositionOrders();
   }
 
+  @Input()
+  price: number
+
   updatePositionOrders() {
     if (!this._position) {
       return
