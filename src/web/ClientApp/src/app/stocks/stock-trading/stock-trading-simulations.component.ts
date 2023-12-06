@@ -60,8 +60,8 @@ export class StockTradingSimulationsComponent implements OnInit {
     const simulatedPosition = results[strategyIndex].positions[positionIndex];
     const actualPosition = results[0].positions[positionIndex];
 
-    const simulatedProfit = simulatedPosition.combinedProfit;
-    const actualProfit = actualPosition.combinedProfit;
+    const simulatedProfit = simulatedPosition.profit;
+    const actualProfit = actualPosition.profit;
 
     return actualProfit >= simulatedProfit ? 'bg-success' : '';
   }

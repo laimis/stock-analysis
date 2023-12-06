@@ -26,7 +26,7 @@ export class TradingActualVsSimulatedPositionComponent {
   }
 
   sortedResults() {
-    return this.simulations.results.sort((a, b) => b.position.combinedProfit - a.position.combinedProfit);
+    return this.simulations.results.sort((a, b) => b.position.profit - a.position.profit);
   }
 }
 

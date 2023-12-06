@@ -79,11 +79,10 @@ namespace coretests.Stocks.Services.Trading
             Assert.True(position.IsClosed);
             Assert.Equal(1005, position.Profit);
             Assert.Equal(1.005m, position.GainPct);
-            Assert.Equal(3.03m, position.RR);
+            Assert.Equal(2.01m, position.RR);
             Assert.Equal(-0.001m, maxDrawdown);
             Assert.Equal(1.501m, maxGain);
             Assert.Equal(14, position.DaysHeld);
-            Assert.Equal(25, position.Price);
 
             var oneThirdPercentBased = results.Results[1];
             maxDrawdown = oneThirdPercentBased.MaxDrawdownPct;
@@ -93,11 +92,10 @@ namespace coretests.Stocks.Services.Trading
             Assert.True(position.IsClosed);
             Assert.Equal(137.3m, position.Profit);
             Assert.Equal(0.1373m, position.GainPct);
-            Assert.Equal(0.5426m, position.RR);
+            Assert.Equal(0.2746m, position.RR);
             Assert.Equal(-0.001m, maxDrawdown);
             Assert.Equal(0.201m, maxGain);
             Assert.Equal(1, position.DaysHeld);
-            Assert.Equal(12, position.Price);
         }
 
         [Fact]
@@ -106,8 +104,8 @@ namespace coretests.Stocks.Services.Trading
             var bars = GeneratePriceBars(100, i => 10 + i);
 
             var testPosition = new PositionInstance(0, TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
-            testPosition.Buy(2, 10, System.DateTimeOffset.UtcNow, Guid.NewGuid());
-            testPosition.SetStopPrice(5, System.DateTimeOffset.UtcNow);
+            testPosition.Buy(2, 10, DateTimeOffset.UtcNow, Guid.NewGuid());
+            testPosition.SetStopPrice(5, DateTimeOffset.UtcNow);
             
             var runner = TradingStrategyFactory.createProfitPointsTrade(3);
             
@@ -120,11 +118,10 @@ namespace coretests.Stocks.Services.Trading
             Assert.True(position.IsClosed);
             Assert.Equal(15, position.Profit);
             Assert.Equal(0.75m, position.GainPct);
-            Assert.Equal(2.5m, position.RR);
+            Assert.Equal(1.5m, position.RR);
             Assert.Equal(-0.001m, maxDrawdown);
             Assert.Equal(1.001m, maxGain);
             Assert.Equal(9, position.DaysHeld);
-            Assert.Equal(20, position.Price);
         }
 
         [Fact]
@@ -164,9 +161,8 @@ namespace coretests.Stocks.Services.Trading
             Assert.True(position.IsClosed);
             Assert.Equal(-25, position.Profit);
             Assert.Equal(-0.1m, position.GainPct);
-            Assert.Equal(-2m, position.RR);
+            Assert.Equal(-1m, position.RR);
             Assert.Equal(4, position.DaysHeld);
-            Assert.Equal(45, position.Price);
             Assert.Equal(0.0002m, maxGain);
             Assert.Equal(-0.1002m, maxDrawdown);
         }
@@ -199,9 +195,8 @@ namespace coretests.Stocks.Services.Trading
             Assert.True(position.IsClosed);
             Assert.Equal(30, position.Profit);
             Assert.Equal(0.12m, position.GainPct);
-            Assert.Equal(2.4m, position.RR);
+            Assert.Equal(1.2m, position.RR);
             Assert.Equal(5, position.DaysHeld);
-            Assert.Equal(56, position.Price);
             Assert.Equal(0.1202m, maxGain);
             Assert.Equal(-0.0002m, maxDrawdown);
         }

@@ -162,11 +162,10 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.filteredPositions = this.positions.filter(p => p.ticker.toLowerCase().indexOf(this.positionFilter.toLowerCase()) > -1)
   }
 
-  loadPosition(p:PositionInstance) {
+  loadPosition(p:PositionInstance){
 
     this.reset()
     var first = true;
-    this.currentCost = p.price
     this.riskedAmount = p.riskedAmount
     p.transactions.forEach(t => {
       if (first) {
@@ -189,7 +188,6 @@ export class StockTradingSimulatorComponent implements OnInit {
         this.addTransaction(t.type)
       }
     })
-    this.price = p.price
     this.updateRiskParameters()
     this.showExisting = false
   }

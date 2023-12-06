@@ -498,13 +498,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             let! pricesResponse = brokerage.GetQuotes user.State tickers
             let prices =
                 match pricesResponse.Success with
-                | Some prices ->
-                    positions |> Array.iter (fun p ->
-                        match prices.TryGetValue(p.Ticker) with
-                        | true, price -> p.SetPrice(price.Price)
-                        | _ -> ()
-                    )
-                    prices
+                | Some prices -> prices
                 | None -> Dictionary<Ticker, StockQuote>()
             
             let current = positions |> Array.sortByDescending (fun p -> p.RR)
@@ -513,10 +507,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let (tradingEntries:TradingEntriesView) =
                 {
-                    current=current;
-                    violations=violations;
-                    cashBalance=account.CashBalance;
+                    current=current
+                    violations=violations
+                    cashBalance=account.CashBalance
                     brokerageOrders=account.Orders
+                    prices=prices
                 }
             return ServiceResponse<TradingEntriesView>(tradingEntries)
     }
