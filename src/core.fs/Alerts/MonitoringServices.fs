@@ -110,8 +110,8 @@ module core.fs.Alerts.MonitoringServices
         
         member _.Execute cancellationToken = task {
             
+            container.AddNotice("Running stop loss checks")
             container.SetStopLossCheckCompleted(false)
-            
             container.ClearStopLossAlert()
             
             let! users = accounts.GetUserEmailIdPairs()
@@ -125,6 +125,7 @@ module core.fs.Alerts.MonitoringServices
                 |> Async.StartAsTask
                 
             container.SetStopLossCheckCompleted(true)
+            container.AddNotice("Stop loss checks completed")
         }
         
         member _.NextRunTime now =
@@ -259,6 +260,7 @@ module core.fs.Alerts.MonitoringServices
             let now = DateTimeOffset.UtcNow
             
             if now > nextPatternMonitoringRunDateTime || container.ManualRunRequested() then
+                container.AddNotice("Running pattern monitoring checks")
                 container.SetListCheckCompleted(false)
                 do! generatePatternMonitoringChecks()
                 
@@ -282,6 +284,7 @@ module core.fs.Alerts.MonitoringServices
                 |> Async.StartAsTask
                 
             if listChecks |> Seq.forall (fun kp -> kp.Value.Count = 0) then
+                container.AddNotice("Pattern monitoring checks completed")
                 container.SetListCheckCompleted(true)
         }
         
@@ -290,7 +293,6 @@ module core.fs.Alerts.MonitoringServices
         interface IApplicationService
         
         member _.Execute (cancellationToken:CancellationToken) = task {
-            container.AddNotice("Stock alert service started");
             
             try
                 do! runThroughMonitoringChecks cancellationToken
