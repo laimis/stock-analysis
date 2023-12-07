@@ -17,8 +17,8 @@
     <div class="col-md-3"><div class="stat-label">Chart</div><div><app-trading-view-link [ticker]="_position.ticker"></app-trading-view-link> </div></div>
   </div>
   <div class="row mt-3">
-    <div class="col-md-3"><div class="stat-label">Unrealized Profit</div><div>Not available</div></div>
-    <div class="col-md-3"><div class="stat-label">Unrealized Gain</div><div>Not available</div></div>
+    <div class="col-md-3"><div class="stat-label">Unrealized Profit</div><div>{{ getUnrealizedProfit() | currency }}</div></div>
+    <div class="col-md-3"><div class="stat-label">Unrealized Gain</div><div>{{ getUnrealizedGainPct() | percent }}</div></div>
     <div class="col-md-3"><div class="stat-label">Realized Profit</div><div>{{ _position.profit | number }} ( {{ _position.gainPct | percent }})</div></div>
     <div class="col-md-3"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
   </div>
@@ -74,7 +74,7 @@
             <div class="row mt-3">
               @for (p of ppp.prices; track p; let i = $index) {
                 <div
-                  [ngClass]="{'col':true, 'bg-positive':p <= price, 'text-white':p <= price}">
+                  [ngClass]="{'col':true, 'bg-positive':p <= quote.price, 'text-white':p <= quote.price}">
                   <div class="stat-label">{{ppp.name}} {{i+1}}</div>
                   <div>{{ p | currency }}</div>
                 </div>

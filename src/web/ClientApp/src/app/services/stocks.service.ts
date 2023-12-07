@@ -890,6 +890,7 @@ export interface StockQuote {
   securityStatus: string
   regularMarketLastPrice: number
   regularMarketLastSize: number
+  price:number
 }
 
 export interface StockDetails {
@@ -1113,6 +1114,7 @@ export interface StockTradingPositions {
   violations: StockViolation[]
   cashBalance: number
   brokerageOrders: BrokerageOrder[]
+  prices: Map<string, StockQuote>
 }
 
 export interface PastStockTradingPositions {

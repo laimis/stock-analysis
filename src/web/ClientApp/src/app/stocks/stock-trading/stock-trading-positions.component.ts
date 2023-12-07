@@ -1,6 +1,12 @@
 import {Component, Input} from '@angular/core';
 import {GetStrategies, isLongTermStrategy, toggleVisuallyHidden} from 'src/app/services/utils';
-import {BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StocksService} from '../../services/stocks.service';
+import {
+  BrokerageOrder,
+  OutcomeValueTypeEnum,
+  PositionInstance,
+  StockQuote,
+  StocksService
+} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 
 @Component({
@@ -54,7 +60,7 @@ export class StockTradingPositionsComponent {
     orders:BrokerageOrder[];
 
     @Input()
-    prices:{[ticker:string]:number};
+    quotes:Map<string, StockQuote>
 
     // constructor that takes stock service
     constructor(
@@ -74,8 +80,8 @@ export class StockTradingPositionsComponent {
     }
 
     recalculateRiskAmount(p:PositionInstance) {
-        var newRiskAmount = (p.averageCostPerShare - this.candidateStopPrice) * p.numberOfShares
-        this.candidateRiskAmount = newRiskAmount
+      const newRiskAmount = (p.averageCostPerShare - this.candidateStopPrice) * p.numberOfShares;
+      this.candidateRiskAmount = newRiskAmount
         p.riskedAmount = newRiskAmount
     }
 
@@ -95,14 +101,20 @@ export class StockTradingPositionsComponent {
         )
     }
 
+    getQuote(p:PositionInstance) {
+      return this.quotes[p.ticker]
+    }
+
     getPrice(p:PositionInstance) {
-      if (this.prices) {
-        return this.prices[p.ticker]
+      if (this.quotes) {
+        return this.quotes[p.ticker].price
       }
+      return 0
     }
 
     sortOptions: { name: string; value: string }[] = [
         { value: "rr", name: "R/R" },
+        { value: "unrealizedRR", name: "Unrealized R/R" },
         { value: "pl", name: "P/L" },
         { value: "plPercent", name: "P/L %" },
         { value: "cost", name: "Cost" },
@@ -166,6 +178,10 @@ export class StockTradingPositionsComponent {
                 break
             case "daysHeld":
                 this.metricFunc = (p:PositionInstance) => p.daysHeld
+                this.metricType = OutcomeValueTypeEnum.Number
+                break
+            case "unrealizedRR":
+                this.metricFunc = (p:PositionInstance) => (p.profit + p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
             default:

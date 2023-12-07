@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="col">
-          <span class="text-muted">Price: </span>{{currentPositionPrice | currency}}
+          <span class="text-muted">Price: </span>{{getPrice(currentPosition) | currency}}
         </div>
         <div class="col">
           <span class="text-muted">Stop: </span>{{currentPosition.stopPrice | currency}}
@@ -124,7 +124,7 @@
         </section>
         <section>
           <h5>Position Information</h5>
-          <app-stock-trading-position [position]="currentPosition" [orders]="orders"></app-stock-trading-position>
+          <app-stock-trading-position [position]="currentPosition" [orders]="orders" [quote]="getQuote(currentPosition)"></app-stock-trading-position>
         </section>
         <section>
           <h5>Stock chart</h5>
@@ -141,4 +141,3 @@
           }
         </section>
       </div>
-      

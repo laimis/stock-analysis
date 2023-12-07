@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {
   BrokerageOrder,
   PositionEvent,
-  PositionInstance,
+  PositionInstance, StockQuote,
   StocksService,
   StrategyProfitPoint
 } from '../../services/stocks.service';
@@ -35,7 +35,6 @@ export class StockTradingPositionComponent {
       this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
       this.positionProfitPoints = []
       this.setCandidateValues()
-      this.updatePositionOrders()
     }
   }
 
@@ -46,7 +45,7 @@ export class StockTradingPositionComponent {
   }
 
   @Input()
-  price: number
+  quote: StockQuote
 
   updatePositionOrders() {
     if (!this._position) {
@@ -88,7 +87,7 @@ export class StockTradingPositionComponent {
   }
 
   recalculateRiskAmount() {
-    var newRiskAmount = (this._position.averageCostPerShare - this.candidateStopPrice) * this._position.numberOfShares
+    const newRiskAmount = (this._position.averageCostPerShare - this.candidateStopPrice) * this._position.numberOfShares;
     this.candidateRiskAmount = newRiskAmount
     this._position.riskedAmount = newRiskAmount
     return false
@@ -156,6 +155,10 @@ export class StockTradingPositionComponent {
   }
 
   clearStrategy() {
+    if (!confirm("Are you sure you want to clear the strategy?")) {
+      return false
+    }
+
     this.stockService.deleteLabel(this._position.ticker, this._position.positionId, "strategy").subscribe(
       (r) => {
       },
@@ -189,6 +192,21 @@ export class StockTradingPositionComponent {
 
   toggleVisibility(elem) {
     toggleVisuallyHidden(elem)
+  }
+
+  getUnrealizedProfit() {
+    if (!this.quote) {
+      return null
+    }
+
+    return this._position.profit + (this.quote.price - this._position.averageCostPerShare) * this._position.numberOfShares
+  }
+
+  getUnrealizedGainPct() {
+    if (!this.quote) {
+      return null
+    }
+    return (this.quote.price - this._position.averageCostPerShare) / this._position.averageCostPerShare
   }
 }
 

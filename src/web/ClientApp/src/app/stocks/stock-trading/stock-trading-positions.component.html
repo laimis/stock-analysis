@@ -23,7 +23,7 @@
         <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
         <div class="col-sm-10">
           <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target)">
-            @for (so of sortOptions; track so) {
+            @for (so of sortOptions; track so.value) {
               <option value="{{so.value}}">{{so.name}}</option>
             }
           </select>
@@ -33,33 +33,39 @@
   </div>
   @if (renderStyle === 'card') {
     <div>
-      @for (position of sortedPositions; track position) {
+      @for (position of sortedPositions; track position.ticker) {
         <div class="card border-info mt-4">
-          @if (position) {
-            <div class="card-body">
-              <div class="card-title">
-                <div class="container">
-                  <div class="row">
-                    <div class="col">
-                      <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
-                      <span class="position-price">{{getPrice(position) | currency}}</span>
-                      <i
-                        (click)="toggleVisibility(detailDiv);"
-                      class="bi bi-info-square-fill ms-2"></i>
-                    </div>
-                    <div class="col text-center">
-                    </div>
-                    <div class="col">
-                      <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
-                    </div>
+          <div class="card-body">
+            <div class="card-title">
+              <div class="container">
+                <div class="row">
+                  <div class="col">
+                    <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
+                    <span class="position-price">{{getPrice(position) | currency}}</span>
+                    <i
+                      (click)="toggleVisibility(detailDiv); toggleVisibility(positionNotesDiv)"
+                    class="bi bi-info-square-fill ms-2"></i>
+                  </div>
+                  <div class="col text-center">
+                  </div>
+                  <div class="col">
+                    <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
                   </div>
                 </div>
               </div>
-              <div class="card-text visually-hidden" #detailDiv>
-                <app-stock-trading-position [position]="position" [orders]="orders" ></app-stock-trading-position>
-              </div>
             </div>
-          }
+            <div class="card-text" #positionNotesDiv>
+              @for (note of position.notes; track note) {
+                <div class="position-note">
+                  <span class="position-note-date">{{note.date | date}}</span>
+                  <span class="position-note-text">{{note.text}}</span>
+                </div>
+              }
+            </div>
+            <div class="card-text visually-hidden" #detailDiv>
+              <app-stock-trading-position [position]="position" [orders]="orders" [quote]="getQuote(position)" ></app-stock-trading-position>
+            </div>
+          </div>
         </div>
       }
     </div>

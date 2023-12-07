@@ -42,10 +42,10 @@
     </div>
   }
   @if (isActive('positions') && positions) {
-    <app-stock-trading-positions    [positions]=positions [orders]="brokerageOrders"></app-stock-trading-positions>
+    <app-stock-trading-positions [positions]=positions [orders]="brokerageOrders" [quotes]="quotes"></app-stock-trading-positions>
   }
   @if (isActive('openreview')) {
-    <app-stock-trading-review [orders]="brokerageOrders" [positions]=positions></app-stock-trading-review>
+    <app-stock-trading-review [orders]="brokerageOrders" [positions]=positions [quotes]="quotes"></app-stock-trading-review>
   }
   @if (isActive('violations')) {
     <app-stock-violations       [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>

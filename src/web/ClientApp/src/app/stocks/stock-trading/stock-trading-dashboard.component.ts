@@ -3,7 +3,7 @@ import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {
   BrokerageOrder,
-  PositionInstance,
+  PositionInstance, StockQuote,
   StocksService,
   StockTradingPositions,
   StockViolation
@@ -21,9 +21,10 @@ export class StockTradingComponent implements OnInit {
   loading: boolean = true
   activeTab:string = 'positions'
   violations: StockViolation[]
-  brokerageOrders: BrokerageOrder[];
-  cashBalance: number;
-  errors: string[];
+  brokerageOrders: BrokerageOrder[]
+  cashBalance: number
+  errors: string[]
+  quotes: Map<string, StockQuote>
 
   constructor(
     private stockService:StocksService,
@@ -34,9 +35,10 @@ export class StockTradingComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(param => {
       this.activeTab = param['tab'] || 'positions'
-      this.title.setTitle("Trading Dashboard - Nightingale Trading")
-      this.loadEntries()
     })
+
+    this.title.setTitle("Trading Dashboard - Nightingale Trading")
+    this.loadEntries()
   }
 
 
@@ -68,6 +70,7 @@ export class StockTradingComponent implements OnInit {
       this.violations = r.violations
       this.brokerageOrders = r.brokerageOrders
       this.cashBalance = r.cashBalance
+      this.quotes = r.prices
       this.loading = false
       this.loaded = true
     }, err => {

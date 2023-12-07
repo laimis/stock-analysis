@@ -1,4 +1,4 @@
-import {Component, HostListener, Input} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
   BrokerageOrder,
@@ -7,7 +7,7 @@ import {
   PositionChartInformation,
   PositionInstance,
   PriceFrequency,
-  Prices,
+  Prices, StockQuote,
   StocksService,
   TradingStrategyResults
 } from 'src/app/services/stocks.service';
@@ -24,7 +24,6 @@ export class StockTradingReviewComponent {
 
   private _index: number = 0
   currentPosition: PositionInstance
-  currentPositionPrice: number
   simulationResults: TradingStrategyResults
   simulationErrors: string[];
   scoresErrors: string[];
@@ -48,8 +47,10 @@ export class StockTradingReviewComponent {
   }
 
   @Input()
-  orders:BrokerageOrder[]
+  quotes:Map<string,StockQuote>
 
+  @Input()
+  orders:BrokerageOrder[]
 
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]
@@ -62,7 +63,6 @@ export class StockTradingReviewComponent {
     this.dailyPositionReport = null
     this.runTradingStrategies();
     this.positionChartInformation = null
-    this.fetchPrice();
     this.setTitle();
   }
 
@@ -70,12 +70,13 @@ export class StockTradingReviewComponent {
     this.title.setTitle(`Trading Review - ${this.currentPosition.ticker} - Nightingale Trading`)
   }
 
-  private fetchPrice() {
-    this.stockService.getStockPrice(this.currentPosition.ticker).subscribe(
-      (r: number) => {
-        this.currentPositionPrice = r;
-      }
-    );
+  getPrice(position:PositionInstance) {
+    let quote = this.quotes[position.ticker]
+    return quote ? quote.price : 0
+  }
+
+  getQuote(position:PositionInstance) {
+    return this.quotes[position.ticker]
   }
 
   private getPositionReport() {

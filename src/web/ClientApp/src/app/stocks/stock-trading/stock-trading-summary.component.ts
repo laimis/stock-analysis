@@ -31,7 +31,7 @@ export class StockTradingSummaryComponent {
     this._positions = value
     this.totalCost = this.sum(value, p => p.averageCostPerShare * p.numberOfShares)
     this.totalRiskedAmount = this.sum(value, p => p.costAtRiskedBasedOnStopPrice)
-    this.totalProfit = this.sum(value, p => p.combinedProfit)
+    this.totalProfit = this.sum(value, p => p.profit)
     this.positionGroups = this.breakdownByStrategy(value)
   }
   get positions():PositionInstance[] {
@@ -69,7 +69,7 @@ export class StockTradingSummaryComponent {
     this.sortDirection = this.sortProperty == property ? 1 : -1
 
     this.sortProperty = property
-    
+
     var sortFunc = this.getSortFunc(property)
 
     var adjustedFunc = (a, b) => this.sortDirection * sortFunc(a, b)
@@ -84,13 +84,13 @@ export class StockTradingSummaryComponent {
 
     let strategyGroups = positions.reduce((acc, cur) => {
       let strategyKey = this.getStrategy(cur)
-      
+
       if (!acc[strategyKey]) {
         acc[strategyKey] = []
       }
-      
+
       acc[strategyKey].push(cur)
-      
+
       return acc
     }, {})
 
@@ -107,10 +107,10 @@ export class StockTradingSummaryComponent {
           positions,
           cost : this.sum(groupPositions, p => p.averageCostPerShare * p.numberOfShares),
           risk : this.sum(groupPositions, p => p.costAtRiskedBasedOnStopPrice),
-          profit : this.sum(groupPositions, p => p.combinedProfit),
+          profit : this.sum(groupPositions, p => p.profit),
           length : groupPositions.length
         }
-        
+
         groupsArray.push(group)
     }
 
