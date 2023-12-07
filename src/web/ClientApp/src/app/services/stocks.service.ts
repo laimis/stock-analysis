@@ -895,7 +895,7 @@ export interface StockQuote {
 
 export interface StockDetails {
   ticker: string
-  price: number
+  quote: StockQuote
   profile : StockProfile
 }
 

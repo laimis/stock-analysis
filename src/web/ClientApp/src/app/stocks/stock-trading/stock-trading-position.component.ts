@@ -194,6 +194,14 @@ export class StockTradingPositionComponent {
     toggleVisuallyHidden(elem)
   }
 
+  getPrice() {
+    if (!this.quote) {
+      return null
+    }
+
+    return this.quote.price
+  }
+
   getUnrealizedProfit() {
     if (!this.quote) {
       return null

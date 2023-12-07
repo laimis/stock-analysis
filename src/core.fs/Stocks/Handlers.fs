@@ -74,7 +74,7 @@ type DetailsQuery =
 type DetailsView =
     {
         Ticker: string
-        Price: decimal option
+        Quote: StockQuote option
         Profile: StockProfile option
     }
     
@@ -341,15 +341,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         | None -> return "User not found" |> ResponseUtils.failedTyped<DetailsView>
         | Some user ->
             let! profileResponse = brokerage.GetStockProfile user.State query.Ticker
-            let! priceResponse = brokerage.GetQuote user.State query.Ticker
-            let price =
-                match priceResponse.Success with
-                | Some price -> Some price.Price
-                | None -> None
+            let! quoteResponse = brokerage.GetQuote user.State query.Ticker
                 
             let view = {
                 Ticker = query.Ticker.Value
-                Price = price
+                Quote = quoteResponse.Success
                 Profile = profileResponse.Success
             }
             

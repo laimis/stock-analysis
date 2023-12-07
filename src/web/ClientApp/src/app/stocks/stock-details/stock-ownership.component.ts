@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { StocksService, StockDetails, StockOwnership, PositionInstance } from '../../services/stocks.service';
+import {StocksService, StockDetails, StockOwnership, PositionInstance, StockQuote} from '../../services/stocks.service';
 import { Router } from '@angular/router';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 
@@ -16,21 +16,24 @@ export class StockOwnershipComponent {
   @Input()
   public set ownership(value) {
     this._ownership = value
-    
-    // create new array of positions that is 
+
+    // create new array of positions that is
     // created from value.positions, but reversed in orders
     if (value)
     {
       this.positions = value.positions.slice().reverse()
     }
-    
+
   }
   public get ownership() {
     return this._ownership
   }
 
   @Input()
-  public stock: StockDetails;
+  stock: StockDetails;
+
+  @Input()
+  quote: StockQuote
 
   @Output()
   ownershipChanged = new EventEmitter();
@@ -39,21 +42,15 @@ export class StockOwnershipComponent {
   private brokerageOrders!: BrokerageOrdersComponent;
 
   public errors: string[]
-  
+
   numberOfShares: number
-	pricePerShare:  number
 	filled:         string
-  positionType:   string
   notes:          string
 
   constructor(
     private service: StocksService,
     private router: Router
   ) { }
-
-  showErrors(errors) {
-    this.errors = errors
-  }
 
   brokerageOrderEntered() {
     this.brokerageOrders.refreshOrders()

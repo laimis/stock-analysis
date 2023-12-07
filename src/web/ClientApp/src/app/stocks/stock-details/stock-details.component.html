@@ -5,10 +5,10 @@
         <div>
           <h3>{{profile.symbol}}: {{profile.description}}
             <a class="float-end ms-3" href="https://invest.ameritrade.com/grid/p/site#r=jPage/https://research.ameritrade.com/grid/wwws/research/stocks/summary?symbol={{stock.ticker}}&c_name=invest_VENDOR" target="_blank">
-              <img src="/assets/images/td-logo-vector.svg" height="25px" />
+              <img src="/assets/images/td-logo-vector.svg" height="25px"  alt="TDAmeritrade logo"/>
             </a>
             <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
-              <img src="/assets/images/finviz.png" height="25px" />
+              <img src="/assets/images/finviz.png" height="25px"  alt="Finviz logo"/>
             </a>
             <span class="float-end ms-3">
               <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
@@ -45,12 +45,12 @@
 }
 </a>
 <span class="float-end">
-  <span class="text-muted">Price:</span> {{stock.price | currency}}
+  <span class="text-muted">Price:</span> {{stock.quote?.price | currency}}
 </span>
 </div>
 @if (isActive('stocks')) {
   <app-stock-ownership
-    [stock]=stock [ownership]=ownership
+    [stock]=stock [ownership]=ownership [quote]="stock.quote"
   (ownershipChanged)="stockOwnershipChanged($event)"></app-stock-ownership>
 }
 @if (isActive('options')) {
