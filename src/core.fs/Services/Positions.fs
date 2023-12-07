@@ -20,6 +20,7 @@ module PositionAnalysis =
         let RR = "RR"
         let Profit = "Profit"
         let UnrealizedProfit = "UnrealizedProfit"
+        let UnrealizedGain = "UnrealizedGain"
         let Price = "Price"
         let RiskAmount = "RiskedAmount"
         let DaysSinceLastTransaction = "DaysSinceLastTransaction"
@@ -41,16 +42,15 @@ module PositionAnalysis =
             | true -> position.StopPrice.Value
             | false -> 0.0m
         
-        let pctToStop =
-            match stopLoss with
-            | 0.0m -> 0.0m
-            | _ -> (stopLoss - bars.Last.Close) / stopLoss
+        let pctToStop = (stopLoss - bars.Last.Close) / stopLoss
         
         let rrOutcomeType = 
             match position.RR with
             | p when p >= 1.0m -> OutcomeType.Positive
             | p when p < 0.0m -> OutcomeType.Negative
             | _ -> OutcomeType.Neutral
+            
+        let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
         
         let max = bars.Bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> fun b -> b.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
@@ -88,6 +88,7 @@ module PositionAnalysis =
             AnalysisOutcome(PortfolioAnalysisKeys.RR, rrOutcomeType, Math.Round(position.RR, 2), ValueFormat.Number, $"{position.RR:N2}")
             AnalysisOutcome(PortfolioAnalysisKeys.Profit, (if position.Profit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.Profit, ValueFormat.Currency, $"{position.Profit}")
             AnalysisOutcome(PortfolioAnalysisKeys.UnrealizedProfit, (if unrealizedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedProfit, ValueFormat.Currency, $"{unrealizedProfit}")
+            AnalysisOutcome(PortfolioAnalysisKeys.UnrealizedGain, (if unrealizedGainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedGainPct, ValueFormat.Percentage, $"{unrealizedGainPct:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdown, OutcomeType.Neutral, drawdown, ValueFormat.Percentage, $"Max drawdown is {drawdown:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.GainAndDrawdownDiff, (if gain + drawdown >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), gain + drawdown, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
