@@ -57,8 +57,7 @@
             <div class="card-text" #positionNotesDiv>
               @for (note of position.notes; track note) {
                 <div class="position-note">
-                  <span class="position-note-date">{{note.date | date}}</span>
-                  <span class="position-note-text">{{note.text}}</span>
+                  {{note}}
                 </div>
               }
             </div>
