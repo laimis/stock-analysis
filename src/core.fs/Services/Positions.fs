@@ -42,7 +42,10 @@ module PositionAnalysis =
             | true -> position.StopPrice.Value
             | false -> 0.0m
         
-        let pctToStop = (stopLoss - bars.Last.Close) / stopLoss
+        let pctToStop =
+            match stopLoss with
+            | 0.0m -> -1.0m
+            | _ -> (stopLoss - bars.Last.Close) / stopLoss
         
         let rrOutcomeType = 
             match position.RR with
