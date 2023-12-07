@@ -1,20 +1,18 @@
 <div>
-    <div class="alert alert-success" role="alert" *ngIf="feedbackMessage">
-        {{feedbackMessage}}
-      </div>
-
-    <app-stock-trading-new-position
-        (stockPurchased)="stockPurchased()"
-        (pendingPositionCreated)="pendingPositionCreated()">
-    </app-stock-trading-new-position>
-
-    <app-brokerage-new-order
-      (brokerageOrderEntered)="brokerageOrderEntered()">
-    </app-brokerage-new-order>
-
-    <app-stock-trading-pendingpositions
-      (pendingPositionClosed)="pendingPositionClosed()">
-    </app-stock-trading-pendingpositions>
-
-    <app-brokerage-orders></app-brokerage-orders>
+  @if (feedbackMessage) {
+    <div class="alert alert-success" role="alert">
+      {{feedbackMessage}}
+    </div>
+  }
+  <app-stock-trading-new-position
+    (stockPurchased)="stockPurchased()"
+    (pendingPositionCreated)="pendingPositionCreated()">
+  </app-stock-trading-new-position>
+  <app-brokerage-new-order
+    (brokerageOrderEntered)="brokerageOrderEntered()">
+  </app-brokerage-new-order>
+  <app-stock-trading-pendingpositions
+    (pendingPositionClosed)="pendingPositionClosed()">
+  </app-stock-trading-pendingpositions>
+  <app-brokerage-orders></app-brokerage-orders>
 </div>

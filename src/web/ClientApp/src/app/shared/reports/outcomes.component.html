@@ -1,27 +1,38 @@
 <div>
-  <div *ngIf="!outcomes">Loading {{title}}...</div>
-  <section *ngIf="outcomes" class="outcomes-section">
-    <h5 *ngIf="title">{{title}}</h5>
-    <table  class="table table-hover striped table-sm mb-4">
-      <thead>
-        <tr>
-          <th class="sort-header fixed-side" (click)="sort('ticker')">Ticker</th>
-          <th *ngFor="let key of getKeys(outcomes)" class="sort-header" (click)="sort(key)">{{key}}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let s of outcomes" [ngClass]="{'table-warning': s.ticker === tickerFilter}">
-          <td class="fixed-side">
-            <app-trading-view-link [ticker]="s.ticker"></app-trading-view-link>
-            <app-stock-link [ticker]="s.ticker" [openInNewTab]="true"></app-stock-link>
-          </td>
-          <td *ngFor="let o of outcomesForRendering(s.outcomes)"
-            [ngClass]="{'text-end': true, 'text-success': o.outcomeType === 'Positive', 'text-danger': o.outcomeType === 'Negative'}" class="text-end">
-            {{ getValue(o)}}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
+  @if (!outcomes) {
+    <div>Loading {{title}}...</div>
+  }
+  @if (outcomes) {
+    <section class="outcomes-section">
+      @if (title) {
+        <h5>{{title}}</h5>
+      }
+      <table  class="table table-hover striped table-sm mb-4">
+        <thead>
+          <tr>
+            <th class="sort-header fixed-side" (click)="sort('ticker')">Ticker</th>
+            @for (key of getKeys(outcomes); track key) {
+              <th class="sort-header" (click)="sort(key)">{{key}}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of outcomes; track s) {
+            <tr [ngClass]="{'table-warning': s.ticker === tickerFilter}">
+              <td class="fixed-side">
+                <app-trading-view-link [ticker]="s.ticker"></app-trading-view-link>
+                <app-stock-link [ticker]="s.ticker" [openInNewTab]="true"></app-stock-link>
+              </td>
+              @for (o of outcomesForRendering(s.outcomes); track o) {
+                <td
+                  [ngClass]="{'text-end': true, 'text-success': o.outcomeType === 'Positive', 'text-danger': o.outcomeType === 'Negative'}" class="text-end">
+                  {{ getValue(o)}}
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
 </div>

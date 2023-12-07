@@ -1,76 +1,77 @@
 <div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">Lists</li>
-        </ol>
-    </nav>
-    <section>
-        <form>
-            <div class="row">
-                <div class="col-2">
-                    <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
-                </div>
-                <div class="col-2">
-                    <label for="tickerFilter" class="float-end">Filter by ticker</label>
-                </div>
-                <div class="col-8">
-                    <input class="form-control" type="text" id="tickerFilter" name="tickerFilter" #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)">
-                </div>
-            </div>
-            
-        </form>
-    </section>
-    <section #addNewListSection class="visually-hidden">
-        <h5>Add new list</h5>
-        <form>
-            <div class="form-group">
-                <label for="newName">Name</label>
-                <input class="form-control" type="text" id="newName" name="newName" [(ngModel)]="newName">
-            </div>
-            
-            <div class="form-group">
-                <label for="newDescription">Description</label>
-                <textarea class="form-control" id="newDescription" name="newDescription" rows="5" [(ngModel)]="newDescription"></textarea>
-            </div>
-
-            <button type="button" class="btn btn-primary btn-small" (click)="createList()">Create</button>
-        </form>
-    </section>
-    
-    <section>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th width="800">Description</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let l of filteredLists">
-                    <td>
-                        <a class="fw-bolder" [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
-                    </td>
-                    <td>
-                        <div *ngIf="l.description" class="ms-1 mb-4">{{l.description}}</div>
-                        <div>
-                            <span class="badge bg-secondary m-1" *ngFor="let t of l.tags">{{t}}</span>
-                        </div>
-                        <div>
-                            {{l.tickers.length}} ticker(s)
-                        </div>
-                    </td>
-                    <!-- <td>
-                        {{l.tickers.length}}
-                    </td> -->
-                    <td class="text-end">
-                        <a class="btn btn-sm btn-secondary m-1" href="{{getAnalysisLink(l)}}" rel="noopener noreferrer" target="_blank">Analysis</a>
-                        <a class="btn btn-sm btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
-                        <button type="button" class="btn btn-sm btn-outline-danger m-1" (click)="deleteList(l)">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>    
-    </section>
-    
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">Lists</li>
+    </ol>
+  </nav>
+  <section>
+    <form>
+      <div class="row">
+        <div class="col-2">
+          <button type="submit" class="btn btn-secondary me-2" (click)="toggleVisibility(addNewListSection)">Create new list</button>
+        </div>
+        <div class="col-2">
+          <label for="tickerFilter" class="float-end">Filter by ticker</label>
+        </div>
+        <div class="col-8">
+          <input class="form-control" type="text" id="tickerFilter" name="tickerFilter" #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)">
+        </div>
+      </div>
+    </form>
+  </section>
+  <section #addNewListSection class="visually-hidden">
+    <h5>Add new list</h5>
+    <form>
+      <div class="form-group">
+        <label for="newName">Name</label>
+        <input class="form-control" type="text" id="newName" name="newName" [(ngModel)]="newName">
+      </div>
+      <div class="form-group">
+        <label for="newDescription">Description</label>
+        <textarea class="form-control" id="newDescription" name="newDescription" rows="5" [(ngModel)]="newDescription"></textarea>
+      </div>
+      <button type="button" class="btn btn-primary btn-small" (click)="createList()">Create</button>
+    </form>
+  </section>
+  <section>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th width="800">Description</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (l of filteredLists; track l) {
+          <tr>
+            <td>
+              <a class="fw-bolder" [routerLink]="['/stocks', 'lists', l.name]">{{l.name}}</a>
+            </td>
+            <td>
+              @if (l.description) {
+                <div class="ms-1 mb-4">{{l.description}}</div>
+              }
+              <div>
+                @for (t of l.tags; track t) {
+                  <span class="badge bg-secondary m-1">{{t}}</span>
+                }
+              </div>
+              <div>
+                {{l.tickers.length}} ticker(s)
+              </div>
+            </td>
+            <!-- <td>
+            {{l.tickers.length}}
+          </td> -->
+          <td class="text-end">
+            <a class="btn btn-sm btn-secondary m-1" href="{{getAnalysisLink(l)}}" rel="noopener noreferrer" target="_blank">Analysis</a>
+            <a class="btn btn-sm btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
+            <button type="button" class="btn btn-sm btn-outline-danger m-1" (click)="deleteList(l)">Delete</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
 </div>

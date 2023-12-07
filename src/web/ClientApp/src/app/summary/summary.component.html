@@ -1,158 +1,180 @@
-<div *ngIf="!loaded">
-  Generating your report, this might take a while, please wait
-  <div class="spinner-border text-info spinner-border-sm" role="status">
-    <span class="sr-only">Loading...</span>
-  </div>
-</div>
-
-<div *ngIf="loaded">
-
-  <select class="form-select" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
-    <option value="thisweek" selected>This week</option>
-    <option value="last7days">Last 7 days</option>
-  </select>
-
-  <h5 class="mt-2">Week of {{ result.start | date }} review</h5>
-
-  <div class="mt-2 mb-2">Profit {{ result.stockProfit + result.optionProfit | currency }}</div>
-
-  <section>
-    <h5 class="mt-5">Closed Positions : {{result.closedPositions.length}}</h5>
-  </section>
-  <ng-container *ngFor="let p of result.closedPositions">
-    <div class="row">
-      <div class="col">
-        <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
-        <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
-      </div>
-      <div class="col">{{p.profit  | currency}}</div>
-      <div class="col">{{p.rr | number:'1.0-2'}}</div>
-      <div class="col">{{p.gainPct | percent:'1.0-2'}}</div>
-      <div class="col"><div class="h1">{{p.grade}}</div></div>
-      <div class="col">
-        <div class="badge bg-success me-1" *ngFor="let buy of buys(p)">
-          {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
-        </div>
-      </div>
-      <div class="col">
-        <div class="badge bg-danger me-1" *ngFor="let sell of sells(p)">
-          {{sell.price | currency}} x {{sell.numberOfShares}} ({{sell.price * sell.numberOfShares | currency}}) on {{sell.date | date: 'MM/dd/yyyy'}}
-        </div>
-      </div>
+@if (!loaded) {
+  <div>
+    Generating your report, this might take a while, please wait
+    <div class="spinner-border text-info spinner-border-sm" role="status">
+      <span class="sr-only">Loading...</span>
     </div>
-    <div class="row mb-3">
-      <div class="col">
-        <ul *ngIf="p.notes.length > 0">
-          <li *ngFor="let note of p.notes" style="white-space: pre-wrap;">{{note}}</li>
-        </ul>
-        <span *ngIf="p.notes.length === 0"> no notes </span>
-        <span class="badge bg-light text-secondary m-1">{{getStrategy(p)}}</span>
-      </div>
-    </div>
-  </ng-container>
-
-  <div class="row" *ngIf="result.closedPositions.length === 0">
-    <div class="col">No stock positions closed</div>
   </div>
-
-  <div *ngIf="result.closedPositions.length > 0" class="row">
-    <div class="col">Totals</div>
-    <div class="col">{{ closedPositionProfit() | currency }}</div>
-    <div class="col">{{ closedPositionRR() | number:'1.0-2' }}</div>
-    <div class="col"></div>
-  </div>
-
-  <section>
-    <h5 class="mt-5">Opened Positions: {{result.openPositions.length}}</h5>
-  </section>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Symbol</th>
-        <th># of Shares</th>
-        <th>Cost</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of result.openPositions">
-        <td style="width: 140px">
+}
+@if (loaded) {
+  <div>
+    <select class="form-select" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
+      <option value="thisweek" selected>This week</option>
+      <option value="last7days">Last 7 days</option>
+    </select>
+    <h5 class="mt-2">Week of {{ result.start | date }} review</h5>
+    <div class="mt-2 mb-2">Profit {{ result.stockProfit + result.optionProfit | currency }}</div>
+    <section>
+      <h5 class="mt-5">Closed Positions : {{result.closedPositions.length}}</h5>
+    </section>
+    @for (p of result.closedPositions; track p) {
+      <div class="row">
+        <div class="col">
           <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
           <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
-        </td>
-        <td style="width: 140px">{{p.completedPositionShares}}</td>
-        <td style="width: 140px">{{p.completedPositionCost  | number:'1.0-2'}}</td>
-        <td style="width: 140px">{{p.opened | date: 'MM/dd/yyyy'}}</td>
-      </tr>
-      <tr *ngIf="result.openPositions.length === 0">
-        <td colspan="6">No stock positions opened</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <section>
-    <h5 class="mt-5">Stocks P&L</h5>
-  </section>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Symbol</th>
-        <th>P/L</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of result.plStockTransactions">
-        <td style="width: 140px">
-          <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
-          <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
-        </td>
-        <td style="width: 140px">{{p.amount  | currency}}</td>
-        <td style="width: 140px">{{p.date | date: 'MM/dd/yyyy'}}</td>
-      </tr>
-      <tr *ngIf="result.plStockTransactions.length === 0">
-        <td colspan="3">No stock P&L transactions </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <section>
-    <h5>Options P&L</h5>
-  </section>
-  <table class="table">
-    <tbody>
-      <tr *ngFor="let g of result.plOptionTransactions">
-        <td style="width: 140px">
-          <app-trading-view-link [ticker]="g.ticker"></app-trading-view-link>
-          <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
-        </td>
-        <td style="width: 140px">{{g.amount | currency}}</td>
-        <td style="width: 140px">{{g.date | date}}</td>
-        <td>{{g.description}}</td>
-      </tr>
-      <tr *ngIf="result.plOptionTransactions.length === 0">
-        <td colspan="4">No option P&L transactions</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <section>
-    <h5>Non-PL Breakdown</h5>
-  </section>
-  <table class="table">
-    <tbody>
-      <tr *ngFor="let g of result.optionTransactions">
-        <td style="width: 140px">
-          <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
-        </td>
-        <td style="width: 140px">{{g.amount | currency}}</td>
-        <td style="width: 140px">{{g.date | date}}</td>
-        <td>{{g.description}}</td>
-      </tr>
-      <tr *ngIf="result.optionTransactions.length === 0">
-        <td colspan="4">No option transactions</td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
+        </div>
+        <div class="col">{{p.profit  | currency}}</div>
+        <div class="col">{{p.rr | number:'1.0-2'}}</div>
+        <div class="col">{{p.gainPct | percent:'1.0-2'}}</div>
+        <div class="col"><div class="h1">{{p.grade}}</div></div>
+        <div class="col">
+          @for (buy of buys(p); track buy) {
+            <div class="badge bg-success me-1">
+              {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
+            </div>
+          }
+        </div>
+        <div class="col">
+          @for (sell of sells(p); track sell) {
+            <div class="badge bg-danger me-1">
+              {{sell.price | currency}} x {{sell.numberOfShares}} ({{sell.price * sell.numberOfShares | currency}}) on {{sell.date | date: 'MM/dd/yyyy'}}
+            </div>
+          }
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          @if (p.notes.length > 0) {
+            <ul>
+              @for (note of p.notes; track note) {
+                <li style="white-space: pre-wrap;">{{note}}</li>
+              }
+            </ul>
+          }
+          @if (p.notes.length === 0) {
+            <span> no notes </span>
+          }
+          <span class="badge bg-light text-secondary m-1">{{getStrategy(p)}}</span>
+        </div>
+      </div>
+    }
+    @if (result.closedPositions.length === 0) {
+      <div class="row">
+        <div class="col">No stock positions closed</div>
+      </div>
+    }
+    @if (result.closedPositions.length > 0) {
+      <div class="row">
+        <div class="col">Totals</div>
+        <div class="col">{{ closedPositionProfit() | currency }}</div>
+        <div class="col">{{ closedPositionRR() | number:'1.0-2' }}</div>
+        <div class="col"></div>
+      </div>
+    }
+    <section>
+      <h5 class="mt-5">Opened Positions: {{result.openPositions.length}}</h5>
+    </section>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th># of Shares</th>
+          <th>Cost</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of result.openPositions; track p) {
+          <tr>
+            <td style="width: 140px">
+              <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+              <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
+            </td>
+            <td style="width: 140px">{{p.completedPositionShares}}</td>
+            <td style="width: 140px">{{p.completedPositionCost  | number:'1.0-2'}}</td>
+            <td style="width: 140px">{{p.opened | date: 'MM/dd/yyyy'}}</td>
+          </tr>
+        }
+        @if (result.openPositions.length === 0) {
+          <tr>
+            <td colspan="6">No stock positions opened</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <section>
+      <h5 class="mt-5">Stocks P&L</h5>
+    </section>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>P/L</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of result.plStockTransactions; track p) {
+          <tr>
+            <td style="width: 140px">
+              <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+              <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
+            </td>
+            <td style="width: 140px">{{p.amount  | currency}}</td>
+            <td style="width: 140px">{{p.date | date: 'MM/dd/yyyy'}}</td>
+          </tr>
+        }
+        @if (result.plStockTransactions.length === 0) {
+          <tr>
+            <td colspan="3">No stock P&L transactions </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <section>
+      <h5>Options P&L</h5>
+    </section>
+    <table class="table">
+      <tbody>
+        @for (g of result.plOptionTransactions; track g) {
+          <tr>
+            <td style="width: 140px">
+              <app-trading-view-link [ticker]="g.ticker"></app-trading-view-link>
+              <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+            </td>
+            <td style="width: 140px">{{g.amount | currency}}</td>
+            <td style="width: 140px">{{g.date | date}}</td>
+            <td>{{g.description}}</td>
+          </tr>
+        }
+        @if (result.plOptionTransactions.length === 0) {
+          <tr>
+            <td colspan="4">No option P&L transactions</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <section>
+      <h5>Non-PL Breakdown</h5>
+    </section>
+    <table class="table">
+      <tbody>
+        @for (g of result.optionTransactions; track g) {
+          <tr>
+            <td style="width: 140px">
+              <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+            </td>
+            <td style="width: 140px">{{g.amount | currency}}</td>
+            <td style="width: 140px">{{g.date | date}}</td>
+            <td>{{g.description}}</td>
+          </tr>
+        }
+        @if (result.optionTransactions.length === 0) {
+          <tr>
+            <td colspan="4">No option transactions</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

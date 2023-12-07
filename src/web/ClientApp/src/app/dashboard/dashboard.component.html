@@ -1,85 +1,76 @@
-<div *ngIf="loaded">
-  <div class="container-fluid">
-
-    <div class="row">
-      <div class="col-md-4">
-
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="text-muted fas fa-certificate"></i>
-              Shares
-            </h5>
-            <p class="card-text">You have {{dashboard.openStockCount === 0 ? 'no' : ''}} tickers on file</p>
-            <a class="card-link" [routerLink]="[ '/trading' ]">Manage Shares</a>
+@if (loaded) {
+  <div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="text-muted fas fa-certificate"></i>
+                Shares
+              </h5>
+              <p class="card-text">You have {{dashboard.openStockCount === 0 ? 'no' : ''}} tickers on file</p>
+              <a class="card-link" [routerLink]="[ '/trading' ]">Manage Shares</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="text-muted fas fa-dice-five"></i>
+                Options
+              </h5>
+              <p class="card-text">You have {{dashboard.openOptionCount === 0 ? 'no' : ''}} open contracts</p>
+              <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="text-muted fab fa-btc"></i>
+                Crypto
+              </h5>
+              <p class="card-text">You have {{dashboard.openCryptoCount === 0 ? 'no' : ''}} crypto tokens</p>
+              <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="text-muted fas fa-dice-five"></i>
-              Options
-            </h5>
-            <p class="card-text">You have {{dashboard.openOptionCount === 0 ? 'no' : ''}} open contracts</p>
-            <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
+      <div class="row">
+        <div class="col">
+          <div class="card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="text-muted fas fa-toolbox"></i>
+                Tools
+              </h5>
+              @for (link of toolLinks; track link) {
+                <a
+                  class="card-link"
+                  [routerLink]="[ link.path ]">{{link.label}}
+                </a>
+              }
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="text-muted fab fa-btc"></i>
-              Crypto
-            </h5>
-            <p class="card-text">You have {{dashboard.openCryptoCount === 0 ? 'no' : ''}} crypto tokens</p>
-            <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
-          </div>
-        </div>
-      </div>
-
-
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <div class="card mt-4">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="text-muted fas fa-toolbox"></i>
-              Tools
-            </h5>
-            <a
-              *ngFor="let link of toolLinks"
-              class="card-link"
-              [routerLink]="[ link.path ]">{{link.label}}
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <div class="card mt-4">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="text-muted fas fa-bell me-1"></i>
-              <a [routerLink]="[ '/alerts' ]">Alerts</a>
-            </h5>
-            <app-alerts [hideRecentTriggered]="true" [hideMessages]="true" [hideScheduling]="true"></app-alerts>
+      <div class="row">
+        <div class="col">
+          <div class="card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="text-muted fas fa-bell me-1"></i>
+                <a [routerLink]="[ '/alerts' ]">Alerts</a>
+              </h5>
+              <app-alerts [hideRecentTriggered]="true" [hideMessages]="true" [hideScheduling]="true"></app-alerts>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-
+    <div class="mt-5">&nbsp;</div>
   </div>
-
-  <div class="mt-5">&nbsp;</div>
-
-</div>
+}

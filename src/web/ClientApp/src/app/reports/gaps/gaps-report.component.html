@@ -1,10 +1,12 @@
 <div>
-    <div *ngIf="error">
-        <div class="alert alert-danger" role="alert">
-            <p>{{error}}</p>
-        </div>
+  @if (error) {
+    <div>
+      <div class="alert alert-danger" role="alert">
+        <p>{{error}}</p>
+      </div>
     </div>
-
-    <app-gaps *ngIf="gaps" [gaps]="gaps"></app-gaps>
-
+  }
+  @if (gaps) {
+    <app-gaps [gaps]="gaps"></app-gaps>
+  }
 </div>

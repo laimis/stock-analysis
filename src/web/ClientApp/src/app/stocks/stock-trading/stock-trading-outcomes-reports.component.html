@@ -1,67 +1,67 @@
 <div>
-
   <app-error-display [errors]="errors"></app-error-display>
-
   <div class="mb-3 mt-3">
     <label for="tickerFilter" class="form-label">Ticker filter</label>
     <select #tickerSelect id="tickerFilter" name="tickerFilter" class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
-        <option value="all">All</option>
-        <option *ngFor="let t of tickers" [value]="t">{{t}}</option>
+      <option value="all">All</option>
+      @for (t of tickers; track t) {
+        <option [value]="t">{{t}}</option>
+      }
     </select>
   </div>
-
-  <app-outcomes
-    *ngIf="allBarsReport"
-    [title]="'Mutliple bar outcomes'"
-    [tickerFilter]="tickerFilter"
-    [outcomes]="allBarsReport.outcomes">
-  </app-outcomes>
-
-  <app-outcomes-analysis-report
-    *ngIf="positionsReport"
-    [title]="'Position report'"
-    [report]="positionsReport"
-    [tickerFilter]="tickerFilter"
-    [showSummary]="false">
-  </app-outcomes-analysis-report>
-
-  <app-outcomes
-    *ngIf="positionsReport"
-    [title]="'Positions outcomes'"
-    [tickerFilter]="tickerFilter"
-    [outcomes]="positionsReport.outcomes">
-  </app-outcomes>
-
-  <app-outcomes-analysis-report
-    *ngIf="singleBarReportDaily"
-    [title]="'Daily report'"
-    [tickerFilter]="tickerFilter"
-    [report]="singleBarReportDaily"
-    [showSummary]="true">
-  </app-outcomes-analysis-report>
-
-  <app-outcomes
-    *ngIf="singleBarReportDaily"
-    [title]="'Daily outcomes'"
-    [tickerFilter]="tickerFilter"
-    [outcomes]="singleBarReportDaily.outcomes">
-  </app-outcomes>
-
-  <app-outcomes-analysis-report
-    *ngIf="singleBarReportWeekly"
-    [title]="'Weekly report'"
-    [report]="singleBarReportWeekly"
-    [tickerFilter]="tickerFilter"
-    [showSummary]="true">
-  </app-outcomes-analysis-report>
-
-  <app-outcomes
-    *ngIf="singleBarReportWeekly"
-    [title]="'Weekly outcomes'"
-    [tickerFilter]="tickerFilter"
-    [outcomes]="singleBarReportWeekly.outcomes">
-  </app-outcomes>
-
-  <app-gaps *ngFor="let gap of gaps" [gaps]="gap"></app-gaps>
-
+  @if (allBarsReport) {
+    <app-outcomes
+      [title]="'Mutliple bar outcomes'"
+      [tickerFilter]="tickerFilter"
+      [outcomes]="allBarsReport.outcomes">
+    </app-outcomes>
+  }
+  @if (positionsReport) {
+    <app-outcomes-analysis-report
+      [title]="'Position report'"
+      [report]="positionsReport"
+      [tickerFilter]="tickerFilter"
+      [showSummary]="false">
+    </app-outcomes-analysis-report>
+  }
+  @if (positionsReport) {
+    <app-outcomes
+      [title]="'Positions outcomes'"
+      [tickerFilter]="tickerFilter"
+      [outcomes]="positionsReport.outcomes">
+    </app-outcomes>
+  }
+  @if (singleBarReportDaily) {
+    <app-outcomes-analysis-report
+      [title]="'Daily report'"
+      [tickerFilter]="tickerFilter"
+      [report]="singleBarReportDaily"
+      [showSummary]="true">
+    </app-outcomes-analysis-report>
+  }
+  @if (singleBarReportDaily) {
+    <app-outcomes
+      [title]="'Daily outcomes'"
+      [tickerFilter]="tickerFilter"
+      [outcomes]="singleBarReportDaily.outcomes">
+    </app-outcomes>
+  }
+  @if (singleBarReportWeekly) {
+    <app-outcomes-analysis-report
+      [title]="'Weekly report'"
+      [report]="singleBarReportWeekly"
+      [tickerFilter]="tickerFilter"
+      [showSummary]="true">
+    </app-outcomes-analysis-report>
+  }
+  @if (singleBarReportWeekly) {
+    <app-outcomes
+      [title]="'Weekly outcomes'"
+      [tickerFilter]="tickerFilter"
+      [outcomes]="singleBarReportWeekly.outcomes">
+    </app-outcomes>
+  }
+  @for (gap of gaps; track gap) {
+    <app-gaps [gaps]="gap"></app-gaps>
+  }
 </div>

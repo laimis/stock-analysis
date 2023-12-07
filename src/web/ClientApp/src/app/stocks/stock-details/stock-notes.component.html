@@ -1,27 +1,29 @@
 <div class="text-end">
   <a [routerLink]="[ '/notes/add', ticker ]">New note</a>
 </div>
-
-<div class="card mb-3" *ngFor="let note of notes.notes">
-  <div class="card-body">
-    <div class="card-title">
-      <app-stock-link class="font-weight-bold" [ticker]="note.relatedToTicker"></app-stock-link>
-    </div>
-    <h6 class="card-subtitle mb-2 text-muted">
-      {{note.created | date}}
-      <span class="ml-3" *ngIf="note.price.amount">price: {{note.price.amount | currency}}</span>
-    </h6>
-
-    <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
-
-    <div>
-      <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
+@for (note of notes.notes; track note) {
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="card-title">
+        <app-stock-link class="font-weight-bold" [ticker]="note.relatedToTicker"></app-stock-link>
+      </div>
+      <h6 class="card-subtitle mb-2 text-muted">
+        {{note.created | date}}
+        @if (note.price.amount) {
+          <span class="ml-3">price: {{note.price.amount | currency}}</span>
+        }
+      </h6>
+      <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
+      <div>
+        <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
+      </div>
     </div>
   </div>
-</div>
-
-<div *ngIf="notes && notes.notes.length === 0">
-  <div class="alert alert-secondary">
-    You haven't recorded any notes for {{ticker}} yet
+}
+@if (notes && notes.notes.length === 0) {
+  <div>
+    <div class="alert alert-secondary">
+      You haven't recorded any notes for {{ticker}} yet
+    </div>
   </div>
-</div>
+}

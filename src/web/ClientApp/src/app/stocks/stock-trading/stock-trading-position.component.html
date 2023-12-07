@@ -1,28 +1,27 @@
-<div class="mb-3" *ngIf="_position">
-
-  <div class="row">
-    <div class="col-md-3"><div class="stat-label">Cost/Share</div><div>{{ (!_position.isClosed ? _position.averageCostPerShare : _position.averageBuyCostPerShare) | currency}}</div></div>
-    <div class="col-md-3"><div class="stat-label">Cost</div><div>{{ (!_position.isClosed ? _position.cost : _position.completedPositionCost) | currency}}</div></div>
-    <div class="col-md-3"><div class="stat-label">Stop</div><div>{{ _position.stopPrice | currency }}
-      <span *ngIf="!_position.isClosed">({{ (_position.stopPrice - _position.averageCostPerShare) / _position.averageCostPerShare | percent }})</span>
+@if (_position) {
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-md-3"><div class="stat-label">Cost/Share</div><div>{{ (!_position.isClosed ? _position.averageCostPerShare : _position.averageBuyCostPerShare) | currency}}</div></div>
+      <div class="col-md-3"><div class="stat-label">Cost</div><div>{{ (!_position.isClosed ? _position.cost : _position.completedPositionCost) | currency}}</div></div>
+      <div class="col-md-3"><div class="stat-label">Stop</div><div>{{ _position.stopPrice | currency }}
+      @if (!_position.isClosed) {
+        <span>({{ (_position.stopPrice - _position.averageCostPerShare) / _position.averageCostPerShare | percent }})</span>
+      }
     </div></div>
     <div class="col-md-3"><div class="stat-label">Number of Shares</div><div>{{ _position.numberOfShares !== 0 ? _position.numberOfShares : _position.completedPositionShares }}</div></div>
   </div>
-
   <div class="row mt-3">
     <div class="col-md-3"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
     <div class="col-md-3"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
     <div class="col-md-3"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
     <div class="col-md-3"><div class="stat-label">Chart</div><div><app-trading-view-link [ticker]="_position.ticker"></app-trading-view-link> </div></div>
   </div>
-
   <div class="row mt-3">
     <div class="col-md-3"><div class="stat-label">Unrealized Profit</div><div>Not available</div></div>
     <div class="col-md-3"><div class="stat-label">Unrealized Gain</div><div>Not available</div></div>
     <div class="col-md-3"><div class="stat-label">Realized Profit</div><div>{{ _position.profit | number }} ( {{ _position.gainPct | percent }})</div></div>
     <div class="col-md-3"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
   </div>
-
   <div class="row mt-3">
     <div class="col-md-3">
       <label class="form-label stat-label" for="candidateRiskAmount">Profit Points</label>
@@ -55,8 +54,10 @@
       <div class="input-group">
         <select class="form-select" id="strategyInput" #strategyInput>
           <option value="">Choose...</option>
-          <option
-            *ngFor="let s of strategies" value="{{s.key}}" [selected]="positionStrategy === s.key">{{s.value}}</option>
+          @for (s of strategies; track s) {
+            <option
+            value="{{s.key}}" [selected]="positionStrategy === s.key">{{s.value}}</option>
+          }
         </select>
         <button class="btn btn-outline-secondary" (click)="setStrategy(strategyInput.value)">Update</button>
       </div>
@@ -65,59 +66,70 @@
       </div>
     </div>
   </div>
-
-  <div class="row" *ngIf="!_position.isClosed">
-    <div class="col" *ngIf="positionProfitPoints.length > 0">
-      <div class="row mt-3" *ngFor="let ppp of positionProfitPoints">
-        <div *ngFor="let p of ppp.prices, let i = index"
-          [ngClass]="{'col':true, 'bg-positive':p <= price, 'text-white':p <= price}">
-          <div class="stat-label">{{ppp.name}} {{i+1}}</div>
-          <div>{{ p | currency }}</div>
+  @if (!_position.isClosed) {
+    <div class="row">
+      @if (positionProfitPoints.length > 0) {
+        <div class="col">
+          @for (ppp of positionProfitPoints; track ppp) {
+            <div class="row mt-3">
+              @for (p of ppp.prices; track p; let i = $index) {
+                <div
+                  [ngClass]="{'col':true, 'bg-positive':p <= price, 'text-white':p <= price}">
+                  <div class="stat-label">{{ppp.name}} {{i+1}}</div>
+                  <div>{{ p | currency }}</div>
+                </div>
+              }
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
-  </div>
-
+  }
   <div class="row mt-3">
     <div class="col">
       <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(ordersContainer)">Orders ({{positionOrders.length}})</div>
       <div #ordersContainer>
-        <div class="row" *ngFor="let order of positionOrders">
-          <div class="col">
-            {{ order.status }} {{ order.type }} {{ order.quantity }} &#64; {{ order.price === 0 ? "MARKET" : order.price | currency }}
+        @for (order of positionOrders; track order) {
+          <div class="row">
+            <div class="col">
+              {{ order.status }} {{ order.type }} {{ order.quantity }} &#64; {{ order.price === 0 ? "MARKET" : order.price | currency }}
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   </div>
-
   <div class="row mt-3">
     <div class="col">
       <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes ({{_position.notes.length}})</div>
       <div #notesContainer>
-        <div *ngFor="let note of _position.notes" style="white-space: pre-wrap;">{{ note }}</div>
+        @for (note of _position.notes; track note) {
+          <div style="white-space: pre-wrap;">{{ note }}</div>
+        }
       </div>
     </div>
   </div>
-
   <div class="row mt-3">
     <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(eventContainer)">Events ({{_position.events.length}})</div>
     <div #eventContainer class="visually-hidden">
-      <div [ngClass]="getCssClassForEvent(t)" class="row event" *ngFor="let t of _position.events">
-        <div class="col">{{t.date | date }}</div>
-        <div class="col">{{t.type}}</div>
-        <div class="col-8">{{t.description}}</div>
-        <div class="col">
-          <button *ngIf="t.type === 'buy' || t.type === 'sell'"  class="btn btn-sm btn-outline-danger" (click)="deleteTransaction(t.id)">Delete {{t.type}}</button>
+      @for (t of _position.events; track t) {
+        <div [ngClass]="getCssClassForEvent(t)" class="row event">
+          <div class="col">{{t.date | date }}</div>
+          <div class="col">{{t.type}}</div>
+          <div class="col-8">{{t.description}}</div>
+          <div class="col">
+            @if (t.type === 'buy' || t.type === 'sell') {
+              <button  class="btn btn-sm btn-outline-danger" (click)="deleteTransaction(t.id)">Delete {{t.type}}</button>
+            }
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
-
   <div class="row mt-3">
     <div class="col">
       <button class="btn btn-sm btn-outline-danger" (click)="deletePosition()">Delete</button>
     </div>
   </div>
-
 </div>
+}

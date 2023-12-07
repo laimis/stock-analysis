@@ -11,7 +11,9 @@
         <label for="strategyToFilter" class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
         <div class="col-sm-10">
           <select class="form-select" name="strategyToFilter" id="strategyToFilter" (change)="strategyToFilterChanged($event.target)">
-            <option *ngFor="let so of strategies" value="{{so.key}}" [selected]="so.key === strategyToFilter">{{so.value}}</option>
+            @for (so of strategies; track so) {
+              <option value="{{so.key}}" [selected]="so.key === strategyToFilter">{{so.value}}</option>
+            }
           </select>
         </div>
       </div>
@@ -21,78 +23,85 @@
         <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
         <div class="col-sm-10">
           <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target)">
-            <option *ngFor="let so of sortOptions" value="{{so.value}}">{{so.name}}</option>
+            @for (so of sortOptions; track so) {
+              <option value="{{so.value}}">{{so.name}}</option>
+            }
           </select>
         </div>
       </div>
     </div>
   </div>
-
-  <div *ngIf="renderStyle === 'card'">
-    <div class="card border-info mt-4" *ngFor="let position of sortedPositions;">
-      <div class="card-body" *ngIf="position">
-        <div class="card-title">
-          <div class="container">
-            <div class="row">
-              <div class="col">
-                <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
-                <span class="position-price">{{getPrice(position) | currency}}</span>
-                <i
-                  (click)="toggleVisibility(detailDiv);"
-                  class="bi bi-info-square-fill ms-2"></i>
+  @if (renderStyle === 'card') {
+    <div>
+      @for (position of sortedPositions; track position) {
+        <div class="card border-info mt-4">
+          @if (position) {
+            <div class="card-body">
+              <div class="card-title">
+                <div class="container">
+                  <div class="row">
+                    <div class="col">
+                      <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
+                      <span class="position-price">{{getPrice(position) | currency}}</span>
+                      <i
+                        (click)="toggleVisibility(detailDiv);"
+                      class="bi bi-info-square-fill ms-2"></i>
+                    </div>
+                    <div class="col text-center">
+                    </div>
+                    <div class="col">
+                      <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col text-center">
-              </div>
-              <div class="col">
-                <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
+              <div class="card-text visually-hidden" #detailDiv>
+                <app-stock-trading-position [position]="position" [orders]="orders" ></app-stock-trading-position>
               </div>
             </div>
-          </div>
+          }
         </div>
-        <div class="card-text visually-hidden" #detailDiv>
-          <app-stock-trading-position [position]="position" [orders]="orders" ></app-stock-trading-position>
-        </div>
-      </div>
+      }
     </div>
-  </div>
-
-  <div *ngIf="renderStyle === 'table'">
-    <table class="table table-hover striped">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Price</th>
-          <th>Cost/Share</th>
-          <th>Stop</th>
-          <th>Cost</th>
-          <th>Shares</th>
-          <th>P/L</th>
-          <th>Risked</th>
-          <th>R/R</th>
-          <th>Opened</th>
-          <th>Last tx Age</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let position of sortedPositions">
-          <td>
-            <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
-          </td>
-          <td>{{getPrice(position) | currency}}</td>
-          <td>{{position.averageCostPerShare | currency}}</td>
-          <td>{{position.stopPrice | currency}}</td>
-          <td>{{position.cost | currency}}</td>
-          <td>{{position.numberOfShares}}</td>
-          <td>{{position.profit}}</td>
-          <td>{{position.riskedAmount | currency}}</td>
-          <td>{{position.rr | number}}</td>
-          <td>{{position.opened | date}}</td>
-          <td>{{position.daysSinceLastTransaction}}</td>
-        </tr>
-      </tbody>
-    </table>
-
-  </div>
-
-
+  }
+  @if (renderStyle === 'table') {
+    <div>
+      <table class="table table-hover striped">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Price</th>
+            <th>Cost/Share</th>
+            <th>Stop</th>
+            <th>Cost</th>
+            <th>Shares</th>
+            <th>P/L</th>
+            <th>Risked</th>
+            <th>R/R</th>
+            <th>Opened</th>
+            <th>Last tx Age</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (position of sortedPositions; track position) {
+            <tr>
+              <td>
+                <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
+              </td>
+              <td>{{getPrice(position) | currency}}</td>
+              <td>{{position.averageCostPerShare | currency}}</td>
+              <td>{{position.stopPrice | currency}}</td>
+              <td>{{position.cost | currency}}</td>
+              <td>{{position.numberOfShares}}</td>
+              <td>{{position.profit}}</td>
+              <td>{{position.riskedAmount | currency}}</td>
+              <td>{{position.rr | number}}</td>
+              <td>{{position.opened | date}}</td>
+              <td>{{position.daysSinceLastTransaction}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

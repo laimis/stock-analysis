@@ -1,42 +1,52 @@
 <div class="clearfix mb-3">
   <select class="btn border rounded me-3" [(ngModel)]="symbolFilter" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
     <option value="">Filter by symbol</option>
-    <option *ngFor="let t of tickers" value="{{t}}">{{t}}</option>
+    @for (t of tickers; track t) {
+      <option value="{{t}}">{{t}}</option>
+    }
   </select>
-
-  <div *ngIf="loading" class="spinner-border spinner-border-sm text-info" role="status">
-    <span class="sr-only">Loading...</span>
-  </div>
-
-  <a *ngIf="!symbolFilter" class="float-end" [routerLink]="[ '/notes/add' ]">New note</a>
-  <a *ngIf="symbolFilter" class="float-end" [routerLink]="[ '/notes/add', symbolFilter ]">New note</a>
+  @if (loading) {
+    <div class="spinner-border spinner-border-sm text-info" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  }
+  @if (!symbolFilter) {
+    <a class="float-end" [routerLink]="[ '/notes/add' ]">New note</a>
+  }
+  @if (symbolFilter) {
+    <a class="float-end" [routerLink]="[ '/notes/add', symbolFilter ]">New note</a>
+  }
 </div>
-
-<div *ngIf="notes && notes.length > 0">
-  <div class="card mb-3" *ngFor="let note of notes">
-    <div class="card-body">
-      <div class="card-title">
-        <app-stock-link class="font-weight-bold" [ticker]="note.relatedToTicker"></app-stock-link>
+@if (notes && notes.length > 0) {
+  <div>
+    @for (note of notes; track note) {
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="card-title">
+            <app-stock-link class="font-weight-bold" [ticker]="note.relatedToTicker"></app-stock-link>
+          </div>
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{note.created | date}}
+            @if (note.price.amount) {
+              <span class="ml-3">price: {{note.price.amount | currency}}</span>
+            }
+          </h6>
+          <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
+          <div>
+            <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
+            <a class="float-end" [routerLink]="[ '/notes/filtered', note.relatedToTicker ]">view all {{note.relatedToTicker}} notes</a>
+          </div>
+        </div>
       </div>
-      <h6 class="card-subtitle mb-2 text-muted">
-        {{note.created | date}}
-        <span class="ml-3" *ngIf="note.price.amount">price: {{note.price.amount | currency}}</span>
-      </h6>
-
-      <p style="white-space: pre-wrap;" class="card-text">{{note.note}}</p>
-
-      <div>
-        <a [routerLink]="[ '/notes', note.id ]" class="card-link">edit</a>
-        <a class="float-end" [routerLink]="[ '/notes/filtered', note.relatedToTicker ]">view all {{note.relatedToTicker}} notes</a>
-      </div>
+    }
+  </div>
+}
+@if (notes && notes.length === 0) {
+  <div>
+    <div class="alert alert-secondary">
+      You haven't recorded any notes @if (symbolFilter) {
+      <span>for {{symbolFilter}}</span>
+      } yet
     </div>
   </div>
-</div>
-
-<div *ngIf="notes && notes.length === 0">
-
-  <div class="alert alert-secondary">
-    You haven't recorded any notes <span *ngIf="symbolFilter">for {{symbolFilter}}</span> yet
-  </div>
-
-</div>
+}

@@ -1,12 +1,13 @@
-<div *ngIf="!loaded">
+@if (!loaded) {
+  <div>
     Loading positions...
     <div class="spinner-border text-info spinner-border-sm" role="status">
       <span class="sr-only">Loading...</span>
     </div>
   </div>
-
-  <div *ngIf="loaded">
-
+}
+@if (loaded) {
+  <div>
     <div class="tab-container mt-2">
       <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
         Positions
@@ -22,14 +23,24 @@
       </a>
       <a class="tab float-end" [routerLink]="" (click)="refresh()">
         Refresh
-        <div class="spinner-border text-info spinner-border-sm" role="status" *ngIf="loading">
-          <span class="sr-only">Loading...</span>
-        </div>
+        @if (loading) {
+          <div class="spinner-border text-info spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        }
       </a>
     </div>
-
-    <app-stock-trading-closed-positions *ngIf="isActive('positions') && past" [positions]=past></app-stock-trading-closed-positions>
-    <app-stock-trading-performance *ngIf="isActive('performance')" [performance]=performance></app-stock-trading-performance>
-    <app-stock-trading-strategies *ngIf="isActive('strategies') && strategies" [results]=strategies></app-stock-trading-strategies>
-    <app-stock-trading-review *ngIf="isActive('review')" [positions]="past"></app-stock-trading-review>
+    @if (isActive('positions') && past) {
+      <app-stock-trading-closed-positions [positions]=past></app-stock-trading-closed-positions>
+    }
+    @if (isActive('performance')) {
+      <app-stock-trading-performance [performance]=performance></app-stock-trading-performance>
+    }
+    @if (isActive('strategies') && strategies) {
+      <app-stock-trading-strategies [results]=strategies></app-stock-trading-strategies>
+    }
+    @if (isActive('review')) {
+      <app-stock-trading-review [positions]="past"></app-stock-trading-review>
+    }
   </div>
+}

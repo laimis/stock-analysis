@@ -1,66 +1,82 @@
-<div *ngIf="loaded" class="mt-2 mb-4">
-
-  <div>
-    <div *ngIf="profile">
-      <h3>{{profile.symbol}}: {{profile.description}}
-        <a class="float-end ms-3" href="https://invest.ameritrade.com/grid/p/site#r=jPage/https://research.ameritrade.com/grid/wwws/research/stocks/summary?symbol={{stock.ticker}}&c_name=invest_VENDOR" target="_blank">
-          <img src="/assets/images/td-logo-vector.svg" height="25px" />
-        </a>
-        <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
-          <img src="/assets/images/finviz.png" height="25px" />
-        </a>
-        <span class="float-end ms-3">
-          <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
-        </span>
-      </h3>
+@if (loaded) {
+  <div class="mt-2 mb-4">
+    <div>
+      @if (profile) {
+        <div>
+          <h3>{{profile.symbol}}: {{profile.description}}
+            <a class="float-end ms-3" href="https://invest.ameritrade.com/grid/p/site#r=jPage/https://research.ameritrade.com/grid/wwws/research/stocks/summary?symbol={{stock.ticker}}&c_name=invest_VENDOR" target="_blank">
+              <img src="/assets/images/td-logo-vector.svg" height="25px" />
+            </a>
+            <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
+              <img src="/assets/images/finviz.png" height="25px" />
+            </a>
+            <span class="float-end ms-3">
+              <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
+            </span>
+          </h3>
+        </div>
+      }
     </div>
-  </div>
-
-  <div class="tab-container mt-2">
-    <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
-      Shares <span *ngIf="ownership && ownership.currentPosition" class="badge rounded-pill bg-info">{{ownership.currentPosition.numberOfShares}}</span>
+    <div class="tab-container mt-2">
+      <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
+        Shares @if (ownership && ownership.currentPosition) {
+        <span class="badge rounded-pill bg-info">{{ownership.currentPosition.numberOfShares}}</span>
+      }
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
-      Options <span *ngIf="options && options.length > 0" class="badge rounded-pill bg-info">{{options.length}}</span>
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
-      Trade <span *ngIf="options && options.length > 0" class="badge rounded-pill bg-info">{{options.length}}</span>
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
-      Analysis
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
-      Fundamentals
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
-      Notes <span *ngIf="notes && notes.notes.length > 0" class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
-    </a>
-    <span class="float-end">
-      <span class="text-muted">Price:</span> {{stock.price | currency}}
-    </span>
-
-  </div>
-
-  <app-stock-ownership *ngIf="isActive('stocks')"
+      Options @if (options && options.length > 0) {
+      <span class="badge rounded-pill bg-info">{{options.length}}</span>
+    }
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
+    Trade @if (options && options.length > 0) {
+    <span class="badge rounded-pill bg-info">{{options.length}}</span>
+  }
+</a>
+<a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+  Analysis
+</a>
+<a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
+  Fundamentals
+</a>
+<a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
+  Notes @if (notes && notes.notes.length > 0) {
+  <span class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
+}
+</a>
+<span class="float-end">
+  <span class="text-muted">Price:</span> {{stock.price | currency}}
+</span>
+</div>
+@if (isActive('stocks')) {
+  <app-stock-ownership
     [stock]=stock [ownership]=ownership
-    (ownershipChanged)="stockOwnershipChanged($event)"></app-stock-ownership>
-
-  <stock-option *ngIf="isActive('options')"
+  (ownershipChanged)="stockOwnershipChanged($event)"></app-stock-ownership>
+}
+@if (isActive('options')) {
+  <stock-option
     [ticker]=stock.ticker [options]=options
-    (ownershipChanged)="optionOwnershipChanged($event)"></stock-option>
-
-  <app-stock-fundamentals *ngIf="isActive('fundamentals')" [stock]=stock></app-stock-fundamentals>
-
-  <stock-notes *ngIf="isActive('notes')" [notes]=notes [ticker]=stock.ticker></stock-notes>
-
-  <app-stock-analysis *ngIf="isActive('analysis')" [ticker]=stock.ticker></app-stock-analysis>
-
-  <app-brokerage-orders *ngIf="isActive('trade')" [filteredTickers]="[stock.ticker]"></app-brokerage-orders>
-  <app-stock-trading-new-position *ngIf="isActive('trade')" [isPendingPositionMode]="true" [presetTicker]="stock.ticker" (pendingPositionCreated)="refreshOrders()" ></app-stock-trading-new-position>
-
-
+  (ownershipChanged)="optionOwnershipChanged($event)"></stock-option>
+}
+@if (isActive('fundamentals')) {
+  <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
+}
+@if (isActive('notes')) {
+  <stock-notes [notes]=notes [ticker]=stock.ticker></stock-notes>
+}
+@if (isActive('analysis')) {
+  <app-stock-analysis [ticker]=stock.ticker></app-stock-analysis>
+}
+@if (isActive('trade')) {
+  <app-brokerage-orders [filteredTickers]="[stock.ticker]"></app-brokerage-orders>
+}
+@if (isActive('trade')) {
+  <app-stock-trading-new-position [isPendingPositionMode]="true" [presetTicker]="stock.ticker" (pendingPositionCreated)="refreshOrders()" ></app-stock-trading-new-position>
+}
 </div>
-
-<div *ngIf="!loaded">
-	Fetching stock information...
-</div>
+}
+@if (!loaded) {
+  <div>
+    Fetching stock information...
+  </div>
+}

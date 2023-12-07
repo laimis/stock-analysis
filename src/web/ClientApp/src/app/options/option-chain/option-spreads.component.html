@@ -1,12 +1,16 @@
 
-<ng-container *ngFor="let s of spreads">
+@for (s of spreads; track s) {
   <table class="table table-striped mt-3">
     <tbody>
       <tr class="table-info">
         <td colspan="2">{{s.name}}</td>
         <td colspan="2">
-          <span *ngIf="s.premiumPaid">You will pay {{s.premiumPaid | currency}}.</span>
-          <span *ngIf="s.premiumReceived">You will receive {{s.premiumReceived | currency}}.</span>
+          @if (s.premiumPaid) {
+            <span>You will pay {{s.premiumPaid | currency}}.</span>
+          }
+          @if (s.premiumReceived) {
+            <span>You will receive {{s.premiumReceived | currency}}.</span>
+          }
         </td>
         <td colspan="2">
           max gain: {{s.maxGain | currency}}
@@ -15,15 +19,17 @@
           Max risk is {{s.risk | currency}}
         </td>
       </tr>
-      <tr *ngFor="let leg of s.legs">
-        <td>{{leg.action}}</td>
-        <td>{{leg.option.strikePrice | currency}} {{leg.option.optionType}}</td>
-        <td>{{leg.option.expirationDate}}</td>
-        <td>{{leg.option.bid | currency}}</td>
-        <td>{{leg.option.ask | currency}}</td>
-        <td>{{leg.option.openInterest}}</td>
-        <td>{{leg.option.volume}}</td>
-      </tr>
+      @for (leg of s.legs; track leg) {
+        <tr>
+          <td>{{leg.action}}</td>
+          <td>{{leg.option.strikePrice | currency}} {{leg.option.optionType}}</td>
+          <td>{{leg.option.expirationDate}}</td>
+          <td>{{leg.option.bid | currency}}</td>
+          <td>{{leg.option.ask | currency}}</td>
+          <td>{{leg.option.openInterest}}</td>
+          <td>{{leg.option.volume}}</td>
+        </tr>
+      }
     </tbody>
-  </table>    
-</ng-container>
+  </table>
+}
