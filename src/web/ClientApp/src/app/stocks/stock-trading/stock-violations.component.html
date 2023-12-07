@@ -1,110 +1,124 @@
-<div class="mt-4" *ngIf="violations">
-  <span *ngIf="violations.length === 0">
-    You have no violations.
-  </span>
-  <table class="table table-hover border d-none d-md-block" *ngIf="violations.length > 0">
-    <thead>
-      <tr>
-        <th scope="col">Ticker</th>
-        <th scope="col">Number of Shares</th>
-        <th scope="col">Buy Price</th>
-        <th scope="col">Current Price</th>
-        <th scope="col">% diff</th>
-        <th scope="col">Message</th>
-        <th scope="col">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let violation of violations">
-        <tr>
-          <td>
+@if (violations) {
+  <div class="mt-4">
+    @if (violations.length === 0) {
+      <span>
+        You have no violations.
+      </span>
+    }
+    @if (violations.length > 0) {
+      <table class="table table-hover border d-none d-md-block">
+        <thead>
+          <tr>
+            <th scope="col">Ticker</th>
+            <th scope="col">Number of Shares</th>
+            <th scope="col">Buy Price</th>
+            <th scope="col">Current Price</th>
+            <th scope="col">% diff</th>
+            <th scope="col">Message</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (violation of violations; track violation) {
+            <tr>
+              <td>
+                <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
+              </td>
+              <td>{{violation.numberOfShares}}</td>
+              <td>{{violation.pricePerShare | currency}}</td>
+              <td>{{violation.currentPrice | currency}}</td>
+              <td>{{(violation.currentPrice - violation.pricePerShare) / violation.pricePerShare | percent}}</td>
+              <td>{{violation.message}}</td>
+              <td>
+                <button type="button" class="btn btn-secondary me-2" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
+                <button type="button" class="btn btn-secondary me-2" (click)="openPosition(violation.ticker)">Open Position</button>
+              </td>
+            </tr>
+            <tr>
+              @if (activeTicker === violation.ticker) {
+                <td colspan="7">
+                  <div>
+                    @if (fixType === 'transaction') {
+                      <app-stock-transaction
+                        [ticker]="activeTicker"
+                        [numberOfShares]="violation.numberOfShares"
+                        [pricePerShare]="violation.pricePerShare"
+                        (transactionFailed)="transactionFailed($event)"
+                        (transactionRecorded)="transactionRecorded($event)">
+                      </app-stock-transaction>
+                    }
+                    @if (fixType === 'position') {
+                      <app-stock-trading-new-position
+                        [presetTicker]="violation.ticker"
+                        [showChart]="false"
+                        [showAnalysis]="false"
+                        [isPendingPositionMode]="false"
+                        (stockPurchased)="transactionRecorded($event)">
+                      </app-stock-trading-new-position>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    <!-- render violations on mobile as cards -->
+    <div class="d-md-none">
+      @for (violation of violations; track violation) {
+        <div class="card mb-3">
+          <div class="card-title">
             <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
-          </td>
-          <td>{{violation.numberOfShares}}</td>
-          <td>{{violation.pricePerShare | currency}}</td>
-          <td>{{violation.currentPrice | currency}}</td>
-          <td>{{(violation.currentPrice - violation.pricePerShare) / violation.pricePerShare | percent}}</td>
-          <td>{{violation.message}}</td>
-          <td>
-            <button type="button" class="btn btn-secondary me-2" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
-            <button type="button" class="btn btn-secondary me-2" (click)="openPosition(violation.ticker)">Open Position</button>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="7" *ngIf="activeTicker === violation.ticker">
-            <div>
-              <app-stock-transaction
-                *ngIf="fixType === 'transaction'"
-                [ticker]="activeTicker"
-                [numberOfShares]="violation.numberOfShares"
-                [pricePerShare]="violation.pricePerShare"
-                (transactionFailed)="transactionFailed($event)"
-                (transactionRecorded)="transactionRecorded($event)">
-              </app-stock-transaction>
-              <app-stock-trading-new-position
-                *ngIf="fixType === 'position'"
-                [presetTicker]="violation.ticker"
-                [showChart]="false"
-                [showAnalysis]="false"
-                [isPendingPositionMode]="false"
-                (stockPurchased)="transactionRecorded($event)">
-              </app-stock-trading-new-position>
-            </div>
-          </td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
-
-  <!-- render violations on mobile as cards -->
-  <div class="d-md-none">
-    <ng-container *ngFor="let violation of violations">
-      <div class="card mb-3">
-        <div class="card-title">
-          <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
-          <span class="float-end">{{violation.currentPrice | currency}}</span>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <button type="button" class="btn btn-secondary btn-block w-100" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
-            </div>
-            <div class="col-md-6">
-              <button type="button" class="btn btn-secondary btn-block w-100" (click)="openPosition(violation.ticker)">Open Position</button>
-            </div>
+            <span class="float-end">{{violation.currentPrice | currency}}</span>
           </div>
-          <div class="row">
-            <div class="col">
-              {{violation.message}}
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <button type="button" class="btn btn-secondary btn-block w-100" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-secondary btn-block w-100" (click)="openPosition(violation.ticker)">Open Position</button>
+              </div>
             </div>
-          </div>
-          <div class="row"  *ngIf="activeTicker === violation.ticker">
-            <div class="col">
-              <app-stock-transaction
-                *ngIf="fixType === 'transaction'"
-                [ticker]="activeTicker"
-                [numberOfShares]="violation.numberOfShares"
-                [pricePerShare]="violation.pricePerShare"
-                (transactionFailed)="transactionFailed($event)"
-                (transactionRecorded)="transactionRecorded($event)">
-              </app-stock-transaction>
-              <app-stock-trading-new-position
-                *ngIf="fixType === 'position'"
-                [presetTicker]="violation.ticker"
-                [showChart]="false"
-                [showAnalysis]="false"
-                [isPendingPositionMode]="false"
-                (stockPurchased)="transactionRecorded($event)">
-              </app-stock-trading-new-position>
+            <div class="row">
+              <div class="col">
+                {{violation.message}}
+              </div>
             </div>
+            @if (activeTicker === violation.ticker) {
+              <div class="row" >
+                <div class="col">
+                  @if (fixType === 'transaction') {
+                    <app-stock-transaction
+                      [ticker]="activeTicker"
+                      [numberOfShares]="violation.numberOfShares"
+                      [pricePerShare]="violation.pricePerShare"
+                      (transactionFailed)="transactionFailed($event)"
+                      (transactionRecorded)="transactionRecorded($event)">
+                    </app-stock-transaction>
+                  }
+                  @if (fixType === 'position') {
+                    <app-stock-trading-new-position
+                      [presetTicker]="violation.ticker"
+                      [showChart]="false"
+                      [showAnalysis]="false"
+                      [isPendingPositionMode]="false"
+                      (stockPurchased)="transactionRecorded($event)">
+                    </app-stock-trading-new-position>
+                  }
+                </div>
+              </div>
+            }
           </div>
         </div>
-      </div>
-    </ng-container>
+      }
+    </div>
+    @if (tickersInViolations.length > 0) {
+      <app-brokerage-new-order (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
+    }
+    @if (tickersInViolations.length > 0) {
+      <app-brokerage-orders (orderExecuted)="orderExecuted($event)" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
+    }
   </div>
-
-  <app-brokerage-new-order *ngIf="tickersInViolations.length > 0" (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
-  <app-brokerage-orders *ngIf="tickersInViolations.length > 0" (orderExecuted)="orderExecuted($event)" [filteredTickers]="tickersInViolations"></app-brokerage-orders>
-
-</div>
-
+}

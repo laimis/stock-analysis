@@ -1,5 +1,4 @@
 <div>
-
   <section>
     <h5>Recent Performance</h5>
     <div>
@@ -20,9 +19,10 @@
         </div>
       </form>
     </div>
-    <app-trading-performance-summary *ngIf="performanceSelection" [performance]="performanceSelection" [title]="performanceTitle"></app-trading-performance-summary>
+    @if (performanceSelection) {
+      <app-trading-performance-summary [performance]="performanceSelection" [title]="performanceTitle"></app-trading-performance-summary>
+    }
   </section>
-
   <section>
     <h5>Performance Trend Charts</h5>
     <div>
@@ -43,10 +43,10 @@
         </div>
       </form>
     </div>
-
-    <div *ngFor="let t of trends" class="p-5 m-2 border">
-      <app-line-chart [dataContainer]="t"></app-line-chart>
-    </div>
-
+    @for (t of trends; track t) {
+      <div class="p-5 m-2 border">
+        <app-line-chart [dataContainer]="t"></app-line-chart>
+      </div>
+    }
   </section>
 </div>

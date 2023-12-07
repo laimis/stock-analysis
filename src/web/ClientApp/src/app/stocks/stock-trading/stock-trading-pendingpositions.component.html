@@ -1,20 +1,18 @@
 <section>
   <h5>Pending Positions</h5>
-
-  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-
-
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
   <div class="d-flex justify-content-end">
     <a class="btn btn-outline-secondary btn-sm" href="{{getPendingPositionExportUrl()}}">Export</a>
   </div>
-
   <div>
-    <span *ngIf="loaded && positions.length === 0">No pending positions found</span>
-
-
-      <h2>Pending Positions ({{positions.length}})</h2>
-      <div class="card mb-3" *ngFor="let position of positions">
-
+    @if (loaded && positions.length === 0) {
+      <span>No pending positions found</span>
+    }
+    <h2>Pending Positions ({{positions.length}})</h2>
+    @for (position of positions; track position) {
+      <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div class="card-title">
@@ -23,42 +21,32 @@
                 <div class="pr-3">
                   <span class="stat-label">Bid: </span> <span class="fw-bold">{{position.bid | currency }}</span>
                 </div>
-
                 <div class="px-3 border-left">
                   <span class="stat-label">Current Price: </span> <span class="fw-bold">{{position.price }} ({{position.percentDiffBetweenBidAndPrice | percent}})</span>
                 </div>
-
                 <div class="px-3 border-left">
                   <span class="stat-label">Shares: </span> <span class="fw-bold">{{position.numberOfShares}}</span>
                 </div>
-
                 <div class="px-3 border-left">
                   <span class="stat-label">Created: </span><span class="fw-bold">{{position.date | date}}</span>
                 </div>
-
                 <div class="pl-3 border-left">
                   <span class="stat-label">Stop: </span> <span class="fw-bold">{{position.stopPrice | currency}}</span>
                 </div>
-
               </div>
             </div>
           </div>
-
           <p class="card-text">
             {{ position.notes }}
           </p>
-
-
-
           <div class="mt-4">
             <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" ></app-brokerage-orders>
           </div>
-
         </div>
         <div class="card-footer no-border">
           <button class="btn btn-warning btn-sm" (click)="closePendingPosition(position)">Close</button>
         </div>
       </div>
-
+    }
   </div>
 </section>

@@ -1,5 +1,9 @@
-<div *ngIf="errors && errors.length > 0" class="alert alert-danger" role="alert">
-  <ul>
-    <li *ngFor="let error of errors">{{error}}</li>
-  </ul>
-</div>
+@if (errors && errors.length > 0) {
+  <div class="alert alert-danger" role="alert">
+    <ul>
+      @for (error of errors; track error) {
+        <li>{{error}}</li>
+      }
+    </ul>
+  </div>
+}

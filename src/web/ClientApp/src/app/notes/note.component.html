@@ -1,30 +1,29 @@
 <div>
-
-  <div class="alert alert-success" *ngIf="saved">The note has been sucessfully recorded,
-    <a [routerLink]="[ '/notes' ]">view</a>
-  </div>
-
-  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-
-  <div *ngIf="note">
-    <form>
-      <div>
-        <label for="description">Note</label>
-        <textarea class="form-control" id="description" name="Note" [(ngModel)]="note.note" rows="10">
-        </textarea>
-      </div>
-
-      <div>
-        <label>Created</label>
-        {{note.created | date}} for <app-stock-link [ticker]=note.relatedToTicker>{{note.relatedToTicker}}</app-stock-link>
-      </div>
-
-      <div>
-        <button class="btn btn-primary m-1" (click)="saveNote()">Save</button>
-        <a [routerLink]="['/notes']" class="btn btn-secondary m-1">Close</a>
-      </div>
-    </form>
-  </div>
-
-
+  @if (saved) {
+    <div class="alert alert-success">The note has been sucessfully recorded,
+      <a [routerLink]="[ '/notes' ]">view</a>
+    </div>
+  }
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
+  @if (note) {
+    <div>
+      <form>
+        <div>
+          <label for="description">Note</label>
+          <textarea class="form-control" id="description" name="Note" [(ngModel)]="note.note" rows="10">
+          </textarea>
+        </div>
+        <div>
+          <label>Created</label>
+          {{note.created | date}} for <app-stock-link [ticker]=note.relatedToTicker>{{note.relatedToTicker}}</app-stock-link>
+        </div>
+        <div>
+          <button class="btn btn-primary m-1" (click)="saveNote()">Save</button>
+          <a [routerLink]="['/notes']" class="btn btn-secondary m-1">Close</a>
+        </div>
+      </form>
+    </div>
+  }
 </div>

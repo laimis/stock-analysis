@@ -1,5 +1,7 @@
 <div class="text-start">
-  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
   <form>
     <div class="h5 mb-3">
       <span

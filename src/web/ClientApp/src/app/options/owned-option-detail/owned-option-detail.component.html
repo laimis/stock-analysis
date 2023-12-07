@@ -1,144 +1,154 @@
 <div class="mt-2">
-
-  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-
-	<div *ngIf="option">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
+  @if (option) {
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/options">Options</a></li>
           <li class="breadcrumb-item active" aria-current="page">{{option.detail?.description}}</li>
-      </ol>
-    </nav>
-
-    <div class="card">
-      <div class="card-body">
-        <h3 class="card-title">
-          <app-stock-link [ticker]="option.ticker"></app-stock-link>
-           &#64; {{option.strikePrice | currency}} {{option.optionType}}
-
-          <span class="float-end" *ngIf="!option.closed">
-            {{option.numberOfContracts}} contracts {{option.boughtOrSold}}
-          </span>
-          <span class="float-end" *ngIf="option.closed">
-            position closed
-          </span>
-        </h3>
-        <h5 class="card-subtitle text-muted">
-          Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
-          <span *ngIf="option.expiresSoon" class="ml-1 badge bg-warning">expires soon</span>
-          <span *ngIf="option.isExpired && !option.closed" class="ml-1 badge bg-danger">expired</span>
-          <span *ngIf="option.closed && option.profit >= 0" class="badge bg-success">win</span>
-          <span *ngIf="option.closed && option.profit < 0" class="badge bg-warning">loss</span>
-        </h5>
-
-        <div *ngIf="!option.closed">
-          <div class="mt-2 row">
-            <div class="col">
-              <div class="stat-label">Current price</div>
-              <div>
-                {{option.strikePriceDiff | percent}}
-                <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
-                {{option.currentPrice | currency}}
+        </ol>
+      </nav>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">
+            <app-stock-link [ticker]="option.ticker"></app-stock-link>
+            &#64; {{option.strikePrice | currency}} {{option.optionType}}
+            @if (!option.closed) {
+              <span class="float-end">
+                {{option.numberOfContracts}} contracts {{option.boughtOrSold}}
+              </span>
+            }
+            @if (option.closed) {
+              <span class="float-end">
+                position closed
+              </span>
+            }
+          </h3>
+          <h5 class="card-subtitle text-muted">
+            Expiration:   {{option.expirationDate | date:"MM/dd/yyyy"}}
+            @if (option.expiresSoon) {
+              <span class="ml-1 badge bg-warning">expires soon</span>
+            }
+            @if (option.isExpired && !option.closed) {
+              <span class="ml-1 badge bg-danger">expired</span>
+            }
+            @if (option.closed && option.profit >= 0) {
+              <span class="badge bg-success">win</span>
+            }
+            @if (option.closed && option.profit < 0) {
+              <span class="badge bg-warning">loss</span>
+            }
+          </h5>
+          @if (!option.closed) {
+            <div>
+              <div class="mt-2 row">
+                <div class="col">
+                  <div class="stat-label">Current price</div>
+                  <div>
+                    {{option.strikePriceDiff | percent}}
+                    <span class="badge" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
+                    {{option.currentPrice | currency}}
+                  </div>
+                </div>
+                <div class="col"><div class="stat-label">Premium</div><div>{{option.profit | currency}}</div></div>
+                <div class="col"><div class="stat-label">Days Left</div><div>{{(option.days - option.daysHeld) | number}}</div></div>
+                <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
               </div>
             </div>
-            <div class="col"><div class="stat-label">Premium</div><div>{{option.profit | currency}}</div></div>
-            <div class="col"><div class="stat-label">Days Left</div><div>{{(option.days - option.daysHeld) | number}}</div></div>
-            <div class="col"><div class="stat-label">Days Held %</div><div>{{option.daysHeld / option.days | percent}}</div></div>
+          }
+          @if (option.closed) {
+            <div>
+              <div class="mt-2 row">
+                <div class="col"><div class="stat-label">Profit</div><div>{{option.profit | currency}}</div></div>
+                <div class="col"><div class="stat-label">Profit / Day Held</div><div>{{(option.profit / option.daysHeld) | currency}}</div></div>
+              </div>
+            </div>
+          }
+          <div class="mt-2">
+            <a [routerLink]="[ '/options' ]">Back to Options</a>
           </div>
         </div>
-
-        <div *ngIf="option.closed">
-          <div class="mt-2 row">
-            <div class="col"><div class="stat-label">Profit</div><div>{{option.profit | currency}}</div></div>
-            <div class="col"><div class="stat-label">Profit / Day Held</div><div>{{(option.profit / option.daysHeld) | currency}}</div></div>
-          </div>
-        </div>
-
-        <div class="mt-2">
-          <a [routerLink]="[ '/options' ]">Back to Options</a>
-        </div>
-
       </div>
-    </div>
-
-    <div class="card mt-2" *ngIf="!option.closed">
-      <div class="card-body">
-        <div class="card-title">
-          If you closed via a trade, record it below:
+      @if (!option.closed) {
+        <div class="card mt-2">
+          <div class="card-body">
+            <div class="card-title">
+              If you closed via a trade, record it below:
+            </div>
+            <form>
+              <div class="row">
+                <div class="col">
+                  <label for="positionType">Trade type</label>
+                  <input class="form-control" type="text" readonly value="{{positionType}}" />
+                </div>
+                <div class="col">
+                  <label for="numberOfContracts">Number of Contracts</label>
+                  <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
+                </div>
+                <div class="col">
+                  <label for="premium">Premium Per Contract</label>
+                  <input type="number" step="0.01" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
+                </div>
+                <div class="col">
+                  <label for="filled">Filled</label>
+                  <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
+                </div>
+              </div>
+              <div>
+                <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <form>
-          <div class="row">
-            <div class="col">
-              <label for="positionType">Trade type</label>
-              <input class="form-control" type="text" readonly value="{{positionType}}" />
+      }
+      @if (!option.closed) {
+        <div class="card mt-2">
+          <div class="card-body">
+            <div class="card-title">
+              Close Option Position
             </div>
-
-            <div class="col">
-              <label for="numberOfContracts">Number of Contracts</label>
-              <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
-            </div>
-
-            <div class="col">
-              <label for="premium">Premium Per Contract</label>
-              <input type="number" step="0.01" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
-            </div>
-
-            <div class="col">
-              <label for="filled">Filled</label>
-              <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
-            </div>
+            <form>
+              <div>
+                <button type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(false)">Close - Expired Worthless</button>
+                @if (option.boughtOrSold === 'Sold') {
+                  <button type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(true)">Close - It was assigned</button>
+                }
+              </div>
+            </form>
           </div>
-
-          <div>
-            <button type="button" class="btn btn-primary mb-1 me-2" (click)="record()">Record</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="card mt-2" *ngIf="!option.closed">
-      <div class="card-body">
-        <div class="card-title">
-          Close Option Position
         </div>
-        <form>
-          <div>
-            <button type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(false)">Close - Expired Worthless</button>
-            <button *ngIf="option.boughtOrSold === 'Sold'" type="button" class="btn btn-secondary mb-1 me-2" (click)="expire(true)">Close - It was assigned</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div>
-      <caption>Transactions</caption>
-      <table class="table table-striped border">
-        <thead class="thead-light">
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount == 0}"
-            *ngFor="let t of option.transactions">
-            <td>{{ t.date | date:'shortDate'}}</td>
-            <td>{{ t.description }}</td>
-            <td>{{ t.amount | currency }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="mb-3">
-      <label>Delete this option position from your portfolio</label>
+      }
       <div>
-        <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
+        <caption>Transactions</caption>
+        <table class="table table-striped border">
+          <thead class="thead-light">
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of option.transactions; track t) {
+              <tr
+                [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount == 0}"
+                >
+                <td>{{ t.date | date:'shortDate'}}</td>
+                <td>{{ t.description }}</td>
+                <td>{{ t.amount | currency }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="mb-3">
+        <label>Delete this option position from your portfolio</label>
+        <div>
+          <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
+        </div>
       </div>
     </div>
-
-	</div>
+  }
 </div>
-

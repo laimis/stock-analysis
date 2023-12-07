@@ -1,14 +1,15 @@
 <div class="mt-2">
-
-  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-
-  <div *ngIf="success" class="alert alert-success" role="alert">
-    Contract sale has been successfully recorded
-  </div>
-
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
+  @if (success) {
+    <div class="alert alert-success" role="alert">
+      Contract sale has been successfully recorded
+    </div>
+  }
   <h3>Record your option transaction</h3>
   <div class="option-purchase-c-container">
-		<form>
+    <form>
       <div class="row">
         <div class="col">
           <app-stock-search
@@ -23,13 +24,11 @@
           <input type="number" step="0.01" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="strikePrice">
         </div>
       </div>
-
       <div class="row mt-2">
         <div class="col">
           <label for="expirationDate">Expiration</label>
           <input type="date" class="form-control" id="expirationDate" name="expirationDate" [(ngModel)]="expirationDate">
         </div>
-
         <div class="col">
           <label for="optionType">Option Type &nbsp;&nbsp; </label>
           <select class="form-control btn border rounded" id="optionType" name="optionType" [(ngModel)]="optionType">
@@ -38,19 +37,16 @@
           </select>
         </div>
       </div>
-
       <div class="row mt-2">
         <div class="col">
           <label for="numberOfContracts">Number of Contracts</label>
           <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
         </div>
-
         <div class="col">
           <label for="premium">Premium per Contract</label>
           <input type="number" step="0.01" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
         </div>
       </div>
-
       <div class="row mt-2">
         <div class="col">
           <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
@@ -64,16 +60,14 @@
           <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
         </div>
       </div>
-
       <div class="row mt-2">
         <label for="notes">Notes and your thoughts around this transaction</label>
         <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="5"></textarea>
       </div>
-
       <div class="mt-2">
         <button type="submit" class="btn btn-primary mb-2 me-2" (click)="record()">Record</button>
         <button type="button" class="btn btn-secondary mb-2" (click)="back()">Back</button>
       </div>
-		</form>
-	</div>
+    </form>
+  </div>
 </div>

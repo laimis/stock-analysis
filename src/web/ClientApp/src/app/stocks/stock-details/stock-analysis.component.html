@@ -1,96 +1,97 @@
 <div>
-
   <section>
     <h5>Chart</h5>
     <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
   </section>
-
   <section>
     <h5>Gaps</h5>
     <app-gaps [gaps]="gaps"></app-gaps>
   </section>
-
   <section>
     <h5>% Change Distribution</h5>
     <app-percent-change-distribution [percentChangeDistribution]="percentChangeDistribution">
     </app-percent-change-distribution>
   </section>
-
   <section>
     <h5>ATR Chart</h5>
-    <app-line-chart *ngIf="chartInfo" [dataContainer]="chartInfo.prices.atr"></app-line-chart>
+    @if (chartInfo) {
+      <app-line-chart [dataContainer]="chartInfo.prices.atr"></app-line-chart>
+    }
   </section>
-
   <section>
     <h5>Single bar outcomes</h5>
-    <div *ngIf="dailyOutcomes">
-      <table class="table table-striped table-hover border">
-        <tbody>
-        <tr>
-          <td>Positive / Negative</td>
-          <td
-            [ngClass]="{'text-danger': positiveCount(dailyOutcomes) < negativeCount(dailyOutcomes), 'text-success': positiveCount(dailyOutcomes) > negativeCount(dailyOutcomes)}">
-            {{ positiveCount(dailyOutcomes) }} / {{ negativeCount(dailyOutcomes) }}
-          </td>
-        </tr>
-        </tbody>
-      </table>
-
-      <table class="table table-hover border">
-        <tbody>
-        <tr *ngFor="let o of dailyOutcomes.outcomes">
-          <td>
-            <span
-              class="badge"
-              [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
-                &nbsp;
-            </span>
-          </td>
-          <td>{{o.key}}</td>
-          <td>{{getValue(o)}}</td>
-          <td>{{o.outcomeType}}</td>
-          <td>{{o.message}}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    @if (dailyOutcomes) {
+      <div>
+        <table class="table table-striped table-hover border">
+          <tbody>
+            <tr>
+              <td>Positive / Negative</td>
+              <td
+                [ngClass]="{'text-danger': positiveCount(dailyOutcomes) < negativeCount(dailyOutcomes), 'text-success': positiveCount(dailyOutcomes) > negativeCount(dailyOutcomes)}">
+                {{ positiveCount(dailyOutcomes) }} / {{ negativeCount(dailyOutcomes) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table table-hover border">
+          <tbody>
+            @for (o of dailyOutcomes.outcomes; track o) {
+              <tr>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
+                    &nbsp;
+                  </span>
+                </td>
+                <td>{{o.key}}</td>
+                <td>{{getValue(o)}}</td>
+                <td>{{o.outcomeType}}</td>
+                <td>{{o.message}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   </section>
-
   <section>
     <h5>Multiple bar outcomes</h5>
-    <div *ngIf="multipleBarOutcomes">
-      <table class="table table-striped table-hover border">
-        <tbody>
-        <tr>
-          <td>Positive / Negative</td>
-          <td
-            [ngClass]="{'text-danger': positiveCount(multipleBarOutcomes) < negativeCount(multipleBarOutcomes), 'text-success': positiveCount(multipleBarOutcomes) > negativeCount(multipleBarOutcomes)}">
-            {{ positiveCount(multipleBarOutcomes) }} / {{ negativeCount(multipleBarOutcomes) }}
-          </td>
-        </tr>
-        </tbody>
-      </table>
-
-      <table class="table table-hover border">
-        <tbody>
-        <tr *ngFor="let o of multipleBarOutcomes.outcomes">
-          <td>
-                            <span
-                              class="badge"
-                              [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
-                                &nbsp;
-                            </span>
-          </td>
-          <td>{{o.key}}</td>
-          <td>{{getValue(o)}}</td>
-          <td>{{o.outcomeType}}</td>
-          <td>{{o.message}}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    @if (multipleBarOutcomes) {
+      <div>
+        <table class="table table-striped table-hover border">
+          <tbody>
+            <tr>
+              <td>Positive / Negative</td>
+              <td
+                [ngClass]="{'text-danger': positiveCount(multipleBarOutcomes) < negativeCount(multipleBarOutcomes), 'text-success': positiveCount(multipleBarOutcomes) > negativeCount(multipleBarOutcomes)}">
+                {{ positiveCount(multipleBarOutcomes) }} / {{ negativeCount(multipleBarOutcomes) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table table-hover border">
+          <tbody>
+            @for (o of multipleBarOutcomes.outcomes; track o) {
+              <tr>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{'bg-success': o.outcomeType === 'Positive', 'bg-danger': o.outcomeType === 'Negative', 'bg-secondary': o.outcomeType === 'Neutral'}">
+                    &nbsp;
+                  </span>
+                </td>
+                <td>{{o.key}}</td>
+                <td>{{getValue(o)}}</td>
+                <td>{{o.outcomeType}}</td>
+                <td>{{o.message}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   </section>
-
   <section>
     <h5>Daily Analysis Report</h5>
     <app-outcomes-analysis-report
@@ -98,6 +99,4 @@
       [showSummary]="true">
     </app-outcomes-analysis-report>
   </section>
-
 </div>
-

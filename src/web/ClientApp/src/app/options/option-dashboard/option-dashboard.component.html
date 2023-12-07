@@ -1,31 +1,45 @@
-<div *ngIf="!loaded">
-  Loading...
-</div>
-
-<div class="tab-container mt-2" *ngIf="loaded">
-  <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
-    Open Positions
-  </a>
-  <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]="" (click)="activateTab('brokerage')">
-    Brokerage
-    <span *ngIf="optionsContainer.brokeragePositions && optionsContainer.brokeragePositions.length > 0" class="badge rounded-pill bg-info">
-      {{optionsContainer.brokeragePositions.length}}
-    </span>
-  </a>
-  <a class="tab" [ngClass]="{'is-active': isActive('closed')}" [routerLink]="" (click)="activateTab('closed')">
-    Past Trades
-  </a>
-  <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
-    Performance
-  </a>
-</div>
-
-<app-option-open *ngIf="loaded && isActive('open')" [openOptions]=optionsContainer.open (positionsUpdated)="refreshOptions()"></app-option-open>
-<app-option-brokerage-positions *ngIf="loaded && isActive('brokerage')" [positions]="optionsContainer.brokeragePositions" (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
-<app-option-brokerage-orders *ngIf="loaded && isActive('brokerage')" [orders]="optionsContainer.orders" (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
-<app-option-closed *ngIf="loaded && isActive('closed')" [closedOptions]=optionsContainer.closed></app-option-closed>
-<app-option-performance *ngIf="loaded && isActive('performance')"
-  [overallStats]="optionsContainer.overallStats"
-  [buyStats]="optionsContainer.buyStats"
-  [sellStats]="optionsContainer.sellStats">
-</app-option-performance>
+@if (!loaded) {
+  <div>
+    Loading...
+  </div>
+}
+@if (loaded) {
+  <div class="tab-container mt-2">
+    <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
+      Open Positions
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]="" (click)="activateTab('brokerage')">
+      Brokerage
+      @if (optionsContainer.brokeragePositions && optionsContainer.brokeragePositions.length > 0) {
+        <span class="badge rounded-pill bg-info">
+          {{optionsContainer.brokeragePositions.length}}
+        </span>
+      }
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('closed')}" [routerLink]="" (click)="activateTab('closed')">
+      Past Trades
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
+      Performance
+    </a>
+  </div>
+}
+@if (loaded && isActive('open')) {
+  <app-option-open [openOptions]=optionsContainer.open (positionsUpdated)="refreshOptions()"></app-option-open>
+}
+@if (loaded && isActive('brokerage')) {
+  <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions" (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
+}
+@if (loaded && isActive('brokerage')) {
+  <app-option-brokerage-orders [orders]="optionsContainer.orders" (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
+}
+@if (loaded && isActive('closed')) {
+  <app-option-closed [closedOptions]=optionsContainer.closed></app-option-closed>
+}
+@if (loaded && isActive('performance')) {
+  <app-option-performance
+    [overallStats]="optionsContainer.overallStats"
+    [buyStats]="optionsContainer.buyStats"
+    [sellStats]="optionsContainer.sellStats">
+  </app-option-performance>
+}

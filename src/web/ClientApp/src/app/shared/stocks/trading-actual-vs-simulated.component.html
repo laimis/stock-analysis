@@ -1,61 +1,70 @@
 <div>
-  <table class="table table-hover simulation-table table-sm mt-2"  *ngIf="simulations">
-    <thead>
-      <tr>
-        <th>Strategy</th>
-        <th>Profit</th>
-        <th>Stop</th>
-        <th>R/R</th>
-        <th>% Gain</th>
-        <th>Gain</th>
-        <th>Drawdown</th>
-        <th>R Gain</th>
-        <th>R Drawdown</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let r of sortedResults(); let i = index">
-        <tr (click)="toggleShowDetails(i)">
-          <td class="text-muted">{{r.strategyName}}</td>
-          <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{r.position.profit | currency}}</td>
-          <td>{{r.position.stopPrice | currency }}</td>
-          <td>{{r.position.rr | number}}</td>
-          <td>{{r.position.gainPct | percent}}</td>
-          <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxGainPct | percent:'1.0-2'}}</td>
-          <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
-          <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{r.maxGainPctRecent | percent:'1.0-2'}}</td>
-          <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{r.maxDrawdownPctRecent | percent:'1.0-2'}}</td>
-          <td>
-            <span *ngIf="r.position.isClosed" class="badge bg-secondary rounded-pill">closed</span>
-          </td>
+  @if (simulations) {
+    <table class="table table-hover simulation-table table-sm mt-2" >
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>Profit</th>
+          <th>Stop</th>
+          <th>R/R</th>
+          <th>% Gain</th>
+          <th>Gain</th>
+          <th>Drawdown</th>
+          <th>R Gain</th>
+          <th>R Drawdown</th>
+          <th></th>
         </tr>
-
-        <tr *ngIf="showDetails === i">
-          <td></td>
-          <td colspan="9">
-            <table class="table small">
-              <tbody>
-                <tr *ngFor="let e of r.position.events" class="event" [ngClass]="'event-' + e.type">
-                  <td>{{e.date}}</td>
-                  <td>{{e.type}}</td>
-                  <td>{{e.quantity}}</td>
-                  <td>{{e.value | currency}}</td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </ng-container>
-
-    </tbody>
-  </table>
-
-  <div class="placeholder col-12" *ngIf="simulationErrors">
-    <div *ngFor="let e of simulationErrors">
-      <div class="alert alert-danger" role="alert">
-        {{e}}
-      </div>
+      </thead>
+      <tbody>
+        @for (r of sortedResults(); track r; let i = $index) {
+          <tr (click)="toggleShowDetails(i)">
+            <td class="text-muted">{{r.strategyName}}</td>
+            <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{r.position.profit | currency}}</td>
+            <td>{{r.position.stopPrice | currency }}</td>
+            <td>{{r.position.rr | number}}</td>
+            <td>{{r.position.gainPct | percent}}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxGainPct | percent:'1.0-2'}}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{r.maxDrawdownPct | percent:'1.0-2'}}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{r.maxGainPctRecent | percent:'1.0-2'}}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{r.maxDrawdownPctRecent | percent:'1.0-2'}}</td>
+            <td>
+              @if (r.position.isClosed) {
+                <span class="badge bg-secondary rounded-pill">closed</span>
+              }
+            </td>
+          </tr>
+          @if (showDetails === i) {
+            <tr>
+              <td></td>
+              <td colspan="9">
+                <table class="table small">
+                  <tbody>
+                    @for (e of r.position.events; track e) {
+                      <tr class="event" [ngClass]="'event-' + e.type">
+                        <td>{{e.date}}</td>
+                        <td>{{e.type}}</td>
+                        <td>{{e.quantity}}</td>
+                        <td>{{e.value | currency}}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  }
+  @if (simulationErrors) {
+    <div class="placeholder col-12">
+      @for (e of simulationErrors; track e) {
+        <div>
+          <div class="alert alert-danger" role="alert">
+            {{e}}
+          </div>
+        </div>
+      }
     </div>
-  </div>
+  }
 </div>

@@ -1,77 +1,98 @@
-<div *ngIf="response">
-
-  <div class="row">
-    <div class="col">
-      <select class="form-select filterDropdown btn border rounded me-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
-        <option value="month">Breakdown by Month</option>
-        <option value="week">Breakdown by Week</option>
-        <option value="ticker">Breakdown by Symbol</option>
-      </select>
-    </div>
-    <div class="col">
-      <select class="form-select filterDropdown btn border rounded" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
-        <option value="crypto">Crypto</option>
-        <option value="options">Options</option>
-        <option value="shares">Shares</option>
-        <option value="">Shares and Options</option>
-      </select>
-    </div>
-    <div class="col">
-      <select class="form-select filterDropdown btn border rounded" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
-        <option value="">All Symbols</option>
-        <option *ngFor="let t of response.tickers" value="{{t}}">{{t}}</option>
-      </select>
-    </div>
-    <div class="col">
-      <select class="form-select filterDropdown btn border rounded" [(ngModel)]="txType" id="txType" name="txType" (ngModelChange)="loadData()">
-        <option value="pl">Realized Gain/Loss</option>
-        <option value="tx">All Transactions</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="mt-2" *ngIf="!ticker && response.transactions.length === 0">
-    <div class="alert alert-secondary">
-      You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
-    </div>
-  </div>
-
-  <div class="mb-2 mt-3" *ngFor="let g of response.grouped">
-    <div class="text-muted font-size-small row">
-      <div class="col-4">
-        <button class="btn btn-link" (click)="showDetails = g.name" *ngIf="showDetails !== g.name">[ + ]</button>
-        <button class="btn btn-link" (click)="showDetails = ''" *ngIf="showDetails === g.name">[ - ]</button>
-        {{g.name}} ({{g.transactions.length}})
+@if (response) {
+  <div>
+    <div class="row">
+      <div class="col">
+        <select class="form-select filterDropdown btn border rounded me-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
+          <option value="month">Breakdown by Month</option>
+          <option value="week">Breakdown by Week</option>
+          <option value="ticker">Breakdown by Symbol</option>
+        </select>
       </div>
-      <div class="col-8 font-weight-bold text-end">
-        {{ g.sum | currency }}
+      <div class="col">
+        <select class="form-select filterDropdown btn border rounded" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
+          <option value="crypto">Crypto</option>
+          <option value="options">Options</option>
+          <option value="shares">Shares</option>
+          <option value="">Shares and Options</option>
+        </select>
+      </div>
+      <div class="col">
+        <select class="form-select filterDropdown btn border rounded" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+          <option value="">All Symbols</option>
+          @for (t of response.tickers; track t) {
+            <option value="{{t}}">{{t}}</option>
+          }
+        </select>
+      </div>
+      <div class="col">
+        <select class="form-select filterDropdown btn border rounded" [(ngModel)]="txType" id="txType" name="txType" (ngModelChange)="loadData()">
+          <option value="pl">Realized Gain/Loss</option>
+          <option value="tx">All Transactions</option>
+        </select>
       </div>
     </div>
-    <table class="table table-hover border rounded" *ngIf="showDetails === g.name">
-      <thead class="thead-light">
-        <tr>
-          <th width="100">Date</th>
-          <th width="100">Symbol</th>
-          <th>Description</th>
-          <th width="125" class="text-end">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let t of g.transactions">
-          <td>{{ t.date | date:'shortDate'}}</td>
-          <td>
-            <app-stock-link [ticker]="t.ticker" [openInNewTab]=true *ngIf="t.isOption"></app-stock-link>
-            <a [routerLink]="[ '/optiondetails', t.aggregateId ]" target="_blank" *ngIf="t.isOption">{{t.ticker}}</a>
-          </td>
-          <td>
-            <span *ngIf="t.amount >= 0" class="badge bg-success">&nbsp;&nbsp;</span>
-            <span *ngIf="t.amount < 0" class="badge bg-warning">&nbsp;&nbsp;</span>
-            {{ t.description }}
-          </td>
-          <td class="text-end">{{ t.amount | currency }}</td>
-        </tr>
-      </tbody>
-    </table>
+    @if (!ticker && response.transactions.length === 0) {
+      <div class="mt-2">
+        <div class="alert alert-secondary">
+          You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
+        </div>
+      </div>
+    }
+    @for (g of response.grouped; track g) {
+      <div class="mb-2 mt-3">
+        <div class="text-muted font-size-small row">
+          <div class="col-4">
+            @if (showDetails !== g.name) {
+              <button class="btn btn-link" (click)="showDetails = g.name">[ + ]</button>
+            }
+            @if (showDetails === g.name) {
+              <button class="btn btn-link" (click)="showDetails = ''">[ - ]</button>
+            }
+            {{g.name}} ({{g.transactions.length}})
+          </div>
+          <div class="col-8 font-weight-bold text-end">
+            {{ g.sum | currency }}
+          </div>
+        </div>
+        @if (showDetails === g.name) {
+          <table class="table table-hover border rounded">
+            <thead class="thead-light">
+              <tr>
+                <th width="100">Date</th>
+                <th width="100">Symbol</th>
+                <th>Description</th>
+                <th width="125" class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of g.transactions; track t) {
+                <tr
+                  >
+                  <td>{{ t.date | date:'shortDate'}}</td>
+                  <td>
+                    @if (t.isOption) {
+                      <app-stock-link [ticker]="t.ticker" [openInNewTab]=true></app-stock-link>
+                    }
+                    @if (t.isOption) {
+                      <a [routerLink]="[ '/optiondetails', t.aggregateId ]" target="_blank">{{t.ticker}}</a>
+                    }
+                  </td>
+                  <td>
+                    @if (t.amount >= 0) {
+                      <span class="badge bg-success">&nbsp;&nbsp;</span>
+                    }
+                    @if (t.amount < 0) {
+                      <span class="badge bg-warning">&nbsp;&nbsp;</span>
+                    }
+                    {{ t.description }}
+                  </td>
+                  <td class="text-end">{{ t.amount | currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
   </div>
-</div>
+}

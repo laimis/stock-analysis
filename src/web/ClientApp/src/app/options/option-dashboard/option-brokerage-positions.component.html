@@ -1,39 +1,45 @@
 <section class="mt-4">
   <h3>Unresolved Brokerage Positions</h3>
-  <div *ngIf="positions && positions.length === 0">
-    No unresolved option positions found 
-  </div>
-  <table class="table table-hover" *ngIf="positions && positions.length > 0">
-    <thead>
-      <tr>
-        <th>Ticker</th>
-        <th>Strike</th>
-        <th>Type</th>
-        <th>Cost</th>
-        <th>Quantity</th>
-        <th>Market Price</th>
-        <th>Expiration</th>
-        <th>Purchase Date</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let option of positions">
-        <td>
-          <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
-          <app-stock-link [ticker]="option.ticker"></app-stock-link>
-        </td>
-        <td>{{option.strikePrice | currency}}</td>
-        <td>{{option.optionType}}</td>
-        <td>{{option.averageCost | currency}}</td>
-        <td>{{option.quantity | number}}</td>
-        <td>{{option.marketValue | currency }}</td>
-        <td>{{option.expirationDate | date}}</td>
-        <td>
-          <input type="date" #purchaseDate class="form-control" />
-        </td>
-        <td><button class="btn btn-primary" (click)="turnIntoPosition(option, purchaseDate.value)">Turn into Position</button></td>
-      </tr>
-    </tbody>
-  </table>
+  @if (positions && positions.length === 0) {
+    <div>
+      No unresolved option positions found
+    </div>
+  }
+  @if (positions && positions.length > 0) {
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Strike</th>
+          <th>Type</th>
+          <th>Cost</th>
+          <th>Quantity</th>
+          <th>Market Price</th>
+          <th>Expiration</th>
+          <th>Purchase Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (option of positions; track option) {
+          <tr>
+            <td>
+              <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
+              <app-stock-link [ticker]="option.ticker"></app-stock-link>
+            </td>
+            <td>{{option.strikePrice | currency}}</td>
+            <td>{{option.optionType}}</td>
+            <td>{{option.averageCost | currency}}</td>
+            <td>{{option.quantity | number}}</td>
+            <td>{{option.marketValue | currency }}</td>
+            <td>{{option.expirationDate | date}}</td>
+            <td>
+              <input type="date" #purchaseDate class="form-control" />
+            </td>
+            <td><button class="btn btn-primary" (click)="turnIntoPosition(option, purchaseDate.value)">Turn into Position</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </section>

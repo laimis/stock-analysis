@@ -1,14 +1,18 @@
-<div *ngIf="overallStats" class="mb-5 container">
-  <div class="row mb-2"><h5>Overall stats</h5></div>
-  <option-stats [stats]=overallStats></option-stats>
-</div>
-
-<div *ngIf="sellStats" class="mb-5 container">
-  <div class="row mb-2"><h5>Sell stats</h5></div>
-  <option-stats [stats]=sellStats></option-stats>
-</div>
-
-<div *ngIf="buyStats" class="mb-5 container">
-  <div class="row mb-2"><h5>Buy stats</h5></div>
-  <option-stats [stats]=buyStats></option-stats>
-</div>
+@if (overallStats) {
+  <div class="mb-5 container">
+    <div class="row mb-2"><h5>Overall stats</h5></div>
+    <option-stats [stats]=overallStats></option-stats>
+  </div>
+}
+@if (sellStats) {
+  <div class="mb-5 container">
+    <div class="row mb-2"><h5>Sell stats</h5></div>
+    <option-stats [stats]=sellStats></option-stats>
+  </div>
+}
+@if (buyStats) {
+  <div class="mb-5 container">
+    <div class="row mb-2"><h5>Buy stats</h5></div>
+    <option-stats [stats]=buyStats></option-stats>
+  </div>
+}

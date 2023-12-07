@@ -1,164 +1,184 @@
 <div>
-  <div class="mt-2" *ngIf="loading">
-    Loading option details...
-  </div>
-
+  @if (loading) {
+    <div class="mt-2">
+      Loading option details...
+    </div>
+  }
   <app-error-display [errors]="errors"></app-error-display>
-
-  <div class="mt-2" *ngIf="options">
-
-    <div>
-      <table class="table border">
-        <thead class="thead-light">
-          <tr>
-            <th>Stock Price</th>
-            <th>Volatility</th>
-            <th>Put vs Call OI</th>
-            <th>Put vs Call OI Ratio</th>
-            <th>Put vs Call Vol</th>
-            <th>Put vs Call Vol Ratio</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <app-stock-link-and-tradingview-link [ticker]="ticker"></app-stock-link-and-tradingview-link>
-              <span>{{ stockPrice | currency }}</span>
-            </td>
-            <td>{{volatility}}</td>
-            <td>{{putOpenInterest() | number}} vs {{callOpenInterest() | number}}</td>
-            <td>{{putOpenInterest() / callOpenInterest() | number }}</td>
-            <td>{{putVolume() | number}} vs {{callVolume() | number}}</td>
-            <td>{{putVolume() / callVolume() | number }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="expirationSelect">Expiration</label>
-        <select class="form-select" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
-          <option value=""></option>
-          <option value="{{expiration}}" *ngFor="let expiration of expirations">{{expiration}}</option>
-        </select>
-      </div>
-      <div class="col">
-        <label class="form-label" for="sideSelect">Side</label>
-        <select class="form-select" [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
-          <option value=""></option>
-          <option value="call">call</option>
-          <option value="put">put</option>
-        </select>
-      </div>
-      <div class="col">
-        <label class="form-label" for="minBid">Min Bid Price</label>
-        <input class="form-control" step="0.01" type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
-      </div>
-      <div class="col">
-        <label class="form-label" for="minBid">Max Ask Price</label>
-        <input class="form-control" step="0.01" type="number" id="maxAsk" name="maxAsk" [(ngModel)]="maxAsk" (ngModelChange)="onMaxAskChange()" />
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="minStrikePrice">Min Strike Price</label>
-        <select class="form-select" [(ngModel)]="minStrikePrice" id="minStrikePrice" name="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()">
-          <option></option>
-          <option *ngFor="let option of options" value="{{option.strikePrice}}">{{option.strikePrice}}</option>
-        </select>
-      </div>
-      <div class="col">
-        <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
-        <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
-          <option></option>
-          <option *ngFor="let option of options" [attr.value]="option.strikePrice">{{option.strikePrice}}</option>
-        </select>
-      </div>
-      <div class="col">
-        <button class="btn btn-link" id="nearMoneyLink" name="nearMoneyLink" (click)="setStrikePriceFilterNearMoney()">Near money</button>
-      </div>
-      <div class="col"></div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <h3>Bearish</h3>
-        <div><a href="#" (click)="selectSpreads($event, 'straddles')">Straddles</a> - buy or sell put and call at the same strike price</div>
-        <div><a href="#" (click)="selectSpreads($event, 'bearCallSpreads')">Bear call spread</a> - sell call at lower strike price and buy call at higher strike price</div>
-        <div><a href="#" (click)="selectSpreads($event, 'bearPutSpreads')">Bear put spread</a> - buy put and then sell put at lower strike price</div>
-      </div>
-      <div class="col">
-        <h3>Bullish</h3>
-        <div><a href="#" (click)="selectSpreads($event, 'straddles')">Straddles</a></div>
-        <div><a href="#" (click)="selectSpreads($event, 'bullCallSpreads')">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price</div>
-        <div><a href="#" (click)="selectSpreads($event, 'bullPutSpreads')">Bull put spread</a> - sell put and then buy put at lower strike price</div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <button *ngIf="selectedSpread" class="btn btn-link" (click)="selectedSpread = null">Clear</button>
-        <app-option-spreads *ngIf="selectedSpread === 'straddles'"  [spreads]="straddles"></app-option-spreads>
-        <app-option-spreads *ngIf="selectedSpread === 'bullCallSpreads'" [spreads]="bullCallSpreads"></app-option-spreads>
-        <app-option-spreads *ngIf="selectedSpread === 'bullPutSpreads'"  [spreads]="bullPutSpreads"></app-option-spreads>
-        <app-option-spreads *ngIf="selectedSpread === 'bearCallSpreads'"  [spreads]="bearCallSpreads"></app-option-spreads>
-        <app-option-spreads *ngIf="selectedSpread === 'bearPutSpreads'"  [spreads]="bearPutSpreads"></app-option-spreads>
-      </div>
-    </div>
-
-    <div *ngFor="let expiration of expirationMap">
-      <section>
-        <h4>
-          <button class="btn btn-link fs-4" (click)="onExpirationChange(expiration[0].expirationDate)">{{expiration[0].expirationDate}}</button>
-          <span class="float-end">Expires in {{expiration[0].daysToExpiration}} day(s)</span>
-        </h4>
-        <div class="row mb-3">
-          <!-- chart sections that show open interest vs strike price
-            I ended up not finding this useful, but leaving this in, in case it becomes useful later
-
-          <app-chart
-            [chartLabels]="getStrikePrices(expiration)"
-            [values]="{values:getOpenInterest(expiration),label:'Open Interest'}"
-            [chartType]="chartType"></app-chart>
-
-          <app-chart
-            [chartLabels]="getStrikePrices(expiration)"
-            [values]="{values:getVolume(expiration),label:'Volume'}"
-            [chartType]="chartType"></app-chart>
-            -->
-        </div>
-        <table class="table table-hover border">
+  @if (options) {
+    <div class="mt-2">
+      <div>
+        <table class="table border">
           <thead class="thead-light">
             <tr>
-              <th>Strike Price</th>
-              <th>Open interest</th>
-              <th>Volume</th>
-              <th>Bid vs Ask</th>
-              <th>Spread</th>
-              <th>PDP</th>
-              <th>Risk</th>
+              <th>Stock Price</th>
+              <th>Volatility</th>
+              <th>Put vs Call OI</th>
+              <th>Put vs Call OI Ratio</th>
+              <th>Put vs Call Vol</th>
+              <th>Put vs Call Vol Ratio</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let option of expiration" [ngClass]="{'table-info': itm(option)}">
-              <td>{{option.strikePrice | currency}} {{option.side}}</td>
-              <td>{{option.openInterest}}</td>
-              <td>{{option.volume}}</td>
-              <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
+            <tr>
               <td>
-                <i *ngIf="isSpreadHealthy(option)" class="bi bi-diamond-fill text-success"></i>
-                <i *ngIf="!isSpreadHealthy(option)" class="bi bi-diamond text-muted"></i>
-                {{option.spread | currency}}
+                <app-stock-link-and-tradingview-link [ticker]="ticker"></app-stock-link-and-tradingview-link>
+                <span>{{ stockPrice | currency }}</span>
               </td>
-              <td>{{option.perDayPrice | currency}}</td>
-              <td>{{option.risk | percent}}</td>
-              <td>{{option.lastUpdated | date}}</td>
+              <td>{{volatility}}</td>
+              <td>{{putOpenInterest() | number}} vs {{callOpenInterest() | number}}</td>
+              <td>{{putOpenInterest() / callOpenInterest() | number }}</td>
+              <td>{{putVolume() | number}} vs {{callVolume() | number}}</td>
+              <td>{{putVolume() / callVolume() | number }}</td>
             </tr>
           </tbody>
         </table>
-      </section>
-
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          <label class="form-label" for="expirationSelect">Expiration</label>
+          <select class="form-select" [(ngModel)]="expirationSelection" id="expirationSelect" name="expirationSelect" (ngModelChange)="onExpirationChange($event)">
+            <option value=""></option>
+            @for (expiration of expirations; track expiration) {
+              <option value="{{expiration}}">{{expiration}}</option>
+            }
+          </select>
+        </div>
+        <div class="col">
+          <label class="form-label" for="sideSelect">Side</label>
+          <select class="form-select" [(ngModel)]="sideSelection" id="sideSelect" name="sideSelect" (ngModelChange)="onSideChange($event)">
+            <option value=""></option>
+            <option value="call">call</option>
+            <option value="put">put</option>
+          </select>
+        </div>
+        <div class="col">
+          <label class="form-label" for="minBid">Min Bid Price</label>
+          <input class="form-control" step="0.01" type="number" id="minBid" name="minBid" [(ngModel)]="minBid" (ngModelChange)="onMinBidChange()" />
+        </div>
+        <div class="col">
+          <label class="form-label" for="minBid">Max Ask Price</label>
+          <input class="form-control" step="0.01" type="number" id="maxAsk" name="maxAsk" [(ngModel)]="maxAsk" (ngModelChange)="onMaxAskChange()" />
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          <label class="form-label" for="minStrikePrice">Min Strike Price</label>
+          <select class="form-select" [(ngModel)]="minStrikePrice" id="minStrikePrice" name="minStrikePrice" (ngModelChange)="onMinStrikePriceChange()">
+            <option></option>
+            @for (option of options; track option) {
+              <option value="{{option.strikePrice}}">{{option.strikePrice}}</option>
+            }
+          </select>
+        </div>
+        <div class="col">
+          <label class="form-label" for="maxStrikePrice">Max Strike Price</label>
+          <select class="form-select" [(ngModel)]="maxStrikePrice" id="maxStrikePrice" name="maxStrikePrice" (ngModelChange)="onMaxStrikePriceChange()">
+            <option></option>
+            @for (option of options; track option) {
+              <option [attr.value]="option.strikePrice">{{option.strikePrice}}</option>
+            }
+          </select>
+        </div>
+        <div class="col">
+          <button class="btn btn-link" id="nearMoneyLink" name="nearMoneyLink" (click)="setStrikePriceFilterNearMoney()">Near money</button>
+        </div>
+        <div class="col"></div>
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          <h3>Bearish</h3>
+          <div><a href="#" (click)="selectSpreads($event, 'straddles')">Straddles</a> - buy or sell put and call at the same strike price</div>
+          <div><a href="#" (click)="selectSpreads($event, 'bearCallSpreads')">Bear call spread</a> - sell call at lower strike price and buy call at higher strike price</div>
+          <div><a href="#" (click)="selectSpreads($event, 'bearPutSpreads')">Bear put spread</a> - buy put and then sell put at lower strike price</div>
+        </div>
+        <div class="col">
+          <h3>Bullish</h3>
+          <div><a href="#" (click)="selectSpreads($event, 'straddles')">Straddles</a></div>
+          <div><a href="#" (click)="selectSpreads($event, 'bullCallSpreads')">Bull call spread</a> - buy call at lower strike price and sell call at higher strike price</div>
+          <div><a href="#" (click)="selectSpreads($event, 'bullPutSpreads')">Bull put spread</a> - sell put and then buy put at lower strike price</div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          @if (selectedSpread) {
+            <button class="btn btn-link" (click)="selectedSpread = null">Clear</button>
+          }
+          @if (selectedSpread === 'straddles') {
+            <app-option-spreads  [spreads]="straddles"></app-option-spreads>
+          }
+          @if (selectedSpread === 'bullCallSpreads') {
+            <app-option-spreads [spreads]="bullCallSpreads"></app-option-spreads>
+          }
+          @if (selectedSpread === 'bullPutSpreads') {
+            <app-option-spreads  [spreads]="bullPutSpreads"></app-option-spreads>
+          }
+          @if (selectedSpread === 'bearCallSpreads') {
+            <app-option-spreads  [spreads]="bearCallSpreads"></app-option-spreads>
+          }
+          @if (selectedSpread === 'bearPutSpreads') {
+            <app-option-spreads  [spreads]="bearPutSpreads"></app-option-spreads>
+          }
+        </div>
+      </div>
+      @for (expiration of expirationMap; track expiration) {
+        <div>
+          <section>
+            <h4>
+              <button class="btn btn-link fs-4" (click)="onExpirationChange(expiration[0].expirationDate)">{{expiration[0].expirationDate}}</button>
+              <span class="float-end">Expires in {{expiration[0].daysToExpiration}} day(s)</span>
+            </h4>
+            <div class="row mb-3">
+              <!-- chart sections that show open interest vs strike price
+              I ended up not finding this useful, but leaving this in, in case it becomes useful later
+              <app-chart
+                [chartLabels]="getStrikePrices(expiration)"
+                [values]="{values:getOpenInterest(expiration),label:'Open Interest'}"
+              [chartType]="chartType"></app-chart>
+              <app-chart
+                [chartLabels]="getStrikePrices(expiration)"
+                [values]="{values:getVolume(expiration),label:'Volume'}"
+              [chartType]="chartType"></app-chart>
+              -->
+            </div>
+            <table class="table table-hover border">
+              <thead class="thead-light">
+                <tr>
+                  <th>Strike Price</th>
+                  <th>Open interest</th>
+                  <th>Volume</th>
+                  <th>Bid vs Ask</th>
+                  <th>Spread</th>
+                  <th>PDP</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (option of expiration; track option) {
+                  <tr [ngClass]="{'table-info': itm(option)}">
+                    <td>{{option.strikePrice | currency}} {{option.side}}</td>
+                    <td>{{option.openInterest}}</td>
+                    <td>{{option.volume}}</td>
+                    <td>{{option.bid | currency}} vs {{option.ask | currency}}</td>
+                    <td>
+                      @if (isSpreadHealthy(option)) {
+                        <i class="bi bi-diamond-fill text-success"></i>
+                      }
+                      @if (!isSpreadHealthy(option)) {
+                        <i class="bi bi-diamond text-muted"></i>
+                      }
+                      {{option.spread | currency}}
+                    </td>
+                    <td>{{option.perDayPrice | currency}}</td>
+                    <td>{{option.risk | percent}}</td>
+                    <td>{{option.lastUpdated | date}}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </section>
+        </div>
+      }
     </div>
-  </div>
+  }
 </div>

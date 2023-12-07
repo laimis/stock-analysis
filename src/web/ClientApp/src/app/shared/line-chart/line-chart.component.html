@@ -1,1 +1,3 @@
-<canvasjs-chart *ngIf="options" [options]="options"></canvasjs-chart>
+@if (options) {
+  <canvasjs-chart [options]="options"></canvasjs-chart>
+}

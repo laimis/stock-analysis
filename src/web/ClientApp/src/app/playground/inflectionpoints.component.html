@@ -1,8 +1,8 @@
 <div>
   <app-error-display [errors]="errors"></app-error-display>
-
-  <span class="badge bg-success m-1" *ngFor="let ticker of tickers">{{ticker}}</span>
-
+  @for (ticker of tickers; track ticker) {
+    <span class="badge bg-success m-1">{{ticker}}</span>
+  }
   <div class="row">
     <div class="col">
       <label class="form-label" for="priceFrequency">Price Frequency</label>
@@ -19,42 +19,42 @@
       </select>
     </div>
   </div>
-
   <app-candlestick-chart [chartInformation]="chartInfo" >
   </app-candlestick-chart>
-
-  <section *ngFor="let container of lineContainers">
-<!--    <h3>{{container.label}}</h3>-->
-    <app-line-chart [dataContainer]="container"></app-line-chart>
-  </section>
-
+  @for (container of lineContainers; track container) {
+    <section>
+      <!--    <h3>{{container.label}}</h3>-->
+      <app-line-chart [dataContainer]="container"></app-line-chart>
+    </section>
+  }
   <section>
     <h3>Peaks & Valleys</h3>
     <app-line-chart [dataContainers]="peaksAndValleys"></app-line-chart>
   </section>
-
   <table class="table table-hover">
     <thead>
-    <tr>
-      <th>From</th>
-      <th></th>
-      <th>To</th>
-      <th></th>
-      <th>Days</th>
-      <th>Change</th>
-      <th>% Change</th>
-    </tr>
+      <tr>
+        <th>From</th>
+        <th></th>
+        <th>To</th>
+        <th></th>
+        <th>Days</th>
+        <th>Change</th>
+        <th>% Change</th>
+      </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let entry of log">
-      <td>{{entry.from.gradient.bar.close}}</td>
-      <td>{{entry.from.gradient.bar.dateStr}}</td>
-      <td>{{entry.to.gradient.bar.close}}</td>
-      <td>{{entry.to.gradient.bar.dateStr}}</td>
-      <td>{{entry.days}}</td>
-      <td>{{entry.change | currency}}</td>
-      <td>{{entry.percentChange | percent}}</td>
-    </tr>
+      @for (entry of log; track entry) {
+        <tr>
+          <td>{{entry.from.gradient.bar.close}}</td>
+          <td>{{entry.from.gradient.bar.dateStr}}</td>
+          <td>{{entry.to.gradient.bar.close}}</td>
+          <td>{{entry.to.gradient.bar.dateStr}}</td>
+          <td>{{entry.days}}</td>
+          <td>{{entry.change | currency}}</td>
+          <td>{{entry.percentChange | percent}}</td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

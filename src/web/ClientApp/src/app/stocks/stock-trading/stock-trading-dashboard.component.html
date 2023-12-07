@@ -1,43 +1,59 @@
 
 <div>
-  <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-
-  <div *ngIf="!loaded">
-    Loading positions...
-    <div class="spinner-border text-info spinner-border-sm" role="status">
-      <span class="sr-only">Loading...</span>
-    </div>
-  </div>
-
-  <div class="tab-container mt-2" *ngIf="loaded">
-    <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
-      Open Positions
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]="" (click)="activateTab('openreview')">
-      Open Review
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
-      Analysis
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]="" (click)="activateTab('violations')">
-      Violations
-      <span *ngIf="violations && violations.length > 0" class="badge rounded-pill bg-info">{{violations.length}}</span>
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]="" (click)="activateTab('summary')">
-      Summary
-    </a>
-    <a class="tab float-end" [routerLink]="" (click)="refresh()">
-      Refresh
-      <div class="spinner-border text-info spinner-border-sm" role="status" *ngIf="loading">
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
+  @if (!loaded) {
+    <div>
+      Loading positions...
+      <div class="spinner-border text-info spinner-border-sm" role="status">
         <span class="sr-only">Loading...</span>
       </div>
-    </a>
-  </div>
-
-  <app-stock-trading-positions    *ngIf="isActive('positions') && positions" [positions]=positions [orders]="brokerageOrders"></app-stock-trading-positions>
-  <app-stock-trading-review *ngIf="isActive('openreview')" [orders]="brokerageOrders" [positions]=positions></app-stock-trading-review>
-  <app-stock-violations       *ngIf="isActive('violations')" [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
-  <app-stock-trading-outcomes-reports       *ngIf="isActive('analysis') && positions" [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
-  <app-stock-trading-summary  *ngIf="isActive('summary')" [positions]="positions" [cashBalance]="cashBalance" ></app-stock-trading-summary>
-
+    </div>
+  }
+  @if (loaded) {
+    <div class="tab-container mt-2">
+      <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
+        Open Positions
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]="" (click)="activateTab('openreview')">
+        Open Review
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+        Analysis
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]="" (click)="activateTab('violations')">
+        Violations
+        @if (violations && violations.length > 0) {
+          <span class="badge rounded-pill bg-info">{{violations.length}}</span>
+        }
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]="" (click)="activateTab('summary')">
+        Summary
+      </a>
+      <a class="tab float-end" [routerLink]="" (click)="refresh()">
+        Refresh
+        @if (loading) {
+          <div class="spinner-border text-info spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        }
+      </a>
+    </div>
+  }
+  @if (isActive('positions') && positions) {
+    <app-stock-trading-positions    [positions]=positions [orders]="brokerageOrders"></app-stock-trading-positions>
+  }
+  @if (isActive('openreview')) {
+    <app-stock-trading-review [orders]="brokerageOrders" [positions]=positions></app-stock-trading-review>
+  }
+  @if (isActive('violations')) {
+    <app-stock-violations       [violations]="violations" (refreshRequested)="refresh()"></app-stock-violations>
+  }
+  @if (isActive('analysis') && positions) {
+    <app-stock-trading-outcomes-reports       [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
+  }
+  @if (isActive('summary')) {
+    <app-stock-trading-summary  [positions]="positions" [cashBalance]="cashBalance" ></app-stock-trading-summary>
+  }
 </div>
