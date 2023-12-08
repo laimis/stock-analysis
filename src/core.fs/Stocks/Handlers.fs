@@ -13,11 +13,14 @@ open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.SEC
 open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 
 
 type StockTransaction =
     {
+        [<Required>]
+        PositionId: StockPositionId
         [<Range(1, 1000000)>]
         NumberOfShares: decimal
         [<Range(0, 100000)>]
@@ -25,9 +28,8 @@ type StockTransaction =
         [<Required>]
         Date: Nullable<DateTimeOffset>
         StopPrice: Nullable<decimal>
-        Notes: string
-        BrokerageOrderId: string
-        Strategy: string
+        Notes: string option
+        BrokerageOrderId: string option
         Ticker: Ticker
     }
     
@@ -189,17 +191,82 @@ type SetStop =
         Ticker:Ticker
     }
     
+type OpenLongStockPosition = {
+    [<Range(1, 1000000)>]
+    NumberOfShares: decimal
+    [<Range(0, 100000)>]
+    Price: decimal
+    [<Required>]
+    Date: DateTimeOffset option
+    StopPrice: decimal option
+    Notes: string option
+    Strategy: string option
+    Ticker: Ticker
+}
+    
     
 type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFilings,portfolio:IPortfolioStorage,csvParser:ICSVParser,csvWriter:ICSVWriter) =
     
     interface IApplicationService
     
+    member _.Handle(cmd:OpenLongStockPosition,userId:UserId) = task {
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionState>
+        | Some _ ->
+            let! stocks = portfolio.GetStockPositions userId
+            
+            // check if we already have an open position for the ticker
+            let openPosition = stocks |> Seq.tryFind (fun x -> x.Ticker = cmd.Ticker && x.Closed = None)
+            
+            match openPosition with
+            | Some _ -> return "Position already open" |> ResponseUtils.failedTyped<StockPositionState>
+            | None ->
+                let newPosition = StockPosition.createPosition cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.StopPrice cmd.Notes
+                
+                let newPosition =
+                    match cmd.Strategy with
+                    | Some strategy -> newPosition.Value |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
+                    | None -> newPosition 
+                
+                do! newPosition |> portfolio.SaveStockPosition userId openPosition
+                
+                // check if we have any pending positions for the ticker
+                let! pendingPositions = portfolio.GetPendingStockPositions userId
+                let pendingPositionOption = pendingPositions |> Seq.tryFind (fun x -> x.State.Ticker = cmd.Ticker && x.State.IsClosed = false)
+                
+                match pendingPositionOption with
+                | Some pendingPosition ->
+                    
+                    // transfer some data from pending position to this new position
+                    let positionWithStop = newPosition.Value |> StockPosition.setStop pendingPosition.State.StopPrice.Value cmd.Date.Value
+                    
+                    let positionWithNotes = 
+                        match positionWithStop.Value.Notes with
+                        | [] when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) = false -> positionWithStop.Value |> StockPosition.addNotes (Some pendingPosition.State.Notes) cmd.Date.Value
+                        | _ -> positionWithStop
+                    
+                    let positionWithStrategy =
+                        match pendingPosition.State.Strategy with
+                        | null -> positionWithNotes
+                        | _ -> positionWithNotes.Value |> StockPosition.setLabel "strategy" pendingPosition.State.Strategy cmd.Date.Value
+                        
+                    do! positionWithStrategy |> portfolio.SaveStockPosition userId newPosition
+                    
+                    pendingPosition.Purchase positionWithStrategy.Value.AverageCost
+                    
+                    do! portfolio.SavePendingPosition pendingPosition userId
+                | None -> ()
+                
+                return newPosition |> Option.get |> ResponseUtils.success
+    }
+    
     member _.Handle(cmd:BuyOrSell) = task {
         
-        let buyOrSellFunction (stock:OwnedStock) =
+        let buyOrSellFunction =
             match cmd with
-            | Buy (data, _) -> stock.Purchase(numberOfShares=data.NumberOfShares, price=data.Price, date=data.Date.Value, stopPrice=data.StopPrice, notes=data.Notes)
-            | Sell (data, _) -> stock.Sell(numberOfShares=data.NumberOfShares, price=data.Price, date=data.Date.Value, notes=data.Notes)
+            | Buy (data, _) -> StockPosition.buy data.NumberOfShares data.Price data.Date.Value data.Notes
+            | Sell (data, _) -> StockPosition.sell data.NumberOfShares data.Price data.Date.Value data.Notes
             
         let data, userId =
             match cmd with
@@ -209,57 +276,20 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
         let! user = accounts.GetUser(userId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None ->
+            return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stock = portfolio.GetStock data.Ticker userId
+            let! stock = portfolio.GetStockPosition data.PositionId userId
             
-            let stockToUse =
-                match stock with
-                | null -> OwnedStock(ticker=data.Ticker, userId=(userId |> IdentifierHelper.getUserId))
-                | _ -> stock
+            match stock with
+            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | Some _ ->
                 
-            let isNewPosition = stockToUse.State.OpenPosition = null
-            
-            stockToUse |> buyOrSellFunction
-            
-            match isNewPosition && data.Strategy <> null with
-            | true -> stockToUse.SetPositionLabel(positionId=stockToUse.State.OpenPosition.PositionId, key="strategy", value=data.Strategy) |> ignore
-            | _ -> ()
-            
-            do! portfolio.Save stockToUse userId
-            
-            let! pendingPositions = portfolio.GetPendingStockPositions(userId)
-            let pendingPositionOption = pendingPositions |> Seq.tryFind (fun x -> x.State.Ticker = data.Ticker && x.State.IsClosed = false)
-            
-            match (pendingPositionOption, isNewPosition) with
-            | Some pendingPosition, true ->
-                // transfer some data from pending position to this new position
-                let! updatedStock = portfolio.GetStock data.Ticker userId
-                let opened = updatedStock.State.OpenPosition
+                let newState = stock.Value |> buyOrSellFunction
                 
-                let stopSet = updatedStock.SetStop(pendingPosition.State.StopPrice.Value)
+                do! portfolio.SaveStockPosition userId stock newState
                 
-                let notesSet =
-                    match opened.Notes.Count with
-                    | 0 -> updatedStock.AddNotes(pendingPosition.State.Notes)
-                    | _ -> false
-                
-                let strategySet =
-                    match pendingPosition.State.Strategy with
-                    | null -> false
-                    | _ -> updatedStock.SetPositionLabel(positionId=opened.PositionId, key="strategy", value=pendingPosition.State.Strategy)
-                    
-                match stopSet || notesSet || strategySet with
-                | true -> do! portfolio.Save updatedStock userId
-                | false -> ()
-                
-                pendingPosition.Purchase stockToUse.State.OpenPosition.AverageCostPerShare
-                
-                do! portfolio.SavePendingPosition pendingPosition userId
-                
-            | _ -> ()
-            
-            return Ok
+                return Ok
     }
     
     member _.Handle (query:DashboardQuery) = task {
@@ -399,23 +429,23 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                     let command =
                         match r.``type`` with
                         | "buy" -> Buy({
+                            PositionId = StockPositionId(Guid.NewGuid())
                             NumberOfShares = r.amount
                             Price = r.price
                             Date = r.date
                             StopPrice = Nullable<decimal>()
-                            Notes = ""
-                            BrokerageOrderId = ""
-                            Strategy = ""
+                            Notes = None
+                            BrokerageOrderId = None
                             Ticker = Ticker(r.ticker)
                         }, cmd.UserId)
                         | "sell" -> Sell({
                             NumberOfShares = r.amount
+                            PositionId = StockPositionId(Guid.NewGuid())
                             Price = r.price
                             Date = r.date
                             StopPrice = Nullable<decimal>()
-                            Notes = ""
-                            BrokerageOrderId = ""
-                            Strategy = ""
+                            Notes = None
+                            BrokerageOrderId = None
                             Ticker = Ticker(r.ticker)
                         }, cmd.UserId)
                         | _ -> failwith "Unknown transaction type"

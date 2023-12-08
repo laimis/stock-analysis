@@ -8,6 +8,7 @@ open core.Options
 open core.Routines
 open core.Shared
 open core.Stocks
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 
 type IPortfolioStorage =
@@ -16,6 +17,10 @@ type IPortfolioStorage =
     abstract member GetStockByStockId : id:System.Guid -> userId:UserId -> Task<OwnedStock>
     abstract member GetStocks : userId:UserId -> Task<IEnumerable<OwnedStock>>
     abstract member Save : stock:OwnedStock -> userId:UserId -> Task
+    
+    abstract member GetStockPositions : userId:UserId -> Task<IEnumerable<StockPositionState>>
+    abstract member GetStockPosition : positionId:StockPositionId -> userId:UserId -> Task<StockPositionState option>
+    abstract member SaveStockPosition : userId:UserId -> previousState:StockPositionState option -> newState:StockPositionState option -> Task
     
     abstract member Delete : userId:UserId -> Task
     

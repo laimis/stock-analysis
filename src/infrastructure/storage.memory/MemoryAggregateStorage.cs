@@ -5,17 +5,11 @@ using storage.shared;
 
 namespace storage.memory;
 
-public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
+public class MemoryAggregateStorage(IOutbox outbox) : IAggregateStorage, IBlobStorage
 {
-    public MemoryAggregateStorage(IOutbox outbox)
-    {
-        _outbox = outbox;
-    }
-    
     private static readonly Dictionary<string, List<StoredAggregateEvent>> _aggregates = new();
     
     private static readonly Dictionary<string, object> _blobs = new();
-    private readonly IOutbox _outbox;
 
     public Task DeleteAggregates(string entity, UserId userId, IDbTransaction? outsideTransaction = null)
     {
@@ -59,8 +53,8 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
         }
         return Task.FromResult(_aggregates[key].AsEnumerable());
     }
-
-    public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+    
+    private async Task SaveEventsInternal(IAggregate agg, int fromVersion, string entity, UserId userId, IDbTransaction? _ = null)
     {
         var key = MakeKey(entity, userId);
 
@@ -69,11 +63,11 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
             _aggregates[key] = new List<StoredAggregateEvent>();
         }
 
-        var version = agg.Version;
+        var version = fromVersion;
 
         var eventsToBlast = new List<AggregateEvent>();
 
-        foreach (var e in agg.Events.Skip(agg.Version))
+        foreach (var e in agg.Events.Skip(fromVersion))
         {
             var se = new StoredAggregateEvent
             {
@@ -89,7 +83,17 @@ public class MemoryAggregateStorage : IAggregateStorage, IBlobStorage
             eventsToBlast.Add(e);
         }
 
-        await _outbox.AddEvents(eventsToBlast, null);
+        await outbox.AddEvents(eventsToBlast, null);
+    }
+
+    public Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+    {
+        return SaveEventsInternal(agg, agg.Version, entity, userId, outsideTransaction);
+    }
+    
+    public Task SaveEventsAsync(IAggregate oldAgg, IAggregate newAgg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+    {
+        return SaveEventsInternal(newAgg, oldAgg.Version, entity, userId);
     }
 
     public Task<T> Get<T>(string key) => Task.FromResult((T)_blobs[key]);

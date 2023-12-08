@@ -17,8 +17,7 @@ type EmailIdPair(email:string, id:string) =
     
     member _.Email = email
     member _.Id = id |> Guid |> UserId
-    
-   
+
 type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset) =
     
     new(userId, timestamp:DateTimeOffset) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, timestamp)

@@ -8,6 +8,7 @@ open core.fs.Shared
 open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Email
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 open core.fs.Stocks
 
@@ -88,16 +89,16 @@ module ImportTransactions =
                     Ticker = Ticker(r.GetTickerFromOptionDescription())
                 }
                 
-            let createStockTransaction r =
+            let createStockTransaction r : StockTransaction =
                 {
+                    PositionId = StockPositionId.create()
                     Ticker = Ticker(r.Symbol)
                     Date = Nullable<DateTimeOffset> r.Date
-                    Notes = r.Description
+                    Notes = Some r.Description
                     NumberOfShares = r.Quantity.Value
                     Price = r.Price.Value
                     StopPrice = Nullable<decimal>()
-                    BrokerageOrderId = null
-                    Strategy = null 
+                    BrokerageOrderId = None
                 }
             
             let! user = accounts.GetUser(cmd.UserId)

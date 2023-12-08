@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Cryptos;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain;
 using core.fs.Shared.Domain.Accounts;
 using core.Notes;
 using core.Options;
 using core.Routines;
 using core.Shared;
 using core.Stocks;
+using Microsoft.FSharp.Core;
 
 namespace storage.shared
 {
@@ -22,6 +24,7 @@ namespace storage.shared
         private const string _stock_list_entity = "stocklist";
         private const string _routine_entity = "routine";
         private const string _pending_stock_position_entity = "pendingstockposition";
+        private const string _stock_position_entity = "stockposition";
 
         private readonly IAggregateStorage _aggregateStorage;
         private readonly IBlobStorage _blobStorage;
@@ -61,6 +64,29 @@ namespace storage.shared
         public Task Save(OwnedStock stock, UserId userId)
         {
             return Save(stock, _stock_entity, userId);
+        }
+
+        public async Task<IEnumerable<StockPositionState>> GetStockPositions(UserId userId)
+        {
+            var events = await _aggregateStorage.GetEventsAsync(_stock_position_entity, userId);
+            
+            return events.GroupBy(e => e.AggregateId)
+                .Select(StockPosition.createFromEvents)
+                .Select(s => s.Value);
+        }
+
+        public async Task<FSharpOption<StockPositionState>> GetStockPosition(StockPositionId positionId, UserId userId)
+        {
+            var positions = await GetStockPositions(userId);
+            
+            var state = positions.SingleOrDefault(s => s.PositionId.Item == positionId.Item);
+            
+            return state == null ? FSharpOption<StockPositionState>.None : FSharpOption<StockPositionState>.Some(state);
+        }
+
+        public Task SaveStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, FSharpOption<StockPositionState> newState)
+        {
+            return _aggregateStorage.SaveEventsAsync(FSharpOption<StockPositionState>.get_IsNone(previousState) ? null : previousState.Value , newState.Value, _stock_position_entity, userId);
         }
 
         public Task SaveOwnedOption(OwnedOption option, UserId userId)
