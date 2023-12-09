@@ -91,9 +91,9 @@ public class MemoryAggregateStorage(IOutbox outbox) : IAggregateStorage, IBlobSt
         return SaveEventsInternal(agg, agg.Version, entity, userId, outsideTransaction);
     }
     
-    public Task SaveEventsAsync(IAggregate oldAgg, IAggregate newAgg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+    public Task SaveEventsAsync(IAggregate? oldAgg, IAggregate newAgg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
     {
-        return SaveEventsInternal(newAgg, oldAgg.Version, entity, userId);
+        return SaveEventsInternal(newAgg, oldAgg?.Version ?? 0, entity, userId);
     }
 
     public Task<T> Get<T>(string key) => Task.FromResult((T)_blobs[key]);

@@ -80,11 +80,11 @@ namespace storagetests
 
             AssertPositions(afterPurchase, reloaded);
 
-            // await storage.Delete(_userId);
-            //
-            // var afterDelete = await storage.GetStockPositions(_userId);
-            //
-            // Assert.Empty(afterDelete);
+            await storage.Delete(_userId);
+            
+            var afterDelete = await storage.GetStockPositions(_userId);
+            
+            Assert.Empty(afterDelete);
         }
 
         [Fact]
