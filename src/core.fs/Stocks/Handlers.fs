@@ -226,7 +226,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 
                 let newPosition =
                     match cmd.Strategy with
-                    | Some strategy -> newPosition.Value |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
+                    | Some strategy -> newPosition |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
                     | None -> newPosition 
                 
                 do! newPosition |> portfolio.SaveStockPosition userId openPosition
@@ -239,26 +239,26 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                 | Some pendingPosition ->
                     
                     // transfer some data from pending position to this new position
-                    let positionWithStop = newPosition.Value |> StockPosition.setStop pendingPosition.State.StopPrice.Value cmd.Date.Value
+                    let positionWithStop = newPosition |> StockPosition.setStop (Some pendingPosition.State.StopPrice.Value) cmd.Date.Value
                     
                     let positionWithNotes = 
-                        match positionWithStop.Value.Notes with
+                        match positionWithStop.Notes with
                         | [] when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) = false -> positionWithStop |> StockPosition.addNotes (Some pendingPosition.State.Notes) cmd.Date.Value
                         | _ -> positionWithStop
                     
                     let positionWithStrategy =
                         match pendingPosition.State.Strategy with
                         | null -> positionWithNotes
-                        | _ -> positionWithNotes.Value |> StockPosition.setLabel "strategy" pendingPosition.State.Strategy cmd.Date.Value
+                        | _ -> positionWithNotes |> StockPosition.setLabel "strategy" pendingPosition.State.Strategy cmd.Date.Value
                         
-                    do! positionWithStrategy |> portfolio.SaveStockPosition userId newPosition
+                    do! positionWithStrategy |> portfolio.SaveStockPosition userId (Some newPosition)
                     
-                    pendingPosition.Purchase positionWithStrategy.Value.AverageCost
+                    pendingPosition.Purchase positionWithStrategy.AverageCost
                     
                     do! portfolio.SavePendingPosition pendingPosition userId
                 | None -> ()
                 
-                return newPosition |> Option.get |> ResponseUtils.success
+                return newPosition |> ResponseUtils.success
     }
     
     member _.Handle(cmd:BuyOrSell) = task {

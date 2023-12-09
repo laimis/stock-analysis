@@ -23,33 +23,34 @@ type StockPositionTransaction = {
     Date: DateTimeOffset
 }
 
-type StockPositionState = {
-    PositionId: StockPositionId
-    Ticker: Ticker
-    NumberOfShares: decimal
-    AverageCost: decimal
-    Opened: DateTimeOffset
-    Closed: DateTimeOffset option
-    Transactions: StockPositionTransaction list
-    StopPrice: decimal option
-    Notes: string list
-    Labels: (string * string) list
+type StockPositionState =
+    {
+        PositionId: StockPositionId
+        Ticker: Ticker
+        NumberOfShares: decimal
+        AverageCost: decimal
+        Opened: DateTimeOffset
+        Closed: DateTimeOffset option
+        Transactions: StockPositionTransaction list
+        StopPrice: decimal option
+        Notes: string list
+        Labels: (string * string) list
+        
+        Version: int
+        Events: AggregateEvent list
+    }
+    member this.Cost = this.NumberOfShares * this.AverageCost
+    member this.AggregateId = this.PositionId |> StockPositionId.guid
+        
+    interface IAggregate with
+        member this.Version = this.Version
+        member this.Events = this.Events
     
-    Version: int
-    Events: AggregateEvent list
-}
-    with interface IAggregate with
-             member this.Events = this.Events
-             member this.Version = this.Version
-             
-
-type StockPositionOpened(id, aggregateId, ``when``, ticker, numberOfShares, price) =
+type StockPositionOpened(id, aggregateId, ``when``, ticker) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     
     member this.PositionId = aggregateId |> StockPositionId    
     member this.Ticker = ticker
-    member this.NumberOfShares = numberOfShares
-    member this.Price = price
     
 type StockPurchased(id, aggregateId, ``when``, numberOfShares, price) =
     inherit AggregateEvent(id, aggregateId, ``when``)
@@ -109,99 +110,77 @@ module StockPosition =
         // we then calculate the average cost of the remaining shares
         slots |> List.average
     
-    let private apply (event: AggregateEvent) (p: StockPositionState option) =
+    let createInitialState (event: StockPositionOpened) =
+        {
+            PositionId = event.PositionId
+            Ticker = event.Ticker
+            NumberOfShares = 0m
+            AverageCost = 0m
+            Opened = event.When
+            Closed = None
+            Transactions = []
+            StopPrice = None
+            Notes = []
+            Labels = []
+            
+            Version = 1
+            Events = [event]
+        }
+        
+    let private apply (event: AggregateEvent) p =
         match event with
         
-        | :? StockPositionOpened as x ->
+        | :? StockPositionOpened as _ ->
             
-            let p = {
-                PositionId = x.AggregateId |> StockPositionId
-                Ticker = x.Ticker
-                NumberOfShares = x.NumberOfShares
-                AverageCost = x.Price
-                Opened = x.When
-                Closed = None
-                Transactions = []
-                StopPrice = None
-                Notes = []
-                Labels = []
-                
-                Version = 1
-                Events = [x]
-            }
-            
-            Some p
+            p // pass through, this should be done by createInitialState
             
         | :? StockPositionStopSet as x ->
-            let p = p.Value
-            Some { p with StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
+            { p with StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? StockPositionNotesAdded as x ->
-            let p = p.Value
-            Some { p with Notes = x.Notes :: p.Notes; Version = p.Version + 1; Events = p.Events @ [x] }
+            { p with Notes = x.Notes :: p.Notes; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockPurchased as x ->
-            let p = p.Value
             let newNumberOfShares = p.NumberOfShares + x.NumberOfShares
             let newTransactions = p.Transactions @ [{ Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
             let averageCost = newTransactions |> calculateAverageCost (p |> isShort)
-            Some { p with NumberOfShares = newNumberOfShares; AverageCost = averageCost; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x] }
+            { p with NumberOfShares = newNumberOfShares; AverageCost = averageCost; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockSold as x ->
-            let p = p.Value
             let newNumberOfShares = p.NumberOfShares - x.NumberOfShares
             let newTransactions = p.Transactions @ [{ Type = Sell; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
             let averageCost = newTransactions |> calculateAverageCost (p |> isShort)
-            Some { p with NumberOfShares = newNumberOfShares; AverageCost = averageCost; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
+            { p with NumberOfShares = newNumberOfShares; AverageCost = averageCost; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionClosed as x ->
-            let p = p.Value
-            Some { p with Closed = Some x.When; Version = p.Version + 1; Events = p.Events @ [x]  }
+            { p with Closed = Some x.When; Version = p.Version + 1; Events = p.Events @ [x]  }
         
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
     let createFromEvents (events: AggregateEvent seq) =
-        events |> Seq.fold (fun acc e -> apply e acc) None
+        // build state from the first event, casting it to PositionOpened
+        let state = events |> Seq.head :?> StockPositionOpened |> createInitialState
+        events |> Seq.skip 1 |> Seq.fold (fun acc e -> apply e acc) state
         
-    let private applyNotesIfApplicable notes date (positionOption:StockPositionState option) =
+    let private applyNotesIfApplicable notes date stockPosition =
         match notes with
-            | None -> positionOption
-            | Some notes when String.IsNullOrWhiteSpace(notes) -> positionOption
+            | None -> stockPosition
+            | Some notes when String.IsNullOrWhiteSpace(notes) -> stockPosition
             | Some notes ->
-                let e = StockPositionNotesAdded(Guid.NewGuid(), positionOption.Value.PositionId |> StockPositionId.guid, date, notes)
-                apply e positionOption
+                let e = StockPositionNotesAdded(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, notes)
+                apply e stockPosition
                 
-    let private createPosition ticker numberOfShares price date notes =
-        let e = StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker, numberOfShares, price)
-        apply e None |> applyNotesIfApplicable notes date
-        
-    let openLong ticker numberOfShares price date stopPrice notes =
-        if numberOfShares <= 0m then
-            failwith "Number of shares must be greater than zero"
-        
-        if price <= 0.0m then
-            failwith "Price must be greater than zero"
-            
-        let longPosition = createPosition ticker numberOfShares price date notes
-        
-        match stopPrice with
-        | None -> longPosition
-        | Some stopPrice ->
-            let e = StockPositionStopSet(Guid.NewGuid(), longPosition.Value.PositionId |> StockPositionId.guid, date, stopPrice)
-            apply e longPosition
-        
-    let openShort ticker numberOfShares price date =
-        if numberOfShares >= 0m then
-            failwith "Number of shares must be less than zero"
-        
-        if price <= 0.0m then
-            failwith "Price must be greater than zero"
-            
-        createPosition ticker numberOfShares price date
+    let private createPosition ticker date notes =
+        StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker)
+        |> createInitialState
+        |> applyNotesIfApplicable notes date
     
-    let private closePosition date stockPosition =
-        let e = StockPositionClosed(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date)
-        apply e (Some stockPosition)
+    let private closePositionIfApplicable date stockPosition =
+        match stockPosition.NumberOfShares with
+        | 0m -> 
+            let e = StockPositionClosed(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date)
+            apply e stockPosition
+        | _ -> stockPosition
         
     let buy numberOfShares price date notes stockPosition =
         if numberOfShares <= 0m then
@@ -217,18 +196,39 @@ module StockPosition =
             
         let e = StockPurchased(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, numberOfShares, price)
         
-        let stockPositionOption = apply e (Some stockPosition) |> applyNotesIfApplicable notes date
+        apply e stockPosition
+        |> applyNotesIfApplicable notes date
+        |> closePositionIfApplicable date
         
-        match isShort with
-        | true ->
-            // check if we need to mark it as closed
-            match stockPositionOption with
-            | Some x when x.NumberOfShares = 0m -> x |> closePosition date
-            | _ -> stockPositionOption
-                
-        | false -> stockPositionOption
+    let setStop stopPrice date stockPosition =
+        match stopPrice with
+        | None -> stockPosition
+        | Some stopPrice when stopPrice <= 0m -> failwith "Stop price must be greater than zero"
+        | Some stopPrice ->    
+            let e = StockPositionStopSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, stopPrice)
+            apply e stockPosition
         
-    let sell numberOfShares price date notes stockPosition=
+    let openLong ticker numberOfShares price date stopPrice notes =
+        if numberOfShares <= 0m then
+            failwith "Number of shares must be greater than zero"
+        
+        if price <= 0.0m then
+            failwith "Price must be greater than zero"
+        
+        createPosition ticker date notes
+        |> buy numberOfShares price date notes
+        |> setStop stopPrice date
+        
+    let openShort ticker numberOfShares price date =
+        if numberOfShares >= 0m then
+            failwith "Number of shares must be less than zero"
+        
+        if price <= 0.0m then
+            failwith "Price must be greater than zero"
+            
+        createPosition ticker date
+        
+    let sell numberOfShares price date notes stockPosition =
         if numberOfShares <= 0m then
             failwith "Number of shares must be greater than zero"
         
@@ -241,22 +241,9 @@ module StockPosition =
             
         let e = StockSold(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, numberOfShares, price)
         
-        let stockPositionOption = apply e (Some stockPosition) |> applyNotesIfApplicable notes date
-        
-        match isLong with
-        | true ->
-            // check if we need to mark it as closed
-            match stockPositionOption with
-            | Some x when x.NumberOfShares = 0m -> x |> closePosition date
-            | _ -> stockPositionOption
-        | false -> stockPositionOption
-        
-    let setStop stopPrice date stockPosition =
-        if stopPrice <= 0.0m then
-            failwith "Stop price must be greater than zero"
-            
-        let e = StockPositionStopSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, stopPrice)
-        apply e (Some stockPosition)
+        apply e stockPosition
+        |> applyNotesIfApplicable notes date
+        |> closePositionIfApplicable date
         
     let addNotes = applyNotesIfApplicable
         
@@ -265,4 +252,4 @@ module StockPosition =
             failwith "Key cannot be empty"
             
         let e = StockPositionLabelSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, key, value)
-        apply e (Some stockPosition)
+        apply e stockPosition

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using core.fs.Shared.Domain;
 using core.Shared;
 using core.Stocks;
 using coretests.testdata;
@@ -7,7 +8,7 @@ using Xunit;
 
 namespace coretests.Stocks
 {
-    public class OwnedStockTests
+    public class StockPositionTests
     {
         private static readonly Guid _userId = TestDataGenerator.RandomUserId().Item;
         private static readonly Ticker _ticker = TestDataGenerator.TEUM;
@@ -15,23 +16,22 @@ namespace coretests.Stocks
         [Fact]
         public void PurchaseWorks()
         {
-            var stock = new OwnedStock(_ticker, _userId);
+            var stock = StockPosition.openLong(_ticker, 10, 2.1m, DateTime.UtcNow, null, null);
 
-            stock.Purchase(10, 2.1m, DateTime.UtcNow);
+            Assert.Equal(_ticker, stock.Ticker);
+            Assert.Equal(10, stock.NumberOfShares);
+            Assert.Equal(2.1m, stock.AverageCost);
+            Assert.Equal(21, stock.Cost);
 
-            Assert.Equal(_ticker, stock.State.Ticker);
-            Assert.Equal(_userId, stock.State.UserId);
-            Assert.Equal(10, stock.State.OpenPosition.NumberOfShares);
-            Assert.Equal(21, stock.State.OpenPosition.Cost);
+            var afterPurchase = StockPosition.buy(5, 2m, DateTimeOffset.Now, null, stock);
 
-            stock.Purchase(5, 2, DateTime.UtcNow);
+            Assert.Equal(15, afterPurchase.NumberOfShares);
+            Assert.Equal(2.07m, afterPurchase.AverageCost, 2);
+            Assert.Equal(31, afterPurchase.Cost);
 
-            Assert.Equal(15, stock.State.OpenPosition.NumberOfShares);
-            Assert.Equal(31, stock.State.OpenPosition.Cost, 0);
+            var afterSell = StockPosition.sell(5, 20, DateTimeOffset.Now, "sample note", afterPurchase);
 
-            stock.Sell(5, 20, DateTime.UtcNow, "sample note");
-
-            Assert.Equal(10, stock.State.OpenPosition.NumberOfShares);
+            Assert.Equal(10, afterSell.NumberOfShares);
         }
 
         [Fact]

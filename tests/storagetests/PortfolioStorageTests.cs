@@ -68,7 +68,7 @@ namespace storagetests
 
             Assert.NotEmpty(loadedList);
 
-            var loaded = await storage.GetStockPosition(position.Value.PositionId, _userId);
+            var loaded = await storage.GetStockPosition(position.PositionId, _userId);
 
             AssertPositions(position, loaded);
 
@@ -76,7 +76,7 @@ namespace storagetests
             
             await storage.SaveStockPosition(_userId, loaded, afterPurchase);
 
-            var reloaded = await storage.GetStockPosition(afterPurchase.Value.PositionId, _userId);
+            var reloaded = await storage.GetStockPosition(afterPurchase.PositionId, _userId);
 
             AssertPositions(afterPurchase, reloaded);
 

@@ -71,8 +71,7 @@ namespace storage.shared
             var events = await _aggregateStorage.GetEventsAsync(_stock_position_entity, userId);
             
             return events.GroupBy(e => e.AggregateId)
-                .Select(StockPosition.createFromEvents)
-                .Select(s => s.Value);
+                .Select(StockPosition.createFromEvents);
         }
 
         public async Task<FSharpOption<StockPositionState>> GetStockPosition(StockPositionId positionId, UserId userId)
@@ -84,9 +83,9 @@ namespace storage.shared
             return state == null ? FSharpOption<StockPositionState>.None : FSharpOption<StockPositionState>.Some(state);
         }
 
-        public Task SaveStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, FSharpOption<StockPositionState> newState)
+        public Task SaveStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, StockPositionState newState)
         {
-            return _aggregateStorage.SaveEventsAsync(FSharpOption<StockPositionState>.get_IsNone(previousState) ? null : previousState.Value , newState.Value, _stock_position_entity, userId);
+            return _aggregateStorage.SaveEventsAsync(FSharpOption<StockPositionState>.get_IsNone(previousState) ? null : previousState.Value , newState, _stock_position_entity, userId);
         }
 
         public Task SaveOwnedOption(OwnedOption option, UserId userId)
