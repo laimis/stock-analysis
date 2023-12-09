@@ -5,8 +5,7 @@ open core.Shared
 
 type StockPositionId =
     StockPositionId of Guid
-    
-        
+      
 module StockPositionId =
     let create() = StockPositionId (Guid.NewGuid())
     let guid (StockPositionId id) = id
@@ -28,7 +27,6 @@ type StockPositionState =
         PositionId: StockPositionId
         Ticker: Ticker
         NumberOfShares: decimal
-        AverageCost: decimal
         Opened: DateTimeOffset
         Closed: DateTimeOffset option
         Transactions: StockPositionTransaction list
@@ -39,7 +37,7 @@ type StockPositionState =
         Version: int
         Events: AggregateEvent list
     }
-    member this.Cost = this.NumberOfShares * this.AverageCost
+    member this.IsShort = this.NumberOfShares < 0m    
     member this.AggregateId = this.PositionId |> StockPositionId.guid
         
     interface IAggregate with
@@ -81,41 +79,11 @@ type StockPositionLabelSet(id, aggregateId, ``when``, key, value) =
 
 module StockPosition =
         
-    let isShort stockPosition =
-        match stockPosition with
-        | x when x.NumberOfShares < 0m -> true
-        | _ -> false
-    
-    let private calculateAverageCost isShort transactions =
-        
-        let buys,sells =
-            transactions
-            |> List.partition (fun x ->
-                match isShort with
-                | true -> x.Type = Sell
-                | false -> x.Type = Buy)
-            
-        // we first build out slots for each buy transaction for each share owned
-        let slots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
-            
-        // we then go through each sell transaction and remove the shares from the slots
-        let slots =
-            sells
-            |> List.fold (fun (acc:decimal list) x ->
-                
-                let numberOfShares = x.NumberOfShares
-                acc |> List.splitAt (int numberOfShares) |> snd
-            ) slots
-        
-        // we then calculate the average cost of the remaining shares
-        slots |> List.average
-    
     let createInitialState (event: StockPositionOpened) =
         {
             PositionId = event.PositionId
             Ticker = event.Ticker
             NumberOfShares = 0m
-            AverageCost = 0m
             Opened = event.When
             Closed = None
             Transactions = []
@@ -143,14 +111,12 @@ module StockPosition =
         | :? StockPurchased as x ->
             let newNumberOfShares = p.NumberOfShares + x.NumberOfShares
             let newTransactions = p.Transactions @ [{ Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
-            let averageCost = newTransactions |> calculateAverageCost (p |> isShort)
-            { p with NumberOfShares = newNumberOfShares; AverageCost = averageCost; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x] }
+            { p with NumberOfShares = newNumberOfShares; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockSold as x ->
             let newNumberOfShares = p.NumberOfShares - x.NumberOfShares
             let newTransactions = p.Transactions @ [{ Type = Sell; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
-            let averageCost = newTransactions |> calculateAverageCost (p |> isShort)
-            { p with NumberOfShares = newNumberOfShares; AverageCost = averageCost; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
+            { p with NumberOfShares = newNumberOfShares; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionClosed as x ->
             { p with Closed = Some x.When; Version = p.Version + 1; Events = p.Events @ [x]  }
@@ -169,12 +135,7 @@ module StockPosition =
             | Some notes ->
                 let e = StockPositionNotesAdded(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, notes)
                 apply e stockPosition
-                
-    let private createPosition ticker date notes =
-        StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker)
-        |> createInitialState
-        |> applyNotesIfApplicable notes date
-    
+        
     let private closePositionIfApplicable date stockPosition =
         match stockPosition.NumberOfShares with
         | 0m -> 
@@ -182,13 +143,17 @@ module StockPosition =
             apply e stockPosition
         | _ -> stockPosition
         
-    let buy numberOfShares price date notes stockPosition =
+    let buy numberOfShares price date notes (stockPosition:StockPositionState) =
         if numberOfShares <= 0m then
             failwith "Number of shares must be greater than zero"
-        
-        let isShort = stockPosition |> isShort
-        
-        if isShort && stockPosition.NumberOfShares + numberOfShares > 0m then
+            
+        if date < DateTimeOffset.UnixEpoch then
+            failwith ("Date after " + DateTimeOffset.UnixEpoch.ToString() + " is required")
+            
+        if date.Subtract(DateTimeOffset.UtcNow).TotalHours >= 12 then
+            failwith "Date cannot be in the future"
+            
+        if stockPosition.IsShort && stockPosition.NumberOfShares + numberOfShares > 0m then
             failwith "Cannot buy more than short position"
         
         if price <= 0.0m then
@@ -215,26 +180,20 @@ module StockPosition =
         if price <= 0.0m then
             failwith "Price must be greater than zero"
         
-        createPosition ticker date notes
+        if date = DateTimeOffset.MinValue then
+            failwith "Date must be specified"
+        
+        StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker)
+        |> createInitialState
         |> buy numberOfShares price date notes
         |> setStop stopPrice date
+        |> applyNotesIfApplicable notes date
         
-    let openShort ticker numberOfShares price date =
-        if numberOfShares >= 0m then
-            failwith "Number of shares must be less than zero"
-        
-        if price <= 0.0m then
-            failwith "Price must be greater than zero"
-            
-        createPosition ticker date
-        
-    let sell numberOfShares price date notes stockPosition =
+    let sell numberOfShares price date notes (stockPosition:StockPositionState) =
         if numberOfShares <= 0m then
             failwith "Number of shares must be greater than zero"
         
-        let isLong = stockPosition |> isShort |> not    
-        
-        if isLong && stockPosition.NumberOfShares - numberOfShares < 0m then failwith "Cannot sell more than long position"
+        if stockPosition.IsShort |> not && stockPosition.NumberOfShares - numberOfShares < 0m then failwith "Cannot sell more than long position"
         
         if price <= 0.0m then
             failwith "Price must be greater than zero"
@@ -253,3 +212,55 @@ module StockPosition =
             
         let e = StockPositionLabelSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, key, value)
         apply e stockPosition
+        
+type StockPositionWithCalculations(stockPosition:StockPositionState) =
+    
+    let sells,buys =
+        stockPosition.Transactions
+        |> List.partition (fun x ->
+            match stockPosition.IsShort with
+            | true -> x.Type = Buy
+            | false -> x.Type = Sell)
+            
+    member this.IsShort = stockPosition.IsShort
+    member this.Transactions = stockPosition.Transactions
+    member this.PositionId = stockPosition.PositionId
+    member this.Ticker = stockPosition.Ticker
+    member this.NumberOfShares = stockPosition.NumberOfShares
+    member this.Opened = stockPosition.Opened
+    member this.Closed = stockPosition.Closed
+    member this.StopPrice = stockPosition.StopPrice
+    member this.Notes = stockPosition.Notes
+    member this.AverageCostPerShare =
+        
+        // we first build out slots for each buy transaction for each share owned
+        let slots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
+        let sharesSoldTotal = sells |> List.sumBy (fun x -> x.NumberOfShares |> abs) |> int
+        let remainingShares = slots |> List.skip sharesSoldTotal
+        
+        // we then calculate the average cost of the remaining shares
+        match remainingShares with
+        | [] -> 0m
+        | _ -> remainingShares |> List.average
+        
+    member this.Cost = stockPosition.NumberOfShares * this.AverageCostPerShare
+    member this.DaysHeld =
+        let referenceDay =
+            match stockPosition.Closed with
+            | None -> DateTimeOffset.UtcNow
+            | Some x -> x   
+        referenceDay.Subtract(stockPosition.Opened).TotalDays |> int
+    member this.Profit =
+        // profit is generating whenever we sell shares of a long position or buy shares of a short position
+        let buySlots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
+        let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
+        
+        sellSlots
+        |> List.indexed
+        |> List.fold (fun (acc:decimal) (index, sellPrice) ->
+            
+            let buyPrice = buySlots[index]
+            let profit = sellPrice - buyPrice
+            acc + profit
+        ) 0m
+    

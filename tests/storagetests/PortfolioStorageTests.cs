@@ -54,7 +54,7 @@ namespace storagetests
                 Assert.Equal(expected.Value.Ticker, actual.Value.Ticker);
                 Assert.Equal(expected.Value.PositionId, actual.Value.PositionId);
                 Assert.Equal(expected.Value.Opened, actual.Value.Opened);
-                Assert.Equal(expected.Value.AverageCost, actual.Value.AverageCost);
+                Assert.Equal(expected.Value.AverageCostPerShare, actual.Value.AverageCostPerShare);
             }
             
             var position =

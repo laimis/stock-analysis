@@ -212,7 +212,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     member _.Handle(cmd:OpenLongStockPosition,userId:UserId) = task {
         let! user = userId |> accounts.GetUser
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionState>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
         | Some _ ->
             let! stocks = portfolio.GetStockPositions userId
             
@@ -220,7 +220,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             let openPosition = stocks |> Seq.tryFind (fun x -> x.Ticker = cmd.Ticker && x.Closed = None)
             
             match openPosition with
-            | Some _ -> return "Position already open" |> ResponseUtils.failedTyped<StockPositionState>
+            | Some _ -> return "Position already open" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
             | None ->
                 let newPosition = StockPosition.openLong cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.StopPrice cmd.Notes
                 
@@ -253,12 +253,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                         
                     do! positionWithStrategy |> portfolio.SaveStockPosition userId (Some newPosition)
                     
-                    pendingPosition.Purchase positionWithStrategy.AverageCost
+                    let withCalculations =
+                        positionWithStrategy
+                        |> StockPositionWithCalculations
+                    
+                    withCalculations.AverageCostPerShare |> pendingPosition.Purchase
                     
                     do! portfolio.SavePendingPosition pendingPosition userId
-                | None -> ()
-                
-                return newPosition |> ResponseUtils.success
+                    
+                    return withCalculations |> ResponseUtils.success
+                | None ->
+                    return newPosition |> StockPositionWithCalculations |> ResponseUtils.success
     }
     
     member _.Handle(cmd:BuyOrSell) = task {

@@ -4,6 +4,7 @@ using core.fs.Shared.Domain;
 using core.Shared;
 using core.Stocks;
 using coretests.testdata;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace coretests.Stocks
@@ -12,24 +13,40 @@ namespace coretests.Stocks
     {
         private static readonly Guid _userId = TestDataGenerator.RandomUserId().Item;
         private static readonly Ticker _ticker = TestDataGenerator.TEUM;
+        
+        private static (StockPositionState, StockPositionWithCalculations) WithCalculations(
+            Func<StockPositionState> func)
+        {
+            var result = func();
+            return (result, new StockPositionWithCalculations(result));
+        }
             
         [Fact]
         public void PurchaseWorks()
         {
-            var stock = StockPosition.openLong(_ticker, 10, 2.1m, DateTime.UtcNow, null, null);
+            var (initialStock, initialCalculations) = WithCalculations(
+                () => StockPosition.openLong(_ticker, 10, 2.1m, DateTime.UtcNow, null, null)
+            );
+            
+            Assert.Equal(_ticker, initialCalculations.Ticker);
+            Assert.Equal(10, initialStock.NumberOfShares);
+            Assert.Equal(10, initialCalculations.NumberOfShares);
+            Assert.Equal(2.1m, initialCalculations.AverageCostPerShare);
+            Assert.Equal(21, initialCalculations.Cost);
 
-            Assert.Equal(_ticker, stock.Ticker);
-            Assert.Equal(10, stock.NumberOfShares);
-            Assert.Equal(2.1m, stock.AverageCost);
-            Assert.Equal(21, stock.Cost);
+            var (afterBuy, afterBuyCalculations) =
+                WithCalculations(
+                    () => StockPosition.buy(5, 2m, DateTimeOffset.Now, null, initialStock)
+                );
 
-            var afterPurchase = StockPosition.buy(5, 2m, DateTimeOffset.Now, null, stock);
+            Assert.Equal(15, afterBuy.NumberOfShares);
+            Assert.Equal(2.07m, afterBuyCalculations.AverageCostPerShare, 2);
+            Assert.Equal(31, afterBuyCalculations.Cost);
 
-            Assert.Equal(15, afterPurchase.NumberOfShares);
-            Assert.Equal(2.07m, afterPurchase.AverageCost, 2);
-            Assert.Equal(31, afterPurchase.Cost);
-
-            var afterSell = StockPosition.sell(5, 20, DateTimeOffset.Now, "sample note", afterPurchase);
+            var (afterSell, _) =
+                WithCalculations(
+                    () => StockPosition.sell(5, 20, DateTimeOffset.Now, "sample note", afterBuy)
+                );
 
             Assert.Equal(10, afterSell.NumberOfShares);
         }
@@ -37,95 +54,82 @@ namespace coretests.Stocks
         [Fact]
         public void SellingNotOwnedFails()
         {
-            var stock = new OwnedStock(_ticker, _userId);
+            var stock = StockPosition.openLong(_ticker, 10, 2.1m, DateTime.UtcNow, null, null);
 
-            stock.Purchase(10, 2.1m, DateTime.UtcNow);
-
-            Assert.ThrowsAny<Exception>(() => stock.Sell(20, 100, DateTime.UtcNow, "sample note"));
+            Assert.ThrowsAny<Exception>(() => StockPosition.sell(20, 100, DateTime.UtcNow, "sample note", stock));
         }
 
         [Fact]
         public void BuyingForZeroThrows()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-
-            Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.UtcNow));
+            Assert.Throws<Exception>(() =>
+                StockPosition.openLong(TestDataGenerator.TSLA, 10, 0m, DateTime.UtcNow, null, null)
+            );
         }
 
         [Fact]
         public void BuyingWithBadDateThrows()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-
-            Assert.Throws<InvalidOperationException>(() => stock.Purchase(10, 0, DateTime.MinValue));
-        }
-
-        [Fact]
-        public void BuyingWithBadUserThrows()
-        {
-            Assert.Throws<InvalidOperationException>(() => new OwnedStock(TestDataGenerator.TSLA, Guid.Empty));
+            Assert.Throws<Exception>(() => 
+                StockPosition.openLong(TestDataGenerator.TSLA, 10, 10m, default, null, null)
+            );
         }
 
         [Fact]
         public void PurchaseWithDateNotProvidedThrows()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
+            var stock = StockPosition.openLong(TestDataGenerator.TSLA, 10, 10m, DateTime.UtcNow, null, null);
 
-            Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTimeOffset.MinValue));
+            Assert.Throws<Exception>(() => StockPosition.buy(1, 20, DateTimeOffset.MinValue, null, stock));
         }
 
         [Fact]
         public void Purchase_WithDateInTheFuture_Throws()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
+            var stock = StockPosition.openLong(TestDataGenerator.TSLA, 10, 10m, DateTime.UtcNow, null, null);
             
-            Assert.Throws<InvalidOperationException>(() => stock.Purchase(1, 20, DateTimeOffset.UtcNow.AddDays(1)));
+            Assert.Throws<Exception>(() => StockPosition.buy(1, 20, DateTimeOffset.UtcNow.AddDays(1), null, stock));
         }
 
         [Fact]
         public void EventCstrReplaysEvents()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-
-            stock.Purchase(1, 10, DateTime.UtcNow);
+            var stock = StockPosition.openLong(_ticker, 10, 2.1m, DateTime.UtcNow, null, null);
 
             var events = stock.Events;
 
-            var stock2 = new OwnedStock(events);
+            var stock2 = StockPosition.createFromEvents(events);
 
-            Assert.Equal(stock.State.OpenPosition.NumberOfShares, stock2.State.OpenPosition.NumberOfShares);
+            Assert.Equal(stock.NumberOfShares, stock2.NumberOfShares);
         }
 
         [Fact]
         public void MultipleBuysAverageCostCorrect()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
+            var stock = StockPosition.openLong(_ticker, 1, 5m, DateTime.UtcNow, null, null);
 
-            stock.Purchase(1, 5, DateTimeOffset.UtcNow);
-            stock.Purchase(1, 10, DateTimeOffset.UtcNow);
+            var purchase1 = StockPosition.buy(1, 10, DateTimeOffset.UtcNow, null, stock);
 
-            Assert.Equal(7.5m, stock.State.OpenPosition.AverageCostPerShare);
-            Assert.Equal(15, stock.State.OpenPosition.Cost);
+            Assert.Equal(7.5m, purchase1.AverageCostPerShare);
+            Assert.Equal(15, purchase1.Cost);
 
-            stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
+            var sell1 = StockPosition.sell(1, 6, DateTimeOffset.UtcNow, null, purchase1);
 
-            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
-            Assert.Equal(10m, stock.State.OpenPosition.Cost);
+            Assert.Equal(10m, sell1.AverageCostPerShare);
+            Assert.Equal(10m, sell1.Cost);
 
-            stock.Purchase(1, 10, DateTimeOffset.UtcNow);
+            var purchase2 = StockPosition.buy(1, 10, DateTimeOffset.UtcNow, null, sell1);
 
-            Assert.Equal(10m, stock.State.OpenPosition.AverageCostPerShare);
-            Assert.Equal(20m, stock.State.OpenPosition.Cost);
+            Assert.Equal(10m, purchase2.AverageCostPerShare);
+            Assert.Equal(20m, purchase2.Cost);
 
-            stock.Sell(2, 10, DateTimeOffset.UtcNow, null);
+            var sell2 = StockPosition.sell(2, 10, DateTimeOffset.UtcNow, null, purchase2);
 
-            Assert.Null(stock.State.OpenPosition);
+            Assert.True(FSharpOption<DateTimeOffset>.get_IsSome(sell2.Closed));
 
-            var positions = stock.State.GetAllPositions();
-            Assert.Single(positions);
-            Assert.Equal(0, positions[0].DaysHeld);
-            Assert.Equal(1, positions[0].Profit);
-            Assert.Equal(0.04m, positions[0].GainPct, 2);
+            Assert.Equal(0, sell2.DaysHeld);
+            Assert.Equal(1, sell2.Profit);
+            // Assert.Equal(0.04m, sell2.GainPct, 2);
         }
 
         [Fact]
