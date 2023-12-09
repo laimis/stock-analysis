@@ -104,9 +104,9 @@ namespace storage.postgres
             return SaveEventsAsyncInternal(agg, agg.Version, entity, userId, outsideTransaction);
         }
 
-        public Task SaveEventsAsync(IAggregate oldAggregate, IAggregate newAggregate, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+        public Task SaveEventsAsync(IAggregate? oldAggregate, IAggregate newAggregate, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
         {
-            return SaveEventsAsyncInternal(newAggregate, oldAggregate.Version, entity, userId, outsideTransaction);
+            return SaveEventsAsyncInternal(newAggregate, oldAggregate?.Version ?? 0, entity, userId, outsideTransaction);
         }
 
         public async Task DoHealthCheck()

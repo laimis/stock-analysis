@@ -15,7 +15,5 @@ namespace storage.shared
         Task DoHealthCheck();
         Task DeleteAggregates(string entity, UserId userId, IDbTransaction outsideTransaction = null);
         Task DeleteAggregate(string entity, Guid aggregateId, UserId userId);
-        
-        Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, UserId userId);
     }
 }

@@ -6,13 +6,13 @@ namespace core.Shared
     {
         private readonly string _ticker;
 
-        public Ticker(string ticker)
+        public Ticker(string value)
         {
-            if (string.IsNullOrWhiteSpace(ticker))
+            if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException(nameof(ticker), "Ticker cannot be blank");
+                throw new ArgumentException(nameof(value), "Ticker cannot be blank");
             }
-            _ticker = ticker.ToUpper();
+            _ticker = value.ToUpper();
         }
 
         public string Value => _ticker;

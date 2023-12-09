@@ -17,14 +17,14 @@ namespace storage.shared
 {
     public class PortfolioStorage : IPortfolioStorage
     {
-        private const string _stock_entity = "ownedstock3";
-        private const string _option_entity = "soldoption3";
-        private const string _note_entity = "note3";
-        private const string _crypto_entity = "ownedcrypto";
-        private const string _stock_list_entity = "stocklist";
-        private const string _routine_entity = "routine";
-        private const string _pending_stock_position_entity = "pendingstockposition";
-        private const string _stock_position_entity = "stockposition";
+        public const string _stock_entity = "ownedstock3";
+        public const string _option_entity = "soldoption3";
+        public const string _note_entity = "note3";
+        public const string _crypto_entity = "ownedcrypto";
+        public const string _stock_list_entity = "stocklist";
+        public const string _routine_entity = "routine";
+        public const string _pending_stock_position_entity = "pendingstockposition";
+        public const string _stock_position_entity = "stockposition";
 
         private readonly IAggregateStorage _aggregateStorage;
         private readonly IBlobStorage _blobStorage;
@@ -149,6 +149,7 @@ namespace storage.shared
             await _aggregateStorage.DeleteAggregates(_crypto_entity, userId);
             await _aggregateStorage.DeleteAggregates(_stock_list_entity, userId);
             await _aggregateStorage.DeleteAggregates(_pending_stock_position_entity, userId);
+            await _aggregateStorage.DeleteAggregates(_stock_position_entity, userId);
         }
 
         public async Task<OwnedCrypto> GetCrypto(string token, UserId userId)

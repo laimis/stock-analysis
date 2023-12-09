@@ -222,7 +222,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             match openPosition with
             | Some _ -> return "Position already open" |> ResponseUtils.failedTyped<StockPositionState>
             | None ->
-                let newPosition = StockPosition.createPosition cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.StopPrice cmd.Notes
+                let newPosition = StockPosition.openLong cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.StopPrice cmd.Notes
                 
                 let newPosition =
                     match cmd.Strategy with
@@ -243,7 +243,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
                     
                     let positionWithNotes = 
                         match positionWithStop.Value.Notes with
-                        | [] when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) = false -> positionWithStop.Value |> StockPosition.addNotes (Some pendingPosition.State.Notes) cmd.Date.Value
+                        | [] when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) = false -> positionWithStop |> StockPosition.addNotes (Some pendingPosition.State.Notes) cmd.Date.Value
                         | _ -> positionWithStop
                     
                     let positionWithStrategy =

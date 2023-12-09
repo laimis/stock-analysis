@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Cryptos;
 using core.fs.Shared.Adapters.Storage;
+using core.fs.Shared.Domain;
 using core.fs.Shared.Domain.Accounts;
 using core.Notes;
 using core.Options;
@@ -10,6 +11,7 @@ using core.Routines;
 using core.Shared;
 using core.Stocks;
 using coretests.testdata;
+using Microsoft.FSharp.Core;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -41,6 +43,48 @@ namespace storagetests
             var storage = CreateStorage();
 
             Assert.Null(await storage.GetOwnedOption(Guid.NewGuid(), _userId));
+        }
+        
+        [Fact]
+        public async Task StockPosition_Works()
+        {
+            void AssertPositions(FSharpOption<StockPositionState> expected, FSharpOption<StockPositionState> actual)
+            {
+                Assert.Equal(expected.Value.NumberOfShares, actual.Value.NumberOfShares);
+                Assert.Equal(expected.Value.Ticker, actual.Value.Ticker);
+                Assert.Equal(expected.Value.PositionId, actual.Value.PositionId);
+                Assert.Equal(expected.Value.Opened, actual.Value.Opened);
+                Assert.Equal(expected.Value.AverageCost, actual.Value.AverageCost);
+            }
+            
+            var position =
+                StockPosition.openLong(GenerateTestTicker(), 10m, 2.1m, DateTimeOffset.UtcNow, null, null);
+
+            var storage = CreateStorage();
+
+            await storage.SaveStockPosition(_userId, FSharpOption<StockPositionState>.None, position);
+
+            var loadedList = await storage.GetStockPositions(_userId);
+
+            Assert.NotEmpty(loadedList);
+
+            var loaded = await storage.GetStockPosition(position.Value.PositionId, _userId);
+
+            AssertPositions(position, loaded);
+
+            var afterPurchase = StockPosition.buy(5m, 5m, DateTimeOffset.UtcNow, FSharpOption<string>.None, loaded.Value);
+            
+            await storage.SaveStockPosition(_userId, loaded, afterPurchase);
+
+            var reloaded = await storage.GetStockPosition(afterPurchase.Value.PositionId, _userId);
+
+            AssertPositions(afterPurchase, reloaded);
+
+            // await storage.Delete(_userId);
+            //
+            // var afterDelete = await storage.GetStockPositions(_userId);
+            //
+            // Assert.Empty(afterDelete);
         }
 
         [Fact]
