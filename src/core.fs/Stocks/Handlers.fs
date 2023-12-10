@@ -220,14 +220,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             let openPosition = stocks |> Seq.tryFind (fun x -> x.Ticker = cmd.Ticker && x.Closed = None)
             
             match openPosition with
-            | Some _ -> return "Position already open" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
+            | Some _ ->
+                return "Position already open" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
             | None ->
-                let newPosition = StockPosition.openLong cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.StopPrice cmd.Notes
-                
                 let newPosition =
-                    match cmd.Strategy with
-                    | Some strategy -> newPosition |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
-                    | None -> newPosition 
+                    StockPosition.openLong cmd.Ticker cmd.Date.Value
+                    |> StockPosition.buy cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.Notes
+                    |> StockPosition.setStop cmd.StopPrice cmd.Date.Value
+                    |> fun x ->
+                        match cmd.Strategy with
+                        | Some strategy -> x |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
+                        | None -> x
                 
                 do! newPosition |> portfolio.SaveStockPosition userId openPosition
                 
