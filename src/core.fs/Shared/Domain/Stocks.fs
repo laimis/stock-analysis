@@ -480,3 +480,9 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         match stopSets with
         | [] -> None
         | _ -> stopSets |> List.head |> _.StopPrice
+        
+    member this.CostAtRiskBasedOnStopPrice =
+        match this.StopPrice with
+        | None -> None
+        | Some stopPrice when this.AverageCostPerShare < stopPrice -> Some 0m
+        | Some stopPrice -> (this.AverageCostPerShare - stopPrice) * this.NumberOfShares |> Some

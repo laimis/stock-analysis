@@ -59,6 +59,24 @@ let ``Risked amount is accurate`` () =
     positionWithStop.RiskedAmount.Value |> should equal 90m
     
 [<Fact>]
+let ``Cost at risk based on stop price is accurate`` () =
+    let position =
+        StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
+        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23")) None
+        |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25")) None
+        |> StockPosition.setStop (Some 20m) (DateTimeOffset.Parse("2020-01-25"))
+        
+    position |> StockPositionWithCalculations |> _.CostAtRiskBasedOnStopPrice.Value |> should equal 250m
+    
+    // now sell some and risk should be reduced
+    let afterSell =
+        position
+        |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25")) None
+        |> StockPositionWithCalculations
+    
+    afterSell.CostAtRiskBasedOnStopPrice.Value |> should equal 150m
+    
+[<Fact>]
 let ``Average buy cost per share is accurate``() =
     position.AverageBuyCostPerShare |> should equal 32.5m
     
