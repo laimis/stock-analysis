@@ -16,11 +16,17 @@ type StockTransactionType =
     | Buy
     | Sell
     
-type StockPositionTransaction = {
+type StockPositionShareTransaction = {
     TransactionId: Guid
     Type: StockTransactionType
     NumberOfShares: decimal
     Price: decimal
+    Date: DateTimeOffset
+}
+
+type StockPositionStopTransaction = {
+    TransactionId: Guid
+    StopPrice: decimal option
     Date: DateTimeOffset
 }
 
@@ -32,6 +38,10 @@ type PLTransaction = {
     Profit: decimal
     GainPct: decimal
 }
+
+type StockPositionTransaction =
+    | Share of StockPositionShareTransaction
+    | Stop of StockPositionStopTransaction
 
 type StockPositionType =
     | Long
@@ -55,7 +65,11 @@ type StockPositionState =
     }
     member this.IsShort = this.StockPositionType = Short
     member this.IsClosed = this.Closed.IsSome
-    member this.NumberOfShares = this.Transactions |> List.map (fun x -> match x.Type with | Buy -> x.NumberOfShares | Sell -> -x.NumberOfShares) |> List.sum
+    member this.NumberOfShares =
+        this.Transactions
+        |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
+        |> List.choose id
+        |> List.map (fun x -> match x.Type with | Buy -> x.NumberOfShares | Sell -> -x.NumberOfShares) |> List.sum
     member this.AggregateId = this.PositionId |> StockPositionId.guid
         
     interface IAggregate with
@@ -82,7 +96,7 @@ type StockSold(id, aggregateId, ``when``, numberOfShares, price) =
 type StockPositionClosed(id, aggregateId, ``when``) =
     inherit AggregateEvent(id, aggregateId, ``when``)
 
-type StockPositionStopSet(id, aggregateId, ``when``, stopPrice) =
+type StockPositionStopSet(id, aggregateId, ``when``, stopPrice:decimal) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.StopPrice = stopPrice
     
@@ -138,17 +152,18 @@ module StockPosition =
             p // pass through, this should be done by createInitialState
             
         | :? StockPositionStopSet as x ->
-            { p with StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
+            let newTransactions = p.Transactions @ [Stop { TransactionId = x.Id; StopPrice = Some x.StopPrice; Date = x.When }]
+            { p with Transactions = newTransactions; StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? StockPositionNotesAdded as x ->
             { p with Notes = x.Notes :: p.Notes; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockPurchased as x ->
-            let newTransactions = p.Transactions @ [{ TransactionId = x.Id; Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
+            let newTransactions = p.Transactions @ [Share { TransactionId = x.Id; Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockSold as x ->
-            let newTransactions = p.Transactions @ [{ TransactionId = x.Id; Type = Sell; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
+            let newTransactions = p.Transactions @ [Share { TransactionId = x.Id; Type = Sell; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionClosed as x ->
@@ -239,7 +254,11 @@ module StockPosition =
         | None -> withStop
         | Some _ when withStop.RiskAmount.IsSome -> withStop
         | Some stopPrice ->
-            let buysBeforeFirstSell = withStop.Transactions |> List.takeWhile (fun x -> x.Type = Buy)
+            let buysBeforeFirstSell =
+                withStop.Transactions
+                |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
+                |> List.choose id
+                |> List.takeWhile (fun x -> x.Type = Buy)
             let riskAmount = buysBeforeFirstSell |> List.sumBy (fun x -> x.NumberOfShares * (x.Price - stopPrice)) |> abs
             let e = StockPositionRiskAmountSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, riskAmount)
             apply e withStop
@@ -291,7 +310,11 @@ module StockPosition =
         
     let deleteTransaction transactionId stockPosition =
         
-        let lastTransaction = stockPosition.Transactions |> List.last
+        let lastTransaction =
+            stockPosition.Transactions
+            |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
+            |> List.choose id
+            |> List.last
         
         if lastTransaction.TransactionId <> transactionId then
             failwith "Can only delete last transaction"
@@ -304,6 +327,8 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     
     let sells,buys =
         stockPosition.Transactions
+        |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
+        |> List.choose id
         |> List.partition (fun x ->
             match stockPosition.IsShort with
             | true -> x.Type = Buy
@@ -339,7 +364,15 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | Some x -> x   
         referenceDay.Subtract(stockPosition.Opened).TotalDays |> int
     member this.DaysSinceLastTransaction =
-        this.Transactions |> List.last |> fun x -> DateTimeOffset.UtcNow.Subtract(x.Date).TotalDays |> int
+        let date =
+            this.Transactions
+            |> List.last
+            |> fun x ->
+                match x with
+                | Share s -> s.Date
+                | Stop s -> s.Date
+                
+        DateTimeOffset.UtcNow.Subtract(date).TotalDays |> int
         
     member this.Profit =
         // profit is generating whenever we sell shares of a long position or buy shares of a short position
@@ -370,7 +403,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.PLTransactions =
         // we fold over sells, and for each sell create a PLTransaction
         sells
-        |> List.fold (fun (acc:PLTransaction list) (sell:StockPositionTransaction) ->
+        |> List.fold (fun (acc:PLTransaction list) (sell:StockPositionShareTransaction) ->
             
             let offset =
                 match acc with
@@ -402,6 +435,27 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.RiskedAmount = stockPosition.RiskAmount
     
+    member this.FirstBuyPrice =
+        match buys with
+        | [] -> 0m
+        | _ -> buys |> List.head |> _.Price
+        
+    member this.CompletedPositionCostPerShare =
+        // it's the average cost per share up until the first sell happens
+        let buysBeforeFirstSell = buys |> List.takeWhile (fun x -> x.Type = Buy)
+        match buysBeforeFirstSell with
+        | [] -> 0m
+        | _ ->
+            let totalCost = buysBeforeFirstSell |> List.sumBy (fun x -> x.NumberOfShares * x.Price)
+            let totalShares = buysBeforeFirstSell |> List.sumBy (_.NumberOfShares)
+            totalCost / totalShares
+        
+    member this.CompletedPositionShares =
+        let buysBeforeFirstSell = buys |> List.takeWhile (fun x -> x.Type = Buy)
+        match buysBeforeFirstSell with
+        | [] -> 0m
+        | _ -> buysBeforeFirstSell |> List.sumBy (_.NumberOfShares)
+        
     member this.LastBuyPrice =
         match buys with
         | [] -> 0m
@@ -416,3 +470,13 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         match this.RiskedAmount with
         | None -> 0m
         | Some riskedAmount -> this.Profit / riskedAmount
+        
+    member this.FirstStop =
+        let stopSets =
+            stockPosition.Transactions
+            |> List.map (fun x -> match x with | Stop s -> Some s | _ -> None)
+            |> List.choose id
+            
+        match stopSets with
+        | [] -> None
+        | _ -> stopSets |> List.head |> _.StopPrice

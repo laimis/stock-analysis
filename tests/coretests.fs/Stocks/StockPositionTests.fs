@@ -5,6 +5,7 @@ open Xunit
 open core.fs.Shared.Domain
 open coretests.testdata
 open FsUnit
+
 let userId = TestDataGenerator.RandomUserId()
 let ticker = TestDataGenerator.TEUM
 
@@ -125,8 +126,12 @@ let ``Multiple buys deleting transactions`` () =
     position.Transactions |> should haveLength 4
     position.NumberOfShares |> should equal 2m
     
-    let lastTransaction = position.Transactions |> List.last
-    
+    let lastTransaction =
+        position.Transactions
+        |> List.map (fun t -> match t with | Share t -> Some t | _ -> None)
+        |> List.choose id
+        |> List.last
+        
     let position2 = StockPosition.deleteTransaction lastTransaction.TransactionId position
     
     position2.Transactions |> should haveLength 3
