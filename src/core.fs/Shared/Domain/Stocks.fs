@@ -46,6 +46,7 @@ type StockPositionState =
         Closed: DateTimeOffset option
         Transactions: StockPositionTransaction list
         StopPrice: decimal option
+        RiskAmount: decimal option
         Notes: string list
         Labels: Dictionary<string, string>
         
@@ -84,6 +85,10 @@ type StockPositionClosed(id, aggregateId, ``when``) =
 type StockPositionStopSet(id, aggregateId, ``when``, stopPrice) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.StopPrice = stopPrice
+    
+type StockPositionRiskAmountSet(id, aggregateId, ``when``, riskAmount) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.RiskAmount = riskAmount
 
 type StockPositionNotesAdded(id, aggregateId, ``when``, notes) =
     inherit AggregateEvent(id, aggregateId, ``when``)
@@ -116,6 +121,7 @@ module StockPosition =
             Closed = None
             Transactions = []
             StopPrice = None
+            RiskAmount = None 
             Notes = []
             Labels = Dictionary<string, string>()
             
@@ -160,6 +166,9 @@ module StockPosition =
         | :? StockPositionLabelDeleted as x ->
             p.Labels.Remove(x.Key) |> ignore
             { p with Version = p.Version + 1; Events = p.Events @ [x]  }
+            
+        | :? StockPositionRiskAmountSet as x ->
+            { p with RiskAmount = Some x.RiskAmount; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
@@ -216,14 +225,25 @@ module StockPosition =
     let setStop stopPrice date (stockPosition:StockPositionState) =
         if stockPosition.IsClosed then failwith "Cannot set stop price on closed position"
         
-        match stopPrice with
-        | None -> stockPosition
-        | Some stopPrice when stopPrice <= 0m -> failwith "Stop price must be greater than zero"
-        | Some stopPrice when stockPosition.StopPrice.IsSome && stopPrice = stockPosition.StopPrice.Value -> stockPosition
-        | Some stopPrice ->    
-            let e = StockPositionStopSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, stopPrice)
-            apply e stockPosition
+        let withStop =
+            match stopPrice with
+            | None -> stockPosition
+            | Some stopPrice when stopPrice <= 0m -> failwith "Stop price must be greater than zero"
+            | Some stopPrice when stockPosition.StopPrice.IsSome && stopPrice = stockPosition.StopPrice.Value -> stockPosition
+            | Some stopPrice ->    
+                let e = StockPositionStopSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, stopPrice)
+                apply e stockPosition
         
+        // if stop price is set, we should set risked amount if it's not set
+        match withStop.StopPrice with
+        | None -> withStop
+        | Some _ when withStop.RiskAmount.IsSome -> withStop
+        | Some stopPrice ->
+            let buysBeforeFirstSell = withStop.Transactions |> List.takeWhile (fun x -> x.Type = Buy)
+            let riskAmount = buysBeforeFirstSell |> List.sumBy (fun x -> x.NumberOfShares * (x.Price - stopPrice)) |> abs
+            let e = StockPositionRiskAmountSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, riskAmount)
+            apply e withStop
+            
     let openLong ticker date =
         
         date |> failIfInvalidDate
@@ -380,11 +400,19 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             acc @ [pl]
         ) []
         
-    member this.RiskedAmount =
+    member this.RiskedAmount = stockPosition.RiskAmount
+    
+    member this.LastBuyPrice =
+        match buys with
+        | [] -> 0m
+        | _ -> buys |> List.last |> _.Price
         
-        match this.StopPrice with
+    member this.LastSellPrice =
+        match sells with
+        | [] -> 0m
+        | _ -> sells |> List.last |> _.Price
+        
+    member this.RR =
+        match this.RiskedAmount with
         | None -> 0m
-        | Some stopPrice ->
-            match stockPosition.IsShort with
-            | true -> (stockPosition.NumberOfShares * (this.AverageCostPerShare - stopPrice)) |> abs
-            | false -> (stockPosition.NumberOfShares * (stopPrice - this.AverageCostPerShare)) |> abs
+        | Some riskedAmount -> this.Profit / riskedAmount

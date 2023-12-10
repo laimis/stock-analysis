@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Compile Include="Stocks\StockPositionTests.fs" />
+    <Compile Include="Stocks\StockPositionWithCalculationsTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

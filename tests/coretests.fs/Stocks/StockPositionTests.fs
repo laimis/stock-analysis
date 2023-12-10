@@ -275,4 +275,4 @@ let ``Buy with stop at cost works``() =
         |> StockPosition.setStop (Some 1m) DateTimeOffset.UtcNow
         |> StockPositionWithCalculations
         
-    position.RiskedAmount |> should equal 0m
+    position.RiskedAmount.Value |> should equal 0m
