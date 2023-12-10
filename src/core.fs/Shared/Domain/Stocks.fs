@@ -1,6 +1,7 @@
 namespace core.fs.Shared.Domain
 
 open System
+open System.Collections.Generic
 open core.Shared
 
 type StockPositionId =
@@ -46,7 +47,7 @@ type StockPositionState =
         Transactions: StockPositionTransaction list
         StopPrice: decimal option
         Notes: string list
-        Labels: (string * string) list
+        Labels: Dictionary<string, string>
         
         Version: int
         Events: AggregateEvent list
@@ -93,6 +94,10 @@ type StockPositionLabelSet(id, aggregateId, ``when``, key, value) =
     member this.Key = key
     member this.Value = value
     
+type StockPositionLabelDeleted(id, aggregateId, ``when``, key) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Key = key
+    
 type StockPositionTransactionDeleted(id, aggregateId, ``when``, transactionId) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.TransactionId = transactionId
@@ -112,7 +117,7 @@ module StockPosition =
             Transactions = []
             StopPrice = None
             Notes = []
-            Labels = []
+            Labels = Dictionary<string, string>()
             
             Version = 1
             Events = [event]
@@ -144,12 +149,17 @@ module StockPosition =
             { p with Closed = Some x.When; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionLabelSet as x ->
-            { p with Labels = (x.Key, x.Value) :: p.Labels; Version = p.Version + 1; Events = p.Events @ [x]  }
+            p.Labels[x.Key] <- x.Value
+            { p with Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionTransactionDeleted as x ->
             // truncate transactions by removing the last one
             let newTransactions = p.Transactions |> List.rev |> List.tail |> List.rev
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
+            
+        | :? StockPositionLabelDeleted as x ->
+            p.Labels.Remove(x.Key) |> ignore
+            { p with Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
@@ -241,11 +251,23 @@ module StockPosition =
     let addNotes = applyNotesIfApplicable
         
     let setLabel key value date stockPosition =
-        if String.IsNullOrWhiteSpace(key) then
-            failwith "Key cannot be empty"
+        
+        match key with
+        | x when String.IsNullOrWhiteSpace(x) -> failwith "Key cannot be empty"
+        | x when stockPosition.Labels.ContainsKey(x) && stockPosition.Labels[x] = value -> stockPosition
+        | _ when String.IsNullOrWhiteSpace(value) -> failwith "Value cannot be empty"
+        | _ ->
+            let e = StockPositionLabelSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, key, value)
+            apply e stockPosition
             
-        let e = StockPositionLabelSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, key, value)
-        apply e stockPosition
+    let deleteLabel key date stockPosition =
+        
+        match key with
+        | x when String.IsNullOrWhiteSpace(x) -> failwith "Key cannot be empty"
+        | x when stockPosition.Labels.ContainsKey(x) |> not -> stockPosition
+        | _ ->
+            let e = StockPositionLabelDeleted(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, key)
+            apply e stockPosition
         
     let deleteTransaction transactionId stockPosition =
         
@@ -357,3 +379,12 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             // and add it to the accumulator
             acc @ [pl]
         ) []
+        
+    member this.RiskedAmount =
+        
+        match this.StopPrice with
+        | None -> 0m
+        | Some stopPrice ->
+            match stockPosition.IsShort with
+            | true -> (stockPosition.NumberOfShares * (this.AverageCostPerShare - stopPrice)) |> abs
+            | false -> (stockPosition.NumberOfShares * (stopPrice - this.AverageCostPerShare)) |> abs

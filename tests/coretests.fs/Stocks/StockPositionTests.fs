@@ -196,134 +196,83 @@ let ``Adding note works``() =
     
     events |> should equal sameNote.Events
     
+[<Fact>]
+let ``Labels work``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.setLabel "strategy" "newhigh" DateTimeOffset.UtcNow
+        
+    position.Labels["strategy"] |> should equal "newhigh"
+    
+    let events = position.Events
+    
+    let sameLabel = position |> StockPosition.setLabel "strategy" "newhigh" DateTimeOffset.UtcNow
+    
+    events |> should equal sameLabel.Events
+    
+    let differentLabel = position |> StockPosition.setLabel "strategy" "newlow" DateTimeOffset.UtcNow
+    
+    differentLabel.Labels["strategy"] |> should equal "newlow"
+    
+[<Fact>]
+let ``Set label with null value fails``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        
+    (fun () -> position |> StockPosition.setLabel "strategy" null DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<Exception>
+    
+[<Fact>]
+let ``Set label with null key fails``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        
+    (fun () -> position |> StockPosition.setLabel null "newhigh" DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<Exception>
 
-// [<Fact>]
+[<Fact>]
+let ``Delete label works``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.setLabel "strategy" "newhigh" DateTimeOffset.UtcNow
+        
+    position.Labels["strategy"] |> should equal "newhigh"
+    
+    let deleted = position |> StockPosition.deleteLabel "strategy" DateTimeOffset.UtcNow
+    
+    deleted.Labels |> should be Empty
+    
+    let events = deleted.Events
+    
+    let deletedAgain = deleted |> StockPosition.deleteLabel "strategy" DateTimeOffset.UtcNow
+    
+    events |> should equal deletedAgain.Events
 
-//         [Fact]
-//         public void DeletePosition_OnClosedPosition_Fails()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
-//
-//             Assert.Throws<InvalidOperationException>(() => 
-//                 stock.DeletePosition(positionId)
-//             );
-//         }
-//
-//         [Fact]
-//         public void DeletePosition_Works()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId2 = stock.State.OpenPosition.PositionId;
-//             stock.DeletePosition(positionId2);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId3 = stock.State.OpenPosition.PositionId;
-//             stock.Sell(1, 6, DateTimeOffset.UtcNow, null);
-//
-//             var positions = stock.State.GetAllPositions();
-//             Assert.Equal(2, positions.Count);
-//             Assert.Equal(positionId, stock.State.GetAllPositions()[0].PositionId);
-//             Assert.Equal(positionId3, stock.State.GetAllPositions()[1].PositionId);
-//             
-//             // make sure transactions don't include deleted position
-//             Assert.Equal(6, stock.State.Transactions.Count);
-//             Assert.Equal(2, stock.State.Transactions.Count(t => t.IsPL));
-//             Assert.Equal(4, stock.State.Transactions.Count(t => !t.IsPL));
-//         }
-//
-//         [Fact]
-//         public void LabelsWork()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             
-//             var set = stock.SetPositionLabel(positionId, "strategy", "newhigh");
-//             Assert.True(set);
-//
-//             var setAgain = stock.SetPositionLabel(positionId, "strategy", "newhigh");
-//             Assert.False(setAgain);
-//
-//             var setDifferent = stock.SetPositionLabel(positionId, "strategy", "newlow");
-//             Assert.True(setDifferent);
-//         }
-//
-//         [Fact]
-//         public void SetLabel_WithNullValue_Fails()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             
-//             Assert.Throws<InvalidOperationException>(() => 
-//                 stock.SetPositionLabel(positionId, "strategy", null)
-//             );
-//         }
-//
-//         [Fact]
-//         public void SetLabel_WithNullKey_Fails()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             
-//             Assert.Throws<InvalidOperationException>(() => 
-//                 stock.SetPositionLabel(positionId, null, "newhigh")
-//             );
-//         }
-//
-//         [Fact]
-//         public void DeleteLabel_Works()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             
-//             var set = stock.SetPositionLabel(positionId, "strategy", "newhigh");
-//             Assert.True(set);
-//
-//             var deleted = stock.DeletePositionLabel(positionId, "strategy");
-//             Assert.True(deleted);
-//
-//             var deletedAgain = stock.DeletePositionLabel(positionId, "strategy");
-//             Assert.False(deletedAgain);
-//         }
-//
-//         [Fact]
-//         public void DeleteLabel_WithNullKey_Fails()
-//         {
-//             var stock = new OwnedStock(TestDataGenerator.TSLA, _userId);
-//
-//             stock.Purchase(1, 5, DateTimeOffset.UtcNow.AddDays(-5));
-//             var positionId = stock.State.OpenPosition.PositionId;
-//             
-//             Assert.Throws<InvalidOperationException>(() => 
-//                 stock.DeletePositionLabel(positionId, null)
-//             );
-//         }
-//
-//         [Fact]
-//         public void BuyWithStopAtCost_Works()
-//         {
-//             var stock = new OwnedStock(_ticker, _userId);
-//             stock.Purchase(1, 1, DateTimeOffset.UtcNow, notes:null, stopPrice: 1);
-//             
-//             Assert.Null(stock.State.OpenPosition.RiskedAmount);
-//         }
-//     }
+[<Fact>]
+let ``Delete label with null key fails``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        
+    (fun () -> position |> StockPosition.deleteLabel null DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<Exception>
 
-// }
+[<Fact>]
+let ``Buy with stop at cost works``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        |> StockPosition.setStop (Some 1m) DateTimeOffset.UtcNow
+        |> StockPositionWithCalculations
+        
+    position.RiskedAmount |> should equal 0m
