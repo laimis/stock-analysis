@@ -56,8 +56,9 @@ namespace storagetests
                 Assert.Equal(expected.Value.Opened, actual.Value.Opened);
             }
             
-            var position =
-                StockPosition.openLong(GenerateTestTicker(), 10m, 2.1m, DateTimeOffset.UtcNow, null, null);
+            var position = StockPosition.openLong(GenerateTestTicker(), DateTimeOffset.UtcNow);
+            
+            position = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, FSharpOption<string>.None, position);
 
             var storage = CreateStorage();
 
