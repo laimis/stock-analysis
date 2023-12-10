@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="Stocks\StockPositionTests.fs" />
     <Compile Include="Stocks\StockPositionWithCalculationsTests.fs" />
+    <Compile Include="Stocks\PriceBarTests.fs" />
+    <Compile Include="Stocks\PricesViewTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

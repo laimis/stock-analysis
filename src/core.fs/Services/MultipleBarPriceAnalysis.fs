@@ -65,10 +65,7 @@ module MultipleBarPriceAnalysis =
                 
                 let value =
                     match sma.LastValue with
-                    | Some v ->
-                        match v with
-                        | Some v -> v
-                        | None -> 0m
+                    | Some v -> v
                     | None -> 0m
                     
                 AnalysisOutcome(

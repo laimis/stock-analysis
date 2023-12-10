@@ -76,7 +76,7 @@ type SMA(values,interval) =
     member this.LastValue =
         match values |> Seq.isEmpty with
         | true -> None
-        | false -> Some (values |> Seq.last)
+        | false -> values |> Seq.last
         
     static member ToSMA (prices:decimal array) interval =
         
