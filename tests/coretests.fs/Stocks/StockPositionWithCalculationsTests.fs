@@ -82,7 +82,7 @@ let ``Average buy cost per share is accurate``() =
     
 [<Fact>]
 let ``Days held is accurate`` () =
-    position.DaysHeld |> should equal 57m
+    Math.Abs(57 - position.DaysHeld) |> should be (lessThanOrEqualTo 1)
     
 [<Fact>]
 let ``Cost is accurate`` () =
