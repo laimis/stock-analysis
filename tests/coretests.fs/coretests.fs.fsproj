@@ -13,6 +13,11 @@
     <Compile Include="Stocks\StockPositionWithCalculationsTests.fs" />
     <Compile Include="Stocks\PriceBarTests.fs" />
     <Compile Include="Stocks\PricesViewTests.fs" />
+    <Compile Include="Stocks\Services\GapAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\MultipleBarPriceAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\NumberAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\PatternDetectionTests.fs" />
+    <Compile Include="Stocks\Services\SingleBarPriceAnalysisTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
