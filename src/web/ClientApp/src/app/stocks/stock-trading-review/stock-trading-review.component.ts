@@ -48,7 +48,7 @@ export class StockTradingReviewComponent {
   }
 
   @Input()
-  quotes:Map<string,StockQuote>
+  quotes:object
 
   @Input()
   orders:BrokerageOrder[]
@@ -88,8 +88,8 @@ export class StockTradingReviewComponent {
   }
 
   getQuote(position:PositionInstance) {
-    if (this.quotes && this.quotes.has(position.ticker)) {
-      return this.quotes.get(position.ticker)
+    if (this.quotes && position.ticker in this.quotes) {
+      return this.quotes[position.ticker]
     }
     return null
   }
