@@ -7,7 +7,8 @@ import {
   PositionChartInformation,
   PositionInstance,
   PriceFrequency,
-  Prices, StockQuote,
+  Prices,
+  StockQuote,
   StocksService,
   TradingStrategyResults
 } from 'src/app/services/stocks.service';
@@ -47,7 +48,7 @@ export class StockTradingReviewComponent {
   }
 
   @Input()
-  quotes:Map<string,StockQuote>
+  quotes:object
 
   @Input()
   orders:BrokerageOrder[]
@@ -71,12 +72,26 @@ export class StockTradingReviewComponent {
   }
 
   getPrice(position:PositionInstance) {
-    let quote = this.quotes[position.ticker]
-    return quote ? quote.price : 0
+    let quote = this.getQuote(position)
+
+    if (quote) {
+      return quote.price
+    }
+
+    // check if we have prices perhaps available
+    if (this.positionChartInformation && this.positionChartInformation.prices) {
+      let prices = this.positionChartInformation.prices
+      return prices.prices[prices.prices.length - 1].close
+    }
+
+    return 0
   }
 
   getQuote(position:PositionInstance) {
-    return this.quotes[position.ticker]
+    if (this.quotes && position.ticker in this.quotes) {
+      return this.quotes[position.ticker]
+    }
+    return null
   }
 
   private getPositionReport() {
