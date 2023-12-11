@@ -18,6 +18,8 @@
     <Compile Include="Stocks\Services\NumberAnalysisTests.fs" />
     <Compile Include="Stocks\Services\PatternDetectionTests.fs" />
     <Compile Include="Stocks\Services\SingleBarPriceAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\SMAAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\VolumeAnalysisTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
