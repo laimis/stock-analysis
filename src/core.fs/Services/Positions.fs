@@ -6,6 +6,7 @@ open core.fs.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Stocks
+open core.fs.Shared.Domain
 
 module PositionAnalysis =
     
@@ -35,12 +36,12 @@ module PositionAnalysis =
         let StrategyLabel = "StrategyLabel"
         let HasSellOrder = "HasSellOrder"
 
-    let generate (position:PositionInstance) (bars:PriceBars) orders =
+    let generate (position:StockPositionWithCalculations) (bars:PriceBars) orders =
         
         let stopLoss = 
-            match position.StopPrice.HasValue with
-            | true -> position.StopPrice.Value
-            | false -> 0.0m
+            match position.StopPrice with
+            | Some p -> p
+            | None -> 0.0m
         
         let pctToStop =
             match stopLoss with
@@ -98,7 +99,7 @@ module PositionAnalysis =
             AnalysisOutcome(PortfolioAnalysisKeys.MaxGainLast10, OutcomeType.Neutral, last10Gain, ValueFormat.Percentage, $"Max gain in last 10 bars is {last10Gain:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdownLast10, OutcomeType.Neutral, last10Drawdown, ValueFormat.Percentage, $"Max drawdown in last 10 bars is {last10Drawdown:P}")
             AnalysisOutcome(PortfolioAnalysisKeys.GainDiffLast10, (if last10MaxGainDrawdownDiff >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), last10MaxGainDrawdownDiff, ValueFormat.Percentage, $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.RiskAmount, OutcomeType.Neutral, (if position.RiskedAmount.HasValue then position.RiskedAmount.Value else 0.0m), ValueFormat.Currency, $"Risk amount is {position.RiskedAmount:C2}")
+            AnalysisOutcome(PortfolioAnalysisKeys.RiskAmount, OutcomeType.Neutral, (if position.RiskedAmount.IsSome then position.RiskedAmount.Value else 0.0m), ValueFormat.Currency, $"Risk amount is {position.RiskedAmount:C2}")
             AnalysisOutcome(PortfolioAnalysisKeys.DaysHeld, OutcomeType.Neutral, position.DaysHeld, ValueFormat.Number, $"Days held: {position.DaysHeld}")
             AnalysisOutcome(PortfolioAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
             AnalysisOutcome(PortfolioAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
@@ -146,18 +147,18 @@ module PositionAnalysis =
             )
         ]
 
-    let dailyPLAndGain (bars:PriceBars) (position:PositionInstance) =
+    let dailyPLAndGain (bars:PriceBars) (position:StockPositionWithCalculations) =
         
         let firstBar = 
             bars.Bars
             |> Array.findIndex (fun b -> b.Date >= position.Opened)
         
         let lastBar = 
-            match position.Closed.HasValue with
-            | true ->
+            match position.Closed with
+            | Some closed ->
                 bars.Bars
-                |> Array.findIndexBack (fun b -> b.Date <= position.Closed.Value)
-            | false -> bars.Length - 1
+                |> Array.findIndexBack (fun b -> b.Date <= closed)
+            | None -> bars.Length - 1
         
         let shares = position.CompletedPositionShares
         let costBasis = position.AverageBuyCostPerShare

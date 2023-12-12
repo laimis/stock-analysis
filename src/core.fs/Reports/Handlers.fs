@@ -14,6 +14,7 @@ open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 
 type ChainQuery =
@@ -44,7 +45,7 @@ type DailyPositionReportQuery =
     {
         UserId: UserId
         Ticker: Ticker
-        PositionId: int
+        PositionId: StockPositionId
     }
     
 type DailyPositionReportView =
@@ -235,43 +236,40 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | None -> return "User not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
         | Some user ->
             
-            let! stock = storage.GetStock request.Ticker request.UserId
+            let! stock = storage.GetStockPosition request.PositionId request.UserId
             
             match stock with
-            | null -> return "Stock not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
-            | _ ->
+            | None -> return "Stock position not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
+            | Some position ->
                 
-                let position = stock.State.GetPosition request.PositionId
-                match position with
-                | null -> return "Position not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
-                | _ ->
-                        
-                    let start = position.Opened |> marketHours.GetMarketStartOfDayTimeInUtc
-                    let ``end`` =
-                        match position.Closed.HasValue with
-                        | true -> position.Closed.Value |> marketHours.GetMarketEndOfDayTimeInUtc
-                        | false -> DateTimeOffset.MinValue
+                let position = position |> StockPositionWithCalculations
+                
+                let start = position.Opened |> marketHours.GetMarketStartOfDayTimeInUtc
+                let ``end`` =
+                    match position.Closed with
+                    | Some closed -> closed |> marketHours.GetMarketEndOfDayTimeInUtc
+                    | None -> DateTimeOffset.MinValue
+                
+                let! pricesResponse =
+                    brokerage.GetPriceHistory
+                        user.State
+                        request.Ticker
+                        PriceFrequency.Daily
+                        start
+                        ``end``
+                
+                match pricesResponse.Success with
+                | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
+                | Some prices ->
+                    let profit, pct = PositionAnalysis.dailyPLAndGain prices position
                     
-                    let! pricesResponse =
-                        brokerage.GetPriceHistory
-                            user.State
-                            request.Ticker
-                            PriceFrequency.Daily
-                            start
-                            ``end``
+                    let response = {
+                        DailyProfit = profit
+                        DailyGainPct = pct
+                        Ticker = request.Ticker.Value
+                    }
                     
-                    match pricesResponse.Success with
-                    | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
-                    | Some prices ->
-                        let profit, pct = PositionAnalysis.dailyPLAndGain prices position
-                        
-                        let response = {
-                            DailyProfit = profit
-                            DailyGainPct = pct
-                            Ticker = request.Ticker.Value
-                        }
-                        
-                        return ServiceResponse<DailyPositionReportView>(response)                   
+                    return ServiceResponse<DailyPositionReportView>(response)                   
     }
     
     member _.Handle (query:GapReportQuery) = task {
@@ -381,9 +379,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
         | Some user ->
-            let! stocks = storage.GetStocks query.UserId
+            let! stocks = query.UserId |> storage.GetStockPositions
             
-            let positions = stocks |> Seq.filter (fun stock -> stock.State.OpenPosition = null |> not) |> Seq.map (fun stock -> stock.State.OpenPosition)
+            let positions = stocks |> Seq.filter (fun stock -> stock.IsClosed |> not)
             
             let! account = brokerage.GetAccount user.State
             let orders =
@@ -394,6 +392,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let! tasks =
                 positions
                 |> Seq.map (fun position -> async {
+                    
+                    let calculations = position |> StockPositionWithCalculations
+                    
                     let! priceResponse =
                         brokerage.GetPriceHistory
                             user.State
@@ -407,7 +408,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | None -> return None
                     | Some prices ->
                         
-                        let outcomes = PositionAnalysis.generate position prices orders
+                        let outcomes = PositionAnalysis.generate calculations prices orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
                         let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
                         

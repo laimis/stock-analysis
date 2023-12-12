@@ -20,6 +20,7 @@
     <Compile Include="Stocks\Services\SingleBarPriceAnalysisTests.fs" />
     <Compile Include="Stocks\Services\SMAAnalysisTests.fs" />
     <Compile Include="Stocks\Services\VolumeAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\PositionAnalysisTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -486,3 +486,6 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         | None -> None
         | Some stopPrice when this.AverageCostPerShare < stopPrice -> Some 0m
         | Some stopPrice -> (this.AverageCostPerShare - stopPrice) * this.NumberOfShares |> Some
+        
+    member this.ContainsLabel key =
+        stockPosition.Labels.ContainsKey(key)
