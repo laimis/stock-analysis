@@ -2,6 +2,7 @@ module coretests.Stocks
 
 open System
 open Xunit
+open core.Shared
 open core.fs.Shared.Domain
 open coretests.testdata
 open FsUnit
@@ -281,3 +282,50 @@ let ``Buy with stop at cost works``() =
         |> StockPositionWithCalculations
         
     position.RiskedAmount.Value |> should equal 0m
+   
+    
+[<Fact>]
+let ``Assign grade to open position should fail`` () =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        
+    (fun () -> position |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<Exception>
+    
+[<Fact>]
+let ``Assign grade to closed position should succeed`` () =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow None
+        |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow
+        
+    position.Grade |> should equal (Some (TradeGrade("A")))
+    position.Notes |> should contain "this trade went perfectly!"
+
+[<Fact>]
+let ``Assign grade to graded position, updates grade and note`` () =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow None
+        |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow
+        |> StockPosition.assignGrade (TradeGrade("B")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
+        
+    position.Grade |> should equal (Some (TradeGrade("B")))
+    position.Notes |> should contain "this trade went perfectly! (updated)"
+
+[<Fact>]
+let ``Assign invalid grade, fails``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow None
+    
+    (fun () -> position |> StockPosition.assignGrade (TradeGrade("L")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<ArgumentException>

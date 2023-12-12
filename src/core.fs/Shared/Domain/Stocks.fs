@@ -59,6 +59,7 @@ type StockPositionState =
         RiskAmount: decimal option
         Notes: string list
         Labels: Dictionary<string, string>
+        Grade: TradeGrade option
         
         Version: int
         Events: AggregateEvent list
@@ -124,12 +125,16 @@ type StockPositionTransactionDeleted(id, aggregateId, ``when``, transactionId) =
 type StockPositionDeleted(id, aggregateId, ``when``) =
     inherit AggregateEvent(id, aggregateId, ``when``)
 
+type StockPositionGradeAssigned(id, aggregateId, ``when``, grade) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Grade = grade
+    
 module StockPosition =
         
     let createInitialState (event: StockPositionOpened) =
         {
             PositionId = event.PositionId
-            Ticker = event.Ticker
+            Ticker = event.Ticker |> Ticker
             StockPositionType = event.PositionType 
             Opened = event.When
             Closed = None
@@ -138,7 +143,7 @@ module StockPosition =
             RiskAmount = None 
             Notes = []
             Labels = Dictionary<string, string>()
-            
+            Grade = None
             Version = 1
             Events = [event]
         }
@@ -184,6 +189,10 @@ module StockPosition =
             
         | :? StockPositionRiskAmountSet as x ->
             { p with RiskAmount = Some x.RiskAmount; Version = p.Version + 1; Events = p.Events @ [x]  }
+            
+        | :? StockPositionGradeAssigned as x ->
+            let gradeValue = x.Grade |> TradeGrade |> Some
+            { p with Grade = gradeValue; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
@@ -233,6 +242,15 @@ module StockPosition =
         |> applyNotesIfApplicable notes date
         |> closePositionIfApplicable date
         
+    let assignGrade grade gradeNotes date (stockPosition:StockPositionState) =
+        match stockPosition with
+        | x when x.Closed.IsNone -> failwith "Cannot assign grade to open position"
+        | x when x.Grade.IsSome && x.Grade.Value = grade -> stockPosition
+        | _ ->
+            let e = StockPositionGradeAssigned(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, grade.Value)
+            apply e stockPosition
+            |> applyNotesIfApplicable gradeNotes date
+        
     let delete stockPosition =
         let e = StockPositionDeleted(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow)
         apply e stockPosition
@@ -263,11 +281,11 @@ module StockPosition =
             let e = StockPositionRiskAmountSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, riskAmount)
             apply e withStop
             
-    let openLong ticker date =
+    let openLong (ticker:Ticker) date =
         
         date |> failIfInvalidDate
         
-        StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker, Long)
+        StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value, Long)
         |> createInitialState
         
     let sell numberOfShares price date notes (stockPosition:StockPositionState) =
