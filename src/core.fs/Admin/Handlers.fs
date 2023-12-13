@@ -8,13 +8,14 @@ open core.fs.Shared
 open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Email
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 
 type Query = {
     everyone: bool
 }
         
-type QueryResponse(user:User, stocks:OwnedStock seq, options:OwnedOption seq, notes:Note seq) =
+type QueryResponse(user:User, stocks:StockPositionState seq, options:OwnedOption seq, notes:Note seq) =
     let stockLength = stocks |> Seq.length
     let optionLength = options |> Seq.length
     let noteLength = notes |> Seq.length
@@ -45,7 +46,7 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
             let! user = storage.GetUser(userId) |> Async.AwaitTask
             let! options = portfolio.GetOwnedOptions(userId) |> Async.AwaitTask
             let! notes = portfolio.GetNotes(userId) |> Async.AwaitTask
-            let! stocks = portfolio.GetStocks(userId) |> Async.AwaitTask
+            let! stocks = portfolio.GetStockPositions(userId) |> Async.AwaitTask
             
             return QueryResponse(user.Value, stocks, options, notes)
         }

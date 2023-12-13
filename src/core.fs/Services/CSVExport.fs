@@ -7,6 +7,7 @@ open core.Shared
 open core.Stocks
 open core.fs.Services.Trading
 open core.fs.Shared.Adapters.CSV
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 
 
@@ -34,7 +35,6 @@ module CSVExport =
             Amount:decimal
             Price:decimal
             Date:string
-            Notes:string
         }
         
     type NoteRecord =
@@ -169,7 +169,7 @@ module CSVExport =
         | false -> writer.Generate(list.Tickers |> Seq.map (fun s -> { Ticker = s.Ticker.Value; Created = s.When.ToString(DATE_FORMAT); Notes = s.Note }))
         
     
-    let trades (writer:ICSVWriter) (trades:seq<PositionInstance>) =
+    let trades (writer:ICSVWriter) (trades:seq<StockPositionWithCalculations>) =
         
         let rows =
             trades
@@ -177,16 +177,16 @@ module CSVExport =
                 {
                     Symbol = t.Ticker.Value
                     Opened = t.Opened.ToString(DATE_FORMAT)
-                    Closed = (if t.Closed.HasValue then t.Closed.Value.ToString(DATE_FORMAT) else "")
+                    Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT) else "")
                     DaysHeld = t.DaysHeld
                     FirstBuyCost = t.CompletedPositionCostPerShare
                     Cost = t.Cost
                     Profit = t.Profit
                     ReturnPct = t.GainPct
                     RR = t.RR
-                    RiskedAmount = (if t.RiskedAmount.HasValue then Some(t.RiskedAmount.Value) else None)
-                    Grade = if t.Grade.HasValue then t.Grade.Value.Value else ""
-                    GradeNote = t.GradeNote
+                    RiskedAmount = t.RiskedAmount
+                    Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
+                    GradeNote = ""
                 }
             )
             
@@ -236,42 +236,30 @@ module CSVExport =
             
         writer.Generate(rows)
         
-    let stocks (writer:ICSVWriter) (stocks:seq<OwnedStock>) =
+    let stocks (writer:ICSVWriter) (stocks:seq<StockPositionState>) =
         
         let rows =
             stocks
-            |> Seq.collect (fun o -> o.State.BuyOrSell |> Seq.map (fun e -> (o, e)))
-            |> Seq.sortBy (fun (_, e) -> e.When)
+            |> Seq.collect (fun o -> o.ShareTransactions |> Seq.map (fun e -> (o, e)))
+            |> Seq.sortBy (fun (_, e) -> e.Date)
             |> Seq.map (fun (o, e) ->
-                match e with
-                | :? StockPurchased_v2 as sp -> 
+                match e.Type with
+                | Buy -> 
                     {
-                        Ticker = o.State.Ticker.Value
+                        Ticker = o.Ticker.Value
                         Type = "buy"
-                        Amount = sp.NumberOfShares
-                        Price = sp.Price
-                        Date = sp.When.ToString(DATE_FORMAT)
-                        Notes = sp.Notes
+                        Amount = e.NumberOfShares
+                        Price = e.Price
+                        Date = e.Date.ToString(DATE_FORMAT)
                     }
-                | :? StockPurchased as sp -> 
+                | Sell ->
                     {
-                        Ticker = o.State.Ticker.Value
-                        Type = "buy"
-                        Amount = sp.NumberOfShares
-                        Price = sp.Price
-                        Date = sp.When.ToString(DATE_FORMAT)
-                        Notes = sp.Notes
-                    }
-                | :? StockSold as ss ->
-                    {
-                        Ticker = o.State.Ticker.Value
+                        Ticker = o.Ticker.Value
                         Type = "sell"
-                        Amount = ss.NumberOfShares
-                        Price = ss.Price
-                        Date = ss.When.ToString(DATE_FORMAT)
-                        Notes = ss.Notes
+                        Amount = e.NumberOfShares
+                        Price = e.Price
+                        Date = e.Date.ToString(DATE_FORMAT)
                     }
-                | _ -> { Ticker = ""; Type = ""; Amount = 0m; Price = 0m; Date = ""; Notes = "" }
             )
             |> Seq.filter (fun r -> r.Ticker <> "")
             

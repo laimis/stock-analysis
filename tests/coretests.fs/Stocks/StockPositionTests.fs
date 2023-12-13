@@ -19,6 +19,9 @@ let ``Purchase works`` () =
     
     stock.Ticker |> should equal ticker
     stock.NumberOfShares |> should equal 10
+    stock.IsClosed |> should equal false
+    stock.StopPrice |> should equal None
+    stock.IsOpen |> should equal true
     
     let afterTransitions =
         stock
@@ -89,10 +92,12 @@ let ``Multiple buys average cost correct`` () =
     withCalculation.Cost |> should equal 20m
     
     let sell2 = StockPosition.sell 2m 10m DateTimeOffset.UtcNow None purchase2
+    sell2.IsClosed |> should equal true
     let withCalculation = sell2 |> StockPositionWithCalculations
     DateTimeOffset.UtcNow.Subtract(withCalculation.Closed.Value).TotalSeconds |> int |> should be (lessThan 1)
     withCalculation.DaysHeld |> should equal 0
     withCalculation.Profit |> should equal 1
+    
     Assert.Equal(0.04m, withCalculation.GainPct, 2)
     
 [<Fact>]
@@ -167,6 +172,7 @@ let ``Assigning stop works``() =
         |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
         
     position.StopPrice.Value |> should equal 4m
+    position.HasStopPrice |> should equal true
     
     let events = position.Events
     
@@ -184,6 +190,47 @@ let ``Assigning stop to closed position fails``() =
         
     (fun () -> position |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
+    
+[<Fact>]
+let ``Delete stop works``() =
+    
+    let position =
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
+        
+    position.HasStopPrice |> should equal true
+    
+    let sameStop = position |> StockPosition.deleteStop DateTimeOffset.UtcNow
+    
+    sameStop.StopPrice |> should equal None
+    sameStop.HasStopPrice |> should equal false
+    
+[<Fact>]
+let ``Delete stop on closed position fails``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
+        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow None
+        
+    (fun () -> position |> StockPosition.deleteStop DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<Exception>
+    
+[<Fact>]
+let ``Delete stop on position without stop does nothing`` () =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        
+    let sameStop = position |> StockPosition.deleteStop DateTimeOffset.UtcNow
+    
+    sameStop.StopPrice |> should equal None
+    sameStop.HasStopPrice |> should equal false
+    
+    position.Events |> should equal sameStop.Events
 
 [<Fact>]
 let ``Adding note works``() =

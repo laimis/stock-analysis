@@ -2,9 +2,9 @@ namespace core.fs
 
 open System.Collections.Generic
 open core.Shared
-open core.Stocks
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
+open core.fs.Shared.Domain
 
 module Helpers =
 
@@ -19,7 +19,7 @@ module Helpers =
                     | true, price -> price.Price
                     | false, _ -> 0m
                     
-                let localPositionOption = localPositions |> Seq.tryFind (fun (x:PositionInstance) -> x.Ticker = brokeragePosition.Ticker)
+                let localPositionOption = localPositions |> Seq.tryFind (fun (x:StockPositionWithCalculations) -> x.Ticker = brokeragePosition.Ticker)
                 
                 match localPositionOption with
                 | None ->

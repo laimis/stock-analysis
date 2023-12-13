@@ -15,6 +15,7 @@ open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
 open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.Storage
+open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
 
 type Query =
@@ -24,7 +25,7 @@ type Query =
     
 type DeletePosition =
     {
-        PositionId: int
+        PositionId: StockPositionId
         Ticker: Ticker
         UserId: UserId
     }
@@ -32,17 +33,17 @@ type DeletePosition =
 type GradePosition =
     {
         [<Required>]
-        PositionId: int
+        PositionId: StockPositionId
         [<Required>]
         Ticker: Ticker
         [<Required>]
         Grade: TradeGrade
-        Note: string
+        Note: string option
     }
     
 type RemoveLabel =
     {
-        PositionId: int
+        PositionId: StockPositionId
         [<Required>]
         Ticker: Ticker
         UserId: UserId
@@ -53,7 +54,7 @@ type RemoveLabel =
 type AddLabel =
     {
         [<Required>]
-        PositionId: int
+        PositionId: StockPositionId
         [<Required>]
         Ticker: Ticker
         [<Required>]
@@ -66,7 +67,7 @@ type ProfitPointsQuery =
     {
         NumberOfPoints: int
         [<Required>]
-        PositionId: int
+        PositionId: StockPositionId
         UserId: UserId
         [<Required>]
         Ticker: Ticker
@@ -75,11 +76,11 @@ type ProfitPointsQuery =
 type SetRisk =
     {
         [<Required>]
-        PositionId: int
+        PositionId: StockPositionId
         [<Required>]
         Ticker: Ticker
         [<Required>]
-        RiskAmount: Nullable<decimal>
+        RiskAmount: decimal option
     }
     
 type SimulateTrade = 
@@ -88,7 +89,7 @@ type SimulateTrade =
         Ticker: Ticker
         UserId: UserId
         [<Required>]
-        PositionId: int
+        PositionId: StockPositionId
     }
     
 type SimulateTradeForTicker =
@@ -96,7 +97,7 @@ type SimulateTradeForTicker =
         Date: DateTimeOffset
         NumberOfShares: decimal
         Price: decimal
-        StopPrice: decimal
+        StopPrice: decimal option
         Ticker: Ticker
         UserId: UserId
     }
@@ -169,38 +170,33 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks(command.UserId)
+            let! position = storage.GetStockPosition command.PositionId command.UserId
             
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = command.Ticker)
-                |> Seq.tryHead
-                
-            match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failed
-            | Some stock ->
-                stock.DeletePosition(command.PositionId) |> ignore
-                do! storage.Save stock command.UserId
+            match position with
+            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | Some position ->
+                let deletedPosition = position |> StockPosition.delete 
+                do! deletedPosition |> storage.SaveStockPosition command.UserId (Some position)
                 return Ok
     }
         
     member this.Handle (query:Query) = task {
-        let! stocks = storage.GetStocks(query.UserId)
+        let! stocks = query.UserId |> storage.GetStockPositions
         
-        let openStocks = stocks |> Seq.filter (fun s -> s.State.OpenPosition = null |> not) |> Seq.map (fun s -> s.State) |> Seq.toList
+        let openStocks = stocks |> Seq.filter _.IsOpen
         
         let! options = storage.GetOwnedOptions(query.UserId)
         let openOptions =
             options
             |> Seq.filter (fun o -> o.State.Closed.HasValue = false)
-            |> Seq.sortBy (fun o -> o.State.Expiration)
+            |> Seq.sortBy _.State.Expiration
             |> Seq.toList
             
         let! cryptos = storage.GetCryptos(query.UserId)
         
         let view =
             {
-                OpenStockCount = openStocks.Length
+                OpenStockCount = openStocks |> Seq.length
                 OpenOptionCount = openOptions.Length
                 OpenCryptoCount = cryptos |> Seq.length
             }
@@ -213,20 +209,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks userId
-            
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = command.Ticker)
-                |> Seq.tryHead
+            let! stock = storage.GetStockPosition command.PositionId userId
                 
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ResponseUtils.failed
             | Some stock ->
                 
-                match stock.AssignGrade(positionId=command.PositionId, grade=command.Grade, note=command.Note) with
-                | false -> ()
-                | true -> do! storage.Save stock userId
+                do! stock
+                    |> StockPosition.assignGrade command.Grade command.Note DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition userId (Some stock)
                 
                 return Ok
     }
@@ -236,20 +227,16 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks(command.UserId)
+            let! stock = storage.GetStockPosition command.PositionId command.UserId
             
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = command.Ticker)
-                |> Seq.tryHead
-                
             match stock with
             | None -> return "Stock not found" |> ResponseUtils.failed
             | Some stock ->
                 
-                match stock.DeletePositionLabel(positionId=command.PositionId, key=command.Key) with
-                | false -> ()
-                | true -> do! storage.Save stock command.UserId
+                do!
+                    stock
+                    |> StockPosition.deleteLabel command.Key DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition command.UserId (Some stock)
                 
                 return Ok
     }
@@ -259,20 +246,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks userId
+            let! stock = storage.GetStockPosition command.PositionId userId
             
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = command.Ticker)
-                |> Seq.tryHead
-                
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ResponseUtils.failed
             | Some stock ->
                 
-                match stock.SetPositionLabel(positionId=command.PositionId, key=command.Key, value=command.Value) with
-                | false -> ()
-                | true -> do! storage.Save stock userId
+                do! stock
+                    |> StockPosition.setLabel command.Key command.Value DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition userId (Some stock)
                 
                 return Ok
     }
@@ -282,35 +264,31 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
         | _ ->
-            let! stocks = storage.GetStocks(query.UserId)
+            let! stock = storage.GetStockPosition query.PositionId query.UserId 
             
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = query.Ticker)
-                |> Seq.tryHead
-                
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
+            | None -> return "Stock position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
             | Some stock ->
                 
-                let position = stock.State.GetPosition(query.PositionId)
-                match position with
-                | null -> return "Position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
-                | _ ->
-                    let stopBased = ProfitPoints.getProfitPointsWithStopPrice position query.NumberOfPoints
+                let stock = stock |> StockPositionWithCalculations
+                
+                let stopBased =
+                    stock
+                    |> ProfitPoints.getProfitPointsWithStopPrice query.NumberOfPoints
+                
+                let percentBased level =
+                    stock
+                    |> ProfitPoints.getProfitPointWithPercentGain level TradingStrategyConstants.AvgPercentGain
                     
-                    let percentBased level =
-                        ProfitPoints.getProfitPointWithPercentGain position level TradingStrategyConstants.AvgPercentGain
-                        
-                    let percentBased = ProfitPoints.getProfitPoints percentBased query.NumberOfPoints
-                        
-                    let arr =
-                        [|
-                            ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
-                            ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
-                        |]
+                let percentBased = ProfitPoints.getProfitPoints percentBased query.NumberOfPoints
                     
-                    return ServiceResponse<ProfitPoints.ProfitPointContainer []>(arr)
+                let arr =
+                    [|
+                        ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
+                        ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
+                    |]
+                
+                return ServiceResponse<ProfitPoints.ProfitPointContainer []>(arr)
     }
     
     member _.HandleSetRisk userId (command:SetRisk) = task {
@@ -318,20 +296,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stocks = storage.GetStocks userId
-            
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = command.Ticker)
-                |> Seq.tryHead
-                
+            let! stock = storage.GetStockPosition command.PositionId userId
             match stock with
             | None -> return "Stock not found" |> ResponseUtils.failed
             | Some stock ->
                 
-                stock.SetRiskAmount(positionId=command.PositionId, riskAmount=command.RiskAmount.Value)
-                
-                do! storage.Save stock userId
+                do!
+                    stock
+                    |> StockPosition.setRiskAmount command.RiskAmount.Value DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition userId (Some stock)
                 
                 return Ok
     }
@@ -341,24 +314,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
         | Some user ->
-            let! stocks = storage.GetStocks(command.UserId)
-            
-            let stock =
-                stocks
-                |> Seq.filter (fun s -> s.State.Ticker = command.Ticker)
-                |> Seq.tryHead
-                
+            let! stock = storage.GetStockPosition command.PositionId command.UserId
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
+            | None -> return "Stock position not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
             | Some stock ->
-                
-                let position = stock.State.GetPosition(command.PositionId)
-                match position with
-                | null -> return "Position not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
-                | _ ->
-                    let runner = TradingStrategyRunner(brokerage, marketHours)
-                    let! simulation = runner.Run(user.State, position=position, closeIfOpenAtTheEnd=false)
-                    return ServiceResponse<TradingStrategyResults>(simulation)
+                let runner = TradingStrategyRunner(brokerage, marketHours)
+                let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=false)
+                return ServiceResponse<TradingStrategyResults>(simulation)
     }
     
     member _.Handle (command:SimulateTradeForTicker) = task {
@@ -383,13 +345,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     
     member _.Handle (command:SimulateUserTrades) = task {
         
-        let runSimulation (runner:TradingStrategyRunner) user (position:PositionInstance) closeIfOpenAtEnd = async {
+        let runSimulation (runner:TradingStrategyRunner) user (position:StockPositionState) closeIfOpenAtEnd = async {
+            let calculations = position |> StockPositionWithCalculations
             let! results =
                 runner.Run(
                     user,
-                    numberOfShares=position.CompletedPositionShares,
-                    price=position.CompletedPositionCostPerShare,
-                    stopPrice=position.FirstStop.Value,
+                    numberOfShares=calculations.CompletedPositionShares,
+                    price=calculations.CompletedPositionCostPerShare,
+                    stopPrice=calculations.FirstStop,
                     ticker=position.Ticker,
                     ``when``=position.Opened,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
@@ -408,7 +371,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         }
         
         let mapToStrategyPerformance (name:string, results:TradingStrategyResult seq) =
-            let positions = results |> Seq.map (fun r -> r.Position) |> Seq.toArray
+            let positions = results |> Seq.map (fun r -> r.Position |> StockPositionWithCalculations) |> Seq.toArray
             let performance =
                 try
                     TradingPerformance.Create(positions)
@@ -416,7 +379,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     // TODO: something is throwing Value was either too large or too small for a Decimal
                     // for certain simulations.
                     // ignoring it here because I need the results, but need to look at it at some point
-                    | :?OverflowException -> TradingPerformance.Create(Array.Empty<PositionInstance>())
+                    | :?OverflowException -> TradingPerformance.Create(Array.Empty<StockPositionWithCalculations>())
             
             {performance = performance; strategyName = name; positions = positions}
         
@@ -425,14 +388,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyPerformance array>
         | Some user ->
             
-            let! stocks = storage.GetStocks(command.UserId)
+            let! stocks = storage.GetStockPositions command.UserId
             
             let positions =
                 stocks
-                |> Seq.map (fun s -> s.State)
-                |> Seq.collect (fun s -> s.GetClosedPositions())
-                |> Seq.filter (fun p -> p.StopPrice.HasValue)
-                |> Seq.sortByDescending (fun p -> p.Closed.Value)
+                |> Seq.filter _.StopPrice.IsSome
+                |> Seq.sortByDescending (fun p -> match p.Closed with | Some c -> c | None -> DateTimeOffset.MinValue)
                 |> Seq.take command.NumberOfTrades
                 |> Seq.toList
                 
@@ -447,8 +408,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             let results =
                 simulations
                 |> Seq.concat
-                |> Seq.groupBy (fun r -> r.StrategyName)
-                |> Seq.map (fun (name, results) -> mapToStrategyPerformance(name, results))
+                |> Seq.groupBy (_.StrategyName)
+                |> Seq.map mapToStrategyPerformance
                 |> Seq.toArray
                 
             return ServiceResponse<TradingStrategyPerformance array>(results)
@@ -475,13 +436,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<TradingEntriesView>
         | Some user ->
-            let! stocks = storage.GetStocks(query.UserId)
+            let! stocks = storage.GetStockPositions query.UserId
             
             let positions =
                 stocks
-                |> Seq.map (fun s -> s.State)
-                |> Seq.filter (fun s -> s.OpenPosition = null |> not)
-                |> Seq.map (fun s -> s.OpenPosition)
+                |> Seq.filter _.IsOpen
+                |> Seq.map (fun s -> s |> StockPositionWithCalculations)
                 |> Seq.toArray
                 
             let! accountResponse = brokerage.GetAccount(user.State)
@@ -491,8 +451,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | None -> TradingAccount.Empty
                 
             let tickers =
-                positions |> Seq.map (fun p -> p.Ticker)
-                |> Seq.append (account.StockPositions |> Seq.map (fun p -> p.Ticker))
+                positions
+                |> Seq.map (_.Ticker)
+                |> Seq.append (account.StockPositions |> Seq.map (_.Ticker))
                 |> Seq.distinct
                 
             let! pricesResponse = brokerage.GetQuotes user.State tickers
@@ -503,7 +464,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 
             let pricesWithStringAsKey = prices.Keys |> Seq.map (fun p -> p.Value, prices[p]) |> Map.ofSeq
             
-            let current = positions |> Array.sortByDescending (fun p -> p.RR)
+            let current = positions |> Array.sortByDescending _.RR
             
             let violations = core.fs.Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
             
@@ -523,28 +484,27 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<PastTradingEntriesView>
         | _ ->
-            let! stocks = storage.GetStocks(query.UserId)
+            let! stocks = storage.GetStockPositions query.UserId
             
             let past =
                 stocks
-                |> Seq.map (fun s -> s.State)
-                |> Seq.collect (fun s -> s.GetClosedPositions())
-                |> Seq.sortByDescending (fun p -> p.Closed.Value)
+                |> Seq.filter _.IsClosed
+                |> Seq.sortByDescending _.Closed.Value
+                |> Seq.map StockPositionWithCalculations
                 |> Seq.toArray
             
             let performance = TradingPerformanceContainerView(past)
             
             let strategyByPerformance =
                 past
-                |> Seq.filter (fun p -> p.ContainsLabel(key="strategy"))
-                |> Seq.groupBy (fun p -> p.GetLabelValue(key="strategy"))
+                |> Seq.filter _.ContainsLabel(key="strategy")
+                |> Seq.groupBy _.GetLabelValue(key="strategy")
                 |> Seq.map (fun (name, positions) ->
                     let performance = TradingPerformance.Create(positions)
                     {strategyName = name; performance = performance; positions = (positions |> Seq.toArray)}
                 )
-                |> Seq.sortByDescending (fun p -> p.performance.Profit)
+                |> Seq.sortByDescending _.performance.Profit
                 |> Seq.toArray
-                
             let (tradingEntries:PastTradingEntriesView) =
                 {
                     past=past;
@@ -557,17 +517,16 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     
     member _.Handle(query:QueryTransactions) = task {
         
-        let toTransactionsView (stocks:OwnedStock seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
-            let tickers = stocks |> Seq.map (fun s -> s.State.Ticker) |> Seq.append (options |> Seq.map (fun o -> o.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
+        let toTransactionsView (stocks:StockPositionWithCalculations seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
+            let tickers = stocks |> Seq.map (_.Ticker) |> Seq.append (options |> Seq.map (_.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
             
-            let stockTransactions =
-                match query.Show = "shares" || query.Show = null with
-                | true ->
-                    stocks
-                    |> Seq.filter (fun s -> query.Ticker.HasValue = false || s.State.Ticker = query.Ticker.Value)
-                    |> Seq.collect (fun s -> s.State.Transactions)
-                    |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
-                | false -> Seq.empty
+            // let stockTransactions =
+            //     match query.Show = "shares" || query.Show = null with
+            //     | true ->
+            //         stocks
+            //         |> Seq.filter (fun s -> query.Ticker.HasValue = false || s.Ticker = query.Ticker.Value)
+            //         |> Seq.collect toPlTransactions
+            //     | false -> Seq.empty
                 
             let optionTransactions =
                 match query.Show = "options" || query.Show = null with
@@ -588,71 +547,58 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
                 
-            let log = stockTransactions |> Seq.append optionTransactions |> Seq.append cryptoTransactions
+            // TODO: reimplement stock transations
+            let log = Seq.empty |> Seq.append optionTransactions |> Seq.append cryptoTransactions
                 
             TransactionsView(log, query.GroupBy, tickers);
             
-        let! stocks = storage.GetStocks(query.UserId)
+        let! stocks = storage.GetStockPositions(query.UserId)
         let! options = storage.GetOwnedOptions(query.UserId)
         let! cryptos = storage.GetCryptos(query.UserId)
         
-        let transactionsView = toTransactionsView stocks options cryptos
+        let transactionsView = toTransactionsView (stocks |> Seq.map StockPositionWithCalculations) options cryptos
         
         return ServiceResponse<TransactionsView>(transactionsView)
     }
     
     member _.Handle (query:TransactionSummary) = task {
         
-        let! stocks = storage.GetStocks(query.UserId)
+        let! stocks = storage.GetStockPositions query.UserId
         let! options = storage.GetOwnedOptions(query.UserId)
         let start, ``end`` = query.GetDates()
         
-        let transactions =
-            stocks
-            |> Seq.collect (fun s -> s.State.Transactions)
-            |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
-            |> Seq.append(
-                options
-                |> Seq.collect (fun o -> o.State.Transactions)
-                |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
-            )
-        
-        let stockTransactions =
-            transactions
-            |> Seq.filter (fun t -> t.IsOption = false && t.IsPL = false)    
-            |> Seq.sortBy (fun t -> t.Ticker)
-            |> Seq.toList
+        let stocks = stocks |> Seq.map StockPositionWithCalculations |> Seq.toArray
              
         let optionTransactions =
-            transactions
-            |> Seq.filter (fun t -> t.IsOption && t.IsPL = false)
+            options
+            |> Seq.collect (fun o -> o.State.Transactions)
+            |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
+            |> Seq.filter (fun t -> t.IsPL |> not)
             |> Seq.sortBy (fun t -> t.Ticker)
             |> Seq.toList
             
         let plStockTransactions =
-            transactions
-            |> Seq.filter (fun t -> t.IsOption = false && t.IsPL)
-            |> Seq.sortBy (fun t -> t.Ticker)
+            stocks
+            |> Seq.collect _.PLTransactions
+            |> Seq.sortBy _.Ticker
             |> Seq.toList
             
-            
         let plOptionTransactions =
-            transactions
-            |> Seq.filter (fun t -> t.IsOption && t.IsPL)
+            options
+            |> Seq.collect (fun o -> o.State.Transactions)
+            |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
+            |> Seq.filter (fun t -> t.IsPL)
             |> Seq.sortBy (fun t -> t.Ticker)
             |> Seq.toList
             
         let closedPositions =
             stocks
-            |> Seq.collect (fun s -> s.State.GetClosedPositions())
-            |> Seq.filter (fun p -> p.Closed.Value >= DateTimeOffset(start) && p.Closed.Value <= DateTimeOffset(``end``))
+            |> Seq.filter (fun p -> p.IsClosed && p.Closed.Value >= DateTimeOffset(start) && p.Closed.Value <= DateTimeOffset(``end``))
             |> Seq.toList
             
         let openPositions =
             stocks
-            |> Seq.map (fun s -> s.State.OpenPosition)
-            |> Seq.filter (fun p -> p = null |> not)
-            |> Seq.filter (fun p -> p.Opened >= DateTimeOffset(start) && p.Opened <= DateTimeOffset(``end``))
+            |> Seq.filter (fun p -> p.IsClosed = false && p.Opened >= DateTimeOffset(start) && p.Opened <= DateTimeOffset(``end``))
             |> Seq.toList
             
         let view = TransactionSummaryView(
@@ -660,7 +606,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             ``end``=``end``,
             openPositions=openPositions,
             closedPositions=closedPositions,
-            stockTransactions=stockTransactions,
+            stockTransactions=Seq.empty,
             optionTransactions=optionTransactions,
             plStockTransactions=plStockTransactions,
             plOptionTransactions=plOptionTransactions

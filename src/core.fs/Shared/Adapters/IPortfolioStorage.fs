@@ -13,10 +13,6 @@ open core.fs.Shared.Domain.Accounts
 
 type IPortfolioStorage =
     
-    abstract member GetStock : ticker:Ticker -> userId:UserId -> Task<OwnedStock>
-    abstract member GetStockByStockId : id:System.Guid -> userId:UserId -> Task<OwnedStock>
-    abstract member GetStocks : userId:UserId -> Task<IEnumerable<OwnedStock>>
-    abstract member Save : stock:OwnedStock -> userId:UserId -> Task
     
     abstract member GetStockPositions : userId:UserId -> Task<IEnumerable<StockPositionState>>
     abstract member GetStockPosition : positionId:StockPositionId -> userId:UserId -> Task<StockPositionState option>

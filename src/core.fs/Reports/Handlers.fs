@@ -175,21 +175,22 @@ type SellView =
         | false -> 0m
         | true -> (this.CurrentPrice.Value - this.Price) / this.Price
     
-type SellsView(stocks:OwnedStock seq,prices:Dictionary<Ticker,StockQuote>) =
+type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote>) =
     
     member _.Sells: SellView seq =
         stocks
-        |> Seq.collect (fun stock -> stock.State.BuyOrSell |> Seq.map (fun t -> {|stock = stock; buyOrSell = t|}))
-        |> Seq.filter (fun t -> t.buyOrSell :? StockSold)
-        |> Seq.filter (fun t -> t.buyOrSell.When > DateTimeOffset.UtcNow.AddDays(-60))
-        |> Seq.groupBy (fun t -> t.stock.State.Ticker)
-        |> Seq.map (fun (ticker, sells) -> {|ticker = ticker; latest = sells |> Seq.maxBy (fun t -> t.buyOrSell.When)|})
+        |> Seq.collect (fun stock -> stock.Transactions |> Seq.map (fun t -> {|stock = stock; buyOrSell = t|}))
+        |> Seq.map (fun t -> match t.buyOrSell with | Share s -> Some s | _ -> None)
+        |> Seq.choose id
+        |> Seq.filter (fun t -> t.Type = Sell && t.Date > DateTimeOffset.UtcNow.AddDays(-60))
+        |> Seq.groupBy _.Ticker
+        |> Seq.map (fun (ticker, sells) -> {|ticker = ticker; latest = sells |> Seq.maxBy (fun t -> t.Date)|})
         |> Seq.map (fun t -> {
             Ticker = t.ticker.Value
-            Date = t.latest.buyOrSell.When
-            NumberOfShares = t.latest.buyOrSell.NumberOfShares
-            Price = t.latest.buyOrSell.Price
-            OlderThan30Days = t.latest.buyOrSell.When < DateTimeOffset.UtcNow.AddDays(-30)
+            Date = t.latest.Date
+            NumberOfShares = t.latest.NumberOfShares
+            Price = t.latest.Price
+            OlderThan30Days = t.latest.Date < DateTimeOffset.UtcNow.AddDays(-30)
             CurrentPrice =
                 match prices.TryGetValue(t.ticker) with
                 | true, q -> Nullable<decimal>(q.Price)
@@ -199,7 +200,7 @@ type SellsView(stocks:OwnedStock seq,prices:Dictionary<Ticker,StockQuote>) =
     
 type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHours,storage:IPortfolioStorage) =
     
-    let getLevel (position:PositionInstance) =
+    let getLevel (position:StockPositionWithCalculations) =
         match position.Profit |> abs with
         | profit when profit > 1000m -> 5
         | profit when profit > 500m -> 4
@@ -211,18 +212,21 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
     interface IApplicationService
     
     member _.Handle(request:ChainQuery) = task {
-        let! stocks = storage.GetStocks request.UserId
+        let! stocks = storage.GetStockPositions request.UserId
         
         let links =
             stocks
-            |> Seq.collect (fun stock -> stock.State.GetClosedPositions())
-            |> Seq.sortByDescending (fun position -> position.Closed.Value)
-            |> Seq.map (fun position -> {
-                success=position.Profit > 0m
-                ticker=position.Ticker
-                level = position |> getLevel
-                profit = position.Profit
-            })
+            |> Seq.filter _.IsClosed
+            |> Seq.sortByDescending _.Closed.Value
+            |> Seq.map StockPositionWithCalculations
+            |> Seq.map (fun position ->
+                {
+                    success=position.Profit > 0m
+                    ticker=position.Ticker
+                    level = position |> getLevel
+                    profit = position.Profit
+                }
+            )
             
         let response = {links=links}
         
@@ -461,12 +465,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<SellsView>
         | Some user ->
-            let! stocks = storage.GetStocks query.UserId
+            let! stocks = storage.GetStockPositions query.UserId
             
             let! priceResult =
                 brokerage.GetQuotes
                     user.State
-                    (stocks |> Seq.map (fun stock -> stock.State.Ticker))
+                    (stocks |> Seq.map (_.Ticker))
             
             let prices =
                 match priceResult.Success with
