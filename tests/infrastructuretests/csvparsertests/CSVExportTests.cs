@@ -2,12 +2,14 @@ using System;
 using core.Cryptos;
 using core.fs.Services;
 using core.fs.Shared.Adapters.CSV;
+using core.fs.Shared.Domain;
 using core.Notes;
 using core.Options;
 using core.Shared;
 using core.Stocks;
 using coretests.testdata;
 using csvparser;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace csvparsertests
@@ -18,8 +20,10 @@ namespace csvparsertests
         [Fact]
         public void ExportStocksHeader()
         {
-            var stock = new OwnedStock(TestDataGenerator.TSLA, Guid.NewGuid());
-            stock.Purchase(1, 100, DateTime.UtcNow, "some note");
+            var stock = StockPosition.buy(
+                1m, 100, DateTime.UtcNow, new FSharpOption<string>("some note"),
+                StockPosition.openLong(TestDataGenerator.NET, DateTimeOffset.UtcNow)
+            );
             
             var report = CSVExport.stocks(_csvWriter, new[] {stock});
 
