@@ -138,7 +138,7 @@ let ``Multiple buys deleting transactions`` () =
         |> List.choose id
         |> List.last
         
-    let position2 = StockPosition.deleteTransaction lastTransaction.TransactionId position
+    let position2 = StockPosition.deleteTransaction lastTransaction.TransactionId DateTimeOffset.UtcNow position
     
     position2.Transactions |> should haveLength 3
     position2.NumberOfShares |> should equal 1m

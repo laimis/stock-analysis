@@ -200,8 +200,12 @@ type IMarketHours =
     abstract member GetMarketEndOfDayTimeInUtc : DateTimeOffset -> DateTimeOffset
     abstract member GetMarketStartOfDayTimeInUtc : DateTimeOffset -> DateTimeOffset
 
-type IBrokerage =
+type IBrokerageGetPriceHistory =
     
+    abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset -> ``end``:DateTimeOffset -> Task<ServiceResponse<PriceBars>>
+    
+type IBrokerage =
+    inherit IBrokerageGetPriceHistory
     abstract member GetOAuthUrl : unit -> Task<string>
     abstract member ConnectCallback : code:string -> Task<OAuthResponse>
     abstract member GetAccessToken : state:UserState -> Task<OAuthResponse>
@@ -210,7 +214,6 @@ type IBrokerage =
     abstract member BuyOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
     abstract member SellOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
     abstract member CancelOrder : state:UserState -> orderId:string -> Task<ServiceResponse<bool>>
-    abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset -> ``end``:DateTimeOffset -> Task<ServiceResponse<PriceBars>>
     abstract member GetQuote : state:UserState -> ticker:Ticker -> Task<ServiceResponse<StockQuote>>
     abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<ServiceResponse<Dictionary<Ticker, StockQuote>>>
     abstract member GetMarketHours : state:UserState -> start:DateTimeOffset -> Task<ServiceResponse<MarketHours>>

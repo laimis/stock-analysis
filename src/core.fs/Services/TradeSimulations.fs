@@ -227,7 +227,7 @@ module TradingStrategyFactory =
             createCloseAfterFixedNumberOfDays 30
         ]
     
-type TradingStrategyRunner(brokerage:IBrokerage, hours:IMarketHours) =
+type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours) =
     
     let setRiskAmountFromActualTradeIfSet actualTrade date stockPosition =
         match actualTrade with

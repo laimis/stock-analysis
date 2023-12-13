@@ -50,5 +50,18 @@ namespace coretests.testdata
         public static TradeGrade B = new("B");
 
         public static UserId RandomUserId() => UserId.NewUserId(Guid.NewGuid());
+        
+        private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public static Ticker GenerateRandomTicker(Random random)
+        {
+            var length = random.Next(3, 5);
+            var ticker = new char[length];
+            for (var i = 0; i < length; i++)
+            {
+                ticker[i] = Chars[random.Next(Chars.Length)];
+            }
+
+            return new Ticker(ticker.ToString());
+        }
     }
 }

@@ -3,7 +3,6 @@ namespace core.fs.Portfolio
 open System
 open Microsoft.FSharp.Collections
 open core.Shared
-open core.Stocks
 open core.fs.Services.Trading
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
