@@ -47,20 +47,7 @@ type DashboardView =
         Positions: StockPositionWithCalculations seq
         Violations: StockViolationView seq
     }
-    
-type DeleteStop =
-    {
-        PositionId: StockPositionId
-        UserId: UserId
-    }
-    
-type DeleteTransaction =
-    {
-        PositionId: StockPositionId
-        UserId: UserId
-        TransactionId: Guid
-    }
-    
+        
 type DetailsQuery =
     {
         Ticker: Ticker
@@ -335,24 +322,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             }
             
             return ServiceResponse<DashboardView>(dashboard)
-    }
-    
-    member _.Handle (cmd:DeleteStop) = task {
-        let! stock = portfolio.GetStockPosition cmd.PositionId cmd.UserId
-        match stock with
-        | None -> return "Stock not found" |> ResponseUtils.failed
-        | Some existing ->
-            do! existing |> StockPosition.deleteStop DateTimeOffset.UtcNow |> portfolio.SaveStockPosition cmd.UserId stock
-            return Ok
-    }
-    
-    member _.Handle (cmd:DeleteTransaction) = task {
-        let! stock = portfolio.GetStockPosition cmd.PositionId cmd.UserId
-        match stock with
-        | None -> return "Stock position not found" |> ResponseUtils.failed
-        | Some existing ->
-            do! existing |> StockPosition.deleteTransaction cmd.TransactionId DateTimeOffset.UtcNow |> portfolio.SaveStockPosition cmd.UserId stock
-            return Ok
     }
     
     member _.Handle (query:DetailsQuery) = task {

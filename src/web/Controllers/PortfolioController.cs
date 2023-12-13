@@ -1,10 +1,13 @@
 using System;
 using System.Threading.Tasks;
 using core.fs.Portfolio;
+using core.fs.Shared.Domain;
+using core.fs.Stocks;
 using core.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
+using Handler = core.fs.Portfolio.Handler;
 
 namespace web.Controllers;
 
@@ -69,14 +72,14 @@ public class PortfolioController : ControllerBase
 
     [HttpGet("{ticker}/positions/{positionId}/simulate/trades")]
     public Task<ActionResult> Trade(
-        [FromRoute] int positionId,
+        [FromRoute] string positionId,
         [FromRoute] string ticker) =>
 
         this.OkOrError(
             _handler.Handle(
                 new SimulateTrade(
                     ticker: new Ticker(ticker),
-                    positionId: positionId, 
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)), 
                     userId: User.Identifier()
                 )
             )
@@ -84,7 +87,7 @@ public class PortfolioController : ControllerBase
 
     [HttpGet("{ticker}/positions/{positionId}/profitpoints")]
     public Task<ActionResult> ProfitPoints(
-        [FromRoute] int positionId,
+        [FromRoute] string positionId,
         [FromRoute] string ticker,
         [FromQuery] int numberOfPoints) =>
 
@@ -92,7 +95,7 @@ public class PortfolioController : ControllerBase
             _handler.Handle(
                 new ProfitPointsQuery(
                     numberOfPoints: numberOfPoints,
-                    positionId: positionId,
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     ticker: new Ticker(ticker),
                     userId: User.Identifier()
                 )
@@ -109,14 +112,14 @@ public class PortfolioController : ControllerBase
 
     [HttpDelete("{ticker}/positions/{positionId}")]
     public Task<ActionResult> DeletePosition(
-        [FromRoute] int positionId,
+        [FromRoute] string positionId,
         [FromRoute] string ticker,
         [FromServices] Handler handler) =>
         this.OkOrError(
             handler.Handle(
                 new DeletePosition(
                     ticker: new Ticker(ticker),
-                    positionId: positionId,
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     userId: User.Identifier()
                 )
             )
@@ -132,7 +135,7 @@ public class PortfolioController : ControllerBase
 
     [HttpDelete("{ticker}/positions/{positionId}/labels/{label}")]
     public Task RemoveLabel(
-        [FromRoute] int positionId,
+        [FromRoute] string positionId,
         [FromRoute] string ticker,
         [FromRoute] string label,
         [FromServices] Handler handler) => 
@@ -140,7 +143,7 @@ public class PortfolioController : ControllerBase
             handler.Handle(
                 new RemoveLabel(
                     ticker: new Ticker(ticker),
-                    positionId: positionId,
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     key: label,
                     userId: User.Identifier()
                 )
@@ -154,6 +157,19 @@ public class PortfolioController : ControllerBase
                 User.Identifier(), command
             )
         );
+    
+    [HttpDelete("{ticker}/positions/{positionId}/transactions/{eventId}")]
+    public Task<ActionResult> DeleteTransaction([FromRoute] string positionId, [FromRoute] Guid eventId) =>
+        this.OkOrError(
+            _handler.Handle(
+                new DeleteTransaction(StockPositionId.NewStockPositionId(Guid.Parse(positionId)), User.Identifier(), eventId
+                )
+            )
+        );
+    
+    [HttpDelete("{ticker}/positions/{positionId}/stop")]
+    public async Task<ActionResult> DeleteStop([FromRoute] string positionId) =>
+        this.OkOrError(await _handler.Handle(new DeleteStop(StockPositionId.NewStockPositionId(Guid.Parse(positionId)), User.Identifier())));
 
     [HttpGet("{ticker}/simulate/trades")]
     public Task<ActionResult> Trade(

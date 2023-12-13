@@ -117,8 +117,8 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 _logger.LogInformation("Processing user {email} upsides", emailId.Email);
                 
                 var userId = UserId.NewUserId(user.Id);
-                var stocks = await _portfolioStorage.GetStocks(userId);
-                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
+                var stocks = await _portfolioStorage.GetStockPositions(userId);
+                var tickersFromPositions = stocks.Where(s => s.IsOpen).Select(s => s.Ticker);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(userId))
                     .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)

@@ -47,21 +47,21 @@ namespace storage.shared
             return _blobStorage.Save(typeof(T).Name + "#" + version + "#" + userId, t);
         }
 
-        public async Task<OwnedStock> GetStock(Ticker ticker, UserId userId)
+        internal async Task<OwnedStock> GetStock(Ticker ticker, UserId userId)
         {
             var stocks = await GetStocks(userId);
             
             return stocks.SingleOrDefault(s => s.State.Ticker.Equals(ticker));
         }
 
-        public async Task<OwnedStock> GetStockByStockId(Guid stockId, UserId userId)
+        internal async Task<OwnedStock> GetStockByStockId(Guid stockId, UserId userId)
         {
             var stocks = await GetStocks(userId);
             
             return stocks.SingleOrDefault(s => s.Id == stockId);
         }
 
-        public Task Save(OwnedStock stock, UserId userId)
+        internal Task Save(OwnedStock stock, UserId userId)
         {
             return Save(stock, _stock_entity, userId);
         }
@@ -98,7 +98,7 @@ namespace storage.shared
             return _aggregateStorage.SaveEventsAsync(agg, entityName, userId);
         }
 
-        public async Task<IEnumerable<OwnedStock>> GetStocks(UserId userId)
+        internal async Task<IEnumerable<OwnedStock>> GetStocks(UserId userId)
         {
             var list = await _aggregateStorage.GetEventsAsync(_stock_entity, userId);
 

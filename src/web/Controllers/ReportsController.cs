@@ -1,9 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 using core.fs.Reports;
 using core.fs.Shared.Adapters.Stocks;
+using core.fs.Shared.Domain;
 using core.Shared;
 
 namespace web.Controllers
@@ -58,7 +60,16 @@ namespace web.Controllers
             this.OkOrError(_service.Handle(new OutcomesReportForPositionsQuery(User.Identifier())));
 
         [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
-        public Task<ActionResult> DailyPositionReport(string ticker, int positionId) =>
-            this.OkOrError(_service.Handle(new DailyPositionReportQuery(User.Identifier(), new Ticker(ticker), positionId)));
+        public Task<ActionResult> DailyPositionReport(string ticker, string positionId) =>
+            this.OkOrError(
+                _service.Handle(
+                    new DailyPositionReportQuery(
+                        User.Identifier(),
+                        new Ticker(ticker),
+                        StockPositionId.NewStockPositionId(Guid.Parse(positionId)
+                        )
+                    )
+                )
+            );
     }
 }

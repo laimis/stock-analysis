@@ -55,19 +55,6 @@ namespace web.Controllers
         public Task<ActionResult> Ownership(string ticker) => 
             this.OkOrError(_service.Handle(new OwnershipQuery(new Ticker(ticker), User.Identifier())));
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete([FromRoute] Guid id) =>
-            this.OkOrError(await _service.Handle(new DeleteStock(id, User.Identifier())));
-
-        [HttpDelete("{ticker}/transactions/{eventId}")]
-        public Task<ActionResult> DeleteTransaction([FromRoute] string ticker, [FromRoute] Guid eventId) =>
-            this.OkOrError(
-                _service.Handle(
-                    new DeleteTransaction(new Ticker(ticker), User.Identifier(), eventId
-                    )
-                )
-            );
-
         [HttpGet("search/{term}")]
         public Task<ActionResult> Search([FromRoute] string term) => 
             this.OkOrError(_service.Handle(new SearchQuery(term, User.Identifier())));
@@ -76,10 +63,6 @@ namespace web.Controllers
         public Task<ActionResult> Stop([FromBody] SetStop command) =>
             this.OkOrError(_service.HandleSetStop(User.Identifier(), command));
         
-        [HttpDelete("{ticker}/stop")]
-        public async Task<ActionResult> DeleteStop([FromRoute] string ticker) =>
-            this.OkOrError(await _service.Handle(new DeleteStop(new Ticker(ticker), User.Identifier())));
-
         [HttpPost("sell")]
         public Task<ActionResult> Sell([FromBody]StockTransaction model) =>
             this.OkOrError(_service.Handle(BuyOrSell.NewSell(model, User.Identifier())));

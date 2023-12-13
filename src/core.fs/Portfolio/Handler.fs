@@ -7,7 +7,6 @@ open Microsoft.FSharp.Core
 open core.Cryptos
 open core.Options
 open core.Shared
-open core.Stocks
 open core.fs.Services
 open core.fs.Services.Trading
 open core.fs.Services.TradingStrategies
@@ -22,11 +21,24 @@ type Query =
     {
         UserId: UserId
     }
-    
+
+type DeleteTransaction =
+    {
+        PositionId: StockPositionId
+        UserId: UserId
+        TransactionId: Guid
+    }
+
 type DeletePosition =
     {
         PositionId: StockPositionId
         Ticker: Ticker
+        UserId: UserId
+    }
+    
+type DeleteStop =
+    {
+        PositionId: StockPositionId
         UserId: UserId
     }
 
@@ -177,6 +189,39 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | Some position ->
                 let deletedPosition = position |> StockPosition.delete 
                 do! deletedPosition |> storage.SaveStockPosition command.UserId (Some position)
+                return Ok
+    }
+    
+    member _.Handle (command:DeleteStop) = task {
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
+        | _ ->
+            let! stock = storage.GetStockPosition command.PositionId command.UserId
+            match stock with
+            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | Some existing ->
+                do!
+                    existing
+                    |> StockPosition.deleteStop DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition command.UserId stock
+                return Ok
+    }
+    
+    member _.Handle (cmd:DeleteTransaction) = task {
+        let! user = accounts.GetUser(cmd.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
+        | _ ->
+            let! stock = storage.GetStockPosition cmd.PositionId cmd.UserId
+            match stock with
+            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | Some existing ->
+                do!
+                    existing
+                    |> StockPosition.deleteTransaction cmd.TransactionId DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition cmd.UserId stock
+                    
                 return Ok
     }
         

@@ -5,7 +5,7 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public class OwnedStockState : IAggregateState
+    internal class OwnedStockState : IAggregateState
 	{
         public Guid Id { get; private set; }
         public Ticker Ticker { get; private set; }
