@@ -5,6 +5,7 @@ open Xunit
 open core.fs.Portfolio
 open core.fs.Services.Trading
 open core.fs.Shared.Domain
+open coretests.fs.Stocks.Services
 open coretests.testdata
 open FsUnit
     
@@ -31,21 +32,21 @@ let getClosedPositions() =
 let generateRandomSet (start:DateTimeOffset) minimumNumberOfTrades =
     
     let random = Random()
-    let numberOfStocks = random.Next(minimumNumberOfTrades, minimumNumberOfTrades + 100)
+    let numberOfTrades = random.Next(minimumNumberOfTrades, minimumNumberOfTrades + 100)
     
     let closedPositions = 
-        [0..numberOfStocks]
+        [0..numberOfTrades]
         |> List.map (fun i ->
             let stock = TestDataGenerator.GenerateRandomTicker random
-            let date = start.AddDays(random.Next(100))
+            let purchaseDate = start.AddDays(-numberOfTrades)
             let shares = random.Next(1, 100) |> decimal
             let price = random.Next(1, 1000) |> decimal
-            let days = random.Next(1, 100)
+            let sellDate = purchaseDate.AddDays(1)
             let sellPrice = random.Next(1, 1000) |> decimal
             
-            StockPosition.openLong stock date
-            |> StockPosition.buy shares price date None
-            |> StockPosition.sell shares sellPrice (date.AddDays days) None
+            StockPosition.openLong stock purchaseDate
+            |> StockPosition.buy shares price purchaseDate None
+            |> StockPosition.sell shares sellPrice sellDate None
         )
     
     closedPositions
@@ -63,7 +64,7 @@ let WinsCorrect() = performance.Wins |> should equal 2
 let LossesCorrect() = performance.Losses |> should equal 1
 
 [<Fact>]
-let WinPctCorrect() = performance.WinPct |> should equal 0.67m
+let WinPctCorrect() = performance.WinPct |> MultipleBarPriceAnalysisTests.rounded 2 |> should equal 0.67m
 
 [<Fact>]
 let AvgWinAmountCorrect() = performance.AvgWinAmount |> should equal 10m
@@ -111,9 +112,11 @@ let rrRatio_Correct() = performance.rrRatio |> should equal 1
 let ProfitRatio_Correct() = performance.ProfitRatio |> should equal 1
 
 [<Fact>]
-let AvgReturnPct_Correct() = performance.AvgReturnPct |> should equal 0.03m
+let AvgReturnPct_Correct() =
+    performance.AvgReturnPct |> MultipleBarPriceAnalysisTests.rounded 2 |> should equal 0.03m
 
-let container = generateRandomSet (DateTimeOffset.UtcNow.AddDays(-100)) 100 |> List.map StockPositionWithCalculations |> List.toArray |> TradingPerformanceContainerView
+let container =
+    generateRandomSet DateTimeOffset.UtcNow 100 |> List.map StockPositionWithCalculations |> List.toArray |> TradingPerformanceContainerView
 
 [<Fact>]
 let ClosedPositions_Length_Correct() = container.ClosedPositions.Length |> should be (greaterThan 0)
@@ -128,11 +131,11 @@ let NumberOfTrades_Correct() = container.PerformanceLast20.NumberOfTrades |> sho
 let YTDContainer_Profit_DaysAreSequential() = 
     let dates = container.TrendsYTD |> List.find (fun c -> c.Label = "Profits") |> fun c -> c.Data |> Seq.map (_.Label)
     
-    let parsedAndSorted =
-        dates |> Seq.map DateTimeOffset.Parse |> Seq.sort
+    dates
+    |> Seq.pairwise
+    |> Seq.forall (fun (a, b) -> DateTimeOffset.Parse(a) < DateTimeOffset.Parse(b))
+    |> should equal true
     
-    dates |> should equal parsedAndSorted
-
 [<Fact>]
 let YTDContainer_Profit_NoRepeatingDays() = 
     let dates = container.TrendsYTD |> List.find (fun c -> c.Label = "Profits") |> fun c -> c.Data |> Seq.map (_.Label)

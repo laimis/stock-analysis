@@ -201,10 +201,10 @@ let ``Delete stop works``() =
         
     position.HasStopPrice |> should equal true
     
-    let sameStop = position |> StockPosition.deleteStop DateTimeOffset.UtcNow
+    let afterDeletion = position |> StockPosition.deleteStop DateTimeOffset.UtcNow
     
-    sameStop.StopPrice |> should equal None
-    sameStop.HasStopPrice |> should equal false
+    afterDeletion.StopPrice |> should equal None
+    afterDeletion.HasStopPrice |> should equal false
     
 [<Fact>]
 let ``Delete stop on closed position fails``() =

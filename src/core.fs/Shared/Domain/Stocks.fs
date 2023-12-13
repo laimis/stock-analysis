@@ -108,6 +108,9 @@ type StockPositionStopSet(id, aggregateId, ``when``, stopPrice:decimal) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.StopPrice = stopPrice
     
+type StockPositionStopDeleted(id, aggregateId, ``when``) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    
 type StockPositionRiskAmountSet(id, aggregateId, ``when``, riskAmount) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.RiskAmount = riskAmount
@@ -200,6 +203,9 @@ module StockPosition =
         | :? StockPositionGradeAssigned as x ->
             let gradeValue = x.Grade |> TradeGrade |> Some
             { p with Grade = gradeValue; Version = p.Version + 1; Events = p.Events @ [x]  }
+            
+        | :? StockPositionStopDeleted as x ->
+            { p with StopPrice = None; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
@@ -297,7 +303,7 @@ module StockPosition =
         match stockPosition.StopPrice with
         | None -> stockPosition
         | Some _ ->
-            let e = StockPositionStopSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, 0m)
+            let e = StockPositionStopDeleted(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date)
             apply e stockPosition
             
     let openLong (ticker:Ticker) date =
