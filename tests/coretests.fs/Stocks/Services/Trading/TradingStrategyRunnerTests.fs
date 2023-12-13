@@ -15,10 +15,12 @@ open FsUnit
 
 let generatePriceBars numberOfBars priceFunction =
     
+    let startingDate = DateTimeOffset.UtcNow.AddDays(-float numberOfBars)
+    
     [|0..numberOfBars|]
     |> Array.map (fun i ->
         PriceBar(
-            date = DateTimeOffset.UtcNow.AddDays(float i),
+            date = startingDate.AddDays(float i),
             ``open`` = priceFunction i,
             high = priceFunction i + 0.01m,
             low = priceFunction i - 0.01m,
@@ -39,12 +41,12 @@ let createRunner numberOfBars priceFunction =
                     prices |> ServiceResponse<PriceBars> |> Task.FromResult
         }
     
-    TradingStrategyRunner(mock, MarketHoursAlwaysOn())
+    TradingStrategyRunner(mock, MarketHoursAlwaysOn()), prices
 
 [<Fact>]
 let ``Basic test``() = task {
     
-    let runner = createRunner 100 (fun i -> 10 + i |> decimal)
+    let runner, prices = createRunner 100 (fun i -> 10 + i |> decimal)
 
     let! results = 
         runner.Run(
@@ -53,7 +55,7 @@ let ``Basic test``() = task {
             10,
             Some 5m,
             TestDataGenerator.NET,
-            DateTimeOffset.UtcNow,
+            prices.First.Date,
             false
         )
 
@@ -69,7 +71,7 @@ let ``Basic test``() = task {
     position.RR |> should equal 2.01m
     maxDrawdown |> should equal -0.001m
     maxGain |> should equal 1.501m
-    position.DaysHeld |> should equal 14
+    position.DaysHeld |> should equal 15
 
     let oneThirdPercentBased = results.Results[1]
     let maxDrawdown = oneThirdPercentBased.MaxDrawdownPct
@@ -82,7 +84,7 @@ let ``Basic test``() = task {
     position.RR |> should equal 0.2746m
     maxDrawdown |> should equal -0.001m
     maxGain |> should equal 0.201m
-    position.DaysHeld |> should equal 1
+    position.DaysHeld |> should equal 2
 }
 
 [<Fact>]
@@ -93,9 +95,9 @@ let ``With portion size too small, still sells at RR levels``() =
     let runner = TradingStrategyFactory.createProfitPointsTrade 3
     
     let result =
-        StockPosition.openLong TestDataGenerator.NET DateTimeOffset.UtcNow
-        |> StockPosition.buy 2m 10m DateTimeOffset.UtcNow None
-        |> StockPosition.setStop (Some 5m) DateTimeOffset.UtcNow
+        StockPosition.openLong TestDataGenerator.NET bars.First.Date
+        |> StockPosition.buy 2m 10m  bars.First.Date None
+        |> StockPosition.setStop (Some 5m)  bars.First.Date
         |> runner.Run bars
     
     let maxDrawdown = result.MaxDrawdownPct
@@ -108,11 +110,11 @@ let ``With portion size too small, still sells at RR levels``() =
     position.RR |> should equal 1.5m
     maxDrawdown |> should equal -0.001m
     maxGain |> should equal 1.001m
-    position.DaysHeld |> should equal 9
+    position.DaysHeld |> should equal 10
 
 [<Fact>]
 let ``With position not fully sold, is open``() = task {
-    let runner = createRunner 100 (fun i -> 10 + i |> decimal)
+    let runner, prices = createRunner 100 (fun i -> 10 + i |> decimal)
 
     let! result = runner.Run(
         UserState(),
@@ -120,7 +122,7 @@ let ``With position not fully sold, is open``() = task {
         price = 50,
         stopPrice = Some 0.01m,
         ticker = TestDataGenerator.NET,
-        ``when``=DateTimeOffset.UtcNow,
+        ``when``= prices.First.Date,
         closeIfOpenAtTheEnd=false)
 
     result.Results
@@ -135,9 +137,9 @@ let createDownsideTestData() =
         let bars = generatePriceBars 10 (fun i -> 50 - i |> decimal)
     
         let positionInstance = 
-            StockPosition.openLong TestDataGenerator.NET DateTimeOffset.UtcNow
-            |> StockPosition.buy 5m 50m DateTimeOffset.UtcNow None
-            |> StockPosition.setStop (Some 45m) DateTimeOffset.UtcNow
+            StockPosition.openLong TestDataGenerator.NET bars.First.Date
+            |> StockPosition.buy 5m 50m bars.First.Date None
+            |> StockPosition.setStop (Some 45m) bars.First.Date
         
         (bars, positionInstance)
         
@@ -156,7 +158,7 @@ let ``With price falling, stop price exit executes``() =
     position.Profit |> should equal -25
     position.GainPct |> should equal -0.1m
     position.RR |> should equal -1m
-    position.DaysHeld |> should equal 4
+    position.DaysHeld |> should equal 5
     maxGain |> should equal 0.0002m
     maxDrawdown |> should equal -0.1002m
 
@@ -166,9 +168,9 @@ let ``Close after fixed number of days, works``() =
     let data = generatePriceBars 10 (fun i -> 50 + i |> decimal)
 
     let positionInstance =
-        StockPosition.openLong TestDataGenerator.NET DateTimeOffset.UtcNow
-        |> StockPosition.buy 5m 50m DateTimeOffset.UtcNow None
-        |> StockPosition.setStop (Some 45m) DateTimeOffset.UtcNow
+        StockPosition.openLong TestDataGenerator.NET data.First.Date
+        |> StockPosition.buy 5m 50m data.First.Date None
+        |> StockPosition.setStop (Some 45m) data.First.Date
         
     let runner = TradingStrategyFactory.createCloseAfterFixedNumberOfDays 5
     
@@ -182,6 +184,6 @@ let ``Close after fixed number of days, works``() =
     position.Profit |> should equal 30
     position.GainPct |> should equal 0.12m
     position.RR |> should equal 1.2m
-    position.DaysHeld |> should equal 5
+    position.DaysHeld |> should equal 6
     maxGain |> should equal 0.1202m
     maxDrawdown |> should equal -0.0002m

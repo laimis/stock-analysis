@@ -35,12 +35,9 @@ type TradingStrategy(name:string) =
     
     member this.ApplyPriceBarToPosition (context:SimulationContext) (bar:PriceBar) =
         
-        let position = context.Position
-        
-        if position.Closed.IsSome then
-            context
-        else
-            
+        match context.Position.Closed with
+        | Some _ -> context
+        | None -> 
             let appliedPosition = this.ApplyPriceBarToPositionInternal context bar
             
             let last10bars = context.Last10Bars
@@ -53,7 +50,7 @@ type TradingStrategy(name:string) =
             let calculations = appliedPosition |> StockPositionWithCalculations
             
             {
-                Position = position
+                Position = appliedPosition
                 MaxDrawdown = Math.Min(context.MaxDrawdown,bar.PercentDifferenceFromLow(calculations.AverageBuyCostPerShare))
                 MaxGain = Math.Max(context.MaxGain,bar.PercentDifferenceFromHigh(calculations.AverageBuyCostPerShare))
                 Last10Bars = last10bars
@@ -166,9 +163,14 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
             | _ -> position
         
             
-        position
-        |> StockPosition.sell portion sellPrice bar.Date None
-        |> adjustStopIfNecessary
+        let afterSell =
+            position
+            |> StockPosition.sell portion sellPrice bar.Date None
+            |> adjustStopIfNecessary
+        
+        _level <- _level + 1
+        
+        afterSell
             
     override this.ApplyPriceBarToPositionInternal context bar =
         
@@ -177,7 +179,6 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
         let executeProfitSellIfNecessary (position:StockPositionState) =
             match bar.High with
             | x when x >= sellPrice ->
-                _level <- _level + 1
                 this.ExecuteProfitSell position sellPrice bar
             | _ -> position
         
