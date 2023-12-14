@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 using Handler = core.fs.Portfolio.Handler;
 
-+namespace web.Controllers;
+namespace web.Controllers;
 
 [ApiController]
 [Authorize]
