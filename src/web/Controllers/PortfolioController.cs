@@ -24,6 +24,31 @@ public class PortfolioController : ControllerBase
     [HttpGet]
     public Task<ActionResult> Index() =>
         this.OkOrError(_handler.Handle(new Query(User.Identifier())));
+
+
+    [HttpGet("stockpositions/export/closed")]
+    public Task<ActionResult> ExportClosed() =>
+        this.GenerateExport(
+            _handler.Handle(
+                new ExportTrades(User.Identifier(), ExportType.Closed)
+            )
+        );
+
+    [HttpGet("stockpositions/export/open")]
+    public Task<ActionResult> ExportTrades() =>
+        this.GenerateExport(
+            _handler.Handle(
+                new ExportTrades(User.Identifier(), ExportType.Open)
+            )
+        );
+    
+    [HttpGet("stockpositions/export/transactions")]
+    public Task<ActionResult> Export() =>
+        this.GenerateExport(
+            _handler.Handle(
+                new ExportTransactions(User.Identifier())
+            )
+        );
     
     [HttpPost("stockpositions/{positionId}/sell")]
     public Task<ActionResult> Sell([FromBody]StockTransaction model) =>
@@ -76,6 +101,16 @@ public class PortfolioController : ControllerBase
                     userId: User.Identifier(),
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
                     numberOfTrades: numberOfTrades
+                )
+            )
+        );
+
+    [HttpGet("{ticker}")]
+    public Task<ActionResult> Ownership([FromRoute] string ticker) =>
+        this.OkOrError(
+            _handler.Handle(
+                new OwnershipQuery(
+                    new Ticker(ticker), User.Identifier()
                 )
             )
         );

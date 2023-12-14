@@ -1,10 +1,7 @@
 namespace core.fs.Stocks
 
 open System
-open System.Collections.Generic
-open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Stocks
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Shared
@@ -15,17 +12,6 @@ open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
 open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
-    
-type DashboardQuery =
-    {
-        UserId: UserId
-    }
-    
-type DashboardView =
-    {
-        Positions: StockPositionWithCalculations seq
-        Violations: StockViolationView seq
-    }
         
 type DetailsQuery =
     {
@@ -39,36 +25,7 @@ type DetailsView =
         Quote: StockQuote option
         Profile: StockProfile option
     }
-    
-type ExportType =
-    | Open = 0
-    | Closed = 1
-    
-type ExportTrades =
-    {
-        UserId: UserId
-        ExportType: ExportType
-    }
-
-type ExportTransactions =
-    {
-        UserId: UserId
-    }
-    
-type OwnershipQuery =
-    {
-        Ticker: Ticker
-        UserId: UserId
-    }
-    
-type OwnershipView =
-    {
-        Ticker:Ticker
-        CurrentPosition: StockPositionWithCalculations option
-        Positions: StockPositionWithCalculations seq
-        Price:decimal option
-    }
-    
+        
 type PriceQuery =
     {
         UserId:UserId
@@ -132,50 +89,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
     
     interface IApplicationService
     
-    
-    member _.Handle (query:DashboardQuery) = task {
-        let! user = accounts.GetUser(query.UserId)
-        match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<DashboardView>
-        | Some user ->
-            let! stocks = portfolio.GetStockPositions query.UserId
-            
-            let positions =
-                stocks
-                |> Seq.filter _.IsOpen
-                |> Seq.sortBy _.Ticker.Value
-                |> Seq.map StockPositionWithCalculations
-                |> Seq.toArray
-                
-            let! brokerageAccount = brokerage.GetAccount(user.State)
-            let brokeragePositions =
-                match brokerageAccount.Success with
-                | Some account -> account.StockPositions
-                | None -> Array.Empty<StockPosition>()
-                
-            let! quotesResponse =
-                brokerage.GetQuotes
-                    user.State
-                    (brokeragePositions |> Seq.map _.Ticker |> Seq.append (positions |> Seq.map _.Ticker) |> Seq.distinct)
-            
-            let prices =
-                match quotesResponse.Success with
-                | Some prices -> prices
-                | None -> Dictionary<Ticker,StockQuote>()
-                
-            let violations =
-                match brokerageAccount.IsOk with
-                | false -> Array.Empty<StockViolationView>()
-                | true -> core.fs.Helpers.getViolations brokeragePositions positions prices |> Seq.toArray
-                
-            let dashboard = {
-                Positions = positions
-                Violations = violations
-            }
-            
-            return ServiceResponse<DashboardView>(dashboard)
-    }
-    
     member _.Handle (query:DetailsQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
@@ -191,70 +104,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFiling
             }
             
             return ServiceResponse<DetailsView>(view)
-    }
-    
-    member _.Handle (query:ExportTrades) = task {
-        
-        let! user = accounts.GetUser(query.UserId)
-        match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
-        | _ ->
-            let! stocks = portfolio.GetStockPositions query.UserId
-            
-            let trades =
-                match query.ExportType with
-                | ExportType.Open -> stocks |> Seq.filter (fun x -> x.IsOpen)
-                | ExportType.Closed -> stocks |> Seq.filter (fun x -> x.IsClosed)
-                | _ -> failwith "Unknown export type"
-                
-            let sorted =
-                trades
-                |> Seq.map StockPositionWithCalculations
-                |> Seq.sortBy (fun x -> if x.Closed.IsSome then x.Closed.Value else x.Opened)
-                
-            let filename = CSVExport.generateFilename("positions")
-            
-            let response = ExportResponse(filename, CSVExport.trades csvWriter sorted)
-            
-            return ServiceResponse<ExportResponse>(response)
-    }
-    
-    member _.Handle (query:ExportTransactions) = task {
-        
-        let! stocks = portfolio.GetStockPositions query.UserId
-        
-        let filename = CSVExport.generateFilename("stocks")
-        
-        let response = ExportResponse(filename, CSVExport.stocks csvWriter stocks)
-        
-        return ServiceResponse<ExportResponse>(response)
-    }
-    
-    member _.Handle (query:OwnershipQuery) = task {
-        let! user = accounts.GetUser(query.UserId)
-        match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<OwnershipView>
-        | Some user ->
-            let! positions = portfolio.GetStockPositions query.UserId
-            let positions = positions |> Seq.filter (fun x -> x.Ticker = query.Ticker) |> Seq.map StockPositionWithCalculations |> Seq.toList
-            
-            match positions with
-            | [] -> return "Stock not found" |> ResponseUtils.failedTyped<OwnershipView>
-            | _ ->
-                let! priceResponse = brokerage.GetQuote user.State query.Ticker
-                let price =
-                    match priceResponse.Success with
-                    | Some price -> Some price.Price
-                    | None -> None
-                    
-                let openPosition = positions |> Seq.tryFind _.IsOpen
-                    
-                let view =
-                    match openPosition with
-                    | None -> {CurrentPosition=None; Ticker=query.Ticker; Positions=positions; Price=price}
-                    | Some _ -> {CurrentPosition=openPosition; Ticker=query.Ticker; Positions=positions; Price=price}
-                    
-                return ServiceResponse<OwnershipView>(view)
     }
     
     member _.Handle (query:PriceQuery) = task {

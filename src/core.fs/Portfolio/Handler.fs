@@ -36,7 +36,28 @@ type private ImportRecord =
          price:decimal
          ticker:string
     }
+    
+type ExportTransactions =
+    {
+        UserId: UserId
+    }
+    
+type ExportType =
+    | Open = 0
+    | Closed = 1
+    
+type ExportTrades =
+    {
+        UserId: UserId
+        ExportType: ExportType
+    }
 
+    
+type OwnershipQuery =
+    {
+        Ticker: Ticker
+        UserId: UserId
+    }
     
 type StockTransaction =
     {
@@ -233,6 +254,59 @@ type TransactionSummary =
 type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser) =
     
     interface IApplicationService
+    
+    member _.Handle (query:OwnershipQuery) = task {
+        let! user = accounts.GetUser(query.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionWithCalculations seq>
+        | Some _ ->
+            let! positions = storage.GetStockPositions query.UserId
+            let positions =
+                positions
+                |> Seq.filter (fun x -> x.Ticker = query.Ticker)
+                |> Seq.sortByDescending _.Opened
+                |> Seq.map StockPositionWithCalculations
+                
+            return ServiceResponse<StockPositionWithCalculations seq>(positions)
+    }
+    
+    member _.Handle (query:ExportTransactions) = task {
+        
+        let! stocks = storage.GetStockPositions query.UserId
+        
+        let filename = CSVExport.generateFilename("stocks")
+        
+        let response = ExportResponse(filename, CSVExport.stocks csvWriter stocks)
+        
+        return ServiceResponse<ExportResponse>(response)
+    }
+    
+    member _.Handle (query:ExportTrades) = task {
+        
+        let! user = accounts.GetUser(query.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+        | _ ->
+            let! stocks = storage.GetStockPositions query.UserId
+            
+            let filter =
+                match query.ExportType with
+                | ExportType.Open -> fun (s:StockPositionState) -> s.IsOpen
+                | ExportType.Closed -> _.IsClosed
+                | _ -> failwith "Unknown export type"
+                
+            let sorted =
+                stocks
+                |> Seq.filter filter
+                |> Seq.map StockPositionWithCalculations
+                |> Seq.sortBy (fun x -> if x.Closed.IsSome then x.Closed.Value else x.Opened)
+                
+            let filename = CSVExport.generateFilename("positions")
+            
+            let response = ExportResponse(filename, CSVExport.trades csvWriter sorted)
+            
+            return ServiceResponse<ExportResponse>(response)
+    }
     
     member _.Handle(cmd:BuyOrSell) = task {
         
