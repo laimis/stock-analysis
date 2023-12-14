@@ -11,6 +11,8 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import {GetErrors} from "../../services/utils";
+import {StockPositionsService} from "../../services/stockpositions.service";
+import {BrokerageService} from "../../services/brokerage.service";
 
 @Component({
   selector: 'app-stock-details',
@@ -32,6 +34,8 @@ export class StockDetailsComponent implements OnInit {
 
 	constructor(
 		private stocks : StocksService,
+    private stockPositions: StockPositionsService,
+    private brokerage : BrokerageService,
     private route: ActivatedRoute,
     private title: Title){}
 
@@ -78,7 +82,7 @@ export class StockDetailsComponent implements OnInit {
   }
 
   loadStockOwnership() {
-    this.stocks.getStockOwnership(this.ticker).subscribe(result => {
+    this.stockPositions.getStockOwnership(this.ticker).subscribe(result => {
       this.ownership = result
     }, err => {
       console.error(err)
@@ -102,7 +106,7 @@ export class StockDetailsComponent implements OnInit {
   }
 
   refreshOrders() {
-    this.stocks.brokerageAccount().subscribe(
+    this.brokerage.brokerageAccount().subscribe(
       a => this.orders = a.orders,
       e => {
         this.errors = GetErrors(e)

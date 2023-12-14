@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PositionInstance, StocksService, StockTradingPerformanceCollection, TradingStrategyPerformance } from 'src/app/services/stocks.service';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-review-dashboard',
@@ -17,7 +18,7 @@ export class StockTradingReviewDashboardComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private stockService: StocksService
+    private stockService: StockPositionsService
   ) { }
 
   ngOnInit() {

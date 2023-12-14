@@ -4,10 +4,10 @@ import {
   BrokerageOrder,
   OutcomeValueTypeEnum,
   PositionInstance,
-  StockQuote,
-  StocksService
+  StockQuote
 } from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-positions',
@@ -64,7 +64,7 @@ export class StockTradingPositionsComponent {
 
     // constructor that takes stock service
     constructor(
-        private stockService:StocksService,
+        private stockService:StockPositionsService,
         private percentPipe: PercentPipe,
         private currencyPipe: CurrencyPipe,
         private decimalPipe: DecimalPipe
@@ -94,7 +94,7 @@ export class StockTradingPositionsComponent {
     }
 
     setRiskAmount(p:PositionInstance) {
-        this.stockService.setRiskAmount(p.ticker, p.positionId, this.candidateRiskAmount).subscribe(
+        this.stockService.setRiskAmount(p.positionId, this.candidateRiskAmount).subscribe(
             (_) => {
                 p.riskedAmount = this.candidateRiskAmount
             }

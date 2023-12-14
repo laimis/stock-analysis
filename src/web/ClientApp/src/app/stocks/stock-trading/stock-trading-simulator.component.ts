@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, stocktransactioncommand, PositionInstance } from '../../services/stocks.service';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 class StockTransaction {
   numberOfShares: number
@@ -43,7 +44,7 @@ export class StockTradingSimulatorComponent implements OnInit {
 
   showExisting: boolean = false
 
-  constructor(private stocks:StocksService) { }
+  constructor(private stocks:StockPositionsService) { }
 
   ngOnInit(): void {
     var simulations = localStorage.getItem('simulations')

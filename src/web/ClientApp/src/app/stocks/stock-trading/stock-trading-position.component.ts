@@ -9,6 +9,7 @@ import {
 import {Output} from '@angular/core';
 import {EventEmitter} from '@angular/core';
 import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -64,7 +65,7 @@ export class StockTradingPositionComponent {
 
   // constructor that takes stock service
   constructor(
-    private stockService: StocksService
+    private stockService: StockPositionsService
   ) {
     this.strategies = GetStrategies()
   }
@@ -115,7 +116,7 @@ export class StockTradingPositionComponent {
 
   setRiskAmount() {
     if (confirm("Are you sure you want to set the risk amount?")) {
-      this.stockService.setRiskAmount(this._position.ticker, this._position.positionId, this.candidateRiskAmount).subscribe(
+      this.stockService.setRiskAmount(this._position.positionId, this.candidateRiskAmount).subscribe(
         (_) => {
           this._position.riskedAmount = this.candidateRiskAmount
         }
@@ -142,7 +143,7 @@ export class StockTradingPositionComponent {
 
   deleteTransaction(transactionId: string) {
     if (confirm("are you sure you want to delete the transaction?")) {
-      this.stockService.deleteStockTransaction(this._position.ticker, transactionId)
+      this.stockService.deleteTransaction(this._position.positionId, transactionId)
         .subscribe(
           _ => {
             // refresh UI somehow here, tbd

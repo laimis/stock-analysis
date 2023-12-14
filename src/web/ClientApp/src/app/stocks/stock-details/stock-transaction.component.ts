@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {PositionInstance, StocksService, stocktransactioncommand} from '../../services/stocks.service';
 import { DatePipe } from '@angular/common';
 import { GetErrors } from 'src/app/services/utils';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-transaction',
@@ -32,7 +33,7 @@ export class StockTransactionComponent implements OnInit {
 
 
   constructor(
-    private service: StocksService,
+    private service: StockPositionsService,
     private datePipe: DatePipe
   ) { }
 

@@ -8,12 +8,12 @@ import {
   PositionInstance,
   PriceFrequency,
   Prices,
-  StockQuote,
-  StocksService,
+  StockQuote, StocksService,
   TradingStrategyResults
 } from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {green, red} from "../../shared/candlestick-chart/candlestick-chart.component";
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 
 @Component({
@@ -35,6 +35,7 @@ export class StockTradingReviewComponent {
 
   constructor (
     private stockService: StocksService,
+    private stockPositionsService: StockPositionsService,
     private title: Title) { }
 
   @Input()
@@ -112,7 +113,7 @@ export class StockTradingReviewComponent {
   }
 
   private runTradingStrategies() {
-    this.stockService.simulatePosition(this.currentPosition.positionId).subscribe(
+    this.stockPositionsService.simulatePosition(this.currentPosition.positionId).subscribe(
       (r: TradingStrategyResults) => {
         this.simulationErrors = null
         this.simulationResults = r;
@@ -182,7 +183,7 @@ export class StockTradingReviewComponent {
   assignedNote: string = null
   assignGrade(note:string) {
     this.assignedNote = note
-    this.stockService.assignGrade(
+    this.stockPositionsService.assignGrade(
       this.currentPosition.positionId,
       this.assignedGrade,
       note).subscribe(

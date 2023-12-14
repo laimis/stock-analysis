@@ -22,6 +22,7 @@ import {
   histogramToDataPointContainer, InfectionPointType,
   toHistogram
 } from "../../services/prices.service";
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-new-position',
@@ -44,6 +45,7 @@ export class StockTradingNewPositionComponent {
 
   constructor(
     private stockService:StocksService,
+    private stockPositionsService:StockPositionsService,
     globalService:GlobalService)
   {
     this.strategies = GetStrategies()
@@ -294,7 +296,7 @@ export class StockTradingNewPositionComponent {
       return
     }
 
-    this.stockService.openPosition(cmd).subscribe(
+    this.stockPositionsService.openPosition(cmd).subscribe(
       _ => {
         this.stockPurchased.emit(cmd)
         this.recordInProgress = false
