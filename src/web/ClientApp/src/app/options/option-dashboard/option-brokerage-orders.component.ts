@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { BrokerageOrder, StocksService } from 'src/app/services/stocks.service';
+import { BrokerageOrder } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
 
