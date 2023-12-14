@@ -14,9 +14,9 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class StocksController : ControllerBase
     {
-        private readonly Handler _service;
+        private readonly StocksHandler _service;
 
-        public StocksController(Handler service) =>
+        public StocksController(StocksHandler service) =>
             _service = service;
 
         [HttpGet("{ticker}")]

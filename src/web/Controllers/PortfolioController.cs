@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 using Handler = core.fs.Portfolio.Handler;
 
-namespace web.Controllers;
++namespace web.Controllers;
 
 [ApiController]
 [Authorize]
@@ -54,7 +54,7 @@ public class PortfolioController : ControllerBase
     public Task<ActionResult> Sell([FromBody]StockTransaction model) =>
         this.OkOrError(_handler.Handle(BuyOrSell.NewSell(model, User.Identifier())));
 
-    [HttpPost("buy")]
+    [HttpPost("stockpositions/{positionId}/buy")]
     public Task<ActionResult> Buy([FromBody]StockTransaction model) =>
         this.OkOrError(_handler.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
     
@@ -73,9 +73,14 @@ public class PortfolioController : ControllerBase
 
     [HttpGet("transactionsummary")]
     public Task<ActionResult> Review(string period) =>
-        this.OkOrError(_handler.Handle(new TransactionSummary(period: period, userId: User.Identifier())));
+        this.OkOrError(
+            _handler.Handle(
+                new TransactionSummary(period: period, userId: User.Identifier()
+                )
+            )
+        );
 
-    [HttpGet("simulate/trades")]
+    [HttpGet("stockpositions/simulate/trades")]
     public Task<ActionResult> Trade(
         [FromQuery] bool closePositionIfOpenAtTheEnd,
         [FromQuery] int numberOfTrades) =>
@@ -90,7 +95,7 @@ public class PortfolioController : ControllerBase
             )
         );
 
-    [HttpGet("simulate/trades/export")]
+    [HttpGet("stockpositions/simulate/trades/export")]
     public Task<ActionResult> SimulateTradesExport(
         [FromQuery] bool closePositionIfOpenAtTheEnd,
         [FromQuery] int numberOfTrades) =>

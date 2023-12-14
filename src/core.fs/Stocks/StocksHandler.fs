@@ -6,11 +6,9 @@ open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Shared
 open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.CSV
 open core.fs.Shared.Adapters.SEC
 open core.fs.Shared.Adapters.Stocks
 open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain
 open core.fs.Shared.Domain.Accounts
         
 type DetailsQuery =
@@ -85,7 +83,7 @@ type CompanyFilingsQuery =
         UserId:UserId
     }
             
-type Handler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFilings,portfolio:IPortfolioStorage,csvParser:ICSVParser,csvWriter:ICSVWriter) =
+type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFilings) =
     
     interface IApplicationService
     

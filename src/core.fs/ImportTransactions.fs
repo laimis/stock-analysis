@@ -68,7 +68,7 @@ module ImportTransactions =
         emailService:IEmailService,
         csvParser:ICSVParser,
         optionsImport:core.fs.Options.Handler,
-        stocksImport:core.fs.Stocks.Handler) =
+        stocksImport:core.fs.Portfolio.Handler) =
         
         interface IApplicationService
         
@@ -89,7 +89,7 @@ module ImportTransactions =
                     Ticker = Ticker(r.GetTickerFromOptionDescription())
                 }
                 
-            let createStockTransaction r : StockTransaction =
+            let createStockTransaction r : core.fs.Portfolio.StockTransaction =
                 {
                     PositionId = StockPositionId.create()
                     Ticker = Ticker(r.Symbol)
@@ -131,12 +131,12 @@ module ImportTransactions =
                                 return result |> ResponseUtils.toOkOrError
                             | _, true, true, _ -> // buy stock
                                 let data = r |> createStockTransaction 
-                                let cmd = Buy(data, cmd.UserId)
+                                let cmd = core.fs.Portfolio.Buy(data, cmd.UserId)
                                 let! result = stocksImport.Handle(cmd) |> Async.AwaitTask
                                 return result
                             | _, true, _, true -> // sell stock
                                 let data = r |> createStockTransaction
-                                let cmd = Sell(data, cmd.UserId)
+                                let cmd = core.fs.Portfolio.Sell(data, cmd.UserId)
                                 let! result = stocksImport.Handle(cmd) |> Async.AwaitTask
                                 return result
                             | _ -> return Ok
