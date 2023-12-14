@@ -174,14 +174,11 @@ public class PortfolioController : ControllerBase
         this.OkOrError(_handler.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
 
     [HttpGet("stockpositions/{positionId}/simulate/trades")]
-    public Task<ActionResult> Trade(
-        [FromRoute] string positionId,
-        [FromRoute] string ticker) =>
+    public Task<ActionResult> Trade([FromRoute] string positionId) =>
 
         this.OkOrError(
             _handler.Handle(
                 new SimulateTrade(
-                    ticker: new Ticker(ticker),
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)), 
                     userId: User.Identifier()
                 )
@@ -191,7 +188,6 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/{positionId}/profitpoints")]
     public Task<ActionResult> ProfitPoints(
         [FromRoute] string positionId,
-        [FromRoute] string ticker,
         [FromQuery] int numberOfPoints) =>
 
         this.OkOrError(
@@ -199,7 +195,6 @@ public class PortfolioController : ControllerBase
                 new ProfitPointsQuery(
                     numberOfPoints: numberOfPoints,
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
-                    ticker: new Ticker(ticker),
                     userId: User.Identifier()
                 )
             )
@@ -224,12 +219,10 @@ public class PortfolioController : ControllerBase
     [HttpDelete("stockpositions/{positionId}")]
     public Task<ActionResult> DeletePosition(
         [FromRoute] string positionId,
-        [FromRoute] string ticker,
         [FromServices] Handler handler) =>
         this.OkOrError(
             handler.Handle(
                 new DeletePosition(
-                    ticker: new Ticker(ticker),
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     userId: User.Identifier()
                 )
@@ -251,13 +244,11 @@ public class PortfolioController : ControllerBase
     [HttpDelete("stockpositions/{positionId}/labels/{label}")]
     public Task RemoveLabel(
         [FromRoute] string positionId,
-        [FromRoute] string ticker,
         [FromRoute] string label,
         [FromServices] Handler handler) => 
         this.OkOrError(
             handler.Handle(
                 new RemoveLabel(
-                    ticker: new Ticker(ticker),
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     key: label,
                     userId: User.Identifier()

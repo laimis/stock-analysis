@@ -72,7 +72,6 @@ type StockTransaction =
         StopPrice: Nullable<decimal>
         Notes: string option
         BrokerageOrderId: string option
-        Ticker: Ticker
     }
     
 type BuyOrSell =
@@ -102,7 +101,6 @@ type OpenLongStockPosition = {
 type DeletePosition =
     {
         PositionId: StockPositionId
-        Ticker: Ticker
         UserId: UserId
     }
     
@@ -125,8 +123,6 @@ type GradePosition =
         [<Required>]
         PositionId: StockPositionId
         [<Required>]
-        Ticker: Ticker
-        [<Required>]
         Grade: TradeGrade
         Note: string option
     }
@@ -134,8 +130,6 @@ type GradePosition =
 type RemoveLabel =
     {
         PositionId: StockPositionId
-        [<Required>]
-        Ticker: Ticker
         UserId: UserId
         [<Required>]
         Key: string
@@ -145,8 +139,6 @@ type AddLabel =
     {
         [<Required>]
         PositionId: StockPositionId
-        [<Required>]
-        Ticker: Ticker
         [<Required>]
         Key: string
         [<Required>]
@@ -159,8 +151,6 @@ type ProfitPointsQuery =
         [<Required>]
         PositionId: StockPositionId
         UserId: UserId
-        [<Required>]
-        Ticker: Ticker
     }
     
 type SetRisk =
@@ -168,15 +158,11 @@ type SetRisk =
         [<Required>]
         PositionId: StockPositionId
         [<Required>]
-        Ticker: Ticker
-        [<Required>]
         RiskAmount: decimal option
     }
     
 type SimulateTrade = 
     {
-        [<Required>]
-        Ticker: Ticker
         UserId: UserId
         [<Required>]
         PositionId: StockPositionId
@@ -222,7 +208,7 @@ type QueryTransactions =
         Show:string
         GroupBy:string
         TxType:string
-        Ticker:Nullable<Ticker>
+        Ticker:Ticker option
     }
     
 type TransactionSummary =
@@ -357,7 +343,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                             StopPrice = Nullable<decimal>()
                             Notes = None
                             BrokerageOrderId = None
-                            Ticker = Ticker(r.ticker)
                         }, cmd.UserId)
                         | "sell" -> Sell({
                             NumberOfShares = r.amount
@@ -367,7 +352,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                             StopPrice = Nullable<decimal>()
                             Notes = None
                             BrokerageOrderId = None
-                            Ticker = Ticker(r.ticker)
                         }, cmd.UserId)
                         | _ -> failwith "Unknown transaction type"
                         
@@ -840,7 +824,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match query.Show = "options" || query.Show = null with
                 | true ->
                     options
-                    |> Seq.filter (fun o -> query.Ticker.HasValue = false || o.State.Ticker = query.Ticker.Value)
+                    |> Seq.filter (fun o -> query.Ticker.IsNone || o.State.Ticker = query.Ticker.Value)
                     |> Seq.collect (fun o -> o.State.Transactions)
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
@@ -849,7 +833,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 match query.Show = "cryptos" || query.Show = null with
                 | true ->
                     cryptos
-                    |> Seq.filter (fun c -> query.Ticker.HasValue = false || c.State.Token = query.Ticker.Value.Value)
+                    |> Seq.filter (fun c -> query.Ticker.IsNone || c.State.Token = query.Ticker.Value.Value)
                     |> Seq.collect (fun c -> c.State.Transactions)
                     |> Seq.map (fun c -> c.ToSharedTransaction())
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
@@ -914,7 +898,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             ``end``=``end``,
             openPositions=openPositions,
             closedPositions=closedPositions,
-            stockTransactions=Seq.empty,
+            stockTransactions=List.empty<PLTransaction>,
             optionTransactions=optionTransactions,
             plStockTransactions=plStockTransactions,
             plOptionTransactions=plOptionTransactions

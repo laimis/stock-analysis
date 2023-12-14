@@ -353,7 +353,15 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
     member _.Credit = transactions |> Seq.sumBy (fun t -> t.Amount)
     member _.Debit = transactions |> Seq.sumBy (fun t -> t.Amount)
     
-type TransactionSummaryView(start,``end``,openPositions,closedPositions,stockTransactions,optionTransactions,plStockTransactions,plOptionTransactions) =
+type TransactionSummaryView(
+    start,
+    ``end``,
+    openPositions:StockPositionWithCalculations list,
+    closedPositions:StockPositionWithCalculations list,
+    stockTransactions:PLTransaction list,
+    optionTransactions:Transaction list,
+    plStockTransactions:PLTransaction list,
+    plOptionTransactions:Transaction list) =
         
         member _.Start = start
         member _.End = ``end``
