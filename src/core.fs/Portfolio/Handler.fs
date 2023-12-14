@@ -244,7 +244,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     member _.Handle (query:OwnershipQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionWithCalculations seq>
+        | None -> return "User not found" |> ResponseUtils.failedTyped<{|positions:StockPositionWithCalculations seq|}>
         | Some _ ->
             let! positions = storage.GetStockPositions query.UserId
             let positions =
@@ -253,7 +253,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.sortByDescending _.Opened
                 |> Seq.map StockPositionWithCalculations
                 
-            return ServiceResponse<StockPositionWithCalculations seq>(positions)
+            let obj = {|positions = positions|}
+            
+            return ServiceResponse<{|positions:StockPositionWithCalculations seq|}>(obj)
     }
     
     member _.Handle (query:ExportTransactions) = task {

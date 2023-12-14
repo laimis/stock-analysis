@@ -1,61 +1,66 @@
-@if (loaded) {
-  <div class="mt-2 mb-4">
-    <div>
-      @if (profile) {
-        <div>
-          <h3>{{profile.symbol}}: {{profile.description}}
-            <a class="float-end ms-3" href="https://invest.ameritrade.com/grid/p/site#r=jPage/https://research.ameritrade.com/grid/wwws/research/stocks/summary?symbol={{stock.ticker}}&c_name=invest_VENDOR" target="_blank">
-              <img src="/assets/images/td-logo-vector.svg" height="25px"  alt="TDAmeritrade logo"/>
-            </a>
-            <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
-              <img src="/assets/images/finviz.png" height="25px"  alt="Finviz logo"/>
-            </a>
-            <span class="float-end ms-3">
-              <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
-            </span>
-          </h3>
-        </div>
-      }
-    </div>
-    <div class="tab-container mt-2">
-      <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
-        Shares @if (ownership && ownership.currentPosition) {
-        <span class="badge rounded-pill bg-info">{{ownership.currentPosition.numberOfShares}}</span>
-      }
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
-      Options @if (options && options.length > 0) {
-      <span class="badge rounded-pill bg-info">{{options.length}}</span>
+@if (loading.stock === false && stock) {
+<div class="mt-2 mb-4">
+  <div>
+    @if (stock.profile) {
+      <div>
+        <h3>{{ stock.profile.symbol }}: {{ stock.profile.description }}
+          <a class="float-end ms-3"
+             href="https://invest.ameritrade.com/grid/p/site#r=jPage/https://research.ameritrade.com/grid/wwws/research/stocks/summary?symbol={{stock.ticker}}&c_name=invest_VENDOR"
+             target="_blank">
+            <img src="/assets/images/td-logo-vector.svg" height="25px" alt="TDAmeritrade logo"/>
+          </a>
+          <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}" target="_blank">
+            <img src="/assets/images/finviz.png" height="25px" alt="Finviz logo"/>
+          </a>
+          <span class="float-end ms-3">
+            <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
+          </span>
+        </h3>
+      </div>
     }
+  </div>
+</div>
+}
+
+<div class="tab-container mt-2">
+  <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
+    Stocks @if (currentPosition) {
+    <span class="badge rounded-pill bg-info">{{ currentPosition.numberOfShares }}</span>
+  }
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
+    Options @if (options && options.length > 0) {
+    <span class="badge rounded-pill bg-info">{{ options.length }}</span>
+  }
   </a>
   <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
     Trade @if (options && options.length > 0) {
-    <span class="badge rounded-pill bg-info">{{options.length}}</span>
+    <span class="badge rounded-pill bg-info">{{ options.length }}</span>
   }
-</a>
-<a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
-  Analysis
-</a>
-<a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]="" (click)="activateTab('fundamentals')">
-  Fundamentals
-</a>
-<a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
-  Notes @if (notes && notes.notes.length > 0) {
-  <span class="badge rounded-pill bg-info">{{notes.notes.length}}</span>
-}
-</a>
-<span class="float-end">
-  <span class="text-muted">Price:</span> {{stock.quote?.price | currency}}
-</span>
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+    Analysis
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]=""
+     (click)="activateTab('fundamentals')">
+    Fundamentals
+  </a>
+  <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
+    Notes @if (notes && notes.notes.length > 0) {
+    <span class="badge rounded-pill bg-info">{{ notes.notes.length }}</span>
+  }
+  </a>
+  @if (stock) {
+    <span class="float-end"><span class="text-muted">Price:</span> {{ stock.quote?.price | currency }}</span>
+  }
 </div>
-@if (isActive('stocks')) {
+
+@if (stock && isActive('stocks')) {
   <app-stock-ownership
-    [stock]=stock [ownership]=ownership [quote]="stock.quote"></app-stock-ownership>
+    [stock]=stock [ownership]=stockOwnership [quote]="stock.quote"></app-stock-ownership>
 }
 @if (isActive('options')) {
-  <stock-option
-    [ticker]=stock.ticker [options]=options
-  (ownershipChanged)="optionOwnershipChanged($event)"></stock-option>
+  <stock-option [ticker]=stock.ticker [options]=options></stock-option>
 }
 @if (isActive('fundamentals')) {
   <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
@@ -73,13 +78,6 @@
   <app-stock-trading-new-position
     [isPendingPositionMode]="true"
     [presetTicker]="stock.ticker"
-    (pendingPositionCreated)="refreshOrders()" >
+    (pendingPositionCreated)="loadOrders()">
   </app-stock-trading-new-position>
-}
-</div>
-}
-@if (!loaded) {
-  <div>
-    Fetching stock information...
-  </div>
 }

@@ -257,11 +257,11 @@ export class StocksService {
   }
 
   getOwnedOptions(ticker:string): Observable<OwnedOption[]> {
-    return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/active')
+    return this.http.get<OwnedOption[]>(`/api/options/ownership/${ticker}`)
   }
 
   getOptionChain(ticker:string): Observable<OptionChain> {
-    return this.http.get<OptionChain>('/api/options/' + ticker + '/chain')
+    return this.http.get<OptionChain>(`/api/options/chain/${ticker}`)
   }
 
   importOptions(formData: FormData) {
@@ -804,10 +804,6 @@ export interface StockProfile {
 }
 
 export interface StockOwnership {
-  id: string
-  ticker: string
-  price: number
-  currentPosition: PositionInstance
   positions: PositionInstance[]
 }
 

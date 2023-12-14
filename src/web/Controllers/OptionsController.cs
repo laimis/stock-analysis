@@ -23,11 +23,21 @@ namespace web.Controllers
             _service = service;
         }
         
-        [HttpGet("{ticker}/chain")]
+        [HttpGet("chain/{ticker}")]
         public Task<ActionResult> Chain([FromRoute] string ticker) =>
             this.OkOrError(
                 _service.Handle(
                     new ChainQuery(
+                        ticker: new Ticker(ticker), userId: User.Identifier()
+                    )
+                )
+            );
+        
+        [HttpGet("ownership/{ticker}")]
+        public Task<ActionResult> Ownership([FromRoute] string ticker) =>
+            this.OkOrError(
+                _service.Handle(
+                    new OwnershipQuery(
                         ticker: new Ticker(ticker), userId: User.Identifier()
                     )
                 )

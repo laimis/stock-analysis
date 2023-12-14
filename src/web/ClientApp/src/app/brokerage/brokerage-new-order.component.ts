@@ -95,7 +95,7 @@ export class BrokerageNewOrderComponent {
           ownership => {
             let position = ownership.positions.filter(p => p.isOpen)[0]
             if (position) {
-              this.numberOfShares = ownership.currentPosition.numberOfShares
+              this.numberOfShares = position.numberOfShares
             }
           }
         )

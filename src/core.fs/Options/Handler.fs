@@ -75,8 +75,8 @@ type BuyOrSellCommand =
     | Sell of OptionTransaction * UserId
 
 type DetailsQuery = { OptionId: Guid; UserId: UserId }
-
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
+type OwnershipQuery = { UserId: UserId; Ticker: Ticker }
 
 type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter) =
 
@@ -142,6 +142,17 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
                 return ServiceResponse<OptionDashboardView>(view)
         }
+        
+    member _.Handle(ownership:OwnershipQuery) = task {
+        let! options = ownership.UserId |> storage.GetOwnedOptions
+        
+        let option =
+            options
+            |> Seq.filter (fun o -> o.State.Ticker = ownership.Ticker && o.State.Active)
+            |> Seq.map _.State
+            
+        return ServiceResponse<OwnedOptionState seq>(option)
+    }
 
     member _.Handle(request: ExportQuery) =
         task {
