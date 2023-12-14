@@ -1227,6 +1227,16 @@ export class stocktransactioncommand {
   brokerageOrderId: string | null
 }
 
+export class openpositioncommand {
+  ticker: string
+  numberOfShares: number
+  price: number
+  date: string
+  notes: string
+  stopPrice: number | null
+  strategy: string | null
+}
+
 export class pendingstockpositioncommand {
   ticker: string
   numberOfShares: number

@@ -1,7 +1,7 @@
 import {DatePipe} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-  DataPointContainer,
+  DataPointContainer, openpositioncommand,
   OutcomeKeys,
   pendingstockpositioncommand,
   PositionChartInformation,
@@ -90,7 +90,7 @@ export class StockTradingNewPositionComponent {
   }
 
   @Output()
-  stockPurchased: EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
+  positionOpened: EventEmitter<openpositioncommand> = new EventEmitter<openpositioncommand>()
 
   @Output()
   pendingPositionCreated: EventEmitter<pendingstockpositioncommand> = new EventEmitter<pendingstockpositioncommand>()
@@ -288,17 +288,17 @@ export class StockTradingNewPositionComponent {
   recordInProgress : boolean = false
   openPosition() {
     this.recordInProgress = true
-    let cmd = this.createPurchaseCommand();
+    let cmd = this.createOpenPositionCommand();
 
     if (!this.recordPositions) {
-      this.stockPurchased.emit(cmd)
+      this.positionOpened.emit(cmd)
       this.recordInProgress = false
       return
     }
 
     this.stockPositionsService.openPosition(cmd).subscribe(
       _ => {
-        this.stockPurchased.emit(cmd)
+        this.positionOpened.emit(cmd)
         this.recordInProgress = false
     },
       err => {
@@ -323,15 +323,16 @@ export class StockTradingNewPositionComponent {
     return cmd;
   }
 
-  private createPurchaseCommand() {
-    let cmd = new stocktransactioncommand();
-    cmd.positionId = "";
-    cmd.numberOfShares = this.numberOfShares;
-    cmd.price = this.costToBuy;
-    cmd.stopPrice = this.positionStopPrice;
-    cmd.notes = this.notes;
-    cmd.date = this.date;
-    return cmd;
+  private createOpenPositionCommand() : openpositioncommand {
+    return {
+      numberOfShares: this.numberOfShares,
+      price: this.costToBuy,
+      stopPrice: this.positionStopPrice,
+      notes: this.notes,
+      date: this.date,
+      ticker: this.ticker,
+      strategy: this.strategy
+    }
   }
 
   createPendingPositionLimit() {

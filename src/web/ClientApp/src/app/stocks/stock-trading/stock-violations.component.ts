@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
-import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks.service';
+import {openpositioncommand, stocktransactioncommand, StockViolation} from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-violations',
@@ -46,6 +46,10 @@ export class StockViolationsComponent {
 
   transactionRecorded(val:stocktransactioncommand) {
     this.refreshRequested.emit(val.positionId)
+  }
+
+  positionOpened(val:openpositioncommand) {
+    this.refreshRequested.emit(val.ticker)
   }
 
   orderExecuted(ticker:string) {

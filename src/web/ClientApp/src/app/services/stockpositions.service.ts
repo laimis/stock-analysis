@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {
-  KeyValuePair,
+  KeyValuePair, openpositioncommand,
   PastStockTradingPositions, PositionInstance, StockOwnership,
   StockTradingPositions, stocktransactioncommand, StrategyProfitPoint,
   TradingStrategyPerformance,
@@ -51,7 +51,7 @@ export class StockPositionsService {
     )
   }
 
-  openPosition(command:stocktransactioncommand) : Observable<PositionInstance> {
+  openPosition(command:openpositioncommand) : Observable<PositionInstance> {
     return this.http.post<PositionInstance>(`/api/portfolio/stockpositions`, command)
   }
 

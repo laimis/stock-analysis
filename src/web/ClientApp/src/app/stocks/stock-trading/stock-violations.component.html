@@ -53,7 +53,7 @@
                         [showChart]="false"
                         [showAnalysis]="false"
                         [isPendingPositionMode]="false"
-                        (stockPurchased)="transactionRecorded($event)">
+                        (positionOpened)="positionOpened($event)">
                       </app-stock-trading-new-position>
                     }
                   </div>

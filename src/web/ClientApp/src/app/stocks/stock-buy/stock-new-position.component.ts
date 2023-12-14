@@ -13,8 +13,8 @@ export class StockNewPositionComponent {
     this.feedbackMessage = "Brokerage order entered";
   }
 
-  stockPurchased() {
-    this.feedbackMessage = "Position open recorded";
+  positionOpened() {
+    this.feedbackMessage = "Position opened";
   }
 
   pendingPositionCreated() {
