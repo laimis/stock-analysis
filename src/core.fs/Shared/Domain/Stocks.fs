@@ -256,6 +256,23 @@ module StockPosition =
         |> applyNotesIfApplicable notes date
         |> closePositionIfApplicable date
         
+    let sell numberOfShares price date notes (stockPosition:StockPositionState) =
+        if numberOfShares <= 0m then
+            failwith "Number of shares must be greater than zero"
+        
+        if stockPosition.IsShort |> not && stockPosition.NumberOfShares - numberOfShares < 0m then failwith $"Cannot sell more than long position: {stockPosition.NumberOfShares} - {numberOfShares} < 0"
+        
+        if price <= 0.0m then
+            failwith "Price must be greater than zero"
+            
+        date |> failIfInvalidDate
+            
+        let e = StockSold(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, numberOfShares, price)
+        
+        apply e stockPosition
+        |> applyNotesIfApplicable notes date
+        |> closePositionIfApplicable date
+        
     let assignGrade grade gradeNotes date (stockPosition:StockPositionState) =
         match stockPosition with
         | x when x.Closed.IsNone -> failwith "Cannot assign grade to open position"
@@ -274,7 +291,7 @@ module StockPosition =
         apply e stockPosition
             
     let setStop stopPrice date (stockPosition:StockPositionState) =
-        if stockPosition.IsClosed then failwith "Cannot set stop price on closed position"
+        //if stockPosition.IsClosed then failwith "Cannot set stop price on closed position"
         
         let withStop =
             match stopPrice with
@@ -313,23 +330,6 @@ module StockPosition =
         
         StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value, Long)
         |> createInitialState
-        
-    let sell numberOfShares price date notes (stockPosition:StockPositionState) =
-        if numberOfShares <= 0m then
-            failwith "Number of shares must be greater than zero"
-        
-        if stockPosition.IsShort |> not && stockPosition.NumberOfShares - numberOfShares < 0m then failwith "Cannot sell more than long position"
-        
-        if price <= 0.0m then
-            failwith "Price must be greater than zero"
-            
-        date |> failIfInvalidDate
-            
-        let e = StockSold(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, numberOfShares, price)
-        
-        apply e stockPosition
-        |> applyNotesIfApplicable notes date
-        |> closePositionIfApplicable date
         
     let addNotes = applyNotesIfApplicable
         
@@ -520,6 +520,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.RR =
         match this.RiskedAmount with
         | None -> 0m
+        | Some riskedAmount when riskedAmount = 0m -> 0m
         | Some riskedAmount -> this.Profit / riskedAmount
         
     member this.FirstStop =
