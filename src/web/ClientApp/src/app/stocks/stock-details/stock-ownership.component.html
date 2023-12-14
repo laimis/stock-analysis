@@ -16,6 +16,10 @@
       <app-stock-trading-position [position]="position" [quote]="quote"></app-stock-trading-position>
     </section>
   } @empty {
-    No positions for this ticker
+    <div>
+      <div class="alert alert-secondary">
+        You haven't recorded any stock positions for this stock yet.
+      </div>
+    </div>
   }
 </div>
