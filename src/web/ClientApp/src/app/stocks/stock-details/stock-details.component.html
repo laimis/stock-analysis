@@ -72,9 +72,8 @@
   <app-stock-analysis [ticker]=stock.ticker></app-stock-analysis>
 }
 @if (isActive('trade')) {
+  <app-brokerage-new-order [ticker]="stock.ticker"></app-brokerage-new-order>
   <app-brokerage-orders [filteredTickers]="[stock.ticker]" [orders]="orders"></app-brokerage-orders>
-}
-@if (isActive('trade')) {
   <app-stock-trading-new-position
     [isPendingPositionMode]="true"
     [presetTicker]="stock.ticker"
