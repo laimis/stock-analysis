@@ -133,7 +133,7 @@ namespace storagetests
         [Fact]
         public async Task NoteStorageWorksAsync()
         {
-            var note = new Note(_userId.Item, "note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
+            var note = new Note(_userId.Item, "note", TestDataGenerator.AMD, DateTimeOffset.UtcNow);
 
             var storage = CreateStorage();
 
@@ -263,7 +263,7 @@ namespace storagetests
 
             var list = new StockList("description", "name", _userId.Item);
 
-            list.AddStock(TestDataGenerator.TSLA, "yeah yeah");
+            list.AddStock(TestDataGenerator.AMD, "yeah yeah");
 
             await storage.SaveStockList(list, _userId);
 
@@ -275,7 +275,7 @@ namespace storagetests
 
             Assert.Equal(list.State.Name, loaded.State.Name);
 
-            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker.Equals(TestDataGenerator.TSLA));
+            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker.Equals(TestDataGenerator.AMD));
 
             Assert.NotNull(ticker);
 
@@ -300,7 +300,7 @@ namespace storagetests
             var note = new Note(
                 _userId.Item,
                 "description",
-                TestDataGenerator.TSLA,
+                TestDataGenerator.AMD,
                 DateTimeOffset.UtcNow
             );
             
@@ -342,7 +342,7 @@ namespace storagetests
                 price: 2.1m,
                 stopPrice: 2m,
                 strategy: "strategy",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: _userId.Item
             );
 
@@ -352,7 +352,7 @@ namespace storagetests
 
             Assert.Single(existing);
 
-            var loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.TSLA));
+            var loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.AMD));
 
             Assert.Equal(position.State.Id, loaded.State.Id);
 
@@ -364,7 +364,7 @@ namespace storagetests
 
             Assert.NotEmpty(existing);
 
-            loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.TSLA));
+            loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.AMD));
 
             Assert.True(loaded.State.IsClosed);
             Assert.NotNull(loaded.State.Closed);

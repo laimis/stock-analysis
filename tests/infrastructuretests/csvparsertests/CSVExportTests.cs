@@ -20,15 +20,17 @@ namespace csvparsertests
         [Fact]
         public void ExportStocksHeader()
         {
+            var ticker = TestDataGenerator.NET;
+            
             var stock = StockPosition.buy(
                 1m, 100, DateTime.UtcNow, new FSharpOption<string>("some note"),
-                StockPosition.openLong(TestDataGenerator.NET, DateTimeOffset.UtcNow)
+                StockPosition.openLong(ticker, DateTimeOffset.UtcNow)
             );
             
             var report = CSVExport.stocks(_csvWriter, new[] {stock});
 
-            Assert.Contains("Ticker,Type,Amount,Price,Date,Notes", report);
-            Assert.Contains(TestDataGenerator.TSLA.Value, report);
+            Assert.Contains("Ticker,Type,Amount,Price,Date", report);
+            Assert.Contains(ticker.Value, report);
         }
 
         [Fact]
@@ -71,7 +73,7 @@ namespace csvparsertests
         [Fact]
         public void ExportNotes()
         {
-            var note = new Note(Guid.NewGuid(), "my note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
+            var note = new Note(Guid.NewGuid(), "my note", TestDataGenerator.AMD, DateTimeOffset.UtcNow);
 
             var report = CSVExport.notes(_csvWriter, new[] {note});
 

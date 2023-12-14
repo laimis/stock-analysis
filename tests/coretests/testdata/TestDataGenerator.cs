@@ -42,7 +42,7 @@ namespace coretests.testdata
         }
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
-        public static Ticker TSLA = new("tsla");
+        public static Ticker AMD = new("amd");
         public static Ticker NET = new("net");
         public static Ticker ENPH = new("enph");
         public static Ticker TEUM = new("teum");

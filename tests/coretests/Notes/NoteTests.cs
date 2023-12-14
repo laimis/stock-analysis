@@ -22,7 +22,7 @@ namespace coretests.Notes
             return new Note(
                 Guid.NewGuid(),
                 "description",
-                TestDataGenerator.TSLA,
+                TestDataGenerator.AMD,
                 DateTimeOffset.UtcNow
             );
         }
@@ -48,25 +48,25 @@ namespace coretests.Notes
         [Fact]
         public void Ticker()
         {
-            Assert.Equal(TestDataGenerator.TSLA, _state.RelatedToTicker);
+            Assert.Equal(TestDataGenerator.AMD, _state.RelatedToTicker);
         }
 
         [Fact]
         public void FailWithEmptyUser()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(Guid.Empty, "some note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.Empty, "some note", TestDataGenerator.AMD, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithNoNote()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "", TestDataGenerator.TSLA, DateTimeOffset.UtcNow));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "", TestDataGenerator.AMD, DateTimeOffset.UtcNow));
         }
 
         [Fact]
         public void FailWithFutureCreated()
         {
-            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow.AddDays(1)));
+            Assert.Throws<InvalidOperationException>(() => new Note(Guid.NewGuid(), "note", TestDataGenerator.AMD, DateTimeOffset.UtcNow.AddDays(1)));
         }
 
         [Fact]
