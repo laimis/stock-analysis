@@ -60,8 +60,8 @@ export class StockTradingSimulatorComponent implements OnInit {
     }
   }
 
-  initialPosition(cmd:stocktransactioncommand) {
-    this.ticker = cmd.ticker
+  initialPosition(ticker:string, cmd:stocktransactioncommand) {
+    this.ticker = ticker
     this.stopPrice = cmd.stopPrice
     this.price = cmd.price
     this.quantity = cmd.numberOfShares
@@ -170,7 +170,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     p.transactions.forEach(t => {
       if (first) {
         var cmd:stocktransactioncommand = {
-          ticker: p.ticker,
+          positionId: p.positionId,
           stopPrice: p.stopPrice,
           price: t.price,
           numberOfShares: t.numberOfShares,
@@ -178,7 +178,7 @@ export class StockTradingSimulatorComponent implements OnInit {
           notes: null,
           brokerageOrderId: null
         }
-        this.initialPosition(cmd)
+        this.initialPosition(p.ticker, cmd)
         first = false
       }
       else {

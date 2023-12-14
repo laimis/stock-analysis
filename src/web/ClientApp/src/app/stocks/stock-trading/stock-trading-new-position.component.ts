@@ -284,7 +284,7 @@ export class StockTradingNewPositionComponent {
   }
 
   recordInProgress : boolean = false
-  record() {
+  openPosition() {
     this.recordInProgress = true
     let cmd = this.createPurchaseCommand();
 
@@ -294,7 +294,7 @@ export class StockTradingNewPositionComponent {
       return
     }
 
-    this.stockService.purchase(cmd).subscribe(
+    this.stockService.openPosition(cmd).subscribe(
       _ => {
         this.stockPurchased.emit(cmd)
         this.recordInProgress = false
@@ -323,7 +323,7 @@ export class StockTradingNewPositionComponent {
 
   private createPurchaseCommand() {
     let cmd = new stocktransactioncommand();
-    cmd.ticker = this.ticker;
+    cmd.positionId = "";
     cmd.numberOfShares = this.numberOfShares;
     cmd.price = this.costToBuy;
     cmd.stopPrice = this.positionStopPrice;

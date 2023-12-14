@@ -112,7 +112,7 @@ export class StockTradingReviewComponent {
   }
 
   private runTradingStrategies() {
-    this.stockService.simulatePosition(this.currentPosition.ticker, this.currentPosition.positionId).subscribe(
+    this.stockService.simulatePosition(this.currentPosition.positionId).subscribe(
       (r: TradingStrategyResults) => {
         this.simulationErrors = null
         this.simulationResults = r;
@@ -183,7 +183,6 @@ export class StockTradingReviewComponent {
   assignGrade(note:string) {
     this.assignedNote = note
     this.stockService.assignGrade(
-      this.currentPosition.ticker,
       this.currentPosition.positionId,
       this.assignedGrade,
       note).subscribe(

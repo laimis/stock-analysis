@@ -50,8 +50,7 @@
 </div>
 @if (isActive('stocks')) {
   <app-stock-ownership
-    [stock]=stock [ownership]=ownership [quote]="stock.quote"
-  (ownershipChanged)="stockOwnershipChanged($event)"></app-stock-ownership>
+    [stock]=stock [ownership]=ownership [quote]="stock.quote"></app-stock-ownership>
 }
 @if (isActive('options')) {
   <stock-option
@@ -68,10 +67,14 @@
   <app-stock-analysis [ticker]=stock.ticker></app-stock-analysis>
 }
 @if (isActive('trade')) {
-  <app-brokerage-orders [filteredTickers]="[stock.ticker]"></app-brokerage-orders>
+  <app-brokerage-orders [filteredTickers]="[stock.ticker]" [orders]="orders"></app-brokerage-orders>
 }
 @if (isActive('trade')) {
-  <app-stock-trading-new-position [isPendingPositionMode]="true" [presetTicker]="stock.ticker" (pendingPositionCreated)="refreshOrders()" ></app-stock-trading-new-position>
+  <app-stock-trading-new-position
+    [isPendingPositionMode]="true"
+    [presetTicker]="stock.ticker"
+    (pendingPositionCreated)="refreshOrders()" >
+  </app-stock-trading-new-position>
 }
 </div>
 }

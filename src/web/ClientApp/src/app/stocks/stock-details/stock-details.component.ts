@@ -1,8 +1,16 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile } from '../../services/stocks.service';
+import {
+  StocksService,
+  StockDetails,
+  NoteList,
+  OwnedOption,
+  StockOwnership,
+  StockProfile,
+  BrokerageOrder
+} from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import {BrokerageOrdersComponent} from "../../brokerage/orders.component";
+import {GetErrors} from "../../services/utils";
 
 @Component({
   selector: 'app-stock-details',
@@ -19,10 +27,8 @@ export class StockDetailsComponent implements OnInit {
   ownership: StockOwnership
   options: OwnedOption[]
   activeTab: string = ''
-
-  // reference child BrokerageOrdersComponent
-  @ViewChild(BrokerageOrdersComponent)
-  private orders: BrokerageOrdersComponent
+  orders: BrokerageOrder[]
+  errors: string[]
 
 	constructor(
 		private stocks : StocksService,
@@ -96,6 +102,11 @@ export class StockDetailsComponent implements OnInit {
   }
 
   refreshOrders() {
-    this.orders.refreshOrders()
+    this.stocks.brokerageAccount().subscribe(
+      a => this.orders = a.orders,
+      e => {
+        this.errors = GetErrors(e)
+      }
+    )
   }
 }

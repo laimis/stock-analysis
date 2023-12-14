@@ -1,7 +1,13 @@
-import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import {StocksService, StockDetails, StockOwnership, PositionInstance, StockQuote} from '../../services/stocks.service';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  StocksService,
+  StockDetails,
+  StockOwnership,
+  PositionInstance,
+  StockQuote,
+  stocktransactioncommand
+} from '../../services/stocks.service';
 import { Router } from '@angular/router';
-import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
 
 @Component({
   selector: 'app-stock-ownership',
@@ -35,45 +41,10 @@ export class StockOwnershipComponent {
   @Input()
   quote: StockQuote
 
-  @Output()
-  ownershipChanged = new EventEmitter();
-
-  @ViewChild(BrokerageOrdersComponent)
-  private brokerageOrders!: BrokerageOrdersComponent;
 
   public errors: string[]
 
   numberOfShares: number
 	filled:         string
   notes:          string
-
-  constructor(
-    private service: StocksService,
-    private router: Router
-  ) { }
-
-  brokerageOrderEntered() {
-    this.brokerageOrders.refreshOrders()
-  }
-
-  brokerageOrderExecuted() {
-    this.ownershipChanged.emit('orders')
-  }
-
-  transactionRecorded(type:string) {
-    this.ownershipChanged.emit(type)
-  }
-
-  delete() {
-
-    if (confirm("are you sure you want to delete this stock?"))
-    {
-      this.errors = null
-
-      this.service.deleteStocks(this.ownership.id).subscribe(r => {
-        this.router.navigateByUrl('/dashboard')
-      })
-    }
-  }
-
 }

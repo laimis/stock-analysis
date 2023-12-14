@@ -1,6 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
-import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
-import { StockTradingPendingPositionsComponent } from '../stock-trading/stock-trading-pendingpositions.component';
+import { Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -11,19 +9,8 @@ import { Title } from '@angular/platform-browser';
 export class StockNewPositionComponent {
   feedbackMessage: string;
 
-  constructor(title:Title) {
-    title.setTitle("Trade - Nightingale Trading")
-  }
-
-  @ViewChild(BrokerageOrdersComponent)
-  private brokerageOrders!: BrokerageOrdersComponent;
-
-  @ViewChild(StockTradingPendingPositionsComponent)
-  private pendingPositions!: StockTradingPendingPositionsComponent;
-
   brokerageOrderEntered() {
     this.feedbackMessage = "Brokerage order entered";
-    this.brokerageOrders.refreshOrders();
   }
 
   stockPurchased() {
@@ -32,13 +19,9 @@ export class StockNewPositionComponent {
 
   pendingPositionCreated() {
     this.feedbackMessage = "Pending position created";
-    this.pendingPositions.refreshPendingPositions();
-    this.brokerageOrders.refreshOrders();
   }
 
   pendingPositionClosed() {
     this.feedbackMessage = "Pending position closed";
-    this.pendingPositions.refreshPendingPositions();
-    this.brokerageOrders.refreshOrders();
   }
 }

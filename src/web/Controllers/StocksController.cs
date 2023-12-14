@@ -58,18 +58,6 @@ namespace web.Controllers
         [HttpGet("search/{term}")]
         public Task<ActionResult> Search([FromRoute] string term) => 
             this.OkOrError(_service.Handle(new SearchQuery(term, User.Identifier())));
-
-        [HttpPost("{ticker}/stop")]
-        public Task<ActionResult> Stop([FromBody] SetStop command) =>
-            this.OkOrError(_service.HandleSetStop(User.Identifier(), command));
-        
-        [HttpPost("sell")]
-        public Task<ActionResult> Sell([FromBody]StockTransaction model) =>
-            this.OkOrError(_service.Handle(BuyOrSell.NewSell(model, User.Identifier())));
-
-        [HttpPost("buy")]
-        public async Task<ActionResult> Buy([FromBody]StockTransaction model) =>
-            this.OkOrError(await _service.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
         
         [HttpGet("export")]
         public Task<ActionResult> Export() =>
@@ -82,17 +70,5 @@ namespace web.Controllers
         [HttpGet("export/open")]
         public Task<ActionResult> ExportTrades() =>
             this.GenerateExport(_service.Handle(new ExportTrades(User.Identifier(), ExportType.Open)));
-
-        [HttpPost("import")]
-        public async Task<ActionResult> Import(IFormFile file)
-        {
-            using var streamReader = new StreamReader(file.OpenReadStream());
-
-            var content = await streamReader.ReadToEndAsync();
-
-            var cmd = new ImportStocks(userId: User.Identifier(), content: content);
-            
-            return await this.OkOrError(_service.Handle(cmd));
-        }
     }
 }

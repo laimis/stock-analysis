@@ -3,12 +3,6 @@
     <app-error-display [errors]="errors"></app-error-display>
   }
 
-  @if (stock) {
-    <app-stock-transaction [ticker]="stock.ticker" (transactionRecorded)="transactionRecorded($event)" ></app-stock-transaction>
-    <app-brokerage-new-order (brokerageOrderEntered)="brokerageOrderEntered()" [ticker]="stock.ticker"></app-brokerage-new-order>
-    <app-brokerage-orders [filteredTickers]="[stock.ticker]" (orderExecuted)="brokerageOrderExecuted()"></app-brokerage-orders>
-  }
-
   @for (position of positions; track position) {
     <section>
       <h5>
@@ -22,12 +16,4 @@
       <app-stock-trading-position [position]="position" [quote]="quote"></app-stock-trading-position>
     </section>
   }
-  <div class="card border-danger mb-3">
-    <div class="card-header">
-      <h5 class="card-title">Delete this stock from your portfolio</h5>
-    </div>
-    <div class="card-body">
-      <button type="button" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
-    </div>
-  </div>
 </div>

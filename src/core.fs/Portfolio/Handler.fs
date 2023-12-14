@@ -21,6 +21,42 @@ type Query =
     {
         UserId: UserId
     }
+    
+type ImportStocks =
+    {
+        UserId: UserId
+        Content: string
+    }
+
+type private ImportRecord =
+    {
+         amount:decimal
+         ``type``:string
+         date:Nullable<DateTimeOffset>
+         price:decimal
+         ticker:string
+    }
+
+    
+type StockTransaction =
+    {
+        [<Required>]
+        PositionId: StockPositionId
+        [<Range(1, 1000000)>]
+        NumberOfShares: decimal
+        [<Range(0, 100000)>]
+        Price: decimal
+        [<Required>]
+        Date: Nullable<DateTimeOffset>
+        StopPrice: Nullable<decimal>
+        Notes: string option
+        BrokerageOrderId: string option
+        Ticker: Ticker
+    }
+    
+type BuyOrSell =
+    | Buy of StockTransaction * UserId
+    | Sell of StockTransaction * UserId
 
 type DeleteTransaction =
     {
@@ -29,6 +65,19 @@ type DeleteTransaction =
         TransactionId: Guid
     }
 
+type OpenLongStockPosition = {
+    [<Range(1, 1000000)>]
+    NumberOfShares: decimal
+    [<Range(0, 100000)>]
+    Price: decimal
+    [<Required>]
+    Date: DateTimeOffset option
+    StopPrice: decimal option
+    Notes: string option
+    Strategy: string option
+    Ticker: Ticker
+}
+ 
 type DeletePosition =
     {
         PositionId: StockPositionId
@@ -38,8 +87,16 @@ type DeletePosition =
     
 type DeleteStop =
     {
+        [<Required>]
         PositionId: StockPositionId
-        UserId: UserId
+    }
+    
+type SetStop =
+    {
+        [<Required>]
+        StopPrice:decimal option
+        [<Required>]
+        PositionId:StockPositionId
     }
 
 type GradePosition =
@@ -173,9 +230,141 @@ type TransactionSummary =
             
             (monday, sunday)
     
-type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours) =
+type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser) =
     
     interface IApplicationService
+    
+    member _.Handle(cmd:BuyOrSell) = task {
+        
+        let buyOrSellFunction =
+            match cmd with
+            | Buy (data, _) -> StockPosition.buy data.NumberOfShares data.Price data.Date.Value data.Notes
+            | Sell (data, _) -> StockPosition.sell data.NumberOfShares data.Price data.Date.Value data.Notes
+            
+        let data, userId =
+            match cmd with
+            | Buy (data, userId) -> (data, userId)
+            | Sell (data, userId) -> (data, userId)
+            
+        let! user = accounts.GetUser(userId)
+        
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
+        | _ ->
+            let! stock = storage.GetStockPosition data.PositionId userId
+            
+            match stock with
+            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | Some position ->
+                
+                do!
+                    position
+                    |> buyOrSellFunction
+                    |> storage.SaveStockPosition userId stock
+                
+                return Ok
+    }
+    
+    member this.Handle (cmd:ImportStocks) = task {
+        let records = csvParser.Parse<ImportRecord>(cmd.Content)
+        match records.Success with
+        | None -> return records |> ResponseUtils.toOkOrError
+        | Some records ->
+            let! results =
+                records
+                |> Seq.map (fun r -> async {
+                    let command =
+                        match r.``type`` with
+                        | "buy" -> Buy({
+                            PositionId = StockPositionId(Guid.NewGuid())
+                            NumberOfShares = r.amount
+                            Price = r.price
+                            Date = r.date
+                            StopPrice = Nullable<decimal>()
+                            Notes = None
+                            BrokerageOrderId = None
+                            Ticker = Ticker(r.ticker)
+                        }, cmd.UserId)
+                        | "sell" -> Sell({
+                            NumberOfShares = r.amount
+                            PositionId = StockPositionId(Guid.NewGuid())
+                            Price = r.price
+                            Date = r.date
+                            StopPrice = Nullable<decimal>()
+                            Notes = None
+                            BrokerageOrderId = None
+                            Ticker = Ticker(r.ticker)
+                        }, cmd.UserId)
+                        | _ -> failwith "Unknown transaction type"
+                        
+                    let! result = this.Handle(command) |> Async.AwaitTask
+                    return result
+                })
+                |> Async.Sequential
+                |> Async.StartAsTask
+                
+            return results |> ResponseUtils.toOkOrConcatErrors
+    }
+    
+    member _.Handle(userId:UserId, cmd:OpenLongStockPosition) = task {
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
+        | Some _ ->
+            let! stocks = storage.GetStockPositions userId
+            
+            // check if we already have an open position for the ticker
+            let openPosition = stocks |> Seq.tryFind (fun x -> x.Ticker = cmd.Ticker && x.Closed = None)
+            
+            match openPosition with
+            | Some _ ->
+                return "Position already open" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
+            | None ->
+                let newPosition =
+                    StockPosition.openLong cmd.Ticker cmd.Date.Value
+                    |> StockPosition.buy cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.Notes
+                    |> StockPosition.setStop cmd.StopPrice cmd.Date.Value
+                    |> fun x ->
+                        match cmd.Strategy with
+                        | Some strategy -> x |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
+                        | None -> x
+                
+                do! newPosition |> storage.SaveStockPosition userId openPosition
+                
+                // check if we have any pending positions for the ticker
+                let! pendingPositions = storage.GetPendingStockPositions userId
+                let pendingPositionOption = pendingPositions |> Seq.tryFind (fun x -> x.State.Ticker = cmd.Ticker && x.State.IsClosed = false)
+                
+                match pendingPositionOption with
+                | Some pendingPosition ->
+                    
+                    // transfer some data from pending position to this new position
+                    let positionWithStop = newPosition |> StockPosition.setStop (Some pendingPosition.State.StopPrice.Value) cmd.Date.Value
+                    
+                    let positionWithNotes = 
+                        match positionWithStop.Notes with
+                        | [] when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) = false -> positionWithStop |> StockPosition.addNotes (Some pendingPosition.State.Notes) cmd.Date.Value
+                        | _ -> positionWithStop
+                    
+                    let positionWithStrategy =
+                        match pendingPosition.State.Strategy with
+                        | null -> positionWithNotes
+                        | _ -> positionWithNotes |> StockPosition.setLabel "strategy" pendingPosition.State.Strategy cmd.Date.Value
+                        
+                    do! positionWithStrategy |> storage.SaveStockPosition userId (Some newPosition)
+                    
+                    let withCalculations =
+                        positionWithStrategy
+                        |> StockPositionWithCalculations
+                    
+                    withCalculations.AverageCostPerShare |> pendingPosition.Purchase
+                    
+                    do! storage.SavePendingPosition pendingPosition userId
+                    
+                    return withCalculations |> ResponseUtils.success
+                | None ->
+                    return newPosition |> StockPositionWithCalculations |> ResponseUtils.success
+    }
 
     member this.Handle (command:DeletePosition) = task {
         let! user = accounts.GetUser(command.UserId)
@@ -192,19 +381,19 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 return Ok
     }
     
-    member _.Handle (command:DeleteStop) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member _.Handle (userId:UserId, command:DeleteStop) = task {
+        let! user = accounts.GetUser(userId)
         match user with
         | None -> return "User not found" |> ResponseUtils.failed
         | _ ->
-            let! stock = storage.GetStockPosition command.PositionId command.UserId
+            let! stock = storage.GetStockPosition command.PositionId userId
             match stock with
             | None -> return "Stock position not found" |> ResponseUtils.failed
             | Some existing ->
                 do!
                     existing
                     |> StockPosition.deleteStop DateTimeOffset.UtcNow
-                    |> storage.SaveStockPosition command.UserId stock
+                    |> storage.SaveStockPosition userId stock
                 return Ok
     }
     
@@ -658,4 +847,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         )
         
         return ServiceResponse<TransactionSummaryView>(view)
+    }
+    
+    member _.HandleStop(userId,cmd:SetStop) = task {
+        let! stock = storage.GetStockPosition cmd.PositionId userId
+        match stock with
+        | None -> return "Stock position not found" |> ResponseUtils.failed
+        | Some existing ->
+            do!
+                existing
+                |> StockPosition.setStop cmd.StopPrice DateTimeOffset.UtcNow
+                |> storage.SaveStockPosition userId stock
+                
+            return Ok
     }

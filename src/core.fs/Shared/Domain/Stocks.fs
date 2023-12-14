@@ -205,7 +205,8 @@ module StockPosition =
             { p with Grade = gradeValue; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionStopDeleted as x ->
-            { p with StopPrice = None; Version = p.Version + 1; Events = p.Events @ [x]  }
+            let newTransactions = p.Transactions @ [Stop {TransactionId = x.Id; StopPrice = None; Date = x.When }]
+            { p with StopPrice = None; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
@@ -381,7 +382,6 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
             
     member this.IsShort = stockPosition.IsShort
-    member this.Transactions = stockPosition.Transactions
     member this.PositionId = stockPosition.PositionId
     member this.Ticker = stockPosition.Ticker
     member this.NumberOfShares = stockPosition.NumberOfShares
@@ -409,9 +409,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | None -> DateTimeOffset.UtcNow
             | Some x -> x   
         referenceDay.Subtract(stockPosition.Opened).TotalDays |> int
+        
     member this.DaysSinceLastTransaction =
         let date =
-            this.Transactions
+            stockPosition.Transactions
             |> List.last
             |> fun x ->
                 match x with
@@ -542,3 +543,31 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.GetLabelValue key =
         stockPosition.Labels[key]
+        
+    member this.Labels = stockPosition.Labels |> Seq.map (fun kv -> kv)
+    
+    member this.Events =
+        // we want to expose buys, sells, and stop sets
+        // and return the object with these properties:
+        // id: string,
+      // date: string,
+      // value: number | null,
+      // type: string,
+      // description: string,
+      // quantity: number | null
+        
+        stockPosition.Transactions
+        |> List.map (fun t ->
+            match t with
+            | Share s ->
+               let ``type`` = match s.Type with | Buy -> "Buy" | Sell -> "Sell" |> _.ToLower()
+               let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
+               {|id = s.TransactionId; date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
+            | Stop s ->
+               let ``type`` = "stop"
+               let description =
+                   match s.StopPrice with
+                   | Some stopPrice -> $"stop price set to {stopPrice}"
+                   | None -> "stop deleted"
+               {|id = s.TransactionId; date = s.Date; value = (s.StopPrice |> Option.defaultValue 0m); ``type`` = ``type``; description = description; quantity = 0m |}
+        )

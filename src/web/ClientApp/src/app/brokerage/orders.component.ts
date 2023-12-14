@@ -8,22 +8,27 @@ import { GetErrors } from '../services/utils';
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css']
 })
-export class BrokerageOrdersComponent implements OnInit {
+export class BrokerageOrdersComponent {
   groupedOrders: BrokerageOrder[][];
   private _orders: BrokerageOrder[] = [];
   private _filteredTickers: string[] = [];
   isEmpty: boolean = false;
   error: string;
 
-  constructor(
-    private stockService: StocksService
-  ) { }
+  @Output()
+  orderCancelled:EventEmitter<string>
+  @Output()
+  purchaseRequested:EventEmitter<stocktransactioncommand>
+  @Output()
+  sellRequested:EventEmitter<stocktransactioncommand>
 
   @Input()
   justOrders: boolean = false;
 
-  ngOnInit(): void {
-    this.refreshOrders()
+  @Input()
+  set orders(value:BrokerageOrder[]) {
+    this._orders = value
+    this.groupAndRenderOrders()
   }
 
   @Input()
@@ -31,21 +36,12 @@ export class BrokerageOrdersComponent implements OnInit {
     this._filteredTickers = val
     this.groupAndRenderOrders()
   }
+
+  @Input()
+  positionId:string
+
   get filteredTickers():string[] {
     return this._filteredTickers
-  }
-
-  refreshOrders() {
-    this.stockService.brokerageAccount().subscribe(account => {
-      this._orders = account.orders
-      this.groupAndRenderOrders()
-    },
-      (err) => {
-        let errors = GetErrors(err)
-        // concat errors with comma separated
-        this.error = errors.join(", ")
-      }
-    )
   }
 
   groupAndRenderOrders() {
@@ -63,44 +59,26 @@ export class BrokerageOrdersComponent implements OnInit {
     this.isEmpty = this.groupedOrders.every(o => o.length == 0)
   }
 
-  @Output()
-  orderExecuted: EventEmitter<string> = new EventEmitter<string>()
-
   cancelOrder(orderId: string) {
-    this.stockService.brokerageCancelOrder(orderId).subscribe(() => {
-      this.refreshOrders()
-    }, (err) => {
-      console.log(err)
-    }
-    )
+    this.orderCancelled.emit(orderId)
   }
 
   recordOrder(order: BrokerageOrder) {
-    var obj:stocktransactioncommand = {
-      ticker: order.ticker,
+    const obj: stocktransactioncommand = {
+      positionId: this.positionId,
       numberOfShares: order.quantity,
       price: order.price,
       date: order.date,
       notes: null,
       stopPrice: null,
       brokerageOrderId: order.orderId
-    }
+    };
 
     if (order.type === 'BUY') {
-      this.stockService.purchase(obj).subscribe(() => {
-        this.orderExecuted.emit(obj.ticker)
-        this.refreshOrders()
-      }, (err) => {
-        console.log(err)
-      })
+      this.purchaseRequested.emit(obj)
     }
     else if (order.type === 'SELL') {
-      this.stockService.sell(obj).subscribe(() => {
-        this.orderExecuted.emit(obj.ticker)
-        this.refreshOrders()
-      }, (err) => {
-        console.log(err)
-      })
+      this.sellRequested.emit(obj)
     }
   }
 

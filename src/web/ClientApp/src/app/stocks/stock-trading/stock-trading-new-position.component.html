@@ -134,12 +134,7 @@
               @if (prices && !isPendingPositionMode) {
                 <div class="row mt-3">
                   <div class="col">
-                    @if (!recordInProgress) {
-                      <button class="btn btn-primary w-100" (click)="record()">Record</button>
-                    }
-                    @if (recordInProgress) {
-                      <button class="btn btn-primary w-100" disabled>Record</button>
-                    }
+                    <button class="btn btn-primary w-100" (click)="openPosition()" [disabled]="recordInProgress">Open Position</button>
                   </div>
                 </div>
               }
@@ -189,4 +184,3 @@
               }
             </section>
           }
-          
