@@ -20,6 +20,10 @@ module MigrateFromV2ToV3 =
             | true -> (fun sp -> sp |> StockPosition.setStop (Some t.Value.Value) t.When) 
             | false -> (fun sp -> sp |> StockPosition.deleteStop t.When)
         | PositionEventType.Risk -> fun sp -> sp |> StockPosition.setRiskAmount t.Value.Value t.When
+        | PositionEventType.Label ->
+            match t.Notes = null with // hack-city on this one, but what can we do
+            | true -> (fun sp -> sp |> StockPosition.deleteLabel t.Description t.When)
+            | false -> (fun sp -> sp |> StockPosition.setLabel t.Description t.Notes t.When)
         | _ -> failwith ("not implemented" + t.Type.Value)
                 
     let migrateUser (storage:PortfolioStorage) (logger:ILogger) (user:User) = async {

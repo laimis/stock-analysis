@@ -11,6 +11,7 @@ namespace core.Stocks
         public const string Stop = "stop";
         public const string Sell = "sell";
         public const string Risk = "risk";
+        public const string Label = "label";
 
         public PositionEventType(string value)
         {
@@ -20,6 +21,7 @@ namespace core.Stocks
                 Stop => Stop,
                 Sell => Sell,
                 Risk => Risk,
+                Label => Label,
                 _ => throw new InvalidOperationException($"Invalid position event type: {value}")
             };
         }
@@ -323,6 +325,7 @@ namespace core.Stocks
         internal void SetLabel(PositionLabelSet labelSet)
         {
             _labels[labelSet.Key] = labelSet.Value;
+            Events.Add(new PositionEvent(Guid.NewGuid(), labelSet.Key, new PositionEventType(PositionEventType.Label), null, labelSet.When, Quantity: null, Notes: labelSet.Value));
         }
 
         public bool ContainsLabel(string key)
@@ -333,6 +336,7 @@ namespace core.Stocks
         internal void DeleteLabel(PositionLabelDeleted labelDeleted)
         {
             _labels.Remove(labelDeleted.Key);
+            Events.Add(new PositionEvent(Guid.NewGuid(), labelDeleted.Key, new PositionEventType(PositionEventType.Label), null, labelDeleted.When, Quantity: null, Notes: null));
         }
 
         public string GetLabelValue(string key) => _labels[key];
