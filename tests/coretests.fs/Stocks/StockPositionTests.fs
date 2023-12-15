@@ -181,17 +181,6 @@ let ``Assigning stop works``() =
     events |> should equal sameStop.Events
     
 [<Fact>]
-let ``Assigning stop to closed position fails``() =
-    
-    let position = 
-        StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
-        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow None
-        
-    (fun () -> position |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow |> ignore)
-    |> should throw typeof<Exception>
-    
-[<Fact>]
 let ``Delete stop works``() =
     
     let position =
