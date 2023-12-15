@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using core.fs.Shared.Adapters.CSV;
+using core.fs.Adapters.CSV;
 using CsvHelper;
 using CsvHelper.Configuration;
 

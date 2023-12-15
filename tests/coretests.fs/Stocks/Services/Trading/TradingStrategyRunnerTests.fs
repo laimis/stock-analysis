@@ -4,11 +4,11 @@ open System
 open System.Threading.Tasks
 open Xunit
 open core.Account
-open core.fs.Services.TradingStrategies
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Domain
+open core.fs
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Stocks
+open core.fs.Services.Trading
+open core.fs.Stocks
 open coretests.testdata
 open timezonesupport
 open FsUnit

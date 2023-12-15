@@ -1,4 +1,4 @@
-namespace core.fs.Shared.Adapters.Email
+namespace core.fs.Adapters.Email
 
 open System.ComponentModel.DataAnnotations
 open System.Threading.Tasks

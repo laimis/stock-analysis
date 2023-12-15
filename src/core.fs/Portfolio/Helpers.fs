@@ -1,10 +1,9 @@
-namespace core.fs
+namespace core.fs.Portfolio
 
 open System.Collections.Generic
 open core.Shared
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Domain
+open core.fs.Adapters.Brokerage
+open core.fs.Stocks
 
 module Helpers =
 

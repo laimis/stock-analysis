@@ -3,13 +3,11 @@ namespace core.fs
 open System
 open System.Text.RegularExpressions
 open core.Shared
+open core.fs.Accounts
+open core.fs.Adapters.CSV
+open core.fs.Adapters.Email
+open core.fs.Adapters.Storage
 open core.fs.Options
-open core.fs.Shared
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Adapters.Email
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain
-open core.fs.Shared.Domain.Accounts
 open core.fs.Stocks
 
 module ImportTransactions =

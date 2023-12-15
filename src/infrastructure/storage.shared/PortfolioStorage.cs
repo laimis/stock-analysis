@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Cryptos;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain;
-using core.fs.Shared.Domain.Accounts;
-using core.Notes;
+using core.fs.Accounts;
+using core.fs.Adapters.Storage;
+using core.fs.Stocks;
 using core.Options;
 using core.Routines;
 using core.Shared;
@@ -19,12 +18,13 @@ namespace storage.shared
     {
         public const string _stock_entity = "ownedstock3";
         public const string _option_entity = "soldoption3";
-        public const string _note_entity = "note3";
         public const string _crypto_entity = "ownedcrypto";
         public const string _stock_list_entity = "stocklist";
         public const string _routine_entity = "routine";
         public const string _pending_stock_position_entity = "pendingstockposition";
         public const string _stock_position_entity = "stockposition";
+        
+        public const string _note_entity = "note3"; // used to be used for stocks but it was modeled "weirdly" and ditched with of the software
 
         private readonly IAggregateStorage _aggregateStorage;
         private readonly IBlobStorage _blobStorage;
@@ -118,26 +118,6 @@ namespace storage.shared
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedOption(g))
                 .Where(g => g.State.Deleted == false);
-        }
-
-        public Task SaveNote(Note note, UserId userId)
-        {
-            return Save(note, _note_entity, userId);
-        }
-
-        public async Task<IEnumerable<Note>> GetNotes(UserId userId)
-        {
-            var list = await _aggregateStorage.GetEventsAsync(_note_entity, userId);
-
-            return list.GroupBy(e => e.AggregateId)
-                .Select(g => new Note(g));
-        }
-
-        public async Task<Note> GetNote(Guid noteId, UserId userId)
-        {
-            var list = await GetNotes(userId);
-
-            return list.SingleOrDefault(n => n.State.Id == noteId);
         }
 
         public async Task Delete(UserId userId)

@@ -2,8 +2,8 @@ namespace core.fs.Options
 
 open System
 open core.Options
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Options
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Options
 
 
 type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail option) =

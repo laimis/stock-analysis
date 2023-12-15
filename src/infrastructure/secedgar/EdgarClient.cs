@@ -1,5 +1,5 @@
-﻿using core.fs.Shared;
-using core.fs.Shared.Adapters.SEC;
+﻿using core.fs;
+using core.fs.Adapters.SEC;
 using core.Shared;
 using Microsoft.Extensions.Logging;
 using SecuritiesExchangeCommission.Edgar;

@@ -3,7 +3,7 @@ module coretests.fs.Stocks.StockPositionWithCalculationsTests
 open System
 open FsUnit
 open Xunit
-open core.fs.Shared.Domain
+open core.fs.Stocks
 open coretests.testdata
 
 
@@ -26,19 +26,19 @@ let positionWithStop =
     
 
 [<Fact>]
-let ``LastBuyPrice_Accurate`` () =
+let ``LastBuyPrice is accurate`` () =
     position.LastBuyPrice |> should equal 35m
 
 [<Fact>]
-let ``LastSellPrice_Accurate`` () =
+let ``LastSellPrice is accurate`` () =
     position.LastSellPrice |> should equal 37m
 
 [<Fact>]
-let ``RR_Accurate`` () =
+let ``RR is accurate`` () =
     Assert.Equal(1.33m, positionWithStop.RR, 2);
 
 [<Fact>]
-let ``GainPct_Accurate`` () =
+let ``GainPct is accurate`` () =
      Assert.Equal(0.185m, position.GainPct, 2);
 
 [<Fact>]

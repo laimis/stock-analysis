@@ -1,8 +1,9 @@
 using System;
 using core.fs.Alerts;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.Logging;
-using core.fs.Shared.Adapters.Storage;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.Logging;
+using core.fs.Adapters.Storage;
+using core.fs.Adapters.Storage;
 using Moq;
 using Xunit;
 

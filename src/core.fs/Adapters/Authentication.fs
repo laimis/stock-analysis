@@ -1,4 +1,4 @@
-namespace core.fs.Shared.Adapters.Authentication
+namespace core.fs.Adapters.Authentication
 
 open core.Account
 

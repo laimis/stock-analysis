@@ -3,8 +3,8 @@
 
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Hosting
-open core.fs.Shared.Adapters.Logging
-open core.fs.Shared.Adapters.Storage
+open core.fs.Adapters.Logging
+open core.fs.Adapters.Storage
 open storage.shared
 open web
 

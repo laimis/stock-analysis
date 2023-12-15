@@ -3,9 +3,10 @@ namespace core.fs.Routines
 open System
 open System.ComponentModel.DataAnnotations
 open core.Routines
-open core.fs.Shared
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain.Accounts
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.Storage
+open core.fs.Adapters.Storage
 
 type Query =
     {

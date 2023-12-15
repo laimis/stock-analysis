@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 using core.Shared;
 using Dapper;
 using Newtonsoft.Json;

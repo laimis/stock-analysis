@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using core.fs.Shared.Adapters.Stocks;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Adapters.Stocks;
+using core.fs.Accounts;
 using core.Shared;
 
 namespace coretests.testdata

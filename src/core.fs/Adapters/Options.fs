@@ -1,4 +1,4 @@
-namespace core.fs.Shared.Adapters.Options
+namespace core.fs.Adapters.Options
 
 open System
 open core.Options

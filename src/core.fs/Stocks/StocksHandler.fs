@@ -2,14 +2,14 @@ namespace core.fs.Stocks
 
 open System
 open core.Shared
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.SEC
+open core.fs.Adapters.Stocks
+open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Analysis
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.SEC
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain.Accounts
         
 type DetailsQuery =
     {

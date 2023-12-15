@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using core.fs.Shared.Adapters.Stocks;
+using core.fs.Adapters.Stocks;
 using core.fs.Stocks;
 using core.Shared;
 using Microsoft.AspNetCore.Authorization;

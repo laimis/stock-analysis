@@ -2,8 +2,9 @@ namespace core.fs.Services.Analysis
 
 open System.Collections.Generic
 open core.Shared
-open core.fs.Shared
-open core.fs.Shared.Adapters.Stocks
+open core.fs
+open core.fs.Adapters.Stocks
+
 
 type OutcomeType =
     | Positive

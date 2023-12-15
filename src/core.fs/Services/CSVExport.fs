@@ -1,15 +1,13 @@
 namespace core.fs.Services
 
 open core.Cryptos
-open core.Notes
 open core.Options
 open core.Shared
 open core.Stocks
+open core.fs.Accounts
+open core.fs.Adapters.CSV
 open core.fs.Services.Trading
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Domain
-open core.fs.Shared.Domain.Accounts
-
+open core.fs.Stocks
 
 module CSVExport =
     
@@ -262,20 +260,6 @@ module CSVExport =
                     }
             )
             |> Seq.filter (fun r -> r.Ticker <> "")
-            
-        writer.Generate(rows)
-        
-    let notes (writer:ICSVWriter) (notes:seq<Note>) =
-        
-        let rows =
-            notes
-            |> Seq.map (fun n ->
-                {
-                    Created = n.State.Created.ToString(DATE_FORMAT)
-                    Ticker = n.State.RelatedToTicker.Value
-                    Note = n.State.Note
-                }
-            )
             
         writer.Generate(rows)
         

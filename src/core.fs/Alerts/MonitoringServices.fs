@@ -3,19 +3,18 @@ module core.fs.Alerts.MonitoringServices
     open System
     open System.Collections.Generic
     open System.Threading
-    open System.Threading.Tasks
     open core.Account
     open core.Shared
-    open core.Stocks
+    open core.fs
+    open core.fs.Accounts
+    open core.fs.Adapters.Brokerage
+    open core.fs.Adapters.Logging
+    open core.fs.Adapters.Stocks
+    open core.fs.Adapters.Storage
     open core.fs.Services
-    open core.fs.Shared
-    open core.fs.Shared.Adapters.Brokerage
-    open core.fs.Shared.Adapters.Logging
-    open core.fs.Shared.Adapters.Stocks
-    open core.fs.Shared.Adapters.Storage
-    open core.fs.Shared.Domain
-    open core.fs.Shared.Domain.Accounts
-
+    open core.fs.Adapters.Storage
+    open core.fs.Stocks
+    
     // stop loss should be monitored at the following times:
     // on trading days every 5 minutes from 9:45am to 4:00pm
     // and no monitoring on weekends

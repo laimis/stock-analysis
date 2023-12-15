@@ -1,4 +1,4 @@
-using core.fs.Shared.Adapters.Brokerage;
+using core.fs.Adapters.Brokerage;
 using TimeZoneConverter;
 
 namespace timezonesupport

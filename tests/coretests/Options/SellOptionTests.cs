@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using core.fs.Options;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.CSV;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.CSV;
+using core.fs.Adapters.Storage;
+using core.fs.Accounts;
 using core.Options;
 using Moq;
 using Xunit;
+using Handler = core.fs.Options.Handler;
 
 namespace coretests.Options
 {

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using core.fs;
 using core.Shared;
 
-namespace storage.shared;
-
-public interface IOutbox
+namespace storage.shared
 {
-    Task<core.fs.Shared.ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
+    public interface IOutbox
+    {
+        Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
+    }
 }

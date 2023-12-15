@@ -1,12 +1,12 @@
 namespace core.fs.Services
 
 open System
-open core.Stocks
+open core.fs
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Domain
+
+open core.fs.Stocks
 
 module PositionAnalysis =
     

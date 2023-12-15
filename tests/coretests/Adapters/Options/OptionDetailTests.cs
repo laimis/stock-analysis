@@ -1,5 +1,5 @@
 using System;
-using core.fs.Shared.Adapters.Options;
+using core.fs.Adapters.Options;
 using Xunit;
 
 namespace coretests.Adapters.Options

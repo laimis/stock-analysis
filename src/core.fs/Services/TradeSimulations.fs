@@ -1,13 +1,13 @@
-namespace core.fs.Services.TradingStrategies
+namespace core.fs.Services.Trading
 
 open System
 open System.Collections.Generic
 open core.Account
 open core.Shared
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Stocks
+open core.fs.Stocks
 open core.fs.Services.Trading
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Domain
 
 [<AbstractClass>]
 type TradingStrategy(name:string) =

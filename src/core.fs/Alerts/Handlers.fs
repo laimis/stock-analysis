@@ -2,9 +2,9 @@ namespace core.fs.Alerts
 
     open core.Shared
     open core.Stocks
-    open core.fs.Shared
-    open core.fs.Shared.Adapters.SMS
-    open core.fs.Shared.Domain.Accounts
+    open core.fs
+    open core.fs.Accounts
+    open core.fs.Adapters.SMS
 
     
     type QueryAlerts = {UserId:UserId}

@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using core.fs.Shared.Adapters.Authentication;
+using core.fs.Adapters.Authentication;
 
 namespace securityutils;
 

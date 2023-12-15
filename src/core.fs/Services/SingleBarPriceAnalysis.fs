@@ -1,11 +1,10 @@
 namespace core.fs.Services.Analysis
 
 open System
+open core.fs
+open core.fs.Adapters.Stocks
 open core.fs.Services
 open core.fs.Services.MultipleBarPriceAnalysis
-open core.fs.Shared
-open core.fs.Shared.Adapters.Stocks
-
 
 module SingleBarPriceAnalysis =
     

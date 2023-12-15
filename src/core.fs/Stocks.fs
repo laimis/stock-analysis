@@ -1,12 +1,11 @@
-namespace core.fs.Shared.Domain
+namespace core.fs.Stocks
 
 open System
 open System.Collections.Generic
 open core.Shared
 
-type StockPositionId =
-    StockPositionId of Guid
-      
+type StockPositionId = StockPositionId of Guid
+
 module StockPositionId =
     let create() = StockPositionId (Guid.NewGuid())
     let guid (StockPositionId id) = id

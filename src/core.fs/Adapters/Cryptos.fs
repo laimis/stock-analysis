@@ -1,4 +1,4 @@
-namespace core.fs.Shared.Adapters.Cryptos
+namespace core.fs.Adapters.Cryptos
 
 open System
 open System.Collections.Generic

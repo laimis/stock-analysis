@@ -5,12 +5,13 @@ open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
 open core.Stocks
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.CSV
+open core.fs.Adapters.Storage
 open core.fs.Services
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain.Accounts
+open core.fs.Adapters.Storage
 
 [<CLIMutable>]
 [<Struct>]

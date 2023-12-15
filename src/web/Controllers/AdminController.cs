@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using core.fs.Accounts;
+using core.fs.Adapters.Email;
 using core.fs.Admin;
-using core.fs.Shared.Adapters.Email;
-using core.fs.Shared.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;

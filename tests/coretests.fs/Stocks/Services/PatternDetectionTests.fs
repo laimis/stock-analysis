@@ -1,8 +1,8 @@
 module coretests.fs.Stocks.Services.PatternDetectionTests
 
 open Xunit
+open core.fs.Adapters.Stocks
 open core.fs.Services
-open core.fs.Shared.Adapters.Stocks
 open coretests.testdata
 open FsUnit
 

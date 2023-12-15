@@ -1,6 +1,6 @@
-namespace core.fs.Shared.Adapters.CSV
+namespace core.fs.Adapters.CSV
 
-open core.fs.Shared
+open core.fs
 
 type ExportResponse(filename:string, content:string) = 
     member this.Filename = filename

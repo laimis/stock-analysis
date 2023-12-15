@@ -4,7 +4,7 @@ open System
 open FsUnit
 open Xunit
 open core.fs.Services.Trading
-open core.fs.Shared.Domain
+open core.fs.Stocks
 open coretests.testdata
 
 let position =

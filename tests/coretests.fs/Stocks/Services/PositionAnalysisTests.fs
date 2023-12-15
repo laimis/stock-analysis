@@ -2,10 +2,10 @@ module coretests.fs.Stocks.Services.PositionAnalysisTests
 
 open Xunit
 open core.Shared
+open core.fs.Adapters.Brokerage
 open core.fs.Services
 open core.fs.Services.Analysis
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Domain
+open core.fs.Stocks
 open coretests.testdata
 open FsUnit
 

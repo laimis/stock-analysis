@@ -1,15 +1,13 @@
-namespace core.fs.Shared.Adapters.Storage
+namespace core.fs.Adapters.Storage
 
 open System.Collections.Generic
 open System.Threading.Tasks
 open core.Cryptos
-open core.Notes
 open core.Options
 open core.Routines
-open core.Shared
 open core.Stocks
-open core.fs.Shared.Domain
-open core.fs.Shared.Domain.Accounts
+open core.fs.Accounts
+open core.fs.Stocks
 
 type IPortfolioStorage =
     
@@ -36,10 +34,6 @@ type IPortfolioStorage =
     abstract member GetOwnedOptions : userId:UserId -> Task<IEnumerable<OwnedOption>>
     abstract member GetOwnedOption : optionId:System.Guid -> userId:UserId -> Task<OwnedOption>
     abstract member SaveOwnedOption : option:OwnedOption -> userId:UserId -> Task
-    
-    abstract member GetNotes : userId:UserId -> Task<IEnumerable<Note>>
-    abstract member GetNote : noteId:System.Guid -> userId:UserId -> Task<Note>
-    abstract member SaveNote : note:Note -> userId:UserId -> Task
     
     abstract member GetCrypto : token:string -> userId:UserId -> Task<OwnedCrypto>
     abstract member GetCryptoByCryptoId : id:System.Guid -> userId:UserId -> Task<OwnedCrypto>

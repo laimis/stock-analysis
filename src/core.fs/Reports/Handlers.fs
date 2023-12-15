@@ -4,18 +4,18 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
-open core.Stocks
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Stocks
+open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.Analysis.SingleBarPriceAnalysis
 open core.fs.Services.GapAnalysis
 open core.fs.Services.MultipleBarPriceAnalysis
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain
-open core.fs.Shared.Domain.Accounts
+open core.fs.Adapters.Storage
+open core.fs.Stocks
 
 type ChainQuery =
     {

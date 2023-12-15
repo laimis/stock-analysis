@@ -2,10 +2,9 @@ namespace core.fs.Services.Trading
 
 open System
 open System.Collections.Generic
-open core.Stocks
-open core.fs.Shared
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Domain
+open core.fs
+open core.fs.Adapters.Stocks
+open core.fs.Stocks
 
 module TradingStrategyConstants =
     // TODO: this needs to come from the environment or user settings

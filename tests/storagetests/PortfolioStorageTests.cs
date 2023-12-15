@@ -2,10 +2,9 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Cryptos;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain;
-using core.fs.Shared.Domain.Accounts;
-using core.Notes;
+using core.fs.Adapters.Storage;
+using core.fs.Accounts;
+using core.fs.Stocks;
 using core.Options;
 using core.Routines;
 using core.Shared;
@@ -126,36 +125,6 @@ namespace storagetests
             await storage.Delete(_userId);
 
             var afterDelete = await storage.GetOwnedOptions(_userId);
-
-            Assert.Empty(afterDelete);
-        }
-
-        [Fact]
-        public async Task NoteStorageWorksAsync()
-        {
-            var note = new Note(_userId.Item, "note", TestDataGenerator.AMD, DateTimeOffset.UtcNow);
-
-            var storage = CreateStorage();
-
-            await storage.SaveNote(note, _userId);
-
-            var notes = await storage.GetNotes(_userId);
-
-            Assert.NotEmpty(notes);
-
-            note = notes.Single(n => n.State.Id == note.State.Id);
-
-            note.Update("new note");
-
-            await storage.SaveNote(note, _userId);
-
-            var fromDb = await storage.GetNote(note.State.Id, _userId);
-            
-            Assert.Equal("new note", fromDb.State.Note);
-
-            await storage.Delete(_userId);
-
-            var afterDelete = await storage.GetNotes(_userId);
 
             Assert.Empty(afterDelete);
         }
@@ -288,45 +257,6 @@ namespace storagetests
             Assert.Empty(existing);
 
             await storage.Delete(_userId);
-        }
-
-        [Fact]
-        public async Task Notes_Works()
-        {
-            var storage = CreateStorage();
-            
-            var existing = await storage.GetNotes(_userId);
-            
-            Assert.Empty(existing);
-            
-            var note = new Note(
-                _userId.Item,
-                "description",
-                TestDataGenerator.AMD,
-                DateTimeOffset.UtcNow
-            );
-            
-            await storage.SaveNote(
-                note,
-                _userId
-            );
-            
-            existing = await storage.GetNotes(_userId);
-            
-            Assert.NotEmpty(existing);
-            
-            var loaded = await storage.GetNote(
-                note.State.Id,
-                _userId
-            );
-            
-            Assert.Equal(note.State.Note, loaded.State.Note);
-            
-            await storage.Delete(_userId);
-            
-            existing = await storage.GetNotes(_userId);
-            
-            Assert.Empty(existing);
         }
 
         [Fact]

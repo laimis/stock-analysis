@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using core.fs.Shared.Adapters.Subscriptions;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
+using core.fs.Adapters.Subscriptions;
 using coretests.testdata;
 using Xunit;
 

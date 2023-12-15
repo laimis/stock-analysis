@@ -1,4 +1,4 @@
-﻿namespace core.fs.Shared.Domain.Accounts
+﻿namespace core.fs.Accounts
 
 open System
 open core.Account

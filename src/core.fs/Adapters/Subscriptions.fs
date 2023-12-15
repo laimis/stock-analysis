@@ -1,6 +1,6 @@
-namespace core.fs.Shared.Adapters.Subscriptions
+namespace core.fs.Adapters.Subscriptions
 
-open core.fs.Shared.Domain.Accounts
+open core.fs.Accounts
 
 // TODO: does not make sense to have plan ids here. It should be hidden in the plan logic provider
 // and in the user state use an enum for the plan, me thinkest

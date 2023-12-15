@@ -1,7 +1,7 @@
 module coretests.fs.Stocks.PricesViewTests
 
 open Xunit
-open core.fs.Shared.Adapters.Stocks
+open core.fs.Adapters.Stocks
 open core.fs.Stocks
 
 [<Fact>]

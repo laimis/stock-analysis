@@ -1,8 +1,8 @@
-namespace core.fs.Shared.Adapters.SEC
+namespace core.fs.Adapters.SEC
 
 open System.Threading.Tasks
 open core.Shared
-open core.fs.Shared
+open core.fs
 
 [<Struct>]
 type FilingDetails =

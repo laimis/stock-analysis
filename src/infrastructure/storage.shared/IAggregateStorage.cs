@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 using core.Shared;
 
 namespace storage.shared

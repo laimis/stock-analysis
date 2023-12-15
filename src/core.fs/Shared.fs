@@ -1,33 +1,9 @@
-namespace core.fs.Shared
+namespace core.fs
 
 open System
 open System.Collections.Generic
-open core.Shared
 
 type IApplicationService = interface end
-
-[<CustomEquality>]
-[<CustomComparison>]
-type StockViolationView =
-    {
-        CurrentPrice: decimal
-        Message: string
-        NumberOfShares: decimal
-        PricePerShare: decimal
-        Ticker: Ticker
-    }
-    
-    override this.Equals(other) =
-        match other with
-        | :? StockViolationView as res -> res.Ticker = this.Ticker
-        | _ -> false
-    override this.GetHashCode() = this.Ticker.GetHashCode()
-    
-    interface IComparable with
-        member this.CompareTo(other) =
-            match other with
-            | :? StockViolationView as res -> this.Ticker.Value.CompareTo(res.Ticker.Value)
-            | _ -> -1
    
    
 type ServiceError(message:string) =

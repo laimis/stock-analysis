@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using ILogger = core.fs.Shared.Adapters.Logging.ILogger;
+using ILogger = core.fs.Adapters.Logging.ILogger;
 
 namespace web.Utils;
 

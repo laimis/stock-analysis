@@ -1,15 +1,16 @@
 using System;
+using core.fs;
+using core.fs.Adapters.Authentication;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.Cryptos;
+using core.fs.Adapters.CSV;
+using core.fs.Adapters.Email;
+using core.fs.Adapters.SEC;
+using core.fs.Adapters.SMS;
+using core.fs.Adapters.Storage;
+using core.fs.Adapters.Subscriptions;
 using core.fs.Alerts;
-using core.fs.Shared;
-using core.fs.Shared.Adapters.Authentication;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.Cryptos;
-using core.fs.Shared.Adapters.CSV;
-using core.fs.Shared.Adapters.Email;
-using core.fs.Shared.Adapters.SEC;
-using core.fs.Shared.Adapters.SMS;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Adapters.Subscriptions;
+using core.fs.Adapters.Storage;
 using csvparser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ namespace web
             services.AddSingleton<IRoleService>(_ => new RoleService(
                 configuration.GetValue<string>("ADMINEmail")
             ));
-            services.AddSingleton<core.fs.Shared.Adapters.Logging.ILogger, GenericLogger>();
+            services.AddSingleton<core.fs.Adapters.Logging.ILogger, GenericLogger>();
             services.AddSingleton(s =>
                 new coinmarketcap.CoinMarketCapClient(
                     s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),

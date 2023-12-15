@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using core.fs.Portfolio;
-using core.fs.Shared.Domain;
 using core.fs.Stocks;
 using core.Shared;
 using Microsoft.AspNetCore.Authorization;

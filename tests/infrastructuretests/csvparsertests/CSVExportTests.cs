@@ -1,12 +1,10 @@
 using System;
 using core.Cryptos;
 using core.fs.Services;
-using core.fs.Shared.Adapters.CSV;
-using core.fs.Shared.Domain;
-using core.Notes;
+using core.fs.Adapters.CSV;
+using core.fs.Stocks;
 using core.Options;
 using core.Shared;
-using core.Stocks;
 using coretests.testdata;
 using csvparser;
 using Microsoft.FSharp.Core;
@@ -68,18 +66,6 @@ namespace csvparsertests
             Assert.Contains("TLSA", report);
             Assert.Contains("CALL", report);
             Assert.Contains("2.5", report);
-        }
-
-        [Fact]
-        public void ExportNotes()
-        {
-            var note = new Note(Guid.NewGuid(), "my note", TestDataGenerator.AMD, DateTimeOffset.UtcNow);
-
-            var report = CSVExport.notes(_csvWriter, new[] {note});
-
-            Assert.Contains("Created,Ticker,Note", report);
-            Assert.Contains(note.State.RelatedToTicker.Value, report);
-            Assert.Contains("my note", report);
         }
 
         [Fact]

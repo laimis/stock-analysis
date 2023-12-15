@@ -1,6 +1,7 @@
 module core.fs.Services.GapAnalysis
 
-open core.fs.Shared.Adapters.Stocks
+open core.fs.Adapters.Stocks
+
     
 type GapType =
     | Up

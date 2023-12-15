@@ -1,4 +1,4 @@
-namespace core.fs.Shared.Adapters.Stocks
+namespace core.fs.Adapters.Stocks
 
 open System
 open System.Collections.Generic

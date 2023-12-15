@@ -3,11 +3,36 @@ namespace core.fs.Portfolio
 open System
 open Microsoft.FSharp.Collections
 open core.Shared
+open core.fs
+open core.fs.Adapters.Brokerage
 open core.fs.Services.Trading
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Domain
 
+open core.fs.Stocks
+
+
+[<CustomEquality>]
+[<CustomComparison>]
+type StockViolationView =
+    {
+        CurrentPrice: decimal
+        Message: string
+        NumberOfShares: decimal
+        PricePerShare: decimal
+        Ticker: Ticker
+    }
+    
+    override this.Equals(other) =
+        match other with
+        | :? StockViolationView as res -> res.Ticker = this.Ticker
+        | _ -> false
+    override this.GetHashCode() = this.Ticker.GetHashCode()
+    
+    interface IComparable with
+        member this.CompareTo(other) =
+            match other with
+            | :? StockViolationView as res -> this.Ticker.Value.CompareTo(res.Ticker.Value)
+            | _ -> -1
+            
 // TODO: this view class is very busy, doing all kinds of stuff. Maybe a service
 // should do this and this type would just contain data...
 type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculations array) =

@@ -1,10 +1,9 @@
-namespace core.fs.Shared.Adapters.Storage
+namespace core.fs.Adapters.Storage
 
 open System
 open System.Collections.Generic
 open System.Threading.Tasks
-open core.Account
-open core.fs.Shared.Domain.Accounts
+open core.fs.Accounts
 
 type IAccountStorage =
     

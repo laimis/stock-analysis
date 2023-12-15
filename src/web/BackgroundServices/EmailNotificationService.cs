@@ -4,11 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.fs;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.Email;
+using core.fs.Adapters.Storage;
 using core.fs.Alerts;
-using core.fs.Shared;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.Email;
-using core.fs.Shared.Adapters.Storage;
 using core.Shared;
 using Microsoft.Extensions.Logging;
 

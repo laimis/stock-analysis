@@ -3,7 +3,7 @@ module coretests.Stocks
 open System
 open Xunit
 open core.Shared
-open core.fs.Shared.Domain
+open core.fs.Stocks
 open coretests.testdata
 open FsUnit
 

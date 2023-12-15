@@ -1,12 +1,12 @@
 ﻿namespace migrations
 
-open CsvHelper.Configuration.Attributes
 open core.Stocks
-open core.fs.Shared.Adapters.Logging
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain
-open core.fs.Shared.Domain.Accounts
+open core.fs.Accounts
+open core.fs.Adapters.Logging
+open core.fs.Adapters.Storage
+open core.fs.Stocks
 open storage.shared
+
 
 // we will be migrating from OwnedStockState silliness to StockPosition
 module MigrateFromV2ToV3 =

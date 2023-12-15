@@ -1,4 +1,4 @@
-namespace core.fs.Shared.Adapters.SMS
+namespace core.fs.Adapters.SMS
 
 open System.Threading.Tasks
 

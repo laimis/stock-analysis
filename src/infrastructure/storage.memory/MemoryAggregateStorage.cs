@@ -1,5 +1,5 @@
 using System.Data;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 using core.Shared;
 using storage.shared;
 

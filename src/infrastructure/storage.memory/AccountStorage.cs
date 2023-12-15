@@ -1,5 +1,5 @@
-﻿using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
+﻿using core.fs.Accounts;
+using core.fs.Adapters.Storage;
 using Microsoft.FSharp.Core;
 using storage.shared;
 

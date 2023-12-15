@@ -7,15 +7,15 @@ open Microsoft.FSharp.Core
 open core.Cryptos
 open core.Options
 open core.Shared
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.CSV
+open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Trading
-open core.fs.Services.TradingStrategies
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain
-open core.fs.Shared.Domain.Accounts
+open core.fs.Adapters.Storage
+open core.fs.Stocks
 
 type Query =
     {
@@ -760,7 +760,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let current = positions |> Array.sortByDescending _.RR
             
-            let violations = core.fs.Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
+            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
             
             let (tradingEntries:TradingEntriesView) =
                 {
