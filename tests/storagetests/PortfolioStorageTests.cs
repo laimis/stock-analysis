@@ -216,6 +216,8 @@ namespace storagetests
             loaded = await storage.GetStockPosition(afterGrading.PositionId, _userId);
 
             Assert.Equal(TestDataGenerator.A, loaded.Value.Grade);    
+            
+            await storage.Delete(_userId);
         }
 
         [Fact]

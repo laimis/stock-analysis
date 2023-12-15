@@ -86,3 +86,5 @@ CREATE TABLE blobs (
 	inserted timestamp,
 	PRIMARY KEY (key) 
 );
+
+ALTER TABLE events ADD COLUMN AggregateId TEXT;

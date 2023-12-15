@@ -82,12 +82,13 @@ namespace storage.postgres
                     Event = e,
                     Key = e.Id.ToString(),
                     UserId = userId.Item,
+                    AggregateId = e.AggregateId.ToString(),
                     Created = DateTimeOffset.UtcNow,
                     Version = ++version
                 };
 
-                var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
-						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
+                var query = @"INSERT INTO events (entity, key, aggregateid, userid, created, version, eventjson) VALUES
+						(@Entity, @Key, @AggregateId, @UserId, @Created, @Version, @EventJson)";
 
                 await db.ExecuteAsync(query, se);
 
