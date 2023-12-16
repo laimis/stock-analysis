@@ -63,7 +63,7 @@ export class StockTradingReviewComponent {
     this.assignedNote = this.currentPosition.gradeNote
     this.simulationResults = null
     this.dailyPositionReport = null
-    this.runTradingStrategies();
+    this.runTradingStrategies(this.currentPosition);
     this.positionChartInformation = null
     this.setTitle();
   }
@@ -95,58 +95,58 @@ export class StockTradingReviewComponent {
     return null
   }
 
-  private getPositionReport() {
+  private getPositionReport(position: PositionInstance) {
     this.stockService.reportDailyPositionReport(
-      this.currentPosition.ticker,
-      this.currentPosition.positionId).subscribe(
+      position.ticker,
+      position.positionId).subscribe(
       (r: DailyPositionReport) => {
         this.scoresErrors = null
         this.dailyPositionReport = r;
-        this.getPrices();
+        this.getPrices(position);
       },
       (error) => {
         this.dailyPositionReport = null
         this.scoresErrors = GetErrors(error)
-        this.getPrices();
+        this.getPrices(position);
       }
     );
   }
 
-  private runTradingStrategies() {
-    this.stockPositionsService.simulatePosition(this.currentPosition.positionId).subscribe(
+  private runTradingStrategies(position: PositionInstance) {
+    this.stockPositionsService.simulatePosition(position.positionId).subscribe(
       (r: TradingStrategyResults) => {
         this.simulationErrors = null
         this.simulationResults = r;
-        this.getPositionReport()
+        this.getPositionReport(position)
       },
       (error) => {
         this.simulationErrors = GetErrors(error)
-        this.getPositionReport()
+        this.getPositionReport(position)
       }
     );
   }
 
-  private getPrices() {
-    this.stockService.getStockPrices(this.currentPosition.ticker, 365, PriceFrequency.Daily).subscribe(
+  private getPrices(position) {
+    this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily).subscribe(
       (r: Prices) => {
 
         let markers: ChartMarker[] = []
 
-        this.currentPosition.transactions.filter(t => t.type == 'buy').forEach(t => {
+        position.transactions.filter(t => t.type == 'buy').forEach(t => {
           markers.push({date: t.date, label: 'Buy', color: green, shape: 'arrowUp'})
         })
 
-        this.currentPosition.transactions.filter(t => t.type == 'sell').forEach(t => {
+        position.transactions.filter(t => t.type == 'sell').forEach(t => {
           markers.push({date: t.date, label: 'Sell', color: red, shape: 'arrowDown'})
         })
 
         this.pricesErrors = null
         this.positionChartInformation = {
-          averageBuyPrice: this.currentPosition.averageCostPerShare,
-          stopPrice: this.currentPosition.stopPrice,
+          averageBuyPrice: position.averageCostPerShare,
+          stopPrice: position.stopPrice,
           markers: markers,
           prices: r,
-          ticker: this.currentPosition.ticker
+          ticker: position.ticker
         }
       },
       (error) => {

@@ -44,10 +44,10 @@ export class StockPositionsService {
     )
   }
 
-  assignGrade(positionId:string, grade: string, note: string): Observable<any> {
+  assignGrade(positionId:string, grade: string, gradeNote: string): Observable<any> {
     return this.http.post<any>(
       `/api/portfolio/stockpositions/${positionId}/grade`,
-      { grade, note, positionId }
+      { grade, gradeNote, positionId }
     )
   }
 

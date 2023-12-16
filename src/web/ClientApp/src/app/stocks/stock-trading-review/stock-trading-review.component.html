@@ -5,11 +5,11 @@
         <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
         <div class="col text-center">
           <select class="form-select" (change)="dropdownClick($event.target)">
-            @for (position of positions; track position; let i = $index) {
+            @for (position of positions; track position;) {
               <option
-                [value]="i"
-                [selected]="position.ticker === currentPosition.ticker && position.positionId === currentPosition.positionId">
-                {{position.ticker}} - {{position.positionId}}
+                [value]="position.positionId"
+                [selected]="position.positionId === currentPosition.positionId">
+                {{position.ticker}}
               </option>
             }
           </select>
