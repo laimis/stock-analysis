@@ -527,7 +527,7 @@ export interface ReviewList {
   openPositions: PositionInstance[]
   closedPositions: PositionInstance[]
   plOptionTransactions: Transaction[]
-  plStockTransactions: Transaction[]
+  plStockTransactions: StockPLTransaction[]
   stockTransactions: Transaction[]
   optionTransactions: Transaction[]
 }
