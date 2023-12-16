@@ -88,8 +88,8 @@ write-host $v
 
 $version = new-object System.Version($v.Substring(1))
 
-# $newVersion = new-object System.Version($version.Major, $version.Minor, ($version.Build + 1))
-$newVersion = new-object System.Version(3, 0, 0, 0)
+$newVersion = new-object System.Version($version.Major, $version.Minor, ($version.Build + 1))
+
 $cmd = "git tag -a v$($newVersion) -m '$message'"
 Invoke-Expression $cmd
 Invoke-Expression "git push --tags"
