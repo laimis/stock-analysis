@@ -1,6 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {
-  StocksService,
   StockDetails,
   StockOwnership,
   PositionInstance,
@@ -16,12 +15,10 @@ import { Router } from '@angular/router';
 })
 export class StockOwnershipComponent {
 
-  private _ownership: StockOwnership
   positions: PositionInstance[];
 
   @Input()
   public set ownership(value) {
-    this._ownership = value
 
     // create new array of positions that is
     // created from value.positions, but reversed in orders
@@ -29,22 +26,9 @@ export class StockOwnershipComponent {
     {
       this.positions = value.positions.slice().reverse()
     }
-
   }
-  public get ownership() {
-    return this._ownership
-  }
-
-  @Input()
-  stock: StockDetails;
 
   @Input()
   quote: StockQuote
 
-
-  public errors: string[]
-
-  numberOfShares: number
-	filled:         string
-  notes:          string
 }
