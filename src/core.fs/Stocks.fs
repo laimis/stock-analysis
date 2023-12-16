@@ -454,12 +454,16 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.Transactions =
         
-        stockPosition.Transactions
-        |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
-        |> List.choose id
+        stockPosition.ShareTransactions
         |> List.map (fun s ->
             let ``type`` = (match s.Type with | Buy -> "Buy" | Sell -> "Sell") |> _.ToLower()
-            let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
+            let pctGainIndicatorForSellOnly =
+                match s.Type with
+                | Buy -> ""
+                | Sell ->
+                    let gainPct = (s.Price - this.AverageCostPerShare) / this.AverageCostPerShare
+                    " (" + gainPct.ToString("P") + ")"
+            let description = $"{``type``} {s.NumberOfShares} @ {s.Price}{pctGainIndicatorForSellOnly}"
             let date = s.Date.ToString("yyyy-MM-dd")
             {|id = s.TransactionId; date = date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
         )
