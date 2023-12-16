@@ -88,3 +88,11 @@ CREATE TABLE blobs (
 );
 
 ALTER TABLE events ADD COLUMN AggregateId TEXT;
+
+UPDATE events SET aggregateid = eventjson::json->>'AggregateId'
+WHERE events.AggregateId IS NULL;
+
+ALTER TABLE events ALTER COLUMN AggregateId SET NOT NULL;
+
+CREATE UNIQUE INDEX events_aggregateid_unique 
+    ON events USING BTREE(aggregateid,userid,version);
