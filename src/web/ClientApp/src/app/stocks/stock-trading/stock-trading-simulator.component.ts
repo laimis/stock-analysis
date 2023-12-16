@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService, stocktransactioncommand, PositionInstance } from '../../services/stocks.service';
+import {
+  StocksService,
+  stocktransactioncommand,
+  PositionInstance,
+  openpositioncommand
+} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 
 class StockTransaction {
@@ -61,7 +66,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     }
   }
 
-  initialPosition(ticker:string, cmd:stocktransactioncommand) {
+  initialPosition(ticker:string, cmd:openpositioncommand) {
     this.ticker = ticker
     this.stopPrice = cmd.stopPrice
     this.price = cmd.price
