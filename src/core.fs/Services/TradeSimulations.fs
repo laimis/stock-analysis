@@ -14,6 +14,11 @@ type TradingStrategy(name:string) =
     
     let mutable _numberOfSharesAtStart = 0m
     
+    static member ClosePosition price date (position:StockPositionState) =
+        match position.IsOpen with
+        | true -> position |> StockPosition.sell position.NumberOfShares price date None
+        | false -> position
+    
     static member CalculateMaxDrawdownAndGain (last10Bars:seq<PriceBar>) =
         
         let maxDrawdownPctRecent,maxGainPctRecent =
@@ -55,15 +60,10 @@ type TradingStrategy(name:string) =
                 MaxGain = Math.Max(context.MaxGain,bar.PercentDifferenceFromHigh(calculations.AverageBuyCostPerShare))
                 Last10Bars = last10bars
             }
-    
-    member this.ClosePosition price date (position:StockPositionState) =
-        match position.NumberOfShares with
-        | x when x > 0m -> position |> StockPosition.sell position.NumberOfShares price date None
-        | _ -> position
            
     interface  ITradingStrategy with
     
-        member this.Run (bars:PriceBars) (position:StockPositionState) =
+        member this.Run (bars:PriceBars) closeIfOpen (position:StockPositionState) =
             
             let context = 
                 {
@@ -81,12 +81,22 @@ type TradingStrategy(name:string) =
                 
             let maxDrawdownPctRecent,maxGainPctRecent = TradingStrategy.CalculateMaxDrawdownAndGain finalContext.Last10Bars
             
+            let positionWithCalculations =
+                match closeIfOpen && finalContext.Position.IsClosed = false with
+                | true ->
+                    let closingPrice = finalContext.Last10Bars[finalContext.Last10Bars.Count - 1].Close
+                    let closingDate = finalContext.Last10Bars[finalContext.Last10Bars.Count - 1].Date
+                    
+                    finalContext.Position |> TradingStrategy.ClosePosition closingPrice closingDate
+                | false -> finalContext.Position
+                |> StockPositionWithCalculations
+            
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
                 MaxGainPct = finalContext.MaxGain
                 MaxDrawdownPctRecent = maxDrawdownPctRecent
                 MaxGainPctRecent = maxGainPctRecent
-                Position = finalContext.Position
+                Position = positionWithCalculations
                 StrategyName = this.Name
             }
 
@@ -96,7 +106,8 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
     
     override this.ApplyPriceBarToPositionInternal (context:SimulationContext) (bar:PriceBar) =
         if exitCondition context bar then
-            this.ClosePosition bar.Close bar.Date context.Position
+            context.Position
+            |> TradingStrategy.ClosePosition bar.Close bar.Date
         else
             context.Position
             
@@ -105,7 +116,7 @@ type TradingStrategyActualTrade() =
     
     interface ITradingStrategy with
     
-        member this.Run (bars:PriceBars) (position:StockPositionState) =
+        member this.Run (bars:PriceBars) (closeIfOpen:bool) (position:StockPositionState) =
             
             let finalPosition, maxDrawdownPct, maxGainPct, last10Bars =
                 bars.Bars
@@ -126,13 +137,23 @@ type TradingStrategyActualTrade() =
                 ) (position, Decimal.MaxValue, Decimal.MinValue, [])
                 
             let maxDrawdownPctRecent,maxGainPctRecent = TradingStrategy.CalculateMaxDrawdownAndGain(last10Bars)
+            
+            let positionWithCalculations =
+                match closeIfOpen with
+                | true ->
+                    let closingPrice = last10Bars.[last10Bars.Length - 1].Close
+                    let closingDate = last10Bars.[last10Bars.Length - 1].Date
+                    
+                    finalPosition |> TradingStrategy.ClosePosition closingPrice closingDate
+                | false -> finalPosition
+                |> StockPositionWithCalculations
                 
             {
                 MaxDrawdownPct = maxDrawdownPct
                 MaxGainPct = maxGainPct
                 MaxDrawdownPctRecent = maxDrawdownPctRecent
                 MaxGainPctRecent = maxGainPctRecent
-                Position = finalPosition
+                Position = positionWithCalculations
                 StrategyName = TradingStrategyConstants.ActualTradesName
             }    
 
@@ -185,7 +206,7 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
         let closeIfNecessary (position:StockPositionState) =
             match position.StopPrice with
             | Some stopPrice when stopPrice >= bar.Close ->
-                this.ClosePosition bar.Close bar.Date position
+                TradingStrategy.ClosePosition bar.Close bar.Date position
             | _ -> position
         
         context.Position
@@ -237,18 +258,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             match actualTrade.RiskAmount with
             | Some riskAmount -> stockPosition |> StockPosition.setRiskAmount riskAmount date
             | None -> stockPosition
-            
-    let closePositionIfOpenedAtTheEnd closeIfOpenAtTheEnd (bars:PriceBars) result =
-        match closeIfOpenAtTheEnd with
-        | false -> result
-        | true ->
-            match result.Position.IsClosed with
-            | true -> result
-            | false ->
-                let lastBar = bars.Last
-                let closedPosition = result.Position |> StockPosition.sell result.Position.NumberOfShares lastBar.Close lastBar.Date None
-                { result with Position = closedPosition }
-            
+    
     member this.Run(
             user:UserState,
             numberOfShares:decimal,
@@ -289,15 +299,14 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                             |> StockPosition.buy numberOfShares price ``when`` None
                             |> StockPosition.setStop stopPrice ``when``
                             |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
-                            |> strategy.Run bars
-                            |> closePositionIfOpenedAtTheEnd closeIfOpenAtTheEnd bars
+                            |> strategy.Run bars closeIfOpenAtTheEnd
                             
                         results.Add(result)
                     )
                     
                     match actualTrade with
                     | Some actualTrade ->
-                        let actualResult = TradingStrategyFactory.createActualTrade().Run bars actualTrade
+                        let actualResult = TradingStrategyFactory.createActualTrade().Run bars closeIfOpenAtTheEnd actualTrade
                         results.Insert(0, actualResult)
                     | None -> ()
             

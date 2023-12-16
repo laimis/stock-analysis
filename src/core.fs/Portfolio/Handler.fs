@@ -123,7 +123,8 @@ type GradePosition =
         PositionId: StockPositionId
         [<Required>]
         Grade: TradeGrade
-        Note: string option
+        [<Required>]
+        GradeNote: string option
     }
     
 type RemoveLabel =
@@ -509,7 +510,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | Some stock ->
                 
                 do! stock
-                    |> StockPosition.assignGrade command.Grade command.Note DateTimeOffset.UtcNow
+                    |> StockPosition.assignGrade command.Grade command.GradeNote DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition userId (Some stock)
                 
                 return Ok
@@ -653,7 +654,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             
             let actualTradingResult = {
                 StrategyName = TradingStrategyConstants.ActualTradesName
-                Position = position
+                Position = calculations
                 MaxDrawdownPct = 0m
                 MaxGainPct = 0m
                 MaxDrawdownPctRecent = 0m
@@ -664,7 +665,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         }
         
         let mapToStrategyPerformance (name:string, results:TradingStrategyResult seq) =
-            let positions = results |> Seq.map (fun r -> r.Position |> StockPositionWithCalculations) |> Seq.toArray
+            let positions = results |> Seq.map (_.Position) |> Seq.toArray
             let performance =
                 try
                     TradingPerformance.Create(positions)

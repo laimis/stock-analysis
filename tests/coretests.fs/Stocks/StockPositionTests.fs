@@ -341,6 +341,7 @@ let ``Assign grade to closed position should succeed`` () =
         
     position.Grade |> should equal (Some (TradeGrade("A")))
     position.Notes |> should contain "this trade went perfectly!"
+    position.GradeNote.Value |> should be (equal "this trade went perfectly!")
 
 [<Fact>]
 let ``Assign grade to graded position, updates grade and note`` () =
@@ -354,6 +355,7 @@ let ``Assign grade to graded position, updates grade and note`` () =
         
     position.Grade |> should equal (Some (TradeGrade("B")))
     position.Notes |> should contain "this trade went perfectly! (updated)"
+    position.GradeNote.Value |> should be (equal "this trade went perfectly! (updated)")
 
 [<Fact>]
 let ``Assign invalid grade, fails``() =

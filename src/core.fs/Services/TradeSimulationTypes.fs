@@ -27,7 +27,7 @@ type TradingStrategyResult =
         MaxGainPct:decimal
         MaxDrawdownPctRecent:decimal
         MaxGainPctRecent:decimal
-        Position:StockPositionState
+        Position:StockPositionWithCalculations
         StrategyName:string
     }
 
@@ -49,7 +49,7 @@ type TradingStrategyResults() =
         this.FailedReason <- Some reason
 
 type ITradingStrategy =
-    abstract Run : bars:PriceBars -> position:StockPositionState -> TradingStrategyResult
+    abstract Run : bars:PriceBars -> closeIfOpen:bool -> position:StockPositionState -> TradingStrategyResult
         
 module ProfitPoints =
     

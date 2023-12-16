@@ -61,6 +61,7 @@ type StockPositionState =
         Notes: string list
         Labels: Dictionary<string, string>
         Grade: TradeGrade option
+        GradeNote : string option
         
         Version: int
         Events: AggregateEvent list
@@ -134,9 +135,10 @@ type StockPositionTransactionDeleted(id, aggregateId, ``when``, transactionId) =
 type StockPositionDeleted(id, aggregateId, ``when``) =
     inherit AggregateEvent(id, aggregateId, ``when``)
 
-type StockPositionGradeAssigned(id, aggregateId, ``when``, grade) =
+type StockPositionGradeAssigned(id, aggregateId, ``when``, grade, gradeNote) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.Grade = grade
+    member this.GradeNote = gradeNote
     
 module StockPosition =
         
@@ -153,6 +155,7 @@ module StockPosition =
             Notes = []
             Labels = Dictionary<string, string>()
             Grade = None
+            GradeNote = None 
             Version = 1
             Events = [event]
         }
@@ -201,7 +204,7 @@ module StockPosition =
             
         | :? StockPositionGradeAssigned as x ->
             let gradeValue = x.Grade |> TradeGrade |> Some
-            { p with Grade = gradeValue; Version = p.Version + 1; Events = p.Events @ [x]  }
+            { p with Grade = gradeValue; GradeNote = x.GradeNote |> Some; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionStopDeleted as x ->
             let newTransactions = p.Transactions @ [Stop {TransactionId = x.Id; StopPrice = None; Date = x.When }]
@@ -272,14 +275,15 @@ module StockPosition =
         |> applyNotesIfApplicable notes date
         |> closePositionIfApplicable date
         
-    let assignGrade grade gradeNotes date (stockPosition:StockPositionState) =
+    let assignGrade grade (gradeNote:string option) date (stockPosition:StockPositionState) =
         match stockPosition with
         | x when x.Closed.IsNone -> failwith "Cannot assign grade to open position"
         | x when x.Grade.IsSome && x.Grade.Value = grade -> stockPosition
+        | _ when gradeNote.IsNone || String.IsNullOrWhiteSpace(gradeNote.Value) -> failwith "Grade notes cannot be empty"
         | _ ->
-            let e = StockPositionGradeAssigned(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, grade.Value)
+            let e = StockPositionGradeAssigned(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, grade.Value, gradeNote.Value)
             apply e stockPosition
-            |> applyNotesIfApplicable gradeNotes date
+            |> applyNotesIfApplicable gradeNote date
         
     let delete stockPosition =
         let e = StockPositionDeleted(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow)
@@ -391,6 +395,8 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.StopPrice = stockPosition.StopPrice
     member this.Notes = stockPosition.Notes
     member this.Grade = stockPosition.Grade
+    member this.GradeNote = stockPosition.GradeNote
+    
     member this.AverageCostPerShare =
         
         let sharesSoldTotal = sells |> List.sumBy (fun x -> x.NumberOfShares |> abs) |> int

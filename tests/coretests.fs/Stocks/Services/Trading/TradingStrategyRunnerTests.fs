@@ -63,7 +63,7 @@ let ``Basic test``() = task {
 
     let maxDrawdown = oneThirdResult.MaxDrawdownPct
     let maxGain = oneThirdResult.MaxGainPct
-    let position = oneThirdResult.Position |> StockPositionWithCalculations
+    let position = oneThirdResult.Position
 
     position.IsClosed |> should equal true
     position.Profit |> should equal 1005
@@ -76,7 +76,7 @@ let ``Basic test``() = task {
     let oneThirdPercentBased = results.Results[1]
     let maxDrawdown = oneThirdPercentBased.MaxDrawdownPct
     let maxGain = oneThirdPercentBased.MaxGainPct
-    let position = oneThirdPercentBased.Position |> StockPositionWithCalculations
+    let position = oneThirdPercentBased.Position
 
     position.IsClosed |> should equal true
     position.Profit |> should equal 137.3m
@@ -98,11 +98,11 @@ let ``With portion size too small, still sells at RR levels``() =
         StockPosition.openLong TestDataGenerator.NET bars.First.Date
         |> StockPosition.buy 2m 10m  bars.First.Date None
         |> StockPosition.setStop (Some 5m)  bars.First.Date
-        |> runner.Run bars
+        |> runner.Run bars false
     
     let maxDrawdown = result.MaxDrawdownPct
     let maxGain = result.MaxGainPct
-    let position = result.Position |> StockPositionWithCalculations
+    let position = result.Position
     
     position.IsClosed |> should equal true
     position.Profit |> should equal 15
@@ -148,9 +148,9 @@ let ``With price falling, stop price exit executes``() =
     
     let bars, positionInstance = createDownsideTestData()
     let runner = TradingStrategyFactory.createProfitPointsTrade 3
-    let result = runner.Run bars positionInstance
+    let result = runner.Run bars false positionInstance
     
-    let position = result.Position |> StockPositionWithCalculations
+    let position = result.Position
     let maxGain = result.MaxGainPct
     let maxDrawdown = result.MaxDrawdownPct
     
@@ -174,9 +174,9 @@ let ``Close after fixed number of days, works``() =
         
     let runner = TradingStrategyFactory.createCloseAfterFixedNumberOfDays 5
     
-    let result = runner.Run data positionInstance
+    let result = runner.Run data false positionInstance
     
-    let position = result.Position |> StockPositionWithCalculations
+    let position = result.Position
     let maxGain = result.MaxGainPct
     let maxDrawdown = result.MaxDrawdownPct
     
