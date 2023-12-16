@@ -151,7 +151,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, PriceFrequency.Weekly, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
                 if (!priceBars.IsOk)
                 {
-                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error.Value);
+                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error.Value.Message);
                     continue;
                 }
 

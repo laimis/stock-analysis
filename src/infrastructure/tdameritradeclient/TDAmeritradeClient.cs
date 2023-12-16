@@ -780,7 +780,6 @@ public class TDAmeritradeClient : IBrokerage
         
         if (token is { IsExpired: false })
         {
-            _logger?.LogInformation("Returning cached access token, with expiration");
             return token;
         }
 
@@ -790,7 +789,6 @@ public class TDAmeritradeClient : IBrokerage
             token = await _blogStorage.Get<OAuthResponse>(storageKey);
             if (token is { IsExpired: false })
             {
-                _logger?.LogInformation("Returning cached access token, without expiration");
                 return token;
             }
             
@@ -804,7 +802,7 @@ public class TDAmeritradeClient : IBrokerage
                 throw new Exception("Could not refresh access token: " + token.error);
             }
 
-            _logger?.LogCritical("Saving access token to storage");
+            _logger?.LogInformation("Saving access token to storage");
         
             await _blogStorage.Save(storageKey, token);
             return token;

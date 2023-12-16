@@ -572,6 +572,26 @@ export interface Transaction {
   isPL: boolean
   ticker: string
 }
+
+export interface StockTransaction {
+  numberOfShares: number,
+  price: number,
+  type: string,
+  date: string,
+  ageInDays: number
+  transactionId: string
+}
+
+export interface StockPLTransaction {
+  ticker: string
+  date: string
+  numberOfShares: number
+  buyPrice: number
+  sellPrice: number
+  profit: number
+  gainPct: number
+}
+
 export interface NoteList {
   tickers: string[]
   notes: Note[]
@@ -1004,14 +1024,6 @@ export interface PriceWithDate {
   price: number,
   date: string
 }
-export interface PositionTransaction {
-  numberOfShares: number,
-  price: number,
-  type: string,
-  date: string,
-  ageInDays: number
-  transactionId: string
-}
 
 export interface PositionEvent {
   id: string,
@@ -1067,7 +1079,8 @@ export interface PositionInstance {
   rrWeighted: number,
   stopPrice: number,
   ticker: string,
-  transactions: PositionTransaction[],
+  plTransactions: StockPLTransaction[],
+  transactions: StockTransaction[],
   events: PositionEvent[],
   costAtRiskedBasedOnStopPrice: number,
   grade: string,

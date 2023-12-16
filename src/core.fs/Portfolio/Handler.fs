@@ -14,7 +14,6 @@ open core.fs.Adapters.CSV
 open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Trading
-open core.fs.Adapters.Storage
 open core.fs.Stocks
 
 type Query =
@@ -874,6 +873,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         let plStockTransactions =
             stocks
             |> Seq.collect _.PLTransactions
+            |> Seq.filter (fun t -> t.Date >= DateTimeOffset(start))
             |> Seq.sortBy _.Ticker
             |> Seq.toList
             

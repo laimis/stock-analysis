@@ -446,6 +446,17 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         | 0m -> 0m // we haven't sold any, no gain pct
         | _ -> (this.AverageSaleCostPerShare - this.AverageBuyCostPerShare) / this.AverageBuyCostPerShare
         
+    member this.Transactions =
+        
+        stockPosition.Transactions
+        |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
+        |> List.choose id
+        |> List.map (fun s ->
+            let ``type`` = match s.Type with | Buy -> "Buy" | Sell -> "Sell" |> _.ToLower()
+            let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
+            {|id = s.TransactionId; date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
+        )
+        
     member this.PLTransactions =
         // we fold over sells, and for each sell create a PLTransaction
         sells
