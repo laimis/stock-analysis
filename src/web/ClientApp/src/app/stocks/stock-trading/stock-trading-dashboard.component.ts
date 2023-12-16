@@ -9,6 +9,7 @@ import {
   StockViolation
 } from '../../services/stocks.service';
 import {GetErrors} from "../../services/utils";
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-dashboard',
@@ -27,7 +28,7 @@ export class StockTradingComponent implements OnInit {
   quotes: Map<string, StockQuote>
 
   constructor(
-    private stockService:StocksService,
+    private stockService:StockPositionsService,
     private title: Title,
     private route: ActivatedRoute
     ) { }

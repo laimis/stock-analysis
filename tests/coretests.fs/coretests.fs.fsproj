@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Stocks\StockPositionTests.fs" />
+    <Compile Include="Stocks\StockPositionWithCalculationsTests.fs" />
+    <Compile Include="Stocks\PriceBarTests.fs" />
+    <Compile Include="Stocks\PricesViewTests.fs" />
+    <Compile Include="Stocks\Services\GapAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\MultipleBarPriceAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\NumberAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\PatternDetectionTests.fs" />
+    <Compile Include="Stocks\Services\SingleBarPriceAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\SMAAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\VolumeAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\PositionAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\Trading\TradingStrategyRunnerTests.fs" />
+    <Compile Include="Stocks\Services\Trading\ProfitPointTests.fs" />
+    <Compile Include="Stocks\TradingPerformanceViewTests.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSUnit" Version="5.6.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.6.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\core.fs\core.fs.fsproj" />
+    <ProjectReference Include="..\coretests\coretests.csproj" />
+  </ItemGroup>
+
+</Project>

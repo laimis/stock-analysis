@@ -3,13 +3,13 @@ namespace core.fs.Accounts
     open System
     open System.ComponentModel.DataAnnotations
     open core.Account
-    open core.fs.Shared
-    open core.fs.Shared.Adapters.Authentication
-    open core.fs.Shared.Adapters.Brokerage
-    open core.fs.Shared.Adapters.Email
-    open core.fs.Shared.Adapters.Storage
-    open core.fs.Shared.Adapters.Subscriptions
-    open core.fs.Shared.Domain.Accounts
+    open core.fs
+    open core.fs.Adapters.Authentication
+    open core.fs.Adapters.Brokerage
+    open core.fs.Adapters.Email
+    open core.fs.Adapters.Storage
+    open core.fs.Adapters.Subscriptions
+    open core.fs.Adapters.Storage
     
     type AccountStatusView =
         {

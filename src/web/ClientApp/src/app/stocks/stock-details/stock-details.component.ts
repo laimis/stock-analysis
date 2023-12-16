@@ -1,8 +1,17 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import { StocksService, StockDetails, NoteList, OwnedOption, StockOwnership, StockProfile } from '../../services/stocks.service';
+import {
+  StocksService,
+  StockDetails,
+  NoteList,
+  OwnedOption,
+  StockOwnership,
+  BrokerageOrder, PositionInstance
+} from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import {BrokerageOrdersComponent} from "../../brokerage/orders.component";
+import {GetErrors} from "../../services/utils";
+import {StockPositionsService} from "../../services/stockpositions.service";
+import {BrokerageService} from "../../services/brokerage.service";
 
 @Component({
   selector: 'app-stock-details',
@@ -11,21 +20,35 @@ import {BrokerageOrdersComponent} from "../../brokerage/orders.component";
 })
 export class StockDetailsComponent implements OnInit {
 
-  profile: StockProfile
   ticker: string
-	loaded: boolean = false
-  stock: StockDetails
-  notes: NoteList
-  ownership: StockOwnership
+	stock: StockDetails
+  stockOwnership: StockOwnership
+  currentPosition: PositionInstance
   options: OwnedOption[]
+  notes: NoteList
+  orders: BrokerageOrder[]
   activeTab: string = ''
 
-  // reference child BrokerageOrdersComponent
-  @ViewChild(BrokerageOrdersComponent)
-  private orders: BrokerageOrdersComponent
+  loading = {
+    stock: false,
+    ownership: false,
+    options: false,
+    notes: false,
+    orders: false
+  }
+
+  errors = {
+    stock: null,
+    ownership: null,
+    options: null,
+    notes: null,
+    orders: null
+  }
 
 	constructor(
 		private stocks : StocksService,
+    private stockPositions: StockPositionsService,
+    private brokerage : BrokerageService,
     private route: ActivatedRoute,
     private title: Title){}
 
@@ -34,48 +57,81 @@ export class StockDetailsComponent implements OnInit {
       const ticker = param['ticker']
       if (ticker){
         this.ticker = ticker;
-        this.fetchStock();
+        this.loadData();
+      } else {
+        this.errors.stock = ['No ticker provided']
       }
 
       this.activeTab = param['tab'] || 'stocks'
     })
 	}
 
-	fetchStock() {
-		this.stocks.getStockDetails(this.ticker).subscribe(result => {
-      this.stock = result;
-      this.profile = result.profile
-      this.loaded = true;
-      this.title.setTitle(this.stock.ticker + " - Nightingale Trading")
-		}, error => {
-			console.error(error);
-			this.loaded = true;
-    });
+	loadData() {
+    this.loading.stock = true;
+    this.loading.ownership = true;
+    this.loading.options = true;
+    this.loading.notes = true;
+    this.loading.orders = true;
 
-    this.stocks.getNotes(this.ticker).subscribe(result => {
-      this.notes = result
-    }, error => {
-      console.error(error)
-    })
-
+    this.loadStockDetails()
+    this.loadNotes()
     this.loadStockOwnership()
-
     this.loadOptionOwnership()
+    this.loadOrders()
   }
 
-  loadOptionOwnership() {
+  loadOrders() {
+    this.brokerage.brokerageAccount().subscribe(
+      a => {
+        this.loading.orders = false
+        this.orders = a.orders
+      },
+      e => {
+        this.loading.orders = false
+        this.errors.orders = GetErrors(e)
+      }
+    )
+  }
+
+  loadStockDetails() {
+    this.stocks.getStockDetails(this.ticker).subscribe(result => {
+      this.loading.stock = false;
+      this.stock = result;
+      this.title.setTitle(this.stock.ticker + " - Nightingale Trading")
+    }, error => {
+      this.errors.stock = GetErrors(error)
+      this.loading.stock = false;
+    });
+  }
+
+  loadNotes() {
+    this.stocks.getNotes(this.ticker).subscribe(result => {
+      this.loading.notes = false;
+      this.notes = result
+    }, error => {
+      this.loading.notes = false;
+      this.errors.notes = GetErrors(error)
+    })
+  }
+
+    loadOptionOwnership() {
     this.stocks.getOwnedOptions(this.ticker).subscribe(result => {
+      this.loading.options = false;
       this.options = result
     }, err => {
-      console.error(err)
+      this.loading.options = false;
+      this.errors.options = GetErrors(err)
     })
   }
 
   loadStockOwnership() {
-    this.stocks.getStockOwnership(this.ticker).subscribe(result => {
-      this.ownership = result
+    this.stockPositions.getStockOwnership(this.ticker).subscribe(result => {
+      this.stockOwnership = result
+      this.currentPosition = result.positions.filter(p => p.isOpen)[0]
+      this.loading.ownership = false;
     }, err => {
-      console.error(err)
+      this.loading.ownership = false;
+      this.errors.ownership = GetErrors(err)
     })
   }
 
@@ -85,17 +141,5 @@ export class StockDetailsComponent implements OnInit {
 
   activateTab(tabName:string) {
     this.activeTab = tabName
-  }
-
-  stockOwnershipChanged(e) {
-    this.loadStockOwnership()
-  }
-
-  optionOwnershipChanged(e) {
-    this.loadOptionOwnership()
-  }
-
-  refreshOrders() {
-    this.orders.refreshOrders()
   }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 using core.Routines;
 using coretests.testdata;
 using Xunit;

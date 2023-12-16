@@ -13,6 +13,9 @@ namespace storage.shared
 
         public string Entity { get; set; }
         public Guid UserId { get; set; }
+        
+        public string? AggregateId { get; set; }
+        
         public string Key { get; set; }
         public DateTimeOffset Created { get; set; }
 

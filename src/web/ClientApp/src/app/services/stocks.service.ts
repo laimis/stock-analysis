@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
-import {tap} from "rxjs/operators";
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -31,65 +30,11 @@ export class StocksService {
     return throwError(() => new Error('Something bad happened; please try again later.'));
   }
 
-  getTradingEntries(): Observable<StockTradingPositions> {
-    return this.http.get<StockTradingPositions>('/api/portfolio/tradingentries')
-  }
-
-  getPastTradingEntries(): Observable<PastStockTradingPositions> {
-    return this.http.get<PastStockTradingPositions>('/api/portfolio/pasttradingentries')
-  }
-
   getTransactions(ticker:string, groupBy:string, filter:string, txType:string): Observable<TransactionsView> {
     if (ticker === null) {
       ticker = ''
     }
     return this.http.get<TransactionsView>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
-  }
-
-  simulatePosition(ticker: string, positionId: number): Observable<TradingStrategyResults> {
-    return this.http.get<TradingStrategyResults>(
-      `/api/portfolio/${ticker}/positions/${positionId}/simulate/trades`
-    )
-  }
-
-  simulatePositions(closePositionIfOpenAtTheEnd:boolean, numberOfTrades: number): Observable<TradingStrategyPerformance[]> {
-    return this.http.get<TradingStrategyPerformance[]>(
-      `/api/portfolio/simulate/trades?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
-    )
-  }
-
-  simulatePositionsExportUrl(closePositionIfOpenAtTheEnd:boolean, numberOfTrades: number): string {
-    return `/api/portfolio/simulate/trades/export?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
-  }
-
-  getStrategyProfitPoints(ticker: string, positionId: number, numberOfPoints: number): Observable<StrategyProfitPoint[]> {
-    return this.http.get<StrategyProfitPoint[]>(
-      `/api/portfolio/${ticker}/positions/${positionId}/profitpoints?numberOfPoints=${numberOfPoints}`
-    )
-  }
-
-  assignGrade(ticker: string, positionId: number, grade: string, note: string): Observable<any> {
-    return this.http.post<any>(
-      `/api/portfolio/${ticker}/positions/${positionId}/grade`,
-      { grade, note, ticker, positionId }
-    )
-  }
-
-  deletePosition(ticker: string, positionId:number): Observable<object>{
-    return this.http.delete(`/api/portfolio/${ticker}/positions/${positionId}`)
-  }
-
-  setLabel(ticker: string, positionId: number, label: KeyValuePair): Observable<object> {
-    return this.http.post(`/api/portfolio/${ticker}/positions/${positionId}/labels`, {
-      key: label.key,
-      value: label.value,
-      ticker: ticker,
-      positionId: positionId
-    })
-  }
-
-  deleteLabel(ticker: string, positionId: number, labelKey: string): Observable<object> {
-    return this.http.delete(`/api/portfolio/${ticker}/positions/${positionId}/labels/${labelKey}`)
   }
 
   // ----------------- alerts ---------------------
@@ -103,6 +48,14 @@ export class StocksService {
 
   scheduleAlertRun(): Observable<any> {
     return this.http.post<any>('/api/alerts/run', {})
+  }
+
+  getAlerts(): Observable<AlertsContainer> {
+    return this.http.get<AlertsContainer>('/api/alerts')
+  }
+
+  getAvailableMonitors(): Observable<Monitor[]> {
+    return this.http.get<Monitor[]>('/api/alerts/monitors')
   }
 
   sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
@@ -189,15 +142,6 @@ export class StocksService {
     return this.http.delete<any>('/api/stocks/pendingpositions/' + id)
   }
 
-  // ----------------- alerts ---------------------
-  getAlerts(): Observable<AlertsContainer> {
-    return this.http.get<AlertsContainer>('/api/alerts')
-  }
-
-  getAvailableMonitors(): Observable<Monitor[]> {
-    return this.http.get<Monitor[]>('/api/alerts/monitors')
-  }
-
   // ----------------- notes ---------------------
 
   addNote(input: any): Observable<any> {
@@ -241,10 +185,6 @@ export class StocksService {
     return this.http.delete(`/api/cryptos/${token}/transactions/${transactionId}`)
   }
 
-  getStocks(): Observable<StockSummary> {
-		return this.http.get<any>('/api/stocks')
-  }
-
 	getStockDetails(symbol:string): Observable<StockDetails> {
 		return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
   }
@@ -269,72 +209,8 @@ export class StocksService {
     return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}?frequeyncy=${frequency}`)
   }
 
-  deleteStocks(id: string): Observable<object> {
-    return this.http.delete(`/api/stocks/${id}`)
-  }
-
-  getStockOwnership(ticker:string): Observable<StockOwnership> {
-		return this.http.get<StockOwnership>(`/api/stocks/${ticker}/ownership`)
-  }
-
-  deleteStockTransaction(id: string, transactionId:string): Observable<object>{
-    return this.http.delete(`/api/stocks/${id}/transactions/${transactionId}`)
-  }
-
-  setStopPrice(ticker:string, stopPrice:number): Observable<object> {
-    return this.http.post(`/api/stocks/${ticker}/stop`, {stopPrice, ticker})
-  }
-
-  deleteStopPrice(ticker:string): Observable<object> {
-    return this.http.delete(`/api/stocks/${ticker}/stop`)
-  }
-
-  setRiskAmount(ticker:string, positionId:number, riskAmount:number): Observable<object> {
-    return this.http.post(`/api/portfolio/${ticker}/positions/${positionId}/risk`, {riskAmount, ticker, positionId})
-  }
-
-  importStocks(file: any) : Observable<any> {
-    return this.http.post('/api/stocks/import', file)
-  }
-
   importTransactions(file: any) : Observable<any> {
     return this.http.post('/api/transactions/import', file)
-  }
-
-	purchase(obj:stocktransactioncommand) : Observable<any> {
-		return this.http.post('/api/stocks/buy', obj)
-	}
-
-	sell(obj:stocktransactioncommand) : Observable<any> {
-		return this.http.post('/api/stocks/sell', obj)
-  }
-
-  brokerageBuy(obj:brokerageordercommand) : Observable<any> {
-    this.brokerageAccountData = null
-    return this.http.post('/api/brokerage/buy', obj)
-	}
-
-  brokerageSell(obj:brokerageordercommand) : Observable<any> {
-    this.brokerageAccountData = null
-    return this.http.post('/api/brokerage/sell', obj)
-	}
-
-  brokerageCancelOrder(orderId:string) : Observable<any> {
-    this.brokerageAccountData = null
-    return this.http.delete('/api/brokerage/orders/' + orderId)
-  }
-
-  // TODO: remove this caching approach once we figure out how
-  // orders component can get orders passed to it instead of
-  // going out to get it itself
-  private brokerageAccountData:BrokerageAccount = null
-  brokerageAccount() : Observable<BrokerageAccount> {
-    if (this.brokerageAccountData) {
-      return of(this.brokerageAccountData)
-    }
-    return this.http.get<BrokerageAccount>('/api/brokerage/account').pipe(
-      tap(data => this.brokerageAccountData = data),
-    )
   }
 
   search(term: string): Observable<StockSearchResult[]> {
@@ -348,6 +224,10 @@ export class StocksService {
 
   getPortfolio(): Observable<Dashboard> {
 		return this.http.get<Dashboard>('/api/portfolio')
+  }
+
+  importStocks(file: any) : Observable<any> {
+    return this.http.post('/api/portfolio/stockpositions/import', file)
   }
 
   // ------- options ----------------
@@ -377,11 +257,11 @@ export class StocksService {
   }
 
   getOwnedOptions(ticker:string): Observable<OwnedOption[]> {
-    return this.http.get<OwnedOption[]>('/api/options/' + ticker + '/active')
+    return this.http.get<OwnedOption[]>(`/api/options/ownership/${ticker}`)
   }
 
   getOptionChain(ticker:string): Observable<OptionChain> {
-    return this.http.get<OptionChain>('/api/options/' + ticker + '/chain')
+    return this.http.get<OptionChain>(`/api/options/chain/${ticker}`)
   }
 
   importOptions(formData: FormData) {
@@ -508,7 +388,7 @@ export class StocksService {
 
   reportDailyPositionReport(
     ticker:string,
-    positionId:number
+    positionId:string
   ) {
     var endpoint = '/api/reports/dailypositionreport/' + ticker + '/' + positionId
     return this.http.get<DailyPositionReport>(endpoint)
@@ -658,6 +538,7 @@ export class StockViolation {
   pricePerShare: number
   ticker: string
   currentPrice: number
+  localPosition: PositionInstance
 }
 
 export interface StockSummary {
@@ -691,6 +572,26 @@ export interface Transaction {
   isPL: boolean
   ticker: string
 }
+
+export interface StockTransaction {
+  numberOfShares: number,
+  price: number,
+  type: string,
+  date: string,
+  ageInDays: number
+  transactionId: string
+}
+
+export interface StockPLTransaction {
+  ticker: string
+  date: string
+  numberOfShares: number
+  buyPrice: number
+  sellPrice: number
+  profit: number
+  gainPct: number
+}
+
 export interface NoteList {
   tickers: string[]
   notes: Note[]
@@ -923,10 +824,6 @@ export interface StockProfile {
 }
 
 export interface StockOwnership {
-  id: string
-  ticker: string
-  price: number
-  currentPosition: PositionInstance
   positions: PositionInstance[]
 }
 
@@ -1127,14 +1024,6 @@ export interface PriceWithDate {
   price: number,
   date: string
 }
-export interface PositionTransaction {
-  numberOfShares: number,
-  price: number,
-  type: string,
-  date: string,
-  ageInDays: number
-  transactionId: string
-}
 
 export interface PositionEvent {
   id: string,
@@ -1164,7 +1053,8 @@ export interface KeyValuePair {
 }
 
 export interface PositionInstance {
-  positionId: number,
+  positionId: string,
+  isOpen: boolean,
   averageBuyCostPerShare: number,
   averageCostPerShare: number,
   averageSaleCostPerShare: number,
@@ -1189,7 +1079,8 @@ export interface PositionInstance {
   rrWeighted: number,
   stopPrice: number,
   ticker: string,
-  transactions: PositionTransaction[],
+  plTransactions: StockPLTransaction[],
+  transactions: StockTransaction[],
   events: PositionEvent[],
   costAtRiskedBasedOnStopPrice: number,
   grade: string,
@@ -1340,13 +1231,23 @@ export class job {
 }
 
 export class stocktransactioncommand {
-  ticker: string
+  positionId: string
   numberOfShares: number
   price: number
   date: string
   notes: string
   stopPrice: number | null
   brokerageOrderId: string | null
+}
+
+export class openpositioncommand {
+  ticker: string
+  numberOfShares: number
+  price: number
+  date: string
+  notes: string
+  stopPrice: number | null
+  strategy: string | null
 }
 
 export class pendingstockpositioncommand {

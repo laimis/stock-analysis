@@ -2,8 +2,8 @@ module studies.ServiceHelper
 
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Storage
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Storage
 open web
 
 let mutable host = null

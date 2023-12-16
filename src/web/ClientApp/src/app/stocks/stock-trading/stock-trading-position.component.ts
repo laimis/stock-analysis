@@ -9,6 +9,7 @@ import {
 import {Output} from '@angular/core';
 import {EventEmitter} from '@angular/core';
 import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-position',
@@ -64,14 +65,13 @@ export class StockTradingPositionComponent {
 
   // constructor that takes stock service
   constructor(
-    private stockService: StocksService
+    private stockService: StockPositionsService
   ) {
     this.strategies = GetStrategies()
   }
 
   fetchProfitPoints() {
     this.stockService.getStrategyProfitPoints(
-      this._position.ticker,
       this._position.positionId,
       this.numberOfProfitPoints).subscribe(
       (profitPoints) => {
@@ -94,7 +94,7 @@ export class StockTradingPositionComponent {
   }
 
   setStopPrice() {
-    this.stockService.setStopPrice(this._position.ticker, this.candidateStopPrice).subscribe(
+    this.stockService.setStopPrice(this._position.positionId, this.candidateStopPrice).subscribe(
       (_) => {
         this._position.stopPrice = this.candidateStopPrice
       }
@@ -103,7 +103,7 @@ export class StockTradingPositionComponent {
 
   deleteStopPrice() {
     if (confirm("Are you sure you want to delete the stop price?")) {
-      this.stockService.deleteStopPrice(this._position.ticker).subscribe(
+      this.stockService.deleteStopPrice(this._position.positionId).subscribe(
         (_) => {
           this._position.stopPrice = null
           this._position.riskedAmount = null
@@ -116,7 +116,7 @@ export class StockTradingPositionComponent {
 
   setRiskAmount() {
     if (confirm("Are you sure you want to set the risk amount?")) {
-      this.stockService.setRiskAmount(this._position.ticker, this._position.positionId, this.candidateRiskAmount).subscribe(
+      this.stockService.setRiskAmount(this._position.positionId, this.candidateRiskAmount).subscribe(
         (_) => {
           this._position.riskedAmount = this.candidateRiskAmount
         }
@@ -125,13 +125,13 @@ export class StockTradingPositionComponent {
   }
 
   getCssClassForEvent(e: PositionEvent) {
-    return "event-" + e.type
+    return "event-" + e.type.toLowerCase()
   }
 
   deletePosition() {
     // prompt user to confirm
     if (confirm("Are you sure you want to delete this position?")) {
-      this.stockService.deletePosition(this._position.ticker, this._position.positionId)
+      this.stockService.deletePosition(this._position.positionId)
         .subscribe(
           (_) => {
             this._position = null
@@ -143,7 +143,7 @@ export class StockTradingPositionComponent {
 
   deleteTransaction(transactionId: string) {
     if (confirm("are you sure you want to delete the transaction?")) {
-      this.stockService.deleteStockTransaction(this._position.ticker, transactionId)
+      this.stockService.deleteTransaction(this._position.positionId, transactionId)
         .subscribe(
           _ => {
             // refresh UI somehow here, tbd
@@ -159,7 +159,7 @@ export class StockTradingPositionComponent {
       return false
     }
 
-    this.stockService.deleteLabel(this._position.ticker, this._position.positionId, "strategy").subscribe(
+    this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe(
       (r) => {
       },
       (err) => {
@@ -181,7 +181,7 @@ export class StockTradingPositionComponent {
       value: strategy
     }
 
-    this.stockService.setLabel(this._position.ticker, this._position.positionId, label).subscribe(
+    this.stockService.setLabel(this._position.positionId, label).subscribe(
       (r) => {
       },
       (err) => {

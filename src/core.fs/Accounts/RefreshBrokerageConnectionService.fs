@@ -1,10 +1,10 @@
 namespace core.fs.Accounts
 
 open System
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Logging
-open core.fs.Shared.Adapters.Storage
+open core.fs
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Logging
+open core.fs.Adapters.Storage
     
 type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBrokerage,logger:ILogger) =
     

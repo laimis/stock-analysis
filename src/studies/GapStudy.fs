@@ -2,8 +2,8 @@ module studies.GapStudy
 
 open System
 open core.Shared
+open core.fs.Adapters.Stocks
 open core.fs.Services.GapAnalysis
-open core.fs.Shared.Adapters.Stocks
 open studies.Types
 
 

@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using core.fs.Shared.Adapters.Stocks;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Adapters.Stocks;
+using core.fs.Accounts;
 using core.Shared;
 
 namespace coretests.testdata
@@ -42,7 +42,7 @@ namespace coretests.testdata
         }
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
-        public static Ticker TSLA = new("tsla");
+        public static Ticker AMD = new("amd");
         public static Ticker NET = new("net");
         public static Ticker ENPH = new("enph");
         public static Ticker TEUM = new("teum");
@@ -50,5 +50,18 @@ namespace coretests.testdata
         public static TradeGrade B = new("B");
 
         public static UserId RandomUserId() => UserId.NewUserId(Guid.NewGuid());
+        
+        private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public static Ticker GenerateRandomTicker(Random random)
+        {
+            var length = random.Next(3, 5);
+            var ticker = new char[length];
+            for (var i = 0; i < length; i++)
+            {
+                ticker[i] = Chars[random.Next(Chars.Length)];
+            }
+
+            return new Ticker(ticker.ToString());
+        }
     }
 }

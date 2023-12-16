@@ -11,6 +11,7 @@ namespace core.Stocks
         public const string Stop = "stop";
         public const string Sell = "sell";
         public const string Risk = "risk";
+        public const string Label = "label";
 
         public PositionEventType(string value)
         {
@@ -20,6 +21,7 @@ namespace core.Stocks
                 Stop => Stop,
                 Sell => Sell,
                 Risk => Risk,
+                Label => Label,
                 _ => throw new InvalidOperationException($"Invalid position event type: {value}")
             };
         }
@@ -30,7 +32,7 @@ namespace core.Stocks
         }
     }
     
-    public readonly record struct PositionEvent (Guid Id, string Description, PositionEventType Type, decimal? Value, DateOnly When, decimal? Quantity = null)
+    public readonly record struct PositionEvent (Guid Id, string Description, PositionEventType Type, decimal? Value, DateTimeOffset When, decimal? Quantity, string Notes)
     {
         public readonly string Date => When.ToString("yyyy-MM-dd");
     }
@@ -101,12 +103,14 @@ namespace core.Stocks
         public decimal CompletedPositionCostPerShare => CompletedPositionCost / CompletedPositionShares;
 
         public TradeGrade? Grade { get; private set; }
+        public DateTimeOffset? GradeDate { get; private set; }
         public string GradeNote { get; private set; }
-        public void SetGrade(TradeGrade grade, string note = null)
+        public void SetGrade(TradeGrade grade, DateTimeOffset when, string note = null)
         {
             Grade = grade;
             var previousNote = GradeNote;
             GradeNote = note;
+            GradeDate = when;
             Notes.Remove(previousNote);
             Notes.Add(note);
         }
@@ -120,7 +124,7 @@ namespace core.Stocks
         public void Buy(decimal numberOfShares, decimal price, DateTimeOffset when, Guid transactionId, string notes = null)
         {
             Transactions.Add(new PositionTransaction(numberOfShares, price, TransactionId: transactionId, Type:"buy", when));
-            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", Type: new PositionEventType(PositionEventType.Buy), Value: price, When: DateOnly.FromDateTime(when.DateTime), Quantity: numberOfShares));
+            Events.Add(new PositionEvent(transactionId, $"buy {numberOfShares} @ ${price}", Type: new PositionEventType(PositionEventType.Buy), Value: price, When: when, Quantity: numberOfShares, Notes: notes));
 
             if (_positionCompleted == false)
             {
@@ -175,7 +179,7 @@ namespace core.Stocks
             var percentGainAtSale = (price - AverageCostPerShare) / AverageCostPerShare;
 
             Transactions.Add(new PositionTransaction(numberOfShares, price, TransactionId:transactionId, Type: "sell", when));
-            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale:P})", new PositionEventType(PositionEventType.Sell), price, DateOnly.FromDateTime(when.DateTime), Quantity: numberOfShares));
+            Events.Add(new PositionEvent(transactionId, $"sell {numberOfShares} @ ${price} ({percentGainAtSale:P})", new PositionEventType(PositionEventType.Sell), price, when.DateTime, Quantity: numberOfShares, Notes: notes));
 
             // if we haven't set the risked amount, when we set it at 5% from the first buy price?
             if (StopPrice == null && !HasEventWithDescription("Stop price deleted"))
@@ -212,7 +216,7 @@ namespace core.Stocks
                 var stopPercentage = (stopPrice.Value - AverageCostPerShare) / AverageCostPerShare;
 
                 Events.Add(
-                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage:P1})", new PositionEventType(PositionEventType.Stop), stopPrice, DateOnly.FromDateTime(when.DateTime)));
+                    new PositionEvent(Guid.Empty, $"Stop price set to {stopPrice.Value:0.##} ({stopPercentage:P1})", new PositionEventType(PositionEventType.Stop), stopPrice, when, Quantity: null, Notes: null));
 
                 if (RiskedAmount == null)
                 {
@@ -226,7 +230,7 @@ namespace core.Stocks
             StopPrice = null;
             RiskedAmount = null;
             
-            Events.Add(new PositionEvent(Guid.Empty, "Stop price deleted", new PositionEventType(PositionEventType.Stop), null, DateOnly.FromDateTime(when.DateTime)));
+            Events.Add(new PositionEvent(Guid.Empty, "Stop price deleted", new PositionEventType(PositionEventType.Stop), null, when, Quantity: null, Notes: null));
         }
 
         public void SetRiskAmount(decimal riskAmount, DateTimeOffset when)
@@ -238,7 +242,7 @@ namespace core.Stocks
             
             RiskedAmount = riskAmount;
 
-            Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", new PositionEventType(PositionEventType.Risk), riskAmount, DateOnly.FromDateTime(when.DateTime)));
+            Events.Add(new PositionEvent(Guid.Empty, $"Set risk amount to {RiskedAmount.Value:0.##}", new PositionEventType(PositionEventType.Risk), riskAmount, when, Quantity: null, Notes: null));
         }
 
         private void RunCalculations()
@@ -321,6 +325,7 @@ namespace core.Stocks
         internal void SetLabel(PositionLabelSet labelSet)
         {
             _labels[labelSet.Key] = labelSet.Value;
+            Events.Add(new PositionEvent(Guid.NewGuid(), labelSet.Key, new PositionEventType(PositionEventType.Label), null, labelSet.When, Quantity: null, Notes: labelSet.Value));
         }
 
         public bool ContainsLabel(string key)
@@ -331,6 +336,7 @@ namespace core.Stocks
         internal void DeleteLabel(PositionLabelDeleted labelDeleted)
         {
             _labels.Remove(labelDeleted.Key);
+            Events.Add(new PositionEvent(Guid.NewGuid(), labelDeleted.Key, new PositionEventType(PositionEventType.Label), null, labelDeleted.When, Quantity: null, Notes: null));
         }
 
         public string GetLabelValue(string key) => _labels[key];

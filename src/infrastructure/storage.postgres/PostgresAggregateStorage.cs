@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 using core.Shared;
 using Dapper;
 using Newtonsoft.Json;
@@ -65,15 +65,16 @@ namespace storage.postgres
             return list.Select(e => e.Event);
         }
 
-        public async Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+        private async Task SaveEventsAsyncInternal(IAggregate agg, int fromVersion, string entity, UserId userId,
+            IDbTransaction? outsideTransaction = null)
         {
             using var db = outsideTransaction?.Connection ?? GetConnection();
-            int version = agg.Version;
+            int version = fromVersion;
 
             var eventsToBlast = new List<AggregateEvent>();
 
             using var tx = outsideTransaction ?? db.BeginTransaction();
-            foreach (var e in agg.Events.Skip(agg.Version))
+            foreach (var e in agg.Events.Skip(fromVersion))
             {
                 var se = new StoredAggregateEvent
                 {
@@ -81,12 +82,13 @@ namespace storage.postgres
                     Event = e,
                     Key = e.Id.ToString(),
                     UserId = userId.Item,
+                    AggregateId = e.AggregateId.ToString(),
                     Created = DateTimeOffset.UtcNow,
                     Version = ++version
                 };
 
-                var query = @"INSERT INTO events (entity, key, userid, created, version, eventjson) VALUES
-						(@Entity, @Key, @UserId, @Created, @Version, @EventJson)";
+                var query = @"INSERT INTO events (entity, key, aggregateid, userid, created, version, eventjson) VALUES
+						(@Entity, @Key, @AggregateId, @UserId, @Created, @Version, @EventJson)";
 
                 await db.ExecuteAsync(query, se);
 
@@ -96,6 +98,16 @@ namespace storage.postgres
             await _outbox.AddEvents(eventsToBlast, tx);
 
             tx.Commit();
+        }
+
+        public Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+        {
+            return SaveEventsAsyncInternal(agg, agg.Version, entity, userId, outsideTransaction);
+        }
+
+        public Task SaveEventsAsync(IAggregate? oldAggregate, IAggregate newAggregate, string entity, UserId userId, IDbTransaction? outsideTransaction = null)
+        {
+            return SaveEventsAsyncInternal(newAggregate, oldAggregate?.Version ?? 0, entity, userId, outsideTransaction);
         }
 
         public async Task DoHealthCheck()

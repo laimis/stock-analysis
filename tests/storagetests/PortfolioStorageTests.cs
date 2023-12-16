@@ -2,14 +2,15 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Cryptos;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
-using core.Notes;
+using core.fs.Adapters.Storage;
+using core.fs.Accounts;
+using core.fs.Stocks;
 using core.Options;
 using core.Routines;
 using core.Shared;
 using core.Stocks;
 using coretests.testdata;
+using Microsoft.FSharp.Core;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -30,7 +31,7 @@ namespace storagetests
         {
             var storage = CreateStorage();
 
-            Assert.Null(await storage.GetStock(new Ticker("nonexisting"), _userId));
+            Assert.Null(await storage.GetStockPosition(StockPositionId.NewStockPositionId(Guid.NewGuid()), _userId));
         }
 
         protected abstract IPortfolioStorage CreateStorage();
@@ -42,38 +43,46 @@ namespace storagetests
 
             Assert.Null(await storage.GetOwnedOption(Guid.NewGuid(), _userId));
         }
-
+        
         [Fact]
-        public async Task OwnedStockStorageAsync()
+        public async Task StockPosition_Works()
         {
-            var stock = new OwnedStock(GenerateTestTicker(), _userId.Item);
-
-            stock.Purchase(10, 2.1m, DateTime.UtcNow);
+            void AssertPositions(FSharpOption<StockPositionState> expected, FSharpOption<StockPositionState> actual)
+            {
+                Assert.Equal(expected.Value.NumberOfShares, actual.Value.NumberOfShares);
+                Assert.Equal(expected.Value.Ticker, actual.Value.Ticker);
+                Assert.Equal(expected.Value.PositionId, actual.Value.PositionId);
+                Assert.Equal(expected.Value.Opened, actual.Value.Opened);
+            }
+            
+            var position = StockPosition.openLong(GenerateTestTicker(), DateTimeOffset.UtcNow);
+            
+            position = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, FSharpOption<string>.None, position);
 
             var storage = CreateStorage();
 
-            await storage.Save(stock, _userId);
+            await storage.SaveStockPosition(_userId, FSharpOption<StockPositionState>.None, position);
 
-            var loadedList = await storage.GetStocks(_userId);
+            var loadedList = await storage.GetStockPositions(_userId);
 
             Assert.NotEmpty(loadedList);
 
-            var loaded = await storage.GetStock(stock.State.Ticker, _userId);
+            var loaded = await storage.GetStockPosition(position.PositionId, _userId);
 
-            Assert.Equal(loaded.State.OpenPosition.NumberOfShares, stock.State.OpenPosition.NumberOfShares);
+            AssertPositions(position, loaded);
 
-            loaded.Purchase(5, 5, DateTime.UtcNow);
+            var afterPurchase = StockPosition.buy(5m, 5m, DateTimeOffset.UtcNow, FSharpOption<string>.None, loaded.Value);
+            
+            await storage.SaveStockPosition(_userId, loaded, afterPurchase);
 
-            await storage.Save(loaded, _userId);
+            var reloaded = await storage.GetStockPosition(afterPurchase.PositionId, _userId);
 
-            loaded = await storage.GetStock(loaded.State.Ticker, UserId.NewUserId(loaded.State.UserId));
-
-            Assert.NotEqual(loaded.State.OpenPosition.NumberOfShares, stock.State.OpenPosition.NumberOfShares);
+            AssertPositions(afterPurchase, reloaded);
 
             await storage.Delete(_userId);
-
-            var afterDelete = await storage.GetStocks(_userId);
-
+            
+            var afterDelete = await storage.GetStockPositions(_userId);
+            
             Assert.Empty(afterDelete);
         }
 
@@ -121,36 +130,6 @@ namespace storagetests
         }
 
         [Fact]
-        public async Task NoteStorageWorksAsync()
-        {
-            var note = new Note(_userId.Item, "note", TestDataGenerator.TSLA, DateTimeOffset.UtcNow);
-
-            var storage = CreateStorage();
-
-            await storage.SaveNote(note, _userId);
-
-            var notes = await storage.GetNotes(_userId);
-
-            Assert.NotEmpty(notes);
-
-            note = notes.Single(n => n.State.Id == note.State.Id);
-
-            note.Update("new note");
-
-            await storage.SaveNote(note, _userId);
-
-            var fromDb = await storage.GetNote(note.State.Id, _userId);
-            
-            Assert.Equal("new note", fromDb.State.Note);
-
-            await storage.Delete(_userId);
-
-            var afterDelete = await storage.GetNotes(_userId);
-
-            Assert.Empty(afterDelete);
-        }
-
-        [Fact]
         public async Task OwnedCryptoWorksAsync()
         {
             var crypto = new OwnedCrypto(new Token("BTC"), IdentifierHelper.getUserId(_userId));
@@ -185,42 +164,29 @@ namespace storagetests
         }
 
         [Fact]
-        public async Task OwnedStock_Grading_Works()
+        public async Task StockPosition_Grading_Works()
         {
-            var stock = new OwnedStock(GenerateTestTicker(), _userId.Item);
+            var stock = StockPosition.openLong(GenerateTestTicker(), DateTimeOffset.UtcNow);
 
-            stock.Purchase(10, 2.1m, DateTime.UtcNow);
-
+            var afterPurchase = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, FSharpOption<string>.None, stock);
+                
             var storage = CreateStorage();
 
-            await storage.Save(stock, _userId);
+            await storage.SaveStockPosition(_userId, FSharpOption<StockPositionState>.None, afterPurchase);
 
-            var loaded = await storage.GetStock(stock.State.Ticker, _userId);
+            var loaded = await storage.GetStockPosition(afterPurchase.PositionId, _userId);
 
-            loaded.Sell(10, 2.2m, DateTime.UtcNow, "sell");
+            var afterSell = StockPosition.sell(10m, 2.2m, DateTimeOffset.UtcNow, new FSharpOption<string>("sell"), loaded.Value);
+            
+            var afterGrading = StockPosition.assignGrade(TestDataGenerator.A, new FSharpOption<string>("test"), DateTimeOffset.UtcNow, afterSell);
+            
+            await storage.SaveStockPosition(_userId, loaded, afterGrading);
 
-            loaded.AssignGrade(0, TestDataGenerator.A, "test");
+            loaded = await storage.GetStockPosition(afterGrading.PositionId, _userId);
 
-            await storage.Save(loaded, _userId);
-
-            loaded = await storage.GetStock(loaded.State.Ticker, UserId.NewUserId(loaded.State.UserId));
-
-            var position = loaded.State.GetAllPositions()[0];
-
-            Assert.Equal(TestDataGenerator.A, position.Grade);
-            Assert.Equal("test", position.GradeNote);
-
-            var lastTx = position.Transactions.Last();
-
-            loaded.DeleteTransaction(lastTx.TransactionId);
-
-            await storage.Save(loaded, _userId);
-
-            // make sure we can still load it
-            _ = await storage.GetStock(loaded.State.Ticker, UserId.NewUserId(loaded.State.UserId));
-
-            // clean up
-            await storage.Delete(_userId);    
+            Assert.Equal(TestDataGenerator.A, loaded.Value.Grade);    
+            
+            await storage.Delete(_userId);
         }
 
         [Fact]
@@ -268,7 +234,7 @@ namespace storagetests
 
             var list = new StockList("description", "name", _userId.Item);
 
-            list.AddStock(TestDataGenerator.TSLA, "yeah yeah");
+            list.AddStock(TestDataGenerator.AMD, "yeah yeah");
 
             await storage.SaveStockList(list, _userId);
 
@@ -280,7 +246,7 @@ namespace storagetests
 
             Assert.Equal(list.State.Name, loaded.State.Name);
 
-            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker.Equals(TestDataGenerator.TSLA));
+            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker.Equals(TestDataGenerator.AMD));
 
             Assert.NotNull(ticker);
 
@@ -291,45 +257,6 @@ namespace storagetests
             Assert.Empty(existing);
 
             await storage.Delete(_userId);
-        }
-
-        [Fact]
-        public async Task Notes_Works()
-        {
-            var storage = CreateStorage();
-            
-            var existing = await storage.GetNotes(_userId);
-            
-            Assert.Empty(existing);
-            
-            var note = new Note(
-                _userId.Item,
-                "description",
-                TestDataGenerator.TSLA,
-                DateTimeOffset.UtcNow
-            );
-            
-            await storage.SaveNote(
-                note,
-                _userId
-            );
-            
-            existing = await storage.GetNotes(_userId);
-            
-            Assert.NotEmpty(existing);
-            
-            var loaded = await storage.GetNote(
-                note.State.Id,
-                _userId
-            );
-            
-            Assert.Equal(note.State.Note, loaded.State.Note);
-            
-            await storage.Delete(_userId);
-            
-            existing = await storage.GetNotes(_userId);
-            
-            Assert.Empty(existing);
         }
 
         [Fact]
@@ -347,7 +274,7 @@ namespace storagetests
                 price: 2.1m,
                 stopPrice: 2m,
                 strategy: "strategy",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: _userId.Item
             );
 
@@ -357,7 +284,7 @@ namespace storagetests
 
             Assert.Single(existing);
 
-            var loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.TSLA));
+            var loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.AMD));
 
             Assert.Equal(position.State.Id, loaded.State.Id);
 
@@ -369,7 +296,7 @@ namespace storagetests
 
             Assert.NotEmpty(existing);
 
-            loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.TSLA));
+            loaded = existing.Single(p => p.State.Ticker.Equals(TestDataGenerator.AMD));
 
             Assert.True(loaded.State.IsClosed);
             Assert.NotNull(loaded.State.Closed);

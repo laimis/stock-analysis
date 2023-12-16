@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {PriceBar, PriceFrequency, StocksService, TradingStrategyPerformance} from '../../services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-simulations',
@@ -16,6 +17,7 @@ export class StockTradingSimulationsComponent implements OnInit {
   errors: string[];
 
   constructor(
+    private stockPositions:StockPositionsService,
     private stocks:StocksService,
     private route:ActivatedRoute) { }
 
@@ -35,7 +37,7 @@ export class StockTradingSimulationsComponent implements OnInit {
         this.numberOfTrades = parseInt(n);
       }
 
-      this.stocks.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
+      this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
         this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
         this.fetchSpyPrices();
       }, error => {
@@ -67,7 +69,7 @@ export class StockTradingSimulationsComponent implements OnInit {
   }
 
   getExportUrl() {
-    return this.stocks.simulatePositionsExportUrl(this.closePositions, this.numberOfTrades);
+    return this.stockPositions.simulatePositionsExportUrl(this.closePositions, this.numberOfTrades);
   }
 }
 

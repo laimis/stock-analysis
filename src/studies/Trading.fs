@@ -1,6 +1,6 @@
 module studies.Trading
 
-open core.fs.Shared.Adapters.Stocks
+open core.fs.Adapters.Stocks
 open studies.Types
 
 let prepareSignalsForTradeSimulations (signalFilepath:string) (priceFunc:string -> Async<PriceBars>) = async {

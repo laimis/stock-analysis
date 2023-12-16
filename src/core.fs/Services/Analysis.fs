@@ -2,8 +2,9 @@ namespace core.fs.Services.Analysis
 
 open System.Collections.Generic
 open core.Shared
-open core.fs.Shared
-open core.fs.Shared.Adapters.Stocks
+open core.fs
+open core.fs.Adapters.Stocks
+
 
 type OutcomeType =
     | Positive
@@ -76,7 +77,7 @@ type SMA(values,interval) =
     member this.LastValue =
         match values |> Seq.isEmpty with
         | true -> None
-        | false -> Some (values |> Seq.last)
+        | false -> values |> Seq.last
         
     static member ToSMA (prices:decimal array) interval =
         

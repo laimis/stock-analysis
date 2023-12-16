@@ -22,41 +22,26 @@
         <div class="col">
           <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
           <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
+          <span class="badge bg-light text-secondary m-1">{{getStrategy(p)}}</span>
         </div>
         <div class="col">{{p.profit  | currency}}</div>
         <div class="col">{{p.rr | number:'1.0-2'}}</div>
         <div class="col">{{p.gainPct | percent:'1.0-2'}}</div>
         <div class="col"><div class="h1">{{p.grade}}</div></div>
+      </div>
+      <div class="row">
         <div class="col">
-          @for (buy of buys(p); track buy) {
-            <div class="badge bg-success me-1">
-              {{buy.price | currency}} x {{buy.numberOfShares}} ({{buy.price * buy.numberOfShares | currency}}) on {{buy.date | date: 'MM/dd/yyyy'}}
-            </div>
-          }
-        </div>
-        <div class="col">
-          @for (sell of sells(p); track sell) {
-            <div class="badge bg-danger me-1">
-              {{sell.price | currency}} x {{sell.numberOfShares}} ({{sell.price * sell.numberOfShares | currency}}) on {{sell.date | date: 'MM/dd/yyyy'}}
+          @for (t of p.plTransactions; track t) {
+            <div>
+              sell {{t.numberOfShares}} &#64; {{t.sellPrice | currency}} for <span class="badge bg-success" [ngClass]="{'bg-success': t.profit >= 0, 'bg-danger': t.profit < 0}" >{{t.gainPct | percent}} gain ({{t.profit | currency}})</span> {{t.date | date: 'MM/dd/yyyy'}}
             </div>
           }
         </div>
       </div>
-      <div class="row mb-3">
-        <div class="col">
-          @if (p.notes.length > 0) {
-            <ul>
-              @for (note of p.notes; track note) {
-                <li style="white-space: pre-wrap;">{{note}}</li>
-              }
-            </ul>
-          }
-          @if (p.notes.length === 0) {
-            <span> no notes </span>
-          }
-          <span class="badge bg-light text-secondary m-1">{{getStrategy(p)}}</span>
-        </div>
-      </div>
+      @for (note of p.notes; track note) {
+        <p style="white-space: pre-wrap;">{{note}}</p>
+      }
+
     }
     @if (result.closedPositions.length === 0) {
       <div class="row">
@@ -120,7 +105,7 @@
               <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
               <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
             </td>
-            <td style="width: 140px">{{p.amount  | currency}}</td>
+            <td style="width: 140px">{{p.profit  | currency}}</td>
             <td style="width: 140px">{{p.date | date: 'MM/dd/yyyy'}}</td>
           </tr>
         }

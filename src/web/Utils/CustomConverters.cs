@@ -1,14 +1,15 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using core.fs;
+using core.fs.Accounts;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.Stocks;
 using core.fs.Options;
 using core.fs.Reports;
 using core.fs.Services;
 using core.fs.Services.Analysis;
-using core.fs.Shared;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.Stocks;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Stocks;
 using core.Shared;
 using core.Stocks;
 
@@ -151,5 +152,18 @@ public class DataPointChartTypeConverter : GenericConverterWithToString<DataPoin
     public override DataPointChartType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return DataPointChartType.FromString(reader.GetString());
+    }
+}
+
+public class StockPositionIdConverter : JsonConverter<StockPositionId>
+{
+    public override StockPositionId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return StockPositionId.NewStockPositionId(Guid.Parse(reader.GetString()));
+    }
+    
+    public override void Write(Utf8JsonWriter writer, StockPositionId value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Item.ToString());
     }
 }

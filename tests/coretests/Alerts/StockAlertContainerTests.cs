@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using core.fs.Alerts;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 using core.Shared;
 using Xunit;
 

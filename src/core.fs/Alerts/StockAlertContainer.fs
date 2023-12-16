@@ -4,10 +4,10 @@ namespace core.fs.Alerts
     open System.Collections.Concurrent
     open core.Account
     open core.Shared
+    open core.fs
+    open core.fs.Accounts
     open core.fs.Services.Analysis
     open core.fs.Services.GapAnalysis
-    open core.fs.Shared
-    open core.fs.Shared.Domain.Accounts
 
     type private StockPositionMonitorKey = {
         Ticker: Ticker

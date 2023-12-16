@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using core.fs.Shared.Adapters.Cryptos;
+using core.fs.Adapters.Cryptos;
 using core.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;

@@ -2,11 +2,10 @@ module core.fs.Brokerage
 
     open System.ComponentModel.DataAnnotations
     open core.Shared
-    open core.fs.Shared
-    open core.fs.Shared.Adapters.Brokerage
-    open core.fs.Shared.Adapters.Storage
-    open core.fs.Shared.Domain.Accounts
-
+    open core.fs.Accounts
+    open core.fs.Adapters.Brokerage
+    open core.fs.Adapters.Storage
+    
     type BuyOrSellData =
         {
             [<Range(1, 1000)>]

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { PositionInstance, StocksService } from 'src/app/services/stocks.service';
+import { PositionInstance } from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-trading-analysis-dashboard',
@@ -11,9 +12,9 @@ export class StockTradingAnalysisDashboardComponent implements OnInit {
 
   positions : PositionInstance[]
   errors : string[]
-  
+
   constructor(
-    private stocksService : StocksService
+    private stocksService : StockPositionsService
   ) { }
 
   ngOnInit() {

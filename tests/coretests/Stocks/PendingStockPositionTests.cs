@@ -16,7 +16,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid());
             
             Assert.Equal("this is a note", pending.State.Notes);
@@ -24,7 +24,7 @@ namespace coretests.Stocks
             Assert.Equal(10, pending.State.Bid);
             Assert.Equal(5, pending.State.StopPrice);
             Assert.Equal("alltimehigh", pending.State.Strategy);
-            Assert.Equal(TestDataGenerator.TSLA, pending.State.Ticker);
+            Assert.Equal(TestDataGenerator.AMD, pending.State.Ticker);
             Assert.NotEqual(Guid.Empty, pending.State.UserId);
         }
 
@@ -37,7 +37,7 @@ namespace coretests.Stocks
                 price: 0,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
         }
 
@@ -50,7 +50,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
         }
 
@@ -63,7 +63,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: -1,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
         }
 
@@ -76,7 +76,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
         }
 
@@ -89,7 +89,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.Empty));
         }
         
@@ -102,7 +102,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: 5,
                 strategy: "",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
         }
 
@@ -115,7 +115,7 @@ namespace coretests.Stocks
                 price: 10,
                 stopPrice: 5,
                 strategy: "alltimehigh",
-                ticker: TestDataGenerator.TSLA,
+                ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid());
 
             pending.Close();

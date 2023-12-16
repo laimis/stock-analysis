@@ -2,12 +2,11 @@ module studies.DataHelpers
 
 open System
 open System.Collections.Concurrent
-open System.Collections.Generic
-open core.fs.Shared.Adapters.Brokerage
-open core.fs.Shared.Adapters.Stocks
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain.Accounts
 open Microsoft.Extensions.Logging
+open core.fs.Accounts
+open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Stocks
+open core.fs.Adapters.Storage
 
 let getUser (storage:IAccountStorage) email = async {
     return! storage.GetUserByEmail email |> Async.AwaitTask

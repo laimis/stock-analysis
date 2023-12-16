@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StocksService, stocktransactioncommand, PositionInstance } from '../../services/stocks.service';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 class StockTransaction {
   numberOfShares: number
@@ -43,7 +44,7 @@ export class StockTradingSimulatorComponent implements OnInit {
 
   showExisting: boolean = false
 
-  constructor(private stocks:StocksService) { }
+  constructor(private stocks:StockPositionsService) { }
 
   ngOnInit(): void {
     var simulations = localStorage.getItem('simulations')
@@ -60,8 +61,8 @@ export class StockTradingSimulatorComponent implements OnInit {
     }
   }
 
-  initialPosition(cmd:stocktransactioncommand) {
-    this.ticker = cmd.ticker
+  initialPosition(ticker:string, cmd:stocktransactioncommand) {
+    this.ticker = ticker
     this.stopPrice = cmd.stopPrice
     this.price = cmd.price
     this.quantity = cmd.numberOfShares
@@ -170,7 +171,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     p.transactions.forEach(t => {
       if (first) {
         var cmd:stocktransactioncommand = {
-          ticker: p.ticker,
+          positionId: p.positionId,
           stopPrice: p.stopPrice,
           price: t.price,
           numberOfShares: t.numberOfShares,
@@ -178,7 +179,7 @@ export class StockTradingSimulatorComponent implements OnInit {
           notes: null,
           brokerageOrderId: null
         }
-        this.initialPosition(cmd)
+        this.initialPosition(p.ticker, cmd)
         first = false
       }
       else {

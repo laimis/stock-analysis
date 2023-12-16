@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { StocksService, stocktransactioncommand } from '../../services/stocks.service';
+import {PositionInstance, StocksService, stocktransactioncommand} from '../../services/stocks.service';
 import { DatePipe } from '@angular/common';
 import { GetErrors } from 'src/app/services/utils';
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-transaction',
@@ -12,7 +13,7 @@ import { GetErrors } from 'src/app/services/utils';
 export class StockTransactionComponent implements OnInit {
 
   @Input()
-  ticker: string
+  position: PositionInstance
 
   @Input()
   numberOfShares: number
@@ -32,7 +33,7 @@ export class StockTransactionComponent implements OnInit {
 
 
   constructor(
-    private service: StocksService,
+    private service: StockPositionsService,
     private datePipe: DatePipe
   ) { }
 
@@ -50,9 +51,8 @@ export class StockTransactionComponent implements OnInit {
 
 
   record() {
-
-    var op = new stocktransactioncommand()
-    op.ticker = this.ticker
+    let op = new stocktransactioncommand()
+    op.positionId = this.position.positionId
     op.numberOfShares = this.numberOfShares
     op.price = this.pricePerShare
     op.date = this.filled

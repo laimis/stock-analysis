@@ -1,7 +1,7 @@
 using System;
 using core.fs.Options;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Adapters.Storage;
+using core.fs.Accounts;
 using core.Options;
 using core.Shared;
 using Moq;

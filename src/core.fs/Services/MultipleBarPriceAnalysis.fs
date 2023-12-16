@@ -1,8 +1,9 @@
 namespace core.fs.Services
 
+open core.fs
+open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
-open core.fs.Shared
-open core.fs.Shared.Adapters.Stocks
+
 
 module MultipleBarPriceAnalysis =
     
@@ -65,10 +66,7 @@ module MultipleBarPriceAnalysis =
                 
                 let value =
                     match sma.LastValue with
-                    | Some v ->
-                        match v with
-                        | Some v -> v
-                        | None -> 0m
+                    | Some v -> v
                     | None -> 0m
                     
                 AnalysisOutcome(

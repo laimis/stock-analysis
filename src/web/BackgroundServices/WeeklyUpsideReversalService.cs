@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs.Accounts;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.Email;
+using core.fs.Adapters.Stocks;
+using core.fs.Adapters.Storage;
 using core.fs.Alerts;
 using core.fs.Services;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.Email;
-using core.fs.Shared.Adapters.Stocks;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
 using core.Shared;
 using Microsoft.Extensions.Logging;
 
@@ -117,8 +117,8 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 _logger.LogInformation("Processing user {email} upsides", emailId.Email);
                 
                 var userId = UserId.NewUserId(user.Id);
-                var stocks = await _portfolioStorage.GetStocks(userId);
-                var tickersFromPositions = stocks.Where(s => s.State.OpenPosition != null).Select(s => s.State.OpenPosition.Ticker);
+                var stocks = await _portfolioStorage.GetStockPositions(userId);
+                var tickersFromPositions = stocks.Where(s => s.IsOpen).Select(s => s.Ticker);
                 var tickersFromLists = (await _portfolioStorage.GetStockLists(userId))
                     .Where(l => l.State.ContainsTag(Constants.MonitorTagPattern))
                     .SelectMany(l => l.State.Tickers)
@@ -151,7 +151,7 @@ public class WeeklyUpsideReversalService : GenericBackgroundServiceHost
                 var priceBars = await _brokerage.GetPriceHistory(u.Key, ticker, PriceFrequency.Weekly, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
                 if (!priceBars.IsOk)
                 {
-                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error.Value);
+                    _logger.LogError("Unable to get price bars for {ticker} with error {error}", ticker, priceBars.Error.Value.Message);
                     continue;
                 }
 

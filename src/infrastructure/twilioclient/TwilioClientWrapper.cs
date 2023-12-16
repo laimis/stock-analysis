@@ -1,4 +1,4 @@
-﻿using core.fs.Shared.Adapters.SMS;
+﻿using core.fs.Adapters.SMS;
 using Microsoft.Extensions.Logging;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;

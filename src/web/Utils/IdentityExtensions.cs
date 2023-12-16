@@ -1,7 +1,6 @@
 using System;
 using System.Security.Claims;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Accounts;
 
 namespace web.Utils
 {

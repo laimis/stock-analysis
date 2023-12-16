@@ -1,7 +1,6 @@
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using core.fs.Shared;
-using core.fs.Shared.Adapters.CSV;
+using core.fs;
+using core.fs.Adapters.CSV;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 

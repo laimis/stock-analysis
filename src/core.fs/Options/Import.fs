@@ -1,9 +1,9 @@
 namespace core.fs.Options
 
 open System
-open core.fs.Shared
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Domain.Accounts
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.CSV
 
 module Import =
     open core.Shared

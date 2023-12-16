@@ -59,10 +59,10 @@ namespace coretests.Stocks
         {
             var list = Create("name", "description");
 
-            list.AddStock(TestDataGenerator.TSLA, "note");
+            list.AddStock(TestDataGenerator.AMD, "note");
 
             Assert.Single(list.State.Tickers);
-            Assert.Equal(TestDataGenerator.TSLA, list.State.Tickers[0].Ticker);
+            Assert.Equal(TestDataGenerator.AMD, list.State.Tickers[0].Ticker);
         }
 
         [Fact]
@@ -70,10 +70,10 @@ namespace coretests.Stocks
         {
             var list = Create("name", "description");
 
-            list.AddStock(TestDataGenerator.TSLA, null);
+            list.AddStock(TestDataGenerator.AMD, null);
 
             Assert.Single(list.State.Tickers);
-            Assert.Equal(TestDataGenerator.TSLA, list.State.Tickers[0].Ticker);
+            Assert.Equal(TestDataGenerator.AMD, list.State.Tickers[0].Ticker);
         }
 
         [Fact]
@@ -81,11 +81,11 @@ namespace coretests.Stocks
         {
             var list = Create("name", "description");
 
-            list.AddStock(TestDataGenerator.TSLA, "note");
+            list.AddStock(TestDataGenerator.AMD, "note");
 
             Assert.Single(list.State.Tickers);
 
-            list.RemoveStock(TestDataGenerator.TSLA);
+            list.RemoveStock(TestDataGenerator.AMD);
 
             Assert.Empty(list.State.Tickers);
         }
@@ -95,7 +95,7 @@ namespace coretests.Stocks
         {
             var list = Create("name", "description");
 
-            Assert.Throws<InvalidOperationException>(() => list.RemoveStock(TestDataGenerator.TSLA));
+            Assert.Throws<InvalidOperationException>(() => list.RemoveStock(TestDataGenerator.AMD));
         }
 
         [Fact]
@@ -103,12 +103,12 @@ namespace coretests.Stocks
         {
             var list = Create("name", "description");
 
-            list.AddStock(TestDataGenerator.TSLA, "note");
+            list.AddStock(TestDataGenerator.AMD, "note");
 
             var events = list.Events.Count();
 
-            list.AddStock(TestDataGenerator.TSLA, "note");
-            list.AddStock(TestDataGenerator.TSLA, "note");
+            list.AddStock(TestDataGenerator.AMD, "note");
+            list.AddStock(TestDataGenerator.AMD, "note");
 
 
             Assert.Single(list.State.Tickers);
@@ -162,7 +162,7 @@ namespace coretests.Stocks
             var list = Create("name", "description");
             
             list.AddStock(TestDataGenerator.NET, "note");
-            list.AddStock(TestDataGenerator.TSLA, "note");
+            list.AddStock(TestDataGenerator.AMD, "note");
             
             list.Clear();
             

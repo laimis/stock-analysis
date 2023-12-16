@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Account;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Adapters.Storage;
+using core.fs.Accounts;
 using Microsoft.FSharp.Core;
 using Xunit;
 

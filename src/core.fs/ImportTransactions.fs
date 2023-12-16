@@ -3,12 +3,11 @@ namespace core.fs
 open System
 open System.Text.RegularExpressions
 open core.Shared
+open core.fs.Accounts
+open core.fs.Adapters.CSV
+open core.fs.Adapters.Email
+open core.fs.Adapters.Storage
 open core.fs.Options
-open core.fs.Shared
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Adapters.Email
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain.Accounts
 open core.fs.Stocks
 
 module ImportTransactions =
@@ -67,7 +66,7 @@ module ImportTransactions =
         emailService:IEmailService,
         csvParser:ICSVParser,
         optionsImport:core.fs.Options.Handler,
-        stocksImport:core.fs.Stocks.Handler) =
+        stocksImport:core.fs.Portfolio.Handler) =
         
         interface IApplicationService
         
@@ -88,16 +87,15 @@ module ImportTransactions =
                     Ticker = Ticker(r.GetTickerFromOptionDescription())
                 }
                 
-            let createStockTransaction r =
+            let createStockTransaction r : core.fs.Portfolio.StockTransaction =
                 {
-                    Ticker = Ticker(r.Symbol)
+                    PositionId = StockPositionId.create()
                     Date = Nullable<DateTimeOffset> r.Date
-                    Notes = r.Description
+                    Notes = Some r.Description
                     NumberOfShares = r.Quantity.Value
                     Price = r.Price.Value
                     StopPrice = Nullable<decimal>()
-                    BrokerageOrderId = null
-                    Strategy = null 
+                    BrokerageOrderId = None
                 }
             
             let! user = accounts.GetUser(cmd.UserId)
@@ -130,12 +128,12 @@ module ImportTransactions =
                                 return result |> ResponseUtils.toOkOrError
                             | _, true, true, _ -> // buy stock
                                 let data = r |> createStockTransaction 
-                                let cmd = Buy(data, cmd.UserId)
+                                let cmd = core.fs.Portfolio.Buy(data, cmd.UserId)
                                 let! result = stocksImport.Handle(cmd) |> Async.AwaitTask
                                 return result
                             | _, true, _, true -> // sell stock
                                 let data = r |> createStockTransaction
-                                let cmd = Sell(data, cmd.UserId)
+                                let cmd = core.fs.Portfolio.Sell(data, cmd.UserId)
                                 let! result = stocksImport.Handle(cmd) |> Async.AwaitTask
                                 return result
                             | _ -> return Ok

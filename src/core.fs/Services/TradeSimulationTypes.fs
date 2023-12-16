@@ -2,9 +2,9 @@ namespace core.fs.Services.Trading
 
 open System
 open System.Collections.Generic
-open core.Stocks
-open core.fs.Shared
-open core.fs.Shared.Adapters.Stocks
+open core.fs
+open core.fs.Adapters.Stocks
+open core.fs.Stocks
 
 module TradingStrategyConstants =
     // TODO: this needs to come from the environment or user settings
@@ -15,7 +15,7 @@ module TradingStrategyConstants =
     
 type SimulationContext =
     {
-        Position:PositionInstance
+        Position:StockPositionState
         MaxGain:decimal
         MaxDrawdown:decimal
         Last10Bars:List<PriceBar>
@@ -27,7 +27,7 @@ type TradingStrategyResult =
         MaxGainPct:decimal
         MaxDrawdownPctRecent:decimal
         MaxGainPctRecent:decimal
-        Position:PositionInstance
+        Position:StockPositionWithCalculations
         StrategyName:string
     }
 
@@ -49,7 +49,7 @@ type TradingStrategyResults() =
         this.FailedReason <- Some reason
 
 type ITradingStrategy =
-    abstract Run : position:PositionInstance -> bars:PriceBars -> TradingStrategyResult
+    abstract Run : bars:PriceBars -> closeIfOpen:bool -> position:StockPositionState -> TradingStrategyResult
         
 module ProfitPoints =
     
@@ -57,19 +57,19 @@ module ProfitPoints =
         member this.Name = name
         member this.Prices = prices
         
-    let getProfitPointWithStopPrice (position:PositionInstance) (level:int) =
+    let getProfitPointWithStopPrice (level:int) (position:StockPositionWithCalculations)  =
         let riskPerShare = position.CompletedPositionCostPerShare - position.FirstStop.Value
         position.CompletedPositionCostPerShare + riskPerShare * decimal(level)
      
-    let getProfitPointWithPercentGain (position:PositionInstance) (level:int) (percentGain:decimal) =
+    let getProfitPointWithPercentGain (level:int) (percentGain:decimal) (position:StockPositionWithCalculations) =
         let singleLevel = position.CompletedPositionCostPerShare * percentGain
         position.CompletedPositionCostPerShare + singleLevel * decimal(level)
     
     
-    let getProfitPointsWithStopPrice position levels =
+    let getProfitPointsWithStopPrice levels position =
         let profitPoints =
             [1..levels]
-            |> List.map (getProfitPointWithStopPrice position)
+            |> List.map (fun l -> position |> getProfitPointWithStopPrice l)
             |> List.filter (fun p -> p > position.CompletedPositionCostPerShare)
             
         profitPoints
@@ -192,99 +192,98 @@ type TradingPerformance =
                 | 0 -> 0m
                 | _ -> this.Profit / this.TotalCost
                 
-            static member Create(closedPositions:seq<PositionInstance>) =
+            static member Create(closedPositions:seq<StockPositionWithCalculations>) =
                 
                 closedPositions
                 |> Seq.fold (fun perf position ->
-                    {
-                        perf with 
-                            NumberOfTrades = perf.NumberOfTrades + 1
-                            TotalDaysHeld = perf.TotalDaysHeld + decimal(position.DaysHeld)
-                            Profit = perf.Profit + position.Profit
-                            TotalCost = perf.TotalCost + (if position.Cost <> 0m then position.Cost else position.CompletedPositionCost)
-                            rrSum = perf.rrSum + position.RR
-                            EarliestDate = if position.Opened < perf.EarliestDate then position.Opened else perf.EarliestDate
-                            LatestDate = if position.Closed.HasValue && position.Closed.Value > perf.LatestDate then position.Closed.Value else perf.LatestDate
-                            GradeDistribution = 
-                                match position.Grade.HasValue with
-                                | true ->
-                                    let gradeDistribution =
-                                        match perf.GradeDistribution |> Array.tryFind (fun g -> g.label = position.Grade.Value.Value) with
-                                        | Some _ -> perf.GradeDistribution |> Array.map (fun g -> if g.label = position.Grade.Value.Value then { g with frequency = g.frequency + 1 } else g)
-                                        | None -> perf.GradeDistribution |> Array.append [| { label = position.Grade.Value.Value; frequency = 1 } |]
-                                    gradeDistribution
-                                | false -> perf.GradeDistribution
-                                
-                            Wins = 
-                                match position.Profit >= 0m with
-                                | true -> perf.Wins + 1
-                                | false -> perf.Wins
+                    {   
+                        NumberOfTrades = perf.NumberOfTrades + 1
+                        TotalDaysHeld = perf.TotalDaysHeld + decimal(position.DaysHeld)
+                        Profit = perf.Profit + position.Profit
+                        TotalCost = perf.TotalCost + (if position.Cost <> 0m then position.Cost else position.CompletedPositionCost)
+                        rrSum = perf.rrSum + position.RR
+                        EarliestDate = if position.Opened < perf.EarliestDate then position.Opened else perf.EarliestDate
+                        LatestDate = if position.Closed.IsSome && position.Closed.Value > perf.LatestDate then position.Closed.Value else perf.LatestDate
+                        GradeDistribution = 
+                            match position.Grade with
+                            | Some grade ->
+                                let gradeDistribution =
+                                    match perf.GradeDistribution |> Array.tryFind (fun g -> g.label = grade.Value) with
+                                    | Some _ -> perf.GradeDistribution |> Array.map (fun g -> if g.label = grade.Value then { g with frequency = g.frequency + 1 } else g)
+                                    | None -> perf.GradeDistribution |> Array.append [| { label = grade.Value; frequency = 1 } |]
+                                gradeDistribution
+                            | None -> perf.GradeDistribution
                             
-                            WinAmount =
-                                match position.Profit >= 0m with
-                                | true -> perf.WinAmount + position.Profit
-                                | false -> perf.WinAmount
-                                
-                            MaxWinAmount =
-                                
-                                match position.Profit >= 0m with
-                                | true -> Math.Max(perf.MaxWinAmount, position.Profit)
-                                | false -> perf.MaxWinAmount
-                                
-                            TotalDaysHeldWins =
-                                match position.Profit >= 0m with
-                                | true -> perf.TotalDaysHeldWins + decimal(position.DaysHeld)
-                                | false -> perf.TotalDaysHeldWins
+                        Wins = 
+                            match position.Profit >= 0m with
+                            | true -> perf.Wins + 1
+                            | false -> perf.Wins
+                        
+                        WinAmount =
+                            match position.Profit >= 0m with
+                            | true -> perf.WinAmount + position.Profit
+                            | false -> perf.WinAmount
                             
-                            TotalDaysHeldLosses =
-                                match position.Profit < 0m with
-                                | true -> perf.TotalDaysHeldLosses + decimal(position.DaysHeld)
-                                | false -> perf.TotalDaysHeldLosses
-                                
-                            WinReturnPctTotal =
-                                match position.Profit >= 0m with
-                                | true -> perf.WinReturnPctTotal + position.GainPct
-                                | false -> perf.WinReturnPctTotal
-                                
-                            Losses = 
-                                match position.Profit < 0m with
-                                | true -> perf.Losses + 1
-                                | false -> perf.Losses
+                        MaxWinAmount =
                             
-                            LossAmount =
-                                match position.Profit < 0m with
-                                | true -> perf.LossAmount + position.Profit
-                                | false -> perf.LossAmount
+                            match position.Profit >= 0m with
+                            | true -> Math.Max(perf.MaxWinAmount, position.Profit)
+                            | false -> perf.MaxWinAmount
                             
-                            MaxLossAmount =
-                                match position.Profit < 0m with
-                                | true -> Math.Min(perf.MaxLossAmount, position.Profit)
-                                | false -> perf.MaxLossAmount
-                                
-                            WinMaxReturnPct =
-                                match position.Profit >= 0m with
-                                | true -> Math.Max(perf.WinMaxReturnPct, position.GainPct)
-                                | false -> perf.WinMaxReturnPct
-                                
-                            LossMaxReturnPct =
-                                match position.Profit < 0m with
-                                | true -> Math.Min(perf.LossMaxReturnPct, position.GainPct)
-                                | false -> perf.LossMaxReturnPct
-                                
-                            LossReturnPctTotal =
-                                match position.Profit < 0m with
-                                | true -> perf.LossReturnPctTotal + position.GainPct
-                                | false -> perf.LossReturnPctTotal
-                                
-                            WinRRTotal =
-                                match position.Profit >= 0m with
-                                | true -> perf.WinRRTotal + position.RR
-                                | false -> perf.WinRRTotal
-                                
-                            LossRRTotal =
-                                match position.Profit < 0m with
-                                | true -> perf.LossRRTotal + position.RR
-                                | false -> perf.LossRRTotal
+                        TotalDaysHeldWins =
+                            match position.Profit >= 0m with
+                            | true -> perf.TotalDaysHeldWins + decimal(position.DaysHeld)
+                            | false -> perf.TotalDaysHeldWins
+                        
+                        TotalDaysHeldLosses =
+                            match position.Profit < 0m with
+                            | true -> perf.TotalDaysHeldLosses + decimal(position.DaysHeld)
+                            | false -> perf.TotalDaysHeldLosses
+                            
+                        WinReturnPctTotal =
+                            match position.Profit >= 0m with
+                            | true -> perf.WinReturnPctTotal + position.GainPct
+                            | false -> perf.WinReturnPctTotal
+                            
+                        Losses = 
+                            match position.Profit < 0m with
+                            | true -> perf.Losses + 1
+                            | false -> perf.Losses
+                        
+                        LossAmount =
+                            match position.Profit < 0m with
+                            | true -> perf.LossAmount + position.Profit
+                            | false -> perf.LossAmount
+                        
+                        MaxLossAmount =
+                            match position.Profit < 0m with
+                            | true -> Math.Min(perf.MaxLossAmount, position.Profit)
+                            | false -> perf.MaxLossAmount
+                            
+                        WinMaxReturnPct =
+                            match position.Profit >= 0m with
+                            | true -> Math.Max(perf.WinMaxReturnPct, position.GainPct)
+                            | false -> perf.WinMaxReturnPct
+                            
+                        LossMaxReturnPct =
+                            match position.Profit < 0m with
+                            | true -> Math.Min(perf.LossMaxReturnPct, position.GainPct)
+                            | false -> perf.LossMaxReturnPct
+                            
+                        LossReturnPctTotal =
+                            match position.Profit < 0m with
+                            | true -> perf.LossReturnPctTotal + position.GainPct
+                            | false -> perf.LossReturnPctTotal
+                            
+                        WinRRTotal =
+                            match position.Profit >= 0m with
+                            | true -> perf.WinRRTotal + position.RR
+                            | false -> perf.WinRRTotal
+                            
+                        LossRRTotal =
+                            match position.Profit < 0m with
+                            | true -> perf.LossRRTotal + position.RR
+                            | false -> perf.LossRRTotal
                     }
                 ) { NumberOfTrades = 0
                     Wins = 0
@@ -314,11 +313,11 @@ type TradingStrategyPerformance =
     {
         strategyName : string
         performance: TradingPerformance
-        positions: PositionInstance[]
+        positions: StockPositionWithCalculations[]
     }
     
     with
         member this.NumberOfOpenPositions =
             this.positions
-            |> Array.filter (fun p -> p.Closed.HasValue)
+            |> Array.filter (fun p -> p.IsClosed = false)
             |> Array.length

@@ -4,13 +4,14 @@ namespace core.fs.Cryptos
     open System.ComponentModel.DataAnnotations
     open core.Cryptos
     open core.Shared
+    open core.fs
+    open core.fs.Accounts
+    open core.fs.Adapters.CSV
+    open core.fs.Adapters.Cryptos
+    open core.fs.Adapters.Storage
     open core.fs.Cryptos.Import
     open core.fs.Services
-    open core.fs.Shared
-    open core.fs.Shared.Adapters.CSV
-    open core.fs.Shared.Adapters.Cryptos
-    open core.fs.Shared.Adapters.Storage
-    open core.fs.Shared.Domain.Accounts
+    open core.fs.Adapters.Storage
     
     type CryptoTransaction =
         {

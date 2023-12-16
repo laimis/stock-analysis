@@ -1,22 +1,46 @@
 namespace core.fs.Portfolio
 
 open System
-open System.Collections.Generic
 open Microsoft.FSharp.Collections
 open core.Shared
-open core.Stocks
+open core.fs
+open core.fs.Adapters.Brokerage
 open core.fs.Services.Trading
-open core.fs.Shared
-open core.fs.Shared.Adapters.Brokerage
 
+open core.fs.Stocks
+
+
+[<CustomEquality>]
+[<CustomComparison>]
+type StockViolationView =
+    {
+        CurrentPrice: decimal
+        Message: string
+        NumberOfShares: decimal
+        PricePerShare: decimal
+        Ticker: Ticker
+    }
+    
+    override this.Equals(other) =
+        match other with
+        | :? StockViolationView as res -> res.Ticker = this.Ticker
+        | _ -> false
+    override this.GetHashCode() = this.Ticker.GetHashCode()
+    
+    interface IComparable with
+        member this.CompareTo(other) =
+            match other with
+            | :? StockViolationView as res -> this.Ticker.Value.CompareTo(res.Ticker.Value)
+            | _ -> -1
+            
 // TODO: this view class is very busy, doing all kinds of stuff. Maybe a service
 // should do this and this type would just contain data...
-type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
+type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculations array) =
      
         // feels a bit hacky, but the expectation is that the positions will always be sorted
         // from the most recent to the oldest. And for performance trends we want window by
         // date from oldest to most recent
-        let closedPositions = inputPositions |> Array.sortBy (fun p -> p.Closed.Value)
+        let closedPositions = inputPositions |> Array.sortBy (_.Closed.Value)
         
         let defaultWindowSize = 20
         
@@ -71,7 +95,7 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             )
             gains
             
-        let generateTrends (trades:PositionInstance array) =
+        let generateTrends (trades:StockPositionWithCalculations array) =
             
             let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
             let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.Vertical) |> Option.Some
@@ -148,10 +172,10 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
             let aGrades, bGrades, cGrades =
                 trades
                 |> Seq.fold ( fun (a, b, c) position ->
-                    match position.Grade.HasValue with
-                    | false -> (a, b, c)
-                    | _ ->
-                        match position.Grade.Value.Value with
+                    match position.Grade with
+                    | None -> (a, b, c)
+                    | Some grade ->
+                        match grade.Value with
                         | "A" -> (a+1, b, c)
                         | "B" -> (a, b+1, c)
                         | "C" -> (a, b, c+1)
@@ -228,12 +252,12 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 positionsClosedByDateContainer
             ]
             
-        let getAtMost (numberOfTrades:int) (trades:PositionInstance array) =
+        let getAtMost (numberOfTrades:int) (trades:StockPositionWithCalculations array) =
             match trades.Length with
             | tradeLength when tradeLength >= numberOfTrades -> trades[trades.Length - numberOfTrades - 1..trades.Length-1]
-            | _ -> Array.Empty<PositionInstance>()
+            | _ -> Array.Empty<StockPositionWithCalculations>()
             
-        let timeBasedSlice cutOff (trades:PositionInstance array) =
+        let timeBasedSlice cutOff (trades:StockPositionWithCalculations array) =
             
             let firstTradeIndex =
                 trades
@@ -243,8 +267,8 @@ type TradingPerformanceContainerView(inputPositions:PositionInstance array) =
                 
             let span =
                 match firstTradeIndex with
-                | Some (index,_) -> Span<PositionInstance>(trades, index, trades.Length - index)
-                | None -> Span<PositionInstance>(trades, 0, 0)
+                | Some (index,_) -> Span<StockPositionWithCalculations>(trades, index, trades.Length - index)
+                | None -> Span<StockPositionWithCalculations>(trades, 0, 0)
                 
             span.ToArray()
         
@@ -302,7 +326,7 @@ type PortfolioView =
 
 type TradingEntriesView =
     {
-        current: PositionInstance array
+        current: StockPositionWithCalculations array
         violations: StockViolationView array
         cashBalance: decimal option
         brokerageOrders: Order array
@@ -311,7 +335,7 @@ type TradingEntriesView =
     
 type PastTradingEntriesView =
     {
-        past: PositionInstance array
+        past: StockPositionWithCalculations array
         performance: TradingPerformanceContainerView
         strategyPerformance: TradingStrategyPerformance array
     }
@@ -354,7 +378,15 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
     member _.Credit = transactions |> Seq.sumBy (fun t -> t.Amount)
     member _.Debit = transactions |> Seq.sumBy (fun t -> t.Amount)
     
-type TransactionSummaryView(start,``end``,openPositions,closedPositions,stockTransactions,optionTransactions,plStockTransactions,plOptionTransactions) =
+type TransactionSummaryView(
+    start,
+    ``end``,
+    openPositions:StockPositionWithCalculations list,
+    closedPositions:StockPositionWithCalculations list,
+    stockTransactions:PLTransaction list,
+    optionTransactions:Transaction list,
+    plStockTransactions:PLTransaction list,
+    plOptionTransactions:Transaction list) =
         
         member _.Start = start
         member _.End = ``end``
@@ -365,5 +397,5 @@ type TransactionSummaryView(start,``end``,openPositions,closedPositions,stockTra
         member _.PLStockTransactions = plStockTransactions
         member _.PLOptionTransactions = plOptionTransactions
         
-        member _.StockProfit = plStockTransactions |> Seq.sumBy (fun (t:Transaction) -> t.Amount)
+        member _.StockProfit = plStockTransactions |> Seq.sumBy (fun (t:PLTransaction) -> t.Profit)
         member _.OptionProfit = plOptionTransactions |> Seq.sumBy (fun (t:Transaction) -> t.Amount)

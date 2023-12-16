@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
-import { stocktransactioncommand, StockViolation } from 'src/app/services/stocks.service';
+import {openpositioncommand, stocktransactioncommand, StockViolation} from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-violations',
@@ -24,7 +24,7 @@ export class StockViolationsComponent {
 
   @ViewChild(BrokerageOrdersComponent)
   private brokerageOrdersComponent!: BrokerageOrdersComponent;
-  
+
   activeTicker: string = null
   fixType : string = null
 
@@ -34,19 +34,22 @@ export class StockViolationsComponent {
     this.activeTicker = ticker
     this.fixType = 'transaction'
   }
-  
+
   openPosition(ticker:string) {
     this.activeTicker = ticker
     this.fixType = 'position'
   }
-  
+
   transactionFailed(errors) {
     alert("failures" + errors.join("\n"))
   }
 
   transactionRecorded(val:stocktransactioncommand) {
+    this.refreshRequested.emit(val.positionId)
+  }
+
+  positionOpened(val:openpositioncommand) {
     this.refreshRequested.emit(val.ticker)
-    this.brokerageOrdersComponent.refreshOrders()
   }
 
   orderExecuted(ticker:string) {

@@ -1,9 +1,11 @@
+using System;
 using System.Threading.Tasks;
+using core.fs.Adapters.Stocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 using core.fs.Reports;
-using core.fs.Shared.Adapters.Stocks;
+using core.fs.Stocks;
 using core.Shared;
 
 namespace web.Controllers
@@ -47,18 +49,41 @@ namespace web.Controllers
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] string frequency)
-            => this.OkOrError(_service.Handle(new PercentChangeStatisticsQuery(PriceFrequency.FromString(frequency ?? PriceFrequency.Daily.ToString()), new Ticker(ticker), User.Identifier())));
+            => this.OkOrError(
+                _service.Handle(
+                    new PercentChangeStatisticsQuery(
+                        PriceFrequency.FromString(frequency ?? PriceFrequency.Daily.ToString()), new Ticker(ticker),
+                        User.Identifier())
+                )
+            );
 
         [HttpGet("gaps/tickers/{ticker}")]
         public Task<ActionResult> TickerGaps(string ticker, [FromQuery] string frequency)
-            => this.OkOrError(_service.Handle(new GapReportQuery(User.Identifier(), new Ticker(ticker), PriceFrequency.FromString(frequency))));
+            => this.OkOrError(
+                _service.Handle(
+                    new GapReportQuery(User.Identifier(), new Ticker(ticker), PriceFrequency.FromString(frequency))
+                )
+            );
 
         [HttpGet("positions")]
         public Task<ActionResult> Portfolio() =>
-            this.OkOrError(_service.Handle(new OutcomesReportForPositionsQuery(User.Identifier())));
+            this.OkOrError(
+                _service.Handle(
+                    new OutcomesReportForPositionsQuery(User.Identifier())
+                )
+            );
 
         [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
-        public Task<ActionResult> DailyPositionReport(string ticker, int positionId) =>
-            this.OkOrError(_service.Handle(new DailyPositionReportQuery(User.Identifier(), new Ticker(ticker), positionId)));
+        public Task<ActionResult> DailyPositionReport(string ticker, string positionId) =>
+            this.OkOrError(
+                _service.Handle(
+                    new DailyPositionReportQuery(
+                        User.Identifier(),
+                        new Ticker(ticker),
+                        StockPositionId.NewStockPositionId(Guid.Parse(positionId)
+                        )
+                    )
+                )
+            );
     }
 }

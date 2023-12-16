@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Account;
+using core.fs;
 using core.fs.Options;
-using core.fs.Shared;
-using core.fs.Shared.Adapters.Brokerage;
-using core.fs.Shared.Adapters.CSV;
-using core.fs.Shared.Adapters.Storage;
-using core.fs.Shared.Domain.Accounts;
+using core.fs.Adapters.Brokerage;
+using core.fs.Adapters.CSV;
+using core.fs.Accounts;
+using core.fs.Adapters.Storage;
 using core.Shared;
 using Microsoft.FSharp.Core;
 using Moq;
 using Xunit;
+using Handler = core.fs.Options.Handler;
 
 namespace coretests.Options
 {

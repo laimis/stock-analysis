@@ -48,13 +48,5 @@ export class SummaryComponent implements OnInit {
   closedPositionRR() : number {
     return this.result.closedPositions.reduce((acc, cur) => acc + cur.rr, 0)
   }
-
-  buys(positionInstance:PositionInstance) {
-    return positionInstance.transactions.filter(t => t.type == 'buy')
-  }
-
-  sells(positionInstance:PositionInstance) {
-    return positionInstance.transactions.filter(t => t.type == 'sell')
-  }
 }
 

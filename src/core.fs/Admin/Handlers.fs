@@ -1,23 +1,22 @@
 namespace core.fs.Admin
 
-open core.Notes
 open core.Options
-open core.Stocks
+open core.fs
+open core.fs.Accounts
+open core.fs.Adapters.CSV
+open core.fs.Adapters.Email
+open core.fs.Adapters.Storage
 open core.fs.Services
-open core.fs.Shared
-open core.fs.Shared.Adapters.CSV
-open core.fs.Shared.Adapters.Email
-open core.fs.Shared.Adapters.Storage
-open core.fs.Shared.Domain.Accounts
+open core.fs.Adapters.Storage
+open core.fs.Stocks
 
 type Query = {
     everyone: bool
 }
         
-type QueryResponse(user:User, stocks:OwnedStock seq, options:OwnedOption seq, notes:Note seq) =
+type QueryResponse(user:User, stocks:StockPositionState seq, options:OwnedOption seq) =
     let stockLength = stocks |> Seq.length
     let optionLength = options |> Seq.length
-    let noteLength = notes |> Seq.length
     
     member _.Email = user.State.Email
     member _.Id = user.State.Id
@@ -26,7 +25,6 @@ type QueryResponse(user:User, stocks:OwnedStock seq, options:OwnedOption seq, no
     member _.Verified = user.State.Verified.HasValue
     member _.Stocks = stockLength
     member _.Options = optionLength
-    member _.Notes = noteLength
         
 type Export = struct end
 
@@ -44,10 +42,9 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
         async {
             let! user = storage.GetUser(userId) |> Async.AwaitTask
             let! options = portfolio.GetOwnedOptions(userId) |> Async.AwaitTask
-            let! notes = portfolio.GetNotes(userId) |> Async.AwaitTask
-            let! stocks = portfolio.GetStocks(userId) |> Async.AwaitTask
+            let! stocks = portfolio.GetStockPositions(userId) |> Async.AwaitTask
             
-            return QueryResponse(user.Value, stocks, options, notes)
+            return QueryResponse(user.Value, stocks, options)
         }
                 
     interface IApplicationService

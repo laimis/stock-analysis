@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -7,22 +8,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Shared\Domain\Accounts.fs" />
-        <Compile Include="Shared\Shared.fs"/>
-        <Compile Include="Shared\Adapters\IAccountStorage.fs" />
-        <Compile Include="Shared\Adapters\IPortfolioStorage.fs" />
-        <Compile Include="Shared\Adapters\Subscriptions.fs" />
-        <Compile Include="Shared\Adapters\Logging.fs" />
-        <Compile Include="Shared\Adapters\Stocks.fs" />
-        <Compile Include="Shared\Adapters\Options.fs" />
-        <Compile Include="Shared\Adapters\Brokerage.fs" />
-        <Compile Include="Shared\Adapters\Cryptos.fs" />
-        <Compile Include="Shared\Adapters\CSV.fs" />
-        <Compile Include="Shared\Adapters\Email.fs" />
-        <Compile Include="Shared\Adapters\SEC.fs" />
-        <Compile Include="Shared\Adapters\SMS.fs" />
-        <Compile Include="Shared\Adapters\Authentication.fs" />
-        <Compile Include="Helpers.fs" />
+        <Compile Include="Shared.fs" />
+        <Compile Include="Accounts.fs" />
+        <Compile Include="Stocks.fs" />
+        <Compile Include="Adapters\IAccountStorage.fs" />
+        <Compile Include="Adapters\IPortfolioStorage.fs" />
+        <Compile Include="Adapters\Subscriptions.fs" />
+        <Compile Include="Adapters\Logging.fs" />
+        <Compile Include="Adapters\Stocks.fs" />
+        <Compile Include="Adapters\Options.fs" />
+        <Compile Include="Adapters\Brokerage.fs" />
+        <Compile Include="Adapters\Cryptos.fs" />
+        <Compile Include="Adapters\CSV.fs" />
+        <Compile Include="Adapters\Email.fs" />
+        <Compile Include="Adapters\SEC.fs" />
+        <Compile Include="Adapters\SMS.fs" />
+        <Compile Include="Adapters\Authentication.fs" />
         <Compile Include="Services\TradeSimulationTypes.fs" />
         <Compile Include="Services\TradeSimulations.fs" />
         <Compile Include="Services\Analysis.fs" />
@@ -44,13 +45,13 @@
         <Compile Include="Brokerage\Handlers.fs"/>
         <Compile Include="Cryptos\Import.fs"/>
         <Compile Include="Cryptos\Handlers.fs"/>
-        <Compile Include="Notes\Handlers.fs"/>
         <Compile Include="Portfolio\Views.fs"/>
+        <Compile Include="Portfolio\Helpers.fs" />
         <Compile Include="Portfolio\Handler.fs" />
         <Compile Include="Reports\Handlers.fs"/>
         <Compile Include="Stocks\ListsHandler.fs" />
         <Compile Include="Stocks\PendingPositionsHandler.fs" />
-        <Compile Include="Stocks\Handlers.fs"/>
+        <Compile Include="Stocks\StocksHandler.fs" />
         <Compile Include="ImportTransactions.fs"/>
         <Compile Include="Routines\Handler.fs" />
     </ItemGroup>

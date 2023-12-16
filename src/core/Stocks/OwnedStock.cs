@@ -5,7 +5,7 @@ using core.Shared;
 
 namespace core.Stocks
 {
-    public class OwnedStock : Aggregate<OwnedStockState>
+    internal class OwnedStock : Aggregate<OwnedStockState>
     {
         public OwnedStock(IEnumerable<AggregateEvent> events) : base(events)
         {

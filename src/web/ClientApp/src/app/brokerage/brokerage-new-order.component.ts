@@ -1,8 +1,9 @@
 import {Component, Output, EventEmitter, Input} from '@angular/core';
 import { Observable } from 'rxjs';
-import { brokerageordercommand, KeyValuePair, StockQuote, StocksService } from 'src/app/services/stocks.service';
+import {brokerageordercommand, KeyValuePair, StockQuote, StocksService} from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
-import {BrokerageOrderDuration, BrokerageOrderType} from "../services/brokerage.service";
+import {BrokerageOrderDuration, BrokerageOrderType, BrokerageService} from "../services/brokerage.service";
+import {StockPositionsService} from "../services/stockpositions.service";
 
 
 @Component({
@@ -38,7 +39,9 @@ export class BrokerageNewOrderComponent {
   orderDurations: KeyValuePair[]
 
   constructor(
-    private stockService: StocksService
+    private brokerage: BrokerageService,
+    private stockService: StocksService,
+    private stockPositions: StockPositionsService
   )
   {
     this.brokerageOrderType = BrokerageOrderType.Limit
@@ -88,10 +91,11 @@ export class BrokerageNewOrderComponent {
         this.quote = prices
         this.price = prices.mark
 
-        this.stockService.getStockOwnership(ticker).subscribe(
+        this.stockPositions.getStockOwnership(ticker).subscribe(
           ownership => {
-            if (ownership.currentPosition) {
-              this.numberOfShares = ownership.currentPosition.numberOfShares
+            let position = ownership.positions.filter(p => p.isOpen)[0]
+            if (position) {
+              this.numberOfShares = position.numberOfShares
             }
           }
         )
@@ -100,11 +104,11 @@ export class BrokerageNewOrderComponent {
   }
 
   brokerageBuy() {
-    this.execute(cmd => this.stockService.brokerageBuy(cmd))
+    this.execute(cmd => this.brokerage.brokerageBuy(cmd))
   }
 
   brokerageSell() {
-    this.execute(cmd => this.stockService.brokerageSell(cmd))
+    this.execute(cmd => this.brokerage.brokerageSell(cmd))
   }
 
   execute(fn: (cmd: brokerageordercommand) => Observable<string>) {

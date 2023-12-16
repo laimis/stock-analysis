@@ -3,18 +3,18 @@ module core.fs.Alerts.MonitoringServices
     open System
     open System.Collections.Generic
     open System.Threading
-    open System.Threading.Tasks
     open core.Account
     open core.Shared
-    open core.Stocks
+    open core.fs
+    open core.fs.Accounts
+    open core.fs.Adapters.Brokerage
+    open core.fs.Adapters.Logging
+    open core.fs.Adapters.Stocks
+    open core.fs.Adapters.Storage
     open core.fs.Services
-    open core.fs.Shared
-    open core.fs.Shared.Adapters.Brokerage
-    open core.fs.Shared.Adapters.Logging
-    open core.fs.Shared.Adapters.Stocks
-    open core.fs.Shared.Adapters.Storage
-    open core.fs.Shared.Domain.Accounts
-
+    open core.fs.Adapters.Storage
+    open core.fs.Stocks
+    
     // stop loss should be monitored at the following times:
     // on trading days every 5 minutes from 9:45am to 4:00pm
     // and no monitoring on weekends
@@ -61,7 +61,7 @@ module core.fs.Alerts.MonitoringServices
         let logInformation = logger.LogInformation
         let logError = logger.LogError
         
-        let runStopLossCheck (user:UserState) (_:CancellationToken) (position:PositionInstance) = async {
+        let runStopLossCheck (user:UserState) (_:CancellationToken) (position:StockPositionState) = async {
             let! priceResponse = brokerage.GetQuote user position.Ticker |> Async.AwaitTask
             
             match priceResponse.Success with
@@ -92,13 +92,11 @@ module core.fs.Alerts.MonitoringServices
                 | Some user ->
                         logInformation $"Found user {userId}"
                         
-                        let! checks = user.Id |> UserId |> portfolio.GetStocks
+                        let! checks = user.Id |> UserId |> portfolio.GetStockPositions
                         
                         let! _ =
                             checks
-                            |> Seq.filter (fun s -> s.State.OpenPosition <> null)
-                            |> Seq.map (fun s -> s.State.OpenPosition)
-                            |> Seq.filter (fun p -> p.StopPrice.HasValue)
+                            |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
                             |> Seq.map (fun p -> p |> runStopLossCheck user.State cancellationToken)
                             |> Async.Sequential // <- don't do this in parallel, usually ends up overloading the brokerage
                             |> Async.StartAsTask
@@ -162,12 +160,12 @@ module core.fs.Alerts.MonitoringServices
             | Some user ->
                 let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
                 
-                let! ownedStocks = emailIdPair.Id |> portfolio.GetStocks |> Async.AwaitTask
+                let! ownedStocks = emailIdPair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
                 
                 let portfolioList =
                     ownedStocks
-                    |> Seq.filter (fun s -> s.State.OpenPosition = null |> not)
-                    |> Seq.map (fun s -> s.State.OpenPosition.Ticker)
+                    |> Seq.filter (_.IsOpen)
+                    |> Seq.map (_.Ticker)
                     |> Seq.map (fun t -> {ticker=t; listName="Portfolio"; user=user.State})
                 
                 return lists
