@@ -175,14 +175,14 @@ export class StockTradingSimulatorComponent implements OnInit {
     this.riskedAmount = p.riskedAmount
     p.transactions.forEach(t => {
       if (first) {
-        var cmd:stocktransactioncommand = {
-          positionId: p.positionId,
+        var cmd:openpositioncommand = {
           stopPrice: p.stopPrice,
           price: t.price,
           numberOfShares: t.numberOfShares,
           date: t.date,
           notes: null,
-          brokerageOrderId: null
+          ticker : p.ticker,
+          strategy: null,
         }
         this.initialPosition(p.ticker, cmd)
         first = false
