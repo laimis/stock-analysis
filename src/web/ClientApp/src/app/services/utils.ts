@@ -54,6 +54,8 @@ export function GetStrategies(): { key: string, value: string }[] {
         { key: "postearningsnewhigh", value: "Post Earnings New High" },
         { key: "recovery", value: "Recovery" },
         { key: "resistancebreakthrough", value: "Resistance Breakthrough" },
+        { key: "shortnewlow", value: "Short, New Low" },
+        { key: "shortweakness", value: "Short, Weakness"},
         { key: "weeklypullbreak", value: "Weekly Pull/Break" },
         { key: "weeklypullbreakdelayed", value: "Weekly Pull/Break Delayed" },
     ]
