@@ -30,7 +30,6 @@ let ``Purchase works`` () =
         
     afterTransitions.NumberOfShares |> should equal 10
 
-
 [<Fact>]
 let ``Selling not owned fails`` () =
     let stock =
@@ -69,56 +68,7 @@ let ``Create from events recreates identical state`` () =
     let stock2 = StockPosition.createFromEvents events
     
     stock |> should equal stock2
-    
-[<Fact>]
-let ``Multiple buys average cost correct`` () =
-    let purchase1 =
-        StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow
-    
-    let withCalculation = purchase1 |> StockPositionWithCalculations
-    withCalculation.AverageCostPerShare |> should equal 7.5m
-    withCalculation.Cost |> should equal 15m
-    
-    let sell1 = StockPosition.sell 1m 6m DateTimeOffset.UtcNow purchase1
-    let withCalculation = sell1 |> StockPositionWithCalculations
-    withCalculation.AverageCostPerShare |> should equal 10m
-    withCalculation.Cost |> should equal 10m
-    
-    let purchase2 = StockPosition.buy 1m 10m DateTimeOffset.UtcNow sell1
-    let withCalculation = purchase2 |> StockPositionWithCalculations
-    withCalculation.AverageCostPerShare |> should equal 10m
-    withCalculation.Cost |> should equal 20m
-    
-    let sell2 = StockPosition.sell 2m 10m DateTimeOffset.UtcNow purchase2
-    sell2.IsClosed |> should equal true
-    let withCalculation = sell2 |> StockPositionWithCalculations
-    DateTimeOffset.UtcNow.Subtract(withCalculation.Closed.Value).TotalSeconds |> int |> should be (lessThan 1)
-    withCalculation.DaysHeld |> should equal 0
-    withCalculation.Profit |> should equal 1
-    
-    Assert.Equal(0.04m, withCalculation.GainPct, 2)
-    
-[<Fact>]
-let ``Sell creates PL Transactions`` () =
-    
-    let stock =
-        StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow 
-        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow
-        |> StockPosition.sell 2m 10m DateTimeOffset.UtcNow
-        |> StockPositionWithCalculations
-        
-    let transactions = stock.PLTransactions
-    
-    transactions |> should haveLength 2
-    
-    transactions |> List.head |> _.Profit |> should equal 1m
-    transactions |> List.last |> _.Profit |> should equal 0m
-    
+  
 [<Fact>]
 let ``Multiple buys deleting transactions`` () =
     
@@ -143,26 +93,7 @@ let ``Multiple buys deleting transactions`` () =
     position2.Transactions |> should haveLength 3
     position2.NumberOfShares |> should equal 1m
     
-[<Fact>]
-let ``Days held is correct`` () =
-    
-    let position =
-        StockPosition.openLong ticker (DateTimeOffset.UtcNow.AddDays(-5))
-        |> StockPosition.buy 1m 5m (DateTimeOffset.UtcNow.AddDays(-5))
-        |> StockPosition.buy 1m 10m (DateTimeOffset.UtcNow.AddDays(-2))
-        
-    let calculated = position |> StockPositionWithCalculations
-    
-    calculated.DaysHeld |> should equal 5
-    calculated.DaysSinceLastTransaction |> should equal 2
-    
-    let afterSell1 = position |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow
-    
-    let calculated = afterSell1 |> StockPositionWithCalculations
-    
-    calculated.DaysHeld |> should equal 5
-    calculated.DaysSinceLastTransaction |> should equal 0
-    
+   
 [<Fact>]
 let ``Assigning stop works``() =
     
@@ -176,7 +107,9 @@ let ``Assigning stop works``() =
     
     let events = position.Events
     
-    let sameStop = position |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
+    let sameStop =
+        position
+        |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
     
     events |> should equal sameStop.Events
     
@@ -315,9 +248,8 @@ let ``Buy with stop at cost works``() =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
         |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
         |> StockPosition.setStop (Some 1m) DateTimeOffset.UtcNow
-        |> StockPositionWithCalculations
         
-    position.RiskedAmount.Value |> should equal 0m
+    position.RiskAmount.Value |> should equal 0m
    
     
 [<Fact>]

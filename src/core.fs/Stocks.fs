@@ -2,6 +2,7 @@ namespace core.fs.Stocks
 
 open System
 open System.Collections.Generic
+open System.IO.Compression
 open core.Shared
 
 type StockPositionId = StockPositionId of Guid
@@ -332,6 +333,13 @@ module StockPosition =
         StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value, Long)
         |> createInitialState
         
+    let openShort (ticker:Ticker) date =
+        
+        date |> failIfInvalidDate
+        
+        StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value, Short)
+        |> createInitialState
+        
     let addNotes = applyNotesIfApplicable
         
     let setLabel key value date stockPosition =
@@ -374,13 +382,13 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         stockPosition.Transactions
         |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
         |> List.choose id
-        |> List.partition (fun x ->
-            match stockPosition.IsShort with
-            | true -> x.Type = Buy
-            | false -> x.Type = Sell)
+        |> List.partition (fun x -> x.Type = Sell)
         
     let buySlots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
+    let completedPositionTransactions =
+        stockPosition.ShareTransactions
+        |> List.takeWhile (fun x -> match stockPosition.IsShort with | true -> x.Type = Sell | false -> x.Type = Buy)
             
     member this.IsShort = stockPosition.IsShort
     member this.PositionId = stockPosition.PositionId
@@ -397,8 +405,13 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     
     member this.AverageCostPerShare =
         
-        let sharesSoldTotal = sells |> List.sumBy (fun x -> x.NumberOfShares |> abs) |> int
-        let remainingShares = buySlots |> List.skip sharesSoldTotal
+        let liquidationSource, liquidationSlots, acquisitionSource, acquisitionSlots = 
+            match stockPosition.IsShort with
+            | true -> buys, buySlots, sells, sellSlots
+            | false -> sells, sellSlots, buys, buySlots
+        
+        let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
+        let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
         
         // we then calculate the average cost of the remaining shares
         match remainingShares with
@@ -406,6 +419,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         | _ -> remainingShares |> List.average
         
     member this.Cost = stockPosition.NumberOfShares * this.AverageCostPerShare
+    
     member this.DaysHeld =
         let referenceDay =
             match stockPosition.Closed with
@@ -502,23 +516,16 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         | _ -> buys |> List.head |> _.Price
         
     member this.CompletedPositionCostPerShare =
-        // it's the average cost per share up until the first sell happens
-        let buysBeforeFirstSell = buys |> List.takeWhile (fun x -> x.Type = Buy)
-        match buysBeforeFirstSell with
+        match completedPositionTransactions with
         | [] -> 0m
         | _ ->
-            let totalCost = buysBeforeFirstSell |> List.sumBy (fun x -> x.NumberOfShares * x.Price)
-            let totalShares = buysBeforeFirstSell |> List.sumBy (_.NumberOfShares)
+            let totalCost = completedPositionTransactions |> List.sumBy (fun x -> x.NumberOfShares * x.Price)
+            let totalShares = completedPositionTransactions |> List.sumBy (_.NumberOfShares)
             totalCost / totalShares
         
-    member this.CompletedPositionShares =
-        let buysBeforeFirstSell = buys |> List.takeWhile (fun x -> x.Type = Buy)
-        match buysBeforeFirstSell with
-        | [] -> 0m
-        | _ -> buysBeforeFirstSell |> List.sumBy (_.NumberOfShares)
+    member this.CompletedPositionShares = completedPositionTransactions |> List.sumBy (_.NumberOfShares)
         
-    member this.CompletedPositionCost =
-        this.CompletedPositionShares * this.CompletedPositionCostPerShare
+    member this.CompletedPositionCost = this.CompletedPositionShares * this.CompletedPositionCostPerShare
         
     member this.LastBuyPrice =
         match buys with
