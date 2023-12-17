@@ -15,18 +15,8 @@ import { Router } from '@angular/router';
 })
 export class StockOwnershipComponent {
 
-  positions: PositionInstance[];
-
   @Input()
-  public set ownership(value) {
-
-    // create new array of positions that is
-    // created from value.positions, but reversed in orders
-    if (value)
-    {
-      this.positions = value.positions.slice().reverse()
-    }
-  }
+  positions: PositionInstance[];
 
   @Input()
   quote: StockQuote

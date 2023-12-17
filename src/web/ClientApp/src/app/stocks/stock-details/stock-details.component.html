@@ -56,8 +56,7 @@
 </div>
 
 @if (stock && isActive('stocks')) {
-  <app-stock-ownership
-    [stock]=stock [ownership]=stockOwnership [quote]="stock.quote"></app-stock-ownership>
+  <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote"></app-stock-ownership>
 }
 @if (isActive('options')) {
   <stock-option [ticker]=stock.ticker [options]=options></stock-option>
