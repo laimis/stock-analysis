@@ -208,7 +208,7 @@ public class PortfolioController : ControllerBase
         );
     
     [HttpPost("stockpositions")]
-    public Task<ActionResult> OpenLongPosition([FromBody]OpenLongStockPosition command) =>
+    public Task<ActionResult> OpenLongPosition([FromBody]OpenStockPosition command) =>
         this.OkOrError(
             _handler.Handle(
                 User.Identifier(), command
