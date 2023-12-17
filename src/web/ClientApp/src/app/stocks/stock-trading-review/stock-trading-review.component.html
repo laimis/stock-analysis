@@ -5,9 +5,9 @@
         <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
         <div class="col text-center">
           <select class="form-select" (change)="dropdownClick($event.target)">
-            @for (position of positions; track position;) {
+            @for (position of positions; track position; let i = $index) {
               <option
-                [value]="position.positionId"
+                [value]="i"
                 [selected]="position.positionId === currentPosition.positionId">
                 {{position.ticker}}
               </option>
