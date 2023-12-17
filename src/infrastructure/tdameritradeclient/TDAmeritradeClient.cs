@@ -575,9 +575,7 @@ public class TDAmeritradeClient : IBrokerage
                 )
             )
             : new ServiceResponse<PriceBars>(
-                new PriceBars(
-                    payload
-                )
+                new PriceBars(payload)
             );
     }
 

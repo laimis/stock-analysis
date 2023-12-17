@@ -1,5 +1,4 @@
 
-import { AddNoteComponent } from './notes/add-note.component';
 import { AppComponent } from './app.component';
 import { AuthGuard, AuthGuardUnverifiedAllowed, AuthGuardAdminOnly } from './auth/auth.guard';
 import { BrowserModule, Title } from '@angular/platform-browser';
@@ -11,8 +10,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { LandingComponent } from './landing/landing.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { NgModule } from '@angular/core';
-import { NoteComponent } from './notes/note.component';
-import { NotesComponent } from './notes/notes.component';
 import { OptionChainComponent } from './options/option-chain/option-chain.component';
 import { OptionSellComponent } from './options/option-sell/option-sell.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -33,7 +30,6 @@ import { AdminEmailComponent } from './admin/email/admin-email.component';
 import { AdminWeeklyComponent } from './admin/weekly/admin-weekly.component';
 import { PaymentsComponent } from './payments/payments.component';
 import { StockFundamentalsComponent } from './stocks/stock-details/stock-fundamentals.component';
-import { StockNotesComponent } from './stocks/stock-details/stock-notes.component';
 import { StockOwnershipComponent } from './stocks/stock-details/stock-ownership.component';
 import { StockOptionComponent } from './stocks/stock-details/stock-option.component';
 import { StockPositionReportsComponent } from './stocks/stock-trading/stock-trading-outcomes-reports.component';
@@ -117,11 +113,6 @@ let routes: Routes = [
   {path: 'profile/login', component: ProfileLoginComponent},
   {path: 'profile/verify', component: ProfileVerifyComponent},
   {path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent},
-  {path: 'notes', component: NotesComponent, canActivate: [AuthGuard]},
-  {path: 'notes/add', component: AddNoteComponent, canActivate: [AuthGuard]},
-  {path: 'notes/add/:ticker', component: AddNoteComponent, canActivate: [AuthGuard]},
-  {path: 'notes/filtered/:ticker', component: NotesComponent, canActivate: [AuthGuard]},
-  {path: 'notes/:id', component: NoteComponent, canActivate: [AuthGuard]},
 
   {path: 'options', component: OptionsComponent, canActivate: [AuthGuard]},
   {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
@@ -173,7 +164,6 @@ let routes: Routes = [
 
 @NgModule({
   declarations: [
-    AddNoteComponent,
     AdminEmailComponent,
     AdminWeeklyComponent,
     AdminUsersComponent,
@@ -184,8 +174,6 @@ let routes: Routes = [
     EventsComponent,
     LandingComponent,
     NavMenuComponent,
-    NoteComponent,
-    NotesComponent,
 
     OptionsComponent,
     OptionStatsComponent,
@@ -212,7 +200,6 @@ let routes: Routes = [
     StockDetailsComponent,
     StockFundamentalsComponent,
     StockPositionReportsComponent,
-    StockNotesComponent,
     StockOptionComponent,
     StockTransactionComponent,
     StockOwnershipComponent,

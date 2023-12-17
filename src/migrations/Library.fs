@@ -11,10 +11,21 @@ open storage.shared
 // we will be migrating from OwnedStockState silliness to StockPosition
 module MigrateFromV2ToV3 =
     
+    let stringToSome s =
+        match s with
+        | null -> None
+        | _ -> Some s
+        
     let mapToStockPositionEvent (t:PositionEvent) =
         match t.Type.Value with
-        | PositionEventType.Buy -> fun sp -> sp |> StockPosition.buy t.Quantity.Value t.Value.Value t.When (Some t.Notes)
-        | PositionEventType.Sell -> fun sp -> sp |> StockPosition.sell t.Quantity.Value t.Value.Value t.When (Some t.Notes)
+        | PositionEventType.Buy -> fun sp ->
+            sp
+            |> StockPosition.buy t.Quantity.Value t.Value.Value t.When
+            |> StockPosition.addNotes (t.Notes |> stringToSome) t.When
+        | PositionEventType.Sell -> fun sp ->
+            sp
+            |> StockPosition.sell t.Quantity.Value t.Value.Value t.When
+            |> StockPosition.addNotes (t.Notes |> stringToSome) t.When
         | PositionEventType.Stop ->
             match t.Value.HasValue with
             | true -> (fun sp -> sp |> StockPosition.setStop (Some t.Value.Value) t.When) 

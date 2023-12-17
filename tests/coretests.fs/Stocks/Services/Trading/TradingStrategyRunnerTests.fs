@@ -96,7 +96,7 @@ let ``With portion size too small, still sells at RR levels``() =
     
     let result =
         StockPosition.openLong TestDataGenerator.NET bars.First.Date
-        |> StockPosition.buy 2m 10m  bars.First.Date None
+        |> StockPosition.buy 2m 10m  bars.First.Date
         |> StockPosition.setStop (Some 5m)  bars.First.Date
         |> runner.Run bars false
     
@@ -138,7 +138,7 @@ let createDownsideTestData() =
     
         let positionInstance = 
             StockPosition.openLong TestDataGenerator.NET bars.First.Date
-            |> StockPosition.buy 5m 50m bars.First.Date None
+            |> StockPosition.buy 5m 50m bars.First.Date
             |> StockPosition.setStop (Some 45m) bars.First.Date
         
         (bars, positionInstance)
@@ -169,7 +169,7 @@ let ``Close after fixed number of days, works``() =
 
     let positionInstance =
         StockPosition.openLong TestDataGenerator.NET data.First.Date
-        |> StockPosition.buy 5m 50m data.First.Date None
+        |> StockPosition.buy 5m 50m data.First.Date
         |> StockPosition.setStop (Some 45m) data.First.Date
         
     let runner = TradingStrategyFactory.createCloseAfterFixedNumberOfDays 5

@@ -9,19 +9,19 @@ open coretests.testdata
 
 let position =
     StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
-    |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23")) None
-    |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25")) None
-    |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25")) None
-    |> StockPosition.sell 10m 37m (DateTimeOffset.Parse("2020-03-21")) None
+    |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23"))
+    |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25"))
+    |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25"))
+    |> StockPosition.sell 10m 37m (DateTimeOffset.Parse("2020-03-21"))
     |> StockPositionWithCalculations
     
 let positionWithStop =
     StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
-    |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23")) None
-    |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25")) None
+    |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23"))
+    |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25"))
     |> StockPosition.setStop (Some 28m) (DateTimeOffset.Parse("2020-01-25"))
-    |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25")) None
-    |> StockPosition.sell 10m 37m (DateTimeOffset.Parse("2020-03-21")) None
+    |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25"))
+    |> StockPosition.sell 10m 37m (DateTimeOffset.Parse("2020-03-21"))
     |> StockPositionWithCalculations
     
 
@@ -62,8 +62,8 @@ let ``Risked amount is accurate`` () =
 let ``Cost at risk based on stop price is accurate`` () =
     let position =
         StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
-        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23")) None
-        |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25")) None
+        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23"))
+        |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25"))
         |> StockPosition.setStop (Some 20m) (DateTimeOffset.Parse("2020-01-25"))
         
     position |> StockPositionWithCalculations |> _.CostAtRiskBasedOnStopPrice.Value |> should equal 250m
@@ -71,7 +71,7 @@ let ``Cost at risk based on stop price is accurate`` () =
     // now sell some and risk should be reduced
     let afterSell =
         position
-        |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25")) None
+        |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25"))
         |> StockPositionWithCalculations
     
     afterSell.CostAtRiskBasedOnStopPrice.Value |> should equal 150m
@@ -88,8 +88,8 @@ let ``Days held is accurate`` () =
 let ``Cost is accurate`` () =
     let position =
         StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
-        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23")) None
-        |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25")) None
+        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23"))
+        |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25"))
         |> StockPositionWithCalculations
         
     position.Cost |> should equal 650m
@@ -98,7 +98,7 @@ let ``Cost is accurate`` () =
 let ``Set stop sets first stop`` () =
     let position =
         StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
-        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23")) None
+        |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23"))
         |> StockPosition.setStop (Some 28m) (DateTimeOffset.Parse("2020-01-25"))
         |> StockPosition.setStop (Some 29m) (DateTimeOffset.Parse("2020-01-25"))
         |> StockPositionWithCalculations

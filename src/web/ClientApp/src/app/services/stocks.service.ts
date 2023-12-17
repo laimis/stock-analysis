@@ -142,33 +142,6 @@ export class StocksService {
     return this.http.delete<any>('/api/stocks/pendingpositions/' + id)
   }
 
-  // ----------------- notes ---------------------
-
-  addNote(input: any): Observable<any> {
-    return this.http.post<any>('/api/notes', input)
-  }
-
-  saveNote(note: object) {
-    return this.http.patch<any>('/api/notes', note)
-  }
-
-  importNotes(formData: FormData) {
-    return this.http.post('/api/notes/import', formData)
-  }
-
-  getNotes(ticker: string): Observable<NoteList> {
-    if (ticker === null)
-    {
-      ticker = ''
-    }
-
-    return this.http.get<NoteList>('/api/notes?ticker=' + ticker)
-  }
-
-  getNote(id: string): Observable<object> {
-    return this.http.get<object>('/api/notes/' + id)
-  }
-
   getCryptos(): Observable<any> {
 		return this.http.get<any>('/api/cryptos')
   }
@@ -590,19 +563,6 @@ export interface StockPLTransaction {
   sellPrice: number
   profit: number
   gainPct: number
-}
-
-export interface NoteList {
-  tickers: string[]
-  notes: Note[]
-}
-
-export interface Note {
-  relatedToTicker: string
-  created: string
-  price: Price
-  note: string
-  id: string
 }
 
 export interface Price {
@@ -1235,7 +1195,6 @@ export class stocktransactioncommand {
   numberOfShares: number
   price: number
   date: string
-  notes: string
   stopPrice: number | null
   brokerageOrderId: string | null
 }

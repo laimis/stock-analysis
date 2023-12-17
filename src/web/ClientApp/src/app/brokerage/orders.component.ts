@@ -69,7 +69,6 @@ export class BrokerageOrdersComponent {
       numberOfShares: order.quantity,
       price: order.price,
       date: order.date,
-      notes: null,
       stopPrice: null,
       brokerageOrderId: order.orderId
     };

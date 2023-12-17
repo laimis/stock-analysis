@@ -90,11 +90,10 @@ module ImportTransactions =
             let createStockTransaction r : core.fs.Portfolio.StockTransaction =
                 {
                     PositionId = StockPositionId.create()
-                    Date = Nullable<DateTimeOffset> r.Date
-                    Notes = Some r.Description
+                    Date = Some r.Date
                     NumberOfShares = r.Quantity.Value
                     Price = r.Price.Value
-                    StopPrice = Nullable<decimal>()
+                    StopPrice = None
                     BrokerageOrderId = None
                 }
             

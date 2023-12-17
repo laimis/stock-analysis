@@ -21,7 +21,7 @@ namespace csvparsertests
             var ticker = TestDataGenerator.NET;
             
             var stock = StockPosition.buy(
-                1m, 100, DateTime.UtcNow, new FSharpOption<string>("some note"),
+                1m, 100, DateTime.UtcNow,
                 StockPosition.openLong(ticker, DateTimeOffset.UtcNow)
             );
             

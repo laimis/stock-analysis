@@ -9,8 +9,8 @@ open coretests.testdata
 
 let position =
     StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))
-    |> StockPosition.buy 10m 30.0m (DateTimeOffset.Parse("2020-01-23")) None
-    |> StockPosition.buy 10m 35.0m (DateTimeOffset.Parse("2020-01-25")) None
+    |> StockPosition.buy 10m 30.0m (DateTimeOffset.Parse("2020-01-23"))
+    |> StockPosition.buy 10m 35.0m (DateTimeOffset.Parse("2020-01-25"))
     |> StockPosition.setStop (Some 27.5m) (DateTimeOffset.UtcNow)
     |> StockPositionWithCalculations
     

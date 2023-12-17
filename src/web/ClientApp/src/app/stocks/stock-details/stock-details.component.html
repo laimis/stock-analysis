@@ -45,11 +45,6 @@
      (click)="activateTab('fundamentals')">
     Fundamentals
   </a>
-  <a class="tab" [ngClass]="{'is-active': isActive('notes')}" [routerLink]="" (click)="activateTab('notes')">
-    Notes @if (notes && notes.notes.length > 0) {
-    <span class="badge rounded-pill bg-info">{{ notes.notes.length }}</span>
-  }
-  </a>
   @if (stock) {
     <span class="float-end"><span class="text-muted">Price:</span> {{ stock.quote?.price | currency }}</span>
   }
@@ -63,9 +58,6 @@
 }
 @if (isActive('fundamentals')) {
   <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
-}
-@if (isActive('notes')) {
-  <stock-notes [notes]=notes [ticker]=stock.ticker></stock-notes>
 }
 @if (isActive('analysis')) {
   <app-stock-analysis [ticker]=stock.ticker></app-stock-analysis>

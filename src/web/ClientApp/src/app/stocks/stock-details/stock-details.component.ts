@@ -1,8 +1,7 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   StocksService,
   StockDetails,
-  NoteList,
   OwnedOption,
   StockOwnership,
   BrokerageOrder, PositionInstance
@@ -25,7 +24,6 @@ export class StockDetailsComponent implements OnInit {
   stockOwnership: StockOwnership
   currentPosition: PositionInstance
   options: OwnedOption[]
-  notes: NoteList
   orders: BrokerageOrder[]
   activeTab: string = ''
 
@@ -33,7 +31,6 @@ export class StockDetailsComponent implements OnInit {
     stock: false,
     ownership: false,
     options: false,
-    notes: false,
     orders: false
   }
 
@@ -70,11 +67,9 @@ export class StockDetailsComponent implements OnInit {
     this.loading.stock = true;
     this.loading.ownership = true;
     this.loading.options = true;
-    this.loading.notes = true;
     this.loading.orders = true;
 
     this.loadStockDetails()
-    this.loadNotes()
     this.loadStockOwnership()
     this.loadOptionOwnership()
     this.loadOrders()
@@ -104,15 +99,6 @@ export class StockDetailsComponent implements OnInit {
     });
   }
 
-  loadNotes() {
-    this.stocks.getNotes(this.ticker).subscribe(result => {
-      this.loading.notes = false;
-      this.notes = result
-    }, error => {
-      this.loading.notes = false;
-      this.errors.notes = GetErrors(error)
-    })
-  }
 
     loadOptionOwnership() {
     this.stocks.getOwnedOptions(this.ticker).subscribe(result => {

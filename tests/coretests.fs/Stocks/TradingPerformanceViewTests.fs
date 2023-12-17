@@ -13,19 +13,19 @@ let getClosedPositions() =
     
     [
         StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.UtcNow.AddDays(-1))
-        |> StockPosition.buy 1m 100m (DateTimeOffset.UtcNow.AddDays(-1)) None
+        |> StockPosition.buy 1m 100m (DateTimeOffset.UtcNow.AddDays(-1))
         |> StockPosition.setStop (Some 95m) (DateTimeOffset.UtcNow.AddDays(-1))
-        |> StockPosition.sell 1m 110m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 110m DateTimeOffset.UtcNow
         
         StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.UtcNow.AddDays(-1))
-        |> StockPosition.buy 1m 100m (DateTimeOffset.UtcNow.AddDays(-1)) None
+        |> StockPosition.buy 1m 100m (DateTimeOffset.UtcNow.AddDays(-1))
         |> StockPosition.setStop (Some 95m) (DateTimeOffset.UtcNow.AddDays(-1))
-        |> StockPosition.sell 1m 110m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 110m DateTimeOffset.UtcNow
         
         StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.UtcNow.AddDays(-1))
-        |> StockPosition.buy 1m 100m (DateTimeOffset.UtcNow.AddDays(-1)) None
+        |> StockPosition.buy 1m 100m (DateTimeOffset.UtcNow.AddDays(-1))
         |> StockPosition.setStop (Some 95m) (DateTimeOffset.UtcNow.AddDays(-1))
-        |> StockPosition.sell 1m 90m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 90m DateTimeOffset.UtcNow
         
     ]
 
@@ -36,7 +36,7 @@ let generateRandomSet (start:DateTimeOffset) minimumNumberOfTrades =
     
     let closedPositions = 
         [0..numberOfTrades]
-        |> List.map (fun i ->
+        |> List.map (fun _ ->
             let stock = TestDataGenerator.GenerateRandomTicker random
             let purchaseDate = start.AddDays(-numberOfTrades)
             let shares = random.Next(1, 100) |> decimal
@@ -45,8 +45,8 @@ let generateRandomSet (start:DateTimeOffset) minimumNumberOfTrades =
             let sellPrice = random.Next(1, 1000) |> decimal
             
             StockPosition.openLong stock purchaseDate
-            |> StockPosition.buy shares price purchaseDate None
-            |> StockPosition.sell shares sellPrice sellDate None
+            |> StockPosition.buy shares price purchaseDate
+            |> StockPosition.sell shares sellPrice sellDate
         )
     
     closedPositions

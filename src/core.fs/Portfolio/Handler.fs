@@ -67,9 +67,8 @@ type StockTransaction =
         [<Range(0, 100000)>]
         Price: decimal
         [<Required>]
-        Date: Nullable<DateTimeOffset>
-        StopPrice: Nullable<decimal>
-        Notes: string option
+        Date: DateTimeOffset option
+        StopPrice: decimal option
         BrokerageOrderId: string option
     }
     
@@ -300,8 +299,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         
         let buyOrSellFunction =
             match cmd with
-            | Buy (data, _) -> StockPosition.buy data.NumberOfShares data.Price data.Date.Value data.Notes
-            | Sell (data, _) -> StockPosition.sell data.NumberOfShares data.Price data.Date.Value data.Notes
+            | Buy (data, _) -> StockPosition.buy data.NumberOfShares data.Price data.Date.Value
+            | Sell (data, _) -> StockPosition.sell data.NumberOfShares data.Price data.Date.Value
             
         let data, userId =
             match cmd with
@@ -341,18 +340,16 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                             PositionId = StockPositionId(Guid.NewGuid())
                             NumberOfShares = r.amount
                             Price = r.price
-                            Date = r.date
-                            StopPrice = Nullable<decimal>()
-                            Notes = None
+                            Date = match r.date.HasValue with | true ->  Some r.date.Value | false -> None
+                            StopPrice = None
                             BrokerageOrderId = None
                         }, cmd.UserId)
                         | "sell" -> Sell({
                             NumberOfShares = r.amount
                             PositionId = StockPositionId(Guid.NewGuid())
                             Price = r.price
-                            Date = r.date
-                            StopPrice = Nullable<decimal>()
-                            Notes = None
+                            Date = match r.date.HasValue with | true ->  Some r.date.Value | false -> None
+                            StopPrice = None
                             BrokerageOrderId = None
                         }, cmd.UserId)
                         | _ -> failwith "Unknown transaction type"
@@ -382,7 +379,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | None ->
                 let newPosition =
                     StockPosition.openLong cmd.Ticker cmd.Date.Value
-                    |> StockPosition.buy cmd.NumberOfShares cmd.Price cmd.Date.Value cmd.Notes
+                    |> StockPosition.buy cmd.NumberOfShares cmd.Price cmd.Date.Value
+                    |> StockPosition.addNotes cmd.Notes cmd.Date.Value
                     |> StockPosition.setStop cmd.StopPrice cmd.Date.Value
                     |> fun x ->
                         match cmd.Strategy with

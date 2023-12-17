@@ -56,7 +56,6 @@ export class StockTransactionComponent implements OnInit {
     op.numberOfShares = this.numberOfShares
     op.price = this.pricePerShare
     op.date = this.filled
-    op.notes = this.notes
 
     if (this.positionType == 'buy') this.recordBuy(op)
     if (this.positionType == 'sell') this.recordSell(op)

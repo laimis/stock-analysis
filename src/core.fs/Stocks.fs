@@ -240,7 +240,7 @@ module StockPosition =
             apply e stockPosition
         | _ -> stockPosition
         
-    let buy numberOfShares price date notes (stockPosition:StockPositionState) =
+    let buy numberOfShares price date (stockPosition:StockPositionState) =
         if numberOfShares <= 0m then
             failwith "Number of shares must be greater than zero"
             
@@ -255,10 +255,9 @@ module StockPosition =
         let e = StockPurchased(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, numberOfShares, price)
         
         apply e stockPosition
-        |> applyNotesIfApplicable notes date
         |> closePositionIfApplicable date
         
-    let sell numberOfShares price date notes (stockPosition:StockPositionState) =
+    let sell numberOfShares price date (stockPosition:StockPositionState) =
         if numberOfShares <= 0m then
             failwith "Number of shares must be greater than zero"
         
@@ -272,7 +271,6 @@ module StockPosition =
         let e = StockSold(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, numberOfShares, price)
         
         apply e stockPosition
-        |> applyNotesIfApplicable notes date
         |> closePositionIfApplicable date
         
     let assignGrade grade (gradeNote:string option) date (stockPosition:StockPositionState) =

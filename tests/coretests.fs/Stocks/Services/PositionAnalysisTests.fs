@@ -17,7 +17,7 @@ let createTestData() =
     
     let position =
         StockPosition.openLong ticker bars.First.Date
-        |> StockPosition.buy 10m 100m (bars.First.Date) None
+        |> StockPosition.buy 10m 100m (bars.First.Date)
         
     let orders = [| Order(Ticker = Some(ticker), Price = 100m, Type = "SELL") |]
     
@@ -58,7 +58,7 @@ let ``Daily PL Correct`` () =
     
     let sold =
         position
-        |> StockPosition.sell position.NumberOfShares bars.Bars.[midPointInBars].Close bars.Bars.[midPointInBars].Date None
+        |> StockPosition.sell position.NumberOfShares bars.Bars.[midPointInBars].Close bars.Bars.[midPointInBars].Date
         |> StockPositionWithCalculations
     
     let dailyPlAndGain = PositionAnalysis.dailyPLAndGain bars sold

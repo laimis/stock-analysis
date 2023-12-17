@@ -16,7 +16,7 @@ type TradingStrategy(name:string) =
     
     static member ClosePosition price date (position:StockPositionState) =
         match position.IsOpen with
-        | true -> position |> StockPosition.sell position.NumberOfShares price date None
+        | true -> position |> StockPosition.sell position.NumberOfShares price date
         | false -> position
     
     static member CalculateMaxDrawdownAndGain (last10Bars:seq<PriceBar>) =
@@ -186,7 +186,7 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
             
         let afterSell =
             position
-            |> StockPosition.sell portion sellPrice bar.Date None
+            |> StockPosition.sell portion sellPrice bar.Date
             |> adjustStopIfNecessary
         
         _level <- _level + 1
@@ -296,7 +296,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                         
                         let result =
                             StockPosition.openLong ticker ``when``
-                            |> StockPosition.buy numberOfShares price ``when`` None
+                            |> StockPosition.buy numberOfShares price ``when``
                             |> StockPosition.setStop stopPrice ``when``
                             |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
                             |> strategy.Run bars closeIfOpenAtTheEnd

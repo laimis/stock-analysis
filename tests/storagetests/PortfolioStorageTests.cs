@@ -57,7 +57,7 @@ namespace storagetests
             
             var position = StockPosition.openLong(GenerateTestTicker(), DateTimeOffset.UtcNow);
             
-            position = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, FSharpOption<string>.None, position);
+            position = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, position);
 
             var storage = CreateStorage();
 
@@ -71,7 +71,7 @@ namespace storagetests
 
             AssertPositions(position, loaded);
 
-            var afterPurchase = StockPosition.buy(5m, 5m, DateTimeOffset.UtcNow, FSharpOption<string>.None, loaded.Value);
+            var afterPurchase = StockPosition.buy(5m, 5m, DateTimeOffset.UtcNow, loaded.Value);
             
             await storage.SaveStockPosition(_userId, loaded, afterPurchase);
 
@@ -168,7 +168,7 @@ namespace storagetests
         {
             var stock = StockPosition.openLong(GenerateTestTicker(), DateTimeOffset.UtcNow);
 
-            var afterPurchase = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, FSharpOption<string>.None, stock);
+            var afterPurchase = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, stock);
                 
             var storage = CreateStorage();
 
@@ -176,7 +176,7 @@ namespace storagetests
 
             var loaded = await storage.GetStockPosition(afterPurchase.PositionId, _userId);
 
-            var afterSell = StockPosition.sell(10m, 2.2m, DateTimeOffset.UtcNow, new FSharpOption<string>("sell"), loaded.Value);
+            var afterSell = StockPosition.sell(10m, 2.2m, DateTimeOffset.UtcNow, loaded.Value);
             
             var afterGrading = StockPosition.assignGrade(TestDataGenerator.A, new FSharpOption<string>("test"), DateTimeOffset.UtcNow, afterSell);
             

@@ -15,7 +15,7 @@ let ``Purchase works`` () =
     
     let stock =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow
     
     stock.Ticker |> should equal ticker
     stock.NumberOfShares |> should equal 10
@@ -25,8 +25,8 @@ let ``Purchase works`` () =
     
     let afterTransitions =
         stock
-        |> StockPosition.buy 5m 2m DateTimeOffset.Now None
-        |> StockPosition.sell 5m 20m DateTimeOffset.Now (Some "sample note")
+        |> StockPosition.buy 5m 2m DateTimeOffset.Now
+        |> StockPosition.sell 5m 20m DateTimeOffset.Now
         
     afterTransitions.NumberOfShares |> should equal 10
 
@@ -35,9 +35,9 @@ let ``Purchase works`` () =
 let ``Selling not owned fails`` () =
     let stock =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow
     
-    (fun () -> StockPosition.sell 20m 100m DateTimeOffset.UtcNow (Some "sample note") stock |> ignore)
+    (fun () -> StockPosition.sell 20m 100m DateTimeOffset.UtcNow stock |> ignore)
     |> should throw typeof<Exception>
 
 
@@ -45,7 +45,7 @@ let ``Selling not owned fails`` () =
 let ``Buying for zero throws`` () =
     let stock = StockPosition.openLong ticker DateTimeOffset.UtcNow
         
-    (fun () -> StockPosition.buy 10m 0m DateTimeOffset.UtcNow None stock |> ignore)
+    (fun () -> StockPosition.buy 10m 0m DateTimeOffset.UtcNow stock |> ignore)
     |> should throw typeof<Exception>
     
 [<Fact>]
@@ -62,7 +62,7 @@ let ``Buying with date in the future throws`` () =
 let ``Create from events recreates identical state`` () =
     let stock =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow
     
     let events = stock.Events
     
@@ -74,24 +74,24 @@ let ``Create from events recreates identical state`` () =
 let ``Multiple buys average cost correct`` () =
     let purchase1 =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow
     
     let withCalculation = purchase1 |> StockPositionWithCalculations
     withCalculation.AverageCostPerShare |> should equal 7.5m
     withCalculation.Cost |> should equal 15m
     
-    let sell1 = StockPosition.sell 1m 6m DateTimeOffset.UtcNow None purchase1
+    let sell1 = StockPosition.sell 1m 6m DateTimeOffset.UtcNow purchase1
     let withCalculation = sell1 |> StockPositionWithCalculations
     withCalculation.AverageCostPerShare |> should equal 10m
     withCalculation.Cost |> should equal 10m
     
-    let purchase2 = StockPosition.buy 1m 10m DateTimeOffset.UtcNow None sell1
+    let purchase2 = StockPosition.buy 1m 10m DateTimeOffset.UtcNow sell1
     let withCalculation = purchase2 |> StockPositionWithCalculations
     withCalculation.AverageCostPerShare |> should equal 10m
     withCalculation.Cost |> should equal 20m
     
-    let sell2 = StockPosition.sell 2m 10m DateTimeOffset.UtcNow None purchase2
+    let sell2 = StockPosition.sell 2m 10m DateTimeOffset.UtcNow purchase2
     sell2.IsClosed |> should equal true
     let withCalculation = sell2 |> StockPositionWithCalculations
     DateTimeOffset.UtcNow.Subtract(withCalculation.Closed.Value).TotalSeconds |> int |> should be (lessThan 1)
@@ -105,11 +105,11 @@ let ``Sell creates PL Transactions`` () =
     
     let stock =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow None 
-        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow None
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow None
-        |> StockPosition.sell 2m 10m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow 
+        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow
+        |> StockPosition.sell 2m 10m DateTimeOffset.UtcNow
         |> StockPositionWithCalculations
         
     let transactions = stock.PLTransactions
@@ -124,10 +124,10 @@ let ``Multiple buys deleting transactions`` () =
     
     let position =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow None
-        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow None
-        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow
+        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 10m DateTimeOffset.UtcNow
         
     position.Transactions |> should haveLength 4
     position.NumberOfShares |> should equal 2m
@@ -148,15 +148,15 @@ let ``Days held is correct`` () =
     
     let position =
         StockPosition.openLong ticker (DateTimeOffset.UtcNow.AddDays(-5))
-        |> StockPosition.buy 1m 5m (DateTimeOffset.UtcNow.AddDays(-5)) None
-        |> StockPosition.buy 1m 10m (DateTimeOffset.UtcNow.AddDays(-2)) None
+        |> StockPosition.buy 1m 5m (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.buy 1m 10m (DateTimeOffset.UtcNow.AddDays(-2))
         
     let calculated = position |> StockPositionWithCalculations
     
     calculated.DaysHeld |> should equal 5
     calculated.DaysSinceLastTransaction |> should equal 2
     
-    let afterSell1 = position |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow None
+    let afterSell1 = position |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow
     
     let calculated = afterSell1 |> StockPositionWithCalculations
     
@@ -168,7 +168,7 @@ let ``Assigning stop works``() =
     
     let position =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
         
     position.StopPrice.Value |> should equal 4m
@@ -185,7 +185,7 @@ let ``Delete stop works``() =
     
     let position =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
         
     position.HasStopPrice |> should equal true
@@ -200,9 +200,9 @@ let ``Delete stop on closed position fails``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         |> StockPosition.setStop (Some 4m) DateTimeOffset.UtcNow
-        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow None
+        |> StockPosition.sell 1m 6m DateTimeOffset.UtcNow
         
     (fun () -> position |> StockPosition.deleteStop DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
@@ -212,7 +212,7 @@ let ``Delete stop on position without stop does nothing`` () =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         
     let sameStop = position |> StockPosition.deleteStop DateTimeOffset.UtcNow
     
@@ -226,7 +226,7 @@ let ``Adding note works``() =
     
     let position =
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         |> StockPosition.addNotes (Some "this is a note") DateTimeOffset.UtcNow
         
     position.Notes |> should haveLength 1
@@ -243,7 +243,7 @@ let ``Labels work``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         |> StockPosition.setLabel "strategy" "newhigh" DateTimeOffset.UtcNow
         
     position.Labels["strategy"] |> should equal "newhigh"
@@ -263,7 +263,7 @@ let ``Set label with null value fails``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         
     (fun () -> position |> StockPosition.setLabel "strategy" null DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
@@ -273,7 +273,7 @@ let ``Set label with null key fails``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         
     (fun () -> position |> StockPosition.setLabel null "newhigh" DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
@@ -283,7 +283,7 @@ let ``Delete label works``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         |> StockPosition.setLabel "strategy" "newhigh" DateTimeOffset.UtcNow
         
     position.Labels["strategy"] |> should equal "newhigh"
@@ -303,7 +303,7 @@ let ``Delete label with null key fails``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 5m DateTimeOffset.UtcNow
         
     (fun () -> position |> StockPosition.deleteLabel null DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
@@ -313,7 +313,7 @@ let ``Buy with stop at cost works``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
         |> StockPosition.setStop (Some 1m) DateTimeOffset.UtcNow
         |> StockPositionWithCalculations
         
@@ -325,7 +325,7 @@ let ``Assign grade to open position should fail`` () =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
         
     (fun () -> position |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
@@ -335,8 +335,8 @@ let ``Assign grade to closed position should succeed`` () =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
-        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow
         |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow
         
     position.Grade |> should equal (Some (TradeGrade("A")))
@@ -348,8 +348,8 @@ let ``Assign grade to graded position, updates grade and note`` () =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
-        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow
         |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow
         |> StockPosition.assignGrade (TradeGrade("B")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
         
@@ -362,8 +362,8 @@ let ``Assign invalid grade, fails``() =
     
     let position = 
         StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow None
-        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow None
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow
     
     (fun () -> position |> StockPosition.assignGrade (TradeGrade("L")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<ArgumentException>
