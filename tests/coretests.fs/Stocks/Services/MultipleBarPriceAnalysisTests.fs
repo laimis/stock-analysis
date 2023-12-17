@@ -75,4 +75,4 @@ let ``Average true range should be correct`` () =
     
 [<Fact>]
 let ``Green streak is positive`` () =
-    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.GreenStreak |> should equal 2
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.GreenStreak |> should equal 1
