@@ -13,9 +13,7 @@ let ticker = TestDataGenerator.TEUM
 [<Fact>]
 let ``Purchase works`` () =
     
-    let stock =
-        StockPosition.openLong ticker DateTimeOffset.UtcNow
-        |> StockPosition.buy 10m 2.1m DateTimeOffset.UtcNow
+    let stock = StockPosition.``open`` ticker 10m 2.1m DateTimeOffset.UtcNow
     
     stock.Ticker |> should equal ticker
     stock.NumberOfShares |> should equal 10

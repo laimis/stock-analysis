@@ -3,6 +3,7 @@ namespace core.fs
 open System
 open System.Collections.Generic
 
+
 type IApplicationService = interface end
    
    

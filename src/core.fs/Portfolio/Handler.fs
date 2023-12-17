@@ -83,8 +83,8 @@ type DeleteTransaction =
         TransactionId: Guid
     }
 
-type OpenLongStockPosition = {
-    [<Range(1, 1000000)>]
+type OpenStockPosition = {
+    [<Range(-1000000, 1000000)>]
     NumberOfShares: decimal
     [<Range(0, 100000)>]
     Price: decimal
@@ -363,7 +363,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             return results |> ResponseUtils.toOkOrConcatErrors
     }
     
-    member _.Handle(userId:UserId, cmd:OpenLongStockPosition) = task {
+    member _.Handle(userId:UserId, cmd:OpenStockPosition) = task {
         let! user = userId |> accounts.GetUser
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
@@ -377,51 +377,61 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | Some _ ->
                 return "Position already open" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
             | None ->
-                let newPosition =
-                    StockPosition.openLong cmd.Ticker cmd.Date.Value
-                    |> StockPosition.buy cmd.NumberOfShares cmd.Price cmd.Date.Value
-                    |> StockPosition.addNotes cmd.Notes cmd.Date.Value
-                    |> StockPosition.setStop cmd.StopPrice cmd.Date.Value
-                    |> fun x ->
-                        match cmd.Strategy with
-                        | Some strategy -> x |> StockPosition.setLabel "strategy" strategy cmd.Date.Value
-                        | None -> x
                 
-                do! newPosition |> storage.SaveStockPosition userId openPosition
-                
-                // check if we have any pending positions for the ticker
                 let! pendingPositions = storage.GetPendingStockPositions userId
                 let pendingPositionOption = pendingPositions |> Seq.tryFind (fun x -> x.State.Ticker = cmd.Ticker && x.State.IsClosed = false)
                 
+                let stop =
+                    match cmd.StopPrice with
+                    | Some _ -> cmd.StopPrice
+                    | None ->
+                        match pendingPositionOption with
+                        | Some pendingPosition ->
+                            match pendingPosition.State.StopPrice.HasValue with
+                            | true -> Some pendingPosition.State.StopPrice.Value
+                            | false -> None
+                        | None -> None
+                        
+                let notes =
+                    match cmd.Notes with
+                    | Some _ -> cmd.Notes
+                    | None ->
+                        match pendingPositionOption with
+                        | Some pendingPosition ->
+                            match pendingPosition.State.Notes with
+                            | x when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) |> not -> pendingPosition.State.Notes |> Some
+                            | _ -> None
+                        | None -> None
+                        
+                let strategy =
+                    match cmd.Strategy with
+                    | Some _ -> cmd.Strategy
+                    | None ->
+                        match pendingPositionOption with
+                        | Some pendingPosition ->
+                            match pendingPosition.State.Strategy with
+                            | x when String.IsNullOrWhiteSpace(pendingPosition.State.Strategy) |> not -> pendingPosition.State.Strategy |> Some
+                            | _ -> None
+                        | None -> None
+                
+                let newPosition =
+                    StockPosition.``open`` cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value
+                    |> StockPosition.addNotes notes cmd.Date.Value
+                    |> StockPosition.setStop stop cmd.Date.Value
+                    |> StockPosition.setLabelIfValueNotNone "strategy" strategy cmd.Date.Value
+                
+                do! newPosition |> storage.SaveStockPosition userId openPosition
+                
+                let withCalculations = newPosition |> StockPositionWithCalculations
+                    
                 match pendingPositionOption with
                 | Some pendingPosition ->
-                    
-                    // transfer some data from pending position to this new position
-                    let positionWithStop = newPosition |> StockPosition.setStop (Some pendingPosition.State.StopPrice.Value) cmd.Date.Value
-                    
-                    let positionWithNotes = 
-                        match positionWithStop.Notes with
-                        | [] when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) = false -> positionWithStop |> StockPosition.addNotes (Some pendingPosition.State.Notes) cmd.Date.Value
-                        | _ -> positionWithStop
-                    
-                    let positionWithStrategy =
-                        match pendingPosition.State.Strategy with
-                        | null -> positionWithNotes
-                        | _ -> positionWithNotes |> StockPosition.setLabel "strategy" pendingPosition.State.Strategy cmd.Date.Value
-                        
-                    do! positionWithStrategy |> storage.SaveStockPosition userId (Some newPosition)
-                    
-                    let withCalculations =
-                        positionWithStrategy
-                        |> StockPositionWithCalculations
-                    
                     withCalculations.AverageCostPerShare |> pendingPosition.Purchase
-                    
                     do! storage.SavePendingPosition pendingPosition userId
-                    
-                    return withCalculations |> ResponseUtils.success
                 | None ->
-                    return newPosition |> StockPositionWithCalculations |> ResponseUtils.success
+                    ()
+                
+                return withCalculations |> ResponseUtils.success
     }
 
     member this.Handle (command:DeletePosition) = task {

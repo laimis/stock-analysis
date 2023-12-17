@@ -340,6 +340,11 @@ module StockPosition =
         StockPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value, Short)
         |> createInitialState
         
+    let ``open`` (ticker:Ticker) (numberOfShares:decimal) price date =
+        match numberOfShares > 0m with
+        | true -> openLong ticker date |> buy numberOfShares price date
+        | false -> openShort ticker date |> sell (numberOfShares |> abs) price date
+        
     let addNotes = applyNotesIfApplicable
         
     let setLabel key value date stockPosition =
@@ -351,6 +356,11 @@ module StockPosition =
         | _ ->
             let e = StockPositionLabelSet(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, key, value)
             apply e stockPosition
+            
+    let setLabelIfValueNotNone key value date stockPosition =
+        match value with
+        | None -> stockPosition
+        | Some value -> setLabel key value date stockPosition
             
     let deleteLabel key date stockPosition =
         

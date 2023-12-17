@@ -12,9 +12,7 @@ let ticker = TestDataGenerator.TEUM
 [<Fact>]
 let ``Opening short position works`` () =
     
-    let position =
-        StockPosition.openShort ticker DateTimeOffset.UtcNow
-        |> StockPosition.sell 10m 1.5m DateTimeOffset.UtcNow
+    let position = StockPosition.``open`` ticker -10m 1.5m DateTimeOffset.UtcNow
         
     position.NumberOfShares |> should equal -10m
     position.IsShort |> should equal true
