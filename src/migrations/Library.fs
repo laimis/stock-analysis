@@ -11,6 +11,11 @@ open storage.shared
 // we will be migrating from OwnedStockState silliness to StockPosition
 module MigrateFromV2ToV3 =
     
+    let stringToSome s =
+        match s with
+        | null -> None
+        | _ -> Some s
+        
     let mapToStockPositionEvent (t:PositionEvent) =
         match t.Type.Value with
         | PositionEventType.Buy -> fun sp ->
