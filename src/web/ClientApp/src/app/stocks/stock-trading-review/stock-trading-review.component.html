@@ -33,9 +33,7 @@
       <app-error-display [errors]="simulationErrors"></app-error-display>
     }
     @if (!simulationResults && !simulationErrors) {
-      <p class="placeholder-glow">
-        <span class="placeholder col-12"></span>
-      </p>
+      <app-loading></app-loading>
     }
     @if (simulationResults) {
       <app-trading-actual-vs-simulated
@@ -98,9 +96,7 @@
             <app-error-display [errors]="scoresErrors"></app-error-display>
           }
           @if (!dailyPositionReport && !scoresErrors) {
-            <p class="placeholder-glow">
-              <span class="placeholder col-12"></span>
-            </p>
+            <app-loading></app-loading>
           }
           @if (dailyPositionReport) {
             <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyGainPct">
@@ -113,9 +109,7 @@
             <app-error-display [errors]="scoresErrors"></app-error-display>
           }
           @if (!dailyPositionReport && !scoresErrors) {
-            <p class="placeholder-glow">
-              <span class="placeholder col-12"></span>
-            </p>
+            <app-loading></app-loading>
           }
           @if (dailyPositionReport) {
             <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyProfit">
@@ -132,9 +126,7 @@
             <app-error-display [errors]="pricesErrors"></app-error-display>
           }
           @if (!positionChartInformation && !pricesErrors) {
-            <p class="placeholder-glow">
-              <span class="placeholder col-12"></span>
-            </p>
+            <app-loading></app-loading>
           }
           @if (positionChartInformation) {
             <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>

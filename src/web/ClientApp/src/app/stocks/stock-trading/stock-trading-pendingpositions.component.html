@@ -3,13 +3,14 @@
   @if (errors) {
     <app-error-display [errors]="errors"></app-error-display>
   }
-  <div class="d-flex justify-content-end">
-    <a class="btn btn-outline-secondary btn-sm" href="{{getPendingPositionExportUrl()}}">Export</a>
-  </div>
   <div>
-    @if (loaded && positions.length === 0) {
-      <span>No pending positions found</span>
-    }
+    @if (this.loading.positions || this.loading.orders) {
+      <app-loading></app-loading>
+    } @else {
+    <div class="d-flex justify-content-end">
+      <a class="btn btn-outline-secondary btn-sm" href="{{getPendingPositionExportUrl()}}">Export</a>
+    </div>
+
     <h2>Pending Positions ({{positions.length}})</h2>
     @for (position of positions; track position) {
       <div class="card mb-3">
@@ -40,7 +41,7 @@
             {{ position.notes }}
           </p>
           <div class="mt-4">
-            <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" ></app-brokerage-orders>
+            <app-brokerage-orders [filteredTickers]="[position.ticker]" [justOrders]="true" [orders]="orders" ></app-brokerage-orders>
           </div>
         </div>
         <div class="card-footer no-border">
@@ -48,5 +49,7 @@
         </div>
       </div>
     }
+    }
   </div>
+
 </section>

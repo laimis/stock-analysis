@@ -98,6 +98,7 @@ import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
+import {LoadingComponent} from "./shared/loading/loading.component";
 
 
 let routes: Routes = [
@@ -273,7 +274,8 @@ let routes: Routes = [
     RoutineDashboardComponent,
     RoutineComponent,
     RoutinesActiveRoutineComponent,
-    LineChartComponent
+    LineChartComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,

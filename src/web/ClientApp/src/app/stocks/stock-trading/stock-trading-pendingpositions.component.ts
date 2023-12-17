@@ -1,7 +1,8 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
-import { PendingStockPosition, StocksService } from 'src/app/services/stocks.service';
+import {BrokerageOrder, PendingStockPosition, StocksService} from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
 import {pendingpositions_export} from "../../services/links.service";
+import {BrokerageService} from "../../services/brokerage.service";
 
 @Component({
   selector: 'app-stock-trading-pendingpositions',
@@ -10,14 +11,19 @@ import {pendingpositions_export} from "../../services/links.service";
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
   errors: string[];
+  orders: BrokerageOrder[];
+  positions: PendingStockPosition[] = [];
 
   constructor(
-      private stockService:StocksService
+      private stockService:StocksService,
+      private brokerage:BrokerageService
       )
   { }
 
-  positions: PendingStockPosition[] = [];
-  loaded: boolean = false;
+  loading = {
+    positions: true,
+    orders: true
+  }
 
   @Output()
   pendingPositionClosed: EventEmitter<PendingStockPosition> = new EventEmitter<PendingStockPosition>()
@@ -30,11 +36,22 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     this.stockService.getPendingStockPositions().subscribe(
       (data) => {
         this.positions = data;
-        this.loaded = true;
+        this.loading.positions = false;
       }, err => {
         console.log(err)
         this.errors = GetErrors(err);
-        this.loaded = true;
+        this.loading.positions = false;
+      }
+    )
+
+    this.brokerage.brokerageAccount().subscribe(
+      (data) => {
+        this.orders = data.orders;
+        this.loading.orders = false;
+      }, err => {
+        console.log(err)
+        this.errors = GetErrors(err);
+        this.loading.orders = false;
       }
     )
   }

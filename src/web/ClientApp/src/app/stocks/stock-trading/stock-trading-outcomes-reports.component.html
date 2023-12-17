@@ -15,9 +15,7 @@
     <app-error-display [errors]="errors.allBars"></app-error-display>
   }
   @if (loading.allBars) {
-    <p class="placeholder-glow">
-      <span class="placeholder col-12"></span>
-    </p>
+    <app-loading></app-loading>
   }
   @if (allBarsReport) {
     <app-outcomes
@@ -31,9 +29,7 @@
     <app-error-display [errors]="errors.positions"></app-error-display>
   }
   @if (loading.positions) {
-    <p class="placeholder-glow">
-      <span class="placeholder col-12"></span>
-    </p>
+    <app-loading></app-loading>
   }
   @if (positionsReport) {
     <app-outcomes-analysis-report
@@ -55,9 +51,7 @@
     <app-error-display [errors]="errors.daily"></app-error-display>
   }
   @if (loading.daily) {
-    <p class="placeholder-glow">
-      <span class="placeholder col-12"></span>
-    </p>
+    <app-loading></app-loading>
   }
   @if (singleBarReportDaily) {
     <app-outcomes-analysis-report
@@ -79,9 +73,7 @@
     <app-error-display [errors]="errors.weekly"></app-error-display>
   }
   @if (loading.weekly) {
-    <p class="placeholder-glow">
-      <span class="placeholder col-12"></span>
-    </p>
+    <app-loading></app-loading>
   }
   @if (singleBarReportWeekly) {
     <app-outcomes-analysis-report
