@@ -26,6 +26,7 @@ module MultipleBarPriceAnalysis =
         let EarliestPrice = "EarliestPrice"
         let Gain = "Gain"
         let AverageTrueRange = "AverageTrueRange"
+        let GreenStreak = "GreenStreak"
         
         let SMA interval = $"sma_%i{interval}"
 
@@ -341,6 +342,32 @@ module MultipleBarPriceAnalysis =
                     valueType = ValueFormat.Currency,
                     message = $"Average True Range: {value}"
                 ) |> Some
+                
+        let generateGreenStreakOutcome (prices:PriceBars) =
+            
+            let greenStreak =
+                prices.Bars
+                |> Array.map (fun p -> p.Close)
+                |> Array.pairwise
+                |> Array.map (fun (a, b) -> b - a)
+                |> Array.map (fun v -> v > 0m)
+                |> Array.rev
+                |> Array.tryFindIndex (fun v -> v = false)
+                |> Option.defaultWith (fun () -> prices.Bars.Length)
+                |> decimal
+                
+            let outcomeType =
+                match greenStreak with
+                | x when x < 5m -> OutcomeType.Neutral
+                | _ -> OutcomeType.Positive
+                
+            AnalysisOutcome(
+                key = MultipleBarOutcomeKeys.GreenStreak,
+                outcomeType = outcomeType,
+                value = greenStreak,
+                valueType = ValueFormat.Number,
+                message = $"Green Streak: {greenStreak}"
+            )
             
         let private generateCurrentPriceOutcome (prices:PriceBars) =
             
@@ -371,6 +398,7 @@ module MultipleBarPriceAnalysis =
                 prices |> generatePercentChangeAverageOutcome
                 prices |> generatePercentChangeStandardDeviationOutcome
                 if atrOutcome.IsSome then atrOutcome.Value
+                prices |> generateGreenStreakOutcome
             ]
     
     let run prices =

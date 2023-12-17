@@ -72,3 +72,7 @@ let ``Gain should be correct()`` () =
 [<Fact>]
 let ``Average true range should be correct`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRange |> rounded 2 |> should equal 3.98m
+    
+[<Fact>]
+let ``Green streak is positive`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.GreenStreak |> should equal 2

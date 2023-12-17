@@ -172,6 +172,8 @@ module SingleBarPriceAnalysis =
             if previousBars.Length > 0 then
                 let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
                 yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
+                
+            yield MultipleBarPriceAnalysis.PriceAnalysis.generateGreenStreakOutcome bars
         ]
         
     let volumeAnalysis (bars:PriceBars) =
