@@ -49,8 +49,8 @@ namespace storage.postgres
             // TODO: no aggregate id in the column, huh?
             // might want to do a migration and add one...
             await db.ExecuteAsync(
-                @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND eventjson LIKE :aggregateId",
-                new { userId = userId.Item, entity, aggregateId = $"%{aggregateId}%" }
+                @"DELETE FROM events WHERE entity = :entity AND userId = :userId AND aggregateId = :aggregateId",
+                new { userId = userId.Item, entity, aggregateId = aggregateId.ToString() }
             );
         }
 
@@ -60,6 +60,17 @@ namespace storage.postgres
             var list = await db.QueryAsync<StoredAggregateEvent>(
                 @"select * FROM events WHERE entity = :entity AND userId = :userId ORDER BY version",
                 new { entity, userId = userId.Item }
+            );
+
+            return list.Select(e => e.Event);
+        }
+        
+        public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid aggregateId, UserId userId)
+        {
+            using var db = GetConnection();
+            var list = await db.QueryAsync<StoredAggregateEvent>(
+                @"select * FROM events WHERE entity = :entity AND userId = :userId AND aggregateId = :aggregateId ORDER BY version",
+                new { entity, userId = userId.Item, aggregateId = aggregateId.ToString() }
             );
 
             return list.Select(e => e.Event);

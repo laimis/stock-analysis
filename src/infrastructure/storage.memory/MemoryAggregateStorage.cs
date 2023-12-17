@@ -43,6 +43,13 @@ public class MemoryAggregateStorage(IOutbox outbox) : IAggregateStorage, IBlobSt
 
         return events.Select(e => e.Event);
     }
+    
+    public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid aggregateId, UserId userId)
+    {
+        var events = await GetStoredEvents(entity, userId);
+
+        return events.Where(e => e.Event.AggregateId == aggregateId).Select(e => e.Event);
+    }
 
     public Task<IEnumerable<StoredAggregateEvent>> GetStoredEvents(string entity, UserId userId)
     {

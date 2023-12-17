@@ -76,11 +76,17 @@ namespace storage.shared
 
         public async Task<FSharpOption<StockPositionState>> GetStockPosition(StockPositionId positionId, UserId userId)
         {
-            var positions = await GetStockPositions(userId);
+            var events = await _aggregateStorage.GetEventsAsync(
+                _stock_position_entity, positionId.Item, userId);
+
+            var list = events.ToList();
             
-            var state = positions.SingleOrDefault(s => s.PositionId.Item == positionId.Item);
+            if (list.Count == 0)
+            {
+                return FSharpOption<StockPositionState>.None;
+            }
             
-            return state == null ? FSharpOption<StockPositionState>.None : FSharpOption<StockPositionState>.Some(state);
+            return FSharpOption<StockPositionState>.Some(StockPosition.createFromEvents(list));
         }
 
         public Task SaveStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, StockPositionState newState)
