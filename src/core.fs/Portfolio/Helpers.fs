@@ -28,6 +28,7 @@ module Helpers =
                             NumberOfShares = brokeragePosition.Quantity
                             PricePerShare = brokeragePosition.AverageCost
                             Ticker = brokeragePosition.Ticker
+                            LocalPosition = None 
                         }
                     Some violation
                     
@@ -41,6 +42,7 @@ module Helpers =
                                 NumberOfShares = brokeragePosition.Quantity
                                 PricePerShare = brokeragePosition.AverageCost
                                 Ticker = brokeragePosition.Ticker
+                                LocalPosition = localPositionOption 
                             }
                         Some violation
                 )
@@ -64,6 +66,7 @@ module Helpers =
                             NumberOfShares = localPosition.NumberOfShares
                             PricePerShare = localPosition.AverageCostPerShare
                             Ticker = localPosition.Ticker
+                            LocalPosition = localPosition |> Some 
                         }
                     Some violation
                     
@@ -78,6 +81,7 @@ module Helpers =
                                 NumberOfShares = localPosition.NumberOfShares
                                 PricePerShare = localPosition.AverageCostPerShare
                                 Ticker = localPosition.Ticker
+                                LocalPosition = localPosition |> Some
                             }
                         Some violation
             )

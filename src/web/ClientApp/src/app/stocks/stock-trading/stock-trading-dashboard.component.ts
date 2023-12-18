@@ -5,7 +5,7 @@ import {
   BrokerageOrder,
   PositionInstance, StockQuote,
   StocksService,
-  StockTradingPositions,
+  StockTradingPositions, stocktransactioncommand,
   StockViolation
 } from '../../services/stocks.service';
 import {GetErrors} from "../../services/utils";
@@ -51,13 +51,26 @@ export class StockTradingComponent implements OnInit {
     this.activeTab = tabName
   }
 
-  stockPurchased() {
-    this.loadEntries()
-    this.activateTab('positions')
+  sellRequested(command:stocktransactioncommand) {
+    this.stockService.sell(command).subscribe(
+      () => {
+        this.loadEntries()
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
   }
 
-  orderExecuted() {
-    this.loadEntries()
+  purchaseRequested(command:stocktransactioncommand) {
+    this.stockService.purchase(command).subscribe(
+      () => {
+        this.loadEntries()
+      },
+      error => {
+        this.errors = GetErrors(error)
+      }
+    )
   }
 
   refresh() {

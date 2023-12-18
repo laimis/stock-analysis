@@ -1,7 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {BrokerageOrder} from "../../services/stocks.service";
+import {BrokerageOrder, StocksService, stocktransactioncommand} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-new-position',
@@ -12,18 +13,24 @@ export class StockNewPositionComponent implements OnInit {
   feedbackMessage: string;
   orders: BrokerageOrder[];
 
-  constructor(private brokerage : BrokerageService) {}
+  constructor(
+    private brokerage : BrokerageService,
+    private stocks : StockPositionsService) {}
 
   ngOnInit(): void {
-        this.brokerage.brokerageAccount().subscribe(account => {
-          this.orders = account.orders
-        }, error => {
-          this.feedbackMessage = GetErrors(error)[0]
-        })
-    }
+    this.getOrders()
+  }
 
   brokerageOrderEntered() {
     this.feedbackMessage = "Brokerage order entered";
+  }
+
+  getOrders() {
+    this.brokerage.brokerageAccount().subscribe(account => {
+      this.orders = account.orders
+    }, error => {
+      this.feedbackMessage = GetErrors(error)[0]
+    })
   }
 
   positionOpened() {
@@ -36,5 +43,17 @@ export class StockNewPositionComponent implements OnInit {
 
   pendingPositionClosed() {
     this.feedbackMessage = "Pending position closed";
+  }
+
+  purchaseRequested(command:stocktransactioncommand) {
+    console.log("Purchae requested in new position component")
+    console.log(command)
+    this.stocks.purchase(command).subscribe(
+      val => {
+        this.feedbackMessage = "Purchase procesed"
+        this.getOrders()
+      },
+      error => this.feedbackMessage = GetErrors(error)[0]
+    )
   }
 }

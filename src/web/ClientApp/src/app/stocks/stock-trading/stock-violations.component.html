@@ -34,8 +34,8 @@
                 <button type="button" class="btn btn-secondary me-2" (click)="openPosition(violation.ticker)">Open Position</button>
               </td>
             </tr>
+            @if (activeTicker === violation.ticker) {
             <tr>
-              @if (activeTicker === violation.ticker) {
                 <td colspan="7">
                   <div>
                     @if (fixType === 'transaction') {
@@ -58,8 +58,22 @@
                     }
                   </div>
                 </td>
-              }
             </tr>
+            }
+            @if (tickerHasOrders(violation.ticker)) {
+            <tr>
+              <td colspan="7">
+                <app-brokerage-orders
+                  [positionId]="violation.localPosition?.positionId"
+                  [orders]="orders"
+                  [filteredTickers]="[violation.ticker]"
+                  [justOrders]="true"
+                  (sellRequested)="sellRequested.emit($event)"
+                  (purchaseRequested)="purchaseRequested.emit($event)"
+                ></app-brokerage-orders>
+              </td>
+            </tr>
+            }
           }
         </tbody>
       </table>

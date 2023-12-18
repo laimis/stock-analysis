@@ -19,6 +19,7 @@ type StockViolationView =
         NumberOfShares: decimal
         PricePerShare: decimal
         Ticker: Ticker
+        LocalPosition: StockPositionWithCalculations option
     }
     
     override this.Equals(other) =

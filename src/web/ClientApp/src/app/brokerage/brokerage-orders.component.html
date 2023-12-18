@@ -43,7 +43,7 @@
                 @if (p.canBeCancelled) {
                   <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
                 }
-                @if (p.canBeRecorded) {
+                @if (p.canBeRecorded && positionId) {
                   <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
                 }
               </td>

@@ -1,6 +1,10 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { BrokerageOrdersComponent } from 'src/app/brokerage/orders.component';
-import {openpositioncommand, stocktransactioncommand, StockViolation} from 'src/app/services/stocks.service';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  BrokerageOrder,
+  openpositioncommand,
+  stocktransactioncommand,
+  StockViolation
+} from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-stock-violations',
@@ -20,10 +24,17 @@ export class StockViolationsComponent {
     return this._violations
   }
 
-  @Output() refreshRequested = new EventEmitter<string>()
+  @Input()
+  orders : BrokerageOrder[] = []
 
-  @ViewChild(BrokerageOrdersComponent)
-  private brokerageOrdersComponent!: BrokerageOrdersComponent;
+  @Output()
+  refreshRequested = new EventEmitter<string>()
+
+  @Output()
+  sellRequested = new EventEmitter<stocktransactioncommand>()
+
+  @Output()
+  purchaseRequested = new EventEmitter<stocktransactioncommand>()
 
   activeTicker: string = null
   fixType : string = null
@@ -54,5 +65,9 @@ export class StockViolationsComponent {
 
   orderExecuted(ticker:string) {
     this.refreshRequested.emit(ticker)
+  }
+
+  tickerHasOrders(ticker:string) {
+    return this.orders.some(o => o.ticker == ticker)
   }
 }
