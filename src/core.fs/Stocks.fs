@@ -396,6 +396,12 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     let buySlots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
+    
+    let liquidationSource, liquidationSlots, acquisitionSource, acquisitionSlots = 
+        match stockPosition.IsShort with
+        | true -> buys, buySlots, sells, sellSlots
+        | false -> sells, sellSlots, buys, buySlots
+    
     let completedPositionTransactions =
         stockPosition.ShareTransactions
         |> List.takeWhile (fun x -> match stockPosition.IsShort with | true -> x.Type = Sell | false -> x.Type = Buy)
@@ -414,11 +420,6 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.GradeNote = stockPosition.GradeNote
     
     member this.AverageCostPerShare =
-        
-        let liquidationSource, liquidationSlots, acquisitionSource, acquisitionSlots = 
-            match stockPosition.IsShort with
-            | true -> buys, buySlots, sells, sellSlots
-            | false -> sells, sellSlots, buys, buySlots
         
         let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
         let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
@@ -450,11 +451,11 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.Profit =
         // profit is generating whenever we sell shares of a long position or buy shares of a short position
-        sellSlots
+        liquidationSlots
         |> List.indexed
         |> List.fold (fun (acc:decimal) (index, sellPrice) ->
             
-            let buyPrice = buySlots[index]
+            let buyPrice = acquisitionSlots[index]
             let profit = sellPrice - buyPrice
             acc + profit
         ) 0m
@@ -470,7 +471,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | _ -> sellSlots |> List.average
         
     member this.GainPct =
-        match this.AverageSaleCostPerShare with
+        match this.AverageBuyCostPerShare with
         | 0m -> 0m // we haven't sold any, no gain pct
         | _ -> (this.AverageSaleCostPerShare - this.AverageBuyCostPerShare) / this.AverageBuyCostPerShare
         
@@ -486,7 +487,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.PLTransactions =
         // we fold over sells, and for each sell create a PLTransaction
-        sells
+        liquidationSource
         |> List.fold (fun (acc:PLTransaction list) (sell:StockPositionShareTransaction) ->
             
             let offset =
@@ -495,7 +496,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 | _ -> acc |> List.sumBy _.NumberOfShares
             
             let slotsOfInterest =
-                buySlots
+                acquisitionSlots
                 |> List.skip (int offset)
                 |> List.take (sell.NumberOfShares |> abs |> int)
                 
