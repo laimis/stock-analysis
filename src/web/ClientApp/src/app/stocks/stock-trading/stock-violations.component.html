@@ -60,7 +60,7 @@
                 </td>
             </tr>
             }
-            @if (tickerHasOrders(violation.ticker) && violation.localPosition) {
+            @if (tickerHasOrders(violation.ticker)) {
             <tr>
               <td colspan="7">
                 <app-brokerage-orders
