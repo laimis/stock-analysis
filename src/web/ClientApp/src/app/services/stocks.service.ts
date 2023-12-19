@@ -959,6 +959,8 @@ export interface BrokerageOrder {
   canBeCancelled: boolean
   canBeRecorded: boolean
   isActive: boolean
+  isBuyOrder: boolean
+  isSellOrder: boolean
 }
 
 export interface BrokerageAccount {

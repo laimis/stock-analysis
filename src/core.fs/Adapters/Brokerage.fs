@@ -117,9 +117,10 @@ type Order() =
         | _ -> false
     member this.CanBeRecorded : bool = this.Status = "FILLED"
     member this.IncludeInResponses : bool = this.Status <> "CANCELED" && this.Status <> "REJECTED" && this.Status <> "EXPIRED"
-    member this.IsSellOrder : bool = this.Type = "SELL"
+    member this.IsSellOrder : bool = this.Type = "SELL" || this.Type = "SELL_SHORT"
     member this.IsBuyOrder : bool = this.Type = "BUY"
     member this.IsOption : bool = this.AssetType = "OPTION"
+    member this.IsShort : bool = this.Type = "SELL_SHORT"
     
     
 type StockPosition(ticker:Ticker, averageCost:decimal, quantity:decimal) =

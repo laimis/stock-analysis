@@ -2,9 +2,6 @@ import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
 
-let isFilled = (o:BrokerageOrder) => o.status === 'FILLED'
-let isBuy = (o:BrokerageOrder) => o.type === 'BUY'
-let isSell = (o:BrokerageOrder) => o.type === 'SELL'
 let orderBy = (a:BrokerageOrder, b:BrokerageOrder) => a.ticker.localeCompare(b.ticker)
 
 @Component({
@@ -52,10 +49,10 @@ export class BrokerageOrdersComponent {
     let isTickerVisible = (ticker:string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
 
     if (this._orders) {
-      var buys = this._orders.filter(o => isBuy(o) && !isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
-      var sells = this._orders.filter(o => isSell(o) && !isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
-      var filledBuys = this._orders.filter(o => isBuy(o) && isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
-      var filledSells = this._orders.filter(o => isSell(o) && isFilled(o) && isTickerVisible(o.ticker)).sort(orderBy);
+      var buys = this._orders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+      var sells = this._orders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+      var filledBuys = this._orders.filter(o => o.isBuyOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+      var filledSells = this._orders.filter(o => o.isSellOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
       this.groupedOrders = [buys, sells, filledBuys, filledSells]
       this.isEmpty = this.groupedOrders.every(o => o.length == 0)
     }
