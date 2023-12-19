@@ -46,7 +46,11 @@ module PositionAnalysis =
         let pctToStop =
             match stopLoss with
             | 0.0m -> -1.0m
-            | _ -> (stopLoss - bars.Last.Close) / stopLoss
+            | _ ->
+                let currentPrice = bars.Last.Close
+                match position.IsShort with
+                | true -> (currentPrice - stopLoss) / currentPrice
+                | false -> (stopLoss - currentPrice) / stopLoss
         
         let rrOutcomeType = 
             match position.RR with
@@ -118,7 +122,7 @@ module PositionAnalysis =
             AnalysisOutcomeEvaluation(
                 "Below stop loss",
                 OutcomeType.Negative,
-                PortfolioAnalysisKeys.Profit,
+                PortfolioAnalysisKeys.StopLoss,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0.0m) ]
             )
             AnalysisOutcomeEvaluation(
