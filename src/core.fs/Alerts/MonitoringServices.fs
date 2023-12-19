@@ -68,10 +68,10 @@ module core.fs.Alerts.MonitoringServices
             | None -> logError($"Could not get price for {position.Ticker}: {priceResponse.Error.Value.Message}")
             | Some response ->
                 
-                let price = response.Price
-                match price <= position.StopPrice.Value with
+                let pctToStop = position |> StockPositionWithCalculations |> fun x -> x.PercentToStop response.Price
+                match pctToStop >= 0m with
                 | true ->
-                    TriggeredAlert.StopPriceAlert position.Ticker price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)
+                    TriggeredAlert.StopPriceAlert position.Ticker response.Price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)
                     |> container.Register
                 | false ->
                     container.DeregisterStopPriceAlert position.Ticker (user.Id |> UserId)

@@ -43,15 +43,8 @@ module PositionAnalysis =
             | Some p -> p
             | None -> 0.0m
         
-        let pctToStop =
-            match stopLoss with
-            | 0.0m -> -1.0m
-            | _ ->
-                let currentPrice = bars.Last.Close
-                match position.IsShort with
-                | true -> (currentPrice - stopLoss) / currentPrice
-                | false -> (stopLoss - currentPrice) / stopLoss
-        
+        let pctToStop = position.PercentToStop bars.Last.Close
+            
         let rrOutcomeType = 
             match position.RR with
             | p when p >= 1.0m -> OutcomeType.Positive
