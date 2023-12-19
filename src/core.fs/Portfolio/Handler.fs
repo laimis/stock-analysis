@@ -445,7 +445,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             | None -> return "Stock position not found" |> ResponseUtils.failed
             | Some position ->
                 let deletedPosition = position |> StockPosition.delete 
-                do! deletedPosition |> storage.SaveStockPosition command.UserId (Some position)
+                do! deletedPosition |> storage.DeleteStockPosition command.UserId (Some position)
                 return Ok
     }
     

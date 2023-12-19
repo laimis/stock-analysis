@@ -86,6 +86,29 @@ namespace storagetests
             Assert.Empty(afterDelete);
         }
 
+        [Fact]
+        public async Task StockPosition_ExplicitDelete_Works()
+        {
+            var position = StockPosition.openLong(GenerateTestTicker(), DateTimeOffset.UtcNow);
+            position = StockPosition.buy(10m, 2.1m, DateTimeOffset.UtcNow, position);
+            
+            var storage = CreateStorage();
+            
+            await storage.SaveStockPosition(_userId, FSharpOption<StockPositionState>.None, position);
+            
+            var loaded = await storage.GetStockPosition(position.PositionId, _userId);
+
+            Assert.NotNull(loaded);
+
+            var deleted = StockPosition.delete(loaded.Value);
+            
+            await storage.DeleteStockPosition(_userId, loaded, deleted);
+            
+            var afterDelete = await storage.GetStockPosition(loaded.Value.PositionId, _userId);
+            
+            Assert.Null(afterDelete);
+        }
+
         private static Ticker GenerateTestTicker()
         {
             return new Ticker($"test-{Guid.NewGuid().ToString("N")[..4]}");

@@ -93,6 +93,14 @@ namespace storage.shared
         {
             return _aggregateStorage.SaveEventsAsync(FSharpOption<StockPositionState>.get_IsNone(previousState) ? null : previousState.Value , newState, _stock_position_entity, userId);
         }
+        
+        public async Task DeleteStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, StockPositionState state)
+        {
+            // first save so that we persist deleted event
+            await SaveStockPosition(userId, previousState, state);
+            
+            await _aggregateStorage.DeleteAggregate(_stock_position_entity, state.PositionId.Item, userId);
+        }
 
         public Task SaveOwnedOption(OwnedOption option, UserId userId)
         {

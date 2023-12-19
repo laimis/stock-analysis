@@ -15,6 +15,7 @@ type IPortfolioStorage =
     abstract member GetStockPositions : userId:UserId -> Task<IEnumerable<StockPositionState>>
     abstract member GetStockPosition : positionId:StockPositionId -> userId:UserId -> Task<StockPositionState option>
     abstract member SaveStockPosition : userId:UserId -> previousState:StockPositionState option -> newState:StockPositionState -> Task
+    abstract member DeleteStockPosition : userId:UserId -> previousState:StockPositionState option -> newState:StockPositionState -> Task
     
     abstract member Delete : userId:UserId -> Task
     

@@ -48,7 +48,13 @@
     <app-stock-trading-review [orders]="brokerageOrders" [positions]=positions [quotes]="quotes"></app-stock-trading-review>
   }
   @if (isActive('violations')) {
-    <app-stock-violations [violations]="violations" [orders]="brokerageOrders" (sellRequested)="sellRequested($event)" (purchaseRequested)="purchaseRequested($event)"></app-stock-violations>
+    <app-stock-violations
+      [violations]="violations"
+      [orders]="brokerageOrders"
+      (sellRequested)="sellRequested($event)"
+      (purchaseRequested)="purchaseRequested($event)"
+      (refreshRequested)="refresh()"
+    ></app-stock-violations>
   }
   @if (isActive('analysis') && positions) {
     <app-stock-trading-outcomes-reports       [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
