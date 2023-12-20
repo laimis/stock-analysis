@@ -66,26 +66,21 @@ export class StockTradingNewPositionComponent {
   @Input()
   recordPositions: boolean = true
 
-  private _presetTicker: string = null
   @Input()
-  get presetTicker():string {
-    return this._presetTicker
-  }
-  set presetTicker(ticker:string) {
-    this._presetTicker = ticker
-    this.onBuyTickerSelected(ticker)
-  }
+  presetTicker:string
 
   @Input()
   isPendingPositionMode: boolean = true
 
   positionEntered = false
+  workflowStarted = false
+  recordInProgress : boolean = false
+
   startNewPosition() {
     this.positionEntered = false
-    // if the UI is for a preset ticker, reset it to the same ticker
-    // to kick off "new position" UI once again
+    this.workflowStarted = true
     if (this.presetTicker) {
-      this.presetTicker = this.presetTicker
+      this.onBuyTickerSelected(this.presetTicker)
     }
   }
 
@@ -123,7 +118,6 @@ export class StockTradingNewPositionComponent {
     this.sizeStopPrice = null
     this.positionStopPrice = null
     this.ticker = ticker
-    // this.date = this.datePipe.transform(Date(), 'yyyy-MM-dd');
 
     this.stockService.getStockQuote(ticker)
       .subscribe(quote => {
@@ -284,8 +278,6 @@ export class StockTradingNewPositionComponent {
     this.stopPct = Math.round((positionStopPrice - this.costToBuy) / this.costToBuy * 100) / 100
     this.chartStop = positionStopPrice
   }
-
-  recordInProgress : boolean = false
   openPosition() {
     this.recordInProgress = true
     let cmd = this.createOpenPositionCommand();

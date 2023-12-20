@@ -1,10 +1,11 @@
-@if (positionEntered) {
+@if (workflowStarted === false) {
   <section>
-    Pending position has been succesfully created. To create another one, click
-    <button class="btn btn-link" (click)="startNewPosition()">here</button>
+    @if (positionEntered) {
+      <div class="alert alert-primary">Pending position has been successfully created</div>
+    }
+    <button class="btn btn-primary" (click)="startNewPosition()">Start New Position</button>
   </section>
-}
-@if (positionEntered === false) {
+} @else {
   <section>
     <h5>
       Initiate Position

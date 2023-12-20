@@ -15,7 +15,6 @@
             <th scope="col">Current Price</th>
             <th scope="col">% diff</th>
             <th scope="col">Message</th>
-            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -29,25 +28,10 @@
               <td>{{violation.currentPrice | currency}}</td>
               <td>{{(violation.currentPrice - violation.pricePerShare) / violation.pricePerShare | percent}}</td>
               <td>{{violation.message}}</td>
-              <td>
-                <button type="button" class="btn btn-secondary me-2" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
-                <button type="button" class="btn btn-secondary me-2" (click)="openPosition(violation.ticker)">Open Position</button>
-              </td>
             </tr>
-            @if (activeTicker === violation.ticker) {
             <tr>
-                <td colspan="7">
+                <td colspan="6">
                   <div>
-                    @if (fixType === 'transaction') {
-                      <app-stock-transaction
-                        [position]="violation.localPosition"
-                        [numberOfShares]="violation.numberOfShares"
-                        [pricePerShare]="violation.pricePerShare"
-                        (transactionFailed)="transactionFailed($event)"
-                        (transactionRecorded)="transactionRecorded($event)">
-                      </app-stock-transaction>
-                    }
-                    @if (fixType === 'position') {
                       <app-stock-trading-new-position
                         [presetTicker]="violation.ticker"
                         [showChart]="false"
@@ -55,14 +39,12 @@
                         [isPendingPositionMode]="false"
                         (positionOpened)="positionOpened($event)">
                       </app-stock-trading-new-position>
-                    }
                   </div>
                 </td>
             </tr>
-            }
             @if (tickerHasOrders(violation.ticker)) {
             <tr>
-              <td colspan="7">
+              <td colspan="6">
                 <app-brokerage-orders
                   [positionId]="violation.localPosition?.positionId"
                   [orders]="orders"
@@ -88,46 +70,27 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-6">
-                <button type="button" class="btn btn-secondary btn-block w-100" (click)="recordTransaction(violation.ticker)">Record Transaction</button>
-              </div>
-              <div class="col-md-6">
-                <button type="button" class="btn btn-secondary btn-block w-100" (click)="openPosition(violation.ticker)">Open Position</button>
-              </div>
-            </div>
-            <div class="row">
               <div class="col">
                 {{violation.message}}
               </div>
             </div>
-            @if (activeTicker === violation.ticker) {
               <div class="row" >
                 <div class="col">
-                  @if (fixType === 'transaction') {
-                    <app-stock-transaction
-                      [position]="violation.localPosition"
-                      [numberOfShares]="violation.numberOfShares"
-                      [pricePerShare]="violation.pricePerShare"
-                      (transactionFailed)="transactionFailed($event)"
-                      (transactionRecorded)="transactionRecorded($event)">
-                    </app-stock-transaction>
-                  }
-                  @if (fixType === 'position') {
-                    <app-stock-trading-new-position
-                      [presetTicker]="violation.ticker"
-                      [showChart]="false"
-                      [showAnalysis]="false"
-                      [isPendingPositionMode]="false"
-                      (positionOpened)="positionOpened($event)">
-                    </app-stock-trading-new-position>
-                  }
+                  <app-stock-trading-new-position
+                    [presetTicker]="violation.ticker"
+                    [showChart]="false"
+                    [showAnalysis]="false"
+                    [isPendingPositionMode]="false"
+                    (positionOpened)="positionOpened($event)">
+                  </app-stock-trading-new-position>
                 </div>
               </div>
-            }
+
           </div>
         </div>
       }
     </div>
+
     @if (tickersInViolations.length > 0) {
       <app-brokerage-new-order (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
     }
