@@ -119,12 +119,6 @@ let container =
     generateRandomSet DateTimeOffset.UtcNow 100 |> List.map StockPositionWithCalculations |> List.toArray |> TradingPerformanceContainerView
 
 [<Fact>]
-let ClosedPositions_Length_Correct() = container.ClosedPositions.Length |> should be (greaterThan 0)
-
-[<Fact>]
-let RecentPositions_Length_Correct() = container.RecentClosedPositions.Length |> should be (greaterThan 0)
-
-[<Fact>]
 let NumberOfTrades_Correct() = container.PerformanceLast20.NumberOfTrades |> should be (lessThan container.PerformanceAll.NumberOfTrades)
 
 [<Fact>]

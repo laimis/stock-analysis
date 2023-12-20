@@ -399,7 +399,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                         match pendingPositionOption with
                         | Some pendingPosition ->
                             match pendingPosition.State.Notes with
-                            | x when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) |> not -> pendingPosition.State.Notes |> Some
+                            | _ when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) |> not -> pendingPosition.State.Notes |> Some
                             | _ -> None
                         | None -> None
                         
@@ -410,7 +410,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                         match pendingPositionOption with
                         | Some pendingPosition ->
                             match pendingPosition.State.Strategy with
-                            | x when String.IsNullOrWhiteSpace(pendingPosition.State.Strategy) |> not -> pendingPosition.State.Strategy |> Some
+                            | _ when String.IsNullOrWhiteSpace(pendingPosition.State.Strategy) |> not -> pendingPosition.State.Strategy |> Some
                             | _ -> None
                         | None -> None
                 
@@ -794,7 +794,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.sortByDescending _.Closed.Value
                 |> Seq.map StockPositionWithCalculations
                 |> Seq.toArray
-            
+
             let performance = TradingPerformanceContainerView(past)
             
             let strategyByPerformance =
@@ -807,6 +807,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 )
                 |> Seq.sortByDescending _.performance.Profit
                 |> Seq.toArray
+
             let (tradingEntries:PastTradingEntriesView) =
                 {
                     past=past;

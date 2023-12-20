@@ -43,14 +43,6 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         // date from oldest to most recent
         let closedPositions = inputPositions |> Array.sortBy (_.Closed.Value)
         
-        let defaultWindowSize = 20
-        
-        let recentLengthToTake =
-            match closedPositions.Length > defaultWindowSize with
-            | true -> defaultWindowSize
-            | false -> closedPositions.Length
-            
-        
         let generateOutcomeHistogram (label:string) transactions valueFunc (buckets:int) symmetric annotation =
             
             let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.Column, annotation)
@@ -273,9 +265,6 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 
             span.ToArray()
         
-        member _.ClosedPositions = closedPositions
-        member _.RecentClosedPositions = closedPositions |> Array.skip (closedPositions.Length - recentLengthToTake)
-        
         member _.PerformanceAll = closedPositions |> TradingPerformance.Create
         member _.PerformanceLast20 = closedPositions |> getAtMost 20 |> TradingPerformance.Create
         member _.PerformanceLast50 = closedPositions |> getAtMost 50 |> TradingPerformance.Create
@@ -303,7 +292,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         member _.TrendsLast100 = closedPositions |> getAtMost 100 |> generateTrends
         
         member this.TrendsTwoMonths =
-            this.ClosedPositions
+            closedPositions
             |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
             |> generateTrends
         
