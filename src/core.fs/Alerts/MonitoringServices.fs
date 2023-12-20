@@ -158,21 +158,27 @@ module core.fs.Alerts.MonitoringServices
             | None ->
                 return Seq.empty<AlertCheck>
             | Some user ->
-                let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
-                
                 let! ownedStocks = emailIdPair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
-                
                 let portfolioList =
                     ownedStocks
                     |> Seq.filter (_.IsOpen)
                     |> Seq.map (_.Ticker)
                     |> Seq.map (fun t -> {ticker=t; listName="Portfolio"; user=user.State})
+                    
+                let! pendingPositions = emailIdPair.Id |> portfolio.GetPendingStockPositions |> Async.AwaitTask
+                let pendingList =
+                    pendingPositions
+                    |> Seq.filter (fun p -> p.State.IsClosed |> not)
+                    |> Seq.map (_.State.Ticker)
+                    |> Seq.map (fun t -> {ticker=t; listName="Pending"; user=user.State})
                 
+                let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
                 return lists
-                |> Seq.filter (fun l -> l.State.ContainsTag(Constants.MonitorTagPattern))
+                |> Seq.filter (_.State.ContainsTag(Constants.MonitorTagPattern))
                 |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listName=l.State.Name; user=user.State}))
                 |> Seq.concat
                 |> Seq.append portfolioList
+                |> Seq.append pendingList
         }
         
         let generatePatternMonitoringChecks() = task {
