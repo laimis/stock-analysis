@@ -64,7 +64,16 @@
 }
 @if (isActive('trade')) {
   <app-brokerage-new-order [ticker]="stock.ticker"></app-brokerage-new-order>
-  <app-brokerage-orders [filteredTickers]="[stock.ticker]" [orders]="orders" [positionId]="currentPosition?.positionId"></app-brokerage-orders>
+  <app-brokerage-orders
+    [filteredTickers]="[stock.ticker]"
+    [orders]="orders"
+    [positionId]="currentPosition?.positionId"
+    (purchaseRequested)="purchaseRequested($event)"
+    (sellRequested)="sellRequested($event)"
+    (orderCancelled)="loadOrders()">
+
+  </app-brokerage-orders>
+
   <app-stock-trading-new-position
     [isPendingPositionMode]="true"
     [presetTicker]="stock.ticker"

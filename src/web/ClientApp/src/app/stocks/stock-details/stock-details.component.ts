@@ -4,7 +4,7 @@ import {
   StockDetails,
   OwnedOption,
   StockOwnership,
-  BrokerageOrder, PositionInstance
+  BrokerageOrder, PositionInstance, stocktransactioncommand
 } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -84,6 +84,30 @@ export class StockDetailsComponent implements OnInit {
       e => {
         this.loading.orders = false
         this.errors.orders = GetErrors(e)
+      }
+    )
+  }
+
+  purchaseRequested(command:stocktransactioncommand) {
+    this.stockPositions.purchase(command).subscribe(
+      () => {
+        this.loading.ownership = true;
+        this.loadStockOwnership()
+      },
+      error => {
+        this.errors.notes = GetErrors(error)
+      }
+    )
+  }
+
+  sellRequested(command:stocktransactioncommand) {
+    this.stockPositions.sell(command).subscribe(
+      () => {
+        this.loading.ownership = true;
+        this.loadStockOwnership()
+      },
+      error => {
+        this.errors.notes = GetErrors(error)
       }
     )
   }
