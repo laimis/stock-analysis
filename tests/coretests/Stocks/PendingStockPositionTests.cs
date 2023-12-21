@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using core.Stocks;
 using coretests.testdata;
 using Xunit;
@@ -10,14 +11,7 @@ namespace coretests.Stocks
         [Fact]
         public void Create_AppliesProperties()
         {
-            var pending = new PendingStockPosition(
-                notes: "this is a note",
-                numberOfShares: 100,
-                price: 10,
-                stopPrice: 5,
-                strategy: "alltimehigh",
-                ticker: TestDataGenerator.AMD,
-                userId: Guid.NewGuid());
+            var pending = CreateTestPendingPosition();
             
             Assert.Equal("this is a note", pending.State.Notes);
             Assert.Equal(100, pending.State.NumberOfShares);
@@ -26,6 +20,19 @@ namespace coretests.Stocks
             Assert.Equal("alltimehigh", pending.State.Strategy);
             Assert.Equal(TestDataGenerator.AMD, pending.State.Ticker);
             Assert.NotEqual(Guid.Empty, pending.State.UserId);
+        }
+
+        private static PendingStockPosition CreateTestPendingPosition()
+        {
+            var pending = new PendingStockPosition(
+                notes: "this is a note",
+                numberOfShares: 100,
+                price: 10,
+                stopPrice: 5,
+                strategy: "alltimehigh",
+                ticker: TestDataGenerator.AMD,
+                userId: Guid.NewGuid());
+            return pending;
         }
 
         [Fact]
@@ -109,18 +116,27 @@ namespace coretests.Stocks
         [Fact]
         public void Close_SetClosedDate()
         {
-            var pending = new PendingStockPosition(
-                notes: "this is a note",
-                numberOfShares: 100,
-                price: 10,
-                stopPrice: 5,
-                strategy: "alltimehigh",
-                ticker: TestDataGenerator.AMD,
-                userId: Guid.NewGuid());
+            var pending = CreateTestPendingPosition();
 
             pending.Close();
 
             Assert.NotNull(pending.State.Closed);
+        }
+
+        [Fact]
+        public void Close_Repeatedly_NoOp()
+        {
+            var pending = CreateTestPendingPosition();
+            
+            pending.Close();
+            
+            var closed = pending.State.Closed;
+            var eventCount = pending.Events.Count();
+            
+            pending.Close();
+            
+            Assert.Equal(closed, pending.State.Closed);
+            Assert.Equal(eventCount, pending.Events.Count());
         }
     }
 }

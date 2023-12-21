@@ -578,8 +578,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | None -> -1.0m
             | Some stopPrice ->
                 match this.IsShort with
-                | true -> (fromPrice - stopPrice) / fromPrice
-                | false -> (stopPrice - fromPrice) / stopPrice
+                | true -> (fromPrice - stopPrice) / stopPrice
+                | false -> (stopPrice - fromPrice) / fromPrice
+                
+    member this.PercentToStopFromCost = this.PercentToStop this.AverageCostPerShare
         
     member this.ContainsLabel key =
         stockPosition.Labels.ContainsKey(key)

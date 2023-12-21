@@ -1040,6 +1040,7 @@ export interface PositionInstance {
   rr: number,
   rrWeighted: number,
   stopPrice: number,
+  percentToStopFromCost: number,
   ticker: string,
   plTransactions: StockPLTransaction[],
   transactions: StockTransaction[],

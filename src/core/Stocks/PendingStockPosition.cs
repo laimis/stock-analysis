@@ -83,6 +83,11 @@ namespace core.Stocks
 
         public void Close()
         {
+            if (State.IsClosed)
+            {
+                return;
+            }
+            
             Apply(
                 new PendingStockPositionClosed(
                     Guid.NewGuid(),

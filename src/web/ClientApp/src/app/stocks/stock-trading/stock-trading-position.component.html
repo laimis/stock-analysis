@@ -17,7 +17,7 @@
       <div>
         <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
         @if (!_position.isClosed) {
-          <span class="float-end"> ({{ (_position.stopPrice - _position.averageCostPerShare) / _position.averageCostPerShare | percent }}) from avg cost</span>
+          <span class="float-end"> ({{ _position.percentToStopFromCost | percent }}) from avg cost</span>
         }
       </div>
     </div>

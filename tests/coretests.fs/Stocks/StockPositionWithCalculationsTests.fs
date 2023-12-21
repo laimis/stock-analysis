@@ -239,4 +239,16 @@ let ``Days held is correct`` () =
     
     calculated.DaysHeld |> should equal 5
     calculated.DaysSinceLastTransaction |> should equal 0
- 
+    
+[<Fact>]
+let ``Percent to stop from cost is correct`` () =
+    
+    let position =
+        StockPosition.openLong ticker (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.buy 1m 5m (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.buy 1m 5m (DateTimeOffset.UtcNow.AddDays(-2))
+        |> StockPosition.setStop (Some 4m) (DateTimeOffset.UtcNow.AddDays(-2))
+        
+    let calculated = position |> StockPositionWithCalculations
+    
+    calculated.PercentToStopFromCost |> should equal -0.2m

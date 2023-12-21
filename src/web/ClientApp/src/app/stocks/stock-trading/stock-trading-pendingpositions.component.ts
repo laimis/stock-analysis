@@ -60,6 +60,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     this.stockService.closePendingPosition(position.id).subscribe(
       (_) => {
         this.pendingPositionClosed.emit(position);
+        this.refreshPendingPositions()
       },
       (error) => {
         console.log(error)

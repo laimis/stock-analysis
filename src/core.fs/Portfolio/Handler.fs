@@ -823,14 +823,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         let toTransactionsView (stocks:StockPositionWithCalculations seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
             let tickers = stocks |> Seq.map (_.Ticker) |> Seq.append (options |> Seq.map (_.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
             
-            // let stockTransactions =
-            //     match query.Show = "shares" || query.Show = null with
-            //     | true ->
-            //         stocks
-            //         |> Seq.filter (fun s -> query.Ticker.HasValue = false || s.Ticker = query.Ticker.Value)
-            //         |> Seq.collect toPlTransactions
-            //     | false -> Seq.empty
-                
             let optionTransactions =
                 match query.Show = "options" || query.Show = null with
                 | true ->

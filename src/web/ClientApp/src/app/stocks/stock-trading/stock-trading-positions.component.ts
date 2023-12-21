@@ -122,6 +122,7 @@ export class StockTradingPositionsComponent {
         { value: "daysSinceLastTransaction", name: "Days Since Last Transaction" },
         { value: "riskedAmount", name: "Risked Amount" },
         { value: "riskedAmountFromStop", name: "Risked Amount from Stop" },
+        { value: "percentToStopFromCost", name: "% to Stop from Cost" },
         { value: "daysHeld", name: "Days Held" },
     ]
 
@@ -183,6 +184,10 @@ export class StockTradingPositionsComponent {
             case "unrealizedRR":
                 this.metricFunc = (p:PositionInstance) => (p.profit + p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
                 this.metricType = OutcomeValueTypeEnum.Number
+                break
+          case "percentToStopFromCost":
+                this.metricFunc = (p:PositionInstance) => p.percentToStopFromCost
+                this.metricType = OutcomeValueTypeEnum.Percentage
                 break
             default:
                 this.metricFunc = (p:PositionInstance) => p.rr
