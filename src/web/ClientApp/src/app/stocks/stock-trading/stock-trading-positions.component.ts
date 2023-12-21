@@ -26,6 +26,7 @@ export class StockTradingPositionsComponent {
     strategies: { key: string; value: string }[] = []
 
     private NO_LONG_TERM_STRATEGY = "nolongterm"
+    private SHORTS = "shorts"
     strategyToFilter = this.NO_LONG_TERM_STRATEGY
 
     @Input()
@@ -49,7 +50,14 @@ export class StockTradingPositionsComponent {
             }
         )
 
+        let shorts = input.filter(
+            (p) => {
+                return p.isShort
+            }
+        )
+
         this.strategies.push({key: this.NO_LONG_TERM_STRATEGY, value: "All minus long term - " + (input.length - longTermPositions.length)})
+        this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})
         this.strategies = this.strategies.concat(
             stratsWithCounts
         )
@@ -241,6 +249,10 @@ export class StockTradingPositionsComponent {
 
             if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
               return !isLongTermStrategy(positionStrategy.value)
+            }
+
+            if (this.strategyToFilter === this.SHORTS) {
+              return p.isShort
             }
 
             return positionStrategy.value === this.strategyToFilter

@@ -1032,6 +1032,7 @@ export interface PositionInstance {
   lastTransaction: string,
   notes: string[],
   labels: KeyValuePair[],
+  isShort: boolean,
   numberOfShares: number,
   opened: string,
   profit: number,
