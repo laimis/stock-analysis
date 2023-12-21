@@ -475,11 +475,14 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | _ -> liquidationSlots |> List.average
         
     member this.GainPct =
-        match this.AverageBuyCostPerShare with
-        | 0m -> 0m // we haven't sold any, no gain pct
-        | _ ->
-            match this.IsShort with
-            | true -> (this.AverageBuyCostPerShare - this.AverageSaleCostPerShare) / this.AverageSaleCostPerShare
+        match this.IsShort with
+        | true ->
+            match this.AverageSaleCostPerShare = 0m with
+            | true -> 0m
+            | false -> (this.AverageBuyCostPerShare - this.AverageSaleCostPerShare) / this.AverageSaleCostPerShare
+        | false ->
+            match this.AverageBuyCostPerShare = 0m with
+            | true -> 0m
             | false -> (this.AverageSaleCostPerShare - this.AverageBuyCostPerShare) / this.AverageBuyCostPerShare
         
     member this.Transactions =
