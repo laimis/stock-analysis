@@ -93,8 +93,8 @@ let ``Short Completed position number of shares accurate`` () =
     shortPosition.CompletedPositionShares |> should equal 20m
     
 [<Fact>]
-let ``Short Average buy cost per share is accurate``() =
-    shortPosition.AverageBuyCostPerShare |> should equal 32.5m
+let ``Short Average buy cost per share represents sell side``() =
+    shortPosition.AverageBuyCostPerShare |> should equal 38.5m
     
 [<Fact>]
 let ``Short Days held is accurate`` () =
