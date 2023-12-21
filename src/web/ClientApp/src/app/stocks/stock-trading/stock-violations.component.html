@@ -29,11 +29,14 @@
               <td>{{(violation.currentPrice - violation.pricePerShare) / violation.pricePerShare | percent}}</td>
               <td>{{violation.message}}</td>
             </tr>
+            @if (!violation.localPosition) {
             <tr>
                 <td colspan="6">
                   <div>
                       <app-stock-trading-new-position
                         [presetTicker]="violation.ticker"
+                        [price]="violation.pricePerShare"
+                        [numberOfShares]="violation.numberOfShares"
                         [showChart]="false"
                         [showAnalysis]="false"
                         [isPendingPositionMode]="false"
@@ -42,6 +45,7 @@
                   </div>
                 </td>
             </tr>
+            }
             @if (tickerHasOrders(violation.ticker)) {
             <tr>
               <td colspan="6">

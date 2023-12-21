@@ -70,6 +70,12 @@ export class StockTradingNewPositionComponent {
   presetTicker:string
 
   @Input()
+  price: number | null = null
+
+  @Input()
+  numberOfShares: number | null = null
+
+  @Input()
   isPendingPositionMode: boolean = true
 
   positionEntered = false
@@ -92,10 +98,8 @@ export class StockTradingNewPositionComponent {
 
   // variables for new positions
   positionSizeCalculated: number = null
-  costToBuy: number | null = null
   ask: number | null = null
   bid: number | null = null
-  numberOfShares : number | null = null
   sizeStopPrice: number | null = null
   positionStopPrice: number | null = null
   oneR: number | null = null
@@ -113,15 +117,15 @@ export class StockTradingNewPositionComponent {
 
   onBuyTickerSelected(ticker: string) {
 
-    this.costToBuy = null
-    this.numberOfShares = null
     this.sizeStopPrice = null
     this.positionStopPrice = null
     this.ticker = ticker
 
     this.stockService.getStockQuote(ticker)
       .subscribe(quote => {
-        this.costToBuy = quote.mark
+        if (!this.price) {
+          this.price = quote.mark
+        }
         this.ask = quote.askPrice
         this.bid = quote.bidPrice
         this.fetchAndRenderPriceRelatedInformation(ticker)
@@ -143,7 +147,7 @@ export class StockTradingNewPositionComponent {
   }
 
   reset() {
-    this.costToBuy = null
+    this.price = null
     this.numberOfShares = null
     this.positionStopPrice = null
     this.sizeStopPrice = null
@@ -194,7 +198,7 @@ export class StockTradingNewPositionComponent {
   }
 
   smaCheck20(): boolean {
-    return this.get20sma() < this.costToBuy && this.get20sma() > this.get50sma()
+    return this.get20sma() < this.price && this.get20sma() > this.get50sma()
   }
 
   get50sma(): number {
@@ -202,7 +206,7 @@ export class StockTradingNewPositionComponent {
   }
 
   smaCheck50(): boolean {
-    return this.get50sma() < this.costToBuy && this.get50sma() > this.get150sma()
+    return this.get50sma() < this.price && this.get50sma() > this.get150sma()
   }
 
   get150sma(): number {
@@ -214,11 +218,11 @@ export class StockTradingNewPositionComponent {
   }
 
   smaCheck150(): boolean {
-    return this.get150sma() < this.costToBuy && this.get150sma() < this.get50sma()
+    return this.get150sma() < this.price && this.get150sma() < this.get50sma()
   }
 
   smaCheck200(): boolean {
-    return this.get200sma() < this.costToBuy && this.get200sma() < this.get150sma()
+    return this.get200sma() < this.price && this.get200sma() < this.get150sma()
   }
 
   getLastSma(sma:SMA): number {
@@ -226,16 +230,16 @@ export class StockTradingNewPositionComponent {
   }
 
   updateBuyingValuesWithNumberOfShares() {
-    if (!this.costToBuy || !this.positionStopPrice) {
+    if (!this.price || !this.positionStopPrice) {
       console.log("not enough info to calculate")
       return
     }
-    let singleShareLoss = this.costToBuy - this.positionStopPrice
+    let singleShareLoss = this.price - this.positionStopPrice
     this.updateBuyingValues(singleShareLoss)
   }
 
   updateBuyingValuesSizeStopPrice() {
-    if (!this.costToBuy) {
+    if (!this.price) {
       console.log("sizeStopChanged: not enough info to calculate the rest")
       return
     }
@@ -245,18 +249,18 @@ export class StockTradingNewPositionComponent {
       return
     }
 
-    let singleShareLoss = this.costToBuy - this.sizeStopPrice
+    let singleShareLoss = this.price - this.sizeStopPrice
     this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
 
     this.updateBuyingValues(singleShareLoss)
   }
 
   updateBuyingValuesPositionStopPrice() {
-    if (!this.costToBuy) {
+    if (!this.price) {
       console.log("positionStopChanged: not enough info to calculate the rest")
       return
     }
-    let singleShareLoss = this.costToBuy - this.positionStopPrice
+    let singleShareLoss = this.price - this.positionStopPrice
     this.updateBuyingValues(singleShareLoss)
   }
 
@@ -272,10 +276,10 @@ export class StockTradingNewPositionComponent {
       positionStopPrice = this.sizeStopPrice
     }
 
-    this.positionSizeCalculated = Math.round(this.numberOfShares * this.costToBuy * 100) / 100
-    this.oneR = this.costToBuy + singleShareLoss
-    this.potentialLoss = positionStopPrice * this.numberOfShares - this.costToBuy * this.numberOfShares
-    this.stopPct = Math.round((positionStopPrice - this.costToBuy) / this.costToBuy * 100) / 100
+    this.positionSizeCalculated = Math.round(this.numberOfShares * this.price * 100) / 100
+    this.oneR = this.price + singleShareLoss
+    this.potentialLoss = positionStopPrice * this.numberOfShares - this.price * this.numberOfShares
+    this.stopPct = Math.round((positionStopPrice - this.price) / this.price * 100) / 100
     this.chartStop = positionStopPrice
   }
   openPosition() {
@@ -306,7 +310,7 @@ export class StockTradingNewPositionComponent {
     let cmd = new pendingstockpositioncommand();
     cmd.ticker = this.ticker;
     cmd.numberOfShares = this.numberOfShares;
-    cmd.price = this.costToBuy;
+    cmd.price = this.price;
     cmd.stopPrice = this.positionStopPrice;
     cmd.notes = this.notes;
     cmd.date = this.date;
@@ -318,7 +322,7 @@ export class StockTradingNewPositionComponent {
   private createOpenPositionCommand() : openpositioncommand {
     return {
       numberOfShares: this.numberOfShares,
-      price: this.costToBuy,
+      price: this.price,
       stopPrice: this.positionStopPrice,
       notes: this.notes,
       date: this.date,
@@ -361,7 +365,7 @@ export class StockTradingNewPositionComponent {
       positions => {
         let position = positions.find(p => p.ticker === ticker)
         if (position) {
-          this.costToBuy = position.bid
+          this.price = position.bid
           this.numberOfShares = null
           this.positionStopPrice = position.stopPrice
           this.notes = position.notes
@@ -380,7 +384,7 @@ export class StockTradingNewPositionComponent {
     if (!this.atr) {
       return
     }
-    return this.costToBuy - this.atr * this.atrMultiplier
+    return this.price - this.atr * this.atrMultiplier
   }
 
   assignSizeStopPrice(value:number) {
@@ -388,7 +392,11 @@ export class StockTradingNewPositionComponent {
     // round to 2 decimal places
     value = Math.round(value * 100) / 100
 
-    this.sizeStopPrice = value
+    if (this.isPendingPositionMode) {
+      this.sizeStopPrice = value
+    } else {
+      this.positionStopPrice = value
+    }
     this.updateBuyingValuesSizeStopPrice()
   }
 

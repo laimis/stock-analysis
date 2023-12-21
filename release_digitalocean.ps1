@@ -8,7 +8,13 @@ function Get-LastCommitMessage {
 
 function Exit-With-Error ($message) {
     write-host $message
-    [Console]::Beep(500, 300); [Console]::Beep(500, 300); [Console]::Beep(500, 300)
+    $voice = New-Object -ComObject Sapi.spvoice
+    
+    # get voices, use one where Id contains ZIRA
+    $voices = $voice.GetVoices()
+    $voice.Voice = $voices | Where-Object { $_.Id.Contains("ZIRA") }
+    $voice.rate = 0
+    $voice.speak($message)
     exit 1
 }
 

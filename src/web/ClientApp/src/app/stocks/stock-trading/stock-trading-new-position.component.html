@@ -3,7 +3,7 @@
     @if (positionEntered) {
       <div class="alert alert-primary">Pending position has been successfully created</div>
     }
-    <button class="btn btn-primary" (click)="startNewPosition()">Start New Position</button>
+    <button class="btn btn-secondary" (click)="startNewPosition()">Start New Position</button>
   </section>
 } @else {
   <section>
@@ -38,7 +38,7 @@
             step="0.01"
             id="costToBuy"
             class="form-control"
-            [(ngModel)]="costToBuy"
+            [(ngModel)]="price"
             (ngModelChange)="updateBuyingValuesWithCostToBuy()"
           />
         </div>

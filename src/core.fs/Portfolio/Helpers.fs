@@ -24,7 +24,7 @@ module Helpers =
                 | None ->
                     let violation = {
                             CurrentPrice = currentPrice
-                            Message = $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says none"
+                            Message = $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost:F2} but NGTrading says none"
                             NumberOfShares = brokeragePosition.Quantity
                             PricePerShare = brokeragePosition.AverageCost
                             Ticker = brokeragePosition.Ticker
@@ -38,7 +38,7 @@ module Helpers =
                     | false ->
                         let violation = {
                                 CurrentPrice = currentPrice
-                                Message = $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare}"
+                                Message = $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost:F2} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare:F2}"
                                 NumberOfShares = brokeragePosition.Quantity
                                 PricePerShare = brokeragePosition.AverageCost
                                 Ticker = brokeragePosition.Ticker
@@ -62,7 +62,7 @@ module Helpers =
                 | None -> 
                     let violation = {
                             CurrentPrice = currentPrice
-                            Message = $"Owned {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare} but brokerage says none"
+                            Message = $"Owned {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare:F2} but brokerage says none"
                             NumberOfShares = localPosition.NumberOfShares
                             PricePerShare = localPosition.AverageCostPerShare
                             Ticker = localPosition.Ticker
@@ -77,7 +77,7 @@ module Helpers =
                     | false ->
                         let violation = {
                                 CurrentPrice = currentPrice
-                                Message = $"Owned {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare} but brokerage says {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost}"
+                                Message = $"Owned {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare:F2} but brokerage says {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost:F2}"
                                 NumberOfShares = localPosition.NumberOfShares
                                 PricePerShare = localPosition.AverageCostPerShare
                                 Ticker = localPosition.Ticker
