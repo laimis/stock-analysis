@@ -6,15 +6,24 @@ function Get-LastCommitMessage {
     return $lastCommit
 }
 
+function Exit-With-Error ($message) {
+    write-host $message
+    [Console]::Beep(500, 300); [Console]::Beep(500, 300); [Console]::Beep(500, 300)
+    exit 1
+}
+
 # check if there are any git changes, and if there are, report them and exit
 $gitStatus = git status --porcelain
 if ($null -ne $gitStatus) {
-    Write-Host "There are uncommitted changes in git, please make sure everything is committed before doing a release."
-    Write-Host "Git status:"
-    Write-Host $gitStatus
+    
+    # store message as multiline string
+    $message = "
+There are uncommitted changes in git, please make sure everything is committed before doing a release.
+Git status:
+$gitStatus
+"
 
-    # exit with error code
-    exit 1
+    Exit-With-Error $message
 }
 
 if ([System.String]::IsNullOrEmpty($message))
@@ -28,7 +37,7 @@ if ([System.String]::IsNullOrEmpty($message))
     }
     else
     {
-        write-host "Please provide a message"
+        Exit-With-Error "Message is missing, exiting"
         exit
     }
 }
@@ -46,8 +55,7 @@ $message = $message -replace "'", "''"
 Invoke-Expression '.\test.bat'
 $exitCode = $LASTEXITCODE
 if ($exitCode -ne 0) {
-    write-host "Basic tests failed"
-    exit
+    Exit-With-Error "Tests failed"
 }
 
 # ensure that the project can build by invoking npm run build -- --configuration production
@@ -57,8 +65,7 @@ invoke-expression "npm run build -- --configuration production"
 $exitCode = $LASTEXITCODE
 pop-location
 if ($exitCode -ne 0) {
-    write-host "Release prep failed"
-    exit
+    Exit-With-Error "Angular failed"
 }
 
 # make sure garbage collection is not in progress
