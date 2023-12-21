@@ -50,7 +50,7 @@
   }
 </div>
 
-@if (stock && isActive('stocks')) {
+@if (stock && stockOwnership && isActive('stocks')) {
   <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote"></app-stock-ownership>
 }
 @if (isActive('options')) {

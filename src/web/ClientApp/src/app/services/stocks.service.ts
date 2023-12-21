@@ -1022,7 +1022,6 @@ export interface PositionInstance {
   averageSaleCostPerShare: number,
   closed: string,
   cost: number,
-  completedPositionCost: number,
   completedPositionShares: number,
   daysHeld: number,
   daysSinceLastTransaction: number,

@@ -73,6 +73,7 @@ module core.fs.Alerts.MonitoringServices
                 | true ->
                     TriggeredAlert.StopPriceAlert position.Ticker response.Price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)
                     |> container.Register
+                    logInformation($"STOP LOSS ALERT {position.Ticker} {pctToStop}")
                 | false ->
                     container.DeregisterStopPriceAlert position.Ticker (user.Id |> UserId)
         }

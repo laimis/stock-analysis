@@ -426,13 +426,14 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
         let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
         let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
-        
-        // we then calculate the average cost of the remaining shares
         match remainingShares with
-        | [] -> 0m
+        | [] -> this.AverageBuyCostPerShare
         | _ -> remainingShares |> List.average
         
-    member this.Cost = stockPosition.NumberOfShares * this.AverageCostPerShare
+    member this.Cost =
+        match this.IsOpen with
+        | true -> stockPosition.NumberOfShares * this.AverageCostPerShare
+        | false -> this.CompletedPositionShares * this.CompletedPositionCostPerShare
     
     member this.DaysHeld =
         let referenceDay =
@@ -464,14 +465,14 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         ) 0m
         
     member this.AverageBuyCostPerShare =
-        match buySlots with
+        match acquisitionSlots with
             | [] -> 0m
-            | _ -> buySlots |> List.average
+            | _ -> acquisitionSlots |> List.average
             
     member this.AverageSaleCostPerShare =
-        match sellSlots with
+        match liquidationSlots with
             | [] -> 0m
-            | _ -> sellSlots |> List.average
+            | _ -> liquidationSlots |> List.average
         
     member this.GainPct =
         match this.AverageBuyCostPerShare with
@@ -538,8 +539,6 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             totalCost / totalShares
         
     member this.CompletedPositionShares = completedPositionTransactions |> List.sumBy (_.NumberOfShares)
-        
-    member this.CompletedPositionCost = this.CompletedPositionShares * this.CompletedPositionCostPerShare
         
     member this.LastBuyPrice =
         match buys with
