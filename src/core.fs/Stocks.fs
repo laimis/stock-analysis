@@ -477,7 +477,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.GainPct =
         match this.AverageBuyCostPerShare with
         | 0m -> 0m // we haven't sold any, no gain pct
-        | _ -> (this.AverageSaleCostPerShare - this.AverageBuyCostPerShare) / this.AverageBuyCostPerShare
+        | _ ->
+            match this.IsShort with
+            | true -> (this.AverageBuyCostPerShare - this.AverageSaleCostPerShare) / this.AverageSaleCostPerShare
+            | false -> (this.AverageSaleCostPerShare - this.AverageBuyCostPerShare) / this.AverageBuyCostPerShare
         
     member this.Transactions =
         
