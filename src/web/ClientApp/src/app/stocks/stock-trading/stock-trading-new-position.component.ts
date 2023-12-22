@@ -296,6 +296,7 @@ export class StockTradingNewPositionComponent {
       _ => {
         this.positionOpened.emit(cmd)
         this.recordInProgress = false
+        this.positionEntered = true
     },
       err => {
         let errors = GetErrors(err)

@@ -9,6 +9,7 @@ import {
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 import {StockPositionsService} from "../../services/stockpositions.service";
 
+
 @Component({
   selector: 'app-stock-trading-positions',
   templateUrl: './stock-trading-positions.component.html',
@@ -18,7 +19,6 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 export class StockTradingPositionsComponent {
     sortedPositions: PositionInstance[];
     _positions: PositionInstance[];
-    metricToRender: string = "rr"
     metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.rr;
     metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number
     candidateRiskAmount: number = 0
@@ -27,6 +27,9 @@ export class StockTradingPositionsComponent {
 
     private NO_LONG_TERM_STRATEGY = "nolongterm"
     private SHORTS = "shorts"
+    private RR = "rr"
+    private UnrealizedRR = "unrealizedRR"
+    metricToRender: string = this.UnrealizedRR
     strategyToFilter = this.NO_LONG_TERM_STRATEGY
 
     @Input()
@@ -121,8 +124,8 @@ export class StockTradingPositionsComponent {
     }
 
     sortOptions: { name: string; value: string }[] = [
-        { value: "rr", name: "R/R" },
-        { value: "unrealizedRR", name: "Unrealized R/R" },
+        { value: this.RR, name: "R/R" },
+        { value: this.UnrealizedRR, name: "Unrealized R/R" },
         { value: "pl", name: "P/L" },
         { value: "plPercent", name: "P/L %" },
         { value: "cost", name: "Cost" },
