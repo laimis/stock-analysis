@@ -77,7 +77,6 @@ export class StockTradingPositionsComponent {
 
     // constructor that takes stock service
     constructor(
-        private stockService:StockPositionsService,
         private percentPipe: PercentPipe,
         private currencyPipe: CurrencyPipe,
         private decimalPipe: DecimalPipe

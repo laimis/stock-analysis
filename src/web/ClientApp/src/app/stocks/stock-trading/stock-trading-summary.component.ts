@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PositionInstance } from 'src/app/services/stocks.service';
+import {PositionInstance, StockQuote} from 'src/app/services/stocks.service';
 import { isLongTermStrategy } from 'src/app/services/utils';
 
 interface PositionGroup {
@@ -31,7 +31,7 @@ export class StockTradingSummaryComponent {
     this._positions = value
     this.totalCost = this.sum(value, p => p.averageCostPerShare * p.numberOfShares)
     this.totalRiskedAmount = this.sum(value, p => p.costAtRiskBasedOnStopPrice)
-    this.totalProfit = this.sum(value, p => p.profit)
+    this.totalProfit = this.sum(value, p => this.getUnrealizedProfit(p))
     this.positionGroups = this.breakdownByStrategy(value)
   }
   get positions():PositionInstance[] {
@@ -39,11 +39,20 @@ export class StockTradingSummaryComponent {
   }
 
   @Input()
+  quotes:Map<string, StockQuote>
+
+
+  @Input()
   cashBalance: number
 
   getStrategy(position:PositionInstance) : string {
     let strategy = position.labels.find(l => l.key == 'strategy')
     return strategy ? strategy.value : "none"
+  }
+
+  getUnrealizedProfit(position:PositionInstance) : number {
+    let quote = this.quotes[position.ticker]
+    return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profit : 0
   }
 
   getSortFunc(property) : (a:PositionGroup, b:PositionGroup) => number {
@@ -59,10 +68,6 @@ export class StockTradingSummaryComponent {
       default:
         return (a, b) => b.strategy.localeCompare(a.strategy)
     }
-  }
-
-  log(message) {
-    alert(message)
   }
 
   sort(property:string) {
@@ -107,7 +112,7 @@ export class StockTradingSummaryComponent {
           positions,
           cost : this.sum(groupPositions, p => p.averageCostPerShare * p.numberOfShares),
           risk : this.sum(groupPositions, p => p.costAtRiskBasedOnStopPrice),
-          profit : this.sum(groupPositions, p => p.profit),
+          profit : this.sum(groupPositions, p => this.getUnrealizedProfit(p)),
           length : groupPositions.length
         }
 

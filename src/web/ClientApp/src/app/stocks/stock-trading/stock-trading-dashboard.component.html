@@ -60,6 +60,6 @@
     <app-stock-trading-outcomes-reports       [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
   }
   @if (isActive('summary')) {
-    <app-stock-trading-summary  [positions]="positions" [cashBalance]="cashBalance" ></app-stock-trading-summary>
+    <app-stock-trading-summary [quotes]="quotes" [positions]="positions" [cashBalance]="cashBalance" ></app-stock-trading-summary>
   }
 </div>
