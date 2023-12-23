@@ -103,6 +103,8 @@ export class StockTradingPositionsComponent {
         { value: this.UnrealizedRR, name: "Unrealized R/R" },
         { value: "pl", name: "P/L" },
         { value: "plPercent", name: "P/L %" },
+        { value: "plUnrealized", name: "Unrealized P/L" },
+        { value: "plUnrealizedPercent", name: "Unrealized P/L %" },
         { value: "cost", name: "Cost" },
         { value: "ticker", name: "Ticker" },
         { value: "daysSinceLastTransaction", name: "Days Since Last Transaction" },
@@ -141,6 +143,14 @@ export class StockTradingPositionsComponent {
                 break;
             case "plPercent":
                 this.metricFunc = (p:PositionInstance) => p.gainPct
+                this.metricType = OutcomeValueTypeEnum.Percentage
+                break;
+            case "plUnrealized":
+                this.metricFunc = (p:PositionInstance) => p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare) + p.profit
+                this.metricType = OutcomeValueTypeEnum.Currency
+                break;
+            case "plUnrealizedPercent":
+                this.metricFunc = (p:PositionInstance) => (this.getPrice(p) - p.averageCostPerShare) / p.averageCostPerShare
                 this.metricType = OutcomeValueTypeEnum.Percentage
                 break;
             case "cost":
