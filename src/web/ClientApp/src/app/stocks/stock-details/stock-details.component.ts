@@ -112,17 +112,6 @@ export class StockDetailsComponent implements OnInit {
     )
   }
 
-  cancelOrder(orderId: string) {
-    this.brokerage.brokerageCancelOrder(orderId).subscribe(
-      () => {
-        this.loadOrders()
-      },
-      error => {
-        this.errors.orders = GetErrors(error)
-      }
-    )
-  }
-
   loadStockDetails() {
     this.stocks.getStockDetails(this.ticker).subscribe(result => {
       this.loading.stock = false;

@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
+import {BrokerageService} from "../services/brokerage.service";
 
 let orderBy = (a:BrokerageOrder, b:BrokerageOrder) => a.ticker.localeCompare(b.ticker)
 
@@ -14,10 +15,11 @@ export class BrokerageOrdersComponent {
   private _orders: BrokerageOrder[] = [];
   private _filteredTickers: string[] = [];
   isEmpty: boolean = false;
-  error: string;
+  errors: string[];
 
-  @Output()
-  orderCancelled:EventEmitter<string> = new EventEmitter<string>()
+  constructor(private brokerage:BrokerageService) {
+  }
+
   @Output()
   purchaseRequested:EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
   @Output()
@@ -59,7 +61,16 @@ export class BrokerageOrdersComponent {
   }
 
   cancelOrder(orderId: string) {
-    this.orderCancelled.emit(orderId)
+    this.brokerage.brokerageCancelOrder(orderId)
+      .subscribe(
+        () => {
+          this.brokerage.brokerageAccount().subscribe(
+            a => this.orders = a.orders,
+            err => this.errors = GetErrors(err)
+          )
+        },
+        err => this.errors = GetErrors(err)
+      )
   }
 
   recordOrder(order: BrokerageOrder) {

@@ -57,9 +57,7 @@
     [orders]="orders"
     [positionId]="currentPosition?.positionId"
     (purchaseRequested)="purchaseRequested($event)"
-    (sellRequested)="sellRequested($event)"
-    (orderCancelled)="cancelOrder($event)">
-
+    (sellRequested)="sellRequested($event)">
   </app-brokerage-orders>
 
   <app-stock-trading-new-position
