@@ -100,12 +100,21 @@ namespace web
 
             StorageRegistrations(configuration, services, logger);
             
-            services.AddHostedService<ThirtyDaySellService>();
-            services.AddHostedService<PatternMonitoringServiceHost>();
-            services.AddHostedService<WeeklyUpsideReversalService>();
-            services.AddHostedService<EmailNotificationService>();
-            services.AddHostedService<StopLossServiceHost>();
-            services.AddHostedService<BrokerageServiceHost>();
+            var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
+            if (backendJobsSwitch != "off")
+            {
+                logger.LogInformation("Backend jobs turned on");
+                services.AddHostedService<ThirtyDaySellService>();
+                services.AddHostedService<PatternMonitoringServiceHost>();
+                services.AddHostedService<WeeklyUpsideReversalService>();
+                services.AddHostedService<EmailNotificationService>();
+                services.AddHostedService<StopLossServiceHost>();
+                services.AddHostedService<BrokerageServiceHost>();
+            }
+            else
+            {
+                logger.LogInformation("Backend jobs turned off");
+            }
         }
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)

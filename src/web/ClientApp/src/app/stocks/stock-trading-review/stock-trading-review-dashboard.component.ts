@@ -32,13 +32,9 @@ export class StockTradingReviewDashboardComponent implements OnInit {
     this.loading = true
     this.stockService.getPastTradingEntries().subscribe(
       response => {
-        this.past = []
+        this.past = response.past
         this.performance = response.performance
-        this.strategies = []
-        // I want to see if it's rendering that's messing up the load times
-        // this.past = response.past
-        // this.performance = response.performance
-        // this.strategies = response.strategyPerformance
+        this.strategies = response.strategyPerformance
         this.loading = false
         this.loaded = true
       }, _ => {
