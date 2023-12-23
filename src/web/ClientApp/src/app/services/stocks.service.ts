@@ -1045,7 +1045,7 @@ export interface PositionInstance {
   plTransactions: StockPLTransaction[],
   transactions: StockTransaction[],
   events: PositionEvent[],
-  costAtRiskedBasedOnStopPrice: number,
+  costAtRiskBasedOnStopPrice: number,
   grade: string,
   gradeNote: string
 }

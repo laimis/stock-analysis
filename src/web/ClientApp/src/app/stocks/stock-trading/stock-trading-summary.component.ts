@@ -30,7 +30,7 @@ export class StockTradingSummaryComponent {
   set positions(value:PositionInstance[]) {
     this._positions = value
     this.totalCost = this.sum(value, p => p.averageCostPerShare * p.numberOfShares)
-    this.totalRiskedAmount = this.sum(value, p => p.costAtRiskedBasedOnStopPrice)
+    this.totalRiskedAmount = this.sum(value, p => p.costAtRiskBasedOnStopPrice)
     this.totalProfit = this.sum(value, p => p.profit)
     this.positionGroups = this.breakdownByStrategy(value)
   }
@@ -106,7 +106,7 @@ export class StockTradingSummaryComponent {
           strategy : key,
           positions,
           cost : this.sum(groupPositions, p => p.averageCostPerShare * p.numberOfShares),
-          risk : this.sum(groupPositions, p => p.costAtRiskedBasedOnStopPrice),
+          risk : this.sum(groupPositions, p => p.costAtRiskBasedOnStopPrice),
           profit : this.sum(groupPositions, p => p.profit),
           length : groupPositions.length
         }

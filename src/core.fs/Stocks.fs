@@ -588,13 +588,11 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 
     member this.PercentToStopFromCost = this.PercentToStop this.AverageCostPerShare
         
-    member this.ContainsLabel key =
-        stockPosition.Labels.ContainsKey(key)
+    member this.ContainsLabel key = stockPosition.Labels.ContainsKey(key)
         
-    member this.GetLabelValue key =
-        stockPosition.Labels[key]
+    member this.GetLabelValue key = stockPosition.Labels[key]
         
-    member this.Labels = stockPosition.Labels |> Seq.map (fun kv -> kv)
+    member this.Labels = stockPosition.Labels |> Seq.map id
     
     member this.Events =
         // we want to expose buys, sells, and stop sets

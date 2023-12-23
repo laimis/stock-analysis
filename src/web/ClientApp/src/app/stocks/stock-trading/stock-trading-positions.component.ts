@@ -21,11 +21,10 @@ export class StockTradingPositionsComponent {
     _positions: PositionInstance[];
     metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.rr;
     metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number
-    candidateRiskAmount: number = 0
-    candidateStopPrice: number = 0
     strategies: { key: string; value: string }[] = []
 
     private NO_LONG_TERM_STRATEGY = "nolongterm"
+    private NONE = ""
     private SHORTS = "shorts"
     private RR = "rr"
     private UnrealizedRR = "unrealizedRR"
@@ -59,8 +58,11 @@ export class StockTradingPositionsComponent {
             }
         )
 
+        let noStrategy = input.filter(i => this.matchesStrategyCheck(i, this.NONE))
+
         this.strategies.push({key: this.NO_LONG_TERM_STRATEGY, value: "All minus long term - " + (input.length - longTermPositions.length)})
         this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})
+        this.strategies.push({key: this.NONE, value: "None - " + noStrategy.length})
         this.strategies = this.strategies.concat(
             stratsWithCounts
         )
@@ -83,33 +85,6 @@ export class StockTradingPositionsComponent {
 
     toggleVisibility(elem:HTMLElement) {
         toggleVisuallyHidden(elem)
-    }
-
-    setCandidateValues(p:PositionInstance) {
-        this.candidateRiskAmount = p.riskedAmount
-        this.candidateStopPrice = p.stopPrice
-    }
-
-    recalculateRiskAmount(p:PositionInstance) {
-      const newRiskAmount = (p.averageCostPerShare - this.candidateStopPrice) * p.numberOfShares;
-      this.candidateRiskAmount = newRiskAmount
-        p.riskedAmount = newRiskAmount
-    }
-
-    setStopPrice(p:PositionInstance) {
-        this.stockService.setStopPrice(p.ticker, this.candidateStopPrice).subscribe(
-            (_) => {
-                p.stopPrice = this.candidateStopPrice
-            }
-        )
-    }
-
-    setRiskAmount(p:PositionInstance) {
-        this.stockService.setRiskAmount(p.positionId, this.candidateRiskAmount).subscribe(
-            (_) => {
-                p.riskedAmount = this.candidateRiskAmount
-            }
-        )
     }
 
     getQuote(p:PositionInstance) {
@@ -226,11 +201,9 @@ export class StockTradingPositionsComponent {
     }
 
     matchesStrategyCheck(p:PositionInstance, strategy:string) {
-        return p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
-    }
-
-    matchesStrategy = (p:PositionInstance) => {
-        return this.matchesStrategyCheck(p, this.strategyToFilter)
+      return strategy === this.NONE ?
+        p.labels.findIndex(l => l.key === "strategy") === -1 :
+        p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
     }
 
     updatePositions() {
@@ -256,6 +229,10 @@ export class StockTradingPositionsComponent {
 
             if (this.strategyToFilter === this.SHORTS) {
               return p.isShort
+            }
+
+            if (this.strategyToFilter === this.NONE) {
+              return this.matchesStrategyCheck(p, this.NONE)
             }
 
             return positionStrategy.value === this.strategyToFilter
