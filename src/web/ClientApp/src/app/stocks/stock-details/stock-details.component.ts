@@ -59,7 +59,7 @@ export class StockDetailsComponent implements OnInit {
         this.errors.stock = ['No ticker provided']
       }
 
-      this.activeTab = param['tab'] || 'stocks'
+      this.activeTab = param['tab'] || 'trade'
     })
 	}
 
