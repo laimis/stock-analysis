@@ -283,10 +283,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             closedPositions
             |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
             |> TradingPerformance.Create
-            
-        // TODO: very slow to calculate, commenting it out as I need to glance it rarely, but perhaps it's something
-        // we can precalculate
-        // member _.TrendsAll = closedPositions |> generateTrends
+        
         member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
         member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends
         member _.TrendsLast100 = closedPositions |> getAtMost 100 |> generateTrends

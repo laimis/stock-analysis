@@ -34,8 +34,6 @@ export class StockTradingPerformanceComponent {
       this.trends = this.performance.trendsYTD
     } else if (this.tradePeriod == "2m") {
       this.trends = this.performance.trendsTwoMonths
-    } else if (this.tradePeriod == "all") {
-      this.trends = this.performance.trendsAll
     } else if (this.tradePeriod == "last20") {
       this.trends = this.performance.trendsLast20
     } else if (this.tradePeriod == "last50") {

@@ -937,7 +937,6 @@ export interface StockTradingPerformanceCollection {
   performanceYTD: StockTradingPerformance,
   performanceOneYear: StockTradingPerformance
 
-  trendsAll: DataPointContainer[]
   trendsTwoMonths: DataPointContainer[]
   trendsYTD: DataPointContainer[]
   trendsOneYear: DataPointContainer[]
