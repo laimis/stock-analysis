@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {
-  KeyValuePair, openpositioncommand,
+  KeyValuePair, openpositioncommand, PastStockTradingPerformance,
   PastStockTradingPositions, PositionInstance, StockOwnership,
   StockTradingPositions, stocktransactioncommand, StrategyProfitPoint,
   TradingStrategyPerformance,
@@ -20,6 +20,10 @@ export class StockPositionsService {
 
   getPastTradingEntries(): Observable<PastStockTradingPositions> {
     return this.http.get<PastStockTradingPositions>('/api/portfolio/stockpositions/pasttradingentries')
+  }
+
+  getPastTradingPerformance(): Observable<PastStockTradingPerformance> {
+    return this.http.get<PastStockTradingPerformance>('/api/portfolio/stockpositions/pasttradingperformance')
   }
 
   simulatePosition(positionId:string): Observable<TradingStrategyResults> {

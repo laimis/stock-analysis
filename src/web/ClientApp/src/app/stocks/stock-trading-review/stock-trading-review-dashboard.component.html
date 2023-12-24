@@ -1,41 +1,34 @@
-@if (!loaded) {
-  <app-loading></app-loading>
-}
-@if (loaded) {
-  <div>
-    <div class="tab-container mt-2">
-      <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
-        Positions
-      </a>
-      <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
-        Performance
-      </a>
-      <a class="tab" [ngClass]="{'is-active': isActive('strategies')}" [routerLink]="" (click)="activateTab('strategies')">
-        Strategies
-      </a>
-      <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
-        Review
-      </a>
-      <a class="tab float-end" [routerLink]="" (click)="refresh()">
-        Refresh
-        @if (loading) {
-          <div class="spinner-border text-info spinner-border-sm" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        }
-      </a>
-    </div>
-    @if (isActive('positions') && past) {
-      <app-stock-trading-closed-positions [positions]=past></app-stock-trading-closed-positions>
-    }
-    @if (isActive('performance')) {
-      <app-stock-trading-performance [performance]=performance></app-stock-trading-performance>
-    }
-    @if (isActive('strategies') && strategies) {
-      <app-stock-trading-strategies [results]=strategies></app-stock-trading-strategies>
-    }
-    @if (isActive('review')) {
-      <app-stock-trading-review [positions]="past"></app-stock-trading-review>
-    }
+<div>
+  <div class="tab-container mt-2">
+    <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
+      Positions
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
+      Performance
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('strategies')}" [routerLink]="" (click)="activateTab('strategies')">
+      Strategies
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
+      Review
+    </a>
+    <a class="tab float-end" [routerLink]="" (click)="refresh()">
+      Refresh
+    </a>
   </div>
-}
+  @if (loading.positions || loading.performance) {
+    <app-loading></app-loading>
+  }
+  @if (isActive('positions') && past) {
+    <app-stock-trading-closed-positions [positions]=past></app-stock-trading-closed-positions>
+  }
+  @if (isActive('performance') && performance) {
+    <app-stock-trading-performance [performance]=performance></app-stock-trading-performance>
+  }
+  @if (isActive('strategies') && strategies) {
+    <app-stock-trading-strategies [results]=strategies></app-stock-trading-strategies>
+  }
+  @if (isActive('review') && past) {
+    <app-stock-trading-review [positions]="past"></app-stock-trading-review>
+  }
+</div>

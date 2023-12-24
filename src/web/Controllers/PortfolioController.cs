@@ -151,6 +151,16 @@ public class PortfolioController : ControllerBase
             )
         );
     
+    [HttpGet("stockpositions/pasttradingperformance")]
+    public Task<ActionResult> PastTradingPerformance() =>
+        this.OkOrError(
+            _handler.Handle(
+                new QueryPastTradingPerformance(
+                    User.Identifier()
+                )
+            )
+        );
+    
     
     [HttpPost("stockpositions/import")]
     public async Task<ActionResult> Import(IFormFile file)

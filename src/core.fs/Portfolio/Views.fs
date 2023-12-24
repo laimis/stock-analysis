@@ -326,6 +326,10 @@ type TradingEntriesView =
 type PastTradingEntriesView =
     {
         past: StockPositionWithCalculations array
+    }
+    
+type PastTradingPerformanceView =
+    {
         performance: TradingPerformanceContainerView
         strategyPerformance: TradingStrategyPerformance array
     }

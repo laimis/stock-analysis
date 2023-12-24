@@ -201,6 +201,11 @@ type QueryPastTradingEntries =
         UserId: UserId
     }
     
+type QueryPastTradingPerformance =
+    {
+        UserId: UserId
+    }
+    
 type QueryTransactions =
     {
         UserId: UserId
@@ -786,11 +791,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
         match user with
         | None -> return "User not found" |> ResponseUtils.failedTyped<PastTradingEntriesView>
         | _ ->
-            let sw = System.Diagnostics.Stopwatch.StartNew()
             
             let! stocks = storage.GetStockPositions query.UserId
-            
-            Console.WriteLine($"GetStockPositions: {sw.ElapsedMilliseconds}ms")
             
             let past =
                 stocks
@@ -798,12 +800,31 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.sortByDescending _.Closed.Value
                 |> Seq.map StockPositionWithCalculations
                 |> Seq.toArray
-
-            Console.WriteLine($"StockPositionWithCalculations: {sw.ElapsedMilliseconds}ms")
+                
+            let (tradingEntries:PastTradingEntriesView) =
+                {
+                    past=past;
+                }
+                
+            return ServiceResponse<PastTradingEntriesView>(tradingEntries)
+    }
+    
+    member _.Handle (query:QueryPastTradingPerformance) = task {
+        let! user = accounts.GetUser(query.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failedTyped<PastTradingPerformanceView>
+        | _ ->
+            
+            let! stocks = storage.GetStockPositions query.UserId
+            
+            let past =
+                stocks
+                |> Seq.filter _.IsClosed
+                |> Seq.sortByDescending _.Closed.Value
+                |> Seq.map StockPositionWithCalculations
+                |> Seq.toArray
             
             let performance = TradingPerformanceContainerView(past)
-            
-            Console.WriteLine($"TradingPerformanceContainerView: {sw.ElapsedMilliseconds}ms")
             
             let strategyByPerformance =
                 past
@@ -816,18 +837,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.sortByDescending _.performance.Profit
                 |> Seq.toArray
                 
-            Console.WriteLine($"strategyByPerformance: {sw.ElapsedMilliseconds}ms")
-
-            let (tradingEntries:PastTradingEntriesView) =
+            let (tradingEntries:PastTradingPerformanceView) =
                 {
-                    past=past;
                     performance=performance;
                     strategyPerformance=strategyByPerformance;
                 }
                 
-            Console.WriteLine($"PastTradingEntriesView: {sw.ElapsedMilliseconds}ms")
-                
-            return ServiceResponse<PastTradingEntriesView>(tradingEntries)
+            return ServiceResponse<PastTradingPerformanceView>(tradingEntries)
     }
     
     member _.Handle(query:QueryTransactions) = task {

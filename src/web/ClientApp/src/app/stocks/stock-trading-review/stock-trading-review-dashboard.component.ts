@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PositionInstance, StocksService, StockTradingPerformanceCollection, TradingStrategyPerformance } from 'src/app/services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {GetErrors} from "../../services/utils";
 
 @Component({
   selector: 'app-stock-trading-review-dashboard',
@@ -10,11 +11,14 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 })
 export class StockTradingReviewDashboardComponent implements OnInit {
   activeTab: string = 'positions';
-  loaded = false;
-  loading = true;
   past: PositionInstance[];
   performance: StockTradingPerformanceCollection;
   strategies: TradingStrategyPerformance[]
+  errors: string[] = []
+  loading = {
+    positions: true,
+    performance: true
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -29,26 +33,35 @@ export class StockTradingReviewDashboardComponent implements OnInit {
   }
 
   loadEntries() {
-    this.loading = true
     this.stockService.getPastTradingEntries().subscribe(
       response => {
         this.past = response.past
+        this.loading.positions = false
+        this.loadPerformance()
+      }, err => {
+        this.loading.positions = false
+        this.errors = GetErrors(err)
+      }
+    )
+  }
+
+  loadPerformance() {
+    this.stockService.getPastTradingPerformance().subscribe(
+      response => {
         this.performance = response.performance
         this.strategies = response.strategyPerformance
-        this.loading = false
-        this.loaded = true
-      }, _ => {
-        this.loading = false
-        this.loaded = true
-      },
-      () => {
-        this.loading = false
-        this.loaded = true
+        this.loading.performance = false
+      }, err => {
+        this.loading.performance = false
+        this.errors = GetErrors(err)
       }
     )
   }
 
   refresh() {
+    this.loading.positions = true
+    this.loading.performance = true
+    this.errors = []
     this.loadEntries()
   }
 

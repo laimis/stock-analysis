@@ -978,6 +978,9 @@ export interface StockTradingPositions {
 
 export interface PastStockTradingPositions {
   past: PositionInstance[]
+}
+
+export interface PastStockTradingPerformance {
   performance: StockTradingPerformanceCollection
   strategyPerformance: TradingStrategyPerformance[]
 }
