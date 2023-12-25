@@ -807,6 +807,7 @@ export interface Pattern {
   name: string
   date: string
   description: string
+  sentimentType: string
 }
 
 export interface OutcomesReport {
