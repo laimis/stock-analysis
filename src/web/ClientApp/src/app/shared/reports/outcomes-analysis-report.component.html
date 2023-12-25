@@ -31,7 +31,11 @@
             <tbody>
               @for (tp of report.patterns; track tp) {
                 @for (p of tp.patterns; track p) {
-                  <tr>
+                  <tr [ngClass]="{
+                  'table-warning': p.sentimentType === 'Negative',
+                  'table-success': p.sentimentType === 'Positive',
+                  'text-white': p.sentimentType === 'Positive'
+                  }">
                     <td>
                       <app-trading-view-link [ticker]="tp.ticker"></app-trading-view-link>
                       <app-stock-link [ticker]="tp.ticker" [openInNewTab]=true></app-stock-link>
