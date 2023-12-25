@@ -5,6 +5,7 @@ using core.fs;
 using core.fs.Accounts;
 using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.Stocks;
+using core.fs.Alerts;
 using core.fs.Options;
 using core.fs.Reports;
 using core.fs.Services;
@@ -165,5 +166,13 @@ public class StockPositionIdConverter : JsonConverter<StockPositionId>
     public override void Write(Utf8JsonWriter writer, StockPositionId value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.Item.ToString());
+    }
+}
+
+public class SentimentTypeConverter : GenericConverterWithToString<SentimentType>
+{
+    public override SentimentType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return SentimentType.FromString(reader.GetString());
     }
 }

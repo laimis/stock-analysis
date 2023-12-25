@@ -224,9 +224,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 profits
                 equityCurve
                 gradeContainer
-                gainDistribution
-                gainPctDistribution
-                rrDistribution
+                // gainDistribution
+                // gainPctDistribution
+                // rrDistribution
                 wins
                 avgWinPct
                 avgLossPct

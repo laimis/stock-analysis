@@ -61,6 +61,7 @@ type Pattern =
         description: string
         value: decimal
         valueFormat: ValueFormat
+        sentimentType: SentimentType
     }
     
 type TickerPatterns =

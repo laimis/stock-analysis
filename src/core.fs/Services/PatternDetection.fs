@@ -6,36 +6,86 @@ open core.fs.Services.Analysis
 open core.fs.Services.Analysis.SingleBarPriceAnalysis
 open core.fs.Services.GapAnalysis
 
-let gapUpName = "Gap Up"
-
-let gapUp (bars: PriceBars) =
-    if bars.Length < 2 then
-        None
-    else
+let gapDownName = "Gap Down"
+let gapDown (bars: PriceBars) =
+    match bars.Length with
+    | 0 | 1 -> None
+    | _ ->
         let gaps = detectGaps bars 2
-        if gaps.Length = 0 || gaps[0].Type <> GapType.Up then
-            None
-        else
-            let gap = gaps[0]
-            let gapPercentFormatted =
-                System.Math.Round(
-                    gap.GapSizePct * 100m,
-                    2
-                )
-            Some({
+        match gaps with
+        | [|gap|] when gap.Type = GapType.Down ->
+            let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
+            {
+                date = bars.Last.Date
+                name = gapDownName
+                description = $"%s{gapDownName} {gapPercentFormatted}%%"
+                value = gap.GapSizePct
+                valueFormat = ValueFormat.Percentage
+                sentimentType = SentimentType.Negative 
+            } |> Some
+        | _ -> None
+
+let gapUpName = "Gap Up"
+let gapUp (bars: PriceBars) =
+    
+    match bars.Length with
+    | 0 | 1 -> None
+    | _ ->
+        let gaps = detectGaps bars 2
+        match gaps with
+        | [|gap|] when gap.Type = GapType.Up ->
+            let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
+            {
                 date = bars.Last.Date
                 name = gapUpName
                 description = $"%s{gapUpName} {gapPercentFormatted}%%"
                 value = gap.GapSizePct
                 valueFormat = ValueFormat.Percentage
-            })
-            
-let upsideReversalName = "Upside Reversal"
+                sentimentType = SentimentType.Positive 
+            } |> Some
+        | _ -> None
 
+let downsideReversalName = "Downside Reversal"
+let downsideReversal (bars: PriceBars) =
+    match bars.Length with
+    | 0 | 1 -> None
+    | _ ->
+        let current = bars.Last
+        let previous = bars.Bars[bars.Length - 2]
+        
+        // downside reversal pattern detection
+        if current.Close < System.Math.Min(previous.Open, previous.Close) && current.High > previous.High then
+            let additionalInfo = 
+            // see if we can do volume numbers
+                if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
+                    
+                    let stats =
+                        SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+                        |> bars.LatestOrAll
+                        |> _.Volumes()
+                        |> DistributionStatistics.calculate
+                    
+                    let multiplier = decimal(current.Volume) / stats.median
+                    ", volume x" + multiplier.ToString("N1")
+                else
+                    ""
+                
+            {
+                date = current.Date
+                name = downsideReversalName
+                description = $"{downsideReversalName}{additionalInfo}"
+                value = current.Close
+                valueFormat = ValueFormat.Currency
+                sentimentType = SentimentType.Negative 
+            } |> Some
+        else
+            None
+
+let upsideReversalName = "Upside Reversal"
 let upsideReversal (bars: PriceBars) =
-    if bars.Length < 2 then
-        None
-    else
+    match bars.Length with
+    | 0 | 1 -> None
+    | _ ->
         let current = bars.Last
         let previous = bars.Bars[bars.Length - 2]
         
@@ -48,7 +98,7 @@ let upsideReversal (bars: PriceBars) =
                     let stats =
                         SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
                         |> bars.LatestOrAll
-                        |> fun x->x.Volumes()
+                        |> _.Volumes()
                         |> DistributionStatistics.calculate
                     
                     let multiplier = decimal(current.Volume) / stats.median
@@ -56,13 +106,14 @@ let upsideReversal (bars: PriceBars) =
                 else
                     ""
                 
-            Some({
+            {
                 date = current.Date
                 name = upsideReversalName
                 description = $"{upsideReversalName}{additionalInfo}"
                 value = current.Close
                 valueFormat = ValueFormat.Currency
-            })
+                sentimentType = SentimentType.Positive 
+            } |> Some
         else
             None
 
@@ -102,6 +153,7 @@ let highest1YearVolume (bars: PriceBars) =
                     description = $"{highest1YearVolumeName}: " + bar.Volume.ToString("N0")
                     value = bar.Volume |> decimal
                     valueFormat = ValueFormat.Number
+                    sentimentType = SentimentType.Neutral 
                 })
             else
                 None
@@ -131,6 +183,7 @@ let highVolume (bars: PriceBars) =
                 description = $"{highVolumeName}: " + bar.Volume.ToString("N0") + " (x" + multiplier.ToString("N1") + ")"
                 value = bar.Volume |> decimal
                 valueFormat = ValueFormat.Number
+                sentimentType = SentimentType.Neutral
             })
         else
             None
@@ -139,9 +192,11 @@ let patternGenerators =
     
     [
         upsideReversalName, upsideReversal
+        downsideReversalName, downsideReversal
         highest1YearVolumeName, highest1YearVolume
         highVolumeName, highVolume
         gapUpName, gapUp
+        gapDownName, gapDown
     ]
     |> Map.ofList
 

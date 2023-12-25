@@ -7,7 +7,6 @@ namespace core.fs.Alerts
     open core.fs
     open core.fs.Accounts
     open core.fs.Services.Analysis
-    open core.fs.Services.GapAnalysis
 
     type private StockPositionMonitorKey = {
         Ticker: Ticker
@@ -27,11 +26,6 @@ namespace core.fs.Alerts
         user: UserState
     }
     
-    type AlertType =
-        | Negative = 0
-        | Neutral = 1
-        | Positive = 2
-        
     module Constants =
         let MonitorTagPattern = "monitor:patterns"
         let MonitorNamePattern = "Patterns"
@@ -49,25 +43,11 @@ namespace core.fs.Alerts
             description:string
             sourceList:string
             userId:UserId
-            alertType:AlertType
+            alertType:SentimentType
             valueFormat:ValueFormat
         }
         
         member this.Age() = (DateTimeOffset.UtcNow - this.``when``)
-        
-        static member GapUpAlert ticker sourceList (gap:Gap) ``when`` userId =
-            {
-                identifier = "Gap up"
-                triggeredValue = gap.GapSizePct
-                watchedValue = gap.GapSizePct
-                ``when`` = ``when``
-                ticker = ticker
-                description = "Gap up"
-                sourceList = sourceList
-                userId = userId
-                alertType = AlertType.Positive
-                valueFormat = ValueFormat.Percentage 
-            }
             
         static member StopPriceAlert ticker price stopPrice ``when`` userId =
             {
@@ -79,7 +59,7 @@ namespace core.fs.Alerts
                 description = "Stop price"
                 sourceList = "Stop price"
                 userId = userId
-                alertType = AlertType.Negative
+                alertType = SentimentType.Negative
                 valueFormat = ValueFormat.Currency
             }
             
@@ -93,7 +73,7 @@ namespace core.fs.Alerts
                 description = pattern.description
                 sourceList = sourceList
                 userId = userId
-                alertType = AlertType.Neutral
+                alertType = pattern.sentimentType
                 valueFormat = pattern.valueFormat
             }
         

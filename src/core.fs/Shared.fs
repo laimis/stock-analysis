@@ -95,6 +95,26 @@ type ValueFormat =
             | nameof Number -> Number
             | nameof Boolean -> Boolean
             | _ -> failwithf $"Unknown value format: %s{value}"
+
+type SentimentType =
+    | Negative
+    | Neutral
+    | Positive
+    
+    static member FromString(value:string) =
+        match value with
+        | nameof Negative -> Negative
+        | nameof Neutral -> Neutral
+        | nameof Positive -> Positive
+        | _ -> failwith $"Invalid gap type: {value}"
+        
+    override this.ToString() =
+        match this with
+        | Negative -> nameof Negative
+        | Neutral -> nameof Neutral
+        | Positive -> nameof Positive
+    
+
             
 type ChartAnnotationLineType =
     | Vertical
