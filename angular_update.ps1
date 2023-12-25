@@ -13,6 +13,11 @@ if ($updates.Count -eq 0) {
     exit
 }
 
+# use voice to tell that there are updates available
+$voice = New-Object -ComObject Sapi.spvoice
+$voice.rate = 0
+$voice.speak("There are updates available")
+
 # ask if to continue
 Write-Host "The following updates are available:"
 $updates | ForEach-Object { Write-Host $_ }
