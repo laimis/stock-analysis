@@ -4,9 +4,11 @@
   }
   @if (outcomes) {
     <section class="outcomes-section">
-      @if (title) {
-        <h5>{{title}}</h5>
-      }
+
+        <h5>
+          @if (title) {{{title}}: } {{outcomes.length}} results
+        </h5>
+
       <table  class="table table-hover striped table-sm mb-4">
         <thead>
           <tr>

@@ -318,38 +318,43 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         match DateTimeOffset.TryParse(query.EndDate) with
                         | false, _ -> DateTimeOffset.MinValue
                         | true, dt -> marketHours.GetMarketEndOfDayTimeInUtc(dt)
-                        
-                    let! priceResponse =
-                        brokerage.GetPriceHistory
-                            user.State
-                            t
-                            query.Frequency
-                            startDate
-                            endDate
-                        |> Async.AwaitTask
                     
-                    match priceResponse.Success with
-                    | None -> return None
-                    | Some prices ->
+                    try
                         
-                        let outcomes =
-                            match query.Duration with
-                            | OutcomesReportDuration.SingleBar ->  SingleBarPriceAnalysis.run prices
-                            | OutcomesReportDuration.AllBars -> MultipleBarPriceAnalysis.run prices
+                        let! priceResponse =
+                            brokerage.GetPriceHistory
+                                user.State
+                                t
+                                query.Frequency
+                                startDate
+                                endDate
+                            |> Async.AwaitTask
                         
-                        let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t}
-                        
-                        let gapsView =
-                            match query.IncludeGapAnalysis with
-                            | true ->
-                                let gaps = detectGaps prices SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
-                                Some {gaps=gaps; ticker=t.Value}
-                            | false -> None
+                        match priceResponse.Success with
+                        | None -> return None
+                        | Some prices ->
                             
-                        let patterns = PatternDetection.generate prices
-                        let tickerPatterns = {patterns = patterns; ticker = t}
-                        
-                        return Some (tickerOutcome, gapsView, tickerPatterns)
+                            let outcomes =
+                                match query.Duration with
+                                | OutcomesReportDuration.SingleBar ->  SingleBarPriceAnalysis.run prices
+                                | OutcomesReportDuration.AllBars -> MultipleBarPriceAnalysis.run prices
+                            
+                            let tickerOutcome:TickerOutcomes = {outcomes=outcomes; ticker=t}
+                            
+                            let gapsView =
+                                match query.IncludeGapAnalysis with
+                                | true ->
+                                    let gaps = detectGaps prices SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+                                    Some {gaps=gaps; ticker=t.Value}
+                                | false -> None
+                                
+                            let patterns = PatternDetection.generate prices
+                            let tickerPatterns = {patterns = patterns; ticker = t}
+                            
+                            return Some (tickerOutcome, gapsView, tickerPatterns)
+                    with
+                    | ex ->
+                        return None
                     }
                 )
                 |> Async.Sequential

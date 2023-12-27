@@ -104,7 +104,7 @@ module SingleBarPriceAnalysis =
             // see if there was a gap down or gap up
             let gaps = GapAnalysis.detectGaps bars SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
             
-            let gap = gaps |> Seq.tryFind (fun x -> x.Bar.Equals(currentBar))
+            let gap = gaps |> Seq.tryFind _.Bar.Equals(currentBar)
             
             let gapType = 
                 match gap with
@@ -242,7 +242,7 @@ module SingleBarPriceAnalysisEvaluation =
             )
             
             AnalysisOutcomeEvaluation(
-                "Positive gap ups",
+                "Gap ups",
                 OutcomeType.Positive,
                 SingleBarOutcomeKeys.GapPercentage,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.GapPercentage && o.Value > 0m) ]

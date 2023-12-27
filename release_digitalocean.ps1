@@ -44,7 +44,6 @@ if ([System.String]::IsNullOrEmpty($message))
     else
     {
         Exit-With-Error "Message is missing, exiting"
-        exit
     }
 }
 

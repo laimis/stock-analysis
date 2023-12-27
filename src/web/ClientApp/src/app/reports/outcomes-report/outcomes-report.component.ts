@@ -11,7 +11,6 @@ import {concat} from "rxjs";
   styleUrls: ['./outcomes-report.component.css']
 })
 export class OutcomesReportComponent implements OnInit {
-  gaps: StockGaps[] = []
   errors: string[] = null;
   startDate: string = null;
   endDate: string = null;
@@ -22,6 +21,7 @@ export class OutcomesReportComponent implements OnInit {
 
   activeTicker: string = null;
 
+  gaps: StockGaps[] = []
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
   singleBarReportWeekly: OutcomesReport;
@@ -89,18 +89,15 @@ export class OutcomesReportComponent implements OnInit {
       return
     }
 
+    this.gaps = []
+    this.allBarsReport = null
+    this.singleBarReportDaily = null
+    this.singleBarReportWeekly = null
+    this.earningsOutcomes = null
+
     this.reset()
 
-    const singleBarDailyReport = this.singleBarDailyReportObservable()
-    const singleBarWeeklyReport = this.singleBarWeeklyReportObservable()
-    const allBarsReport = this.allBarsReportObservable()
-
-    concat(singleBarDailyReport, singleBarWeeklyReport, allBarsReport).subscribe(
-      (_) => {},
-      (error) => {
-        this.errors = GetErrors(error)
-      }
-    )
+    this.fetchSingleBarDailyReport()
   }
 
   private reset() {
@@ -112,49 +109,45 @@ export class OutcomesReportComponent implements OnInit {
     this.earningsOutcomes = [];
   }
 
-  private allBarsReportObservable() {
+  private fetchAllBarsReport() {
     return this.stocksService.reportOutcomesAllBars(this.tickers, this.startDate, this.endDate)
-      .pipe(
-        tap(
+      .subscribe(
           report => {
             this.allBarsReport = report;
           },
           error => {
             this.errors = GetErrors(error)
           }
-        )
       )
   }
 
-  private singleBarWeeklyReportObservable() {
-    return this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
-      .pipe(
-        tap(
+  private fetchSingleBarWeeklyReport() {
+    this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
+      .subscribe(
           report => {
             this.singleBarReportWeekly = report;
+            this.fetchAllBarsReport()
           },
           error => {
             this.errors = GetErrors(error)
           }
-        )
       )
   }
 
-  private singleBarDailyReportObservable() {
-    return this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
-      .pipe(
-        tap(
+  private fetchSingleBarDailyReport() {
+    this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
+      .subscribe(
           report => {
             this.singleBarReportDaily = report;
             if (this.earnings.length > 0) {
               this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
             }
+            this.fetchSingleBarWeeklyReport()
           },
           error => {
             this.errors = GetErrors(error)
           }
         )
-      )
   }
 
   onTickerChange(activeTicker:string) {
