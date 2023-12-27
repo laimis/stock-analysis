@@ -83,13 +83,10 @@ export class BrokerageOrdersComponent {
       brokerageOrderId: order.orderId
     };
 
-    console.log("Processing ")
-    console.log(order)
-
-    if (order.type === 'BUY') {
+    if (order.isBuyOrder) {
       this.purchaseRequested.emit(obj)
     }
-    else if (order.type === 'SELL') {
+    else if (order.isSellOrder) {
       this.sellRequested.emit(obj)
     }
   }
