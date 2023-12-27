@@ -118,7 +118,7 @@ type Order() =
     member this.CanBeRecorded : bool = this.Status = "FILLED"
     member this.IncludeInResponses : bool = this.Status <> "CANCELED" && this.Status <> "REJECTED" && this.Status <> "EXPIRED"
     member this.IsSellOrder : bool = this.Type = "SELL" || this.Type = "SELL_SHORT"
-    member this.IsBuyOrder : bool = this.Type = "BUY"
+    member this.IsBuyOrder : bool = this.Type = "BUY" || this.Type = "BUY_TO_COVER"
     member this.IsOption : bool = this.AssetType = "OPTION"
     member this.IsShort : bool = this.Type = "SELL_SHORT"
     
