@@ -100,4 +100,20 @@ export class OutcomesComponent {
       return this.decimalPipe.transform(o.value)
     }
   }
+
+  async copyOutcomesToClipboard() {
+    let data =
+      this.outcomes
+        .map(o => {
+          return `${o.ticker},${o.outcomes.filter(o => o.key ==='Gain').map(o => this.getValue(o).replace(",", "")).join(',')}`
+        })
+
+    // let header = `Ticker,${this.getKeys(this.outcomes).join(',')}`
+    let header = `Ticker,Gain`
+    data.unshift(header)
+
+    let text = data.join('\n')
+
+    await navigator.clipboard.writeText(text)
+  }
 }

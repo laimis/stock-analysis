@@ -5,9 +5,14 @@
   @if (outcomes) {
     <section class="outcomes-section">
 
-        <h5>
-          @if (title) {{{title}}: } {{outcomes.length}} results
-        </h5>
+      <h5>
+        @if (title) {{{title}}: } {{outcomes.length}} results
+
+        <!-- float right button to copy to clipboard -->
+        <button class="btn btn-sm btn-outline-secondary float-end" (click)="copyOutcomesToClipboard()">
+          <i class="bi bi-clipboard"></i>
+        </button>
+      </h5>
 
       <table  class="table table-hover striped table-sm mb-4">
         <thead>
