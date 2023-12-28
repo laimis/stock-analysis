@@ -457,10 +457,13 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         // profit is generating whenever we sell shares of a long position or buy shares of a short position
         liquidationSlots
         |> List.indexed
-        |> List.fold (fun (acc:decimal) (index, sellPrice) ->
+        |> List.fold (fun (acc:decimal) (index, liquidationPrice) ->
             
-            let buyPrice = acquisitionSlots[index]
-            let profit = sellPrice - buyPrice
+            let acquisitionPrice = acquisitionSlots[index]
+            let profit =
+                match this.IsShort with
+                | false -> liquidationPrice - acquisitionPrice
+                | true -> acquisitionPrice - liquidationPrice
             acc + profit
         ) 0m
         
@@ -498,7 +501,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.PLTransactions =
         // we fold over sells, and for each sell create a PLTransaction
         liquidationSource
-        |> List.fold (fun (acc:PLTransaction list) (sell:StockPositionShareTransaction) ->
+        |> List.fold (fun (acc:PLTransaction list) (liquidation:StockPositionShareTransaction) ->
             
             let offset =
                 match acc with
@@ -508,21 +511,32 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             let slotsOfInterest =
                 acquisitionSlots
                 |> List.skip (int offset)
-                |> List.take (sell.NumberOfShares |> abs |> int)
+                |> List.take (liquidation.NumberOfShares |> abs |> int)
                 
-            let buyPrice = slotsOfInterest |> List.average
-            let profit = sell.NumberOfShares * (sell.Price - buyPrice)
-            let gainPct = (sell.Price - buyPrice) / buyPrice
+            let averageAcquisitionPrice = slotsOfInterest |> List.average
+            let profitPerShare, gainPct =
+                match this.IsShort with
+                | false ->
+                    (
+                        liquidation.Price - averageAcquisitionPrice,
+                        (liquidation.Price - averageAcquisitionPrice) / averageAcquisitionPrice
+                    )
+                | true ->
+                    (
+                        averageAcquisitionPrice - liquidation.Price,
+                        (averageAcquisitionPrice - liquidation.Price) / liquidation.Price
+                    )
+            let profit = liquidation.NumberOfShares * profitPerShare
             
             // we then create a PLTransaction
             let pl = {
                 Ticker = stockPosition.Ticker
-                Date = sell.Date
+                Date = liquidation.Date
                 Profit = profit
-                BuyPrice = buyPrice
+                BuyPrice = averageAcquisitionPrice
                 GainPct = gainPct
-                SellPrice = sell.Price
-                NumberOfShares = sell.NumberOfShares 
+                SellPrice = liquidation.Price
+                NumberOfShares = liquidation.NumberOfShares 
             }
             
             // and add it to the accumulator

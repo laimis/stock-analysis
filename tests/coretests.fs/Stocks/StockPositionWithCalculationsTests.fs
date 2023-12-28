@@ -99,6 +99,10 @@ let ``Short Average buy cost per share represents sell side``() =
 [<Fact>]
 let ``Short Days held is accurate`` () =
     Math.Abs(57 - shortPosition.DaysHeld) |> should be (lessThanOrEqualTo 1)
+
+[<Fact>]
+let ``Short position profit is accurate`` () =
+    shortPosition.Profit |> should equal 120m
     
 [<Fact>]
 let ``Short Cost is accurate`` () =
@@ -252,3 +256,21 @@ let ``Percent to stop from cost is correct`` () =
     let calculated = position |> StockPositionWithCalculations
     
     calculated.PercentToStopFromCost |> should equal -0.2m
+    
+[<Fact>]
+let ``Losing short position, profit calculation is accurate`` () =
+    
+    let position =
+        StockPosition.openShort ticker (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.sell 1m 5m (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.sell 1m 5m (DateTimeOffset.UtcNow.AddDays(-2))
+        |> StockPosition.buy 1m 6m (DateTimeOffset.UtcNow.AddDays(-2))
+        
+    let calculated = position |> StockPositionWithCalculations
+    
+    calculated.Profit |> should equal -1m
+    calculated.PLTransactions |> should haveLength 1
+    
+    let transaction = calculated.PLTransactions |> List.head
+    
+    transaction.Profit |> should equal -1m

@@ -514,12 +514,6 @@ export class StockViolation {
   localPosition: PositionInstance
 }
 
-export interface StockSummary {
-  positions: PositionInstance[]
-  violations: StockViolation[]
-  orders: BrokerageOrder[]
-}
-
 export interface TransactionsView {
   tickers: string[]
   transactions: Transaction[]
