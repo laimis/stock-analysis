@@ -81,6 +81,7 @@ module ProfitPoints =
 
 type TradingPerformance =
     {
+        Name:string
         NumberOfTrades:int
         Wins:int
         WinAmount:decimal
@@ -192,11 +193,12 @@ type TradingPerformance =
                 | 0 -> 0m
                 | _ -> this.Profit / this.TotalCost
                 
-            static member Create(closedPositions:seq<StockPositionWithCalculations>) =
+            static member Create name (closedPositions:seq<StockPositionWithCalculations>) =
                 
                 closedPositions
                 |> Seq.fold (fun perf position ->
-                    {   
+                    {
+                        Name = name
                         NumberOfTrades = perf.NumberOfTrades + 1
                         TotalDaysHeld = perf.TotalDaysHeld + decimal(position.DaysHeld)
                         Profit = perf.Profit + position.Profit
@@ -306,7 +308,8 @@ type TradingPerformance =
                     WinReturnPctTotal = 0m
                     LossReturnPctTotal = 0m
                     WinRRTotal = 0m
-                    LossRRTotal = 0m 
+                    LossRRTotal = 0m
+                    Name = name
                 }
 
 type TradingStrategyPerformance =

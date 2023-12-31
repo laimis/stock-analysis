@@ -90,7 +90,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             )
             gains
             
-        let generateTrends (trades:StockPositionWithCalculations array) =
+        let generateTrends name (trades:StockPositionWithCalculations array) =
             
             let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
             let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.Vertical) |> Option.Some
@@ -132,7 +132,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 let start = firstDate.AddDays(i)
                 let ``end`` = firstDate.AddDays(float i+20.0)
                 
-                let perfView = trades |> Seq.filter (fun t -> t.Closed.Value.Date >= start && t.Closed.Value.Date < ``end``) |> TradingPerformance.Create
+                let perfView = trades |> Seq.filter (fun t -> t.Closed.Value.Date >= start && t.Closed.Value.Date < ``end``) |> TradingPerformance.Create name
                 
                 profits.Add(start, perfView.Profit)
                 wins.Add(start, perfView.WinPct |> rounded)
@@ -267,24 +267,24 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 
             span.ToArray()
         
-        member _.PerformanceAll = closedPositions |> TradingPerformance.Create
-        member _.PerformanceLast20 = closedPositions |> getAtMost 20 |> TradingPerformance.Create
-        member _.PerformanceLast50 = closedPositions |> getAtMost 50 |> TradingPerformance.Create
-        member _.PerformanceLast100 = closedPositions |> getAtMost 100 |> TradingPerformance.Create
-        member _.PerformanceTwoMonths =
-            closedPositions
-            |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
-            |> TradingPerformance.Create
-            
-        member _.PerformanceYTD =
-            closedPositions
-            |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero))
-            |> TradingPerformance.Create
-            
-        member _.PerformanceOneYear =
-            closedPositions
-            |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
-            |> TradingPerformance.Create
+        member _.Performances =
+            [
+                closedPositions |> TradingPerformance.Create "All"
+                closedPositions |> getAtMost 20 |> TradingPerformance.Create "Last 20"
+                closedPositions |> getAtMost 50 |> TradingPerformance.Create "Last 50"
+                closedPositions |> getAtMost 100 |> TradingPerformance.Create "Last 100"
+                closedPositions
+                    |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
+                    |> TradingPerformance.Create "Last 2 Months"
+                    
+                closedPositions
+                    |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                    |> TradingPerformance.Create "YTD"
+                    
+                closedPositions
+                    |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
+                    |> TradingPerformance.Create "1 Year"
+            ]
         
         // member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
         // member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends

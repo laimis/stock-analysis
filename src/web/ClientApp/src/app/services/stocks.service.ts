@@ -876,6 +876,7 @@ export interface StockGaps {
 }
 
 export interface StockTradingPerformance {
+  name: string,
   wins: number,
   losses: number,
   numberOfTrades: number,
@@ -924,13 +925,7 @@ export interface DataPointContainer {
 }
 
 export interface StockTradingPerformanceCollection {
-  performanceAll: StockTradingPerformance,
-  performanceLast20: StockTradingPerformance,
-  performanceLast50: StockTradingPerformance,
-  performanceLast100: StockTradingPerformance,
-  performanceTwoMonths: StockTradingPerformance,
-  performanceYTD: StockTradingPerformance,
-  performanceOneYear: StockTradingPerformance
+  performances: StockTradingPerformance[]
 
   trendsTwoMonths: DataPointContainer[]
   trendsYTD: DataPointContainer[]

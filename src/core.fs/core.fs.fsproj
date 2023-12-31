@@ -24,7 +24,7 @@
         <Compile Include="Adapters\SEC.fs" />
         <Compile Include="Adapters\SMS.fs" />
         <Compile Include="Adapters\Authentication.fs" />
-        <Compile Include="Services\TradeSimulationTypes.fs" />
+        <Compile Include="Services\TradeTypes.fs" />
         <Compile Include="Services\TradeSimulations.fs" />
         <Compile Include="Services\Analysis.fs" />
         <Compile Include="Services\GapAnalysis.fs" />

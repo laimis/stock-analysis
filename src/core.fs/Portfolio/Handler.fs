@@ -681,12 +681,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
             let positions = results |> Seq.map (_.Position) |> Seq.toArray
             let performance =
                 try
-                    TradingPerformance.Create(positions)
+                    TradingPerformance.Create name positions
                 with
                     // TODO: something is throwing Value was either too large or too small for a Decimal
                     // for certain simulations.
                     // ignoring it here because I need the results, but need to look at it at some point
-                    | :?OverflowException -> TradingPerformance.Create(Array.Empty<StockPositionWithCalculations>())
+                    | :?OverflowException -> TradingPerformance.Create name (Array.Empty<StockPositionWithCalculations>())
             
             {performance = performance; strategyName = name; positions = positions}
         
@@ -831,7 +831,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 |> Seq.filter _.ContainsLabel(key="strategy")
                 |> Seq.groupBy _.GetLabelValue(key="strategy")
                 |> Seq.map (fun (name, positions) ->
-                    let performance = TradingPerformance.Create(positions)
+                    let performance = TradingPerformance.Create name positions
                     {strategyName = name; performance = performance; positions = (positions |> Seq.toArray)}
                 )
                 |> Seq.sortByDescending _.performance.Profit

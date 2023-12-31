@@ -43,29 +43,12 @@ export class StockTradingPerformanceComponent {
     }
   }
 
-  performanceTradePeriod = "last20"
+  performanceTradePeriod = "Last 20"
   performanceSelection:StockTradingPerformance
-  performanceTitle = "Last 20 Trades"
+  performanceTitle = "Last 20"
   selectPerformanceToRenderBasedOnTradePeriodFilter() {
-    if (this.performanceTradePeriod == "last20") {
-      this.performanceSelection = this.performance.performanceLast20
-      this.performanceTitle = "Last 20 Trades"
-    } else if (this.performanceTradePeriod == "last50") {
-      this.performanceSelection = this.performance.performanceLast50
-      this.performanceTitle = "Last 50 Trades"
-    } else if (this.performanceTradePeriod == "last100") {
-      this.performanceSelection = this.performance.performanceLast100
-      this.performanceTitle = "Last 100 Trades"
-    } else if (this.performanceTradePeriod == "all") {
-      this.performanceSelection = this.performance.performanceAll
-      this.performanceTitle = "All Trades"
-    } else if (this.performanceTradePeriod == "ytd") {
-      this.performanceSelection = this.performance.performanceYTD
-      this.performanceTitle = "Year To Date"
-    } else if (this.performanceTradePeriod == "1y") {
-      this.performanceSelection = this.performance.performanceOneYear
-      this.performanceTitle = "One Year"
-    }
+      this.performanceSelection = this.performance.performances.find(p => p.name == this.performanceTradePeriod)
+      this.performanceTitle = this.performanceSelection.name
   }
 
   performanceTradePeriodChanged(value:string) {
