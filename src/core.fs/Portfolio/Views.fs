@@ -252,18 +252,22 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             | tradeLength when tradeLength >= numberOfTrades -> trades[trades.Length - numberOfTrades - 1..trades.Length-1]
             | _ -> Array.Empty<StockPositionWithCalculations>()
             
-        let timeBasedSlice cutOff (trades:StockPositionWithCalculations array) =
+        let timeBasedSlice startDate endDate (trades:StockPositionWithCalculations array) =
             
-            let firstTradeIndex =
+            let matchingTrades =
                 trades
                 |> Array.indexed
-                |> Array.filter (fun (_,trade) -> trade.Closed.Value >= cutOff)
-                |> Array.tryHead
+                |> Array.filter (fun (_,trade) -> trade.Closed.Value >= startDate && trade.Closed.Value <= endDate)
+                
+            let firstIndex, lastIndex =
+                match matchingTrades.Length with
+                | 0 -> (None, None)
+                | _ -> (matchingTrades[0] |> fst |> Some, matchingTrades[matchingTrades.Length-1] |> fst |> Some)
                 
             let span =
-                match firstTradeIndex with
-                | Some (index,_) -> Span<StockPositionWithCalculations>(trades, index, trades.Length - index)
-                | None -> Span<StockPositionWithCalculations>(trades, 0, 0)
+                match firstIndex, lastIndex with
+                | Some firstIndex, Some lastIndex -> Span<StockPositionWithCalculations>(trades, firstIndex, lastIndex-firstIndex+1)
+                | _ -> Span<StockPositionWithCalculations>(trades, 0, 0)
                 
             span.ToArray()
         
@@ -274,16 +278,27 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 closedPositions |> getAtMost 50 |> TradingPerformance.Create "Last 50"
                 closedPositions |> getAtMost 100 |> TradingPerformance.Create "Last 100"
                 closedPositions
-                    |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
+                    |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2)) (DateTimeOffset.UtcNow)
                     |> TradingPerformance.Create "Last 2 Months"
                     
                 closedPositions
-                    |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                    |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)) (DateTimeOffset.UtcNow)
                     |> TradingPerformance.Create "YTD"
                     
                 closedPositions
-                    |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
+                    |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1)) (DateTimeOffset.UtcNow)
                     |> TradingPerformance.Create "1 Year"
+                    
+                yield! closedPositions
+                |> Array.map (fun p -> p.Closed.Value.Year)
+                |> Array.distinct
+                |> Array.map (fun year ->
+                    let start = DateTimeOffset(year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                    let ``end`` = DateTimeOffset(year, 12, 31, 0, 0, 0, TimeSpan.Zero)
+                    let trades = closedPositions |> timeBasedSlice start ``end``
+                    let name = sprintf "%d" year
+                    TradingPerformance.Create name trades
+                )
             ]
         
         // member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
