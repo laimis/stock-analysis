@@ -35,7 +35,7 @@
         <div>{{labelFrequency.frequency}}</div>
       </div>
     }
-    <div class="col"></div>
+    <div class="col"><div class="stat-label">Average R/R</div><div>{{performance.averageRR | number:'1.0-2' }}</div></div>
     <div class="col"><div class="stat-label">Invested</div><div>{{performance.totalCost | currency }}</div></div>
   </div>
 </div>

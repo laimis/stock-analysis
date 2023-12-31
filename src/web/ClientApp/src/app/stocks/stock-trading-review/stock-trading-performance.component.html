@@ -1,46 +1,33 @@
 <div>
-  <section>
-    <h5>Recent Performance</h5>
-    <div>
-      <form>
-        <div class="row">
-          <div class="form-group col">
-            <label class="form-label" for="performanceTradePeriod">Trade Period</label>
-            <select #performanceTradePeriodDropdown class="form-select" id="performanceTradePeriod" (change)="performanceTradePeriodChanged(performanceTradePeriodDropdown.value)">
-              @for (p of performance.performances; track p) {
-                <option [value]="p.name" [selected]="performanceTitle === p.name" >{{p.name}}</option>
-              }
-            </select>
-          </div>
+  <div>
+    <form>
+      <div class="row">
+        <div class="form-group col">
+          <label class="form-label" for="performanceTradePeriod">Trade Period</label>
+          <select #performanceTradePeriodDropdown class="form-select" id="performanceTradePeriod" (change)="performanceTradePeriodChanged(performanceTradePeriodDropdown.value)">
+            @for (p of performance.performances; track p) {
+              <option [value]="p.name" [selected]="performanceTitle === p.name" >{{p.name}}</option>
+            }
+          </select>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
+  </div>
+  <section>
+    <h5>Summary</h5>
     @if (performanceSelection) {
       <app-trading-performance-summary [performance]="performanceSelection" [title]="performanceTitle"></app-trading-performance-summary>
     }
   </section>
   <section>
-    <h5>Performance Trend Charts</h5>
-    <div>
-      <form>
-        <div class="row">
-          <div class="form-group col">
-            <label class="form-label" for="tradePeriod">Trade Period</label>
-            <select #tradePeriodDropdown class="form-select" id="tradePeriod" (change)="tradePeriodChanged(tradePeriodDropdown.value)">
-              <option value="last20" [selected]="tradePeriod === 'last20'">Last 20</option>
-              <option value="last50" [selected]="tradePeriod === 'last50'">Last 50</option>
-              <option value="last100" [selected]="tradePeriod === 'last100'">Last 100</option>
-              <option value="2m" [selected]="tradePeriod === '2m'">Last 2 Months</option>
-              <option value="ytd" [selected]="tradePeriod === 'ytd'">YTD</option>
-              <option value="1y" [selected]="tradePeriod === '1y'">1 year</option>
-            </select>
-          </div>
-        </div>
-      </form>
-    </div>
+    <h5>Charts</h5>
     @for (t of trends; track t) {
       <div class="p-5 m-2 border">
         <app-line-chart [dataContainer]="t"></app-line-chart>
+      </div>
+    } @empty {
+      <div class="p-5 m-2 border">
+        <p>No data available</p>
       </div>
     }
   </section>

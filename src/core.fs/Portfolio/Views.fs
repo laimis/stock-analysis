@@ -303,9 +303,10 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             ]
             
         member _.Trends =
-            Array.Empty<ChartDataPointContainer<decimal>>()
-        
-        // member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
+            [
+                closedPositions |> getAtMost 20 |> generateTrends "Last 20"
+            ]
+        // member _.TrendsLast20 = 
         // member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends
         // member _.TrendsLast100 = closedPositions |> getAtMost 100 |> generateTrends
         //

@@ -182,6 +182,11 @@ type TradingPerformance =
                 | 0 -> 0m
                 | _ -> this.LossRRTotal / decimal this.Losses
                 
+            member this.AverageRR =
+                match this.NumberOfTrades with
+                | 0 -> 0m
+                | _ -> this.rrSum / decimal this.NumberOfTrades
+                
             member this.rrRatio =
                 match (this.WinAvgRR, this.LossAvgRR) with
                 | 0m, _ -> this.LossAvgRR

@@ -899,6 +899,7 @@ export interface StockTradingPerformance {
   avgReturnPct: number,
   rrSum: number,
   rrRatio: number,
+  averageRR: number,
   earliestDate: string,
   latestDate: string,
   totalCost: number,
@@ -926,13 +927,7 @@ export interface DataPointContainer {
 
 export interface StockTradingPerformanceCollection {
   performances: StockTradingPerformance[]
-
-  trendsTwoMonths: DataPointContainer[]
-  trendsYTD: DataPointContainer[]
-  trendsOneYear: DataPointContainer[]
-  trendsLast20: DataPointContainer[]
-  trendsLast50: DataPointContainer[]
-  trendsLast100: DataPointContainer[]
+  trends: DataPointContainer[][]
 }
 
 export interface BrokerageOrder {
