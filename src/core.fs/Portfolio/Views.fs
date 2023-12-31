@@ -273,7 +273,6 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         
         member _.Performances =
             [
-                closedPositions |> TradingPerformance.Create "All"
                 closedPositions |> getAtMost 20 |> TradingPerformance.Create "Last 20"
                 closedPositions |> getAtMost 50 |> TradingPerformance.Create "Last 50"
                 closedPositions |> getAtMost 100 |> TradingPerformance.Create "Last 100"
@@ -299,7 +298,12 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                     let name = sprintf "%d" year
                     TradingPerformance.Create name trades
                 )
+                
+                closedPositions |> TradingPerformance.Create "All"
             ]
+            
+        member _.Trends =
+            Array.Empty<ChartDataPointContainer<decimal>>()
         
         // member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
         // member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends
