@@ -8,7 +8,7 @@
             <label class="form-label" for="performanceTradePeriod">Trade Period</label>
             <select #performanceTradePeriodDropdown class="form-select" id="performanceTradePeriod" (change)="performanceTradePeriodChanged(performanceTradePeriodDropdown.value)">
               @for (p of performance.performances; track p) {
-                <option [value]="p.name" [selected]="performanceTitle === p.nameg" >{{p.name}}</option>
+                <option [value]="p.name" [selected]="performanceTitle === p.name" >{{p.name}}</option>
               }
             </select>
           </div>
