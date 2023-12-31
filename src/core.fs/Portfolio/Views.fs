@@ -43,6 +43,8 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         // date from oldest to most recent
         let closedPositions = inputPositions |> Array.sortBy (_.Closed.Value)
         
+        let rounded (value:decimal) = Math.Round(value, 4)
+        
         let generateOutcomeHistogram (label:string) transactions valueFunc (buckets:int) symmetric annotation =
             
             let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.Column, annotation)
@@ -133,19 +135,19 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 let perfView = trades |> Seq.filter (fun t -> t.Closed.Value.Date >= start && t.Closed.Value.Date < ``end``) |> TradingPerformance.Create
                 
                 profits.Add(start, perfView.Profit)
-                wins.Add(start, perfView.WinPct)
-                avgWinPct.Add(start, perfView.WinAvgReturnPct)
-                avgLossPct.Add(start, perfView.LossAvgReturnPct)
-                ev.Add(start, perfView.EV)
-                avgWinAmount.Add(start, perfView.AvgWinAmount)
-                avgLossAmount.Add(start, perfView.AvgLossAmount)
-                gainPctRatio.Add(start, perfView.ReturnPctRatio)
-                profitRatio.Add(start, perfView.ProfitRatio)
-                rrRatio.Add(start, perfView.rrRatio)
-                maxWin.Add(start, perfView.MaxWinAmount)
-                maxLoss.Add(start, perfView.MaxLossAmount)
-                rrSum.Add(start, perfView.rrSum)
-                invested.Add(start, perfView.TotalCost)
+                wins.Add(start, perfView.WinPct |> rounded)
+                avgWinPct.Add(start, perfView.WinAvgReturnPct |> rounded)
+                avgLossPct.Add(start, perfView.LossAvgReturnPct |> rounded)
+                ev.Add(start, perfView.EV |> rounded)
+                avgWinAmount.Add(start, perfView.AvgWinAmount |> rounded)
+                avgLossAmount.Add(start, perfView.AvgLossAmount |> rounded)
+                gainPctRatio.Add(start, perfView.ReturnPctRatio |> rounded)
+                profitRatio.Add(start, perfView.ProfitRatio |> rounded)
+                rrRatio.Add(start, perfView.rrRatio |> rounded)
+                maxWin.Add(start, perfView.MaxWinAmount |> rounded)
+                maxLoss.Add(start, perfView.MaxLossAmount |> rounded)
+                rrSum.Add(start, perfView.rrSum |> rounded)
+                invested.Add(start, perfView.TotalCost |> rounded)
                 tradeCount.Add(start, perfView.NumberOfTrades)
                 
                 // number of positions opened on start day
@@ -157,7 +159,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 positionsClosedByDateContainer.Add(start, decimal numberOfPositionsClosed)
                 
                 // calculate equity curve
-                equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (fun t -> t.Profit))
+                equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (_.Profit))
                 
                 equityCurve.Add(start, equity)
             )
@@ -189,7 +191,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                     generateOutcomeHistogram
                         label
                         trades
-                        (fun p -> p.Profit)
+                        (_.Profit)
                         20
                         true
                         zeroLineAnnotationVertical
@@ -224,9 +226,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 profits
                 equityCurve
                 gradeContainer
-                // gainDistribution
-                // gainPctDistribution
-                // rrDistribution
+                gainDistribution
+                gainPctDistribution
+                rrDistribution
                 wins
                 avgWinPct
                 avgLossPct
@@ -284,24 +286,24 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
             |> TradingPerformance.Create
         
-        member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
-        member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends
-        member _.TrendsLast100 = closedPositions |> getAtMost 100 |> generateTrends
-        
-        member this.TrendsTwoMonths =
-            closedPositions
-            |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
-            |> generateTrends
-        
-        member _.TrendsYTD =
-            closedPositions
-            |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero))
-            |> generateTrends
-        
-        member _.TrendsOneYear = 
-            closedPositions
-            |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
-            |> generateTrends
+        // member _.TrendsLast20 = closedPositions |> getAtMost 20 |> generateTrends
+        // member _.TrendsLast50 = closedPositions |> getAtMost 50 |> generateTrends
+        // member _.TrendsLast100 = closedPositions |> getAtMost 100 |> generateTrends
+        //
+        // member this.TrendsTwoMonths =
+        //     closedPositions
+        //     |> timeBasedSlice (DateTimeOffset.UtcNow.AddMonths(-2))
+        //     |> generateTrends
+        //
+        // member _.TrendsYTD =
+        //     closedPositions
+        //     |> timeBasedSlice (DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero))
+        //     |> generateTrends
+        //
+        // member _.TrendsOneYear = 
+        //     closedPositions
+        //     |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1))
+        //     |> generateTrends
             
 type PortfolioView =
     {

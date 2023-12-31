@@ -211,7 +211,7 @@ type TradingPerformance =
                                     match perf.GradeDistribution |> Array.tryFind (fun g -> g.label = grade.Value) with
                                     | Some _ -> perf.GradeDistribution |> Array.map (fun g -> if g.label = grade.Value then { g with frequency = g.frequency + 1 } else g)
                                     | None -> perf.GradeDistribution |> Array.append [| { label = grade.Value; frequency = 1 } |]
-                                gradeDistribution
+                                gradeDistribution |> Array.sortBy _.label
                             | None -> perf.GradeDistribution
                             
                         Wins = 

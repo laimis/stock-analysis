@@ -9,12 +9,11 @@
         <div class="row">
           <div class="col-md-4">
             <label class="form-label" for="startDate">Start Date</label>
-            <input #startDateControl type="date" class="form-control form-control-sm" [value]="startDate"
-              id="startDate"/>
+            <input #startDateControl type="date" class="form-control form-control-sm" [(ngModel)]="startDate" id="startDate" name="startDate"/>
             </div>
             <div class="col-md-4">
               <label class="form-label" for="endDate">End Date</label>
-              <input #endDateControl type="date" class="form-control form-control-sm" [value]="endDate" id="endDate"/>
+              <input #endDateControl type="date" class="form-control form-control-sm" [(ngModel)]="endDate" id="endDate" name="endDate"/>
             </div>
             <div class="col-md-4 d-flex align-items-end">
               <button class="btn btn-primary btn-sm" (click)="runReports(startDateControl.value, endDateControl.value)">
@@ -92,4 +91,3 @@
       <app-gaps [gaps]="gap"></app-gaps>
     }
   </div>
-  
