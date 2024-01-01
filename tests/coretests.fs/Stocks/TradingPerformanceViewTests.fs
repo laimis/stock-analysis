@@ -121,11 +121,12 @@ let container =
 [<Fact>]
 let NumberOfTrades_Correct() = container.Performances[0].NumberOfTrades |> should be (lessThan container.Performances[1].NumberOfTrades)
 
-[<Fact(Skip = "Need to fix trends")>]
-let YTDContainer_Profit_DaysAreSequential() = 
+[<Fact>]
+let ``Trends profits dates are sequential``() =
+    let dataIndex = container.Performances |> List.findIndex (fun p -> p.Name = "1 Year")
     let dates =
-        container.Trends
-        |> Array.find (fun c -> c.Label = "Profits")
+        container.Trends[dataIndex]
+        |> List.find (fun c -> c.Label = "Profits")
         |> fun c -> c.Data |> Seq.map (_.Label)
     
     dates
@@ -133,9 +134,14 @@ let YTDContainer_Profit_DaysAreSequential() =
     |> Seq.forall (fun (a, b) -> DateTimeOffset.Parse(a) < DateTimeOffset.Parse(b))
     |> should equal true
     
-[<Fact(Skip = "Need to fix trends")>]
-let YTDContainer_Profit_NoRepeatingDays() = 
-    let dates = container.Trends |> Array.find (fun c -> c.Label = "Profits") |> fun c -> c.Data |> Seq.map (_.Label)
+[<Fact>]
+let ``Trends profit dates do not repeat``() = 
+    let dataIndex = container.Performances |> List.findIndex (fun p -> p.Name = "1 Year")
+    
+    let dates =
+        container.Trends[dataIndex]
+        |> List.find (fun c -> c.Label = "Profits")
+        |> fun c -> c.Data |> Seq.map (_.Label)
     
     let distinctDates = dates |> Seq.distinct
     
