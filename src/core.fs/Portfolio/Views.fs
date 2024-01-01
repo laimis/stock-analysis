@@ -282,6 +282,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
     let oneYear = closedPositions |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1)) DateTimeOffset.UtcNow
     
     let yearByYear =
+        printfn "Generating year by year"
         closedPositions
         |> Array.map (fun p -> p.Closed.Value.Year)
         |> Array.distinct
@@ -293,29 +294,41 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         )
             
     let trends =
-        [
-            generateTrends "Last 20" last20
-            generateTrends "Last 50" last50
-            generateTrends "Last 100" last100
-            generateTrends "Last 2 Months" last2Months
-            generateTrends "YTD" ytd
-            generateTrends "1 Year" oneYear
-            yield! yearByYear |> Array.map (fun (year, trades) -> generateTrends $"%d{year}" trades)
-            generateTrends "All" closedPositions
-        ]
+        let sw = System.Diagnostics.Stopwatch.StartNew()
+        printfn "Generating trends"
+        let trends =
+            [
+                generateTrends "Last 20" last20
+                generateTrends "Last 50" last50
+                generateTrends "Last 100" last100
+                generateTrends "Last 2 Months" last2Months
+                generateTrends "YTD" ytd
+                generateTrends "1 Year" oneYear
+                yield! yearByYear |> Array.map (fun (year, trades) -> generateTrends $"%d{year}" trades)
+                generateTrends "All" closedPositions
+            ]
+        sw.Stop()
+        printfn "Generating trends took %d ms" sw.ElapsedMilliseconds
+        trends
         
     let performances =
+        let sw = System.Diagnostics.Stopwatch.StartNew()
         printfn "Generating performances"
-        [
-            last20 |> TradingPerformance.Create "Last 20"
-            last50 |> TradingPerformance.Create "Last 50"
-            last100 |> TradingPerformance.Create "Last 100"
-            last2Months |> TradingPerformance.Create "Last 2 Months"
-            ytd |> TradingPerformance.Create "YTD"
-            oneYear |> TradingPerformance.Create "1 Year"
-            yield! yearByYear |> Array.map (fun (year, trades) -> trades |> TradingPerformance.Create $"%d{year}")
-            closedPositions |> TradingPerformance.Create "All"
-        ]
+        let performances =
+            [
+                last20 |> TradingPerformance.Create "Last 20"
+                last50 |> TradingPerformance.Create "Last 50"
+                last100 |> TradingPerformance.Create "Last 100"
+                last2Months |> TradingPerformance.Create "Last 2 Months"
+                ytd |> TradingPerformance.Create "YTD"
+                oneYear |> TradingPerformance.Create "1 Year"
+                yield! yearByYear |> Array.map (fun (year, trades) -> trades |> TradingPerformance.Create $"%d{year}")
+                closedPositions |> TradingPerformance.Create "All"
+            ]
+        sw.Stop()
+        printfn "Generating performances took %d ms" sw.ElapsedMilliseconds
+        performances
+        
     member _.Performances = performances    
     member _.Trends = trends
             
