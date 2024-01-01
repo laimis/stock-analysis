@@ -305,7 +305,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 generateTrends "YTD" ytd
                 generateTrends "1 Year" oneYear
                 yield! yearByYear |> Array.map (fun (year, trades) -> generateTrends $"%d{year}" trades)
-                generateTrends "All" closedPositions
+                // generateTrends "All" closedPositions
             ]
         sw.Stop()
         printfn "Generating trends took %d ms" sw.ElapsedMilliseconds
