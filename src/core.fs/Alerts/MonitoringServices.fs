@@ -12,7 +12,6 @@ module core.fs.Alerts.MonitoringServices
     open core.fs.Adapters.Stocks
     open core.fs.Adapters.Storage
     open core.fs.Services
-    open core.fs.Adapters.Storage
     open core.fs.Stocks
     
     // stop loss should be monitored at the following times:
@@ -65,7 +64,9 @@ module core.fs.Alerts.MonitoringServices
             let! priceResponse = brokerage.GetQuote user position.Ticker |> Async.AwaitTask
             
             match priceResponse.Success with
-            | None -> logError($"Could not get price for {position.Ticker}: {priceResponse.Error.Value.Message}")
+            | None ->
+                logError($"Could not get price for {position.Ticker}: {priceResponse.Error.Value.Message}")
+                return None
             | Some response ->
                 
                 let pctToStop = position |> StockPositionWithCalculations |> fun x -> x.PercentToStop response.Price
@@ -73,28 +74,32 @@ module core.fs.Alerts.MonitoringServices
                 | true ->
                     TriggeredAlert.StopPriceAlert position.Ticker response.Price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)
                     |> container.Register
+                    return Some true
                 | false ->
                     container.DeregisterStopPriceAlert position.Ticker (user.Id |> UserId)
+                    return None
         }
         
         let runStopLossCheckForUser (cancellationToken:CancellationToken) userId = task {
             
             match cancellationToken.IsCancellationRequested with
             | true ->
-                ()
+                return 0
             | false ->
                 logInformation($"Running stop loss check for {userId}")
                 
                 let! user = accounts.GetUser(userId) |> Async.AwaitTask
                 
                 match user with
-                | None -> logError $"Unable to find user {userId}"
+                | None ->
+                    logError $"Unable to find user {userId}"
+                    return 0
                 | Some user ->
                         logInformation $"Found user {userId}"
                         
                         let! checks = user.Id |> UserId |> portfolio.GetStockPositions
                         
-                        let! _ =
+                        let! triggered =
                             checks
                             |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
                             |> Seq.map (fun p -> p |> runStopLossCheck user.State cancellationToken)
@@ -102,6 +107,8 @@ module core.fs.Alerts.MonitoringServices
                             |> Async.StartAsTask
                             
                         logInformation("done")
+                        
+                        return triggered |> Seq.choose id |> Seq.length
         }
             
         interface IApplicationService
@@ -114,7 +121,7 @@ module core.fs.Alerts.MonitoringServices
             
             let! users = accounts.GetUserEmailIdPairs()
             
-            let! _ =
+            let! triggeredCounts =
                 users
                 |> Seq.map (fun emailIdPair ->
                     runStopLossCheckForUser cancellationToken emailIdPair.Id
@@ -123,7 +130,7 @@ module core.fs.Alerts.MonitoringServices
                 |> Async.StartAsTask
                 
             container.SetStopLossCheckCompleted(true)
-            container.AddNotice("Stop loss checks completed")
+            container.AddNotice("Stop loss checks completed, triggered " + (triggeredCounts |> Array.sum |> string))
         }
         
         member _.NextRunTime now =
@@ -148,7 +155,7 @@ module core.fs.Alerts.MonitoringServices
     type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,container:StockAlertContainer,logger:ILogger,marketHours:IMarketHours,portfolio:IPortfolioStorage) =
         
         let mutable nextPatternMonitoringRunDateTime = DateTimeOffset.MinValue
-        let listChecks = Dictionary<string, List<AlertCheck>>()
+        let listOfChecks = List<AlertCheck>()
         let priceCache = Dictionary<Ticker, PriceBars>()
         
         let generateAlertListForUser (emailIdPair:EmailIdPair) = async {
@@ -182,32 +189,26 @@ module core.fs.Alerts.MonitoringServices
         }
         
         let generatePatternMonitoringChecks() = task {
-            listChecks.Clear()
+            listOfChecks.Clear()
             
             let! users = accounts.GetUserEmailIdPairs()
-            
-            let alertList = List<AlertCheck>()
             
             let! alertListOps =
                 users
                 |> Seq.map generateAlertListForUser
-                |> Async.Sequential
+                |> Async.Parallel
                 |> Async.StartAsTask
                 
             let allAlerts = alertListOps |> Seq.concat
             
-            alertList.AddRange allAlerts
-            
-            listChecks.Add(Constants.MonitorTagPattern, alertList)
+            listOfChecks.AddRange(allAlerts)
                 
             nextPatternMonitoringRunDateTime <- nextPatternMonitoringRun DateTimeOffset.UtcNow marketHours
             
             container.ManualRunCompleted()
             
-            let description = String.Join(", ", listChecks |> Seq.map (fun kp -> $"{kp.Key} {kp.Value.Count} checks"))
-            
             container.AddNotice(
-                 $"Alert check generator added {description}, next run at {marketHours.ToMarketTime(nextPatternMonitoringRunDateTime)}"
+                 $"Alert check generator added {listOfChecks.Count}, next run at {marketHours.ToMarketTime(nextPatternMonitoringRunDateTime)}"
             )
         }
         
@@ -257,7 +258,7 @@ module core.fs.Alerts.MonitoringServices
                 
                 logger.LogInformation($"Found {patterns.Length} patterns for {alertCheck.ticker}")
                 
-                return Some alertCheck
+                return Some (alertCheck,patterns.Length)
         }
         
         let runThroughMonitoringChecks (cancellationToken:CancellationToken) = task {
@@ -270,26 +271,32 @@ module core.fs.Alerts.MonitoringServices
                 
             priceCache.Clear()
             
-            let! _ =
-                listChecks
-                |> Seq.where (fun kp -> kp.Value.Count > 0)
-                |> Seq.map (fun kp -> async {
-                        
-                        let! completedChecks =
-                            kp.Value
-                            |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
-                            |> Seq.map runCheck
-                            |> Async.Sequential
-                            
-                        completedChecks |> Seq.choose id |> Seq.iter (fun c -> kp.Value.Remove(c) |> ignore)
-                    }
-                )
+            let startingNumberOfChecks = listOfChecks.Count
+            
+            let! checks =
+                listOfChecks
+                |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
+                |> Seq.map runCheck
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
-            if listChecks |> Seq.forall (fun kp -> kp.Value.Count = 0) then
-                container.AddNotice("Pattern monitoring checks completed")
+            let completedChecksWithCounts = checks |> Seq.choose id
+            
+            let completedChecks = completedChecksWithCounts |> Seq.map fst
+            
+            completedChecks |> Seq.iter (fun kp ->
+                listOfChecks.Remove(kp) |> ignore
+            )
+            
+            let totalPatternsFoundCount = completedChecksWithCounts |> Seq.map snd |> Seq.sum
+            
+            match listOfChecks.Count with
+            | 0 ->
                 container.SetListCheckCompleted(true)
+                if startingNumberOfChecks > 0 then
+                    container.AddNotice($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
+            | _ ->
+                container.AddNotice($"Pattern monitoring checks completed, {listOfChecks.Count} remaining")
         }
         
         let monitoringFrequency = TimeSpan.FromMinutes(1)
