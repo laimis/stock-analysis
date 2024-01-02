@@ -36,6 +36,7 @@ export class StockTradingPositionComponent {
       this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
       this.positionProfitPoints = []
       this.setCandidateValues()
+      this.updatePositionOrders()
     }
   }
 
