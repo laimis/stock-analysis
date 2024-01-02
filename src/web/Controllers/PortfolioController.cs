@@ -7,6 +7,7 @@ using core.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FSharp.Core;
 using web.Utils;
 using Handler = core.fs.Portfolio.Handler;
 
@@ -33,7 +34,7 @@ public class PortfolioController : ControllerBase
                     show: show,
                     groupBy: groupBy,
                     txType: txType,
-                    ticker: new Ticker(ticker))
+                    ticker: string.IsNullOrWhiteSpace(ticker) ? FSharpOption<Ticker>.None : new FSharpOption<Ticker>(new Ticker(ticker)))
             )
         );
 

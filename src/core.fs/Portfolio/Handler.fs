@@ -848,15 +848,26 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
     
     member _.Handle(query:QueryTransactions) = task {
         
+        let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, plTransaction.Ticker.Value, plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
+            
         let toTransactionsView (stocks:StockPositionWithCalculations seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
             let tickers = stocks |> Seq.map (_.Ticker) |> Seq.append (options |> Seq.map (_.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
+            
+            let stockTransactions =
+                match query.Show = "stocks" || query.Show = null with
+                | true ->
+                    stocks
+                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
+                    |> Seq.collect (fun s -> s.PLTransactions |> Seq.map (toSharedTransaction s))
+                | false -> Seq.empty
             
             let optionTransactions =
                 match query.Show = "options" || query.Show = null with
                 | true ->
                     options
                     |> Seq.filter (fun o -> query.Ticker.IsNone || o.State.Ticker = query.Ticker.Value)
-                    |> Seq.collect (fun o -> o.State.Transactions)
+                    |> Seq.collect _.State.Transactions
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
                 
@@ -865,13 +876,12 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 | true ->
                     cryptos
                     |> Seq.filter (fun c -> query.Ticker.IsNone || c.State.Token = query.Ticker.Value.Value)
-                    |> Seq.collect (fun c -> c.State.Transactions)
-                    |> Seq.map (fun c -> c.ToSharedTransaction())
+                    |> Seq.collect _.State.Transactions
+                    |> Seq.map _.ToSharedTransaction()
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
                 
-            // TODO: reimplement stock transations
-            let log = Seq.empty |> Seq.append optionTransactions |> Seq.append cryptoTransactions
+            let log = stockTransactions |> Seq.append optionTransactions |> Seq.append cryptoTransactions
                 
             TransactionsView(log, query.GroupBy, tickers);
             
