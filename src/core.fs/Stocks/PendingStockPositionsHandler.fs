@@ -72,6 +72,17 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 return "Position already exists" |> ResponseUtils.failed
             | None ->
                 
+                // create position here so that validation runs and fails if something is wrong
+                let position = PendingStockPosition(
+                    notes=command.Notes,
+                    numberOfShares=command.NumberOfShares,
+                    price=command.Price,
+                    stopPrice=command.StopPrice,
+                    strategy=command.Strategy,
+                    ticker=command.Ticker,
+                    userId=(userId |> IdentifierHelper.getUserId)
+                )
+                
                 let orderType =
                     match command.UseLimitOrder with
                     | Some useLimit ->
@@ -79,7 +90,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                         | true -> Limit
                         | false -> Market
                     | None -> Market
-                    
+
                 let duration =
                     match orderType with
                     | Limit -> GtcPlus
@@ -95,18 +106,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 
                 match order.Success with
                 | None -> return order |> ResponseUtils.toOkOrError
-                | Some _ ->
-                    
-                    let position = PendingStockPosition(
-                        notes=command.Notes,
-                        numberOfShares=command.NumberOfShares,
-                        price=command.Price,
-                        stopPrice=command.StopPrice,
-                        strategy=command.Strategy,
-                        ticker=command.Ticker,
-                        userId=(userId |> IdentifierHelper.getUserId)
-                    )
-                    
+                | Some _ ->    
                     do! portfolio.SavePendingPosition position userId
                     return Ok
     }
