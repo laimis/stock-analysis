@@ -13,13 +13,6 @@ module core.fs.Alerts.MonitoringServices
     open core.fs.Adapters.Storage
     open core.fs.Services
     open core.fs.Stocks
-    
-    // stop loss should be monitored at the following times:
-    // on trading days every 5 minutes from 9:45am to 4:00pm
-    // and no monitoring on weekends
-    let private marketStartTime = TimeOnly(9, 30, 0)
-    let private marketEndTime = TimeOnly(16, 0, 0)
-    
         
     let private _patternMonitorTimes = [
         TimeOnly.Parse("09:45")
@@ -59,103 +52,125 @@ module core.fs.Alerts.MonitoringServices
         // need to decide how I will log these
         let logInformation = logger.LogInformation
         let logError = logger.LogError
+        let marketStartTime = TimeOnly(9, 30, 0)
+        let marketEndTime = TimeOnly(16, 0, 0)
+        let checks = List<StopLossCheck>()
         
-        let runStopLossCheck (user:UserState) (_:CancellationToken) (position:StockPositionState) = async {
-            let! priceResponse = brokerage.GetQuote user position.Ticker |> Async.AwaitTask
+        let runStopLossCheck (check:StopLossCheck) = async {
+            let! priceResponse = brokerage.GetQuote check.user check.ticker |> Async.AwaitTask
             
             match priceResponse.Success with
             | None ->
-                logError($"Could not get price for {position.Ticker}: {priceResponse.Error.Value.Message}")
+                logError($"Could not get price for {check.ticker}: {priceResponse.Error.Value.Message}")
                 return None
+                
             | Some response ->
                 
-                let pctToStop = position |> StockPositionWithCalculations |> fun x -> x.PercentToStop response.Price
-                match pctToStop >= 0m with
-                | true ->
-                    TriggeredAlert.StopPriceAlert position.Ticker response.Price position.StopPrice.Value DateTimeOffset.UtcNow (user.Id |> UserId)
-                    |> container.Register
-                    return Some true
-                | false ->
-                    container.DeregisterStopPriceAlert position.Ticker (user.Id |> UserId)
-                    return None
+                let trigger =
+                    match check.isShort with
+                    | true -> response.Price > check.stopPrice
+                    | false -> response.Price < check.stopPrice
+                
+                match trigger with    
+                | true -> TriggeredAlert.StopPriceAlert check.ticker response.Price check.stopPrice DateTimeOffset.UtcNow (check.user.Id |> UserId) |> container.Register
+                | false -> container.Deregister check.ticker Constants.StopLossIdentifier (check.user.Id |> UserId)
+                
+                return Some check
         }
         
-        let runStopLossCheckForUser (cancellationToken:CancellationToken) userId = task {
+        let generateStopLossChecksForUser userId = task {
             
-            match cancellationToken.IsCancellationRequested with
-            | true ->
-                return 0
-            | false ->
-                logInformation($"Running stop loss check for {userId}")
+            logInformation($"Running stop loss check for {userId}")
+            
+            let! user = accounts.GetUser(userId) |> Async.AwaitTask
+            
+            match user with
+            | None ->
+                logError $"Unable to find user {userId}"
+                return []
+            | Some user ->
+                logInformation $"Found user {userId}"
                 
-                let! user = accounts.GetUser(userId) |> Async.AwaitTask
+                let! stockPositions = userId |> portfolio.GetStockPositions
                 
-                match user with
-                | None ->
-                    logError $"Unable to find user {userId}"
-                    return 0
-                | Some user ->
-                        logInformation $"Found user {userId}"
-                        
-                        let! checks = user.Id |> UserId |> portfolio.GetStockPositions
-                        
-                        let! triggered =
-                            checks
-                            |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
-                            |> Seq.map (fun p -> p |> runStopLossCheck user.State cancellationToken)
-                            |> Async.Sequential // <- don't do this in parallel, usually ends up overloading the brokerage
-                            |> Async.StartAsTask
-                            
-                        logInformation("done")
-                        
-                        return triggered |> Seq.choose id |> Seq.length
+                let checks =
+                    stockPositions
+                    |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
+                    |> Seq.map (fun p -> {ticker=p.Ticker; stopPrice=p.StopPrice.Value; user=user.State; isShort = p.IsShort })
+                    |> Seq.toList
+                    
+                logInformation("done")
+                
+                return checks
         }
             
         interface IApplicationService
         
-        member _.Execute cancellationToken = task {
+        member _.Execute (cancellationToken:CancellationToken) = task {
             
-            container.AddNotice("Running stop loss checks")
-            container.SetStopLossCheckCompleted(false)
-            container.ClearStopLossAlert()
+            match checks.Count with
+            | 0 ->
+                container.AddNotice("Generating stop loss checks")
+                container.SetStopLossCheckCompleted(false)
+                container.ClearStopLossAlert()
+                
+                let! users = accounts.GetUserEmailIdPairs()
+                
+                let! _ =
+                    users
+                    |> Seq.map (fun pair -> async {
+                        let! generatedChecks = generateStopLossChecksForUser pair.Id |> Async.AwaitTask
+                        checks.AddRange(generatedChecks)
+                    })
+                    |> Async.Parallel
+                    
+                container.AddNotice($"Generated {checks.Count} stop loss checks")
+            | _ ->
+                ()
             
-            let! users = accounts.GetUserEmailIdPairs()
-            
-            let! triggeredCounts =
-                users
-                |> Seq.map (fun emailIdPair ->
-                    runStopLossCheckForUser cancellationToken emailIdPair.Id
-                    |> Async.AwaitTask)
+            let! resolvedChecks =
+                checks
+                |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
+                |> Seq.map runStopLossCheck
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
-            container.SetStopLossCheckCompleted(true)
-            container.AddNotice("Stop loss checks completed, triggered " + (triggeredCounts |> Array.sum |> string))
+            resolvedChecks |> Array.choose id |> Array.iter (fun c -> checks.Remove(c) |> ignore)
+               
+            match checks.Count with
+            | 0 ->
+                container.SetStopLossCheckCompleted(true)
+                container.AddNotice("Stop loss checks completed")
+            | _ ->
+                container.AddNotice("Stop loss checks pending, remaining " + checks.Count.ToString())
         }
         
-        member _.NextRunTime now =
+        member _.NextRunTime (now:DateTimeOffset) =
             
-            let nowInEasterTimezone = marketHours.ToMarketTime(now)
-            let marketStartTimeInEastern = DateTimeOffset(nowInEasterTimezone.Date.Add(marketStartTime.ToTimeSpan()))
-            
-            let nextScan =
-                match TimeOnly.FromTimeSpan(nowInEasterTimezone.TimeOfDay) with
-                | t when t < marketStartTime -> marketStartTimeInEastern
-                | t when t > marketEndTime -> marketStartTimeInEastern.AddDays(1)
-                | _ -> nowInEasterTimezone.AddMinutes(5)
+            match checks.Count with
+            | x when x > 0 -> now.Add(TimeSpan.FromMinutes(1.0))
+            | _ ->
+                let nowInEasterTimezone = marketHours.ToMarketTime(now)
+                let marketStartTimeInEastern = DateTimeOffset(nowInEasterTimezone.Date.Add(marketStartTime.ToTimeSpan()))
                 
-            let adjustedScanTime =
-                match nextScan.DayOfWeek with
-                | DayOfWeek.Saturday -> nextScan.AddDays(2)
-                | DayOfWeek.Sunday -> nextScan.AddDays(1)
-                | _ -> nextScan
+                let nextScan =
+                    match TimeOnly.FromTimeSpan(nowInEasterTimezone.TimeOfDay) with
+                    | t when t < marketStartTime -> marketStartTimeInEastern
+                    | t when t > marketEndTime -> marketStartTimeInEastern.AddDays(1)
+                    | _ -> nowInEasterTimezone.AddMinutes(5)
+                    
+                let adjustedScanTime =
+                    match nextScan.DayOfWeek with
+                    | DayOfWeek.Saturday -> nextScan.AddDays(2)
+                    | DayOfWeek.Sunday -> nextScan.AddDays(1)
+                    | _ -> nextScan
 
-            marketHours.ToUniversalTime(adjustedScanTime)
+                marketHours.ToUniversalTime(adjustedScanTime)
         
     type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,container:StockAlertContainer,logger:ILogger,marketHours:IMarketHours,portfolio:IPortfolioStorage) =
         
         let mutable nextPatternMonitoringRunDateTime = DateTimeOffset.MinValue
-        let listOfChecks = List<AlertCheck>()
+        let listOfChecks = List<PatternCheck>()
         let priceCache = Dictionary<Ticker, PriceBars>()
         
         let generateAlertListForUser (emailIdPair:EmailIdPair) = async {
@@ -163,7 +178,7 @@ module core.fs.Alerts.MonitoringServices
                         
             match user with
             | None ->
-                return Seq.empty<AlertCheck>
+                return Seq.empty<PatternCheck>
             | Some user ->
                 let! ownedStocks = emailIdPair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
                 let portfolioList =
@@ -232,7 +247,7 @@ module core.fs.Alerts.MonitoringServices
                 return prices
         }
         
-        let runCheck alertCheck = async {
+        let runCheck (alertCheck:PatternCheck) = async {
             
             let! priceResponse = getPrices alertCheck.user alertCheck.ticker |> Async.AwaitTask
             
@@ -246,7 +261,7 @@ module core.fs.Alerts.MonitoringServices
                     
                 PatternDetection.availablePatterns
                 |> Seq.iter( fun pattern ->
-                    container.Deregister pattern alertCheck.ticker userId
+                    container.Deregister alertCheck.ticker pattern userId
                 )
                 
                 let patterns = PatternDetection.generate prices

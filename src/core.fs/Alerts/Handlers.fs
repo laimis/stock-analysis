@@ -18,7 +18,7 @@ namespace core.fs.Alerts
     type Handler(container:StockAlertContainer,smsService:ISMSClient) =
     
         let deregisterStopPriceMonitoring userId ticker =
-            container.DeregisterStopPriceAlert ticker userId
+            container.Deregister ticker Constants.StopLossIdentifier userId
             
         interface IApplicationService
         member this.StockPurchased() =

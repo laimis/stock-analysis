@@ -11,6 +11,7 @@ namespace core.fs.Alerts
     type private StockPositionMonitorKey = {
         Ticker: Ticker
         UserId: UserId
+        Identifier: string
     }
     
     [<Struct>]
@@ -20,9 +21,17 @@ namespace core.fs.Alerts
     }
     
     [<Struct>]
-    type AlertCheck = {
+    type PatternCheck = {
         ticker: Ticker
         listName: string
+        user: UserState
+    }
+    
+    [<Struct>]
+    type StopLossCheck = {
+        ticker: Ticker
+        stopPrice: decimal
+        isShort: bool
         user: UserState
     }
     
@@ -106,7 +115,7 @@ namespace core.fs.Alerts
         
         
         member _.Register (alert:TriggeredAlert) =
-            let key = { Ticker = alert.ticker; UserId = alert.userId }
+            let key = { Ticker = alert.ticker; UserId = alert.userId; Identifier = alert.identifier  }
             
             match alerts.TryAdd(key, alert) with
             | true -> alert |> addToRecent
@@ -114,15 +123,11 @@ namespace core.fs.Alerts
             
         member _.DeregisterAlert (alert:TriggeredAlert) =
             
-            { Ticker = alert.ticker; UserId = alert.userId }
+            { Ticker = alert.ticker; UserId = alert.userId; Identifier = alert.identifier }
             |> alerts.TryRemove |> ignore
             
-        member _.Deregister _ ticker userId =
-            { Ticker = ticker; UserId = userId }
-            |> alerts.TryRemove |> ignore
-            
-        member _.DeregisterStopPriceAlert ticker userId =
-            { Ticker = ticker; UserId = userId }
+        member _.Deregister ticker identifier userId =
+            { Ticker = ticker; UserId = userId; Identifier = identifier }
             |> alerts.TryRemove |> ignore
             
         member _.GetRecentlyTriggered userId =
@@ -154,6 +159,6 @@ namespace core.fs.Alerts
         member this.ClearStopLossAlert() =
             alerts.Values
             |> Seq.filter (fun x -> x.identifier = Constants.StopLossIdentifier)
-            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId })
+            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId; Identifier = Constants.StopLossIdentifier })
             |> Seq.iter (fun x -> alerts.TryRemove(x) |> ignore)
             
