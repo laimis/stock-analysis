@@ -29,11 +29,6 @@ namespace core.Stocks
                 throw new InvalidOperationException("Price cannot be negative or zero");
             }
 
-            if (numberOfShares <= 0)
-            {
-                throw new InvalidOperationException("Number of shares cannot be negative or zero");
-            }
-
             if (stopPrice.HasValue && stopPrice.Value < 0)
             {
                 throw new InvalidOperationException("Stop price cannot be negative or zero");

@@ -213,7 +213,9 @@ type IBrokerage =
     abstract member RefreshAccessToken : state:UserState -> Task<OAuthResponse>
     abstract member GetAccount : state:UserState -> Task<ServiceResponse<TradingAccount>>
     abstract member BuyOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
+    abstract member BuyToCoverOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
     abstract member SellOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
+    abstract member SellShortOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
     abstract member CancelOrder : state:UserState -> orderId:string -> Task<ServiceResponse<bool>>
     abstract member GetQuote : state:UserState -> ticker:Ticker -> Task<ServiceResponse<StockQuote>>
     abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<ServiceResponse<Dictionary<Ticker, StockQuote>>>

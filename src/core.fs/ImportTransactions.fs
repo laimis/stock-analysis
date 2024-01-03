@@ -66,7 +66,7 @@ module ImportTransactions =
         emailService:IEmailService,
         csvParser:ICSVParser,
         optionsImport:core.fs.Options.Handler,
-        stocksImport:core.fs.Portfolio.Handler) =
+        stocksImport:core.fs.Portfolio.StockPositionHandler) =
         
         interface IApplicationService
         

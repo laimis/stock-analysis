@@ -39,6 +39,8 @@ namespace core.fs.Alerts
         let MonitorTagPattern = "monitor:patterns"
         let MonitorNamePattern = "Patterns"
         let StopLossIdentifier = "Stop loss"
+        let PortfolioIdentifier = "💼 Portfolio"
+        let PendingIdentifier = "⏳ Pending"
     
     
     [<Struct>]

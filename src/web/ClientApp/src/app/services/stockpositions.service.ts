@@ -63,6 +63,10 @@ export class StockPositionsService {
     return this.http.delete(`/api/portfolio/stockpositions/${positionId}`)
   }
 
+  closePosition(positionId:string): Observable<object>{
+    return this.http.post(`/api/portfolio/stockpositions/${positionId}/close`, {positionId})
+  }
+
   setLabel(positionId:string, label: KeyValuePair): Observable<object> {
     return this.http.post(`/api/portfolio/stockpositions/${positionId}/labels`, {
       key: label.key,

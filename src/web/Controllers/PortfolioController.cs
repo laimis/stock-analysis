@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FSharp.Core;
 using web.Utils;
-using Handler = core.fs.Portfolio.Handler;
 
 namespace web.Controllers;
 
@@ -18,17 +17,17 @@ namespace web.Controllers;
 [Route("api/[controller]")]
 public class PortfolioController : ControllerBase
 {
-    private readonly Handler _handler;
-    public PortfolioController(Handler handler) => _handler = handler;
+    private readonly StockPositionHandler _stockPositionHandler;
+    public PortfolioController(StockPositionHandler stockPositionHandler) => _stockPositionHandler = stockPositionHandler;
     
     [HttpGet]
     public Task<ActionResult> Index() =>
-        this.OkOrError(_handler.Handle(new Query(User.Identifier())));
+        this.OkOrError(_stockPositionHandler.Handle(new Query(User.Identifier())));
     
     [HttpGet("transactions")]
     public Task<ActionResult> Transactions(string ticker, string groupBy, string show, string txType) =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new QueryTransactions(
                     userId: User.Identifier(),
                     show: show,
@@ -41,7 +40,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("transactionsummary")]
     public Task<ActionResult> Review(string period) =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new TransactionSummary(period: period, userId: User.Identifier()
                 )
             )
@@ -50,7 +49,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/export/closed")]
     public Task<ActionResult> ExportClosed() =>
         this.GenerateExport(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new ExportTrades(User.Identifier(), ExportType.Closed)
             )
         );
@@ -58,7 +57,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/export/open")]
     public Task<ActionResult> ExportTrades() =>
         this.GenerateExport(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new ExportTrades(User.Identifier(), ExportType.Open)
             )
         );
@@ -66,7 +65,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/export/transactions")]
     public Task<ActionResult> Export() =>
         this.GenerateExport(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new ExportTransactions(User.Identifier())
             )
         );
@@ -77,7 +76,7 @@ public class PortfolioController : ControllerBase
         [FromQuery] int numberOfTrades) =>
 
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new SimulateUserTrades(
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
                     numberOfTrades: numberOfTrades,
@@ -92,7 +91,7 @@ public class PortfolioController : ControllerBase
         [FromQuery] int numberOfTrades) =>
 
         this.GenerateExport(
-            _handler.HandleExport(
+            _stockPositionHandler.HandleExport(
                 new ExportUserSimulatedTrades(
                     userId: User.Identifier(),
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
@@ -104,7 +103,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/ownership/{ticker}")]
     public Task<ActionResult> Ownership([FromRoute] string ticker) =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new OwnershipQuery(
                     new Ticker(ticker), User.Identifier()
                 )
@@ -121,7 +120,7 @@ public class PortfolioController : ControllerBase
         [FromQuery] string when) =>
 
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new SimulateTradeForTicker(
                     userId: User.Identifier(),
                     ticker: new Ticker(ticker),
@@ -135,7 +134,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/tradingentries")]
     public Task<ActionResult> TradingEntries() =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new QueryTradingEntries(
                     User.Identifier()
                 )
@@ -145,7 +144,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/pasttradingentries")]
     public Task<ActionResult> PastTradingEntries() =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new QueryPastTradingEntries(
                     User.Identifier()
                 )
@@ -155,7 +154,7 @@ public class PortfolioController : ControllerBase
     [HttpGet("stockpositions/pasttradingperformance")]
     public Task<ActionResult> PastTradingPerformance() =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new QueryPastTradingPerformance(
                     User.Identifier()
                 )
@@ -172,22 +171,22 @@ public class PortfolioController : ControllerBase
 
         var cmd = new ImportStocks(userId: User.Identifier(), content: content);
             
-        return await this.OkOrError(_handler.Handle(cmd));
+        return await this.OkOrError(_stockPositionHandler.Handle(cmd));
     }
     
     [HttpPost("stockpositions/{positionId}/sell")]
     public Task<ActionResult> Sell([FromBody]StockTransaction model) =>
-        this.OkOrError(_handler.Handle(BuyOrSell.NewSell(model, User.Identifier())));
+        this.OkOrError(_stockPositionHandler.Handle(BuyOrSell.NewSell(model, User.Identifier())));
 
     [HttpPost("stockpositions/{positionId}/buy")]
     public Task<ActionResult> Buy([FromBody]StockTransaction model) =>
-        this.OkOrError(_handler.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
+        this.OkOrError(_stockPositionHandler.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
 
     [HttpGet("stockpositions/{positionId}/simulate/trades")]
     public Task<ActionResult> Trade([FromRoute] string positionId) =>
 
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new SimulateTrade(
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)), 
                     userId: User.Identifier()
@@ -201,7 +200,7 @@ public class PortfolioController : ControllerBase
         [FromQuery] int numberOfPoints) =>
 
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new ProfitPointsQuery(
                     numberOfPoints: numberOfPoints,
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
@@ -213,7 +212,7 @@ public class PortfolioController : ControllerBase
     [HttpPost("stockpositions/{positionId}/grade")]
     public Task Grade([FromBody]GradePosition command) =>
         this.OkOrError(
-            _handler.HandleGradePosition(
+            _stockPositionHandler.HandleGradePosition(
                 User.Identifier(), command
             )
         );
@@ -221,7 +220,7 @@ public class PortfolioController : ControllerBase
     [HttpPost("stockpositions")]
     public Task<ActionResult> OpenLongPosition([FromBody]OpenStockPosition command) =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 User.Identifier(), command
             )
         );
@@ -229,10 +228,23 @@ public class PortfolioController : ControllerBase
     [HttpDelete("stockpositions/{positionId}")]
     public Task<ActionResult> DeletePosition(
         [FromRoute] string positionId,
-        [FromServices] Handler handler) =>
+        [FromServices] StockPositionHandler stockPositionHandler) =>
         this.OkOrError(
-            handler.Handle(
+            stockPositionHandler.Handle(
                 new DeletePosition(
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
+                    userId: User.Identifier()
+                )
+            )
+        );
+    
+    [HttpPost("stockpositions/{positionId}/close")]
+    public Task<ActionResult> ClosePosition(
+        [FromRoute] string positionId,
+        [FromServices] StockPositionHandler stockPositionHandler) =>
+        this.OkOrError(
+            stockPositionHandler.Handle(
+                new ClosePosition(
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     userId: User.Identifier()
                 )
@@ -240,24 +252,24 @@ public class PortfolioController : ControllerBase
         );
 
     [HttpPost("stockpositions/{positionId}/labels")]
-    public Task SetLabel([FromBody]AddLabel command, [FromServices] Handler handler) =>
+    public Task SetLabel([FromBody]AddLabel command, [FromServices] StockPositionHandler stockPositionHandler) =>
         this.OkOrError(
-            handler.HandleAddLabel(
+            stockPositionHandler.HandleAddLabel(
                 User.Identifier(), command
             )
         );
     
     [HttpPost("stockpositions/{positionId}/stop")]
     public Task<ActionResult> Stop([FromBody] SetStop command) =>
-        this.OkOrError(_handler.HandleStop(User.Identifier(), command));
+        this.OkOrError(_stockPositionHandler.HandleStop(User.Identifier(), command));
 
     [HttpDelete("stockpositions/{positionId}/labels/{label}")]
     public Task RemoveLabel(
         [FromRoute] string positionId,
         [FromRoute] string label,
-        [FromServices] Handler handler) => 
+        [FromServices] StockPositionHandler stockPositionHandler) => 
         this.OkOrError(
-            handler.Handle(
+            stockPositionHandler.Handle(
                 new RemoveLabel(
                     positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     key: label,
@@ -269,7 +281,7 @@ public class PortfolioController : ControllerBase
     [HttpPost("stockpositions/{positionId}/risk")]
     public Task<ActionResult> Risk(SetRisk command) =>
         this.OkOrError(
-            _handler.HandleSetRisk(
+            _stockPositionHandler.HandleSetRisk(
                 User.Identifier(), command
             )
         );
@@ -277,7 +289,7 @@ public class PortfolioController : ControllerBase
     [HttpDelete("stockpositions/{positionId}/transactions/{eventId}")]
     public Task<ActionResult> DeleteTransaction([FromRoute] string positionId, [FromRoute] Guid eventId) =>
         this.OkOrError(
-            _handler.Handle(
+            _stockPositionHandler.Handle(
                 new DeleteTransaction(StockPositionId.NewStockPositionId(Guid.Parse(positionId)), User.Identifier(), eventId
                 )
             )
@@ -285,5 +297,5 @@ public class PortfolioController : ControllerBase
     
     [HttpDelete("stockpositions/{positionId}/stop")]
     public async Task<ActionResult> DeleteStop([FromRoute] string positionId) =>
-        this.OkOrError(await _handler.Handle(User.Identifier(), new DeleteStop(StockPositionId.NewStockPositionId(Guid.Parse(positionId)))));
+        this.OkOrError(await _stockPositionHandler.Handle(User.Identifier(), new DeleteStop(StockPositionId.NewStockPositionId(Guid.Parse(positionId)))));
 }

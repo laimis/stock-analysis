@@ -47,10 +47,10 @@
         <Compile Include="Cryptos\Handlers.fs"/>
         <Compile Include="Portfolio\Views.fs"/>
         <Compile Include="Portfolio\Helpers.fs" />
-        <Compile Include="Portfolio\Handler.fs" />
+        <Compile Include="Portfolio\StockPositionHandler.fs" />
         <Compile Include="Reports\Handlers.fs"/>
         <Compile Include="Stocks\ListsHandler.fs" />
-        <Compile Include="Stocks\PendingPositionsHandler.fs" />
+        <Compile Include="Stocks\PendingStockPositionsHandler.fs" />
         <Compile Include="Stocks\StocksHandler.fs" />
         <Compile Include="ImportTransactions.fs"/>
         <Compile Include="Routines\Handler.fs" />

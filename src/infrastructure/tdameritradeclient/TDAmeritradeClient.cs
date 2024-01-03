@@ -336,6 +336,68 @@ public class TDAmeritradeClient : IBrokerage
 
         return EnterOrder(user, postData);
     }
+    
+    public Task<ServiceResponse<bool>> BuyToCoverOrder(
+        UserState user,
+        Ticker ticker,
+        decimal numberOfShares,
+        decimal price,
+        BrokerageOrderType type,
+        BrokerageOrderDuration duration)
+    {
+        var legCollection = new {
+            instruction = "BUY_TO_COVER",
+            quantity = numberOfShares,
+            instrument = new {
+                symbol = ticker.Value,
+                assetType = "EQUITY"
+            }
+        };
+
+        var postData = new
+        {
+            orderType = GetBuyOrderType(type),
+            session = GetSession(duration),
+            duration = GetBuyOrderDuration(duration),
+            price = GetPrice(type, price),
+            stopPrice = GetActivationPrice(type, price),
+            orderStrategyType = "SINGLE",
+            orderLegCollection = new [] {legCollection}
+        };
+
+        return EnterOrder(user, postData);
+    }
+    
+    public Task<ServiceResponse<bool>> SellShortOrder(
+        UserState user,
+        Ticker ticker,
+        decimal numberOfShares,
+        decimal price,
+        BrokerageOrderType type,
+        BrokerageOrderDuration duration)
+    {
+        var legCollection = new {
+            instruction = "SELL_SHORT",
+            quantity = numberOfShares,
+            instrument = new {
+                symbol = ticker.Value,
+                assetType = "EQUITY"
+            }
+        };
+
+        var postData = new
+        {
+            orderType = GetBuyOrderType(type),
+            session = GetSession(duration),
+            duration = GetBuyOrderDuration(duration),
+            price = GetPrice(type, price),
+            stopPrice = GetActivationPrice(type, price),
+            orderStrategyType = "SINGLE",
+            orderLegCollection = new [] {legCollection}
+        };
+
+        return EnterOrder(user, postData);
+    }
 
     public Task<ServiceResponse<bool>> SellOrder(
         UserState user,

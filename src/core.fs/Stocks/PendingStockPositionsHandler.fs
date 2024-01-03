@@ -11,7 +11,6 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.CSV
 open core.fs.Adapters.Storage
 open core.fs.Services
-open core.fs.Adapters.Storage
 
 [<CLIMutable>]
 [<Struct>]
@@ -20,7 +19,7 @@ type Create =
         [<Required>]
         Notes: string
         [<Required>]
-        [<Range(1, Int32.MaxValue)>]
+        [<Range(-1000000, 1000000)>]
         NumberOfShares: decimal
         [<Required>]
         [<Range(0.01, 100000.0)>]
@@ -52,7 +51,7 @@ type Query =
         UserId: UserId
     }
 
-type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioStorage,csvWriter:ICSVWriter) =
+type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioStorage,csvWriter:ICSVWriter) =
     
     interface IApplicationService
     
@@ -86,7 +85,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioS
                     | Limit -> GtcPlus
                     | _ -> Gtc
                     
-                let! order = brokerage.BuyOrder user.State command.Ticker command.NumberOfShares command.Price orderType duration
+                let orderTask =
+                    match command.NumberOfShares with
+                    | x when x > 0m -> brokerage.BuyOrder user.State command.Ticker command.NumberOfShares command.Price orderType duration
+                    | x when x < 0m -> brokerage.SellShortOrder user.State command.Ticker (x |> abs) command.Price orderType duration
+                    | _ -> failwith "Invalid number of shares"
+                
+                let! order = orderTask
                 
                 match order.Success with
                 | None -> return order |> ResponseUtils.toOkOrError
