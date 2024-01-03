@@ -34,22 +34,19 @@ let generateRandomSet (start:DateTimeOffset) minimumNumberOfTrades =
     let random = Random()
     let numberOfTrades = random.Next(minimumNumberOfTrades, minimumNumberOfTrades + 100)
     
-    let closedPositions = 
-        [0..numberOfTrades]
-        |> List.map (fun _ ->
-            let stock = TestDataGenerator.GenerateRandomTicker random
-            let purchaseDate = start.AddDays(-numberOfTrades)
-            let shares = random.Next(1, 100) |> decimal
-            let price = random.Next(1, 1000) |> decimal
-            let sellDate = purchaseDate.AddDays(1)
-            let sellPrice = random.Next(1, 1000) |> decimal
-            
-            StockPosition.openLong stock purchaseDate
-            |> StockPosition.buy shares price purchaseDate
-            |> StockPosition.sell shares sellPrice sellDate
-        )
-    
-    closedPositions
+    [0..numberOfTrades]
+    |> List.map (fun _ ->
+        let stock = TestDataGenerator.GenerateRandomTicker random
+        let purchaseDate = start.AddDays(-numberOfTrades)
+        let shares = random.Next(1, 100) |> decimal
+        let price = random.Next(1, 1000) |> decimal
+        let sellDate = purchaseDate.AddDays(1)
+        let sellPrice = random.Next(1, 1000) |> decimal
+        
+        StockPosition.openLong stock purchaseDate
+        |> StockPosition.buy shares price purchaseDate
+        |> StockPosition.sell shares sellPrice sellDate
+    )
 
 
 let performance = getClosedPositions() |> List.map StockPositionWithCalculations |> TradingPerformance.Create "All"
@@ -100,7 +97,7 @@ let LossAvgDaysHeldCorrect() = performance.LossAvgDaysHeld |> should equal 1.0m
 let AvgDaysHeldCorrect() = performance.AverageDaysHeld |> should equal 1.0m
 
 [<Fact>]
-let EV_Correct() = performance.EV |> should equal 10.00m
+let EV_Correct() = Math.Round(performance.EV, 2) |> should equal 3.33m
 
 [<Fact>]
 let ReturnPctRatio_Correct() = performance.ReturnPctRatio |> should equal 1
@@ -115,17 +112,17 @@ let ProfitRatio_Correct() = performance.ProfitRatio |> should equal 1
 let AvgReturnPct_Correct() =
     performance.AvgReturnPct |> MultipleBarPriceAnalysisTests.rounded 2 |> should equal 0.03m
 
-let container =
+let containerWithRandomTrades =
     generateRandomSet DateTimeOffset.UtcNow 100 |> List.map StockPositionWithCalculations |> List.toArray |> TradingPerformanceContainerView
 
 [<Fact>]
-let NumberOfTrades_Correct() = container.Performances[0].NumberOfTrades |> should be (lessThan container.Performances[1].NumberOfTrades)
+let NumberOfTrades_Correct() = containerWithRandomTrades.Performances[0].NumberOfTrades |> should be (lessThan containerWithRandomTrades.Performances[1].NumberOfTrades)
 
 [<Fact>]
 let ``Trends profits dates are sequential``() =
-    let dataIndex = container.Performances |> List.findIndex (fun p -> p.Name = "1 Year")
+    let dataIndex = containerWithRandomTrades.Performances |> List.findIndex (fun p -> p.Name = "1 Year")
     let dates =
-        container.Trends[dataIndex]
+        containerWithRandomTrades.Trends[dataIndex]
         |> List.find (fun c -> c.Label = "Profits")
         |> fun c -> c.Data |> Seq.map (_.Label)
     
@@ -136,13 +133,17 @@ let ``Trends profits dates are sequential``() =
     
 [<Fact>]
 let ``Trends profit dates do not repeat``() = 
-    let dataIndex = container.Performances |> List.findIndex (fun p -> p.Name = "1 Year")
+    let dataIndex = containerWithRandomTrades.Performances |> List.findIndex (fun p -> p.Name = "1 Year")
     
     let dates =
-        container.Trends[dataIndex]
+        containerWithRandomTrades.Trends[dataIndex]
         |> List.find (fun c -> c.Label = "Profits")
         |> fun c -> c.Data |> Seq.map (_.Label)
     
     let distinctDates = dates |> Seq.distinct
     
     dates |> Seq.length |> should equal (distinctDates |> Seq.length)
+    
+[<Fact>]
+let ``Performance for 20 trades is 20 trades``() =
+    containerWithRandomTrades.Performances |> List.find (fun p -> p.Name = "Last 20") |> fun p -> p.NumberOfTrades |> should equal 20

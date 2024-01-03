@@ -252,7 +252,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         
     let getAtMost (numberOfTrades:int) (trades:StockPositionWithCalculations array) =
         match trades.Length with
-        | tradeLength when tradeLength >= numberOfTrades -> trades[trades.Length - numberOfTrades - 1..trades.Length-1]
+        | tradeLength when tradeLength >= numberOfTrades -> trades[trades.Length - numberOfTrades..]
         | _ -> Array.Empty<StockPositionWithCalculations>()
         
     let timeBasedSlice startDate endDate (trades:StockPositionWithCalculations array) =

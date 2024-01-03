@@ -159,18 +159,7 @@ type TradingPerformance =
             member this.EV =
                 match this.NumberOfTrades with
                 | 0 -> 0m
-                | _ ->
-                    let winRatio =
-                        match this.Wins with
-                        | 0 -> 0m
-                        | _ -> this.WinAmount / decimal this.Wins
-                        
-                    let lossRatio =
-                        match this.Losses with
-                        | 0 -> 0m
-                        | _ -> this.LossAmount / decimal this.Losses
-                        
-                    this.WinPct * winRatio - (1m - this.WinPct) * lossRatio
+                | _ -> this.WinPct * this.AvgWinAmount - (1m - this.WinPct) * (this.AvgLossAmount |> abs)
                 
             member this.WinAvgRR =
                 match this.Wins with
