@@ -60,6 +60,21 @@ namespace coretests.Stocks
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
         }
+        
+        [Fact]
+        public void Create_WithNegativeNumberOfSharesForShortPositions_Works()
+        {
+            var position = new PendingStockPosition(
+                notes: "this is a note",
+                numberOfShares: -10,
+                price: 10,
+                stopPrice: 5,
+                strategy: "alltimehigh",
+                ticker: TestDataGenerator.AMD,
+                userId: Guid.NewGuid());
+            
+            Assert.Equal(-10, position.State.NumberOfShares);
+        }
 
         [Fact]
         public void Create_WithInvalidStopPrice_Throws()

@@ -12,28 +12,28 @@ namespace web.Controllers;
 [Route("api/stocks/pendingpositions")]
 public class PendingPositionsController : ControllerBase
 {
-    private readonly Handler _handler;
-    public PendingPositionsController(Handler handler) => _handler = handler;
+    private readonly PendingStockPositionsHandler _pendingStockPositionsHandler;
+    public PendingPositionsController(PendingStockPositionsHandler pendingStockPositionsHandler) => _pendingStockPositionsHandler = pendingStockPositionsHandler;
     
     [HttpGet]
     public Task<ActionResult> PendingStockPositions() =>
-        this.OkOrError(_handler.Handle(new Query(User.Identifier())));
+        this.OkOrError(_pendingStockPositionsHandler.Handle(new Query(User.Identifier())));
         
     [HttpGet("export")]
     public Task<ActionResult> ExportPendingStockPositions() =>
         this.GenerateExport(
-            _handler.Handle(new Export(User.Identifier())
+            _pendingStockPositionsHandler.Handle(new Export(User.Identifier())
             ));
         
     [HttpPost]
     public Task<ActionResult> CreatePendingStockPosition([FromBody]Create command) =>
         this.OkOrError(
-            _handler.HandleCreate(
+            _pendingStockPositionsHandler.HandleCreate(
                 User.Identifier(), command
             )
         );
 
     [HttpDelete("{id}")]
     public Task<ActionResult> ClosePendingStockPosition([FromRoute] Guid id) =>
-        this.OkOrError(_handler.Handle(new Close(id, User.Identifier())));
+        this.OkOrError(_pendingStockPositionsHandler.Handle(new Close(id, User.Identifier())));
 }

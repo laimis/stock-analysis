@@ -185,14 +185,14 @@ module core.fs.Alerts.MonitoringServices
                     ownedStocks
                     |> Seq.filter (_.IsOpen)
                     |> Seq.map (_.Ticker)
-                    |> Seq.map (fun t -> {ticker=t; listName="Portfolio"; user=user.State})
+                    |> Seq.map (fun t -> {ticker=t; listName=Constants.PortfolioIdentifier; user=user.State})
                     
                 let! pendingPositions = emailIdPair.Id |> portfolio.GetPendingStockPositions |> Async.AwaitTask
                 let pendingList =
                     pendingPositions
                     |> Seq.filter (fun p -> p.State.IsClosed |> not)
                     |> Seq.map (_.State.Ticker)
-                    |> Seq.map (fun t -> {ticker=t; listName="Pending"; user=user.State})
+                    |> Seq.map (fun t -> {ticker=t; listName=Constants.PendingIdentifier; user=user.State})
                 
                 let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
                 return lists

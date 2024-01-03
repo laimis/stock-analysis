@@ -95,6 +95,12 @@ type OpenStockPosition = {
     Strategy: string option
     Ticker: Ticker
 }
+
+type ClosePosition =
+    {
+        PositionId: StockPositionId
+        UserId: UserId
+    }
  
 type DeletePosition =
     {
@@ -241,7 +247,7 @@ type TransactionSummary =
             
             (monday, sunday)
     
-type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser) =
+type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser) =
     
     interface IApplicationService
     
@@ -452,6 +458,28 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,
                 let deletedPosition = position |> StockPosition.delete 
                 do! deletedPosition |> storage.DeleteStockPosition command.UserId (Some position)
                 return Ok
+    }
+    
+    member this.Handle (command:ClosePosition) = task {
+        let! user = accounts.GetUser(command.UserId)
+        match user with
+        | None -> return "User not found" |> ResponseUtils.failed
+        | Some user ->
+            let! position = storage.GetStockPosition command.PositionId command.UserId
+            match position with
+            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | Some position ->
+                
+                // if short, we need to buy to cover
+                // if long, we need to sell
+                let taskToRun =
+                    match position.IsShort with
+                    | true -> brokerage.BuyToCoverOrder user.State position.Ticker (position.NumberOfShares |> abs) 0m BrokerageOrderType.Market BrokerageOrderDuration.Day
+                    | false -> brokerage.SellOrder user.State position.Ticker position.NumberOfShares 0m BrokerageOrderType.Market BrokerageOrderDuration.Day
+                
+                let! orderResponse = taskToRun
+                
+                return orderResponse |> ResponseUtils.toOkOrError
     }
     
     member _.Handle (userId:UserId, command:DeleteStop) = task {

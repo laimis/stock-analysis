@@ -137,6 +137,25 @@ export class StockTradingPositionComponent {
           (_) => {
             this._position = null
             this.positionDeleted.emit()
+          },
+          err => {
+            let errors = GetErrors(err)
+            alert("Error deleting position: " + errors.join(", "))
+          })
+    }
+  }
+
+  closePosition() {
+    if (confirm("Are you sure you want to close this position?")) {
+      this.stockService.closePosition(this._position.positionId)
+        .subscribe(
+          (_) => {
+            this._position = null
+            this.positionDeleted.emit()
+          },
+          err => {
+            let errors = GetErrors(err)
+            alert("Error closing position: " + errors.join(", "))
           })
     }
   }
