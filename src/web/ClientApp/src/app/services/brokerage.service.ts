@@ -23,14 +23,24 @@ export class BrokerageService {
 
   constructor(private http: HttpClient) { }
 
-  brokerageBuy(obj:brokerageordercommand) : Observable<any> {
+  buy(obj:brokerageordercommand) : Observable<any> {
     this.brokerageAccountData = null
     return this.http.post('/api/brokerage/buy', obj)
   }
 
-  brokerageSell(obj:brokerageordercommand) : Observable<any> {
+  sell(obj:brokerageordercommand) : Observable<any> {
     this.brokerageAccountData = null
     return this.http.post('/api/brokerage/sell', obj)
+  }
+
+  sellShort(obj:brokerageordercommand) : Observable<any> {
+    this.brokerageAccountData = null
+    return this.http.post('/api/brokerage/sellshort', obj)
+  }
+
+  buyToCover(obj:brokerageordercommand) : Observable<any> {
+    this.brokerageAccountData = null
+    return this.http.post('/api/brokerage/buytocover', obj)
   }
 
   brokerageCancelOrder(orderId:string) : Observable<any> {

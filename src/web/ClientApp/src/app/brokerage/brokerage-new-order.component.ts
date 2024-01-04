@@ -103,12 +103,20 @@ export class BrokerageNewOrderComponent {
     )
   }
 
-  brokerageBuy() {
-    this.execute(cmd => this.brokerage.brokerageBuy(cmd))
+  buy() {
+    this.execute(cmd => this.brokerage.buy(cmd))
   }
 
-  brokerageSell() {
-    this.execute(cmd => this.brokerage.brokerageSell(cmd))
+  sell() {
+    this.execute(cmd => this.brokerage.sell(cmd))
+  }
+
+  buyToCover() {
+    this.execute(cmd => this.brokerage.buyToCover(cmd))
+  }
+
+  sellShort() {
+    this.execute(cmd => this.brokerage.sellShort(cmd))
   }
 
   execute(fn: (cmd: brokerageordercommand) => Observable<string>) {

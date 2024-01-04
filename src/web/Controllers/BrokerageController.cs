@@ -23,6 +23,32 @@ namespace web.Controllers
                     )
                 )
             );
+        
+        [HttpPost("buytocover")]
+        public Task<ActionResult> BuyToCover(
+            [FromBody] Brokerage.BuyOrSellData data,
+            [FromServices] Brokerage.Handler handler) =>
+            this.OkOrError(
+                handler.Handle(
+                    Brokerage.BrokerageTransaction.NewBuyToCover(
+                        data,
+                        User.Identifier()
+                    )
+                )
+            );
+        
+        [HttpPost("sellshort")]
+        public Task<ActionResult> SellShort(
+            [FromBody] Brokerage.BuyOrSellData data,
+            [FromServices] Brokerage.Handler handler) =>
+            this.OkOrError(
+                handler.Handle(
+                    Brokerage.BrokerageTransaction.NewSellShort(
+                        data,
+                        User.Identifier()
+                    )
+                )
+            );
 
         [HttpPost("sell")]
         public Task<ActionResult> Sell(

@@ -22,7 +22,9 @@ module core.fs.Brokerage
         
     type BrokerageTransaction =
         | Buy of BuyOrSellData * UserId
+        | BuyToCover of BuyOrSellData * UserId
         | Sell of BuyOrSellData * UserId
+        | SellShort of BuyOrSellData * UserId
         
     type CancelOrder =
         {
@@ -41,6 +43,10 @@ module core.fs.Brokerage
             brokerage.BuyOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
         let sell (data:BuyOrSellData) user = 
             brokerage.SellOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
+        let buyToCover (data:BuyOrSellData) user = 
+            brokerage.BuyToCoverOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
+        let sellShort (data:BuyOrSellData) user =
+            brokerage.SellShortOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
         
         interface IApplicationService
         
@@ -50,6 +56,8 @@ module core.fs.Brokerage
                 match command with
                 | Buy (data,userId) -> (userId, data, buy)
                 | Sell (data,userId) -> (userId, data, sell)
+                | BuyToCover (data,userId) -> (userId, data, buyToCover)
+                | SellShort (data,userId) -> (userId, data, sellShort)
                 
             let! user = accounts.GetUser(userId)
             

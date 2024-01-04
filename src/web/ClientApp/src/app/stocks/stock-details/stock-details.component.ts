@@ -88,6 +88,10 @@ export class StockDetailsComponent implements OnInit {
     )
   }
 
+  brokerageOrderEntered(ticker:string) {
+    this.loadOrders()
+  }
+
   purchaseRequested(command:stocktransactioncommand) {
     this.stockPositions.purchase(command).subscribe(
       () => {

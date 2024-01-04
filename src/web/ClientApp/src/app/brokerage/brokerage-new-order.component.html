@@ -67,11 +67,17 @@
         @if (submittedOrder === false && submittingOrder === false) {
           @if (!submittedOrder) {
             <div class="row mt-3">
-              <div class="col-md-6" >
-                <button class="btn btn-primary w-100" (click)="brokerageBuy()">Buy</button>
+              <div class="col-md" >
+                <button class="btn btn-primary w-100" (click)="buy()">Buy</button>
               </div>
-              <div class="col-md-6" >
-                <button class="btn btn-primary w-100" (click)="brokerageSell()">Sell</button>
+              <div class="col-md" >
+                <button class="btn btn-primary w-100" (click)="buyToCover()">Buy to Cover</button>
+              </div>
+              <div class="col-md" >
+                <button class="btn btn-primary w-100" (click)="sell()">Sell</button>
+              </div>
+              <div class="col-md" >
+                <button class="btn btn-primary w-100" (click)="sellShort()">Sell Short</button>
               </div>
             </div>
           }
@@ -94,4 +100,3 @@
         }
       </div>
     </section>
-    
