@@ -330,7 +330,7 @@ module SingleBarPriceAnalysisEvaluation =
                 "Price below 20 SMA",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.PriceBelow20SMA,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceBelow20SMA && o.Value < 0m) ]
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMA && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
@@ -344,6 +344,6 @@ module SingleBarPriceAnalysisEvaluation =
                 "Price went below 20 SMA",
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.PriceBelow20SMADays,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceBelow20SMADays && o.Value = -1m)  ]
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMADays && o.Value = -1m)  ]
             )
         ]
