@@ -114,7 +114,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.Line)
         let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.Line)
         let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.Line)
-        let rrAverage = ChartDataPointContainer<decimal>("RR Average", DataPointChartType.Line)
+        let rrAverage = ChartDataPointContainer<decimal>("RR Average", DataPointChartType.Line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.Horizontal) |> Option.Some)
         let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.Line)
         let tradeCount = ChartDataPointContainer<decimal>("Trade Count", DataPointChartType.Line)
         let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.Column)
