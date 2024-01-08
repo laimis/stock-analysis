@@ -196,7 +196,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 generateOutcomeHistogram
                     label
                     trades
-                    (_.Profit)
+                    (fun x -> x.Profit)
                     20
                     true
                     zeroLineAnnotationVertical
