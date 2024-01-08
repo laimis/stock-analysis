@@ -114,6 +114,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.Line)
         let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.Line)
         let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.Line)
+        let rrAverage = ChartDataPointContainer<decimal>("RR Average", DataPointChartType.Line)
         let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.Line)
         let tradeCount = ChartDataPointContainer<decimal>("Trade Count", DataPointChartType.Line)
         let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.Column)
@@ -150,6 +151,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             maxWin.Add(start, perfView.MaxWinAmount |> rounded)
             maxLoss.Add(start, perfView.MaxLossAmount |> rounded)
             rrSum.Add(start, perfView.rrSum |> rounded)
+            rrAverage.Add(start, perfView.AverageRR |> rounded)
             invested.Add(start, perfView.TotalCost |> rounded)
             tradeCount.Add(start, perfView.NumberOfTrades)
             
@@ -242,6 +244,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             profitRatio
             rrRatio
             rrSum
+            rrAverage
             invested
             maxWin
             maxLoss

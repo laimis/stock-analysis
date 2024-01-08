@@ -82,8 +82,16 @@ export class OutcomesComponent {
     }
     else {
       return (a:TickerOutcomes, b:TickerOutcomes) => {
-        var aVal = a.outcomes.find(o => o.key === column).value
-        var bVal = b.outcomes.find(o => o.key === column).value
+        if (a.outcomes.find(o => o.key === column) === undefined) {
+          return 0
+        }
+
+        if (b.outcomes.find(o => o.key === column) === undefined) {
+          return 0
+        }
+
+        const aVal = a.outcomes.find(o => o.key === column).value;
+        const bVal = b.outcomes.find(o => o.key === column).value;
 
         return aVal - bVal
       }
