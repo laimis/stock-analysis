@@ -366,7 +366,7 @@ type PastTradingPerformanceView =
 type TransactionGroup(name:string,transactions:Transaction seq) =
     member _.Name = name
     member _.Transactions = transactions
-    member _.Sum = transactions |> Seq.sumBy (fun t -> t.Amount)
+    member _.Sum = transactions |> Seq.sumBy _.Amount
     
 
 type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Ticker array) =
@@ -375,15 +375,16 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
         match groupBy with
         | "ticker" -> t.Ticker.Value
         | "week" -> t.DateAsDate.AddDays(- float t.DateAsDate.DayOfWeek+1.0).ToString("MMMM dd, yyyy")
+        | "year" -> t.DateAsDate.ToString("yyyy")
         | _ -> t.DateAsDate.ToString("MMMM, yyyy")
         
     let ordered groupBy (transactions:Transaction seq) =
         match groupBy with
-        | "ticker" -> transactions |> Seq.sortBy (fun t -> t.Ticker)
-        | _ -> transactions |> Seq.sortByDescending (fun t -> t.DateAsDate)
+        | "ticker" -> transactions |> Seq.sortBy _.Ticker
+        | _ -> transactions |> Seq.sortByDescending _.DateAsDate
     
     member _.Transactions = ordered groupBy transactions
-    member _.Tickers = tickers |> Array.map (fun t -> t.Value)
+    member _.Tickers = tickers |> Array.map _.Value
     member _.Grouped =
         match groupBy with
         | null  -> Seq.empty<TransactionGroup>

@@ -24,7 +24,7 @@ export class TransactionsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    var ticker = this.route.snapshot.queryParamMap.get("ticker")
+    const ticker = this.route.snapshot.queryParamMap.get("ticker");
     if (ticker)
     {
       this.ticker = ticker;

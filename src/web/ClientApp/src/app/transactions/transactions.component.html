@@ -1,43 +1,50 @@
-@if (response) {
-  <div>
-    <div class="row">
-      <div class="col">
-        <select class="form-select filterDropdown btn border rounded me-3" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
-          <option value="month">Breakdown by Month</option>
-          <option value="week">Breakdown by Week</option>
-          <option value="ticker">Breakdown by Symbol</option>
-        </select>
-      </div>
-      <div class="col">
-        <select class="form-select filterDropdown btn border rounded" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
-          <option value="crypto">Crypto</option>
-          <option value="options">Options</option>
-          <option value="shares">Shares</option>
-          <option value="">Shares and Options</option>
-        </select>
-      </div>
-      <div class="col">
-        <select class="form-select filterDropdown btn border rounded" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
-          <option value="">All Symbols</option>
-          @for (t of response.tickers; track t) {
-            <option value="{{t}}">{{t}}</option>
-          }
-        </select>
-      </div>
-      <div class="col">
-        <select class="form-select filterDropdown btn border rounded" [(ngModel)]="txType" id="txType" name="txType" (ngModelChange)="loadData()">
-          <option value="pl">Realized Gain/Loss</option>
-          <option value="tx">All Transactions</option>
-        </select>
+<div>
+  <div class="row">
+    <div class="col">
+      <select class="form-select filterDropdown" [(ngModel)]="groupBy" id="breakdownFilter" name="breakdownFilter" (ngModelChange)="loadData()">
+        <option value="month">Breakdown by Month</option>
+        <option value="week">Breakdown by Week</option>
+        <option value="year">Breakdown by Year</option>
+        <option value="ticker">Breakdown by Symbol</option>
+      </select>
+    </div>
+    <div class="col">
+      <select class="form-select filterDropdown" [(ngModel)]="filterType" id="showFilter" name="showFilter" (ngModelChange)="loadData()">
+        <option value="crypto">Crypto</option>
+        <option value="options">Options</option>
+        <option value="shares">Shares</option>
+        <option value="">Shares and Options</option>
+      </select>
+    </div>
+    <div class="col">
+      <select class="form-select filterDropdown" [(ngModel)]="ticker" id="symbolFilter" name="symbolFilter" (ngModelChange)="loadData()">
+        <option value="">All Symbols</option>
+        @for (t of response.tickers; track t) {
+          <option value="{{t}}">{{t}}</option>
+        }
+      </select>
+    </div>
+    <div class="col">
+      <select class="form-select filterDropdown" [(ngModel)]="txType" id="txType" name="txType" (ngModelChange)="loadData()">
+        <option value="pl">Realized Gain/Loss</option>
+        <option value="tx">All Transactions</option>
+      </select>
+    </div>
+  </div>
+
+  @if (loading) {
+    <app-loading></app-loading>
+  }
+
+  @if (!ticker && response.transactions.length === 0) {
+    <div class="mt-2">
+      <div class="alert alert-secondary">
+        You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
       </div>
     </div>
-    @if (!ticker && response.transactions.length === 0) {
-      <div class="mt-2">
-        <div class="alert alert-secondary">
-          You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.
-        </div>
-      </div>
-    }
+  }
+
+  @if (response) {
     @for (g of response.grouped; track g) {
       <div class="mb-2 mt-3">
         <div class="text-muted font-size-small row">
@@ -58,10 +65,10 @@
           <table class="table table-hover border rounded">
             <thead class="thead-light">
               <tr>
-                <th width="100">Date</th>
-                <th width="100">Symbol</th>
+                <th>Date</th>
+                <th>Symbol</th>
                 <th>Description</th>
-                <th width="125" class="text-end">Amount</th>
+                <th class="text-end">Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -94,5 +101,5 @@
         }
       </div>
     }
-  </div>
-}
+  }
+</div>
