@@ -81,6 +81,14 @@ export class StockTradingPositionComponent {
     )
   }
 
+  profitPointReached(price: number) {
+    if (this._position.isShort) {
+      return price <= this.quote.price
+    }
+
+    return price >= this.quote.price
+  }
+
   setCandidateValues() {
     // round risked amount to 2 decimal places
     this.candidateRiskAmount = Math.round(this._position.riskedAmount * 100) / 100
