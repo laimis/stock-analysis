@@ -297,3 +297,25 @@ let ``Assign invalid grade, fails``() =
     
     (fun () -> position |> StockPosition.assignGrade (TradeGrade("L")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<ArgumentException>
+    
+[<Fact>]
+let ``Close works`` () =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.close 1m DateTimeOffset.UtcNow
+        
+    position.IsClosed |> should equal true
+    position.NumberOfShares |> should equal 0m
+    
+[<Fact>]
+let ``Close already closed position fails``() =
+    
+    let position = 
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.close 1m DateTimeOffset.UtcNow
+        
+    (fun () -> position |> StockPosition.close 1m DateTimeOffset.UtcNow |> ignore)
+    |> should throw typeof<Exception>

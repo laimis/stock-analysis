@@ -16,7 +16,7 @@ type TradingStrategy(name:string) =
     
     static member ClosePosition price date (position:StockPositionState) =
         match position.IsOpen with
-        | true -> position |> StockPosition.sell position.NumberOfShares price date
+        | true -> position |> StockPosition.close price date
         | false -> position
     
     static member CalculateMaxDrawdownAndGain (last10Bars:seq<PriceBar>) =
@@ -73,7 +73,7 @@ type TradingStrategy(name:string) =
                     Last10Bars = List<PriceBar>(10)
                 }
                 
-            _numberOfSharesAtStart <- position.NumberOfShares
+            _numberOfSharesAtStart <- position.NumberOfShares |> abs
                 
             let finalContext =
                 bars.Bars
@@ -141,8 +141,8 @@ type TradingStrategyActualTrade() =
             let positionWithCalculations =
                 match closeIfOpen with
                 | true ->
-                    let closingPrice = last10Bars.[last10Bars.Length - 1].Close
-                    let closingDate = last10Bars.[last10Bars.Length - 1].Date
+                    let closingPrice = last10Bars[last10Bars.Length - 1].Close
+                    let closingDate = last10Bars[last10Bars.Length - 1].Date
                     
                     finalPosition |> TradingStrategy.ClosePosition closingPrice closingDate
                 | false -> finalPosition
@@ -163,8 +163,13 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
     
     let mutable _level = 1
     
-    member this.ExecuteProfitSell (position:StockPositionState) sellPrice (bar:PriceBar) =
+    member this.ExecuteProfitTake sellPrice date (position:StockPositionState) =
         
+        let executeProfitTake portion price date (position:StockPositionState) =
+            match position.IsShort with
+            | true -> position |> StockPosition.buy portion price date
+            | false -> position |> StockPosition.sell portion price date
+            
         // figure out how much to sell based on the number of profit points
         // and how many shares we have left
         let portion =
@@ -177,16 +182,16 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
                 | x -> x
         
         let adjustStopIfNecessary (position:StockPositionState) =
-            match position.NumberOfShares with
-            | x when x > 0m ->
+            match position.IsOpen with
+            | true ->
                 let stopPrice:decimal = position |> StockPositionWithCalculations |> stopPriceFunc _level
-                position |> StockPosition.setStop (Some stopPrice) bar.Date
+                position |> StockPosition.setStop (Some stopPrice) date
             | _ -> position
         
             
         let afterSell =
             position
-            |> StockPosition.sell portion sellPrice bar.Date
+            |> executeProfitTake portion sellPrice date
             |> adjustStopIfNecessary
         
         _level <- _level + 1
@@ -195,22 +200,33 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
             
     override this.ApplyPriceBarToPositionInternal context bar =
         
-        let sellPrice = context.Position |> StockPositionWithCalculations |> profitPointFunc _level
+        let profitPrice = context.Position |> StockPositionWithCalculations |> profitPointFunc _level
+                
+        let stopReached price (position:StockPositionState) =
+            match position.StopPrice with
+            | Some stopPrice ->
+                match position.IsShort with
+                | true -> price >= stopPrice
+                | false -> price <= stopPrice
+            | _ -> false
+            
+        let profitTakeReached (bar:PriceBar) (position:StockPositionState) =
+            match position.IsShort with
+            | true -> bar.Low < profitPrice
+            | false -> bar.High > profitPrice
         
-        let executeProfitSellIfNecessary (position:StockPositionState) =
-            match bar.High with
-            | x when x >= sellPrice ->
-                this.ExecuteProfitSell position sellPrice bar
-            | _ -> position
+        let executeProfitTakeIfNecessary (position:StockPositionState) =
+            match profitTakeReached bar position with
+            | true -> this.ExecuteProfitTake profitPrice bar.Date position
+            | false -> position
         
         let closeIfNecessary (position:StockPositionState) =
-            match position.StopPrice with
-            | Some stopPrice when stopPrice >= bar.Close ->
-                TradingStrategy.ClosePosition bar.Close bar.Date position
+            match stopReached bar.Close position with
+            | true -> TradingStrategy.ClosePosition bar.Close bar.Date position
             | _ -> position
         
         context.Position
-        |> executeProfitSellIfNecessary
+        |> executeProfitTakeIfNecessary
         |> closeIfNecessary
             
             
@@ -295,8 +311,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                     |> Seq.iter ( fun strategy ->
                         
                         let result =
-                            StockPosition.openLong ticker ``when``
-                            |> StockPosition.buy numberOfShares price ``when``
+                            StockPosition.``open`` ticker numberOfShares price ``when``
                             |> StockPosition.setStop stopPrice ``when``
                             |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
                             |> strategy.Run bars closeIfOpenAtTheEnd
@@ -341,10 +356,15 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             match calculations.FirstStop with
             | None -> Some (calculations.CompletedPositionCostPerShare * TradingStrategyConstants.DefaultStopPriceMultiplier)
             | _ -> calculations.FirstStop
+            
+        let numberOfShares =
+            match position.IsShort with
+            | true -> calculations.CompletedPositionShares * -1m
+            | false -> calculations.CompletedPositionShares
                 
         this.Run(
             user=user,
-            numberOfShares=calculations.CompletedPositionShares,
+            numberOfShares=numberOfShares,
             price=calculations.CompletedPositionCostPerShare,
             stopPrice = stopPrice,
             ticker = position.Ticker,

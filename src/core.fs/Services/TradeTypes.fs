@@ -63,8 +63,9 @@ module ProfitPoints =
      
     let getProfitPointWithPercentGain (level:int) (percentGain:decimal) (position:StockPositionWithCalculations) =
         let singleLevel = position.CompletedPositionCostPerShare * percentGain
-        position.CompletedPositionCostPerShare + singleLevel * decimal(level)
-    
+        match position.IsShort with
+        | true -> position.CompletedPositionCostPerShare - singleLevel * decimal(level)
+        | false -> position.CompletedPositionCostPerShare + singleLevel * decimal(level)
     
     let getProfitPointsWithStopPrice levels position =
         let profitPoints =

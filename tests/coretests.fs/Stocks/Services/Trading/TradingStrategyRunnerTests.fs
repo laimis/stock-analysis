@@ -147,8 +147,8 @@ let createDownsideTestData() =
 let ``With price falling, stop price exit executes``() =
     
     let bars, positionInstance = createDownsideTestData()
-    let runner = TradingStrategyFactory.createProfitPointsTrade 3
-    let result = runner.Run bars false positionInstance
+    let strategy = TradingStrategyFactory.createProfitPointsTrade 3
+    let result = strategy.Run bars false positionInstance
     
     let position = result.Position
     let maxGain = result.MaxGainPct

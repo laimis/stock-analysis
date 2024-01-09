@@ -348,6 +348,14 @@ module StockPosition =
         | true -> openLong ticker date |> buy numberOfShares price date
         | false -> openShort ticker date |> sell (numberOfShares |> abs) price date
         
+    let close price date (stockPosition:StockPositionState) =
+        match stockPosition.IsClosed with
+        | true -> failwith "Position is already closed"
+        | false ->
+            match stockPosition.IsShort with
+            | true -> buy (stockPosition.NumberOfShares |> abs) price date stockPosition
+            | false -> sell stockPosition.NumberOfShares price date stockPosition
+        
     let addNotes = applyNotesIfApplicable
         
     let setLabel key value date stockPosition =

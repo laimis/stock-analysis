@@ -69,3 +69,15 @@ let ``From events recreates identical state`` () =
     position2.IsOpen |> should equal position.IsOpen
     position2.Ticker |> should equal position.Ticker
     position2.PositionId |> should equal position.PositionId
+
+[<Fact>]
+let ``Close position works`` () =
+    
+    let position =
+        StockPosition.openShort ticker DateTimeOffset.UtcNow
+        |> StockPosition.sell 10m 1.5m DateTimeOffset.UtcNow
+        |> StockPosition.close 1.5m DateTimeOffset.UtcNow
+        
+    position.NumberOfShares |> should equal 0m
+    position.IsShort |> should equal true
+    position.IsClosed |> should equal true
