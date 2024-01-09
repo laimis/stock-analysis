@@ -71,7 +71,6 @@ module ProfitPoints =
         let profitPoints =
             [1..levels]
             |> List.map (fun l -> position |> getProfitPointWithStopPrice l)
-            |> List.filter (fun p -> p > position.CompletedPositionCostPerShare)
             
         profitPoints
     

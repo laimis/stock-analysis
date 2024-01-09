@@ -52,3 +52,15 @@ let ``Percent levels for short position works`` () =
     ProfitPoints.getProfitPointWithPercentGain 3 0.05m shortPosition |> should equal 27.625m
     ProfitPoints.getProfitPointWithPercentGain 4 0.05m shortPosition |> should equal 26.0m
     ProfitPoints.getProfitPointWithPercentGain 5 0.05m shortPosition |> should equal 24.375m
+    
+[<Fact>]
+let ``Get profit points list for long works`` () =
+    let profitPoints = ProfitPoints.getProfitPointsWithStopPrice 4 longPosition
+    profitPoints |> should haveLength 4
+    profitPoints |> should equal [37.5m; 42.5m; 47.5m; 52.5m]
+    
+[<Fact>]
+let ``Get profit points list for short works`` () =
+    let profitPoints = ProfitPoints.getProfitPointsWithStopPrice 4 shortPosition
+    profitPoints |> should haveLength 4
+    profitPoints |> should equal [27.5m; 22.5m; 17.5m; 12.5m]
