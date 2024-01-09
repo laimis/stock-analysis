@@ -444,12 +444,9 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.DaysSinceLastTransaction =
         let date =
-            stockPosition.Transactions
+            stockPosition.ShareTransactions
             |> List.last
-            |> fun x ->
-                match x with
-                | Share s -> s.Date
-                | Stop s -> s.Date
+            |> _.Date
                 
         DateTimeOffset.UtcNow.Subtract(date).TotalDays |> int
         
