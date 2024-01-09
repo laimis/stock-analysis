@@ -83,10 +83,10 @@ export class StockTradingPositionComponent {
 
   profitPointReached(price: number) {
     if (this._position.isShort) {
-      return price <= this.quote.price
+      return price >= this.quote.price
     }
 
-    return price >= this.quote.price
+    return price <= this.quote.price
   }
 
   setCandidateValues() {
