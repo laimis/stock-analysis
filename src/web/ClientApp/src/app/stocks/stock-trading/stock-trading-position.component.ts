@@ -102,10 +102,11 @@ export class StockTradingPositionComponent {
     return false
   }
 
-  setStopPrice() {
+  setStopPrice(elementVisibilityToToggle:HTMLElement[]) {
     this.stockService.setStopPrice(this._position.positionId, this.candidateStopPrice).subscribe(
       (_) => {
         this._position.stopPrice = this.candidateStopPrice
+        elementVisibilityToToggle.forEach(this.toggleVisibility)
       }
     )
   }
@@ -123,11 +124,12 @@ export class StockTradingPositionComponent {
     return false
   }
 
-  setRiskAmount() {
+  setRiskAmount(elementVisibilityToToggle:HTMLElement[]) {
     if (confirm("Are you sure you want to set the risk amount?")) {
       this.stockService.setRiskAmount(this._position.positionId, this.candidateRiskAmount).subscribe(
         (_) => {
           this._position.riskedAmount = this.candidateRiskAmount
+          elementVisibilityToToggle.forEach(this.toggleVisibility)
         }
       )
     }
@@ -182,13 +184,15 @@ export class StockTradingPositionComponent {
     }
   }
 
-  clearStrategy() {
+  clearStrategy(elementVisibilityToToggle:HTMLElement[]) {
     if (!confirm("Are you sure you want to clear the strategy?")) {
       return false
     }
 
     this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe(
       (r) => {
+        this.positionStrategy = null
+        elementVisibilityToToggle.forEach(this.toggleVisibility)
       },
       (err) => {
         alert("Error clearing strategy")
@@ -198,7 +202,7 @@ export class StockTradingPositionComponent {
     return false
   }
 
-  setStrategy(strategy: string) {
+  setStrategy(strategy: string, elementVisibilityToToggle:HTMLElement[]) {
     if (!strategy) {
       alert("Please select strategy")
       return
@@ -211,6 +215,8 @@ export class StockTradingPositionComponent {
 
     this.stockService.setLabel(this._position.positionId, label).subscribe(
       (r) => {
+        this.positionStrategy = strategy
+        elementVisibilityToToggle.forEach(this.toggleVisibility)
       },
       (err) => {
         alert("Error setting strategy")

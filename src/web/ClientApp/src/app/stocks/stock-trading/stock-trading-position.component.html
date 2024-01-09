@@ -8,11 +8,18 @@
   </div>
   <div class="row mt-3">
     <div class="col-md-3"><div class="stat-label">Current Price</div><div>{{ getPrice() | currency}}</div></div>
-    <div class="col-md-3">
+    <div class="col-md-3" #stopPriceReadonlyDiv>
+      <div class="stat-label">
+        Stop Price
+        <span class="bi bi-pencil" role="button" (click)="toggleVisibility(stopPriceReadonlyDiv); toggleVisibility(stopPriceEditDiv)"></span>
+      </div>
+      <div>{{candidateStopPrice | currency}}</div>
+    </div>
+    <div class="col-md-3 visually-hidden" #stopPriceEditDiv>
       <label class="form-label stat-label" for="candidateStopPrice">Stop Price</label>
       <div class="input-group">
         <input class="form-control" step="0.01" id="candidateStopPrice" [(ngModel)]="candidateStopPrice" type="number">
-        <button class="btn btn-outline-secondary" (click)="setStopPrice()">Update</button>
+        <button class="btn btn-outline-secondary" (click)="setStopPrice([stopPriceEditDiv,stopPriceReadonlyDiv]);">Update</button>
       </div>
       <div>
         <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
@@ -21,17 +28,31 @@
         }
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3" #riskReadonlyDiv>
+      <div class="stat-label">
+        Risk Amount
+        <span class="bi bi-pencil" role="button" (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
+      </div>
+      <div>{{candidateRiskAmount | currency}}</div>
+    </div>
+    <div class="col-md-3 visually-hidden" #riskEditDiv>
       <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
       <div class="input-group">
         <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
-        <button class="btn btn-outline-secondary" (click)="setRiskAmount()">Update</button>
+        <button class="btn btn-outline-secondary" (click)="setRiskAmount([riskReadonlyDiv,riskEditDiv])">Update</button>
       </div>
       <div>
         <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3" #strategyReadonyDiv>
+      <div class="stat-label">
+        Strategy
+        <span class="bi bi-pencil" role="button" (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
+      </div>
+      <div>{{positionStrategy}}</div>
+    </div>
+    <div class="col-md-3 visually-hidden" #strategyEditDiv>
       <label class="form-label stat-label" for="strategyInput">Strategy</label>
       <div class="input-group">
         <select class="form-select" id="strategyInput" #strategyInput>
@@ -41,23 +62,24 @@
               value="{{s.key}}" [selected]="positionStrategy === s.key">{{s.value}}</option>
           }
         </select>
-        <button class="btn btn-outline-secondary" (click)="setStrategy(strategyInput.value)">Update</button>
+        <button class="btn btn-outline-secondary" (click)="setStrategy(strategyInput.value,[strategyReadonyDiv,strategyEditDiv])">Update</button>
       </div>
       <div>
-        <a href="#" (click)="strategyInput.value = ''; clearStrategy();">Clear Strategy</a>
+        <a href="#" (click)="strategyInput.value = ''; clearStrategy([strategyReadonyDiv,strategyEditDiv]);">Clear Strategy</a>
       </div>
     </div>
   </div>
   <div class="row mt-3">
     <div class="col-md-3"><div class="stat-label">Profit</div><div>{{ _position.profit | currency }}</div></div>
-    <div class="col-md-3"><div class="stat-label">Risked</div><div>{{ _position.riskedAmount | currency }} </div></div>
+    <div class="col-md-3"><div class="stat-label">Profit Gain</div><div>{{ _position.gainPct | percent }}</div></div>
     <div class="col-md-3"><div class="stat-label">R/R</div><div>{{ _position.rr | number }}</div></div>
     <div class="col-md-3"><div class="stat-label">Chart</div><div><app-trading-view-link [ticker]="_position.ticker"></app-trading-view-link> </div></div>
   </div>
+    @if (!_position.isClosed) {
   <div class="row mt-3">
     <div class="col-md-3"><div class="stat-label">Unrealized Profit</div><div>@if(_position.isClosed === false) { {{ getUnrealizedProfit() | currency }} }</div></div>
     <div class="col-md-3"><div class="stat-label">Unrealized Gain</div><div>@if(_position.isClosed === false) { {{ getUnrealizedGainPct() | percent }} }</div></div>
-    <div class="col-md-3"><div class="stat-label">Realized Profit</div><div>{{ _position.profit | number }} ( {{ _position.gainPct | percent }})</div></div>
+    <div class="col-md-3"><div class="stat-label">Last Transaction</div><div>{{ _position.daysSinceLastTransaction}} days ago</div></div>
     <div class="col-md-3">
       <label class="form-label stat-label" for="candidateRiskAmount">Profit Points</label>
       <div>
@@ -65,24 +87,24 @@
       </div>
     </div>
   </div>
-  @if (!_position.isClosed) {
-    <div class="row">
-      @if (positionProfitPoints.length > 0) {
-        <div class="col">
-          @for (ppp of positionProfitPoints; track ppp) {
-            <div class="row mt-3">
-              @for (p of ppp.prices; track p; let i = $index) {
-                <div
-                  [ngClass]="{'col':true, 'bg-positive':profitPointReached(p), 'text-white':profitPointReached(p)}">
-                  <div class="stat-label">{{ppp.name}} {{i+1}}</div>
-                  <div>{{ p | currency }}</div>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      }
-    </div>
+  
+  <div class="row">
+    @if (positionProfitPoints.length > 0) {
+      <div class="col">
+        @for (ppp of positionProfitPoints; track ppp) {
+          <div class="row mt-3">
+            @for (p of ppp.prices; track p; let i = $index) {
+              <div
+                [ngClass]="{'col':true, 'bg-positive':profitPointReached(p), 'text-white':profitPointReached(p)}">
+                <div class="stat-label">{{ppp.name}} {{i+1}}</div>
+                <div>{{ p | currency }}</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
   }
   <div class="row mt-3">
     <div class="col">
