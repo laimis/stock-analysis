@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using core.fs;
 using core.fs.Accounts;
 using core.fs.Adapters.Email;
 using core.fs.Adapters.Storage;
@@ -99,7 +98,7 @@ public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshB
     }
 }
 
-public class AlertEmailServiceHost(ILogger<AlertEmailService> logger, AlertEmailService service):
+public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service):
     GenericBackgroundServiceHost(logger)
 {
     protected override TimeSpan GetSleepDuration() => service.NextRunTime(DateTimeOffset.UtcNow);
