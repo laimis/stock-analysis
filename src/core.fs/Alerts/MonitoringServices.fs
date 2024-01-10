@@ -583,29 +583,29 @@ type AlertEmailService(accounts:IAccountStorage,
         
     member _.NextRunTime (now:DateTimeOffset) =
         
-        match container.ContainerReadyForNotifications() with
-        | false -> TimeSpan.FromMinutes(1.)
+        match container.ContainerReadyForNotifications() |> not with
+        | false ->
+            now.AddMinutes(1.0)
         | true ->
-            let nextRun() =
-                let eastern = marketHours.ToMarketTime(now);
-                
-                let nextTime =
-                    emailTimes
-                    |> Seq.map (fun t -> eastern.Date.Add(t.ToTimeSpan()) |> DateTimeOffset)
-                    |> Seq.filter (fun t -> t > eastern)
-                    |> Seq.map marketHours.ToUniversalTime
-                    |> Seq.tryHead
-                    
-                match nextTime with
-                | Some t -> t
-                | None ->
-                    let nextDay = eastern.Date.AddDays(1)
-                    
-                    match nextDay.DayOfWeek with
-                    | DayOfWeek.Saturday -> nextDay.AddDays(2)
-                    | DayOfWeek.Sunday -> nextDay.AddDays(1)
-                    | _ -> nextDay
-                    |> fun d -> d |> DateTimeOffset
-                    |> marketHours.ToUniversalTime
             
-            nextRun() - DateTimeOffset.UtcNow
+            let eastern = marketHours.ToMarketTime(now);
+            
+            let nextTime =
+                emailTimes
+                |> Seq.map (fun t -> eastern.Date.Add(t.ToTimeSpan()) |> DateTimeOffset)
+                |> Seq.filter (fun t -> t > eastern)
+                |> Seq.map marketHours.ToUniversalTime
+                |> Seq.tryHead
+                
+            match nextTime with
+            | Some t ->
+                t
+            | None ->
+                let nextDay = eastern.Date.AddDays(1)
+                
+                match nextDay.DayOfWeek with
+                | DayOfWeek.Saturday -> nextDay.AddDays(2)
+                | DayOfWeek.Sunday -> nextDay.AddDays(1)
+                | _ -> nextDay
+                |> fun d -> d |> DateTimeOffset
+                |> marketHours.ToUniversalTime

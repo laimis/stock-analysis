@@ -166,14 +166,14 @@ type SellView =
         NumberOfShares: decimal
         Price: decimal
         OlderThan30Days: bool
-        CurrentPrice: Nullable<decimal>
+        CurrentPrice: decimal option
     }
     
     member this.Age = DateTimeOffset.UtcNow - this.Date
     member this.Diff =
-        match this.CurrentPrice.HasValue with
-        | false -> 0m
-        | true -> (this.CurrentPrice.Value - this.Price) / this.Price
+        match this.CurrentPrice with
+        | None -> 0m
+        | Some value -> (value - this.Price) / this.Price
     
 type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote>) =
     
@@ -193,8 +193,8 @@ type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote
             OlderThan30Days = t.latest.Date < DateTimeOffset.UtcNow.AddDays(-30)
             CurrentPrice =
                 match prices.TryGetValue(t.ticker) with
-                | true, q -> Nullable<decimal>(q.Price)
-                | false, _ -> Nullable<decimal>()
+                | true, q -> Some q.Price
+                | false, _ -> None
         })
         
     

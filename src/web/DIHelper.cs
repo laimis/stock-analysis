@@ -104,7 +104,7 @@ namespace web
             if (backendJobsSwitch != "off")
             {
                 logger.LogInformation("Backend jobs turned on");
-                services.AddHostedService<ThirtyDaySellService>();
+                services.AddHostedService<ThirtyDaySellServiceHost>();
                 services.AddHostedService<PatternMonitoringServiceHost>();
                 services.AddHostedService<WeeklyUpsideReversalServiceHost>();
                 services.AddHostedService<StopLossServiceHost>();

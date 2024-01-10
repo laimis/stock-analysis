@@ -48,6 +48,7 @@
         <Compile Include="Portfolio\Views.fs"/>
         <Compile Include="Portfolio\Helpers.fs" />
         <Compile Include="Portfolio\StockPositionHandler.fs" />
+        <Compile Include="Portfolio\MonitoringServices.fs" />
         <Compile Include="Reports\Handlers.fs"/>
         <Compile Include="Stocks\ListsHandler.fs" />
         <Compile Include="Stocks\PendingStockPositionsHandler.fs" />

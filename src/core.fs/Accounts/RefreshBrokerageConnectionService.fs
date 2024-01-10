@@ -52,3 +52,5 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
             
         ()
     }
+    
+    member _.NextRunTime (now:DateTimeOffset) = now.AddHours(12.0)
