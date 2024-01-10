@@ -139,8 +139,14 @@ namespace core.fs.Alerts
         member _.GetNotices () =
             notices |> Seq.sortByDescending (fun x -> x.``when``)
 
-        member _.SetListCheckCompleted completed = listChecksCompleted <- completed
-        member _.SetStopLossCheckCompleted completed = stopLossCheckCompleted <- completed
+        member this.SetListCheckCompleted completed =
+            if completed then
+                this.AddNotice "List check completed"
+            listChecksCompleted <- completed
+        member this.SetStopLossCheckCompleted completed =
+            if completed then
+                this.AddNotice "Stop loss check completed"
+            stopLossCheckCompleted <- completed
         member _.ContainerReadyForNotifications() = listChecksCompleted && stopLossCheckCompleted
         member this.ClearStopLossAlert() =
             alerts.Values

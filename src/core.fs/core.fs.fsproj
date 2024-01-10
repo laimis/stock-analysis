@@ -43,6 +43,7 @@
         <Compile Include="Alerts\Handlers.fs"/>
         <Compile Include="Alerts\MonitoringServices.fs" />
         <Compile Include="Brokerage\Handlers.fs"/>
+        <Compile Include="Brokerage\MonitoringServices.fs" />
         <Compile Include="Cryptos\Import.fs"/>
         <Compile Include="Cryptos\Handlers.fs"/>
         <Compile Include="Portfolio\Views.fs"/>

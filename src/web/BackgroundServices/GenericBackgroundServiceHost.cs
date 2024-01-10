@@ -13,6 +13,7 @@ public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILog
 {
     // ReSharper disable once InconsistentNaming
     protected abstract DateTimeOffset GetNextRunDateTime(DateTimeOffset referenceTime);
+    protected core.fs.Adapters.Logging.ILogger baseLogger => logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -93,7 +94,7 @@ public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshB
 public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service)
     : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
+    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(baseLogger, now);
 
     protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
 }

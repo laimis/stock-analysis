@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using core.fs;
+using core.fs.Brokerage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
@@ -13,11 +13,11 @@ namespace web.Controllers
     {
         [HttpPost("buy")]
         public Task<ActionResult> Buy(
-            [FromBody] Brokerage.BuyOrSellData data,
-            [FromServices] Brokerage.Handler handler) =>
+            [FromBody] BuyOrSellData data,
+            [FromServices] BrokerageHandler brokerageHandler) =>
             this.OkOrError(
-                handler.Handle(
-                    Brokerage.BrokerageTransaction.NewBuy(
+                brokerageHandler.Handle(
+                    BrokerageTransaction.NewBuy(
                         data,
                         User.Identifier()
                     )
@@ -26,11 +26,11 @@ namespace web.Controllers
         
         [HttpPost("buytocover")]
         public Task<ActionResult> BuyToCover(
-            [FromBody] Brokerage.BuyOrSellData data,
-            [FromServices] Brokerage.Handler handler) =>
+            [FromBody] BuyOrSellData data,
+            [FromServices] BrokerageHandler brokerageHandler) =>
             this.OkOrError(
-                handler.Handle(
-                    Brokerage.BrokerageTransaction.NewBuyToCover(
+                brokerageHandler.Handle(
+                    BrokerageTransaction.NewBuyToCover(
                         data,
                         User.Identifier()
                     )
@@ -39,11 +39,11 @@ namespace web.Controllers
         
         [HttpPost("sellshort")]
         public Task<ActionResult> SellShort(
-            [FromBody] Brokerage.BuyOrSellData data,
-            [FromServices] Brokerage.Handler handler) =>
+            [FromBody] BuyOrSellData data,
+            [FromServices] BrokerageHandler brokerageHandler) =>
             this.OkOrError(
-                handler.Handle(
-                    Brokerage.BrokerageTransaction.NewSellShort(
+                brokerageHandler.Handle(
+                    BrokerageTransaction.NewSellShort(
                         data,
                         User.Identifier()
                     )
@@ -52,11 +52,11 @@ namespace web.Controllers
 
         [HttpPost("sell")]
         public Task<ActionResult> Sell(
-            [FromBody] Brokerage.BuyOrSellData data,
-            [FromServices] Brokerage.Handler handler) =>
+            [FromBody] BuyOrSellData data,
+            [FromServices] BrokerageHandler brokerageHandler) =>
             this.OkOrError(
-                handler.Handle(
-                    Brokerage.BrokerageTransaction.NewSell(
+                brokerageHandler.Handle(
+                    BrokerageTransaction.NewSell(
                         data,
                         User.Identifier()
                     )
@@ -64,11 +64,11 @@ namespace web.Controllers
             );
 
         [HttpDelete("orders/{orderId}")]
-        public Task<ActionResult> Delete([FromRoute] string orderId, [FromServices] Brokerage.Handler service) =>
-            this.OkOrError(service.Handle(new Brokerage.CancelOrder(User.Identifier(), orderId)));
+        public Task<ActionResult> Delete([FromRoute] string orderId, [FromServices] BrokerageHandler service) =>
+            this.OkOrError(service.Handle(new CancelOrder(User.Identifier(), orderId)));
 
         [HttpGet("account")]
-        public Task<ActionResult> GetAccount([FromServices] Brokerage.Handler service) =>
-            this.OkOrError(service.Handle(new Brokerage.QueryAccount(User.Identifier())));
+        public Task<ActionResult> GetAccount([FromServices] BrokerageHandler service) =>
+            this.OkOrError(service.Handle(new QueryAccount(User.Identifier())));
     }
 }

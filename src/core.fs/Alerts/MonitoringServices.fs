@@ -271,7 +271,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         container.ManualRunCompleted()
         
         container.AddNotice(
-             $"Alert check generator added {listOfChecks.Count}, next run at {marketHours.ToMarketTime(nextPatternMonitoringRunDateTime)}"
+             $"Pattern check generator added {listOfChecks.Count}, next run at {marketHours.ToMarketTime(nextPatternMonitoringRunDateTime)}"
         )
     }
     
@@ -489,30 +489,31 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
     
     member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
         
-        if isFridayOrWeekend() |> not then
+        match isFridayOrWeekend() with
+        | false ->
             logger.LogInformation("Not running weekly upside reversal check because it is not Friday or the weekend")
-            return ()
+        | true ->
+            logger.LogInformation("Running weekly upside reversal check")
             
-        logger.LogInformation("Running weekly upside reversal check")
-        
-        match tickersToCheckCount() with
-        | 0 -> 
-            logger.LogInformation("No tickers to check, loading them")
-            let! _ = loadTickersToCheck logger cancellationToken
-            ()
-        | _ ->
-            logger.LogInformation("Running checks")
-            let! _ = runChecks logger cancellationToken
             match tickersToCheckCount() with
-            | 0 ->
-                logger.LogInformation("Sending emails")
-                do! sendEmails logger cancellationToken
-            | _ -> ()
+            | 0 -> 
+                logger.LogInformation("No tickers to check, loading them")
+                let! _ = loadTickersToCheck logger cancellationToken
+                ()
+            | _ ->
+                logger.LogInformation("Running checks")
+                let! _ = runChecks logger cancellationToken
+                match tickersToCheckCount() with
+                | 0 ->
+                    logger.LogInformation("Sending emails")
+                    do! sendEmails logger cancellationToken
+                | _ ->
+                    ()
     }
     
     member _.NextRunTime (now:DateTimeOffset) =
         match tickersToCheckCount() with
-        | 0 -> now.Add(TimeSpan.FromMinutes(1.0))
+        | x when x > 0 -> now.Add(TimeSpan.FromMinutes(1.0))
         | _ ->
             let marketTime = marketHours.ToMarketTime(now)
         
@@ -578,13 +579,14 @@ type AlertEmailService(accounts:IAccountStorage,
                 container.AddNotice "Emails sent" 
         }
         
-    member _.NextRunTime (now:DateTimeOffset) =
+    member _.NextRunTime (logger:ILogger) (now:DateTimeOffset) =
         
         match container.ContainerReadyForNotifications() |> not with
         | false ->
+            logger.LogInformation("Container is not ready for notifications")
             now.AddMinutes(1.0)
         | true ->
-            
+            logger.LogInformation("Container was ready for notifications")
             let eastern = marketHours.ToMarketTime(now);
             
             let nextTime =
@@ -598,7 +600,7 @@ type AlertEmailService(accounts:IAccountStorage,
             | Some t ->
                 t
             | None ->
-                let nextDay = eastern.Date.AddDays(1)
+                let nextDay = eastern.Date.AddDays(1).Add(emailTimes[0].ToTimeSpan())
                 
                 match nextDay.DayOfWeek with
                 | DayOfWeek.Saturday -> nextDay.AddDays(2)
