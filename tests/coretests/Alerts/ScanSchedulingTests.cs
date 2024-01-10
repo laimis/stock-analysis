@@ -1,8 +1,6 @@
 using System;
-using core.fs;
 using core.fs.Alerts;
 using core.fs.Adapters.Brokerage;
-using core.fs.Adapters.Logging;
 using core.fs.Adapters.Storage;
 using Moq;
 using Xunit;
@@ -52,7 +50,7 @@ namespace coretests.Alerts
         {
             var stopLossService = new MonitoringServices.StopLossMonitoringService(
                 Mock.Of<IAccountStorage>(), Mock.Of<IBrokerage>(), new StockAlertContainer(),
-                Mock.Of<IPortfolioStorage>(), Mock.Of<ILogger>(), _marketHours);
+                Mock.Of<IPortfolioStorage>(), _marketHours);
             return stopLossService;
         }
 
