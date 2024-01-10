@@ -106,10 +106,10 @@ namespace web
                 logger.LogInformation("Backend jobs turned on");
                 services.AddHostedService<ThirtyDaySellService>();
                 services.AddHostedService<PatternMonitoringServiceHost>();
-                services.AddHostedService<WeeklyUpsideReversalService>();
-                services.AddHostedService<EmailNotificationService>();
+                services.AddHostedService<WeeklyUpsideReversalServiceHost>();
                 services.AddHostedService<StopLossServiceHost>();
                 services.AddHostedService<BrokerageServiceHost>();
+                services.AddHostedService<AlertEmailServiceHost>();
             }
             else
             {

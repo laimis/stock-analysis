@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using core.fs;
 using core.fs.Accounts;
 using core.fs.Adapters.Email;
 using core.fs.Adapters.Storage;
@@ -13,14 +14,10 @@ using Handler = core.fs.Reports.Handler;
 
 namespace web.BackgroundServices;
 
-public abstract class GenericBackgroundServiceHost : BackgroundService
+public abstract class GenericBackgroundServiceHost(ILogger logger) : BackgroundService
 {
-    protected readonly ILogger _logger;
-    
-    public GenericBackgroundServiceHost(ILogger logger)
-    {
-        _logger = logger;            
-    }
+    // ReSharper disable once InconsistentNaming
+    protected readonly ILogger _logger = logger;
 
     protected abstract TimeSpan GetSleepDuration();
 
@@ -58,81 +55,71 @@ public abstract class GenericBackgroundServiceHost : BackgroundService
     protected abstract Task Loop(CancellationToken stoppingToken);
 }
 
-public class StopLossServiceHost : GenericBackgroundServiceHost
+public class StopLossServiceHost(
+    ILogger<StopLossServiceHost> logger,
+    MonitoringServices.StopLossMonitoringService stopLossMonitoringService)
+    : GenericBackgroundServiceHost(logger)
 {
-    private readonly MonitoringServices.StopLossMonitoringService _service;
-
-    public StopLossServiceHost(
-        ILogger<StopLossServiceHost> logger,
-        MonitoringServices.StopLossMonitoringService stopLossMonitoringService) : base(logger)
-    {
-        _service = stopLossMonitoringService;
-    }
-
     protected override TimeSpan GetSleepDuration() =>
-        _service.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
+        stopLossMonitoringService.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
 
-    protected override async Task Loop(CancellationToken stoppingToken) => await _service.Execute(stoppingToken);
+    protected override async Task Loop(CancellationToken stoppingToken) => await stopLossMonitoringService.Execute(stoppingToken);
 }
 
-public class PatternMonitoringServiceHost : GenericBackgroundServiceHost
+public class PatternMonitoringServiceHost(
+    ILogger<PatternMonitoringServiceHost> logger,
+    MonitoringServices.PatternMonitoringService patternMonitoringService)
+    : GenericBackgroundServiceHost(logger)
 {
-    private readonly MonitoringServices.PatternMonitoringService _service;
-
-    public PatternMonitoringServiceHost(
-        ILogger<PatternMonitoringServiceHost> logger,
-        MonitoringServices.PatternMonitoringService patternMonitoringService) : base(logger)
-    {
-        _service = patternMonitoringService;
-    }
-
     protected override TimeSpan GetSleepDuration() =>
-        _service.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
+        patternMonitoringService.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
 
-    protected override async Task Loop(CancellationToken stoppingToken) => await _service.Execute(stoppingToken);
-
+    protected override async Task Loop(CancellationToken stoppingToken) => await patternMonitoringService.Execute(stoppingToken);
 }
 
-public class BrokerageServiceHost : GenericBackgroundServiceHost
+public class WeeklyUpsideReversalServiceHost(
+    ILogger<MonitoringServices.WeeklyUpsideMonitoringService> logger,
+    MonitoringServices.WeeklyUpsideMonitoringService service)
+    : GenericBackgroundServiceHost(logger)
 {
-    private readonly RefreshBrokerageConnectionService _service;
+    protected override TimeSpan GetSleepDuration() =>
+        service.NextRunTime(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
 
-    public BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshBrokerageConnectionService service) : base(logger)
-    {
-        _service = service;
-    }
+    protected override async Task Loop(CancellationToken stoppingToken) => await service.Execute(stoppingToken);
+}
 
+public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshBrokerageConnectionService service)
+    : GenericBackgroundServiceHost(logger)
+{
     protected override TimeSpan GetSleepDuration() => TimeSpan.FromHours(12);
 
     protected override Task Loop(CancellationToken stoppingToken)
     {
-        return _service.Execute(stoppingToken);
+        return service.Execute(stoppingToken);
     }
 }
 
-public class ThirtyDaySellService : GenericBackgroundServiceHost
+public class AlertEmailServiceHost(ILogger<AlertEmailService> logger, AlertEmailService service):
+    GenericBackgroundServiceHost(logger)
 {
-    private readonly IAccountStorage _accounts;
-    private readonly Handler _service;
-    private readonly IEmailService _emails;
+    protected override TimeSpan GetSleepDuration() => service.NextRunTime(DateTimeOffset.UtcNow);
 
-    public ThirtyDaySellService(
-        ILogger<ThirtyDaySellService> logger,
-        IAccountStorage accounts,
-        IEmailService emails,
-        Handler service) : base(logger)
-    {
-        _accounts = accounts;
-        _emails = emails;
-        _service = service;
-    }
+    protected override Task Loop(CancellationToken stoppingToken) => service.Execute(stoppingToken);
+}
 
+public class ThirtyDaySellService(
+    ILogger<ThirtyDaySellService> logger,
+    IAccountStorage accounts,
+    IEmailService emails,
+    Handler service)
+    : GenericBackgroundServiceHost(logger)
+{
     private static readonly TimeSpan _sleepInterval = TimeSpan.FromHours(24);
     protected override TimeSpan GetSleepDuration() => _sleepInterval;
 
     protected override async Task Loop(CancellationToken stoppingToken)
     {
-        var pairs = await _accounts.GetUserEmailIdPairs();
+        var pairs = await accounts.GetUserEmailIdPairs();
 
         foreach(var p in pairs)
         {
@@ -159,7 +146,7 @@ public class ThirtyDaySellService : GenericBackgroundServiceHost
 
         var query = new SellsQuery(p.Id);
 
-        var sellView = await _service.Handle(query);
+        var sellView = await service.Handle(query);
 
         if (sellView.IsOk == false)
         {
@@ -171,7 +158,7 @@ public class ThirtyDaySellService : GenericBackgroundServiceHost
 
         if (sellsOfInterest.Count > 0)
         {
-            await _emails.SendWithTemplate(
+            await emails.SendWithTemplate(
                 recipient: new Recipient(email: p.Email, name: null),
                 Sender.NoReply,
                 template: EmailTemplate.SellAlert,

@@ -2,7 +2,6 @@ namespace core.fs.Alerts
 
     open System
     open System.Collections.Concurrent
-    open core.Account
     open core.Shared
     open core.fs
     open core.fs.Accounts
@@ -18,21 +17,6 @@ namespace core.fs.Alerts
     type AlertContainerMessage = {
         message: string
         ``when``: DateTimeOffset
-    }
-    
-    [<Struct>]
-    type PatternCheck = {
-        ticker: Ticker
-        listName: string
-        user: UserState
-    }
-    
-    [<Struct>]
-    type StopLossCheck = {
-        ticker: Ticker
-        stopPrice: decimal
-        isShort: bool
-        user: UserState
     }
     
     module Constants =
