@@ -5,10 +5,11 @@ using core.fs.Accounts;
 using core.fs.Alerts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using web.Utils;
 
 namespace web.BackgroundServices;
 
-public abstract class GenericBackgroundServiceHost(ILogger logger) : BackgroundService
+public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILogger logger) : BackgroundService
 {
     // ReSharper disable once InconsistentNaming
     protected abstract DateTimeOffset GetNextRunDateTime(DateTimeOffset referenceTime);
@@ -19,7 +20,7 @@ public abstract class GenericBackgroundServiceHost(ILogger logger) : BackgroundS
         var randomSleep = new Random().Next(5, 10);
         await Task.Delay(TimeSpan.FromSeconds(randomSleep), stoppingToken);
         
-        logger.LogInformation("running {name}", GetType().Name);
+        logger.LogInformation($"running {GetType().Name}");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -29,23 +30,23 @@ public abstract class GenericBackgroundServiceHost(ILogger logger) : BackgroundS
             }
             catch(Exception ex)
             {
-                logger.LogError("Failed: {exception}", ex);
+                logger.LogError($"Failed: {ex}");
             }
 
             var sleepDuration = GetNextRunDateTime(DateTimeOffset.UtcNow).Subtract(DateTimeOffset.UtcNow);
             if (sleepDuration.TotalMinutes > 1) // only show less frequent sleeps in order not to spam logs
             {
-                logger.LogInformation("sleeping for {sleepDuration}", sleepDuration);
+                logger.LogInformation($"sleeping for {sleepDuration}");
             }
             if (sleepDuration.TotalMinutes < 0)
             {
-                logger.LogWarning("sleep duration is negative: {sleepDuration}", sleepDuration);
+                logger.LogWarning($"sleep duration is negative: {sleepDuration}");
             }
 
             await Task.Delay(sleepDuration, stoppingToken);
         }
 
-        logger.LogInformation("{name} exit", GetType().Name);
+        logger.LogInformation($"{GetType().Name} exit");
     }
 
     protected abstract Task Loop(CancellationToken stoppingToken);
@@ -54,7 +55,7 @@ public abstract class GenericBackgroundServiceHost(ILogger logger) : BackgroundS
 public class StopLossServiceHost(
     ILogger<StopLossServiceHost> logger,
     MonitoringServices.StopLossMonitoringService stopLossMonitoringService)
-    : GenericBackgroundServiceHost(logger)
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => stopLossMonitoringService.NextRunTime(now);
 
@@ -64,7 +65,7 @@ public class StopLossServiceHost(
 public class PatternMonitoringServiceHost(
     ILogger<PatternMonitoringServiceHost> logger,
     MonitoringServices.PatternMonitoringService patternMonitoringService)
-    : GenericBackgroundServiceHost(logger)
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => patternMonitoringService.NextRunTime(now);
 
@@ -74,7 +75,7 @@ public class PatternMonitoringServiceHost(
 public class WeeklyUpsideReversalServiceHost(
     ILogger<MonitoringServices.WeeklyUpsideMonitoringService> logger,
     MonitoringServices.WeeklyUpsideMonitoringService service)
-    : GenericBackgroundServiceHost(logger)
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
@@ -82,15 +83,15 @@ public class WeeklyUpsideReversalServiceHost(
 }
 
 public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshBrokerageConnectionService service)
-    : GenericBackgroundServiceHost(logger)
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
     protected override Task Loop(CancellationToken stoppingToken) => service.Execute(stoppingToken);
 }
 
-public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service):
-    GenericBackgroundServiceHost(logger)
+public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service)
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
@@ -99,7 +100,8 @@ public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService>
 
 public class ThirtyDaySellServiceHost(
     ILogger<core.fs.Portfolio.MonitoringServices.ThirtyDaySellService> logger,
-    core.fs.Portfolio.MonitoringServices.ThirtyDaySellService service) : GenericBackgroundServiceHost(logger)
+    core.fs.Portfolio.MonitoringServices.ThirtyDaySellService service) 
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRun(now);
     
