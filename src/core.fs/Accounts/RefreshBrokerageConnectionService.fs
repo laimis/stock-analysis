@@ -1,14 +1,15 @@
 namespace core.fs.Accounts
 
 open System
+open System.Threading
 open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
     
-type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBrokerage,logger:ILogger) =
+type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBrokerage) =
     
-    let runBrokerageCheck _ userId = task {
+    let runBrokerageCheck (logger:ILogger) (cancellationToken:CancellationToken) userId = task {
         
         let! user = accounts.GetUser userId
         match user with
@@ -39,14 +40,14 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
     
     interface IApplicationService
     
-    member _.Execute cancellationToken = task {
+    member _.Execute (logger:ILogger) cancellationToken = task {
             
         let! users = accounts.GetUserEmailIdPairs()
         
         let! _ =
             users
             |> Seq.map (fun emailIdPair ->
-                runBrokerageCheck cancellationToken emailIdPair.Id |> Async.AwaitTask)
+                runBrokerageCheck logger cancellationToken emailIdPair.Id |> Async.AwaitTask)
             |> Async.Sequential
             |> Async.StartAsTask
             

@@ -11,12 +11,11 @@ open core.fs.Stocks
 type ThirtyDaySellService(
     accounts: IAccountStorage,
     emails: IEmailService,
-    logger: ILogger,
     portfolio: IPortfolioStorage) =
 
     interface IApplicationService
 
-    member _.Execute (cancellationToken:CancellationToken) = task {
+    member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
         
         let! pairs = accounts.GetUserEmailIdPairs()
         
@@ -61,4 +60,4 @@ type ThirtyDaySellService(
         return ()
     }
     
-    member _.NextRun (now:System.DateTimeOffset) = now.AddHours(24.0)
+    member _.NextRun (now:DateTimeOffset) = now.AddHours(24.0)

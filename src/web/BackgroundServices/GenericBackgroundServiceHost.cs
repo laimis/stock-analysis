@@ -26,7 +26,7 @@ public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILog
         {
             try
             {
-                await Loop(stoppingToken);
+                await Loop(logger, stoppingToken);
             }
             catch(Exception ex)
             {
@@ -49,7 +49,7 @@ public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILog
         logger.LogInformation($"{GetType().Name} exit");
     }
 
-    protected abstract Task Loop(CancellationToken stoppingToken);
+    protected abstract Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken);
 }
 
 public class StopLossServiceHost(
@@ -59,7 +59,7 @@ public class StopLossServiceHost(
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => stopLossMonitoringService.NextRunTime(now);
 
-    protected override async Task Loop(CancellationToken stoppingToken) => await stopLossMonitoringService.Execute(stoppingToken);
+    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => await stopLossMonitoringService.Execute(logger, stoppingToken);
 }
 
 public class PatternMonitoringServiceHost(
@@ -69,7 +69,7 @@ public class PatternMonitoringServiceHost(
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => patternMonitoringService.NextRunTime(now);
 
-    protected override Task Loop(CancellationToken stoppingToken) => patternMonitoringService.Execute(stoppingToken);
+    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => patternMonitoringService.Execute(logger, stoppingToken);
 }
 
 public class WeeklyUpsideReversalServiceHost(
@@ -79,7 +79,7 @@ public class WeeklyUpsideReversalServiceHost(
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
-    protected override async Task Loop(CancellationToken stoppingToken) => await service.Execute(stoppingToken);
+    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => await service.Execute(logger, stoppingToken);
 }
 
 public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshBrokerageConnectionService service)
@@ -87,7 +87,7 @@ public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshB
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
-    protected override Task Loop(CancellationToken stoppingToken) => service.Execute(stoppingToken);
+    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
 }
 
 public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service)
@@ -95,7 +95,7 @@ public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService>
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
-    protected override Task Loop(CancellationToken stoppingToken) => service.Execute(stoppingToken);
+    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
 }
 
 public class ThirtyDaySellServiceHost(
@@ -105,5 +105,5 @@ public class ThirtyDaySellServiceHost(
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRun(now);
     
-    protected override Task Loop(CancellationToken stoppingToken) => service.Execute(stoppingToken);
+    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
 }
