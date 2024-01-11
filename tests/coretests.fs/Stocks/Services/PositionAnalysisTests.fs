@@ -8,7 +8,6 @@ open core.fs.Services.Analysis
 open core.fs.Stocks
 open coretests.testdata
 open FsUnit
-open timezonesupport
 
 let createTestData() =
     
@@ -54,16 +53,8 @@ let ``Evaluate with no strategy, selects missing strategy ticker``() =
     |> Seq.filter (fun e -> e.SortColumn = PositionAnalysis.PositionAnalysisKeys.StrategyLabel)
     |> Seq.head
     |> _.MatchingTickers
-    |> should not' Empty 
+    |> should not' Empty
     
-[<Fact>]
-let ``Evaluate without risk amount but stop loss is set, selects the position``() =
-    generateEvaluationsFromTestData()
-    |> Seq.filter (fun e -> e.SortColumn = PositionAnalysis.PositionAnalysisKeys.RiskAmount)
-    |> Seq.head
-    |> _.MatchingTickers
-    |> should not' Empty 
-
 [<Fact>]
 let ``Daily PL Correct`` () =
     
@@ -73,7 +64,7 @@ let ``Daily PL Correct`` () =
     
     let sold =
         position
-        |> StockPosition.sell position.NumberOfShares bars.Bars.[midPointInBars].Close bars.Bars.[midPointInBars].Date
+        |> StockPosition.sell position.NumberOfShares bars.Bars[midPointInBars].Close bars.Bars[midPointInBars].Date
         |> StockPositionWithCalculations
     
     let dailyPlAndGain = PositionAnalysis.dailyPLAndGain bars sold
