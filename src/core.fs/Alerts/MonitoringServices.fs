@@ -54,7 +54,7 @@ let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
         |}
         
 let private toEmailAlert marketHours alertGroup =
-    {| identifer = alertGroup |> fst; alertCount = alertGroup |> snd |> Seq.length; alerts = alertGroup |> snd |> Seq.map (toEmailData marketHours)  |}
+    {| identifier = alertGroup |> fst; alertCount = alertGroup |> snd |> Seq.length; alerts = alertGroup |> snd |> Seq.map (toEmailData marketHours)  |}
 
 let generateEmailDataPayloadForAlerts marketHours alerts =
     let groups =

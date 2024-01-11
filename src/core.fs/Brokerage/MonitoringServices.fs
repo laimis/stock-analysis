@@ -2,6 +2,7 @@ module core.fs.Brokerage.MonitoringServices
 
 open System
 open System.Threading
+open System.Threading.Tasks
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Logging
@@ -18,37 +19,40 @@ type AccountMonitoringService(
         
         let! pairs = accounts.GetUserEmailIdPairs()
         
-        return!
+        let! users =
             pairs
             |> Seq.takeWhile (fun _ -> not cancellationToken.IsCancellationRequested)
-            |> Seq.map (fun pair -> async {
-                let! user = pair.Id |> accounts.GetUser |> Async.AwaitTask
-                match user with
-                | None ->
-                    return ()
-                | Some user ->
-                    if user.State.ConnectedToBrokerage then
-                        let! account = brokerage.GetAccount user.State |> Async.AwaitTask
-                        let result = account.Result
-                        
-                        match result with
-                        | Error e ->
-                            logger.LogError $"Unable to get brokerage account for {user.State.Id}: {e.Message}"
-                        | Ok account ->
-                            let cash = account.CashBalance
-                            let equity = account.Equity
-                            let longValue = account.LongMarketValue
-                            let shortValue = account.ShortMarketValue
-                            let marketNow = marketHours.ToMarketTime DateTime.UtcNow |> _.ToString("yyyy-MM-dd")
-                            let snapshot = AccountBalancesSnapshot(cash.Value, equity.Value, longValue.Value, shortValue.Value, marketNow, user.State.Id)
-                            do! accounts.SaveAccountBalancesSnapshot (user.State.Id |> UserId) snapshot |> Async.AwaitTask
-                            logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
-                            
-                            return ()
-                        
-                    return ()
+            |> Seq.map (fun pair -> pair.Id |> accounts.GetUser |> Async.AwaitTask)
+            |> Async.Sequential
+            
+        let connectedUsers =
+            users
+            |> Seq.choose id
+            |> Seq.filter _.State.ConnectedToBrokerage
+            
+        let! _ =
+            connectedUsers
+            |> Seq.takeWhile (fun _ -> not cancellationToken.IsCancellationRequested)
+            |> Seq.map (fun user -> async {
+                    
+                let! account = brokerage.GetAccount user.State |> Async.AwaitTask
+                match account.Result with
+                | Error e ->
+                    logger.LogError $"Unable to get brokerage account for {user.State.Id}: {e.Message}"
+                | Ok account ->
+                    let cash = account.CashBalance
+                    let equity = account.Equity
+                    let longValue = account.LongMarketValue
+                    let shortValue = account.ShortMarketValue
+                    let marketNow = marketHours.ToMarketTime DateTime.UtcNow |> _.ToString("yyyy-MM-dd")
+                    let snapshot = AccountBalancesSnapshot(cash.Value, equity.Value, longValue.Value, shortValue.Value, marketNow, user.State.Id)
+                    do! accounts.SaveAccountBalancesSnapshot (user.State.Id |> UserId) snapshot |> Async.AwaitTask
+                    logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
+                    
             })
             |> Async.Sequential
+            
+        return Task.CompletedTask
     }
     
     member _.NextRun now =
