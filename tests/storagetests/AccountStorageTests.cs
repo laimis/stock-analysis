@@ -86,8 +86,10 @@ namespace storagetests
             var storage = GetStorage();
 
             var userId = UserId.NewUserId(Guid.NewGuid());
+
+            var date = DateTime.UtcNow.ToString("yyyy-MM-dd");
             
-            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, DateTime.UtcNow, userId.Item);
+            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, date, userId.Item);
 
             await storage.SaveAccountBalancesSnapshot(userId, balances);
             
@@ -97,7 +99,7 @@ namespace storagetests
             Assert.Equal(balances.Cash, fromDb.Value.Cash);
             Assert.Equal(balances.LongValue, fromDb.Value.LongValue);
             Assert.Equal(balances.ShortValue, fromDb.Value.ShortValue);
-            Assert.Equal(balances.Date.Date, fromDb.Value.Date);
+            Assert.Equal(balances.Date, fromDb.Value.Date);
             
             // saving the same snapshot should not blow up but just do update
             await storage.SaveAccountBalancesSnapshot(userId, balances);

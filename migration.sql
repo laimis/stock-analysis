@@ -97,14 +97,13 @@ ALTER TABLE events ALTER COLUMN AggregateId SET NOT NULL;
 CREATE UNIQUE INDEX events_aggregateid_unique 
     ON events USING BTREE(aggregateid,userid,version);
 
--- cash,equity,longValue,shortValue,date,userId
 CREATE TABLE accountbalancessnapshots (
     userid uuid,
     cash decimal,
     equity decimal,
     longvalue decimal,
     shortvalue decimal,
-    date timestamp,
+    date text,
     PRIMARY KEY (userid,date) 
 );
 ALTER TABLE accountbalancessnapshots OWNER TO stocks;

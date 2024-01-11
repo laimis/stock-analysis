@@ -130,7 +130,28 @@ public class BrokerageAccountServiceHost(
     core.fs.Brokerage.MonitoringServices.AccountMonitoringService service)
     : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRun(now);
+    private bool _failed;
 
-    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
+    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now)
+    {
+        if (_failed)
+        {
+            return now.AddMinutes(1);
+        }
+        
+        return service.NextRun(now);
+    }
+
+    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken)
+    {
+        try
+        {
+            await service.Execute(logger, stoppingToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"Brokerage account sync failed: {e}");
+            _failed = true;
+        }
+    }
 }
