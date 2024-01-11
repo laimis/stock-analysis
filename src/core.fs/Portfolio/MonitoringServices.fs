@@ -43,7 +43,7 @@ type ThirtyDaySellService(
                         )
                         |> Seq.map (fun t ->
                             {|
-                                Ticker = t.Ticker
+                                Ticker = t.Ticker.Value
                                 Date = t.Date
                                 Price = t.Price
                                 NUmberOfShares = t.NumberOfShares
