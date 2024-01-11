@@ -146,6 +146,9 @@ type TradingAccount() =
     member val OptionPositions : OptionPosition [] = [||] with get, set
     member val Orders : Order [] = [||] with get, set
     member val CashBalance : decimal option = None with get, set
+    member val Equity : decimal option = None with get, set
+    member val LongMarketValue : decimal option = None with get, set
+    member val ShortMarketValue : decimal option = None with get, set
     
     static member Empty : TradingAccount =
         let trading:TradingAccount = TradingAccount()

@@ -109,6 +109,7 @@ namespace web
                 services.AddHostedService<WeeklyUpsideReversalServiceHost>();
                 services.AddHostedService<StopLossServiceHost>();
                 services.AddHostedService<BrokerageServiceHost>();
+                services.AddHostedService<BrokerageAccountServiceHost>();
                 services.AddHostedService<AlertEmailServiceHost>();
             }
             else

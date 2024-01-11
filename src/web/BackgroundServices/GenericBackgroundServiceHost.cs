@@ -108,3 +108,13 @@ public class ThirtyDaySellServiceHost(
     
     protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
 }
+
+public class BrokerageAccountServiceHost(
+    ILogger<core.fs.Brokerage.MonitoringServices.AccountMonitoringService> logger,
+    core.fs.Brokerage.MonitoringServices.AccountMonitoringService service)
+    : GenericBackgroundServiceHost(new WrappingLogger(logger))
+{
+    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRun(now);
+
+    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
+}

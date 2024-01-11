@@ -272,7 +272,10 @@ public class TDAmeritradeClient : IBrokerage
             Orders = orders,
             StockPositions = stockPositions,
             OptionPositions = optionPositions,
-            CashBalance = accounts[0].securitiesAccount?.currentBalances?.cashBalance
+            CashBalance = accounts[0].securitiesAccount?.currentBalances?.cashBalance,
+            Equity = accounts[0].securitiesAccount?.currentBalances?.equity,
+            LongMarketValue = accounts[0].securitiesAccount?.currentBalances?.longMarketValue,
+            ShortMarketValue = accounts[0].securitiesAccount?.currentBalances?.shortMarketValue,
         };
 
         return new ServiceResponse<TradingAccount>(account);

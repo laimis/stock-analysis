@@ -182,6 +182,9 @@ internal class SecuritiesAccount
 internal class TDBalances
 {
     public decimal cashBalance { get; set; }
+    public decimal equity { get; set; }
+    public decimal longMarketValue { get; set; }
+    public decimal shortMarketValue { get; set; }
 }
 
 internal class TDPosition
