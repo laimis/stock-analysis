@@ -226,6 +226,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                     40
                     true
                     zeroLineAnnotationVertical
+                    
+        let profitByIndex = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Column)
+        trades |> Seq.sortBy _.Profit |> Seq.iteri (fun i p -> profitByIndex.Add(i.ToString(), p.Profit))
         
         [
             profits
@@ -234,6 +237,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             gainDistribution
             gainPctDistribution
             rrDistribution
+            profitByIndex
             wins
             avgWinPct
             avgLossPct
