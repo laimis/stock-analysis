@@ -323,8 +323,6 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             container.AddNotice("Running pattern monitoring checks")
             do! generatePatternMonitoringChecks()
             
-        priceCache.Clear()
-        
         let startingNumberOfChecks = listOfChecks.Count
         
         let! checks =
@@ -338,14 +336,13 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         
         let completedChecks = completedChecksWithCounts |> Seq.map fst
         
-        completedChecks |> Seq.iter (fun kp ->
-            listOfChecks.Remove(kp) |> ignore
-        )
+        completedChecks |> Seq.iter (fun kp -> listOfChecks.Remove(kp) |> ignore)
         
         let totalPatternsFoundCount = completedChecksWithCounts |> Seq.map snd |> Seq.sum
         
         match listOfChecks.Count with
         | 0 ->
+            priceCache.Clear()
             if startingNumberOfChecks > 0 then
                 container.AddNotice($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
         | _ ->
@@ -529,37 +526,34 @@ type AlertEmailService(accounts:IAccountStorage,
             TimeOnly.Parse("15:50")
         ]
     
-    let sendAlerts recipient alerts = 
-        
-       let sendTask =
+    let sendAlerts recipient alerts =
+        logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
+        let sendTask =
             alerts
             |> generateEmailDataPayloadForAlerts marketHours
             |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
        
-       sendTask |> Async.AwaitTask
+        sendTask |> Async.AwaitTask
     
     interface IApplicationService
     
     member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
             
-            // check if container is ready for notifications
             let! users = accounts.GetUserEmailIdPairs()
             
-            let result =
+            let! result =
                 users
                 |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
                 |> Seq.map (fun emailIdPair -> async {
                     let! user = accounts.GetUser emailIdPair.Id |> Async.AwaitTask
                     match user with
-                    | None ->
-                        logger.LogError $"User {emailIdPair.Id} not found"
-                        
+                    | None -> logger.LogError $"User {emailIdPair.Id} not found"
                     | Some user ->
                         let recipient = Recipient(email=user.State.Email, name=user.State.Name)
-                        
                         let alerts = container.GetAlerts emailIdPair.Id
-                        
-                        do! sendAlerts recipient alerts;
+                        match alerts |> Seq.isEmpty with
+                        | true -> ()
+                        | false -> do! sendAlerts recipient alerts;
                 })
                 |> Async.Sequential
                 

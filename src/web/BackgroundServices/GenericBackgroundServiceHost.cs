@@ -96,7 +96,7 @@ public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshB
     protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
 }
 
-public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service)
+public class AlertEmailServiceHost(ILogger<AlertEmailServiceHost> logger, MonitoringServices.AlertEmailService service)
     : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     private bool _firstRun = true;
