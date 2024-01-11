@@ -8,6 +8,7 @@ open core.fs.Services.Analysis
 open core.fs.Stocks
 open coretests.testdata
 open FsUnit
+open timezonesupport
 
 let createTestData() =
     
@@ -18,10 +19,24 @@ let createTestData() =
     let position =
         StockPosition.openLong ticker bars.First.Date
         |> StockPosition.buy 10m 100m (bars.First.Date)
+        |> StockPosition.setStop (Some 90m) (bars.First.Date)
         
     let orders = [| Order(Ticker = Some(ticker), Price = 100m, Type = "SELL") |]
     
     (position, bars, orders)
+    
+let generateEvaluationsFromTestData() =
+    
+    let position, bars, orders = createTestData()
+    
+    let outcomes = [
+        {
+            outcomes = PositionAnalysis.generate (position|> StockPositionWithCalculations) bars orders
+            ticker = position.Ticker
+        }
+    ]
+    
+    PositionAnalysis.evaluate outcomes
 
 
 [<Fact>]
@@ -31,23 +46,23 @@ let ``Position with no strategy label sets appropriate key value``() =
     
     let outcomes = PositionAnalysis.generate (position|> StockPositionWithCalculations) bars orders
     
-    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PortfolioAnalysisKeys.StrategyLabel && o.Value = 0m) |> should equal true
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.StrategyLabel && o.Value = 0m) |> should equal true
 
 [<Fact>]
 let ``Evaluate with no strategy, selects missing strategy ticker``() =
+    generateEvaluationsFromTestData()
+    |> Seq.filter (fun e -> e.SortColumn = PositionAnalysis.PositionAnalysisKeys.StrategyLabel)
+    |> Seq.head
+    |> _.MatchingTickers
+    |> should not' Empty 
     
-    let (position, bars, orders) = createTestData()
-    
-    let outcomes = [
-        {
-            outcomes = PositionAnalysis.generate (position|> StockPositionWithCalculations) bars orders
-            ticker = position.Ticker
-        }
-    ]
-    
-    let evaluations = PositionAnalysis.evaluate outcomes
-    
-    evaluations |> Seq.exists (fun e -> e.SortColumn = PositionAnalysis.PortfolioAnalysisKeys.StrategyLabel) |> should equal true
+[<Fact>]
+let ``Evaluate without risk amount but stop loss is set, selects the position``() =
+    generateEvaluationsFromTestData()
+    |> Seq.filter (fun e -> e.SortColumn = PositionAnalysis.PositionAnalysisKeys.RiskAmount)
+    |> Seq.head
+    |> _.MatchingTickers
+    |> should not' Empty 
 
 [<Fact>]
 let ``Daily PL Correct`` () =
@@ -81,11 +96,11 @@ let ``Stop price set, percent to stop matches stop level``() =
         
     let outcomes = setStopAndReturnOutcomes (bars.Last.Close - 2m)
     
-    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PortfolioAnalysisKeys.PercentToStopLoss && o.Value < 0m) |> should equal true
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.PercentToStopLoss && o.Value < 0m) |> should equal true
     
     let outcomes = setStopAndReturnOutcomes (bars.Last.Close + 2m)
     
-    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0m) |> should equal true
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.PercentToStopLoss && o.Value > 0m) |> should equal true
     
 [<Fact>]
 let ``Stop price set, for short position, percent to stop matches stop level`` () =
@@ -106,8 +121,8 @@ let ``Stop price set, for short position, percent to stop matches stop level`` (
         
     let outcomes = setStopAndReturnOutcomes (bars.Last.Close + 2m)
     
-    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PortfolioAnalysisKeys.PercentToStopLoss && o.Value < 0m) |> should equal true
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.PercentToStopLoss && o.Value < 0m) |> should equal true
     
     let outcomes = setStopAndReturnOutcomes (bars.Last.Close - 2m)
     
-    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0m) |> should equal true
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.PercentToStopLoss && o.Value > 0m) |> should equal true

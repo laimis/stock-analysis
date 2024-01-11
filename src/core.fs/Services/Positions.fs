@@ -10,7 +10,7 @@ open core.fs.Stocks
 
 module PositionAnalysis =
     
-    module PortfolioAnalysisKeys =
+    module PositionAnalysisKeys =
         
         let PercentToStopLoss = "PercentToStopLoss"
         let DaysSinceOpened = "DaysSinceOpened"
@@ -81,28 +81,28 @@ module PositionAnalysis =
         let unrealizedProfit =  position.Profit + position.NumberOfShares * (bars.Last.Close - position.AverageCostPerShare)
         
         [
-            AnalysisOutcome(PortfolioAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
-            AnalysisOutcome(PortfolioAnalysisKeys.StopLoss, OutcomeType.Neutral, stopLoss, ValueFormat.Currency, $"Stop loss is {stopLoss:C2}")
-            AnalysisOutcome(PortfolioAnalysisKeys.PercentToStopLoss, (if pctToStop < 0.0m then OutcomeType.Neutral else OutcomeType.Negative), pctToStop, ValueFormat.Percentage, $"%% difference to stop loss {stopLoss} is {pctToStop}")
-            AnalysisOutcome(PortfolioAnalysisKeys.AverageCost, OutcomeType.Neutral, Math.Round(position.AverageCostPerShare, 2), ValueFormat.Currency, $"Average cost per share is {position.AverageCostPerShare:C2}")
-            AnalysisOutcome(PortfolioAnalysisKeys.GainPct, (if position.GainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.GainPct, ValueFormat.Percentage, $"{position.GainPct:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.RR, rrOutcomeType, Math.Round(position.RR, 2), ValueFormat.Number, $"{position.RR:N2}")
-            AnalysisOutcome(PortfolioAnalysisKeys.Profit, (if position.Profit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.Profit, ValueFormat.Currency, $"{position.Profit}")
-            AnalysisOutcome(PortfolioAnalysisKeys.UnrealizedProfit, (if unrealizedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedProfit, ValueFormat.Currency, $"{unrealizedProfit}")
-            AnalysisOutcome(PortfolioAnalysisKeys.UnrealizedGain, (if unrealizedGainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedGainPct, ValueFormat.Percentage, $"{unrealizedGainPct:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdown, OutcomeType.Neutral, drawdown, ValueFormat.Percentage, $"Max drawdown is {drawdown:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.GainAndDrawdownDiff, (if gain + drawdown >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), gain + drawdown, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.MaxGainLast10, OutcomeType.Neutral, last10Gain, ValueFormat.Percentage, $"Max gain in last 10 bars is {last10Gain:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.MaxDrawdownLast10, OutcomeType.Neutral, last10Drawdown, ValueFormat.Percentage, $"Max drawdown in last 10 bars is {last10Drawdown:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.GainDiffLast10, (if last10MaxGainDrawdownDiff >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), last10MaxGainDrawdownDiff, ValueFormat.Percentage, $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}")
-            AnalysisOutcome(PortfolioAnalysisKeys.RiskAmount, OutcomeType.Neutral, (if position.RiskedAmount.IsSome then position.RiskedAmount.Value else 0.0m), ValueFormat.Currency, $"Risk amount is {position.RiskedAmount:C2}")
-            AnalysisOutcome(PortfolioAnalysisKeys.DaysHeld, OutcomeType.Neutral, position.DaysHeld, ValueFormat.Number, $"Days held: {position.DaysHeld}")
-            AnalysisOutcome(PortfolioAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
-            AnalysisOutcome(PortfolioAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
-            AnalysisOutcome(PortfolioAnalysisKeys.DaysSinceOpened, OutcomeType.Neutral, decimal daysSinceOpened, ValueFormat.Number, $"Days since opened: {daysSinceOpened}")
-            AnalysisOutcome(PortfolioAnalysisKeys.StrategyLabel, OutcomeType.Negative, (if position.ContainsLabel("strategy") then 1 else 0), ValueFormat.Boolean, $"Missing strategy label")
-            AnalysisOutcome(PortfolioAnalysisKeys.HasSellOrder, OutcomeType.Neutral, (if hasSellOrderInOrders then 1 else 0), ValueFormat.Boolean, $"Has sell order")
+            AnalysisOutcome(PositionAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
+            AnalysisOutcome(PositionAnalysisKeys.StopLoss, OutcomeType.Neutral, stopLoss, ValueFormat.Currency, $"Stop loss is {stopLoss:C2}")
+            AnalysisOutcome(PositionAnalysisKeys.PercentToStopLoss, (if pctToStop < 0.0m then OutcomeType.Neutral else OutcomeType.Negative), pctToStop, ValueFormat.Percentage, $"%% difference to stop loss {stopLoss} is {pctToStop}")
+            AnalysisOutcome(PositionAnalysisKeys.AverageCost, OutcomeType.Neutral, Math.Round(position.AverageCostPerShare, 2), ValueFormat.Currency, $"Average cost per share is {position.AverageCostPerShare:C2}")
+            AnalysisOutcome(PositionAnalysisKeys.GainPct, (if position.GainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.GainPct, ValueFormat.Percentage, $"{position.GainPct:P}")
+            AnalysisOutcome(PositionAnalysisKeys.RR, rrOutcomeType, Math.Round(position.RR, 2), ValueFormat.Number, $"{position.RR:N2}")
+            AnalysisOutcome(PositionAnalysisKeys.Profit, (if position.Profit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.Profit, ValueFormat.Currency, $"{position.Profit}")
+            AnalysisOutcome(PositionAnalysisKeys.UnrealizedProfit, (if unrealizedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedProfit, ValueFormat.Currency, $"{unrealizedProfit}")
+            AnalysisOutcome(PositionAnalysisKeys.UnrealizedGain, (if unrealizedGainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedGainPct, ValueFormat.Percentage, $"{unrealizedGainPct:P}")
+            AnalysisOutcome(PositionAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
+            AnalysisOutcome(PositionAnalysisKeys.MaxDrawdown, OutcomeType.Neutral, drawdown, ValueFormat.Percentage, $"Max drawdown is {drawdown:P}")
+            AnalysisOutcome(PositionAnalysisKeys.GainAndDrawdownDiff, (if gain + drawdown >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), gain + drawdown, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
+            AnalysisOutcome(PositionAnalysisKeys.MaxGainLast10, OutcomeType.Neutral, last10Gain, ValueFormat.Percentage, $"Max gain in last 10 bars is {last10Gain:P}")
+            AnalysisOutcome(PositionAnalysisKeys.MaxDrawdownLast10, OutcomeType.Neutral, last10Drawdown, ValueFormat.Percentage, $"Max drawdown in last 10 bars is {last10Drawdown:P}")
+            AnalysisOutcome(PositionAnalysisKeys.GainDiffLast10, (if last10MaxGainDrawdownDiff >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), last10MaxGainDrawdownDiff, ValueFormat.Percentage, $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}")
+            AnalysisOutcome(PositionAnalysisKeys.RiskAmount, OutcomeType.Neutral, (if position.RiskedAmount.IsSome then position.RiskedAmount.Value else 0.0m), ValueFormat.Currency, $"Risk amount is {position.RiskedAmount:C2}")
+            AnalysisOutcome(PositionAnalysisKeys.DaysHeld, OutcomeType.Neutral, position.DaysHeld, ValueFormat.Number, $"Days held: {position.DaysHeld}")
+            AnalysisOutcome(PositionAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
+            AnalysisOutcome(PositionAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
+            AnalysisOutcome(PositionAnalysisKeys.DaysSinceOpened, OutcomeType.Neutral, decimal daysSinceOpened, ValueFormat.Number, $"Days since opened: {daysSinceOpened}")
+            AnalysisOutcome(PositionAnalysisKeys.StrategyLabel, OutcomeType.Negative, (if position.ContainsLabel("strategy") then 1 else 0), ValueFormat.Boolean, $"Missing strategy label")
+            AnalysisOutcome(PositionAnalysisKeys.HasSellOrder, OutcomeType.Neutral, (if hasSellOrderInOrders then 1 else 0), ValueFormat.Boolean, $"Has sell order")
         ]
         
     let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
@@ -115,32 +115,41 @@ module PositionAnalysis =
             AnalysisOutcomeEvaluation(
                 "Below stop loss",
                 OutcomeType.Negative,
-                PortfolioAnalysisKeys.StopLoss,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value > 0.0m) ]
+                PositionAnalysisKeys.StopLoss,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.PercentToStopLoss && o.Value > 0.0m) ]
             )
             AnalysisOutcomeEvaluation(
                 "Stop loss at risk",
                 OutcomeType.Neutral,
-                PortfolioAnalysisKeys.PercentToStopLoss,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.PercentToStopLoss && o.Value >= percentToStopThreshold && o.Value <= 0.0m) ]
+                PositionAnalysisKeys.PercentToStopLoss,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.PercentToStopLoss && o.Value >= percentToStopThreshold && o.Value <= 0.0m) ]
             )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
-                PortfolioAnalysisKeys.Profit,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays) ]
+                PositionAnalysisKeys.Profit,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {withinTwoWeeksThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
-                PortfolioAnalysisKeys.DaysSinceOpened,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays) ]
+                PositionAnalysisKeys.DaysSinceOpened,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 "No Strategy",
                 OutcomeType.Negative,
-                PortfolioAnalysisKeys.StrategyLabel,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PortfolioAnalysisKeys.StrategyLabel && o.Value = 0m) ]
+                PositionAnalysisKeys.StrategyLabel,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.StrategyLabel && o.Value = 0m) ]
+            )
+            AnalysisOutcomeEvaluation(
+                "No Risk Amount",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.RiskAmount,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value = 0m)
+                    (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
+                ]
             )
         ]
 

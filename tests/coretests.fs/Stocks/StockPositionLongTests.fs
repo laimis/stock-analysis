@@ -102,6 +102,7 @@ let ``Assigning stop works``() =
         
     position.StopPrice.Value |> should equal 4m
     position.HasStopPrice |> should equal true
+    position.RiskAmount |> should not' (equal None)
     
     let events = position.Events
     

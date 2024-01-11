@@ -312,12 +312,11 @@ module StockPosition =
         | None -> withStop
         | Some _ when withStop.RiskAmount.IsSome -> withStop
         | Some stopPrice ->
-            let buysBeforeFirstSell =
-                withStop.Transactions
-                |> List.map (fun x -> match x with | Share s -> Some s | _ -> None)
-                |> List.choose id
-                |> List.takeWhile (fun x -> x.Type = Buy)
-            let riskAmount = buysBeforeFirstSell |> List.sumBy (fun x -> x.NumberOfShares * (x.Price - stopPrice)) |> abs
+            let riskAmount = 
+                withStop.ShareTransactions
+                |> List.takeWhile (fun x -> match withStop.IsShort with | true -> x.Type = Sell | false -> x.Type = Buy)
+                |> List.sumBy (fun x -> x.NumberOfShares * (x.Price - stopPrice)) |> abs
+                
             withStop |> setRiskAmount riskAmount date
     
     let deleteStop date (stockPosition:StockPositionState) =

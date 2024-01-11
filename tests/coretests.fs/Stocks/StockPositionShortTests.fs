@@ -81,3 +81,25 @@ let ``Close position works`` () =
     position.NumberOfShares |> should equal 0m
     position.IsShort |> should equal true
     position.IsClosed |> should equal true
+    
+[<Fact>]
+let ``Assigning stop works`` () =
+    
+    let position =
+        StockPosition.openShort ticker DateTimeOffset.UtcNow
+        |> StockPosition.sell 10m 1.5m DateTimeOffset.UtcNow
+        |> StockPosition.setStop (Some 1.4m) DateTimeOffset.UtcNow
+        
+    position.StopPrice.Value |> should equal 1.4m
+    position.HasStopPrice |> should equal true
+    position.RiskAmount.IsSome |> should equal true
+    position.RiskAmount.Value |> should be (greaterThan 0)
+    
+    let events = position.Events
+    
+    let sameStop =
+        position
+        |> StockPosition.setStop (Some 1.4m) DateTimeOffset.UtcNow
+    
+    events |> should equal sameStop.Events
+    
