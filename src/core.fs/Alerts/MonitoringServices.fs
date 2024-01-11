@@ -159,7 +159,6 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
         match checks.Count with
         | 0 ->
             container.AddNotice("Generating stop loss checks")
-            container.SetStopLossCheckCompleted(false)
             container.ClearStopLossAlert()
             
             let! users = accounts.GetUserEmailIdPairs()
@@ -187,7 +186,6 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
            
         match checks.Count with
         | 0 ->
-            container.SetStopLossCheckCompleted(true)
             container.AddNotice("Stop loss checks completed")
         | _ ->
             container.AddNotice("Stop loss checks pending, remaining " + checks.Count.ToString())
@@ -268,8 +266,6 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             
         nextPatternMonitoringRunDateTime <- nextPatternMonitoringRun DateTimeOffset.UtcNow marketHours
         
-        container.ManualRunCompleted()
-        
         container.AddNotice(
              $"Pattern check generator added {listOfChecks.Count}, next run at {marketHours.ToMarketTime(nextPatternMonitoringRunDateTime)}"
         )
@@ -288,7 +284,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             
             match prices.Success with
             | None ->
-                logger.LogError($"Could not get price history for {ticker}: {prices.Error.Value.Message}")
+                logger.LogError($"Pattern monitor could not get price history for {ticker}: {prices.Error.Value.Message}")
             | Some response ->
                 priceCache.Add(ticker, response)
             
@@ -300,9 +296,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         let! priceResponse = getPrices logger alertCheck.user alertCheck.ticker |> Async.AwaitTask
         
         match priceResponse.Success with
-        | None ->
-            logger.LogError($"Could not get price for {alertCheck.ticker}: {priceResponse.Error.Value.Message}")
-            return None
+        | None -> return None
         | Some prices ->
             
             let userId = alertCheck.user.Id |> UserId
@@ -319,17 +313,14 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
                 container.Register alert
             )
             
-            logger.LogInformation($"Found {patterns.Length} patterns for {alertCheck.ticker}")
-            
             return Some (alertCheck,patterns.Length)
     }
     
     let runThroughMonitoringChecks logger (cancellationToken:CancellationToken) = task {
         let now = DateTimeOffset.UtcNow
         
-        if now > nextPatternMonitoringRunDateTime || container.ManualRunRequested() then
+        if now > nextPatternMonitoringRunDateTime then
             container.AddNotice("Running pattern monitoring checks")
-            container.SetListCheckCompleted(false)
             do! generatePatternMonitoringChecks()
             
         priceCache.Clear()
@@ -355,7 +346,6 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         
         match listOfChecks.Count with
         | 0 ->
-            container.SetListCheckCompleted(true)
             if startingNumberOfChecks > 0 then
                 container.AddNotice($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
         | _ ->
@@ -374,7 +364,6 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             | ex ->
                 logger.LogError("Failed while running alert monitor, will sleep: " + ex.ToString())
                 container.AddNotice("Failed while running alert monitor: " + ex.Message)
-                container.RequestManualRun();
     }
     
     member _.NextRunTime (now:DateTimeOffset) =
@@ -537,7 +526,7 @@ type AlertEmailService(accounts:IAccountStorage,
     let emailTimes =
         [
             TimeOnly.Parse("09:50")
-            TimeOnly.Parse("15:45")
+            TimeOnly.Parse("15:50")
         ]
     
     let sendAlerts recipient alerts = 
@@ -554,57 +543,49 @@ type AlertEmailService(accounts:IAccountStorage,
     member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
             
             // check if container is ready for notifications
-            if container.ContainerReadyForNotifications() then
+            let! users = accounts.GetUserEmailIdPairs()
+            
+            let result =
+                users
+                |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
+                |> Seq.map (fun emailIdPair -> async {
+                    let! user = accounts.GetUser emailIdPair.Id |> Async.AwaitTask
+                    match user with
+                    | None ->
+                        logger.LogError $"User {emailIdPair.Id} not found"
+                        
+                    | Some user ->
+                        let recipient = Recipient(email=user.State.Email, name=user.State.Name)
+                        
+                        let alerts = container.GetAlerts emailIdPair.Id
+                        
+                        do! sendAlerts recipient alerts;
+                })
+                |> Async.Sequential
                 
-                let! users = accounts.GetUserEmailIdPairs()
-                
-                let result =
-                    users
-                    |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
-                    |> Seq.map (fun emailIdPair -> async {
-                        let! user = accounts.GetUser emailIdPair.Id |> Async.AwaitTask
-                        match user with
-                        | None ->
-                            logger.LogError $"User {emailIdPair.Id} not found"
-                            
-                        | Some user ->
-                            let recipient = Recipient(email=user.State.Email, name=user.State.Name)
-                            
-                            let alerts = container.GetAlerts emailIdPair.Id
-                            
-                            do! sendAlerts recipient alerts;
-                    })
-                    |> Async.Sequential
-                    
-                container.AddNotice "Emails sent" 
+            container.AddNotice "Emails sent" 
         }
         
     member _.NextRunTime (logger:ILogger) (now:DateTimeOffset) =
         
-        match container.ContainerReadyForNotifications() |> not with
-        | false ->
-            logger.LogInformation("Container is not ready for notifications")
-            now.AddMinutes(1.0)
-        | true ->
-            logger.LogInformation("Container was ready for notifications")
-            let eastern = marketHours.ToMarketTime(now);
+        let eastern = marketHours.ToMarketTime(now);
+        
+        let nextTime =
+            emailTimes
+            |> Seq.map (fun t -> eastern.Date.Add(t.ToTimeSpan()) |> DateTimeOffset)
+            |> Seq.filter (fun t -> t > eastern)
+            |> Seq.map marketHours.ToUniversalTime
+            |> Seq.tryHead
             
-            let nextTime =
-                emailTimes
-                |> Seq.map (fun t -> eastern.Date.Add(t.ToTimeSpan()) |> DateTimeOffset)
-                |> Seq.filter (fun t -> t > eastern)
-                |> Seq.map marketHours.ToUniversalTime
-                |> Seq.tryHead
-                
-            match nextTime with
-            | Some t ->
-                t
-            | None ->
-                let nextDay = eastern.Date.AddDays(1).Add(emailTimes[0].ToTimeSpan())
-                
-                match nextDay.DayOfWeek with
-                | DayOfWeek.Saturday -> nextDay.AddDays(2)
-                | DayOfWeek.Sunday -> nextDay.AddDays(1)
-                | _ -> nextDay
-                |> fun d -> d |> DateTimeOffset
-                |> marketHours.ToUniversalTime
+        match nextTime with
+        | Some t ->
+            t
+        | None ->
+            let nextDay = eastern.Date.AddDays(1).Add(emailTimes[0].ToTimeSpan())
+            
+            match nextDay.DayOfWeek with
+            | DayOfWeek.Saturday -> nextDay.AddDays(2)
+            | DayOfWeek.Sunday -> nextDay.AddDays(1)
+            | _ -> nextDay
+            |> fun d -> d |> DateTimeOffset
+            |> marketHours.ToUniversalTime

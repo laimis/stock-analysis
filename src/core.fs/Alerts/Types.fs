@@ -77,10 +77,6 @@ namespace core.fs.Alerts
         let recentlyTriggered = ConcurrentDictionary<UserId, List<TriggeredAlert>>()
         let notices = System.Collections.Generic.List<AlertContainerMessage>(capacity=10)
         
-        let mutable manualRun = false
-        let mutable listChecksCompleted = false
-        let mutable stopLossCheckCompleted = false
-        
         let addToRecent (alert:TriggeredAlert) =
             
             match recentlyTriggered.TryAdd(key=alert.userId, value=[alert]) with
@@ -94,11 +90,6 @@ namespace core.fs.Alerts
                     | _ -> list
                 
                 recentlyTriggered[alert.userId] <- (newList @ [alert])
-        
-        member _.RequestManualRun() = manualRun <- true;
-        member _.ManualRunRequested() = manualRun
-        member _.ManualRunCompleted() = manualRun <- false
-        
         
         member _.Register (alert:TriggeredAlert) =
             let key = { Ticker = alert.ticker; UserId = alert.userId; Identifier = alert.identifier  }
@@ -137,17 +128,8 @@ namespace core.fs.Alerts
             |> notices.Add
             
         member _.GetNotices () =
-            notices |> Seq.sortByDescending (fun x -> x.``when``)
+            notices |> Seq.sortByDescending (_.``when``)
 
-        member this.SetListCheckCompleted completed =
-            if completed then
-                this.AddNotice "List check completed"
-            listChecksCompleted <- completed
-        member this.SetStopLossCheckCompleted completed =
-            if completed then
-                this.AddNotice "Stop loss check completed"
-            stopLossCheckCompleted <- completed
-        member _.ContainerReadyForNotifications() = listChecksCompleted && stopLossCheckCompleted
         member this.ClearStopLossAlert() =
             alerts.Values
             |> Seq.filter (fun x -> x.identifier = Constants.StopLossIdentifier)

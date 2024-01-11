@@ -34,14 +34,19 @@ public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILog
                 logger.LogError($"Failed: {ex}");
             }
 
-            var sleepDuration = GetNextRunDateTime(DateTimeOffset.UtcNow).Subtract(DateTimeOffset.UtcNow);
-            if (sleepDuration.TotalMinutes > 1) // only show less frequent sleeps in order not to spam logs
+            var now = DateTimeOffset.UtcNow;
+            var nextRun = GetNextRunDateTime(now);
+            var sleepDuration = nextRun.Subtract(now);
+            
+            switch (sleepDuration.TotalMinutes)
             {
-                logger.LogInformation($"sleeping for {sleepDuration}");
-            }
-            if (sleepDuration.TotalMinutes < 0)
-            {
-                logger.LogWarning($"sleep duration is negative: {sleepDuration}");
+                // only show less frequent sleeps in order not to spam logs
+                case > 1:
+                    logger.LogInformation($"Next run {nextRun:u}, sleeping for {sleepDuration}");
+                    break;
+                case < 0:
+                    logger.LogWarning($"sleep duration is negative: {sleepDuration}");
+                    break;
             }
 
             await Task.Delay(sleepDuration, stoppingToken);
@@ -94,9 +99,20 @@ public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshB
 public class AlertEmailServiceHost(ILogger<MonitoringServices.AlertEmailService> logger, MonitoringServices.AlertEmailService service)
     : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
+    private bool _firstRun = true;
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(baseLogger, now);
 
-    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
+    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken)
+    {
+        if (_firstRun)
+        {
+            _firstRun = false;
+            logger.LogInformation("First run for alert emailing, sleeping for 5 minutes");
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+        }
+        
+        await service.Execute(logger, stoppingToken);
+    }
 }
 
 public class ThirtyDaySellServiceHost(

@@ -194,8 +194,7 @@ public class TDAmeritradeClient : IBrokerage
         var response = await CallApi<AccountsResponse[]>(
             user,
             "/accounts?fields=positions,orders",
-            HttpMethod.Get,
-            debug: true
+            HttpMethod.Get
         );
 
         if (response.IsOk == false)

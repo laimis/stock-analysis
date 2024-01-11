@@ -21,8 +21,6 @@ namespace core.fs.Alerts
             container.Deregister ticker Constants.StopLossIdentifier userId
             
         interface IApplicationService
-        member this.StockPurchased() =
-            container.RequestManualRun()
             
         member this.Handle(stockSold:StockSold) =
             stockSold.Ticker |> Ticker |> deregisterStopPriceMonitoring (stockSold.UserId |> UserId)
@@ -53,7 +51,7 @@ namespace core.fs.Alerts
             available |> ResponseUtils.success
         
         member this.Handle (_:Run) =
-            container.RequestManualRun()
+            // TODO: need to bring this functionality back, it should kick off pattern monitoring run
             Ok
       
         member this.Handle (send:SendSMS) = task {
