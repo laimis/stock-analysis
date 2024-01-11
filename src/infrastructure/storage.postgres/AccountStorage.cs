@@ -92,7 +92,7 @@ namespace storage.postgres
         {
             using var db = GetConnection();
             
-            var query = @"INSERT INTO accountbalancessnapshots (cash,equity,longValue,shortValue,date,userId) VALUES (:cash,:equity,:longValue,:shortValue,DATE(:date),:userId)
+            var query = @"INSERT INTO accountbalancessnapshots (cash,equity,longValue,shortValue,date,userId) VALUES (:cash,:equity,:longValue,:shortValue,:date,:userId)
 ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longValue = :longValue, shortValue = :shortValue";
             
             await db.ExecuteAsync(query, new

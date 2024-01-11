@@ -23,7 +23,7 @@ type AccountBalancesSnapshot(cash:decimal,equity:decimal,longValue:decimal,short
     member _.Equity = equity
     member _.LongValue = longValue
     member _.ShortValue = shortValue
-    member _.Date = date
+    member _.Date = date.Date
     member _.UserId = userId |> UserId
     
 type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset) =
