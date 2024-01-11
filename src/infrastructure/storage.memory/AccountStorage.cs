@@ -8,6 +8,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 {
     private static readonly Dictionary<UserId, User?> _users = new();
     private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new();
+    private static readonly Dictionary<UserId, AccountBalancesSnapshot> _snapshots = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
@@ -24,6 +25,18 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     {
         var response = _users.TryGetValue(userId, out var u) ? new FSharpOption<User>(u!) : FSharpOption<User>.None;
         
+        return Task.FromResult(response);
+    }
+
+    public Task SaveAccountBalancesSnapshot(UserId userId, AccountBalancesSnapshot balances)
+    {
+        _snapshots[userId] = balances;
+        return Task.CompletedTask;
+    }
+    
+    public Task<FSharpOption<AccountBalancesSnapshot>> GetLatestAccountBalancesSnapshot(UserId userId)
+    {
+        var response = _snapshots.TryGetValue(userId, out var snapshot) ? new FSharpOption<AccountBalancesSnapshot>(snapshot!) : FSharpOption<AccountBalancesSnapshot>.None;
         return Task.FromResult(response);
     }
 
@@ -59,6 +72,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         _associations[r.Id] = r;
         return Task.CompletedTask;
     }
+
 
     public Task SaveViewModel<T>(T user, UserId userId)
     {

@@ -2,6 +2,7 @@ module core.fs.Brokerage.MonitoringServices
 
 open System
 open System.Threading
+open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
@@ -36,10 +37,11 @@ type AccountMonitoringService(
                         | Ok account ->
                             let cash = account.CashBalance
                             let equity = account.Equity
-                            let shortValue = account.ShortMarketValue
                             let longValue = account.LongMarketValue
-                            
-                            // do! accounts.SaveUserBalances pair.Id DateTimeOffset.UtcNow cash equity shortValue longValue |> Async.AwaitTask
+                            let shortValue = account.ShortMarketValue
+                            let marketNow = marketHours.ToMarketTime DateTime.UtcNow
+                            let snapshot = AccountBalancesSnapshot(cash.Value, equity.Value, longValue.Value, shortValue.Value, marketNow.DateTime, user.State.Id)
+                            do! accounts.SaveAccountBalancesSnapshot (user.State.Id |> UserId) snapshot |> Async.AwaitTask
                             logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
                             
                             return ()

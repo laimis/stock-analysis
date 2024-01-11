@@ -77,6 +77,35 @@ namespace storage.postgres
             await db.ExecuteAsync(query, new {r.Id, userId = r.UserId.Item, timestamp = r.Timestamp});
         }
 
+        public async Task<FSharpOption<AccountBalancesSnapshot>> GetLatestAccountBalancesSnapshot(UserId userId)
+        {
+            using var db = GetConnection();
+
+            var query = @"SELECT cash,equity,longValue,shortValue,date,userId FROM accountbalancessnapshots WHERE userId = :userId ORDER BY date DESC LIMIT 1";
+            
+            var result = await db.QuerySingleOrDefaultAsync<AccountBalancesSnapshot>(query, new {userId = userId.Item});
+            
+            return result == null ? FSharpOption<AccountBalancesSnapshot>.None : new FSharpOption<AccountBalancesSnapshot>(result);
+        }
+
+        public async Task SaveAccountBalancesSnapshot(UserId userId, AccountBalancesSnapshot balances)
+        {
+            using var db = GetConnection();
+            
+            var query = @"INSERT INTO accountbalancessnapshots (cash,equity,longValue,shortValue,date,userId) VALUES (:cash,:equity,:longValue,:shortValue,DATE(:date),:userId)
+ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longValue = :longValue, shortValue = :shortValue";
+            
+            await db.ExecuteAsync(query, new
+            {
+                cash = balances.Cash,
+                equity = balances.Equity,
+                longValue = balances.LongValue,
+                shortValue = balances.ShortValue,
+                date = balances.Date,
+                userId = userId.Item
+            });
+        }
+
         public async Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid id)
         {
             using var db = GetConnection();

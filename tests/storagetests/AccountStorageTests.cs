@@ -79,5 +79,28 @@ namespace storagetests
 
             Assert.Equal(r.UserId, fromDb.Value.UserId);
         }
+        
+        [Fact]
+        public async Task AccountBalancesSnapshotWorks()
+        {
+            var storage = GetStorage();
+
+            var userId = UserId.NewUserId(Guid.NewGuid());
+            
+            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, DateTime.UtcNow, userId.Item);
+
+            await storage.SaveAccountBalancesSnapshot(userId, balances);
+            
+            var fromDb = await storage.GetLatestAccountBalancesSnapshot(userId);
+
+            Assert.Equal(balances.UserId, fromDb.Value.UserId);
+            Assert.Equal(balances.Cash, fromDb.Value.Cash);
+            Assert.Equal(balances.LongValue, fromDb.Value.LongValue);
+            Assert.Equal(balances.ShortValue, fromDb.Value.ShortValue);
+            Assert.Equal(balances.Date.Date, fromDb.Value.Date);
+            
+            // saving the same snapshot should not blow up but just do update
+            await storage.SaveAccountBalancesSnapshot(userId, balances);
+        }
     }
 }
