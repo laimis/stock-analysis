@@ -1,6 +1,11 @@
-import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { AnalysisOutcomeEvaluation, OutcomeValueTypeEnum, StockAnalysisOutcome, TickerOutcomes } from '../../services/stocks.service';
+import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {
+  AnalysisOutcomeEvaluation,
+  OutcomeValueTypeEnum,
+  StockAnalysisOutcome,
+  TickerOutcomes
+} from '../../services/stocks.service';
 
 @Component({
   selector: 'app-outcomes',
@@ -26,11 +31,19 @@ export class OutcomesComponent {
 
   @Input()
   set category(value:AnalysisOutcomeEvaluation) {
-    this.outcomes = value.matchingTickers
+    // make a copy of matching tickers so we can sort it
+    this.outcomes = value.matchingTickers.map(t => {
+      return {
+        ticker: t.ticker,
+        outcomes: t.outcomes
+      }
+    })
+    this.highlightColumn = value.sortColumn
     this.sort(value.sortColumn)
   }
 
   sortColumn: string;
+  highlightColumn: string;
   sortDirection: number = -1
 
 	getKeys(entries:TickerOutcomes[]) {
@@ -38,9 +51,15 @@ export class OutcomesComponent {
       return []
     }
 
-    return entries[0].outcomes
-      .filter(o => this.IsRenderableOutcome(o))
+    let otherColumns = entries[0].outcomes
+      .filter(o => this.IsRenderableOutcome(o) && o.key !== this.highlightColumn)
       .map(o => o.key)
+
+    if (this.highlightColumn === undefined) {
+      return otherColumns
+    }
+
+    return [this.highlightColumn, ...otherColumns]
   }
 
   sort(column:string) {
@@ -63,11 +82,16 @@ export class OutcomesComponent {
   }
 
   outcomesForRendering(outcomes:StockAnalysisOutcome[]) {
-    return outcomes.filter(o => this.IsRenderableOutcome(o))
+
+    const highlightColumn = outcomes.find(o => o.key === this.highlightColumn);
+    const others = outcomes.filter(o => o.key !== this.highlightColumn);
+
+    return [highlightColumn, ...others]
+      .filter(o => this.IsRenderableOutcome(o))
   }
 
   private IsRenderableOutcome(o: StockAnalysisOutcome): unknown {
-    return o.key !== 'NewHigh' && o.key !== 'NewLow';
+    return o !== undefined && o.key !== 'NewHigh' && o.key !== 'NewLow';
   }
 
   private runSort(analysis:TickerOutcomes[], compareFn) {
