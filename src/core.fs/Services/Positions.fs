@@ -111,6 +111,28 @@ module PositionAnalysis =
         let recentlyOpenThreshold = TimeSpan.FromDays(5)
         let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
         
+        let tickersAndTheirRiskAmounts = 
+            tickerOutcomes
+            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.tryFind (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0.0m)))
+            |> Seq.filter (fun (ticker, outcome) -> outcome.IsSome)
+            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value.Value))
+        
+        let riskAmountAnalysis =
+            tickersAndTheirRiskAmounts
+            |> Seq.map snd
+            |> DistributionStatistics.calculate
+            
+        let tickersAndTheirCosts =
+            tickerOutcomes // we are only interested in this for positions that have stops set
+            |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m) ]
+            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.tryFind (fun o -> o.Key = PositionAnalysisKeys.PositionSize)))
+            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value.Value))
+            
+        let costAnalysis =
+            tickersAndTheirCosts
+            |> Seq.map snd
+            |> DistributionStatistics.calculate
+        
         [
             AnalysisOutcomeEvaluation(
                 "Below stop loss",
@@ -149,6 +171,23 @@ module PositionAnalysis =
                 tickerOutcomes |> TickerOutcomes.filter [
                     (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value = 0m)
                     (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Unbalanced Risk Amount",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.RiskAmount,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
+                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && riskAmountAnalysis.mean / o.Value < 0.9m)
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Unbalanced Position Size",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.PositionSize,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
                 ]
             )
         ]
