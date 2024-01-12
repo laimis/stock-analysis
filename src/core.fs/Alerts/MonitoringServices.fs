@@ -465,6 +465,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
         
         let! _ =
             weeklyUpsidesDiscovered
+            |> Seq.filter (fun pair -> pair.Value.Count > 0)
             |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
             |> Seq.map (fun pair -> async {
                 
