@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Threading
 open core.Account
 open core.Shared
+open core.Stocks
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
@@ -239,14 +240,28 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
                 |> Seq.filter (fun p -> p.State.IsClosed |> not)
                 |> Seq.map (_.State.Ticker)
                 |> Seq.map (fun t -> {ticker=t; listName=Constants.PendingIdentifier; user=user.State})
-            
+                
             let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
-            return lists
-            |> Seq.filter (_.State.ContainsTag(Constants.MonitorTagPattern))
-            |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listName=l.State.Name; user=user.State}))
-            |> Seq.concat
-            |> Seq.append portfolioList
-            |> Seq.append pendingList
+            let stockList = 
+                lists
+                |> Seq.filter (_.State.ContainsTag(Constants.MonitorTagPattern))
+                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listName=l.State.Name; user=user.State}))
+                |> Seq.concat
+            
+            // create a map of all the tickers we are checking so we can remove duplicates, and we want to prefer portfolio list entries
+            // over pending list entries over stock list entries
+            let tickerMap = Dictionary<Ticker, PatternCheck>()
+            
+            let addTicker (ticker: Ticker) (check:PatternCheck) =
+                match tickerMap.TryGetValue(ticker) with
+                | true, _ -> ()
+                | _ -> tickerMap.Add(ticker, check)
+                
+            portfolioList |> Seq.iter (fun check -> addTicker check.ticker check)
+            pendingList |> Seq.iter (fun check -> addTicker check.ticker check)
+            stockList |> Seq.iter (fun check -> addTicker check.ticker check)
+            
+            return tickerMap.Values
     }
     
     let generatePatternMonitoringChecks() = task {
