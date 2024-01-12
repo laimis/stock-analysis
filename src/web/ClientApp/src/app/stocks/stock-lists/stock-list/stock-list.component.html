@@ -47,7 +47,8 @@
                 <input class="form-control" id="quickAdd" #quickAdd placeholder="Tickers" type="text">
               </div>
               <div class="col-2">
-                <button type="submit" class="btn btn-primary" (click)="add(quickAdd.value)">Add</button>
+                <button *ngIf="addInProgress === false" type="submit" class="btn btn-primary" (click)="add(quickAdd.value, undefined)">Add</button>
+                <button *ngIf="addInProgress === true" type="submit" class="btn btn-primary" disabled>Adding...</button>
               </div>
             </div>
           </div>
@@ -69,34 +70,41 @@
       <h5>Add new</h5>
       <form>
         <div class="form-group">
-          <label for="ticker">Tickers</label>
+          <label for="tickers">Tickers</label>
           <textarea class="form-control" id="tickers" #ticker placeholder="Tickers" rows="5"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary" (click)="add(ticker.value)">Add</button>
+        <button *ngIf="addInProgress === false" type="submit" class="btn btn-primary" (click)="add(ticker.value, addNewSection)">Add</button>
+        <button *ngIf="addInProgress === true" type="submit" class="btn btn-primary" disabled>Adding...</button>
+        <button type="button" class="btn btn-secondary float-end" (click)="toggleVisibility(addNewSection)">Close</button>
       </form>
     </section>
     <section>
-      <table class="table table-striped">
-        <thead>
+      @if (list.tickers.length > 0) {
+        <h5>Tickers</h5>
+        <table class="table table-striped">
+          <thead>
           <tr>
             <th>Ticker</th>
             <th></th>
           </tr>
-        </thead>
-        <tbody>
-          @for (t of sortedTickers(list); track t) {
-            <tr>
-              <td>
-                <app-trading-view-link [ticker]="t.ticker"></app-trading-view-link>
-                <a [routerLink]="['/stocks', t.ticker]">{{t.ticker}}</a>
-              </td>
-              <td class="text-end">
-                <button class="btn btn-danger" (click)="remove(t)">Remove</button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (t of sortedTickers(list); track t) {
+              <tr>
+                <td>
+                  <app-trading-view-link [ticker]="t.ticker"></app-trading-view-link>
+                  <a [routerLink]="['/stocks', t.ticker]">{{t.ticker}}</a>
+                </td>
+                <td class="text-end">
+                  <button class="btn btn-danger" (click)="remove(t)">Remove</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p>No tickers</p>
+      }
     </section>
   </div>
 }

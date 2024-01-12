@@ -15,7 +15,8 @@ export class StockListComponent implements OnInit {
   analysisLink: string;
   exportLink: string;
   exportLinkJustTickers: string;
-  importStatus: string
+  addInProgress: boolean = false;
+  controlToHide: HTMLElement;
 
   constructor(
     private stockService: StocksService,
@@ -58,43 +59,47 @@ export class StockListComponent implements OnInit {
     );
   }
 
-  add(tickers: string) {
+  add(tickers: string, controlToHide:HTMLElement) {
     var separator = '\n';
     if (tickers.includes(',')) {
       separator = ',';
     }
 
     let tickerArray = tickers.split(separator)
-
-    this.AddTickersToList(tickerArray)
+    this.controlToHide = controlToHide
+    this.addTickersToList(tickerArray)
   }
 
-  private AddTickersToList(tickerArray: string[]) {
+  private addTickersToList(tickerArray: string[]) {
     if (tickerArray.length == 0) {
       this.loadList(this.list.name)
-      this.importStatus = "Finished"
+      this.addInProgress = false
+      if (this.controlToHide) {
+        toggleVisuallyHidden(this.controlToHide)
+      }
       return
     }
 
-    var ticker = tickerArray[0].trim();
+    this.addInProgress = true
+
+    let ticker = tickerArray[0].trim();
     if (ticker.includes(':'))
     {
       ticker = ticker.split(':')[1].trim();
     }
 
     if (ticker) {
-      this.importStatus = `Importing ${ticker}...`
       this.stockService.addToStockList(this.list.name, ticker).subscribe(
         _ => {
-          this.AddTickersToList(tickerArray.slice(1))
+          this.addTickersToList(tickerArray.slice(1))
         },
         e => {
           console.error(e);
-          this.AddTickersToList(tickerArray.slice(1))
+          this.addTickersToList(tickerArray.slice(1))
         }
       );
     } else {
-      this.AddTickersToList(tickerArray.slice(1))
+      this.addTickersToList(tickerArray.slice(1))
     }
   }
 
