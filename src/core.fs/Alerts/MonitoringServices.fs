@@ -5,7 +5,6 @@ open System.Collections.Generic
 open System.Threading
 open core.Account
 open core.Shared
-open core.Stocks
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
@@ -15,6 +14,7 @@ open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
 open core.fs.Alerts
 open core.fs.Services
+open core.fs.Services.Analysis
 open core.fs.Stocks
 
 [<Struct>]
@@ -32,12 +32,10 @@ type private StopLossCheck = {
     user: UserState
 }
 
-[<Struct>]
-type private WeeklyUpsideCheck = {
-    ticker: Ticker
-    user: UserState
-}
-
+type private WeeklyUpsideCheckResult =
+    | Success of Ticker * Pattern option
+    | Failure of Ticker
+    
 let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
         let formattedValue format (value:decimal) =
             match format with
@@ -186,10 +184,8 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
         resolvedChecks |> Array.choose id |> Array.iter (fun c -> checks.Remove(c) |> ignore)
            
         match checks.Count with
-        | 0 ->
-            container.AddNotice("Stop loss checks completed")
-        | _ ->
-            container.AddNotice("Stop loss checks pending, remaining " + checks.Count.ToString())
+        | 0 -> container.AddNotice("Stop loss checks completed")
+        | _ -> container.AddNotice("Stop loss checks pending, remaining " + checks.Count.ToString())
     }
     
     member _.NextRunTime (now:DateTimeOffset) =
@@ -382,54 +378,57 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         now.Add(monitoringFrequency)
         
         
-type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage) =
+type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage) =
     
     let tickersToCheck = Dictionary<UserState, HashSet<Ticker>>()
     let weeklyUpsidesDiscovered = Dictionary<UserState, List<TriggeredAlert>>()
     
-    let loadTickersToCheck (logger:ILogger) (cancellationToken:CancellationToken) = task {
-        let! users = accounts.GetUserEmailIdPairs()
-            
-        return!
-            users
-            |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
-            |> Seq.map (fun pair -> async {
+    let loadTickersToCheckForUser (logger:ILogger) (pair:EmailIdPair) = async {
+        let! user = pair.Id |> accounts.GetUser |> Async.AwaitTask
+        match user with
+        | None -> logger.LogError($"Could not find user {pair.Id}")
+        | Some user ->
+            let! stocks = pair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
+            let tickersFromPositions = stocks |> Seq.filter _.IsOpen |> Seq.map _.Ticker
+            let! lists = pair.Id |> portfolio.GetStockLists |> Async.AwaitTask
+            let tickersFromLists =
+                lists
+                |> Seq.filter _.State.ContainsTag(Constants.MonitorTagPattern)
+                |> Seq.map (fun l -> l.State.Tickers |> Seq.map _.Ticker)
+                |> Seq.concat
                 
-                let! user = accounts.GetUser pair.Id |> Async.AwaitTask
-                match user with
-                | None -> logger.LogError($"Could not find user {pair.Email}")
-                | Some user ->
-                    let! stocks = portfolio.GetStockPositions pair.Id |> Async.AwaitTask
-                    let tickersFromPositions = stocks |> Seq.filter _.IsOpen |> Seq.map _.Ticker
-                    let! lists = portfolio.GetStockLists pair.Id |> Async.AwaitTask
-                    let tickersFromLists =
-                        lists
-                        |> Seq.filter _.State.ContainsTag(Constants.MonitorTagPattern)
-                        |> Seq.map (fun l -> l.State.Tickers |> Seq.map _.Ticker)
-                        |> Seq.concat
-                        
-                    let set = HashSet<Ticker>(tickersFromLists |> Seq.append tickersFromPositions);
+            let set = HashSet<Ticker>(tickersFromLists |> Seq.append tickersFromPositions);
 
-                    tickersToCheck[user.State] <- set;
-            })
-            |> Async.Sequential
+            tickersToCheck[user.State] <- set;
     }
     
-    let runCheckForUserTicker (logger:ILogger) (cancellationToken:CancellationToken) user ticker = async {
+    let loadTickersToCheck (logger:ILogger) (cancellationToken:CancellationToken) = async {
+        let! users = accounts.GetUserEmailIdPairs() |> Async.AwaitTask
+        
+        do!
+            users
+            |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
+            |> Seq.map (loadTickersToCheckForUser logger)
+            |> Async.Sequential
+            |> Async.Ignore
+    }
+    
+    let runCheckForUserTicker (logger:ILogger) (_:CancellationToken) user ticker = async {
         let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Weekly DateTimeOffset.MinValue DateTimeOffset.MinValue |> Async.AwaitTask
         
-        match prices.IsOk with
-        | false ->
-            logger.LogError($"Weekly job could not get price history for {ticker}: {prices.Error.Value.Message}")
-            return ticker, None
-        | true ->
-            return ticker, PatternDetection.upsideReversal(prices.Success.Value)
+        return
+            match prices.Result with
+            | Result.Error err ->
+                logger.LogError($"Weekly job could not get price history for {ticker}: {err.Message}")
+                WeeklyUpsideCheckResult.Failure ticker
+            | Result.Ok bars ->
+                WeeklyUpsideCheckResult.Success (ticker, PatternDetection.upsideReversal(bars))
     }
     
     let runCheckForUser (logger:ILogger) (cancellationToken:CancellationToken) (user:UserState) (tickers: HashSet<Ticker>) = async {
         
-        weeklyUpsidesDiscovered.Remove(user) |> ignore
-        weeklyUpsidesDiscovered.Add(user, List<TriggeredAlert>())
+        if weeklyUpsidesDiscovered.ContainsKey(user) |> not then
+            weeklyUpsidesDiscovered.Add(user, List<TriggeredAlert>())
         
         let! work =
             tickers
@@ -437,23 +436,28 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
             |> Seq.map (runCheckForUserTicker logger cancellationToken user)
             |> Async.Sequential
         
-        work
-        |> Seq.filter (fun (ticker, p) -> p.IsSome)
+        let succeeded = work |> Seq.choose (function WeeklyUpsideCheckResult.Success (t,p) -> Some (t,p) | _ -> None) |> Seq.toList
+        let failed = work |> Seq.choose (function WeeklyUpsideCheckResult.Failure x -> Some x | _ -> None) |> Seq.toList
+        
+        logger.LogInformation($"Weekly upside reversal check for {user.Id} successfully checked {succeeded.Length} tickers, and failed for {failed.Length} tickers")
+        
+        succeeded
+        |> Seq.filter (fun (_, p) -> p.IsSome)
         |> Seq.map (fun (ticker, p) -> TriggeredAlert.PatternAlert p.Value ticker "Watchlist" DateTimeOffset.UtcNow (user.Id |> UserId))
         |> weeklyUpsidesDiscovered[user].AddRange
         
-        work |> Seq.map fst |> Seq.map tickers.Remove |> ignore
+        let removed = succeeded |> Seq.map fst |> Seq.map tickers.Remove |> Seq.map (fun b -> if b then 1 else 0) |> Seq.sum
+        
+        logger.LogInformation($"Weekly upside reversal check for {user.Id} removed {removed} tickers from the check list")
     }
     
     let runChecks (logger:ILogger) (cancellationToken:CancellationToken) = async {
-        let work =
+        do!
             tickersToCheck
             |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
-            |> Seq.map (fun pair -> async {
-                return! runCheckForUser logger cancellationToken pair.Key pair.Value
-            })
-            
-        return! work |> Async.Sequential
+            |> Seq.map (fun pair -> runCheckForUser logger cancellationToken pair.Key pair.Value)
+            |> Async.Sequential
+            |> Async.Ignore
     }
     
     let sendEmails (logger:ILogger) (cancellationToken:CancellationToken) = async {
@@ -496,20 +500,19 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
         | true ->
             logger.LogInformation("Running weekly upside reversal check")
             
-            match tickersToCheckCount() with
-            | 0 -> 
+            if tickersToCheckCount() = 0 then
+                weeklyUpsidesDiscovered.Clear()
                 logger.LogInformation("No tickers to check, loading them")
-                let! _ = loadTickersToCheck logger cancellationToken
-                ()
+                do! loadTickersToCheck logger cancellationToken
+            
+            logger.LogInformation($"Running {tickersToCheckCount()} checks")
+            let! _ = runChecks logger cancellationToken
+            match tickersToCheckCount() with
+            | 0 ->
+                logger.LogInformation("Sending emails")
+                do! sendEmails logger cancellationToken
             | _ ->
-                logger.LogInformation("Running checks")
-                let! _ = runChecks logger cancellationToken
-                match tickersToCheckCount() with
-                | 0 ->
-                    logger.LogInformation("Sending emails")
-                    do! sendEmails logger cancellationToken
-                | _ ->
-                    ()
+                logger.LogInformation($"Checks remaining: {tickersToCheckCount()}")
     }
     
     member _.NextRunTime (now:DateTimeOffset) =
