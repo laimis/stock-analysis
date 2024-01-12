@@ -149,13 +149,13 @@ module PositionAnalysis =
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
-                PositionAnalysisKeys.Profit,
+                PositionAnalysisKeys.UnrealizedProfit,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {withinTwoWeeksThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
-                PositionAnalysisKeys.DaysSinceOpened,
+                PositionAnalysisKeys.UnrealizedProfit,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
