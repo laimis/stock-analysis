@@ -178,8 +178,9 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
             else
                 match int (this.NumberOfSharesAtStart / decimal numberOfProfitPoints) |> decimal with
                 | 0m -> 1m
-                | x when x > position.NumberOfShares -> position.NumberOfShares    
+                | x when x > (abs position.NumberOfShares) -> position.NumberOfShares    
                 | x -> x
+            |> abs // it can be negative if we're shorting
         
         let adjustStopIfNecessary (position:StockPositionState) =
             match position.IsOpen with

@@ -51,21 +51,30 @@
 </div>
 
 @if (stock && isActive('trade')) {
-  <app-brokerage-new-order [ticker]="stock.ticker" (brokerageOrderEntered)="brokerageOrderEntered($event)" ></app-brokerage-new-order>
-  <app-brokerage-orders
-    [filteredTickers]="[stock.ticker]"
-    [orders]="orders"
-    [positionId]="currentPosition?.positionId"
-    (purchaseRequested)="purchaseRequested($event)"
-    (sellRequested)="sellRequested($event)">
-  </app-brokerage-orders>
-
   <app-stock-trading-new-position
     [isPendingPositionMode]="true"
     [presetTicker]="stock.ticker"
     (positionOpened)="loadOrders()"
     (pendingPositionCreated)="loadOrders()">
   </app-stock-trading-new-position>
+
+  <section>
+    <h3>Brokerage</h3>
+    <app-brokerage-new-order [ticker]="stock.ticker" (brokerageOrderEntered)="brokerageOrderEntered($event)" ></app-brokerage-new-order>
+
+    <app-brokerage-orders
+      [filteredTickers]="[stock.ticker]"
+      [orders]="orders"
+      [positionId]="currentPosition?.positionId"
+      (purchaseRequested)="purchaseRequested($event)"
+      (sellRequested)="sellRequested($event)">
+    </app-brokerage-orders>
+  </section>
+
+  <section>
+    <h3>Manual Entry</h3>
+    <app-stock-transaction [ticker]="stock.ticker" [position]="currentPosition"></app-stock-transaction>
+  </section>
 }
 @if (stock && stockOwnership && isActive('stocks')) {
   <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote"></app-stock-ownership>

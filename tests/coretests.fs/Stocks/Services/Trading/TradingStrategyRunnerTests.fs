@@ -131,22 +131,17 @@ let ``With position not fully sold, is open``() = task {
         r.Position.IsClosed |> should equal false
     )
 }
-
-let createDownsideTestData() =
-    
-        let bars = generatePriceBars 10 (fun i -> 50 - i |> decimal)
-    
-        let positionInstance = 
-            StockPosition.openLong TestDataGenerator.NET bars.First.Date
-            |> StockPosition.buy 5m 50m bars.First.Date
-            |> StockPosition.setStop (Some 45m) bars.First.Date
-        
-        (bars, positionInstance)
         
 [<Fact>]
 let ``With price falling, stop price exit executes``() =
     
-    let bars, positionInstance = createDownsideTestData()
+    let bars = generatePriceBars 10 (fun i -> 50 - i |> decimal)
+    
+    let positionInstance = 
+        StockPosition.openLong TestDataGenerator.NET bars.First.Date
+        |> StockPosition.buy 5m 50m bars.First.Date
+        |> StockPosition.setStop (Some 45m) bars.First.Date
+    
     let strategy = TradingStrategyFactory.createProfitPointsTrade 3
     let result = strategy.Run bars false positionInstance
     
@@ -161,6 +156,29 @@ let ``With price falling, stop price exit executes``() =
     position.DaysHeld |> should equal 5
     maxGain |> should equal 0.0002m
     maxDrawdown |> should equal -0.1002m
+    
+[<Fact>]
+let ``With price falling, short position simulates profit taking``() =
+    
+    let bars = generatePriceBars 10 (fun i -> 100 - i*5 |> decimal)
+    
+    let positionInstance = 
+        StockPosition.openShort TestDataGenerator.NET bars.First.Date
+        |> StockPosition.sell 5m 100m bars.First.Date
+        |> StockPosition.setStop (Some 105m) bars.First.Date
+        
+    let strategy = TradingStrategyFactory.createProfitPointsTrade 3
+    
+    let result = strategy.Run bars false positionInstance
+    
+    let position = result.Position
+    
+    position.IsClosed |> should equal true
+    position.Profit |> should equal 60
+    Math.Round(position.GainPct, 2) |> should equal 0.14m
+    position.RR |> should equal 2.4m
+    position.DaysHeld |> should equal 3
+    
 
 [<Fact>]
 let ``Close after fixed number of days, works``() =

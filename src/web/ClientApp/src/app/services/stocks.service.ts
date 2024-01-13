@@ -541,12 +541,12 @@ export interface Transaction {
 }
 
 export interface StockTransaction {
+  date: string,
+  description: string,
   numberOfShares: number,
   price: number,
-  type: string,
-  date: string,
-  ageInDays: number
   transactionId: string
+  type: string
 }
 
 export interface StockPLTransaction {

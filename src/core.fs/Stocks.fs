@@ -499,7 +499,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             let ``type`` = (match s.Type with | Buy -> "Buy" | Sell -> "Sell") |> _.ToLower()
             let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
             let date = s.Date.ToString("yyyy-MM-dd")
-            {|id = s.TransactionId; date = date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
+            {|transactionId = s.TransactionId; date = date; price = s.Price; ``type`` = ``type``; description = description; numberOfShares = s.NumberOfShares |}
         )
         
     member this.PLTransactions =

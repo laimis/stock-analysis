@@ -16,6 +16,9 @@ export class StockTransactionComponent implements OnInit {
   position: PositionInstance
 
   @Input()
+  ticker: string
+
+  @Input()
   numberOfShares: number
 
   @Input()

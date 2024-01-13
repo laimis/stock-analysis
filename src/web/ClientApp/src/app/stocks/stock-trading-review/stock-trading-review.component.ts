@@ -8,7 +8,7 @@ import {
   PositionInstance,
   PriceFrequency,
   Prices,
-  StockQuote, StocksService,
+  StockQuote, StocksService, StockTransaction,
   TradingStrategyResults
 } from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
@@ -126,19 +126,23 @@ export class StockTradingReviewComponent {
     );
   }
 
-  private getPrices(position) {
+  private getPrices(position:PositionInstance) {
     this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily).subscribe(
       (r: Prices) => {
 
         let markers: ChartMarker[] = []
 
-        position.transactions.filter(t => t.type == 'buy').forEach(t => {
-          markers.push({date: t.date, label: 'Buy', color: green, shape: 'arrowUp'})
+        position.transactions
+          .filter((t: StockTransaction) => t.type == 'buy')
+          .forEach((t: StockTransaction) => {
+          markers.push({date: t.date, label: 'Buy ' + t.numberOfShares, color: green, shape: 'arrowUp'})
         })
 
-        position.transactions.filter(t => t.type == 'sell').forEach(t => {
-          markers.push({date: t.date, label: 'Sell', color: red, shape: 'arrowDown'})
-        })
+        position.transactions
+          .filter((t: StockTransaction) => t.type == 'sell')
+          .forEach((t: StockTransaction) => {
+            markers.push({date: t.date, label: 'Sell ' + t.numberOfShares, color: red, shape: 'arrowDown'})
+          })
 
         this.pricesErrors = null
         this.positionChartInformation = {
