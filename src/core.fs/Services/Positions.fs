@@ -51,8 +51,6 @@ module PositionAnalysis =
             | p when p < 0.0m -> OutcomeType.Negative
             | _ -> OutcomeType.Neutral
             
-        let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
-        
         let max = bars.Bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> fun b -> b.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
@@ -79,6 +77,7 @@ module PositionAnalysis =
             |> Array.exists (fun (o:Order) -> o.IsSellOrder && o.Ticker.Value = position.Ticker)
             
         let unrealizedProfit =  position.Profit + position.NumberOfShares * (bars.Last.Close - position.AverageCostPerShare)
+        let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
         
         [
             AnalysisOutcome(PositionAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
@@ -206,7 +205,7 @@ module PositionAnalysis =
                 |> Array.findIndexBack (fun b -> b.Date <= closed)
             | None -> bars.Length - 1
         
-        let shares = position.CompletedPositionShares
+        let shares = position.CompletedPositionShares * (match position.IsShort with | true -> -1.0m | false -> 1.0m)
         let costBasis = position.AverageBuyCostPerShare
         
         let profit = ChartDataPointContainer<decimal>("Profit", DataPointChartType.Line)

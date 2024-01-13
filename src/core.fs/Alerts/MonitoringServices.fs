@@ -58,7 +58,7 @@ let private toEmailAlert marketHours alertGroup =
 let generateEmailDataPayloadForAlerts marketHours alerts =
     let groups =
         alerts
-        |> Seq.groupBy _.identifier
+        |> Seq.groupBy (fun _ -> "Weekly Upside Reversal") // they are all weekly upside reversals
         |> Seq.map (toEmailAlert marketHours)
         
     {| alertGroups = groups |};
