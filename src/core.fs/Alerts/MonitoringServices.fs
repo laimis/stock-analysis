@@ -63,7 +63,7 @@ let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours groupingFu
         
     {| alertGroups = groups |};
 
-let generateEmailDataPayloadForAlerts marketHours = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours (fun a -> a.identifier, a.ticker)
+let generateEmailDataPayloadForAlerts marketHours = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours _.identifier
     
 let private _patternMonitorTimes = [
     TimeOnly.Parse("09:45")
