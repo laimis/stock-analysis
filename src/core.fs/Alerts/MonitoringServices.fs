@@ -55,13 +55,15 @@ let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
 let private toEmailAlert marketHours alertGroup =
     {| identifier = alertGroup |> fst; alertCount = alertGroup |> snd |> Seq.length; alerts = alertGroup |> snd |> Seq.map (toEmailData marketHours)  |}
 
-let generateEmailDataPayloadForAlerts marketHours alerts =
+let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours groupingFunc alerts=
     let groups =
         alerts
-        |> Seq.groupBy (fun _ -> "Weekly Upside Reversal") // they are all weekly upside reversals
+        |> Seq.groupBy groupingFunc
         |> Seq.map (toEmailAlert marketHours)
         
     {| alertGroups = groups |};
+
+let generateEmailDataPayloadForAlerts marketHours = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours (fun a -> a.identifier, a.ticker)
     
 let private _patternMonitorTimes = [
     TimeOnly.Parse("09:45")
@@ -473,7 +475,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
                 
                 do!
                     pair.Value
-                    |> generateEmailDataPayloadForAlerts marketHours
+                    |> generateEmailDataPayloadForAlertsWithGroupingFunction marketHours (fun _ -> "Weekly Upside Reversal")
                     |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
                     |> Async.AwaitTask
             })
