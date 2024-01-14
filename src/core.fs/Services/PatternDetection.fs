@@ -55,8 +55,9 @@ let downsideReversal (bars: PriceBars) =
         
         // downside reversal pattern detection
         if current.Close < System.Math.Min(previous.Open, previous.Close) && current.High > previous.High then
-            let additionalInfo = 
-            // see if we can do volume numbers
+            let completeReversal = current.Close < previous.Low
+            let volumeInfo = 
+                // see if we can do volume numbers
                 if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
                     
                     let stats =
@@ -69,6 +70,11 @@ let downsideReversal (bars: PriceBars) =
                     ", volume x" + multiplier.ToString("N1")
                 else
                     ""
+                    
+            let additionalInfo =
+                match completeReversal with
+                | true -> " (complete) " + volumeInfo
+                | false -> volumeInfo
                 
             {
                 date = current.Date
@@ -91,8 +97,9 @@ let upsideReversal (bars: PriceBars) =
         
         // upside reversal pattern detection
         if current.Close > System.Math.Max(previous.Open, previous.Close) && current.Low < previous.Low then
-            let additionalInfo = 
-            // see if we can do volume numbers
+            let completeReversal = current.Close < previous.Low
+            let volumeInfo = 
+                // see if we can do volume numbers
                 if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
                     
                     let stats =
@@ -105,6 +112,11 @@ let upsideReversal (bars: PriceBars) =
                     ", volume x" + multiplier.ToString("N1")
                 else
                     ""
+            
+            let additionalInfo =
+                match completeReversal with
+                | true -> " (complete) " + volumeInfo
+                | false -> volumeInfo
                 
             {
                 date = current.Date
