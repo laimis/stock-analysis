@@ -8,11 +8,8 @@ import {
   PriceFrequency,
   Prices,
   SMA,
-  StockAnalysisOutcome,
   StockGaps,
-  StocksService,
-  stocktransactioncommand,
-  TickerOutcomes
+  StocksService
 } from 'src/app/services/stocks.service';
 import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {GlobalService} from "../../services/global.service";
@@ -79,6 +76,7 @@ export class StockTradingNewPositionComponent {
   isPendingPositionMode: boolean = true
 
   positionEntered = false
+  pendingPositionEntered = false
   workflowStarted = false
   recordInProgress : boolean = false
 
@@ -158,6 +156,7 @@ export class StockTradingNewPositionComponent {
     this.supportContainer = null
     this.notes = null
     this.strategy = ""
+    this.workflowStarted = false
   }
 
   fetchAndRenderPriceRelatedInformation(ticker:string) {
@@ -297,7 +296,7 @@ export class StockTradingNewPositionComponent {
         this.positionOpened.emit(cmd)
         this.recordInProgress = false
         this.positionEntered = true
-        this.workflowStarted = false
+        this.reset()
     },
       err => {
         let errors = GetErrors(err)
@@ -350,10 +349,9 @@ export class StockTradingNewPositionComponent {
         this.prices = null
         this.chartInfo = null
         this.gaps = null
+        this.pendingPositionEntered = true
         this.pendingPositionCreated.emit(cmd)
         this.reset()
-
-        this.positionEntered = true
       },
       errors => {
         let errorMessages = GetErrors(errors).join(", ")

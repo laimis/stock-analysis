@@ -1,8 +1,13 @@
 @if (workflowStarted === false) {
   <section>
     @if (positionEntered) {
+      <div class="alert alert-primary">Position has been successfully opened</div>
+    }
+
+    @if (pendingPositionEntered) {
       <div class="alert alert-primary">Pending position has been successfully created</div>
     }
+
     <button class="btn btn-secondary" (click)="startNewPosition()">Start New Position</button>
   </section>
 } @else {
