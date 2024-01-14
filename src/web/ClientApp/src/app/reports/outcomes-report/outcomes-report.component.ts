@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { GetErrors } from 'src/app/services/utils';
+import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
 import {tap} from "rxjs/operators";
 import {concat} from "rxjs";
@@ -163,5 +163,10 @@ export class OutcomesReportComponent implements OnInit {
       this.excludedTickers = this.earnings;
       this.excludeEarningsTitle = "Include Earnings";
     }
+  }
+
+  toggleVisibility(form:HTMLElement, button:HTMLElement) {
+    toggleVisuallyHidden(form);
+    toggleVisuallyHidden(button);
   }
 }

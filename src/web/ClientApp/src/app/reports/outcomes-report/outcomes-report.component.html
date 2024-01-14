@@ -4,8 +4,10 @@
     <h3>@if (title) {
       <span>{{title}} - </span>
     }{{tickers.length}} tickers</h3>
-    <div>
-      <form>
+
+    <div #dateFilter>
+      <span role="button" #spanButton (click)="toggleVisibility(dateForm, spanButton)">Date Selections {{startDate}} {{endDate}}</span>
+      <form class="visually-hidden" #dateForm>
         <div class="row">
           <div class="col-md-4">
             <label class="form-label" for="startDate">Start Date</label>
@@ -16,7 +18,7 @@
               <input #endDateControl type="date" class="form-control form-control-sm" [(ngModel)]="endDate" id="endDate" name="endDate"/>
             </div>
             <div class="col-md-4 d-flex align-items-end">
-              <button class="btn btn-primary btn-sm" (click)="runReports(startDateControl.value, endDateControl.value)">
+              <button class="btn btn-primary btn-sm" (click)="toggleVisibility(dateForm,spanButton); runReports(startDateControl.value, endDateControl.value)">
                 Apply
               </button>
             </div>
@@ -28,66 +30,66 @@
               }
             </div>
           }
-        </form>
-      </div>
+      </form>
+    </div>
       <!-- drop down with all the tickers -->
-      <div class="mb-3 mt-3">
-        <label for="tickerFilter" class="form-label">Ticker highlighter</label>
-        @if (earnings.length > 0) {
-          <button class="btn btn-link float-end"
-          (click)="toggleExcludeEarnings()">{{excludeEarningsTitle}}</button>
+    <div class="mb-3 mt-3">
+      <label for="tickerFilter" class="form-label">Ticker highlighter</label>
+      @if (earnings.length > 0) {
+        <button class="btn btn-link float-end"
+        (click)="toggleExcludeEarnings()">{{excludeEarningsTitle}}</button>
+      }
+      <select #tickerSelect id="tickerFilter" class="form-select" aria-label="Ticker filter"
+        (change)="onTickerChange(tickerSelect.value)">
+        <option value="all">All</option>
+        @for (t of tickers; track t) {
+          <option [value]="t">{{t}}</option>
         }
-        <select #tickerSelect id="tickerFilter" class="form-select" aria-label="Ticker filter"
-          (change)="onTickerChange(tickerSelect.value)">
-          <option value="all">All</option>
-          @for (t of tickers; track t) {
-            <option [value]="t">{{t}}</option>
-          }
-        </select>
-      </div>
-    </section>
-    @if (earningsOutcomes) {
-      <app-outcomes
-        [outcomes]="earningsOutcomes"
-        [tickerFilter]="activeTicker"
-        title="Earnings - {{this.earnings.length}}">
-      </app-outcomes>
-    }
-    <app-outcomes-analysis-report
-      [report]="singleBarReportDaily"
-      [showSummary]="true"
+      </select>
+    </div>
+  </section>
+  @if (earningsOutcomes && earningsOutcomes.length > 0) {
+    <app-outcomes
+      [outcomes]="earningsOutcomes"
       [tickerFilter]="activeTicker"
-      [excludeTickers]="excludedTickers"
-      title="Daily Report">
-    </app-outcomes-analysis-report>
-    @if (singleBarReportDaily) {
-      <app-outcomes
-        [outcomes]="singleBarReportDaily.outcomes"
-        [tickerFilter]="activeTicker"
-        title="Single Bar Outcome (daily)">
-      </app-outcomes>
-    }
-    <app-outcomes-analysis-report
-      [report]="singleBarReportWeekly"
-      [showSummary]="true"
+      title="Earnings - {{this.earnings.length}}">
+    </app-outcomes>
+  }
+  <app-outcomes-analysis-report
+    [report]="singleBarReportDaily"
+    [showSummary]="true"
+    [tickerFilter]="activeTicker"
+    [excludeTickers]="excludedTickers"
+    title="Daily Report">
+  </app-outcomes-analysis-report>
+  @if (singleBarReportDaily) {
+    <app-outcomes
+      [outcomes]="singleBarReportDaily.outcomes"
       [tickerFilter]="activeTicker"
-      title="Weekly Report">
-    </app-outcomes-analysis-report>
-    @if (singleBarReportWeekly) {
-      <app-outcomes
-        [outcomes]="singleBarReportWeekly.outcomes"
-        [tickerFilter]="activeTicker"
-        title="Single Bar Outcome (weekly)">
-      </app-outcomes>
-    }
-    @if (allBarsReport) {
-      <app-outcomes
-        [outcomes]="allBarsReport.outcomes"
-        [tickerFilter]="activeTicker"
-        title="All Bar Outcomes (daily)">
-      </app-outcomes>
-    }
-    @for (gap of gaps; track gap) {
-      <app-gaps [gaps]="gap"></app-gaps>
-    }
-  </div>
+      title="Single Bar Outcome (daily)">
+    </app-outcomes>
+  }
+  <app-outcomes-analysis-report
+    [report]="singleBarReportWeekly"
+    [showSummary]="true"
+    [tickerFilter]="activeTicker"
+    title="Weekly Report">
+  </app-outcomes-analysis-report>
+  @if (singleBarReportWeekly) {
+    <app-outcomes
+      [outcomes]="singleBarReportWeekly.outcomes"
+      [tickerFilter]="activeTicker"
+      title="Single Bar Outcome (weekly)">
+    </app-outcomes>
+  }
+  @if (allBarsReport) {
+    <app-outcomes
+      [outcomes]="allBarsReport.outcomes"
+      [tickerFilter]="activeTicker"
+      title="All Bar Outcomes (daily)">
+    </app-outcomes>
+  }
+  @for (gap of gaps; track gap) {
+    <app-gaps [gaps]="gap"></app-gaps>
+  }
+</div>
