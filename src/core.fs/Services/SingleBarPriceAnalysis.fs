@@ -14,7 +14,6 @@ module SingleBarPriceAnalysis =
     module SingleBarOutcomeKeys =
         let PriceAbove20SMA = "PriceAbove20SMA"
         let PriceAbove20SMADays = "PriceAbove20SMADays"
-        let PriceBelow20SMA = "PriceBelow20SMA"
         let PriceBelow20SMADays = "PriceBelow20SMADays"
         let RelativeVolume = "RelativeVolume"
         let Volume = "Volume"
@@ -173,7 +172,7 @@ module SingleBarPriceAnalysis =
                 let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
                 yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
                 
-            yield MultipleBarPriceAnalysis.PriceAnalysis.generateGreenStreakOutcome bars
+            yield PriceAnalysis.generateGreenStreakOutcome bars
         ]
         
     let volumeAnalysis (bars:PriceBars) =
@@ -329,7 +328,7 @@ module SingleBarPriceAnalysisEvaluation =
             AnalysisOutcomeEvaluation(
                 "Price below 20 SMA",
                 OutcomeType.Neutral,
-                SingleBarOutcomeKeys.PriceBelow20SMA,
+                SingleBarOutcomeKeys.PriceAbove20SMA,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAbove20SMA && o.Value < 0m) ]
             )
             

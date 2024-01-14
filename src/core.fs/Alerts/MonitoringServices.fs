@@ -562,7 +562,7 @@ type AlertEmailService(accounts:IAccountStorage,
             
             let! users = accounts.GetUserEmailIdPairs()
             
-            let! result =
+            do!
                 users
                 |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
                 |> Seq.map (fun emailIdPair -> async {
@@ -577,11 +577,12 @@ type AlertEmailService(accounts:IAccountStorage,
                         | false -> do! sendAlerts recipient alerts;
                 })
                 |> Async.Sequential
+                |> Async.Ignore
                 
             container.AddNotice "Emails sent" 
         }
         
-    member _.NextRunTime (logger:ILogger) (now:DateTimeOffset) =
+    member _.NextRunTime (now:DateTimeOffset) =
         
         let eastern = marketHours.ToMarketTime(now);
         

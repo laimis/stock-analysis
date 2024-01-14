@@ -100,7 +100,7 @@ public class AlertEmailServiceHost(ILogger<AlertEmailServiceHost> logger, Monito
     : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     private bool _firstRun = true;
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(baseLogger, now);
+    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
     protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken)
     {

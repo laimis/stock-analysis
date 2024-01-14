@@ -51,15 +51,9 @@ export class OutcomesComponent {
       return []
     }
 
-    let otherColumns = entries[0].outcomes
-      .filter(o => this.IsRenderableOutcome(o) && o.key !== this.highlightColumn)
+    return entries[0].outcomes
+      .filter(o => this.IsRenderableOutcome(o))
       .map(o => o.key)
-
-    if (this.highlightColumn === undefined) {
-      return otherColumns
-    }
-
-    return [this.highlightColumn, ...otherColumns]
   }
 
   sort(column:string) {
@@ -82,12 +76,7 @@ export class OutcomesComponent {
   }
 
   outcomesForRendering(outcomes:StockAnalysisOutcome[]) {
-
-    const highlightColumn = outcomes.find(o => o.key === this.highlightColumn);
-    const others = outcomes.filter(o => o.key !== this.highlightColumn);
-
-    return [highlightColumn, ...others]
-      .filter(o => this.IsRenderableOutcome(o))
+    return outcomes.filter(o => this.IsRenderableOutcome(o));
   }
 
   private IsRenderableOutcome(o: StockAnalysisOutcome): unknown {
