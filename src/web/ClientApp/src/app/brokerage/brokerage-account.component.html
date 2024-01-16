@@ -1,4 +1,17 @@
-<div>
+<div *ngIf="account && account.connected === false">
+  <div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Account not connected</h4>
+    <p>
+      Your account is not connected. Please connect your account to see your positions.
+    </p>
+    <hr>
+    <p class="mb-0">
+      <a class="btn btn-primary" href="/profile">Connect Account</a>
+    </p>
+  </div>
+</div>
+
+<div *ngIf="account && account.connected">
   <div class="row">
     <div class="col-md mb-4 mt-2 text-center">
       <div class="text-muted sort-header" >
