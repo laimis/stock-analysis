@@ -349,7 +349,7 @@ export class StockTradingNewPositionComponent {
         this.prices = null
         this.chartInfo = null
         this.gaps = null
-        this.pendingPositionEntered = true
+        this.flashPendingPositionCreated()
         this.pendingPositionCreated.emit(cmd)
         this.reset()
       },
@@ -358,6 +358,13 @@ export class StockTradingNewPositionComponent {
         alert('pending position failed: ' + errorMessages)
       }
     )
+  }
+
+  flashPendingPositionCreated() {
+    this.pendingPositionEntered = true
+    setTimeout(() => {
+      this.pendingPositionEntered = false
+    }, 1000)
   }
 
   lookupPendingPosition(ticker: string) {

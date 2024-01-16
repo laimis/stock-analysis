@@ -26,6 +26,7 @@ export class StockTradingPositionsComponent {
     private NO_LONG_TERM_STRATEGY = "nolongterm"
     private NONE = ""
     private SHORTS = "shorts"
+    private LONGS = "longs"
     private RR = "rr"
     private UnrealizedRR = "unrealizedRR"
     metricToRender: string = this.UnrealizedRR
@@ -58,9 +59,16 @@ export class StockTradingPositionsComponent {
             }
         )
 
+        let longs = input.filter(
+            (p) => {
+                return !p.isShort
+            }
+        )
+
         let noStrategy = input.filter(i => this.matchesStrategyCheck(i, this.NONE))
 
         this.strategies.push({key: this.NO_LONG_TERM_STRATEGY, value: "All minus long term - " + (input.length - longTermPositions.length)})
+        this.strategies.push({key: this.LONGS, value: "Longs - " + longs.length})
         this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})
         this.strategies.push({key: this.NONE, value: "None - " + noStrategy.length})
         this.strategies = this.strategies.concat(
@@ -229,7 +237,7 @@ export class StockTradingPositionsComponent {
 
             let positionStrategy = p.labels.find(l => l.key === "strategy")
             if (!positionStrategy) {
-              return false
+              return this.strategyToFilter === this.NONE
             }
 
             if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
@@ -238,6 +246,10 @@ export class StockTradingPositionsComponent {
 
             if (this.strategyToFilter === this.SHORTS) {
               return p.isShort
+            }
+
+            if (this.strategyToFilter === this.LONGS) {
+              return !p.isShort
             }
 
             if (this.strategyToFilter === this.NONE) {
