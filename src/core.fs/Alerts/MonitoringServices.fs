@@ -89,7 +89,7 @@ let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
     | _ ->
         // markets are closed if we get here, so jump to the next day
         let nextDayOffset =
-            match candidates.Head.DayOfWeek with
+            match easternTime.DayOfWeek with
             | DayOfWeek.Friday -> 3
             | DayOfWeek.Saturday -> 2
             | _ -> 1
