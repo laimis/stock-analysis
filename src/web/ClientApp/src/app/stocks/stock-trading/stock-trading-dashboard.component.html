@@ -28,6 +28,9 @@
           <span class="badge rounded-pill bg-info">{{violations.length}}</span>
         }
       </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]="" (click)="activateTab('brokerage')">
+        Brokerage
+      </a>
       <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]="" (click)="activateTab('summary')">
         Summary
       </a>
@@ -42,15 +45,15 @@
     </div>
   }
   @if (isActive('positions') && positions) {
-    <app-stock-trading-positions [positions]=positions [orders]="brokerageOrders" [quotes]="quotes"></app-stock-trading-positions>
+    <app-stock-trading-positions [positions]=positions [orders]="brokerageAccount.orders" [quotes]="quotes"></app-stock-trading-positions>
   }
   @if (isActive('openreview')) {
-    <app-stock-trading-review [orders]="brokerageOrders" [positions]=positions [quotes]="quotes"></app-stock-trading-review>
+    <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=positions [quotes]="quotes"></app-stock-trading-review>
   }
   @if (isActive('violations')) {
     <app-stock-violations
       [violations]="violations"
-      [orders]="brokerageOrders"
+      [orders]="brokerageAccount.orders"
       (sellRequested)="sellRequested($event)"
       (purchaseRequested)="purchaseRequested($event)"
       (refreshRequested)="refresh()"
@@ -60,6 +63,9 @@
     <app-stock-trading-outcomes-reports       [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
   }
   @if (isActive('summary')) {
-    <app-stock-trading-summary [quotes]="quotes" [positions]="positions" [cashBalance]="cashBalance" ></app-stock-trading-summary>
+    <app-stock-trading-summary [quotes]="quotes" [positions]="positions" [brokerageAccount]="brokerageAccount" ></app-stock-trading-summary>
+  }
+  @if (isActive('brokerage')) {
+    <app-brokerage-account [account]="brokerageAccount"></app-brokerage-account>
   }
 </div>

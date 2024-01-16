@@ -140,7 +140,7 @@ type OptionPosition() =
     
     member this.IsCall = if this.OptionType = "CALL" then "true" else "false"
     
-type TradingAccount() =
+type BrokerageAccount() =
     
     member val StockPositions : StockPosition [] = [||] with get, set
     member val OptionPositions : OptionPosition [] = [||] with get, set
@@ -149,10 +149,12 @@ type TradingAccount() =
     member val Equity : decimal option = None with get, set
     member val LongMarketValue : decimal option = None with get, set
     member val ShortMarketValue : decimal option = None with get, set
+    member val Connected : bool = true with get, set
     
-    static member Empty : TradingAccount =
-        let trading:TradingAccount = TradingAccount()
+    static member Empty : BrokerageAccount =
+        let trading:BrokerageAccount = BrokerageAccount()
         trading.CashBalance <- Some 0m
+        trading.Connected <- false
         trading
     
 type BrokerageOrderDuration =
@@ -214,7 +216,7 @@ type IBrokerage =
     abstract member ConnectCallback : code:string -> Task<OAuthResponse>
     abstract member GetAccessToken : state:UserState -> Task<OAuthResponse>
     abstract member RefreshAccessToken : state:UserState -> Task<OAuthResponse>
-    abstract member GetAccount : state:UserState -> Task<ServiceResponse<TradingAccount>>
+    abstract member GetAccount : state:UserState -> Task<ServiceResponse<BrokerageAccount>>
     abstract member BuyOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
     abstract member BuyToCoverOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
     abstract member SellOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>

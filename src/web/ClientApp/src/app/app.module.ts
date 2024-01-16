@@ -44,7 +44,7 @@ import { RecentSellsComponent } from './recentsells/recentsells.component';
 import { CryptoDashboardComponent } from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import { CryptoOwnershipGridComponent } from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import { CryptoDetailsComponent } from './cryptos/crypto-details/crypto-details.component';
-import { StockTradingComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
+import { StockTradingDashboardComponent } from './stocks/stock-trading/stock-trading-dashboard.component';
 import { StockTradingPositionsComponent } from './stocks/stock-trading/stock-trading-positions.component';
 import { StockTradingNewPositionComponent } from './stocks/stock-trading/stock-trading-new-position.component';
 import { StockTradingPerformanceComponent } from './stocks/stock-trading-review/stock-trading-performance.component';
@@ -95,6 +95,7 @@ import {StockSearchComponent} from "./stocks/stock-search/stock-search.component
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
+import {BrokerageAccountComponent} from "./brokerage/brokerage-account.component";
 
 
 let routes: Routes = [
@@ -129,13 +130,13 @@ let routes: Routes = [
   {path: 'playground/inflectionpoints', component: InflectionPointsComponent, canActivate: [AuthGuard]},
 
   {path: 'privacy', component: PrivacyComponent},
-  {path: 'trading', component: StockTradingComponent, canActivate: [AuthGuard]},
+  {path: 'trading', component: StockTradingDashboardComponent, canActivate: [AuthGuard]},
   {path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard]},
   {path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
   {path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
   {path: 'trading/review', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
   {path: 'trading/review/:tab', component: StockTradingReviewDashboardComponent, canActivate: [AuthGuard]},
-  {path: 'trading/:tab', component: StockTradingComponent, canActivate: [AuthGuard]},
+  {path: 'trading/:tab', component: StockTradingDashboardComponent, canActivate: [AuthGuard]},
 
   {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
   {path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
@@ -205,7 +206,7 @@ let routes: Routes = [
     StockOwnershipComponent,
     StockViolationsComponent,
 
-    StockTradingComponent,
+    StockTradingDashboardComponent,
     StockTradingPositionComponent,
     StockTradingPositionsComponent,
     StockTradingNewPositionComponent,
@@ -220,6 +221,7 @@ let routes: Routes = [
 
     BrokerageOrdersComponent,
     BrokerageNewOrderComponent,
+    BrokerageAccountComponent,
 
     StockSearchComponent,
     TransactionsComponent,

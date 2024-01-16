@@ -184,11 +184,11 @@ public class TDAmeritradeClient : IBrokerage
         return new ServiceResponse<SearchResult[]>(converted);
     }
 
-    public async Task<ServiceResponse<TradingAccount>> GetAccount(UserState user)
+    public async Task<ServiceResponse<BrokerageAccount>> GetAccount(UserState user)
     {
         if (user.ConnectedToBrokerage == false)
         {
-            return NotConnectedToBrokerageError<TradingAccount>();
+            return NotConnectedToBrokerageError<BrokerageAccount>();
         }
         
         var response = await CallApi<AccountsResponse[]>(
@@ -199,7 +199,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (response.IsOk == false)
         {
-            return new ServiceResponse<TradingAccount>(response.Error.Value);
+            return new ServiceResponse<BrokerageAccount>(response.Error.Value);
         }
 
         var accounts = response.Success.Value;
@@ -266,7 +266,7 @@ public class TDAmeritradeClient : IBrokerage
                 };
             }).ToArray();
 
-        var account = new TradingAccount
+        var account = new BrokerageAccount
         {
             Orders = orders,
             StockPositions = stockPositions,
@@ -277,7 +277,7 @@ public class TDAmeritradeClient : IBrokerage
             ShortMarketValue = accounts[0].securitiesAccount?.currentBalances?.shortMarketValue,
         };
 
-        return new ServiceResponse<TradingAccount>(account);
+        return new ServiceResponse<BrokerageAccount>(account);
     }
 
     public async Task<ServiceResponse<bool>> CancelOrder(UserState user, string orderId)

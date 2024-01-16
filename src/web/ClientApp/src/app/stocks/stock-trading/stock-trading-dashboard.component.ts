@@ -2,9 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {
-  BrokerageOrder,
+  BrokerageAccount,
   PositionInstance, StockQuote,
-  StocksService,
   StockTradingPositions, stocktransactioncommand,
   StockViolation
 } from '../../services/stocks.service';
@@ -16,14 +15,13 @@ import {StockPositionsService} from "../../services/stockpositions.service";
   templateUrl: './stock-trading-dashboard.component.html',
   styleUrls: ['./stock-trading-dashboard.component.css']
 })
-export class StockTradingComponent implements OnInit {
+export class StockTradingDashboardComponent implements OnInit {
   positions: PositionInstance[]
   loaded: boolean = false
   loading: boolean = true
   activeTab:string = 'positions'
   violations: StockViolation[]
-  brokerageOrders: BrokerageOrder[]
-  cashBalance: number
+  brokerageAccount: BrokerageAccount
   errors: string[]
   quotes: Map<string, StockQuote>
 
@@ -82,8 +80,7 @@ export class StockTradingComponent implements OnInit {
     this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
       this.positions = r.current
       this.violations = r.violations
-      this.brokerageOrders = r.brokerageOrders
-      this.cashBalance = r.cashBalance
+      this.brokerageAccount = r.brokerageAccount
       this.quotes = r.prices
       this.loading = false
       this.loaded = true
@@ -95,7 +92,6 @@ export class StockTradingComponent implements OnInit {
     })
   }
 
-  numberOfPositions: number = 0
   invested: number = 0
 }
 

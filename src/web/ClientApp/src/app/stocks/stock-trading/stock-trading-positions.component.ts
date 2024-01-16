@@ -7,7 +7,6 @@ import {
   StockQuote
 } from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
-import {StockPositionsService} from "../../services/stockpositions.service";
 
 
 @Component({

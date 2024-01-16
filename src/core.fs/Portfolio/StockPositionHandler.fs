@@ -783,7 +783,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             let account =
                 match accountResponse.Success with
                 | Some acc -> acc
-                | None -> TradingAccount.Empty
+                | None -> BrokerageAccount.Empty
                 
             let tickers =
                 positions
@@ -807,8 +807,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 {
                     current=current
                     violations=violations
-                    cashBalance=account.CashBalance
-                    brokerageOrders=account.Orders
+                    brokerageAccount=account
                     prices=pricesWithStringAsKey
                 }
             return ServiceResponse<TradingEntriesView>(tradingEntries)

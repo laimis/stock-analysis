@@ -84,7 +84,7 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage) =
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return ResponseUtils.failedTyped<TradingAccount> "User not found"
+        | None -> return ResponseUtils.failedTyped<BrokerageAccount> "User not found"
         | Some user -> return! brokerage.GetAccount(user.State)
     }
         

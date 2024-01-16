@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {PositionInstance, StockQuote} from 'src/app/services/stocks.service';
+import {BrokerageAccount, PositionInstance, StockQuote} from 'src/app/services/stocks.service';
 import { isLongTermStrategy } from 'src/app/services/utils';
 
 interface PositionGroup {
@@ -43,7 +43,7 @@ export class StockTradingSummaryComponent {
 
 
   @Input()
-  cashBalance: number
+  brokerageAccount: BrokerageAccount
 
   getStrategy(position:PositionInstance) : string {
     let strategy = position.labels.find(l => l.key == 'strategy')

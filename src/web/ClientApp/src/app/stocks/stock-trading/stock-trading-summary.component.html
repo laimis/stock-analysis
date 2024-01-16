@@ -1,5 +1,5 @@
 @if (positions) {
-  <div class="summary-card rounded">
+  <div>
     <div class="row">
       <div class="col-md mb-4 mt-2 text-center">
         <div class="text-muted sort-header" >
@@ -38,7 +38,7 @@
           Cash
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{ cashBalance | currency}}
+          {{ brokerageAccount.cashBalance | currency}}
         </div>
       </div>
     </div>

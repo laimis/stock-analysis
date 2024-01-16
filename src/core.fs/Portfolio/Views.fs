@@ -351,8 +351,7 @@ type TradingEntriesView =
     {
         current: StockPositionWithCalculations array
         violations: StockViolationView array
-        cashBalance: decimal option
-        brokerageOrders: Order array
+        brokerageAccount: BrokerageAccount
         prices: Map<string, StockQuote>
     }
     

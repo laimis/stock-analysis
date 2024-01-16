@@ -947,16 +947,26 @@ export interface BrokerageOrder {
   isSellOrder: boolean
 }
 
+export interface BrokerageStockPositionInstance {
+  ticker: string
+  quantity: number
+  averageCost: number
+}
+
 export interface BrokerageAccount {
+  stockPositions: BrokerageStockPositionInstance[]
   orders: BrokerageOrder[]
   cashBalance: number
+  equity: number
+  longMarketValue: number
+  shortMarketValue: number
+  connected: boolean
 }
 
 export interface StockTradingPositions {
   current: PositionInstance[]
   violations: StockViolation[]
-  cashBalance: number
-  brokerageOrders: BrokerageOrder[]
+  brokerageAccount: BrokerageAccount
   prices: Map<string, StockQuote>
 }
 

@@ -50,8 +50,8 @@ namespace coretests.Options
 
             brokerage.Setup(x => x.GetAccount(It.IsAny<UserState>()))
                 .Returns(Task.FromResult(
-                    new ServiceResponse<TradingAccount>(
-                        new TradingAccount {
+                    new ServiceResponse<BrokerageAccount>(
+                        new BrokerageAccount {
                             OptionPositions = Array.Empty<OptionPosition>(),
                             StockPositions = Array.Empty<StockPosition>(),
                         }
