@@ -13,6 +13,7 @@
     <Compile Include="PriceTransformation.fs" />
     <Compile Include="DataHelpers.fs" />
     <Compile Include="Program.fs" />
+    <Content Include="newhigh_and_topgainer_long.bat" />
   </ItemGroup>
 
   <ItemGroup>

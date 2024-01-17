@@ -14,13 +14,13 @@ module Constants =
 
 type Signal =
     CsvProvider<
-        Sample = "screenerid (int), date (date), ticker (string)",
+        Sample = "screenerid (int), date (string), ticker (string)",
         HasHeaders=true
     >
 
 type SignalWithPriceProperties =
     CsvProvider<
-        Schema = "screenerid (int), date (date), ticker (string), gap (decimal)",
+        Schema = "screenerid (int), date (string), ticker (string), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal)",
         HasHeaders=false
     >
     
@@ -55,13 +55,13 @@ module Unified =
         let maximumDate = records |> Seq.maxBy (fun r -> r |> getDate) |> getDate
         
         printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
-        printfn $"Minimum date: %A{minimumDate.Date}"
-        printfn $"Maximum date: %A{maximumDate.Date}"
+        printfn $"Minimum date: %A{minimumDate}"
+        printfn $"Maximum date: %A{maximumDate}"
         printfn ""
     
 type TradeOutcomeOutput =
     CsvProvider<
-        Sample = "strategy (string), ticker (string), date (date), screenerid (int), gap (decimal), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+        Sample = "strategy (string), ticker (string), date (string), screenerid (int), gap (decimal), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
         HasHeaders=true
     >
     

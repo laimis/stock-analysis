@@ -34,7 +34,8 @@ let actions = [
         let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
         let inputFilename = ServiceHelper.inputFilename() |> generateFilePathInStudiesDirectory
         let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
-        do! PriceTransformation.transform inputFilename outputFilename getPricesWithBrokerage
+        let! transformed = PriceTransformation.transform inputFilename getPricesWithBrokerage
+        do! transformed.SaveToString() |> DataHelpers.appendCsv outputFilename
     }
     if ServiceHelper.hasArgument "-trade" then fun () -> async {
         let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory

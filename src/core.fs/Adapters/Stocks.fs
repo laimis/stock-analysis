@@ -60,7 +60,8 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         // if ``open`` > high then failwith $"Invalid open price: {``open``} is greater than high: {high} on {date}"
         // if ``open`` < low then failwith $"Invalid open price: {``open``} is less than low: {low} on {date}"
     
-        
+    let dateStr = date.ToString("yyyy-MM-dd")
+    
     new(value:string) =
         let parts = value.Split(',')
         PriceBar(
@@ -79,7 +80,7 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
     member this.Close = close
     member this.Volume = volume
     
-    member this.DateStr = this.Date.ToString("yyyy-MM-dd")
+    member this.DateStr = dateStr
     
     override this.ToString () =
         $"{this.DateStr},{this.Open},{this.High},{this.Low},{this.Close},{this.Volume}"
@@ -125,11 +126,11 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
 type PriceBarWithIndex = PriceBar * int
 
 type PriceBars(bars:PriceBar array) =
-    let dateIndex = Dictionary<DateOnly, PriceBarWithIndex>()
+    let dateIndex = Dictionary<string, PriceBarWithIndex>()
     do
         bars
         |> Array.indexed
-        |> Array.iter (fun (index, bar) -> dateIndex.Add(DateOnly(bar.Date.Year, bar.Date.Month, bar.Date.Day), (bar, index)))
+        |> Array.iter (fun (index, bar) -> dateIndex.Add(bar.DateStr, (bar, index)))
             
     member this.Bars = bars
     member this.Length = bars.Length
@@ -141,11 +142,11 @@ type PriceBars(bars:PriceBar array) =
         | false -> this.Bars[this.Length - numberOfBars ..]
         |> PriceBars
     member this.AllButLast() = this.Bars[0 .. this.Length - 2] |> PriceBars
-    member this.ClosingPrices() = this.Bars |> Array.map (fun bar -> bar.Close)
+    member this.ClosingPrices() = this.Bars |> Array.map (_.Close)
     member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal)
-    member this.TryFindByDate (date:DateOnly) =
-        match dateIndex.TryGetValue(date) with
+    member this.TryFindByDate (dateStr:string) =
+        match dateIndex.TryGetValue(dateStr) with
         | true, bar -> Some bar
         | _ -> None
-    member this.TryFindByDate (date:DateTimeOffset) =
-        DateOnly(date.Year, date.Month, date.Day) |> this.TryFindByDate
+    member this.TryFindByDate (date:DateOnly) = this.TryFindByDate (date.ToString("yyyy-MM-dd"))
+    member this.TryFindByDate (date:DateTimeOffset) = this.TryFindByDate (date.ToString("yyyy-MM-dd"))

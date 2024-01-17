@@ -113,3 +113,7 @@ let getScreenerResults screenerExportUrl = async {
 let saveCsv filename content = async {
     do! System.IO.File.WriteAllTextAsync(filename, content) |> Async.AwaitTask
 }
+
+let appendCsv filename content = async {
+    do! System.IO.File.AppendAllTextAsync(filename, content) |> Async.AwaitTask
+}

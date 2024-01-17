@@ -106,13 +106,11 @@ type SMAContainer(all:SMA array) =
     member this.sma150 = all |> Array.find (fun x -> x.Interval = 150)
     member this.sma200 = all |> Array.find (fun x -> x.Interval = 200)
     
-    static member Generate (prices:PriceBars) =
-        
-        let closingPrices = prices.ClosingPrices()
-        
-        let generate = closingPrices |> SMA.ToSMA
-        
+    static member Generate (prices:decimal array) =
+        let generate = prices |> SMA.ToSMA
         [|20;50;150;200|] |> Array.map generate |> SMAContainer
+        
+    static member Generate (prices:PriceBars) = prices.ClosingPrices() |> SMAContainer.Generate
     
 module AnalysisOutcomeEvaluationScoringHelper =
     

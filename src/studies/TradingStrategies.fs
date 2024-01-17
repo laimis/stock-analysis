@@ -20,9 +20,9 @@ let private toOutputRow name (signal:SignalWithPriceProperties.Row) (openBar:Pri
         date=signal.Date,
         screenerid=signal.Screenerid,
         gap=signal.Gap,
-        opened=openBar.Date.DateTime,
+        opened=openBar.DateStr,
         openPrice=openPrice,
-        closed=closeBar.Date.DateTime,
+        closed=closeBar.DateStr,
         closePrice=closePrice,
         percentGain=gain,
         numberOfDaysHeld=(daysHeld.TotalDays |> int)

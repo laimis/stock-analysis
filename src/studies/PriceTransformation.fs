@@ -3,6 +3,7 @@ module studies.PriceTransformation
 open System
 open core.Shared
 open core.fs.Adapters.Stocks
+open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 open studies.Types
 
@@ -15,11 +16,7 @@ let verifyRecords (input:Signal) =
     | x when x < Constants.MinimumRecords -> failwith $"not enough records: {x}"
     | _ -> ()
     
-    // make sure all dates are as expected
-    let datesFine = records |> Seq.forall (fun r -> r.Date.Year >= Constants.EarliestYear && r.Date.Year <= Constants.LatestYear)
-    match datesFine with
-    | false -> failwith "date is out of range"
-    | true -> ()
+    // should we check dates?
     
     // make sure all tickers are set
     let tickersFine = records |> Seq.forall (fun r -> String.IsNullOrWhiteSpace(r.Ticker) = false)
@@ -44,18 +41,18 @@ let getEarliestDateByTicker (records:Signal.Row seq) =
             (ticker, earliestDate)
         )
         
-let transform (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
+let transform (inputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
     // parse and verify
-    let records =
+    let signals =
         inputFilename
         |> Signal.Load
         |> verifyRecords
         
     // describe records
-    records |> Seq.map (fun r -> Input r) |> Unified.describeRecords
+    signals |> Seq.map Input |> Unified.describeRecords
         
     // generate a pair of ticker and the earliest data it is seen
-    let tickerDatePairs = records |> getEarliestDateByTicker
+    let tickerDatePairs = signals |> getEarliestDateByTicker
     
     // output how many records are left
     printfn $"Unique tickers: %d{tickerDatePairs |> Seq.length}"
@@ -67,7 +64,7 @@ let transform (inputFilename:string) (outputFilename:string) (priceFunc:DateTime
         tickerDatePairs
         |> Seq.map (fun (ticker, earliestDate) -> async {
             
-            let earliestDateMinus365 = earliestDate.Date.AddDays(-365) |> DateTimeOffset
+            let earliestDateMinus365 = earliestDate.Date |> DateTimeOffset.Parse |> _.AddDays(-365)
             let today = DateTimeOffset.UtcNow
             
             let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
@@ -80,77 +77,98 @@ let transform (inputFilename:string) (outputFilename:string) (priceFunc:DateTime
         results
         |> Array.choose (fun (ticker, prices) ->
             match prices with
-            | Some prices -> Some (ticker, prices)
-            | None -> None
+            | Some prices ->
+                Some (ticker, (prices, prices |> SMAContainer.Generate))
+            | None ->
+                None
         )
         |> Map.ofArray
     
     printfn $"Failed: %d{failed.Length}"
     printfn $"Succeeded: %d{prices.Count}"
     
-    let recordsWithPrices =
-        records
+    let signalsWithPrices =
+        signals
         |> Seq.filter (fun r -> prices.ContainsKey(r.Ticker))
         |> Seq.filter (fun r ->
             let ticker = r.Ticker
             let date = r.Date
-            let prices = prices[ticker]
+            let prices, _ = prices[ticker]
             let signalBarWithIndex = prices.TryFindByDate date
             match signalBarWithIndex with
             | None ->
                 // failwith $"Could not find signal bar for {ticker} on {date}"
                 false
-            | Some signalBarWithIndex -> 
-                let nextDay = signalBarWithIndex |> snd |> fun x -> x + 1
+            | Some (_, index) -> 
+                let nextDay = index + 1
                 let nextDayBar = prices.Bars |> Array.tryItem nextDay
                 match nextDayBar with
                 | Some _ -> true
                 | None -> false
         )
         
-    printfn $"Records with prices: %d{recordsWithPrices |> Seq.length}"
+    printfn $"Records with prices: %d{signalsWithPrices |> Seq.length}"
     
     // now we are interested in gap ups
-    let gapUpIndex =
-        prices |> Map.keys |> Seq.collect (fun key ->
-            let bars = prices[key]
+    let gapIndex =
+        prices
+        |> Map.keys
+        |> Seq.collect (fun ticker ->
+            let bars, _ = prices[ticker]
             let gaps = detectGaps bars bars.Length
-            let gapUps =
-                gaps
-                |> Array.filter (fun (g:Gap) -> g.Type = GapType.Up)
-                |> Array.map (fun (g:Gap) ->
-                    let gapKey = (key, g.Bar.DateStr)
-                    (gapKey,g)
-                )
-            gapUps
+            gaps
+            |> Array.map (fun (g:Gap) ->
+                let gapKey = (ticker, g.Bar.DateStr)
+                (gapKey,g)
+            )
         )
         |> Map.ofSeq
         
         
-    printfn $"Gap up index: %d{gapUpIndex.Count}"
+    printfn $"Gap up index: %d{gapIndex.Count}"
     
-    // go through the records and only keep the ones that have a gap up
-    let updatedRecords =
-        recordsWithPrices
+    // go through the signals and add gap information if found
+    let transformed =
+        signalsWithPrices
         |> Seq.map (fun r ->
-            let key = (r.Ticker, r.Date.ToString("yyyy-MM-dd"))
+            let key = (r.Ticker, r.Date)
             let gapSize =
-                match gapUpIndex.TryGetValue(key) with
-                | false, _ -> 0m
-                | true, g -> g.GapSizePct
+                match gapIndex.TryGetValue(key) with
+                | false, _ -> None
+                | true, g -> Some g
             (r, gapSize)
         )
     
-    printfn $"Updated records: %d{updatedRecords |> Seq.length}"
+    printfn $"Updated records: %d{transformed |> Seq.length}"
     
-    // output records with gap ups into CSV
+    let findSmaValue index smaValues =
+        match smaValues |> Array.tryItem index with
+        | Some v ->
+            match v with | Some v -> v | None -> 0m
+        | None -> 0m
+    
     let rows =
-        updatedRecords
-        |> Seq.map (fun (r,gapSize) ->
-            let row = SignalWithPriceProperties.Row(ticker=r.Ticker, date=r.Date, screenerid=r.Screenerid, gap=gapSize)
+        transformed
+        |> Seq.map (fun (r,g) ->
+            let gapSize = match g with | None -> 0m | Some g -> g.GapSizePct
+            let prices, container = prices[r.Ticker]
+            let _,index = prices.TryFindByDate r.Date |> Option.get
+            let sma20 = container.sma20.Values |> findSmaValue index
+            let sma50 = container.sma50.Values |> findSmaValue index
+            let sma150 = container.sma150.Values |> findSmaValue index
+            let sma200 = container.sma200.Values |> findSmaValue index
+            
+            let row = SignalWithPriceProperties.Row(
+                ticker=r.Ticker,
+                date=r.Date,
+                screenerid=r.Screenerid,
+                gap=gapSize,
+                sma20=sma20,
+                sma50=sma50,
+                sma150=sma150,
+                sma200=sma200)
             row
         )
-       
-    let csvOutput = new SignalWithPriceProperties(rows)
-    csvOutput.Save outputFilename
+    
+    return new SignalWithPriceProperties(rows)
 }
