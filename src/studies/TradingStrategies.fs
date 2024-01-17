@@ -4,7 +4,7 @@ open core.fs.Adapters.Stocks
 open studies.Types
 
 
-let private toOutputRow name (signal:GapStudyOutput.Row) (openBar:PriceBar) (closeBar:PriceBar) =
+let private toOutputRow name (signal:SignalWithPriceProperties.Row) (openBar:PriceBar) (closeBar:PriceBar) =
     
     let openPrice = openBar.Open
     let closePrice = closeBar.Close
@@ -19,7 +19,7 @@ let private toOutputRow name (signal:GapStudyOutput.Row) (openBar:PriceBar) (clo
         ticker=signal.Ticker,
         date=signal.Date,
         screenerid=signal.Screenerid,
-        hasGapUp=signal.HasGapUp,
+        gap=signal.Gap,
         opened=openBar.Date.DateTime,
         openPrice=openPrice,
         closed=closeBar.Date.DateTime,
@@ -28,7 +28,7 @@ let private toOutputRow name (signal:GapStudyOutput.Row) (openBar:PriceBar) (clo
         numberOfDaysHeld=(daysHeld.TotalDays |> int)
     )
     
-let private findNextDayBarAndIndex (signal:GapStudyOutput.Row) (prices:PriceBars) =
+let private findNextDayBarAndIndex (signal:SignalWithPriceProperties.Row) (prices:PriceBars) =
     match prices.TryFindByDate signal.Date with
     | None -> failwith $"Could not find the price bar for the {signal.Ticker} @ {signal.Date}, unexpected"
     | Some openBarWithIndex ->
@@ -38,7 +38,7 @@ let private findNextDayBarAndIndex (signal:GapStudyOutput.Row) (prices:PriceBars
         | true -> failwith $"No open day available for {signal.Ticker} @ {signal.Date}"
         | false -> (prices.Bars[nextDayIndex], nextDayIndex)
 
-let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:GapStudyOutput.Row,prices:PriceBars) =
+let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     let openBar, openDayIndex = findNextDayBarAndIndex signal prices
     
     if verbose then printfn $"Open bar for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} @ %A{openBar.Open}"
@@ -64,7 +64,7 @@ let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (sign
     
     toOutputRow name signal openBar closeBar
 
-let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:GapStudyOutput.Row,prices:PriceBars) =
+let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
     let stopLossPortion =
         match stopLossPercent with
@@ -101,7 +101,7 @@ let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPe
     
     buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
     
-let buyAndHoldWithSignalOpenAsStop verbose (signal:GapStudyOutput.Row,prices:PriceBars) =
+let buyAndHoldWithSignalOpenAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
     let name = "B&H with signal open as stop"
         
@@ -115,7 +115,7 @@ let buyAndHoldWithSignalOpenAsStop verbose (signal:GapStudyOutput.Row,prices:Pri
     
     buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
     
-let buyAndHoldWithSignalCloseAsStop verbose (signal:GapStudyOutput.Row,prices:PriceBars) =
+let buyAndHoldWithSignalCloseAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
     let name = "B&H with signal close as stop"
         
@@ -130,7 +130,7 @@ let buyAndHoldWithSignalCloseAsStop verbose (signal:GapStudyOutput.Row,prices:Pr
     buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
     
     
-let buyAndHoldWithTrailingStop verbose (signal:GapStudyOutput.Row,prices:PriceBars) =
+let buyAndHoldWithTrailingStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
     let name = "B&H with signal with trailing stop"
     let maxPriceSeen = ref 0m

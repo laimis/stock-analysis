@@ -18,31 +18,42 @@ let studiesDirectory =
         exit -1
     | Some d -> d
     
-let inputFilename = $"{studiesDirectory}\\01_export_date_ticker_screenerid.csv"
-let outputFilename = $"{studiesDirectory}\\02_export_date_ticker_screenerid_gap.csv"
+let generateFilePathInStudiesDirectory filename = $"{studiesDirectory}\\{filename}"
 let tradeOutcomesFilename = $"{studiesDirectory}\\03_export_date_ticker_screenerid_gap_outcomes.csv"
 
-let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
-let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
+// -i "https://localhost:5001/screeners/29/results/export" -o signals_topgainers.csv
+// -pt -f signals_topgainers.csv
 
 let actions = [
-    if ServiceHelper.hasArgument "-s" then fun () -> async {
-            do! GapStudy.study inputFilename outputFilename getPricesWithBrokerage
-        }
-    if ServiceHelper.hasArgument "-t" then fun () -> async {
-            let strategies = [
-                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 5) None
-                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 10) None
-                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 30) None
-                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 60) None
-                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 90) None
-                TradingStrategies.buyAndHoldStrategyWithStopLossPercent false None None
-            ]
-    
-            let! signalsWithPriceBars = Trading.prepareSignalsForTradeSimulations outputFilename getPricesFromCsv
-            let! outcomes = Trading.runTrades signalsWithPriceBars strategies 
-            outcomes |> Types.TradeOutcomeOutput.save tradeOutcomesFilename
-        }
+    if ServiceHelper.hasImportUrl() then fun () -> async {
+        let! csv = ServiceHelper.importUrl() |> DataHelpers.getScreenerResults
+        let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
+        do! csv |> DataHelpers.saveCsv outputFilename
+    }
+    if ServiceHelper.hasArgument "-pt" then fun () -> async {
+        let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
+        let inputFilename = ServiceHelper.inputFilename() |> generateFilePathInStudiesDirectory
+        let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
+        do! PriceTransformation.transform inputFilename outputFilename getPricesWithBrokerage
+    }
+    if ServiceHelper.hasArgument "-trade" then fun () -> async {
+        let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
+        
+        let strategies = [
+            TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 5) None
+            TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 10) None
+            TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 30) None
+            TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 60) None
+            TradingStrategies.buyAndHoldStrategyWithStopLossPercent false (Some 90) None
+            TradingStrategies.buyAndHoldStrategyWithStopLossPercent false None None
+        ]
+        
+        let inputFilename = ServiceHelper.inputFilename() |> generateFilePathInStudiesDirectory
+
+        let! signalsWithPriceBars = Trading.prepareSignalsForTradeSimulations inputFilename getPricesFromCsv
+        let! outcomes = Trading.runTrades signalsWithPriceBars strategies 
+        outcomes |> Types.TradeOutcomeOutput.save tradeOutcomesFilename
+    }
 ]
 
 actions

@@ -12,21 +12,21 @@ module Constants =
     [<Literal>]
     let LatestYear = 2024
 
-type StudyInput =
+type Signal =
     CsvProvider<
-        Sample = "date (date), ticker (string), screenerid (int)",
+        Sample = "screenerid (int), date (date), ticker (string)",
         HasHeaders=true
     >
 
-type GapStudyOutput =
+type SignalWithPriceProperties =
     CsvProvider<
-        Schema = "ticker (string), date (date), screenerid (int), hasGapUp (bool)",
+        Schema = "screenerid (int), date (date), ticker (string), gap (decimal)",
         HasHeaders=false
     >
     
 type Unified =
-    | Input of StudyInput.Row
-    | Output of GapStudyOutput.Row
+    | Input of Signal.Row
+    | Output of SignalWithPriceProperties.Row
 
 module Unified =    
     let describeRecords (records:Unified seq) =
@@ -61,7 +61,7 @@ module Unified =
     
 type TradeOutcomeOutput =
     CsvProvider<
-        Sample = "strategy (string), ticker (string), date (date), screenerid (int), hasGapUp (bool), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+        Sample = "strategy (string), ticker (string), date (date), screenerid (int), gap (decimal), opened (date), openPrice (decimal), closed (date), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
         HasHeaders=true
     >
     
@@ -69,6 +69,9 @@ module TradeOutcomeOutput =
     let save (filepath:string) outcomes =
         let csv = new TradeOutcomeOutput(outcomes)
         csv.Save(filepath)
+        
+    let parseTradeOutcomes (filepath:string) =
+        TradeOutcomeOutput.Load(filepath).Rows
 
 type TradeSummary = {
     StrategyName:string

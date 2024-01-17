@@ -2,6 +2,7 @@ module studies.DataHelpers
 
 open System
 open System.Collections.Concurrent
+open FSharp.Data
 open Microsoft.Extensions.Logging
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
@@ -99,4 +100,16 @@ let getPricesWithBrokerage (user:User) (brokerage:IBrokerage) studiesDirectory s
             | e ->
                 recordError e.Message
                 return None
+}
+
+let getScreenerResults screenerExportUrl = async {
+    let! response = Http.AsyncRequest(screenerExportUrl)
+    return
+        match response.Body with
+        | Text text -> text
+        | _ -> failwith "Unexpected response from screener"
+}
+
+let saveCsv filename content = async {
+    do! System.IO.File.WriteAllTextAsync(filename, content) |> Async.AwaitTask
 }

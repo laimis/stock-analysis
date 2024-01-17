@@ -11,9 +11,26 @@ let mutable logger : ILogger = null
 let mutable private commandLine:string[] = null
 
 let studiesDirectory() =
-    commandLine |> Array.tryFindIndex (fun arg -> arg = "-d") |> Option.map (fun i -> commandLine[i+1])
+    commandLine |> Array.tryFindIndex (fun arg -> arg = "-d") |> Option.map (fun i -> commandLine[i+1])    
 
 let hasArgument switch = commandLine |> Array.exists (fun arg -> arg = switch)
+
+let hasImportUrl() = commandLine |> Array.exists (fun arg -> arg = "-i")
+
+let importUrl() =
+    commandLine |> Array.findIndex (fun arg -> arg = "-i") |> fun i -> commandLine[i+1]
+    
+let outputFilename() =
+    let index = commandLine |> Array.tryFindIndex (fun arg -> arg = "-o")
+    match index with
+    | Some i -> commandLine[i+1]
+    | None -> failwith "No output file specified, use -o <filename>"
+    
+let inputFilename() =
+    let index = commandLine |> Array.tryFindIndex (fun arg -> arg = "-f")
+    match index with
+    | Some i -> commandLine[i+1]
+    | None -> failwith "No input file specified, use -f <filename>"
 
 let init args =
     

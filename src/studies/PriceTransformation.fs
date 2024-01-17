@@ -1,4 +1,4 @@
-module studies.GapStudy
+module studies.PriceTransformation
 
 open System
 open core.Shared
@@ -6,11 +6,7 @@ open core.fs.Adapters.Stocks
 open core.fs.Services.GapAnalysis
 open studies.Types
 
-
-
-let parseTradeOutcomes (filepath:string) = TradeOutcomeOutput.Load(filepath).Rows
-
-let verifyRecords (input:StudyInput) =
+let verifyRecords (input:Signal) =
     let records = input.Rows
     // make sure there is at least some records in here, ideally in thousands
     let numberOfRecords = records |> Seq.length
@@ -39,7 +35,7 @@ let verifyRecords (input:StudyInput) =
     
     records
     
-let getEarliestDateByTicker (records:StudyInput.Row seq) =
+let getEarliestDateByTicker (records:Signal.Row seq) =
     
     records
         |> Seq.groupBy (fun r -> r.Ticker)
@@ -48,11 +44,11 @@ let getEarliestDateByTicker (records:StudyInput.Row seq) =
             (ticker, earliestDate)
         )
         
-let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
+let transform (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
     // parse and verify
     let records =
         inputFilename
-        |> StudyInput.Load
+        |> Signal.Load
         |> verifyRecords
         
     // describe records
@@ -71,7 +67,7 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
         tickerDatePairs
         |> Seq.map (fun (ticker, earliestDate) -> async {
             
-            let earliestDateMinus365 = earliestDate.Date.AddDays(-365)
+            let earliestDateMinus365 = earliestDate.Date.AddDays(-365) |> DateTimeOffset
             let today = DateTimeOffset.UtcNow
             
             let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
@@ -137,8 +133,12 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
     let updatedRecords =
         recordsWithPrices
         |> Seq.map (fun r ->
-            let hasGapUp = gapUpIndex.ContainsKey(r.Ticker, r.Date.ToString("yyyy-MM-dd"))
-            (r, hasGapUp)
+            let key = (r.Ticker, r.Date.ToString("yyyy-MM-dd"))
+            let gapSize =
+                match gapUpIndex.TryGetValue(key) with
+                | false, _ -> 0m
+                | true, g -> g.GapSizePct
+            (r, gapSize)
         )
     
     printfn $"Updated records: %d{updatedRecords |> Seq.length}"
@@ -146,11 +146,11 @@ let study (inputFilename:string) (outputFilename:string) (priceFunc:DateTimeOffs
     // output records with gap ups into CSV
     let rows =
         updatedRecords
-        |> Seq.map (fun (r,hasGapUp) ->
-            let row = GapStudyOutput.Row(ticker=r.Ticker, date=r.Date, screenerid=r.Screenerid, hasGapUp=hasGapUp)
+        |> Seq.map (fun (r,gapSize) ->
+            let row = SignalWithPriceProperties.Row(ticker=r.Ticker, date=r.Date, screenerid=r.Screenerid, gap=gapSize)
             row
         )
        
-    let csvOutput = new GapStudyOutput(rows)
+    let csvOutput = new SignalWithPriceProperties(rows)
     csvOutput.Save outputFilename
 }
