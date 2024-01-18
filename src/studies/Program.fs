@@ -3,6 +3,7 @@
 open System
 open studies
 open Microsoft.Extensions.Logging
+open studies.Types
 
 Environment.GetCommandLineArgs() |> ServiceHelper.init
 
@@ -32,9 +33,9 @@ let actions = [
     }
     if ServiceHelper.hasArgument "-pt" then fun () -> async {
         let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
-        let inputFilename = ServiceHelper.inputFilename() |> generateFilePathInStudiesDirectory
+        let signals = ServiceHelper.inputFilename() |> generateFilePathInStudiesDirectory |> Signal.Load |> _.Rows
         let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
-        let! transformed = PriceTransformation.transform inputFilename getPricesWithBrokerage
+        let! transformed = PriceTransformation.transform signals getPricesWithBrokerage
         do! transformed.SaveToString() |> DataHelpers.appendCsv outputFilename
     }
     if ServiceHelper.hasArgument "-trade" then fun () -> async {

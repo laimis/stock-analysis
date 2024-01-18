@@ -35,21 +35,13 @@ let verifyRecords (input:Signal) =
 let getEarliestDateByTicker (records:Signal.Row seq) =
     
     records
-        |> Seq.groupBy (fun r -> r.Ticker)
+        |> Seq.groupBy _.Ticker
         |> Seq.map (fun (ticker, records) ->
-            let earliestDate = records |> Seq.minBy (fun r -> r.Date)
+            let earliestDate = records |> Seq.minBy _.Date
             (ticker, earliestDate)
         )
         
-let transform (inputFilename:string) (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
-    // parse and verify
-    let signals =
-        inputFilename
-        |> Signal.Load
-        |> verifyRecords
-        
-    // describe records
-    signals |> Seq.map Input |> Unified.describeRecords
+let transform signals (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
         
     // generate a pair of ticker and the earliest data it is seen
     let tickerDatePairs = signals |> getEarliestDateByTicker

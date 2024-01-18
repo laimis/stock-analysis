@@ -6,7 +6,10 @@
 
 
     <ItemGroup>
-        <Content Include="testdata\*.txt">
+        <Content Include="testdata\*.csv">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="testdata\studies\*.csv">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
