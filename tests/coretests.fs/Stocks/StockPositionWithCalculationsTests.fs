@@ -4,7 +4,7 @@ open System
 open FsUnit
 open Xunit
 open core.fs.Stocks
-open coretests.testdata
+open testutils
 
 
 let ticker = TestDataGenerator.NET

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using core.fs.Accounts;
 using core.fs.Adapters.Subscriptions;
-using coretests.testdata;
+using testutils;
 using Xunit;
 
 namespace coretests.Account

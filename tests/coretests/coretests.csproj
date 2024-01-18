@@ -24,12 +24,7 @@
     <ProjectReference Include="..\..\src\core\core.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\timezonesupport\timezonesupport.csproj" />
     <ProjectReference Include="..\..\src\core.fs\core.fs.fsproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="testdata\*">
-       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\testutils\testutils.csproj" />
   </ItemGroup>
 
 </Project>

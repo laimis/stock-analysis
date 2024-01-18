@@ -3,7 +3,7 @@ module coretests.fs.Stocks.Services.MultipleBarPriceAnalysisTests
 open Xunit
 open core.fs.Services
 open core.fs.Services.Analysis
-open coretests.testdata
+open testutils
 open FsUnit
 
 let outcomesWithSmallNumberOfBars = MultipleBarPriceAnalysis.run (TestDataGenerator.IncreasingPriceBars(10));

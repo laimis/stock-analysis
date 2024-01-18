@@ -3,7 +3,7 @@ module coretests.fs.Stocks.Services.GapAnalysisTests
 open Xunit
 open core.fs.Services
 open core.fs.Services.Analysis
-open coretests.testdata
+open testutils
 open FsUnit
 
 let gaps =

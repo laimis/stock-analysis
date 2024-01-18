@@ -1,7 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <Content Include="testdata\*.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\core\core.csproj" />
+      <ProjectReference Include="..\..\src\core.fs\core.fs.fsproj" />
+    </ItemGroup>
 
 </Project>

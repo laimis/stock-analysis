@@ -3,7 +3,7 @@ module coretests.fs.Stocks.Services.SingleBarPriceAnalysisTests
 open Xunit
 open core.Shared
 open core.fs.Services.Analysis
-open coretests.testdata
+open testutils
 open FsUnit
 
 let generate ticker =

@@ -2,35 +2,6 @@ module studies.TradingStrategies
 
 open core.fs.Adapters.Stocks
 open studies.Types
-
-
-let private toOutputRow name (signal:SignalWithPriceProperties.Row) (openBar:PriceBar) (closeBar:PriceBar) =
-    
-    let openPrice = openBar.Open
-    let closePrice = closeBar.Close
-    
-    // calculate gain percentage
-    let gain = (closePrice - openPrice) / openPrice
-    
-    let daysHeld = closeBar.Date - openBar.Date
-    
-    TradeOutcomeOutput.Row(
-        screenerid=signal.Screenerid,
-        date=signal.Date,
-        ticker=signal.Ticker,
-        gap=signal.Gap,
-        sma20=signal.Sma20,
-        sma50=signal.Sma50,
-        sma150=signal.Sma150,
-        sma200=signal.Sma200,
-        strategy=name,
-        opened=openBar.DateStr,
-        openPrice=openPrice,
-        closed=closeBar.DateStr,
-        closePrice=closePrice,
-        percentGain=gain,
-        numberOfDaysHeld=(daysHeld.TotalDays |> int)
-    )
     
 let private findNextDayBarAndIndex (signal:SignalWithPriceProperties.Row) (prices:PriceBars) =
     match prices.TryFindByDate signal.Date with
@@ -66,7 +37,7 @@ let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (sign
             if verbose then printfn $"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{closeBar.Date} because {reason}"
             closeBar
     
-    toOutputRow name signal openBar closeBar
+    TradeOutcomeOutput.create name signal openBar closeBar
 
 let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     

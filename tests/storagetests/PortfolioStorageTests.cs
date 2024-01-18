@@ -9,8 +9,8 @@ using core.Options;
 using core.Routines;
 using core.Shared;
 using core.Stocks;
-using coretests.testdata;
 using Microsoft.FSharp.Core;
+using testutils;
 using Xunit;
 using Xunit.Abstractions;
 

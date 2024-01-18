@@ -2,7 +2,7 @@ module coretests.fs.Stocks.Services.NumberAnalysisTests
 
 open Xunit
 open core.fs.Services.Analysis
-open coretests.testdata
+open testutils
 
 
 module PercentChangesTests =

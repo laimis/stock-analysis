@@ -8,7 +8,7 @@ let prepareSignalsForTradeSimulations (signalFilepath:string) (priceFunc:string 
     let signals =
         signalFilepath
         |> SignalWithPriceProperties.Load
-        |> fun x -> x.Rows
+        |> _.Rows
         
     signals |> Seq.map Output |> Unified.describeRecords
     

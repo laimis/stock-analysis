@@ -5,7 +5,7 @@ using core.fs.Adapters.Stocks;
 using core.fs.Accounts;
 using core.Shared;
 
-namespace coretests.testdata
+namespace testutils
 {
     public class TestDataGenerator
     {

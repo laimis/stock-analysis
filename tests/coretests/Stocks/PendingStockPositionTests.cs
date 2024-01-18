@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using core.Stocks;
-using coretests.testdata;
+using testutils;
 using Xunit;
 
 namespace coretests.Stocks

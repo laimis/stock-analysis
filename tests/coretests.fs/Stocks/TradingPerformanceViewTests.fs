@@ -6,8 +6,8 @@ open core.fs.Portfolio
 open core.fs.Services.Trading
 open core.fs.Stocks
 open coretests.fs.Stocks.Services
-open coretests.testdata
 open FsUnit
+open testutils
     
 let getClosedPositions() =
     

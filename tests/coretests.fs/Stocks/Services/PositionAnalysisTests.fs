@@ -6,7 +6,7 @@ open core.fs.Adapters.Brokerage
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Stocks
-open coretests.testdata
+open testutils
 open FsUnit
 
 let createTestData() =

@@ -4,10 +4,8 @@ using core.fs.Services;
 using core.fs.Adapters.CSV;
 using core.fs.Stocks;
 using core.Options;
-using core.Shared;
-using coretests.testdata;
 using csvparser;
-using Microsoft.FSharp.Core;
+using testutils;
 using Xunit;
 
 namespace csvparsertests
@@ -51,7 +49,7 @@ namespace csvparsertests
         public void ExportOptionsHeader()
         {
             var option = new OwnedOption(
-                new Ticker("tlsa"),
+                TestDataGenerator.NET,
                 2.5m,
                 OptionType.CALL,
                 DateTimeOffset.UtcNow.AddDays(1),
@@ -63,7 +61,7 @@ namespace csvparsertests
 
             Assert.Contains("Ticker,Type,Strike,OptionType,Expiration,Amount,Premium,Filled", report);
             
-            Assert.Contains("TLSA", report);
+            Assert.Contains(TestDataGenerator.NET.Value, report);
             Assert.Contains("CALL", report);
             Assert.Contains("2.5", report);
         }

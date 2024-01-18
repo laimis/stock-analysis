@@ -5,7 +5,7 @@ open FsUnit
 open Xunit
 open core.fs.Services.Trading
 open core.fs.Stocks
-open coretests.testdata
+open testutils
 
 let longPosition =
     StockPosition.openLong TestDataGenerator.NET (DateTimeOffset.Parse("2020-01-23"))

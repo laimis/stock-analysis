@@ -4,7 +4,7 @@ open System
 open Xunit
 open FsUnit
 open core.fs.Stocks
-open coretests.testdata
+open testutils
 
 let userId = TestDataGenerator.RandomUserId()
 let ticker = TestDataGenerator.TEUM

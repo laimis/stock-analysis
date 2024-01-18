@@ -1,6 +1,7 @@
 namespace studies.Types
 
 open FSharp.Data
+open core.fs.Adapters.Stocks
 
 module Constants =
     [<Literal>]
@@ -72,6 +73,34 @@ module TradeOutcomeOutput =
         
     let parseTradeOutcomes (filepath:string) =
         TradeOutcomeOutput.Load(filepath).Rows
+        
+    let create name (signal:SignalWithPriceProperties.Row) (openBar:PriceBar) (closeBar:PriceBar) =
+        
+        let openPrice = openBar.Open
+        let closePrice = closeBar.Close
+        
+        // calculate gain percentage
+        let gain = (closePrice - openPrice) / openPrice
+        
+        let daysHeld = closeBar.Date - openBar.Date
+        
+        TradeOutcomeOutput.Row(
+            screenerid=signal.Screenerid,
+            date=signal.Date,
+            ticker=signal.Ticker,
+            gap=signal.Gap,
+            sma20=signal.Sma20,
+            sma50=signal.Sma50,
+            sma150=signal.Sma150,
+            sma200=signal.Sma200,
+            strategy=name,
+            opened=openBar.DateStr,
+            openPrice=openPrice,
+            closed=closeBar.DateStr,
+            closePrice=closePrice,
+            percentGain=gain,
+            numberOfDaysHeld=(daysHeld.TotalDays |> int)
+        )
 
 type TradeSummary = {
     StrategyName:string

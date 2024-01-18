@@ -9,7 +9,7 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Services.Trading
 open core.fs.Stocks
-open coretests.testdata
+open testutils
 open timezonesupport
 open FsUnit
 

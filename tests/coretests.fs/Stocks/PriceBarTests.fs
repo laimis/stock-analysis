@@ -1,8 +1,8 @@
 module coretests.fs.Stocks.PriceBarTests
 
 open Xunit
-open coretests.testdata
 open FsUnit
+open testutils
 
 let bars = TestDataGenerator.PriceBars(TestDataGenerator.NET)
 let bar = bars.First

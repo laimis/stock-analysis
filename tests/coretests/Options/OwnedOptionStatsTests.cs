@@ -1,7 +1,7 @@
 ﻿using System;
 using core.fs.Options;
 using core.Options;
-using coretests.testdata;
+using testutils;
 using Xunit;
 using OptionType = core.Options.OptionType;
 
