@@ -15,11 +15,15 @@ let private toOutputRow name (signal:SignalWithPriceProperties.Row) (openBar:Pri
     let daysHeld = closeBar.Date - openBar.Date
     
     TradeOutcomeOutput.Row(
-        strategy=name,
-        ticker=signal.Ticker,
-        date=signal.Date,
         screenerid=signal.Screenerid,
+        date=signal.Date,
+        ticker=signal.Ticker,
         gap=signal.Gap,
+        sma20=signal.Sma20,
+        sma50=signal.Sma50,
+        sma150=signal.Sma150,
+        sma200=signal.Sma200,
+        strategy=name,
         opened=openBar.DateStr,
         openPrice=openPrice,
         closed=closeBar.DateStr,

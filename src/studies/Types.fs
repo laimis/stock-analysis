@@ -24,6 +24,12 @@ type SignalWithPriceProperties =
         HasHeaders=false
     >
     
+type TradeOutcomeOutput =
+    CsvProvider<
+        Sample = "screenerid (int), date (string), ticker (string), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal), strategy (string), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+        HasHeaders=true
+    >
+    
 type Unified =
     | Input of Signal.Row
     | Output of SignalWithPriceProperties.Row
@@ -58,12 +64,6 @@ module Unified =
         printfn $"Minimum date: %A{minimumDate}"
         printfn $"Maximum date: %A{maximumDate}"
         printfn ""
-    
-type TradeOutcomeOutput =
-    CsvProvider<
-        Sample = "strategy (string), ticker (string), date (string), screenerid (int), gap (decimal), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
-        HasHeaders=true
-    >
     
 module TradeOutcomeOutput =
     let save (filepath:string) outcomes =
