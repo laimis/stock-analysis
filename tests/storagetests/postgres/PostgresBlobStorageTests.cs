@@ -1,5 +1,4 @@
-﻿using core.fs.Adapters.Storage;
-using storage.postgres;
+﻿using storage.postgres;
 using storage.shared;
 using testutils;
 using Xunit;

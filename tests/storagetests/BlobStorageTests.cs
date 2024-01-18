@@ -39,4 +39,15 @@ public abstract class BlobStorageTests
         
         await storage.Save(key, expected);
     }
+    
+    [Fact]
+    public async Task GetNonExisting_ReturnsNone()
+    {
+        var storage = CreateStorage();
+        var key = Guid.NewGuid().ToString();
+        
+        var actual = await storage.Get<string>(key);
+        
+        Assert.Null(actual);
+    }
 }

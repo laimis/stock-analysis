@@ -103,7 +103,14 @@ public class MemoryAggregateStorage(IOutbox outbox) : IAggregateStorage, IBlobSt
         return SaveEventsInternal(newAgg, oldAgg?.Version ?? 0, entity, userId);
     }
 
-    public Task<T> Get<T>(string key) => Task.FromResult((T)_blobs[key]);
+    public Task<T?> Get<T>(string key)
+    {
+        if (!_blobs.ContainsKey(key))
+        {
+            return Task.FromResult(default(T));
+        }
+        return Task.FromResult((T?)_blobs[key]);
+    }
 
     public Task Save<T>(string key, T t)
     {

@@ -5,6 +5,7 @@ using core.Account;
 using core.fs.Adapters.Storage;
 using core.fs.Accounts;
 using Microsoft.FSharp.Core;
+using storage.postgres;
 using Xunit;
 
 namespace storagetests
@@ -51,6 +52,13 @@ namespace storagetests
 
             var users = await storage.GetUserEmailIdPairs();
             Assert.NotEmpty(users.Where(u => u.Email == email));
+            
+            // make sure you can fetch the events if needed
+            if (storage is PostgresAggregateStorage postgresStorage)
+            {
+                var events = await postgresStorage.GetStoredEvents("users", UserId.NewUserId(fromDb.State.Id));
+                Assert.NotEmpty(events);
+            }
             
             await storage.Delete(user);
 

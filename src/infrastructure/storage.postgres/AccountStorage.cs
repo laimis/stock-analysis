@@ -127,13 +127,5 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
             
             return users;
         }
-
-        public Task<T?> ViewModel<T>(Guid userId) =>
-            Get<T>(typeof(T).Name + ":" + userId.ToString());
-
-        public Task SaveViewModel<T>(T user, Guid userId) =>
-            Save<T>(
-                typeof(T).Name + ":" + userId.ToString(),
-                user);
     }
 }
