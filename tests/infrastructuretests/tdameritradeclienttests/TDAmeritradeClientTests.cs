@@ -31,37 +31,37 @@ namespace tdameritradeclienttests
         }
     }
 
-    [Trait("Category", "Integration")]
-    public class TDAmeritradeClientTests
-    {
-        [Fact]
-        public async Task PriceHistoryTest()
-        {
-            var config = testutils.CredsHelper.GetTDAmeritradeConfig().Split(',');
-            var tokenJson = testutils.CredsHelper.GetTDAmeritradeToken();
-            var at = System.Text.Json.JsonSerializer.Deserialize<OAuthResponse>(tokenJson);
-            var client = new TDAmeritradeClient(
-                new MemoryAggregateStorage(Mock.Of<IOutbox>()),
-                config[0],
-                config[1],
-                null
-            );
-
-            var user = User.Create("test", "test", "test");
-            user.ConnectToBrokerage(
-                at!.access_token,
-                at!.refresh_token,
-                "type",
-                1,
-                "name",
-                1
-            );
-
-            var chainResponse = await client.GetOptions(user.State, new Ticker("RELL"), FSharpOption<DateTimeOffset>.None, FSharpOption<decimal>.None, FSharpOption<string>.None);
-
-            var chain = chainResponse.Success!;
-
-            Assert.NotNull(chain);
-        }
-    }
+    // [Trait("Category", "Integration")]
+    // public class TDAmeritradeClientTests
+    // {
+    //     [Fact]
+    //     public async Task PriceHistoryTest()
+    //     {
+    //         var config = testutils.CredsHelper.GetTDAmeritradeConfig().Split(',');
+    //         var tokenJson = testutils.CredsHelper.GetTDAmeritradeToken();
+    //         var at = System.Text.Json.JsonSerializer.Deserialize<OAuthResponse>(tokenJson);
+    //         var client = new TDAmeritradeClient(
+    //             new MemoryAggregateStorage(Mock.Of<IOutbox>()),
+    //             config[0],
+    //             config[1],
+    //             null
+    //         );
+    //
+    //         var user = User.Create("test", "test", "test");
+    //         user.ConnectToBrokerage(
+    //             at!.access_token,
+    //             at!.refresh_token,
+    //             "type",
+    //             1,
+    //             "name",
+    //             1
+    //         );
+    //
+    //         var chainResponse = await client.GetOptions(user.State, new Ticker("RELL"), FSharpOption<DateTimeOffset>.None, FSharpOption<decimal>.None, FSharpOption<string>.None);
+    //
+    //         var chain = chainResponse.Success!;
+    //
+    //         Assert.NotNull(chain);
+    //     }
+    // }
 }

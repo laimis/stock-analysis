@@ -93,7 +93,7 @@ namespace core.fs.Cryptos
     type CryptoDashboardView(owned:OwnedCryptoView list) =
         member _.Owned = owned
         
-    type CryptoDetailsView(token:Token, price:Nullable<Price>) =
+    type CryptoDetailsView(token:Token, price:Price option) =
         member _.Token = token
         member _.Price = price
                 
@@ -200,7 +200,7 @@ namespace core.fs.Cryptos
             let! prices = crypto.GetAll()
             return
                 match prices.TryGet(query.Token) with
-                | Some price -> CryptoDetailsView(query.Token, price) |> ResponseUtils.success<CryptoDetailsView>
+                | Some token -> CryptoDetailsView(query.Token, Price(token.quote.Value.USD.Value.price) |> Some) |> ResponseUtils.success<CryptoDetailsView>
                 | None -> $"Price not found for {query.Token.ToString()}" |> ResponseUtils.failedTyped<CryptoDetailsView>
         }
         

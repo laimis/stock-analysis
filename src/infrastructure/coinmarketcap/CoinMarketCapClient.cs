@@ -26,11 +26,14 @@ namespace coinmarketcap
 
             var response = await _httpClient.GetAsync(url);
 
-            response.EnsureSuccessStatusCode();
-
-            var content = await response.Content.ReadAsStreamAsync();
-
-            var value = await JsonSerializer.DeserializeAsync<Listings>(content);
+            var content = await response.Content.ReadAsStringAsync();
+            
+            if (response.IsSuccessStatusCode == false)
+            {
+                throw new System.Exception("Could not get listings: " + content);
+            }
+            
+            var value = JsonSerializer.Deserialize<Listings>(content);
             if (value == null)
             {
                 throw new System.Exception("Could not deserialize response: " + content);
@@ -39,18 +42,18 @@ namespace coinmarketcap
             return value;
         }
 
-        public async Task<FSharpOption<Price>> Get(string token)
+        public async Task<FSharpOption<Datum>> Get(string token)
         {
             var prices = await GetAll();
 
             return prices.TryGet(token);
         }
 
-        public async Task<Dictionary<string, Price>> Get(IEnumerable<string> tokens)
+        public async Task<Dictionary<string, Datum>> Get(IEnumerable<string> tokens)
         {
             var prices = await GetAll();
 
-            var result = new Dictionary<string, Price>();
+            var result = new Dictionary<string, Datum>();
 
             foreach (var token in tokens)
             {

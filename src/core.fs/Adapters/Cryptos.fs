@@ -36,7 +36,7 @@ type Usd =
 [<CLIMutable>]
 type Quote =
     {
-        usd: Usd
+        USD: Usd option
     }
     
 [<CLIMutable>]
@@ -49,13 +49,13 @@ type Datum =
         num_market_pairs: int
         date_added: DateTimeOffset
         tags: string list
-        max_supply: int option
+        max_supply: int64 option
         circulating_supply: double
         total_supply: double
         platform: Platform option
         cmc_rank: int
         last_updated: DateTimeOffset
-        quote: Quote
+        quote: Quote option
     }
 
 [<CLIMutable>]
@@ -79,13 +79,10 @@ type Listings =
     
     with
         member this.TryGet(token: string) =
-            let data = this.data |> List.tryFind (fun d -> d.symbol = token)
-            match data with
-            | Some d -> Some (Price(d.quote.usd.price))
-            | None -> None
+            this.data |> List.tryFind (fun d -> d.symbol = token)
 
 
 type ICryptoService =
     abstract member GetAll : unit -> Task<Listings>
-    abstract member Get : token:string -> Task<Price option>
-    abstract member Get : tokens:string seq -> Task<Dictionary<string, Price>>
+    abstract member Get : token:string -> Task<Datum option>
+    abstract member Get : tokens:string seq -> Task<Dictionary<string, Datum>>
