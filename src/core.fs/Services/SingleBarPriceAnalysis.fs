@@ -72,7 +72,7 @@ module SingleBarPriceAnalysis =
                 yield AnalysisOutcome (SingleBarOutcomeKeys.PercentChange, percentChangeOutcomeType, percentChange, ValueFormat.Percentage, $"%% change from close is {percentChange}.")
                 
                 // generate percent change statistical data for NumberOfDaysForRecentAnalysis days
-                let descriptor = SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis |> previousBars.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
+                let descriptor = Constants.NumberOfDaysForRecentAnalysis |> previousBars.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
                 
                 // for some price feeds, price has finished changing, so mean and
                 // standard deviation will be 0, we need to check for that so that we don't divide by 0
@@ -98,7 +98,7 @@ module SingleBarPriceAnalysis =
                 
                 
             // see if there was a gap down or gap up
-            let gaps = GapAnalysis.detectGaps bars SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+            let gaps = GapAnalysis.detectGaps bars Constants.NumberOfDaysForRecentAnalysis
             
             let gap = gaps |> Seq.tryFind _.Bar.Equals(currentBar)
             
@@ -174,7 +174,7 @@ module SingleBarPriceAnalysis =
         
     let volumeAnalysis (bars:PriceBars) =
         
-        let volumeStats = SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis |> bars.LatestOrAll |> fun x -> x.Volumes() |> DistributionStatistics.calculate
+        let volumeStats = Constants.NumberOfDaysForRecentAnalysis |> bars.LatestOrAll |> fun x -> x.Volumes() |> DistributionStatistics.calculate
         
         let currentBar = bars.Last
         
