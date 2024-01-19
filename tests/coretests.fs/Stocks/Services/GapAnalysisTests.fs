@@ -22,7 +22,7 @@ let ``Gap PercentChange Correct`` () =
 
 [<Fact>]
 let ``Gap RelativeVolume Correct`` () =
-    gaps.[0].RelativeVolume |> should equal 0.94m
+    gaps.[0].RelativeVolume |> Option.get |> should equal 0.94m
 
 [<Fact>]
 let ``Gap GapType Correct`` () =

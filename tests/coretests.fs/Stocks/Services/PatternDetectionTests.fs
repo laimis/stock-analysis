@@ -92,17 +92,26 @@ let ``Generate with empty bars does not blow up``() =
 [<Fact>]
 let ``Generate with gaps finds gap pattern`` () =
     
-    let bars = TestDataGenerator.IncreasingPriceBars(10)
+    let generateTestBars numberOfBars =
+        let bars = TestDataGenerator.IncreasingPriceBars(numberOfBars)
     
-    // append a bar with a gap up
-    let lastBar = bars.Last
-    let newBar = PriceBar(lastBar.Date.AddDays(1), lastBar.Open * 1.1m, lastBar.High * 1.1m, lastBar.Close * 1.1m, lastBar.Close * 1.1m, lastBar.Volume)
-    let bars = PriceBars([newBar] |> Seq.append bars.Bars |> Array.ofSeq)
-    
+        // append a bar with a gap up
+        let lastBar = bars.Last
+        let newBar = PriceBar(lastBar.Date.AddDays(1), lastBar.Open * 1.1m, lastBar.High * 1.1m, lastBar.Close * 1.1m, lastBar.Close * 1.1m, lastBar.Volume)
+        PriceBars([newBar] |> Seq.append bars.Bars |> Array.ofSeq)
+        
+    let bars = generateTestBars 10
     let patterns = PatternDetection.generate bars
     patterns |> should haveLength 1
     
     let pattern = patterns |> Seq.head
     pattern.name |> should equal PatternDetection.gapUpName
+    pattern.description |> should equal "Gap Up 10.0%"
     
-    pattern.description |> should contain "Gap Up 10.0%"
+    // generating with a gap up but with enough bars, should include volume multiplier
+    let bars = generateTestBars 100
+    let patterns = PatternDetection.generate bars
+    
+    let pattern = patterns |> Seq.find (fun x -> x.name = PatternDetection.gapUpName)
+    pattern.name |> should equal PatternDetection.gapUpName
+    pattern.description |> should equal "Gap Up 10.0%, volume x1.4"

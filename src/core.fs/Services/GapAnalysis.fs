@@ -1,6 +1,7 @@
 module core.fs.Services.GapAnalysis
 
 open core.fs.Adapters.Stocks
+open core.fs.Services.Analysis
 
     
 type GapType =
@@ -26,7 +27,7 @@ type Gap =
         Bar: PriceBar
         ClosedQuickly: bool
         Open: bool
-        RelativeVolume: decimal
+        RelativeVolume: decimal option
         ClosingRange: decimal
     }
         
@@ -71,7 +72,11 @@ let private generateInternal (prices: PriceBars) (volumeStats: core.fs.Services.
         let i = index * 2 // each indexed pair has two bars
         let closedQuickly = closingConditionMet prices.Bars i 10 closingCondition
         let open' = not (closingConditionMet prices.Bars i (prices.Length - i) closingCondition)
-        let relativeVolume = System.Math.Round ((current.Volume |> decimal) / volumeStats.mean, 2)
+        let relativeVolume =
+            match volumeStats.count < Constants.NumberOfDaysForRecentAnalysis with
+            | false -> System.Math.Round ((current.Volume |> decimal) / volumeStats.mean, 2) |> Some
+            | true -> None
+            
         let closingRange = current.ClosingRange()
         
         {
@@ -89,7 +94,7 @@ let private generateInternal (prices: PriceBars) (volumeStats: core.fs.Services.
 let detectGaps (prices: PriceBars) (numberOfBarsToAnalyze: int) =
     
     let barsForAnalysis = numberOfBarsToAnalyze |> prices.LatestOrAll
-    let barsForVolume = Analysis.Constants.NumberOfDaysForRecentAnalysis |> prices.LatestOrAll 
-    let volumeStats = barsForVolume.Volumes() |> core.fs.Services.Analysis.DistributionStatistics.calculate
+    let barsForVolume = Constants.NumberOfDaysForRecentAnalysis |> prices.LatestOrAll 
+    let volumeStats = barsForVolume.Volumes() |> DistributionStatistics.calculate
     
     generateInternal barsForAnalysis volumeStats

@@ -3,9 +3,25 @@ module core.fs.Services.PatternDetection
 open core.fs
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
-open core.fs.Services.Analysis.SingleBarPriceAnalysis
 open core.fs.Services.GapAnalysis
 
+let private toVolumeMultiplierString (multiplier: decimal option) =
+    match multiplier with
+    | Some m -> ", volume x" + m.ToString("N1")
+    | None -> ""
+    
+let private relativeVolume (current:PriceBar) (bars:PriceBars) =
+    match bars.Length >= Constants.NumberOfDaysForRecentAnalysis with
+    | true ->
+        let stats =
+            Constants.NumberOfDaysForRecentAnalysis
+            |> bars.LatestOrAll
+            |> _.Volumes()
+            |> DistributionStatistics.calculate
+        
+        decimal(current.Volume) / stats.median |> Some
+    | false -> None
+        
 let gapDownName = "Gap Down"
 let gapDown (bars: PriceBars) =
     match bars.Length with
@@ -14,12 +30,12 @@ let gapDown (bars: PriceBars) =
         let gaps = detectGaps bars 2
         match gaps with
         | [|gap|] when gap.Type = GapType.Down ->
-            let relativeVolume = gap.RelativeVolume.ToString("N1")
+            let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString
             let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
             {
                 date = bars.Last.Date
                 name = gapDownName
-                description = $"%s{gapDownName} {gapPercentFormatted}%%, volume x{relativeVolume}"
+                description = $"%s{gapDownName} {gapPercentFormatted}%%{relativeVolume}"
                 value = gap.GapSizePct
                 valueFormat = ValueFormat.Percentage
                 sentimentType = SentimentType.Negative 
@@ -35,12 +51,12 @@ let gapUp (bars: PriceBars) =
         let gaps = detectGaps bars 2
         match gaps with
         | [|gap|] when gap.Type = GapType.Up ->
-            let relativeVolume = gap.RelativeVolume.ToString("N1")
+            let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString
             let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
             {
                 date = bars.Last.Date
                 name = gapUpName
-                description = $"%s{gapUpName} {gapPercentFormatted}%%, volume x{relativeVolume}"
+                description = $"%s{gapUpName} {gapPercentFormatted}%%{relativeVolume}"
                 value = gap.GapSizePct
                 valueFormat = ValueFormat.Percentage
                 sentimentType = SentimentType.Positive 
@@ -58,20 +74,7 @@ let downsideReversal (bars: PriceBars) =
         // downside reversal pattern detection
         if current.Close < System.Math.Min(previous.Open, previous.Close) && current.High > previous.High then
             let completeReversal = current.Close < previous.Low
-            let volumeInfo = 
-                // see if we can do volume numbers
-                if bars.Length >= Constants.NumberOfDaysForRecentAnalysis then
-                    
-                    let stats =
-                        Constants.NumberOfDaysForRecentAnalysis
-                        |> bars.LatestOrAll
-                        |> _.Volumes()
-                        |> DistributionStatistics.calculate
-                    
-                    let multiplier = decimal(current.Volume) / stats.median
-                    ", volume x" + multiplier.ToString("N1")
-                else
-                    ""
+            let volumeInfo = relativeVolume current bars |> toVolumeMultiplierString
                     
             let additionalInfo =
                 match completeReversal with
@@ -100,20 +103,7 @@ let upsideReversal (bars: PriceBars) =
         // upside reversal pattern detection
         if current.Close > System.Math.Max(previous.Open, previous.Close) && current.Low < previous.Low then
             let completeReversal = current.Close < previous.Low
-            let volumeInfo = 
-                // see if we can do volume numbers
-                if bars.Length >= Constants.NumberOfDaysForRecentAnalysis then
-                    
-                    let stats =
-                        Constants.NumberOfDaysForRecentAnalysis
-                        |> bars.LatestOrAll
-                        |> _.Volumes()
-                        |> DistributionStatistics.calculate
-                    
-                    let multiplier = decimal(current.Volume) / stats.median
-                    ", volume x" + multiplier.ToString("N1")
-                else
-                    ""
+            let volumeInfo = relativeVolume current bars |> toVolumeMultiplierString
             
             let additionalInfo =
                 match completeReversal with
@@ -175,33 +165,28 @@ let highest1YearVolume (bars: PriceBars) =
 let highVolumeName = "High Volume"
 
 let highVolume (bars: PriceBars) =
-    if bars.Length < Constants.NumberOfDaysForRecentAnalysis then
-        None
-    else
-        let subsetOfBars = bars.LatestOrAll Constants.NumberOfDaysForRecentAnalysis
-            
-        let volumeStats = subsetOfBars.Volumes() |> DistributionStatistics.calculate
+    
+    match bars.Bars with
+    | [||] -> None
+    | _ ->
+        let relativeVolume = relativeVolume bars.Last bars
         
-        // now take the last bar volume
-        let lastBarVolume = bars.Last.Volume
-        let multiplier = decimal(lastBarVolume) / volumeStats.median
+        match relativeVolume with
+        | None -> None
+        | Some relativeVolume ->
+            match relativeVolume with
+            | x when x > 5m ->
+                let bar = bars.Last
+                Some({
+                    date = bar.Date
+                    name = highVolumeName
+                    description = $"{highVolumeName}: " + bar.Volume.ToString("N0") + " (x" + relativeVolume.ToString("N1") + ")"
+                    value = bar.Volume |> decimal
+                    valueFormat = ValueFormat.Number
+                    sentimentType = SentimentType.Neutral
+                })
+            | _ -> None
         
-        // if the last bar volume is some predefined multiple of the average volume, then we have a pattern
-        let threshold = volumeStats.median * decimal(5) |> int64
-        
-        if lastBarVolume > threshold then
-            let bar = bars.Last
-            Some({
-                date = bar.Date
-                name = highVolumeName
-                description = $"{highVolumeName}: " + bar.Volume.ToString("N0") + " (x" + multiplier.ToString("N1") + ")"
-                value = bar.Volume |> decimal
-                valueFormat = ValueFormat.Number
-                sentimentType = SentimentType.Neutral
-            })
-        else
-            None
-            
 let patternGenerators =
     
     [

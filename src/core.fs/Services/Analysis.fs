@@ -189,7 +189,7 @@ module Histogram =
     
 type DistributionStatistics =
     {
-        count: decimal
+        count: int64
         kurtosis: decimal
         min: decimal
         max: decimal
@@ -205,7 +205,7 @@ module DistributionStatistics =
         
         if numbers |> Seq.isEmpty then
             {
-                count = 0m
+                count = 0
                 kurtosis = 0m
                 min = 0m
                 max = 0m
@@ -277,7 +277,7 @@ module DistributionStatistics =
             let buckets = Histogram.calculate numbers min max 21
             
             {
-                count = decimal count
+                count = count
                 kurtosis = kurtosis
                 min = min
                 max = max
