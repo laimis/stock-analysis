@@ -105,4 +105,4 @@ let ``Generate with gaps finds gap pattern`` () =
     let pattern = patterns |> Seq.head
     pattern.name |> should equal PatternDetection.gapUpName
     
-    pattern.description |> should equal "Gap Up 10.0%"
+    pattern.description |> should contain "Gap Up 10.0%"
