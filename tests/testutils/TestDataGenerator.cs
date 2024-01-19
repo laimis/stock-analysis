@@ -9,9 +9,11 @@ namespace testutils
 {
     public class TestDataGenerator
     {
+        public const string TestDataPath = "./testdata";
+        
         public static PriceBars PriceBars(Ticker ticker)
         {
-            var content = File.ReadAllText($"testdata/{ticker.Value}.csv");
+            var content = File.ReadAllText($"{TestDataPath}/{ticker.Value}.csv");
 
             var array = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => new PriceBar(s))
@@ -61,7 +63,7 @@ namespace testutils
                 ticker[i] = Chars[random.Next(Chars.Length)];
             }
 
-            return new Ticker(ticker.ToString());
+            return new Ticker(new string(ticker));
         }
     }
 }

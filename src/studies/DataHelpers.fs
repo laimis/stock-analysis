@@ -13,14 +13,13 @@ let getUser (storage:IAccountStorage) email = async {
     return! storage.GetUserByEmail email |> Async.AwaitTask
 }
 
-
-let generatePriceCsvPath studiesDirectory ticker =
+let private generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
     $"{studiesDirectory}\\{filename}"
 
 let private priceCache = ConcurrentDictionary<string,PriceBars>()
 
-let readPricesFromCsv (path:string) = async {
+let private readPricesFromCsv (path:string) = async {
         match priceCache.TryGetValue(path) with
         | true, bars -> return bars
         | false, _ ->
@@ -31,8 +30,6 @@ let readPricesFromCsv (path:string) = async {
             return bars
     }
         
-// start / end date are here because we might be dealing with interfaces
-// that are passing dates but we always return just what we have
 let getPricesFromCsv studiesDirectory ticker = async {
         let path = generatePriceCsvPath studiesDirectory ticker
         return! path |> readPricesFromCsv
@@ -58,7 +55,10 @@ let private pricesAvailableOnFileSystem path =
                 | x when x.Contains("ERROR") -> NotAvailable
                 | _ -> Available
                 
-let getPricesWithBrokerage (user:User) (brokerage:IBrokerage) studiesDirectory startDate endDate ticker = async {
+let callLogFuncIfSetup func =
+    if ServiceHelper.logger <> null then func(ServiceHelper.logger)
+                
+let getPricesWithBrokerage (user:User) (brokerage:IBrokerageGetPriceHistory) studiesDirectory startDate endDate ticker = async {
     
     // check first if we have prices for this ticker and date range
     // if we do, return them
@@ -67,13 +67,13 @@ let getPricesWithBrokerage (user:User) (brokerage:IBrokerage) studiesDirectory s
     let path = generatePriceCsvPath studiesDirectory ticker
     
     let recordError message =
-        ServiceHelper.logger.LogCritical("Error getting price history for {ticker}: {error}", ticker, message)
+        callLogFuncIfSetup _.LogCritical("Error getting price history for {ticker}: {error}", ticker, message)
         let csvContent = $"ERROR: {message}"
         System.IO.File.WriteAllText(path, csvContent)
     
     let recordPrices (prices:PriceBars) =
         // store prices on a filesystem, filename should contain ticker and date range
-        let csv = prices.Bars |> Array.map (fun p -> p.ToString()) |> String.concat Environment.NewLine
+        let csv = prices.Bars |> Array.map _.ToString() |> String.concat Environment.NewLine
         System.IO.File.WriteAllText(path, csv)
         
     match pricesAvailableOnFileSystem(path) with
@@ -86,7 +86,7 @@ let getPricesWithBrokerage (user:User) (brokerage:IBrokerage) studiesDirectory s
     
     | NotAvailable ->
         try
-            ServiceHelper.logger.LogInformation("Getting price history for {ticker} from {startDate} to {endDate}", ticker, startDate, endDate)
+            callLogFuncIfSetup _.LogInformation("Getting price history for {ticker} from {startDate} to {endDate}", ticker, startDate, endDate)
             let! response = brokerage.GetPriceHistory user.State ticker PriceFrequency.Daily startDate endDate |> Async.AwaitTask
             let result = response.Result
             match result with

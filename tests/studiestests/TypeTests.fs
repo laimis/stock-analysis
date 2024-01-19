@@ -1,4 +1,4 @@
-module Tests
+module studiestests.TypeTests
 
 open Xunit
 open FsUnit
