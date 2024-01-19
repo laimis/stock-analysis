@@ -5,6 +5,8 @@ open core.Shared
 open core.fs
 open core.fs.Adapters.Stocks
 
+module Constants =
+    let NumberOfDaysForRecentAnalysis = 60
 
 type OutcomeType =
     | Positive

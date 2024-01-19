@@ -15,7 +15,7 @@ let getUser (storage:IAccountStorage) email = async {
 
 let private generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
-    $"{studiesDirectory}\\{filename}"
+    $"{studiesDirectory}/{filename}"
 
 let private priceCache = ConcurrentDictionary<string,PriceBars>()
 

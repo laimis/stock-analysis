@@ -8,9 +8,6 @@ open core.fs.Services.MultipleBarPriceAnalysis
 
 module SingleBarPriceAnalysis =
     
-    module SingleBarAnalysisConstants =
-        let NumberOfDaysForRecentAnalysis = 60
-    
     module SingleBarOutcomeKeys =
         let PriceAbove20SMA = "PriceAbove20SMA"
         let PriceAbove20SMADays = "PriceAbove20SMADays"

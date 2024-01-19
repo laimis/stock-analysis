@@ -14,11 +14,12 @@ let gapDown (bars: PriceBars) =
         let gaps = detectGaps bars 2
         match gaps with
         | [|gap|] when gap.Type = GapType.Down ->
+            let relativeVolume = gap.RelativeVolume.ToString("N1")
             let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
             {
                 date = bars.Last.Date
                 name = gapDownName
-                description = $"%s{gapDownName} {gapPercentFormatted}%%"
+                description = $"%s{gapDownName} {gapPercentFormatted}%%, volume x{relativeVolume}"
                 value = gap.GapSizePct
                 valueFormat = ValueFormat.Percentage
                 sentimentType = SentimentType.Negative 
@@ -34,11 +35,12 @@ let gapUp (bars: PriceBars) =
         let gaps = detectGaps bars 2
         match gaps with
         | [|gap|] when gap.Type = GapType.Up ->
+            let relativeVolume = gap.RelativeVolume.ToString("N1")
             let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
             {
                 date = bars.Last.Date
                 name = gapUpName
-                description = $"%s{gapUpName} {gapPercentFormatted}%%"
+                description = $"%s{gapUpName} {gapPercentFormatted}%%, volume x{relativeVolume}"
                 value = gap.GapSizePct
                 valueFormat = ValueFormat.Percentage
                 sentimentType = SentimentType.Positive 
@@ -58,10 +60,10 @@ let downsideReversal (bars: PriceBars) =
             let completeReversal = current.Close < previous.Low
             let volumeInfo = 
                 // see if we can do volume numbers
-                if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
+                if bars.Length >= Constants.NumberOfDaysForRecentAnalysis then
                     
                     let stats =
-                        SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+                        Constants.NumberOfDaysForRecentAnalysis
                         |> bars.LatestOrAll
                         |> _.Volumes()
                         |> DistributionStatistics.calculate
@@ -100,10 +102,10 @@ let upsideReversal (bars: PriceBars) =
             let completeReversal = current.Close < previous.Low
             let volumeInfo = 
                 // see if we can do volume numbers
-                if bars.Length >= SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
+                if bars.Length >= Constants.NumberOfDaysForRecentAnalysis then
                     
                     let stats =
-                        SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+                        Constants.NumberOfDaysForRecentAnalysis
                         |> bars.LatestOrAll
                         |> _.Volumes()
                         |> DistributionStatistics.calculate
@@ -173,10 +175,10 @@ let highest1YearVolume (bars: PriceBars) =
 let highVolumeName = "High Volume"
 
 let highVolume (bars: PriceBars) =
-    if bars.Length < SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis then
+    if bars.Length < Constants.NumberOfDaysForRecentAnalysis then
         None
     else
-        let subsetOfBars = bars.LatestOrAll SingleBarAnalysisConstants.NumberOfDaysForRecentAnalysis
+        let subsetOfBars = bars.LatestOrAll Constants.NumberOfDaysForRecentAnalysis
             
         let volumeStats = subsetOfBars.Volumes() |> DistributionStatistics.calculate
         
