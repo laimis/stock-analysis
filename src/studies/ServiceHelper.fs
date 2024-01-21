@@ -1,5 +1,6 @@
 module studies.ServiceHelper
 
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open core.fs.Adapters.Brokerage
@@ -15,10 +16,8 @@ let studiesDirectory() =
 
 let hasArgument switch = commandLine |> Array.exists (fun arg -> arg = switch)
 
-let hasImportUrl() = commandLine |> Array.exists (fun arg -> arg = "-i")
-
 let importUrl() =
-    commandLine |> Array.findIndex (fun arg -> arg = "-i") |> fun i -> commandLine[i+1]
+    commandLine |> Array.tryFindIndex (fun arg -> arg = "-i") |> Option.map (fun i -> commandLine[i+1])
     
 let outputFilename() =
     let index = commandLine |> Array.tryFindIndex (fun arg -> arg = "-o")
@@ -32,7 +31,7 @@ let inputFilename() =
     | Some i -> commandLine[i+1]
     | None -> failwith "No input file specified, use -f <filename>"
 
-let init args =
+let init (configuration:IConfiguration option) args =
     
     // print args
     args |> Array.iter (fun arg -> printfn $"%s{arg}")
@@ -49,9 +48,14 @@ let init args =
     logger <- loggerFactory.CreateLogger("study")
     
     let builder = Host.CreateApplicationBuilder args
+    
+    let configuration =
+        match configuration with
+        | None -> builder.Configuration :> IConfiguration
+        | Some config -> config
      
     DIHelper.RegisterServices(
-        builder.Configuration,
+        configuration,
         builder.Services,
         logger
     )

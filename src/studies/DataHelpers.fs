@@ -9,9 +9,6 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
 
-let getUser (storage:IAccountStorage) email = async {
-    return! storage.GetUserByEmail email |> Async.AwaitTask
-}
 
 let private generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
@@ -100,14 +97,6 @@ let getPricesWithBrokerage (user:User) (brokerage:IBrokerageGetPriceHistory) stu
             | e ->
                 recordError e.Message
                 return None
-}
-
-let getScreenerResults screenerExportUrl = async {
-    let! response = Http.AsyncRequest(screenerExportUrl)
-    return
-        match response.Body with
-        | Text text -> text
-        | _ -> failwith "Unexpected response from screener"
 }
 
 let saveCsv filename content = async {

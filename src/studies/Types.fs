@@ -1,5 +1,6 @@
 namespace studies.Types
 
+open System
 open FSharp.Data
 open core.fs.Adapters.Stocks
 
@@ -31,6 +32,37 @@ type TradeOutcomeOutput =
         HasHeaders=true
     >
     
+module Signal =
+    let verifyRecords (input:Signal) minimumRecordsExpected =
+        let records = input.Rows
+        // make sure there is at least some records in here, ideally in thousands
+        let numberOfRecords = records |> Seq.length
+        match numberOfRecords with
+        | x when x < minimumRecordsExpected -> failwith $"{x} is not enough records, expecting at least {minimumRecordsExpected}"
+        | _ -> ()
+        
+        let verifyCondition failureConditionFunc messageIfFound =
+            records
+            |> Seq.map (fun r -> match failureConditionFunc r with | true -> Some r | false -> None)
+            |> Seq.choose id
+            |> Seq.tryHead
+            |> Option.iter (fun r -> r |> messageIfFound |> failwith)
+        
+        // make sure all the dates are set (and can be parsed?)
+        let invalidDate = fun (r:Signal.Row) -> match DateTimeOffset.TryParse(r.Date) with | true, _ -> false | false, _ -> true
+        let messageIfInvalidDate = fun (r:Signal.Row) -> $"date is invalid for record {r.Screenerid}, {r.Ticker}"
+        verifyCondition invalidDate messageIfInvalidDate
+        
+        let invalidTicker = fun (r:Signal.Row) -> System.String.IsNullOrWhiteSpace(r.Ticker)
+        let messageIfInvalidTicker = fun (r:Signal.Row) -> $"ticker is blank for record {r.Screenerid}, {r.Date}"
+        verifyCondition invalidTicker messageIfInvalidTicker
+        
+        let invalidScreenerId = fun (r:Signal.Row) -> r.Screenerid = 0
+        let messageIfInvalidScreenerId = fun (r:Signal.Row) -> $"screenerid is blank for record {r.Ticker}, {r.Date}"
+        verifyCondition invalidScreenerId messageIfInvalidScreenerId
+
+        records
+
 type Unified =
     | Input of Signal.Row
     | Output of SignalWithPriceProperties.Row
@@ -67,13 +99,7 @@ module Unified =
         printfn ""
     
 module TradeOutcomeOutput =
-    let save (filepath:string) outcomes =
-        let csv = new TradeOutcomeOutput(outcomes)
-        csv.Save(filepath)
-        
-    let parseTradeOutcomes (filepath:string) =
-        TradeOutcomeOutput.Load(filepath).Rows
-        
+    
     let create name (signal:SignalWithPriceProperties.Row) (openBar:PriceBar) (closeBar:PriceBar) =
         
         let openPrice = openBar.Open

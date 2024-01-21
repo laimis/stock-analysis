@@ -6,33 +6,8 @@ open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 open studies.Types
-
-let verifyRecords (input:Signal) =
-    let records = input.Rows
-    // make sure there is at least some records in here, ideally in thousands
-    let numberOfRecords = records |> Seq.length
-    match numberOfRecords with
-    | 0 -> failwith "no records"
-    | x when x < Constants.MinimumRecords -> failwith $"not enough records: {x}"
-    | _ -> ()
     
-    // should we check dates?
-    
-    // make sure all tickers are set
-    let tickersFine = records |> Seq.forall (fun r -> String.IsNullOrWhiteSpace(r.Ticker) = false)
-    match tickersFine with
-    | false -> failwith "ticker is blank"
-    | true -> ()
-    
-    // make sure all screenerIds are set
-    let screenerIdsFine = records |> Seq.forall (fun r -> r.Screenerid <> 0)
-    match screenerIdsFine with
-    | false -> failwith "screenerid is blank"
-    | true -> ()
-    
-    records
-    
-let getEarliestDateByTicker (records:Signal.Row seq) =
+let private getEarliestDateByTicker (records:Signal.Row seq) =
     
     records
         |> Seq.groupBy _.Ticker
@@ -41,7 +16,7 @@ let getEarliestDateByTicker (records:Signal.Row seq) =
             (ticker, earliestDate)
         )
         
-let transform signals (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) = async {
+let transform (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) signals = async {
         
     // generate a pair of ticker and the earliest data it is seen
     let tickerDatePairs = signals |> getEarliestDateByTicker
