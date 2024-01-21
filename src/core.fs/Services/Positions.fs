@@ -110,22 +110,29 @@ module PositionAnalysis =
         let recentlyOpenThreshold = TimeSpan.FromDays(5)
         let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
         
+        let withRiskAmountFilters = [(fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0.0m)]
+        
         let tickersAndTheirRiskAmounts = 
             tickerOutcomes
-            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.tryFind (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0.0m)))
-            |> Seq.filter (fun (ticker, outcome) -> outcome.IsSome)
-            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value.Value))
+            |> TickerOutcomes.filter withRiskAmountFilters
+            |> Seq.map (fun o -> (o.ticker, o.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.RiskAmount)))
+            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value))
         
         let riskAmountAnalysis =
             tickersAndTheirRiskAmounts
             |> Seq.map snd
             |> DistributionStatistics.calculate
             
+        let withStopLossAndLongFilters = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
+        ]
+        
         let tickersAndTheirCosts =
-            tickerOutcomes // we are only interested in this for positions that have stops set
-            |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m) ]
-            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.tryFind (fun o -> o.Key = PositionAnalysisKeys.PositionSize)))
-            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value.Value))
+            tickerOutcomes // we are only interested in this for positions that have stops set, and right now only longs
+            |> TickerOutcomes.filter withStopLossAndLongFilters
+            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.PositionSize)))
+            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value))
             
         let costAnalysis =
             tickersAndTheirCosts
@@ -187,7 +194,8 @@ module PositionAnalysis =
                 OutcomeType.Negative,
                 PositionAnalysisKeys.PositionSize,
                 tickerOutcomes |> TickerOutcomes.filter [
-                    (fun o -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
+                    yield! withStopLossAndLongFilters
+                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
                 ]
             )
         ]
