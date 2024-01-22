@@ -6,6 +6,8 @@ open FsUnit
 open studies.Types
 open testutils
 
+let round (number:decimal) = Math.Round(number, 4)
+
 [<Fact>]
 let ``loading signals csv works`` () =
     
@@ -54,3 +56,35 @@ let ``Verification fails if screenerid is blank``() =
 let ``Describe records for Signal works``() =
     let signals = studies.Types.Signal.Load(StudiesTestData.SignalsPath)
     signals.Rows |> Seq.map Input |> Unified.describeRecords
+    
+[<Fact>]
+let ``Manual trade outcomes``() =
+
+    let gains = [0.02m; 0.01m; 1m; -0.05m; -0.08m]
+    let outcomes =
+        gains
+        |> List.map( fun g ->
+            TradeOutcomeOutput.Row(
+                    screenerid = 1, date = "2022-08-08", ticker = "NET",
+                    gap = 0m, sma20 = 0m, sma50 = 0m, sma150 = 0m, sma200 = 0m,
+                    strategy = "B&H with trailing stop",
+                    opened = "2022-08-08", openPrice = 74.425m,
+                    closed = "2022-08-17", closePrice = 74.51m,
+                    percentGain = g,
+                    numberOfDaysHeld = 9
+                )
+        )
+    
+    let summary = TradeSummary.create "B&H with trailing stop" outcomes
+    
+    summary.Gains |> Seq.map (fun g -> Math.Round(g, 4)) |> should equal [0.02m; 0.01m; 1m; -0.05m; -0.08m]
+    summary.Losers |> should equal 2
+    summary.Total |> should equal 5
+    summary.Winners |> should equal 3
+    summary.AvgLoss |> round |> should equal -0.065m
+    summary.AvgWin |> round |> should equal 0.3433m
+    summary.EV  |> round |> should equal 0.18m
+    summary.WinPct |> round |> should equal 0.6m
+    summary.AvgGainLoss |> round |> should equal 5.2821m
+    summary.StrategyName |> should equal "B&H with trailing stop"
+    

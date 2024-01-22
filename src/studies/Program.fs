@@ -52,13 +52,13 @@ let actions = [
         let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
         
         let strategies = [
-            Trading.buyAndHoldStrategyWithStopLossPercent false (Some 5) None
-            Trading.buyAndHoldStrategyWithStopLossPercent false (Some 10) None
-            Trading.buyAndHoldStrategyWithStopLossPercent false (Some 30) None
-            Trading.buyAndHoldStrategyWithStopLossPercent false (Some 60) None
-            Trading.buyAndHoldStrategyWithStopLossPercent false (Some 90) None
-            Trading.buyAndHoldStrategyWithStopLossPercent false None None
-            Trading.buyAndHoldWithTrailingStop false
+            Trading.strategyWithStopLossPercent false (Some 5) None
+            Trading.strategyWithStopLossPercent false (Some 10) None
+            Trading.strategyWithStopLossPercent false (Some 30) None
+            Trading.strategyWithStopLossPercent false (Some 60) None
+            Trading.strategyWithStopLossPercent false (Some 90) None
+            Trading.strategyWithStopLossPercent false None None
+            Trading.strategyWithTrailingStop false
         ]
         
         let signals =

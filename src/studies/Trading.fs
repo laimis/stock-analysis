@@ -13,7 +13,7 @@ let private findNextDayBarAndIndex (signal:SignalWithPriceProperties.Row) (price
         | true -> failwith $"No open day available for {signal.Ticker} @ {signal.Date}"
         | false -> (prices.Bars[nextDayIndex], nextDayIndex)
 
-let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     let openBar, openDayIndex = findNextDayBarAndIndex signal prices
     
     if verbose then printfn $"Open bar for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} @ %A{openBar.Open}"
@@ -39,7 +39,7 @@ let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (sign
     
     TradeOutcomeOutput.create name signal openBar closeBar
 
-let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
     // validate stop loss percent to be less than or equal to 1
     match stopLossPercent with
@@ -54,9 +54,9 @@ let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPe
     let holdPeriod =
         match numberOfBarsToHold with
         | None -> ""
-        | Some numberOfBarsToHold -> numberOfBarsToHold.ToString() + " bars"
+        | Some numberOfBarsToHold -> "hold for " + numberOfBarsToHold.ToString() + " bars"
         
-    let name = String.concat " " (["B&H"; holdPeriod; stopLossPortion] |> List.filter (fun x -> x <> ""))
+    let name = String.concat " " (["Buy"; holdPeriod; stopLossPortion] |> List.filter (fun x -> x <> ""))
         
     let openDay, openDayIndex = findNextDayBarAndIndex signal prices
     
@@ -79,11 +79,11 @@ let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPe
         let closeDayReached = bar.Date >= closeBar.Date
         (index, bar, stopPriceReached, closeDayReached)
     
-    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
     
-let buyAndHoldWithSignalOpenAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithSignalOpenAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
-    let name = "B&H with signal open as stop"
+    let name = "Buy and use signal open as stop"
         
     let closeBar = prices.Last        
     let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> fst |> fun (bar:PriceBar) -> bar.Open
@@ -93,11 +93,11 @@ let buyAndHoldWithSignalOpenAsStop verbose (signal:SignalWithPriceProperties.Row
         let closeDayReached = bar.Date >= closeBar.Date
         (index, bar, stopPriceReached, closeDayReached)
     
-    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
     
-let buyAndHoldWithSignalCloseAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithSignalCloseAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
-    let name = "B&H with signal close as stop"
+    let name = "Buy and use signal close as stop"
         
     let closeBar = prices.Last        
     let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> fst |> fun (bar:PriceBar) -> bar.Close
@@ -107,12 +107,12 @@ let buyAndHoldWithSignalCloseAsStop verbose (signal:SignalWithPriceProperties.Ro
         let closeDayReached = bar.Date >= closeBar.Date
         (index, bar, stopPriceReached, closeDayReached)
     
-    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
     
     
-let buyAndHoldWithTrailingStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithTrailingStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
-    let name = "B&H with trailing stop"
+    let name = "Buy and use trailing stop"
     let maxPriceSeen = ref 0m
     
     let closeBar = prices.Last
@@ -126,7 +126,7 @@ let buyAndHoldWithTrailingStop verbose (signal:SignalWithPriceProperties.Row,pri
         
         (index, bar, stopPriceReached, closeDayReached)
     
-    buyAndHoldStrategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
 
 let private prepareSignalsForTradeSimulations (priceFunc:string -> Async<PriceBars>) signals = async {
     
