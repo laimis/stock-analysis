@@ -188,3 +188,17 @@ let ``Buy NET on 2021-05-20 and use 5% stop loss vs 5% trailing stop loss``() = 
     outcome.Closed |> should equal "2021-07-15"
     outcome.PercentGain |> round |> should equal 0.3667m
 }
+
+[<Fact>]
+let ``Stop loss percent should be 1 or less``() = async {
+    try
+        do! [Trading.buyAndHoldStrategyWithStopLossPercent false None (Some 1.1m)]
+            |> runTradesSetup
+            |> Async.Ignore
+            
+        failwith "Above should have failed"
+    with
+        | e -> e.Message |> should equal "Stop loss percent 1.1 is greater than 1"
+}
+    
+    

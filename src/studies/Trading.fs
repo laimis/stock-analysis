@@ -41,6 +41,11 @@ let buyAndHoldStrategyWithGenericStopLoss verbose name stopLossReachedFunc (sign
 
 let buyAndHoldStrategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
+    // validate stop loss percent to be less than or equal to 1
+    match stopLossPercent with
+    | Some stopLossPercent when stopLossPercent > 1m -> failwith $"Stop loss percent {stopLossPercent} is greater than 1"
+    | _ -> ()
+    
     let stopLossPortion =
         match stopLossPercent with
         | None -> ""
