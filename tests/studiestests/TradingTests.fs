@@ -9,8 +9,8 @@ open testutils
 
 let round (number:decimal) = Math.Round(number, 4)
 
-let runTradesSetup strategies = async {
-    let signals = [Signal.Row(date = "2022-08-05", ticker = "NET", screenerid = 1)]
+let runTradesSetupWithSpecificEntryDate date strategies = async {
+    let signals = [Signal.Row(date = date, ticker = "NET", screenerid = 1)]
     
     let getPricesFunc = DataHelpersTests.setupGetPricesWithNoBrokerageAccess
     
@@ -21,15 +21,17 @@ let runTradesSetup strategies = async {
     return outcomes
 }
 
+let runTradesSetup = runTradesSetupWithSpecificEntryDate "2022-08-05"
+
 [<Fact>]
 let ``Buy & Hold with trailing stop``() = async {
     let strategy = Trading.buyAndHoldWithTrailingStop false
     
     let! outcomes = [strategy] |> runTradesSetup
     
-    outcomes |> Seq.length |> should equal 1
+    outcomes |> List.length |> should equal 1
     
-    let outcome = outcomes |> Seq.head
+    let outcome = outcomes[0]
     
     outcome.Opened |> should equal "2022-08-08"
     outcome.Closed |> should equal "2022-08-17"
@@ -47,9 +49,9 @@ let ``Buy & Hold with signal close as stop``() = async {
     
     let! outcomes = [strategy] |> runTradesSetup
     
-    outcomes |> Seq.length |> should equal 1
+    outcomes |> List.length |> should equal 1
     
-    let outcome = outcomes |> Seq.head
+    let outcome = outcomes[0]
     
     outcome.Opened |> should equal "2022-08-08"
     outcome.Closed |> should equal "2022-08-08"
@@ -67,9 +69,9 @@ let ``Buy & Hold with signal open as stop``() = async {
     
     let! outcomes = [strategy] |> runTradesSetup
     
-    outcomes |> Seq.length |> should equal 1
+    outcomes |> List.length |> should equal 1
     
-    let outcome = outcomes |> Seq.head
+    let outcome = outcomes[0]
     
     outcome.Opened |> should equal "2022-08-08"
     outcome.Closed |> should equal "2022-08-19"
@@ -87,9 +89,9 @@ let ``Buy & Hold with stop loss percent``() = async {
     
     let! outcomes = [strategy] |> runTradesSetup
     
-    outcomes |> Seq.length |> should equal 1
+    outcomes |> List.length |> should equal 1
     
-    let outcome = outcomes |> Seq.head
+    let outcome = outcomes[0]
     
     outcome.Opened |> should equal "2022-08-08"
     outcome.Closed |> should equal "2022-08-22"
@@ -108,9 +110,9 @@ let ``Buy & Hold for a fixed number of bars``() = async {
     
     let! outcomes = [strategy] |> runTradesSetup
     
-    outcomes |> Seq.length |> should equal 1
+    outcomes |> List.length |> should equal 1
     
-    let outcome = outcomes |> Seq.head
+    let outcome = outcomes[0]
     
     outcome.Opened |> should equal "2022-08-08"
     outcome.Closed |> should equal "2022-09-20"
@@ -131,7 +133,7 @@ let ``Trade output summary works`` () = async {
     
     let! outcomes = strategies |> runTradesSetup
     
-    let outcome = outcomes |> Seq.head
+    let outcome = outcomes[0]
     
     let summary = TradeSummary.create outcome.Strategy outcomes
     
@@ -153,5 +155,36 @@ let ``Buy and hold with stop loss and number of bars really big, does not fail``
     
     let! outcomes = [strategy] |> runTradesSetup
     
-    outcomes |> Seq.length |> should equal 1
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Closed |> should equal "2022-11-30"
+}
+
+[<Fact>]
+let ``Buy NET on 2021-05-20 and use 5% stop loss vs 5% trailing stop loss``() = async {
+    let strategy = Trading.buyAndHoldStrategyWithStopLossPercent false None (Some 0.05m)
+    
+    let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2021-05-20"
+    
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Opened |> should equal "2021-05-21"
+    outcome.Closed |> should equal "2022-05-06"
+    outcome.PercentGain |> round |> should equal -0.1266m
+    
+    let strategy = Trading.buyAndHoldWithTrailingStop false
+    
+    let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2021-05-20"
+    
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Opened |> should equal "2021-05-21"
+    outcome.Closed |> should equal "2021-07-15"
+    outcome.PercentGain |> round |> should equal 0.3667m
 }

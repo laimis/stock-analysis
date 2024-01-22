@@ -169,6 +169,7 @@ let runTrades getPricesFunc signals strategies = async {
             )
         )
         |> Seq.concat
+        |> Seq.toList
         
     return allOutcomes
 }
