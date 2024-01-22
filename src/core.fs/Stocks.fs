@@ -2,7 +2,6 @@ namespace core.fs.Stocks
 
 open System
 open System.Collections.Generic
-open System.IO.Compression
 open core.Shared
 
 type StockPositionId = StockPositionId of Guid
@@ -31,6 +30,12 @@ type StockPositionStopTransaction = {
     Date: DateTimeOffset
 }
 
+type StockPositionRiskTransaction = {
+    TransactionId: Guid
+    RiskAmount: decimal
+    Date: DateTimeOffset
+}
+
 type PLTransaction = {
     Ticker:Ticker
     Date: DateTimeOffset
@@ -44,6 +49,7 @@ type PLTransaction = {
 type StockPositionTransaction =
     | Share of StockPositionShareTransaction
     | Stop of StockPositionStopTransaction
+    | Risk of StockPositionRiskTransaction
 
 type StockPositionType =
     | Long
@@ -201,7 +207,8 @@ module StockPosition =
             { p with Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionRiskAmountSet as x ->
-            { p with RiskAmount = Some x.RiskAmount; Version = p.Version + 1; Events = p.Events @ [x]  }
+            let newTransactions = p.Transactions @ [ Risk { TransactionId = x.Id; RiskAmount = x.RiskAmount; Date = x.When } ]
+            { p with Transactions = newTransactions; RiskAmount = Some x.RiskAmount; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionGradeAssigned as x ->
             let gradeValue = x.Grade |> TradeGrade |> Some
@@ -296,7 +303,6 @@ module StockPosition =
         apply e stockPosition
             
     let setStop stopPrice date (stockPosition:StockPositionState) =
-        //if stockPosition.IsClosed then failwith "Cannot set stop price on closed position"
         
         let withStop =
             match stopPrice with
@@ -613,15 +619,6 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.Labels = stockPosition.Labels |> Seq.map id
     
     member this.Events =
-        // we want to expose buys, sells, and stop sets
-        // and return the object with these properties:
-        // id: string,
-      // date: string,
-      // value: number | null,
-      // type: string,
-      // description: string,
-      // quantity: number | null
-        
         stockPosition.Transactions
         |> List.map (fun t ->
             match t with
@@ -629,6 +626,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                let ``type`` = match s.Type with | Buy -> "Buy" | Sell -> "Sell" |> _.ToLower()
                let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
                {|id = s.TransactionId; date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
+            | Risk r ->
+                let ``type`` = "risk"
+                let description = $"risk amount set to {r.RiskAmount}"
+                {|id = r.TransactionId; date = r.Date; value = r.RiskAmount; ``type`` = ``type``; description = description; quantity = 0m |}
             | Stop s ->
                let ``type`` = "stop"
                let description =

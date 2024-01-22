@@ -2,7 +2,16 @@
   <div class="mb-3">
     <div class="row">
       <div class="col-md-3"><div class="stat-label">Cost/Share</div><div>{{ _position.averageCostPerShare | currency}}</div></div>
-      <div class="col-md-3"><div class="stat-label">Number of Shares</div><div>{{ _position.numberOfShares !== 0 ? _position.numberOfShares : _position.completedPositionShares }}</div></div>
+      <div class="col-md-3">
+        <div class="stat-label">Number of Shares</div>
+        <div>
+        @if (_position.isClosed) {
+          {{ _position.numberOfShares }}
+        } @else {
+          {{ _position.numberOfShares }} / {{ _position.completedPositionShares }}
+        }
+        </div>
+      </div>
       <div class="col-md-3"><div class="stat-label">Cost</div><div>{{ _position.cost | currency}}</div></div>
       <div class="col-md-3"><div class="stat-label">Opened</div><div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div></div>
   </div>
@@ -87,7 +96,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="row">
     @if (positionProfitPoints.length > 0) {
       <div class="col">
