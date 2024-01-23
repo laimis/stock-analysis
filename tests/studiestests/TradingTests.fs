@@ -41,7 +41,7 @@ let ``Buy & Hold with trailing stop``() = async {
     outcome.ClosePrice |> should equal 74.51m
     outcome.PercentGain |> round |> should equal 0.0011m
     outcome.NumberOfDaysHeld |> should equal 9
-    outcome.Strategy |> should equal "Buy and use trailing stop"
+    outcome.Strategy |> should equal "Buy and use trailing stop, SL of 0.05%"
 }
 
 [<Fact>]
@@ -250,7 +250,7 @@ let ``Short position with trailing stop works``() = async {
     outcome.ClosePrice |> should equal 66.38m
     outcome.PercentGain |> round |> should equal 0.298m
     outcome.NumberOfDaysHeld |> should equal 18
-    outcome.Strategy |> should equal "Sell and use trailing stop"
+    outcome.Strategy |> should equal "Sell and use trailing stop, SL of 0.1%"
 }
 
 [<Fact(Skip = "Run this to troubleshoot specific studies not working")>]
