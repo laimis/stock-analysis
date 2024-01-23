@@ -186,7 +186,7 @@ module PositionAnalysis =
                 tickerOutcomes |> TickerOutcomes.filter [
                     (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
                     (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
-                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && riskAmountAnalysis.mean / o.Value < 0.9m)
+                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && (riskAmountAnalysis.mean / o.Value < 0.9m || riskAmountAnalysis.mean / o.Value > 1.1m))
                 ]
             )
             AnalysisOutcomeEvaluation(
