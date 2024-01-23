@@ -209,6 +209,32 @@ let ``Short positions with stop loss should work``() = async {
 }
 
 [<Fact>]
+let ``Short positions with stop loss not set, should go to the end or to number of bars``() = async {
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Short None None
+    
+    let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2022-04-22"
+    
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Opened |> should equal "2022-04-25"
+    outcome.Closed |> should equal "2022-11-30"
+    
+    // now try with number of bars
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Short (Some 20) None
+    
+    let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2022-04-22"
+    
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Opened |> should equal "2022-04-25"
+    outcome.Closed |> should equal "2022-05-23"
+}
+
+[<Fact>]
 let ``Short position with trailing stop works``() = async {
     let strategy = Trading.strategyWithTrailingStop false StockPositionType.Short 0.1m
     
@@ -226,4 +252,33 @@ let ``Short position with trailing stop works``() = async {
     outcome.NumberOfDaysHeld |> should equal 18
     outcome.Strategy |> should equal "Sell and use trailing stop"
 }
+
+[<Fact(Skip = "Run this to troubleshoot specific studies not working")>]
+let ``Specific test``() = async {
+    let signals = [Signal.Row(date = "2023-08-16", ticker = "PSFE", screenerid = 1)]
     
+    let mock =
+        {
+            new core.fs.Adapters.Brokerage.IBrokerageGetPriceHistory with 
+                member this.GetPriceHistory userState ticker priceFrequency start ``end`` = task {
+                    return [||] |> core.fs.Adapters.Stocks.PriceBars |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
+                }
+        }
+        
+    let user = core.fs.Accounts.User.Create("email", "first", "last")
+    
+    let getPricesFunc = DataHelpers.getPricesWithBrokerage user mock "d:\\studies\\"
+    
+    let! transformed = PriceTransformation.transform getPricesFunc signals
+    
+    let strategies = [studies.Trading.strategyWithStopLossPercent false StockPositionType.Short None None]
+    
+    let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv "d:\\studies\\") transformed.Rows strategies
+    
+    let outcome = outcomes |> List.head
+    
+    // PSFE Sell: 2023-08-17 -> 2023-08-17, 13.49 -> 12.29: profit of 8.9%, signal: Top Losers
+    
+    outcome.Opened |> should equal "2023-08-17"
+    outcome.Closed |> should equal "2023-08-17"
+}

@@ -1,5 +1,6 @@
 module studies.Trading
 
+open System
 open core.fs.Adapters.Stocks
 open studies.Types
 
@@ -79,7 +80,10 @@ let strategyWithStopLossPercent verbose positionType numberOfBarsToHold (stopLos
             
     let stopPrice =
         match stopLossPercent with
-        | None -> 0m
+        | None ->
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long -> 0m
+            | core.fs.Stocks.StockPositionType.Short -> Decimal.MaxValue
         | Some stopLossPercent ->
             let multiplier =
                 match positionType with
@@ -136,7 +140,8 @@ let strategyWithTrailingStop verbose positionType stopLossPercent (signal:Signal
         | core.fs.Stocks.StockPositionType.Long -> "Buy"
         | core.fs.Stocks.StockPositionType.Short -> "Sell"
         
-    let name = $"{buyOrSell} and use trailing stop"
+    let name = $"{buyOrSell} and use trailing stop, SL of {stopLossPercent}%%"
+    
     let stopLossReferencePrice = ref 0m
     
     let closeBar = prices.Last
@@ -182,6 +187,7 @@ let private prepareSignalsForTradeSimulations (priceFunc:string -> Async<PriceBa
             | None -> None
             | Some _ -> Some (r, prices)
         )
+        |> Seq.toList
     
     printfn "Ensured that data has prices"
     
@@ -199,14 +205,11 @@ let runTrades getPricesFunc signals strategies = async {
     printfn "Executing trades..."
     
     let allOutcomes =
-        signalsWithPriceBars
-        |> Seq.map (fun signalWithPriceBars ->
-            strategies |> Seq.map (fun strategy ->
-                strategy signalWithPriceBars
-            )
+        strategies
+        |> List.map (fun strategy ->
+            signalsWithPriceBars |> List.map strategy
         )
-        |> Seq.concat
-        |> Seq.toList
+        |> List.concat
         
     return allOutcomes
 }
