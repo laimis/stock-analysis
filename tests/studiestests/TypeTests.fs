@@ -67,7 +67,7 @@ let ``Manual trade outcomes``() =
             TradeOutcomeOutput.Row(
                     screenerid = 1, date = "2022-08-08", ticker = "NET",
                     gap = 0m, sma20 = 0m, sma50 = 0m, sma150 = 0m, sma200 = 0m,
-                    strategy = "B&H with trailing stop",
+                    strategy = "B&H with trailing stop", longOrShort = "long",
                     opened = "2022-08-08", openPrice = 74.425m,
                     closed = "2022-08-17", closePrice = 74.51m,
                     percentGain = g,

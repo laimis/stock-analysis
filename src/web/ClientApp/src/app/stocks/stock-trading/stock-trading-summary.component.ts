@@ -29,9 +29,9 @@ export class StockTradingSummaryComponent {
   @Input()
   set positions(value:PositionInstance[]) {
     this._positions = value
-    this.totalCost = this.sum(value, p => p.averageCostPerShare * p.numberOfShares)
-    this.totalRiskedAmount = this.sum(value, p => p.costAtRiskBasedOnStopPrice)
-    this.totalProfit = this.sum(value, p => this.getUnrealizedProfit(p))
+    this.totalCost = this.sum(value, (p:PositionInstance) => p.averageCostPerShare * p.numberOfShares)
+    this.totalRiskedAmount = this.sum(value, (p:PositionInstance) => p.costAtRiskBasedOnStopPrice)
+    this.totalProfit = this.sum(value, (p:PositionInstance) => this.getUnrealizedProfit(p))
     this.positionGroups = this.breakdownByStrategy(value)
   }
   get positions():PositionInstance[] {
@@ -55,7 +55,7 @@ export class StockTradingSummaryComponent {
     return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profit : 0
   }
 
-  getSortFunc(property) : (a:PositionGroup, b:PositionGroup) => number {
+  getSortFunc(property:string) : (a:PositionGroup, b:PositionGroup) => number {
     switch (property) {
       case 'cost':
         return (a, b) => b.cost - a.cost
@@ -75,14 +75,14 @@ export class StockTradingSummaryComponent {
 
     this.sortProperty = property
 
-    var sortFunc = this.getSortFunc(property)
+    const sortFunc = this.getSortFunc(property)
 
-    var adjustedFunc = (a, b) => this.sortDirection * sortFunc(a, b)
+    const adjustedFunc = (a:PositionGroup, b:PositionGroup) => this.sortDirection * sortFunc(a, b)
 
     this.positionGroups.sort(adjustedFunc)
   }
 
-  breakdownByStrategy(positions) : PositionGroup[] {
+  breakdownByStrategy(positions:PositionInstance[]) : PositionGroup[] {
     console.log("breaking down positions")
 
     if (!positions) return []
@@ -101,8 +101,8 @@ export class StockTradingSummaryComponent {
 
     // custom groups
     strategyGroups["allbutlongterm"] = positions.filter(p => !isLongTermStrategy(this.getStrategy(p)))
-    strategyGroups["long"] = positions.filter((p:PositionInstance) => p.isShort === false)
-    strategyGroups["short"] = positions.filter((p:PositionInstance) => p.isShort === true)
+    strategyGroups["long"] = positions.filter((p:PositionInstance) => p.isShort === false && !isLongTermStrategy(this.getStrategy(p)))
+    strategyGroups["short"] = positions.filter((p:PositionInstance) => p.isShort === true && !isLongTermStrategy(this.getStrategy(p)))
 
     let groupsArray = []
 

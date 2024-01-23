@@ -28,7 +28,7 @@ type SignalWithPriceProperties =
     
 type TradeOutcomeOutput =
     CsvProvider<
-        Sample = "screenerid (int), date (string), ticker (string), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal), strategy (string), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+        Sample = "screenerid (int), date (string), ticker (string), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal), strategy (string), longOrShort (string), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
         HasHeaders=true
     >
     
@@ -53,7 +53,7 @@ module Signal =
         let messageIfInvalidDate = fun (r:Signal.Row) -> $"date is invalid for record {r.Screenerid}, {r.Ticker}"
         verifyCondition invalidDate messageIfInvalidDate
         
-        let invalidTicker = fun (r:Signal.Row) -> System.String.IsNullOrWhiteSpace(r.Ticker)
+        let invalidTicker = fun (r:Signal.Row) -> String.IsNullOrWhiteSpace(r.Ticker)
         let messageIfInvalidTicker = fun (r:Signal.Row) -> $"ticker is blank for record {r.Screenerid}, {r.Date}"
         verifyCondition invalidTicker messageIfInvalidTicker
         
@@ -100,15 +100,20 @@ module Unified =
     
 module TradeOutcomeOutput =
     
-    let create name (signal:SignalWithPriceProperties.Row) (openBar:PriceBar) (closeBar:PriceBar) =
+    let create strategy positionType (signal:SignalWithPriceProperties.Row) (openBar:PriceBar) (closeBar:PriceBar) =
         
         let openPrice = openBar.Open
         let closePrice = closeBar.Close
         
-        // calculate gain percentage
-        let gain = (closePrice - openPrice) / openPrice
-        
         let daysHeld = closeBar.Date - openBar.Date
+        
+        let longOrShortString, gainFactor =
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long -> "long", 1m
+            | core.fs.Stocks.StockPositionType.Short -> "short", -1m
+        
+        // calculate gain percentage
+        let gain = (closePrice - openPrice) / openPrice * gainFactor
         
         TradeOutcomeOutput.Row(
             screenerid=signal.Screenerid,
@@ -119,7 +124,8 @@ module TradeOutcomeOutput =
             sma50=signal.Sma50,
             sma150=signal.Sma150,
             sma200=signal.Sma200,
-            strategy=name,
+            strategy=strategy,
+            longOrShort=longOrShortString,
             opened=openBar.DateStr,
             openPrice=openPrice,
             closed=closeBar.DateStr,
@@ -151,10 +157,10 @@ module TradeSummary =
         let numberOfWinners = winners |> Seq.length
         let numberOfLosers = losers |> Seq.length
         let win_pct = decimal numberOfWinners / decimal total
-        let avg_win = winners |> Seq.averageBy (fun o -> o.PercentGain)
-        let avg_loss = losers |> Seq.averageBy (fun o -> o.PercentGain)
-        let avg_gain_loss = avg_win / avg_loss |> System.Math.Abs
-        let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> System.Math.Abs)
+        let avg_win = winners |> Seq.averageBy (_.PercentGain)
+        let avg_loss = losers |> Seq.averageBy (_.PercentGain)
+        let avg_gain_loss = avg_win / avg_loss |> Math.Abs
+        let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> Math.Abs)
 
         let gains = outcomes |> Seq.map (fun o -> o.PercentGain)
         let gainDistribution = core.fs.Services.Analysis.DistributionStatistics.calculate gains

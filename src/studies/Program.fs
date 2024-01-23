@@ -22,9 +22,6 @@ let studiesDirectory =
     
 let generateFilePathInStudiesDirectory filename = $"{studiesDirectory}\\{filename}"
 
-// -i "https://localhost:5001/screeners/29/results/export" -o signals_topgainers.csv
-// -pt -f signals_topgainers.csv
-
 let actions = [
     if ServiceHelper.importUrl().IsSome then fun () -> async {
         let importUrl = ServiceHelper.importUrl() |> Option.get
@@ -52,13 +49,13 @@ let actions = [
         let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
         
         let strategies = [
-            Trading.strategyWithStopLossPercent false (Some 5) None
-            Trading.strategyWithStopLossPercent false (Some 10) None
-            Trading.strategyWithStopLossPercent false (Some 30) None
-            Trading.strategyWithStopLossPercent false (Some 60) None
-            Trading.strategyWithStopLossPercent false (Some 90) None
-            Trading.strategyWithStopLossPercent false None None
-            Trading.strategyWithTrailingStop false
+            Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 5) None
+            Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 10) None
+            Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 30) None
+            Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 60) None
+            Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 90) None
+            Trading.strategyWithStopLossPercent false core.fs.Stocks.Long None None
+            Trading.strategyWithTrailingStop false core.fs.Stocks.Long 0.05m
         ]
         
         let signals =

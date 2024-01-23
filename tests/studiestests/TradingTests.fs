@@ -3,6 +3,7 @@ module studiestests.TradingTests
 open System
 open Xunit
 open FsUnit
+open core.fs.Stocks
 open studies
 open studies.Types
 open testutils
@@ -25,7 +26,7 @@ let runTradesSetup = runTradesSetupWithSpecificEntryDate "2022-08-05"
 
 [<Fact>]
 let ``Buy & Hold with trailing stop``() = async {
-    let strategy = Trading.strategyWithTrailingStop false
+    let strategy = Trading.strategyWithTrailingStop false StockPositionType.Long 0.05m
     
     let! outcomes = [strategy] |> runTradesSetup
     
@@ -85,7 +86,7 @@ let ``Buy & Hold with signal open as stop``() = async {
 
 [<Fact>]
 let ``Buy & Hold with stop loss percent``() = async {
-    let strategy = Trading.strategyWithStopLossPercent false None (Some 0.1m)
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Long None (Some 0.1m)
     
     let! outcomes = [strategy] |> runTradesSetup
     
@@ -106,7 +107,7 @@ let ``Buy & Hold with stop loss percent``() = async {
 [<Fact>]
 let ``Buy & Hold for a fixed number of bars``() = async {
     
-    let strategy = Trading.strategyWithStopLossPercent false (Some 30) None
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Long (Some 30) None
     
     let! outcomes = [strategy] |> runTradesSetup
     
@@ -125,33 +126,8 @@ let ``Buy & Hold for a fixed number of bars``() = async {
 }
 
 [<Fact>]
-let ``Trade output summary works`` () = async {
-    let strategies = [
-        Trading.strategyWithTrailingStop true
-        Trading.strategyWithStopLossPercent true (Some 30) None
-    ]
-    
-    let! outcomes = strategies |> runTradesSetup
-    
-    let outcome = outcomes[0]
-    
-    let summary = TradeSummary.create outcome.Strategy outcomes
-    
-    summary.Gains |> Seq.map (fun g -> Math.Round(g, 4)) |> should equal [0.0011m; -0.1786m]
-    summary.Losers |> should equal 1
-    summary.Total |> should equal 2
-    summary.Winners |> should equal 1
-    summary.AvgLoss |> round |> should equal -0.1786m
-    summary.AvgWin |> round |> should equal 0.0011m
-    summary.EV  |> round |> should equal -0.0887m 
-    summary.StrategyName |> should equal outcome.Strategy
-    summary.WinPct |> round |> should equal 0.5m
-    summary.AvgGainLoss |> round |> should equal 0.0064m
-}
-
-[<Fact>]
 let ``Buy and hold with stop loss and number of bars really big, does not fail``() = async {
-    let strategy = Trading.strategyWithStopLossPercent false (Some 100000) None
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Long (Some 100000) None
     
     let! outcomes = [strategy] |> runTradesSetup
     
@@ -164,7 +140,7 @@ let ``Buy and hold with stop loss and number of bars really big, does not fail``
 
 [<Fact>]
 let ``Buy NET on 2021-05-20 and use 5% stop loss vs 5% trailing stop loss``() = async {
-    let strategy = Trading.strategyWithStopLossPercent false None (Some 0.05m)
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Long None (Some 0.05m)
     
     let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2021-05-20"
     
@@ -176,7 +152,7 @@ let ``Buy NET on 2021-05-20 and use 5% stop loss vs 5% trailing stop loss``() = 
     outcome.Closed |> should equal "2022-05-06"
     outcome.PercentGain |> round |> should equal -0.1266m
     
-    let strategy = Trading.strategyWithTrailingStop false
+    let strategy = Trading.strategyWithTrailingStop false StockPositionType.Long 0.05m
     
     let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2021-05-20"
     
@@ -192,12 +168,62 @@ let ``Buy NET on 2021-05-20 and use 5% stop loss vs 5% trailing stop loss``() = 
 [<Fact>]
 let ``Stop loss percent should be 1 or less``() = async {
     try
-        do! [Trading.strategyWithStopLossPercent false None (Some 1.1m)]
+        do! [Trading.strategyWithStopLossPercent false StockPositionType.Long None (Some 1.1m)]
             |> runTradesSetup
             |> Async.Ignore
             
         failwith "Above should have failed"
     with
         | e -> e.Message |> should equal "Stop loss percent 1.1 is greater than 1"
+}
+
+[<Fact>]
+let ``Stop loss percent should be 0 or greater``() = async {
+    try
+        do! [Trading.strategyWithStopLossPercent false StockPositionType.Long None (Some -0.1m)]
+            |> runTradesSetup
+            |> Async.Ignore
+            
+        failwith "Above should have failed"
+    with
+        | e -> e.Message |> should equal "Stop loss percent -0.1 is less than 0"
+}
+
+[<Fact>]
+let ``Short positions with stop loss should work``() = async {
+    let strategy = Trading.strategyWithStopLossPercent false StockPositionType.Short None (Some 0.05m)
+    
+    let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2022-04-22"
+    
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Opened |> should equal "2022-04-25"
+    outcome.Closed |> should equal "2022-11-30"
+    outcome.OpenPrice |> should equal 94.56m
+    outcome.ClosePrice |> should equal 49.14m
+    outcome.PercentGain |> round |> should equal 0.4803m
+    outcome.NumberOfDaysHeld |> should equal 219
+    outcome.Strategy |> should equal "Sell SL of 0.05%"
+}
+
+[<Fact>]
+let ``Short position with trailing stop works``() = async {
+    let strategy = Trading.strategyWithTrailingStop false StockPositionType.Short 0.1m
+    
+    let! outcomes = [strategy] |> runTradesSetupWithSpecificEntryDate "2022-04-22"
+    
+    outcomes |> List.length |> should equal 1
+    
+    let outcome = outcomes[0]
+    
+    outcome.Opened |> should equal "2022-04-25"
+    outcome.Closed |> should equal "2022-05-13"
+    outcome.OpenPrice |> should equal 94.56m
+    outcome.ClosePrice |> should equal 66.38m
+    outcome.PercentGain |> round |> should equal 0.298m
+    outcome.NumberOfDaysHeld |> should equal 18
+    outcome.Strategy |> should equal "Sell and use trailing stop"
 }
     

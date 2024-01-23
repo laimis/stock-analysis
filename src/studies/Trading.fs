@@ -3,6 +3,12 @@ module studies.Trading
 open core.fs.Adapters.Stocks
 open studies.Types
 
+let private validateStopLossPercent stopLossPercent =
+    match stopLossPercent with
+    | Some stopLossPercent when stopLossPercent > 1m -> failwith $"Stop loss percent {stopLossPercent} is greater than 1"
+    | Some stopLossPercent when stopLossPercent < 0m -> failwith $"Stop loss percent {stopLossPercent} is less than 0"
+    | _ -> ()
+        
 let private findNextDayBarAndIndex (signal:SignalWithPriceProperties.Row) (prices:PriceBars) =
     match prices.TryFindByDate signal.Date with
     | None -> failwith $"Could not find the price bar for the {signal.Ticker} @ {signal.Date}, unexpected"
@@ -13,7 +19,7 @@ let private findNextDayBarAndIndex (signal:SignalWithPriceProperties.Row) (price
         | true -> failwith $"No open day available for {signal.Ticker} @ {signal.Date}"
         | false -> (prices.Bars[nextDayIndex], nextDayIndex)
 
-let strategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithGenericStopLoss verbose name positionType stopLossReachedFunc (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     let openBar, openDayIndex = findNextDayBarAndIndex signal prices
     
     if verbose then printfn $"Open bar for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} @ %A{openBar.Open}"
@@ -37,14 +43,11 @@ let strategyWithGenericStopLoss verbose name stopLossReachedFunc (signal:SignalW
             if verbose then printfn $"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{closeBar.Date} because {reason}"
             closeBar
     
-    TradeOutcomeOutput.create name signal openBar closeBar
+    TradeOutcomeOutput.create name positionType signal openBar closeBar
 
-let strategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithStopLossPercent verbose positionType numberOfBarsToHold (stopLossPercent:decimal option) (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
-    // validate stop loss percent to be less than or equal to 1
-    match stopLossPercent with
-    | Some stopLossPercent when stopLossPercent > 1m -> failwith $"Stop loss percent {stopLossPercent} is greater than 1"
-    | _ -> ()
+    validateStopLossPercent stopLossPercent
     
     let stopLossPortion =
         match stopLossPercent with
@@ -56,7 +59,12 @@ let strategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:deci
         | None -> ""
         | Some numberOfBarsToHold -> "hold for " + numberOfBarsToHold.ToString() + " bars"
         
-    let name = String.concat " " (["Buy"; holdPeriod; stopLossPortion] |> List.filter (fun x -> x <> ""))
+    let buyOrSell =
+        match positionType with
+        | core.fs.Stocks.StockPositionType.Long -> "Buy"
+        | core.fs.Stocks.StockPositionType.Short -> "Sell"
+        
+    let name = String.concat " " ([buyOrSell; holdPeriod; stopLossPortion] |> List.filter (fun x -> x <> ""))
         
     let openDay, openDayIndex = findNextDayBarAndIndex signal prices
     
@@ -72,14 +80,23 @@ let strategyWithStopLossPercent verbose numberOfBarsToHold (stopLossPercent:deci
     let stopPrice =
         match stopLossPercent with
         | None -> 0m
-        | Some stopLossPercent -> openDay.Open * (1m - stopLossPercent)
+        | Some stopLossPercent ->
+            let multiplier =
+                match positionType with
+                | core.fs.Stocks.StockPositionType.Long -> 1m - stopLossPercent
+                | core.fs.Stocks.StockPositionType.Short -> 1m + stopLossPercent
+            openDay.Open * multiplier
     
     let stopLossFunc (index, bar:PriceBar) =
-        let stopPriceReached = bar.Close < stopPrice
+        let stopPriceReached =
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long -> bar.Close < stopPrice
+            | core.fs.Stocks.StockPositionType.Short -> bar.Close > stopPrice
+            
         let closeDayReached = bar.Date >= closeBar.Date
         (index, bar, stopPriceReached, closeDayReached)
     
-    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name positionType stopLossFunc (signal,prices)
     
 let strategyWithSignalOpenAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
@@ -93,7 +110,7 @@ let strategyWithSignalOpenAsStop verbose (signal:SignalWithPriceProperties.Row,p
         let closeDayReached = bar.Date >= closeBar.Date
         (index, bar, stopPriceReached, closeDayReached)
     
-    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
     
 let strategyWithSignalCloseAsStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
@@ -107,26 +124,41 @@ let strategyWithSignalCloseAsStop verbose (signal:SignalWithPriceProperties.Row,
         let closeDayReached = bar.Date >= closeBar.Date
         (index, bar, stopPriceReached, closeDayReached)
     
-    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
     
     
-let strategyWithTrailingStop verbose (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
+let strategyWithTrailingStop verbose positionType stopLossPercent (signal:SignalWithPriceProperties.Row,prices:PriceBars) =
     
-    let name = "Buy and use trailing stop"
-    let maxPriceSeen = ref 0m
+    stopLossPercent |> Some |> validateStopLossPercent
+    
+    let buyOrSell = 
+        match positionType with
+        | core.fs.Stocks.StockPositionType.Long -> "Buy"
+        | core.fs.Stocks.StockPositionType.Short -> "Sell"
+        
+    let name = $"{buyOrSell} and use trailing stop"
+    let stopLossReferencePrice = ref 0m
     
     let closeBar = prices.Last
     
     let stopLossFunc (index, bar:PriceBar) =
         let closeDayReached = bar.Date >= closeBar.Date
         
-        if bar.Close > maxPriceSeen.Value then maxPriceSeen.Value <- bar.Close
+        if stopLossReferencePrice.Value = 0m then
+            stopLossReferencePrice.Value <- bar.Close
         
-        let stopPriceReached = bar.Close < maxPriceSeen.Value * 0.95m
+        let refValue, stopReached =
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long ->
+                System.Math.Max(bar.Close, stopLossReferencePrice.Value), bar.Close < stopLossReferencePrice.Value * (1m - stopLossPercent)
+            | core.fs.Stocks.StockPositionType.Short ->
+                System.Math.Min(bar.Close, stopLossReferencePrice.Value), bar.Close > stopLossReferencePrice.Value * (1m + stopLossPercent)
+                
+        stopLossReferencePrice.Value <- refValue
         
-        (index, bar, stopPriceReached, closeDayReached)
+        (index, bar, stopReached, closeDayReached)
     
-    strategyWithGenericStopLoss verbose name stopLossFunc (signal,prices)
+    strategyWithGenericStopLoss verbose name positionType stopLossFunc (signal,prices)
 
 let private prepareSignalsForTradeSimulations (priceFunc:string -> Async<PriceBars>) signals = async {
     
